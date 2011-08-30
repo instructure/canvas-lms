@@ -118,7 +118,7 @@ class AssignmentGroupsController < ApplicationController
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.find_all_by_id(order).map(&:assignment_group_id))).uniq.compact
       Assignment.update_all("assignment_group_id=#{@group.id}", :id => order, :context_id => @context.id, :context_type => @context.class.to_s)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
-      AssignmentGroup.update_all({:updated_at => Time.now}, {:id => group_ids})
+      AssignmentGroup.update_all({:updated_at => Time.now.utc}, {:id => group_ids})
       ids = @group.assignments.map(&:id)
       @context.recompute_student_scores rescue nil
       respond_to do |format|
@@ -187,7 +187,7 @@ class AssignmentGroupsController < ApplicationController
         order = @new_group.assignments.active.map(&:id)
         ids_to_change = @assignment_group.assignments.active.map(&:id)
         order += ids_to_change
-        Assignment.update_all({:assignment_group_id => @new_group.id, :updated_at => Time.now}, {:id => ids_to_change}) unless ids_to_change.empty?
+        Assignment.update_all({:assignment_group_id => @new_group.id, :updated_at => Time.now.utc}, {:id => ids_to_change}) unless ids_to_change.empty?
         Assignment.find_by_id(order).update_order(order) unless order.empty?
         @new_group.touch
         @assignment_group.reload

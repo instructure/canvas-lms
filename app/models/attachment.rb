@@ -925,7 +925,7 @@ class Attachment < ActiveRecord::Base
     self.file_state = 'deleted' #destroy
     self.deleted_at = Time.now
     ContentTag.delete_for(self)
-    MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:attachment_id => self.id}) if self.id && delete_media_object
+    MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:attachment_id => self.id}) if self.id && delete_media_object
     save!
   end
   

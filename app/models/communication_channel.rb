@@ -273,7 +273,7 @@ class CommunicationChannel < ActiveRecord::Base
       self.save!
       if old_user_id
         Pseudonym.update_all({:user_id => user.id}, {:user_id => old_user_id, :unique_id => self.path})
-        User.update_all({:updated_at => Time.now}, {:id => [old_user_id, user.id]})
+        User.update_all({:updated_at => Time.now.utc}, {:id => [old_user_id, user.id]})
       end
     end
   end

@@ -222,7 +222,7 @@ class OutcomesController < ApplicationController
       if @asset
         @all_tags = ContentTag.learning_outcome_tags_for(@asset)
       end
-      @asset.class.update_all({:updated_at => Time.now}, {:id => @asset.id})
+      @asset.class.update_all({:updated_at => Time.now.utc}, {:id => @asset.id})
       render :json => @all_tags.to_json(:include => :learning_outcome)
     end
   end

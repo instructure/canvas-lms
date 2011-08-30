@@ -205,7 +205,7 @@ class Quiz < ActiveRecord::Base
       self.context_module_tag.confirm_valid_module_requirements
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
+      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
       self.quiz_submissions.each { |q| q.submission.try(:destroy); q.submission = nil; q.save }
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
       ContentTag.delete_for(Assignment.find(self.last_assignment_id)) if self.last_assignment_id

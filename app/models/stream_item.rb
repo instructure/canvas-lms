@@ -265,7 +265,7 @@ class StreamItem < ActiveRecord::Base
     # the teacher's comment even if it is farther down.
 
     # touch all the users to invalidate the cache
-    User.update_all({:updated_at => Time.now}, {:id => user_ids})
+    User.update_all({:updated_at => Time.now.utc}, {:id => user_ids})
 
     return [res]
   end
@@ -299,7 +299,7 @@ class StreamItem < ActiveRecord::Base
 
     unless user_ids.empty?
       # touch all the users to invalidate the cache
-      User.update_all({:updated_at => Time.now}, {:id => user_ids.to_a})
+      User.update_all({:updated_at => Time.now.utc}, {:id => user_ids.to_a})
     end
 
     count

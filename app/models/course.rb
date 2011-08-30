@@ -570,7 +570,7 @@ class Course < ActiveRecord::Base
         something_changed = true if section.send(field) != section.send("#{field}_was")
       end
       if something_changed
-        attr_hash = {:updated_at => Time.now}
+        attr_hash = {:updated_at => Time.now.utc}
         fields_to_possibly_rename.each { |key| attr_hash[key] = section.send(key) }
         CourseSection.update_all(attr_hash, {:id => section.id})
       end
@@ -592,8 +592,8 @@ class Course < ActiveRecord::Base
     when 'MySQL'
       Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
     else
-      Enrollment.update_all({:updated_at => Time.now}, :course_id => self.id)
-      User.update_all({:updated_at => Time.now}, "id IN (SELECT user_id FROM enrollments WHERE course_id=#{self.id})")
+      Enrollment.update_all({:updated_at => Time.now.utc}, :course_id => self.id)
+      User.update_all({:updated_at => Time.now.utc}, "id IN (SELECT user_id FROM enrollments WHERE course_id=#{self.id})")
     end
   end
   

@@ -163,7 +163,7 @@ class UnzipAttachment
     FileInContext.queue_files_to_delete(false)
     FileInContext.destroy_queued_files
     Attachment.send_later(:submit_to_scribd, @attachments.map(&:id))
-    Course.update_all({:updated_at => Time.now}, {:id => @course.id})
+    Course.update_all({:updated_at => Time.now.utc}, {:id => @course.id})
     update_progress(1.0)
   end
 

@@ -128,7 +128,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def touch_assignment_group
-    AssignmentGroup.update_all({:updated_at => Time.now}, {:id => self.assignment_group_id}) if self.assignment_group_id
+    AssignmentGroup.update_all({:updated_at => Time.now.utc}, {:id => self.assignment_group_id}) if self.assignment_group_id
     true
   end
   
@@ -703,7 +703,7 @@ class Assignment < ActiveRecord::Base
     send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
     
     changed_since_publish = !!self.available?
-    Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
+    Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
   end
   
   def update_user_from_rubric(user, assessment)

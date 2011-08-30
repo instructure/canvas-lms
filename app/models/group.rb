@@ -137,7 +137,7 @@ class Group < ActiveRecord::Base
   def close_memberships_if_deleted
     return unless self.deleted?
     memberships = self.group_memberships
-    User.update_all({:updated_at => Time.now}, {:id => memberships.map(&:user_id).uniq})
+    User.update_all({:updated_at => Time.now.utc}, {:id => memberships.map(&:user_id).uniq})
     GroupMembership.update_all({:workflow_state => 'deleted'}, {:id => memberships.map(&:id).uniq})
   end
   

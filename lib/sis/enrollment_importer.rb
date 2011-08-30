@@ -202,7 +202,7 @@ module SIS
       Enrollment.update_all({:sis_batch_id => @batch.id}, {:id => enrollments_to_update_sis_batch_ids}) if @batch && !enrollments_to_update_sis_batch_ids.empty?
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
-      Course.update_all({:updated_at => Time.now}, {:id => courses_to_touch_ids.to_a}) unless courses_to_touch_ids.empty?
+      Course.update_all({:updated_at => Time.now.utc}, {:id => courses_to_touch_ids.to_a}) unless courses_to_touch_ids.empty?
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       if incrementally_update_account_associations_user_ids.length < 10
@@ -217,7 +217,7 @@ module SIS
       end
       User.update_account_associations(update_account_association_user_ids.to_a,
                                        :account_chain_cache => account_chain_cache)
-      User.update_all({:updated_at => Time.now}, {:id => users_to_touch_ids.to_a}) unless users_to_touch_ids.empty?
+      User.update_all({:updated_at => Time.now.utc}, {:id => users_to_touch_ids.to_a}) unless users_to_touch_ids.empty?
 
       logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
     end

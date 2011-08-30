@@ -121,7 +121,7 @@ describe WebConference do
       # second one doesn't trigger another create call
       conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
 
-      WebConference.update_all({:updated_at => Time.now - 1.day}, {:id => conference.id})
+      WebConference.update_all({:updated_at => 1.day.ago}, {:id => conference.id})
       conference.reload
 
       conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)

@@ -21,16 +21,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe SubmissionsApiController, :type => :integration do
 
   def submit_homework(assignment, student, opts = {:body => "test!"})
-    @submit_homework_time ||= 0
+    @submit_homework_time ||= Time.zone.at(0)
     @submit_homework_time += 1.hour
     sub = assignment.find_or_create_submission(student)
     if sub.versions.size == 1
-      Version.update_all({:created_at => Time.at(@submit_homework_time)}, {:id => sub.versions.first.id})
+      Version.update_all({:created_at => @submit_homework_time}, {:id => sub.versions.first.id})
     end
     sub.workflow_state = 'submitted'
     yield(sub) if block_given?
     sub.with_versioning(:explicit => true) do
-      update_with_protected_attributes!(sub, { :submitted_at => Time.at(@submit_homework_time), :created_at => Time.at(@submit_homework_time) }.merge(opts))
+      update_with_protected_attributes!(sub, { :submitted_at => @submit_homework_time, :created_at => @submit_homework_time }.merge(opts))
     end
     sub.versions(true).each { |v| Version.update_all({ :created_at => v.model.created_at }, { :id => v.id }) }
     sub
