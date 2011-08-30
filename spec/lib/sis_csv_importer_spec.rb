@@ -818,6 +818,22 @@ describe SIS::SisCsv do
       Pseudonym.count.should == (p_count + 2)
       p.sis_user_id.should == "user_2"
     end
+    
+    it "should strip white space on fields" do
+      process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1  ,user1   ,User   ,Uno   ,user@example.com   ,active  ",
+        "   user_2,   user2,   User,   Dos,   user2@example.com,  active"
+      )
+      user = User.find_by_email('user@example.com')
+      user.should_not be_nil
+      p = user.pseudonyms.first
+      p.unique_id.should == "user1"
+      user = User.find_by_email('user2@example.com')
+      user.should_not be_nil
+      p = user.pseudonyms.first
+      p.unique_id.should == "user2"
+    end
 
   end
 

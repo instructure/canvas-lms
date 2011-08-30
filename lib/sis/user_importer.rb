@@ -26,7 +26,7 @@ module SIS
     def verify(csv, verify)
       user_ids = (verify[:user_ids] ||= {})
       identical_row_checker = (verify[:user_rows] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         user_id = row['user_id']
         if user_ids[user_id]
           if identical_row_checker[user_id] != row
@@ -53,7 +53,7 @@ module SIS
       pseudos_to_set_sis_batch_ids = []
 
       User.skip_updating_account_associations do
-        FasterCSV.open(csv[:fullpath], "rb", :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |csv_object|
+        FasterCSV.open(csv[:fullpath], "rb", PARSE_ARGS) do |csv_object|
           row = csv_object.shift
           count = 0
           until row.nil?

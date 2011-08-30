@@ -28,7 +28,7 @@ module SIS
     def verify(csv, verify)
       # section ids must be unique across the account
       section_ids = (verify[:sections_id] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         section_id = row['section_id']
         course_id = row['course_id']
         add_error(csv, "Duplicate section id #{section_id}") if section_ids[section_id]
@@ -47,7 +47,7 @@ module SIS
       sections_to_update_sis_batch_ids = []
       course_ids_to_update_associations = [].to_set
 
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         update_progress
         
         Course.skip_updating_account_associations do

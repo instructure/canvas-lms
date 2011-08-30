@@ -27,7 +27,7 @@ module SIS
     end
 
     def verify(csv, verify)
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         add_error(csv, "No course_id or section_id given for an enrollment") if row['course_id'].blank? && row['section_id'].blank?
         add_error(csv, "No user_id given for an enrollment") if row['user_id'].blank?
         add_error(csv, "Improper role \"#{row['role']}\" for an enrollment") unless row['role'] =~ /\Astudent|\Ateacher|\Ata|\Aobserver|\Adesigner/i
@@ -49,7 +49,7 @@ module SIS
 
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
         User.skip_updating_account_associations do
-          FasterCSV.open(csv[:fullpath], "rb", :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |csv_object|
+          FasterCSV.open(csv[:fullpath], "rb", PARSE_ARGS) do |csv_object|
             row = csv_object.shift
             count = 0
 
