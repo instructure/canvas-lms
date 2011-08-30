@@ -89,7 +89,8 @@ ActionController::Routing::Routes.draw do |map|
     end
     course.undelete_items 'undelete', :controller => 'context', :action => 'undelete_index'
     course.undelete_item 'undelete/:asset_string', :controller => 'context', :action => 'undelete_item'
-    course.details 'details', :controller => 'courses', :action => 'course_details'
+    course.settings 'settings', :controller => 'courses', :action => 'settings'
+    course.details 'details', :controller => 'courses', :action => 'settings'
     course.re_send_invitations 're_send_invitations', :controller => 'courses', :action => 're_send_invitations', :conditions => {:method => :post}
     course.enroll_users 'enroll_users', :controller => 'courses', :action => 'enroll_users'
     course.link_enrollment 'link_enrollment', :controller => 'courses', :action => 'link_enrollment'

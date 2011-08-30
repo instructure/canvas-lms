@@ -2267,7 +2267,7 @@ es:
       all: Cualquiera
       only_teachers: "Sólo Profesores"
       teachers_students: "Profesor y Estudiantes"
-  course_details: 
+  course_settings:
     buttons: 
       add_section: "Agregar Sección"
       adding_section: "Agregando Sección..."
@@ -2396,7 +2396,7 @@ es:
         start_at: "Fecha de Inicio"
       titles: 
         copy_course: "Copiar el Curso"
-    course_details: 
+    course_settings:
       accepted_invitation: "%{user} ya ha recibido y aceptado la invitación a unirse al curso, pero todavía puede reenviar la invitación si la necesitan."
       admin_invitation_unaccepted: "%{user} aún no ha aceptado la invitación para unirse al curso. La invitación fue enviada: %{time}"
       buttons: 

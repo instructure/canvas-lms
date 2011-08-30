@@ -25,11 +25,11 @@ class SectionsController < ApplicationController
       respond_to do |format|
         if @section.save
           flash[:notice] = t('section_created', "Section successfully created!")
-          format.html { redirect_to course_details_url(@context) }
+          format.html { redirect_to course_settings_url(@context) }
           format.json { render :json => @section.to_json }
         else
           flash[:error] = t('section_creation_failed', "Section creation failed")
-          format.html { redirect_to course_details_url(@context) }
+          format.html { redirect_to course_settings_url(@context) }
           format.json { render :json => @section.errors.to_json, :status => :bad_request }
         end
       end
@@ -125,7 +125,7 @@ class SectionsController < ApplicationController
         if @section.enrollments.empty?
           @section.destroy
           flash[:notice] = t('section_deleted', "Course section successfully deleted!")
-          format.html { redirect_to course_details_url(@context) }
+          format.html { redirect_to course_settings_url(@context) }
           format.json { render :json => @section.to_json }
         else
           flash[:error] = t('section_delete_not_allowed', "You can't delete a section that has enrollments")
