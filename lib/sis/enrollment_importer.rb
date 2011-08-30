@@ -23,7 +23,7 @@ module SIS
   class EnrollmentImporter < SisImporter
 
     def self.is_enrollment_csv?(row)
-      row.header?('course_id') and row.header?('user_id')
+      (row.header?('section_id') || row.header?('course_id')) && row.header?('user_id')
     end
 
     def verify(csv, verify)
