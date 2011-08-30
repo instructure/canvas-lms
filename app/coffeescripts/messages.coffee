@@ -707,8 +707,9 @@ I18n.scoped 'conversations', (I18n) ->
         else
           link = match
           link = "http://" + link if link[0..3] == 'www'
+          link = encodeURI(link).replace(/'/g, '%27')
           links.push link
-          "<a href='#{link}'>#{match}</a>"
+          "<a href='#{$.h(link)}'>#{$.h(match)}</a>"
       )
       link_placeholder
 

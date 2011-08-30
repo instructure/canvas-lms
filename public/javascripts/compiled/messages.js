@@ -949,7 +949,7 @@
       placeholder_blocks = [];
       message = message.replace(link_re, function(match, i) {
         var link;
-        placeholder_blocks.push(match === link_placeholder ? link_placeholder : (link = match, link.slice(0, 4) === 'www' ? link = "http://" + link : void 0, links.push(link), "<a href='" + link + "'>" + match + "</a>"));
+        placeholder_blocks.push(match === link_placeholder ? link_placeholder : (link = match, link.slice(0, 4) === 'www' ? link = "http://" + link : void 0, link = encodeURI(link).replace(/'/g, '%27'), links.push(link), "<a href='" + ($.h(link)) + "'>" + ($.h(match)) + "</a>"));
         return link_placeholder;
       });
       message = $.h(message);
