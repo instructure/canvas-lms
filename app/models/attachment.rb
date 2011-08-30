@@ -171,7 +171,7 @@ class Attachment < ActiveRecord::Base
   serialize :scribd_doc, Scribd::Document
   
   def delete_scribd_doc
-    return true unless self.scribd_doc && ScribdAPI.enabled?
+    return true unless self.scribd_doc && ScribdAPI.enabled? && !self.root_attachment_id
     ScribdAPI.instance.set_user(self.scribd_account)
     self.scribd_doc.destroy
   end
@@ -708,6 +708,10 @@ class Attachment < ActiveRecord::Base
     self.thumbnail_without_root_attachment || self.root_attachment.try(:thumbnail)
   end
   alias_method_chain :thumbnail, :root_attachment
+
+  def scribd_doc
+    self.read_attribute(:scribd_doc) || self.root_attachment.try(:scribd_doc)
+  end
 
   def content_directory
     self.directory_name || Folder.root_folders(self.context).first.name
