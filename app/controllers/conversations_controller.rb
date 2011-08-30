@@ -99,6 +99,8 @@ class ConversationsController < ApplicationController
   end
 
   def show
+    return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" unless request.xhr?
+    
     @conversation.mark_as_read! if @conversation.unread?
     submissions = []
     if @conversation.one_on_one?
@@ -284,6 +286,7 @@ class ConversationsController < ApplicationController
 
   def get_conversation(allow_deleted = false)
     @conversation = (allow_deleted ? @current_user.all_conversations : @current_user.conversations).find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
+    raise ActiveRecord::RecordNotFound unless @conversation
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
