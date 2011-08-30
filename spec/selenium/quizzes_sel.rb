@@ -344,7 +344,7 @@ shared_examples_for "quiz selenium tests" do
   it "should check permissions when retrieving question banks" do
     course_with_teacher_logged_in
     @course.account = Account.default
-    @course.account.role_overrides.create(:permission => :read_question_banks, :enrollment_type => 'TeacherEnrollment', :enabled => false)
+    @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
 
