@@ -62,11 +62,19 @@ describe ConversationsController do
   end
 
   describe "GET 'show'" do
-    it "should assign variables" do
+    it "should redirect if not xhr" do
       course_with_student_logged_in(:active_all => true)
       conversation
 
       get 'show', :id => @conversation.conversation_id
+      response.should be_redirect
+    end
+
+    it "should assign variables" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+
+      xhr :get, 'show', :id => @conversation.conversation_id
       response.should be_success
       assigns[:conversation].should == @conversation
     end
