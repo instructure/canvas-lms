@@ -564,11 +564,11 @@ I18n.scoped 'conversations', (I18n) ->
   is_selected = ($conversation) ->
     $selected_conversation && $selected_conversation.attr('id') == $conversation?.attr('id')
 
-  select_unloaded_conversation = (conversation_id) ->
+  select_unloaded_conversation = (conversation_id, params) ->
     $.ajaxJSON '/conversations/' + conversation_id, 'GET', { include_conversation: 1 }, (data) ->
       add_conversation data.conversation, true
       $("#conversation_" + conversation_id).hide()
-      select_conversation $("#conversation_" + conversation_id), data: data
+      select_conversation $("#conversation_" + conversation_id), $.extend(params, {data: data})
 
   select_conversation = ($conversation, params={}) ->
     toggle_message_actions(off)
@@ -593,13 +593,14 @@ I18n.scoped 'conversations', (I18n) ->
 
     if $selected_conversation || $('#action_compose_message').length
       show_message_form()
+      $form.find('#body').val(params.message) if params.message
     else
       $form.parent().hide()
 
     if $selected_conversation
       $selected_conversation.scrollIntoView()
     else
-      if params and params.user_id and params.user_name
+      if params.user_id and params.user_name
         $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name, data: {id: params.user_id, name: params.user_name, can_add_notes: params.can_add_notes}
         $('#from_conversation_id').val(params.from_conversation_id)
       return
@@ -1470,11 +1471,12 @@ I18n.scoped 'conversations', (I18n) ->
 
     $(window).bind 'hashchange', ->
       hash = location.hash
-      if match = hash.match(/^#\/conversations\/(\d+)$/)
+      if match = hash.match(/^#\/conversations\/(\d+)(\?(.*))?/)
+        params = if match[3] then parse_query_string(match[3]) else {}
         if ($c = $('#conversation_' + match[1])) and $c.length
-          select_conversation($c)
+          select_conversation($c, params)
         else
-          select_unloaded_conversation(match[1])
+          select_unloaded_conversation(match[1], params)
       else if $('#action_compose_message').length
         params = {}
         if match = hash.match(/^#\/conversations\?(.*)$/)

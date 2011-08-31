@@ -772,15 +772,15 @@
     is_selected = function($conversation) {
       return $selected_conversation && $selected_conversation.attr('id') === ($conversation != null ? $conversation.attr('id') : void 0);
     };
-    select_unloaded_conversation = function(conversation_id) {
+    select_unloaded_conversation = function(conversation_id, params) {
       return $.ajaxJSON('/conversations/' + conversation_id, 'GET', {
         include_conversation: 1
       }, function(data) {
         add_conversation(data.conversation, true);
         $("#conversation_" + conversation_id).hide();
-        return select_conversation($("#conversation_" + conversation_id), {
+        return select_conversation($("#conversation_" + conversation_id), $.extend(params, {
           data: data
-        });
+        }));
       });
     };
     select_conversation = function($conversation, params) {
@@ -813,13 +813,16 @@
       }
       if ($selected_conversation || $('#action_compose_message').length) {
         show_message_form();
+        if (params.message) {
+          $form.find('#body').val(params.message);
+        }
       } else {
         $form.parent().hide();
       }
       if ($selected_conversation) {
         $selected_conversation.scrollIntoView();
       } else {
-        if (params && params.user_id && params.user_name) {
+        if (params.user_id && params.user_name) {
           $('#recipients').data('token_input').add_token({
             value: params.user_id,
             text: params.user_name,
@@ -1994,11 +1997,12 @@
       return $(window).bind('hashchange', function() {
         var $c, hash, match, params;
         hash = location.hash;
-        if (match = hash.match(/^#\/conversations\/(\d+)$/)) {
+        if (match = hash.match(/^#\/conversations\/(\d+)(\?(.*))?/)) {
+          params = match[3] ? parse_query_string(match[3]) : {};
           if (($c = $('#conversation_' + match[1])) && $c.length) {
-            return select_conversation($c);
+            return select_conversation($c, params);
           } else {
-            return select_unloaded_conversation(match[1]);
+            return select_unloaded_conversation(match[1], params);
           }
         } else if ($('#action_compose_message').length) {
           params = {};

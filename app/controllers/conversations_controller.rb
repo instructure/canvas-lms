@@ -99,7 +99,7 @@ class ConversationsController < ApplicationController
   end
 
   def show
-    return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" unless request.xhr?
+    return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" + (params[:message] ? '?message=' + URI.encode(params[:message], Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")) : '') unless request.xhr?
     
     @conversation.mark_as_read! if @conversation.unread?
     submissions = []

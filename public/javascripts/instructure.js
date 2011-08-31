@@ -639,7 +639,7 @@ jQuery(function($) {
     } else {
       params = {message: ($form.find("textarea:visible:first").val() || "")};
     }
-    location.href = $(this).attr('href') + (params ? JSON.stringify(params) : "");
+    location.href = $(this).attr('href') + "?message=" + encodeURIComponent(params.message);
   });
   $(".communication_message.new_activity_message").ifExists(function(){
     this.find(".message_type img").click(function() {
