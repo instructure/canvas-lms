@@ -278,6 +278,7 @@ class Enrollment < ActiveRecord::Base
     ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
     Message.delete_all({:id => ids}) if ids && !ids.empty?
     update_attribute(:workflow_state, 'active')
+    user.touch
     true
   end
   
