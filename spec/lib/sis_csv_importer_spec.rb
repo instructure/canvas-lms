@@ -895,15 +895,16 @@ describe SIS::SisCsv do
         "test_1,user_7,teacher,S001,active,,1985-08-24,2011-08-29"
       )
       course = @account.courses.find_by_sis_source_id("test_1")
-      course.teachers.first.name.should == "User Uno"
+      course.teachers.map(&:name).should be_include("User Uno")
       course.students.first.name.should == "User Dos"
       course.tas.first.name.should == "User Tres"
       course.observers.first.name.should == "User Quatro"
       course.observer_enrollments.first.associated_user_id.should == course.students.first.id
       course.designers.first.name.should == "User Cinco"
-      course.teacher_enrollments.last.user.name.should == "User Siete"
-      course.teacher_enrollments.last.start_at.should == DateTime.new(1985, 8, 24)
-      course.teacher_enrollments.last.end_at.should == DateTime.new(2011, 8, 29)
+      siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
+      siete.should_not be_nil
+      siete.start_at.should == DateTime.new(1985, 8, 24)
+      siete.end_at.should == DateTime.new(2011, 8, 29)
     end
 
     it "should not try looking up a section to enroll into if the section name is empty" do
