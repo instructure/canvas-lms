@@ -1634,7 +1634,8 @@ class User < ActiveRecord::Base
             conditions = {:course_section_id => section_id_hash[course.id]}
           when :restricted
             section_visibilities.each do |s|
-              (restricted_course_hash[course.id] ||= []) << s[:associated_user_id] if s[:associated_user_id]
+              restricted_course_hash[course.id] ||= []
+              restricted_course_hash[course.id] << s[:associated_user_id] if s[:associated_user_id]
             end
             conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
