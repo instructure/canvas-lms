@@ -59,7 +59,16 @@
     <h3><%= t(:import_log_title, "Import Progress Log") %></h3>
     <div id="import_log"></div>
   </div>
-  
+
+  <% pending_batch_count = @account.sis_batches.needs_processing.count %>
+  <% pending_batch_count -= 1 if @current_batch && @current_batch.created? %>
+  <% if pending_batch_count > 0 %>
+    <div class="pending_batches" style="margin-top: 20px">
+      <h3><%= t(:pending_batches_title, "Pending Batches") %></h3>
+      <p><%= t(:pending_batches_count, { :one => "%{count} batch waiting to be processed.", :other => "%{count} batches waiting to be processed." }, :count => pending_batch_count) %></p>
+    </div>
+  <% end %>
+
   <% if show_last_batch %>
     <div class="last_batch" style="margin-top: 20px;">
       <h3><%= t(:last_batch_title, "Last Batch") %></h3>
