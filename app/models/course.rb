@@ -837,18 +837,25 @@ class Course < ActiveRecord::Base
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
 
     # Active teachers
-    given { |user, session| (self.available? || self.created? || self.claimed? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read_as_admin and can :read and can :manage and can :update and can :delete
+    given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    can :read_as_admin and can :read and can :manage and can :update
 
-    given { |user| !self.deleted? && self.prior_enrollments.map(&:user_id).include?(user && user.id) }
+    given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    can :delete
+
+    # Prior users
+    given { |user| !self.deleted? && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
     can :read
 
     # Teacher of a concluded course
-    given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user && user.id) }
+    given { |user| !self.deleted? && user && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) }
     can :read_as_admin and can :read_user_notes and can :read_roster and can :view_all_grades and can :read_prior_users
 
+    given { |user| !self.deleted? && !self.sis_source_id && user && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) }
+    can :delete
+
     # Student of a concluded course
-    given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
+    given { |user| !self.deleted? && user && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) }
     can :read and can :read_grades
 
     # Viewing as different role type
@@ -864,6 +871,9 @@ class Course < ActiveRecord::Base
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
     can :read
+
+    given { |user, session| !self.deleted? && self.sis_source_id && self.account_membership_allows(user, session, :manage_sis) }
+    can :delete
 
     # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
     # because students can't see prior enrollments)

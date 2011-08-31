@@ -43,13 +43,40 @@ describe Course do
     @course.uuid.should_not be_nil
   end
 
-  it "should follow account chain when looking for generic permissions from AccountUsers" do
-    account = Account.create!
-    sub_account = Account.create!(:parent_account => account)
-    sub_sub_account = Account.create!(:parent_account => sub_account)
-    user = account_admin_user(:account => sub_account)
-    course = Course.create!(:account => sub_sub_account)
-    course.grants_right?(user, nil, :manage).should be_true
+  context "permissions" do
+    it "should follow account chain when looking for generic permissions from AccountUsers" do
+      account = Account.create!
+      sub_account = Account.create!(:parent_account => account)
+      sub_sub_account = Account.create!(:parent_account => sub_account)
+      user = account_admin_user(:account => sub_account)
+      course = Course.create!(:account => sub_sub_account)
+      course.grants_right?(user, nil, :manage).should be_true
+    end
+
+    it "should grant delete to the proper individuals" do
+      account_admin_user_with_role_changes(:membership_type => 'managecourses', :role_changes => {:manage_courses => true})
+      @admin1 = @admin
+      account_admin_user_with_role_changes(:membership_type => 'managesis', :role_changes => {:manage_sis => true})
+      @admin2 = @admin
+      course_with_teacher(:active_all => true)
+
+      @course.grants_right?(@teacher, nil, :delete).should be_true
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_false
+
+      @course.complete!
+
+      @course.grants_right?(@teacher, nil, :delete).should be_true
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_false
+
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+
+      @course.grants_right?(@teacher, nil, :delete).should be_false
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_true
+    end
   end
 
   it "should clear content when resetting" do

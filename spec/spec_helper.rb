@@ -105,7 +105,7 @@ Spec::Runner.configure do |config|
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
-        account.role_overrides.create(:permission => permission, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+        account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
       end
     end
     account_admin_user(opts)

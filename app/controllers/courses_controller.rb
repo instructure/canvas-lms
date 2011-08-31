@@ -231,21 +231,21 @@ class CoursesController < ApplicationController
 
   def destroy
     @context = Course.find(params[:id])
-    if authorized_action(@context, @current_user, :delete)
-      if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
-        @context.workflow_state = 'deleted'
-        @context.sis_source_id = nil
-        @context.save
-        flash[:notice] = t('notices.deleted', "Course successfully deleted")
-      else
-        @context.complete
-        flash[:notice] = t('notices.concluded', "Course successfully concluded")
-      end
-      @current_user.touch
-      respond_to do |format|
-        format.html {redirect_to dashboard_url}
-        format.json {render :json => {:deleted => true}.to_json}
-      end
+    if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
+      return unless authorized_action(@context, @current_user, :delete)
+      @context.workflow_state = 'deleted'
+      @context.sis_source_id = nil
+      @context.save
+      flash[:notice] = t('notices.deleted', "Course successfully deleted")
+    else
+      return unless authorized_action(@context, @current_user, :update)
+      @context.complete
+      flash[:notice] = t('notices.concluded', "Course successfully concluded")
+    end
+    @current_user.touch
+    respond_to do |format|
+      format.html {redirect_to dashboard_url}
+      format.json {render :json => {:deleted => true}.to_json}
     end
   end
   

@@ -670,8 +670,16 @@ describe "security" do
         response.body.should_not match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
+        response.body.should_not match /Delete this Course/
+        response.body.should_not match /End this Course/
         html.css('#course_account_id').should be_empty
         html.css('#course_enrollment_term_id').should be_empty
+
+        delete "/courses/#{@course.id}"
+        response.status.should == '401 Unauthorized'
+
+        delete "/courses/#{@course.id}", :event => 'delete'
+        response.status.should == '401 Unauthorized'
 
         add_permission :manage_courses
 
@@ -680,12 +688,19 @@ describe "security" do
         response.body.should match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
+        response.body.should match /Delete this Course/
+        response.body.should match /End this Course/
         html = Nokogiri::HTML(response.body)
         html.css('#course_account_id').should_not be_empty
         html.css('#course_enrollment_term_id').should_not be_empty
 
         get "/courses/#{@course.id}/copy"
         response.should be_success
+
+        delete "/courses/#{@course.id}", :event => 'delete'
+        response.should be_redirect
+
+        @course.reload.should be_deleted
       end
 
       it 'manage_content' do
