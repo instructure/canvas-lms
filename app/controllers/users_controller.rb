@@ -61,8 +61,18 @@ class UsersController < ApplicationController
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
-      @current_enrollments = @user.current_enrollments.scoped(:include => :course)
-      
+      @current_active_enrollments = @user.current_enrollments.scoped(:include => :course)
+      @prior_enrollments = []; @current_enrollments = []
+      @current_active_enrollments.each do |e|
+        case e.state_based_on_date
+        when :active
+          @current_enrollments << e
+        when :completed
+          #@prior_enrollments << e
+        end
+      end
+      #@prior_enrollments.concat @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
+
       @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
       
       @observer_enrollments = @current_enrollments.select{|e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
@@ -71,16 +81,15 @@ class UsersController < ApplicationController
         @observed_enrollments << StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
       end
       @observed_enrollments = @observed_enrollments.uniq.compact
-      Enrollment.send(:preload_associations, @observed_enrollments, :course)
-      
-      if @current_enrollments.length + @observed_enrollments.length == 1
+
+      if @current_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
         redirect_to course_grades_url(@current_enrollments.first.course_id)
         return
       end
-      
+      Enrollment.send(:preload_associations, @observed_enrollments, :course)
+
       @teacher_enrollments = @current_enrollments.select{|e| e.admin? }
-      @prior_enrollments = @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
-      Enrollment.send(:preload_associations, @prior_enrollments, :course)
+      #Enrollment.send(:preload_associations, @prior_enrollments, :course)
       @course_grade_summaries = {}
       @teacher_enrollments.each do |enrollment|
         @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', enrollment.course].cache_key) do

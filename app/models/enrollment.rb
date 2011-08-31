@@ -435,8 +435,8 @@ class Enrollment < ActiveRecord::Base
     end
   end
   
-  def workflow_readable_type
-    case self.workflow_state
+  def self.workflow_readable_type(state)
+    case state.to_s
       when 'active'
         t('#enrollment.workflow.active', "Active")
       when 'completed'
@@ -449,7 +449,13 @@ class Enrollment < ActiveRecord::Base
         t('#enrollment.workflow.pending', "Pending")
       when 'rejected'
         t('#enrollment.workflow.rejected', "Rejected")
+      when 'inactive'
+        t('#enrollment.workflow.inactive', "Inactive")
     end
+  end
+
+  def workflow_readable_type
+    Enrollment.workflow_readable_type(self.workflow_state)
   end
   
   def readable_type
