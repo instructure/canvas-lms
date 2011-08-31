@@ -243,13 +243,20 @@ describe ConversationsController do
   describe "GET 'find_recipients'" do
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
-      other = User.create(:name => 'testuser')
+      @course.update_attribute(:name, "this_is_a_test_course")
+
+      other = User.create(:name => 'this_is_a_test_user')
       enrollment = @course.enroll_student(other)
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      get 'find_recipients', :search => other.name
+      group = @course.groups.create(:name => 'this_is_a_test_group')
+      group.users = [@user, other]
+
+      get 'find_recipients', :search => 'this_is_a_test_'
       response.should be_success
+      response.body.should include(@course.name)
+      response.body.should include(group.name)
       response.body.should include(other.name)
     end
   end
