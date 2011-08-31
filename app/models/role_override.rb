@@ -554,6 +554,12 @@ class RoleOverride < ActiveRecord::Base
         :label => lambda { t('permissions.manage_interaction_alerts', "Manage alerts") },
         :true_for => %w(AccountAdmin TeacherEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment),
+      },
+      :manage_jobs => {
+        :label => lambda { t('permissions.managed_jobs', "Manage background jobs") },
+        :account_only => :site_admin,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
       }
     }.freeze
   def self.permissions

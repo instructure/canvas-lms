@@ -1,7 +1,11 @@
 class JobsController < ApplicationController
-  before_filter :require_site_admin
+  before_filter :require_manage_jobs
   POPULAR_TAG_COUNTS = 10
   LIMIT = 100
+
+  def require_manage_jobs
+    require_site_admin_with_permission(:manage_jobs)
+  end
 
   def index
     if request.path == '/delayed_jobs'
