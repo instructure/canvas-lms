@@ -443,6 +443,16 @@ describe "security" do
         delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
         response.should be_success
       end
+
+      it "manage_jobs" do
+        get "/jobs"
+        response.should be_redirect
+
+        add_permission :manage_jobs
+
+        get "/jobs"
+        response.should be_success
+      end
     end
 
     describe 'course' do
