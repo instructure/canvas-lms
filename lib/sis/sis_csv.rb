@@ -295,8 +295,8 @@ module SIS
       # throttling can be set on individual SisBatch instances, and also
       # site-wide in the Setting table.
       @batch.reload(:select => 'data') # update to catch changes to pause vars
-      @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 50)).to_i
-      @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 1)).to_f
+      @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 100)).to_i
+      @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
     end
     
     def unzip_file(file, dest)
