@@ -428,7 +428,7 @@ class User < ActiveRecord::Base
   end
   
   def self.find_by_email(email)
-    CommunicationChannel.find_by_path(email).user rescue nil
+    CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
   end
     
   def <=>(other)
@@ -1551,7 +1551,7 @@ class User < ActiveRecord::Base
   
   def self.assert_by_email(email, name=nil, password=nil)
     user = Pseudonym.find_by_unique_id(email).user rescue nil
-    user ||= CommunicationChannel.find_by_path(email).user rescue nil
+    user ||= CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
     res = {:email => email}
     if user
       p = user.pseudonyms.active.find_by_unique_id(email)
@@ -1569,7 +1569,7 @@ class User < ActiveRecord::Base
     else
       user = User.create!(:name => name || email)
       user.pseudonyms.create!(:unique_id => email, :path => email, :password => password, :password_confirmation => password)
-      cc = user.communication_channels.find_by_path(email) #pseudonym.communication_channel.confirm
+      cc = user.communication_channels.find_by_path_and_path_type(email, 'email') #pseudonym.communication_channel.confirm
       cc.confirm if cc
       res[:password] = password
       res[:new] = true

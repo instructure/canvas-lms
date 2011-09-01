@@ -50,7 +50,13 @@ describe User do
     @user = User.find(@user)
     @user.name.should eql('bill')
   end
-  
+
+  it "should not find a user by non-email when searching by email" do
+    @user = User.create
+    @user.communication_channels.create!(:path => 'cody', :path_type => 'twitter')
+    User.find_by_email('cody').should be_nil
+  end
+
   it "should update account associations when a course account changes" do
     account1 = account_model
     account2 = account_model
