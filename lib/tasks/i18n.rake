@@ -232,7 +232,7 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
     # in addition to getting the non-en stuff into each bundle, we need to get the core
     # formats and stuff for all languages (en included) into the common bundle
     core_translations = I18n.available_locales.inject({}) { |h1, locale|
-      h1[locale] = [:date, :time, :number, :datetime].inject({}) { |h2, key|
+      h1[locale] = [:date, :time, :number, :datetime, :support].inject({}) { |h2, key|
         h2[key] = all_translations[locale][key] if all_translations[locale][key]
         h2
       }

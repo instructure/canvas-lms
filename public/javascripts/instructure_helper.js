@@ -3522,4 +3522,33 @@ I18n.scoped('instructure', function(I18n) {
     return this;
 
   };
+
+  $.toSentence = function(array, options) {
+    if (typeof options == 'undefined') {
+      options = {};
+    } else if (options == 'or') {
+      options = {
+        two_words_connector: I18n.t('#support.array.or.two_words_connector'),
+        last_word_connector: I18n.t('#support.array.or.last_word_connector')
+      };
+    }
+
+    options = $.extend({
+        words_connector: I18n.t('#support.array.words_connector'),
+        two_words_connector: I18n.t('#support.array.two_words_connector'),
+        last_word_connector: I18n.t('#support.array.last_word_connector')
+      }, options);
+
+    switch (array.length) {
+      case 0:
+        return '';
+      case 1:
+        return '' + array[0];
+      case 2:
+        return array[0] + options.two_words_connector + array[1];
+      default:
+        return array.slice(0, -1).join(options.words_connector) + options.last_word_connector + array[array.length - 1];
+    }
+  }
 });
+
