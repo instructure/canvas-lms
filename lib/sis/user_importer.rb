@@ -51,6 +51,8 @@ module SIS
       start = Time.now
       users_to_set_sis_batch_ids = []
       pseudos_to_set_sis_batch_ids = []
+      users_to_add_account_associations = []
+      users_to_update_account_associations = []
 
       User.skip_updating_account_associations do
         FasterCSV.open(csv[:fullpath], "rb", PARSE_ARGS) do |csv_object|
@@ -91,20 +93,18 @@ module SIS
 
                   user = pseudo.user
                   user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}" if user.sis_name && user.sis_name == user.name
-                  update_account_association = (pseudo.account_id != @root_account.id)
 
                 else
                   user = User.new
                   user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}"
-                  update_account_association = true
                 end
 
                 if row['status']=~ /active/i
                   user.workflow_state = 'registered'
                 elsif row['status']=~ /deleted/i
                   user.workflow_state = 'deleted'
-                  enrolls = user.enrollments.find_all_by_root_account_id(@root_account.id).map(&:id)
-                  Enrollment.update_all({:workflow_state => 'deleted'}, :id => enrolls)
+                  user.enrollments.scoped(:conditions => {:root_account_id => @root_account.id }).update_all(:workflow_state => 'deleted')
+                  users_to_update_account_associations << user.id unless user.new_record?
                 end
 
                 pseudo ||= Pseudonym.new
@@ -124,7 +124,9 @@ module SIS
                   User.transaction(:requires_new => true) do
                     if user.changed?
                       user.creation_sis_batch_id = @batch.id if @batch
+                      new_record = user.new_record?
                       raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                      users_to_add_account_associations << user.id if new_record && user.workflow_state != 'deleted'
                     elsif @batch
                       users_to_set_sis_batch_ids << user.id
                     end
@@ -168,12 +170,12 @@ module SIS
                   pseudos_to_set_sis_batch_ids << pseudo.id
                 end
 
-                user.update_account_associations if update_account_association
-
                 @sis.counts[:users] += 1
               end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0 && tx_end_time > Time.now
             end
           end
+          User.update_account_associations(users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
+          User.update_account_associations(users_to_update_account_associations)
           User.update_all({:creation_sis_batch_id => @batch.id}, {:id => users_to_set_sis_batch_ids}) if @batch && !users_to_set_sis_batch_ids.empty?
           Pseudonym.update_all({:sis_batch_id => @batch.id}, {:id => pseudos_to_set_sis_batch_ids}) if @batch && !pseudos_to_set_sis_batch_ids.empty?
           logger.debug("Users took #{Time.now - start} seconds")

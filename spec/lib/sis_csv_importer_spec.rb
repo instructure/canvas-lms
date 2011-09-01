@@ -2020,6 +2020,25 @@ describe SIS::SisCsv do
         @account.courses.find_by_sis_source_id("X001").students.first.name.should == "User Uno"
       end
     end
+
+    it "user" do
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,deleted"
+      )
+      user1 = @account.pseudonyms.find_by_sis_source_id('user1')
+      user2 = @account.pseudonyms.find_by_sis_source_id('user2')
+      user1.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
+      user2.user.user_account_associations.should be_empty
+
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,deleted"
+      )
+      user1.reload
+      user1.user.user_account_associations.should be_empty
+    end
   end
 
   describe "group importing" do
