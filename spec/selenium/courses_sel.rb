@@ -89,6 +89,23 @@ shared_examples_for "course selenium tests" do
     keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
   end
 
+  it "should copy the course" do
+    enable_cache do
+      course_with_teacher_logged_in
+
+      get "/courses/#{@course.id}/copy"
+      driver.find_element(:css, "div#content form button[type=submit]").click
+      wait_for_dom_ready
+      driver.find_element(:id, 'copy_context_form').submit
+      wait_for_animations
+      keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+
+      @new_course = Course.last(:order => :id)
+      get "/courses/#{@new_course.id}"
+      driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")
+    end
+  end
+
   it "should correctly update the course quota" do
     course_with_admin_logged_in
     
