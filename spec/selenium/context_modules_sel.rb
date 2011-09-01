@@ -50,6 +50,5 @@ describe "context_modules selenium tests" do
     assignment_picker.find_element(:css, "option[value='#{content_tag_2.id}']").click
     requirement_picker.find_element(:css, 'option[value="min_score"]').click
     driver.execute_script('return $(".points_possible_parent:visible").length').should == 0
-
   end
 end

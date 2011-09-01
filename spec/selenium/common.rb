@@ -386,6 +386,7 @@ shared_examples_for "all selenium tests" do
   self.use_transactional_fixtures = false
 
   append_after(:each) do
+    wait_for_ajax_requests
     ALL_MODELS.each { |m| truncate_table(m) }
   end
 

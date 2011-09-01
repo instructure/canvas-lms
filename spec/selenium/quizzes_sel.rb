@@ -363,7 +363,7 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:css, '.find_question_link').click
       driver.find_element(:id, 'find_question_dialog').should be_displayed
       wait_for_ajaximations
-    driver.find_element(:link, "Select All").should be_displayed
+      driver.find_element(:link, "Select All").should be_displayed
     }
     find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
 

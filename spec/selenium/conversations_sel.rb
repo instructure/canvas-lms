@@ -33,11 +33,11 @@ shared_examples_for "conversations selenium tests" do
         }.send_keys(fullpath)
       end
 
-      old_count = ConversationMessage.count
-      find_with_jquery("#create_message_form button[type='submit']").click
-      wait_for_ajax_requests
+      expect {
+        find_with_jquery("#create_message_form button[type='submit']").click
+        wait_for_ajax_requests
+      }.to change(ConversationMessage, :count).by(1)
 
-      ConversationMessage.count.should == old_count + 1
       message = ConversationMessage.last
       driver.find_element(:id, "message_#{message.id}").should_not be_nil
       message

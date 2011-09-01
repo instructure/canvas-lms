@@ -98,7 +98,7 @@ describe "assignment selenium tests" do
     end
     day_id = 'day_' + due_date.year.to_s() + '_' + due_date.strftime('%m') + '_' + due_date.strftime('%d')
     day_div = driver.find_element(:id, day_id)
-    day_div.find_element(:link, assignment_name).click
+    keep_trying_until { day_div.find_element(:link, assignment_name).click }
     wait_for_animations
     details_dialog = driver.find_element(:id, 'event_details').find_element(:xpath, '..')
     details_dialog.should include_text(assignment_name)
@@ -182,7 +182,6 @@ describe "assignment selenium tests" do
     #need to wait for the total to update
     wait_for_animations
     keep_trying_until{ driver.find_element(:id, 'group_weight_total').text.should == '50%' }
-
   end
 
   it "should create an assignment" do
