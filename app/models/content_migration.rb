@@ -211,8 +211,8 @@ class ContentMigration < ActiveRecord::Base
   def check_quiz_id_prepender
     if !migration_settings[:id_prepender] && !migration_settings[:overwrite_questions]
       # only prepend an id if the course already has some migrated questions/quizzes
-      if self.context.assessment_questions.scoped(:conditions => 'migration_id IS NOT NULL').any? ||
-         self.context.quizzes.scoped(:conditions => 'migration_id IS NOT NULL').any?
+      if self.context.assessment_questions.scoped(:conditions => 'assessment_questions.migration_id IS NOT NULL').any? ||
+         self.context.quizzes.scoped(:conditions => 'quizzes.migration_id IS NOT NULL').any?
         migration_settings[:id_prepender] = self.id  
       end
     end
