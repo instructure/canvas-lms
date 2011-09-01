@@ -3,6 +3,18 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "course selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  it "should not create two assignments when using more options in the wizard" do
+    course_with_teacher_logged_in
+
+    get "/getting_started?fresh=1"
+    expect {
+      expect_new_page_load { driver.find_element(:css, ".next_step_button").click }
+      driver.find_element(:css, ".add_assignment_link").click
+      expect_new_page_load { driver.find_element(:css, ".more_options_link").click }
+      expect_new_page_load { driver.find_element(:css, "#edit_assignment_form button[type='submit']").click }
+    }.to change(Assignment, :count).by(1)
+  end
+
   it "should properly hide the wizard and remember its hidden state" do
     course_with_teacher_logged_in
 
