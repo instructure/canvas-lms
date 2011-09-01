@@ -524,12 +524,16 @@ I18n.scoped('instructure', function(I18n) {
     var boundary = "-----AaB03x" + $.uniqueId(),
         result = {content_type: "multipart/form-data; boundary=" + boundary},
         body = "--" + boundary + "\r\n",
-        paramsList = [];
+        paramsList = [],
+        hasFakeFile = false;
     
     for(var idx in params) {
       paramsList.push([idx, params[idx]]);
+      if (params[idx].fake_file) {
+        hasFakeFile = true;
+      }
     }
-    if(window.FormData) {
+    if(window.FormData && !hasFakeFile) {
       var fd = new FormData();
       for(var idx in params) {
         var param = params[idx];
