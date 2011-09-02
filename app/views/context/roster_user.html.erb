@@ -76,7 +76,7 @@
 <% jammit_css :roster_user %>
 
 <h2><%= t 'headings.users_details', "%{user}'s Details", :user => @user.short_name %></h2>
-<% if can_do(@context, @current_user, :manage_students) %>
+<% if can_do(@context, @current_user, :manage_students) && !@context.is_a?(Group)%>
 <h2><%= t('headings.user_details', %{User Details}) %></h2>
 <%= render :partial => 'users/name' %>
 <a href="#" class="more_user_information_link"><%= t('links.more_user_details', %{more user details...}) %></a>
