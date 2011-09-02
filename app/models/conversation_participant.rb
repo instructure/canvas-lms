@@ -41,7 +41,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   before_update :update_unread_count
 
-  attr_accessible :subscribed, :label
+  attr_accessible :subscribed, :label, :workflow_state
 
   def self.labels
     (@labels ||= {})[I18n.locale] ||= [
@@ -58,9 +58,9 @@ class ConversationParticipant < ActiveRecord::Base
 
   def as_json(options = {})
     latest = options[:last_message] || messages.human.first
+    options[:include_context_info] ||= private?
     {
       :id => conversation_id,
-      :participants => participants(private?),
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
       :last_message_at => latest ? latest.created_at : last_message_at,
@@ -87,26 +87,30 @@ class ConversationParticipant < ActiveRecord::Base
     ASSOC
   end
 
-  def participants(include_context_info = true, include_forwarded_participants = false)
+  def participants(options = {})
+    options = {
+      :include_context_info => true,
+      :include_forwarded_participants => false
+    }.merge(options)
+
     context_info = {}
-    self_conversation = conversation.participants == [self.user]
-    participants = self_conversation ? conversation.participants : self.other_participants
-    if include_forwarded_participants
+    participants = conversation.participants
+    if options[:include_forwarded_participants]
       user_ids = messages.select{ |m|
         m.forwarded_messages
       }.map{ |m|
         m.forwarded_messages.map(&:author_id)
-      }.flatten.uniq - [self.user_id]
-      participants |= User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
+      }.flatten.uniq - participants.map(&:id)
+      participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups, TRUE AS secondary", :conditions => {:id => user_ids})
     end
-    return participants unless include_context_info
+    return participants unless options[:include_context_info]
     # we do this to find out the contexts they share with the user
     user.messageable_users(:ids => participants.map(&:id), :no_check_context => true).each { |user|
       context_info[user.id] = user
     }
     participants.each { |user|
-      user.common_courses = context_info[user.id].common_courses
-      user.common_groups = context_info[user.id].common_groups
+      user.common_courses = user.id == self.user_id ? {} : context_info[user.id].common_courses
+      user.common_groups = user.id == self.user_id ? {} : context_info[user.id].common_groups
     }
   end
 
@@ -145,8 +149,16 @@ class ConversationParticipant < ActiveRecord::Base
     save
   end
 
-  def subscribed=(value)
+  def update_attributes(hash)
+    # subscribed= can update the workflow_state, but an explicit
+    # workflow_state should trump that. so we do this first
+    subscribed = (hash.has_key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
+    self.subscribed = subscribed unless subscribed.nil?
     super
+  end
+
+  def subscribed=(value)
+    super unless private?
     if subscribed_changed?
       if subscribed?
         update_cached_data(false)
@@ -175,17 +187,9 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   workflow do
-    state :unread do
-      event :mark_as_read, :transitions_to => :read
-      event :archive, :transitions_to => :archived
-    end
-    state :read do
-      event :mark_as_unread, :transitions_to => :unread
-      event :archive, :transitions_to => :archived
-    end
-    state :archived do
-      event :unarchive, :transitions_to => :read
-    end
+    state :unread
+    state :read
+    state :archived
   end
 
   private

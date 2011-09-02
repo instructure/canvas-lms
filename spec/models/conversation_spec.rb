@@ -62,7 +62,7 @@ describe Conversation do
       convo = new_guy.conversations.first
       convo.unread?.should be_true
       convo.messages.size.should == 2 # the test message plus a "user was added" message
-      convo.participants.size.should == 2 # doesn't include user, just the other people
+      convo.participants.size.should == 3 # includes the sender (though we don't show him in the ui)
     end
 
     it "should not re-add existing participants to group conversations" do
@@ -121,7 +121,7 @@ describe Conversation do
 
       unread_guy.reload.unread_conversations_count.should eql 1
       unread_guy.conversations.unread.size.should eql 1
-      subscribed_guy.conversations.first.mark_as_read
+      subscribed_guy.conversations.first.update_attribute(:workflow_state, "read")
       subscribed_guy.reload.unread_conversations_count.should eql 0
       subscribed_guy.conversations.unread.size.should eql 0
       unsubscribed_guy.conversations.first.update_attributes(:subscribed => false)
@@ -159,7 +159,7 @@ describe Conversation do
 
       unread_guy.reload.unread_conversations_count.should eql 1
       unread_guy.conversations.unread.size.should eql 1
-      unread_guy.conversations.first.mark_as_read
+      unread_guy.conversations.first.update_attribute(:workflow_state, "read")
       unread_guy.reload.unread_conversations_count.should eql 0
       unread_guy.conversations.unread.size.should eql 0
     end
@@ -169,11 +169,11 @@ describe Conversation do
       unread_guy = user
       root_convo = Conversation.initiate([sender.id, unread_guy.id], false)
       root_convo.add_message(sender, 'test')
-      unread_guy.conversations.first.mark_as_read
+      unread_guy.conversations.first.update_attribute(:workflow_state, "read")
 
       unread_guy.reload.unread_conversations_count.should eql 0
       unread_guy.conversations.unread.size.should eql 0
-      unread_guy.conversations.first.mark_as_unread
+      unread_guy.conversations.first.update_attribute(:workflow_state, "unread")
       unread_guy.reload.unread_conversations_count.should eql 1
       unread_guy.conversations.unread.size.should eql 1
     end
@@ -194,8 +194,7 @@ describe Conversation do
       subscription_guy.reload.unread_conversations_count.should eql 0
       subscription_guy.conversations.unread.size.should eql 0
 
-      archive_guy.conversations.first.archive!
-      archive_guy.conversations.first.update_attributes(:subscribed => false)
+      archive_guy.conversations.first.update_attributes(:workflow_state => "archived", :subscribed => false)
       archive_guy.conversations.archived.size.should eql 1
     end
 
@@ -216,8 +215,7 @@ describe Conversation do
       flip_flopper_guy.conversations.unread.size.should eql 0
 
       subscription_guy.conversations.first.update_attributes(:subscribed => false)
-      archive_guy.conversations.first.archive!
-      archive_guy.conversations.first.update_attributes(:subscribed => false)
+      archive_guy.conversations.first.update_attributes(:workflow_state => "archived", :subscribed => false)
 
       message = root_convo.add_message(sender, 'you wish you were subscribed!')
       message.update_attribute(:created_at, Time.now.utc + 1.minute)
@@ -275,20 +273,19 @@ describe Conversation do
       sender = user
       Conversation.initiate([sender.id, user.id], true).add_message(sender, 'test')
       convo = sender.conversations.first
-      convo.mark_as_unread!
+      convo.update_attribute(:workflow_state, "unread")
       convo.add_message('another test')
       convo.reload.unread?.should be_true
 
-      convo.archive!
+      convo.update_attribute(:workflow_state, "archived")
       convo.add_message('one more test')
       convo.reload.archived?.should be_true
 
-      convo.unarchive!
-      convo.mark_as_unread!
+      convo.update_attribute(:workflow_state, "unread")
       convo.add_message('and another test', :update_for_sender => true) # overrides subscribed-ness and updates timestamps
       convo.reload.unread?.should be_true
 
-      convo.archive!
+      convo.update_attribute(:workflow_state, "archived")
       convo.add_message('last one', :update_for_sender => true)
       convo.reload.archived?.should be_true
 

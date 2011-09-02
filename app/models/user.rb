@@ -104,7 +104,7 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
-  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC"
+  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
   def conversations
     all_conversations.visible # i.e. exclude any where the user has deleted all the messages
   end
@@ -1774,8 +1774,8 @@ class User < ActiveRecord::Base
       ) users
       GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
       ORDER BY LOWER(COALESCE(short_name, name))
-      #{options[:offset] ? "OFFSET #{options[:offset].to_i}" : ""}
-      #{options[:limit] ? "LIMIT #{options[:limit].to_i}" : ""}
+      #{options[:limit] && options[:limit] > 0 ? "LIMIT #{options[:limit].to_i}" : ""}
+      #{options[:offset] && options[:offset] > 0 ? "OFFSET #{options[:offset].to_i}" : ""}
     SQL
     users.each do |user|
       user.common_courses = user.common_courses.to_s.split(",").inject({}){ |hash, info|

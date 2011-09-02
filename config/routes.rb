@@ -18,10 +18,6 @@ ActionController::Routing::Routes.draw do |map|
     conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
     conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
     conversation.remove_messages 'remove_messages', :controller => 'conversations', :action => 'remove_messages', :conditions => {:method => :post}
-    conversation.archive 'archive', :controller => 'conversations', :action => 'workflow_event', :event => 'archive', :conditions => {:method => :post}
-    conversation.unarchive 'unarchive', :controller => 'conversations', :action => 'workflow_event', :event => 'unarchive', :conditions => {:method => :post}
-    conversation.mark_as_read 'mark_as_read', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_read', :conditions => {:method => :post}
-    conversation.mark_as_unread 'mark_as_unread', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_unread', :conditions => {:method => :post}
   end
   
   # So, this will look like:
@@ -690,6 +686,19 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index
+
+    api.with_options(:controller => :conversations) do |conversations|
+      conversations.get 'conversations', :action => :index
+      conversations.post 'conversations', :action => :create
+      conversations.get 'conversations/find_recipients', :action => :find_recipients
+      conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
+      conversations.get 'conversations/:id', :action => :show
+      conversations.put 'conversations/:id', :action => :update # labels, subscribed-ness, workflow_state
+      conversations.delete 'conversations/:id', :action => :destroy
+      conversations.post 'conversations/:id/add_message', :action => :add_message
+      conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
+      conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
+    end
   end
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
