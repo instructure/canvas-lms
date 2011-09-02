@@ -757,7 +757,26 @@ class CoursesController < ApplicationController
           @enrollment_state = 'active'
         end
         if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
-          format.json { render :json => @enrollments.to_json(:include => :user, :methods => [:type, :email, :last_name_first, :users_pseudonym_id, :communication_channel_id]) }
+          format.json do
+            Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
+            json = @enrollments.map { |e|
+              { 'enrollment' =>
+                { 'associated_user_id' => e.associated_user_id,
+                  'communication_channel_id' => e.user.communication_channel.try(:id),
+                  'email' => e.email,
+                  'id' => e.id,
+                  'name' => (e.user.last_name_first || e.user.name),
+                  'pseudonym_id' => e.user.pseudonym.try(:id),
+                  'section' => e.course_section.display_name,
+                  'short_name' => e.user.short_name,
+                  'type' => e.type,
+                  'user_id' => e.user_id,
+                  'workflow_state' => e.workflow_state
+                }
+              }
+            }
+            render :json => json
+          end
         else
           format.json { render :json => "", :status => :bad_request }
         end

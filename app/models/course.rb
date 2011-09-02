@@ -1172,6 +1172,7 @@ class Course < ActiveRecord::Base
     e = self.enrollments.find_by_user_id_and_type(user.id, type) if user
     e.update_attributes(:workflow_state => 'invited', :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section) if e && (e.completed? || e.rejected?)
     e ||= self.send(type.underscore.pluralize).create(:user => user, :workflow_state => enrollment_state, :course_section => section, :invitation_email => invitation_email, :limit_priveleges_to_course_section => limit_priveleges_to_course_section)
+    e.user = user
     self.claim if self.created? && e && e.admin?
     user.try(:touch) unless opts[:skip_touch_user]
     e
