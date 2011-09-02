@@ -152,14 +152,14 @@ class Conversation < ActiveRecord::Base
                           "id IN (SELECT user_id FROM conversation_participants cp WHERE #{cp_conditions})"
         end
         conversation_participants.update_all(
-          {:last_message_at => Time.now.utc, :workflow_state => 'unread'},
+          {:last_message_at => message.created_at, :workflow_state => 'unread'},
           ["(last_message_at IS NULL OR subscribed) AND user_id <> ?", current_user.id]
         )
 
         # for the sender, update the timestamps (marking it as read is always a ui concern)
         if (sender_conversation = conversation_participants.find_by_user_id(current_user.id)) && (options[:update_for_sender] || sender_conversation.last_message_at)
-          sender_conversation.last_message_at = Time.now.utc
-          sender_conversation.last_authored_at = Time.now.utc
+          sender_conversation.last_message_at = message.created_at
+          sender_conversation.last_authored_at = message.created_at
           sender_conversation.save
         end
   

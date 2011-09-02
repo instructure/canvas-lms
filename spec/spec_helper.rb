@@ -64,6 +64,7 @@ Spec::Runner.configure do |config|
   config.before :each do
     Time.zone = 'UTC'
     Account.default.update_attribute(:default_time_zone, 'UTC')
+    Setting.reset_cache!
   end
 
   def account_with_cas(opts={})
