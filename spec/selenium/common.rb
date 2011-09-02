@@ -150,10 +150,12 @@ module SeleniumTestsHelperMethods
     at_exit { shutdown.call }
     for i in 0..MAX_SERVER_START_TIME
       begin
+        s = nil
         Timeout::timeout(5) do
           s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
           break if s
         end
+        break if s
       rescue Timeout::Error
         # pass
       end
@@ -247,15 +249,13 @@ shared_examples_for "all selenium tests" do
   end
   
   def wait_for_ajax_requests
-    keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlighRequests") == 0 }
+    return if driver.execute_script("return typeof($) == 'undefined' || typeof($.ajaxJSON) == 'undefined' || typeof($.ajaxJSON.inFlightRequests) == 'undefined'")
+    keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlightRequests") == 0 }
   end
  
   def wait_for_animations
-    animations = driver.execute_script("return $(':animated').length")
-    until (animations == 0) do
-      sleep 1
-      animations = driver.execute_script("return $(':animated').length")
-    end
+    return if driver.execute_script("return typeof($) == 'undefined'")
+    keep_trying_until { driver.execute_script("return $(':animated').length") == 0 }
   end
 
   def wait_for_ajaximations

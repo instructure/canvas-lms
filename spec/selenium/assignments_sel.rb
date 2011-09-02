@@ -95,10 +95,12 @@ describe "assignment selenium tests" do
     #click on assignment in calendar
     if due_date.month > current_date.month
       driver.find_element(:css, '#content .next_month_link').click
+      wait_for_ajax_requests
     end
     day_id = 'day_' + due_date.year.to_s() + '_' + due_date.strftime('%m') + '_' + due_date.strftime('%d')
     day_div = driver.find_element(:id, day_id)
-    keep_trying_until { day_div.find_element(:link, assignment_name).click }
+    sleep 1 # this is one of those cases where if we click too early, no subsequent clicks will work
+    day_div.find_element(:link, assignment_name).click
     wait_for_animations
     details_dialog = driver.find_element(:id, 'event_details').find_element(:xpath, '..')
     details_dialog.should include_text(assignment_name)

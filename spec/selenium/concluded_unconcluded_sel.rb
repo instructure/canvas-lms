@@ -30,7 +30,6 @@ describe "concluded/unconcluded" do
     keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
     entry.find_element(:css, ".grade").should be_displayed
-    puts "#submission_#{@student.id}_#{@assignment.id} .grade"
     # normally we hate sleeping in these tests, but in this case, i'm not sure what we're waiting to see happen,
     # and if we just try to click and click until it works, then things get jammed up.
     sleep 2
