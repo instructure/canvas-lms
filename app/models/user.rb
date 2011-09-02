@@ -923,7 +923,7 @@ class User < ActiveRecord::Base
   end
   
   def self.max_messages_per_day
-    25
+    Setting.get('max_messages_per_day_per_user', 50).to_i
   end
   
   def max_messages_per_day
