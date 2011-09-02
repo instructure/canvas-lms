@@ -18,12 +18,13 @@
           offset: '0 10px'
         },
         open: function(event) {
-          var $trigger, caratOffset, differenceInWidth, triggerWidth;
+          var $trigger, actualOffset, caratOffset, differenceInWidth, triggerWidth;
           $(this).find(".ui-menu-carat").remove();
           $trigger = jQUI19(this).popup("option", "trigger");
           triggerWidth = $trigger.width();
           differenceInWidth = $(this).width() - triggerWidth;
-          caratOffset = Math.min(Math.max(20, event.offsetX), triggerWidth - 20) + differenceInWidth / 2;
+          actualOffset = event.pageX - $trigger.offset().left;
+          caratOffset = Math.min(Math.max(20, actualOffset), triggerWidth - 20) + differenceInWidth / 2;
           $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this);
           return $(this).css('-webkit-transform-origin-x', caratOffset + 'px').addClass('ui-state-open');
         },
