@@ -3,10 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "user lists Windows-Firefox-Tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  before(:each) do
-    course_with_teacher_logged_in(:active_all => true)
-  end
-  
   def add_users_to_user_list
     @course.root_account.pseudonyms.create!(:unique_id => "A124123").assert_user{|u| u.name = "login_name user"}
     
@@ -28,6 +24,7 @@ eolist
   end
 
   it "should support both email addresses and user names on the course details page" do
+    course_with_teacher_logged_in(:active_all => true)
     get "/courses/#{@course.id}/details"
     driver.find_element(:css, "a#tab-users-link").click
     driver.find_element(:css, "div#tab-users a.add_users_link").click
@@ -35,7 +32,18 @@ eolist
   end
 
   it "should support both email addresses and user names on the getting started page" do
+    course_with_teacher_logged_in(:active_all => true)
     get "/getting_started/students"
+    add_users_to_user_list
+  end
+
+  it "should support adding an enrollment to an enrollmentless course" do
+    user_logged_in
+    Account.default.add_user(@user)
+    course
+    get "/courses/#{@course.id}/details"
+    driver.find_element(:css, "a#tab-users-link").click
+    driver.find_element(:css, "div#tab-users a.add_users_link").click
     add_users_to_user_list
   end
 

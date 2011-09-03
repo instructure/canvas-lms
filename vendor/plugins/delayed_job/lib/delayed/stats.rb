@@ -27,7 +27,8 @@ module Stats
       data['full_command'] = job.full_name
       data['run_time'] = data['finished_at'] - data['locked_at']
       redis.hmset("job:id:#{job.id}", *data.to_a.flatten)
-      redis.expireat("job:id:#{job.id}", 1.month.from_now.to_i)
+      ttl = Setting.get_cached('delayed_jobs_stats_ttl', 1.month.to_s).to_i.from_now
+      redis.expireat("job:id:#{job.id}", ttl.to_i)
     end
   rescue
     Rails.logger.warn "Failed saving job stats: #{$!.inspect}"

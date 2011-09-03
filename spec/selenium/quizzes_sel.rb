@@ -71,11 +71,12 @@ shared_examples_for "quiz selenium tests" do
     end
     
     #### Multiple Choice Question
-    
+    question_count = 1
+    points_total = 1
     new_question_link.click
     
     questions = find_all_with_jquery(".question_holder:visible")
-    questions.length.should eql(1)
+    questions.length.should eql(question_count)
     question = questions[0]
     question.
       find_element(:css, 'select.question_type').
@@ -100,10 +101,10 @@ shared_examples_for "quiz selenium tests" do
     set_feedback_content(question.find_element(:css, "div.text .question_neutral_comment"), "Pass or fail, you're a winner!")
     
     save_question_and_wait(question)
-    driver.find_element(:css, "#right-side .points_possible").text.should eql("1")
+    driver.find_element(:css, "#right-side .points_possible").text.should eql(points_total.to_s)
     
     quiz.reload
-    quiz.quiz_questions.length.should == 1
+    quiz.quiz_questions.length.should == question_count
     question_data = quiz.quiz_questions[0].question_data
     question_data[:answers].length.should == 4
     question_data[:answers][0][:text].should == "Correct Answer"
@@ -123,15 +124,17 @@ shared_examples_for "quiz selenium tests" do
     #### True False Question
     
     new_question_link.click
+    question_count += 1
+    points_total += (points = 2)
     
     questions = find_all_with_jquery(".question_holder:visible")
-    questions.length.should eql(2)
-    question = questions[1]
+    questions.length.should eql(question_count)
+    question = questions.last
     question.
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="true_false_question"]').click
     
-    replace_content(question.find_element(:css, "input[name='question_points']"), "2")
+    replace_content(question.find_element(:css, "input[name='question_points']"), points.to_s)
     
     tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
     in_frame tiny_frame["id"] do
@@ -145,24 +148,26 @@ shared_examples_for "quiz selenium tests" do
     answers[1].find_element(:css, ".answer_comments textarea").send_keys("Good job!")
     
     save_question_and_wait(question)
-    driver.find_element(:css, "#right-side .points_possible").text.should eql("3")
+    driver.find_element(:css, "#right-side .points_possible").text.should eql(points_total.to_s)
     
     quiz.reload
-    quiz.quiz_questions.length.should == 2
+    quiz.quiz_questions.length.should == question_count
     
     
     #### Fill in the Blank Question
     
     new_question_link.click
+    question_count += 1
+    points_total += (points = 1)
     
     questions = find_all_with_jquery(".question_holder:visible")
-    questions.length.should eql(3)
-    question = questions[2]
+    questions.length.should eql(question_count)
+    question = questions.last
     question.
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="short_answer_question"]').click
     
-    replace_content(question.find_element(:css, "input[name='question_points']"), "1")
+    replace_content(question.find_element(:css, "input[name='question_points']"), points.to_s)
     
     tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
     in_frame tiny_frame["id"] do
@@ -183,10 +188,10 @@ shared_examples_for "quiz selenium tests" do
     replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
     
     save_question_and_wait(question)
-    driver.find_element(:css, "#right-side .points_possible").text.should eql("4")
+    driver.find_element(:css, "#right-side .points_possible").text.should eql(points_total.to_s)
     
     quiz.reload
-    quiz.quiz_questions.length.should == 3
+    quiz.quiz_questions.length.should == question_count
     
     
     #### Fill in Multiple Blanks
@@ -201,6 +206,45 @@ shared_examples_for "quiz selenium tests" do
     
     #### Formula Question
     
+    new_question_link.click
+    question_count += 1
+    points_total += (points = 1)
+    
+    questions = find_all_with_jquery(".question_holder:visible")
+    questions.length.should eql(question_count)
+    question = questions.last
+    question.
+      find_element(:css, 'select.question_type').
+      find_element(:css, 'option[value="calculated_question"]').click
+    
+    replace_content(question.find_element(:css, "input[name='question_points']"), points.to_s)
+    
+    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
+    in_frame tiny_frame["id"] do
+      driver.find_element(:id, 'tinymce').send_keys('If [x] + [y] is a whole number, then this is a formula question.')
+    end
+    
+    find_with_jquery('button.recompute_variables').click
+    find_with_jquery('.supercalc:visible').send_keys('x + y')
+    find_with_jquery('button.save_formula_button').click
+    # normally it's capped at 200 (to keep the yaml from getting crazy big)...
+    # since selenium tests take forever, let's make the limit much lower
+    driver.execute_script("window.maxCombinations = 10")
+    find_with_jquery('.combination_count:visible').send_keys('20') # over the limit
+    button = find_with_jquery('button.compute_combinations:visible')
+    button.click
+    find_with_jquery('.combination_count:visible').attribute(:value).should eql "10"
+    keep_trying_until {
+      button.text == 'Generate'
+    }
+    find_all_with_jquery('table.combinations:visible tr').size.should eql 11 # plus header row
+    
+    save_question_and_wait(question)
+    driver.find_element(:css, "#right-side .points_possible").text.should eql(points_total.to_s)
+    
+    quiz.reload
+    quiz.quiz_questions.length.should == question_count
+
     #### Missing Word
     
     #### Essay Question
@@ -246,10 +290,10 @@ shared_examples_for "quiz selenium tests" do
     
     button = dialog.find_element(:css, "button.send_button")
     button.click
-    keep_trying_until{ button.text != "Sending message..." }
+    keep_trying_until{ button.text != "Sending Message..." }
     button.text.should eql("Message Sent!")
 
-    student.conversations(true).size.should eql(1)
+    student.conversations.size.should eql(1)
   end
 
   it "should tally up question bank question points" do
@@ -268,6 +312,59 @@ shared_examples_for "quiz selenium tests" do
     }.click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
+  end
+
+  it "should allow you to use inherited question banks" do
+    course_with_teacher_logged_in
+    @course.account = Account.default
+    @course.save
+    quiz = @course.quizzes.create!(:title => "My Quiz")
+    bank = AssessmentQuestionBank.create!(:context => @course.account)
+    bank.assessment_questions << assessment_question_model
+
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+    driver.find_element(:link, "Find Questions").click
+    keep_trying_until {
+      driver.find_element(:link, "Select All")
+    }.click
+    find_with_jquery("div#find_question_dialog button.submit_button").click
+    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
+
+    driver.find_element(:link, "New Question Group").click
+    driver.find_element(:link, "Link to a Question Bank").click
+    keep_trying_until {
+      find_with_jquery("#find_bank_dialog .bank:visible")
+    }.click
+    find_with_jquery("#find_bank_dialog .submit_button").click
+    find_with_jquery("#group_top_new button[type=submit]").click
+    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
+  end
+
+  it "should check permissions when retrieving question banks" do
+    course_with_teacher_logged_in
+    @course.account = Account.default
+    @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+    @course.save
+    quiz = @course.quizzes.create!(:title => "My Quiz")
+
+    course_bank = AssessmentQuestionBank.create!(:context => @course)
+    course_bank.assessment_questions << assessment_question_model
+
+    account_bank = AssessmentQuestionBank.create!(:context => @course.account)
+    account_bank.assessment_questions << assessment_question_model
+
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+    driver.find_element(:link, "Find Questions").click
+    keep_trying_until {
+      driver.find_element(:link, "Select All")
+    }
+    find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
+
+    driver.find_element(:link, "New Question Group").click
+    driver.find_element(:link, "Link to a Question Bank").click
+    find_all_with_jquery("#find_bank_dialog .bank:visible").size.should eql 1
   end
 
   it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do

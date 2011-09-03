@@ -54,7 +54,7 @@ end
 
 if PageView.page_view_method == :cache
   # periodically pull new page views off the cache and insert them into the db
-  Delayed::Periodic.cron 'PageView.process_cache_queue', '*/5 * * * *' do
+  Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
     PageView.process_cache_queue
   end
 end
@@ -72,3 +72,6 @@ if Delayed::Stats.enabled?
   end
 end
 
+Delayed::Periodic.cron 'Alert.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
+  Alert.process
+end

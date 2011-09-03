@@ -24,7 +24,7 @@
         <%= link_to(t('links.student_teacher_activity', 'Your Interactions Report with %{user}', :user => context_user_name(@context, @user)), user_student_teacher_activity_url(@current_user, @user), :class => 'button button-sidebar-wide') %>
       <% end %>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_students) %>
+    <% if can_do(@context, @current_user, :read_reports) %>
       <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> <%= t 'links.access_report', "Access Report for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
@@ -76,7 +76,7 @@
 <% jammit_css :roster_user %>
 
 <h2><%= t 'headings.users_details', "%{user}'s Details", :user => @user.short_name %></h2>
-<% if can_do(@context, @current_user, :manage_students) %>
+<% if can_do(@context, @current_user, :manage_students) && !@context.is_a?(Group)%>
 <h2><%= t('headings.user_details', %{User Details}) %></h2>
 <%= render :partial => 'users/name' %>
 <a href="#" class="more_user_information_link"><%= t('links.more_user_details', %{more user details...}) %></a>

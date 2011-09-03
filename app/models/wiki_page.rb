@@ -36,6 +36,8 @@ class WikiPage < ActiveRecord::Base
   before_save :set_revised_at
   before_validation :ensure_unique_title
   
+  TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
+  
   def ensure_unique_title
     return if deleted?
     self.title ||= (self.url || "page").to_cased_title
@@ -45,13 +47,17 @@ class WikiPage < ActiveRecord::Base
       baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = p.url.to_cased_title; p.save_without_broadcasting! }
     end
-    while !(self.wiki.wiki_pages.not_deleted.find_all_by_title(self.title) - [self]).empty?
-      n, real_title = self.title.reverse.split("-", 2).map(&:reverse)
-      if n.to_i.to_s == n
-        self.title = "#{real_title}-#{(n.to_i + 1)}"
-      else
-        self.title = "#{(real_title ? real_title + "-" : "")}#{n}-2"
-      end
+    if existing = self.wiki.wiki_pages.not_deleted.find_by_title(self.title)
+      return if existing == self
+      real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
+      n = $1 ? $1.to_i + 1 : 2
+      begin
+        mod = "-#{n}"
+        new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
+        n = n.succ
+      end while self.wiki.wiki_pages.not_deleted.find_by_title(new_title)
+      
+      self.title = new_title
     end
   end
   
@@ -510,6 +516,10 @@ class WikiPage < ActiveRecord::Base
     elsif hash[:title] and hash[:text]
       #it's an actual wiki page
       item.title = hash[:title].presence || item.url.presence || "unnamed page"
+      if item.title.length > TITLE_LENGTH
+        migration.add_warning(t('warnings.truncated_wiki_title', "The title of the following wiki page was truncated: %{title}", :title => item.title))
+        item.title.splice!(0...TITLE_LENGTH) # truncate too-long titles
+      end
       item.body = ImportedHtmlConverter.convert(hash[:text] || "", context)
     else
       allow_save = false

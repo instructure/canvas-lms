@@ -28,6 +28,7 @@ class CourseSection < ActiveRecord::Base
   belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user
+  has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
   has_many :users, :through => :enrollments
   has_many :course_account_associations
   
@@ -54,15 +55,22 @@ class CourseSection < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.cached_course_grants_right?(user, session, :manage_admin_users) }
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
     can :read and can :create and can :update and can :delete
-    
-    given {|user, session| self.enrollments.find_by_user_id(user.id) }
+
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_students, :manage_admin_users) }
+    can :read
+
+    given {|user, session| self.course.account_membership_allows(user, session, :read_roster) }
+    can :read
+
+    given {|user, session| self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
     can :read
   end
 
   def set_update_account_associations_if_changed
     @should_update_account_associations = self.account_id_changed? || self.course_id_changed? || self.nonxlist_course_id_changed?
+    @should_update_account_associations = false if self.new_record? && self.account_id.nil?
     true
   end
   
@@ -71,6 +79,7 @@ class CourseSection < ActiveRecord::Base
   end
   
   def update_account_associations
+    Course.update_account_associations([self.course, self.nonxlist_course].compact)
     self.course.try(:update_account_associations)
     self.nonxlist_course.try(:update_account_associations)
   end
@@ -131,55 +140,54 @@ class CourseSection < ActiveRecord::Base
     self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account)
   end
   
-  def move_to_course(course, delay_jobs = true)
+  def move_to_course(course, *opts)
     return self if self.course_id == course.id
+    old_course = self.course
     self.course = course
-    root_account_change = (self.root_account != course.root_account)
-    self.root_account = course.root_account if root_account_change
+    self.root_account_id = course.root_account_id
     self.default_section = (course.course_sections.active.size == 0)
-    self.save!
+    old_course.course_sections.reset
+    course.course_sections.reset
     user_ids = self.enrollments.map(&:user_id).uniq
-    if root_account_change
-      self.enrollments.update_all :course_id => course.id, :root_account_id => self.root_account.id
-      User.send_later_if_production(:update_account_associations, user_ids) if delay_jobs
-      User.update_account_associations(user_ids) unless delay_jobs
+
+    old_course_is_unrelated = old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
+    if self.root_account_id_changed?
+      self.save!
+      self.enrollments.update_all :course_id => course.id, :root_account_id => self.root_account_id
     else
+      self.save!
       self.enrollments.update_all :course_id => course.id
     end
-    Enrollment.send_later(:recompute_final_score, user_ids, course.id) if delay_jobs
-    Enrollment.recompute_final_score(user_ids, course.id) unless delay_jobs
-    self
+    User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
+    if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
+      old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?
+    end
+    Enrollment.send_now_or_later(opts.include?(:run_jobs_immediately) ? :now : :later, :recompute_final_score, user_ids, course.id)
   end
   
-  def crosslist_to_course(course, delay_jobs = true, make_sticky = true)
-    return self if self.course == course
-    save_needed = false
-    unless self.nonxlist_course
-      self.nonxlist_course = self.course
-      save_needed = true
-    end
-    if !self.sticky_xlist && make_sticky
+  def crosslist_to_course(course, *opts)
+    return self if self.course_id == course.id
+    self.nonxlist_course_id ||= self.course_id
+    if !self.sticky_xlist && !opts.include?(:nonsticky)
       self.sticky_xlist = true
-      save_needed = true
     end
-    self.save! if save_needed
-    self.move_to_course(course, delay_jobs)
+    self.move_to_course(course, *opts)
   end
   
-  def uncrosslist(delay_jobs = true)
-    return unless self.nonxlist_course
+  def uncrosslist(*opts)
+    return unless self.nonxlist_course_id
     if self.nonxlist_course.workflow_state == "deleted"
       self.nonxlist_course.workflow_state = "claimed"
       self.nonxlist_course.save!
     end
-    self.move_to_course(self.nonxlist_course, delay_jobs)
+    nonxlist_course = self.nonxlist_course
     self.nonxlist_course = nil
     self.sticky_xlist = false
-    self.save!
+    self.move_to_course(nonxlist_course, *opts)
   end
   
   def crosslisted?
-    return !!self.nonxlist_course
+    return !!self.nonxlist_course_id
   end
   
   def destroy_course_if_no_more_sections

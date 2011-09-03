@@ -37,7 +37,7 @@ module CC
       ) do |standards_node|
         @course.grading_standards.each do |standard|
           migration_id = CCHelper.create_key(standard)
-          standards_node.gradingStandard(:identifier=>migration_id) do |standard_node|
+          standards_node.gradingStandard(:identifier=>migration_id, :version=>standard.version) do |standard_node|
             standard_node.title standard.title unless standard.title.blank?
             standard_node.data standard.data.to_json
           end

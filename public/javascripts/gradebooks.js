@@ -2036,11 +2036,7 @@ I18n.scoped('gradebook', function(I18n) {
     }
     var letterGrade = "";
     if(grading_scheme) {
-      var letters = $.grep(grading_scheme, function(row, i) {
-        return finalGrade <= row[1] * 100 || i == 0;
-      });
-      var letter = letters[letters.length - 1];
-      letterGrade = letter[0];
+      letterGrade = INST.GradeCalculator.letter_grade(grading_scheme, finalGrade);
     }
     $("#submission_" + student_id + "_final-grade")
       .css('visibility', '')

@@ -30,6 +30,6 @@ describe 'new_wiki_page.sms' do
     @object.wiki_with_participants.wiki_namespaces.first.context.participants.should be_include(@user)
     @object.wiki.wiki_namespaces.should_not be_empty
     @object.find_namespace_for_user(@user).should_not be_nil
-    generate_message(:new_wiki_page, :sms, @object, @user)
+    generate_message(:new_wiki_page, :sms, @object, :user => @user)
   end
 end

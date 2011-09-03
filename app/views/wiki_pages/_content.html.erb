@@ -49,30 +49,31 @@
       <% end %>
     </div>
   <% else %>
-  <div id="last_edited_by" class="clearfix">
-    <% last_version = @page.versions.current.model rescue @page %>
-    <a href="<%= context_url(@context, :context_wiki_page_wiki_page_revisions_path, @page) %>" id="page_history" class="history"><%= t 'links.page_history', 'Page history' %></a>
-    <%= t 'labels.last_edited', 'Last edited by %{name} %{time_ago} ago', :name => @page.user_name, :time_ago => (time_ago_in_words(last_version.updated_at) rescue "???") %>
-    <% if (@context.context.is_a?(Course) rescue false) %>
-      <div><%= image_tag "warning.png", :style => "height: 10px;" %>
-        <%= mt :group_wiki_warning, "This page is part of the group wiki, *not* your course wiki. If you're looking for the course wiki, [click here](%{link}).", 
-          :link => context_url(@context.context, :context_wiki_pages_url) %>
+    <div id="last_edited_by" class="clearfix">
+      <% last_version = @page.versions.current.model rescue @page %>
+      <a href="<%= context_url(@context, :context_wiki_page_wiki_page_revisions_path, @page) %>" id="page_history" class="history"><%= t 'links.page_history', 'Page history' %></a>
+      <%= t 'labels.last_edited', 'Last edited by %{name} %{time_ago} ago', :name => @page.user_name, :time_ago => (time_ago_in_words(last_version.updated_at) rescue "???") %>
+      <% if (@context.context.is_a?(Course) rescue false) %>
+        <div><%= image_tag "warning.png", :style => "height: 10px;" %>
+          <%= mt :group_wiki_warning, "This page is part of the group wiki, *not* your course wiki. If you're looking for the course wiki, [click here](%{link}).", 
+            :link => context_url(@context.context, :context_wiki_pages_url) %>
+        </div>
+      <% end %>
+    </div>
+    <div class="someone_else_edited" style="display: none; font-size: 0.8em;">
+      <%= image_tag "warning.png", :style => "height: 12px;" %> 
+      <%= mt 'notices.page_edited_while_viewing', 'This page has been updated by someone else since you started viewing it. [Click here to reload the page.](%{link})', :link => request.url %>
+    </div>
+    <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
+    <% if @page.deleted? %>
+      <div id="deleted_message" class="user_content" style="margin-top: 10px;">
+        <%= t 'notices.page_deleted', 'This page has been deleted.' %>
+      </div>
+    <% else %>
+      <div id="wiki_body" class="user_content">
+        <%= user_content(@page.body) %>
       </div>
     <% end %>
-  </div>
-  <div class="someone_else_edited" style="display: none; font-size: 0.8em;">
-    <%= image_tag "warning.png", :style => "height: 12px;" %> 
-    <%= mt 'notices.page_edited_while_viewing', 'This page has been updated by someone else since you started viewing it. [Click here to reload the page.](%{link})', :link => request.url %>
-  </div>
-  <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-  <% if @page.deleted? %>
-    <div id="deleted_message" class="user_content" style="margin-top: 10px;">
-      <%= t 'notices.page_deleted', 'This page has been deleted.' %>
-    </div>
-  <% end %>
-  <div id="wiki_body" class="user_content" style="<%= hidden if @page.deleted? %>">
-    <%= user_content(@page.body) %>
-  </div>
   <% end %>
 </div>
 <div id="wiki_edit_view_main" style="display:none; text-align: right;">

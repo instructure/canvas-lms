@@ -16,12 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def generate_message(notification_name, path_type, asset, user=nil, delayed_messages=[])
+def generate_message(notification_name, path_type, asset, options = {})
+  raise "options must be a hash!" unless options.is_a? Hash
   @notification = Notification.create!(:name => notification_name.to_s)
+  user = options[:user]
+  asset_context = options[:asset_context]
   user ||= User.create!(:name => "some user")
   
   @cc = user.communication_channels.create!(:path_type => path_type.to_s)
-  @message = Message.new(:notification => @notification, :context => asset, :user => user, :communication_channel => @cc)
+  @message = Message.new(:notification => @notification, :context => asset, :user => user, :communication_channel => @cc, :asset_context => asset_context)
   @message.delayed_messages = []
   @message.parse!(path_type.to_s)
   @message.body.should_not be_nil

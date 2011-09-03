@@ -1194,7 +1194,7 @@ class Quiz < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :view_all_grades) }
     can :read_statistics and can :review_grades
 
     given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }

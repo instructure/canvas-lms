@@ -134,7 +134,6 @@ class UnzipAttachment
           @batch.data[:last_path] = path
           @batch.save
         end
-        f.close
         # This is where the attachment actually happens.  See file_in_context.rb
         attachment = nil
         begin
@@ -149,6 +148,8 @@ class UnzipAttachment
         @attachments << attachment if attachment
       rescue => e
         @logger.warn "Couldn't unzip archived file #{path}: #{e.message}" if @logger
+      ensure
+        f.close
       end
     end
     updates = []

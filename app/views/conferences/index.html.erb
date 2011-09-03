@@ -27,6 +27,9 @@
 
 <% form_for :web_conference, :url => context_url(@context, :context_conferences_url), :html => {:id => "add_conference_form", :style => "display: none;", :class => "communication_message"} do |f| %>
   <div class="header">
+    <a href="#" target="_blank" class="advanced_settings" style="float:right" data-base-href="<%= context_url(@context, :context_conference_settings_url, "{{ id }}") %>">
+      <%= t('links.advanced_settings', "Manage Advanced Settings...") %>
+    </a>
     <span class="title"><%= t :new_conference_heading, "Start a New Conference" %></span>
   </div>
   <div class="content">

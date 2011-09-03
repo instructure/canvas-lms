@@ -31,6 +31,6 @@ describe 'new_wiki_page.summary' do
     @object.wiki.wiki_namespaces.should_not be_empty
     @object.find_namespace_for_user(@user).should_not be_nil
     @object.find_namespace_for_user(@user).context.should_not be_nil
-    generate_message(:new_wiki_page, :summary, @object, @user)
+    generate_message(:new_wiki_page, :summary, @object, :user => @user)
   end
 end

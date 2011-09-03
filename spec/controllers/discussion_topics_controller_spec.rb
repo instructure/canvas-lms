@@ -237,6 +237,26 @@ describe DiscussionTopicsController do
       @topic.old_assignment_id.should == old_assignment_id
       DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
     end
+
+    it "should not drift when saving delayed_post_at with user-preferred timezone set" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic
+
+      @teacher.time_zone = 'Alaska'
+      @teacher.save
+
+      teacher_tz = Time.use_zone(@teacher.time_zone) { Time.zone }
+      time_string = "Fri Aug 26, 2031 8:39AM"
+      expected_time = teacher_tz.parse(time_string)
+
+      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {
+        :delay_posting => '1',
+        :delayed_post_at => time_string
+      }
+
+      @topic.reload
+      @topic.delayed_post_at.should == expected_time
+    end
   end
   
   describe "DELETE 'destroy'" do

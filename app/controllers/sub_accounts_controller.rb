@@ -20,10 +20,28 @@ class SubAccountsController < ApplicationController
   # these actions assume that if we're authorized to act on @account , we're
   # authorized to act on all its sub-accounts too.
 
+  def sub_accounts_of(account, current_depth = 0)
+    account_data = @accounts[account.id] = { :account => account, :course_count => 0}
+    sub_accounts = account.sub_accounts.active(:limit => 101, :order => :name) unless current_depth == 2
+    sub_account_ids = (sub_accounts || []).map(&:id)
+    if current_depth == 2 || sub_accounts.length > 100
+      sub_accounts = account_data[:sub_account_ids] = []
+      account_data[:sub_account_count] = 0
+      @accounts[:accounts_to_get_sub_account_count] << account.id
+    else
+      account_data[:sub_account_ids] = sub_account_ids
+      account_data[:sub_account_count] = sub_accounts.length
+    end
+    @accounts[:all_account_ids].concat sub_account_ids
+    sub_accounts.each do |sub_account|
+      sub_accounts_of(sub_account, current_depth + 1)
+    end
+  end
+
   before_filter :require_context, :require_account_management
   def index
-    @accounts = []
     if (params[:account] && params[:account][:name]) || request.format == :json
+      @accounts = []
       if @context && @context.is_a?(Account)
         @accounts = @context.all_accounts.active.name_like(params[:account][:name]).limit(100)
       end
@@ -36,8 +54,30 @@ class SubAccountsController < ApplicationController
             :suggestions =>  @accounts.map(& :name),
             :data => @accounts.map{ |c| {:url => account_url(c), :id => c.id}  }
           }.to_json
+          return
         }
       end
+    end
+
+    @accounts = {}
+    @accounts[:all_account_ids] = [@context.id]
+    @accounts[:accounts_to_get_sub_account_count] = []
+    sub_accounts_of(@context)
+    unless @accounts[:accounts_to_get_sub_account_count].empty?
+      counts = Account.count(:all,
+                             :group => :parent_account_id,
+                             :conditions => {:parent_account_id => @accounts[:accounts_to_get_sub_account_count]})
+      counts.each do |account_id, count|
+        @accounts[account_id][:sub_account_count] = count
+      end
+    end
+    counts = Course.count('DISTINCT courses.id',
+      :group => 'course_account_associations.account_id',
+      :joins => :course_account_associations,
+      :conditions => "course_account_associations.account_id IN (#{@accounts[:all_account_ids].join(', ')}) AND " +
+                    "course_account_associations.depth=0 AND courses.workflow_state<>'deleted'")
+    counts.each do |account_id, count|
+      @accounts[account_id][:course_count] = count
     end
   end
   

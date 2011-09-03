@@ -179,6 +179,17 @@
         return 0;
       }
     };
+    GradeCalculator.letter_grade = function(grading_scheme, score) {
+      var letter, letters;
+      if (score < 0) {
+        score = 0;
+      }
+      letters = $.grep(grading_scheme, function(row, i) {
+        return score >= row[1] * 100 || i === (grading_scheme.length - 1);
+      });
+      letter = letters[0];
+      return letter[0];
+    };
     return GradeCalculator;
   })();
   window.INST.GradeCalculator = GradeCalculator;

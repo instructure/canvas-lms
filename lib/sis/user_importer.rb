@@ -52,7 +52,7 @@ module SIS
       users_to_set_sis_batch_ids = []
       pseudos_to_set_sis_batch_ids = []
 
-      User.skip_updating_user_account_associations do
+      User.skip_updating_account_associations do
         FasterCSV.open(csv[:fullpath], "rb", :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |csv_object|
           row = csv_object.shift
           count = 0

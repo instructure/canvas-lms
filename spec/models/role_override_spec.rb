@@ -20,15 +20,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe RoleOverride do
   it "should retain the prior permission when it encounters the first explicit override" do
-    course_model
-    RoleOverride.create!(:context => @course, :permission => 'moderate_forum',
+    @account = account_model(:parent_account => Account.default)
+    RoleOverride.create!(:context => @account, :permission => 'moderate_forum',
                          :enrollment_type => "TeacherEnrollment", :enabled => false)
-    permissions = RoleOverride.permission_for(@course.account, :moderate_forum, "TeacherEnrollment")
+    permissions = RoleOverride.permission_for(Account.default, :moderate_forum, "TeacherEnrollment")
     permissions[:enabled].should == true
     permissions.key?(:prior_default).should == false
     permissions[:explicit].should == false
 
-    permissions = RoleOverride.permission_for(@course, :moderate_forum, "TeacherEnrollment")
+    permissions = RoleOverride.permission_for(@account, :moderate_forum, "TeacherEnrollment")
     permissions[:enabled].should == false
     permissions[:prior_default].should == true
     permissions[:explicit].should == true

@@ -326,6 +326,13 @@ class WebConference < ActiveRecord::Base
     end
   end
   
+  def has_advanced_settings?
+    respond_to?(:admin_settings_url)
+  end
+  def has_advanced_settings
+    has_advanced_settings? ? 1 : 0
+  end
+
   def clone_for(context, dup=nil, options={})
     dup ||= WebConference.new
     self.attributes.delete_if{|k,v| [:id, :conference_key, :user_id, :added_user_id, :started_at, :uuid, :invited_user_ids].include?(k.to_sym) }.each do |key, val|
@@ -377,6 +384,10 @@ class WebConference < ActiveRecord::Base
   
   named_scope :active, lambda {
   }
+
+  def as_json(options={})
+    super(options.merge(:methods => [:has_advanced_settings]))
+  end
 
   def self.plugins
     Canvas::Plugin.all_for_tag(:web_conferencing)

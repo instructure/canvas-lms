@@ -45,6 +45,16 @@ ActionController::Routing::Routes.draw do |map|
   
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
 
+  question_bank_resources = lambda do |bank|
+    bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
+    bank.reorder 'reorder', :controller => 'question_banks', :action => 'reorder'
+    bank.questions 'questions', :controller => 'question_banks', :action => 'questions'
+    bank.move_questions 'move_questions', :controller => 'question_banks', :action => 'move_questions'
+    bank.resources :assessment_questions do |question|
+      question.move_question 'move', :controller => 'assessment_questions', :action => 'move'
+    end
+  end
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -59,7 +69,6 @@ ActionController::Routing::Routes.draw do |map|
     course.backup 'backup', :controller => 'courses', :action => 'backup'
     course.unconclude 'unconclude', :controller => 'courses', :action => 'unconclude'
     course.students 'students', :controller => 'courses', :action => 'students'
-    course.resources :role_overrides, :only => [:index, :create]
     course.enrollment_invitation 'enrollment_invitation', :controller => 'courses', :action => 'enrollment_invitation'
     course.users 'users', :controller => 'context', :action => 'roster'
     course.user_services 'user_services', :controller => 'context', :action => 'roster_user_services'
@@ -176,17 +185,11 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
       conference.close "close", :controller => "conferences", :action => "close"
+      conference.settings "settings", :controller => "conferences", :action => "settings"
     end
     
-    course.resources :question_banks do |bank|
-      bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
-      bank.reorder 'reorder', :controller => 'question_banks', :action => 'reorder'
-      bank.questions 'questions', :controller => 'question_banks', :action => 'questions'
-      bank.move_questions 'move_questions', :controller => 'question_banks', :action => 'move_questions'
-    end
-    course.resources :assessment_questions do |question|
-      question.move_question 'move', :controller => 'assessment_questions', :action => 'move'
-    end
+    course.resources :question_banks, &question_bank_resources
+
     course.quizzes_publish 'quizzes/publish', :controller => 'quizzes', :action => 'publish'
     course.resources :quizzes do |quiz|
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
@@ -259,6 +262,8 @@ ActionController::Routing::Routes.draw do |map|
     course.publish_to_sis 'details/sis_publish', :controller => 'courses', :action => 'publish_to_sis', :conditions => {:method => :post}
     
     course.resources :user_lists, :only => :create
+    course.reset 'reset', :controller => 'courses', :action => 'reset_content', :conditions => {:method => :post}
+    course.resources :alerts
   end
 
   map.resources :page_views, :only => [:update,:index]
@@ -359,6 +364,7 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
       conference.close "close", :controller => "conferences", :action => "close"
+      conference.settings "settings", :controller => "conferences", :action => "settings"
     end
     group.chat 'chat', :controller => 'context', :action => 'chat'
     group.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
@@ -445,6 +451,8 @@ ActionController::Routing::Routes.draw do |map|
     account.courses_redirect 'courses/:id', :controller => 'accounts', :action => 'courses_redirect'
     account.user_notes 'user_notes', :controller => 'user_notes', :action => 'user_notes'
     account.run_report 'run_report', :controller => 'accounts', :action => 'run_report'
+    account.resources :alerts
+    account.resources :question_banks, &question_bank_resources
   end
   map.avatar_image 'images/users/:user_id', :controller => 'info', :action => 'avatar_image_url', :conditions => {:method => :get}
   map.thumbnail_image 'images/thumbnails/:id/:uuid', :controller => 'files', :action => 'image_thumbnail'
@@ -640,6 +648,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
+      courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -665,6 +674,16 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :sis_imports_api) do |sis|
       sis.post 'accounts/:account_id/sis_imports', :action => :create
       sis.get 'accounts/:account_id/sis_imports/:id', :action => :show
+    end
+
+    api.with_options(:controller => :users) do |users|
+      users.get 'users/activity_stream', :action => 'activity_stream'
+    end
+
+    api.with_options(:controller => :accounts) do |accounts|
+      accounts.get 'accounts', :action => :index, :path_name => 'accounts'
+      accounts.get 'accounts/:id', :action => :show
+      accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
     end
   end
 

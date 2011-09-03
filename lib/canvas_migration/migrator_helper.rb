@@ -100,6 +100,7 @@ module Canvas::MigratorHelper
   # Does a JSON export of the courses
   def save_to_file(file_name = nil)
     make_export_dir
+    add_assessment_id_prepend
     file_name ||= File.join(@base_export_dir, FULL_COURSE_JSON_FILENAME)
     file_name = File.expand_path(file_name)
     @course[:full_export_file_path] = file_name
@@ -108,6 +109,40 @@ module Canvas::MigratorHelper
     logger.debug "Writing the full course json file to: #{file_name}"
     File.open(file_name, 'w') { |file| file << @course.to_json}
     file_name
+  end
+  
+  def id_prepender
+    @settings[:id_prepender]
+  end
+  
+  def prepend_id(id)
+    id_prepender ? "#{id_prepender}_#{id}" : id
+  end
+  
+  def add_assessment_id_prepend
+    if id_prepender
+      if @course[:assessment_questions]
+        @course[:assessment_questions][:assessment_questions].each do |q|
+          q[:migration_id] = prepend_id(q[:migration_id])
+          q[:question_bank_id] = prepend_id(q[:question_bank_id]) if q[:question_bank_id].present?
+        end
+      end
+      if @course[:assessments]
+        @course[:assessments][:assessments].each do |a|
+          a[:migration_id] = prepend_id(a[:migration_id])
+          a[:questions].each do |q|
+            if q[:question_type] == "question_reference"
+              q[:migration_id] = prepend_id(q[:migration_id])
+            elsif q[:question_type] == "question_group"
+              q[:question_bank_migration_id] = prepend_id(q[:question_bank_migration_id]) if q[:question_bank_migration_id].present?
+              q[:questions].each do |gq|
+                gq[:migration_id] = prepend_id(gq[:migration_id])
+              end
+            end
+          end
+        end
+      end
+    end
   end
 
   # Does a JSON overview export of the courses

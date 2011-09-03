@@ -31,6 +31,6 @@ describe 'new_wiki_page.email' do
     @object.wiki.wiki_namespaces.should_not be_empty
     @object.wiki.wiki_namespaces.count.should == 1
     @object.find_namespace_for_user(@user).should_not be_nil
-    generate_message(:new_wiki_page, :email, @object, @user, @user)
+    generate_message(:new_wiki_page, :email, @object, :user => @user)
   end
 end

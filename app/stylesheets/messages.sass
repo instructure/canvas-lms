@@ -627,7 +627,7 @@ li.purple .label_icon, .purple.label_icon
     background: transparent url(/images/messages/address-book-icon-sprite.png) 0 0 no-repeat
   a.browser:hover
     background-position: 0 -18px
-  span
+  > span
     float: left
     color: #888
     margin: 2px 1px 0
@@ -637,7 +637,15 @@ li.purple .label_icon, .purple.label_icon
     padding: 0
   li
     div
-      display: inline
+      background-color: #dee7fa
+      +border-radius(10px)
+      padding: 0 14px 0 11px
+      display: inline-block
+    span
+      color: #fff
+      font-size: 0.8em
+      vertical-align: top
+      display: inline-block
     a
       position: absolute
       right: 1px
@@ -651,15 +659,15 @@ li.purple .label_icon, .purple.label_icon
     white-space: nowrap
     float: left
     margin: 1px 2px 1px 4px
-    padding: 0 14px 0 11px
     color: #000
-    background-color: #dee7fa
+    background-color: #85ace0
     border: 1px solid #a5bcf0
     +border-radius(10px)
     cursor: default
     position: relative
   li:hover
-    background-color: #bccef4
+    div
+      background-color: #bccef4
     border-color: #6f94e6
     a
       background-position: 1px center
@@ -669,6 +677,11 @@ li.purple .label_icon, .purple.label_icon
     color: #fff
     a
       background-position: -10px center
+  li.details
+    div
+      padding: 0 11px
+    span
+      padding: 0 15px 0 4px
   input
     -webkit-box-shadow: none
     -moz-box-shadow: none
@@ -906,6 +919,7 @@ form
     -webkit-box-sizing: border-box
     -moz-box-sizing: border-box
     width: 100%
+    max-height: 350px
 
 #forward_message_form
   input, textarea

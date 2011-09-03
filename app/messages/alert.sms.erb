@@ -1,0 +1,9 @@
+<%=
+  if asset_context.user_id == user.id
+    t('body_student', "An alert has been triggered for you")
+  else
+    t('body', "An alert has been triggered for %{student}", :student => asset_context.user.name)
+  end
+%>
+
+<%= t('more_info', 'More info at %{url}', :url => HostUrl.context_host(asset_context.course)) %>

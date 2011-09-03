@@ -22,6 +22,7 @@ I18n.scoped('site_admin', function(I18n) {
       event.preventDefault();
       var name = $(this).attr('data-name');
       var url = $.replaceTags($(".over_time_url").attr('href'), 'attribute', $(this).attr('data-key'));
+      url = $.replaceTags(url, 'category', $(this).attr('data-category'))
       var $link = $(this);
       $link.text(I18n.t('status.loading', "loading..."));
       $.ajaxJSON(url, 'GET', {}, function(data) {

@@ -20,5 +20,6 @@
 <div id="sub_account_urls">
   <a href="<%= context_url(@context, :context_sub_account_url, "{{ id }}") %>" class="sub_account_url" style="display: none;">&nbsp;</a>
 </div>
-<%= render :partial => "sub_accounts", :locals => {:account => @context, :depth => 2} %>
+<% account_data = @accounts[@context.id] %>
+<%= render :partial => "sub_accounts", :locals => {:account => @context, :depth => 2, :course_count => account_data[:course_count], :sub_account_count => account_data[:sub_account_count]} %>
 <%= render :partial => "sub_accounts" %>

@@ -286,6 +286,7 @@
               <xs:element name="data" type="xs:string" minOccurs="1"/>
             </xs:all>
             <xs:attribute name="identifier" type="xs:ID" use="required"/>
+            <xs:attribute name="version" type="xs:integer" default="1"/>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
