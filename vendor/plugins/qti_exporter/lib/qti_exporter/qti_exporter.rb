@@ -19,7 +19,6 @@ class QtiExporter < Canvas::Migrator
     @files = {}
     @converted = false
     @dest_dir_2_1 = nil
-    @id_prepender = settings[:id_prepender]
   end
 
   def export
@@ -38,24 +37,6 @@ class QtiExporter < Canvas::Migrator
 
     if settings[:apply_respondus_settings_file]
       apply_respondus_settings
-    end
-
-    if @id_prepender
-      @course[:assessment_questions][:assessment_questions].each do |q|
-        q[:migration_id] = "#{@id_prepender}_#{q[:migration_id]}"
-      end
-      @course[:assessments][:assessments].each do |a|
-        a[:migration_id] = "#{@id_prepender}_#{a[:migration_id]}"
-        a[:questions].each do |q|
-          if q[:question_type] == "question_reference"
-            q[:migration_id] = "#{@id_prepender}_#{q[:migration_id]}"
-          elsif q[:question_type] == "question_group"
-            q[:questions].each do |gq|
-              gq[:migration_id] = "#{@id_prepender}_#{gq[:migration_id]}"
-            end
-          end
-        end
-      end
     end
 
     save_to_file

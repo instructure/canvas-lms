@@ -47,11 +47,11 @@ module Api::V1::DiscussionTopics
     end
   end
 
-  def api_pagination_headers(topics)
+  def topic_pagination_path
     if @context.is_a? Course
-      Api.set_pagination_headers!(topics, response, api_v1_course_discussion_topics_path(@context))
+      api_v1_course_discussion_topics_path(@context)
     else
-      Api.set_pagination_headers!(topics, response, api_v1_group_discussion_topics_path(@context))
+      api_v1_group_discussion_topics_path(@context)
     end
   end
 end

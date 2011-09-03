@@ -3,7 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe FilesController do
   context "should support Submission as a context" do
     before(:each) do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      login_as
       @me = @user
       submission_model
       @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
@@ -20,10 +21,14 @@ describe FilesController do
       uri.path.should == "/files/#{@submission.attachment.id}/download"
       @me.valid_access_verifier?(qs['ts'], qs['sf_verifier']).should be_true
       qs['verifier'].should == @submission.attachment.uuid
+      location = response['Location']
+      reset!
 
-      get response['Location']
+      get location
       response.should be_success
       response.content_type.should == 'image/png'
+      # ensure that the user wasn't logged in by the normal means
+      controller.instance_variable_get(:@current_user).should be_nil
     end
 
     it "without safefiles" do
@@ -37,7 +42,8 @@ describe FilesController do
   end
 
   it "should use relative urls for safefiles in course context" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     HostUrl.stub!(:file_host).and_return('files-test.host')
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", :inline => '1'
@@ -48,10 +54,14 @@ describe FilesController do
     uri.path.should == "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
     @user.valid_access_verifier?(qs['ts'], qs['sf_verifier']).should be_true
     qs['verifier'].should be_nil
+    location = response['Location']
+    reset!
 
-    get response['Location']
+    get location
     response.should be_success
     response.content_type.should == 'image/png'
+    # ensure that the user wasn't logged in by the normal means
+    controller.instance_variable_get(:@current_user).should be_nil
   end
 
   it "shouldn't use relative urls for safefiles in other contexts" do

@@ -106,7 +106,7 @@ describe AssignmentsController do
       a = @course.assignments.create(:title => "some assignment")
       
       get 'show', :course_id => @course.id, :id => a.id
-      assigns[:assignment_groups].should_not be_nil
+      assigns[:assignment_groups].should_not be_blank
       assigns[:unlocked].should_not be_nil
     end
     

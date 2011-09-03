@@ -51,6 +51,35 @@ describe Course do
     course = Course.create!(:account => sub_sub_account)
     course.grants_right?(user, nil, :manage).should be_true
   end
+
+  it "should clear content when resetting" do
+    course_with_student
+    @course.discussion_topics.create!
+    @course.quizzes.create!
+    @course.assignments.create!
+    @course.wiki.wiki_page.save!
+    @course.sis_source_id = 'sis_id'
+    @course.save!
+    @course.course_sections.should_not be_empty
+    @course.students.should == [@student]
+
+    @new_course = @course.reset_content
+
+    @course.reload
+    @course.course_sections.should be_empty
+    @course.students.should be_empty
+    @course.sis_source_id.should be_nil
+
+    @new_course.reload
+    @new_course.course_sections.should_not be_empty
+    @new_course.students.should == [@student]
+    @new_course.discussion_topics.should be_empty
+    @new_course.quizzes.should be_empty
+    @new_course.assignments.should be_empty
+    @new_course.sis_source_id.should == 'sis_id'
+
+    @course.replacement_course_id.should == @new_course.id
+  end
 end
 
 describe Course, "account" do
@@ -128,7 +157,7 @@ end
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard
-    default.to_json.should eql([["A", 1], ["A-", 0.93], ["B+", 0.89], ["B", 0.86], ["B-", 0.83], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]].to_json)
+    default.to_json.should eql([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]].to_json)
     course_model
     @course.score_to_grade(95).should eql("")
     @course.grading_standard_id = 0
@@ -137,7 +166,8 @@ describe Course, "score_to_grade" do
     @course.score_to_grade(100).should eql("A")
     @course.score_to_grade(99).should eql("A")
     @course.score_to_grade(94).should eql("A")
-    @course.score_to_grade(93.001).should eql("A")
+    @course.score_to_grade(93.999).should eql("A-")
+    @course.score_to_grade(93.001).should eql("A-")
     @course.score_to_grade(93).should eql("A-")
     @course.score_to_grade(92.999).should eql("A-")
     @course.score_to_grade(90).should eql("A-")
@@ -213,6 +243,31 @@ describe Course, "gradebook_to_csv" do
     rows[0][-3].should == "Current Score"
     rows[1][-3].should == "(read only)"
     rows[2][-3].should == "90"
+  end
+
+  it "should include sis ids if enabled" do
+    user_with_pseudonym(:active_all => true)
+    course(:active_all => true)
+    student_in_course(:user => @user)
+    @user.pseudonym.sis_user_id = "SISUSERID"
+    @user.pseudonym.sis_source_id = "SISLOGINID"
+    @user.pseudonym.save!
+    @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+    @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+    @assignment.grade_student(@user, :grade => "10")
+    @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+
+    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv.should_not be_nil
+    rows = FasterCSV.parse(csv)
+    rows.length.should equal(3)
+    rows[0][2].should == 'SIS User ID'
+    rows[0][3].should == 'SIS Login ID'
+    rows[2][2].should == 'SISUSERID'
+    rows[2][3].should == 'SISLOGINID'
   end
 end
 
@@ -961,5 +1016,48 @@ describe Course, "conclusions" do
     enrollment.state_based_on_date.should == :completed
 
     @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+  end
+end
+
+describe Course, "inherited_assessment_question_banks" do
+  it "should include the course's banks if include_self is true" do
+    @account = Account.create
+    @course = Course.create(:account => @account)
+    @course.inherited_assessment_question_banks(true).should be_empty
+
+    bank = @course.assessment_question_banks.create
+    @course.inherited_assessment_question_banks(true).should eql [bank]
+  end
+
+  it "should include all banks in the account hierarchy" do
+    @root_account = Account.create
+    root_bank = @root_account.assessment_question_banks.create
+
+    @account = Account.new
+    @account.root_account = @root_account
+    @account.save
+    account_bank = @account.assessment_question_banks.create
+
+    @course = Course.create(:account => @account)
+    @course.inherited_assessment_question_banks.sort_by(&:id).should eql [root_bank, account_bank]
+  end
+
+  it "should return a useful scope" do
+    @root_account = Account.create
+    root_bank = @root_account.assessment_question_banks.create
+
+    @account = Account.new
+    @account.root_account = @root_account
+    @account.save
+    account_bank = @account.assessment_question_banks.create
+
+    @course = Course.create(:account => @account)
+    bank = @course.assessment_question_banks.create
+
+    banks = @course.inherited_assessment_question_banks(true)
+    banks.scoped(:order => :id).should eql [root_bank, account_bank, bank]
+    banks.find_by_id(bank.id).should eql bank
+    banks.find_by_id(account_bank.id).should eql account_bank
+    banks.find_by_id(root_bank.id).should eql root_bank
   end
 end

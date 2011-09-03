@@ -54,9 +54,9 @@ class Conversation < ActiveRecord::Base
         user_ids.each do |user_id|
           participant = conversation.conversation_participants.build
           participant.user_id = user_id
+          participant.workflow_state = 'read'
           participant.save!
         end
-        User.update_all('unread_conversations_count = unread_conversations_count + 1', :id => user_ids)
       end
       conversation
     end
@@ -70,13 +70,15 @@ class Conversation < ActiveRecord::Base
       user_ids -= conversation_participants.map(&:user_id)
       next if user_ids.empty?
 
-      User.update_all('unread_conversations_count = unread_conversations_count + 1', :id => user_ids)
-
       last_message_at = conversation_messages.human.first.created_at
+      raise "can't add participants if there are no messages" unless last_message_at
       num_messages = conversation_messages.human.size
+
+      User.update_all('unread_conversations_count = unread_conversations_count + 1', :id => user_ids)
       user_ids.each do |user_id|
         participant = conversation_participants.build
         participant.user_id = user_id
+        participant.workflow_state = 'unread'
         participant.last_message_at = last_message_at
         participant.message_count = num_messages
         participant.save!
@@ -154,16 +156,10 @@ class Conversation < ActiveRecord::Base
           ["(last_message_at IS NULL OR subscribed) AND user_id <> ?", current_user.id]
         )
 
-        # for the sender, update the timestamps
-        # marking it as read is a ui concern, unless it's the first message (e.g. we might be sending from outside the inbox)
+        # for the sender, update the timestamps (marking it as read is always a ui concern)
         if (sender_conversation = conversation_participants.find_by_user_id(current_user.id)) && (options[:update_for_sender] || sender_conversation.last_message_at)
-          mark_as_read = options[:update_for_sender] && sender_conversation.last_message_at.nil?
-          if mark_as_read && sender_conversation.unread? && sender_conversation.last_message_at 
-            User.update_all 'unread_conversations_count = unread_conversations_count - 1', :id => current_user.id
-          end
           sender_conversation.last_message_at = Time.now.utc
           sender_conversation.last_authored_at = Time.now.utc
-          sender_conversation.workflow_state = 'read' if mark_as_read
           sender_conversation.save
         end
   

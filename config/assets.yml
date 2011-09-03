@@ -151,6 +151,7 @@ javascripts:
     - public/javascripts/attendance.js
   grade_summary:
     - public/javascripts/grade_summary.js
+    - public/javascripts/compiled/grade_calculator.js
   groups:
     - public/javascripts/groups.js
   learning_outcomes:
@@ -230,6 +231,8 @@ javascripts:
     - public/javascripts/compiled/conversations_intro.js
     - public/javascripts/jquery.elastic.js
     - public/javascripts/jquery.cookie.js
+  alerts:
+    - public/javascripts/alerts.js
 <% base_js = _erbout; _erbout = saved %>
 
 <%=
@@ -356,3 +359,5 @@ stylesheets:
     - public/stylesheets/compiled/slideshow.css
   dashboard:
     - public/stylesheets/compiled/g_dashboard_conversations.css
+  alerts:
+    - public/stylesheets/compiled/alerts.css

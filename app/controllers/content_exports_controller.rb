@@ -21,56 +21,56 @@ class ContentExportsController < ApplicationController
   before_filter { |c| c.active_tab = "settings" }
   
   def index
-    if authorized_action(@context, @current_user, :manage)
-      @exports = @context.content_exports.active
-      @current_export_id = nil
-      if export = @context.content_exports.running.first
-        @current_export_id = export.id
-      end
+    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+
+    @exports = @context.content_exports.active
+    @current_export_id = nil
+    if export = @context.content_exports.running.first
+      @current_export_id = export.id
     end
   end
   
   def show
-    if authorized_action(@context, @current_user, :manage)
-      if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
-        render_export(export)
-      else
-        render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
-      end
+    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+
+    if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
+      render_export(export)
+    else
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
     end
   end
   
   def create
-    if authorized_action(@context, @current_user, :manage)
-      if @context.content_exports.running.count == 0
-        export = ContentExport.new
-        export.course = @context
-        export.user = @current_user
-        export.workflow_state = 'created'
-        export.export_type = 'common_cartridge'
-        export.progress = 0
-        if export.save
-          export.export_course
-          render_export(export)
-        else
-          render :json => {:error_message => t('errors.couldnt_create', "Couldn't create course export.")}.to_json
-        end
-      else
-        # an export is already running, just return it
-        export = @context.content_exports.running.first
+    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+
+    if @context.content_exports.running.count == 0
+      export = ContentExport.new
+      export.course = @context
+      export.user = @current_user
+      export.workflow_state = 'created'
+      export.export_type = 'common_cartridge'
+      export.progress = 0
+      if export.save
+        export.export_course
         render_export(export)
+      else
+        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create course export.")}.to_json
       end
+    else
+      # an export is already running, just return it
+      export = @context.content_exports.running.first
+      render_export(export)
     end
   end
   
   def destroy
-    if authorized_action(@context, @current_user, :manage)
-      if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
-        export.destroy
-        render :json => {:success=>'true'}.to_json
-      else
-        render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
-      end
+    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+
+    if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
+      export.destroy
+      render :json => {:success=>'true'}.to_json
+    else
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
     end
   end
   

@@ -2,10 +2,10 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a href="#" class="button button-sidebar-wide edit_section_link"><%= image_tag "edit.png" %> <%= t('buttons.edit_section', 'Edit Section') %></a>
     <% if can_do(@section, @current_user, :update) %>
+      <a href="#" class="button button-sidebar-wide edit_section_link"><%= image_tag "edit.png" %> <%= t('buttons.edit_section', 'Edit Section') %></a>
       <% if @section.nonxlist_course_id %>
-        <% if can_do(@section.nonxlist_course, @current_user, :manage_admin_users) %>
+        <% if can_do(@section.nonxlist_course, @current_user, :manage) %>
           <a href="#" class="button button-sidebar-wide uncrosslist_link"><%= image_tag "move.png" %> <%= t('buttons.uncrosslist_section', 'De-Cross-List this Section') %></a>
         <% end %>
         <a href="#" class="button button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>
@@ -163,21 +163,23 @@ h3 .tally {
     </div>
   <% end %>
 </div>
-<% unless @current_enrollments.empty? %>
-<h3><%= t('titles.current_enrollments', 'Current Enrollments') %></h3>
-<ul class="user_list">
-<% @current_enrollments.each do |enrollment| %>
-  <%= render :partial => "shared/enrollment", :object => enrollment, :locals => {:include_type => true} %>
-<% end %>
-</ul>
-<% end %>
-<% unless @completed_enrollments.empty? %>
-<h2><%= t('titles.completed_enrollments', 'Completed Enrollments') %></h2>
-<ul class="user_list">
-<% @completed_enrollments.each do |enrollment| %>
-  <%= render :partial => "shared/enrollment", :object => enrollment, :locals => {:include_type => true} %>
-<% end %>
-</ul>
+<% if can_do @context, @current_user, :read_roster, :manage_students, :manage_admin_users %>
+  <% unless @current_enrollments.empty? %>
+    <h3><%= t('titles.current_enrollments', 'Current Enrollments') %></h3>
+    <ul class="user_list">
+      <% @current_enrollments.each do |enrollment| %>
+        <%= render :partial => "shared/enrollment", :object => enrollment, :locals => {:include_type => true} %>
+      <% end %>
+    </ul>
+  <% end %>
+  <% unless @completed_enrollments.empty? %>
+    <h2><%= t('titles.completed_enrollments', 'Completed Enrollments') %></h2>
+    <ul class="user_list">
+      <% @completed_enrollments.each do |enrollment| %>
+        <%= render :partial => "shared/enrollment", :object => enrollment, :locals => {:include_type => true} %>
+      <% end %>
+    </ul>
+  <% end %>
 <% end %>
 <% jammit_js :section %>
 

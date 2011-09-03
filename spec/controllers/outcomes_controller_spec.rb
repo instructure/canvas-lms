@@ -84,6 +84,32 @@ describe OutcomesController do
       get 'show', :course_id => @course.id, :id => @outcome.id
       response.should be_success
     end
+    
+    it "should work in accounts" do
+      @account = Account.default
+      account_admin_user
+      user_session(@user)
+      account_outcome
+      get 'show', :account_id => @account.id, :id => @outcome.id
+      response.should be_success
+    end
+    
+    it "should include tags from courses when viewed in the account" do
+      course
+      @account = @course.account
+
+      account_outcome
+      @outcome
+
+      quiz = @course.quizzes.create!
+      tag = ContentTag.create!(:content => quiz, :context => @course, :learning_outcome => @outcome)
+
+      account_admin_user(:account => @account)
+      user_session(@user)
+      get 'show', :account_id => @account.id, :id => @outcome.id
+
+      assigns[:tags].any?{ |t| t.id == tag.id }.should be_true
+    end
   end
 
   describe "GET 'detail'" do

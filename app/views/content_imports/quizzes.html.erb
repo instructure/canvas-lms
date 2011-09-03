@@ -26,16 +26,20 @@
     <p><%= t 'messages.uploading', "Uploading and processing your zip file, if it is large it may take a while." %></p>
   </div>
   <% form_tag context_url(@context, :context_import_migrate_url), :method => :post, :id => "qti_file_import_form", :multipart => true do %>
-      <input type="hidden" name="migration_settings[migration_type]" value="qti_exporter"/>
-      <input type="hidden" name="export_file_enabled" value="1"/>
-    <div>
+    <input type="hidden" name="migration_settings[migration_type]" value="qti_exporter"/>
+    <input type="hidden" name="export_file_enabled" value="1"/>
+    
+    <fieldset id="file_upload">
+      <legend><%= t :upload_qti_file, "Choose a QTI .zip package" %></legend>
       <input type="file" id="export_file_input" name="export_file"  class="export_file_input"/>
       <br/><span class="error zip_error ui-state-error" style="display:none; font-size: 16px"><%= t 'errors.choose_file', "You must choose a .zip file to upload" %></span>
-    </div>
+    </fieldset>
 
-    <div class="qti_settings" style="padding-left:10px;">
+    <fieldset class="qti_settings">
+      <legend><%= t :question_bank_configuration, "Question Bank Configuration" %></legend>
       <%= render :partial=>'question_bank_config' %>
-    </div>
+    </fieldset>
+    
     <div style="margin-top: 10px;">
       <button type="submit" class="submit_button button big-button"><%= t 'buttons.import', "Import Quiz" %></button>
       <a href="<%= context_url(@context, :context_url) %>" class="button"><%= image_tag "check.png" %> <%= t 'buttons.back', "I'm Done Importing, back to the Course." %></a>

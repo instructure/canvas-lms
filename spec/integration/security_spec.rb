@@ -52,17 +52,17 @@ describe "security" do
     it "should flush the role_override caches on permission changes" do
       course_with_teacher_logged_in
 
-      get "/courses/#{@course.to_param}/users"
+      get "/courses/#{@course.to_param}/statistics"
       assert_response :success
 
-      RoleOverride.create!(:context => @course,
-                           :permission => 'read_roster',
+      RoleOverride.create!(:context => @course.account,
+                           :permission => 'read_reports',
                            :enrollment_type => 'TeacherEnrollment',
                            :enabled => false)
 
       # if this second get doesn't fail with a permission denied error, we've
       # still got the permissions cached and haven't seen the change
-      get "/courses/#{@course.to_param}/users"
+      get "/courses/#{@course.to_param}/statistics"
       assert_response 401
     end
 
@@ -441,6 +441,289 @@ describe "security" do
         response.should be_success
 
         delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+        response.should be_success
+      end
+
+      it "manage_jobs" do
+        get "/jobs"
+        response.should be_redirect
+
+        add_permission :manage_jobs
+
+        get "/jobs"
+        response.should be_success
+      end
+    end
+
+    describe 'course' do
+      before (:each) do
+        course(:active_all => 1)
+        Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
+      end
+
+      it 'read_as_admin' do
+        get "/courses/#{@course.id}"
+        response.should be_redirect
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        html = Nokogiri::HTML(response.body)
+        html.css('.edit_course_link').should be_empty
+        html.css('#tab-users').should be_empty
+        html.css('#tab-navigation').should be_empty
+
+        @course.enroll_teacher(@admin).accept!
+        @admin.reload
+
+        get "/courses/#{@course.id}"
+        response.should be_success
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        html = Nokogiri::HTML(response.body)
+        html.css('.edit_course_link').should_not be_empty
+        html.css('#tab-users').should_not be_empty
+        html.css('#tab-navigation').should_not be_empty
+      end
+
+      it 'read_roster' do
+        get "/courses/#{@course.id}/users"
+        response.status.should == "401 Unauthorized"
+
+        get "/courses/#{@course.id}/users/prior"
+        response.status.should == "401 Unauthorized"
+
+        get "/courses/#{@course.id}/groups"
+        response.status.should == "401 Unauthorized"
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should_not match /People/
+        html = Nokogiri::HTML(response.body)
+        html.css('#tab-users').should be_empty
+
+        add_permission :read_roster
+
+        get "/courses/#{@course.id}/users"
+        response.should be_success
+        response.body.should match /View Student Groups/
+        response.body.should match /View Prior Enrollments/
+        response.body.should_not match /Manage Users/
+
+        get "/courses/#{@course.id}/users/prior"
+        response.should be_success
+
+        get "/courses/#{@course.id}/groups"
+        response.should be_success
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /People/
+        html = Nokogiri::HTML(response.body)
+        html.css('#tab-users').should_not be_empty
+        html.css('.add_users_link').should be_empty
+      end
+
+      it "manage_students" do
+        get "/courses/#{@course.id}/users"
+        response.status.should == "401 Unauthorized"
+
+        get "/courses/#{@course.id}/users/prior"
+        response.status.should == "401 Unauthorized"
+
+        get "/courses/#{@course.id}/groups"
+        response.status.should == "401 Unauthorized"
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should_not match /People/
+        html = Nokogiri::HTML(response.body)
+        html.css('#tab-users').should be_empty
+
+        add_permission :manage_students
+
+        get "/courses/#{@course.id}/users"
+        response.should be_success
+        response.body.should_not match /View Student Groups/
+        response.body.should match /View Prior Enrollments/
+        response.body.should match /Manage Users/
+
+        get "/courses/#{@course.id}/users/prior"
+        response.should be_success
+
+        get "/courses/#{@course.id}/groups"
+        response.status.should == "401 Unauthorized"
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /People/
+        html = Nokogiri::HTML(response.body)
+        html.css('#tab-users').should_not be_empty
+        html.css('.add_users_link').should_not be_empty
+      end
+
+      it 'view_all_grades' do
+        get "/courses/#{@course.id}/grades"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/gradebook"
+        response.status.should == '401 Unauthorized'
+
+        add_permission :view_all_grades
+
+        get "/courses/#{@course.id}/grades"
+        response.should be_redirect
+
+        get "/courses/#{@course.id}/gradebook"
+        response.should be_success
+      end
+
+      it 'read_course_content' do
+        @course.assignments.create!
+        @course.wiki_namespace.wiki.wiki_page.save!
+        @course.quizzes.create!
+        @course.attachments.create!(:uploaded_data => default_uploaded_data)
+
+        get "/courses/#{@course.id}"
+        response.should be_redirect
+
+        get "/courses/#{@course.id}/assignments"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/assignments/syllabus"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/wiki"
+        response.should be_redirect
+        follow_redirect!
+        response.should be_redirect
+
+        get "/courses/#{@course.id}/quizzes"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/discussion_topics"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/files"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/copy"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/content_exports"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        html = Nokogiri::HTML(response.body)
+        html.css('.section .assignments').should be_empty
+        html.css('.section .syllabus').should be_empty
+        html.css('.section .pages').should be_empty
+        html.css('.section .quizzes').should be_empty
+        html.css('.section .discussions').should be_empty
+        html.css('.section .files').should be_empty
+        response.body.should_not match /Copy this Course/
+        response.body.should_not match /Import Content into this Course/
+        response.body.should_not match /Export this Course/
+
+        add_permission :read_course_content
+
+        get "/courses/#{@course.id}"
+        response.should be_success
+
+        get "/courses/#{@course.id}/assignments"
+        response.should be_success
+
+        get "/courses/#{@course.id}/assignments/syllabus"
+        response.should be_success
+
+        get "/courses/#{@course.id}/wiki"
+        response.should be_redirect
+
+        follow_redirect!
+        response.should be_success
+
+        get "/courses/#{@course.id}/quizzes"
+        response.should be_success
+
+        get "/courses/#{@course.id}/discussion_topics"
+        response.should be_success
+
+        get "/courses/#{@course.id}/files"
+        response.should be_success
+
+        get "/courses/#{@course.id}/copy"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/content_exports"
+        response.should be_success
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        html = Nokogiri::HTML(response.body)
+        html.css('.section .assignments').should_not be_empty
+        html.css('.section .syllabus').should_not be_empty
+        html.css('.section .pages').should_not be_empty
+        html.css('.section .quizzes').should_not be_empty
+        html.css('.section .discussions').should_not be_empty
+        html.css('.section .files').should_not be_empty
+        response.body.should_not match /Copy this Course/
+        response.body.should_not match /Import Content into this Course/
+        response.body.should match /Export this Course/
+        html.css('#course_account_id').should be_empty
+        html.css('#course_enrollment_term_id').should be_empty
+
+        add_permission :manage_courses
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /Copy this Course/
+        response.body.should_not match /Import Content into this Course/
+        response.body.should match /Export this Course/
+        html = Nokogiri::HTML(response.body)
+        html.css('#course_account_id').should_not be_empty
+        html.css('#course_enrollment_term_id').should_not be_empty
+
+        get "/courses/#{@course.id}/copy"
+        response.should be_success
+      end
+
+      it 'manage_content' do
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should_not match /Import Content into this Course/
+
+        get "/courses/#{@course.id}/imports"
+        response.status.should == '401 Unauthorized'
+
+        add_permission :manage_content
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /Import Content into this Course/
+
+        get "/courses/#{@course.id}/imports"
+        response.should be_success
+      end
+
+      it 'read_reports' do
+        student_in_course(:active_all => 1)
+        add_permission :read_roster
+
+        get "/courses/#{@course.id}/users/#{@student.id}"
+        response.should be_success
+        response.body.should_not match "Access Report"
+
+        get "/courses/#{@course.id}/users/#{@student.id}/usage"
+        response.status.should == '401 Unauthorized'
+
+        add_permission :read_reports
+
+        get "/courses/#{@course.id}/users/#{@student.id}"
+        response.should be_success
+        response.body.should match "Access Report"
+
+        get "/courses/#{@course.id}/users/#{@student.id}/usage"
         response.should be_success
       end
     end

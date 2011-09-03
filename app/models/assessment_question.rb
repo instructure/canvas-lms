@@ -21,7 +21,8 @@ class AssessmentQuestion < ActiveRecord::Base
   attr_accessible :name, :question_data, :form_question_data
   has_many :quiz_questions
   has_many :attachments, :as => :context
-  belongs_to :context, :polymorphic => true
+  delegate :context, :context_id, :context_type, :to => :assessment_question_bank
+  attr_accessor :initial_context
   belongs_to :assessment_question_bank, :touch => true
   simply_versioned :automatic => false
   acts_as_list :scope => :assessment_question_bank_id
@@ -52,7 +53,7 @@ class AssessmentQuestion < ActiveRecord::Base
       self.question_data[:name] = self.question_data[:question_name]
     end
     self.name = self.question_data[:question_name] || self.name
-    self.assessment_question_bank ||= AssessmentQuestionBank.unfiled_for_context(self.context)
+    self.assessment_question_bank ||= AssessmentQuestionBank.unfiled_for_context(self.initial_context)
   end
   
   def translate_links_if_changed
@@ -384,7 +385,6 @@ class AssessmentQuestion < ActiveRecord::Base
     self.attributes.delete_if{|k,v| [:id, :question_data].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
-    dup.context = question_bank.context
     dup.assessment_question_bank_id = question_bank
     dup.write_attribute(:question_data, self.question_data)
     dup
@@ -417,7 +417,7 @@ class AssessmentQuestion < ActiveRecord::Base
     if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
       if check = questions.first
         # we don't re-migrate questions
-        if AssessmentQuestion.find_all_by_context_id_and_migration_id(migration.context.id, check['migration_id']).count > 0
+        if migration.context.assessment_questions.scoped(:conditions => {:migration_id => check['migration_id']}).size > 0
           return question_data
         end
       end
@@ -435,13 +435,13 @@ class AssessmentQuestion < ActiveRecord::Base
         question[:question_bank_name] ||= AssessmentQuestionBank.default_imported_title
         hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
         if !banks[hash_id]
-            unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(migration.context.class.to_s, migration.context.id, question[:question_bank_name], question[:question_bank_id])
-              bank = migration.context.assessment_question_banks.new
-              bank.title = question[:question_bank_name]
-              bank.migration_id = question[:question_bank_id]
-              bank.save!
-            end
-            banks[hash_id] = bank
+          unless bank = migration.context.assessment_question_banks.find_by_title_and_migration_id(question[:question_bank_name], question[:question_bank_id])
+            bank = migration.context.assessment_question_banks.new
+            bank.title = question[:question_bank_name]
+            bank.migration_id = question[:question_bank_id]
+            bank.save!
+          end
+          banks[hash_id] = bank
         end
         
         begin
@@ -472,8 +472,8 @@ class AssessmentQuestion < ActiveRecord::Base
     prep_for_import(hash, context)
     question_data = AssessmentQuestion.connection.quote hash.to_yaml
     question_name = AssessmentQuestion.connection.quote hash[:question_name]
-    query = "INSERT INTO assessment_questions (name, question_data, context_id, context_type, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
-    query += " VALUES (#{question_name},#{question_data},#{context.id},'#{context.class}','active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
+    query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
+    query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
     id = AssessmentQuestion.connection.insert(query)
     hash['assessment_question_id'] = id
     hash

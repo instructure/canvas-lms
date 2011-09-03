@@ -80,7 +80,9 @@ class TokenInput
   add_token: (data) ->
     val = data?.value ? @val()
     id = 'token_' + val
-    unless @tokens.find('#' + id).length
+    $token = @tokens.find('#' + id)
+    new_token = ($token.length is 0)
+    if new_token
       $token = $('<li />')
       text = data?.text ? @val()
       $token.attr('id', id)
@@ -97,7 +99,7 @@ class TokenInput
       @tokens.append($token)
     @val('') unless data?.no_clear
     @placeholder.hide()
-    @added?(data.data) if data
+    @added?(data.data, $token, new_token) if data
     @change?(@token_values())
     @selector?.reposition()
 
@@ -1385,7 +1387,14 @@ I18n.scoped 'conversations', (I18n) ->
 
     $('.recipients').tokenInput
       placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
-      added: (data) ->
+      added: (data, $token, new_token) ->
+        if new_token and data.type
+          $token.addClass(data.type)
+          if data.user_count?
+            $token.addClass('details')
+            $details = $('<span />')
+            $details.text(I18n.t('people_count', 'person', {count: data.user_count}))
+            $token.append($details)
         unless data.id and "#{data.id}".match(/^(course|group)_/)
           data = $.extend({}, data)
           delete data.avatar # since it's the wrong size and possibly a blank image
@@ -1400,7 +1409,10 @@ I18n.scoped 'conversations', (I18n) ->
           $b = $('<b />')
           $b.text(data.name)
           $span = $('<span />')
-          $span.text(MessageInbox.shared_contexts_for_user(data)) if data.common_courses?
+          if data.common_courses?
+            $span.text(MessageInbox.shared_contexts_for_user(data))
+          else if data.type and data.user_count?
+            $span.text(I18n.t('people_count', 'person', {count: data.user_count})) 
           $node.append($b, $span)
           $node.attr('title', data.name)
           $node.data('id', data.id)

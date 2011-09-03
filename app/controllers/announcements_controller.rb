@@ -22,9 +22,9 @@ class AnnouncementsController < ApplicationController
   
   def index
     add_crumb(t(:announcements_crumb, "Announcements"))
-    return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
-    @announcements = @context.active_announcements.paginate(:page => params[:page]).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
     if authorized_action(@context, @current_user, :read)
+      return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
+      @announcements = @context.active_announcements.paginate(:page => params[:page]).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
       log_asset_access("announcements:#{@context.asset_string}", "announcements", "other")
       respond_to do |format|
         format.html { render }

@@ -22,8 +22,8 @@ class OutcomesController < ApplicationController
   before_filter { |c| c.active_tab = "outcomes" }
   
   def index
-    return unless tab_enabled?(@context.class::TAB_OUTCOMES)
     if authorized_action(@context, @current_user, :read)
+      return unless tab_enabled?(@context.class::TAB_OUTCOMES)
       @root_outcome_group = LearningOutcomeGroup.default_for(@context)
       @outcomes = @context.learning_outcomes
     end
@@ -139,7 +139,12 @@ class OutcomesController < ApplicationController
   
   def alignment_redirect
     if authorized_action(@context, @current_user, :read)
-      @outcome = @context.learning_outcomes.find(params[:outcome_id])
+      # TODO LearningOutcome.available_in_context is a horrible horrible
+      # method. It runs way too many queries, and then throws most of the
+      # results away. But it has the semantics we want, and will need to be
+      # fixed for its other use cases anyways, so we'll use it here and in
+      # remove_alignment.
+      @outcome = LearningOutcome.available_in_context(@context, [params[:outcome_id].to_i]).first
       @tag = @outcome.content_tags.find(params[:id])
       content_tag_redirect(@context, @tag, :context_outcomes_url)
     end
@@ -147,7 +152,7 @@ class OutcomesController < ApplicationController
   
   def remove_alignment
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = @context.learning_outcomes.find(params[:outcome_id])
+      @outcome = LearningOutcome.available_in_context(@context, [params[:outcome_id].to_i]).first
       @tag = @outcome.content_tags.find(params[:id])
       @tag = @outcome.remove_alignment(@tag.content, @context)
       render :json => @tag.to_json(:include => :learning_outcome)

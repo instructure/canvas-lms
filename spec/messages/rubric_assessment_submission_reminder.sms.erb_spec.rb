@@ -26,6 +26,6 @@ describe 'rubric_assessment_submission_reminder.sms' do
     @object = @rubric_assessment
     @object.rubric_association.should_not be_nil
     @object.rubric_association.context.should_not be_nil
-    generate_message(:rubric_assessment_submission_reminder, :sms, @object, @user)
+    generate_message(:rubric_assessment_submission_reminder, :sms, @object, :user => @user)
   end
 end

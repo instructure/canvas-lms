@@ -17,7 +17,7 @@ module Delayed
         # Add a job to the queue
         # The first argument should be an object that respond_to?(:perform)
         # The rest should be named arguments, these keys are expected:
-        # :priority, :run_at, :queue
+        # :priority, :run_at, :queue, :strand, :singleton
         # Example: Delayed::Job.enqueue(object, :priority => 0, :run_at => time, :queue => queue)
         def enqueue(*args)
           object = args.shift
@@ -30,7 +30,15 @@ module Delayed
           options[:payload_object] = object
           options[:queue] ||= Delayed::Worker.queue
           options[:max_attempts] ||= Delayed::Worker.max_attempts
-          self.create(options)
+          if options[:singleton]
+            options[:strand] = options.delete :singleton
+            self.transaction do
+              self.clear_strand!(options[:strand])
+              self.create(options)
+            end
+          else
+            self.create(options)
+          end
         end
       end
 

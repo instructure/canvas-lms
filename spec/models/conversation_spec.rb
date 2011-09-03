@@ -99,10 +99,11 @@ describe Conversation do
   end
 
   context "unread counts" do
-    it "should increment when creating a conversation" do
+    it "should increment for recipients when sending the first message in a conversation" do
       sender = user
       recipient = user
       root_convo = Conversation.initiate([sender.id, recipient.id], false)
+      ConversationParticipant.unread.size.should eql 0 # only once the first message is added
       root_convo.add_message(sender, 'test')
       sender.reload.unread_conversations_count.should eql 0
       sender.conversations.unread.size.should eql 0
@@ -117,7 +118,7 @@ describe Conversation do
       unsubscribed_guy = user
       root_convo = Conversation.initiate([sender.id, unread_guy.id, subscribed_guy.id, unsubscribed_guy.id], false)
       root_convo.add_message(sender, 'test')
-      
+
       unread_guy.reload.unread_conversations_count.should eql 1
       unread_guy.conversations.unread.size.should eql 1
       subscribed_guy.conversations.first.mark_as_read
@@ -142,7 +143,7 @@ describe Conversation do
       unread_guy = user
       root_convo = Conversation.initiate([sender.id, unread_guy.id], false)
       root_convo.add_message(sender, 'test')
-      
+
       unread_guy.reload.unread_conversations_count.should eql 1
       unread_guy.conversations.unread.size.should eql 1
       unread_guy.conversations.first.remove_messages(:all)
@@ -155,7 +156,7 @@ describe Conversation do
       unread_guy = user
       root_convo = Conversation.initiate([sender.id, unread_guy.id], false)
       root_convo.add_message(sender, 'test')
-      
+
       unread_guy.reload.unread_conversations_count.should eql 1
       unread_guy.conversations.unread.size.should eql 1
       unread_guy.conversations.first.mark_as_read
@@ -169,12 +170,87 @@ describe Conversation do
       root_convo = Conversation.initiate([sender.id, unread_guy.id], false)
       root_convo.add_message(sender, 'test')
       unread_guy.conversations.first.mark_as_read
-      
+
       unread_guy.reload.unread_conversations_count.should eql 0
       unread_guy.conversations.unread.size.should eql 0
       unread_guy.conversations.first.mark_as_unread
       unread_guy.reload.unread_conversations_count.should eql 1
       unread_guy.conversations.unread.size.should eql 1
+    end
+  end
+
+  context "subscription" do
+    it "should mark-as-read when unsubscribing iff it was unread" do
+      sender = user
+      subscription_guy = user
+      archive_guy = user
+      root_convo = Conversation.initiate([sender.id, archive_guy.id, subscription_guy.id], false)
+      root_convo.add_message(sender, 'test')
+
+      subscription_guy.reload.unread_conversations_count.should eql 1
+      subscription_guy.conversations.unread.size.should eql 1
+
+      subscription_guy.conversations.first.update_attributes(:subscribed => false)
+      subscription_guy.reload.unread_conversations_count.should eql 0
+      subscription_guy.conversations.unread.size.should eql 0
+
+      archive_guy.conversations.first.archive!
+      archive_guy.conversations.first.update_attributes(:subscribed => false)
+      archive_guy.conversations.archived.size.should eql 1
+    end
+
+    it "should mark-as-unread when re-subscribing iff there are newer messages" do
+      sender = user
+      flip_flopper_guy = user
+      subscription_guy = user
+      archive_guy = user
+      root_convo = Conversation.initiate([sender.id, flip_flopper_guy.id, archive_guy.id, subscription_guy.id], false)
+      root_convo.add_message(sender, 'test')
+
+      flip_flopper_guy.conversations.first.update_attributes(:subscribed => false)
+      flip_flopper_guy.reload.unread_conversations_count.should eql 0
+      flip_flopper_guy.conversations.unread.size.should eql 0
+      # no new messages in the interim, he should stay "marked-as-read"
+      flip_flopper_guy.conversations.first.update_attributes(:subscribed => true)
+      flip_flopper_guy.reload.unread_conversations_count.should eql 0
+      flip_flopper_guy.conversations.unread.size.should eql 0
+
+      subscription_guy.conversations.first.update_attributes(:subscribed => false)
+      archive_guy.conversations.first.archive!
+      archive_guy.conversations.first.update_attributes(:subscribed => false)
+
+      message = root_convo.add_message(sender, 'you wish you were subscribed!')
+      message.update_attribute(:created_at, Time.now.utc + 1.minute)
+      last_message_at = message.reload.created_at
+
+      subscription_guy.conversations.first.update_attributes(:subscribed => true)
+      archive_guy.conversations.first.update_attributes(:subscribed => true)
+
+      subscription_guy.reload.unread_conversations_count.should eql 1
+      subscription_guy.conversations.unread.size.should eql 1
+      subscription_guy.conversations.first.last_message_at.should eql last_message_at
+
+      archive_guy.reload.unread_conversations_count.should eql 1
+      archive_guy.conversations.unread.size.should eql 1
+      subscription_guy.conversations.first.last_message_at.should eql last_message_at
+    end
+
+    it "should not toggle read/unread until the subscription change is saved" do
+      sender = user
+      subscription_guy = user
+      root_convo = Conversation.initiate([sender.id, user.id, subscription_guy.id], false)
+      root_convo.add_message(sender, 'test')
+
+      subscription_guy.reload.unread_conversations_count.should eql 1
+      subscription_guy.conversations.unread.size.should eql 1
+
+      subscription_guy.conversations.first.subscribed = false
+      subscription_guy.reload.unread_conversations_count.should eql 1
+      subscription_guy.conversations.unread.size.should eql 1
+
+      subscription_guy.conversations.first.subscribed = true
+      subscription_guy.reload.unread_conversations_count.should eql 1
+      subscription_guy.conversations.unread.size.should eql 1
     end
   end
 
@@ -195,14 +271,30 @@ describe Conversation do
       end
     end
 
-    it "should not auto mark it as read for the sender" do
+    it "should never change the workflow_state for the sender" do
       sender = user
-      recipients = 5.times.map{ user }
-      Conversation.initiate([sender.id] + recipients.map(&:id), false).add_message(sender, 'test')
+      Conversation.initiate([sender.id, user.id], true).add_message(sender, 'test')
       convo = sender.conversations.first
       convo.mark_as_unread!
       convo.add_message('another test')
       convo.reload.unread?.should be_true
+
+      convo.archive!
+      convo.add_message('one more test')
+      convo.reload.archived?.should be_true
+
+      convo.unarchive!
+      convo.mark_as_unread!
+      convo.add_message('and another test', :update_for_sender => true) # overrides subscribed-ness and updates timestamps
+      convo.reload.unread?.should be_true
+
+      convo.archive!
+      convo.add_message('last one', :update_for_sender => true)
+      convo.reload.archived?.should be_true
+
+      convo.remove_messages(:all)
+      convo.add_message('for reals', :update_for_sender => true)
+      convo.reload.archived?.should be_true
     end
 
     it "should deliver the message to unsubscribed participants but not alert them" do
@@ -217,7 +309,8 @@ describe Conversation do
       rconvo.unread?.should be_false
 
       convo = sender.conversations.first
-      convo.add_message('another test')
+      message = convo.add_message('another test')
+      message.update_attribute(:created_at, Time.now.utc + 1.minute)
 
       rconvo.reload.unread?.should be_false
       rconvo.update_attributes(:subscribed => true)

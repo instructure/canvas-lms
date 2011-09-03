@@ -142,15 +142,18 @@ class ConversationParticipant < ActiveRecord::Base
       messages.clear if messages.all?(&:generated?)
     end
     update_cached_data
+    save
   end
 
   def subscribed=(value)
     super
-    if subscribed?
-      self.workflow_state = :unread
-      update_cached_data(false)
-    else
-      mark_as_read
+    if subscribed_changed?
+      if subscribed?
+        update_cached_data(false)
+        self.workflow_state = 'unread' if last_message_at_changed? && last_message_at > last_message_at_was
+      else
+        self.workflow_state = 'read' if unread?
+      end
     end
     subscribed?
   end
@@ -200,7 +203,6 @@ class ConversationParticipant < ActiveRecord::Base
       self.has_media_objects = false
       self.label = nil
     end
-    save
   end
 
   def update_unread_count

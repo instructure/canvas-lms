@@ -18,6 +18,25 @@ shared_examples_for "course selenium tests" do
     wizard_box.displayed?.should be_false
   end
 
+  it "should open and close wizard after initial close" do
+    course_with_teacher_logged_in
+
+    get "/getting_started?fresh=1"
+    driver.find_element(:css, ".save_button").click
+
+    checklist_button = driver.find_element(:css, '#course_show_secondary .wizard_popup_link')
+    checklist_button.click
+    wizard_box = driver.find_element(:id, "wizard_box")
+    wait_for_dom_ready
+    wizard_box.should be_displayed
+    checklist_button.should_not be_displayed
+    wizard_box.find_element(:css, ".close_wizard_link").click
+    wait_for_dom_ready
+    wizard_box.displayed?.should be_false
+    checklist_button.displayed?.should be_true
+
+  end
+
   it "should allow content export downloads" do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/content_exports"
@@ -28,6 +47,63 @@ shared_examples_for "course selenium tests" do
     new_download_link = keep_trying_until { driver.find_element(:css, "div#exports a") }
     url = new_download_link.attribute 'href'
     url.should match(%r{/files/\d+/download\?verifier=})
+  end
+
+  it "should copy course content" do
+    course_with_teacher_logged_in
+    @second_course = Course.create!(:name => 'second course')
+    @second_course.offer!
+    #add teacher as a user
+    e = @second_course.enroll_teacher(@user)
+    e.workflow_state = 'active'
+    e.accept
+    e.save!
+    @second_course.reload
+
+    get "/courses/#{@course.id}/details"
+    
+    driver.find_element(:link, I18n.t('links.import','Import Content into this Course')).click
+    driver.find_element(:css, '#content a.button').click
+    option_value = find_option_value(:id, 'copy_from_course', 'second course')
+    driver.find_element(:css, '#copy_from_course > option[value="'+option_value+'"]').click
+    driver.find_element(:css, '#content form').submit
+
+    #modify course dates
+    driver.find_element(:id, 'copy_shift_dates').click
+    #adjust start dates
+    driver.find_element(:css, '#copy_old_start_date + img').click
+    datepicker = driver.find_element(:id, 'ui-datepicker-div')
+    datepicker.find_element(:css, 'a.ui-datepicker-prev').click
+    datepicker.find_element(:css, '.ui-datepicker-calendar tr:first-child td:last-child a').click
+    #adjust end dates
+    driver.find_element(:css, '#copy_old_end_date + img').click
+    datepicker = driver.find_element(:id, 'ui-datepicker-div')
+    datepicker.find_element(:css, 'a.ui-datepicker-next').click
+    datepicker.find_element(:css, '.ui-datepicker-calendar tr:first-child td:last-child a').click
+    #adjust day substitutions
+    driver.find_element(:css, '.shift_dates_settings .add_substitution_link').click
+    driver.find_element(:css, '.substitutions > .substitution').should be_displayed
+
+    driver.find_element(:id, 'copy_context_form').submit
+    wait_for_dom_ready
+    keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+  end
+
+  it "should copy the course" do
+    enable_cache do
+      course_with_teacher_logged_in
+
+      get "/courses/#{@course.id}/copy"
+      driver.find_element(:css, "div#content form button[type=submit]").click
+      wait_for_dom_ready
+      driver.find_element(:id, 'copy_context_form').submit
+      wait_for_animations
+      keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+
+      @new_course = Course.last(:order => :id)
+      get "/courses/#{@new_course.id}"
+      driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")
+    end
   end
 
   it "should correctly update the course quota" do
@@ -192,6 +268,7 @@ shared_examples_for "course selenium tests" do
 
     driver.current_url.should match %r{/courses/#{course2.id}/grades/#{student.id}}
   end
+
 end
 
 describe "course Windows-Firefox-Tests" do

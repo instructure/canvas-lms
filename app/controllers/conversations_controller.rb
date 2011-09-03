@@ -99,6 +99,8 @@ class ConversationsController < ApplicationController
   end
 
   def show
+    return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" unless request.xhr?
+    
     @conversation.mark_as_read! if @conversation.unread?
     submissions = []
     if @conversation.one_on_one?
@@ -260,6 +262,8 @@ class ConversationsController < ApplicationController
 
   def matching_contexts(search, exclude = [])
     avatar_url = avatar_url_for_group(true)
+    course_user_counts = @current_user.enrollment_visibility[:user_counts]
+    group_user_counts = @current_user.groups.inject({}){ |hash, group| hash[group.id] = group.users.size; hash }
     @contexts.values.map(&:values).flatten.
       select{ |context| search.downcase.strip.split(/\s+/).all?{ |part| context[:name].downcase.include?(part) } }.
       select{ |context| context[:active] }.
@@ -268,7 +272,8 @@ class ConversationsController < ApplicationController
         {:id => "#{context[:type]}_#{context[:id]}",
          :name => context[:name],
          :avatar => avatar_url,
-         :type => :context }
+         :type => :context,
+         :user_count => (context[:type] == :course ? course_user_counts : group_user_counts)[context[:id]]}
       }.
       reject{ |context|
         exclude.include?(context[:id])
@@ -281,6 +286,7 @@ class ConversationsController < ApplicationController
 
   def get_conversation(allow_deleted = false)
     @conversation = (allow_deleted ? @current_user.all_conversations : @current_user.conversations).find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
+    raise ActiveRecord::RecordNotFound unless @conversation
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)

@@ -13,7 +13,6 @@ module Canvas
           settings[:content_migration_id] = migration_id
           settings[:user_id] = cm.user_id
           settings[:attachment_id] = cm.attachment.id rescue nil
-          settings[:id_prepender] = cm.id
 
           exporter = Qti::QtiExporter.new(settings)
           assessments = exporter.export

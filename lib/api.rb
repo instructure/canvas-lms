@@ -66,6 +66,8 @@ module Api
       { 'sis_term_id' => 'sis_source_id' }
     when User.table_name
       { 'sis_user_id' => 'sis_user_id', 'sis_login_id' => 'sis_source_id' }
+    when Account.table_name
+      { 'sis_account_id' => 'sis_source_id' }
     else
       raise ArgumentError, "need to add support for table name: #{collection.table_name}"
     end
@@ -73,7 +75,10 @@ module Api
   
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection
-  def self.set_pagination_headers!(collection, response, base_url)
+  # a new, paginated collection will be returned
+  def self.paginate(collection, controller, base_url, pagination_args = {})
+    per_page = [(controller.params[:per_page] || 10).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
+    collection = collection.paginate({ :page => controller.params[:page], :per_page => per_page }.merge(pagination_args))
     return unless collection.respond_to?(:next_page)
     links = []
     template = "<#{base_url}?page=%s&per_page=#{collection.per_page}>; rel=\"%s\""
@@ -87,7 +92,8 @@ module Api
       links << template % [1, "first"]
       links << template % [collection.total_pages, "last"]
     end
-    response.headers["Link"] = links.join(',') if links.length > 0
+    controller.response.headers["Link"] = links.join(',') if links.length > 0
+    collection
   end
   
   def attachment_json(attachment, opts={})

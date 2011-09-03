@@ -254,6 +254,7 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
     begin
       base_filename = "config/locales/generated/en.yml"
       export_filename = 'en.yml'
+      current_branch = nil
 
       prevgit = {}
       prevgit[:branch] = `git branch | grep '\*'`.sub(/^\* /, '').strip
@@ -269,14 +270,14 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
         arg = $stdin.gets.strip
         if arg.blank?
           last_export = {:type => :none}
-        elsif arg =~ /\A[a-z0-9]{7,}\z/
+        elsif arg =~ /\A[a-f0-9]{7,}\z/
           puts "Fetching previous export..."
           ret = `git show --name-only --oneline #{arg}`
           if $?.exitstatus == 0
             if ret.include?(base_filename)
               `git checkout #{arg}`
               if previous = YAML.load(File.read(arg)).flatten rescue nil
-                last_export = {:type => :file, :data => previous}
+                last_export = {:type => :commit, :data => previous}
               else
                 $stderr.puts "Unable to load en.yml file"
               end
@@ -301,16 +302,25 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
         end
       end until last_export
 
+      begin
+        puts "Enter local branch containing current en translations (default master):"
+        current_branch = $stdin.gets.strip
+      end until current_branch.blank? || current_branch !~ /[^a-z0-9_\.\-]/
+      current_branch = nil if current_branch.blank?
+      
       puts "Extracting current en translations..."
-      `git checkout master; git pull --rebase`
+      `git checkout #{current_branch || 'master'}; git pull --rebase` if last_export[:type] == :commit || current_branch != prevgit[:branch]
       Rake::Task["i18n:generate"].invoke
 
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
       current_strings = YAML.load(File.read(base_filename)).flatten
       new_strings = last_export[:data] ?
-        current_strings.inject({}){ |h, (k, v)| h[k] = v unless last_export[:data][k] == v } :
+        current_strings.inject({}){ |h, (k, v)|
+          h[k] = v unless last_export[:data][k] == v
+          h
+        } :
         current_strings
-      File.open(export_filename, "w"){ |f| f.write new_strings.expand }
+      File.open(export_filename, "w"){ |f| f.write new_strings.expand.ya2yaml(:syck_compatible => true) }
 
       push = 'n'
       begin
@@ -323,14 +333,19 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
           puts "Exported en.yml, current translations unmodified (check git log for last change)"
         else
           `git commit -a -m"generated en.yml for translation"`
-          `git push -u origin master`
+          remote_branch = `git remote-ref`.strip.sub(%r{\Aremotes/[^/]+/(.*)\z}, '\\1')
+          local = current_branch || 'master'
+          `remote=$(git config branch."#{local}".remote); \
+           remote_ref=$(git config branch."#{local}".merge); \
+           remote_name=${remote_ref##refs/heads/}; \
+           git push $remote HEAD:refs/for/$remote_name`
           puts "Exported en.yml, committed/pushed current translations (#{`git log --oneline|head -n 1`.sub(/ .*/m, '')})"
         end
       else
         puts "Exported en.yml, dumped current translations (not committed)"
       end
     ensure
-      `git checkout #{prevgit[:branch]}` if prevgit[:branch]
+      `git checkout #{prevgit[:branch] || 'master'}` if prevgit[:branch] != current_branch
       `git stash pop` if prevgit[:stashed]
     end
   end

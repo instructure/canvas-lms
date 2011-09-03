@@ -21,6 +21,7 @@ var wikiSidebar;
 // take a little bit of work.  I just wrapped it in a closure for now
 // to not pollute the global namespace, but it could use more.
 var quiz = {};
+var maxCombinations;
 I18n.scoped('quizzes', function(I18n) {
   quiz = {
     uniqueLocalIDStore: {},
@@ -124,10 +125,13 @@ I18n.scoped('quizzes', function(I18n) {
     questionContentCounter: 0,
     showFormQuestion: function($form) {
       if(!$form.attr('id')) {
+        // we show and then hide the form so that the layout for the editorBox is computed correctly
+        $form.show();
         $form.find(".question_content").attr('id', 'question_content_' + quiz.questionContentCounter++);
         $form.find(".question_content").editorBox();
         $form.find(".text_after_answers").attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
         $form.find(".text_after_answers").editorBox();
+        $form.hide();
       }
       return $form.show();
     },
@@ -1150,7 +1154,7 @@ I18n.scoped('quizzes', function(I18n) {
       var $question = $(this).parents(".question");
       var question = $question.getTemplateData({
         textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id'],
-        htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'netural_comments_html']
+        htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
       question.question_text = $question.find("textarea[name='question_text']").val();
       var matches = [];
@@ -1591,9 +1595,9 @@ I18n.scoped('quizzes', function(I18n) {
       var $bank = $findQuestionDialog.find(".bank.selected_side_tab");
       var bank = $bank.data('bank_data');
       var url = $findQuestionDialog.find(".question_bank_questions_url").attr('href');
-      url = $.replaceTags($.replaceTags($.replaceTags(url, 'question_bank_id', bank.id), 'context_id', bank.context_id), 'context_type_plural', $.pluralize($.underscore(bank.context_type)));
+      url = $.replaceTags(url, 'question_bank_id', bank.id);
       var page = ($findQuestionDialog.find(".page_link").data('page') || 0) + 1;
-      url += "?page=" + page;
+      url += "&page=" + page;
       $.ajaxJSON(url, 'GET', {}, function(data) {
         $link.removeClass('loading');
         $findQuestionDialog.find(".page_link").data('page', page);
@@ -2422,6 +2426,12 @@ I18n.scoped('quizzes', function(I18n) {
       $table.find("thead tr").append($th);
       $table.find("tbody").empty();
       var cnt = parseInt($question.find(".combination_count").val(), 10) || 10;
+      if (cnt < 0) {
+        cnt = 10;
+      } else if (cnt > maxCombinations) {
+        cnt = maxCombinations;
+      }
+      $question.find(".combination_count").val(cnt);
       var succeeded = 0;
       var existingCombinations = {};
       var mod = 0;

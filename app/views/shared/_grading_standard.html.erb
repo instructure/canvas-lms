@@ -51,23 +51,26 @@
             <div class="displaying name">
               <%= row[0] %>
             </div>
-          </td><td style="padding: 2px 5px; width: 25%;">
+          </td>
+          <td style="padding: 2px 5px; width: 25%;">
             <div class="editing_box">
-              <input type="text" class="standard_value" name="grading_standard[standard_data][scheme_<%= idx %>][value]" value="<%= (row[1] * 100).to_i %>" style="width: 30px;"/>%
+              <span class="edit_max_score"><%= idx == 0 ? 100 : "< #{data[idx - 1][1] * 100}" %></span>%
             </div>
             <div class="displaying">
-              <span class="max_score"><%= (row[1] * 100).to_i %></span>%
+              <span class="max_score"><%= idx == 0 ? 100 : "< #{data[idx - 1][1] * 100}" %></span>%
             </div>
-          </td><td style="padding: 2px 5px; width: 25%;">
+          </td>
+          <td style="padding: 2px 5px; width: 25%;">
             <div class="editing_box">
               <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
-              <span class="edit_min_score"><%= (data[idx + 1][1] * 100).to_i + 1 rescue 0 %></span>%
+              <input type="text" class="standard_value" name="grading_standard[standard_data][scheme_<%= idx %>][value]" value="<%= row[1] * 100 %>" style="width: 30px;"/>%
             </div>
             <div class="displaying">
               <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
-              <span class="min_score"><%= (data[idx + 1][1] * 100).to_i + 1 rescue 0 %></span>%
+              <span class="min_score"><%= row[1] * 100 %></span>%
             </div>
-          </td><td class="editing_box" style="padding: 2px 5px 2px 15px; width: 25%;">
+          </td>
+          <td class="editing_box" style="padding: 2px 5px 2px 15px; width: 25%;">
             <a href="#" class="delete_row_link no-hover"><%= image_tag "delete_circle.png" %></a>
           </td>
         </tr>
@@ -90,23 +93,26 @@
           <div class="displaying">
             &nbsp;
           </div>
-        </td><td style="padding: 2px 5px;">
+        </td>
+        <td style="padding: 2px 5px;">
+          <div class="editing_box">
+            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
+            <span class="edit_max_score">&nbsp;</span>%
+          </div>
+          <div class="displaying">
+            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
+            <span class="max_score">&nbsp;</span>%
+          </div>
+        </td>
+        <td style="padding: 2px 5px;">
           <div class="editing_box">
             <input type="text" class="standard_value" name="grading_standard[standard_data][scheme_blank][value]" value="" style="width: 30px;"/>%
           </div>
           <div class="displaying">
-            <span class="max_score">&nbsp;</span>%
-          </div>
-        </td><td style="padding: 2px 5px;">
-          <div class="editing_box">
-            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
-            <span class="edit_min_score">&nbsp;</span>%
-          </div>
-          <div class="displaying">
-            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
             <span class="min_score">&nbsp;</span>%
           </div>
-        </td><td class="editing_box" style="padding: 2px 5px 2px 15px;">
+        </td>
+        <td class="editing_box" style="padding: 2px 5px 2px 15px;">
           <a href="#" class="delete_row_link no-hover"><%= image_tag "delete_circle.png" %></a>
         </td>
       </tr>

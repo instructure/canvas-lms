@@ -47,10 +47,10 @@ class Eportfolio < ActiveRecord::Base
   protected :assign_uuid
 
   set_policy do
-    given {|user| user }
+    given {|user| user && user.eportfolios_enabled? }
     can :create
     
-    given {|user| self.user == user}
+    given {|user| self.user == user && user.eportfolios_enabled? }
     can :read and can :manage and can :update and can :delete
     
     given {|user| self.public }

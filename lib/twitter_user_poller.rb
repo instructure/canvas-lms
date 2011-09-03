@@ -61,7 +61,7 @@ class TwitterUserPoller
           })
           @logger.info("unexpected error: #{e.to_s} #{e.backtrace.join "\n"}")
         end
-        retry_after = [REFRESH_INTERVAL_EMPTY, retry_after].max
+        retry_after = [REFRESH_INTERVAL_EMPTY, retry_after.to_i].max
         service.refresh_at = Time.now.utc + retry_after + 1.minute
         service.save
       end

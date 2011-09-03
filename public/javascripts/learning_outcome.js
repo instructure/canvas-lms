@@ -53,7 +53,7 @@ $(document).ready(function() {
       }
     });
   });
-  $("#alignments").sortable({
+  $("#alignments.orderable").sortable({
     axis: 'y',
     handle: '.move_alignment_link',
     update: function(event, ui) {
@@ -101,7 +101,7 @@ $(document).ready(function() {
           $item.loadingImage('remove');
           $item.remove();
           addAlignment(data.content_tag);
-          $("#alignments").sortable('refresh');
+          $("#alignments.orderable").sortable('refresh');
         });
       };
       INST.selectContentDialog(options);

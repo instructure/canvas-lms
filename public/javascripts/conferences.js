@@ -77,13 +77,15 @@ $(document).ready(function() {
         $conference = $("#conference_blank");
       }
       var data = $conference.getTemplateData({
-        textValues: ['title', 'duration', 'description', 'user_ids', 'conference_type', 'long_running'].concat(INST.webConferenceUserSettings)
+        textValues: ['title', 'duration', 'description', 'user_ids', 'conference_type', 'long_running', 'has_advanced_settings', 'id'].concat(INST.webConferenceUserSettings)
       });
       if(edit) {
         $form.find("span.title").text(I18n.t('index.edit_conference_heading', "Edit Conference Details"));
         $form.find("button[type=submit]").text(I18n.t('index.buttons.update', "Update Conference"));
         $form.attr('method', 'PUT').attr('action', $(this).attr('href'));
         $form.find('select').attr("disabled", true);
+        var $advanced_settings = $form.find('.advanced_settings').showIf(parseInt(data.has_advanced_settings));
+        $advanced_settings.attr('href', $.replaceTags($advanced_settings.data('base-href'), {id: data.id}));
         $conference.after($form);
         $form.find("#members_list").show().find(":checkbox").attr('checked', false).end().end()
           .find(".all_users_checkbox").attr('checked', false);
@@ -104,6 +106,7 @@ $(document).ready(function() {
         $form.find("button[type=submit]").text(I18n.t('index.buttons.create', "Create Conference"));
         $form.attr('method', 'POST').attr('action', $(".add_conference_url").attr('href'));
         $form.find('select').attr("disabled", false);
+        $form.find('.advanced_settings').hide();
         $form.find(".all_users_checkbox").attr('checked', true).end()
           .find("#members_list").hide().find(":checkbox").attr('checked', false);
         $("#conferences").before($form);

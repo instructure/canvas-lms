@@ -103,6 +103,34 @@ shared_examples_for "grading standards selenium tests" do
     
     form.find_element(:css, "#course_grading_standard_enabled").attribute(:checked).should be_nil
   end
+
+  it "should extend ranges to fractional values at the boundary with the next range" do
+    student = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(student).accept!
+    @course.update_attribute :grading_standard_id, 0
+    @course.assignment_groups.create!
+    @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
+    @assignment.grade_student(student, :grade => 899)
+    get "/courses/#{@course.id}/grades/#{student.id}"
+    driver.find_element(:css, '#right-side .final_grade .grade').text.should == '89.9'
+    driver.find_element(:css, '#right-side .final_letter_grade .grade').text.should == 'B+'
+  end
+
+  it "should allow editing the standard again without reloading the page" do
+    user_session(account_admin_user)
+    @standard = Account.default.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+    get("/accounts/#{Account.default.id}/grading_standards")
+    std = keep_trying_until { driver.find_element(:css, "#grading_standard_#{@standard.id}") }
+    std.find_element(:css, ".edit_grading_standard_link").click
+    std.find_element(:css, "button.save_button").click
+    wait_for_ajax_requests
+    std = keep_trying_until { driver.find_element(:css, "#grading_standard_#{@standard.id}") }
+    std.find_element(:css, ".edit_grading_standard_link").click
+    std.find_element(:css, "button.save_button").click
+    wait_for_ajax_requests
+    @standard.reload.data.length.should == 3
+  end
 end
 
 describe "grading standards Windows-Firefox-Tests" do

@@ -86,8 +86,8 @@ I18n.scoped('grading_standards', function(I18n){
         $standard.attr('id', 'grading_standard_blank');
       }
       $standard.find(".grading_standard_row").each(function() {
-        var data = $(this).getTemplateData({textValues: ['max_score', 'name']});
-        $(this).find(".standard_value").val(data.max_score).end()
+        var data = $(this).getTemplateData({textValues: ['min_score', 'name']});
+        $(this).find(".standard_value").val(data.min_score).end()
           .find(".standard_name").val(data.name);
       });
       $("#standards").ifExists(function() {
@@ -208,8 +208,8 @@ I18n.scoped('grading_standards', function(I18n){
         var $row_instance = $row.clone(true);
         var row = standard.data[idx];
         $row_instance.removeClass('to_delete').removeClass('to_add');
-        $row_instance.find(".standard_name").val(row[0]).end()
-          .find(".standard_value").val(row[1] * 100);
+        $row_instance.find(".standard_name").val(row[0]).attr('name', 'grading_standard[standard_data][scheme_'+idx+'][name]').end()
+          .find(".standard_value").val(row[1] * 100).attr('name', 'grading_standard[standard_data][scheme_'+idx+'][value]');
         $table.append($row_instance.show());
         $table.append($link.clone(true).show());
       }
@@ -218,8 +218,8 @@ I18n.scoped('grading_standards', function(I18n){
       $table.append($link.hide());
       $standard.find(".grading_standard_row").each(function() {
         $(this).find(".name").text($(this).find(".standard_name").val()).end()
-          .find(".max_score").text($(this).find(".standard_value").val()).end()
-          .find(".min_score").text($(this).find(".edit_min_score").text());
+          .find(".min_score").text($(this).find(".standard_value").val()).end()
+          .find(".max_score").text($(this).find(".edit_max_score").text());
       });
       $standard.removeClass('editing');
       $standard.find(".insert_grading_standard").hide();
@@ -313,51 +313,55 @@ I18n.scoped('grading_standards', function(I18n){
       }
       $standard.fadeOut(function() {
         $(this).addClass('to_delete');
+        // force refresh in case the deletion requires other changes
+        $(".grading_standard input[type='text']:first").triggerHandler('change');
       });
     });
     $(".grading_standard input[type='text']").bind('blur change', function() {
       var $standard = $(this).parents(".grading_standard");
-      var val = parseInt($(this).parents(".grading_standard_row").find(".standard_value").val(), 10);
+      var val = parseFloat($(this).parents(".grading_standard_row").find(".standard_value").val());
+      // round to 0.1
+      val = Math.round(val * 10) / 10.0;
+      $(this).parents(".grading_standard_row").find(".standard_value").val(val);
       if(isNaN(val)) { val = null; }
       var lastVal = val || 100;
       var prevVal = val || 0;
       var $list = $standard.find(".grading_standard_row:not(.blank,.to_delete)");
       for(var idx = $list.index($(this).parents(".grading_standard_row")) + 1; idx < $list.length; idx++) {
         var $row = $list.eq(idx);
-        var points = parseInt($row.find(".standard_value").val(), 10);
+        var points = parseFloat($row.find(".standard_value").val());
         if(isNaN(points)) { points = null; }
-        if(idx == 0) { 
-          points = 100; 
-        }
-        else if(!points || points > lastVal - 2) {
-          points = lastVal - 2;
+        if(idx == $list.length - 1) {
+          points = 0;
+        } else if (!points || points > lastVal - 0.1) {
+          points = parseInt(lastVal) - 1;
         }
         $row.find(".standard_value").val(points);
         lastVal = points;
       }
       for(var idx = $list.index($(this).parents(".grading_standard_row")) - 1; idx  >= 0; idx--) {
         var $row = $list.eq(idx);
-        var points = parseInt($row.find(".standard_value").val(), 10);
+        var points = parseFloat($row.find(".standard_value").val());
         if(isNaN(points)) { points = null; }
-        if(idx == 0) { 
-          points = 100; 
+        if(idx == $list.length - 1) {
+          points = 0;
         }
-        else if(!points || points < prevVal + 2) {
-          points = prevVal + 2;
+        else if(!points || points < prevVal + 0.1) {
+          points = parseInt(prevVal) + 1;
         }
         prevVal = points;
         $row.find(".standard_value").val(points);
       }
       lastVal = 100;
       $list.each(function(idx) {
-        var points = parseInt($(this).find(".standard_value").val(), 10);
+        var points = parseFloat($(this).find(".standard_value").val());
         var idx = $list.index(this);
         if(isNaN(points)) { points = null; }
-        if(idx == 0) { 
-          points = 100; 
+        if(idx == $list.length - 1) {
+          points = 0;
         }
-        else if(!points || points > lastVal - 2) {
-          points = lastVal - 2;
+        else if(!points || points > lastVal - 0.1) {
+          points = parseInt(lastVal) - 1;
         }
         $(this).find(".standard_value").val(points);
         lastVal = points;
@@ -365,27 +369,27 @@ I18n.scoped('grading_standards', function(I18n){
       prevVal = 0;
       for(var idx = $list.length - 1; idx  >= 0; idx--) {
         var $row = $list.eq(idx);
-        var points = parseInt($row.find(".standard_value").val(), 10);
+        var points = parseFloat($row.find(".standard_value").val());
         if(isNaN(points)) { points = null; }
-        if(idx == 0) { 
-          points = 100; 
+        if(idx == $list.length - 1) {
+          points = 0;
         }
-        else if(!points || points < prevVal + 2) {
-          points = prevVal + 2;
+        else if(!points || points < prevVal + 0.1) {
+          points = parseInt(prevVal) + 1;
         }
         prevVal = points;
         $row.find(".standard_value").val(points);
       }
       $list.each(function(idx) {
-        var $next = $list.eq(idx + 1);
+        var $prev = $list.eq(idx - 1);
         var min_score = 0;
-        if($next && $next.length > 0) {
-          min_score = parseInt($next.find(".standard_value").val(), 10) + 1;
+        if($prev && $prev.length > 0) {
+          min_score = parseFloat($prev.find(".standard_value").val());
           if(isNaN(min_score)) { min_score = 0; }
-          $(this).find(".edit_min_score").text(min_score);
+          $(this).find(".edit_max_score").text("< " + min_score);
         }
       });
-      $list.filter(":last").find(".edit_min_score").text(0);
+      $list.filter(":first").find(".edit_max_score").text(100);
     });
   });
 });

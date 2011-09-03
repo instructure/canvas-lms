@@ -37,7 +37,7 @@ describe 'submission_grade_changed.email' do
     user = message.user
     user.preferences[:send_scores_in_emails] = true
     user.save!
-    message = generate_message(:submission_grade_changed, :summary, @object, user)
+    message = generate_message(:submission_grade_changed, :summary, @object, :user => user)
     message.body.should match(/score:/)
   end
 end

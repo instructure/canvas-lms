@@ -116,7 +116,7 @@ class Notification < ActiveRecord::Base
       message.notification_name = self.name
       message.user = user
       message.context = asset
-      message.asset_context = asset.context(user) rescue asset
+      message.asset_context = opts[:asset_context] || asset.context(user) rescue asset
       message.parse!('summary')
       delayed_message = DelayedMessage.new(
         :notification => self,
@@ -139,6 +139,7 @@ class Notification < ActiveRecord::Base
     current_locale = I18n.locale
 
     tos = tos.flatten.compact.uniq
+    options = tos.delete_at(tos.length - 1) if tos.last.is_a? Hash
     @delayed_messages_to_save = []
     recipient_ids = []
     recipients = []
@@ -184,7 +185,7 @@ class Notification < ActiveRecord::Base
       too_many_and_summarizable = user && self.summarizable? && too_many_messages?(user)
       channels = CommunicationChannel.find_all_for(user, self, cc)
       fallback_channel = channels.sort_by{|c| c.path_type }.first
-      record_delayed_messages(:user => user, :communication_channel => cc, :asset => asset, :fallback_channel => too_many_and_summarizable ? channels.first : nil)
+      record_delayed_messages((options || {}).merge(:user => user, :communication_channel => cc, :asset => asset, :fallback_channel => too_many_and_summarizable ? channels.first : nil))
       if too_many_and_summarizable
         channels = channels.select{|cc| cc.path_type != 'email' && cc.path_type != 'sms' }
       end
@@ -206,7 +207,7 @@ class Notification < ActiveRecord::Base
         message.dispatch_at = nil
         message.user = user
         message.context = asset
-        message.asset_context = asset.context(user) rescue asset
+        message.asset_context = options[:asset_context] || asset.context(user) rescue asset
         message.notification_category = self.category
         message.delay_for = self.delay_for if self.delay_for 
         message.parse!
@@ -491,6 +492,7 @@ class Notification < ActiveRecord::Base
     t 'names.summaries', 'Summaries'
     t 'names.updated_wiki_page', 'Updated Wiki Page'
     t 'names.web_conference_invitation', 'Web Conference Invitation'
+    t 'names.alert', 'Alert'
   end
 
   # TODO: i18n ... show these anywhere we show the category today
@@ -543,7 +545,7 @@ class Notification < ActiveRecord::Base
     when 'Invitation'
       t(:invitation_description, "For new invitations")
     when 'Other'
-      t(:other_description, "For any other alerts")
+      t(:other_description, "For any other notifications")
     when 'Calendar'
       t(:calendar_description, "For calendar changes")
     when 'Message'
@@ -555,7 +557,7 @@ class Notification < ActiveRecord::Base
     when 'Added To Conversation'
       t(:added_to_conversation_description, "For conversations to which you're added")
     else
-      t(:missing_description_description, "For %{category} alerts", :category => category)
+      t(:missing_description_description, "For %{category} notifications", :category => category)
     end
   end
   

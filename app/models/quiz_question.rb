@@ -65,7 +65,7 @@ class QuizQuestion < ActiveRecord::Base
     self.assessment_question ||= AssessmentQuestion.new
     if self.assessment_question.editable_by?(self)
       self.assessment_question.question_data = self.question_data
-      self.assessment_question.context = self.quiz.context if self.quiz && self.quiz.context
+      self.assessment_question.initial_context = self.quiz.context if self.quiz && self.quiz.context
       self.assessment_question.save if self.assessment_question.new_record?
       self.assessment_question_id = self.assessment_question.id
       self.assessment_question_version = self.assessment_question.version_number rescue nil

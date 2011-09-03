@@ -1,4 +1,5 @@
 module CustomSeleniumRspecMatchers
+
   class HasClass
     def initialize(class_name)
       @class_name = class_name
@@ -17,6 +18,26 @@ module CustomSeleniumRspecMatchers
 
   def have_class(class_name)
     HasClass.new(class_name)
+  end
+
+  class IncludeText
+    def initialize(text)
+      @text = text
+    end
+    def matches?(element)
+      @element = element
+      !!@element.text.include?(@text)
+    end
+    def failure_message
+      "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element.text}"
+    end
+    def negative_failure_message
+      "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element.text}"
+    end
+  end
+
+  def include_text(text)
+    IncludeText.new(text)
   end
 
 end

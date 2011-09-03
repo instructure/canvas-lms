@@ -485,6 +485,17 @@ I18n.scoped('course_details', function(I18n) {
     if (typeof(sisPublishEnabled) != 'undefined' && sisPublishEnabled) {
       updatePublishingStatus();
     }
+    $(".reset_course_content_button").click(function(event) {
+      event.preventDefault();
+      $("#reset_course_content_dialog").dialog('close').dialog({
+        autoOpen: false,
+        title: I18n.t('titles.reset_course_content_dialog_help', "Reset Course Content"),
+        width: 500
+      }).dialog('open');
+    });
+    $("#reset_course_content_dialog .cancel_button").click(function() {
+      $("#reset_course_content_dialog").dialog('close');
+    });
 
     $.scrollSidebar();
   });

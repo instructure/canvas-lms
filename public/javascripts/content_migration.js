@@ -27,7 +27,9 @@ $(function(){
       $export_file_input = $migration_form.find("#export_file_input"),
       $migration_config = $migration_form.find("#migration_config"),
       $migration_configs = $("#migration_configs"),
-      $migration_alt_div = $("#migration_alt_div");
+      $migration_alt_div = $("#migration_alt_div"),
+      $overwrite_questions_config = $("#overwrite_questions_config"),
+      $overwrite_questions = $("#overwrite_questions");
 
   function enableFileUpload(file_type){
     file_type = typeof(file_type) != 'undefined' ? file_type : ".zip";
@@ -35,6 +37,10 @@ $(function(){
     $export_file_enabled.val("1");
     $file_upload.show();
   }
+  
+   function showQuestionOverwrite(){
+     $overwrite_questions_config.show();
+   }
 
   function resetMigrationForm(){
     $config_options.find("#migration_config > div").hide();
@@ -42,6 +48,8 @@ $(function(){
     $file_upload.hide();
     $export_file_input.val("");
     $submit_button.attr('disabled', true);
+    $overwrite_questions_config.hide();
+    $overwrite_questions.removeAttr("checked");
 
     $migration_config.find(".migration_config").ifExists(function(){
       $plugin_mother = $migration_configs.find($(this).data("mother_id"));
@@ -73,7 +81,7 @@ $(function(){
       }
 
       $config_options.show();
-      $plugin_mother_div.triggerHandler("pluginShown", [enableFileUpload, $migration_form, $migration_alt_div]);
+      $plugin_mother_div.triggerHandler("pluginShown", [enableFileUpload, $migration_form, showQuestionOverwrite]);
     }
   }).change();
 

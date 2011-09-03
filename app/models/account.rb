@@ -59,6 +59,20 @@ class Account < ActiveRecord::Base
   has_many :account_authorization_configs, :order => 'id'
   has_many :account_reports
   has_many :grading_standards, :as => :context
+  has_many :assessment_questions, :through => :assessment_question_banks
+  has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
+  def inherited_assessment_question_banks(include_self = false, *additional_contexts)
+    sql = []
+    conds = []
+    contexts = additional_contexts + account_chain
+    contexts.delete(self) unless include_self
+    contexts.each { |c|
+      sql << "context_type = ? AND context_id = ?"
+      conds += [c.class.to_s, c.id]
+    }
+    conds.unshift(sql.join(" OR "))
+    AssessmentQuestionBank.scoped :conditions => conds
+  end
   
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :learning_outcomes, :as => :context
@@ -69,6 +83,8 @@ class Account < ActiveRecord::Base
   has_many :page_views
   has_many :error_reports
   has_many :account_notifications
+  has_many :alerts, :as => :context, :include => :criteria
+  has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -113,6 +129,8 @@ class Account < ActiveRecord::Base
   add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser
+  add_setting :enable_alerts, :boolean => true, :root_only => true
+  add_setting :enable_eportfolios, :boolean => true, :root_only => true
   
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -244,14 +262,11 @@ class Account < ActiveRecord::Base
 
   def fast_course_base(opts)
     columns = "courses.id, courses.name, courses.section, courses.workflow_state, courses.course_code, courses.sis_source_id"
-    conditions = []
-    if opts[:hide_enrollmentless_courses]
-      conditions = ["exists (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"]
-    end
     associated_courses = self.associated_courses.active
+    associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns, :conditions => conditions)
+    associated_courses.limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns)
   end
 
   def fast_all_courses(opts={})
@@ -720,19 +735,16 @@ class Account < ActiveRecord::Base
 
   # Updates account associations for all the courses and users associated with this account
   def update_account_associations
+    account_chain_cache = {}
     all_user_ids = []
-    self.associated_courses.compact.uniq.each do |course|
-      # Don't update the user associations yet, we'll do that afterwards so we only do it once per user
-      course.update_account_associations(false)
-      all_user_ids += course.user_ids
-    end
-    
+    all_user_ids += Course.update_account_associations(self.associated_courses.uniq, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+
     # Make sure we have all users with existing account associations.
     # (This should catch users with Pseudonyms associated with the account.)
-    all_user_ids += UserAccountAssociation.scoped(:select => 'user_id', :conditions => { :account_id => id }).map(&:user_id)
-    
+    all_user_ids += UserAccountAssociation.scoped(:select => 'user_id', :conditions => { :account_id => self.id }).map(&:user_id)
+
     # Update the users' associations as well
-    User.update_account_associations(all_user_ids.uniq)
+    User.update_account_associations(all_user_ids.uniq, :account_chain_cache => account_chain_cache)
   end
   
   # this will take an account and make it a sub_account of
@@ -764,7 +776,7 @@ class Account < ActiveRecord::Base
   end
   
   def course_count
-    self.child_courses.not_deleted.uniq.count
+    self.child_courses.not_deleted.count('DISTINCT course_id')
   end
   memoize :course_count
   
@@ -825,7 +837,8 @@ class Account < ActiveRecord::Base
   TAB_FACULTY_JOURNAL = 10
   TAB_SIS_IMPORT = 11
   TAB_GRADING_STANDARDS = 12
-  
+  TAB_QUESTION_BANKS = 13
+
   def tabs_available(user=nil, opts={})
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
@@ -842,6 +855,7 @@ class Account < ActiveRecord::Base
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
       tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
+      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, nil, :manage_grades)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, nil, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if !self.root_account_id && manage_settings

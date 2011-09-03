@@ -215,7 +215,7 @@ module ApplicationHelper
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
   # policies from within a view.  Caches the response, but basically
   # user calls object.grants_right?(user, nil, action)
-  def can_do(object, user, action)
+  def can_do(object, user, *actions)
     return false unless object
     if object.is_a?(OpenObject) && object.type
       obj = object.temporary_instance
@@ -225,24 +225,32 @@ module ApplicationHelper
         obj.instance_variable_set("@new_record", false)
         object.temporary_instance = obj
       end
-      return can_do(obj, user, action)
+      return can_do(obj, user, actions)
     end
+    actions = Array(actions).flatten
     if (object == @context || object.is_a?(Course)) && user == @current_user
       @context_all_permissions ||= {}
       @context_all_permissions[object.asset_string] ||= object.grants_rights?(user, session, nil)
-      return @context_all_permissions[object.asset_string][action]
+      return !(@context_all_permissions[object.asset_string].keys & actions).empty?
     end
     @permissions_lookup ||= {}
-    lookup = [object ? object.asset_string : nil, user ? user.id : nil, action]
-    return @permissions_lookup[lookup] if @permissions_lookup[lookup] != nil
-    res = false
+    return true if actions.any? do |action|
+      lookup = [object ? object.asset_string : nil, user ? user.id : nil, action]
+      @permissions_lookup[lookup] if @permissions_lookup[lookup] != nil
+    end
     begin
-      res = object.grants_right?(user, session, action)
+      rights = object.grants_rights?(user, session, *actions)
     rescue => e
       logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
-      false 
+      return false
     end
-    @permissions_lookup[lookup] = res
+    res = false
+    rights.each do |action, value|
+      lookup = [object ? object.asset_string : nil, user ? user.id : nil, action]
+      @permissions_lookup[lookup] = value
+      res ||= value
+    end
+    res
   end
   
   # Loads up the lists of files needed for the wiki_sidebar.  Called from
@@ -366,7 +374,7 @@ var I18n = I18n || {};
   end
   
   def sortable_tabs
-    tabs = @context.tabs_available(@current_user)
+    tabs = @context.tabs_available(@current_user, :for_reordering => true)
     tabs.select do |tab| 
       if (tab[:id] == @context.class::TAB_CHAT rescue false)
         feature_enabled?(:tinychat)

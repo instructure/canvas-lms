@@ -165,7 +165,7 @@ class ContentMigration < ActiveRecord::Base
   # add a non-fatal error/warning to the import. user_message is what will be
   # displayed to the end user. exception_or_info can be either an Exception
   # object or any other information on the error.
-  def add_warning(user_message, exception_or_info)
+  def add_warning(user_message, exception_or_info='')
     migration_settings[:warnings] ||= []
     if exception_or_info.is_a?(Exception)
       er = ErrorReport.log_exception(:content_migration, exception_or_info)
@@ -180,6 +180,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def export_content
+    check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])
     if plugin
       begin
@@ -204,6 +205,16 @@ class ContentMigration < ActiveRecord::Base
       migration_settings[:last_error] = message
       logger.error message
       self.save
+    end
+  end
+  
+  def check_quiz_id_prepender
+    if !migration_settings[:id_prepender] && !migration_settings[:overwrite_questions]
+      # only prepend an id if the course already has some migrated questions/quizzes
+      if self.context.assessment_questions.scoped(:conditions => 'assessment_questions.migration_id IS NOT NULL').any? ||
+         self.context.quizzes.scoped(:conditions => 'quizzes.migration_id IS NOT NULL').any?
+        migration_settings[:id_prepender] = self.id  
+      end
     end
   end
 

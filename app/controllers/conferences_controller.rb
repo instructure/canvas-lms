@@ -132,6 +132,18 @@ class ConferencesController < ApplicationController
     end
   end
 
+  def settings
+    get_conference
+    if authorized_action(@conference, @current_user, :update)
+      if @conference.has_advanced_settings?
+        redirect_to @conference.admin_settings_url(@current_user)
+      else
+        flash[:error] = t(:no_settings_error, "The conference does not have an advanced settings page")
+        redirect_to named_context_url(@context, :context_conference_url, @conference.id)
+      end
+    end
+  end
+
   def destroy
     get_conference
     if authorized_action(@conference, @current_user, :delete)

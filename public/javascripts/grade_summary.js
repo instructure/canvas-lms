@@ -202,11 +202,7 @@ I18n.scoped('gradebook', function(I18n) {
     }
     $(".student_assignment.final_grade").find(".grade").text(finalGrade);
     if(grading_scheme) {
-      var letters = $.grep(grading_scheme, function(row, i) {
-        return finalGrade <= row[1] * 100 || i == 0;
-      });
-      var letter = letters[letters.length - 1];
-      $(".final_letter_grade .grade").text(letter[0]);
+      $(".final_letter_grade .grade").text(INST.GradeCalculator.letter_grade(grading_scheme, finalGrade));
     }
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);
     var eTime = (new Date()).getTime();
