@@ -1,3 +1,11 @@
+canvas-lms (1.1-55) professional; urgency=low
+
+  * Package ref: cbd78cd6c53494ceacd41bd8c0f5f4d74f5f6f9e
+  *
+  * [+cbd78cd] fix for when switching students does not switch scribd doc in speedgrader
+
+ -- JT Olds <jt@instructure.com>  Sat, 03 Sep 2011 16:23:33 -0600
+
 canvas-lms (1.1-54) professional; urgency=low
 
   * Package ref: f49edf7cdaa3bb3ec8beab78b90c21c087a46308
