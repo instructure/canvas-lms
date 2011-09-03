@@ -64,7 +64,6 @@ I18n.scoped('gradebook', function(I18n) {
       $grded_so_far = $("#x_of_x_graded span:first"),
       $average_score = $("#average_score"),
       $this_student_does_not_have_a_submission = $("#this_student_does_not_have_a_submission").hide(),
-      $doc_preview_holder = $("#doc_preview_holder"),
       $rubric_assessments_select = $("#rubric_assessments_select"),
       $rubric_summary_container = $("#rubric_summary_container"),
       $rubric_holder = $("#rubric_holder"),
@@ -978,7 +977,6 @@ I18n.scoped('gradebook', function(I18n) {
   	  }
   	  else {
         $iframe_holder.empty();
-        $iframe_holder.find("iframe").remove();
         
         //if it's a scribd doc load it.
         var scribdDocAvailable = attachment && attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
@@ -998,7 +996,7 @@ I18n.scoped('gradebook', function(I18n) {
               scribd_access_key: attachment.scribd_doc.attributes.access_key
             });
           }
-          $doc_preview_holder.show().loadDocPreview(options);
+          $iframe_holder.show().loadDocPreview(options);
 	      }
 	      else if (attachment && broswerableCssClasses.test(attachment.mime_class)) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
