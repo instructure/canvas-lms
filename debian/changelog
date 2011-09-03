@@ -1,3 +1,114 @@
+canvas-lms (1.1-54) professional; urgency=low
+
+  * Package ref: f49edf7cdaa3bb3ec8beab78b90c21c087a46308
+  *
+  * [-2a9e825] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [-687bdf6] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [-1d0834a] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-5e7cb01] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-699454c] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-388e97b] generated en.yml for translation
+  * [-009e620] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-53c7c6b] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-e931bf5] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-073d447] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-b1c26e9] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [-2d56d35] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [-c1e9763] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [+93f594a] fix site admin statistics, and add account settings extension points
+  * [+54bab9d] prompt to overwrite/rename new files with duplicate names; refs #5131
+  * [+cd762f4] pin closure-compiler to 1.0.0
+  * [+2f80779] typo causing qti/respondus question groups to fail to import
+  * [+7810d67] clean up course permissions slightly refs #4952
+  * [+4923464] clean up delayed jobs plugin dir
+  * [+41785a0] support importing enrollments that are enrolled to cross-listed courses
+  * [+a777763] copy course settings hash (hide totals) when copying course
+  * [+6a26aed] always immediately update enrollments when the restrictions change
+  * [+39d2817] drop course level role override "support"
+  * [+42e89f9] cinch down course permissions for admins refs #4952
+  * [+a75c30b] finish locking down courses from admin perspective
+  * [+f997efd] re-write update_account_associations for SPEED!
+  * [+4bb161c] optimize sis enrollment imports
+  * [+de92627] optimize course, section, and xlist sis imports
+  * [+521cb6a] include sis ids in gradebook csv closes #4922
+  * [+43b89f7] fix markdown'ed text being truncated at first newline
+  * [+1da705b] make i18n:export more flexible, fix a couple bugs
+  * [+46fbd65] Merge remote-tracking branch 'origin/dev/conversations'
+  * [+3e66b02] prevent wiki title uniquefying from making the title too long
+  * [+fe36731] question banks were being shown in reverse alpha order
+  * [+f66a90b] don't show deleted assignment groups in the new graded discussion page
+  * [+3c8b5b9] fix selenium spec
+  * [+41bff45] ensure an assignment group exists when editing assignment
+  * [+09aebea] typo causing import buttons to disappear
+  * [+9dc7701] configurable ttl for delayed job redis stats
+  * [+3d9eead] api for the activity stream, closes #4740
+  * [+5f51a08] fix submitting assignment using already uploaded file
+  * [+29310a3] reset course content closes #4583
+  * [+544ffa0] No % sign in Quiz Statistics
+  * [+f9892cd] dont render wiki_page body at all if it was deleted
+  * [+21d7337] include basic user info in oauth response, closes #5247
+  * [+b4de1b0] account list/show apis, for account_users
+  * [+f673176] fix deleting ajax-loaded questions from question banks
+  * [+f483a19] api to retrieve all courses in an account
+  * [+1705495] fix periodic spec failures
+  * [+c8f7529] oauth2 web app flow, refs #5029
+  * [+1a9edb3] make datetime_field() idempotent
+  * [+caae827] alerts, closes #4317
+  * [+01a7fcc] added and modified selenium tests to include sales demo user interactions
+  * [+b6be7f1] clear out the wiki when resetting course content refs #4583
+  * [+68d6b13] fix twitter poller x-ratelimit-reset handling
+  * [+99d4540] limit maximum per_page in api calls
+  * [+ff5fd14] include context info in stream item api, closes #5377
+  * [+9aad6b1] fix safefiles not setting session permissions properly
+  * [+032f407] account-level option to disable eportfolios, closes #5169
+  * [+8fb11bd] update oauth docs for new web app flow
+  * [+cffaa78] add a few useful indexes
+  * [+15c6635] allow importing question bank packages  with the same ids
+  * [+556b5cd] allow teachers access according to course OR term dates
+  * [+1247d10] wimba advanced settings link, closes #5291
+  * [+f9c88ae] case-insensitive lookups when adding users to course, fixes #4980
+  * [+c6dd22a] show course items aligned to account outcomes
+  * [+54d6fe4] fix some permissions checks refs #4952
+  * [+1f8d6ce] :read_reports should control access to access reports
+  * [+ec01d52] html5 uploads for chrome
+  * [+60b6364] don't show crumbs on dashboard
+  * [+ef43714] fall back to term dates when an override exists but has nil dates
+  * [+36fa28e] typo making html neutral comments editable, fixes #5418
+  * [+805d605] optimize sub_accounts page
+  * [+b4d0163] fix race condition with unzipped files' tmp files
+  * [+0460765] set a max-height on conversations body text area, fixes #5313
+  * [+0e359b5] parse in user timezone on discussion topic update
+  * [+2570dae] fix letter grade rounding of fractional grades, fixes #4879
+  * [+188ace5] don't error out if a stream item's assignment is hard deleted
+  * [+dfa6a9b] editing grade standard multiple times lost data, fixes #5431
+  * [+ba7be77] support fractional values in grading schemes, closes #5397
+  * [+a580766] add singleton support to DelayedJob
+  * [+f394576] expire the home menu html cache after 15 minutes
+  * [+59c15dc] render the icons on the tinymce editor toolbar better for quiz questions
+  * [+432283d] bump question_data size, limit possible combinations. fixes #4953
+  * [+7fa0ff9] conversations are teacher interactions, fixes #5437
+  * [+f20bf4b] show number of recipients in course/group
+  * [+8b731d1] account-level question banks, closes #5025
+  * [+a625dea] re-do reset course refs #4583
+  * [+100b3c9] fix external tools tab in course settings
+  * [+814e9c3] pull page views from redis every 1 minute
+  * [+fbe249d] use the root attachment scribd doc, closes #5394
+  * [+a3866b2] question bank nav link, closes #5446
+  * [+dfa8027] fix question bank editing/deleting, closes #5447, #5455
+  * [+d142999] friendlier conversation urls/redirects
+  * [+fcd0ef9] use zoned time calculations in cache keys, fixes #5461
+  * [+d6fb60b] fix conversation count bug, closes #5428
+  * [+776b681] show pending sis batch count on sis imports page
+  * [+044dd92] break out a specific permission for managing delayed jobs
+  * [+e7f6713] fix group count bug
+  * [+8d7df48] fix conversation bug for observers w/ no observed users
+  * [+a63aeb3] touch the user when accepting enrollments
+  * [+3d7ed0c] fix a content migration error
+  * [+2d73db2] touch user after adding enrollment, fixes #5481
+  * [+f49edf7] don't show student details on group roster pages
+
+ -- JT Olds <jt@instructure.com>  Sat, 03 Sep 2011 11:18:02 -0600
+
 canvas-lms (1.1-53) professional; urgency=low
 
   * Package ref: 417d11741479173f8658bbeeb3bdea7f293596d9
