@@ -23,23 +23,21 @@ class ContentImportsController < ApplicationController
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   
   def intro
-    if authorized_action(@context, @current_user, :update)
-    end
+    authorized_action(@context, @current_user, [:manage_content, :manage_files, :manage_quizzes])
   end
   
   def files
-    if authorized_action(@context, @current_user, :update)
-    end
+    authorized_action(@context, @current_user, [:manage_content, :manage_files])
   end
   
   def quizzes
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, [:manage_content, :manage_quizzes])
       @quizzes = @context.quizzes.active
     end
   end
   
   def migrate_content
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :manage_content)
       if params[:migration_settings]
 
         if params[:migration_settings][:question_bank_name] == 'new_question_bank'
@@ -110,7 +108,7 @@ class ContentImportsController < ApplicationController
   end
 
   def migrate_content_choose
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :manage_content)
       @content_migration = ContentMigration.for_context(@context).find(params[:id]) #)_all_by_context_id_and_context_type(@context.id, @context.class.to_s).last
       if @content_migration.progress && @content_migration.progress >= 100
         flash[:notice] = t 'notices.already_imported', "That extraction has already been imported into the course"
@@ -132,7 +130,7 @@ class ContentImportsController < ApplicationController
   end
   
   def migrate_content_execute
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :manage_content)
       migration_id = params[:id] || params[:copy] && params[:copy][:content_migration_id]
       @content_migration = ContentMigration.find_by_context_id_and_context_type_and_id(@context.id, @context.class.to_s, migration_id) if migration_id.present?
       @content_migration ||= ContentMigration.find_by_context_id_and_context_type(@context.id, @context.class.to_s, :order => "id DESC")
@@ -148,7 +146,7 @@ class ContentImportsController < ApplicationController
   end
   
   def copy_course
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :manage_content)
       if params[:import_id]
         @import = CourseImport.for_course(@context, 'instructure_copy').find(params[:import_id])
         @copy_context = @import.source
@@ -178,9 +176,9 @@ class ContentImportsController < ApplicationController
   end
   
   def copy_course_content
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :manage_content)
       @copy_context = Course.find(params[:copy][:course_id]) #@current_user.available_courses.find(params[:copy][:course_id])
-      @copy_context = Course.find(0) unless @copy_context.grants_right?(@current_user, nil, :manage_content)
+      return render_unauthorized_action unless @copy_context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
       @import = CourseImport.create!(:import_type => "instructure_copy", :source => @copy_context, :course => @context)
       params[:copy][:import] = @import
       @copies = []
@@ -202,7 +200,7 @@ class ContentImportsController < ApplicationController
   end
   
   def review
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :manage_content)
       @root_folders = Folder.root_folders(@context)
       @folders = @context.folders.active
       @assignments = @context.assignments.active
@@ -213,7 +211,7 @@ class ContentImportsController < ApplicationController
   end
   
   def index
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :manage_content)
       @successful = ContentMigration.successful.find_all_by_context_id(@context.id)
       @running = ContentMigration.running.find_all_by_context_id(@context.id)
       @waiting = ContentMigration.waiting.find_all_by_context_id(@context.id)
@@ -224,7 +222,7 @@ class ContentImportsController < ApplicationController
   private
 
   def load_migration_and_attachment
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :manage_content)
       @migration = ContentMigration.for_context(@context).find(params[:id])
       @attachment = @migration.attachment
       if block_given?

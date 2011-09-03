@@ -58,8 +58,8 @@
 </div>
 <div id="bank_urls" style="display: none;">
   <a href="<%= context_url(@context, :context_question_bank_questions_url, @bank, :page => "{{ page }}") %>" class="more_questions_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_assessment_questions_url) %>" class="add_question_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_assessment_question_move_question_url, "{{ id }}") %>" class="move_question_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_question_bank_assessment_questions_url, @bank) %>" class="add_question_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_question_bank_assessment_question_move_question_url, "{{ id }}") %>" class="move_question_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_question_bank_move_questions_url, @bank.id) %>" class="move_questions_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_question_banks_url) %>" class="assessment_question_banks_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="managed_banks_url">&nbsp;</a>
@@ -69,7 +69,7 @@
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
   <% if @questions.total_pages <= 1 %>
     <% @questions.each do |question| %>
-      <%= render :partial => "quizzes/display_question", :object => question.data, :locals => {:is_assessment_question => true, :editing => true, :asset_string => question.asset_string} %>
+      <%= render :partial => "quizzes/display_question", :object => question.data, :locals => {:question_bank_id => @bank.id, :editing => true, :asset_string => question.asset_string} %>
     <% end %>
   <% else %>
     <%= render :partial => "question_teaser", :collection => @questions %>
@@ -84,7 +84,7 @@
 
 <%= render :partial => "question_teaser" %>
 <%= render :partial => "question_bank" %>
-<%= render :partial => "quizzes/display_question", :object => nil, :locals => {:is_assessment_question => true, :editing => true} %>
+<%= render :partial => "quizzes/display_question", :object => nil, :locals => {:question_bank_id => @bank.id, :editing => true} %>
 <%= render :partial => "quizzes/display_answer", :object => nil %>
 <%= render :partial => "quizzes/form_answer", :object => nil %>
 <%= render :partial => "quizzes/form_question", :object => nil, :locals => {:question_bank_id => @bank.id} %>
@@ -162,7 +162,7 @@ $(document).ready(function() {
     url = $.replaceTags(url, 'page', currentPage + 1);
     $link.text("loading more questions...").addClass('loading');
     $.ajaxJSON(url, 'GET', {}, function(data) {
-      $link.text("more questions").removeClass('loading');
+      $link.text(I18n.t('links.more_questions', "more questions")).removeClass('loading');
       $more_questions.attr('data-current-page', currentPage + 1);
       $more_questions.showIf(currentPage + 1 < totalPages);
       for(var idx in data.questions) {
@@ -170,10 +170,13 @@ $(document).ready(function() {
         question.assessment_question_id = question.id;
         var $question = $("#question_teaser_blank").clone().removeAttr('id');
         $question.fillTemplateData({
-          data: question.question_data,
-          id: 'question_teaser_id',
-          htmlValues: ['question_text'],
+          data: question,
+          id: 'question_teaser_' + question.id,
           hrefValues: ['id']
+        });
+        $question.fillTemplateData({
+          data: question.question_data,
+          htmlValues: ['question_text']
         });
         $question.data('question', question);
         $("#questions").append($question);
@@ -254,7 +257,7 @@ $(document).ready(function() {
     $bank.find("label").attr('for', "question_bank_" + bank.id)
       .find(".bank_name").text(bank.title || I18n.t('default_name', "No Name")).end()
       .find(".context_name").text(bank.cached_context_short_name);
-    $dialog.find("ul.banks").find("li.bank.bank:first").before($bank.show());
+    $bank.show().insertBefore($dialog.find("ul.banks .bank.blank:last"));
   };
   var loadBanks = function() {
     var url = $("#bank_urls .managed_banks_url").attr('href');

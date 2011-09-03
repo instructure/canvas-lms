@@ -60,7 +60,7 @@ describe "users/_logins.html.erb" do
       assigns[:current_user] = admin
       render
       response.should have_tag("span#sis_source_id_#{@pseudo.id}", @pseudo.sis_source_id)
-      response.should have_tag("div.can_edit_sis_user_id", '')
+      response.should have_tag("div.can_edit_sis_user_id", 'false')
     end
   end
 end

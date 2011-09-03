@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Users
+#
+# API for accessing information on the current and other users.
 class UsersController < ApplicationController
   include GoogleDocs
   include Twitter
@@ -206,6 +209,11 @@ class UsersController < ApplicationController
 
   def user_dashboard
     get_context
+    
+    # dont show crubms on dashboard because it does not make sense to have a breadcrumb
+    # trail back to home if you are already home
+    clear_crumbs 
+    
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
@@ -215,6 +223,101 @@ class UsersController < ApplicationController
     end
     @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @is_default_account = @current_user.pseudonyms.active.map(&:account_id).include?(Account.default.id)
+  end
+
+  include Api::V1::StreamItem
+
+  # @API
+  # Returns the current user's global activity stream.
+  #
+  # The response is currently hard-coded to the last 2 weeks or 21 total items.
+  #
+  # There are many types of objects that can be returned in the activity
+  # stream. All object types have the same basic set of shared attributes:
+  #   {
+  #     'created_at': '2011-07-13T09:12:00Z',
+  #     'updated_at': '2011-07-25T08:52:41Z',
+  #     'id': 1234,
+  #     'title': 'Stream Item Subject',
+  #     'message': 'This is the body text of the activity stream item. It is plain-text, and can be multiple paragraphs.',
+  #     'type': 'DiscussionTopic|ContextMessage|Message|Submission|Conference|Collaboration|...'
+  #   }
+  #
+  # In addition, each item type has its own set of attributes available.
+  #
+  # DiscussionTopic:
+  #
+  #   {
+  #     'type': 'DiscussionTopic',
+  #     'discussion_topic_id': 1234,
+  #     'total_root_discussion_entries': 5,
+  #     'root_discussion_entries': {
+  #       ...
+  #     }
+  #   }
+  # For DiscussionTopic, the message is truncated at 4kb.
+  #
+  # Announcement:
+  #
+  #   {
+  #     'type': 'Announcement',
+  #     'announcement_id': 1234,
+  #     'total_root_discussion_entries': 5,
+  #     'root_discussion_entries': {
+  #       ...
+  #     }
+  #   }
+  # For Announcement, the message is truncated at 4kb.
+  #
+  # ContextMessage:
+  #
+  #   {
+  #     'type': 'ContextMessage',
+  #     'context_message_id': 1234,
+  #     'sender': {
+  #       'user_id': 5678,
+  #       'user_name': 'joe user'
+  #     },
+  #     'recipients_count': 1
+  #   }
+  # For ContextMessage, the message is truncated at 4kb.
+  #
+  # Message:
+  #
+  #   {
+  #     'type': 'Message',
+  #     'message_id': 1234,
+  #     'notification_category': 'Assignment Graded'
+  #   }
+  #
+  # Submission:
+  #
+  #   {
+  #     'type': 'Submission',
+  #     'grade': '12',
+  #     'score': 12,
+  #     'assignment': {
+  #       'title': 'Assignment 3',
+  #       'id': 5678,
+  #       'points_possible': 15
+  #     }
+  #   }
+  #
+  # Conference:
+  #
+  #   {
+  #     'type': 'Conference',
+  #     'web_conference_id': 1234
+  #   }
+  #
+  # Collaboration:
+  #
+  #   {
+  #     'type': 'Collaboration',
+  #     'collaboration_id': 1234
+  #   }
+  def activity_stream
+    render :json => @current_user.stream_items.map { |i| stream_item_json(i) }
   end
 
   def manageable_courses
@@ -730,6 +833,15 @@ class UsersController < ApplicationController
       :conditions => ["author_id = ? AND recipient_id IN (?)", teacher.id, ids])
     last_comment_dates.each do |user_id, date|
       next unless student = data[user_id]
+      student[:last_interaction] = [student[:last_interaction], date].compact.max
+    end
+    last_message_dates = ConversationMessage.maximum(
+      :created_at,
+      :joins => 'INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id',
+      :group => ['conversation_participants.user_id', 'conversation_messages.author_id'],
+      :conditions => [ 'conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher.id, ids ])
+    last_message_dates.each do |key, date|
+      next unless student = data[key.first.to_i]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
 

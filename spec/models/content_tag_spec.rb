@@ -60,4 +60,31 @@ describe ContentTag do
     tag = ContentTag.new
     tag.assignment.should be_nil
   end
+
+  it "should include tags from a course in the for_context named scope" do
+    course
+    quiz = @course.quizzes.create!
+    tag = ContentTag.create!(:content => quiz, :context => @course)
+    tags = ContentTag.for_context(@course)
+    tags.should_not be_empty
+    tags.any?{ |t| t.id == tag.id }.should be_true
+  end
+
+  it "should include tags from an account in the for_context named scope" do
+    account = Account.default
+    outcome = account.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
+    tag = ContentTag.create!(:content => outcome, :context => account)
+    tags = ContentTag.for_context(account)
+    tags.should_not be_empty
+    tags.any?{ |t| t.id == tag.id }.should be_true
+  end
+
+  it "should include tags from courses under an account in the for_context named scope" do
+    course
+    quiz = @course.quizzes.create!
+    tag = ContentTag.create!(:content => quiz, :context => @course)
+    tags = ContentTag.for_context(@course.account)
+    tags.should_not be_empty
+    tags.any?{ |t| t.id == tag.id }.should be_true
+  end
 end

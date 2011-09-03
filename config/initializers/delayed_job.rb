@@ -41,4 +41,12 @@ class Object
       send(method, *args)
     end
   end
+
+  def send_now_or_later(_when, *args)
+    if _when == :now
+      send(*args)
+    else
+      send_later(*args)
+    end
+  end
 end

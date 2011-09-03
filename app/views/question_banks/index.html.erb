@@ -52,14 +52,12 @@
       <%= t 'course_question_banks', "Course Question Banks" %>
     <% when 'User' %>
       <%= t 'user_question_banks', "User Question Banks" %>
+    <% when 'Account' %>
+      <%= t 'account_question_banks', "Account Question Banks" %>
   <% end %>
 </h2>
 <% if @context != @current_user %>
   <%= render :partial => "question_bank" %>
-  <%= render :partial => "quizzes/display_question", :object => nil, :locals => {:is_assessment_question => true} %>
-  <%= render :partial => "quizzes/display_answer", :object => nil %>
-  <%= render :partial => "quizzes/form_answer", :object => nil %>
-  <%= render :partial => "quizzes/form_question", :object => nil %>
 
   <% form_for :assessment_question_bank, :url => "", :html => {:id => "edit_bank_form", :style => "display: none;"} do |f| %>
     <%= f.blabel :title, :en => "Bank Name" %>
@@ -71,9 +69,4 @@
 <% end %>
 <div id="questions" class="question_editing brief">
   <%= render :partial => "question_bank", :collection => @question_banks %>
-  <div id="unfiled_questions" style="display: none;">
-    <% @unfiled_questions.each do |question| %>
-      <%= render :partial => 'quizzes/display_question', :object => question.data, :locals => {:is_assessment_question => true, :asset_string => question.asset_string} %>
-    <% end %>
-  </div>
 </div>

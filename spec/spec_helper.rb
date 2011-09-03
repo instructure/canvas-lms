@@ -121,6 +121,7 @@ Spec::Runner.configure do |config|
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
+    @user.associated_accounts << opts[:account] if opts[:account]
     @user
   end
 
@@ -151,6 +152,7 @@ Spec::Runner.configure do |config|
     @course ||= opts[:course] || course(opts)
     @student = @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
+    @enrollment.course = @course
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
       @enrollment.save!
@@ -164,6 +166,8 @@ Spec::Runner.configure do |config|
     @user = opts[:user] || user(opts)
     @teacher = @user
     @enrollment = @course.enroll_teacher(@user)
+    # set the reverse association
+    @enrollment.course = @course
     @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
     @enrollment
   end
@@ -201,6 +205,44 @@ Spec::Runner.configure do |config|
     session.stub!(:record).and_return(pseudonym)
     session.stub!(:session_credentials).and_return(nil)
     PseudonymSession.stub!(:find).and_return(session)
+  end
+
+  def login_as(username = "nobody@example.com", password = "asdfasdf")
+    post_via_redirect "/login",
+      "pseudonym_session[unique_id]" => username,
+      "pseudonym_session[password]" => password
+    assert_response :success
+    path.should eql("/?login_success=1")
+  end
+
+  def outcome_with_rubric(opts={})
+    @outcome = @course.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
+    @rubric.data = [
+      {
+        :points => 3,
+        :description => "Outcome row",
+        :long_description => @outcome.description,
+        :id => 1,
+        :ratings => [
+          {
+            :points => 3,
+            :description => "Rockin'",
+            :criterion_id => 1,
+            :id => 2
+          },
+          {
+            :points => 0,
+            :description => "Lame",
+            :criterion_id => 1,
+            :id => 3
+          }
+        ],
+        :learning_outcome_id => @outcome.id
+      }
+    ]
+    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.save!
   end
 
   def eportfolio(opts={})

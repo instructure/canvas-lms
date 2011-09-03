@@ -34,7 +34,6 @@ class Enrollment < ActiveRecord::Base
   
   before_save :assign_uuid
   before_save :assert_section
-  after_save :touch_user
   before_save :update_user_account_associations_if_necessary
 
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :invitation_email
@@ -279,6 +278,7 @@ class Enrollment < ActiveRecord::Base
     ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
     Message.delete_all({:id => ids}) if ids && !ids.empty?
     update_attribute(:workflow_state, 'active')
+    user.touch
     true
   end
   
@@ -310,30 +310,45 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Rails.cache.fetch([self, 'enrollment_dates'].cache_key) do
+    Rails.cache.fetch([self, self.course, 'enrollment_date_ranges'].cache_key) do
+      result = []
       if self.start_at && self.end_at
-        [self.start_at, self.end_at]
-      elsif course_section.try(:restrict_enrollments_to_section_dates) && !self.admin?
-        [course_section.start_at, course_section.end_at]
-      elsif course.try(:restrict_enrollments_to_course_dates) && !self.admin?
-        [course.start_at, course.conclude_at]
+        result << [self.start_at, self.end_at]
+      elsif course_section.try(:restrict_enrollments_to_section_dates)
+        result << [course_section.start_at, course_section.end_at]
+        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
+      elsif course.try(:restrict_enrollments_to_course_dates)
+        result << [course.start_at, course.conclude_at]
+        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
       elsif course.try(:enrollment_term)
-        course.enrollment_term.enrollment_dates_for(self)
+        result << course.enrollment_term.enrollment_dates_for(self)
       else
-        [nil, nil]
+        result << [nil, nil]
       end
+      result
     end
   end
 
   def state_based_on_date
     if state == :active
-      start_at, end_at = self.enrollment_dates
-      if start_at && start_at >= Time.now
-        :inactive
-      elsif end_at && end_at <= Time.now
+      ranges = self.enrollment_dates
+      ranges.each do |range|
+        start_at, end_at = range
+        if start_at && start_at >= Time.now
+          result = :inactive
+        elsif end_at && end_at <= Time.now
+          result = :completed
+        else
+          return :active
+        end
+      end
+      # not strictly within any range
+      global_start_at = ranges.map(&:first).compact.min
+      return :active unless global_start_at
+      if global_start_at < Time.now
         :completed
       else
-        :active
+        :inactive
       end
     else
       state
@@ -492,12 +507,9 @@ class Enrollment < ActiveRecord::Base
     given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
     can :read and can :read_services
     
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :manage_grades) }
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
     can :read and can :read_grades
-    
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :read_as_admin) }
-    can :read and can :read_grades
-    
+
     given { |user| !!Enrollment.active.find_by_user_id_and_associated_user_id(user.id, self.user_id) }
     can :read and can :read_grades and can :read_services
   end

@@ -1,4 +1,25 @@
-<label for="question_bank_select"><%= t 'labels.default_question_bank', "If not specified in the export, questions will go in this question bank" %></label>
+<div id="overwrite_questions_config">
+  <input type="checkbox" id="overwrite_questions" name="migration_settings[overwrite_questions]" value="1" />
+  <label for="overwrite_questions">
+    <%= t 'instructions.overwrite_questions', "Overwrite assessment content with matching IDs" %>
+  </label>
+  <a href="#" class="overwrite_questions_description_link"><%= image_tag "help.png"%></a>
+  <div style="display: none;" id="overwrite_questions_description">
+    <%= t 'instructions.overwrite_questions_long', <<-SAYWHAT
+           Some systems recycle their IDs for each new export.
+           As a result, if you export two separate question banks they will have the same IDs.
+           To prevent losing assessment data we treat these objects as different despite the IDs. 
+           Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs.
+      SAYWHAT
+    %>
+  </div>
+</div>
+
+<label for="question_bank_select">
+  <%= t 'labels.default_question_bank', "If not specified in the export, questions will go in this question bank" %>
+</label>
+
+
 <select name="migration_settings[question_bank_name]" id="question_bank_select">
 <% question_banks_select_list.each do |qb| %>
     <option value="<%= qb %>"><%= qb %></option>
@@ -20,6 +41,13 @@ $("#question_bank_select").change(function() {
   } else {
     $('#new_question_bank').hide();
   }
+});
+$(".overwrite_questions_description_link").click(function(event) {
+  event.preventDefault();
+  $('#overwrite_questions_description').dialog('close').dialog({
+    title: 'Overwrite Assessment Data',
+    width: 500
+  });
 });
 </script>
 <% end %>

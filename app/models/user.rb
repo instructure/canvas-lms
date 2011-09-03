@@ -197,76 +197,152 @@ class User < ActiveRecord::Base
   end
   memoize :page_views_by_day
   
-  def self.skip_updating_user_account_associations(&block)
-    @skip_updating_user_account_associations = true
+  def self.skip_updating_account_associations(&block)
+    @skip_updating_account_associations = true
     block.call
   ensure
-    @skip_updating_user_account_associations = false
+    @skip_updating_account_associations = false
   end
-  def self.skip_updating_user_account_associations?
-    !!@skip_updating_user_account_associations
+  def self.skip_updating_account_associations?
+    !!@skip_updating_account_associations
   end
   
   def update_account_associations_later
-    self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_user_account_associations?
-  end
-  
-  def self.update_account_associations(all_user_ids)
-    all_user_ids.uniq.compact.each_slice(100) do |user_ids|
-      User.find_all_by_id(user_ids).each do |user|
-        user.update_account_associations
-      end
-    end
+    self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_account_associations?
   end
   
   def update_account_associations
-    # Look up the current associations, and remove any duplicates.
-    associations_hash = {}
-    to_delete = {}
-    self.user_account_associations.reload.each do |a|
-      if !associations_hash[a.account_id]
-        associations_hash[a.account_id] = a
-        to_delete[a.account_id] = a
-      else
-        a.destroy
+    User.update_account_associations([self])
+  end
+
+  def self.add_to_account_chain_cache(account_id, account_chain_cache)
+    if account_id.is_a? Account
+      account = account_id
+      account_id = account.id
+    end
+    return account_chain_cache[account_id] if account_chain_cache.has_key?(account_id)
+    account ||= Account.find(account_id)
+    return account_chain_cache[account.id] = [account.id] if account.root_account?
+    account_chain_cache[account.id] = [account.id] + add_to_account_chain_cache(account.parent_account_id, account_chain_cache)
+  end
+
+  def self.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
+    results = {}
+    remaining_ids = []
+    starting_account_ids.each do |account_id|
+      unless account_chain_cache.has_key? account_id
+        remaining_ids << account_id
+        next
+      end
+      account_chain = account_chain_cache[account_id]
+      account_chain.each_with_index do |account_id, idx|
+        results[account_id] ||= idx
+        results[account_id] = idx if idx < results[account_id]
       end
     end
-    
-    # Users are tied to accounts a couple ways:
-    #   Through enrollments:
-    #      User -> Enrollment -> Section -> Course -> Account
-    #      User -> Enrollment -> Section -> Non-Xlisted Course -> Account
-    #      User -> Enrollment -> Course -> Account
-    #   Through pseudonyms:
-    #      User -> Pseudonym -> Account
-    #   Through account_users
-    #      User -> AccountUser -> Account
-    starting_points = []
-    self.enrollments.find(:all, :conditions => "workflow_state != 'deleted'", :include => {:course_section => [:course, :course_account_associations], :course => :course_account_associations}).each do |enrollment|
-      starting_points << enrollment.course << enrollment.course_section.try(:course) << enrollment.course_section.try(:nonxlist_course)
-    end
-    starting_points += self.pseudonyms.reload.active.map(&:account)
-    starting_points += self.account_users.reload.map(&:account)
-    
-    # For each Course and Account, make sure an association exists.
-    starting_points.compact.each do |entity|
-      account_ids = []
-      if entity.is_a?(Course)
-        account_ids = entity.course_account_associations.sort_by{|a| a.depth }.map{|a| a.account_id}.uniq
-      elsif entity.is_a?(Account)
-        account_ids = entity.account_chain.map(&:id)
-      end
-      account_ids.uniq.each_with_index do |account_id, idx|
-        if associations_hash[account_id]
-          associations_hash[account_id].update_attribute(:depth, idx) unless associations_hash[account_id].depth == idx
-          to_delete.delete(account_id)
-        else
-          associations_hash[account_id] = self.user_account_associations.create(:account_id => account_id, :depth => idx)
+
+    unless remaining_ids.empty?
+      accounts = Account.find_all_by_id(remaining_ids)
+      accounts.each do |account|
+        account_chain = add_to_account_chain_cache(account, account_chain_cache)
+        account_chain.each_with_index do |account_id, idx|
+          results[account_id] ||= idx
+          results[account_id] = idx if idx < results[account_id]
         end
       end
     end
-    to_delete.each {|id, a| a.destroy if a }
-    true
+    results
+  end
+
+  # Users are tied to accounts a couple ways:
+  #   Through enrollments:
+  #      User -> Enrollment -> Section -> Course -> Account
+  #      User -> Enrollment -> Section -> Non-Xlisted Course -> Account
+  #   Through pseudonyms:
+  #      User -> Pseudonym -> Account
+  #   Through account_users
+  #      User -> AccountUser -> Account
+  def calculate_account_associations(account_chain_cache = {})
+    # Hopefully these have all been pre-loaded
+    starting_account_ids = self.enrollments.map { |e| e.workflow_state != 'deleted' ? [e.course_section.course.account_id, e.course_section.nonxlist_course.try(:account_id)] : nil }.flatten.compact
+    starting_account_ids += self.pseudonyms.map { |p| p.active? ? p.account_id : nil }.compact
+    starting_account_ids += self.account_users.map(&:account_id)
+    starting_account_ids.uniq!
+
+    result = User.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
+    result
+  end
+
+  def self.update_account_associations(users_or_user_ids, opts = {})
+    return if users_or_user_ids.empty?
+
+    opts.reverse_merge! :account_chain_cache => {}
+    account_chain_cache = opts[:account_chain_cache]
+
+    # Split it up into manageable chunks
+    if users_or_user_ids.length > 500
+      users_or_user_ids.uniq.compact.each_slice(500) do |users_or_user_ids_slice|
+        update_account_associations(users_or_user_ids_slice, opts)
+      end
+      return
+    end
+
+    incremental = opts[:incremental]
+    precalculated_associations = opts[:precalculated_associations]
+
+    user_ids = users_or_user_ids
+    user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
+    users_or_user_ids = User.find(:all, :conditions => {:id => user_ids}, :include => [:pseudonyms, :account_users, { :enrollments => { :course_section => [ :course, :nonxlist_course ] }}]) if !user_ids.first.is_a?(User) && !precalculated_associations
+    UserAccountAssociation.transaction do
+      current_associations = {}
+      to_delete = []
+      UserAccountAssociation.find(:all, :conditions => { :user_id => user_ids }).each do |aa|
+        key = [aa.user_id, aa.account_id]
+        # duplicates
+        if current_associations.has_key?(key)
+          to_delete << aa.id
+          next
+        end
+        current_associations[key] = [aa.id, aa.depth]
+      end
+
+      users_or_user_ids.each do |user_id|
+        if user_id.is_a? User
+          user = user_id
+          user_id = user_id.id
+        end
+
+        account_ids_with_depth = precalculated_associations
+        if account_ids_with_depth.nil?
+          user ||= User.find(user_id)
+          account_ids_with_depth = user.calculate_account_associations(account_chain_cache)
+        end
+
+        account_ids_with_depth.each do |account_id, depth|
+          key = [user_id, account_id]
+          association = current_associations[key]
+          if association.nil?
+            # new association, create it
+            UserAccountAssociation.create! do |aa|
+              aa.user_id = user_id
+              aa.account_id = account_id
+              aa.depth = depth
+            end
+          else
+            # for incremental, only update the old association if it is deeper than the new one
+            # for non-incremental, update it if it changed
+            if incremental && association[1] > depth || !incremental && association[1] != depth
+              UserAccountAssociation.update_all("depth=#{depth}", :id => association[0])
+            end
+            # remove from list of existing for non-incremental
+            current_associations.delete(key) unless incremental
+          end
+        end
+      end
+
+      to_delete += current_associations.map { |k, v| v[0] }
+      UserAccountAssociation.delete_all(:id => to_delete) unless incremental || to_delete.empty?
+    end
   end
   
   def page_view_data(options={})    
@@ -710,6 +786,9 @@ class User < ActiveRecord::Base
       user && self.all_courses.any? { |c| c.grants_right?(user, nil, :manage_user_notes) }
     end
     can :create_user_notes and can :read_user_notes
+
+    given { |user| user && self.all_courses.any? { |c| c.grants_right?(user, nil, :read_user_notes) } }
+    can :read_user_notes
 
     given do |user|
       user && (
@@ -1527,6 +1606,11 @@ class User < ActiveRecord::Base
     pseudonym.try(:sis_user_id)
   end
 
+  def eportfolios_enabled?
+    accounts = associated_root_accounts.reject(&:site_admin?)
+    accounts.size == 0 || accounts.any?{ |a| a.settings[:enable_eportfolios] != false }
+  end
+
   def initiate_conversation(user_ids, private = nil)
     user_ids = ([self.id] + user_ids).uniq
     private = user_ids.size <= 2 if private.nil?
@@ -1534,22 +1618,35 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch(['enrollment_visibility', self].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'enrollment_visibility'].cache_key, :expires_in => 1.hour) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
+      user_counts = {}
       (courses + concluded_courses).each do |course|
         section_visibilities = course.section_visibilities_for(self)
+        conditions = nil
         case course.enrollment_visibility_level_for(self, section_visibilities)
-          when :full then full_course_ids << course.id
-          when :sections then section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
+          when :full
+            full_course_ids << course.id
+          when :sections
+            section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
+            conditions = {:course_section_id => section_id_hash[course.id]}
           when :restricted
             section_visibilities.each do |s|
-              (restricted_course_hash[course.id] ||= []) << s[:associated_user_id] if s[:associated_user_id]
+              restricted_course_hash[course.id] ||= []
+              restricted_course_hash[course.id] << s[:associated_user_id] if s[:associated_user_id]
             end
+            conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
+        user_counts[course.id] = course.enrollments.scoped(:conditions => self.class.reflections[:current_and_invited_enrollments].options[:conditions]).scoped(:conditions => conditions).size +
+                                 course.enrollments.scoped(:conditions => self.class.reflections[:concluded_enrollments].options[:conditions]).scoped(:conditions => conditions).size
       end
-      {:full_course_ids => full_course_ids, :section_id_hash => section_id_hash, :restricted_course_hash => restricted_course_hash}
+      {:full_course_ids => full_course_ids,
+       :section_id_hash => section_id_hash,
+       :restricted_course_hash => restricted_course_hash,
+       :user_counts => user_counts
+      }
     end
   end
 

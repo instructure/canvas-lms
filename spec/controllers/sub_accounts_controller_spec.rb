@@ -52,4 +52,61 @@ describe SubAccountsController do
       sub_sub_account_2.root_account.should == root_account
     end
   end
+
+  describe "GET 'index'" do
+    it "should preload all necessary information" do
+      root_account = Account.default
+      account_admin_user(:active_all => true)
+      user_session(@user)
+
+      # no sub accounts or courses
+      sub_account_1 = root_account.sub_accounts.create!
+
+      # 2 courses, 1 deleted
+      sub_account_2 = root_account.sub_accounts.create!
+      Course.create!(:account => sub_account_2)
+      Course.create!(:account => sub_account_2) { |c| c.workflow_state ='deleted' }
+
+      # 1 course, 2 sections
+      sub_account_3 = root_account.sub_accounts.create!
+      course = Course.create!(:account => sub_account_3)
+      course.course_sections.create!
+      course.course_sections.create!
+
+      # deeply nested sub account; sub_sub_account won't be visible
+      sub_account_4 = root_account.sub_accounts.create!
+      sub_sub_account = sub_account_4.sub_accounts.create!
+      sub_sub_sub_account = sub_sub_account.sub_accounts.create!
+
+      # 150 sub_accounts; these sub_accounts won't be visible
+      sub_account_5 = root_account.sub_accounts.create!
+      (1..150).each { sub_account_5.sub_accounts.create! }
+
+      get 'index', :account_id => root_account.id
+
+      @accounts = assigns[:accounts]
+      @accounts[root_account.id][:sub_account_count].should == 5
+      @accounts[root_account.id][:course_count].should == 0
+      @accounts[root_account.id][:sub_account_ids].sort.should == [sub_account_1.id, sub_account_2.id, sub_account_3.id, sub_account_4.id, sub_account_5.id].sort
+
+      @accounts[sub_account_1.id][:sub_account_count].should == 0
+      @accounts[sub_account_1.id][:course_count].should == 0
+      @accounts[sub_account_1.id][:sub_account_ids].should == []
+
+      @accounts[sub_account_2.id][:sub_account_count].should == 0
+      @accounts[sub_account_2.id][:course_count].should == 1
+
+      @accounts[sub_account_3.id][:sub_account_count].should == 0
+      @accounts[sub_account_3.id][:course_count].should == 1
+
+      @accounts[sub_account_4.id][:sub_account_count].should == 1
+      @accounts[sub_account_4.id][:sub_account_ids].should == [sub_sub_account.id]
+      @accounts[sub_sub_account.id][:sub_account_count].should == 1
+      @accounts[sub_sub_account.id][:sub_account_ids].should == []
+      @accounts[sub_sub_sub_account.id].should be_nil
+
+      @accounts[sub_account_5.id][:sub_account_count].should == 150
+      @accounts[sub_account_2.id][:sub_account_ids].should == []
+    end
+  end
 end

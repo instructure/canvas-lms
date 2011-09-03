@@ -21,23 +21,16 @@ class QuestionBanksController < ApplicationController
   add_crumb("Question Banks") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
   
   def index
-    @unfiled_questions = []
-    if @context != @current_user && @context.respond_to?(:assessment_questions)
-      @unfiled_questions = @context.assessment_questions.select{|q| q.assessment_question_bank_id == nil }.sort_by{|q| q.created_at }.reverse
-    end
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
-      if !@unfiled_questions.empty?
-        @bank = @context.assessment_question_banks.find_or_create_by_title_and_workflow_state(AssessmentQuestionBank.default_unfiled_title, 'active')
-        AssessmentQuestion.update_all(['assessment_question_bank_id=?, position=id', @bank.id], {:context_type => @context.class.to_s, :context_id => @context.id, :assessment_question_bank_id => nil})
+      @question_banks = @context.assessment_question_banks.active
+      if params[:include_bookmarked] == '1'
+        @question_banks += @current_user.assessment_question_banks.active
       end
-      @question_banks = @context.assessment_question_banks.active.include_questions.sort_by{|b| b.title || "zzz" }
-      if params[:managed] == '1'
-        @question_banks += @current_user.assessment_question_banks.active if @current_user
-        @question_banks = @question_banks.uniq.sort_by{|b| b.title || "zzz" }.select{|b| b.grants_right?(@current_user, nil, :manage) }
-      elsif params[:include_bookmarked] == '1'
-        @question_banks += @current_user.assessment_question_banks.active if @current_user
-        @question_banks = @question_banks.uniq.sort_by{|b| b.title || "zzz" }
+      if params[:inherited] == '1' && @context != @current_user && @context.grants_right?(@current_user, nil, :read_question_banks) 
+        @question_banks += @context.inherited_assessment_question_banks
       end
+      @question_banks = @question_banks.select{|b| b.grants_right?(@current_user, nil, :manage) } if params[:managed] == '1'
+      @question_banks = @question_banks.uniq.sort_by{|b| b.title || "zzz" }
       respond_to do |format|
         format.html
         format.json { render :json => @question_banks.to_json(:methods => [:cached_context_short_name, :assessment_question_count]) }
@@ -46,8 +39,7 @@ class QuestionBanksController < ApplicationController
   end
   
   def questions
-    @bank = @context.assessment_question_banks.find(params[:question_bank_id])
-    if authorized_action(@bank, @current_user, :read)
+    find_bank(params[:question_bank_id], params[:inherited] == '1') do
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => params[:page])
       render :json => {:pages => @questions.total_pages, :questions => @questions}.to_json
     end
@@ -85,7 +77,6 @@ class QuestionBanksController < ApplicationController
         if params[:move] != '1'
           new_question = question.clone_for(@new_bank)
         end
-        new_question.context = @new_bank.context
         new_question.assessment_question_bank = @new_bank
         new_question.save
         @new_questions << new_question

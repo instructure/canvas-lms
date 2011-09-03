@@ -263,7 +263,7 @@ class ContextController < ApplicationController
   def roster
     get_context
 
-    if authorized_action(@context, @current_user, :read_roster)
+    if authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       if @context.is_a?(Course)
         @enrollments_hash = {}
@@ -291,7 +291,7 @@ class ContextController < ApplicationController
   
   def prior_users
     get_context
-    if authorized_action(@context, @current_user, [:manage_admin_users, :read_as_admin])
+    if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
       @prior_memberships = @context.enrollments.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name] }
     end
   end
@@ -315,7 +315,7 @@ class ContextController < ApplicationController
   
   def roster_user_usage
     get_context
-    if authorized_action(@context, @current_user, :manage_students)
+    if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
       @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent.paginate(:page => params[:page], :per_page => 50)
       respond_to do |format|

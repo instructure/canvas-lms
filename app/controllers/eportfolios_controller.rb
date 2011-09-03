@@ -26,8 +26,8 @@ class EportfoliosController < ApplicationController
   end
   
   def user_index
-    @active_tab = "eportfolios"
     @context = UserProfile.new(@current_user)
+    return unless tab_enabled?(UserProfile::TAB_EPORTFOLIOS)
     @active_tab = "eportfolios"
     add_crumb(@current_user.short_name, profile_url)
     add_crumb(t(:crumb, "ePortfolios"))

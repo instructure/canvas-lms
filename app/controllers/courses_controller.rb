@@ -23,7 +23,7 @@ require 'set'
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_user_for_context, :only => [:roster, :roster_user, :locks, :switch_role, :publish_to_sis]
+  before_filter :require_user_for_context, :only => [:roster, :locks, :switch_role]
 
   include Api::V1::Course
 
@@ -219,6 +219,16 @@ class CoursesController < ApplicationController
     end
   end
 
+  include Api::V1::StreamItem
+  # @API
+  # Returns the current user's course-specific activity stream.
+  #
+  # For full documentation, see the API documentation for the user activity stream.
+  def activity_stream
+    get_context
+    render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+  end
+
   def destroy
     @context = Course.find(params[:id])
     if authorized_action(@context, @current_user, :delete)
@@ -276,10 +286,12 @@ class CoursesController < ApplicationController
       end
     end
   end
-  
+
   def course_details
     get_context
-    if authorized_action(@context, @current_user, [:update, :add_students, :add_admin_users])
+    if authorized_action(@context, @current_user, :read_as_admin)
+      @alerts = @context.alerts
+      @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       render :action => :course_details
     end
@@ -569,6 +581,9 @@ class CoursesController < ApplicationController
     check_unknown_user
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
     @unauthorized_user = @finished_enrollment.user rescue nil
+    if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
+      return redirect_to course_details_path(@context.id)
+    end
     if authorized_action(@context, @current_user, :read)
       
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
@@ -784,13 +799,15 @@ class CoursesController < ApplicationController
   
   def copy
     get_context
-    authorized_action(@context, @current_user, :update) &&
-        authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
+    authorized_action(@context, @current_user, :read) &&
+      authorized_action(@context, @current_user, :read_as_admin) &&
+      authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
   end
   
   def copy_course
     get_context
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :read) &&
+      authorized_action(@context, @current_user, :read_as_admin)
       args = params[:course].slice(:name, :start_at, :conclude_at)
       account = @context.account
       if params[:course][:account_id]
@@ -824,14 +841,14 @@ class CoursesController < ApplicationController
     @course = Course.find(params[:id])
     if authorized_action(@course, @current_user, :update)
       root_account_id = params[:course].delete :root_account_id
-      if root_account_id && current_user_is_site_admin?
+      if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)
       end
       standard_id = params[:course].delete :grading_standard_id
       if standard_id && @course.grants_right?(@current_user, session, :manage_grades)
         @course.grading_standard = GradingStandard.standards_for(@course, @current_user).detect{|s| s.id == standard_id.to_i }
       end
-      if @course.root_account.grants_right?(@current_user, session, :manage)
+      if @course.root_account.grants_right?(@current_user, session, :manage_courses)
         if params[:course][:account_id]
           account = Account.find(params[:course].delete(:account_id))
           @course.account = account if account != @course.account && account.grants_right?(@current_user, session, :manage)
@@ -905,12 +922,22 @@ class CoursesController < ApplicationController
   end
 
   def publish_to_sis
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_grades)
     @context.publish_final_grades(@current_user)
     render :json => {:sis_publish_status => @context.grade_publishing_status}.to_json
   end
 
   def sis_publish_status
     get_context
+    return unless authorized_action(@context, @current_user, :manage_grades)
     render :json => {:sis_publish_status => @context.grade_publishing_status}
+  end
+
+  def reset_content
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_content)
+    @new_course = @context.reset_content
+    redirect_to course_details_path(@new_course.id)
   end
 end

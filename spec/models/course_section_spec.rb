@@ -88,6 +88,51 @@ describe CourseSection, "moving to new course" do
     e.root_account.should eql(account1)
     e.course.should eql(course1)
   end
+
+  it "should update user account associations for xlist between subaccounts" do
+    root_account = Account.create!(:name => "root")
+    sub_account1 = Account.create!(:parent_account => root_account, :name => "account1")
+    sub_account2 = Account.create!(:parent_account => root_account, :name => "account2")
+    sub_account3 = Account.create!(:parent_account => root_account, :name => "account3")
+    course1 = sub_account1.courses.create!(:name => "course1")
+    course2 = sub_account2.courses.create!(:name => "course2")
+    course3 = sub_account3.courses.create!(:name => "course3")
+    cs = course1.course_sections.create!
+    cs.nonxlist_course_id.should be_nil
+    u = User.create!
+    u.register!
+    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    u.update_account_associations
+
+    course1.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id].sort
+    course2.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account2.id].sort
+    course3.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account3.id].sort
+    u.reload
+    u.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id].sort
+
+    cs.crosslist_to_course(course2)
+    course1.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id].sort
+    course2.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id, sub_account2.id].sort
+    course3.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account3.id].sort
+    u.reload
+    u.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id, sub_account2.id].sort
+
+    cs.crosslist_to_course(course3)
+    cs.nonxlist_course_id.should == course1.id
+    course1.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id].sort
+    course2.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account2.id].sort
+    course3.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id, sub_account3.id].sort
+    u.reload
+    u.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id, sub_account3.id].sort
+
+    cs.uncrosslist
+    cs.nonxlist_course_id.should be_nil
+    course1.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id].sort
+    course2.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account2.id].sort
+    course3.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account3.id].sort
+    u.reload
+    u.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id]
+  end
   
   it "should crosslist and uncrosslist" do
     account1 = Account.create!(:name => "1")
@@ -184,20 +229,21 @@ describe CourseSection, "moving to new course" do
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     cs1 = course1.course_sections.create!
-    cs2 = course2.course_sections.create!
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.should == [account2.id]
     cs1.account = account2
+    cs1.course.course_sections.reset
     cs1.save
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).sort.should == [account1.id, account2.id].sort
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.sort.should == [account1.id, account2.id].sort
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.should == [account2.id]
     cs1.account = nil
+    cs1.course.course_sections.reset
     cs1.save
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.should == [account2.id]
     cs1.crosslist_to_course(course2)
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).sort.should == [account1.id, account2.id].sort
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.sort.should == [account1.id, account2.id].sort
   end
-  
+
 end

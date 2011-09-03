@@ -21,7 +21,7 @@ $(document).ready(function() {
       console.log("uploading files");
       $.ajaxJSONPreparedFiles.call(this, {
         handle_files: function(attachments, data) {
-          var ids = (data['submission[attachment_ids]'] || "").split(",")
+          var ids = (data['submission[attachment_ids]'] || "").split(",");
           for(var idx in attachments) {
             ids.push(attachments[idx].attachment.id);
           }
@@ -31,7 +31,10 @@ $(document).ready(function() {
         context_code: $("#submit_assignment").data('context_code'),
         asset_string: $("#submit_assignment").data('asset_string'),
         intent: "submit",
-        file_elements: $(this).find("input[type='file']:visible"),
+        file_elements: $(this).find("input[type='file']:visible").filter(function(){ 
+          // only include file inputs where user has selected a file, no blank ones.
+          return $(this).val() !== ''; 
+        }),
         data: $(this).getFormData(),
         url: $(this).attr('action'),
         success: function(data) {
@@ -111,31 +114,22 @@ $(document).ready(function() {
   });
   $(".add_another_file_link").click(function(event) {
     event.preventDefault();
-    var $file = $(this).parents("td").find(".submission_attachment:last").clone(true).hide();
-    $file.val("").find("input").attr('name', 'attachments[' + (++submissionAttachmentIndex) + '][uploaded_data]');
-    $(this).before($file.slideDown());
-    if($(this).parents("td").find(".submission_attachment").length >= 3) {
-      $(this).parents("td").find(".remove_attachment_link").show();
-    }
-  });
+    $('#submission_attachment_blank').clone(true).removeAttr('id').show().insertBefore(this)
+      .find("input").attr('name', 'attachments[' + (++submissionAttachmentIndex) + '][uploaded_data]');
+    toggleRemoveAttachmentLinks();
+  }).click();
   $(".remove_attachment_link").click(function(event) {  
     event.preventDefault();
-    $(this).parents(".submission_attachment").slideUp(function() {
-      $(this).remove();
-      checkAllowUploadSubmit();
-    });
-    if($(this).parents("td").find(".submission_attachment").length <= 3) {
-      $(this).parents("td").find(".remove_attachment_link").hide();
-    }
+    $(this).parents(".submission_attachment").remove();
+    checkAllowUploadSubmit();
+    toggleRemoveAttachmentLinks();
   });
-  var checkAllowUploadSubmit = function() {
+  function toggleRemoveAttachmentLinks(){
+    $('#submit_online_upload_form .remove_attachment_link').showIf($('#submit_online_upload_form .submission_attachment:not(#submission_attachment_blank)').length > 1);
+  }
+  function checkAllowUploadSubmit() {
     // disable the submit button if any extensions are bad
-    var $submit_button = $("#submit_online_upload_form").find('button[type=submit]');
-    if ($(".bad_ext_msg:visible").length > 0) {
-      $submit_button.attr('disabled', true);
-    } else {
-      $submit_button.attr('disabled', false);
-    }
+    $('#submit_online_upload_form button[type=submit]').attr('disabled', !!$(".bad_ext_msg:visible").length);
   }
   $(".submission_attachment input[type=file]").live('change', function() {
     if (allowed_extensions.length < 1 || $(this).val() == "")
@@ -144,7 +138,6 @@ $(document).ready(function() {
     $(this).parent().find('.bad_ext_msg').showIf($.inArray(ext, allowed_extensions) < 0);
     checkAllowUploadSubmit();
   });
-  $('.add_another_file_link').click();
 });
 window.submissionAttachmentIndex = -1;
 </script>
@@ -185,7 +178,7 @@ window.submissionAttachmentIndex = -1;
         <td><%= blabel :attachment, :uploaded_data, :en => "File" %></td>
         <td>
           <a href="#" class="add add_another_file_link"> <%= t 'links.add_another_file', "Add Another File" %> </a>
-          <div class="submission_attachment" style="display: none;">
+          <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
             <input type="file" name="attachments[-1][uploaded_data]"/>
             <a href="#" class="remove_attachment_link no-hover" style="display: none;"><%= image_tag "delete_circle.png" %></a>
             <% if @assignment.allowed_extensions.present? -%>

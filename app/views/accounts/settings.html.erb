@@ -9,6 +9,7 @@
 
 <% content_for :right_side do %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>
+  <%= render :partial => "additional_settings_right_side" %>
 <% end %>
 
 <% content_for :stylesheets do %>
@@ -30,13 +31,16 @@
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
     <% if @account.root_account? && !@account.site_admin? %>
-      <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
+      <li><a href="#tab-announcements" id="tab-announcements-link"><%= t(:tab_announcements, "Announcements") %></a></li>
     <% end %>
     <% if !@available_reports.blank? %>
       <li><a href="#tab-reports" id="tab-reports-link"><%= t(:tab_reports, "Reports") %></a></li>
     <% end %>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
-      <li><a href="#tab-tools" id="tab-tols-link"><%= t(:tab_external_tools, "External Tools") %></a></li>
+      <li><a href="#tab-tools" id="tab-tools-link"><%= t(:tab_external_tools, "External Tools") %></a></li>
+    <% end %>
+    <% if (@context.root_account || @context).settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+      <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
     <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
@@ -113,6 +117,7 @@
             <% end %>
           </table>
         </fieldset>
+        <%= render :partial => 'additional_settings' %>
 
         <% unless @account.site_admin? %>
           <fieldset>
@@ -163,8 +168,16 @@
                   <%= f.label :enable_user_notes, :en => "Faculty Journal" %>
                 </div>
                 <div>
+                  <%= settings.check_box :enable_eportfolios, :checked => @account.settings[:enable_eportfolios] != false %>
+                  <%= settings.label :enable_eportfolios, :en => "ePortfolios" %>
+                </div>
+                <div>
                   <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
                   <%= f.label :allow_sis_import, :en => "SIS imports" %>
+                </div>
+                <div>
+                  <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
+                  <%= settings.label :enable_alerts, :en => "Alerts" %>
                 </div>
               <% end %>
               <div>
@@ -347,15 +360,15 @@
     <% end %>
   </div>
   <% if @account.root_account? && !@account.site_admin? %>
-    <div id="tab-alerts">
-      <h2><%= t(:user_alerts_title, "User Alerts") %></h2>
-      <%= mt(:user_alerts_description,
-      "Alerts are a way for you to post sticky messages on the dashboard " +
+    <div id="tab-announcements">
+      <h2><%= t(:global_announcements_title, "Global Announcements") %></h2>
+      <%= mt(:global_announcements_description,
+      "Global announcements are a way for you to post sticky messages on the dashboard " +
       "of all users in your account.  They will appear on each user's " +
       "dashboard for the given time period or until the user clicks the " +
-      "\"close\" link to ignore the alert. **These alerts should be " +
+      "\"close\" link to ignore the alert. **These announcements should be " +
       "used sparingly.**") %>
-      <ul class="alerts_list unstyled_list">
+      <ul class="announcements_list unstyled_list">
         <% @account_notifications.each do |notification| %>
           <li>
             <div class="subject">
@@ -380,7 +393,7 @@
         <% end %>
       </ul>
       <% if can_do(@account, @current_user, :manage_alerts) %>
-        <a href="#" class="button add_notification_link"><%= image_tag "add.png" %><%= t(:add_alert_link, "Add a New Alert") %></a>
+        <a href="#" class="button add_notification_link"><%= image_tag "add.png" %><%= t(:add_announcement_link, "Add a New Announcement") %></a>
         <% form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none; margin-top: 10px;'} do |f| %>
           <table class="formtable">
             <tr>
@@ -411,7 +424,7 @@
             </tr><tr>
               <td colspan="2">
                 <div class="button-container">
-                  <button type="submit" class="button"><%= t(:add_alert_button, "Add Alert") %></button>
+                  <button type="submit" class="button"><%= t(:add_announcement_button, "Add Announcement") %></button>
                 </div>
               </td>
             </tr>
@@ -494,6 +507,12 @@
       <div id="tab-tools">
         <h2><%= t(:external_tools_title, "External Tools") %></h2>
         <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
+      </div>
+  <% end %>
+  <% if (@context.root_account || @context).settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+      <div id="tab-alerts">
+        <h2><%= t(:alerts_title, "Alerts") %></h2>
+        <%= render :partial => 'alerts/alerts' %>
       </div>
   <% end %>
 </div>

@@ -57,7 +57,7 @@ class SectionsController < ApplicationController
     @section = @context.course_sections.find(params[:section_id])
     course_id = params[:new_course_id]
     @new_course = Course.find_by_id(course_id) if course_id.present?
-    if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage_admin_users)
+    if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.crosslist_to_course @new_course
       respond_to do |format|
         flash[:notice] = t('section_crosslisted', "Section successfully cross-listed!")
@@ -70,7 +70,7 @@ class SectionsController < ApplicationController
   def uncrosslist
     @section = @context.course_sections.find(params[:section_id])
     @new_course = @section.nonxlist_course
-    if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage_admin_users)
+    if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.uncrosslist
       respond_to do |format|
         flash[:notice] = t('section_decrosslisted', "Section successfully de-cross-listed!")
@@ -109,7 +109,7 @@ class SectionsController < ApplicationController
   
   def show
     @section = @context.course_sections.find(params[:id])
-    if authorized_action(@context, @current_user, :manage_students)
+    if authorized_action(@section, @current_user, :read)
       add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
       @enrollments = @section.enrollments.sort_by{|e| e.user.sortable_name }
       @student_enrollments = @enrollments.select{|e| e.student? }

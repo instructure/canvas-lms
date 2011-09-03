@@ -31,7 +31,7 @@ class EnrollmentsFromUserList
     @enrollment_state = opts[:enrollment_state]
     @enrollment_type = opts[:enrollment_type] || 'StudentEnrollment'
     @limit = opts[:limit]
-    @section = (opts[:course_section_id].present? ? @course.course_sections.active.find_by_id(opts[:course_section_id]) : nil) || @course.default_section
+    @section = (opts[:course_section_id].present? ? @course.course_sections.active.find_by_id(opts[:course_section_id].to_i) : nil) || @course.default_section
     @limit_privileges_to_course_section = opts[:limit_priveleges_to_course_section] # doh, misspelling
     @enrolled_users = {}
   end
@@ -56,10 +56,10 @@ class EnrollmentsFromUserList
 
     # really more of this should be SQL
     found_channels = {}
-    CommunicationChannel.find(:all, :conditions => {:path => emails, :path_type => 'email', :workflow_state => ['active','unconfirmed']}, :include => {:user => :pseudonyms, :pseudonym => {}}).each do |cc|
+    CommunicationChannel.find(:all, :conditions => "LOWER(path) IN (#{emails.map{|x|Pseudonym.sanitize(x.downcase)}.join(', ')}) AND path_type = 'email' AND communication_channels.workflow_state IN ('active', 'unconfirmed')", :include => {:user => :pseudonyms, :pseudonym => {}}).each do |cc|
       found_channels[cc.path.downcase] ||= []
       found_channels[cc.path.downcase] << cc
-    end
+    end if emails.size
     found_channels.keys.each do |path|
       found_channels[path] = found_channels[path].sort_by{|some_cc| [(some_cc.active? ? 0 : 1), (some_cc.pseudonym && some_cc.pseudonym.account_id == @course.root_account.id ? 0 : 1), (some_cc.created_at || Time.now)]}.first
     end

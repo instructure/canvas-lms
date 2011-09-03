@@ -22,6 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'pseudonym_registration.email.summary' do
   it "should render" do
     pseudonym_model
-    generate_message(:pseudonym_registration, :email, @pseudonym, @user)
+    generate_message(:pseudonym_registration, :email, @pseudonym, :user => @user)
   end
 end

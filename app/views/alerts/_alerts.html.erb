@@ -1,0 +1,72 @@
+<% jammit_css :alerts %>
+<% jammit_js :alerts %>
+
+<p>
+<%=
+  if @context.is_a? Course
+    t(:alerts_description_course,
+      'An alert is generated for each student that meets all of the criteria. They are ' +
+      'checked every day, and notifications will be sent to the student and/or the ' +
+      'teacher until the triggering problem is resolved.')
+  else
+    t(:alerts_description_account,
+      'An alert is generated for each student that meets all of the criteria. They are ' +
+      'checked every day, and notifications will be sent to the student, teacher, and/or ' +
+      'account admin until the triggering problem is resolved.')
+  end
+%>
+</p>
+
+<div class="alerts_list">
+  <%= render :partial => 'alerts/alert', :collection => @alerts %>
+  <%= render :partial => 'alerts/alert' %>
+  <a href="#" class="delete_item_link editing" style="display:none;" title="<%= t(:remove, "Remove this item") %>"><%= image_tag 'delete_circle.png' %></a>
+</div>
+
+<div class="button-container" style="margin-top: 20px;">
+  <button class="button add_alert_link"><%= image_tag "add.png" %> <%= t('buttons.add_alert', 'Add Alert') %></a>
+</div>
+
+<% js_block do %>
+  <script type="text/javascript">
+    var alert_data = <%= @alerts.to_json.html_safe %>;
+
+    var possible_alert_recipients_order = [':student', ':teachers'];
+    var possible_alert_recipients = {
+      ':student': { label: <%= h(t(:the_student, "The Student")).to_json.html_safe %> },
+      ':teachers': { label: <%= h(t(:the_teacher, "The Teacher")).to_json.html_safe %> }
+    };
+    <% @role_types.each do |role| %>
+      possible_alert_recipients_order.push(<%= role[:name].to_json.html_safe %>);
+      possible_alert_recipients[<%= role[:name].to_json.html_safe %>] = { label: <%= role[:label].to_json.html_safe %> };
+    <% end %>
+
+    var possible_alert_criteria_order = ['Interaction', 'UngradedCount', 'UngradedTimespan'];
+    <% count = "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />".html_safe %>
+    var possible_alert_criteria = {
+      Interaction: {
+        label: <%= t(:description, "A teacher has not interacted with the student for %{count} days", :count => count).to_json.html_safe %>,
+        option: <%= t(:option, "No Teacher Interaction").to_json.html_safe %>,
+        title: <%= t(:title, "Days since a teacher has interacted with the student").to_json.html_safe %>,
+        default_threshold: 7 },
+      UngradedCount: {
+        label: <%= t(:ungraded_count_description, "More than %{count} submissions have not been graded", :count => count).to_json.html_safe %>,
+        option: <%= t(:ungraded_count_option, "Ungraded Submissions (Count)").to_json.html_safe %>,
+        title: <%= t(:ungraded_count_title, "Number of submissions that have not been graded").to_json.html_safe %>,
+        default_threshold: 3 },
+      UngradedTimespan: {
+        label: <%= t(:ungraded_timespan_description, "A submission has been left ungraded for %{count} days", :count => count).to_json.html_safe %>,
+        option: <%= t(:ungraded_timespan_option, "Ungraded Submissions (Time)").to_json.html_safe %>,
+        title: <%= t(:ungraded_timespan_title, "Days that a submission has been left ungraded").to_json.html_safe %>,
+        default_threshold: 7 }
+    };
+    <% if @context.enable_user_notes %>
+      possible_alert_criteria_order.push('UserNote');
+      possible_alert_criteria['UserNote'] = {
+        label: <%= t(:usernote_description, "No faculty journal entry has been added for %{count} days", :count => count).to_json.html_safe %>,
+        option: <%= t(:usernote_option, "No Faculty Journal Entry").to_json.html_safe %>,
+        title: <%= t(:usernote_title, "Days since a faculty journal has been added").to_json.html_safe %>,
+        default_threshold: 7 };
+    <% end %>
+  </script>
+<% end %>

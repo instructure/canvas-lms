@@ -74,6 +74,15 @@ describe EnrollmentsFromUserList do
       enrollments.map(&:user).should be_include(u)
     end
 
+    it "should check communication channels in a case-insensitive manner" do
+      u = user
+      u.pseudonyms.create!(:account => Account.default, :unique_id => "david_richards", :path => "David_Richards_JR@example.com", :password => "dave4Instructure", :password_confirmation => "dave4Instructure")
+      @el = UserList.new(list_to_parse_with_repeats)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
+      enrollments.length.should eql(3)
+      enrollments.map(&:user).should be_include(u)
+    end
+
   end
   
   context "EnrollmentsFromUserList.process" do
@@ -93,5 +102,5 @@ def list_to_parse
 end
 
 def list_to_parse_with_repeats
-  %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>, david_richards_jr@example.com}
+  %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>, david_richards_jr@example.com, DAVID@example.com}
 end

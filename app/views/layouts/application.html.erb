@@ -72,7 +72,7 @@
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
     <% if @current_user %>
     <ul role="navigation" id="menu">
-      <%- cache([@current_user, 'home-menu']) do -%>
+      <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
       <li class="menu-item">
         <%# if any of these have anything in them, then we should show a dropdown on the 'home' menu item  %>
         <%- if [ @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]),

@@ -23,6 +23,8 @@
         <%= t '#conferences.show.status.finished', "Finished %{date_and_time} (%{duration})", :date_and_time => datetime_string(conference.ended_at), :duration => t('#conferences.show.minute', "minute", :count => (conference.running_time / 60)) %>
       <% end %>
       <div style="display: none;" class="long_running"><%= conference && conference.long_running? ? 1 : 0 %></div>
+      <div style="display: none;" class="id"><%= conference && conference.id %></div>
+      <div style="display: none;" class="has_advanced_settings"><%= conference && conference.has_advanced_settings %></div>
       <div style="display: none;" class="duration"><%= conference ? conference.duration : WebConference::DEFAULT_DURATION %></div>
       <div style="display: none;" class="user_ids"><%= Array(conference.user_ids).join(",") rescue nbsp %></div>
       <div style="display: none;" class="conference_type"><%= conference && conference.conference_type %></div>

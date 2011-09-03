@@ -131,12 +131,16 @@ class WimbaConference < WebConference
       'last_name' => names[0]})
   end
 
-  def add_user_to_conference(user, role='participant')
+  def add_user_to_conference(user, role=:participant)
     touch_user(user) &&
     send_request('createRole', {
       'target' => wimba_id,
       'user_id' => wimba_id(user.uuid),
-      'role_id' => (role == 'participant' ? 'Student' : 'Instructor')
+      'role_id' => case role
+        when :presenter: 'Instructor'
+        when :admin: 'ClassAdmin'
+        else 'Student'
+      end
     })
   end
 
@@ -152,6 +156,11 @@ class WimbaConference < WebConference
     "http://#{server}/launcher.cgi.pl?hzA=#{CGI::escape(token)}&room=#{CGI::escape(room_id)}"
   end
 
+  def settings_url(user, room_id=wimba_id)
+    (token = get_auth_token(user)) &&
+    "http://#{server}/admin/class/create_manage_frameset.html.epl?hzA=#{CGI::escape(token)}&class_id=#{CGI::escape(room_id)}"
+  end
+
   def get_auth_token(user)
     (res = send_request('getAuthToken', {
         'target'    => wimba_id(user.uuid),
@@ -161,8 +170,14 @@ class WimbaConference < WebConference
   end
 
   def admin_join_url(user, return_to="http://www.instructure.com")
-    add_user_to_conference(user, :admin) &&
+    add_user_to_conference(user, :presenter) &&
     join_url(user)
+  end
+
+  def admin_settings_url(user, return_to="http://www.instructure.com")
+    initiate_conference and touch or return nil
+    add_user_to_conference(user, :admin) &&
+    settings_url(user)
   end
 
   def participant_join_url(user, return_to="http://www.instructure.com")

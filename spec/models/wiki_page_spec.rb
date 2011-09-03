@@ -64,6 +64,20 @@ describe WikiPage do
     p2.url.should eql('asdf-2')
   end
 
+  it "should make the title unique and truncate to proper length" do
+    course_with_teacher(:active_all => true)
+    p1 = @course.wiki.wiki_pages.create!(:title => "a" * WikiPage::TITLE_LENGTH)
+    p2 = @course.wiki.wiki_pages.create!(:title => p1.title)
+    p3 = @course.wiki.wiki_pages.create!(:title => p1.title)
+    p4 = @course.wiki.wiki_pages.create!(:title => "a" * (WikiPage::TITLE_LENGTH - 2) + "-2")
+    p2.title.length.should == WikiPage::TITLE_LENGTH
+    p2.title.end_with?('-2').should be_true
+    p3.title.length.should == WikiPage::TITLE_LENGTH
+    p3.title.end_with?('-3').should be_true
+    p4.title.length.should == WikiPage::TITLE_LENGTH
+    p4.title.end_with?('-4').should be_true
+  end
+
   it "should let you reuse the title/url of a deleted page" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki.wiki_pages.create(:title => "Asdf")

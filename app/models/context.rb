@@ -55,6 +55,7 @@ module Context
     Submission = ::Submission
     WebConference = ::WebConference
     Wiki = ::Wiki
+    WikiNamespace = ::WikiNamespace
     WikiPage = ::WikiPage
   end
 

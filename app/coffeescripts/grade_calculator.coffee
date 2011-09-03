@@ -101,5 +101,11 @@ class GradeCalculator
     result = parseFloat score
     if result && isFinite(result) then result else 0
 
+  @letter_grade: (grading_scheme, score) ->
+    score = 0 if score < 0
+    letters = $.grep grading_scheme, (row, i) ->
+      score >= row[1] * 100 || i == (grading_scheme.length - 1)
+    letter = letters[0]
+    letter[0]
 
 window.INST.GradeCalculator = GradeCalculator

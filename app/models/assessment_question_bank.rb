@@ -132,7 +132,4 @@ class AssessmentQuestionBank < ActiveRecord::Base
   named_scope :active, lambda {
     {:conditions => ['assessment_question_banks.workflow_state != ?', 'deleted'] }
   }
-  named_scope :include_questions, lambda{
-    {:include => :assessment_questions }
-  }
 end

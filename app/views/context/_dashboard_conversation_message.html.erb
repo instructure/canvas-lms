@@ -1,7 +1,7 @@
 <% message = dashboard_conversation_message || nil %>
 <% hide_message ||= false %>
 <% author = message ? message.author : @current_user %>
-<% conversation_path = "#{conversations_path}#/conversations/#{conversation ? conversation.id : '{{ id }}'}" %>
+<% conversation_path = conversation_path(conversation ? conversation.id : '{{ id }}') %>
 <div id="dashboard_conversation_message_<%= message ? message.id : "blank" %>" style="<%= hidden unless message %>" class="communication_sub_message <%= 'toggled_communication_sub_message' if hide_message %> <%= 'blank' unless message %>">
   <div class="header">
     <div class="header_title">

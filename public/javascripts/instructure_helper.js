@@ -245,6 +245,7 @@ I18n.scoped('instructure', function(I18n) {
             url: action,
             body: params.body,
             content_type: params.content_type,
+            form_data: params.form_data,
             method: method,
             success: function(data) {
               if(options.success && $.isFunction(options.success)) {
@@ -389,7 +390,7 @@ I18n.scoped('instructure', function(I18n) {
     return this;
   };
   
-  $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest && (new XMLHttpRequest()).sendAsBinary);
+  $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest);
   if($.handlesHTML5Files) {
     $("input[type='file']").live('change', function(event) {
       var file_list = this.files;
@@ -408,6 +409,7 @@ I18n.scoped('instructure', function(I18n) {
         url: options.url,
         body: params.body,
         content_type: params.content_type,
+        form_data: params.form_data,
         method: options.method,
         success: function(data) {
           if(options.success && $.isFunction(options.success)) {
@@ -488,18 +490,24 @@ I18n.scoped('instructure', function(I18n) {
       };
     }
     xhr.open(method, url);
-    xhr.overrideMimeType(options.content_type || "multipart/form-data");
-    xhr.setRequestHeader('Content-Type', options.content_type || "multipart/form-data");
-    xhr.setRequestHeader('Content-Length', body.length);
     xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*');
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    if(not_binary) {
-      xhr.send(body);
+    if(options.form_data) {
+      xhr.send(options.form_data);
     } else {
-      if(!xhr.sendAsBinary) {
-        console.log('xhr.sendAsBinary not supported');
+      xhr.overrideMimeType(options.content_type || "multipart/form-data");
+      
+      xhr.setRequestHeader('Content-Type', options.content_type || "multipart/form-data");
+      xhr.setRequestHeader('Content-Length', body.length);
+      if(not_binary) {
+        xhr.send(body);
+      } else {
+        if(!xhr.sendAsBinary) {
+          console.log('xhr.sendAsBinary not supported');
+        } else {
+          xhr.sendAsBinary(body);
+        }
       }
-      xhr.sendAsBinary(body);
     }
   };
   
@@ -520,6 +528,19 @@ I18n.scoped('instructure', function(I18n) {
     
     for(var idx in params) {
       paramsList.push([idx, params[idx]]);
+    }
+    if(window.FormData) {
+      var fd = new FormData();
+      for(var idx in params) {
+        var param = params[idx];
+        if(window.FileList && (param instanceof FileList)) {
+          param = param[0];
+        }
+        fd.append(idx, param);
+      }
+      result.form_data = fd;
+      callback(result);
+      return;
     }
     function sanitizeQuotedString(text) {
       return text.replace(/\"/g, "");
@@ -1124,6 +1145,7 @@ I18n.scoped('instructure', function(I18n) {
     }
     var $form = this;
     var errors = {};
+    var elementErrors = [];
     if(data_errors && data_errors['errors']) {
       data_errors = data_errors['errors'];
     }
@@ -1135,6 +1157,9 @@ I18n.scoped('instructure', function(I18n) {
         var newval = [];
         newval.push(val);
         val = newval;
+      } else if(typeof(i) == "number" && val.length == 2 && (val[0] instanceof jQuery) && typeof(val[1]) == "string") {
+        elementErrors.push(val);
+        return;
       } else if(typeof(i) == "number" && val.length == 2 && typeof(val[1]) == "string") {
         newval = [];
         newval.push(val[1]);
@@ -1157,8 +1182,6 @@ I18n.scoped('instructure', function(I18n) {
       }
       if($form.find(":input[name='" + i + "'],:input[name*='[" + i + "]']").length > 0) {
         $.each(val, function(idx, msg) {
-          if(!msg.match(i)) {
-          }
           if(!errors[i]) {
             errors[i] = msg;
           } else {
@@ -1192,6 +1215,15 @@ I18n.scoped('instructure', function(I18n) {
         highestTop = offset.top;
       }
     });
+    for(var idx in elementErrors) {
+      var $obj = elementErrors[idx][0];
+      var msg = elementErrors[idx][1];
+      hasErrors = true;
+      var offset = $obj.errorBox(msg).offset();
+      if(offset.top > highestTop) {
+        highestTop = offset.top;
+      }
+    }
     if(hasErrors) {
       $('html,body').scrollTo({top: highestTop, left:0});
     }
@@ -2110,7 +2142,7 @@ I18n.scoped('instructure', function(I18n) {
             $.ajaxJSON.ignoredXHRs.push(xhr);
           }
         } else if(success && $.isFunction(success)) {
-          success(data);
+          success(data, xhr);
         }
       },
       error: function() {
@@ -2500,8 +2532,8 @@ I18n.scoped('instructure', function(I18n) {
     options = $.extend({}, options);
     this.each(function() {
       var $field = $(this);
-      // if($field.hasClass('datetime_field_enabled')) { return; }
-      // $field.addClass('datetime_field_enabled');
+      if($field.hasClass('datetime_field_enabled')) { return; }
+      $field.addClass('datetime_field_enabled');
       if(!options.timeOnly) {
         $field.datepicker({
           timePicker: (!options.dateOnly),
@@ -2513,7 +2545,6 @@ I18n.scoped('instructure', function(I18n) {
         });
       }
       var $after = $(this);
-      $field.addClass('datetime_field_enabled');
       if($field.next(".ui-datepicker-trigger").length > 0) { $after = $field.next(); }
       var $div = $(document.createElement('div')).addClass('datetime_suggest');
       $after.after($div);
@@ -2884,8 +2915,46 @@ I18n.scoped('instructure', function(I18n) {
     var res = (string || "").replace(/([A-Z])/g, " $1").replace(/_/g, " ").replace(/\s+/, " ").replace(/^\s/, "");
     return $.map(res.split(/\s/), function(word) { return (word[0] || "").toUpperCase() + word.substring(1); }).join(" ");
   };
+  // ported pluralizations from active_support/inflections.rb
+  // (except for cow -> kine, because nobody does that) 
+  pluralize = {
+    skip: ['equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep', 'jeans'],
+    patterns: [
+      [/person$/i, 'people'],
+      [/man$/i, 'men'],
+      [/child$/i, 'children'],
+      [/sex$/i, 'sexes'],
+      [/move$/i, 'moves'],
+      [/(quiz)$/i, '$1zes'],
+      [/^(ox)$/i, '$1en'],
+      [/([m|l])ouse$/i, '$1ice'],
+      [/(matr|vert|ind)(?:ix|ex)$/i, '$1ices'],
+      [/(x|ch|ss|sh)$/i, '$1es'],
+      [/([^aeiouy]|qu)y$/i, '$1ies'],
+      [/(hive)$/i, '$1s'],
+      [/(?:([^f])fe|([lr])f)$/i, '$1$2ves'],
+      [/sis$/i, 'ses'],
+      [/([ti])um$/i, '$1a'],
+      [/(buffal|tomat)o$/i, '$1oes'],
+      [/(bu)s$/i, '$1ses'],
+      [/(alias|status)$/i, '$1es'],
+      [/(octop|vir)us$/i, '$1i'],
+      [/(ax|test)is$/i, '$1es'],
+      [/s$/i, 's']
+    ]
+  };
   $.pluralize = function(string) {
-    return (string || "") + "s";
+    string = string || '';
+    if ($.inArray(string, pluralize.skip) > 0) {
+      return string;
+    }
+    for (var i = 0; i < pluralize.patterns.length; i++) {
+      var pair = pluralize.patterns[i];
+      if (string.match(pair[0])) {
+        return string.replace(pair[0], pair[1])
+      }
+    }
+    return string + "s";
   };
   $.pluralize_with_count = function(count, string) {
     return "" + count + " " + (count == 1 ? string : $.pluralize(string));

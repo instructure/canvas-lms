@@ -345,7 +345,21 @@ class ContentTag < ActiveRecord::Base
     {:conditions => ['content_tags.url = ? AND content_tags.tag = ?', url, tag] }
   }
   named_scope :for_context, lambda{|context|
-    {:conditions => ['content_tags.context_type = ? AND content_tags.context_id = ?', context.class.to_s, context.id]}
+    case context
+    when Account
+      { :select => 'content_tags.*',
+        :joins => "INNER JOIN (
+            SELECT DISTINCT ct.id AS content_tag_id FROM content_tags AS ct
+            INNER JOIN course_account_associations AS caa ON caa.course_id = ct.context_id
+              AND ct.context_type = 'Course'
+            WHERE caa.account_id = #{context.id}
+          UNION
+            SELECT ct.id AS content_tag_id FROM content_tags AS ct
+            WHERE ct.context_id = #{context.id} AND context_type = 'Account')
+          AS related_content_tags ON related_content_tags.content_tag_id = content_tags.id" }
+    else
+      {:conditions => ['content_tags.context_type = ? AND content_tags.context_id = ?', context.class.to_s, context.id]}
+    end
   }
   named_scope :include_progressions, lambda{
     { :include => {:context_module => :context_module_progressions} }

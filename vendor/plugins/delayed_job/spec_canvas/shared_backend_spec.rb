@@ -286,6 +286,24 @@ shared_examples_for 'a backend' do
       @backend.get_and_lock_next_available('w2', 60).should == job2
       @backend.get_and_lock_next_available('w3', 60).should == nil
     end
+
+    context 'clear' do
+      it "should clear all jobs" do
+        create_job(:strand => 'myjobs')
+        @backend.clear_strand!('myjobs')
+        @backend.get_and_lock_next_available('w1', 60).should be_nil
+      end
+
+      it "should not clear running jobs" do
+        job1 = create_job(:strand => 'myjobs')
+        @backend.get_and_lock_next_available('w1', 60).should == job1
+        @backend.clear_strand!('myjobs')
+        job2 = create_job(:strand => 'myjobs')
+        # returns nil, because job1 is still running and job2 shouldn't
+        # start yet
+        @backend.get_and_lock_next_available('w1', 60).should be_nil
+      end
+    end
   end
 
   context "on hold" do

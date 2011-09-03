@@ -72,7 +72,7 @@ class StreamItem < ActiveRecord::Base
     else
       res['formatted_body'] = message.formatted_body(250)
     end
-    res.delete 'body'
+    res['body'] = res['body'][0, 4.kilobytes] if res['body'].present?
     res['attachments'] = message.attachments.map do |file|
       hash = file.attributes
       hash['readable_size'] = file.readable_size
@@ -160,7 +160,7 @@ class StreamItem < ActiveRecord::Base
         hash = entry.attributes
         hash['user_short_name'] = entry.user.short_name if entry.user
         hash['truncated_message'] = entry.truncated_message(250)
-        hash.delete 'message'
+        hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
         hash
       end
       if object.attachment
@@ -176,23 +176,13 @@ class StreamItem < ActiveRecord::Base
       if object.asset_context_type
         self.context_code = "#{object.asset_context_type.underscore}_#{object.asset_context_id}"
       end
-    when Assignment
-      return nil
-      res = object.attributes
-      res['submission_count'] = object.submissions.having_submission.count
-      res['submissions'] = object.submissions.having_submission[0..5].map do |submission|
-        hash = submission.attributes
-        hash['user_short_name'] = submission.user.name if submission.user
-        hash
-      end
     when Submission
       res = object.attributes
       res.delete 'body' # this can be pretty large, and we don't display it
       res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types')
-      res[:submission_comments] = object.submission_comments.select{|c| true }.map do |comment|
+      res[:submission_comments] = object.submission_comments.map do |comment|
         hash = comment.attributes
         hash['formatted_body'] = comment.formatted_body(250)
-        hash.delete 'body'
         hash['context_code'] = comment.context_code
         hash['user_short_name'] = comment.author.short_name if comment.author
         hash

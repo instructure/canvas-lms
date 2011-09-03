@@ -22,10 +22,29 @@ class GradingStandard < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :user
   has_many :assignments
+  # version 1 data is an array of [ letter, max_integer_value ]
+  # we created a version 2 because this is ambiguous once we added support for
+  # fractional values -- 89 used to actually mean < 90, so 89.9999... , but
+  # 89.5 actually means 89.5. by switching the version 2 format to [ letter,
+  # min_integer_value ], we remove the ambiguity.
+  #
+  # version 1:
+  #
+  # [ 'A',  100 ],
+  # [ 'A-',  93 ]
+  #
+  # It's implied that a 93.9 is actually an A-, not an A, but once we add fractional cutoffs to the mix, that implication breaks down.
+  #
+  # version 2:
+  #
+  # [ 'A',   94   ],
+  # [ 'A-',  89.5 ]
+  #
+  # No more ambiguity, because anything >= 94 is an A, and anything < 94 and >=
+  # 89.5 is an A-.
   serialize :data
-  
+
   before_save :update_usage_count
-  
 
   workflow do
     state :active
@@ -33,7 +52,71 @@ class GradingStandard < ActiveRecord::Base
   end
   
   named_scope :active, :conditions => ['grading_standards.workflow_state != ?', 'deleted']
-  
+
+  def version
+    read_attribute(:version).presence || 1
+  end
+
+  # e.g. convert 89.7 to B+
+  def self.score_to_grade(scheme, score)
+    score = 0 if score < 0
+    scheme.max_by {|s| score >= s[1] * 100 ? s[1] : -1 }[0]
+  end
+
+  # e.g. convert B to 86
+  def self.grade_to_score(scheme, grade)
+    scheme = scheme.to_a.sort_by { |g, percent| -percent }
+    idx = scheme.index { |g, percent| g.downcase == grade.downcase }
+    if idx && idx > 0
+      # if there's room to step down at least one whole number, do that. this
+      # matches the previous behavior, before we added support for fractional
+      # grade cutoffs.
+      # otherwise, we step down just 1/10th of a point, which is the
+      # granularity we support right now
+      if (scheme[idx].last - scheme[idx - 1].last).abs >= 0.01
+        scheme[idx - 1].last * 100.0 - 1.0
+      else
+        scheme[idx - 1].last * 100.0 - 0.1
+      end
+    elsif idx
+      # first grade always goes to 100%
+      100.0
+    else
+      nil
+    end
+  end
+
+  def score_to_grade(score)
+    GradingStandard.score_to_grade(data, score)
+  end
+
+  def data=(new_val)
+    self.version = 2
+    # round values to the nearest 0.1 (0.001 since e.g. 78 is stored as .78)
+    new_val = new_val.dup.each { |row| row[1] = (row[1] * 1000).to_i / 1000.0 }
+    write_attribute(:data, new_val)
+  end
+
+  def data
+    data = read_attribute(:data)
+    GradingStandard.upgrade_data(data, self.version)
+  end
+
+  def self.upgrade_data(data, version)
+    case version.to_i
+    when 2
+      data
+    when 1
+      0.upto(data.length-2) do |i|
+        data[i][1] = data[i+1][1] + 0.01
+      end
+      data[-1][1] = 0
+      data
+    else
+      raise "Unknown GradingStandard data version: #{version}"
+    end
+  end
+
   def update_usage_count
     self.usage_count = self.assignments.active.length
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
@@ -105,18 +188,18 @@ class GradingStandard < ActiveRecord::Base
   
   def self.default_grading_scheme
     {
-      "A" => 1.0,
-      "A-" => 0.93,
-      "B+" => 0.89,
-      "B" => 0.86,
-      "B-" => 0.83,
-      "C+" => 0.79,
-      "C" => 0.76,
-      "C-" => 0.73,
-      "D+" => 0.69,
-      "D" => 0.66,
-      "D-" => 0.63,
-      "F" => 0.6
+      "A" => 0.94,
+      "A-" => 0.90,
+      "B+" => 0.87,
+      "B" => 0.84,
+      "B-" => 0.80,
+      "C+" => 0.77,
+      "C" => 0.74,
+      "C-" => 0.70,
+      "D+" => 0.67,
+      "D" => 0.64,
+      "D-" => 0.61,
+      "F" => 0.0,
     }
   end
   
@@ -133,7 +216,7 @@ class GradingStandard < ActiveRecord::Base
       end
     end
   end
-  
+
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access
     return nil if hash[:migration_id] && hash[:grading_standards_to_import] && !hash[:grading_standards_to_import][hash[:migration_id]]
@@ -142,7 +225,7 @@ class GradingStandard < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     begin
-      item.data = JSON.parse hash[:data]
+      item.data = self.upgrade_data(JSON.parse(hash[:data]), hash[:version] || 1)
     rescue
       #todo - add to message to display to user
     end

@@ -17,17 +17,12 @@
 #
 
 class RoleOverride < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, :polymorphic => true # only Account now; we dropped Course level role overrides
   has_many :children, :class_name => "Role", :foreign_key => "parent_id"
   belongs_to :parent, :class_name => "Role"
-  before_save :default_values
 
   attr_accessible :context, :permission, :enrollment_type, :enabled
-  
-  def default_values
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
-  end
-  
+
   def self.account_membership_types(account)
     res = [{:name => "AccountAdmin", :label => t('roles.account_admin', "Account Admin")}]
     (account.account_membership_types - ['AccountAdmin']).each do |t| 
@@ -62,10 +57,12 @@ class RoleOverride < ActiveRecord::Base
     KNOWN_ROLE_TYPES
   end
 
+  # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
+  # for legacy reasons
   PERMISSIONS =
     {
       :manage_wiki => {
-        :label => lambda { t('permissions.manage_wiki', "Manage Wiki (add / edit / delete pages)") },
+        :label => lambda { t('permissions.manage_wiki', "Manage wiki (add / edit / delete pages)") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -141,7 +138,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_outcomes => {
-        :label => lambda { t('permissions.manage_outcomes', "Manage Learning Outcomes") },
+        :label => lambda { t('permissions.manage_outcomes', "Manage learning outcomes") },
         :available_to => [
           'StudentEnrollment',
           'TaEnrollment',
@@ -268,7 +265,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_students => {
-        :label => lambda { t('permissions.manage_students', "Add/Remove students for the course") },
+        :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },
         :available_to => [
           'TaEnrollment',
           'DesignerEnrollment',
@@ -285,7 +282,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_admin_users => {
-        :label => lambda { t('permissions.manage_admin_users', "Add/Remove other teachers, Course Designers or TAs to the course") },
+        :label => lambda { t('permissions.manage_admin_users', "Add/remove other teachers, course designers or TAs to the course") },
         :available_to => [
           'TaEnrollment',
           'DesignerEnrollment',
@@ -299,21 +296,13 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_role_overrides => {
-        :label => lambda { t('permissions.manage_role_overrides', "Manage default role permissions (define these permissions for course role types)") },
-        :available_to => [
-          'TaEnrollment',
-          'DesignerEnrollment',
-          'TeacherEnrollment',
-          'AccountAdmin',
-          'AccountMembership'
-        ],
-        :true_for => [
-          'TeacherEnrollment',
-          'AccountAdmin'
-        ]
+        :label => lambda { t('permissions.manage_role_overrides', "Manage permissions") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_account_memberships => {
-        :label => lambda { t('permissions.manage_account_memberships', "Add/Remove other admins for the account") },
+        :label => lambda { t('permissions.manage_account_memberships', "Add/remove other admins for the account") },
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
@@ -404,6 +393,24 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :read_question_banks => {
+        :label => lambda { t('permissions.read_question_banks', "View and link to question banks") },
+        :available_to => [
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      },
       :manage_calendar => {
         :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
         :available_to => [
@@ -441,7 +448,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_courses => {
-        :label => lambda { t('permissions.manage_courses', "Add/Remove Courses for the account") },
+        :label => lambda { t('permissions.manage_courses', "Manage ( add / edit / delete ) courses") },
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
@@ -452,7 +459,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_user_logins => {
-        :label => lambda { t('permissions.manage_user_logins', "Modify Login details for users") },
+        :label => lambda { t('permissions.manage_user_logins', "Modify login details for users") },
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
@@ -463,7 +470,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_alerts => {
-        :label => lambda { t('permissions.manage_alerts', "Manage account user alerts") },
+        :label => lambda { t('permissions.manage_alerts', "Manage global alerts") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
@@ -500,13 +507,13 @@ class RoleOverride < ActiveRecord::Base
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :view_statistics => {
-        :label => lambda { t('permissions.view_statistics', "View Statistics") },
+        :label => lambda { t('permissions.view_statistics', "View statistics") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_user_notes => {
-        :label => lambda { t('permissions.manage_user_notes', "Manage Faculty Journal Entries") },
+        :label => lambda { t('permissions.manage_user_notes', "Manage faculty journal entries") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -518,6 +525,41 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'AccountAdmin'
         ]
+      },
+      :read_course_content => {
+        :label => lambda { t('permission.read_course_content', "View course content") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :manage_content => {
+        :label => lambda { t('permission.manage_content', "Manage all other course content") },
+        :available_to => [
+          'TaEnrollment',
+          'TeacherEnrollment',
+          'DesignerEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'TaEnrollment',
+          'TeacherEnrollment',
+          'DesignerEnrollment',
+          'AccountAdmin'
+        ]
+      },
+      :manage_interaction_alerts => {
+        :label => lambda { t('permissions.manage_interaction_alerts', "Manage alerts") },
+        :true_for => %w(AccountAdmin TeacherEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment),
+      },
+      :manage_jobs => {
+        :label => lambda { t('permissions.managed_jobs', "Manage background jobs") },
+        :account_only => :site_admin,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
       }
     }.freeze
   def self.permissions
@@ -600,10 +642,10 @@ class RoleOverride < ActiveRecord::Base
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key]
     unless overrides
-      contexts = []
+      account_ids = []
       context_walk = context
       while context_walk
-        contexts << context_walk
+        account_ids << context_walk.id if context_walk.is_a? Account
         if context_walk.respond_to?(:course)
           context_walk = context_walk.course
         elsif context_walk.respond_to?(:account)
@@ -614,24 +656,23 @@ class RoleOverride < ActiveRecord::Base
           context_walk = nil
         end
       end
-      context_codes = contexts.reverse.map(&:asset_string)
       case_string = ""
-      context_codes.each_with_index{|code, idx| case_string += " WHEN context_code='#{code}' THEN #{idx} " }
-      overrides = RoleOverride.find(:all, :conditions => {:context_code => context_codes, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => "CASE #{case_string} ELSE 9999 END")
+      account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
+      overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => "CASE #{case_string} ELSE 9999 END DESC")
     end
     
     @@role_override_chain[permissionless_key] = overrides
-    overrides.select{|o| o.permission == permission.to_s}.each do |override|
-      if override
-        generated_permission[:readonly] = true if override.locked && (override.context_id != context.id || override.context_type != context.class.to_s)
-        generated_permission.merge!({ 
+    overrides.each do |override|
+      if override.permission == permission.to_s
+        generated_permission[:readonly] = true if override.locked && (override.context_id != context.id || !context.is_a?(Account))
+        generated_permission.merge!({
           :readonly => generated_permission[:readonly] || generated_permission[:locked],
           :explicit => false
         })
-      
-        if !generated_permission[:locked] && context_override = override
-          unless context_override.enabled.nil?
-            if context_override.context == context
+
+        if !generated_permission[:locked]
+          unless override.enabled.nil?
+            if override.context == context
               # if the explicit override is for the target context, the prior default
               # is the parent context's value
               generated_permission[:prior_default] = generated_permission[:enabled]
@@ -639,14 +680,14 @@ class RoleOverride < ActiveRecord::Base
               # otherwise, the prior default is the same as the new override,
               # since changing it in the target context will create a new
               # override
-              generated_permission[:prior_default] = context_override.enabled?
+              generated_permission[:prior_default] = override.enabled?
             end
             generated_permission.merge!({
-              :enabled => context_override.enabled?,
-              :explicit => !context_override.enabled.nil?
+              :enabled => override.enabled?,
+              :explicit => !override.enabled.nil?
             })
           end
-          generated_permission[:locked] = context_override.locked?
+          generated_permission[:locked] = override.locked?
         end
       end
     end

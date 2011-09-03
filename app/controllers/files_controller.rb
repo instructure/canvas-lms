@@ -46,6 +46,7 @@ class FilesController < ApplicationController
         # permission checks
         session['file_access_user_id'] = user.id
         session['file_access_expiration'] = 1.hour.from_now.to_i
+        session[:session_affects_permissions] = true
       end
     end
     # These sessions won't get deleted when the user logs out since this

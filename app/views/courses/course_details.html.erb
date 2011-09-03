@@ -21,16 +21,20 @@
   observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]}
   has_multiple_sections = @context.course_sections.active.count > 1
 
-  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true'
+  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true' && can_do(@context, @current_user, :manage_grades)
+
+  can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 %>
 <% content_for :right_side do %>
 
   <div class="rs-margin-lr rs-margin-top">
-    <% if can_do(@context, @current_user, :manage) %>
+    <% if can_do(@context, @current_user, :read_reports) %>
       <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> <%= t('links.stats', %{Course Statistics}) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :read) %>
       <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> <%= t('links.calendar', %{Course Calendar}) %></a>
     <% end %>
-    
+
     <% if can_do(@context, @current_user, :update) %>
       <% if @context.completed? %>
         <% form_tag context_url(@context, :context_unconclude_url) do %>
@@ -40,11 +44,27 @@
       <% else %>
         <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.conclude', %{End this Course}) %></a>
       <% end %>
-      <% if show_user_create_course_button(@current_user) %>
-        <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>
-      <% end %>
-        <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
-        <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export', %{Export this Course}) %></a>
+    <% end %>
+    <% if show_user_create_course_button(@current_user) && can_do(@context, @current_user, :read) %>
+      <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_content, :manage_files, :manage_quizzes) %>
+      <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :read) %>
+      <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export', %{Export this Course}) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_content) %>
+      <a href="<%= context_url(@context, :course_reset_url) %>" class="button button-sidebar-wide reset_course_content_button"><%= image_tag "delete.png" %><%= t('links.reset', %{Reset Course Content}) %></a>
+      <div id="reset_course_content_dialog" style="display: none;">
+          <%= mt 'help.reset_course_content', %{Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content.  This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?} %>
+          <% form_for @context, :url => context_url(@context, :course_reset_url), :html => {:method => 'post'} do %>
+            <div class="button-container">
+              <button type="submit" class="submit_button button"><%= t('buttons.reset', %{Reset Course Content}) %></button>
+              <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+            </div>
+          <% end %>
+        </div>
     <% end %>
     <table class="summary" style="margin-top: 20px;">
       <thead>
@@ -76,11 +96,20 @@
   <ul>
     <li><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
     <li><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
-    <li><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
-    <li><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
-    <li><a href="#tab-tools" id="tab-tols-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
+    <% if can_see_users %>
+      <li><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
+    <% end %>
+    <% if can_do @context, @current_user, :update %>
+      <li><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
+    <% end %>
+    <% if can_do @context, @current_user, :update %>
+      <li><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
+    <% end %>
     <% if publishing_enabled %>
       <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
+    <% end %>
+    <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+      <li><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
     <% end %>
   </ul>
   <div id="tab-details">
@@ -169,7 +198,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         <td><%= f.blabel :account_id, :en => "Department" %></td>
         <td>
           <span class="course_form">
-            <% if can_do(@context.root_account, @current_user, :manage) %>
+            <% if can_do(@context.root_account, @current_user, :manage_courses) %>
               <% if @context.root_account.all_accounts.count > 500 %>
                 <a href="<%= context_url(@context.root_account, :context_sub_accounts_url, :format => :json) %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
                 <input type="hidden" name="course[account_id]" id="course_account_id" value="<%= @context.account_id %>"/>
@@ -197,7 +226,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         <td><%= f.blabel :enrollment_term_id, :en => "Term" %></td>
         <td>
           <span class="course_form">
-            <% if can_do(@context.root_account, @current_user, :manage) %>
+            <% if can_do(@context.root_account, @current_user, :manage_courses) %>
               <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
                 <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || Time.parse("Jan 1 2000")}.each do |term| %>
                   <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
@@ -359,7 +388,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <% if can_do(@context, @current_user, :update) %>
             <a href="#" class="edit_course_link button"><%= image_tag "edit.png" %><%= t('links.edit_course', %{Edit Course Details}) %></a>
           <% end %>
-          <% if current_user_is_site_admin? && Account.root_accounts.length > 1 %>
+          <% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) && Account.root_accounts.length > 1 %>
             <a href="#" class="move_course_link button"><%= image_tag "ball.png" %><%= t('links.move_course', %{Move To Another Account}) %></a>
           <% end %>
           <span class="course_form">
@@ -387,9 +416,15 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <% if can_do(section, @current_user, :update) && !section.defined_by_sis? %>
             <a class="section_link edit_section_link no-hover" title="<%= t('links.title.edit_section', %{Edit Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
           <% end %>
-          <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
-            <%= section.display_name %>
-          </a>
+          <% if can_do section, @current_user, :read %>
+            <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
+              <%= section.display_name %>
+            </a>
+          <% else %>
+            <span class="name">
+              <%= section.display_name %>
+            </span>
+          <% end %>
           <span class="users_count">
             (
               <%= t 'enrollment_count', 'User', :count => section.enrollments.count %><% if section && section.sis_source_id %>, 
@@ -421,6 +456,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <%= f.text_field :name %>
     <% end %>
   </div>
+  <% if can_see_users %>
   <div id="tab-users">
     <h2 style="margin-top: 10px;"><%= t('headings.current_users', %{Current Users}) %></h2>
     <div style="margin-bottom: 10px; <%= hidden if (students + teachers + tas + observers).select{|e| e.invited? }.empty? %>">
@@ -562,6 +598,8 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     </div>
     <%= render :partial => 'link_enrollment' %>
   </div>
+  <% end %>
+  <% if can_do @context, @current_user, :update %>
   <div id="tab-navigation">
     <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
@@ -595,10 +633,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </p>
     <% end %>
   </div>
-  <div id="tab-tools">
-    <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
-    <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
-  </div>
+  <% end %>
+  <% if can_do @context, @current_user, :update %>
+    <div id="tab-tools">
+      <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
+      <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
+    </div>
+  <% end %>
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
@@ -609,8 +650,14 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <span id="publish_grades_error" style="display: none;">&nbsp;<%= t('errors.sis_publish', %{An error occurred on the last attempt to publish grades to SIS.}) %></span>
     </div>
   <% end %>
+  <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+    <div id="tab-alerts">
+      <h2><%= t(:alerts_title, "Alerts") %></h2>
+      <%= render :partial => 'alerts/alerts' %>
+    </div>
+  <% end %>
 </div>
-<% if current_user_is_site_admin? %>
+<% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) %>
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
     <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>

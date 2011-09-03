@@ -114,24 +114,21 @@ class ActiveRecord::Base
     @@cached_permissions = {}
   end
   
-  def cached_context_grants_right?(user, session, permission, context_key=nil)
+  def cached_context_grants_right?(user, session, *permissions)
     @@cached_contexts = nil if ENV['RAILS_ENV'] == "test"
     @@cached_contexts ||= {}
-    context_key ||= "#{self.context_type}_#{self.context_id}"
-    @@cached_contexts[context_key] ||= self.context rescue nil
-    @@cached_contexts[context_key] ||= self.course rescue nil
+    context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
+    context_key ||= "Course_#{self.course_id}"
+    @@cached_contexts[context_key] ||= self.context if self.respond_to?(:context)
+    @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
     key = [context_key, (user ? user.id : nil)].join
     @@cached_permissions[key] = nil if ENV['RAILS_ENV'] == "test"
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
-    @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil)
-    @@cached_permissions[key][permission]
+    @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
+    (@@cached_permissions[key] & Array(permissions).flatten).any?
   end
-  
-  def cached_course_grants_right?(user, session, permission)
-    cached_context_grants_right?(user, session, permission, "Course_#{self.course_id}")
-  end
-  
+
   def cached_context_short_name
     if self.respond_to?(:context)
       code = self.respond_to?(:context_code) ? self.context_code : self.context.asset_string
@@ -289,6 +286,20 @@ class ActiveRecord::Base
       raise DynamicFinderTypeError, error if Canvas.dynamic_finder_type_cast_error == :raise
       logger.debug "WARNING: " + error
     end
+  end
+
+  def self.merge_includes(first, second)
+    result = (safe_to_array(first) + safe_to_array(second)).uniq
+    result.each_with_index do |item, index|
+      if item.is_a?(Hash) && item.has_key?(:exclude)
+        exclude = item[:exclude]
+        item.delete :exclude
+        result.delete_at(index) if item.empty?
+        result = (result - safe_to_array(exclude))
+        break
+      end
+    end
+    result
   end
 end
 

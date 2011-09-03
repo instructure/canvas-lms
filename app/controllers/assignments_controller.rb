@@ -60,6 +60,7 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
+      @context.require_assignment_group
       @assignment_groups = @context.assignment_groups.active
       if !@assignment.new_record? && !@assignment_groups.map(&:id).include?(@assignment.assignment_group_id)
         @assignment.assignment_group = @assignment_groups.first
@@ -183,10 +184,10 @@ class AssignmentsController < ApplicationController
   end
   
   def syllabus
-    return unless tab_enabled?(@context.class::TAB_SYLLABUS)
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
     if authorized_action(@context.assignments.new, @current_user, :read)
+      return unless tab_enabled?(@context.class::TAB_SYLLABUS)
       @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
       @assignment_groups = @groups
       @events = @context.calendar_events.active.to_a

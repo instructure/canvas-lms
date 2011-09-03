@@ -80,17 +80,16 @@ class DiscussionTopicsController < ApplicationController
     @context.assert_assignment_group rescue nil
     @all_topics = @context.discussion_topics.active
     @all_topics = @all_topics.only_discussion_topics if params[:include_announcements] != "1"
-    @topics = @all_topics.paginate(:page => params[:page], :per_page => params[:per_page] || 10).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @topics = Api.paginate(@all_topics, self, topic_pagination_path).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
     if authorized_action(@context.discussion_topics.new, @current_user, :read)
       return child_topic if params[:root_discussion_topic_id] && @context.respond_to?(:context) && @context.context && @context.context.discussion_topics.find(params[:root_discussion_topic_id])
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
       respond_to do |format|
         format.html
         format.xml  { render :xml => @topics.to_xml }
-        format.json do 
+        format.json do
           if api_request?
-            api_pagination_headers(@topics)
-            render :json => discussion_topic_api_json(@topics) 
+            render :json => discussion_topic_api_json(@topics)
           else
             render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count], :permissions => {:user => @current_user, :session => session })
           end
@@ -285,7 +284,7 @@ class DiscussionTopicsController < ApplicationController
       end
       delay_posting = params[:discussion_topic].delete :delay_posting
       delayed_post_at = params[:discussion_topic].delete :delayed_post_at
-      delayed_post_at = Time.parse(delayed_post_at) if delayed_post_at
+      delayed_post_at = Time.zone.parse(delayed_post_at) if delayed_post_at
       @topic.workflow_state = (delay_posting == '1' && delayed_post_at > Time.now ? 'post_delayed' : @topic.workflow_state)
       @topic.workflow_state = 'active' if @topic.post_delayed? && (!delayed_post_at || delay_posting != '1')
       @topic.delayed_post_at = @topic.post_delayed? ? delayed_post_at : nil

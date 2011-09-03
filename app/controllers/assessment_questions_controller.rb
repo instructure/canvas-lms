@@ -18,16 +18,13 @@
 
 class AssessmentQuestionsController < ApplicationController
   before_filter :require_context
+  before_filter :require_bank
   def create
-    if authorized_action(@context.assessment_questions.new, @current_user, :create)
+    if authorized_action(@bank.assessment_questions.new, @current_user, :create)
       params[:assessment_question] ||= {}
+      params[:assessment_question].delete(:assessment_question_bank_id)
       params[:assessment_question][:form_question_data] ||= params[:question]
-      question_bank_id = params[:assessment_question].delete(:assessment_question_bank_id)
-      @question = @context.assessment_questions.build(params[:assessment_question])
-      if question_bank_id.present?
-        @bank = @context.assessment_question_banks.active.find_by_id(question_bank_id)
-        @question.assessment_question_bank = @bank
-      end
+      @question = @bank.assessment_questions.build(params[:assessment_question])
       if @question.with_versioning(&:save)
         @question.insert_at_bottom
         render :json => @question.to_json
@@ -38,7 +35,7 @@ class AssessmentQuestionsController < ApplicationController
   end
   
   def update
-    @question = @context.assessment_questions.find(params[:id])
+    @question = @bank.assessment_questions.find(params[:id])
     if authorized_action(@question, @current_user, :update)
       params[:assessment_question] ||= {}
       # changing the question bank id needs to use the move action, below
@@ -55,7 +52,7 @@ class AssessmentQuestionsController < ApplicationController
   end
   
   def destroy
-    @question = @context.assessment_questions.find(params[:id])
+    @question = @bank.assessment_questions.find(params[:id])
     if authorized_action(@question, @current_user, :delete)
       @question.destroy
       render :json => @question.to_json
@@ -72,10 +69,14 @@ class AssessmentQuestionsController < ApplicationController
       if params[:move] != '1'
         @new_question = @question.clone_for(@new_bank)
       end
-      @new_question.context = @new_bank.context
       @new_question.assessment_question_bank = @new_bank
       @new_question.save
       render :json => @new_question.to_json
     end
+  end
+
+  private
+  def require_bank
+    @bank = @context.assessment_question_banks.active.find(params[:question_bank_id])
   end
 end

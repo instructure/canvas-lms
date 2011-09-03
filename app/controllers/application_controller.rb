@@ -89,10 +89,13 @@ class ApplicationController < ActionController::Base
   # used to generate context-specific urls without having to
   # check which type of context it is everywhere
   def named_context_url(context, name, *opts)
-    context = context.user if context.is_a?(UserProfile)
-    klass = context.class.base_ar_class
-    name = name.to_s.sub(/context/, klass.name.underscore)
-    opts.unshift(context)
+    if context.is_a?(UserProfile)
+      name = name.to_s.sub(/context/, "profile")
+    else
+      klass = context.class.base_ar_class
+      name = name.to_s.sub(/context/, klass.name.underscore)
+      opts.unshift(context)
+    end
     opts.push({}) unless opts[-1].is_a?(Hash)
     include_host = opts[-1].delete(:include_host)
     if !include_host
@@ -109,7 +112,7 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_enabled?(id)
-    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :include_hidden_unused => true).any?{|t| t[:id] == id }
+    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :session => session, :include_hidden_unused => true).any?{|t| t[:id] == id }
       if @context.is_a?(Account)
         flash[:notice] = t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
       elsif @context.is_a?(Course)
@@ -150,7 +153,7 @@ class ApplicationController < ActionController::Base
         @context_all_permissions ||= @context.grants_rights?(user, session, nil)
         can_do = actions.any?{|a| @context_all_permissions[a] }
       else
-        can_do = actions.any?{|a| object.grants_right?(user, action_session, a) }
+        can_do = object.grants_rights?(user, action_session, *actions).values.any?
       end
     rescue => e
       logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}"
@@ -239,7 +242,8 @@ class ApplicationController < ActionController::Base
         @context_enrollment = @context.enrollments.find_all_by_user_id(@current_user.id).sort_by{|e| [e.state_sortable, e.rank_sortable] }.first if @context && @current_user
         @context_membership = @context_enrollment
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
-        @context = Account.find(params[:account_id])
+        @context = api_request? ?
+          Api.find(Account, params[:account_id]) : Account.find(params[:account_id])
         params[:context_id] = params[:account_id]
         params[:context_type] = "Account"
         @context_enrollment = @context.account_users.find_by_user_id(@current_user.id) if @context && @current_user
@@ -950,10 +954,6 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_is_site_admin?
 
   def require_site_admin_with_permission(permission)
-    if session[:become_user_id]
-      session[:become_user_id] = nil
-      @current_user = @real_current_user
-    end
     unless current_user_is_site_admin?(permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
       redirect_to root_url
@@ -964,7 +964,7 @@ class ApplicationController < ActionController::Base
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # specified permission.
   def current_user_is_site_admin?(permission = :site_admin)
-    user_is_site_admin?(@current_user)
+    user_is_site_admin?(@current_user, permission)
   end
   helper_method :current_user_is_site_admin?
 
@@ -1001,4 +1001,20 @@ class ApplicationController < ActionController::Base
     UserContent.escape(str)
   end
   helper_method :user_content
+
+  def find_bank(id, check_context_chain=true)
+    bank = @context.assessment_question_banks.active.find_by_id(id)
+    if bank
+      (block_given? ?
+        authorized_action(bank, @current_user, :read) :
+        bank.grants_right?(@current_user, session, :read)) or return nil
+    elsif check_context_chain
+      (block_given? ?
+        authorized_action(@context, @current_user, :read_question_banks) :
+        @context.grants_right?(@current_user, session, :read_question_banks)) or return nil
+      bank = @context.inherited_assessment_question_banks.find_by_id(id)
+    end
+    yield if block_given? && (@bank = bank)
+    bank
+  end
 end
