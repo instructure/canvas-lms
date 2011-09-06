@@ -59,7 +59,7 @@ class EnrollmentsFromUserList
     CommunicationChannel.find(:all, :conditions => "LOWER(path) IN (#{emails.map{|x|Pseudonym.sanitize(x.downcase)}.join(', ')}) AND path_type = 'email' AND communication_channels.workflow_state IN ('active', 'unconfirmed')", :include => {:user => :pseudonyms, :pseudonym => {}}).each do |cc|
       found_channels[cc.path.downcase] ||= []
       found_channels[cc.path.downcase] << cc
-    end if emails.size
+    end unless emails.empty?
     found_channels.keys.each do |path|
       found_channels[path] = found_channels[path].sort_by{|some_cc| [(some_cc.active? ? 0 : 1), (some_cc.pseudonym && some_cc.pseudonym.account_id == @course.root_account.id ? 0 : 1), (some_cc.created_at || Time.now)]}.first
     end
