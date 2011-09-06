@@ -111,7 +111,7 @@ class SisBatch < ActiveRecord::Base
   def process_instructure_csv_zip
     require 'sis'
     download_zip
-    importer = SIS::SisCsv.process(self.account, :files => [ @data_file.path ], :batch => self)
+    importer = SIS::CSV::Import.process(self.account, :files => [ @data_file.path ], :batch => self)
     finish importer.finished
   end
 

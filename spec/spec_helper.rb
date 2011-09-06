@@ -314,7 +314,7 @@ Spec::Runner.configure do |config|
     tmp.close!
     File.open(path, "w+") { |f| f.puts lines.join "\n" }
     
-    importer = SIS::SisCsv.process(@account, :files => [ path ], :allow_printing=>false)
+    importer = SIS::CSV::Import.process(@account, :files => [ path ], :allow_printing=>false)
     
     File.unlink path
     

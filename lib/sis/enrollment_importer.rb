@@ -20,206 +20,217 @@ require "set"
 require "skip_callback"
 
 module SIS
-  class EnrollmentImporter < SisImporter
+  class EnrollmentImporter
 
-    def self.is_enrollment_csv?(row)
-      (row.header?('section_id') || row.header?('course_id')) && row.header?('user_id')
+    def initialize(batch_id, root_account, logger)
+      @batch_id = batch_id
+      @root_account = root_account
+      @logger = logger
     end
 
-    def verify(csv, verify)
-      csv_rows(csv) do |row|
-        add_error(csv, "No course_id or section_id given for an enrollment") if row['course_id'].blank? && row['section_id'].blank?
-        add_error(csv, "No user_id given for an enrollment") if row['user_id'].blank?
-        add_error(csv, "Improper role \"#{row['role']}\" for an enrollment") unless row['role'] =~ /\Astudent|\Ateacher|\Ata|\Aobserver|\Adesigner/i
-        add_error(csv, "Improper status \"#{row['status']}\" for an enrollment") unless row['status'] =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
-      end
-    end
-
-    # expected columns
-    # course_id,user_id,role,section_id,status
-    def process(csv)
+    def process(messages, updates_every)
       start = Time.now
-      update_account_association_user_ids = Set.new
-      incrementally_update_account_associations_user_ids = Set.new
-      users_to_touch_ids = Set.new
-      courses_to_touch_ids = Set.new
-      enrollments_to_update_sis_batch_ids = []
-      account_chain_cache = {}
-      course = section = nil
-
+      i = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
         User.skip_updating_account_associations do
-          FasterCSV.open(csv[:fullpath], "rb", PARSE_ARGS) do |csv_object|
-            row = csv_object.shift
-            count = 0
-
-            until row.nil?
-              update_progress(count)
-              count = 0
-              # this transaction assumes that all these pseudonyms, courses, enrollments and
-              # course_sections are all in the same database
-              Enrollment.transaction do
-                remaining_in_transaction = @sis.updates_every
-                tx_end_time = Time.now + Setting.get('sis_transaction_seconds', '1').to_i.seconds
-
-                begin
-                  logger.debug("Processing Enrollment #{row.inspect}")
-                  count += 1
-                  remaining_in_transaction -= 1
-
-                  last_section = section
-                  # reset the cached course/section if they don't match this row
-                  if course && row['course_id'].present? && course.sis_source_id != row['course_id']
-                    course = nil
-                    section = nil
-                  end
-                  if section && row['section_id'].present? && section.sis_source_id != row['section_id']
-                    section = nil
-                  end
-
-                  pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['user_id'])
-                  user = pseudo.user rescue nil
-                  course ||= Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id']) unless row['course_id'].blank?
-                  section ||= CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id']) unless row['section_id'].blank?
-                  unless user && (course || section)
-                    add_warning csv, "Neither course #{row['course_id']} nor section #{row['section_id']} existed for user enrollment" unless (course || section)
-                    add_warning csv, "User #{row['user_id']} didn't exist for user enrollment" unless user
-                    next
-                  end
-
-                  if row['section_id'] && !section
-                    add_warning csv, "An enrollment referenced a non-existent section #{row['section_id']}"
-                    next
-                  end
-
-                  if row['course_id'] && !course
-                    add_warning csv, "An enrollment referenced a non-existent course #{row['course_id']}"
-                    next
-                  end
-
-                  # reset cached/inferred course and section if they don't match with the opposite piece that was
-                  # explicitly provided
-                  section = course.default_section if section.nil? || row['section_id'].blank? && !section.default_section
-                  course = section.course if course.nil? || (row['course_id'].blank? && course.id != section.course_id) ||
-                    (course.id != section.course_id && section.nonxlist_course_id == course.id)
-
-                  if course.id != section.course_id
-                    add_warning csv, "An enrollment listed a section and a course that are unrelated"
-                    next
-                  end
-                  # preload the course object to avoid later queries for it
-                  section.course = course
-
-                  # commit pending incremental account associations
-                  if section != last_section and !incrementally_update_account_associations_user_ids.empty?
-                    if incrementally_update_account_associations_user_ids.length < 10
-                      update_account_association_user_ids.merge(incrementally_update_account_associations_user_ids)
-                    else
-                      User.update_account_associations(incrementally_update_account_associations_user_ids.to_a,
-                          :incremental => true,
-                          :precalculated_associations => User.calculate_account_associations_from_accounts(
-                              [course.account_id, section.nonxlist_course.try(:account_id)].compact.uniq,
-                              account_chain_cache
-                          ))
-                    end
-                    incrementally_update_account_associations_user_ids = Set.new
-                  end
-
-                  enrollment = section.enrollments.find_by_user_id(user.id)
-                  unless enrollment
-                    enrollment = Enrollment.new
-                    enrollment.root_account = @root_account
-                  end
-                  enrollment.user = user
-                  enrollment.sis_source_id = [row['course_id'], row['user_id'], row['role'], section.name].compact.join(":")
-
-                  enrollment.course = course
-                  enrollment.course_section = section
-                  if row['role'] =~ /\Ateacher\z/i
-                    enrollment.type = 'TeacherEnrollment'
-                  elsif row['role'] =~ /student/i
-                    enrollment.type = 'StudentEnrollment'
-                  elsif row['role'] =~ /\Ata\z|assistant/i
-                    enrollment.type = 'TaEnrollment'
-                  elsif row['role'] =~ /\Aobserver\z/i
-                    enrollment.type = 'ObserverEnrollment'
-                    if row['associated_user_id']
-                      pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['associated_user_id'])
-                      associated_enrollment = pseudo && course.student_enrollments.find_by_user_id(pseudo.user_id)
-                      enrollment.associated_user_id = associated_enrollment && associated_enrollment.user_id
-                    end
-                  elsif row['role'] =~ /\Adesigner\z/i
-                    enrollment.type = 'DesignerEnrollment'
-                  end
-
-                  if row['status']=~ /\Aactive/i
-                    if user.workflow_state != 'deleted'
-                      enrollment.workflow_state = 'active'
-                    else
-                      enrollment.workflow_state = 'deleted'
-                      add_warning csv, "Attempted enrolling of deleted user #{row['user_id']} in course #{row['course_id']}"
-                    end
-                  elsif  row['status']=~ /\Adeleted/i
-                    enrollment.workflow_state = 'deleted'
-                  elsif  row['status']=~ /\Acompleted/i
-                    enrollment.workflow_state = 'completed'
-                  elsif  row['status']=~ /\Ainactive/i
-                    enrollment.workflow_state = 'inactive'
-                  end
-
-                  begin
-                    enrollment.start_at = row['start_date'].blank? ? nil : DateTime.parse(row['start_date'])
-                    enrollment.end_at = row['end_date'].blank? ? nil : DateTime.parse(row['end_date'])
-                  rescue
-                    add_warning(csv, "Bad date format for user #{row['user_id']} in #{row['course_id'].blank? ? 'section' : 'course'} #{row['course_id'].blank? ? row['section_id'] : row['course_id']}")
-                  end
-
-
-                  courses_to_touch_ids.add(enrollment.course)
-                  if enrollment.should_update_user_account_association?
-                    if enrollment.new_record? && !update_account_association_user_ids.include?(user.id)
-                      incrementally_update_account_associations_user_ids.add(user.id)
-                    else
-                      update_account_association_user_ids.add(user.id)
-                    end
-                  end
-                  if enrollment.changed?
-                    users_to_touch_ids.add(user.id)
-                    enrollment.sis_batch_id = @batch.id if @batch
-                    enrollment.save_without_broadcasting
-                  elsif @batch
-                    enrollments_to_update_sis_batch_ids << enrollment.id
-                  end
-
-                  @sis.counts[:enrollments] += 1
-                end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0 && tx_end_time > Time.now
-              end
-            end
+          yield i
+          while i.any_left_to_process?
+            i.process_batch
           end
         end
       end
-      logger.debug("Raw enrollments took #{Time.now - start} seconds")
-      Enrollment.update_all({:sis_batch_id => @batch.id}, {:id => enrollments_to_update_sis_batch_ids}) if @batch && !enrollments_to_update_sis_batch_ids.empty?
+      @logger.debug("Raw enrollments took #{Time.now - start} seconds")
+      Enrollment.update_all({:sis_batch_id => @batch_id}, {:id => i.enrollments_to_update_sis_batch_ids}) if @batch_id && !i.enrollments_to_update_sis_batch_ids.empty?
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
-      Course.update_all({:updated_at => Time.now.utc}, {:id => courses_to_touch_ids.to_a}) unless courses_to_touch_ids.empty?
+      Course.update_all({:updated_at => Time.now.utc}, {:id => i.courses_to_touch_ids.to_a}) unless i.courses_to_touch_ids.empty?
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
-      if incrementally_update_account_associations_user_ids.length < 10
-        update_account_association_user_ids.merge(incrementally_update_account_associations_user_ids)
-      else
-        User.update_account_associations(incrementally_update_account_associations_user_ids.to_a,
-            :incremental => true,
-            :precalculated_associations => User.calculate_account_associations_from_accounts(
-                [course.account_id, section.nonxlist_course.try(:account_id)].compact.uniq,
-                account_chain_cache
-            ))
-      end
-      User.update_account_associations(update_account_association_user_ids.to_a,
-                                       :account_chain_cache => account_chain_cache)
-      User.update_all({:updated_at => Time.now.utc}, {:id => users_to_touch_ids.to_a}) unless users_to_touch_ids.empty?
-
-      logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
+      i.incrementally_update_account_associations
+      User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
+      User.update_all({:updated_at => Time.now.utc}, {:id => i.users_to_touch_ids.to_a}) unless i.users_to_touch_ids.empty?
+      @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
+      return i.success_count
     end
+
+  private
+    class Work
+      attr_accessor :enrollments_to_update_sis_batch_ids, :courses_to_touch_ids,
+          :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
+          :account_chain_cache, :users_to_touch_ids, :success_count
+
+      def initialize(batch_id, root_account, logger, updates_every, messages)
+        @batch_id = batch_id
+        @root_account = root_account
+        @logger = logger
+        @updates_every = updates_every
+        @messages = messages
+
+        @update_account_association_user_ids = Set.new
+        @incrementally_update_account_associations_user_ids = Set.new
+        @users_to_touch_ids = Set.new
+        @courses_to_touch_ids = Set.new
+        @enrollments_to_update_sis_batch_ids = []
+        @account_chain_cache = {}
+        @course = @section = nil
+
+        @enrollment_batch = []
+        @success_count = 0
+      end
+
+      def add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil)
+        raise ImportError, "No course_id or section_id given for an enrollment" if course_id.blank? && section_id.blank?
+        raise ImportError, "No user_id given for an enrollment" if user_id.blank?
+        raise ImportError, "Improper role \"#{role}\" for an enrollment" unless role =~ /\Astudent|\Ateacher|\Ata|\Aobserver|\Adesigner/i
+        raise ImportError, "Improper status \"#{status}\" for an enrollment" unless status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
+        @enrollment_batch << [course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id]
+        process_batch if @enrollment_batch.size >= @updates_every
+      end
+
+      def any_left_to_process?
+        return @enrollment_batch.size > 0
+      end
+
+      def process_batch
+        return unless any_left_to_process?
+
+        transaction_timeout = Setting.get('sis_transaction_seconds', '1').to_i.seconds
+        Enrollment.transaction do
+          tx_end_time = Time.now + transaction_timeout
+          enrollment = nil
+          while !(enrollment = @enrollment_batch.shift).nil? && tx_end_time > Time.now
+            @logger.debug("Processing Enrollment #{enrollment.inspect}")
+            course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id = enrollment
+
+            last_section = @section
+            # reset the cached course/section if they don't match this row
+            if @course && course_id.present? && @course.sis_source_id != course_id
+              @course = nil
+              @section = nil
+            end
+            if @section && section_id.present? && @section.sis_source_id != section_id
+              @section = nil
+            end
+
+            pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, user_id)
+            user = pseudo.user rescue nil
+            @course ||= Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id) unless course_id.blank?
+            @section ||= CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, section_id) unless section_id.blank?
+            unless (@course || @section)
+              @messages << "Neither course #{course_id} nor section #{section_id} existed for user enrollment"
+              next
+            end
+            unless user
+              @messages << "User #{user_id} didn't exist for user enrollment"
+              next
+            end
+
+            if section_id && !@section
+              @messages << "An enrollment referenced a non-existent section #{section_id}"
+              next
+            end
+            if course_id && !@course
+              @messages << "An enrollment referenced a non-existent course #{course_id}"
+              next
+            end
+
+            # reset cached/inferred course and section if they don't match with the opposite piece that was
+            # explicitly provided
+            @section = @course.default_section if @section.nil? || section_id.blank? && !@section.default_section
+            @course = @section.course if @course.nil? || (course_id.blank? && @course.id != @section.course_id) || (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
+
+            if @course.id != @section.course_id
+              @messages << "An enrollment listed a section and a course that are unrelated"
+              next
+            end
+
+            # preload the course object to avoid later queries for it
+            @section.course = @course
+
+            # commit pending incremental account associations
+            incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
+
+            enrollment = @section.enrollments.find_by_user_id(user.id)
+            unless enrollment
+              enrollment = Enrollment.new
+              enrollment.root_account = @root_account
+            end
+            enrollment.user = user
+            enrollment.sis_source_id = [course_id, user_id, role, @section.name].compact.join(":")
+
+            enrollment.course = @course
+            enrollment.course_section = @section
+            if role =~ /\Ateacher\z/i
+              enrollment.type = 'TeacherEnrollment'
+            elsif role =~ /student/i
+              enrollment.type = 'StudentEnrollment'
+            elsif role =~ /\Ata\z|assistant/i
+              enrollment.type = 'TaEnrollment'
+            elsif role =~ /\Aobserver\z/i
+              enrollment.type = 'ObserverEnrollment'
+              if associated_user_id
+                pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, associated_user_id)
+                associated_enrollment = pseudo && @course.student_enrollments.find_by_user_id(pseudo.user_id)
+                enrollment.associated_user_id = associated_enrollment && associated_enrollment.user_id
+              end
+            elsif role =~ /\Adesigner\z/i
+              enrollment.type = 'DesignerEnrollment'
+            end
+
+            if status =~ /\Aactive/i
+              if user.workflow_state != 'deleted'
+                enrollment.workflow_state = 'active'
+              else
+                enrollment.workflow_state = 'deleted'
+                @messages << "Attempted enrolling of deleted user #{user_id} in course #{course_id}"
+              end
+            elsif status =~ /\Adeleted/i
+              enrollment.workflow_state = 'deleted'
+            elsif status =~ /\Acompleted/i
+              enrollment.workflow_state = 'completed'
+            elsif status =~ /\Ainactive/i
+              enrollment.workflow_state = 'inactive'
+            end
+
+            enrollment.start_at = start_date
+            enrollment.end_at = end_date
+
+            @courses_to_touch_ids.add(enrollment.course)
+            if enrollment.should_update_user_account_association?
+              if enrollment.new_record? && !@update_account_association_user_ids.include?(user.id)
+                @incrementally_update_account_associations_user_ids.add(user.id)
+              else
+                @update_account_association_user_ids.add(user.id)
+              end
+            end
+            if enrollment.changed?
+              @users_to_touch_ids.add(user.id)
+              enrollment.sis_batch_id = @batch_id if @batch_id
+              enrollment.save_without_broadcasting
+            elsif @batch_id
+              @enrollments_to_update_sis_batch_ids << enrollment.id
+            end
+
+            @success_count += 1
+          end
+        end
+      end
+
+      def incrementally_update_account_associations
+        if @incrementally_update_account_associations_user_ids.length < 10
+          @update_account_association_user_ids.merge(@incrementally_update_account_associations_user_ids)
+        else
+          User.update_account_associations(@incrementally_update_account_associations_user_ids.to_a,
+              :incremental => true,
+              :precalculated_associations => User.calculate_account_associations_from_accounts(
+                  [@course.account_id, @section.nonxlist_course.try(:account_id)].compact.uniq,
+                          @account_chain_cache
+                      ))
+        end
+        @incrementally_update_account_associations_user_ids = Set.new
+      end
+
+    end
+
   end
 end

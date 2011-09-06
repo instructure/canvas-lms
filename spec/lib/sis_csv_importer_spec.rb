@@ -23,7 +23,7 @@ def gen_ssha_password(password)
   "{SSHA}" + Base64.encode64(Digest::SHA1.digest(password+salt).unpack('H*').first+salt).gsub(/\s/, '')
 end
 
-describe SIS::SisCsv do
+describe SIS::CSV::Import do
   before do
     account_model
   end
@@ -129,22 +129,20 @@ describe SIS::SisCsv do
   end
 
   context "abstract course importing" do
-    it 'should detect bad content' do
+    it 'should skip bad content' do
       before_count = AbstractCourse.count
       importer = process_csv_data(
         "abstract_course_id,short_name,long_name,account_id,term_id,status",
         "C001,Hum101,Humanities,A001,T001,active",
-        "C001,Hum102,Humanities 2,A001,T001,active",
         ",Hum102,Humanities 2,A001,T001,active",
         "C003,Hum102,Humanities 2,A001,T001,inactive",
         "C004,,Humanities 2,A001,T001,active",
         "C005,Hum102,,A001,T001,active"
       )
-      AbstractCourse.count.should == before_count
+      AbstractCourse.count.should == before_count + 1
 
-      importer.warnings.should == []
-      importer.errors.map(&:last).should == [
-          "Duplicate abstract course id C001",
+      importer.errors.should == []
+      importer.warnings.map(&:last).should == [
           "No abstract_course_id given for an abstract course",
           "Improper status \"inactive\" for abstract course C003",
           "No short_name given for abstract course C004",
@@ -153,20 +151,18 @@ describe SIS::SisCsv do
 
     it 'should create new abstract courses' do
       before_count = AbstractCourse.count
-      process_csv_data(
+      process_csv_data_cleanly(
         "term_id,name,status,start_date,end_date",
         "T001,Winter13,active,,"
-      ).tap{|i| i.errors.should == []; i.warnings.should == []}
-      process_csv_data(
+      )
+      process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,TestAccount,active"
-      ).tap{|i| i.errors.should == []; i.warnings.should == []}
-      importer = process_csv_data(
+      )
+      process_csv_data_cleanly(
         "abstract_course_id,short_name,long_name,account_id,term_id,status",
         "C001,Hum101,Humanities,A001,T001,active"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
       AbstractCourse.count.should == before_count + 1
       AbstractCourse.last.tap{|c|
         c.sis_source_id.should == "C001"
@@ -182,22 +178,22 @@ describe SIS::SisCsv do
     end
 
     it 'should allow instantiations of abstract courses' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "term_id,name,status,start_date,end_date",
         "T001,Winter13,active,,"
-      ).tap{|i| i.errors.should == []; i.warnings.should == []}
-      process_csv_data(
+      )
+      process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,TestAccount,active"
-      ).tap{|i| i.errors.should == []; i.warnings.should == []}
-      process_csv_data(
+      )
+      process_csv_data_cleanly(
         "abstract_course_id,short_name,long_name,account_id,term_id,status",
         "AC001,Hum101,Humanities,A001,T001,active"
-      ).tap{|i| i.errors.should == []; i.warnings.should == []}
-      process_csv_data(
+      )
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
         "C001,,,,,active,AC001"
-      ).tap{|i| i.errors.should == []; i.warnings.should == []}
+      )
       Course.last.tap{|c|
         c.sis_source_id.should == "C001"
         c.abstract_course.should == AbstractCourse.last
@@ -281,29 +277,28 @@ describe SIS::SisCsv do
   end
 
   context "course importing" do
-    it 'should detect bad content' do
+    it 'should skip bad content' do
       before_count = Course.count
       importer = process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,Hum101,Humanities,A001,T001,active",
-        "C001,Hum102,Humanities 2,A001,T001,active",
         ",Hum102,Humanities 2,A001,T001,active",
         "C003,Hum102,Humanities 2,A001,T001,inactive",
         "C004,,Humanities 2,A001,T001,active",
         "C005,Hum102,,A001,T001,active"
       )
-      Course.count.should == before_count
+      Course.count.should == before_count + 1
 
-      errors = importer.errors.map { |r| r.last }
-      errors.should == ["Duplicate course id C001",
-                        "No course_id given for a course",
-                        "Improper status \"inactive\" for course C003",
-                        "No short_name given for course C004",
-                        "No long_name given for course C005"]
+      importer.errors.should == []
+      warnings = importer.warnings.map { |r| r.last }
+      warnings.should == ["No course_id given for a course",
+                          "Improper status \"inactive\" for course C003",
+                          "No short_name given for course C004",
+                          "No long_name given for course C005"]
     end
 
     it "should create new courses" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
       )
@@ -314,12 +309,12 @@ describe SIS::SisCsv do
     end
 
     it "shouldn't blow away the account id if it's already set" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active"
       )
       account = @account.sub_accounts.find_by_sis_source_id("A001")
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
       )
@@ -327,14 +322,14 @@ describe SIS::SisCsv do
       course.account.should == @account
       course.associated_accounts.map(&:id).sort.should == [@account.id]
       account.should_not == @account
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,A001,,active"
       )
       course.reload
       course.account.should == account
       course.associated_accounts.map(&:id).sort.should == [account.id, @account.id].sort
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
       )
@@ -358,7 +353,7 @@ describe SIS::SisCsv do
     end
 
     it "should rename courses that have not had their name manually changed" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active",
         "test_2,TB 101,Testing & Breaking 101,,,active"
@@ -370,7 +365,7 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("test_2")
       course.name.should eql("Testing & Breaking 101")
 
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 102,Test Course 102,,,active",
         "test_2,TB 102,Testing & Breaking 102,,,active"
@@ -385,7 +380,7 @@ describe SIS::SisCsv do
     end
 
     it "should not rename courses that have had their names manually changed" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
       )
@@ -397,7 +392,7 @@ describe SIS::SisCsv do
       course.course_code = "SUCKERS 101"
       course.save
 
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 102,Test Course 102,,,active"
       )
@@ -407,13 +402,13 @@ describe SIS::SisCsv do
     end
 
     it 'should override term dates if the start or end dates are set' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
         "test1,TC 101,Test Course 1,,,active,,",
         "test2,TC 102,Test Course 2,,,active,,2011-05-14 00:00:00",
         "test3,TC 103,Test Course 3,,,active,2011-04-14 00:00:00,",
         "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       @account.courses.find_by_sis_source_id("test1").restrict_enrollments_to_course_dates.should be_false
       @account.courses.find_by_sis_source_id("test2").restrict_enrollments_to_course_dates.should be_true
       @account.courses.find_by_sis_source_id("test3").restrict_enrollments_to_course_dates.should be_true
@@ -619,32 +614,6 @@ describe SIS::SisCsv do
 
     end
 
-    it "should warn for duplicate rows" do
-      importer = process_csv_data(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active",
-        "user_1,user1,User,Uno,user@example.com,active"
-      )
-      user = User.find_by_email('user@example.com')
-      user.should_not be_nil
-
-      warnings = importer.warnings.map { |r| r.last }
-      warnings.should == ['Duplicate user id user_1']
-    end
-
-    it "should not allow non-identical duplicate user rows" do
-      importer = process_csv_data(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active",
-        "user_1,user2,User,Uno,user@example.com,active"
-      )
-      user = User.find_by_email('user@example.com')
-      user.should be_nil
-
-      errors = importer.errors.map { |r| r.last }
-      errors.should == ['Non-identical duplicate user rows for user_1']
-    end
-
     it "should catch active-record-level errors, like too short unique_id" do
       before_user_count = User.count
       before_pseudo_count = Pseudonym.count
@@ -660,35 +629,9 @@ describe SIS::SisCsv do
       [User.count, Pseudonym.count].should == [before_user_count, before_pseudo_count]
     end
 
-    it "should not allow non-identical duplicate user rows in multiple files" do
-      file1 = ["user_id,login_id,first_name,last_name,email,status",
-              "user_1,user1,User,Uno,user@example.com,active"]
-      file2 = ["user_id,login_id,first_name,last_name,email,status",
-              "user_1,user2,User,Uno,user@example.com,active"]
-      tmp = Tempfile.new("sis_rspec")
-      path = "#{tmp.path}.csv"
-      tmp.close!
-      File.open(path, "w+") { |f| f.puts file1.join "\n" }
-      tmp2 = Tempfile.new("sis_rspec2")
-      path2 = "#{tmp2.path}.csv"
-      tmp2.close!
-      File.open(path2, "w+") { |f| f.puts file2.join "\n" }
-
-      importer = SIS::SisCsv.process(@account, :files => [path,path2], :allow_printing=>false)
-
-      File.unlink path
-      File.unlink path2
-
-      user = User.find_by_email('user@example.com')
-      user.should be_nil
-
-      errors = importer.errors.map { |r| r.last }
-      errors.should == ['Non-identical duplicate user rows for user_1']
-    end
-
     it "should not allow a secondary user account with the same login id." do
       p_count = Pseudonym.count
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active"
       )
@@ -700,6 +643,7 @@ describe SIS::SisCsv do
         "user_id,login_id,first_name,last_name,email,status",
         "user_2,user1,User,Uno,user@example.com,active"
       )
+      importer.errors.should == []
       importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
       user = User.find_by_email('user@example.com')
       user.pseudonyms.count.should == 1
@@ -708,7 +652,7 @@ describe SIS::SisCsv do
     end
 
     it "should not allow a secondary user account to change its login id to some other registered login id" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,active"
@@ -720,61 +664,53 @@ describe SIS::SisCsv do
         "user_1,user3,User,Uno,user1@example.com,active"
       )
       importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
+      importer.errors.should == []
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user2"
     end
 
     it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,active"
       )
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user3,User,Uno,user1@example.com,active",
         "user_2,user1,User,Dos,user2@example.com,active"
       )
-      importer.warnings.should == []
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user1"
     end
 
     it "should allow a user to update information" do
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user2,User,Uno-Dos,user1@example.com,active"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
 
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.last_name.should == "Uno-Dos"
     end
 
     it "should allow a user to update emails specifically" do
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
 
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user2@example.com,active"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
 
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
     end
@@ -818,14 +754,12 @@ describe SIS::SisCsv do
       Pseudonym.find_by_unique_id('user1').should be_nil
       Pseudonym.find_by_unique_id('user2').should_not be_nil
       p.sis_user_id.should be_nil
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,active"
       )
       p.reload
-      importer.errors.should == []
-      importer.warnings.should == []
       Pseudonym.find_by_unique_id('user1').should_not be_nil
       Pseudonym.find_by_unique_id('user2').should_not be_nil
       Pseudonym.count.should == (p_count + 2)
@@ -841,23 +775,21 @@ describe SIS::SisCsv do
       Pseudonym.find_by_unique_id('user2').should be_nil
       Pseudonym.find_by_unique_id('user2@example.com').should_not be_nil
       p.sis_user_id.should be_nil
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,active"
       )
       p.reload
-      importer.errors.should == []
-      importer.warnings.should == []
       Pseudonym.find_by_unique_id('user1').should_not be_nil
       Pseudonym.find_by_unique_id('user2').should_not be_nil
       Pseudonym.find_by_unique_id('user2@example.com').should be_nil
       Pseudonym.count.should == (p_count + 2)
       p.sis_user_id.should == "user_2"
     end
-    
+
     it "should strip white space on fields" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1  ,user1   ,User   ,Uno   ,user@example.com   ,active  ",
         "   user_2,   user2,   User,   Dos,   user2@example.com,  active"
@@ -873,7 +805,7 @@ describe SIS::SisCsv do
     end
 
     it "should use an existing communication channel" do
-      importer = process_csv_data_cleanly(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active"
       )
@@ -888,7 +820,7 @@ describe SIS::SisCsv do
       user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
 
       # change to user2@example.com; because user1@example.com was sis created, it should disappear
-      importer = process_csv_data_cleanly(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user2@example.com,active"
       )
@@ -935,7 +867,7 @@ describe SIS::SisCsv do
   end
 
   context 'enrollment importing' do
-    it 'should detect bad content' do
+    it 'should skip bad content' do
       before_count = Enrollment.count
       importer = process_csv_data(
         "course_id,user_id,role,section_id,status",
@@ -946,24 +878,25 @@ describe SIS::SisCsv do
       )
       Enrollment.count.should == before_count
 
-      errors = importer.errors.map { |r| r.last }
-      errors.should == ["No course_id or section_id given for an enrollment",
+      importer.errors.should == []
+      warnings = importer.warnings.map { |r| r.last }
+      warnings.should == ["No course_id or section_id given for an enrollment",
                         "No user_id given for an enrollment",
                         "Improper role \"cheater\" for an enrollment",
                         "Improper status \"semi-active\" for an enrollment"]
     end
 
     it 'should warn about inconsistent data' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
         "C002,TC 102,Test Course 102,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "1B,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "U001,user1,User,Uno,user@example.com,active"
       )
@@ -976,15 +909,16 @@ describe SIS::SisCsv do
       warnings.should == ["An enrollment referenced a non-existent course NONEXISTENT",
                           "An enrollment referenced a non-existent section NONEXISTENT",
                           "An enrollment listed a section and a course that are unrelated"]
+      importer.errors.should == []
     end
 
     it "should enroll users" do
       #create course, users, and sections
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,active",
@@ -993,12 +927,12 @@ describe SIS::SisCsv do
         "user_6,user6,User,Cinco,user6@example.com,active",
         "user_7,user7,User,Siete,user7@example.com,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
         "S001,test_1,Sec1,active,,"
       )
       # the enrollments
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "test_1,user_1,teacher,,active,,,",
         ",user_2,student,S001,active,,,",
@@ -1021,7 +955,7 @@ describe SIS::SisCsv do
     end
 
     it "should not try looking up a section to enroll into if the section name is empty" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active",
         "test_2,TC 102,Test Course 102,,,active"
@@ -1030,16 +964,14 @@ describe SIS::SisCsv do
       bad_course.course_sections.length.should == 0
       good_course = @account.courses.find_by_sis_source_id("test_2")
       good_course.course_sections.length.should == 0
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active"
       )
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id",
         "test_2,user_1,teacher,,active,"
       )
-      importer.warnings.length.should == 0
-      importer.errors.length.should == 0
       good_course.teachers.first.name.should == "User Uno"
     end
 
@@ -1160,26 +1092,24 @@ describe SIS::SisCsv do
   end
 
   context 'account importing' do
-    it 'should detect bad content' do
+    it 'should skip bad content' do
       before_count = Account.count
       importer = process_csv_data(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",
-        "A001,,Humanities 2,active",
         ",,Humanities 3,active")
 
       errors = importer.errors.map { |r| r.last }
       warnings = importer.warnings.map { |r| r.last }
-      errors.should == ["Duplicate account id A001",
-                        "No account_id given for an account"]
-      warnings.should == []
+      warnings.should == ["No account_id given for an account"]
+      errors.should == []
 
       importer = process_csv_data(
         "account_id,parent_account_id,name,status",
-        "A002,A001,English,active",
+        "A002,A000,English,active",
         "A003,,English,inactive",
         "A004,,,active")
-      Account.count.should == before_count
+      Account.count.should == before_count + 1
 
       errors = importer.errors.map { |r| r.last }
       warnings = importer.warnings.map { |r| r.last }
@@ -1191,7 +1121,7 @@ describe SIS::SisCsv do
 
     it 'should create accounts' do
       before_count = Account.count
-      process_csv_data(
+      process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",
         "A002,A001,English,active",
@@ -1221,15 +1151,13 @@ describe SIS::SisCsv do
 
     it 'should update the hierarchies of existing accounts' do
       before_count = Account.count
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",
         "A002,,English,deleted",
         "A003,,English Literature,active",
         "A004,,Awesomeness,active"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
       Account.count.should == before_count + 4
 
       ['A001', 'A002', 'A003', 'A004'].each do |id|
@@ -1238,14 +1166,12 @@ describe SIS::SisCsv do
       Account.find_by_sis_source_id('A002').workflow_state.should == "deleted"
       Account.find_by_sis_source_id('A003').name.should == "English Literature"
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A002,A001,,",
         "A003,A002,,",
         "A004,A002,,"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
       Account.count.should == before_count + 4
 
       a1 = Account.find_by_sis_source_id('A001')
@@ -1264,21 +1190,20 @@ describe SIS::SisCsv do
   end
 
   context 'term importing' do
-    it 'should detect bad content' do
+    it 'should skip bad content' do
       before_count = EnrollmentTerm.count
       importer = process_csv_data(
         "term_id,name,status,start_date,end_date",
         "T001,Winter11,active,,",
-        "T001,Winter12,active,,",
         ",Winter13,active,,",
         "T002,Winter10,inactive,,",
         "T003,,active,,"
       )
-      EnrollmentTerm.count.should == before_count
+      EnrollmentTerm.count.should == before_count + 1
 
-      errors = importer.errors.map { |r| r.last }
-      errors.should == ["Duplicate term id T001",
-                        "No term_id given for a term",
+      importer.errors.should == []
+      warnings = importer.warnings.map { |r| r.last }
+      warnings.should == ["No term_id given for a term",
                         "Improper status \"inactive\" for term T002",
                         "No name given for term T003"]
     end
@@ -1306,33 +1231,39 @@ describe SIS::SisCsv do
       t2.end_at.should be_nil
 
       importer.warnings.map{|r|r.last}.should == ["Bad date format for term T002"]
+      importer.errors.should == []
     end
   end
 
   context 'section importing' do
-    it 'should detect bad content' do
+    it 'should skip bad content' do
       before_count = CourseSection.count
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C010,TC 101,Test Course 101,,,active"
+      )
       importer = process_csv_data(
         "section_id,course_id,name,start_date,end_date,status",
-        "S001,C001,Sec1,,,active",
-        "S001,C001,Sec2,,,active",
+        "S001,C010,Sec1,,,active",
         "S002,,Sec2,,,active",
         ",C001,Sec2,,,active",
         "S003,C002,Sec1,,,inactive",
-        "S004,C002,,,,active"
+        "S004,C002,,,,active",
+        "S005,C001,Sec1,,,active"
       )
-      CourseSection.count.should == before_count
+      CourseSection.count.should == before_count + 1
 
-      errors = importer.errors.map { |r| r.last }
-      errors.should == ["Duplicate section id S001",
-                        "No course_id given for a section S002",
+      importer.errors.should == []
+      warnings = importer.warnings.map { |r| r.last }
+      warnings.should == ["No course_id given for a section S002",
                         "No section_id given for a section in course C001",
                         "Improper status \"inactive\" for section S003 in course C002",
-                        "No name given for section S004 in course C002"]
+                        "No name given for section S004 in course C002",
+                        "Section S005 references course C001 which doesn't exist"]
     end
 
     it 'should create sections' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active"
       )
@@ -1361,20 +1292,21 @@ describe SIS::SisCsv do
 
       importer.warnings.map{|r|r.last}.should == ["Bad date format for section S002",
                                                   "Section S003 references course C002 which doesn't exist"]
+      importer.errors.should == []
     end
 
     it 'should override term dates if the start or end dates are set' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
         "test1,TC 101,Test Course 1,,,active,,"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
-      process_csv_data(
+      )
+      process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
         "sec1,test1,Test Course 1,active,,",
         "sec2,test1,Test Course 2,active,,2011-05-14 00:00:00",
         "sec3,test1,Test Course 3,active,2011-04-14 00:00:00,",
         "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       course = @account.courses.find_by_sis_source_id('test1')
       course.course_sections.find_by_sis_source_id("sec1").restrict_enrollments_to_section_dates.should be_false
       course.course_sections.find_by_sis_source_id("sec2").restrict_enrollments_to_section_dates.should be_true
@@ -1387,35 +1319,35 @@ describe SIS::SisCsv do
         "xlist_course_id,section_id,status",
         ",S001,active"
       )
-      importer.warnings.should == []
-      importer.errors.map{|r|r.last}.should == ["No xlist_course_id given for a cross-listing"]
+      importer.errors.should == []
+      importer.warnings.map{|r|r.last}.should == ["No xlist_course_id given for a cross-listing"]
       importer = process_csv_data(
         "xlist_course_id,section_id,status",
         "X001,,active"
       )
-      importer.warnings.should == []
-      importer.errors.map{|r|r.last}.should == ["No section_id given for a cross-listing"]
+      importer.errors.should == []
+      importer.warnings.map{|r|r.last}.should == ["No section_id given for a cross-listing"]
       importer = process_csv_data(
         "xlist_course_id,section_id,status",
         "X001,S001,"
       )
-      importer.warnings.should == []
-      importer.errors.map{|r|r.last}.should == ['Improper status "" for a cross-listing']
+      importer.errors.should == []
+      importer.warnings.map{|r|r.last}.should == ['Improper status "" for a cross-listing']
       importer = process_csv_data(
         "xlist_course_id,section_id,status",
         "X001,S001,baleeted"
       )
-      importer.warnings.should == []
-      importer.errors.map{|r|r.last}.should == ['Improper status "baleeted" for a cross-listing']
+      importer.errors.should == []
+      importer.warnings.map{|r|r.last}.should == ['Improper status "baleeted" for a cross-listing']
       @account.courses.size.should == 0
     end
 
     it 'should work with xlists with no xlist course' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
         "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
@@ -1430,13 +1362,10 @@ describe SIS::SisCsv do
       course.associated_accounts.map(&:id).sort.should == [@account.id]
       @account.courses.find_by_sis_source_id("X001").should be_nil
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-
-      importer.warnings.should == []
-      importer.errors.should == []
 
       xlist_course = @account.courses.find_by_sis_source_id("X001")
       xlist_course.associated_accounts.map(&:id).sort.should == [@account.id]
@@ -1449,13 +1378,10 @@ describe SIS::SisCsv do
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,deleted"
       )
-
-      importer.warnings.should == []
-      importer.errors.should == []
 
       xlist_course = @account.courses.find_by_sis_source_id("X001")
       course = @account.courses.find_by_sis_source_id("C001")
@@ -1479,12 +1405,12 @@ describe SIS::SisCsv do
     end
 
     it 'should preserve data into copied xlist courses' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
         "C002,TC 102,Test Course 102,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
         "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
@@ -1494,7 +1420,7 @@ describe SIS::SisCsv do
       )
       @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
       @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active",
         "X001,S002,active",
@@ -1507,7 +1433,7 @@ describe SIS::SisCsv do
       @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
       @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 101"
       @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 102"
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 103,Test Course 103,,,active",
         "C002,TC 104,Test Course 104,,,active"
@@ -1518,7 +1444,7 @@ describe SIS::SisCsv do
       @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
       @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 103"
       @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 104"
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,deleted",
         "X001,S002,deleted",
@@ -1532,12 +1458,12 @@ describe SIS::SisCsv do
     end
 
     it 'should work with xlists with an xlist course defined' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "X001,TC 102,Test Course 102,,,active",
         "C001,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
         "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
@@ -1551,13 +1477,10 @@ describe SIS::SisCsv do
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       @account.courses.find_by_sis_source_id("X001").should_not be_nil
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-
-      importer.warnings.should == []
-      importer.errors.should == []
 
       xlist_course = @account.courses.find_by_sis_source_id("X001")
       course = @account.courses.find_by_sis_source_id("C001")
@@ -1568,13 +1491,10 @@ describe SIS::SisCsv do
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,deleted"
       )
-
-      importer.warnings.should == []
-      importer.errors.should == []
 
       xlist_course = @account.courses.find_by_sis_source_id("X001")
       course = @account.courses.find_by_sis_source_id("C001")
@@ -1589,11 +1509,11 @@ describe SIS::SisCsv do
     end
 
     it 'should work with xlist courses in crazy orders' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
         "S002,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
@@ -1601,7 +1521,7 @@ describe SIS::SisCsv do
         "S004,C001,Sec4,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
         "S005,C001,Sec5,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active",
         "X001,S002,active",
@@ -1609,9 +1529,6 @@ describe SIS::SisCsv do
         "X002,S004,active",
         "X001,S005,active"
       )
-
-      importer.warnings.should == []
-      importer.errors.should == []
 
       xlist_course_1 = @account.courses.find_by_sis_source_id("X001")
       xlist_course_2 = @account.courses.find_by_sis_source_id("X002")
@@ -1623,21 +1540,19 @@ describe SIS::SisCsv do
     end
 
     it 'should be idempotent with active xlists' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
       3.times do
-        importer = process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,active"
         )
-        importer.warnings.should == []
-        importer.errors.should == []
 
         xlist_course = @account.courses.find_by_sis_source_id("X001")
         course = @account.courses.find_by_sis_source_id("C001")
@@ -1649,20 +1564,18 @@ describe SIS::SisCsv do
     end
 
     it 'should be idempotent with deleted xlists' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
 
       xlist_course = @account.courses.find_by_sis_source_id("X001")
       course = @account.courses.find_by_sis_source_id("C001")
@@ -1672,12 +1585,10 @@ describe SIS::SisCsv do
       s1.account.should be_nil
 
       3.times do
-        importer = process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,deleted"
         )
-        importer.warnings.should == []
-        importer.errors.should == []
 
         course = @account.courses.find_by_sis_source_id("C001")
         s1 = course.course_sections.find_by_sis_source_id("S001")
@@ -1688,21 +1599,19 @@ describe SIS::SisCsv do
     end
 
     it 'should be able to move around a section and then uncrosslist back to the original' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
       3.times do |i|
-        importer = process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X00#{i},S001,active"
         )
-        importer.warnings.should == []
-        importer.errors.should == []
 
         xlist_course = @account.courses.find_by_sis_source_id("X00#{i}")
         course = @account.courses.find_by_sis_source_id("C001")
@@ -1713,12 +1622,10 @@ describe SIS::SisCsv do
         s1.account.should be_nil
         s1.crosslisted?.should be_true
       end
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X101,S001,deleted"
       )
-      importer.warnings.should == []
-      importer.errors.should == []
 
       course = @account.courses.find_by_sis_source_id("C001")
       s1 = course.course_sections.find_by_sis_source_id("S001")
@@ -1730,15 +1637,15 @@ describe SIS::SisCsv do
     end
 
     it 'should be able to handle additional section updates and not screw up the crosslisting' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
@@ -1750,7 +1657,7 @@ describe SIS::SisCsv do
       s1.course.should eql(xlist_course)
       s1.crosslisted?.should be_true
       s1.name.should == "Sec1"
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
@@ -1765,12 +1672,12 @@ describe SIS::SisCsv do
     end
 
     it 'should be able to move a non-crosslisted section between courses' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
         "C002,TC 102,Test Course 102,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
@@ -1778,7 +1685,7 @@ describe SIS::SisCsv do
       course2 = @account.courses.find_by_sis_source_id("C002")
       s1 = course1.course_sections.find_by_sis_source_id("S001")
       s1.course.should eql(course1)
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
@@ -1789,16 +1696,16 @@ describe SIS::SisCsv do
     end
 
     it 'should uncrosslist a section if it is getting moved from the original course' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
         "C002,TC 102,Test Course 102,,,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
@@ -1811,7 +1718,7 @@ describe SIS::SisCsv do
       s1.course.should eql(xlist_course)
       s1.account.should be_nil
       s1.crosslisted?.should be_true
-      process_csv_data(
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
@@ -1823,16 +1730,16 @@ describe SIS::SisCsv do
     end
 
     it 'should leave a section alone if a section has been crosslisted with the sticky_xlist flag set' do
-      process_csv_data(
+      process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
         "C002,TC 102,Test Course 102,,,active",
         "C003,TC 103,Test Course 103,,,active"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
-      process_csv_data(
+      )
+      process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
 
       def with_section(&block)
         CourseSection.find_by_root_account_id_and_sis_source_id(@account.id, 'S001').tap(&block)
@@ -1851,60 +1758,60 @@ describe SIS::SisCsv do
       end
 
       check_section_not_crosslisted
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,active"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       check_section_crosslisted 'C002'
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,deleted"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       check_section_not_crosslisted
       with_section do |s|
         s.crosslist_to_course(Course.find_by_root_account_id_and_sis_source_id(@account.id, 'C002'))
       end
       check_section_crosslisted 'C002'
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,deleted"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       check_section_crosslisted 'C002'
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C003,S001,active"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       check_section_crosslisted 'C002'
       with_section do |s|
         s.uncrosslist
       end
       check_section_not_crosslisted
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C003,S001,active"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       check_section_crosslisted 'C003'
-      process_csv_data(
+      process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C003,S001,deleted"
-      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      )
       check_section_not_crosslisted
     end
 
   end
 
   context 'grade publishing results importing' do
-    it 'should detect bad content' do
+    it 'should skip bad content' do
       importer = process_csv_data(
         "enrollment_id,grade_publishing_status",
         ",published",
         "1,published",
-        "1,error",
         "2,asplode")
 
-      errors = importer.errors.map { |r| r.last }
-      errors.should == ["No enrollment_id given",
-                        "Duplicate enrollment id 1",
+      importer.errors.should == []
+      warnings = importer.warnings.map { |r| r.last }
+      warnings.should == ["No enrollment_id given",
+                        "Enrollment 1 doesn't exist",
                         "Improper grade_publishing_status \"asplode\" for enrollment 2"]
     end
 
@@ -1916,12 +1823,9 @@ describe SIS::SisCsv do
       @enrollment.grade_publishing_status = 'publishing';
       @enrollment.save!
 
-      importer = process_csv_data(
+      process_csv_data_cleanly(
         "enrollment_id,grade_publishing_status",
         "#{@enrollment.id},published")
-
-      importer.warnings.length.should == 0
-      importer.errors.length.should == 0
 
       @enrollment.reload
       @enrollment.grade_publishing_status.should == 'published'
@@ -1930,7 +1834,7 @@ describe SIS::SisCsv do
 
   context 'account associations' do
     before(:each) do
-      process_csv_data(
+      process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",
         "A002,A001,English,active",
@@ -1941,27 +1845,27 @@ describe SIS::SisCsv do
 
     context 'course' do
       it 'should change course account associations when a course account changes' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "test_1,TC 101,Test Course 101,,,active"
         )
         Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).should == [@account.id]
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "test_1,TC 101,Test Course 101,A001,,active"
         )
         Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "test_1,TC 101,Test Course 101,A004,,active"
         )
         Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "test_1,TC 101,Test Course 101,A003,,active"
         )
         Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A003').id, Account.find_by_sis_source_id('A002').id, Account.find_by_sis_source_id('A001').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "test_1,TC 101,Test Course 101,A001,,active"
         )
@@ -1971,7 +1875,7 @@ describe SIS::SisCsv do
 
     context 'section' do
       before(:each) do
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "C001,TC 101,Test Course 101,,,active",
           "C002,TC 101,Test Course 101,A001,,active",
@@ -1982,17 +1886,17 @@ describe SIS::SisCsv do
       end
 
       it 'should change course account associations when a section account changes' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A001"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
@@ -2000,13 +1904,13 @@ describe SIS::SisCsv do
       end
 
       it 'should change course account associations when a section is not crosslisted and the original section\'s course changes via sis' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
         Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
@@ -2015,20 +1919,20 @@ describe SIS::SisCsv do
       end
 
       it 'should change course account associations when a section is crosslisted and the original section\'s course changes via sis' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
         Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,active"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
         Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
         Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
@@ -2051,16 +1955,16 @@ describe SIS::SisCsv do
       end
 
       it 'should have proper account associations when new' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,active"
         )
         Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,deleted"
         )
@@ -2068,22 +1972,22 @@ describe SIS::SisCsv do
       end
 
       it 'should have proper account associations when being undeleted' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004",
           "S002,C002,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,active"
         )
         Course.find_by_sis_source_id("X001").deleted?.should be_false
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "X001,TC 101,Test Course 101,,,deleted"
         )
         Course.find_by_sis_source_id("X001").deleted?.should be_true
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S002,active"
         )
@@ -2092,19 +1996,19 @@ describe SIS::SisCsv do
       end
 
       it 'should have proper account associations when a section is added and then removed' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
         Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "C002,S001,active"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
         Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "C002,S001,deleted"
         )
@@ -2113,23 +2017,23 @@ describe SIS::SisCsv do
       end
 
       it 'should get account associations updated when the template course is updated' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "section_id,course_id,name,start_date,end_date,status,account_id",
           "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
         )
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,active"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
         Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).should == [@account.id]
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "C001,TC 101,Test Course 101,A004,,active"
         )
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
         Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "C001,TC 101,Test Course 101,A001,,active"
         )
@@ -2138,19 +2042,19 @@ describe SIS::SisCsv do
       end
 
       it 'should import active enrollments with states based on enrollment date restrictions' do
-        process_csv_data(
+        process_csv_data_cleanly(
           "term_id,name,status,start_date,end_date",
           "T001,Winter13,active,#{2.days.from_now.strftime("%Y-%m-%d 00:00:00")},#{4.days.from_now.strftime("%Y-%m-%d 00:00:00")}"
         )
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "C001,TC 101,Test Course 101,,T001,active"
         )
-        process_csv_data(
+        process_csv_data_cleanly(
           "user_id,login_id,first_name,last_name,email,status",
           "user_1,user1,User,Uno,user@example.com,active"
         )
-        process_csv_data(
+        process_csv_data_cleanly(
           "course_id,user_id,role,section_id,status,associated_user_id",
           "C001,user_1,student,,active,"
         )
@@ -2174,7 +2078,7 @@ describe SIS::SisCsv do
         )
         @account.courses.find_by_sis_source_id("C001").students.first.name.should == "User Uno"
         @account.courses.find_by_sis_source_id("X001").should be_nil
-        process_csv_data(
+        process_csv_data_cleanly(
           "xlist_course_id,section_id,status",
           "X001,S001,active"
         )
@@ -2208,33 +2112,33 @@ describe SIS::SisCsv do
   end
 
   describe "group importing" do
-    it "should detect bad content" do
+    it "should skip bad content" do
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      )
+      before_count = Group.count
       importer = process_csv_data(
         "group_id,account_id,name,status",
         "G001,A001,Group 1,available",
-        "G001,A001,Group 2,available",
         "G002,A001,Group 1,blerged",
         "G003,A001,,available",
+        "G004,A004,Group 4,available",
         ",A001,G1,available")
-      importer.errors.map(&:last).should ==
-        ["Duplicate group id G001",
-          "No group_id given for a group"]
-      importer = process_csv_data(
-        "group_id,account_id,name,status",
-        "G001,A001,Group 1,available",
-        "G002,,Group 1,blerged",
-        "G003,,,available")
+      importer.errors.should == []
       importer.warnings.map(&:last).should ==
-        ["Parent account didn't exist for A001",
-         "Improper status \"blerged\" for group G002, skipping",
-         "No name given for group G003, skipping"]
+        ["Improper status \"blerged\" for group G002, skipping",
+         "No name given for group G003, skipping",
+         "Parent account didn't exist for A004",
+         "No group_id given for a group"]
+      Group.count.should == before_count + 1
     end
 
     it "should create groups" do
       account_model
       @sub = @account.all_accounts.create!(:name => 'sub')
       @sub.update_attribute('sis_source_id', 'A002')
-      process_csv_data(
+      process_csv_data_cleanly(
         "group_id,account_id,name,status",
         "G001,,Group 1,available",
         "G002,A002,Group 2,deleted")
@@ -2248,13 +2152,13 @@ describe SIS::SisCsv do
     it "should update group attributes" do
       @sub = @account.sub_accounts.create!(:name => 'sub')
       @sub.update_attribute('sis_source_id', 'A002')
-      process_csv_data(
+      process_csv_data_cleanly(
         "group_id,account_id,name,status",
         "G001,,Group 1,available",
         "G002,,Group 2,available")
       Group.count.should == 2
       Group.find_by_sis_source_id('G001').update_attribute(:name, 'Group 1-1')
-      process_csv_data(
+      process_csv_data_cleanly(
         "group_id,account_id,name,status",
         "G001,,Group 1-b,available",
         "G002,A002,Group 2-b,deleted")
@@ -2281,17 +2185,18 @@ describe SIS::SisCsv do
       @user3.pseudonym.update_attribute(:account, @account)
     end
 
-    it "should detect bad content" do
+    it "should skip bad content" do
       importer = process_csv_data(
         "group_id,user_id,status",
         ",U001,accepted",
         "G001,,accepted",
         "G001,U001,bogus")
       GroupMembership.count.should == 0
-      importer.errors.map(&:last).should ==
+      importer.warnings.map(&:last).should ==
         ["No group_id given for a group user",
          "No user_id given for a group user",
          "Improper status \"bogus\" for a group user"]
+      importer.errors.should == []
     end
 
     it "should add users to groups" do

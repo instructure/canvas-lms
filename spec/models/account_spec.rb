@@ -50,7 +50,7 @@ describe Account do
     path = "#{tmp.path}.csv"
     tmp.close!
     File.open(path, "w+") { |f| f.puts lines.join "\n" }
-    importer = SIS::SisCsv.process(@account, :files => [path],
+    importer = SIS::CSV::Import.process(@account, :files => [path],
         :allow_printing => false)
     File.unlink path
     importer.warnings.should == []

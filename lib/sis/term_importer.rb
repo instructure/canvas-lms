@@ -17,67 +17,63 @@
 #
 
 module SIS
-  class TermImporter < SisImporter
-    
-    EXPECTED_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-    
-    def self.is_term_csv?(row)
-      #This matcher works because a course has long_name/short_name
-      row.header?('term_id') && row.header?('name')
+  class TermImporter
+    def initialize(batch_id, root_account, logger)
+      @batch_id = batch_id
+      @root_account = root_account
+      @logger = logger
     end
-    
-    def verify(csv, verify)
-      term_ids = (verify[:terms_id] ||= {})
-      csv_rows(csv) do |row|
-        term_id = row['term_id']
-        add_error(csv, "Duplicate term id #{term_id}") if term_ids[term_id]
-        term_ids[term_id] = true
-        add_error(csv, "No term_id given for a term") if row['term_id'].blank?
-        add_error(csv, "No name given for term #{term_id}") if row['name'].blank?
-        add_error(csv, "Improper status \"#{row['status']}\" for term #{term_id}") unless row['status'] =~ /\Aactive|\Adeleted/i
-      end
-    end
-    
-    # expected columns
-    # account_id,parent_account_id,name,status
-    def process(csv)
+
+    def process
       start = Time.now
-      csv_rows(csv) do |row|
-        update_progress
-        logger.debug("Processing Term #{row.inspect}")
-        
-        term = nil
-        term = @root_account.enrollment_terms.find_by_sis_source_id(row['term_id'])
+      importer = Work.new(@batch_id, @root_account, @logger)
+      yield importer
+      @logger.debug("Terms took #{Time.now - start} seconds")
+      return importer.success_count
+    end
+
+  private
+    class Work
+      attr_accessor :success_count
+
+      def initialize(batch_id, root_account, logger)
+        @batch_id = batch_id
+        @root_account = root_account
+        @logger = logger
+        @success_count = 0
+      end
+
+      def add_term(term_id, name, status, start_date=nil, end_date=nil)
+        @logger.debug("Processing Term #{[term_id, name, status, start_date, end_date].inspect}")
+
+        raise ImportError, "No term_id given for a term" if term_id.blank?
+        raise ImportError, "No name given for term #{term_id}" if name.blank?
+        raise ImportError, "Improper status \"#{status}\" for term #{term_id}" unless status =~ /\Aactive|\Adeleted/i
+
+        term = @root_account.enrollment_terms.find_by_sis_source_id(term_id)
         term ||= @root_account.enrollment_terms.new
-        
-        # only update the name on new records, and ones that haven't been changed since the last sis import
+
+        # only update the name on new records, and ones that haven't been
+        # changed since the last sis import
         if term.new_record? || (term.sis_name && term.sis_name == term.name)
-          term.name = term.sis_name = row['name']
+          term.name = term.sis_name = name
         end
-        
-        term.sis_source_id = row['term_id']
-        term.sis_batch_id = @batch.id if @batch
-        if row['status'] =~ /active/i
+
+        term.sis_source_id = term_id
+        term.sis_batch_id = @batch_id if @batch_id
+        if status =~ /active/i
           term.workflow_state = 'active'
-        elsif  row['status'] =~ /deleted/i
+        elsif status =~ /deleted/i
           term.workflow_state = 'deleted'
         end
-        
-        begin
-          unless row['start_date'].blank?
-            term.start_at = DateTime.parse(row['start_date'])
-          end
-          unless row['end_date'].blank?
-            term.end_at = DateTime.parse(row['end_date'])
-          end
-        rescue
-          add_warning(csv, "Bad date format for term #{row['term_id']}")
-        end
-        
+
+        term.start_at = start_date
+        term.end_at = end_date
+
         term.save
-        @sis.counts[:terms] += 1
+        @success_count += 1
       end
-      logger.debug("Terms took #{Time.now - start} seconds")
+
     end
   end
 end
