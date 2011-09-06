@@ -110,6 +110,12 @@ describe Pseudonym do
     @pseudonym.ldap_bind_result('yay!').should be_true
     module Net; class LDAP; alias_method :bind_as, :bind_as_old; end; end
   end
+
+  it "should not error on malformed SSHA password" do
+    pseudonym_model
+    @pseudonym.sis_ssha = '{SSHA}garbage'
+    @pseudonym.valid_ssha?('garbage').should be_false
+  end
   
   context "Needs a pseudonym with an active user" do
     before do
