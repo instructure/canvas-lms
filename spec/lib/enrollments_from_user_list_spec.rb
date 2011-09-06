@@ -83,6 +83,15 @@ describe EnrollmentsFromUserList do
       enrollments.map(&:user).should be_include(u)
     end
 
+    it "should not fail when processing logins" do
+      u = user
+      u.pseudonyms.create!(:account => Account.default, :unique_id => "david_richards", :path => "David_Richards_JR@example.com", :password => "dave4Instructure", :password_confirmation => "dave4Instructure")
+      @el = UserList.new('david_richards')
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
+      enrollments.length.should eql(1)
+      enrollments.map(&:user).should be_include(u)
+    end
+
   end
   
   context "EnrollmentsFromUserList.process" do
