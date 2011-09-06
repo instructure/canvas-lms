@@ -12,9 +12,13 @@ javascripts:
     - public/javascripts/date.js
     - public/javascripts/jquery-1.5.2.js
     - public/javascripts/jquery-ui-1.8.js
+    - public/javascripts/i18n.js
     - public/javascripts/jquery.ba-throttle-debounce.js
     - public/javascripts/jquery.ba-tinypubsub.js
     - public/javascripts/jquery.ba-hashchange.js
+    - public/javascripts/spin.js
+    - public/javascripts/jquery.spin.js
+    - public/javascripts/jquery.disableWhileLoading.js
     - public/javascripts/jquery.fancyplaceholder.js
     - public/javascripts/jquery.autocomplete.js
     - public/javascripts/jquery.google-analytics.js
@@ -22,7 +26,6 @@ javascripts:
     - public/javascripts/jquery.inst_tree.js
     - public/javascripts/jquery.store.js
     - public/javascripts/jquery.scrollTo.js
-    - public/javascripts/i18n.js
     - public/javascripts/scribd.view.js
     - public/javascripts/swfobject/swfobject.js
     - public/javascripts/reminders.js
