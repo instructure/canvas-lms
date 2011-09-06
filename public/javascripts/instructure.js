@@ -265,6 +265,38 @@ jQuery(function($) {
     $dialog.find("iframe").attr('src', $(this).attr('href'));
   });
 
+
+  // Adds a way to automatically open dialogs by just giving them the .dialog_opener class.
+  // Uses the aria-controls attribute to specify id of dialog to open because that is already
+  // a best practice accessibility-wise (as a side note you should also add "role=button").
+  // You can pass in options to the dialog with the data-dialog-options attribute.
+  // 
+  // Examples:
+  // 
+  // <a class="dialog_opener" aria-controls="foobar" role="button" href="#">
+  // opens the dialog with id="foobar"
+  // 
+  // <a class="dialog_opener" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
+  // opens the .my_dialog dialog and passes the options {resizable:false, width: 300}
+
+  // the :not clause is to not allow users access to this functionality in their content.
+  $('.dialog_opener[aria-controls]:not(.user_content *)').live('click', function(event){
+    var link = this;
+    $('#' + $(this).attr('aria-controls')).ifExists(function($dialog){
+      event.preventDefault();
+      
+      // if the linked dialog has not already been initialized, initialize it (passing in opts)
+      if (!$dialog.data('dialog')) {
+        $dialog.dialog($.extend({
+          autoOpen: false,
+          modal: true
+        }, $(link).data('dialogOpts')));
+      }
+
+      $dialog.dialog('open');
+    });
+  });
+
   function enhanceUserContent() {
     var $content = $("#content");
     $(".user_content:not(.enhanced):visible").addClass('unenhanced');
