@@ -30,6 +30,7 @@ class AccountsController < ApplicationController
   def index
     @accounts = @current_user.accounts rescue []
     respond_to do |format|
+      format.html
       format.json do
         # TODO: what would be more useful, include sub-accounts here
         # that you implicitly have access to, or have a separate method
@@ -37,7 +38,6 @@ class AccountsController < ApplicationController
         @accounts = Api.paginate(@accounts, self, api_v1_accounts_path)
         render :json => @accounts.map { |a| account_json(a, []) }
       end
-      format.html
     end
   end
 
@@ -48,13 +48,13 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
 
     respond_to do |format|
-      format.json { render :json => account_json(@account, []) }
       format.html do
         return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
         build_course_stats
       end
+      format.json { render :json => account_json(@account, []) }
     end
   end
 
