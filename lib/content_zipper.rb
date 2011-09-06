@@ -22,6 +22,7 @@ require 'tmpdir'
 require 'set'
 
 class ContentZipper
+
   def initialize
     @logger = Rails.logger
   end
@@ -41,7 +42,13 @@ class ContentZipper
       send(*args)
     end
   end
-  
+
+  # we evaluate some ERB templates from under app/views/ while generating assignment zips
+  include I18nUtilities
+  def t(*a, &b)
+    I18n.t(*a, &b)
+  end
+
   def self.process_attachment(*args)
     ContentZipper.new.process_attachment(*args)
   end
