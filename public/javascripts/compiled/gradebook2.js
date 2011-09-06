@@ -20,6 +20,7 @@
         this.staticCellFormatter = __bind(this.staticCellFormatter, this);
         this.cellFormatter = __bind(this.cellFormatter, this);
         this.gotSubmissionsChunk = __bind(this.gotSubmissionsChunk, this);
+        this.buildRows = __bind(this.buildRows, this);
         this.rowFilter = __bind(this.rowFilter, this);
         this.gotStudents = __bind(this.gotStudents, this);
         this.gotAssignmentGroups = __bind(this.gotAssignmentGroups, this);
@@ -33,6 +34,7 @@
         this.sectionToShow = Number($.store.userGet("grading_show_only_section" + this.options.context_id)) || void 0;
         this.show_attendance = $.store.userGet("show_attendance_" + this.options.context_code) === 'true';
         this.include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_" + this.options.context_code) === 'true';
+        $.subscribe('assignment_group_weights_changed', this.buildRows);
         $.when($.ajaxJSON(this.options.assignment_groups_url, "GET", {}, this.gotAssignmentGroups), $.ajaxJSON(this.options.sections_and_students_url, "GET", this.sectionToShow && {
           sections: [this.sectionToShow]
         })).then(__bind(function(assignmentGroupsArgs, studentsArgs) {
@@ -40,15 +42,19 @@
           return this.initHeader();
         }, this));
       }
-      Gradebook.prototype.gotAssignmentGroups = function(assignment_groups) {
+      Gradebook.prototype.gotAssignmentGroups = function(assignmentGroups) {
         var assignment, group, _i, _len, _results;
-        this.assignment_groups = {};
+        this.assignmentGroups = {};
         this.assignments = {};
+        new AssignmentGroupWeightsDialog({
+          context: this.options,
+          assignmentGroups: assignmentGroups
+        });
         _results = [];
-        for (_i = 0, _len = assignment_groups.length; _i < _len; _i++) {
-          group = assignment_groups[_i];
+        for (_i = 0, _len = assignmentGroups.length; _i < _len; _i++) {
+          group = assignmentGroups[_i];
           $.htmlEscapeValues(group);
-          this.assignment_groups[group.id] = group;
+          this.assignmentGroups[group.id] = group;
           _results.push((function() {
             var _j, _len2, _ref, _results2;
             _ref = group.assignments;
@@ -251,7 +257,7 @@
       Gradebook.prototype.calculateStudentGrade = function(student) {
         var group, result, _i, _len, _ref;
         if (student.loaded) {
-          result = INST.GradeCalculator.calculate(student.submissionsAsArray, this.assignment_groups, 'percent');
+          result = INST.GradeCalculator.calculate(student.submissionsAsArray, this.assignmentGroups, this.options.group_weighting_scheme);
           _ref = result.group_sums;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             group = _ref[_i];
@@ -543,7 +549,7 @@
           }
           this.columns.push(columnDef);
         }
-        _ref2 = this.assignment_groups;
+        _ref2 = this.assignmentGroups;
         for (id in _ref2) {
           group = _ref2[id];
           html = "" + group.name;

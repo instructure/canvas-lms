@@ -11,7 +11,8 @@
     :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
     :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
     :context_id => @context.id,
-    :context_code => @context.asset_string
+    :context_code => @context.asset_string,
+    :group_weighting_scheme => @context.group_weighting_scheme
   }
 %>
 <div id="gradebook-toolbar">
@@ -23,12 +24,15 @@
   </ul>
   <button id="gradebook_settings">&nbsp;</button>
   <ul style="display: none; width: 210px;">
-    <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= I18n.t('view_grading_history', 'View Grading History') %></a></li>
-    <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= I18n.t('download_scores', 'Download Scores (.csv)') %></a></li>
-    <li><a class="gradebook_upload_link" href="#"><%= I18n.t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
-    <!-- <li><a href="#"><%= I18n.t('set_group_weights', 'Set Group Weights') %></a></li> -->
-    <li><a href="#"><label><%= I18n.t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
-    <li><a href="#"><label><%= I18n.t('include_ungraded', 'Include Ungraded Assignments') %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
+    <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
+    <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
+    <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
+    <% if PluginSetting.settings_for_plugin('grade_export')[:enabled] %>
+    <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url, :fragment => "tab-grade-publishing") %>"><%= t('publish_to_sis', 'Publish grades to SIS') %></a></li>
+    <% end %>
+    <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('set_group_weights', 'Set Group Weights') %></a></li>
+    <li><a href="#"><label><%= t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
+    <li><a href="#"><label><%= t('include_ungraded', 'Include Ungraded Assignments') %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
   </ul>
 </div>
 <div id="gradebook-grid-wrapper">
@@ -37,6 +41,7 @@
 </div>
 <div style="display:none;">
   <%= render :partial => 'gradebook_uploads/form' %>
+  <%= render :partial => 'assignment_group_weights_dialog' %>
 </div>
 
 <% js_block do %>

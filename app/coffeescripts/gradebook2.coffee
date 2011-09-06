@@ -13,6 +13,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       @sectionToShow = Number($.store.userGet("grading_show_only_section#{@options.context_id}")) || undefined
       @show_attendance = $.store.userGet("show_attendance_#{@options.context_code}") == 'true'
       @include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_#{@options.context_code}") == 'true'
+      $.subscribe('assignment_group_weights_changed', @buildRows)
       $.when(
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
         $.ajaxJSON( @options.sections_and_students_url, "GET", @sectionToShow && {sections: [@sectionToShow]})
@@ -20,12 +21,16 @@ I18n.scoped 'gradebook2', (I18n) ->
         @gotStudents.apply(this, studentsArgs)
         @initHeader()
 
-    gotAssignmentGroups: (assignment_groups) =>
-      @assignment_groups = {}
+    gotAssignmentGroups: (assignmentGroups) =>
+      @assignmentGroups = {}
       @assignments       = {}
-      for group in assignment_groups
+      
+      # purposely passing the @options and assignmentGroups by reference so it can update 
+      # an assigmentGroup's .group_weight and @options.group_weighting_scheme
+      new AssignmentGroupWeightsDialog { context: @options, assignmentGroups }
+      for group in assignmentGroups
         $.htmlEscapeValues(group)
-        @assignment_groups[group.id] = group
+        @assignmentGroups[group.id] = group
         for assignment in group.assignments
           $.htmlEscapeValues(assignment)
           assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
@@ -61,7 +66,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       !@sectionToShow || (student.section.id == @sectionToShow)
     # filter, sort, and build the dataset for slickgrid to read from, then force
     # a full redraw
-    buildRows: () ->
+    buildRows: =>
       @rows.length = 0
       sortables = {}
 
@@ -147,7 +152,7 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     calculateStudentGrade: (student) =>
       if student.loaded
-        result = INST.GradeCalculator.calculate(student.submissionsAsArray, @assignment_groups, 'percent')
+        result = INST.GradeCalculator.calculate(student.submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[if @include_ungraded_assignments then 'final' else 'current']
         student["total_grade"] = result[if @include_ungraded_assignments then 'final' else 'current']
@@ -419,7 +424,7 @@ I18n.scoped 'gradebook2', (I18n) ->
               .bind('gridready.render', => @gradeGrid.invalidate())
         @columns.push columnDef
 
-      for id, group of @assignment_groups
+      for id, group of @assignmentGroups
         html = "#{group.name}"
         html += "<div class='assignment-points-possible'>#{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: I18n.toPercentage(group.group_weight, precision: 0)}</div>" if group.group_weight?
 

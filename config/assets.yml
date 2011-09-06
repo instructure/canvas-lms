@@ -187,6 +187,7 @@ javascripts:
     - public/javascripts/jquery.ui.menu.inputmenu.js
     - public/javascripts/compiled/jquery.kylemenu.js
   gradebook2:
+    - public/javascripts/compiled/assignment_group_weights_dialog.js
     - public/javascripts/compiled/multi_grid.js
     - public/javascripts/compiled/grade_calculator.js
     - public/javascripts/compiled/gradebook2.js
@@ -364,6 +365,7 @@ stylesheets:
     - public/stylesheets/compiled/message_students.css
   gradebook2:
     - public/stylesheets/compiled/gradebook2.css
+    - public/stylesheets/compiled/assignment_group_weights_dialog.css
   attendance:
     - public/stylesheets/compiled/attendance.css
   quizzes:
