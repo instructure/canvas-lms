@@ -1,3 +1,13 @@
+canvas-lms (1.1-56) professional; urgency=low
+
+  * Package ref: 8505d23ae31e0d96016f358a65a7f38e11ab38b9
+  *
+  * [+80b904c] fix adding only users by login fixes #5523
+  * [+592c6c3] prioritize html over json in account index/show actions
+  * [+8505d23] fail gracefully for invalid SSHA passwords
+
+ -- JT Olds <jt@instructure.com>  Tue, 06 Sep 2011 13:24:04 -0600
+
 canvas-lms (1.1-55) professional; urgency=low
 
   * Package ref: cbd78cd6c53494ceacd41bd8c0f5f4d74f5f6f9e
