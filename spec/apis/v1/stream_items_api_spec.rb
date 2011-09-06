@@ -45,6 +45,7 @@ describe UsersController, :type => :integration do
       'title' => "value for title",
       'message' => 'value for message',
       'type' => 'DiscussionTopic',
+      'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
@@ -71,6 +72,7 @@ describe UsersController, :type => :integration do
       'title' => "value for title",
       'message' => 'value for message',
       'type' => 'Announcement',
+      'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
@@ -96,6 +98,7 @@ describe UsersController, :type => :integration do
       'id' => StreamItem.last.id,
       'conversation_id' => @conversation.id,
       'type' => 'Conversation',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'title' => nil,
@@ -129,10 +132,12 @@ describe UsersController, :type => :integration do
       'title' => "value for subject",
       'message' => 'value for body',
       'type' => 'Message',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
       'notification_category' => 'TestImmediately',
+      'url' => nil,
     }]
   end
 
@@ -152,6 +157,7 @@ describe UsersController, :type => :integration do
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
@@ -176,6 +182,7 @@ describe UsersController, :type => :integration do
       'title' => "hey",
       'message' => nil,
       'type' => 'Collaboration',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
     }]
@@ -196,6 +203,7 @@ describe UsersController, :type => :integration do
         'web_conference_id' => @conference.id,
         'title' => "myconf",
         'type' => 'WebConference',
+        'context_type' => nil,
         'message' => 'mydesc',
         'created_at' => StreamItem.last.created_at.as_json,
         'updated_at' => StreamItem.last.updated_at.as_json,
