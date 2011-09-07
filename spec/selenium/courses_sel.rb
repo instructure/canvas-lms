@@ -97,7 +97,11 @@ shared_examples_for "course selenium tests" do
     driver.find_element(:css, '.substitutions > .substitution').should be_displayed
 
     driver.find_element(:id, 'copy_context_form').submit
-    wait_for_animations
+    wait_for_ajaximations
+    
+    # since jobs aren't running
+    CourseImport.last.perform
+    
     keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
   end
 
@@ -109,9 +113,12 @@ shared_examples_for "course selenium tests" do
       driver.find_element(:css, "div#content form button[type=submit]").click
       wait_for_dom_ready
       driver.find_element(:id, 'copy_context_form').submit
-      wait_for_animations
+      wait_for_ajaximations
+      
+      CourseImport.last.perform
+      
       keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
-
+      
       @new_course = Course.last(:order => :id)
       get "/courses/#{@new_course.id}"
       driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")

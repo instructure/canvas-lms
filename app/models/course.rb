@@ -152,6 +152,7 @@ class Course < ActiveRecord::Base
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
   has_many :content_exports
+  has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
   attr_accessor :import_source
   
@@ -1300,9 +1301,9 @@ class Course < ActiveRecord::Base
   end
   
   
-  def merge_in(course, options={})
+  def merge_in(course, options = {}, import = nil)
     return [] if course == self
-    res = merge_into_course(course, options)
+    res = merge_into_course(course, options, import)
     course.course_sections.active.each do |section|
       if options[:all_sections] || options[section.asset_string.to_sym]
         section.move_to_course(self)
@@ -1684,8 +1685,7 @@ class Course < ActiveRecord::Base
   end
   
   attr_accessor :merge_mappings
-  def merge_into_course(course, options)
-    course_import = options[:import]
+  def merge_into_course(course, options, course_import = nil)
     @merge_mappings = {}
     @merge_results = []
     to_shift_dates = []
@@ -1915,8 +1915,6 @@ class Course < ActiveRecord::Base
     if course_import
       course_import.added_item_codes = added_items.map{|i| i.asset_string }
       course_import.log = merge_results
-      course_import.workflow_state = 'completed'
-      course_import.progress = 100
       course_import.save!
     end
     added_items.map{|i| i.asset_string }
