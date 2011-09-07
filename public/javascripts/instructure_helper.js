@@ -140,7 +140,7 @@ I18n.scoped('instructure', function(I18n) {
               var $this = $(this);
               // if you can't add the class .use-css-transitions-for-show-hide to your element, you can
               // add it to this selector to have it use css3 transitions.
-              if ($this.is('.use-css-transitions-for-show-hide, .webkit .ui-widget-overlay')) {
+              if ($this.is('.use-css-transitions-for-show-hide, .ui-widget-overlay')) {
                 var oldOpacityCssAttribute = this.style.opacity,
                     oldComputedOpacity = $this.css('opacity'),
                     newOpacity = (showHideOrRemove === 'hide' || showHideOrRemove === 'remove') ? 0 : (!oldComputedOpacity || oldComputedOpacity == "0" ? 1 : oldComputedOpacity);
@@ -148,6 +148,10 @@ I18n.scoped('instructure', function(I18n) {
                   this.style.opacity = 0;
                   previousFn.apply($this); //change out of display:none
                 }
+                
+                // things like '.ui-widget-overlay' may not already have this class,
+                // it is needed in the css to tell the browser to use the animation.
+                $this.addClass('use-css-transitions-for-show-hide');
                 $this.bind('transitionend oTransitionEnd webkitTransitionEnd', function(event){
                   if (event.originalEvent.propertyName === 'opacity') {
                     previousFn.apply($(this)); //change to display:none when we are hiding.

@@ -501,8 +501,8 @@
 
 
 .use-css-transitions-for-show-hide {
-  -webkit-transition: opacity 1.5s;
-  -moz-transition: opacity 1.5s;
-  -o-transition: opacity 1.5;
-  transition: opacity 1.5s;
+  -webkit-transition: opacity 0.5s;
+  -moz-transition: opacity 0.5s;
+  -o-transition: opacity 0.5;
+  transition: opacity 0.5s;
 }
