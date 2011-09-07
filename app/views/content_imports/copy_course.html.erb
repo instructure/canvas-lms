@@ -208,12 +208,28 @@
             <td><label for="copy_from_course"><%= before_label :select_course, "Or Select from the List" %></label></td>
             <td>
               <% if @possible_courses.length < 500 %>
-              <select style="font-size: 1.2em; width: 250px;" id="copy_from_course">
-                <option value="none"><%= t 'options.select_course', "[Select Course]" %></option>
-                <% @possible_courses.sort_by{|c| c.name || "zzzz"}.each do |course| %>
-                  <option value="<%= course.id %>"><%= course.name %></option>
-                <% end %>
-              </select>
+                <select style="font-size: 1.2em; width: 250px;" id="copy_from_course">
+                  <option value="none"><%= t 'options.select_course', "[Select Course]" %></option>
+                  <%
+                  term_map = @possible_courses.inject(Hash.new {|h, k| h[k] = [] }) {|h, c| h[c.enrollment_term] << c; h }
+                  term_names = term_map.keys.inject(Hash.new(0)) {|h, term| h[term.name] += 1; h}
+                  # sort by term start date (descending) and then by name
+                  term_map.keys.sort {|a,b|
+                    a.start_at == b.start_at ?
+                      a.name.try(:downcase) <=> b.name.try(:downcase) :
+                      (b.start_at || Time.at(0)) <=> (a.start_at || Time.at(0))
+                  }.each do |term| %>
+                    <% if term_names[term.name] > 1 %>
+                      <optgroup label="<%= t('term_with_account', '%{term_name} (%{account_name})', :term_name => term.name, :account_name => term.root_account.name) %>">
+                    <% else %>
+                      <optgroup label="<%= term.name %>">
+                    <% end %>
+                      <% term_map[term].sort_by {|c| c.name || "zzzz" }.each do |course| %>
+                        <option value="<%= course.id %>"><%= course.name %></option>
+                      <% end %>
+                    </optgroup>
+                  <% end %>
+                </select>
               <% end %>
             </td>
           </tr><tr>

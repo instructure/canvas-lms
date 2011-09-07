@@ -72,12 +72,26 @@ shared_examples_for "course selenium tests" do
     e.save!
     @second_course.reload
 
+    new_term = Account.default.enrollment_terms.create(:name => 'Test Term')
+    third_course = Course.create!(:name => 'third course', :enrollment_term => new_term)
+    e = third_course.enroll_teacher(@user)
+    e.workflow_state = 'active'
+    e.accept
+    e.save!
+
     get "/courses/#{@course.id}/details"
-    
+
     driver.find_element(:link, I18n.t('links.import','Import Content into this Course')).click
     driver.find_element(:css, '#content a.button').click
+
+    select_box = driver.find_element(:id, 'copy_from_course')
+    select_box.find_elements(:css, 'optgroup').length.should == 2
+    second_group = select_box.find_elements(:css, 'optgroup').last
+    second_group.find_elements(:css, 'option').length.should == 1
+    second_group.attribute('label').should == 'Test Term'
+
     option_value = find_option_value(:id, 'copy_from_course', 'second course')
-    driver.find_element(:css, '#copy_from_course > option[value="'+option_value+'"]').click
+    driver.find_element(:css, '#copy_from_course option[value="'+option_value+'"]').click
     driver.find_element(:css, '#content form').submit
 
     #modify course dates
