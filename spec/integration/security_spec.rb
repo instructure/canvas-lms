@@ -560,6 +560,15 @@ describe "security" do
         html = Nokogiri::HTML(response.body)
         html.css('#tab-users').should_not be_empty
         html.css('.add_users_link').should_not be_empty
+
+        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.save!
+
+        # Should still be able to see People tab even if disabled, because we can
+        # manage stuff in it
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /People/
       end
 
       it 'view_all_grades' do
@@ -627,12 +636,18 @@ describe "security" do
         response.body.should_not match /Export this Course/
 
         add_permission :read_course_content
+        add_permission :read_roster
 
         get "/courses/#{@course.id}"
         response.should be_success
+        response.body.should match /People/
+
+        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.save!
 
         get "/courses/#{@course.id}/assignments"
         response.should be_success
+        response.body.should_not match /People/
 
         get "/courses/#{@course.id}/assignments/syllabus"
         response.should be_success

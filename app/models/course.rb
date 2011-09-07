@@ -2216,23 +2216,32 @@ class Course < ActiveRecord::Base
         tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
       end
-      tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read, :moderate_forum, :post_to_forum).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
-    end
-
-    if !user || !self.grants_right?(user, nil, :manage_content)
-      # remove some tabs for logged-out users or non-students
-      if self.grants_right?(user, nil, :read_as_admin)
-        tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) } 
-      elsif !self.grants_right?(user, nil, :participate_as_student)
-        tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } 
+      if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
+        tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
+        tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
+        tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
       end
+      tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
+      tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
+      tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_rights?(user, opts[:session], :manage_students, :manage_admin_users).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
+      tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :managed_files)
+      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read, :moderate_forum, :post_to_forum).values.any?
+      tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
+      tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
 
-      # remove hidden tabs from students
-      tabs.delete_if {|t| t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused]) }
+      if !user || !self.grants_right?(user, nil, :manage_content)
+        # remove some tabs for logged-out users or non-students
+        if self.grants_right?(user, nil, :read_as_admin)
+          tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) }
+        elsif !self.grants_right?(user, nil, :participate_as_student)
+          tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) }
+        end
+
+        # remove hidden tabs from students
+        tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
+      end
     end
     # Uncommenting these lines will always put hidden links after visible links
     # tabs.each_with_index{|t, i| t[:sort_index] = i }
