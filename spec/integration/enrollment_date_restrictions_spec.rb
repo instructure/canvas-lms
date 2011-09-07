@@ -116,4 +116,20 @@ describe "enrollment_date_restrictions" do
     response.body.should match /Completed/
     response.body.should match /Active/
   end
+
+  it "should not included date-inactive courses when searching for pertinent contexts" do
+    course_with_teacher(:active_all => 1)
+    student_in_course(:active_all => 1)
+    user_session(@student)
+
+    @course.start_at = 2.days.from_now
+    @course.conclude_at = 4.days.from_now
+    @course.restrict_enrollments_to_course_dates = true
+    @course.save!
+    @enrollment.state_based_on_date.should == :inactive
+
+    get '/calendar'
+    html = Nokogiri::HTML(response.body)
+    html.css("#group_course_#{@course.id}").length.should == 0
+  end
 end

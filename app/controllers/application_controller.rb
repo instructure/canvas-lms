@@ -308,14 +308,14 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.courses.active
+      courses = @context.current_enrollments.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
       groups = include_groups ? @context.groups.active : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        courses = course_ids.empty? ? [] : courses.find_all_by_id(course_ids)
+        courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
         group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
         groups = group_ids.empty? ? [] : groups.find_all_by_id(group_ids) if include_groups
       end
