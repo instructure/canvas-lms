@@ -54,6 +54,33 @@ shared_examples_for "discussions selenium tests" do
     driver.find_element(:css, '#podcast_link_holder .feed').should be_displayed
 
   end
+
+  it "should display the current username when making a side comment" do
+    course_with_teacher_logged_in
+
+    topic = @course.discussion_topics.create!
+    entry = topic.discussion_entries.create!
+
+    get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+
+    form = keep_trying_until {
+      find_with_jquery('.communication_sub_message .add_entry_link:visible').click
+      find_with_jquery('.add_sub_message_form:visible')
+    }
+
+    tiny_frame = wait_for_tiny(form.find_element(:css, 'textarea'))
+    in_frame tiny_frame["id"] do
+      driver.find_element(:id, 'tinymce').send_keys("My side comment!")
+    end
+    form.find_element(:css, '.submit_button').click
+    wait_for_ajax_requests
+    wait_for_animations
+
+    entry.discussion_subentries.should_not be_empty
+
+    find_with_jquery(".communication_sub_message:visible .user_name").text.should == @user.name
+
+  end
 end
 
 describe "course Windows-Firefox-Tests" do
