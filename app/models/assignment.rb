@@ -944,7 +944,7 @@ class Assignment < ActiveRecord::Base
             :attachments => {:except => :thumbnail_url},
             :rubric_assessment => {}
           },
-          :methods => [:scribdable?, :conversion_status, :scribd_doc, :submission_history]
+          :methods => [:scribdable?, :scribd_doc, :submission_history]
         },
         :rubric_association => {
           :except => {}

@@ -1021,9 +1021,9 @@ class Attachment < ActiveRecord::Base
     self.submit_to_scribd!
   end
   
-  # Should be one of :processing, :displayable, :done, :error.  :done
-  # should mean indexed, :displayable is good enough for showing a user
-  # the iPaper.  I added a state, :not_submitted, for any attachment that
+  # Should be one of "PROCESSING", "DISPLAYABLE", "DONE", "ERROR".  "DONE"
+  # should mean indexed, "DISPLAYABLE" is good enough for showing a user
+  # the iPaper.  I added a state, "NOT SUBMITTED", for any attachment that
   # hasn't been submitted, regardless of whether it should be.  As long as
   # we go through the submit_to_scribd! gateway, we'll be fine.
   def conversion_status
