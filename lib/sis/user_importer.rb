@@ -160,6 +160,16 @@ module SIS
                     rescue => e
                       add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
                     end
+                  elsif row['status'] =~ /active/i
+                    if comm.user_id != pseudo.user_id
+                      add_warning(csv, "E-mail address #{row['email']} for user #{row['login_id']} is already claimed; ignoring")
+                    else
+                      pseudo.sis_communication_channel.destroy if pseudo.sis_communication_channel != comm
+                      pseudo.sis_communication_channel = comm
+                      pseudo.communication_channel_id = comm.id
+                      comm.do_delayed_jobs_immediately = true
+                      comm.save_without_broadcasting if comm.changed?
+                    end
                   end
                 end
 

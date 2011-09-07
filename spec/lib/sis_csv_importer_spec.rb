@@ -749,7 +749,7 @@ describe SIS::SisCsv do
         "user_2,user2,User,Dos,user@example.com,active"
       )
       importer.errors.should == []
-      importer.warnings.should == []
+      importer.warnings.map(&:last).should == ['E-mail address user@example.com for user user2 is already claimed; ignoring']
       user1 = Pseudonym.find_by_unique_id('user1').user
       user2 = Pseudonym.find_by_unique_id('user2').user
       user1.should_not == user2
@@ -833,6 +833,37 @@ describe SIS::SisCsv do
       user.should_not be_nil
       p = user.pseudonyms.first
       p.unique_id.should == "user2"
+    end
+
+    it "should use an existing communication channel" do
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+      )
+      p = Pseudonym.find_by_unique_id('user1')
+      user1 = p.user
+      user1.last_name.should == "Uno"
+      user1.pseudonyms.count.should == 1
+      p.communication_channel_id.should_not be_nil
+      user1.communication_channels.count.should == 1
+      user1.communication_channels.first.path.should == 'user1@example.com'
+      p.sis_communication_channel_id.should == p.communication_channel_id
+      user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+
+      # change to user2@example.com; because user1@example.com was sis created, it should disappear
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user2@example.com,active"
+      )
+      p.reload
+      user1.reload
+      user1.pseudonyms.count.should == 1
+      user1.communication_channels.count.should == 2
+      user1.communication_channels.unretired.count.should == 1
+      p.communication_channel_id.should_not be_nil
+      user1.communication_channels.unretired.first.path.should == 'user2@example.com'
+      p.sis_communication_channel_id.should == p.communication_channel_id
+      p.communication_channel_id.should == user1.communication_channels.unretired.first.id
     end
 
   end
