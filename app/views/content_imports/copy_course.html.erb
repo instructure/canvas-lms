@@ -144,7 +144,7 @@
           <div class="clear"></div>
         </div>
         <div>
-          <div style="margin-bottom: 5px margin-top: 10px;"><%= mt 'labels.dates_range', "**%{course}** dates range", :course => @copy_context.name %></div>
+          <div style="margin-bottom: 5px margin-top: 10px;"><%= mt 'labels.dates_range', "**%{course}** dates range", :course => @context.name %></div>
           <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
                 :start_date => capture { %>
             <div style="float: left;"><%= text_field :copy, :new_start_date, :value => date_string(@context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
