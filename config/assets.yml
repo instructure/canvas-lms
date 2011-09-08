@@ -61,6 +61,19 @@ javascripts:
     - public/javascripts/scribd.view.js
     - public/javascripts/swfobject/swfobject.js
     - public/javascripts/reminders.js
+    - public/javascripts/jquery.instructure_jquery_patches.js
+    - public/javascripts/jquery.instructure_misc_helpers.js
+    - public/javascripts/jquery.instructure_misc_plugins.js
+    - public/javascripts/jquery.instructure_date_and_time.js
+    - public/javascripts/jquery.instructure_forms.js
+    - public/javascripts/jquery.ajaxJSON.js
+    - public/javascripts/jquery.doc_previews.js
+    - public/javascripts/jquery.dropdownList.js
+    - public/javascripts/jquery.keycodes.js
+    - public/javascripts/jquery.loadingImg.js
+    - public/javascripts/jquery.rails_flash_notifications.js
+    - public/javascripts/jquery.scrollToVisible.js
+    - public/javascripts/jquery.templateData.js
     - public/javascripts/instructure_helper.js
     - public/javascripts/media_comments.js
     - public/javascripts/tinymce.editor_box.js
