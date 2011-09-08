@@ -1,3 +1,14 @@
+canvas-lms (1.1-57) professional; urgency=low
+
+  * Package ref: 2e00d89c45c6fbdd974c691b447cad9b09f714a9
+  *
+  * [+328cb8b] run course copy asynchronously in a job; fixes #5422
+  * [+0f85078] fix so google docs can preview an attachment
+  * [+939a5c6] fix viewing of imports list fixes #5561
+  * [+2e00d89] support funky characters in username/passwords for http url parsing
+
+ -- JT Olds <jt@instructure.com>  Thu, 08 Sep 2011 14:39:56 -0600
+
 canvas-lms (1.1-56) professional; urgency=low
 
   * Package ref: 8505d23ae31e0d96016f358a65a7f38e11ab38b9
