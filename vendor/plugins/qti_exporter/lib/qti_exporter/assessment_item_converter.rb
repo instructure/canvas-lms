@@ -82,7 +82,7 @@ class AssessmentItemConverter
       if @migration_type and UNSUPPORTED_TYPES.member?(@migration_type)
         @question[:question_type] = @migration_type
         @question[:unsupported] = true
-      elsif @migration_type != 'text_only_question'
+      elsif !%w(text_only_question).include?(@migration_type)
         self.parse_question_data
       end
     rescue => e
@@ -94,6 +94,11 @@ class AssessmentItemConverter
     
     @question
   end
+
+  QUESTION_TYPE_MAPPING = {
+    /matching/i => 'matching_question',
+    'textInformation' => 'text_only_question',
+  }
   
   def parse_instructure_metadata
     if meta = @doc.at_css('instructureMetadata')
@@ -132,10 +137,11 @@ class AssessmentItemConverter
       end
       if type =  get_node_att(meta, 'instructureField[name=question_type]', 'value')
         @migration_type = type
+        QUESTION_TYPE_MAPPING.each do |k,v|
+          @migration_type = v if k === @migration_type
+        end
         if AssessmentQuestion::ALL_QUESTION_TYPES.member?(@migration_type)
           @question[:question_type] = @migration_type
-        elsif @migration_type =~ /matching/i
-          @question[:question_type] = 'matching_question'
         end
       end
     end
