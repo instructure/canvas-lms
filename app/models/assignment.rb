@@ -105,10 +105,6 @@ class Assignment < ActiveRecord::Base
                 :remove_assignment_updated_flag
                 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review 
-    # I was going to be smart and get rid of any existing job, 
-    # but i figured it wasn't worth the extra column needed to keep track of a auto_peer_review_assigner_job_id
-    # or the extra code needed.  The way this is now, it schedules a new job evertime this assignment gets saved 
-    # (if it is supposed to be auto_peer_reviewed)
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
       # handle if it has already come due, but has not yet been auto_peer_reviewed
       if due_at && due_at <= Time.now
@@ -116,7 +112,7 @@ class Assignment < ActiveRecord::Base
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
           :run_at => due_at,
-          :strand => "assignment:auto_peer_review:#{self.id}"
+          :singleton => "assignment:auto_peer_review:#{self.id}"
         })
       end
     end
