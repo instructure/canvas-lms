@@ -118,11 +118,11 @@ ActionController::Routing::Routes.draw do |map|
     course.import_upload 'imports/upload', :controller => 'content_imports', :action => 'migrate_content_upload'
     course.import_s3_success 'imports/s3_success', :controller => 'content_imports', :action => 'migrate_content_s3_success'
     course.import_copy_content 'imports/copy', :controller => 'content_imports', :action => 'copy_course_content', :conditions => {:method => :post}
-    course.import_copy_status 'imports/:id', :controller => 'content_imports', :action => 'copy_course_status', :conditions => {:method => :get}
     course.import_migrate_choose 'imports/migrate/:id', :controller => 'content_imports', :action => 'migrate_content_choose'
     course.import_migrate_execute 'imports/migrate/:id/execute', :controller => 'content_imports', :action => 'migrate_content_execute'
     course.import_review 'imports/review', :controller => 'content_imports', :action => 'review'
     course.import_list 'imports/list', :controller => 'content_imports', :action => 'index'
+    course.import_copy_status 'imports/:id', :controller => 'content_imports', :action => 'copy_course_status', :conditions => {:method => :get}
     course.resource :gradebook_upload
     course.resources :notifications, :only => [:index, :destroy, :update], :collection => {:clear => :post}
     course.grades "grades", :controller => 'gradebooks', :action => 'grade_summary', :id => nil
