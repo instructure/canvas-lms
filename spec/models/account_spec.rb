@@ -261,6 +261,12 @@ describe Account do
       @a.disable_service(:twitter)
       @a.allowed_services.should be_nil
     end
+
+    it "should not wipe out services that are substrings of each other" do
+      @a.disable_service('google_docs_previews')
+      @a.disable_service('google_docs')
+      @a.allowed_services.should == '-google_docs_previews,-google_docs'
+    end
   end
   
   context "settings=" do

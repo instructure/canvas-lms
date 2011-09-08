@@ -935,10 +935,10 @@ class Account < ActiveRecord::Base
     allowed_service_names = (self.allowed_services || "").split(",").compact
     if allowed_service_names.count > 0 and not [ '+', '-' ].member?(allowed_service_names[0][0,1])
       # This account has a hard-coded list of services, so handle accordingly
-      allowed_service_names.reject! { |flag| flag.match(service.to_s) }
+      allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
       allowed_service_names << service if enable
     else
-      allowed_service_names.reject! { |flag| flag.match(service.to_s) }
+      allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
       if enable
         # only enable if it is not enabled by default
         allowed_service_names << "+#{service}" unless Account.default_allowable_services[service]
