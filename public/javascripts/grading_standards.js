@@ -137,10 +137,7 @@ I18n.scoped('grading_standards', function(I18n){
               $standard.removeClass('blank');
               for(var jdx = 0; jdx < standard.data.length; jdx++) {
                 var list = standard.data[jdx];
-                var row = {name: list[0], value: Math.round(list[1] * 100), next_value: 0};
-                if(standard.data[jdx + 1]) {
-                  row.next_value = Math.round(standard.data[jdx + 1][1] * 100) + 1;
-                }
+                var row = {name: list[0], value: (jdx == 0 ? 100 : '< ' + standard.data[jdx - 1][1] * 100), next_value: list[1] * 100};
                 var $row = $standard.find(".details_row.blank:first").clone(true);
                 $row.removeClass('blank');
                 $row.fillTemplateData({data: row});
@@ -166,7 +163,7 @@ I18n.scoped('grading_standards', function(I18n){
       var data = [];
       $(this).parents(".grading_standard_brief").find(".details_row:not(.blank)").each(function() {
         var name = $(this).find(".name").text();
-        var val = parseInt($(this).find(".value").text(), 10) / 100.0;
+        var val = parseFloat($(this).find(".next_value").text()) / 100.0;
         if(isNaN(val)) { val = ""; }
         data.push([name, val]);
       });
