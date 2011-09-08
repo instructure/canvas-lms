@@ -19,7 +19,11 @@
 class ErrorsController < ApplicationController
   PER_PAGE = 20
 
-  before_filter :require_user, :require_site_admin
+  before_filter :require_view_error_reports
+  def require_view_error_reports
+    require_site_admin_with_permission(:view_error_reports)
+  end
+
   def index
     params[:page] = params[:page].to_i > 0 ? params[:page].to_i : 1
     @reports = ErrorReport
