@@ -3444,6 +3444,14 @@ I18n.scoped('instructure', function(I18n) {
           scribdDoc.addEventListener('iPaperReady', opts.ready);
         }
         scribdDoc.write( id );
+
+        // this is a hack so that the <embed> doesn't throw a bunch of these errors after it is .remove()d:
+        // Uncaught TypeError: Object #<HTMLEmbedElement> has no method 'keyboardShortcut(Up/Down)'
+        // They come from the actionscript running in their viewer:
+        // see: http://dragstudio.com/app/ScribdViewer/javascript/_-0j.as
+        // and http://groups.google.com/group/scribd-platform-developers/msg/46a4f12db73d02d8
+        this.childNodes[0].keyboardShortcutDown = this.childNodes[0].keyboardShortcutUp = function(){};
+
         tellAppIViewedThisInline();
       } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){ 
         // else if it's something google docs preview can handle and we can get a public url to this document.
