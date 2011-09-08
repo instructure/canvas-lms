@@ -226,7 +226,9 @@ class CoursesController < ApplicationController
   # For full documentation, see the API documentation for the user activity stream.
   def activity_stream
     get_context
-    render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+    if authorized_action(@context, @current_user, :read)
+      render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+    end
   end
 
   def destroy

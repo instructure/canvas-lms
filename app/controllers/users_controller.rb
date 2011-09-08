@@ -326,7 +326,11 @@ class UsersController < ApplicationController
   #     'collaboration_id': 1234
   #   }
   def activity_stream
-    render :json => @current_user.stream_items.map { |i| stream_item_json(i) }
+    if @current_user
+      render :json => @current_user.stream_items.map { |i| stream_item_json(i) }
+    else
+      render_unauthorized_action
+    end
   end
 
   def manageable_courses

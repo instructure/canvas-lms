@@ -23,6 +23,18 @@ describe UsersController, :type => :integration do
     course_with_student(:active_all => true)
   end
 
+  it "should check for auth" do
+    get("/api/v1/users/activity_stream")
+    response.status.should == '401 Unauthorized'
+    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+
+    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    raw_api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream",
+                :controller => "courses", :action => "activity_stream", :format => "json", :course_id => @course.to_param)
+    response.status.should == '401 Unauthorized'
+    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+  end
+
   it "should return the activity stream" do
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
