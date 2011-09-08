@@ -266,7 +266,7 @@ class AssessmentItemConverter
           opts[:custom_type] = 'canvas_matching'
         elsif type == 'matching'
           opts[:custom_type] = 'respondus_matching'
-        elsif type =~ /fill_in_multiple_blanks_question|fill in the blanks/i
+        elsif type =~ /fillInMultiple|fill_in_multiple_blanks_question|fill in the blanks/i
           opts[:interaction_type] = 'fill_in_multiple_blanks_question'
         elsif type == 'multiple_dropdowns_question'
           opts[:interaction_type] = 'multiple_dropdowns_question'
