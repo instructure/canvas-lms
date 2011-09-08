@@ -98,6 +98,7 @@ class AssessmentItemConverter
   QUESTION_TYPE_MAPPING = {
     /matching/i => 'matching_question',
     'textInformation' => 'text_only_question',
+    'trueFalse' => 'true_false_question',
   }
   
   def parse_instructure_metadata
