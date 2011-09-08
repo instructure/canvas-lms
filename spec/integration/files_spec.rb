@@ -63,6 +63,29 @@ describe FilesController do
     # ensure that the user wasn't logged in by the normal means
     controller.instance_variable_get(:@current_user).should be_nil
   end
+  
+  it "should allow access to non-logged-in user agent if it has the right :verifier (lets google docs preview submissions in speedGrader)" do
+    submission_model
+    @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
+    @submission.save!
+    HostUrl.stub!(:file_host).and_return('files-test.host')
+    get "http://test.host/users/#{@submission.user.id}/files/#{@submission.attachment.id}/download", :verifier => @submission.attachment.uuid
+    
+    response.should be_redirect
+    uri = URI.parse response['Location']
+    qs = Rack::Utils.parse_nested_query(uri.query)
+    uri.host.should == 'files-test.host'
+    uri.path.should == "/files/#{@submission.attachment.id}/download"
+    qs['verifier'].should == @submission.attachment.uuid
+    location = response['Location']
+    reset!
+
+    get location
+    response.should be_success
+    response.content_type.should == 'image/png'
+    controller.instance_variable_get(:@current_user).should be_nil
+    controller.instance_variable_get(:@context).should be_nil
+  end
 
   it "shouldn't use relative urls for safefiles in other contexts" do
     course_with_teacher_logged_in(:active_all => true)

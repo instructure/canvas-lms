@@ -248,32 +248,42 @@ $(document).ready(function() {
   $("body").append($frame.hide());
   $("#copy_context_form").attr('target', 'copy_course_target');
   $(".copy_progress").progressbar();
-  $("#copy_context_form").submit(function() {
-    $("#copy_context_form .submit_button").text(I18n.t('messages.copying', "Copying... this will take a few minutes")).attr('disabled', true);
-    $(".progress_bar_holder").show();
-    var checkup = function() {
-      var url = location.href;
-      $.ajaxJSON(url, 'GET', {}, function(data) {
-        var course_import = data.course_import;
-        if(course_import) { 
-          $(".copy_progress").progressbar('option', 'value', course_import.progress);
-        }
-        if(course_import && course_import.workflow_state == 'completed') {
-          location.href = location.href + "&import_id=" + course_import.id;
-        } else if(course_import && course_import.workflow_state == 'failed') {
-          var message = I18n.t('errors.failed', "Course Import failed with the following error:") + " \"import_" + course_import.id + "\"";
-          $.flashError(message);
-          $(".progress_bar_holder").after("<b>" + message + "</b>");
-        } else {
-          setTimeout(checkup, 1500);
-        }
-      }, function() {
-        setTimeout(checkup, 3000);
-      });
-    };
-    setTimeout(checkup, 5000);
-    return true;
-  });
+
+  var checkup = function(url) {
+    $.ajaxJSON(url, 'GET', {}, function(data) {
+      var course_import = data.course_import;
+      if(course_import) {
+        $(".copy_progress").progressbar('option', 'value', course_import.progress);
+      }
+      if(course_import && course_import.workflow_state == 'completed') {
+        location.href = location.href + "&import_id=" + course_import.id;
+      } else if(course_import && course_import.workflow_state == 'failed') {
+        var message = I18n.t('errors.failed', "Course Import failed with the following error:") + " \"import_" + course_import.id + "\"";
+        $.flashError(message);
+        $(".progress_bar_holder").after("<b>" + message + "</b>");
+      } else {
+        setTimeout(function() {
+          checkup(url);
+        }, 1500);
+      }
+    }, function() {
+      setTimeout(function() {
+        checkup(url);
+      }, 3000);
+    });
+  };
+
+  $("#copy_context_form").formSubmit({
+    beforeSubmit: function(data) {
+      $("#copy_context_form .submit_button").text(I18n.t('messages.copying', "Copying... this will take a few minutes")).attr('disabled', true);
+      $(".progress_bar_holder").show();
+    },
+    success: function(data) {
+      setTimeout(function() {
+        checkup(data.course_import.check_url);
+      }, 5000);
+    }
+  })
   $("#copy_entries_dialog button").click(function() {
     var $checkbox = $("#copy_all_topics");
     var include_secondaries = $(this).hasClass('include');

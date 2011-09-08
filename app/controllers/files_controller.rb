@@ -170,7 +170,7 @@ class FilesController < ApplicationController
       @skip_crumb = true
     end
     params[:download] ||= params[:preview]
-    @context = UserProfile.new(@context) if @context == @current_user
+    @context = UserProfile.new(@context) if (@context == @current_user) && @current_user
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
       # before telling them it's deleted, try to find another active attachment with the same full path

@@ -36,7 +36,7 @@ class SSLCommon
       url = URI.parse(url)
       http = self.get_http_conn(url.host, url.port, url.scheme.downcase == 'https')
       req = Net::HTTP::Post.new(url.request_uri, headers)
-      req.basic_auth url.user, url.password if url.user
+      req.basic_auth URI.unescape(url.user || ""), URI.unescape(url.password || "") if url.user
       req.form_data = form_data if form_data
       http.start {|http| http.request(req, payload) }
     end

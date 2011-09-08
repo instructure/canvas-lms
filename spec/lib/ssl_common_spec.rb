@@ -33,6 +33,20 @@ describe SSLCommon do
         "somedata"]
   end
 
+  it "should work with http basic auth, username and password, with encoded characters" do
+    server, server_thread, post_lines = start_test_http_server
+    SSLCommon.post_data("http://theusername%40theuseremail.tld:thepassword@localhost:#{server.addr[1]}/endpoint",
+        "somedata", "application/x-jt-is-so-cool")
+    server_thread.join
+    post_lines.should == [
+        "POST /endpoint HTTP/1.1",
+        "Accept: */*",
+        "Content-Type: application/x-jt-is-so-cool",
+        "Authorization: Basic #{Base64.encode64("theusername@theuseremail.tld:thepassword").strip}",
+        "",
+        "somedata"]
+  end
+
   it "should work with http basic auth, just username" do
     server, server_thread, post_lines = start_test_http_server
     SSLCommon.post_data("http://theusername@localhost:#{server.addr[1]}/endpoint",
