@@ -368,4 +368,8 @@ class Group < ActiveRecord::Base
     context.imported_migration_items << item
     item
   end
+
+  def allow_media_comments?
+    true
+  end
 end
