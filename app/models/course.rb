@@ -945,6 +945,11 @@ class Course < ActiveRecord::Base
     self.account.account_chain
   end
   
+  def account_chain_ids
+    account_chain.map(&:id)
+  end
+  memoize :account_chain_ids
+  
   def institution_name
     return self.root_account.name if self.root_account_id != Account.default.id
     return (self.account || self.root_account).name

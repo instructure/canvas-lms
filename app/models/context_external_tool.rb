@@ -39,7 +39,7 @@ class ContextExternalTool < ActiveRecord::Base
   def custom_fields=(hash)
     settings[:custom_fields] ||= {}
     hash.each do |key, val|
-      settings[:custom_fields][key] = val if key.match(/\Acustom_/)
+      settings[:custom_fields][key] = val.to_s
     end
   end
   
@@ -176,6 +176,18 @@ class ContextExternalTool < ActiveRecord::Base
       if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
         item = import_from_migration(tool, migration.context)
         migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
+      end
+    end
+  end
+  
+  def set_custom_fields(hash)
+    fields = settings[:custom_fields]
+    (fields || {}).each do |key, val|
+      key = key.gsub(/[^\w]/, '_').downcase
+      if key.match(/^custom_/)
+        hash[key] = val
+      else
+        hash["custom_#{key}"] = val
       end
     end
   end

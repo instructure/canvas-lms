@@ -1027,22 +1027,28 @@ class User < ActiveRecord::Base
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
   
-  def lti_role_types
-    memberships = current_enrollments.uniq + account_users.uniq
+  def lti_role_types(context=nil)
+    memberships = []
+    if context.is_a?(Course)
+      memberships += current_enrollments.find_all_by_course_id(context.id).uniq
+    end
+    if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
+      memberships += account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
+    end
     memberships.map{|membership|
       case membership
       when StudentEnrollment
-        'Student'
+        'Learner'
       when TeacherEnrollment
         'Instructor'
       when TaEnrollment
         'Instructor'
       when ObserverEnrollment
-        'Observer'
+        'urn:lti:instrole:ims/lis/Observer'
       when AccountUser
-        'AccountAdmin'
+        'urn:lti:instrole:ims/lis/Administrator'
       else
-        'Observer'
+        'urn:lti:instrole:ims/lis/Observer'
       end
     }.uniq
   end

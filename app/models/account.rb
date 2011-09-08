@@ -388,6 +388,11 @@ class Account < ActiveRecord::Base
     res.compact
   end
   
+  def account_chain_ids(opts={})
+    account_chain(opts).map(&:id)
+  end
+  memoize :account_chain_ids
+  
   def all_page_views
     PageView.of_account(self)
   end
