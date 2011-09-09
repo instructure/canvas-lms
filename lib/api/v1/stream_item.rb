@@ -86,6 +86,13 @@ module Api::V1::StreamItem
         hash['title'] = data.assignment.try(:title)
         hash['grade'] = data.grade
         hash['score'] = data.score
+        hash['submission_comments'] = data.submission_comments.map do |comment|
+          {
+            'body' => comment.formatted_body,
+            'user_name' => comment.user_short_name,
+            'user_id' => comment.author_id,
+          }
+        end unless data.submission_comments.blank?
         hash['assignment'] = {
           'title' => hash['title'],
           'id' => data.assignment.try(:id),

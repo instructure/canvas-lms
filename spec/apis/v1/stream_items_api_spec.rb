@@ -153,7 +153,7 @@ describe UsersController, :type => :integration do
     }]
   end
 
-  it "should format Submission" do
+  it "should format graded Submission with comments" do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
@@ -180,6 +180,59 @@ describe UsersController, :type => :integration do
         'id' => @assignment.id,
         'points_possible' => 14.2,
       },
+      
+      'submission_comments' => [{
+        'body' => '<p>c1</p>',
+        'user_name' => 'teacher',
+        'user_id' => @teacher.id,
+      },
+      {
+        'body' => '<p>c2</p>',
+        'user_name' => 'User',
+        'user_id' => @user.id,
+      },],
+      'course_id' => @course.id,
+    }]
+  end
+  
+  it "should format ungraded Submission with comments" do
+    @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
+    @teacher = User.create!(:name => 'teacher')
+    @course.enroll_teacher(@teacher)
+    @sub = @assignment.grade_student(@user, { :grade => nil }).first
+    @sub.workflow_state = 'submitted'
+    @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @user.id)
+    @sub.submission_comments.create!(:comment => 'c2', :author => @user, :recipient_id => @teacher.id)
+    @sub.save!
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == [{
+      'id' => StreamItem.last.id,
+      'title' => "assignment 1",
+      'message' => nil,
+      'type' => 'Submission',
+      'context_type' => nil,
+      'created_at' => StreamItem.last.created_at.as_json,
+      'updated_at' => StreamItem.last.updated_at.as_json,
+      'grade' => nil,
+      'score' => nil,
+
+      'assignment' => {
+        'title' => 'assignment 1',
+        'id' => @assignment.id,
+        'points_possible' => 14.2,
+      },
+      
+      'submission_comments' => [{
+        'body' => '<p>c1</p>',
+        'user_name' => 'teacher',
+        'user_id' => @teacher.id,
+      },
+      {
+        'body' => '<p>c2</p>',
+        'user_name' => 'User',
+        'user_id' => @user.id,
+      },],
       'course_id' => @course.id,
     }]
   end
