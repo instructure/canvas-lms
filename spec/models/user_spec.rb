@@ -424,6 +424,10 @@ describe User do
       messageable_users = @student.messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
+
+      messageable_users = @student.messageable_users(:context => "course_#{@course.id}").map(&:id)
+      messageable_users.should include @this_section_user.id
+      messageable_users.should_not include @other_section_user.id
     end
 
     it "should include users from all sections if visibility is not limited to sections" do

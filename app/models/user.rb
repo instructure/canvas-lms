@@ -1672,7 +1672,7 @@ class User < ActiveRecord::Base
         end
       end
       full_course_ids &= limited_course_ids
-      section_ids = section_id_hash.values_at(limited_course_ids).flatten.compact
+      section_ids = section_id_hash.values_at(*limited_course_ids).flatten.compact
       restricted_course_hash.delete_if{|course_id, ids| !limited_course_ids.include?(course_id)}
       group_ids &= limited_group_ids
     else
