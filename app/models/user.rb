@@ -43,6 +43,8 @@ class User < ActiveRecord::Base
   has_many :all_courses, :source => :course, :through => :enrollments  
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
+  has_many :current_group_memberships, :include => :group, :class_name => 'GroupMembership', :conditions => "group_memberships.workflow_state = 'accepted'"
+  has_many :current_groups, :through => :current_group_memberships, :source => :group, :conditions => "groups.workflow_state != 'deleted'"
   has_many :user_account_associations
   has_many :associated_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth'
   has_many :associated_root_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth', :conditions => 'accounts.parent_account_id IS NULL'
@@ -1650,15 +1652,61 @@ class User < ActiveRecord::Base
     end
   end
 
+  def messageable_groups
+    group_visibility = group_membership_visibility
+    Group.find_all_by_id(visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 } + [0])
+  end
+
+  def visible_group_ids
+    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.hour) do
+      (courses + concluded_courses.recently_ended).inject(self.current_groups) { |groups, course|
+        groups | course.groups.active
+      }.map(&:id)
+    end
+  end
+
+  def group_membership_visibility
+    Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.hour) do
+      course_visibility = enrollment_visibility
+      own_group_ids = current_groups.map(&:id)
+
+      full_group_ids = []
+      section_id_hash = {}
+      user_counts = {}
+
+      if visible_group_ids.present?
+        Group.find_all_by_id(visible_group_ids).each do |group|
+          if own_group_ids.include?(group.id) || group.context_type == 'Course' && course_visibility[:full_course_ids].include?(group.context_id)
+            full_group_ids << group.id
+            user_counts[group.id] = group.users.size
+          elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
+            section_id_hash[group.id] = sections
+            conditions = {:user_id => group.group_memberships.map(&:user_id), :course_section_id => sections}
+            user_counts[group.id] = conditions[:user_id].present? ?
+                                      group.context.enrollments.scoped(:conditions => self.class.reflections[:current_and_invited_enrollments].options[:conditions]).scoped(:conditions => conditions).size +
+                                      group.context.enrollments.scoped(:conditions => self.class.reflections[:concluded_enrollments].options[:conditions]).scoped(:conditions => conditions).size :
+                                    0
+          end
+        end
+      end
+      {:full_group_ids => full_group_ids,
+       :section_id_hash => section_id_hash,
+       :user_counts => user_counts
+      }
+    end
+  end
+
   MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
   def messageable_users(options = {})
-    hash = enrollment_visibility
-    full_course_ids = hash[:full_course_ids]
-    section_id_hash = hash[:section_id_hash]
-    restricted_course_hash = hash[:restricted_course_hash]
+    course_hash = enrollment_visibility
+    full_course_ids = course_hash[:full_course_ids]
+    restricted_course_hash = course_hash[:restricted_course_hash]
 
-    group_ids = groups.map(&:id)
+    group_hash = group_membership_visibility
+    full_group_ids = group_hash[:full_group_ids]
+    group_section_ids = []
+
     account_ids = []
 
     if options[:context]
@@ -1672,11 +1720,12 @@ class User < ActiveRecord::Base
         end
       end
       full_course_ids &= limited_course_ids
-      section_ids = section_id_hash.values_at(*limited_course_ids).flatten.compact
+      course_section_ids = course_hash[:section_id_hash].values_at(*limited_course_ids).flatten.compact
+      group_section_ids = group_hash[:section_id_hash].values_at(*limited_group_ids).flatten.compact
       restricted_course_hash.delete_if{|course_id, ids| !limited_course_ids.include?(course_id)}
-      group_ids &= limited_group_ids
+      full_group_ids &= limited_group_ids
     else
-      section_ids = section_id_hash.values.flatten
+      course_section_ids = course_hash[:section_id_hash].values.flatten
       # if we're not searching with context(s) in mind, include any users we
       # have admin access to know about
       account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
@@ -1699,7 +1748,8 @@ class User < ActiveRecord::Base
 
     course_sql = []
     course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
-    course_sql << "(course_section_id IN (#{section_ids.join(',')}))" if section_ids.present?
+    course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
+    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id IN (#{limited_group_ids.join(',')})) )" if group_section_ids.present?
     course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
     user_sql << <<-SQL if course_sql.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
@@ -1712,11 +1762,11 @@ class User < ActiveRecord::Base
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
     SQL
 
-    user_sql << <<-SQL if group_ids.present?
+    user_sql << <<-SQL if full_group_ids.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, group_id, NULL AS roles
       FROM users, group_memberships
-      WHERE group_id IN (#{group_ids.join(',')}) AND users.id = user_id
-        AND group_memberships.workflow_state <> 'deleted'
+      WHERE group_id IN (#{full_group_ids.join(',')}) AND users.id = user_id
+        AND group_memberships.workflow_state = 'accepted'
         AND #{user_condition_sql}
     SQL
 
