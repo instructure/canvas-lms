@@ -444,7 +444,7 @@ class Assignment < ActiveRecord::Base
       score = score.to_f / self.points_possible
       result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
     end
-    result
+    result.to_s
   end
 
   def self.interpret_grade(grade, points_possible, grading_scheme = nil)
