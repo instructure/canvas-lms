@@ -601,7 +601,7 @@ class ConversationsController < ApplicationController
     @current_user.courses.each do |course|
       @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => true, :can_add_notes => can_add_notes_to?(course) }
     end
-    @current_user.groups.each do |group|
+    @current_user.messageable_groups.each do |group|
       @contexts[:groups][group.id] = {:id => group.id, :name => group.name, :type => :group, :active => group.active? }
     end
   end
@@ -617,7 +617,7 @@ class ConversationsController < ApplicationController
 
     avatar_url = avatar_url_for_group(params[:blank_avatar_fallback])
     course_user_counts = @current_user.enrollment_visibility[:user_counts]
-    group_user_counts = @current_user.groups.inject({}){ |hash, group| hash[group.id] = group.users.size; hash }
+    group_user_counts = @current_user.group_membership_visibility[:user_counts]
     terms = options[:search].downcase.strip.split(/\s+/)
     exclude = options[:exclude_ids] || []
 
