@@ -322,14 +322,16 @@ class Group < ActiveRecord::Base
   TAB_CHAT = 4
   TAB_FILES = 5
   TAB_CONFERENCES = 6
+  TAB_ANNOUNCEMENTS = 7
   def tabs_available(user=nil, opts={})
     available_tabs = [
-      { :id => TAB_HOME,        :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
-      { :id => TAB_PAGES,       :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_pages_path },
-      { :id => TAB_PEOPLE,      :label => t("#group.tabs.people", "People"), :css_class => 'peopel', :href => :group_users_path },
-      { :id => TAB_DISCUSSIONS, :label => t("#group.tabs.discussions", "Discussions"), :css_class => 'discussions', :href => :group_discussion_topics_path },
-      { :id => TAB_CHAT,        :label => t("#group.tabs.chat", "Chat"), :css_class => 'chat', :href => :group_chat_path },
-      { :id => TAB_FILES,       :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path }
+      { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
+      { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :css_class => 'announcements', :href => :group_announcements_path },
+      { :id => TAB_PAGES,         :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_pages_path },
+      { :id => TAB_PEOPLE,        :label => t("#group.tabs.people", "People"), :css_class => 'peopel', :href => :group_users_path },
+      { :id => TAB_DISCUSSIONS,   :label => t("#group.tabs.discussions", "Discussions"), :css_class => 'discussions', :href => :group_discussion_topics_path },
+      { :id => TAB_CHAT,          :label => t("#group.tabs.chat", "Chat"), :css_class => 'chat', :href => :group_chat_path },
+      { :id => TAB_FILES,         :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path }
     ]
     available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :create_conferences)
     available_tabs
@@ -367,5 +369,9 @@ class Group < ActiveRecord::Base
     item.save!
     context.imported_migration_items << item
     item
+  end
+
+  def allow_media_comments?
+    true
   end
 end
