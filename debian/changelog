@@ -1,3 +1,13 @@
+canvas-lms (1.1-58) professional; urgency=low
+
+  * Package ref: 66803228b8f1808d76dd0ca1b91c0e47ab84c649
+  *
+  * [+769b2b0] allow media comments for discussion group assignments
+  * [+80bb9cb] fix link to creating announcements within groups; fixes #5430
+  * [+6680322] remove conversion_status from speedgrader json response, fixes #5497
+
+ -- JT Olds <jt@instructure.com>  Fri, 09 Sep 2011 14:43:29 -0600
+
 canvas-lms (1.1-57) professional; urgency=low
 
   * Package ref: 2e00d89c45c6fbdd974c691b447cad9b09f714a9
