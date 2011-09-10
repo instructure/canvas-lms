@@ -2,7 +2,7 @@ class ContextExternalTool < ActiveRecord::Base
   include Workflow
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
-  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, :name, :description, :custom_fields
+  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, :name, :description, :custom_fields, :custom_fields_string
   validates_presence_of :name
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
@@ -36,11 +36,23 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
   
-  def custom_fields=(hash)
-    settings[:custom_fields] ||= {}
-    hash.each do |key, val|
-      settings[:custom_fields][key] = val.to_s
+  def custom_fields_string
+    (settings[:custom_fields] || {}).map{|key, val|
+      "#{key}=#{val}"
+    }.join("\n")
+  end
+  
+  def custom_fields_string=(str)
+    hash = {}
+    str.split(/\n/).each do |line|
+      key, val = line.split(/=/)
+      hash[key] = val if key.present? && val.present?
     end
+    settings[:custom_fields] = hash
+  end
+  
+  def custom_fields=(hash)
+    settings[:custom_fields] = hash if hash.is_a?(Hash)
   end
   
   def shared_secret=(val)
@@ -168,6 +180,8 @@ class ContextExternalTool < ActiveRecord::Base
   named_scope :active, :conditions => ['context_external_tools.workflow_state != ?', 'deleted']
   
   def self.serialization_excludes; [:shared_secret,:settings]; end
+  
+  def self.serialization_methods; [:custom_fields_string]; end
   
   def self.process_migration(data, migration)
     tools = data['external_tools'] ? data['external_tools']: []
