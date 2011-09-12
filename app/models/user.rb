@@ -1529,11 +1529,11 @@ class User < ActiveRecord::Base
   end
   
   def manageable_courses
-    Course.manageable_by_user(self.id)
+    Course.manageable_by_user(self.id).not_deleted
   end
 
   def manageable_courses_name_like(query="")
-    self.manageable_courses.name_like(query).limit(50)
+    self.manageable_courses.not_deleted.name_like(query).limit(50)
   end
   memoize :manageable_courses_name_like
   
