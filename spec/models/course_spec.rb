@@ -653,6 +653,25 @@ describe Course, "backup" do
       folder.reload
       new_attachment.folder.cloned_item_id.should == folder.cloned_item_id
     end
+
+    it "should perform day substitutions" do
+      old_course = course_model
+      old_course.assert_assignment_group
+      today = Time.now.utc
+      @assignment = old_course.assignments.build
+      @assignment.due_at = today
+      @assignment.workflow_state = 'published'
+      @assignment.save!
+      old_course.reload
+
+      new_course = course_model
+
+      new_course.merge_into_course(old_course, :everything => true, :shift_dates => true, :day_substitutions => { today.wday.to_s => (today.wday + 1).to_s})
+      new_course.reload
+      new_assignment = new_course.assignments.first
+      # new_assignment.due_at.should == today + 1.day does not work
+      (new_assignment.due_at.to_i - (today + 1.day).to_i).abs.should < 60
+    end
   end
   
   it "should copy learning outcomes into the new course" do
