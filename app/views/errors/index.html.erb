@@ -3,6 +3,7 @@
   add_crumb t("#crumbs.error_reports", "Error Reports")
 %>
 
+<% unless params[:action] == 'show' %>
 <% form_for @current_user, :url => '/error_reports', :html => { :method => :get }  do |f| %>
   <%= t :message_contains, "Message contains" %>
   <input type="text" name="message" value="<%= @message %>" style="width: 250px;"/>
@@ -10,6 +11,7 @@
     <%= options_for_select(([[t(:all_categories, " - All Categories -"), nil]] + ErrorReport.all(:select => 'DISTINCT category').map(&:category)).compact, params[:category]) %>
   </select>
   <button type="submit" class="button"><%= t "#buttons.search", "Search" %></button>
+<% end %>
 <% end %>
 
 <% content_for :pagination do %>
