@@ -27,7 +27,7 @@ module Canvas
           settings[:user_id] = cm.user_id
           settings[:attachment_id] = cm.attachment.id rescue nil
 
-          converter = CC::Importer::CCConverter.new(settings)
+          converter = CC::Importer::Canvas::Converter.new(settings)
           course = converter.export
           export_folder_path = course[:export_folder_path]
           overview_file_path = course[:overview_file_path]
