@@ -1956,7 +1956,7 @@ class Course < ActiveRecord::Base
     result[:old_end_date] = Date.parse(options[:old_end_date]) rescue course.real_end_date
     result[:new_start_date] = Date.parse(options[:new_start_date]) rescue self.real_start_date
     result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
-    result[:day_substitions] = options[:day_substitions]
+    result[:day_substitutions] = options[:day_substitutions]
     result
   end
 
