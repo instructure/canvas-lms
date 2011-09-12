@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../cc_spec_helper'
 
-describe "Common Cartridge importing" do
+describe "Canvas Cartridge importing" do
   before(:each) do
     @converter = get_cc_converter
     @copy_from = course_model

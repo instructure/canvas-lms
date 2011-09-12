@@ -22,6 +22,14 @@ module CCHelper
   XSD_URI = 'http://canvas.instructure.com/xsd/cccv1p0.xsd'
   
   # IMS formats/types
+  # Common Cartridge 1.0
+  # associatedcontent/imscc_xmlv1p0/learning-application-resource
+  # imsdt_xmlv1p0
+  # imswl_xmlv1p0
+  # imsqti_xmlv1p2/imscc_xmlv1p0/assessment
+  # imsqti_xmlv1p2/imscc_xmlv1p0/question-bank
+  
+  # Common Cartridge 1.1 (What Canvas exports)
   ASSESSMENT_TYPE = 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment'
   CC_EXTENSION = 'imscc'
   DISCUSSION_TOPIC = "imsdt_xmlv1p1"
@@ -31,6 +39,15 @@ module CCHelper
   WEB_LINK = "imswl_xmlv1p1"
   WEBCONTENT = "webcontent"
   BASIC_LTI = 'imsbasiclti_xmlv1p0'
+  QUESTION_BANK = 'imsqti_xmlv1p2/imscc_xmlv1p1/question-bank'
+  
+  # Common Cartridge 1.2
+  # associatedcontent/imscc_xmlv1p2/learning-application-resource
+  # imsdt_xmlv1p2
+  # imswl_xmlv1p2
+  # imsqti_xmlv1p2/imscc_xmlv1p2/assessment
+  # imsqti_xmlv1p2/imscc_xmlv1p2/question-bank
+  # imsbasiclti_xmlv1p0
   
   # substitution tokens
   OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"

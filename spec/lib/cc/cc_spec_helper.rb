@@ -24,6 +24,10 @@ def get_cc_converter
   CC::Importer::CCConverter.new({:testing=>true})
 end
 
+def get_standard_converter
+  CC::Importer::Standard::Converter.new({:testing=>true})
+end
+
 def get_cc_export_file(rel_path)
   File.join(CC_XML_EXPORT_DIR, rel_path)
 end
