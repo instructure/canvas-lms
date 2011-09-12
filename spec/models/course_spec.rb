@@ -266,6 +266,11 @@ describe Course, "gradebook_to_csv" do
     rows.length.should equal(3)
     rows[0][2].should == 'SIS User ID'
     rows[0][3].should == 'SIS Login ID'
+    rows[0][4].should == 'Section'
+    rows[1][2].should == ''
+    rows[1][3].should == ''
+    rows[1][4].should == ''
+    rows[1][-1].should == '(read only)'
     rows[2][2].should == 'SISUSERID'
     rows[2][3].should == 'SISLOGINID'
   end
