@@ -125,7 +125,7 @@ module Api
     render :text => proc { |r, o|
       o.write('[')
       array.each_with_index { |v,i|
-        o.write(v.to_json(:include_root => false, :only => (PageView.content_columns.map(&:name) + ['request_id'])));
+        o.write(v.to_json(json_opts));
         o.write(',') unless i == array.length - 1
       }
       o.write(']')
