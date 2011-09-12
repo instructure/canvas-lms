@@ -1115,6 +1115,7 @@ class Course < ActiveRecord::Base
       
       #Second Row
       row = ["    Points Possible", "", ""]
+      row.concat(["", ""]) if options[:include_sis_id]
       row.concat(assignments.map{|a| single ? [a.points_possible, ''] : a.points_possible})
       row.concat([read_only, read_only])
       row.concat([read_only]) if self.grading_standard_id
