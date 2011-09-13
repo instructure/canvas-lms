@@ -158,7 +158,7 @@ class EportfoliosController < ApplicationController
         @attachment.save!
       end
       if params[:compile] && @attachment.to_be_zipped?
-        ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY }, @attachment)
+        ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
         render :json => @attachment.to_json
       else
         respond_to do |format|
