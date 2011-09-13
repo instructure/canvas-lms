@@ -82,6 +82,8 @@ describe "Accounts API", :type => :integration do
     @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
     @c1.enrollments.delete_all
     @c2 = course_model(:name => 'c2', :account => @a2, :root_account => @a1, :sis_source_id => 'sis2')
+    @c2.course_sections.create!
+    @c2.course_sections.create!
     @user = @me
     json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                     { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
