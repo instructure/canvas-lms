@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC::Importer::Canvas
-  class Converter < Canvas::Migrator
+  class Converter < Canvas::Migration::Migrator
     include CC::Importer
     include CourseSettings
     include WikiConverter

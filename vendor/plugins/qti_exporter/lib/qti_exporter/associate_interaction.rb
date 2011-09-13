@@ -1,6 +1,6 @@
 module Qti
 class AssociateInteraction < AssessmentItemConverter
-  include Canvas::XMLHelper
+  include Canvas::Migration::XMLHelper
   
   def initialize(opts)
     super(opts)

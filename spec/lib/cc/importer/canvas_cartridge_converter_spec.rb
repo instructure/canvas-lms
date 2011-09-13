@@ -72,7 +72,7 @@ describe "Canvas Cartridge importing" do
     @copy_to.name.should_not == @copy_from.name
     @copy_to.course_code.should_not == @copy_from.course_code
     atts = Course.clonable_attributes
-    atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
+    atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     atts.each do |att|
       @copy_to.send(att).should == @copy_from.send(att)
     end

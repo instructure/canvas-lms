@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC::Importer::Standard
-  class Converter < Canvas::Migrator
+  class Converter < Canvas::Migration::Migrator
     include CC::Importer
     include WebcontentConverter
     include OrgConverter

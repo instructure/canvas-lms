@@ -1611,11 +1611,11 @@ class Course < ActiveRecord::Base
   def import_settings_from_migration(data)
     return unless data[:course]
     settings = data[:course]
-    self.conclude_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
-    self.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
+    self.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
+    self.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
     self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
     atts = Course.clonable_attributes
-    atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
+    atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
       self.send("#{key}=", val)
     end

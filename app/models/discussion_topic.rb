@@ -530,9 +530,9 @@ class DiscussionTopic < ActiveRecord::Base
     item.title = hash[:title]
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
-    item.posted_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
-    item.delayed_post_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
-    item.delayed_post_at ||= Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
+    item.posted_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
+    item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
+    item.delayed_post_at ||= Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
     item.position = hash[:position] if hash[:position]
     if hash[:attachment_migration_id]
       item.attachment = context.attachments.find_by_migration_id(hash[:attachment_migration_id])

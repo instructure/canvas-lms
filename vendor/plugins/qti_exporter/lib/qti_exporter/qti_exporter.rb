@@ -1,7 +1,7 @@
 require_dependency 'qti_exporter/respondus_settings'
 
 module Qti
-class QtiExporter < Canvas::Migrator
+class QtiExporter < Canvas::Migration::Migrator
 
   MANIFEST_FILE = "imsmanifest.xml"
   QTI_2_1_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p1'
@@ -115,7 +115,7 @@ class QtiExporter < Canvas::Migrator
     unless @files.empty?
       # move the original archive to all_files.zip and it can be processed
       # during the import to grab attachments
-      move_archive_to(File.join(@base_export_dir, Canvas::MigratorHelper::ALL_FILES_ZIP))
+      move_archive_to(File.join(@base_export_dir, Canvas::Migration::MigratorHelper::ALL_FILES_ZIP))
     end
     @files
   end

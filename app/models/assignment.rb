@@ -1445,7 +1445,7 @@ class Assignment < ActiveRecord::Base
     
     hash[:due_at] ||= hash[:due_date]
     [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at, :all_day_date].each do |key|
-      item.send"#{key}=", Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
+      item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
     end
     
     [:all_day, :turnitin_enabled, :peer_reviews_assigned, :peer_reviews,

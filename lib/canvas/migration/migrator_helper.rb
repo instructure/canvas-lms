@@ -17,7 +17,8 @@
 #
 require 'tmpdir'
 require 'shellwords'
-module Canvas::MigratorHelper
+module Canvas::Migration
+module MigratorHelper
   include Canvas::Migration
 
   FULL_COURSE_JSON_FILENAME = "course_export.json"
@@ -64,6 +65,10 @@ module Canvas::MigratorHelper
     end
 
     error
+  end
+  
+  def logger
+    Rails.logger
   end
   
   def find_export_dir
@@ -321,4 +326,5 @@ module Canvas::MigratorHelper
 #    end
     @overview
   end
+end
 end

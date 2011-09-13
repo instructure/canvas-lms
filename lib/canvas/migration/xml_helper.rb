@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Canvas::XMLHelper
+module Canvas::Migration
+module XMLHelper
   def convert_to_timestamp(string)
     return nil if string.nil? or string == ""
     Time.parse(string).to_i * 1000 rescue nil
@@ -91,4 +92,5 @@ module Canvas::XMLHelper
   def open_file_xml(path)
     File.exists?(path) ? ::Nokogiri::XML(open(path)) : nil
   end
+end
 end

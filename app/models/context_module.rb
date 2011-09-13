@@ -669,9 +669,9 @@ class ContextModule < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.position = hash[:position] || hash[:order]
     item.context = context
-    item.unlock_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
-    item.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
-    item.end_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
+    item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
+    item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
+    item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
     
     if hash[:prerequisites]
       preqs = []

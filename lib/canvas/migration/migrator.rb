@@ -17,9 +17,9 @@
 #
 
 require 'open-uri'
-
-class Canvas::Migrator
-  include Canvas::MigratorHelper
+module Canvas::Migration
+class Migrator
+  include MigratorHelper
   SCRAPE_ALL_HASH = { 'course_outline' => true, 'announcements' => true, 'assignments' => true, 'goals' => true, 'rubrics' => true, 'web_links' => true, 'learning_modules' => true, 'calendar_events' => true, 'calendar_start' => nil, 'calendar_end' => nil, 'discussions' => true, 'assessments' => true, 'question_bank' => true, 'all_files' => true, 'groups' => true, 'assignment_groups' => true, 'tasks' => true, 'wikis' => true }
 
   attr_accessor :course, :unzipped_file_path, :extra_settings, :total_error_count
@@ -50,7 +50,7 @@ class Canvas::Migrator
 
   def unzip_archive
     begin
-      command = Canvas::MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
+      command = MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
       logger.debug "Running unzip command: #{command}"
       zip_std_out = `#{command}`
 
@@ -114,4 +114,5 @@ class Canvas::Migrator
 
     @archive_file_path = @archive_file.path
   end
+end
 end

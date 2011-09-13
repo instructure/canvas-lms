@@ -92,7 +92,7 @@ module CC
         c.start_at ims_datetime(@course.start_at) if @course.start_at
         c.conclude_at ims_datetime(@course.conclude_at) if @course.conclude_at
         atts = Course.clonable_attributes
-        atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
+        atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
         atts.each do |att|
           c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ''
         end

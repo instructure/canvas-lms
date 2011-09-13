@@ -19,7 +19,8 @@
 require 'action_controller'
 require 'action_controller/test_process.rb'
 
-module Canvas::MigrationWorker
+module Canvas::Migration
+module Worker
   def self.upload_overview_file(file, content_migration)
     uploaded_data = ActionController::TestUploadedFile.new(file.path, Attachment.mimetype(file.path))
     
@@ -77,4 +78,5 @@ module Canvas::MigrationWorker
       Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"
     end
   end
+end
 end

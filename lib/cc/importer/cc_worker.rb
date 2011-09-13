@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Canvas
-  module MigrationWorker
+module Canvas::Migration
+  module Worker
     class CCWorker < Struct.new(:migration_id)
 
       def perform
@@ -34,11 +34,11 @@ module Canvas
 
           if overview_file_path
             file = File.new(overview_file_path)
-            Canvas::MigrationWorker::upload_overview_file(file, cm)
+            Canvas::Migration::Worker::upload_overview_file(file, cm)
           end
           if export_folder_path
-            Canvas::MigrationWorker::upload_exported_data(export_folder_path, cm)
-            Canvas::MigrationWorker::clear_exported_data(export_folder_path)
+            Canvas::Migration::Worker::upload_exported_data(export_folder_path, cm)
+            Canvas::Migration::Worker::clear_exported_data(export_folder_path)
           end
 
           cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}

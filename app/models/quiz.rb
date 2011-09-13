@@ -1101,9 +1101,9 @@ class Quiz < ActiveRecord::Base
 
     hash[:due_at] ||= hash[:due_date]
     hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]
-    item.lock_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
-    item.unlock_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
-    item.due_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
+    item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
+    item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
+    item.due_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
     item.description = ImportedHtmlConverter.convert(hash[:description], context)
     [:migration_id, :title, :allowed_attempts, :time_limit, 

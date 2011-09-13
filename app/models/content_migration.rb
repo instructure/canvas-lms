@@ -184,9 +184,9 @@ class ContentMigration < ActiveRecord::Base
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])
     if plugin
       begin
-        if Canvas::MigrationWorker.const_defined?(plugin.settings['worker'])
+        if Canvas::Migration::Worker.const_defined?(plugin.settings['worker'])
           self.workflow_state = :exporting
-          Canvas::MigrationWorker.const_get(plugin.settings['worker']).enqueue(self)
+          Canvas::Migration::Worker.const_get(plugin.settings['worker']).enqueue(self)
           self.save
         else
           raise NameError
