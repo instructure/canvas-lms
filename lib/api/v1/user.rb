@@ -20,7 +20,7 @@ module Api::V1::User
   JSON_FIELDS = {
     :include_root => false,
     :only => %w(id name),
-    :methods => :sortable_name
+    :methods => %w(sortable_name short_name)
   }
 
   def user_json(user)
@@ -29,7 +29,7 @@ module Api::V1::User
         # the sis fields on pseudonym are poorly named -- sis_user_id is
         # the id in the SIS import data, where on every other table
         # that's called sis_source_id. But on pseudonym, sis_source_id is
-        # the login in from the SIS import data.
+        # the login id from the SIS import data.
         json.merge! :sis_user_id => user.pseudonym.try(:sis_user_id), 
                     :sis_login_id => user.pseudonym.try(:sis_source_id), 
                     :login_id => user.pseudonym.unique_id
@@ -41,10 +41,16 @@ module Api::V1::User
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?
     if @user_json_is_admin.nil?
+      if @context.is_a?(UserProfile)
+        permissions_context = permissions_account = @domain_root_account
+      else
+        permissions_context = @context
+        permissions_account = @context.account
+      end
       @user_json_is_admin = !!(
-        @context.grants_right?(@current_user, :manage_students) ||
-        @context.account.membership_for_user(@current_user) || 
-        @context.account.grants_right?(@current_user, :manage_sis)
+        permissions_context.grants_right?(@current_user, :manage_students) ||
+        permissions_account.membership_for_user(@current_user) || 
+        permissions_account.grants_right?(@current_user, :manage_sis)
       )
     end
     @user_json_is_admin

@@ -21,11 +21,69 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe "Users API", :type => :integration do
   before do
     @admin = account_admin_user
-    course_with_student(:user => user_with_pseudonym(:username => 'pvuser@example.com'))
+    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
     @student = @user
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
     @user = @admin
+    Account.default.tap { |a| a.enable_service(:avatars) }.save
     user_with_pseudonym(:user => @user)
+  end
+
+  it "should return another user's profile, if allowed" do
+    json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+             :controller => "profile", :action => "show", :user_id => @student.to_param, :format => 'json')
+    json.should == {
+      'id' => @student.id,
+      'name' => 'Student',
+      'sortable_name' => 'student',
+      'short_name' => 'Student',
+      'primary_email' => 'pvuser@example.com',
+      'sis_user_id' => 'sis-user-id',
+      'sis_login_id' => nil,
+      'login_id' => 'pvuser@example.com',
+      'avatar_url' => "http://www.example.com/images/users/#{@student.id}",
+    }
+  end
+
+  it "should return this user's profile" do
+    json = api_call(:get, "/api/v1/users/self/profile",
+             :controller => "profile", :action => "show", :user_id => 'self', :format => 'json')
+    json.should == {
+      'id' => @admin.id,
+      'name' => 'User',
+      'sortable_name' => 'user',
+      'short_name' => 'User',
+      'primary_email' => 'nobody@example.com',
+      'sis_user_id' => nil,
+      'sis_login_id' => nil,
+      'login_id' => 'nobody@example.com',
+      'avatar_url' => "http://www.example.com/images/users/#{@admin.id}",
+      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
+    }
+  end
+
+  it "should return this user's profile (non-admin)" do
+    @user = @student
+    json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+             :controller => "profile", :action => "show", :user_id => @student.to_param, :format => 'json')
+    json.should == {
+      'id' => @student.id,
+      'name' => 'Student',
+      'sortable_name' => 'student',
+      'short_name' => 'Student',
+      'primary_email' => 'pvuser@example.com',
+      'login_id' => 'pvuser@example.com',
+      'avatar_url' => "http://www.example.com/images/users/#{@student.id}",
+      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+    }
+  end
+
+  it "shouldn't return disallowed profiles" do
+    @user = @student
+    raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
+             :controller => "profile", :action => "show", :user_id => @admin.to_param, :format => 'json')
+    response.status.should == "401 Unauthorized"
+    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
   end
 
   it "should return page view history" do

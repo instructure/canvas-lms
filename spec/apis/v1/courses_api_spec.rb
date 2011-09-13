@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe CoursesController, :type => :integration do
-  USER_API_FIELDS = %w(id name sortable_name)
+  USER_API_FIELDS = %w(id name sortable_name short_name)
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user

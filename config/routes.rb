@@ -687,6 +687,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index
+    api.get 'users/:user_id/profile', :controller => :profile, :action => :show
 
     api.with_options(:controller => :conversations) do |conversations|
       conversations.get 'conversations', :action => :index
