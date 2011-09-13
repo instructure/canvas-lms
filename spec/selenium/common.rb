@@ -264,23 +264,19 @@ shared_examples_for "all selenium tests" do
   end
 
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
-    seconds.times do |i|
+    val = seconds.times do |i|
       puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
-      if i < seconds - 2
-        val = false
-        begin
-          val = yield
-        rescue => e
-          puts "exception: #{e}" if i > SECONDS_UNTIL_COUNTDOWN
-        end
+      val = false
+      begin
+        val = yield
         break(val) if val
-      elsif i == seconds - 1
-        yield
-      else
-        raise
+      rescue => e
+        raise if i == seconds - 1
       end
       sleep 1
     end
+    raise "Unexpected #{val.inspect}" unless val
+    val
   end
   
   def find_with_jquery(selector)
