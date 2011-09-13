@@ -2,10 +2,10 @@
 <% ot(:timespan, "%{start_at} *to* %{end_at}", :start_at => capture { %>
     <td class="start_date">
       <div class="show_term">
-        <span class="<%= date_class_prefix %>start_at"><%= (date_string(object.start_at, :long) || t('date.unspecified', "whenever")) rescue t('date.unspecified', "whenever") %></span>
+        <span class="<%= date_class_prefix %>start_at"><%= date_string(object.try(:start_at), :long) || (key.blank? ? t('date.unspecified', "whenever") : t('date.term_start', "term start")) %></span>
       </div>
       <div class="edit_term">
-        <input type="text" name="enrollment_term<%= key %>[start_at]" value="<%= date_string(object.start_at, :long) rescue nil %>" title="<%= start_tooltip %>" class="date_field" style="width: 120px;"/>
+        <input type="text" name="enrollment_term<%= key %>[start_at]" value="<%= date_string(object.try(:start_at), :long) %>" title="<%= start_tooltip %>" class="date_field" style="width: 120px;"/>
       </div>
     </td>
   <% }, :wrapper => capture { %>
@@ -15,10 +15,10 @@
   <% }, :end_at => capture { %>
     <td class="end_date">
       <div class="show_term">
-        <span class="<%= date_class_prefix %>end_at"><%= (date_string(object.end_at, :long) || t('date.unspecified', "whenever")) rescue t('date.unspecified', "whenever") %></span>
+        <span class="<%= date_class_prefix %>end_at"><%= date_string(object.try(:end_at), :long) || (key.blank? ? t('date.unspecified', "whenever") : t('date.term_end', "term end")) %></span>
       </div>
       <div class="edit_term">
-        <input type="text" name="enrollment_term<%= key %>[end_at]" value="<%= date_string(object.end_at, :long) rescue nil %>" title="<%= end_tooltip %>" class="date_field" style="width: 120px;"/>
+        <input type="text" name="enrollment_term<%= key %>[end_at]" value="<%= date_string(object.try(:end_at), :long) %>" title="<%= end_tooltip %>" class="date_field" style="width: 120px;"/>
       </div>
     </td>
   <% }) %>
