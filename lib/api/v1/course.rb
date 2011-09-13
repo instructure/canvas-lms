@@ -25,6 +25,7 @@ module Api::V1::Course
       :include_root => false, :only => %w(id name course_code))
     hash['sis_course_id'] = course.sis_source_id
     hash['enrollments'] = enrollments.map { |e| { :type => e.readable_type.downcase } } if enrollments
+    hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
     if include_grading && enrollments && enrollments.any? { |e| e.participating_admin? }
       hash['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
     end

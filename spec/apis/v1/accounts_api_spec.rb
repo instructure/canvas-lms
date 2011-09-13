@@ -91,12 +91,14 @@ describe "Accounts API", :type => :integration do
         'name' => 'c1',
         'course_code' => 'c1',
         'sis_course_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c1.uuid}.ics" },
       },
       {
         'id' => @c2.id,
         'name' => 'c2',
         'course_code' => 'c2',
         'sis_course_id' => 'sis2',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
       },
     ]
 
@@ -109,6 +111,7 @@ describe "Accounts API", :type => :integration do
         'name' => 'c2',
         'course_code' => 'c2',
         'sis_course_id' => 'sis2',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
       },
     ]
 
@@ -121,6 +124,7 @@ describe "Accounts API", :type => :integration do
         'name' => 'c2',
         'course_code' => 'c2',
         'sis_course_id' => 'sis2',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
       },
     ]
   end

@@ -497,7 +497,7 @@ class ApplicationController < ActionController::Base
         if @context_type == 'course'
           @problem = t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
         elsif @context_type == 'group'
-          @problem = t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
+          @problem = t "#application.errors.feed_private_group", "The matching group has gone private, so public feeds like this one will no longer be visible."
         else
           @problem = t "#application.errors.feed_private", "The matching context has gone private, so public feeds like this one will no longer be visible."
         end

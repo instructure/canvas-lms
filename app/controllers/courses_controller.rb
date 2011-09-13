@@ -56,8 +56,8 @@ class CoursesController < ApplicationController
   #   include[]=needs_grading_count
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student'}] },
-  #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'enrollments': [{'type': 'teacher'}] } ]
+  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student'}], 'calendar': { 'ics': '..url..' } },
+  #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'enrollments': [{'type': 'teacher'}], 'calendar': { 'ics': '..url..' } } ]
   def index
     respond_to do |format|
       format.html {
