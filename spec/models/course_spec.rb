@@ -104,7 +104,10 @@ describe Course do
     @new_course.quizzes.should be_empty
     @new_course.assignments.should be_empty
     @new_course.sis_source_id.should == 'sis_id'
+    @new_course.syllabus_body.should be_blank
 
+    @course.uuid.should_not == @new_course.uuid
+    @course.wiki_id.should_not == @new_course.wiki_id
     @course.replacement_course_id.should == @new_course.id
   end
 end
