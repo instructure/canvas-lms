@@ -4,7 +4,7 @@
 <li class="course" id="course_<%= course ? course.id : "blank" %>" style="<%= hidden unless course %>">
   <div class="course <%= 'unpublished' if course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) %>">
     <div class="name">
-      <a href="<%= course_path(course ? course.id : "{{ id }}") %>" class="name"><%= (course && (course.name || course.section)) || nbsp %></a>
+      <a href="<%= course_path(course ? course.id : "{{ id }}") %>" class="name"><%= (course && course.name) || nbsp %></a>
       <%= image_tag "hammer.png", :title => t(:course_unpublished_title, "This course hasn't been published yet"), :alt => t(:course_unpublished_tooltip, "Unpublished"), :class => "unpublished_icon", :style => (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>
     </div>
     <% if course %>

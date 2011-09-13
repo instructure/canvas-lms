@@ -262,7 +262,7 @@ class Account < ActiveRecord::Base
   end
 
   def fast_course_base(opts)
-    columns = "courses.id, courses.name, courses.section, courses.workflow_state, courses.course_code, courses.sis_source_id"
+    columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id"
     associated_courses = self.associated_courses.active
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
