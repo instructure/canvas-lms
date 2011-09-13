@@ -47,7 +47,7 @@ class Account < ActiveRecord::Base
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :course_account_associations
-  has_many :associated_courses, :through => :course_account_associations, :source => :course
+  has_many :associated_courses, :through => :course_account_associations, :source => :course, :select => 'DISTINCT courses.*'
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted'], :order => 'attachments.display_name'
@@ -737,7 +737,7 @@ class Account < ActiveRecord::Base
   def update_account_associations
     account_chain_cache = {}
     all_user_ids = []
-    all_user_ids += Course.update_account_associations(self.associated_courses.uniq, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+    all_user_ids += Course.update_account_associations(self.associated_courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
 
     # Make sure we have all users with existing account associations.
     # (This should catch users with Pseudonyms associated with the account.)
