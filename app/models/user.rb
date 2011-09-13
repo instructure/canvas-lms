@@ -1839,6 +1839,10 @@ class User < ActiveRecord::Base
     User.update_all 'unread_conversations_count = 0', :id => id
   end
 
+  def conversation_participant(conversation_id)
+    all_conversations.find_by_conversation_id(conversation_id)
+  end
+
   # association with dynamic, filtered join condition for submissions.
   # This is messy, but in ActiveRecord 2 this is the only way to do an eager
   # loading :include condition that has dynamic join conditions. It looks like

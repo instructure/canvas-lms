@@ -118,19 +118,7 @@ describe UsersController, :type => :integration do
 
       'private' => false,
 
-      'recent_messages' => [{
-        'id' => @message.id,
-        'created_at' => @message.created_at.as_json,
-        'generated' => false,
-        'body' => 'hello',
-        'author' => {
-          'user_id' => @sender.id,
-          'user_name' => 'sender',
-        },
-      }],
-
-      'participant_count' => 2,
-      'message_count' => 1,
+      'participant_count' => 2
     }
   end
 

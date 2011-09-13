@@ -157,6 +157,10 @@ class ConversationParticipant < ActiveRecord::Base
     super
   end
 
+  def recent_messages
+    messages.scoped(:limit => 10)
+  end
+
   def subscribed=(value)
     super unless private?
     if subscribed_changed?
