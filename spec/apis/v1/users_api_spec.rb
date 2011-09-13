@@ -21,8 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe "Users API", :type => :integration do
   before do
     @admin = account_admin_user
-    course_with_student
+    course_with_student(:user => user_with_pseudonym(:username => 'pvuser@example.com'))
     @student = @user
+    @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
     @user = @admin
     user_with_pseudonym(:user => @user)
   end
@@ -36,10 +37,17 @@ describe "Users API", :type => :integration do
                        { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :per_page => '1000' })
     json.size.should == 2
     json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
-    json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?page=2",
-                       { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => '2' })
+    json = api_call(:get, "/api/v1/users/sis_user_id:sis-user-id/page_views?page=2",
+                       { :controller => "page_views", :action => "index", :user_id => 'sis_user_id:sis-user-id', :format => 'json', :page => '2' })
     json.size.should == 1
     json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
+  end
+
+  it "should allow id of 'self'" do
+    page_view_model(:user => @admin)
+    json = api_call(:get, "/api/v1/users/self/page_views?per_page=1000",
+                       { :controller => "page_views", :action => "index", :user_id => 'self', :format => 'json', :per_page => '1000' })
+    json.size.should == 1
   end
 end
 

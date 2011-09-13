@@ -17,8 +17,12 @@
 #
 
 # @API Users
-#
 # API for accessing information on the current and other users.
+#
+# Throughout this API, the `:user_id` parameter can be replaced with `self` as
+# a shortcut for the id of the user accessing the API. For instance,
+# `users/:user_id/page_views` can be accessed as `users/self/page_views` to
+# access the current user's page views.
 class UsersController < ApplicationController
   include GoogleDocs
   include Twitter

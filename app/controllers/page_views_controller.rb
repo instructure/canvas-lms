@@ -18,8 +18,6 @@
 
 # @API Users
 class PageViewsController < ApplicationController
-  include Api
-
   before_filter :require_user, :only => [:index]
   def update
     render :json => {:ok => true}
@@ -38,7 +36,7 @@ class PageViewsController < ApplicationController
   # @response_field action The action in the Rails controller that processed the request.
   # @response_field context_type The type of "context" of the request, e.g. Account or Course.
   def index
-    @user = User.find(params[:user_id])
+    @user = api_find(User, params[:user_id])
     if authorized_action(@user, @current_user, :view_statistics)
       @page_views = Api.paginate(@user.page_views, self, :order => 'created_at DESC')
       respond_to do |format|

@@ -676,7 +676,8 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :users) do |users|
-      users.get 'users/activity_stream', :action => 'activity_stream'
+      users.get 'users/self/activity_stream', :action => 'activity_stream'
+      users.get 'users/activity_stream', :action => 'activity_stream' # deprecated
     end
 
     api.with_options(:controller => :accounts) do |accounts|

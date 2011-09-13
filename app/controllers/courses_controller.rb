@@ -563,7 +563,7 @@ class CoursesController < ApplicationController
   # single course with the same fields as that action.
   def show
     if api_request?
-      @context = Api.find(Course, params[:id])
+      @context = api_find(Course, params[:id])
       if authorized_action(@context, @current_user, :read)
         enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
         includes = Set.new(Array(params[:include]))

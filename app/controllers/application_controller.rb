@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
 
   attr_accessor :active_tab
 
+  include Api
   include LocaleSelection
   around_filter :set_locale
 
@@ -234,7 +235,7 @@ class ApplicationController < ActionController::Base
     unless @context
       if params[:course_id]
         @context = api_request? ?
-          Api.find(Course, params[:course_id]) : Course.find(params[:course_id])
+          api_find(Course, params[:course_id]) : Course.find(params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && session[:enrollment_uuid_course_id] == @context.id
@@ -250,7 +251,7 @@ class ApplicationController < ActionController::Base
         @context_membership = @context_enrollment
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
         @context = api_request? ?
-          Api.find(Account, params[:account_id]) : Account.find(params[:account_id])
+          api_find(Account, params[:account_id]) : Account.find(params[:account_id])
         params[:context_id] = params[:account_id]
         params[:context_type] = "Account"
         @context_enrollment = @context.account_users.find_by_user_id(@current_user.id) if @context && @current_user

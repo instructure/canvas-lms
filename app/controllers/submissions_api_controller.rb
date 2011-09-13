@@ -22,7 +22,6 @@
 # id in these URLs is the id of the student in the course, there is no separate
 # submission id exposed in these APIs.
 class SubmissionsApiController < ApplicationController
-  include Api
   before_filter :require_context
 
   # @API
@@ -181,7 +180,7 @@ class SubmissionsApiController < ApplicationController
   def update
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @user = Api.find(@context.students_visible_to(@current_user), params[:id]) { |sis_column, sis_id| User.first(:include => :pseudonym, :conditions => { "pseudonyms.#{sis_column}" => sis_id }) } || raise(ActiveRecord::RecordNotFound)
+      @user = api_find(@context.students_visible_to(@current_user), params[:id])
 
       submission = {}
       if params[:submission].is_a?(Hash)
@@ -329,11 +328,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User) { |sis_column, sis_id|
-      User.first(:include => :pseudonym,
-                 :select => 'user.id',
-                 :conditions => { "pseudonyms.#{sis_column}" => sis_id }).try(:id)
-    }.compact
+    Api.map_ids(user_ids, User).compact
   end
 
 end
