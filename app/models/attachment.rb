@@ -98,7 +98,7 @@ class Attachment < ActiveRecord::Base
   def build_media_object
     return true if self.class.skip_media_object_creation?
     if self.content_type && self.content_type.match(/\A(video|audio)/)
-      MediaObject.send_later(:add_media_files, self, false)
+      MediaObject.send_later_enqueue_args(:add_media_files, {:locked_by => 'on hold', :locked_at => Time.zone.now, :attempts => Delayed::Job::ON_HOLD_COUNT}, self, false)
     end
   end
 
