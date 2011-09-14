@@ -58,14 +58,6 @@ module CC::Importer::Standard
       @course
     end
     
-    # checks whether this CC package is a canvas-generated package
-    def is_canvas_cartridge?
-      if @is_canvas_cartridge.nil?
-        @is_canvas_cartridge = !!@manifest.at_css(%{resources resource[href="#{COURSE_SETTINGS_DIR}/#{SYLLABUS}"] file[href="#{COURSE_SETTINGS_DIR}/#{COURSE_SETTINGS}"]})
-      end
-      @is_canvas_cartridge
-    end
-    
     def get_all_resources(manifest)
       manifest.css('resource').each do |r_node|
         id = r_node['identifier']

@@ -36,7 +36,11 @@ class Migrator
 
     return if settings[:testing]
 
-    download_archive
+    unless settings[:archive_file]
+      MigratorHelper::download_archive(settings)
+    end
+    @archive_file = settings[:archive_file]
+    @archive_file_path = @archive_file.path 
     config = Setting.from_config('external_migration')
     @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
@@ -93,26 +97,6 @@ class Migrator
     else
       FileUtils.copy(@archive_file.path, full_path)
     end
-  end
-
-  protected
-
-  def download_archive
-    config = Setting.from_config('external_migration')
-    if @settings[:export_archive_path]
-      @archive_file = File.open(@settings[:export_archive_path], 'rb')
-    elsif @settings[:course_archive_download_url].present?
-      # open-uri downloads the http response to a tempfile
-      @archive_file = open(@settings[:course_archive_download_url])
-    elsif @settings[:attachment_id]
-      att = Attachment.find(@settings[:attachment_id])
-      @archive_file = att.open(:temp_folder => config[:data_folder],
-                               :need_local_file => true)
-    else
-      raise "No migration file found"
-    end
-
-    @archive_file_path = @archive_file.path
   end
 end
 end

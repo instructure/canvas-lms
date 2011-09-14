@@ -21,6 +21,11 @@ require 'action_controller/test_process.rb'
 
 module Canvas::Migration
 module Worker
+  
+  def self.get_converter(settings)
+    PackageIdentifier.new(settings).get_converter
+  end
+  
   def self.upload_overview_file(file, content_migration)
     uploaded_data = ActionController::TestUploadedFile.new(file.path, Attachment.mimetype(file.path))
     

@@ -19,6 +19,7 @@
 module CC
   module Importer
     include CC::CCHelper
+    include Canvas::Migration
     include Canvas::Migration::XMLHelper
   end
 end

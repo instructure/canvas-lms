@@ -133,7 +133,8 @@ Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
   :select_text => lambda{ t :file_description, "Canvas Course Export Package" },
   :settings => {
     :worker => 'CCWorker',
-    :migration_partial => 'cc_config',
+    :migration_partial => 'canvas_config',
+    :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter}
   },
 }
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
@@ -146,6 +147,10 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
+    :provides =>{:common_cartridge=>CC::Importer::Standard::Converter, 
+                 :common_cartridge_1_0=>CC::Importer::Standard::Converter, 
+                 :common_cartridge_1_1=>CC::Importer::Standard::Converter, 
+                 :common_cartridge_1_2=>CC::Importer::Standard::Converter},
   },
 }
 Canvas::Plugin.register('grade_export', :sis, {
