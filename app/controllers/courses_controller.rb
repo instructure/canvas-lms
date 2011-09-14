@@ -227,7 +227,7 @@ class CoursesController < ApplicationController
         if include_students
           proxy = section.enrollments
           if user_json_is_admin?
-            proxy = proxy.scoped(:include => { :user => :pseudonym })
+            proxy = proxy.scoped(:include => { :user => :pseudonyms })
           else
             proxy = proxy.scoped(:include => :user)
           end
@@ -256,7 +256,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       proxy = @context.students
       if user_json_is_admin?
-        proxy = proxy.scoped(:include => :pseudonym)
+        proxy = proxy.scoped(:include => :pseudonyms)
       end
       render :json => proxy.map { |u| user_json(u, @current_user, session) }
     end

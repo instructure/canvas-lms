@@ -276,6 +276,17 @@ describe EnrollmentsApiController, :type => :integration do
           res = res + @course.send("#{type}_enrollments").scoped(:include => :user)
         end
         json.should == enrollments.map do |e|
+          user_json = {
+                        'name' => e.user.name,
+                        'sortable_name' => e.user.sortable_name,
+                        'short_name' => e.user.short_name,
+                        'id' => e.user.id,
+                        'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
+                      }
+          user_json.merge!({
+              'sis_user_id' => e.user.pseudonym.sis_user_id,
+              'sis_login_id' => e.user.pseudonym.unique_id,
+            }) if e.user.pseudonym && e.user.pseudonym.sis_user_id
           {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -285,15 +296,7 @@ describe EnrollmentsApiController, :type => :integration do
             'type' => e.type,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'user' => {
-              'name' => e.user.name,
-              'sortable_name' => e.user.sortable_name,
-              'short_name' => e.user.short_name,
-              'id' => e.user.id,
-              'sis_user_id' => e.user.pseudonym ? e.user.pseudonym.sis_user_id : nil,
-              'sis_login_id' => e.user.pseudonym && e.user.sis_user_id ? e.user.pseudonym.unique_id : nil,
-              'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
-            }
+            'user' => user_json
           }
         end
       end

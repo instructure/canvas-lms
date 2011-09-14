@@ -1139,6 +1139,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@course).should == 42
@@ -1151,6 +1152,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@group).should == 42
@@ -1162,6 +1164,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@root_account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@account).should == 42
@@ -1172,6 +1175,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@account).should == 42

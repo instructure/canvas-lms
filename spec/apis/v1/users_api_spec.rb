@@ -23,6 +23,9 @@ class TestUserApi
   attr_accessor :services_enabled, :context, :current_user
   def service_enabled?(service); @services_enabled.include? service; end
   def avatar_image_url(user_id); "avatar_image_url(#{user_id})"; end
+  def initialize
+    @domain_root_account = Account.default
+  end
 end
 
 describe Api::V1::User do
@@ -47,6 +50,54 @@ describe Api::V1::User do
         "avatar_url" => "avatar_image_url(#{@student.id})"
       })
     end
+
+    it 'should use the correct SIS pseudonym' do
+      @user = User.create!(:name => 'User')
+      @account2 = Account.create!
+      @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'abc' }
+      @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+      @test_api.user_json(@user, @admin, {}, [], Account.default).should == {
+          'name' => 'User',
+          'sortable_name' => 'User',
+          'sis_user_id' => 'xyz',
+          'id' => @user.id,
+          'short_name' => 'User',
+          'login_id' => 'xyz',
+          'sis_login_id' => 'xyz'
+        }
+    end
+
+    it 'should use the SIS pseudonym instead of another pseudonym' do
+      @user = User.create!(:name => 'User')
+      @account2 = Account.create!
+      @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
+      @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+      @test_api.user_json(@user, @admin, {}, [], Account.default).should == {
+          'name' => 'User',
+          'sortable_name' => 'User',
+          'sis_user_id' => 'xyz',
+          'id' => @user.id,
+          'short_name' => 'User',
+          'login_id' => 'xyz',
+          'sis_login_id' => 'xyz'
+        }
+    end
+
+    it 'should use the correct pseudonym' do
+      @user = User.create!(:name => 'User')
+      @account2 = Account.create!
+      @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2)
+      @pseudonym = @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default)
+      @user.stubs(:find_pseudonym_for_account).with(Account.default).returns(@pseudonym)
+      @test_api.user_json(@user, @admin, {}, [], Account.default).should == {
+          'name' => 'User',
+          'sortable_name' => 'User',
+          'id' => @user.id,
+          'short_name' => 'User',
+          'login_id' => 'xyz',
+        }
+    end
+
 
     def test_context(mock_context, context_to_pass)
       mock_context.expects(:account).returns(mock_context)
@@ -179,8 +230,6 @@ describe "Users API", :type => :integration do
       'sortable_name' => 'User',
       'short_name' => 'User',
       'primary_email' => 'nobody@example.com',
-      'sis_user_id' => nil,
-      'sis_login_id' => nil,
       'login_id' => 'nobody@example.com',
       'avatar_url' => "http://www.example.com/images/users/#{@admin.id}",
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
@@ -250,15 +299,14 @@ describe "Users API", :type => :integration do
 
   describe "user account listing" do
     it "should return users for an account" do
-      @account = @user.account
+      @account = Account.default
       users = []
       [['Test User1', 'test@example.com'], ['Test User2', 'test2@example.com'], ['Test User3', 'test3@example.com']].each_with_index do |u, i|
-        users << User.create(:name => u[0])
-        users[i].pseudonyms.create(:unique_id => u[1], :password => '123456', :password_confirmation => '123456')
-        users[i].pseudonym.update_attribute(:sis_user_id, (i + 1) * 100)
-        users[i].pseudonym.update_attribute(:account_id, @account.id)
+        users << User.create!(:name => u[0])
+        users[i].pseudonyms.create!(:unique_id => u[1], :account => @account) { |p| p.sis_user_id = u[1] }
       end
       @account.all_users.scoped(:order => :sortable_name).each_with_index do |user, i|
+        next unless users.find { |u| u == user }
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
                { :controller => 'users', :action => 'index', :account_id => @account.id.to_param, :format => 'json' },
                { :per_page => 1, :page => i + 1 })
@@ -269,7 +317,7 @@ describe "Users API", :type => :integration do
           'id' => user.id,
           'short_name' => user.short_name,
           'login_id' => user.pseudonym.unique_id,
-          'sis_login_id' => user.pseudonym.sis_user_id ? user.pseudonym.unique_id : nil
+          'sis_login_id' => user.pseudonym.sis_user_id
         }]
       end
     end
