@@ -113,12 +113,15 @@ module SIS
                 pseudo.sis_user_id = row['user_id']
                 pseudo.account = @root_account
                 pseudo.workflow_state = row['status']=~ /active/i ? 'active' : 'deleted'
-                if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated)
+                # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
+                # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
+                if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(row['password']))
                   pseudo.password = row['password']
                   pseudo.password_confirmation = row['password']
                   pseudo.password_auto_generated = true
                 end
                 pseudo.sis_ssha = row['ssha_password'] if !row['ssha_password'].blank?
+                pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
 
                 begin
                   User.transaction(:requires_new => true) do
