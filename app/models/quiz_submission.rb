@@ -297,7 +297,7 @@ class QuizSubmission < ActiveRecord::Base
     self.finished_at = Time.now
     self.manually_unlocked = nil
     self.finished_at = opts[:finished_at] if opts[:finished_at]
-    if self.quiz.for_assignment?
+    if self.quiz.for_assignment? && self.user_id
       assignment_submission = self.quiz.assignment.find_or_create_submission(self.user_id)
       self.submission = assignment_submission
     end

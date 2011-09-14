@@ -803,15 +803,10 @@ class Assignment < ActiveRecord::Base
   def self.find_or_create_submission(assignment_id, user_id)
     s = nil
     attempts = 0
-    begin
-      s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-      s.created_correctly_from_assignment_rb = true
-      s.save_without_broadcast if s.new_record?
-      raise "bad" if s.new_record?
-    rescue => e
-      attempts += 1
-      retry if attempts < 3
-    end
+    s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
+    s.created_correctly_from_assignment_rb = true
+    s.save_without_broadcast if s.new_record?
+    raise "bad" if s.new_record?
     s
   end
   
@@ -1531,4 +1526,3 @@ class Assignment < ActiveRecord::Base
     end
     
 end
-
