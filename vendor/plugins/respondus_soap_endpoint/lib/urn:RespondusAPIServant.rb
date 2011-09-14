@@ -5,9 +5,12 @@ class RespondusAPIPort
   attr_reader :session, :user
   attr_accessor :rack_env
 
+  OAUTH_TOKEN_USERNAME = 'oauth_access_token'
+
   protected
 
   class BadAuthError < Exception; end
+  class NeedDelegatedAuthError < Exception; end
   class CantReplaceError < Exception; end
   class OtherError < Exception
     attr_reader :errorStatus
@@ -42,13 +45,30 @@ class RespondusAPIPort
     @verifier.generate(session)
   end
 
+  def load_user_with_oauth(token, domain_root_account)
+    token = AccessToken.find_by_token(token)
+    if !token.try(:usable?) || !token.try(:user)
+      raise(BadAuthError)
+    end
+    token.used!
+    @user = token.user
+  end
+
   def load_user(method, userName, password)
     return nil if %w(identifyServer).include?(method.to_s)
     domain_root_account = rack_env['canvas.domain_root_account'] || Account.default
+    if userName == OAUTH_TOKEN_USERNAME
+      # password is the oauth token
+      return load_user_with_oauth(password, domain_root_account)
+    end
+
     scope = domain_root_account.require_account_pseudonym? ?
       domain_root_account.pseudonyms :
       Pseudonym
     pseudonym = scope.find_by_unique_id(userName) || raise(BadAuthError)
+    if pseudonym.account.try(:delegated_authentication?)
+      raise(NeedDelegatedAuthError)
+    end
     raise(BadAuthError) unless pseudonym.valid_arbitrary_credentials?(password)
     @user = pseudonym.user
   end
@@ -72,6 +92,8 @@ class RespondusAPIPort
       ["Function not implemented"]
     when BadAuthError
       ["Invalid credentials"]
+    when NeedDelegatedAuthError
+      ["Access token required"]
     when ActiveSupport::MessageVerifier::InvalidSignature
       ["Invalid context"]
     when CantReplaceError

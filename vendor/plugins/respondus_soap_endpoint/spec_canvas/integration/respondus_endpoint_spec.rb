@@ -77,6 +77,49 @@ Implemented for: Canvas LMS}
     soap_response.first.should == "Invalid credentials"
   end
 
+  describe "delegated auth" do
+    before do
+      @account = account_with_cas
+      @pseudonym.update_attribute(:account, @account)
+    end
+
+    it "should error if token is required" do
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'hax0r',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Access token required"
+    end
+
+    it "should allow using an oauth token for delegated auth" do
+      uname = 'oauth_access_token'
+      # we already test the oauth flow in spec/apis/oauth_spec, so shortcut here
+      @key = DeveloperKey.create!
+      @token = AccessToken.create!(:user => @user, :developer_key => @key)
+      soap_response = soap_request('ValidateAuth',
+                                   uname, @token.token,
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Success"
+
+      status, details, context, list = soap_request('GetServerItems',
+                                                    uname, @token.token,
+                                                    '', ['itemType', 'course'])
+      status.should == "Success"
+      pair = list.item
+      pair.name.should == "value for name"
+      pair.value.should == @course.to_param
+
+      # verify that the respondus api session works with token auth
+      status, details, context = soap_request('SelectServerItem',
+                                              uname, @token.token,
+                                              context, ['itemType', 'course'],
+                                              ['itemID', @course.to_param],
+                                              ['clearState', ''])
+      status.should == "Success"
+    end
+  end
+
   it "should reject a session created for a different user" do
     user1 = @user
     user2 = user_with_pseudonym :active_user => true,
