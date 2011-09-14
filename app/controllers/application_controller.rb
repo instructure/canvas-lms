@@ -1010,7 +1010,7 @@ class ApplicationController < ActionController::Base
   helper_method :user_content
 
   def find_bank(id, check_context_chain=true)
-    bank = @context.assessment_question_banks.active.find_by_id(id)
+    bank = @context.assessment_question_banks.active.find_by_id(id) || @current_user.assessment_question_banks.active.find_by_id(id)
     if bank
       (block_given? ?
         authorized_action(bank, @current_user, :read) :
