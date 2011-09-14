@@ -25,7 +25,7 @@
     }
     for(var jdx in data) {
       var submission = data[jdx].submission;
-      var comments = submission.submission_comments;
+      var comments = submission.visible_submission_comments || submission.submission_comments;
       if(submission.user_id != <%= @submission.user_id %>) { continue; }
       //$(".comments .comment_list").empty();
       for(var idx in comments) {
@@ -270,7 +270,10 @@
 <% end %>
   <div style="padding: 0px 20px 3px;" class="submission_details">
     <div style="float: right;">
-      <% if can_do(@submission, @current_user, :read_grade) %>
+      <% if @assignment.muted? %>
+        <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
+      <% end %>
+      <% if can_do(@submission, @current_user, :read_grade) && !@assignment.muted? %>
         <%= before_label('grade', 'Grade') %> 
           <% if can_do(@assignment, @current_user, :grade) %>
             <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
@@ -378,7 +381,7 @@
             <% unless can_do(@submission, @current_user, :read_grade) %>
               <i><%= t('only_see_your_own_comments', 'As a peer reviewing student, you will only see comments written by you.') %></i><br/><br/>
             <% end %>
-            <% @submission.submission_comments.each do |comment| %>
+            <% @submission.submission_comments(:visible).each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
               <div class="comment" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
@@ -459,7 +462,6 @@
       </div>
     </div>
   </div>
-
 <% js_block do %>
 <script>
 var rubricAssessments = <%= raw @visible_rubric_assessments.to_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) %>;

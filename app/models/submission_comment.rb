@@ -33,7 +33,7 @@ class SubmissionComment < ActiveRecord::Base
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
 
-  attr_accessible :comment, :submission, :submission_id, :recipient, :recipient_id, :author, :context_id, :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous
+  attr_accessible :comment, :submission, :submission_id, :recipient, :recipient_id, :author, :context_id, :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden
   
   before_save :infer_details
   after_save :update_submission
@@ -114,6 +114,7 @@ class SubmissionComment < ActiveRecord::Base
     p.whenever {|record|
       record.just_created &&
       record.submission.assignment &&
+      !record.submission.assignment.muted? &&
       (!record.submission.assignment.context.admins.include?(author) || record.submission.assignment.published?)
     }
 
@@ -191,9 +192,9 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   def update_submission
-    conn = Submission.connection
-    comments_count = SubmissionComment.find_all_by_submission_id(self.submission_id).length
-    conn.execute("UPDATE submissions SET submission_comments_count=#{comments_count}, updated_at=#{conn.quote(Time.now.utc.to_s(:db))} WHERE id=#{self.submission_id}") rescue nil
+    return nil if hidden?
+    comments_count = SubmissionComment.count(:conditions => { :submission_id => submission_id, :hidden => false })
+    Submission.update_all({ :submission_comments_count => comments_count }, { :id => submission_id }) rescue nil
   end
   
   def formatted_body(truncate=nil)
@@ -206,6 +207,8 @@ class SubmissionComment < ActiveRecord::Base
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
   end
+
+  named_scope :visible, :conditions => { :hidden => false }
 
   named_scope :after, lambda{|date|
     {:conditions => ['submission_comments.created_at > ?', date] }

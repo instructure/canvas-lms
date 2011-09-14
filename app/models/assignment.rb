@@ -23,6 +23,7 @@ class Assignment < ActiveRecord::Base
   include TextHelper
   include HasContentTags
   include CopyAuthorizedLinks
+  include Mutable
   
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
@@ -338,6 +339,7 @@ class Assignment < ActiveRecord::Base
     p.to { participants }
     p.whenever { |record| 
       !self.suppress_broadcast and
+      !record.muted? and
       record.created_at < Time.now - (30*60) and
       record.context.state == :available and [:available, :published].include?(record.state) and
       record.prior_version and (record.points_possible != record.prior_version.points_possible || @assignment_changed)
@@ -354,18 +356,26 @@ class Assignment < ActiveRecord::Base
     p.to { @students_whose_grade_just_changed }
     p.whenever {|record|
       !self.suppress_broadcast and
+      !record.muted? and
       @notify_affected_students_of_grading_change and 
       record.context.state == :available and
       @students_whose_grade_just_changed and !@students_whose_grade_just_changed.empty?
     }
-      
     
     p.dispatch :assignment_graded
     p.to { participants }
     p.whenever {|record|
       !self.suppress_broadcast and
+      !record.muted? and
       @notify_all_students_of_grading and
       record.context.state == :available
+    }
+
+    p.dispatch :assignment_unmuted
+    p.to { participants }
+    p.whenever { |record|
+      !self.suppress_broadcast and
+      record.recently_unmuted
     }
 
   end

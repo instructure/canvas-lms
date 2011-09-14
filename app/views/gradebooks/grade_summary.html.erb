@@ -104,7 +104,7 @@
      visible_rubric_assessments = []
      visible_rubric_assessments = submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] } if submission
   %>
-  <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable" %>" id="<%= "submission_" + assignment.id.to_s %>">
+  <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %> <%= assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable" %>" id="<%= "submission_" + assignment.id.to_s %>">
     <td class="title">
       <% if assignment.class.to_s == "Assignment" %>
         <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @student.id) %>"><%= assignment.title %></a>
@@ -128,6 +128,8 @@
               <span class="tooltip_text score_teaser">
                 <% if assignment.special_class %>
                   <%= t(:percent, "Percent") %>
+                <% elsif assignment.muted? %>
+                  <%= t(:student_mute_notification, "Instructor is working on grades") %>
                 <% else %>
                   <%= t(:click_to_change, "Click to test a different score") %>
                 <% end %>
@@ -135,7 +137,11 @@
             <% end %>
           </span>
           <span class="grade">
-            <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
+            <% if assignment.muted? %>
+              <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
+            <% else %>
+              <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
+            <% end %>
           </span>
           <% if assignment.grading_type == 'letter_grade' %>
             <span class="score_value" style="font-size: 0.8em; color: #aaa; <%= hidden unless submission && submission.published_score %>"><%= submission.published_score rescue nbsp %></span>
@@ -143,8 +149,8 @@
           <%= "%" if assignment.special_class %>
         </span>
         <div style="display: none;">
-          <span class="original_score"><%= submission.published_score rescue "" %></span>
-          <span class="score"><%= submission.published_score rescue "" %></span>
+          <span class="original_score"><%= if assignment.muted? then "" else submission.published_score end rescue "" %></span>
+          <span class="score"><%= if assignment.muted? then "" else submission.published_score end rescue "" %></span>
           <span class="assignment_group_id"><%= assignment.assignment_group_id rescue "" %></span>
           <span class="assignment_id"><%= assignment.id.to_s %></span>
           <span class="group_weight"><%= assignment.group_weight rescue "" %></span>
@@ -156,14 +162,14 @@
     <td class="possible points_possible" <%= "colspan='2'" if assignment.special_class %>><%= assignment.points_possible %></td>
     <% if !assignment.special_class %>
     <td style="padding-left: 10px; white-space: nowrap;">
-      <% has_comments = submission && submission.submission_comments && !submission.submission_comments.empty? %>
+      <% has_comments = submission && submission.visible_submission_comments && !submission.visible_submission_comments.empty? %>
       <a href="#" class="toggle_comments_link tooltip" title="<%= t(:view_comments, "View comments and scoring details") %>" style="<%= 'visibility: hidden;' unless has_comments %>">
         <span class="tooltip_wrap right">
-          <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.submission_comments.size rescue 0)) %></span>
+          <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.visible_submission_comments.size rescue 0)) %></span>
         </span>
         <%= image_tag "word_bubble.png" %>
       </a>
-      <% has_scoring_details = submission && submission.score && assignment.points_possible && assignment.points_possible > 0 %>
+      <% has_scoring_details = submission && submission.score && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? %>
       <a href="#" class="toggle_comments_link tooltip" title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless has_scoring_details %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= t(:see_scoring_details, "See scoring details") %></span>
@@ -204,9 +210,9 @@
     <% end %>
   </tr>
   <% if !assignment.special_class && (has_comments || has_scoring_details) %>
-    <tr class="comments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
+    <tr class="comments <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %>" style="display: none;">
       <td colspan="5" style="padding-bottom: 20px;">
-        <% if assignment && assignment.points_possible && assignment.points_possible > 0 %>
+        <% if assignment && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? %>
         <% high, low, mean = assignment.grade_distribution(@all_submissions.select { |s| s.assignment_id == assignment.id }) %>
         <% title = "" %>
         <% title += " " + before_label(:mean_score, "Mean") + " " + (mean.round(1) rescue 0).to_s %>
@@ -257,8 +263,8 @@
         </div>
         <% end %>
         <% end %>
-        <% if submission && submission.submission_comments %>
-          <% submission.submission_comments.each do |comment| %>
+        <% if submission && submission.visible_submission_comments %>
+          <% submission.visible_submission_comments.each do |comment| %>
             <div>
               <% if comment.media_comment_id && comment.media_comment_type %>
                 <div class="comment_media">
@@ -299,6 +305,10 @@
   <% end %>
 <% end %>
 </table>
+<% muted_assignment_count = @assignments.inject(0) { |i, a| if a.muted? then i + 1 else i end } %>
+<% if muted_assignment_count > 0 %>
+  <small><%= image_tag "sound_mute.png" %><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
+<% end %>
 <% total_weight = 0
   if @context.group_weighting_scheme == "percent"
     @groups.each {|g| total_weight = total_weight + g.group_weight}

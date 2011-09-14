@@ -33,6 +33,8 @@ module Api::V1::Assignment
     hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
   end
 
+  hash['muted'] = assignment.muted?
+
   if assignment.rubric_association
     hash['use_rubric_for_grading'] =
       !!assignment.rubric_association.use_for_grading

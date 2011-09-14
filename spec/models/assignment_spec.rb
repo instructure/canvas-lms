@@ -171,6 +171,26 @@ describe Assignment do
     @a.submissions.first.versions.length.should eql(3)
   end
 
+  it "should default to unmuted" do
+    assignment_model
+    @assignment.muted?.should eql false
+  end
+
+  it "should be mutable" do
+    assignment_model
+    @assignment.respond_to?(:mute!).should eql true
+    @assignment.mute!
+    @assignment.muted?.should eql true
+  end
+
+  it "should be unmutable" do
+    assignment_model
+    @assignment.respond_to?(:unmute!).should eql true
+    @assignment.mute!
+    @assignment.unmute!
+    @assignment.muted?.should eql false
+  end
+
   describe "infer_due_at" do
     it "should set to all_day" do
       assignment_model(:due_at => "Sep 3 2008 12:00am")
@@ -444,6 +464,14 @@ describe Assignment do
       @assignment.messages_sent.should be_include("Assignment Graded")
       @sub1.messages_sent.should be_empty
     end
+
+    it "should not fire off assignment graded notification on first publish if muted" do
+      setup_unpublished_assignment_with_students
+      @assignment.mute!
+      @assignment.publish!
+      @assignment.should be_muted
+      @assignment.messages_sent.should_not be_include("Assignment Graded")
+    end
     
     it "should fire off submission graded notifications if already published" do
       setup_unpublished_assignment_with_students
@@ -456,6 +484,17 @@ describe Assignment do
       @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
       @sub2.messages_sent.should_not be_include("Submission Graded")
       @sub2.messages_sent.should be_include("Submission Grade Changed")
+    end
+
+    it "should not fire off submission graded notifications if already published but muted" do
+      setup_unpublished_assignment_with_students
+      @assignment.publish!
+      @assignment.mute!
+      @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+      @sub2.messages_sent.should_not be_include("Submission Graded")
+      @sub2.update_attributes(:graded_at => Time.now - 60*60)
+      @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
+      @sub2.messages_sent.should_not be_include("Submission Grade Changed")
     end
     
     it "should not fire off assignment graded notification if started as published" do
@@ -521,7 +560,7 @@ describe Assignment do
       @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
       @sub2.messages_sent.should be_empty
     end
-    
+
     it" should fire off submission graded notifications on second publish" do
       setup_unpublished_assignment_with_students
       @assignment.publish!
@@ -543,7 +582,7 @@ describe Assignment do
       @assignment.updated_submissions.sort_by(&:id).last.messages_sent.should be_include("Submission Grade Changed")
     end
   end
-  
+
   context "to_json" do
     it "should include permissions if specified" do
       assignment_model
@@ -868,6 +907,18 @@ describe Assignment do
         @sub2.messages_sent['Submission Graded'].should be_nil
         @sub2.messages_sent['Submission Grade Changed'].should_not be_nil
       end
+
+      it "should not notify students when their grade is changed if muted" do
+        setup_unpublished_assignment_with_students
+        @assignment.publish!
+        @assignment.mute!
+        @assignment.should be_muted
+        @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+        @sub2.update_attributes(:graded_at => Time.now - 60*60)
+        @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
+        @sub2.messages_sent.should be_empty
+      end
+
       it "should not notify students of grade changes if unpublished" do
         setup_unpublished_assignment_with_students
         @assignment.publish!
@@ -886,6 +937,14 @@ describe Assignment do
         @assignment.set_default_grade(:default_grade => 10)
         @assignment.messages_sent.should_not be_nil
         @assignment.messages_sent['Assignment Graded'].should_not be_nil
+      end
+
+      it "should not notify affected students on a mass-grade change if muted" do
+        setup_unpublished_assignment_with_students
+        @assignment.publish!
+        @assignment.mute!
+        @assignment.set_default_grade(:default_grade => 10)
+        @assignment.messages_sent.should be_empty
       end
       
       it "should notify affected students of a grade change when the assignment is republished" do
@@ -962,6 +1021,16 @@ describe Assignment do
         @a.description = "something different"
         @a.save
         @a.messages_sent.should_not be_include('Assignment Changed')
+      end
+
+      it "should not create a message when a muted assignment changes" do
+        assignment_model
+        @a.mute!
+        Notification.create :name => "Assignment Changed"
+        @a.context.offer!
+        @a.description = "something different"
+        @a.save
+        @a.messages_sent.should be_empty
       end
       
       # it "should NOT create a message when the content changes to an empty string" do

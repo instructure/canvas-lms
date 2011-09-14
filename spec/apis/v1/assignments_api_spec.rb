@@ -76,6 +76,7 @@ describe AssignmentsApiController, :type => :integration do
           'position' => 1,
           'points_possible' => 12,
           'grading_type' => 'points',
+          'muted' => false,
           'use_rubric_for_grading' => true,
           'free_form_criterion_comments' => true,
           'needs_grading_count' => 0,
@@ -142,6 +143,7 @@ describe AssignmentsApiController, :type => :integration do
     json.should == {
       'id' => Assignment.first.id,
       'name' => 'some assignment',
+      'muted' => false,
       'position' => 1,
       'points_possible' => 12,
       'grading_type' => 'points',
@@ -179,6 +181,7 @@ describe AssignmentsApiController, :type => :integration do
     json.should == {
       'id' => @assignment.id,
       'name' => 'some assignment again',
+      'muted' => false,
       'position' => 1,
       'points_possible' => 15,
       'grading_type' => 'points',
@@ -206,5 +209,18 @@ describe AssignmentsApiController, :type => :integration do
             :id => @assignment.id.to_s, })
     json['discussion_topic']['id'].should == @topic.id
     json['discussion_topic']['url'].should == "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+  end
+
+  it "should return the mute status of the assignment" do
+    course_with_teacher(:active_all => true)
+    @context = @course
+    @assignment = @course.assignments.create! :title => "Test Assignment"
+    
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+      { :controller => "assignments_api", :action => "show",
+        :format => "json", :course_id => @course.id.to_s,
+        :id => @assignment.id.to_s })
+    json["muted"].should eql false
   end
 end

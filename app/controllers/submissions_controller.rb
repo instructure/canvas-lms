@@ -231,7 +231,8 @@ class SubmissionsController < ApplicationController
           :media_comment_type => params[:submission][:media_comment_type],
           :assessment_request => @request,
           :commenter => @current_user,
-          :group_comment => params[:submission][:group_comment]
+          :group_comment => params[:submission][:group_comment],
+          :hidden => @assignment.muted? && @context_enrollment.admin?
         }
       end
       begin
@@ -248,11 +249,12 @@ class SubmissionsController < ApplicationController
           format.html { redirect_to course_assignment_url(@context, @assignment) }
           format.xml  { head :created, :location => course_gradebook_url(@submission.assignment.context) }
           excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
+          comments_type = @context_enrollment.admin? ? :submission_comments : :visible_submission_comments
           format.json { 
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history])), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type)), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
           format.text { 
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history])), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type)), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
         else
           @error_message = t('errors_update_failed', "Update Failed")

@@ -28,6 +28,7 @@ class Submission < ActiveRecord::Base
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
   has_many :submission_comments, :order => 'created_at', :dependent => :destroy
+  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at', :conditions => { :hidden => false }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   belongs_to :quiz_submission
@@ -92,7 +93,7 @@ class Submission < ActiveRecord::Base
                         assignments.context_id, assignments.context_type, courses.name AS context_name',
             :joins => 'JOIN assignments ON assignments.id = submissions.assignment_id
                        JOIN courses ON courses.id = assignments.context_id',
-            :conditions => ["graded_at > ? AND user_id = ?", date.to_s(:db), user_id],
+            :conditions => ["graded_at > ? AND user_id = ? AND muted = ?", date.to_s(:db), user_id, false],
             :order => 'graded_at DESC',
             :limit => limit
             }
@@ -522,6 +523,7 @@ class Submission < ActiveRecord::Base
     p.to { student }
     p.whenever {|record|
       !record.suppress_broadcast and
+      !record.assignment.muted? and
       record.assignment.context.state == :available and 
       record.assignment.state == :published and 
       (record.changed_state_to(:graded) || (record.changed_in_state(:graded, :fields => [:score, :grade]) && !@assignment_just_published && record.assignment_graded_in_the_last_hour?))
@@ -531,12 +533,14 @@ class Submission < ActiveRecord::Base
     p.to { student }
     p.whenever {|record|
       !record.suppress_broadcast and
+      !record.assignment.muted? and
       record.graded_at and 
       record.assignment.context.state == :available and 
       record.assignment.state == :published and 
       (!record.assignment_graded_in_the_last_hour? or record.submission_type == 'online_quiz' ) and
       (@assignment_just_published || (record.changed_in_state(:graded, :fields => [:score, :grade]) && !record.assignment_graded_in_the_last_hour?))
     }
+
   end
   
   def assignment_graded_in_the_last_hour?
@@ -736,7 +740,7 @@ class Submission < ActiveRecord::Base
     end
     opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || t('no_comment', "no comment")))
     self.save! if self.new_record?
-    valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous]
+    valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden]
     comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?
     opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
     comment
@@ -746,14 +750,24 @@ class Submission < ActiveRecord::Base
     @comment_limiting_user = user
     @comment_limiting_session = session
   end
-  
-  alias_method :old_submission_comments, :submission_comments
-  def submission_comments
-    res = old_submission_comments
-    if @comment_limiting_user
+
+  def limit_if_comment_limiting_user(res)
+   if @comment_limiting_user
       res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) }
-    end
-    res
+   end
+   res
+  end
+
+  alias_method :old_submission_comments, :submission_comments
+  def submission_comments(comment_scope = nil)
+    res = comment_scope.nil? ? old_submission_comments : old_submission_comments.send(comment_scope)
+    limit_if_comment_limiting_user(res)
+  end
+
+  alias_method :old_visible_submission_comments, :visible_submission_comments
+  def visible_submission_comments
+    res = old_visible_submission_comments
+    limit_if_comment_limiting_user(res)
   end
   
   def assessment_request_count
@@ -888,9 +902,10 @@ class Submission < ActiveRecord::Base
   end
   
   def self.json_serialization_full_parameters(additional_parameters={})
+    additional_parameters[:comments] ||= :submission_comments
     res = {
       :methods => [:scribdable?,:conversion_status,:scribd_doc,:formatted_body,:submission_history], 
-      :include => [:attachments,:submission_comments,:quiz_submission],
+      :include => [:attachments,additional_parameters[:comments],:quiz_submission],
     }.merge(additional_parameters || {})
     if additional_parameters[:except]
       additional_parameters[:except].each do |key|
@@ -899,6 +914,7 @@ class Submission < ActiveRecord::Base
       end
     end
     res.delete :except
+    res.delete :comments
     res
   end
 

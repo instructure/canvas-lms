@@ -278,6 +278,27 @@ describe User do
     user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 0}, {3 => 1}].sort(&sort_account_associations)
   end
 
+  def create_course_with_student_and_assignment
+    @course = course_model
+    @course.offer!
+    @student = user_model
+    @course.enroll_student @student
+    @assignment = @course.assignments.create :title => "Test Assignment", :points_possible => 10
+  end
+
+  it "should not include recent feedback for muted assignments" do
+    create_course_with_student_and_assignment
+    @assignment.mute!
+    @assignment.grade_student @student, :grade => 9
+    @user.recent_feedback.should be_empty
+  end
+
+  it "should include recent feedback for unmuted assignments" do
+    create_course_with_student_and_assignment
+    @assignment.grade_student @user, :grade => 9
+    @user.recent_feedback(:contexts => [@course]).should_not be_empty
+  end
+
   context "move_to_user" do
     it "should delete the old user" do
       @user1 = user_model

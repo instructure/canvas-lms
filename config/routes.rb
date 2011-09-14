@@ -148,6 +148,7 @@ ActionController::Routing::Routes.draw do |map|
       assignment.delete_peer_review "peer_reviews/:id", :controller => 'assignments', :action => 'delete_peer_review', :conditions => {:method => :delete}
       assignment.remind_peer_review "peer_reviews/:id", :controller => 'assignments', :action => 'remind_peer_review', :conditions => {:method => :post}
       assignment.assign_peer_review "peer_reviews/users/:reviewer_id", :controller => 'assignments', :action => 'assign_peer_review', :conditions => {:method => :post}
+      assignment.mute "mute", :controller => "assignments", :action => "toggle_mute", :conditions => {:method => :put}
     end
     course.resources :grading_standards, :only => %w(index create update destroy)
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|

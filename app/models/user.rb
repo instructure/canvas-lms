@@ -1384,11 +1384,12 @@ class User < ActiveRecord::Base
     submissions = []
     submissions += self.submissions.after(opts[:fallback_start_at]).for_context_codes(context_codes).find(
       :all, 
-      :conditions => "submissions.score IS NOT NULL AND assignments.workflow_state != 'deleted'",
+      :conditions => ["submissions.score IS NOT NULL AND assignments.workflow_state != ? AND assignments.muted = ?", 'deleted', false],
       :include => [:assignment, :user, :submission_comments],
       :order => 'submissions.created_at DESC',
       :limit => opts[:limit]
     )
+
     # THIS IS SLOW, it takes ~230ms for mike
     submissions += Submission.for_context_codes(context_codes).find(
       :all,
@@ -1406,7 +1407,8 @@ class User < ActiveRecord::Base
                 INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
                 SQL
       :order => 'last_updated_at_from_db DESC',
-      :limit => opts[:limit]
+      :limit => opts[:limit],
+      :conditions => { "assignments.muted" => false }
     )
     
     submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil)  || t.created_at}.reverse

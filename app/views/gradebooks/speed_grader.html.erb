@@ -21,6 +21,7 @@
       </div>
     </div>
     <div class="right">
+      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class="label"><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if Setting.get_cached("show_feedback_link", "false") == "true" %>| <a href="#" id="feedback_link"><%= t('links.help', "Help") %></a><% end %>
       <div>
@@ -243,6 +244,7 @@
     <button type="submit" class="button submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
   </p>
 </form>
+<%= render :partial => "shared/mute_dialog" %>
 <ul id="section-menu" class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open" style="display:none;" role="listbox" aria-activedescendant="section-menu-link">
   <li role="presentation" class="ui-selectmenu-item">
     <a href="#" tabindex="-1" role="option" aria-selected="true" id="section-menu-link">

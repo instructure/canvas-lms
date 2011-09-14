@@ -1,0 +1,6 @@
+<%= t :body, <<-BODY, :title => asset.title, :course => asset.context.name, :website => HostUrl.context_host(asset.context)
+Your instructor has released grades and comments for %{title}, %{course}.
+
+More info at %{website}
+BODY
+%>

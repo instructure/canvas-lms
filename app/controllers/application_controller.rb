@@ -379,6 +379,11 @@ class ApplicationController < ActionController::Base
     @submissions_hash = {}
     @submissions.each{|s|
       @submissions_hash[s.assignment_id] = s
+      assignment = @assignments.select { |a| a.id == s.assignment_id }[0]
+      if assignment && assignment.muted?
+        submission = @submissions_hash[s.assignment_id]
+        submission.published_score = submission.published_grade = submission.graded_at = submission.grade = submission.score = nil
+      end
     }
     @ungraded_assignments = @assignments.select{|a| 
       a.grants_right?(@current_user, session, :grade) && 
