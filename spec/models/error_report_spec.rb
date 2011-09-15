@@ -47,4 +47,8 @@ describe ErrorReport do
     m = Message.last
     (!!(m && m.to == "nobody@nowhere.com")).should eql(false)
   end
+
+  it "should not fail with invalid UTF-8" do
+    ErrorReport.log_error('my error', :message => "he\xffllo")
+  end
 end
