@@ -701,6 +701,10 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
     end
+    
+    api.with_options(:controller => :services_api) do |services|
+      services.get 'services/kaltura', :action => :show_kaltura_config
+    end
   end
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
