@@ -264,12 +264,13 @@ shared_examples_for "all selenium tests" do
   end
 
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
-    val = seconds.times do |i|
+    val = false
+    seconds.times do |i|
       puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
       val = false
       begin
         val = yield
-        break(val) if val
+        break if val
       rescue => e
         raise if i == seconds - 1
       end
