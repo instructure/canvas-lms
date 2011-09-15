@@ -249,7 +249,7 @@ class UsersController < ApplicationController
   #     'id': 1234,
   #     'title': 'Stream Item Subject',
   #     'message': 'This is the body text of the activity stream item. It is plain-text, and can be multiple paragraphs.',
-  #     'type': 'DiscussionTopic|ContextMessage|Message|Submission|Conference|Collaboration|...'
+  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...'
   #   }
   #
   # In addition, each item type has its own set of attributes available.
@@ -278,18 +278,14 @@ class UsersController < ApplicationController
   #   }
   # For Announcement, the message is truncated at 4kb.
   #
-  # ContextMessage:
+  # Conversation:
   #
   #   {
-  #     'type': 'ContextMessage',
-  #     'context_message_id': 1234,
-  #     'sender': {
-  #       'user_id': 5678,
-  #       'user_name': 'joe user'
-  #     },
-  #     'recipients_count': 1
+  #     'type': 'Conversation',
+  #     'conversation_id': 1234,
+  #     'private': false,
+  #     'participant_count': 3,
   #   }
-  # For ContextMessage, the message is truncated at 4kb.
   #
   # Message:
   #
