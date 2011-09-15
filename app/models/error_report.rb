@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'iconv'
+
 class ErrorReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
@@ -42,6 +44,9 @@ class ErrorReport < ActiveRecord::Base
     def log_error(category, opts)
       opts[:category] = category.to_s
       @opts = opts
+      # sanitize invalid encodings
+      @opts[:message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:message]) if @opts[:message]
+      @opts[:exception_message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:exception_message]) if @opts[:exception_message]
       run_callbacks :on_log_error
       create_error_report(opts)
     end
