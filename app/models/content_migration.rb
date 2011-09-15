@@ -269,7 +269,11 @@ class ContentMigration < ActiveRecord::Base
   named_scope :running, :conditions=>"workflow_state IN ('exporting', 'importing')"
   named_scope :waiting, :conditions=>"workflow_state IN ('exported')"
   named_scope :failed, :conditions=>"workflow_state IN ('failed', 'pre_process_error')"
-  
+
+  def complete?
+    %w[imported failed pre_process_error].include?(workflow_state)
+  end
+
   def download_exported_data
     raise "No exported data to import" unless self.exported_attachment
     config = Setting.from_config('external_migration')

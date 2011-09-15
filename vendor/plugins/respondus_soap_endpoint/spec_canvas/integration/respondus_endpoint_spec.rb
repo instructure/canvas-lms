@@ -190,6 +190,8 @@ Implemented for: Canvas LMS}
   end
 
   it "should queue QTI quiz uploads for processing" do
+    Setting.set('respondus_endpoint.polling_api', 'false')
+
     status, details, context = soap_request('SelectServerItem',
                                             'nobody@example.com', 'asdfasdf',
                                             '', ['itemType', 'course'],
@@ -197,13 +199,13 @@ Implemented for: Canvas LMS}
                                             ['clearState', ''])
     status.should == "Success"
 
-    mock_migration = ContentMigration.new
+    mock_migration = ContentMigration.create!
     mock_migration.should_receive(:export_content) do
-      mock_migration.workflow_state = :imported
+      mock_migration.workflow_state = 'imported'
       mock_migration.migration_settings[:imported_assets] = ["quiz_xyz"]
-      mock_migration.save!
     end
-    ContentMigration.stub(:new).and_return(mock_migration)
+    ContentMigration.stub!(:new).and_return(mock_migration)
+    ContentMigration.stub!(:find).with(mock_migration.id).and_return(mock_migration)
 
     status, details, context, item_id = soap_request(
       'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
@@ -217,5 +219,63 @@ Implemented for: Canvas LMS}
     folder = Folder.assert_path(RespondusAPIPort::ATTACHMENT_FOLDER_NAME,
                                 @course)
     folder.hidden?.should == true
+  end
+
+  describe "polling publish" do
+    before do
+      status, details, context = soap_request('SelectServerItem',
+                                              'nobody@example.com', 'asdfasdf',
+                                              '', ['itemType', 'course'],
+                                              ['itemID', @course.to_param],
+                                              ['clearState', ''])
+      status.should == "Success"
+
+      @mock_migration = ContentMigration.create!
+      @mock_migration.should_receive(:export_content) do
+        @mock_migration.workflow_state = 'importing'
+      end
+      ContentMigration.stub!(:new).and_return(@mock_migration)
+      ContentMigration.stub!(:find).with(@mock_migration.id).and_return(@mock_migration)
+
+      status, details, context, item_id = soap_request(
+        'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
+        ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
+        ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file'])
+      status.should == "Success"
+      item_id.should == 'pending'
+      @token = context
+    end
+
+    it "should respond immediately and allow polling for completion" do
+      status, details, context, item_id = soap_request(
+        'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
+        ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
+        ['fileName', 'import.zip'], ['fileData', "\x0"])
+      status.should == "Success"
+      item_id.should == 'pending'
+      @token.should == context
+
+      @mock_migration.migration_settings[:imported_assets] = ["quiz_xyz"]
+      @mock_migration.workflow_state = 'imported'
+
+      status, details, context, item_id = soap_request(
+        'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
+        ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
+        ['fileName', 'import.zip'], ['fileData', "\x0"])
+      status.should == "Success"
+      item_id.should == 'xyz'
+    end
+
+    it "should respond with failures asynchronously as well" do
+      @mock_migration.migration_settings[:imported_assets] = []
+      @mock_migration.workflow_state = 'failed'
+
+      status, details, context, item_id = soap_request(
+        'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
+        ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
+        ['fileName', 'import.zip'], ['fileData', "\x0"])
+      status.should == "Invalid file data"
+      item_id.should == nil
+    end
   end
 end

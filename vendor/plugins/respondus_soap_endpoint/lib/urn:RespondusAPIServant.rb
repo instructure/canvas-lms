@@ -461,6 +461,10 @@ Implemented for: Canvas LMS}]
   ATTACHMENT_FOLDER_NAME = 'imported qti files'
 
   def do_import(item, itemType, uploadType, fileName, fileData)
+    if fileData == "\x0" && session['pending_migration_id']
+      return poll_for_completion()
+    end
+
     unless %w(quiz qdb).include?(itemType)
       raise OtherError, "Invalid item type"
     end
@@ -514,17 +518,36 @@ Implemented for: Canvas LMS}]
     migration.attachment = attachment
     migration.export_content
 
-    # This is a sad excuse for a notification system, but we're just going to
-    # check the migration every couple seconds, see if it's done.
-    timeout(5.minutes.to_i) do
-      while %w[pre_processing exporting exported importing].include?(migration.workflow_state)
-        sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
-        ContentMigration.uncached { migration.reload }
+    session['pending_migration_id'] = migration.id
+    session['pending_migration_itemType'] = itemType
+
+    if Setting.get_cached('respondus_endpoint.polling_api', 'true') != 'false'
+      return poll_for_completion()
+    else
+      # Deprecated in-line waiting for the migration. We've worked with Respondus
+      # to implement an asynchronous, polling solution now.
+      timeout(5.minutes.to_i) do
+        loop do
+          ret = poll_for_completion()
+          if ret == ['pending']
+            sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
+          else
+            return ret
+          end
+        end
       end
     end
+  end
 
-    assets = migration.migration_settings[:imported_assets]
-    a_type = ASSET_TYPES[itemType]
+  def poll_for_completion
+    migration = ContentMigration.uncached { ContentMigration.find(session['pending_migration_id']) }
+
+    unless migration.complete?
+      return [ 'pending' ]
+    end
+
+    assets = migration.migration_settings[:imported_assets] || []
+    a_type = ASSET_TYPES[session['pending_migration_itemType']]
     asset = assets.find { |a| a =~ a_type }
     raise(OtherError, "Invalid file data") unless asset
 
