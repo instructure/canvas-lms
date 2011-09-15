@@ -51,7 +51,7 @@ class InfoController < ApplicationController
       body = t(:feedback_subject, "Student Feedback on %{course}", :course => @course.name)
       body += "\n" + backtrace if backtrace.present?
       body += "\n" + comments
-      @current_user.initiate_conversation(@admins.map(&:id)).add_message(comments)
+      @message = @current_user.initiate_conversation(@admins.map(&:id)).add_message(comments)
       respond_to do |format|
         flash[:notice] = t('notices.feedback_sent', "Thanks for your feedback!  Your teacher has been notified.")
         format.html { redirect_to root_url }

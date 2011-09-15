@@ -4,7 +4,7 @@ describe "help" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should show the Help dialog when 'help' is clicked and feedback is enabled" do
-    course_with_student_logged_in
+    course_with_student_logged_in(:active_all => true)
     
     get "/dashboard"
     driver.find_elements(:css, '#feedback_link').length.should == 0
@@ -19,7 +19,7 @@ describe "help" do
   end
   
   it "should allow sending the teacher a message" do
-    course_with_student_logged_in
+    course_with_student_logged_in(:active_all => true)
     
     Setting.set('show_feedback_link', 'true')
     get "/dashboard"
@@ -39,7 +39,7 @@ describe "help" do
   end
   
   it "should allow submitting a ticket" do
-    course_with_student_logged_in
+    course_with_student_logged_in(:active_all => true)
     
     Setting.set('show_feedback_link', 'true')
     get "/dashboard"
@@ -60,7 +60,7 @@ describe "help" do
   end
   
   it "should not show the 'Message teacher' button if not a student" do
-    course_with_teacher_logged_in
+    course_with_teacher_logged_in(:active_all => true)
     
     Setting.set('show_feedback_link', 'true')
     get "/dashboard"
@@ -70,7 +70,7 @@ describe "help" do
   end
   
   it "should load the ticket dialog if button is clicked" do
-    course_with_student_logged_in
+    course_with_student_logged_in(:active_all => true)
     
     Setting.set('show_feedback_link', 'true')
     get "/dashboard"
@@ -101,7 +101,7 @@ describe "help" do
   end
   
   it "should load the message teacher dialog if button is clicked" do
-    course_with_student_logged_in
+    course_with_student_logged_in(:active_all => true)
     
     Setting.set('show_feedback_link', 'true')
     get "/dashboard"
