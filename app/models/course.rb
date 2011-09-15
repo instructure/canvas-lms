@@ -1553,18 +1553,19 @@ class Course < ActiveRecord::Base
     #todo - Import external tools when there are post-migration messages to tell the user to add shared secret/password
     #ContextExternalTool.process_migration(data, migration)
 
-    2.times do |i|
-      DiscussionTopic.process_migration(data, migration)
-      WikiPage.process_migration(data, migration)
-      migration.fast_update_progress((i==0 ? 55 : 75))
-      Assignment.process_migration(data, migration)
-      ContextModule.process_migration(data, migration)
-      migration.fast_update_progress((i==0 ? 65 : 80))
-    end
+    #These need to be ran twice because they can reference each other
+    DiscussionTopic.process_migration(data, migration);migration.fast_update_progress(55)
+    WikiPage.process_migration(data, migration);migration.fast_update_progress(60)
+    Assignment.process_migration(data, migration);migration.fast_update_progress(65)
+    ContextModule.process_migration(data, migration);migration.fast_update_progress(70)
+    # and second time...
+    DiscussionTopic.process_migration(data, migration);migration.fast_update_progress(75)
+    WikiPage.process_migration(data, migration);migration.fast_update_progress(80)
+    Assignment.process_migration(data, migration);migration.fast_update_progress(85)
+    
     #These aren't referenced by anything, but reference other things
-    CalendarEvent.process_migration(data, migration)
-    WikiPage.process_migration_course_outline(data, migration)
-    migration.fast_update_progress(90)
+    CalendarEvent.process_migration(data, migration);migration.fast_update_progress(90)
+    WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
     
     begin
       #Adjust dates

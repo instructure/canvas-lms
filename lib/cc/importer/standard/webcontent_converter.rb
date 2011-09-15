@@ -22,23 +22,39 @@ module CC::Importer::Standard
     def create_file_map
       file_map = {}
 
-      css = "resource[type=#{WEBCONTENT}][href^=#{WEB_RESOURCES_FOLDER}]"
-
-      @manifest.css(css).each do |res|
-        file = {}
-        file['migration_id'] = res['identifier']
-        file['path_name'] = res['href']
-        file['path_name'] = res['href'].sub(WEB_RESOURCES_FOLDER + '/', '') if is_canvas_cartridge?
+      resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
+        main_file = {}
+        main_file[:migration_id] = res[:migration_id]
+        main_file[:path_name] = res[:href]
         # todo check for CC permissions on the file
-        file['file_name'] = File.basename file['path_name']
-        file['type'] = 'FILE_TYPE'
+        
+        # add any extra files in this resource
+        res[:files].each do |file_ref|
+          next unless file_ref[:href]
+          if !main_file[:path_name]
+            # if the resource didn't have an href use the first file
+            main_file[:path_name] = file_ref[:href]
+            next
+          elsif main_file[:path_name] == file_ref[:href]
+            next
+          end
+          sub_file = {}
+          sub_file[:path_name] = file_ref[:href]
+          sub_file[:migration_id] = Digest::MD5.hexdigest(main_file[:path_name])
+          sub_file[:file_name] = File.basename sub_file[:path_name]
+          sub_file[:type] = 'FILE_TYPE'
+          file_map[sub_file[:migration_id]] = sub_file
+        end
+        
+        main_file[:file_name] = File.basename main_file[:path_name]
+        main_file[:type] = 'FILE_TYPE'
 
-        file_map[file['migration_id']] = file
+        file_map[main_file[:migration_id]] = main_file
       end
 
       file_map
     end
-    
+
     def package_course_files(file_map)
       zip_file = File.join(@base_export_dir, 'all_files.zip')
       make_export_dir

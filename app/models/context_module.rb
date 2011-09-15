@@ -231,7 +231,7 @@ class ContextModule < ActiveRecord::Base
 
   def add_item(params, added_item=nil, opts={})
     association_id = nil
-    position = (self.content_tags.active.map(&:position).compact.max || 0) + 1
+    position = opts[:position] || (self.content_tags.active.map(&:position).compact.max || 0) + 1
     if params[:type] == "wiki_page"
       item = opts[:wiki_page] || WikiPage.find_by_id(params[:id])
       item_namespace = item.wiki.wiki_namespaces.find_by_context_id_and_context_type(self.context_id, self.context_type)
@@ -711,6 +711,11 @@ class ContextModule < ActiveRecord::Base
     item
   end
   
+  def migration_position
+    @migration_position_counter ||= 0
+    @migration_position_counter = @migration_position_counter + 1
+  end
+  
   def add_item_from_migration(hash, level, context, item_map)
     hash = hash.with_indifferent_access
     hash[:migration_id] ||= hash[:linked_resource_id] 
@@ -730,7 +735,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'wiki_page',
           :id => wiki.id,
           :indent => hash[:indent].to_i
-        }, existing_item, :wiki_page => wiki)
+        }, existing_item, :wiki_page => wiki, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
       # this is a file of some kind
@@ -746,7 +751,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'attachment',
           :id => file.id,
           :indent => hash[:indent].to_i
-        }, existing_item, :attachment => file)
+        }, existing_item, :attachment => file, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /assignment|project/i
       # this is a file of some kind
@@ -757,7 +762,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'assignment',
           :id => ass.id,
           :indent => hash[:indent].to_i
-        }, existing_item, :assignment => ass)
+        }, existing_item, :assignment => ass, :position => migration_position)
       end
     elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
       # just a snippet of text
@@ -765,7 +770,7 @@ class ContextModule < ActiveRecord::Base
         :title => hash[:title] || hash[:linked_resource_title],
         :type => 'context_module_sub_header',
         :indent => hash[:indent].to_i
-      }, existing_item)
+      }, existing_item, :position => migration_position)
     elsif hash[:linked_resource_type] =~ /url/i
       # external url
       if hash['url']
@@ -774,7 +779,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'external_url',
           :indent => hash[:indent].to_i,
           :url => hash['url']
-        }, existing_item)
+        }, existing_item, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /contextexternaltool/i
       # external tool
@@ -784,7 +789,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'context_external_tool',
           :indent => hash[:indent].to_i,
           :url => hash['url']
-        }, existing_item)
+        }, existing_item, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /assessment|quiz/i
       quiz = self.context.quizzes.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
@@ -794,7 +799,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'quiz',
           :indent => hash[:indent].to_i,
           :id => quiz.id
-        }, existing_item, :quiz => quiz)
+        }, existing_item, :quiz => quiz, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /discussion|topic/i
       topic = self.context.discussion_topics.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
@@ -804,7 +809,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'discussion_topic',
           :indent => hash[:indent].to_i,
           :id => topic.id
-        }, existing_item, :discussion_topic => topic)
+        }, existing_item, :discussion_topic => topic, :position => migration_position)
       end
     elsif hash[:linked_resource_type] == 'UNSUPPORTED_TYPE'
       # We know what this is and that we don't support it

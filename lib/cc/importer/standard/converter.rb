@@ -20,6 +20,7 @@ module CC::Importer::Standard
     include CC::Importer
     include WebcontentConverter
     include OrgConverter
+    include DiscussionConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
     
@@ -28,26 +29,31 @@ module CC::Importer::Standard
     # settings will use these keys: :course_name, :base_download_dir
     def initialize(settings)
       super(settings, "cc")
-      @course = @course.with_indifferent_access
+      @course = @course
       @is_canvas_cartridge = nil
       @resources = {}
+      @file_path_migration_id = {}
+      
+      # namespace prefixes
+      @lom = nil
+      @lomimscc = nil
     end
 
     # exports the package into the intermediary json
     def export(to_export = SCRAPE_ALL_HASH)
       to_export = SCRAPE_ALL_HASH.merge to_export if to_export
       unzip_archive
-      
-      @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
+      @manifest = open_file_xml(File.join(@unzipped_file_path, MANIFEST_FILE))
+      check_metadata_namespaces
 
-      get_all_resources
+      get_all_resources(@manifest)
       @course[:file_map] = create_file_map
+      @course[:file_map].values.each {|f|@file_path_migration_id[f[:path_name]] = f[:migration_id]}
+      @course[:discussion_topics] = convert_discussions
       @course[:modules] = convert_organizations(@manifest)
-      
-      package_course_files(@course[:file_map])
+      @course[:all_files_zip] = package_course_files(@course[:file_map])
       
       # check for assignment intendeduse
-      # handle web links
       # handle blti
       # handle quizzes
       # handle banks
@@ -58,15 +64,29 @@ module CC::Importer::Standard
       @course
     end
     
+    # Finds the resource object with the specified type(s)
+    # does a "start_with?" so that CC version can be ignored
+    def resources_by_type(*types)
+      @resources.values.find_all {|res| types.any?{|t| res[:type].start_with? t} }
+    end
+    
+    def find_file_migration_id(path)
+      @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')]
+    end
+    
+    def get_canvas_att_replacement_url(path)
+      "$CANVAS_OBJECT_REFERENCE$/attachments/#{find_file_migration_id(path)}"
+    end
+    
     def get_all_resources(manifest)
       manifest.css('resource').each do |r_node|
         id = r_node['identifier']
         resource = @resources[id]
         resource ||= {:migration_id=>id}
         resource[:type] = r_node['type']
-        resource[:href] = get_full_path(r_node['href'])
+        resource[:href] = r_node['href']
         # Should be "Learner", "Instructor", or "Mentor"
-        resource[:intended_user_role] = get_node_val(r_node, 'intendedEndUserRole value', nil)
+        resource[:intended_user_role] = get_node_val(r_node, "#{@lom}|intendedEndUserRole #{@lom}|value", nil) if @lom
         # Should be "assignment", "lessonplan", "syllabus", or "unspecified"
         resource[:intended_use] = r_node['intendeduse']
         resource[:files] = []
@@ -78,6 +98,16 @@ module CC::Importer::Standard
           resource[:dependencies] << d_node[:identifierref]
         end
         @resources[id] = resource
+      end
+    end
+    
+    def check_metadata_namespaces
+      @manifest.namespaces.each_pair do |key, val|
+        if val =~ %r{lom/resource\z}i
+          @lom = key.gsub('xmlns:','')
+        elsif val =~ %r{lom/manifest\z}i
+          @lomimscc = key.gsub('xmlns:','')
+        end
       end
     end
     

@@ -18,6 +18,7 @@
 module CC::Importer::Standard
   module OrgConverter
     include CC::Importer
+    include WeblinkConverter
     
     def convert_organizations(doc)
       modules = []
@@ -47,12 +48,22 @@ module CC::Importer::Standard
           if !item_node['identifierref']
             add_children(item_node, mod, indent + 1)
           elsif resource = @resources[item_node['identifierref']]
-            
+
             if resource[:type] == ASSESSMENT_TYPE
-            elsif resource[:type] == LOR 
+            elsif resource[:type] == QUESTION_BANK
+            elsif resource[:type] == LOR
             elsif resource[:type] == WEB_LINK
+              item = {:indent => indent, :linked_resource_type => 'URL'}
+              item[:linked_resource_title], item[:url] = get_weblink_title_and_url(resource)
+              mod[:items] << item unless item[:url].blank?
             elsif resource[:type] == BASIC_LTI
             elsif resource[:type] == DISCUSSION_TOPIC
+              item = {
+                      :indent =>indent, 
+                      :linked_resource_type => 'DISCUSSION',
+                      :linked_resource_id => resource[:migration_id] 
+              }
+              mod[:items] << item
             elsif resource[:type] == WEBCONTENT 
               # todo check intended use
               item = {:indent => indent, :linked_resource_type => 'FILE_TYPE'}
