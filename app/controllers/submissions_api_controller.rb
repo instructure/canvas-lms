@@ -289,7 +289,7 @@ class SubmissionsApiController < ApplicationController
     attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
     hash['attachments'] = attachments.map do |attachment|
       attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
-    end unless attachments.blank?
+    end.compact unless attachments.blank?
 
     # include the discussion topic entries
     if assignment.submission_types =~ /discussion_topic/ &&
@@ -310,7 +310,7 @@ class SubmissionsApiController < ApplicationController
         attachments = (entry.attachments.dup + [entry.attachment]).compact
         ehash['attachments'] = attachments.map do |attachment|
           attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
-        end unless attachments.blank?
+        end.compact unless attachments.blank?
         ehash
       end
     end

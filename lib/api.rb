@@ -104,7 +104,7 @@ module Api
         course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
       when "Group"
         group_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
-      when /Submission|User/
+      when /Submission|User|Assignment/
         return nil unless opts[:assignment]
         course_assignment_submission_url(@context, opts[:assignment], url_params.merge(:download => attachment.id))
       else

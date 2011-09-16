@@ -183,7 +183,7 @@ describe SubmissionsApiController, :type => :integration do
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:context => student1, :folder => nil)] }
 
-    sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s| s.attachment = attachment_model(:context => s, :filename => 'snapshot.png', :content_type => 'image/png') }
+    sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s| s.attachment = attachment_model(:context => s, :filename => 'snapshot.png', :content_type => 'image/png'); s.attachments = [attachment_model(:context => a1, :filename => 'ss2.png', :content_type => 'image/png')] }
 
     a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
     sub1.reload
@@ -296,20 +296,32 @@ describe SubmissionsApiController, :type => :integration do
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=0",
           "grade_matches_current_submission"=>true,
            "attachments" =>
-            [{"content-type" => "image/png",
+            [
+             {"content-type" => "image/png",
+              "display_name" => "ss2.png",
+              "filename" => "ss2.png",
+              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachments.first.id}",},
+             {"content-type" => "image/png",
               "display_name" => "snapshot.png",
               "filename" => "snapshot.png",
-              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",}],
+              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",},
+            ],
            "score"=>9}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
         "submission_type"=>"online_url",
         "user_id"=>student2.id,
         "attachments" =>
-         [{"content-type" => "image/png",
+         [
+          {"content-type" => "image/png",
+           "display_name" => "ss2.png",
+           "filename" => "ss2.png",
+           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachments.first.id}",},
+          {"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",}],
+           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",},
+         ],
         "submission_comments"=>[],
         "score"=>9,
         "rubric_assessment"=>
