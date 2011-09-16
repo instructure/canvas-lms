@@ -15,6 +15,7 @@ describe "Canvas Cartridge importing" do
     @migration = Object.new
     @migration.stub!(:to_import).and_return(nil)
     @migration.stub!(:context).and_return(@copy_to)
+    @migration.stub!(:add_warning).and_return('')
   end
 
   it "should import course settings" do
@@ -140,6 +141,7 @@ describe "Canvas Cartridge importing" do
     tool1.privacy_level = 'name_only'
     tool1.consumer_key = 'haha'
     tool1.shared_secret = "don't share me"
+    tool1.settings[:custom_fields] = {"key1" => "value1", "key2" => "value2"}
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
     tool2.domain = 'example.com'
@@ -148,18 +150,26 @@ describe "Canvas Cartridge importing" do
     tool2.privacy_level = 'anonymous'
     tool2.consumer_key = 'haha'
     tool2.shared_secret = "don't share me"
+    tool2.settings[:vendor_extensions] = [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}]
     tool2.save!
 
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
-    @resource.create_external_tools(builder)
-    #convert to json
-    doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_external_tools(doc)
-    #import json into new course
-    ContextExternalTool.process_migration({'external_tools'=>hash}, @migration)
-    @copy_to.save!
+    @resource.create_blti_link(tool1, builder)
+    builder2 = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_blti_link(tool2, builder2)
 
+    #convert to json
+    doc1 = Nokogiri::XML(builder.target!)
+    tool1_hash = @converter.convert_blti_link(doc1)
+    tool1_hash['migration_id'] = CC::CCHelper.create_key(tool1)
+    doc2 = Nokogiri::XML(builder2.target!)
+    tool2_hash = @converter.convert_blti_link(doc2)
+    tool2_hash['migration_id'] = CC::CCHelper.create_key(tool2)
+    #import json into new course
+    ContextExternalTool.process_migration({'external_tools'=>[tool1_hash, tool2_hash]}, @migration)
+    @copy_to.save!
+    
     #compare settings
     t1 = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(tool1))
     t1.url.should == tool1.url
@@ -169,7 +179,9 @@ describe "Canvas Cartridge importing" do
     t1.domain.should == nil
     t1.consumer_key.should == 'fake'
     t1.shared_secret.should == 'fake'
-
+    t1.settings[:custom_fields].should == {"key1"=>"value1", "key2"=>"value2"}
+    t1.settings[:vendor_extensions].should == [] 
+    
     t2 = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(tool2))
     t2.domain.should == tool2.domain
     t2.url.should == nil
@@ -178,6 +190,8 @@ describe "Canvas Cartridge importing" do
     t2.workflow_state.should == tool2.workflow_state
     t2.consumer_key.should == 'fake'
     t2.shared_secret.should == 'fake'
+    t2.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}]
+    t2.settings[:custom_fields].should == {}
   end
   
   it "should import external feeds" do

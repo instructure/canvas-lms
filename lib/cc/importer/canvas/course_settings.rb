@@ -100,6 +100,7 @@ module CC::Importer::Canvas
       groups
     end
 
+    # This is deprecated in favor of 'extensions' on the normal CC:BLTI xml format
     def convert_external_tools(doc)
       tools = []
       return tools unless doc

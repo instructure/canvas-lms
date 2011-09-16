@@ -24,6 +24,7 @@ module CC::Importer::Canvas
     include TopicConverter
     include WebcontentConverter
     include QuizConverter
+    include CC::Importer::BLTIConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -43,6 +44,7 @@ module CC::Importer::Canvas
       @course[:wikis] = convert_wikis
       @course[:assignments] = convert_assignments
       @course[:discussion_topics] = convert_topics
+      @course[:external_tools] = convert_blti_links
       @course[:file_map] = create_file_map
       package_course_files
       convert_quizzes

@@ -1550,8 +1550,7 @@ class Course < ActiveRecord::Base
     ExternalFeed.process_migration(data, migration); migration.fast_update_progress(39.5)
     GradingStandard.process_migration(data, migration); migration.fast_update_progress(40)
     Quiz.process_migration(data, migration, question_data); migration.fast_update_progress(50)
-    #todo - Import external tools when there are post-migration messages to tell the user to add shared secret/password
-    #ContextExternalTool.process_migration(data, migration)
+    ContextExternalTool.process_migration(data, migration); migration.fast_update_progress(54)
 
     #These need to be ran twice because they can reference each other
     DiscussionTopic.process_migration(data, migration);migration.fast_update_progress(55)

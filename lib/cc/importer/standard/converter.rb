@@ -21,6 +21,7 @@ module CC::Importer::Standard
     include WebcontentConverter
     include OrgConverter
     include DiscussionConverter
+    include CC::Importer::BLTIConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
     
@@ -50,11 +51,11 @@ module CC::Importer::Standard
       @course[:file_map] = create_file_map
       @course[:file_map].values.each {|f|@file_path_migration_id[f[:path_name]] = f[:migration_id]}
       @course[:discussion_topics] = convert_discussions
+      @course[:external_tools] = convert_blti_links(resources_by_type("imsbasiclti"))
       @course[:modules] = convert_organizations(@manifest)
       @course[:all_files_zip] = package_course_files(@course[:file_map])
       
       # check for assignment intendeduse
-      # handle blti
       # handle quizzes
       # handle banks
       

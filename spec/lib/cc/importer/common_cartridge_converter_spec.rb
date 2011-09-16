@@ -99,7 +99,7 @@ describe "Standard Common Cartridge importing" do
     
     mod1 = @course.context_modules.find_by_migration_id("m3")
     mod1.name.should == "Misc Module"
-    mod1.content_tags.count.should == 2
+    mod1.content_tags.count.should == 3
     tag = mod1.content_tags[0]
     tag.content_type.should == 'ExternalUrl'
     tag.title.should == "Wikipedia - Sigmund Freud"
@@ -109,6 +109,11 @@ describe "Standard Common Cartridge importing" do
     tag.content_type.should == 'DiscussionTopic'
     tag.title.should == "Talk about the issues"
     tag.content_id.should == @course.discussion_topics.find_by_migration_id("I_00009_R").id
+    tag.indent.should == 0
+    tag = mod1.content_tags[2]
+    tag.content_type.should == 'ContextExternalTool'
+    tag.title.should == "BLTI Test"
+    tag.url.should == "http://www.imsglobal.org/developers/BLTI/tool.php"
     tag.indent.should == 0
     
   end
@@ -122,9 +127,15 @@ describe "Standard Common Cartridge importing" do
     @converter.resources_by_type("imsdt").length.should == 2
     @converter.resources_by_type("imswl").length.should == 3
   end
-
-  it "should process web links" do
-
+  
+  it "should import external tools" do
+    @course.context_external_tools.count.should == 1
+    et = @course.context_external_tools.find_by_migration_id("I_00010_R")
+    et.name.should == "BLTI Test"
+    et.url.should == 'http://www.imsglobal.org/developers/BLTI/tool.php'
+    et.settings[:custom_fields].should == {"key1"=>"value1", "key2"=>"value2"}
+    et.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}]
+    @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
   end
 
 end
