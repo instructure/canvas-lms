@@ -903,6 +903,35 @@ describe SIS::SisCsv do
       p.communication_channel_id.should == user1.communication_channels.unretired.first.id
     end
 
+    it "should work when a communication channel already exists, but there's no sis_communication_channel" do
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,,active"
+      )
+      p = Pseudonym.find_by_unique_id('user1')
+      user1 = p.user
+      user1.last_name.should == "Uno"
+      user1.pseudonyms.count.should == 1
+      p.communication_channel_id.should be_nil
+      user1.communication_channels.count.should == 0
+      p.sis_communication_channel_id.should be_nil
+      user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user2@example.com,active"
+      )
+      p.reload
+      user1.reload
+      user1.pseudonyms.count.should == 1
+      user1.communication_channels.count.should == 1
+      user1.communication_channels.unretired.count.should == 1
+      p.communication_channel_id.should_not be_nil
+      user1.communication_channels.unretired.first.path.should == 'user2@example.com'
+      p.sis_communication_channel_id.should == p.communication_channel_id
+      p.communication_channel_id.should == user1.communication_channels.unretired.first.id
+    end
+
   end
 
   context 'enrollment importing' do
