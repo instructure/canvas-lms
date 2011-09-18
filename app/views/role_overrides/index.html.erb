@@ -67,9 +67,9 @@
   <div style="text-align: right;">
     <% if !@context.site_admin? %>
       <% if @managing_account_roles %>
-        <a href="<%= context_url(@context, :context_role_overrides_url) %>"><%= t 'links.manage_course_roles', "Manage Course-Level Roles" %></a>
+        <a href="<%= context_url(@context, :context_permissions_url) %>"><%= t 'links.manage_course_roles', "Manage Course-Level Roles" %></a>
       <% else %>
-        <a href="<%= context_url(@context, :context_role_overrides_url, :account_roles => 1) %>"><%= t 'links.manage_accoiunt_roles', "Manage Account-Level Roles" %></a>
+        <a href="<%= context_url(@context, :context_permissions_url, :account_roles => 1) %>"><%= t 'links.manage_accoiunt_roles', "Manage Account-Level Roles" %></a>
       <% end %>
     <% end %>
   </div>
@@ -86,13 +86,13 @@
         <tr class="<%= cycle("even", "odd") %>">
           <td style="padding: 1px 3px;"><%= AccountUser.readable_type type %></td>
           <td style="padding: 1px 3px; text-align: right;">
-            <%= link_to(image_tag("delete_circle.png"), context_url(@context, :remove_role_context_role_overrides_url, :role => type), :class => "no-hover remove_role_link", :method => :delete, :confirm => t('prompts.delete_role_type', "Are you sure you want to delete this role type?")) unless type == 'AccountAdmin' %>
+            <%= link_to(image_tag("delete_circle.png"), context_url(@context, :remove_role_context_permissions_url, :role => type), :class => "no-hover remove_role_link", :method => :delete, :confirm => t('prompts.delete_role_type', "Are you sure you want to delete this role type?")) unless type == 'AccountAdmin' %>
           </td>
         </tr>
       <% end %>
       <tr>
         <td colspan="2" style="padding: 2px 3px;">
-          <% form_tag(context_url(@context, :add_role_context_role_overrides_url)) do %>
+          <% form_tag(context_url(@context, :add_role_context_permissions_url)) do %>
             <input type="hidden" name="account_roles" value="1"/>
             <%= before_label :new_role_type, "New Role Type" %>
             <input type="text" name="role_type"/>
@@ -104,7 +104,7 @@
   </table>
   <% end %>
 
-  <% form_tag(context_url(@context, :context_role_overrides_url, :account_roles => params[:account_roles])) do %>
+  <% form_tag(context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])) do %>
     <table cellspacing="0" id="permissions-table" class='ui-widget ui-widget-content ui-corner-all zebra-stripes'>
       <thead class='ui-widget-header'>
         <tr>

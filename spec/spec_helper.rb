@@ -64,6 +64,7 @@ Spec::Runner.configure do |config|
   config.before :each do
     Time.zone = 'UTC'
     Account.default.update_attribute(:default_time_zone, 'UTC')
+    Setting.reset_cache!
   end
 
   def account_with_cas(opts={})
@@ -105,7 +106,7 @@ Spec::Runner.configure do |config|
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
-        account.role_overrides.create(:permission => permission, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+        account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
       end
     end
     account_admin_user(opts)

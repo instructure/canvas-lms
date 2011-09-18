@@ -26,7 +26,7 @@ module SIS
     def verify(csv, verify)
       user_ids = (verify[:user_ids] ||= {})
       identical_row_checker = (verify[:user_rows] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         user_id = row['user_id']
         if user_ids[user_id]
           if identical_row_checker[user_id] != row
@@ -51,9 +51,11 @@ module SIS
       start = Time.now
       users_to_set_sis_batch_ids = []
       pseudos_to_set_sis_batch_ids = []
+      users_to_add_account_associations = []
+      users_to_update_account_associations = []
 
       User.skip_updating_account_associations do
-        FasterCSV.open(csv[:fullpath], "rb", :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |csv_object|
+        FasterCSV.open(csv[:fullpath], "rb", PARSE_ARGS) do |csv_object|
           row = csv_object.shift
           count = 0
           until row.nil?
@@ -91,20 +93,18 @@ module SIS
 
                   user = pseudo.user
                   user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}" if user.sis_name && user.sis_name == user.name
-                  update_account_association = (pseudo.account_id != @root_account.id)
 
                 else
                   user = User.new
                   user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}"
-                  update_account_association = true
                 end
 
                 if row['status']=~ /active/i
                   user.workflow_state = 'registered'
                 elsif row['status']=~ /deleted/i
                   user.workflow_state = 'deleted'
-                  enrolls = user.enrollments.find_all_by_root_account_id(@root_account.id).map(&:id)
-                  Enrollment.update_all({:workflow_state => 'deleted'}, :id => enrolls)
+                  user.enrollments.scoped(:conditions => {:root_account_id => @root_account.id }).update_all(:workflow_state => 'deleted')
+                  users_to_update_account_associations << user.id unless user.new_record?
                 end
 
                 pseudo ||= Pseudonym.new
@@ -113,18 +113,23 @@ module SIS
                 pseudo.sis_user_id = row['user_id']
                 pseudo.account = @root_account
                 pseudo.workflow_state = row['status']=~ /active/i ? 'active' : 'deleted'
-                if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated)
+                # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
+                # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
+                if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(row['password']))
                   pseudo.password = row['password']
                   pseudo.password_confirmation = row['password']
                   pseudo.password_auto_generated = true
                 end
                 pseudo.sis_ssha = row['ssha_password'] if !row['ssha_password'].blank?
+                pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
 
                 begin
                   User.transaction(:requires_new => true) do
                     if user.changed?
                       user.creation_sis_batch_id = @batch.id if @batch
+                      new_record = user.new_record?
                       raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                      users_to_add_account_associations << user.id if new_record && user.workflow_state != 'deleted'
                     elsif @batch
                       users_to_set_sis_batch_ids << user.id
                     end
@@ -158,6 +163,16 @@ module SIS
                     rescue => e
                       add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
                     end
+                  elsif row['status'] =~ /active/i
+                    if comm.user_id != pseudo.user_id
+                      add_warning(csv, "E-mail address #{row['email']} for user #{row['login_id']} is already claimed; ignoring")
+                    else
+                      pseudo.sis_communication_channel.destroy if pseudo.sis_communication_channel != comm and !pseudo.sis_communication_channel.nil?
+                      pseudo.sis_communication_channel = comm
+                      pseudo.communication_channel_id = comm.id
+                      comm.do_delayed_jobs_immediately = true
+                      comm.save_without_broadcasting if comm.changed?
+                    end
                   end
                 end
 
@@ -168,12 +183,12 @@ module SIS
                   pseudos_to_set_sis_batch_ids << pseudo.id
                 end
 
-                user.update_account_associations if update_account_association
-
                 @sis.counts[:users] += 1
               end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0 && tx_end_time > Time.now
             end
           end
+          User.update_account_associations(users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
+          User.update_account_associations(users_to_update_account_associations)
           User.update_all({:creation_sis_batch_id => @batch.id}, {:id => users_to_set_sis_batch_ids}) if @batch && !users_to_set_sis_batch_ids.empty?
           Pseudonym.update_all({:sis_batch_id => @batch.id}, {:id => pseudos_to_set_sis_batch_ids}) if @batch && !pseudos_to_set_sis_batch_ids.empty?
           logger.debug("Users took #{Time.now - start} seconds")

@@ -31,10 +31,15 @@
 
 // provides cross-browser vertical background gradients, will work on everything we support including ie7&8  
 =vertical-gradiant($topColor, $bottomColor)
-  background-image: -moz-linear-gradient(top, $topColor, $bottomColor)
-  background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, 		$topColor), color-stop(1, 		$bottomColor))
-  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$topColor}', EndColorStr='#{$bottomColor}')"
-	
+  background-color: mix($topColor, $bottomColor) /* fallback for browsers that older then even IE6 */
+  background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor)) /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient(top, $topColor, $bottomColor) /* Chrome 10+, Saf5.1+ */
+  background-image:    -moz-linear-gradient(top, $topColor, $bottomColor) /* FF3.6 */
+  background-image:     -ms-linear-gradient(top, $topColor, $bottomColor) /* IE10 */
+  background-image:      -o-linear-gradient(top, $topColor, $bottomColor) /* Opera 11.10+ */
+  background-image:         linear-gradient(top, $topColor, $bottomColor)
+  filter:           "progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$topColor}', EndColorStr='#{$bottomColor}')" /* IE6–IE9 */
+
 =accessible_text_replacement
   display: inline-block
   text-indent: 999px

@@ -24,6 +24,6 @@
     <li class="logout"><%= link_to t('links.logout', "Logout"), logout_path, :method => :delete %></li>
   <% end %>
   <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
-    <li class="feedback"><a href="#" id="feedback_link"><%= t 'links.feedback', "Feedback" %></a></li>
+    <li id="identity_feedback" class="feedback <%= @current_user.try(:highest_role) %>"><a href="#" id="feedback_link"><%= t 'links.help', "Help" %></a></li>
   <% end %>
 </ul>

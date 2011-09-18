@@ -49,4 +49,18 @@ describe UsersController do
     assigns[:users].map(&:id).sort.should == [e2.user, c2.teachers.first].map(&:id).sort
   end
 
+  it "should not include deleted courses in manageable courses" do
+    course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+    course1 = @course
+    course1.destroy!
+    course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
+    course2 = @course
+
+    get 'manageable_courses', :user_id => @teacher.id, :query => "MyCourse"
+    response.should be_success
+
+    courses = ActiveSupport::JSON.decode(response.body)
+    courses['data'].map { |c| c['course']['id'] }.should == [course2.id]
+  end
+
 end

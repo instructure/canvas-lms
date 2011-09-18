@@ -504,7 +504,7 @@ class TokenSelector
     post_data = $.extend(data, {search: @input.val()})
     post_data.exclude = @input.base_exclude.concat(if @stack.length then [] else @input.token_values())
     post_data.context = @stack[@stack.length - 1][0].data('id') if @list_expanded()
-    post_data.limit ?= @options.limiter?(level: @stack.length)
+    post_data.per_page ?= @options.limiter?(level: @stack.length)
     post_data
 
 
@@ -564,11 +564,11 @@ I18n.scoped 'conversations', (I18n) ->
   is_selected = ($conversation) ->
     $selected_conversation && $selected_conversation.attr('id') == $conversation?.attr('id')
 
-  select_unloaded_conversation = (conversation_id) ->
-    $.ajaxJSON '/conversations/' + conversation_id, 'GET', { include_conversation: 1 }, (data) ->
+  select_unloaded_conversation = (conversation_id, params) ->
+    $.ajaxJSON '/conversations/' + conversation_id, 'GET', {}, (data) ->
       add_conversation data.conversation, true
       $("#conversation_" + conversation_id).hide()
-      select_conversation $("#conversation_" + conversation_id), data: data
+      select_conversation $("#conversation_" + conversation_id), $.extend(params, {data: data})
 
   select_conversation = ($conversation, params={}) ->
     toggle_message_actions(off)
@@ -593,23 +593,24 @@ I18n.scoped 'conversations', (I18n) ->
 
     if $selected_conversation || $('#action_compose_message').length
       show_message_form()
+      $form.find('#body').val(params.message) if params.message
     else
       $form.parent().hide()
 
     if $selected_conversation
       $selected_conversation.scrollIntoView()
     else
-      if params and params.user_id and params.user_name
+      if params.user_id and params.user_name
         $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name, data: {id: params.user_id, name: params.user_name, can_add_notes: params.can_add_notes}
         $('#from_conversation_id').val(params.from_conversation_id)
       return
 
     $form.loadingImage()
     $c = $selected_conversation
-    
+
     completion = (data) ->
       return unless is_selected($c)
-      for user in data.participants when !MessageInbox.user_cache[user.id]?.avatar
+      for user in data.participants when !MessageInbox.user_cache[user.id]?.avatar_url
         MessageInbox.user_cache[user.id] = user
         user.html_name = html_name_for_user(user)
       $form.find('#user_note_info').showIf(
@@ -646,10 +647,10 @@ I18n.scoped 'conversations', (I18n) ->
       , ->
         $form.loadingImage('remove')
 
-  MessageInbox.shared_contexts_for_user = (user, limit=2) ->
-    shared_contexts = (course.name for course_id, roles of user.common_courses when course = @contexts.courses[course_id]).
-                concat(group.name for group_id, roles of user.common_groups when group = @contexts.groups[group_id])
-    shared_contexts.sort (a, b) ->
+  MessageInbox.context_list = (contexts, limit=2) ->
+    shared_contexts = (course.name for course_id, roles of contexts.courses when course = @contexts.courses[course_id]).
+                concat(group.name for group_id, roles of contexts.groups when group = @contexts.groups[group_id])
+    $.toSentence(shared_contexts.sort((a, b) ->
       a = a.toLowerCase()
       b = b.toLowerCase()
       if a < b
@@ -658,11 +659,10 @@ I18n.scoped 'conversations', (I18n) ->
         1
       else
         0
-    .slice(0, limit).join(", ") # TODO: [].to_sentence for js
+    )[0...limit])
 
-  html_name_for_user = (user) ->
-    shared_contexts = MessageInbox.shared_contexts_for_user(user)
-    $.htmlEscape(user.name) + if shared_contexts.length then " <em>" + $.htmlEscape(shared_contexts) + "</em>" else ''
+  html_name_for_user = (user, contexts = {courses: user.common_courses, groups: user.common_groups}) ->
+    $.h(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + $.h(MessageInbox.context_list(contexts)) + "</em>" else ''
 
   can_add_notes_for = (user) ->
     return false unless MessageInbox.notes_enabled
@@ -707,8 +707,9 @@ I18n.scoped 'conversations', (I18n) ->
         else
           link = match
           link = "http://" + link if link[0..3] == 'www'
+          link = encodeURI(link).replace(/'/g, '%27')
           links.push link
-          "<a href='#{link}'>#{match}</a>"
+          "<a href='#{$.h(link)}'>#{$.h(match)}</a>"
       )
       link_placeholder
 
@@ -755,7 +756,7 @@ I18n.scoped 'conversations', (I18n) ->
       'other'
     )
     user = MessageInbox.user_cache[data.author_id]
-    if avatar = user?.avatar
+    if avatar = user?.avatar_url
       $message.prepend $('<img />').attr('src', avatar).addClass('avatar')
     user.html_name ?= html_name_for_user(user) if user
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
@@ -861,7 +862,7 @@ I18n.scoped 'conversations', (I18n) ->
     $comment = blank.clone(true).attr('id', 'submission_comment_' + data.id)
     $comment.data('id', data.id)
     user = MessageInbox.user_cache[data.author_id]
-    if avatar = user?.avatar
+    if avatar = user?.avatar_url
       $comment.prepend $('<img />').attr('src', avatar).addClass('avatar')
     user.html_name ?= html_name_for_user(user) if user
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
@@ -913,13 +914,43 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation_list.append $("#conversations_loader")
     $conversation
 
+  html_audience_for_conversation = (conversation, cutoff=2) ->
+    audience = conversation.audience
+
+    return "<span>#{$.h(I18n.t('notes_to_self', 'Monologue'))}</span>" if audience.length == 0
+    context_info = "<em>#{$.h(MessageInbox.context_list(conversation.audience_contexts))}</em>"
+    return "<span>#{$.h(MessageInbox.user_cache[audience[0]].name)}</span> #{context_info}" if audience.length == 1
+
+    audience = audience[0...cutoff].concat([audience[cutoff...audience.length]]) if audience.length > cutoff
+    $.toSentence(for id_or_array in audience
+      if typeof id_or_array is 'number'
+        "<span>#{$.h(MessageInbox.user_cache[id_or_array].name)}</span>"
+      else
+        """
+        <span class='others'>
+          #{$.h(I18n.t('other_recipients', "other", count: id_or_array.length))}
+          <span>
+            <ul>
+              #{("<li>#{$.h(MessageInbox.user_cache[id].name)}</li>" for id in id_or_array).join('')}
+            </ul>
+          </span>
+        </span>
+        """
+    ) + " " + context_info
+
   update_conversation = ($conversation, data, move_mode='slide') ->
     toggle_message_actions(off)
 
     $a = $conversation.find('a.details_link')
     $a.attr 'href', $.replaceTags($a.attr('href'), 'id', data.id)
     $a.attr 'add_url', $.replaceTags($a.attr('add_url'), 'id', data.id)
-    $conversation.find('.audience').html data.audience if data.audience
+    if data.participants
+      for user in data.participants when !MessageInbox.user_cache[user.id]
+        MessageInbox.user_cache[user.id] = user
+
+    if data.audience
+      $conversation.data('audience', data.audience.concat([MessageInbox.user_id]))
+      $conversation.find('.audience').html html_audience_for_conversation(data)
     $conversation.find('.actions a').click (e) ->
       e.preventDefault()
       e.stopImmediatePropagation()
@@ -1080,19 +1111,20 @@ I18n.scoped 'conversations', (I18n) ->
         $(this).loadingImage()
       success: (data) ->
         $(this).loadingImage 'remove'
-        if data.conversations # e.g. we just sent bulk private messages
-          for conversation in data.conversations
+        if data.length > 1 # e.g. we just sent bulk private messages
+          for conversation in data
             $conversation = $('#conversation_' + conversation.id)
             update_conversation($conversation, conversation, 'immediate') if $conversation.length
           $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
         else
-          $conversation = $('#conversation_' + data.conversation.id)
+          conversation = data[0] ? data
+          $conversation = $('#conversation_' + conversation.id)
           if $conversation.length
-            build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
-            update_conversation($conversation, data.conversation)
+            build_message(conversation.messages[0]).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
+            update_conversation($conversation, conversation)
           else
-            add_conversation(data.conversation)
-            set_hash '#/conversations/' + data.conversation.id
+            add_conversation(conversation)
+            set_hash '#/conversations/' + conversation.id
           $.flashMessage(I18n.t('message_sent', 'Message Sent'))
         reset_message_form()
       error: (data) ->
@@ -1111,8 +1143,8 @@ I18n.scoped 'conversations', (I18n) ->
         $(this).loadingImage()
       success: (data) ->
         $(this).loadingImage 'remove'
-        build_message(data.message).prependTo($message_list).slideDown 'fast'
-        update_conversation($selected_conversation, data.conversation)
+        build_message(data.messages[0]).prependTo($message_list).slideDown 'fast'
+        update_conversation($selected_conversation, data)
         reset_message_form()
         $(this).dialog('close')
       error: (data) ->
@@ -1159,6 +1191,7 @@ I18n.scoped 'conversations', (I18n) ->
       e.preventDefault()
       e.stopImmediatePropagation()
       inbox_action $(this),
+        method: 'PUT'
         before: ($node) ->
           set_conversation_state $node, 'read' unless MessageInbox.scope == 'unread'
           true
@@ -1171,6 +1204,7 @@ I18n.scoped 'conversations', (I18n) ->
       e.preventDefault()
       e.stopImmediatePropagation()
       inbox_action $(this),
+        method: 'PUT'
         before: ($node) -> set_conversation_state $node, 'unread'
         error: ($node) -> set_conversation_state $node, 'read'
 
@@ -1232,7 +1266,7 @@ I18n.scoped 'conversations', (I18n) ->
           ]
           open: ->
             token_input = $('#add_recipients').data('token_input')
-            token_input.base_exclude = ($(node).data('id') for node in $selected_conversation.find('.participant'))
+            token_input.base_exclude = $selected_conversation.data('audience')
             $(this).find("input[name!=authenticity_token]").val('').change()
           close: ->
             $('#add_recipients').data('token_input').input.blur()
@@ -1250,7 +1284,9 @@ I18n.scoped 'conversations', (I18n) ->
         success: ($node) -> $node.addClass 'unsubscribed'
 
     $('#action_archive, #action_unarchive').click ->
-      inbox_action $(this), { success: remove_conversation }
+      inbox_action $(this),
+        method: 'PUT'
+        success: remove_conversation
 
     $('#action_delete_all').click ->
       if confirm I18n.t('confirm.delete_conversation', "Are you sure you want to delete your copy of this conversation? This action cannot be undone.")
@@ -1320,14 +1356,15 @@ I18n.scoped 'conversations', (I18n) ->
       beforeSubmit: ->
         $(this).loadingImage()
       success: (data) ->
+        conversation = data[0]
         $(this).loadingImage 'remove'
-        $conversation = $('#conversation_' + data.conversation.id)
+        $conversation = $('#conversation_' + conversation.id)
         if $conversation.length
-          build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
-          update_conversation($conversation, data.conversation)
+          build_message(conversation.messages[0]).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
+          update_conversation($conversation, conversation)
         else
-          add_conversation(data.conversation)
-        set_hash '#/conversations/' + data.conversation.id
+          add_conversation(conversation)
+        set_hash '#/conversations/' + conversation.id
         reset_message_form()
         $(this).dialog('close')
       error: (data) ->
@@ -1397,22 +1434,22 @@ I18n.scoped 'conversations', (I18n) ->
             $token.append($details)
         unless data.id and "#{data.id}".match(/^(course|group)_/)
           data = $.extend({}, data)
-          delete data.avatar # since it's the wrong size and possibly a blank image
+          delete data.avatar_url # since it's the wrong size and possibly a blank image
           MessageInbox.user_cache[data.id] ?= data
       selector:
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
-          if data.avatar
+          if data.avatar_url
             $img = $('<img class="avatar" />')
-            $img.attr('src', data.avatar)
+            $img.attr('src', data.avatar_url)
             $node.append($img)
           $b = $('<b />')
           $b.text(data.name)
           $span = $('<span />')
           if data.common_courses?
-            $span.text(MessageInbox.shared_contexts_for_user(data))
+            $span.text(MessageInbox.context_list(data))
           else if data.type and data.user_count?
-            $span.text(I18n.t('people_count', 'person', {count: data.user_count})) 
+            $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
           $node.append($b, $span)
           $node.attr('title', data.name)
           $node.data('id', data.id)
@@ -1425,7 +1462,7 @@ I18n.scoped 'conversations', (I18n) ->
             $node.prepend('<a class="expand"><i></i></a>')
             $node.addClass('expandable')
         limiter: (options) ->
-          -1 if options.level > 0
+          if options.level > 0 then -1 else 5
         browser:
           data:
             limit: -1
@@ -1454,6 +1491,7 @@ I18n.scoped 'conversations', (I18n) ->
         container: $conversation_list
         params:
           format: 'json'
+          per_page: 25
         loader: $("#conversations_loader")
         scrape: (data) ->
           if typeof(data) == 'string'
@@ -1469,11 +1507,12 @@ I18n.scoped 'conversations', (I18n) ->
 
     $(window).bind 'hashchange', ->
       hash = location.hash
-      if match = hash.match(/^#\/conversations\/(\d+)$/)
+      if match = hash.match(/^#\/conversations\/(\d+)(\?(.*))?/)
+        params = if match[3] then parse_query_string(match[3]) else {}
         if ($c = $('#conversation_' + match[1])) and $c.length
-          select_conversation($c)
+          select_conversation($c, params)
         else
-          select_unloaded_conversation(match[1])
+          select_unloaded_conversation(match[1], params)
       else if $('#action_compose_message').length
         params = {}
         if match = hash.match(/^#\/conversations\?(.*)$/)

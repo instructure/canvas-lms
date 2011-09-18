@@ -144,9 +144,11 @@ a.load_members_link, .loading_members {
 <% if @context.is_a?(Course) && @context.students.empty? %>
   <div style="text-align: center;" id="no_students_message">
     <%= t 'messages.no_students', 'No students have been added for this course' %>
-    <div style="margin: 20px; font-size: 1.2em;">
-      <a href="<%= context_url(@context, :context_details_url) %>#add_students" style="padding-left: 20px;"><%= t 'actions.add_students', 'Add Students to the Course' %></a>
-    </div>
+    <% if can_do @context, @current_user, :manage_students %>
+      <div style="margin: 20px; font-size: 1.2em;">
+        <a href="<%= context_url(@context, :context_details_url) %>#add_students" style="padding-left: 20px;"><%= t 'actions.add_students', 'Add Students to the Course' %></a>
+      </div>
+    <% end %>
   </div>
 <% else %>
   <div style="display: none;" id="manage_group_urls">

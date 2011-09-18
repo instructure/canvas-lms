@@ -1,4 +1,5 @@
 require 'active_record'
+require 'hair_trigger'
 
 class ActiveRecord::Base
   def self.load_for_delayed_job(id)
@@ -18,6 +19,36 @@ module Delayed
       class Job < ::ActiveRecord::Base
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
+
+        # be aware that some strand functionality is controlled by triggers on
+        # the database. see
+        # db/migrate/20110831210257_add_delayed_jobs_next_in_strand.rb
+        #
+        # next_in_strand defaults to true. if we insert a new job, and it has a
+        # strand, and it's not the next in the strand, we set it to false.
+        #
+        # if we delete a job, and it has a strand, mark the next job in that
+        # strand to be next_in_strand
+        # (this is safe even if we're not deleting the job that was currently
+        # next_in_strand)
+
+        # special mysql support, since its triggers don't support modifying the
+        # underlying table from within the trigger.
+        # this means that deleting the first job from a strand from
+        # outside rails is *not* safe when using mysql for the queue.
+        after_destroy :update_strand_on_destroy
+        cattr_accessor :adapter_name
+        def update_strand_on_destroy
+          if adapter_name.nil?
+            self.class.adapter_name = connection.adapter_name
+          end
+          if strand.present? && next_in_strand? && adapter_name == 'MySQL'
+            # this funky sub-sub-select is to force mysql to create a temporary
+            # table, otherwise it fails complaining that you can't select from
+            # the same table you are updating
+            self.class.execute_with_sanitize(["UPDATE delayed_jobs SET next_in_strand = 1 WHERE id = (SELECT _id.id FROM (SELECT id FROM delayed_jobs j2 WHERE j2.strand = ? ORDER BY j2.strand, j2.id ASC LIMIT 1) AS _id)", strand])
+          end
+        end
 
         cattr_accessor :default_priority
         self.default_priority = 0
@@ -40,7 +71,7 @@ module Delayed
         # then fire up your workers
         # you can check out strand correctness: diff test1.txt <(sort -n test1.txt)
         named_scope :ready_to_run, lambda {|worker_name, max_run_time|
-          { :conditions => ["run_at <= ? AND locked_at IS NULL AND (strand IS NULL OR (SELECT id FROM #{table_name} j2 WHERE j2.strand = #{table_name}.strand ORDER BY j2.strand, j2.id ASC LIMIT 1) = id)", db_time_now] }
+          { :conditions => ["run_at <= ? AND locked_at IS NULL AND next_in_strand = ?", db_time_now, true] }
         }
         named_scope :by_priority, :order => 'priority ASC, run_at ASC'
 
@@ -133,6 +164,7 @@ module Delayed
           attrs = self.attributes
           attrs['original_id'] = attrs.delete('id')
           attrs['failed_at'] ||= self.class.db_time_now
+          attrs.delete('next_in_strand')
           self.class.transaction do
             Failed.create(attrs)
             self.destroy

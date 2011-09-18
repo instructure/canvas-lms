@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('course_details', function(I18n) {
+I18n.scoped('course_settings', function(I18n) {
   function checkup() {
     $.ajaxJSON($("#sis_publish_link").attr('href'), 'GET', {}, function(data) {
       if (!data.hasOwnProperty("sis_publish_status")) {

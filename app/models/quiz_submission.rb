@@ -283,7 +283,9 @@ class QuizSubmission < ActiveRecord::Base
     @user_answers = []
     data = self.submission_data || {}
     self.questions_as_object.each do |q|
-      score_question(q, data)
+      user_answer = self.class.score_question(q, data)
+      @user_answers << user_answer
+      @tally += (user_answer[:points] || 0) if user_answer[:correct]
     end
     self.score = @tally
     self.score = self.quiz.points_possible if self.quiz && self.quiz.quiz_type == 'graded_survey'
@@ -295,7 +297,7 @@ class QuizSubmission < ActiveRecord::Base
     self.finished_at = Time.now
     self.manually_unlocked = nil
     self.finished_at = opts[:finished_at] if opts[:finished_at]
-    if self.quiz.for_assignment?
+    if self.quiz.for_assignment? && self.user_id
       assignment_submission = self.quiz.assignment.find_or_create_submission(self.user_id)
       self.submission = assignment_submission
     end
@@ -423,7 +425,7 @@ class QuizSubmission < ActiveRecord::Base
     (self.finished_at || self.started_at) - self.started_at rescue 0
   end
   
-  def score_question(q, params)
+  def self.score_question(q, params)
     params = params.with_indifferent_access
     # TODO: undefined_if_blank - we need a better solution for the
     # following problem: since teachers can modify quizzes after students
@@ -590,21 +592,19 @@ class QuizSubmission < ActiveRecord::Base
       end
       answer_tally = 0
       chosen_answers.each do |variable, answer|
-        answer_tally += q[:points_possible].to_f / variables.length.to_f if answer[:weight] == 100 && !variables.empty?
+        answer_tally += 1 if answer[:weight] == 100 && !variables.empty?
         user_answer["answer_for_#{variable}".to_sym] = answer[:text] rescue nil
         user_answer["answer_id_for_#{variable}".to_sym] = answer[:id] rescue nil
       end
-      user_answer[:points] = answer_tally
-      user_answer[:correct] = true if answer_tally == q[:points_possible]
-      user_answer[:correct] = "partial" if answer_tally > 0 && answer_tally < q[:points_possible]
+      user_answer[:points] = (answer_tally / variables.length.to_f) * q[:points_possible].to_f
+      user_answer[:correct] = true if answer_tally == variables.length.to_i
+      user_answer[:correct] = "partial" if answer_tally > 0 && answer_tally < variables.length.to_i
     else
     end
     user_answer[:points] = 0.0 unless user_answer[:correct]
     user_answer[:points] = (user_answer[:points] * 100.0).round.to_f / 100.0
-    @user_answers << user_answer
-    @tally += (user_answer[:points] || 0) if user_answer[:correct]
+    user_answer
   end
-  private :score_question
   
   named_scope :before, lambda{|date|
     {:conditions => ['quiz_submissions.created_at < ?', date]}

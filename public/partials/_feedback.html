@@ -2,16 +2,15 @@
   <input type="hidden" name="error[url]" id="feedback_form_page_url" value=""/>
   <div>
     <p style="margin-top: 0; margin-bottom: 1.0em;"><img src="/images/feedback.png" style="display: none; float: left; margin: 0px 5px;" alt=""/>
-    <span>
+    <span class="feedback_message">
     Thank you for taking time to provide your feedback.  We're working hard to make Canvas a product
-    you'll enjoy using, so we want to know right away if anything goes wrong or if
-    you notice anything that could be improved.  Let us know what you think!
+    you'll enjoy using, so we want to know right away if anything goes wrong.
     </span>
     </p>
     <div class="feedback-type-holder" id="feedback-dialog-settings" style="display: none; font-size: 0.9em; margin-bottom: 10px;">
       This feedback is for:
       <div style="margin-left: 20px;">
-        <div>
+        <div style="display: none;">
           <input type="radio" id="feedback-type-instructure" name="feedback_type" value="instructure"/>
           <label for="feedback-type-instructure">Canvas Support</label>
         </div>
@@ -25,12 +24,6 @@
           </span>
         </div>
       </div>
-    </div>
-    <div>
-      <span class="feedback-text" style="font-weight: bold; font-size: 1.2em;">I have a: </span>
-      <span class="feedback-option feedback-option-selected problem">Problem</span>
-      <span class="feedback-option idea">Idea</span>
-      <span class="feedback-option compliment">Compliment</span>
     </div>
   </div>
   <div style="clear:both;">

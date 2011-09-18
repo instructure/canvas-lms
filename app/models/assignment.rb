@@ -105,10 +105,6 @@ class Assignment < ActiveRecord::Base
                 :remove_assignment_updated_flag
                 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review 
-    # I was going to be smart and get rid of any existing job, 
-    # but i figured it wasn't worth the extra column needed to keep track of a auto_peer_review_assigner_job_id
-    # or the extra code needed.  The way this is now, it schedules a new job evertime this assignment gets saved 
-    # (if it is supposed to be auto_peer_reviewed)
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
       # handle if it has already come due, but has not yet been auto_peer_reviewed
       if due_at && due_at <= Time.now
@@ -116,7 +112,7 @@ class Assignment < ActiveRecord::Base
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
           :run_at => due_at,
-          :strand => "assignment:auto_peer_review:#{self.id}"
+          :singleton => "assignment:auto_peer_review:#{self.id}"
         })
       end
     end
@@ -128,7 +124,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def touch_assignment_group
-    AssignmentGroup.update_all({:updated_at => Time.now}, {:id => self.assignment_group_id}) if self.assignment_group_id
+    AssignmentGroup.update_all({:updated_at => Time.now.utc}, {:id => self.assignment_group_id}) if self.assignment_group_id
     true
   end
   
@@ -703,7 +699,7 @@ class Assignment < ActiveRecord::Base
     send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
     
     changed_since_publish = !!self.available?
-    Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
+    Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
   end
   
   def update_user_from_rubric(user, assessment)
@@ -807,15 +803,10 @@ class Assignment < ActiveRecord::Base
   def self.find_or_create_submission(assignment_id, user_id)
     s = nil
     attempts = 0
-    begin
-      s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-      s.created_correctly_from_assignment_rb = true
-      s.save_without_broadcast if s.new_record?
-      raise "bad" if s.new_record?
-    rescue => e
-      attempts += 1
-      retry if attempts < 3
-    end
+    s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
+    s.created_correctly_from_assignment_rb = true
+    s.save_without_broadcast if s.new_record?
+    raise "bad" if s.new_record?
     s
   end
   
@@ -1535,4 +1526,3 @@ class Assignment < ActiveRecord::Base
     end
     
 end
-

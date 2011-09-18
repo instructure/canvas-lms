@@ -25,11 +25,14 @@ describe "concluded/unconcluded" do
   
   it "should let the teacher edit the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
+    wait_for_ajax_requests
     
     keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
     entry.find_element(:css, ".grade").should be_displayed
-    sleep 1
+    # normally we hate sleeping in these tests, but in this case, i'm not sure what we're waiting to see happen,
+    # and if we just try to click and click until it works, then things get jammed up.
+    sleep 2
     entry.find_element(:css, ".grade").click
     entry.find_element(:css, ".grade").should_not be_displayed
     entry.find_element(:css, ".grading_value").should be_displayed
@@ -42,7 +45,7 @@ describe "concluded/unconcluded" do
     keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
     entry.find_element(:css, ".grade").should be_displayed
-    sleep 1
+    sleep 2
     entry.find_element(:css, ".grade").click
     entry.find_element(:css, ".grade").should be_displayed
   end
@@ -54,10 +57,11 @@ describe "concluded/unconcluded" do
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
 
     driver.execute_script("$('#submission_#{@student.id}_#{@assignment.id} .grade').mouseover();")
-    sleep 0.5
-    entry.send_keys('i')
+    keep_trying_until {
+      entry.send_keys('i')
+      driver.find_element(:css, "#submission_information").displayed?
+    }
 
-    keep_trying_until { driver.find_element(:css, "#submission_information").displayed? }
     driver.find_element(:css, "#submission_information .add_comment").should be_displayed
     driver.find_element(:css, "#submission_information .save_buttons").should be_displayed
   end
@@ -70,10 +74,11 @@ describe "concluded/unconcluded" do
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
 
     driver.execute_script("$('#submission_#{@student.id}_#{@assignment.id} .grade').mouseover();")
-    sleep 0.5
-    entry.send_keys('i')
+    keep_trying_until {
+      entry.send_keys('i')
+      driver.find_element(:css, "#submission_information").displayed?
+    }
 
-    keep_trying_until { driver.find_element(:css, "#submission_information").displayed? }
     driver.find_element(:css, "#submission_information .add_comment").should_not be_displayed
     driver.find_element(:css, "#submission_information .save_buttons").should_not be_displayed
   end

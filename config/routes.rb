@@ -18,10 +18,6 @@ ActionController::Routing::Routes.draw do |map|
     conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
     conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
     conversation.remove_messages 'remove_messages', :controller => 'conversations', :action => 'remove_messages', :conditions => {:method => :post}
-    conversation.archive 'archive', :controller => 'conversations', :action => 'workflow_event', :event => 'archive', :conditions => {:method => :post}
-    conversation.unarchive 'unarchive', :controller => 'conversations', :action => 'workflow_event', :event => 'unarchive', :conditions => {:method => :post}
-    conversation.mark_as_read 'mark_as_read', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_read', :conditions => {:method => :post}
-    conversation.mark_as_unread 'mark_as_unread', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_unread', :conditions => {:method => :post}
   end
   
   # So, this will look like:
@@ -89,7 +85,8 @@ ActionController::Routing::Routes.draw do |map|
     end
     course.undelete_items 'undelete', :controller => 'context', :action => 'undelete_index'
     course.undelete_item 'undelete/:asset_string', :controller => 'context', :action => 'undelete_item'
-    course.details 'details', :controller => 'courses', :action => 'course_details'
+    course.settings 'settings', :controller => 'courses', :action => 'settings'
+    course.details 'details', :controller => 'courses', :action => 'settings'
     course.re_send_invitations 're_send_invitations', :controller => 'courses', :action => 're_send_invitations', :conditions => {:method => :post}
     course.enroll_users 'enroll_users', :controller => 'courses', :action => 'enroll_users'
     course.link_enrollment 'link_enrollment', :controller => 'courses', :action => 'link_enrollment'
@@ -389,6 +386,7 @@ ActionController::Routing::Routes.draw do |map|
     account.statistics_graph 'statistics/over_time/:attribute', :controller => 'accounts', :action => 'statistics_graph'
     account.formatted_statistics_graph 'statistics/over_time/:attribute.:format', :controller => 'accounts', :action => 'statistics_graph'
     account.turnitin_confirmation 'turnitin/:id/:shared_secret', :controller => 'accounts', :action => 'turnitin_confirmation'
+    account.resources :permissions, :controller => 'role_overrides', :only => [:index, :create], :collection => {:add_role => :post, :remove_role => :delete}
     account.resources :role_overrides, :only => [:index, :create], :collection => {:add_role => :post, :remove_role => :delete}
     account.resources :terms
     account.resources :sub_accounts
@@ -685,6 +683,25 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts', :action => :index, :path_name => 'accounts'
       accounts.get 'accounts/:id', :action => :show
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
+    end
+
+    api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index
+
+    api.with_options(:controller => :conversations) do |conversations|
+      conversations.get 'conversations', :action => :index
+      conversations.post 'conversations', :action => :create
+      conversations.get 'conversations/find_recipients', :action => :find_recipients
+      conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
+      conversations.get 'conversations/:id', :action => :show
+      conversations.put 'conversations/:id', :action => :update # labels, subscribed-ness, workflow_state
+      conversations.delete 'conversations/:id', :action => :destroy
+      conversations.post 'conversations/:id/add_message', :action => :add_message
+      conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
+      conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
+    end
+    
+    api.with_options(:controller => :services_api) do |services|
+      services.get 'services/kaltura', :action => :show_kaltura_config
     end
   end
 

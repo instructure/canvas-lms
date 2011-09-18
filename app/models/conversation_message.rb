@@ -118,7 +118,7 @@ class ConversationMessage < ActiveRecord::Base
   def format_event_message
     case event_data[:event_type]
     when :users_added
-      user_names = User.find_all_by_id(event_data[:user_ids]).map(&:short_name)
+      user_names = User.find_all_by_id(event_data[:user_ids], :order => "id").map(&:short_name)
       EventFormatter.users_added(author.short_name, user_names)
     end
   end
@@ -150,10 +150,10 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def as_json(options = {})
-    super(options)['conversation_message'].merge({
+    super(:only => [:id, :created_at, :body, :generated, :author_id])['conversation_message'].merge({
       'forwarded_messages' => forwarded_messages,
-      'attachments' => attachments.map{ |a| a.as_json['attachment'].merge({'uuid' => a.uuid}) },
-      'media_comment' => media_comment.as_json['media_object']
+      'attachments' => attachments.map{ |a| a.as_json(:only => [:id, :display_name], :methods => ['uuid'])['attachment'] },
+      'media_comment' => media_comment.as_json(:only => [:id, :title, :media_id])['media_object']
     })
   end
 

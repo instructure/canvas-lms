@@ -261,6 +261,12 @@ describe Account do
       @a.disable_service(:twitter)
       @a.allowed_services.should be_nil
     end
+
+    it "should not wipe out services that are substrings of each other" do
+      @a.disable_service('google_docs_previews')
+      @a.disable_service('google_docs')
+      @a.allowed_services.should == '-google_docs_previews,-google_docs'
+    end
   end
   
   context "settings=" do
@@ -442,5 +448,32 @@ describe Account do
         ["&nbsp;&nbsp;sub2", sub2.id],
         ["&nbsp;&nbsp;&nbsp;&nbsp;sub2-1", sub2_1.id]
       ]
+  end
+
+  it "should return the correct user count" do
+    a = Account.default
+    a.all_users.count.should == a.user_count
+    a.user_count.should == 0
+
+    u = User.create!
+    a.add_user(u)
+    a.all_users.count.should == a.user_count(:reload)
+    a.user_count.should == 1
+
+    course_with_teacher
+    @teacher.update_account_associations
+    a.all_users.count.should == a.user_count(:reload)
+    a.user_count.should == 2
+
+    a2 = a.sub_accounts.create!
+    course_with_teacher(:account => a2)
+    @teacher.update_account_associations
+    a.all_users.count.should == a.user_count(:reload)
+    a.user_count.should == 3
+
+    user_with_pseudonym
+    a.all_users.count.should == a.user_count(:reload)
+    a.user_count.should == 4
+
   end
 end

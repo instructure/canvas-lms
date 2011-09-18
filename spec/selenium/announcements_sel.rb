@@ -120,7 +120,7 @@ describe "announcements selenium tests" do
 
     #add math equation to rce
     driver.find_element(:css, '#topic_content_topic_new_instructure_equation > img.mceIcon').click
-    wait_for_dom_ready
+    wait_for_animations
     equation_dialog = driver.find_element(:id, 'instructure_equation_prompt') 
     misc_tab = driver.find_element(:css, '.mathquill-tab-bar > li:last-child a')
     driver.action.move_to(misc_tab).perform
@@ -157,7 +157,7 @@ describe "announcements selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys(first_text)
     end 
     driver.find_element(:css, '.add_topic_form_new').submit
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:link, "First Announcement").should be_displayed
     driver.find_element(:css, 'img[src="' + flickr_img_url + '"]').should be_displayed
 
@@ -177,7 +177,8 @@ describe "announcements selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys(entry_text)
     end
     driver.find_element(:id, 'add_entry_form_entry_new').submit
-    wait_for_dom_ready
+    wait_for_ajax_requests
+    wait_for_animations
     driver.find_element(:css, '#entry_list .discussion_entry .content').should include_text(entry_text)
     driver.find_element(:css, '#left-side .announcements').click
     driver.find_element(:css, '#topic_list .replies').should include_text('1')
@@ -199,13 +200,14 @@ describe "announcements selenium tests" do
     end
     feed_form.find_element(:id, 'external_feed_header_match').send_keys('blah')
     feed_form.submit
+    wait_for_ajaximations
 
     #delete external feed
     driver.find_element(:link, feed_name).should be_displayed
     driver.find_element(:css, '#external_feeds li:nth-child(2) .delete_feed_link').click
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.accept
-    wait_for_dom_ready
+    wait_for_ajaximations
     element_exists(:link, feed_name).should be_false
     ExternalFeed.count.should eql(0)
 
@@ -214,7 +216,7 @@ describe "announcements selenium tests" do
     feed_form.find_element(:id, 'external_feed_url').send_keys('http://www.yahoo.com')
     feed_form.find_element(:id, 'external_feed_header_match').send_keys('more blah')
     feed_form.find_element(:css, '#add_external_feed_form .cancel_button').click
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:id,'add_external_feed_form').should_not be_displayed
 
   end

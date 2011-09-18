@@ -520,7 +520,35 @@ describe SIS::SisCsv do
         "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass1")}"
       )
 
+      user1_persistence_token = nil
+      user2_persistence_token = nil
       User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        user1_persistence_token = p.persistence_token
+        p.valid_arbitrary_credentials?('password1').should be_true
+        p.valid_arbitrary_credentials?('password2').should be_false
+        p.valid_arbitrary_credentials?('password3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+      end
+
+      user2_sis_ssha = nil
+      User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        user2_persistence_token = p.persistence_token
+        user2_sis_ssha = p.sis_ssha
+        p.valid_arbitrary_credentials?('encpass1').should be_true
+        p.valid_arbitrary_credentials?('encpass2').should be_false
+        p.valid_arbitrary_credentials?('encpass3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+      end
+
+      # passwords haven't changed, neither should persistence tokens
+      process_csv_data_cleanly(
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,password1,User,Uno,user1@example.com,active,",
+        "user_2,user2,,User,Dos,user2@example.com,active,#{user2_sis_ssha}"
+      )
+
+      User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        user1_persistence_token.should == p.persistence_token
         p.valid_arbitrary_credentials?('password1').should be_true
         p.valid_arbitrary_credentials?('password2').should be_false
         p.valid_arbitrary_credentials?('password3').should be_false
@@ -528,12 +556,14 @@ describe SIS::SisCsv do
       end
 
       User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        user2_persistence_token.should == p.persistence_token
         p.valid_arbitrary_credentials?('encpass1').should be_true
         p.valid_arbitrary_credentials?('encpass2').should be_false
         p.valid_arbitrary_credentials?('encpass3').should be_false
         p.valid_arbitrary_credentials?('password4').should be_false
       end
 
+      # passwords change, persistence token should change
       process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
         "user_1,user1,password2,User,Uno,user1@example.com,active,",
@@ -541,6 +571,7 @@ describe SIS::SisCsv do
       )
 
       User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        user1_persistence_token.should_not == p.persistence_token
         p.valid_arbitrary_credentials?('password1').should be_false
         p.valid_arbitrary_credentials?('password2').should be_true
         p.valid_arbitrary_credentials?('password3').should be_false
@@ -548,9 +579,11 @@ describe SIS::SisCsv do
 
         p.password_confirmation = p.password = 'password4'
         p.save
+        user1_persistence_token = p.persistence_token
       end
 
       User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        user2_persistence_token.should_not == p.persistence_token
         p.valid_arbitrary_credentials?('encpass1').should be_false
         p.valid_arbitrary_credentials?('encpass2').should be_true
         p.valid_arbitrary_credentials?('encpass3').should be_false
@@ -558,8 +591,10 @@ describe SIS::SisCsv do
 
         p.password_confirmation = p.password = 'password4'
         p.save
+        user2_persistence_token = p.persistence_token
       end
 
+      # user set password, persistence token should not change
       process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
         "user_1,user1,password3,User,Uno,user1@example.com,active,",
@@ -567,6 +602,7 @@ describe SIS::SisCsv do
       )
 
       User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        user1_persistence_token.should == p.persistence_token
         p.valid_arbitrary_credentials?('password1').should be_false
         p.valid_arbitrary_credentials?('password2').should be_false
         p.valid_arbitrary_credentials?('password3').should be_false
@@ -574,6 +610,7 @@ describe SIS::SisCsv do
       end
 
       User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        user2_persistence_token.should == p.persistence_token
         p.valid_arbitrary_credentials?('encpass1').should be_false
         p.valid_arbitrary_credentials?('encpass2').should be_false
         p.valid_arbitrary_credentials?('encpass3').should be_false
@@ -749,7 +786,7 @@ describe SIS::SisCsv do
         "user_2,user2,User,Dos,user@example.com,active"
       )
       importer.errors.should == []
-      importer.warnings.should == []
+      importer.warnings.map(&:last).should == ['E-mail address user@example.com for user user2 is already claimed; ignoring']
       user1 = Pseudonym.find_by_unique_id('user1').user
       user2 = Pseudonym.find_by_unique_id('user2').user
       user1.should_not == user2
@@ -818,6 +855,82 @@ describe SIS::SisCsv do
       Pseudonym.count.should == (p_count + 2)
       p.sis_user_id.should == "user_2"
     end
+    
+    it "should strip white space on fields" do
+      process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1  ,user1   ,User   ,Uno   ,user@example.com   ,active  ",
+        "   user_2,   user2,   User,   Dos,   user2@example.com,  active"
+      )
+      user = User.find_by_email('user@example.com')
+      user.should_not be_nil
+      p = user.pseudonyms.first
+      p.unique_id.should == "user1"
+      user = User.find_by_email('user2@example.com')
+      user.should_not be_nil
+      p = user.pseudonyms.first
+      p.unique_id.should == "user2"
+    end
+
+    it "should use an existing communication channel" do
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+      )
+      p = Pseudonym.find_by_unique_id('user1')
+      user1 = p.user
+      user1.last_name.should == "Uno"
+      user1.pseudonyms.count.should == 1
+      p.communication_channel_id.should_not be_nil
+      user1.communication_channels.count.should == 1
+      user1.communication_channels.first.path.should == 'user1@example.com'
+      p.sis_communication_channel_id.should == p.communication_channel_id
+      user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+
+      # change to user2@example.com; because user1@example.com was sis created, it should disappear
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user2@example.com,active"
+      )
+      p.reload
+      user1.reload
+      user1.pseudonyms.count.should == 1
+      user1.communication_channels.count.should == 2
+      user1.communication_channels.unretired.count.should == 1
+      p.communication_channel_id.should_not be_nil
+      user1.communication_channels.unretired.first.path.should == 'user2@example.com'
+      p.sis_communication_channel_id.should == p.communication_channel_id
+      p.communication_channel_id.should == user1.communication_channels.unretired.first.id
+    end
+
+    it "should work when a communication channel already exists, but there's no sis_communication_channel" do
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,,active"
+      )
+      p = Pseudonym.find_by_unique_id('user1')
+      user1 = p.user
+      user1.last_name.should == "Uno"
+      user1.pseudonyms.count.should == 1
+      p.communication_channel_id.should be_nil
+      user1.communication_channels.count.should == 0
+      p.sis_communication_channel_id.should be_nil
+      user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+
+      importer = process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user2@example.com,active"
+      )
+      p.reload
+      user1.reload
+      user1.pseudonyms.count.should == 1
+      user1.communication_channels.count.should == 1
+      user1.communication_channels.unretired.count.should == 1
+      p.communication_channel_id.should_not be_nil
+      user1.communication_channels.unretired.first.path.should == 'user2@example.com'
+      p.sis_communication_channel_id.should == p.communication_channel_id
+      p.communication_channel_id.should == user1.communication_channels.unretired.first.id
+    end
 
   end
 
@@ -877,7 +990,8 @@ describe SIS::SisCsv do
         "user_2,user2,User,Dos,user2@example.com,active",
         "user_3,user4,User,Tres,user3@example.com,active",
         "user_5,user5,User,Quatro,user5@example.com,active",
-        "user_6,user6,User,Cinco,user6@example.com,active"
+        "user_6,user6,User,Cinco,user6@example.com,active",
+        "user_7,user7,User,Siete,user7@example.com,active"
       )
       process_csv_data(
         "section_id,course_id,name,status,start_date,end_date",
@@ -885,20 +999,25 @@ describe SIS::SisCsv do
       )
       # the enrollments
       process_csv_data(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,user_1,teacher,,active,",
-        ",user_2,student,S001,active,",
-        "test_1,user_3,ta,S001,active,",
-        "test_1,user_5,observer,S001,active,user_2",
-        "test_1,user_6,designer,S001,active,"
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "test_1,user_1,teacher,,active,,,",
+        ",user_2,student,S001,active,,,",
+        "test_1,user_3,ta,S001,active,,,",
+        "test_1,user_5,observer,S001,active,user_2,,",
+        "test_1,user_6,designer,S001,active,,,",
+        "test_1,user_7,teacher,S001,active,,1985-08-24,2011-08-29"
       )
       course = @account.courses.find_by_sis_source_id("test_1")
-      course.teachers.first.name.should == "User Uno"
+      course.teachers.map(&:name).should be_include("User Uno")
       course.students.first.name.should == "User Dos"
       course.tas.first.name.should == "User Tres"
       course.observers.first.name.should == "User Quatro"
       course.observer_enrollments.first.associated_user_id.should == course.students.first.id
       course.designers.first.name.should == "User Cinco"
+      siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
+      siete.should_not be_nil
+      siete.start_at.should == DateTime.new(1985, 8, 24)
+      siete.end_at.should == DateTime.new(2011, 8, 29)
     end
 
     it "should not try looking up a section to enroll into if the section name is empty" do
@@ -1997,6 +2116,25 @@ describe SIS::SisCsv do
         @account.courses.find_by_sis_source_id("C001").students.size.should == 0
         @account.courses.find_by_sis_source_id("X001").students.first.name.should == "User Uno"
       end
+    end
+
+    it "user" do
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,deleted"
+      )
+      user1 = @account.pseudonyms.find_by_sis_source_id('user1')
+      user2 = @account.pseudonyms.find_by_sis_source_id('user2')
+      user1.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
+      user2.user.user_account_associations.should be_empty
+
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,deleted"
+      )
+      user1.reload
+      user1.user.user_account_associations.should be_empty
     end
   end
 

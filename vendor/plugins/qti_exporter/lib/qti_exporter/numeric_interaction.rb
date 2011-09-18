@@ -7,19 +7,15 @@ class NumericInteraction < AssessmentItemConverter
   end
 
   def parse_question_data
-    if @type == 'numeric'
-      get_answer_values()
-    elsif @type == 'numerical_question'
-      get_canvas_answers
-      attach_feedback_values(@question[:answers])
-    end
+    get_answer_values()
+    get_canvas_answers
+    attach_feedback_values(@question[:answers])
     get_feedback()
     @question
   end
   
   def get_answer_values
     answer = {:weight=>100,:comments=>"",:id=>unique_local_id,:numerical_answer_type=>"range_answer"}
-    @question[:answers] << answer
     if gte = @doc.at_css('responseCondition gte baseValue')
       answer[:start] = gte.text.to_f
     end
@@ -29,21 +25,27 @@ class NumericInteraction < AssessmentItemConverter
     if equal = @doc.at_css('responseCondition equal baseValue')
       answer[:exact] = equal.text.to_f
     end
+    if (answer[:start] && answer[:end]) || answer[:exact]
+      @question[:answers] << answer
+    end
   end
-  
+
   def get_canvas_answers
     @doc.css('responseIf, responseElseIf').each do |r_if|
-      next unless r_if.at_css('or') || r_if.at_css('and')
       answer = {:weight=>100, :id=>unique_local_id, :text=>'answer_text'}
+      answer[:feedback_id] = get_feedback_id(r_if)
       if or_node = r_if.at_css('or')
         # exact answer
+        exact_node = or_node.at_css('stringMatch baseValue')
+        next unless exact_node
         answer[:numerical_answer_type] = 'exact_answer'
-        exact = or_node.at_css('stringMatch baseValue').text.to_f rescue 0.0
+        exact = exact_node.text.to_f rescue 0.0
         answer[:exact] = exact
         if upper = or_node.at_css('and customOperator[class=varlte] baseValue')
           margin = upper.text.to_f - exact rescue 0.0
           answer[:margin] = margin
         end
+        @question[:answers] << answer
       elsif and_node = r_if.at_css('and')
         # range answer
         answer[:numerical_answer_type] = 'range_answer'
@@ -53,11 +55,12 @@ class NumericInteraction < AssessmentItemConverter
         if lower = and_node.at_css('customOperator[class=varlte] baseValue')
           answer[:start] = lower.text.to_f rescue 0.0
         end
+        if upper || lower
+          @question[:answers] << answer
+        end
       end
-      answer[:feedback_id] = get_feedback_id(r_if)
-      @question[:answers] << answer
     end
   end
-  
+
 end
 end

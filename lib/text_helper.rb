@@ -70,8 +70,9 @@ module TextHelper
         link = s
         link = "http://#{link}" if link[0,3] == 'www'
         link = add_notification_to_link(link, notification_id) if notification_id
+        link = URI.escape(link).gsub("'", "%27")
         links << link
-        "<a href='#{link}'>#{s}</a>"
+        "<a href='#{ERB::Util.h(link)}'>#{ERB::Util.h(s)}</a>"
       end
       AUTO_LINKIFY_PLACEHOLDER
     end

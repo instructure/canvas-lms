@@ -28,7 +28,7 @@ module SIS
     
     def verify(csv, verify)
       term_ids = (verify[:terms_id] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         term_id = row['term_id']
         add_error(csv, "Duplicate term id #{term_id}") if term_ids[term_id]
         term_ids[term_id] = true
@@ -42,7 +42,7 @@ module SIS
     # account_id,parent_account_id,name,status
     def process(csv)
       start = Time.now
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         update_progress
         logger.debug("Processing Term #{row.inspect}")
         

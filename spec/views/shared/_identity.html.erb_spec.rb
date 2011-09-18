@@ -21,10 +21,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/shared/_identity" do
   it "should render" do
+    Setting.set('show_feedback_link', 'true')
     course_with_student
     view_context
     render :partial => "shared/identity"
-    response.should_not be_nil
+    response.should be_success
+  end
+
+  it "should render without a current user" do
+    Setting.set('show_feedback_link', 'true')
+    course_with_student
+    view_context
+    assigns.delete(:current_user)
+    render :partial => "shared/identity"
+    response.should be_success
   end
 end
 

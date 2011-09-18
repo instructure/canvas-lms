@@ -126,6 +126,54 @@ I18n.scoped('instructure', function(I18n) {
     return ret.concat.apply([], ret);
   }
 
+  // add ability to handle css3 opacity transitions on show or hide
+  // if you want to use this just add the class 'use-css-transitions-for-show-hide' to an element.
+  // whenever that element is .show()n or .hide()n it will use a css opacity transition (in non-IE browsers). 
+  // if you want to override the length or details of the transition, just specify it in a css file.
+  if ($.detect(['-moz-transition', '-o-transition', '-webkit-transition'], function(){ return document.body.style[this] !== undefined })) {
+    $(function(){ //have to do it later (on dom ready) because jQuery UI is going to override show and hide as well
+      $.each(['show', 'hide', 'remove'], function(i, showHideOrRemove) {
+        var previousFn = $.fn[showHideOrRemove];
+        $.fn[showHideOrRemove] = function(){
+          if (!arguments.length) {
+            return this.each(function() {
+              var $this = $(this);
+              // if you can't add the class .use-css-transitions-for-show-hide to your element, you can
+              // add it to this selector to have it use css3 transitions.
+              if ($this.is('.use-css-transitions-for-show-hide, .ui-widget-overlay')) {
+                var oldOpacityCssAttribute = this.style.opacity,
+                    oldComputedOpacity = $this.css('opacity'),
+                    newOpacity = (showHideOrRemove === 'hide' || showHideOrRemove === 'remove') ? 0 : (!oldComputedOpacity || oldComputedOpacity == "0" ? 1 : oldComputedOpacity);
+                if (showHideOrRemove === 'show' && $this.is(':hidden')) {
+                  this.style.opacity = 0;
+                  previousFn.apply($this); //change out of display:none
+                }
+                
+                // things like '.ui-widget-overlay' may not already have this class,
+                // it is needed in the css to tell the browser to use the animation.
+                $this.addClass('use-css-transitions-for-show-hide');
+                $this.bind('transitionend oTransitionEnd webkitTransitionEnd', function(event){
+                  if (event.originalEvent.propertyName === 'opacity') {
+                    previousFn.apply($(this)); //change to display:none when we are hiding.
+                    this.style.opacity = oldOpacityCssAttribute;
+                    $(this).unbind(event);
+                  }
+                });
+                setTimeout(function(){
+                  $this.css('opacity', newOpacity);
+                }, 1);
+              } else {
+                previousFn.apply($this);
+              }
+            });
+          } else {
+            return previousFn.apply(this, arguments);
+          }
+        };
+      });
+    });
+  }
+
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
   // NOTE: because IE only allows form methods to be "POST" or "GET",
@@ -524,12 +572,16 @@ I18n.scoped('instructure', function(I18n) {
     var boundary = "-----AaB03x" + $.uniqueId(),
         result = {content_type: "multipart/form-data; boundary=" + boundary},
         body = "--" + boundary + "\r\n",
-        paramsList = [];
+        paramsList = [],
+        hasFakeFile = false;
     
     for(var idx in params) {
       paramsList.push([idx, params[idx]]);
+      if (params[idx].fake_file) {
+        hasFakeFile = true;
+      }
     }
-    if(window.FormData) {
+    if(window.FormData && !hasFakeFile) {
       var fd = new FormData();
       for(var idx in params) {
         var param = params[idx];
@@ -2126,7 +2178,7 @@ I18n.scoped('instructure', function(I18n) {
       dataType: "json",
       type: submit_type,
       success: function(data) {
-        $.ajaxJSON.inFlighRequests -= 1;
+        $.ajaxJSON.inFlightRequests -= 1;
         data = data || {};
         var page_view_id = null;
         if(xhr && xhr.getResponseHeader && (page_view_id = xhr.getResponseHeader("X-Canvas-Page-View-Id"))) {
@@ -2146,7 +2198,7 @@ I18n.scoped('instructure', function(I18n) {
         }
       },
       error: function() {
-        $.ajaxJSON.inFlighRequests -= 1;
+        $.ajaxJSON.inFlightRequests -= 1;
         ajaxError.apply(this, arguments);
       },
       data: data
@@ -2154,12 +2206,12 @@ I18n.scoped('instructure', function(I18n) {
     if(options && options.timeout) {
       params['timeout'] = options.timeout;
     }
-    $.ajaxJSON.inFlighRequests += 1;
+    $.ajaxJSON.inFlightRequests += 1;
     var xhr = $.ajax(params);
     $.ajaxJSON.storeRequest(xhr, url, submit_type, data);
     return xhr;
   };
-  $.ajaxJSON.inFlighRequests = 0;
+  $.ajaxJSON.inFlightRequests = 0;
   $.ajaxJSON.unhandledXHRs = [];
   $.ajaxJSON.ignoredXHRs = [];
   $.ajaxJSON.passedRequests = [];
@@ -2515,6 +2567,7 @@ I18n.scoped('instructure', function(I18n) {
     }
     this.realDatepicker(options);
     $(document).data('last_datepicker', this);
+    return this;
   };
   $.fn.date_field = function(options) {
     options = $.extend({}, options);
@@ -3391,6 +3444,14 @@ I18n.scoped('instructure', function(I18n) {
           scribdDoc.addEventListener('iPaperReady', opts.ready);
         }
         scribdDoc.write( id );
+
+        // this is a hack so that the <embed> doesn't throw a bunch of these errors after it is .remove()d:
+        // Uncaught TypeError: Object #<HTMLEmbedElement> has no method 'keyboardShortcut(Up/Down)'
+        // They come from the actionscript running in their viewer:
+        // see: http://dragstudio.com/app/ScribdViewer/javascript/_-0j.as
+        // and http://groups.google.com/group/scribd-platform-developers/msg/46a4f12db73d02d8
+        this.childNodes[0].keyboardShortcutDown = this.childNodes[0].keyboardShortcutUp = function(){};
+
         tellAppIViewedThisInline();
       } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){ 
         // else if it's something google docs preview can handle and we can get a public url to this document.
@@ -3522,4 +3583,33 @@ I18n.scoped('instructure', function(I18n) {
     return this;
 
   };
+
+  $.toSentence = function(array, options) {
+    if (typeof options == 'undefined') {
+      options = {};
+    } else if (options == 'or') {
+      options = {
+        two_words_connector: I18n.t('#support.array.or.two_words_connector'),
+        last_word_connector: I18n.t('#support.array.or.last_word_connector')
+      };
+    }
+
+    options = $.extend({
+        words_connector: I18n.t('#support.array.words_connector'),
+        two_words_connector: I18n.t('#support.array.two_words_connector'),
+        last_word_connector: I18n.t('#support.array.last_word_connector')
+      }, options);
+
+    switch (array.length) {
+      case 0:
+        return '';
+      case 1:
+        return '' + array[0];
+      case 2:
+        return array[0] + options.two_words_connector + array[1];
+      default:
+        return array.slice(0, -1).join(options.words_connector) + options.last_word_connector + array[array.length - 1];
+    }
+  }
 });
+

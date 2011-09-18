@@ -43,13 +43,40 @@ describe Course do
     @course.uuid.should_not be_nil
   end
 
-  it "should follow account chain when looking for generic permissions from AccountUsers" do
-    account = Account.create!
-    sub_account = Account.create!(:parent_account => account)
-    sub_sub_account = Account.create!(:parent_account => sub_account)
-    user = account_admin_user(:account => sub_account)
-    course = Course.create!(:account => sub_sub_account)
-    course.grants_right?(user, nil, :manage).should be_true
+  context "permissions" do
+    it "should follow account chain when looking for generic permissions from AccountUsers" do
+      account = Account.create!
+      sub_account = Account.create!(:parent_account => account)
+      sub_sub_account = Account.create!(:parent_account => sub_account)
+      user = account_admin_user(:account => sub_account)
+      course = Course.create!(:account => sub_sub_account)
+      course.grants_right?(user, nil, :manage).should be_true
+    end
+
+    it "should grant delete to the proper individuals" do
+      account_admin_user_with_role_changes(:membership_type => 'managecourses', :role_changes => {:manage_courses => true})
+      @admin1 = @admin
+      account_admin_user_with_role_changes(:membership_type => 'managesis', :role_changes => {:manage_sis => true})
+      @admin2 = @admin
+      course_with_teacher(:active_all => true)
+
+      @course.grants_right?(@teacher, nil, :delete).should be_true
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_false
+
+      @course.complete!
+
+      @course.grants_right?(@teacher, nil, :delete).should be_true
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_false
+
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+
+      @course.grants_right?(@teacher, nil, :delete).should be_false
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_true
+    end
   end
 
   it "should clear content when resetting" do
@@ -77,7 +104,10 @@ describe Course do
     @new_course.quizzes.should be_empty
     @new_course.assignments.should be_empty
     @new_course.sis_source_id.should == 'sis_id'
+    @new_course.syllabus_body.should be_blank
 
+    @course.uuid.should_not == @new_course.uuid
+    @course.wiki_id.should_not == @new_course.wiki_id
     @course.replacement_course_id.should == @new_course.id
   end
 end
@@ -266,6 +296,11 @@ describe Course, "gradebook_to_csv" do
     rows.length.should equal(3)
     rows[0][2].should == 'SIS User ID'
     rows[0][3].should == 'SIS Login ID'
+    rows[0][4].should == 'Section'
+    rows[1][2].should == ''
+    rows[1][3].should == ''
+    rows[1][4].should == ''
+    rows[1][-1].should == '(read only)'
     rows[2][2].should == 'SISUSERID'
     rows[2][3].should == 'SISLOGINID'
   end
@@ -625,6 +660,25 @@ describe Course, "backup" do
       new_attachment.full_path.should == "course files/folder_1/folder_2/folder_3/merge.test"
       folder.reload
       new_attachment.folder.cloned_item_id.should == folder.cloned_item_id
+    end
+
+    it "should perform day substitutions" do
+      old_course = course_model
+      old_course.assert_assignment_group
+      today = Time.now.utc
+      @assignment = old_course.assignments.build
+      @assignment.due_at = today
+      @assignment.workflow_state = 'published'
+      @assignment.save!
+      old_course.reload
+
+      new_course = course_model
+
+      new_course.merge_into_course(old_course, :everything => true, :shift_dates => true, :day_substitutions => { today.wday.to_s => (today.wday + 1).to_s})
+      new_course.reload
+      new_assignment = new_course.assignments.first
+      # new_assignment.due_at.should == today + 1.day does not work
+      (new_assignment.due_at.to_i - (today + 1.day).to_i).abs.should < 60
     end
   end
   

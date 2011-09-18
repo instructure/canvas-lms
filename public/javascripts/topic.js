@@ -197,8 +197,7 @@ I18n.scoped('topics', function(I18n) {
   $(document).ready(function() {
     setTimeout(function() {
       $(".communication_sub_message.blank").each(function() {
-        var $name = $("#discussion_topic_permissions .user_name").clone(true);
-        $(this).find(".user_name").after($name).remove();
+        $(this).find(".user_name").text('');
       });
     }, 500);
     var permissionsList = [];

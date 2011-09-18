@@ -10,3 +10,8 @@ en:
     formats:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
+  support:
+    array:
+      or:
+        two_words_connector: ' or '
+        last_word_connector: ', or '

@@ -16,19 +16,80 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Conversations
+#
+# API for creating, accessing and updating user conversations.
 class ConversationsController < ApplicationController
   include ConversationsHelper
 
   before_filter :require_user
-  before_filter lambda { |c| c.avatar_size = 32 }, :only => :find_recipients
-  before_filter :get_conversation, :only => [:show, :update, :destroy, :workflow_event, :add_recipients, :remove_messages]
+  before_filter :set_avatar_size
+  before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   add_crumb(lambda { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
+  # @API
+  # Returns the list of conversations for the current user, most recent ones first.
+  #
+  # @argument scope [optional, "unread"|"labeled"|"archived"]
+  #   When set, only return conversations of the specified type. For example,
+  #   set to "unread" to return only conversations that haven't been read.
+  #   The default behavior is to return all non-archived conversations (i.e.
+  #   read and unread).
+  #
+  # @argument label [optional, "red"|"orange"|"yellow"|"green"|"blue"|"purple"]
+  #   When scope is set to "labeled", you can use this argument to limit the
+  #   results to a particular label.
+  #
+  # @response_field id The unique identifier for the conversation.
+  # @response_field workflow_state The current state of the conversation
+  #   (read, unread or archived)
+  # @response_field last_message A <=100 character preview from the most
+  #   recent message
+  # @response_field last_message_at The timestamp of the latest message
+  # @response_field message_count The number of messages in this conversation
+  # @response_field subscribed Indicates whether the user is actively
+  #   subscribed to the conversation
+  # @response_field private Indicates whether this is a private conversation
+  #   (i.e. audience of one)
+  # @response_field label Current label for this conversation, if set
+  # @response_field properties Additional conversation flags (last_author,
+  #   attachments, media_objects). Each listed property means the flag is
+  #   set to true (i.e. the current user is the most recent author, there
+  #   are attachments, or there are media objects)
+  # @response_field audience Array of user ids who are involved in the
+  #   conversation, ordered by participation level, then alphabetical.
+  #   Excludes current user, unless this is a monologue.
+  # @response_field audience_contexts Most relevant shared contexts (courses
+  #   and groups) between current user and other participants. If there is
+  #   only one participant, it will also include that user's enrollment(s)/
+  #   membership type(s) in each course/group
+  # @response_field avatar_url URL to appropriate icon for this conversation
+  #   (custom, individual or group avatar, depending on audience)
+  # @response_field participants Array of users (id, name) participating in
+  #   the conversation. Includes current user.
+  #
+  # @example_response
+  #   [
+  #     {
+  #       "id": 2,
+  #       "workflow_state": "unread",
+  #       "last_message": "sure thing, here's the file",
+  #       "last_message_at": "2011-09-02T12:00:00Z",
+  #       "message_count": 2,
+  #       "subscribed": true,
+  #       "private": true,
+  #       "label": null,
+  #       "properties": ["attachments"],
+  #       "audience": [2],
+  #       "audience_contexts": {"courses": {"1": ["StudentEnrollment"]}, "groups": {}},
+  #       "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
+  #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}]
+  #     }
+  #   ]
   def index
-    @page_max = params[:count].try(:to_i) || 25
-    @page = params[:page].try(:to_i) || 1
+    @page_max = params[:per_page] = params[:per_page].try(:to_i) || 10
     conversations_scope = case params[:scope]
       when 'unread'
         @view_name = I18n.t('index.inbox_views.unread', 'Unread')
@@ -60,7 +121,7 @@ class ConversationsController < ApplicationController
     end
     @scope ||= params[:scope].to_sym
     @conversations_count = conversations_scope.count
-    conversations = conversations_scope.scoped(:limit => @page_max, :offset => (@page - 1) * @page_max).all
+    conversations = Api.paginate(conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
     # optimize loading the most recent messages for each conversation into a single query
     last_messages = ConversationMessage.latest_for_conversations(conversations).human.
                       inject({}) { |hash, message|
@@ -69,7 +130,7 @@ class ConversationsController < ApplicationController
                         end
                         hash
                       }
-    @conversations_json = conversations.map{ |c| jsonify_conversation(c, last_messages[c.conversation_id]) }
+    @conversations_json = conversations.map{ |c| jsonify_conversation(c, :last_message => last_messages[c.conversation_id], :include_participant_avatars => false, :include_participant_contexts => false) }
     @user_cache = Hash[*jsonify_users([@current_user]).map{|u| [u[:id], u] }.flatten]
     respond_to do |format|
       format.html
@@ -77,6 +138,19 @@ class ConversationsController < ApplicationController
     end
   end
 
+  # @API
+  # Create a new conversation with one or more recipients. If there is already
+  # an existing private conversation with the given recipients, it will be
+  # reused.
+  #
+  # @argument recipients An array of recipient ids. These may be user ids
+  #   or course/group ids prefixed with "course_" or "group_" respectively,
+  #   e.g. [1, 2, "course_3"].
+  # @argument body The message to be sent
+  # @argument group_conversation [true|false] Ignored if there is just one
+  #   recipient. If true, this will be a group conversation (i.e. all
+  #   recipients will see all messages and replies). If false, individual
+  #   private conversations will be started with each recipient.
   def create
     if @recipient_ids.present? && params[:body].present?
       batch_private_messages = !params[:group_conversation] && @recipient_ids.size > 1
@@ -87,21 +161,106 @@ class ConversationsController < ApplicationController
         @conversation
       end
       if batch_private_messages
-        render :text => {:conversations => conversations.each(&:reload).select{|c|c.last_message_at}.map{|c|jsonify_conversation(c)}}.to_json
+        render :json => conversations.each(&:reload).select{|c|c.last_message_at}.map{|c|jsonify_conversation(c)}
       else
-        render :text => {:participants => jsonify_users(@conversation.participants(true, true)),
-                         :conversation => jsonify_conversation(@conversation.reload),
-                         :message => @message}.to_json
+        render :json => [jsonify_conversation(@conversation.reload,
+                                             :include_context_info => true,
+                                             :include_forwarded_participants => true,
+                                             :messages => [@message])]
       end
     else
-      render :text => {}.to_json, :status => :bad_request
+      render :json => {}, :status => :bad_request
     end
   end
 
+  # @API
+  # Returns information for a single conversation. Response includes all
+  # fields that are present in the list/index action, as well as messages,
+  # submissions, and extended participant information.
+  #
+  # @response_field participants Array of relevant users. Includes current
+  #   user. If there are forwarded messages in this conversation, the authors
+  #   of those messages will also be included, even if they are not
+  #   participating in this conversation. Fields include:
+  # @response_field messages Array of messages, newest first. Fields include:
+  #   id:: The unique identifier for the message
+  #   created_at:: The timestamp of the message
+  #   body:: The actual message body
+  #   author_id:: The id of the user who sent the message (see audience, participants)
+  #   generated:: If true, indicates this is a system-generated message (e.g. "Bob added Alice to the conversation")
+  #   media_comment:: Audio comment data for this message (if applicable). Fields include: id, title, media_id
+  #   forwarded_messages:: If this message contains forwarded messages, they will be included here (same format as this list). Note that those messages may have forwarded messages of their own, etc.
+  #   attachments:: Array of attachments for this message. Fields include: id, display_name, uuid
+  # @response_field submissions Array of assignment submissions having
+  #   comments relevant to this conversation. These should be interleaved with
+  #   the messages when displaying to the user. Fields include:
+  #   id:: The unique identifier for the submission.
+  #   course_id:: The unique identifier for the course.
+  #   assignment_id:: The unique identifier for the assignment.
+  #   author_id:: The id of the user who submitted the assignment (could be current user, or a student if the current user is a teacher)
+  #   created_at:: The timestamp when the submission was created
+  #   updated_at:: The timestamp of the last update to this submission
+  #   title:: Title of the assignment
+  #   score:: Score for the assignment submission
+  #   comment_count:: Total number of comments on this submission
+  #   recent_comments:: Array of recent comments. Fields include: id, author_id, created_at, body
+  #
+  # @example_response
+  #   {
+  #     "id": 2,
+  #     "workflow_state": "unread",
+  #     "last_message": "sure thing, here's the file",
+  #     "last_message_at": "2011-09-02T12:00:00-06:00",
+  #     "message_count": 2,
+  #     "subscribed": true,
+  #     "private": true,
+  #     "label": null,
+  #     "properties": ["attachments"],
+  #     "audience": [2],
+  #     "audience_contexts": {"courses": {"1": ["StudentEnrollment"]}, "groups": {}},
+  #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-50.png",
+  #     "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}, {"id": 3, "name": "Bob Student"}],
+  #     "messages":
+  #       [
+  #         {
+  #           "id": 3
+  #           "created_at": "2011-09-02T12:00:00Z",
+  #           "body": "sure thing, here's the file",
+  #           "author_id": 2,
+  #           "generated": false,
+  #           "media_comment": null,
+  #           "forwarded_messages": [],
+  #           "attachments": [{"id": 1, "display_name": "notes.doc", "uuid": "abcdefabcdefabcdefabcdefabcdef"}]
+  #         },
+  #         {
+  #           "id": 2
+  #           "created_at": "2011-09-02T11:00:00Z",
+  #           "body": "hey, bob didn't get the notes. do you have a copy i can give him?",
+  #           "author_id": 2,
+  #           "generated": false,
+  #           "media_comment": null,
+  #           "forwarded_messages":
+  #             [
+  #               {
+  #                 "id": 1
+  #                 "created_at": "2011-09-02T10:00:00Z",
+  #                 "body": "can i get a copy of the notes? i was out",
+  #                 "author_id": 3,
+  #                 "generated": false,
+  #                 "media_comment": null,
+  #                 "forwarded_messages": [],
+  #                 "attachments": []
+  #               }
+  #             ],
+  #           "attachments": []
+  #         }
+  #       ],
+  #     "submissions": []
+  #   }
   def show
-    return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" unless request.xhr?
+    return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" + (params[:message] ? '?message=' + URI.encode(params[:message], Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")) : '') unless request.xhr? || params[:format] == 'json'
     
-    @conversation.mark_as_read! if @conversation.unread?
+    @conversation.update_attribute(:workflow_state, "read") if @conversation.unread?
     submissions = []
     if @conversation.one_on_one?
       submissions = Submission.for_conversation_participant(@conversation).with_comments.map do |submission|
@@ -127,12 +286,36 @@ class ConversationsController < ApplicationController
       end
       submissions = submissions.sort_by{ |s| s[:updated_at] }.reverse
     end
-    render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
-                     :messages => @conversation.messages,
-                     :submissions => submissions,
-                     :conversation => params[:include_conversation] ? jsonify_conversation(@conversation) : nil}
+    render :json => jsonify_conversation(@conversation,
+                                         :include_context_info => true,
+                                         :include_forwarded_participants => true,
+                                         :messages => @conversation.messages,
+                                         :submissions => submissions)
   end
 
+  # @API
+  # Updates attributes for a single conversation.
+  #
+  # Response includes only a subset of the fields that are present in the
+  # list/index/show actions: id, workflow_state, last_message, last_message_at
+  # message_count, subscribed, private, lable, properties
+  #
+  # @argument conversation[workflow_state] ["read"|"unread"|"archived"] Change the state of this conversation
+  # @argument conversation[subscribed] [true|false] Toggle the current user's subscription to the conversation (only valid for group conversations). If unsubscribed, the user will still have access to the latest messages, but the conversation won't be automatically flagged as unread, nor will it jump to the top of the inbox.
+  # @argument conversation[label] ["red"|"orange"|"yellow"|"green"|"blue"|"purple"|null] Set/unset a flag on this conversation
+  #
+  # @example_response
+  #   {
+  #     "id": 2,
+  #     "workflow_state": "read",
+  #     "last_message": "sure thing, here's the file",
+  #     "last_message_at": "2011-09-02T12:00:00-06:00",
+  #     "message_count": 2,
+  #     "subscribed": true,
+  #     "private": true,
+  #     "label": null,
+  #     "properties": ["attachments"]
+  #   }
   def update
     if @conversation.update_attributes(params[:conversation])
       render :json => @conversation
@@ -141,46 +324,149 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def workflow_event
-    event = params[:event].to_sym
-    if [:mark_as_read, :mark_as_unread, :archive, :unarchive].include?(event) && @conversation.send(event)
-      render :json => @conversation
-    else
-      # TODO: if it was archived/marked_as_read/etc. out-of-band, we should
-      # handle it better (perhaps reload the conversation js-side)
-      render :json => @conversation.errors, :status => :bad_request
-    end
-  end
-
+  # @API
+  # Mark all conversations as read.
   def mark_all_as_read
     @current_user.mark_all_conversations_as_read!
     render :json => {}
   end
 
+  # @API
+  # Delete this conversation and its messages. Note that this only deletes
+  # this user's view of the conversation.
+  #
+  # Response includes same fields as UPDATE action
+  #
+  # @example_response
+  #   {
+  #     "id": 2,
+  #     "workflow_state": "read",
+  #     "last_message": null,
+  #     "last_message_at": null,
+  #     "message_count": 0,
+  #     "subscribed": true,
+  #     "private": true,
+  #     "label": null,
+  #     "properties": []
+  #   }
   def destroy
     @conversation.remove_messages(:all)
-    render :json => {}
+    render :json => @conversation
   end
 
+  # @API
+  # Add recipients to an existing group conversation. Response is similar to
+  # the GET/show action, except that omits submissions and only includes the
+  # latest message (e.g. "joe was added to the conversation by bob")
+  #
+  # @argument recipients An array of recipient ids. These may be user ids
+  #   or course/group ids prefixed with "course_" or "group_" respectively,
+  #   e.g. [1, 2, "course_3"].
+  #
+  # @example_response
+  #   {
+  #     "id": 2,
+  #     "workflow_state": "read",
+  #     "last_message": "let's talk this over with jim",
+  #     "last_message_at": "2011-09-02T12:00:00-06:00",
+  #     "message_count": 2,
+  #     "subscribed": true,
+  #     "private": false,
+  #     "label": null,
+  #     "properties": [],
+  #     "audience": [2, 3, 4],
+  #     "audience_contexts": {"courses": {"1": []}, "groups": {}},
+  #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
+  #     "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}, {"id": 3, "name": "Bob Student"}, {"id": 4, "name": "Jim Admin"}],
+  #     "messages":
+  #       [
+  #         {
+  #           "id": 4
+  #           "created_at": "2011-09-02T12:10:00Z",
+  #           "body": "Jim was added to the conversation by Joe TA",
+  #           "author_id": 1,
+  #           "generated": true,
+  #           "media_comment": null,
+  #           "forwarded_messages": [],
+  #           "attachments": []
+  #         }
+  #       ]
+  #   }
+  #
   def add_recipients
     if @recipient_ids.present?
       @conversation.add_participants(@recipient_ids)
-      render :json => {:conversation => jsonify_conversation(@conversation.reload), :message => @conversation.messages.first}
+      render :json => jsonify_conversation(@conversation.reload, :messages => [@conversation.messages.first])
     else
       render :json => {}, :status => :bad_request
     end
   end
 
+  # @API
+  # Add a message to an existing conversation. Response is similar to the
+  # GET/show action, except that omits submissions and only includes the
+  # latest message (i.e. what we just sent)
+  #
+  # @argument body The message to be sent
+  #
+  # @example_response
+  #   {
+  #     "id": 2,
+  #     "workflow_state": "unread",
+  #     "last_message": "let's talk this over with jim",
+  #     "last_message_at": "2011-09-02T12:00:00-06:00",
+  #     "message_count": 2,
+  #     "subscribed": true,
+  #     "private": false,
+  #     "label": null,
+  #     "properties": [],
+  #     "audience": [2, 3],
+  #     "audience_contexts": {"courses": {"1": []}, "groups": {}},
+  #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
+  #     "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}, {"id": 3, "name": "Bob Student"}],
+  #     "messages":
+  #       [
+  #         {
+  #           "id": 3
+  #           "created_at": "2011-09-02T12:00:00Z",
+  #           "body": "let's talk this over with jim",
+  #           "author_id": 2,
+  #           "generated": false,
+  #           "media_comment": null,
+  #           "forwarded_messages": [],
+  #           "attachments": []
+  #         }
+  #       ]
+  #   }
+  #
   def add_message
     get_conversation(true)
     if params[:body].present?
       message = create_message_on_conversation
-      render :text => {:conversation => jsonify_conversation(@conversation.reload), :message => message}.to_json
+      render :json => jsonify_conversation(@conversation.reload, :messages => [message])
     else
-      render :text => {}.to_json, :status => :bad_request
+      render :json => {}, :status => :bad_request
     end
   end
 
+  # @API
+  # Delete messages from this conversation. Note that this only affects this user's view of the conversation.
+  # If all messages are deleted, the conversation will be as well (equivalent to DELETE)
+  #
+  # @argument remove Array of message ids to be deleted
+  #
+  # @example_response
+  #   {
+  #     "id": 2,
+  #     "workflow_state": "read",
+  #     "last_message": "sure thing, here's the file",
+  #     "last_message_at": "2011-09-02T12:00:00-06:00",
+  #     "message_count": 1,
+  #     "subscribed": true,
+  #     "private": true,
+  #     "label": null,
+  #     "properties": ["attachments"]
+  #   }
   def remove_messages
     if params[:remove]
       to_delete = []
@@ -192,25 +478,84 @@ class ConversationsController < ApplicationController
     end
   end
 
+  # @API
+  # Find valid recipients (users, courses and groups) that the current user
+  # can send messages to.
+  #
+  # Pagination is supported if an explicit type is given (but there is no last
+  # link). If no type is given, results will be limited to 10 by default (can
+  # be overridden via per_page).
+  #
+  # @argument search Search terms used for matching users/courses/groups (e.g.
+  #   "bob smith"). If multiple terms are given (separated via whitespace),
+  #   only results matching all terms will be returned.
+  # @argument context Limit the search to a particular course/group (e.g.
+  # "course_3" or "group_4").
+  # @argument exclude Array of ids to exclude from the search. These may be
+  #   user ids or course/group ids prefixed with "course_" or "group_"
+  #   respectively, e.g. [1, 2, "course_3"].
+  # @argument type ["user"|"context"] Limit the search just to users or contexts (groups/courses).
+  #
+  # @example_response
+  #   [
+  #     {"id": "group_1", "name": "the group", "type": "context", "user_count": 3},
+  #     {"id": 2, "name": "greg", "common_courses": {}, "common_groups": {"1": ["Member"]}}
+  #   ]
+  #
+  # @response_field id The unique identifier for the user/context. For
+  #   groups/courses, the id is prefixed by "group_"/"course_" respectively.
+  # @response_field name The name of the user/context
+  # @response_field avatar_url Avatar image url for the user/context
+  # @response_field type ["context"|null] Not set for users, implicitly "user"
+  # @response_field user_count Only set for contexts, indicates number of
+  #   messageable users
+  # @response_field common_courses Only set for users. Hash of course ids and
+  #   enrollment types for each course to show what they share with this user
+  # @response_field common_groups Only set for users. Hash of group ids and
+  #   enrollment types for each group to show what they share with this user
   def find_recipients
-    max_results = params[:limit] ? params[:limit].to_i : 5
-    max_results = nil if max_results < 0
-    recipients = []
+    max_results = [params[:per_page].try(:to_i) || 10, 50].min
+    if max_results < 1
+      if params[:type] == 'context' || params[:context]
+        max_results = nil # i.e. all results
+      else
+        max_results = params[:per_page] = 10
+      end
+    end
+    limit = max_results ? max_results + 1 : nil
+    page = params[:page].try(:to_i) || 1
+    offset = max_results ? (page - 1) * max_results : 0
     exclude = params[:exclude] || []
-    if params[:context]
-      recipients = matching_participants(:search => params[:search], :context => params[:context], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i), :blank_avatar_fallback => true)
-    elsif params[:search]
-      contexts = params[:type] != 'user' ? matching_contexts(params[:search], exclude.grep(/\A(course|group)_\d+\z/)) : []
-      participants = params[:type] != 'context' ? matching_participants(:search => params[:search], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i), :blank_avatar_fallback => true) : []
+
+    recipients = []
+    if (params[:context] || params[:search]) && ['user', 'context', nil].include?(params[:type])
+      options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset}
+
+      contexts = params[:type] != 'user' ? matching_contexts(options.merge(:exclude_ids => exclude.grep(/\A(course|group)_\d+\z/))) : []
+      participants = params[:type] != 'context' ? matching_participants(options.merge(:exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))) : []
       if max_results
-        if contexts.size < max_results / 2
+        if params[:type]
           recipients = contexts + participants
-        elsif participants.size < max_results / 2
-          recipients = contexts[0, max_results - participants.size] + participants
+          has_next_page = recipients.size > max_results
+          recipients = recipients[0, max_results]
+          recipients.instance_eval <<-CODE
+            def paginate(*args); self; end
+            def next_page; #{has_next_page ? page + 1 : 'nil'}; end
+            def previous_page; #{page > 1 ? page - 1 : 'nil'}; end
+            def total_pages; nil; end
+            def per_page; #{max_results}; end
+          CODE
+          recipients = Api.paginate(recipients, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
         else
-          recipients = contexts[0, max_results / 2] + participants
+          if contexts.size < max_results / 2
+            recipients = contexts + participants
+          elsif participants.size < max_results / 2
+            recipients = contexts[0, max_results - participants.size] + participants
+          else
+            recipients = contexts[0, max_results / 2] + participants
+          end
+          recipients = recipients[0, max_results]
         end
-        recipients = recipients[0, max_results]
       else
         recipients = contexts + participants
       end
@@ -225,10 +570,15 @@ class ConversationsController < ApplicationController
     end
     render :json => {}
   end
-  
-  attr_writer :avatar_size
+
+  attr_reader :avatar_size
 
   private
+
+  def set_avatar_size
+    @avatar_size = params[:avatar_size].to_i
+    @avatar_size = 50 unless [32, 50].include?(@avatar_size)
+  end
 
   def normalize_recipients
     if params[:recipients]
@@ -251,7 +601,7 @@ class ConversationsController < ApplicationController
     @current_user.courses.each do |course|
       @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => true, :can_add_notes => can_add_notes_to?(course) }
     end
-    @current_user.groups.each do |group|
+    @current_user.messageable_groups.each do |group|
       @contexts[:groups][group.id] = {:id => group.id, :name => group.name, :type => :group, :active => group.active? }
     end
   end
@@ -260,28 +610,37 @@ class ConversationsController < ApplicationController
     course.enable_user_notes && course.grants_right?(@current_user, nil, :manage_user_notes)
   end
 
-  def matching_contexts(search, exclude = [])
-    avatar_url = avatar_url_for_group(true)
+  def matching_contexts(options)
+    # TODO: return groups for the given course, allowing multiple levels in
+    # in the finder
+    return [] if options[:context]
+
+    avatar_url = avatar_url_for_group(params[:blank_avatar_fallback])
     course_user_counts = @current_user.enrollment_visibility[:user_counts]
-    group_user_counts = @current_user.groups.inject({}){ |hash, group| hash[group.id] = group.users.size; hash }
-    @contexts.values.map(&:values).flatten.
-      select{ |context| search.downcase.strip.split(/\s+/).all?{ |part| context[:name].downcase.include?(part) } }.
+    group_user_counts = @current_user.group_membership_visibility[:user_counts]
+    terms = options[:search].downcase.strip.split(/\s+/)
+    exclude = options[:exclude_ids] || []
+
+    result = @contexts.values.map(&:values).flatten.
+      select{ |context| terms.all?{ |part| context[:name].downcase.include?(part) } }.
       select{ |context| context[:active] }.
       sort_by{ |context| context[:name] }.
       map{ |context|
         {:id => "#{context[:type]}_#{context[:id]}",
          :name => context[:name],
-         :avatar => avatar_url,
+         :avatar_url => avatar_url,
          :type => :context,
          :user_count => (context[:type] == :course ? course_user_counts : group_user_counts)[context[:id]]}
       }.
       reject{ |context|
         exclude.include?(context[:id])
       }
+    offset = options[:offset] || 0
+    options[:limit] ? result[offset, offset + options[:limit]] : result
   end
 
   def matching_participants(options)
-    jsonify_users(@current_user.messageable_users(options), options.delete(:blank_avatar_fallback))
+    jsonify_users(@current_user.messageable_users(options), options.merge(:blank_avatar_fallback => params[:blank_avatar_fallback]))
   end
 
   def get_conversation(allow_deleted = false)
@@ -313,25 +672,42 @@ class ConversationsController < ApplicationController
     message
   end
 
-  def jsonify_conversation(conversation, last_message = nil)
-    hash = {:audience => formatted_audience(conversation, 3)}
-    hash[:avatar_url] = avatar_url_for(conversation)
-    conversation.as_json(:last_message => last_message).merge(hash)
+  def jsonify_conversation(conversation, options = {})
+    result = conversation.as_json(options)
+    audience = conversation.participants.reject{ |u| u.id == conversation.user_id }
+    result[:messages] = options[:messages] if options[:messages]
+    result[:submissions] = options[:submissions] if options[:submissions]
+    result[:audience] = audience.map(&:id)
+    result[:audience_contexts] = contexts_for(audience)
+    result[:avatar_url] = avatar_url_for(conversation)
+    result[:participants] = jsonify_users(conversation.participants(options), options)
+    result
   end
 
-  def jsonify_users(users, blank_avatar_fallback = false)
-    ids_present = users.first.respond_to?(:common_courses)
+  def jsonify_users(users, options = {})
+    options = {
+      :include_participant_avatars => true,
+      :blank_avatar_fallback => false,
+      :include_participant_contexts => users.first.respond_to?(:common_courses)
+    }.merge(options)
     users.map { |user|
-      {:id => user.id,
-       :name => user.short_name,
-       :avatar => avatar_url_for_user(user, blank_avatar_fallback),
-       :common_courses => ids_present ? user.common_courses : [],
-       :common_groups => ids_present ? user.common_groups : []
+      hash = {
+        :id => user.id,
+        :name => user.short_name
       }
+      if options[:include_participant_contexts]
+        hash[:common_courses] = user.common_courses
+        hash[:common_groups] = user.common_groups
+      end
+      hash[:avatar_url] = avatar_url_for_user(user, options[:blank_avatar_fallback]) if options[:include_participant_avatars]
+      hash
     }
   end
 
-  def avatar_size
-    @avatar_size ||= 50
+  def render(options = {}, extra_options = {}, &block)
+    if options.keys == [:json] && request.headers['Content-Type'] == 'multipart/form-data' && params[:format].to_s != 'json'
+      options[:text] = options.delete(:json).to_json
+    end
+    super
   end
 end

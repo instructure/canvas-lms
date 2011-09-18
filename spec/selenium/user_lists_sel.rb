@@ -12,7 +12,8 @@ eolist
     driver.find_element(:css, "textarea.user_list").send_keys(user_list)
     driver.find_element(:css, "button.verify_syntax_button").click
     driver.find_element(:css, "button.add_users_button").click
-    wait_for_dom_ready
+    wait_for_ajax_requests
+    wait_for_animations
     keep_trying_until {driver.find_element(:css, "#enrollment_#{Enrollment.last.id}").text == "user, login_name"}
     
     unique_ids = ["user1@example.com", "bob@thesagatfamily.name", "A124123"]

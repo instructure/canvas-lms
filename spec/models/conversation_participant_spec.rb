@@ -26,7 +26,7 @@ describe ConversationParticipant do
     convo.add_message('test')
 
     sender.conversations.should == [convo]
-    convo.participants.size.should == 1 # doesn't include the user
+    convo.participants.size.should == 2
     convo.conversation.participants.size.should == 2
     convo.messages.size.should == 1
   end
