@@ -1,3 +1,107 @@
+canvas-lms (1.1-59) professional; urgency=low
+
+  * Package ref: bd910c91a86ef3076c211296a584f326a99bf5f9
+  *
+  * [+9ad7f12] fix i18n.t being called too early
+  * [+443d925] add start_date/end_date to enrollment sis imports closes #5408
+  * [+1a761c2] explicit utc db times in update_all
+  * [+be9dd56] lock down linkification
+  * [+b69fa9d] Fix error string on ldap test login exceptions
+  * [+7d1941a] use /accounts/:id/permissions rather than /accounts/:id/role_overrides
+  * [+563af38] recognize enrollment csvs with only section_id
+  * [+42d5269] don't bother figuring out where in the nil folder list attachments go for sis imports
+  * [+7a7a34d] fix ordering issues in spec
+  * [+187d124] optionally add X-Frame-Options header to responses
+  * [+9712b2d] fix infinite redirect regression (when files domain == root domain)
+  * [+795d107] clear whitespace on sis csv imports
+  * [+555d004] speed up SIS imports dramatically
+  * [+381c398] fix broken selenium tests
+  * [+191f9d4] optimize and fix account associations during user sis import
+  * [+92e7afc] $.toSentence for arrays
+  * [+dff4b27] more selenium test tweaks
+  * [+fa39f89] don't use FormData for fake file uploads
+  * [+31a3215] fix more selenium tests
+  * [+71bccba] eliminate next-job strand subquery, closes #5485
+  * [+9c83a33] make the maximum messages/day/user configurable with default of 50
+  * [+da6426b] change the permissions necessary to delete a course
+  * [+a817758] use state_based_on_date for /grades and user details pages
+  * [+3d47925] drop mailboxes table
+  * [+7c29906] remove dead columns and indexes
+  * [+47430db] scoring of FIMB questions had float comparison issues, fixes #5484
+  * [+a574c8e] restrict find_by_email (and add admin) to email addresses
+  * [+cb703c9] add some url filtering to cutycapt websnap processing
+  * [+742d597] don't create a duplicate assignment in the course wizard; fixes #4166
+  * [+fe85551] migration to repair duplicate discussions
+  * [+10870a8] i18n functionality in content_zipper for submission rendering
+  * [+fb7732a] user page views api
+  * [+9f4e750] fix virgin mobile addresses fixes #5532
+  * [+6229f61] Add context_type and url to the stream item json response.
+  * [+8c76c53] allow chaining after $.fn.datepicker
+  * [+effcd4a] make vertical_gradient sass mixin work in more browsers
+  * [+8e6cba4] fix carat offset in kylemenu
+  * [+92f3e16] allow having an element open a dialog just from markup
+  * [+1be0f0e] better media comment player dialog resizing
+  * [+b2b3ca4] allow using css3 transitions for show/hide in jQuery
+  * [+6058963] fix ajax display of usernames when making side comments fixes #5534
+  * [+07e295d] fix typo displaying the wrong course name when copying
+  * [+732547f] add $.publish / $.subscribe for loose coupling js
+  * [+ce2a7fb] add plugin to disable a form while XHR is happening.
+  * [+33de0f4] fix "more options" link from dashboard into inbox, closes #5459
+  * [+2e59598] speed up account pages a bit
+  * [+a36d570] s/course_details/settings/g closes #5458
+  * [+bb09b4b] fix css3 transitions for jQuery show/hide
+  * [+0682887] don't remove tabs for content that is specifically manageable fixes #5537
+  * [+6238c7a] more gracefully handle pre-existing communication channels for sis imports
+  * [+f5f97d8] re-enable announcements for site_admin fixes #5538
+  * [+cf5b534] show courses to copy from within terms; fixes #5260
+  * [+05c45bf] stream item api auth fixes
+  * [+0e28ffd] don't log errors on every key up/down in speedGrader
+  * [+93689b9] fix inactive courses showing up in calendar, etc. fixes #5555
+  * [+1a9e9eb] fix enabling/disabling services that are substrings of each other
+  * [+601cd8d] get rid of duplicate Assignment#do_auto_peer_review jobs
+  * [+6a3cd56] support for respondus FIMB questions, refs #5386
+  * [+32510f5] support respondus text-only questions, refs #5386
+  * [+43368a2] support respondus numerical questions, refs #5386
+  * [+5682794] support MT distractors in respondus qti import, refs #5386
+  * [+4719240] support respondus TF questions, refs #5386
+  * [+b4b8574] specs for respondus qti import, fixes #5386
+  * [+7344996] When a submission has comments, add them to the stream item.
+  * [+d78d073] fix course drilldown when limit_priveleges_to_course_section
+  * [+8656896] fix i18n typo in gradebook
+  * [+5d39e39] fix typo breaking day substitions fixes #5590
+  * [+72b05f1] remove the error reports search form from the show action
+  * [+76f50e2] use json_opts in stream_json_array
+  * [+28ae039] don't include deleted courses when searching for courses to copy from
+  * [+5dbdd72] fix points possible row in exported grades csv fixes #5603
+  * [+11e29f0] show the correct user when merging
+  * [+ff94cdc] conversations api, closes #4753
+  * [+92c49b1] allow users to send messages to other groups, fixes #5406
+  * [+c98b8fd] fix ability to use bookmarked question banks, closes #5604
+  * [+758c47a] don't log users out when doing a sis import fixes #5583
+  * [+72b3b21] temporarily create add_media_files jobs as on hold
+  * [+fb89284] warn about the limit to per_page
+  * [+230ca57] update stream item api doc for conversations
+  * [+6e9fe10] change 'feedback' dialog to 'help' dialog
+  * [+c08f5d5] api endpoint for getting service configurations. closes #5631
+  * [+789d2e3] fix error displayed when sending teacher feedback
+  * [+4ab5bb8] sanitize invalid UTF-8 before creating error reports
+  * [+c6cb1fd] convert charsets when processing incoming messages
+  * [+6d1495e] term start/term end, rather than whenever
+  * [+1d9c701] fix term dropdown fixes #5490
+  * [+c520bc5] fix course reset for content on course object itself
+  * [+8c88e46] fix display issues when searching for existing grading schemes
+  * [+76961dc] remove a bunch of links from the UI for stuff you don't have permission do to
+  * [+e3bd85e] don't duplicate courses returned from the API
+  * [+93b7c17] quiz preview problem refs #5545
+  * [+d4b2a31] tmp blockage
+  * [+b2bb7a8] api attachment_json improvements, fixes #5642
+  * [+2b0f188] fix feedback dialog text
+  * [+a4fd10a] fix identity partial when no current user
+  * [+a2af42d] typo in enrollment_registration.email
+  * [+bd910c9] handle nil sis_communication_channels appropriately
+
+ -- JT Olds <jt@instructure.com>  Sun, 18 Sep 2011 01:29:22 -0600
+
 canvas-lms (1.1-58) professional; urgency=low
 
   * Package ref: 66803228b8f1808d76dd0ca1b91c0e47ab84c649
