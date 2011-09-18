@@ -16,7 +16,7 @@ class AccountNotification < ActiveRecord::Base
   end
   
   def touch_account
-    Account.update_all({:updated_at => Time.now}, {:id => self.account_id}) if self.account_id
+    Account.update_all({:updated_at => Time.now.utc}, {:id => self.account_id}) if self.account_id
   end
   
   named_scope :for_account, lambda{|account|

@@ -19,6 +19,45 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentZipper do
+  describe "zip_assignment" do
+    it "should zip up online_url submissions" do
+      course_with_student(:active_all => true)
+      submission_model
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user_id = @user.id
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      ContentZipper.process_attachment(attachment)
+      attachment.reload
+      attachment.workflow_state.should == 'zipped'
+      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+        if f.file?
+          f.get_input_stream.read.should match(%r{This submission was a url, we're taking you to the url link now.})
+          f.get_input_stream.read.should be_include("http://www.instructure.com/")
+        end
+      end
+    end
+
+    it "should zip up online_text_entry submissions" do
+      course_with_student(:active_all => true)
+      submission_model(:body => "hai this is my answer")
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user_id = @user.id
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      ContentZipper.process_attachment(attachment)
+      attachment.reload
+      attachment.workflow_state.should == 'zipped'
+      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+        if f.file?
+          f.get_input_stream.read.should be_include("hai this is my answer")
+        end
+      end
+    end
+  end
+
   describe "zip_folder" do
     it "should only zip up files/folders the user has access to" do
       course_with_student(:active_all => true)

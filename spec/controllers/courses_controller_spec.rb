@@ -37,24 +37,24 @@ describe CoursesController do
     end
   end
   
-  describe "GET 'course_details'" do
+  describe "GET 'settings'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      get 'course_details', :course_id => @course.id
+      get 'settings', :course_id => @course.id
       assert_unauthorized
     end
     
     it "should should not allow students" do
       course_with_student_logged_in(:active_all => true)
-      get 'course_details', :course_id => @course.id
+      get 'settings', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should render properly" do
       course_with_teacher_logged_in(:active_all => true)
-      get 'course_details', :course_id => @course.id
+      get 'settings', :course_id => @course.id
       response.should be_success
-      response.should render_template("course_details")
+      response.should render_template("settings")
     end
   end
   

@@ -5,7 +5,7 @@
       $menu = $(this).button(opts.buttonOpts).next()
                 .menu(opts.menuOpts)
                 .popup(opts.popupOpts)
-                .addClass("ui-kyle-menu")
+                .addClass("ui-kyle-menu use-css-transitions-for-show-hide")
       $menu.bind "menuselect", -> $(this).removeClass "ui-state-open"
 
   $.fn.kyleMenu.defaults =
@@ -17,8 +17,9 @@
         $trigger = jQUI19(this).popup("option", "trigger")
         triggerWidth = $trigger.width()
         differenceInWidth = $(this).width() - triggerWidth
+        actualOffset = event.pageX - $trigger.offset().left
         caratOffset = Math.min(
-          Math.max(20, event.offsetX),
+          Math.max(20, actualOffset),
           triggerWidth - 20
         ) + differenceInWidth/2
         $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this)

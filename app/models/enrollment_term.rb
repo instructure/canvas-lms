@@ -42,7 +42,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   def touch_all_courses
     return if new_record?
-    Course.update_all({:updated_at => Time.now}, "enrollment_term_id=#{self.id}")
+    Course.update_all({:updated_at => Time.now.utc}, "enrollment_term_id=#{self.id}")
   end
 
   def update_courses_later

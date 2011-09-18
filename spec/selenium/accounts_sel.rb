@@ -105,9 +105,9 @@ describe "account authentication configs" do
     keep_trying_until { term.attribute(:class) !~ /editing_term/ }
     verify_displayed_term_dates(term, {
       :general => [ "Jul 1", "Jul 31" ],
-      :student_enrollment => [ "whenever", "whenever" ],
-      :teacher_enrollment => [ "whenever", "whenever" ],
-      :ta_enrollment => [ "whenever", "whenever" ]
+      :student_enrollment => [ "term start", "term end" ],
+      :teacher_enrollment => [ "term start", "term end" ],
+      :ta_enrollment => [ "term start", "term end" ]
     })
     
     get "/accounts/#{Account.default.id}/terms"
@@ -120,8 +120,8 @@ describe "account authentication configs" do
     verify_displayed_term_dates(term, {
       :general => [ "Jul 1", "Jul 31" ],
       :student_enrollment => [ "Jul 2", "Jul 30" ],
-      :teacher_enrollment => [ "whenever", "whenever" ],
-      :ta_enrollment => [ "whenever", "whenever" ]
+      :teacher_enrollment => [ "term start", "term end" ],
+      :ta_enrollment => [ "term start", "term end" ]
     })
     
     get "/accounts/#{Account.default.id}/terms"
@@ -150,7 +150,7 @@ describe "account authentication configs" do
     verify_displayed_term_dates(term, {
       :general => [ "Jul 1", "Jul 31" ],
       :student_enrollment => [ "Jul 2", "Jul 30" ],
-      :teacher_enrollment => [ "whenever", "whenever" ],
+      :teacher_enrollment => [ "term start", "term end" ],
       :ta_enrollment => [ "Jul 4", "Jul 28" ]
     })
   end

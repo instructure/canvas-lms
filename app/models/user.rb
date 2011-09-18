@@ -43,6 +43,8 @@ class User < ActiveRecord::Base
   has_many :all_courses, :source => :course, :through => :enrollments  
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
+  has_many :current_group_memberships, :include => :group, :class_name => 'GroupMembership', :conditions => "group_memberships.workflow_state = 'accepted'"
+  has_many :current_groups, :through => :current_group_memberships, :source => :group, :conditions => "groups.workflow_state != 'deleted'"
   has_many :user_account_associations
   has_many :associated_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth'
   has_many :associated_root_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth', :conditions => 'accounts.parent_account_id IS NULL'
@@ -104,7 +106,7 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
-  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC"
+  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
   def conversations
     all_conversations.visible # i.e. exclude any where the user has deleted all the messages
   end
@@ -428,7 +430,7 @@ class User < ActiveRecord::Base
   end
   
   def self.find_by_email(email)
-    CommunicationChannel.find_by_path(email).user rescue nil
+    CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
   end
     
   def <=>(other)
@@ -923,7 +925,7 @@ class User < ActiveRecord::Base
   end
   
   def self.max_messages_per_day
-    25
+    Setting.get('max_messages_per_day_per_user', 50).to_i
   end
   
   def max_messages_per_day
@@ -1529,11 +1531,11 @@ class User < ActiveRecord::Base
   end
   
   def manageable_courses
-    Course.manageable_by_user(self.id)
+    Course.manageable_by_user(self.id).not_deleted
   end
 
   def manageable_courses_name_like(query="")
-    self.manageable_courses.name_like(query).limit(50)
+    self.manageable_courses.not_deleted.name_like(query).limit(50)
   end
   memoize :manageable_courses_name_like
   
@@ -1551,7 +1553,7 @@ class User < ActiveRecord::Base
   
   def self.assert_by_email(email, name=nil, password=nil)
     user = Pseudonym.find_by_unique_id(email).user rescue nil
-    user ||= CommunicationChannel.find_by_path(email).user rescue nil
+    user ||= CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
     res = {:email => email}
     if user
       p = user.pseudonyms.active.find_by_unique_id(email)
@@ -1569,7 +1571,7 @@ class User < ActiveRecord::Base
     else
       user = User.create!(:name => name || email)
       user.pseudonyms.create!(:unique_id => email, :path => email, :password => password, :password_confirmation => password)
-      cc = user.communication_channels.find_by_path(email) #pseudonym.communication_channel.confirm
+      cc = user.communication_channels.find_by_path_and_path_type(email, 'email') #pseudonym.communication_channel.confirm
       cc.confirm if cc
       res[:password] = password
       res[:new] = true
@@ -1605,6 +1607,14 @@ class User < ActiveRecord::Base
   def sis_user_id
     pseudonym.try(:sis_user_id)
   end
+  
+  def highest_role
+    return 'admin' unless self.accounts.empty?
+    return 'teacher' if self.cached_current_enrollments.any?(&:admin?)
+    return 'student' if self.cached_current_enrollments.any?(&:student?)
+    return 'user'
+  end
+  memoize :highest_role
 
   def eportfolios_enabled?
     accounts = associated_root_accounts.reject(&:site_admin?)
@@ -1650,15 +1660,61 @@ class User < ActiveRecord::Base
     end
   end
 
+  def messageable_groups
+    group_visibility = group_membership_visibility
+    Group.find_all_by_id(visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 } + [0])
+  end
+
+  def visible_group_ids
+    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.hour) do
+      (courses + concluded_courses.recently_ended).inject(self.current_groups) { |groups, course|
+        groups | course.groups.active
+      }.map(&:id)
+    end
+  end
+
+  def group_membership_visibility
+    Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.hour) do
+      course_visibility = enrollment_visibility
+      own_group_ids = current_groups.map(&:id)
+
+      full_group_ids = []
+      section_id_hash = {}
+      user_counts = {}
+
+      if visible_group_ids.present?
+        Group.find_all_by_id(visible_group_ids).each do |group|
+          if own_group_ids.include?(group.id) || group.context_type == 'Course' && course_visibility[:full_course_ids].include?(group.context_id)
+            full_group_ids << group.id
+            user_counts[group.id] = group.users.size
+          elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
+            section_id_hash[group.id] = sections
+            conditions = {:user_id => group.group_memberships.map(&:user_id), :course_section_id => sections}
+            user_counts[group.id] = conditions[:user_id].present? ?
+                                      group.context.enrollments.scoped(:conditions => self.class.reflections[:current_and_invited_enrollments].options[:conditions]).scoped(:conditions => conditions).size +
+                                      group.context.enrollments.scoped(:conditions => self.class.reflections[:concluded_enrollments].options[:conditions]).scoped(:conditions => conditions).size :
+                                    0
+          end
+        end
+      end
+      {:full_group_ids => full_group_ids,
+       :section_id_hash => section_id_hash,
+       :user_counts => user_counts
+      }
+    end
+  end
+
   MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
   def messageable_users(options = {})
-    hash = enrollment_visibility
-    full_course_ids = hash[:full_course_ids]
-    section_id_hash = hash[:section_id_hash]
-    restricted_course_hash = hash[:restricted_course_hash]
+    course_hash = enrollment_visibility
+    full_course_ids = course_hash[:full_course_ids]
+    restricted_course_hash = course_hash[:restricted_course_hash]
 
-    group_ids = groups.map(&:id)
+    group_hash = group_membership_visibility
+    full_group_ids = group_hash[:full_group_ids]
+    group_section_ids = []
+
     account_ids = []
 
     if options[:context]
@@ -1672,11 +1728,12 @@ class User < ActiveRecord::Base
         end
       end
       full_course_ids &= limited_course_ids
-      section_ids = section_id_hash.values_at(limited_course_ids).flatten.compact
+      course_section_ids = course_hash[:section_id_hash].values_at(*limited_course_ids).flatten.compact
+      group_section_ids = group_hash[:section_id_hash].values_at(*limited_group_ids).flatten.compact
       restricted_course_hash.delete_if{|course_id, ids| !limited_course_ids.include?(course_id)}
-      group_ids &= limited_group_ids
+      full_group_ids &= limited_group_ids
     else
-      section_ids = section_id_hash.values.flatten
+      course_section_ids = course_hash[:section_id_hash].values.flatten
       # if we're not searching with context(s) in mind, include any users we
       # have admin access to know about
       account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
@@ -1699,7 +1756,8 @@ class User < ActiveRecord::Base
 
     course_sql = []
     course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
-    course_sql << "(course_section_id IN (#{section_ids.join(',')}))" if section_ids.present?
+    course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
+    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id IN (#{limited_group_ids.join(',')})) )" if group_section_ids.present?
     course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
     user_sql << <<-SQL if course_sql.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
@@ -1712,11 +1770,11 @@ class User < ActiveRecord::Base
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
     SQL
 
-    user_sql << <<-SQL if group_ids.present?
+    user_sql << <<-SQL if full_group_ids.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, group_id, NULL AS roles
       FROM users, group_memberships
-      WHERE group_id IN (#{group_ids.join(',')}) AND users.id = user_id
-        AND group_memberships.workflow_state <> 'deleted'
+      WHERE group_id IN (#{full_group_ids.join(',')}) AND users.id = user_id
+        AND group_memberships.workflow_state = 'accepted'
         AND #{user_condition_sql}
     SQL
 
@@ -1774,8 +1832,8 @@ class User < ActiveRecord::Base
       ) users
       GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
       ORDER BY LOWER(COALESCE(short_name, name))
-      #{options[:offset] ? "OFFSET #{options[:offset].to_i}" : ""}
-      #{options[:limit] ? "LIMIT #{options[:limit].to_i}" : ""}
+      #{options[:limit] && options[:limit] > 0 ? "LIMIT #{options[:limit].to_i}" : ""}
+      #{options[:offset] && options[:offset] > 0 ? "OFFSET #{options[:offset].to_i}" : ""}
     SQL
     users.each do |user|
       user.common_courses = user.common_courses.to_s.split(",").inject({}){ |hash, info|

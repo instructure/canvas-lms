@@ -20,7 +20,7 @@ class EnrollmentDatesOverride < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :enrollment_term
 
-  attr_accessible :enrollment_type, :enrollment_term, :start_at, :end_at
+  attr_accessible :context, :enrollment_type, :enrollment_term, :start_at, :end_at
   before_save :touch_all_courses
 
   def touch_all_courses

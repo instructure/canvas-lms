@@ -216,5 +216,42 @@ describe QuizSubmission do
       @results.last.mastery.should eql(true)
       @results.last.original_mastery.should eql(false)
     end
+
+    it "should tally up fill in multiple blanks" do
+      course_with_student(:active_all => true)
+      # @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
+      q = {:position=>1, :name=>"Question 1", :correct_comments=>"", :question_type=>"fill_in_multiple_blanks_question", :assessment_question_id=>7903, :incorrect_comments=>"", :neutral_comments=>"", :id=>1, :points_possible=>50, :question_name=>"Question 1", :answers=>[{:comments=>"", :text=>"control", :weight=>100, :id=>3950, :blank_id=>"answer1"}, {:comments=>"", :text=>"controll", :weight=>100, :id=>9177, :blank_id=>"answer1"}, {:comments=>"", :text=>"patrol", :weight=>100, :id=>9181, :blank_id=>"answer2"}, {:comments=>"", :text=>"soul", :weight=>100, :id=>3733, :blank_id=>"answer3"}, {:comments=>"", :text=>"tolls", :weight=>100, :id=>9756, :blank_id=>"answer4"}, {:comments=>"", :text=>"toll", :weight=>100, :id=>7829, :blank_id=>"answer4"}, {:comments=>"", :text=>"explode", :weight=>100, :id=>3046, :blank_id=>"answer5"}, {:comments=>"", :text=>"assplode", :weight=>100, :id=>5301, :blank_id=>"answer5"}, {:comments=>"", :text=>"old", :weight=>100, :id=>3367, :blank_id=>"answer6"}], :question_text=>"<p><span>Ayo my quality [answer1], captivates your party [answer2]. </span>Your mind, body, and [answer3]. For whom the bell [answer4], let the rhythm [answer5]. Big, bad, and bold b-boys of [answer6].</p>"}
+      user_answer = QuizSubmission.score_question(q, {
+        "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "control",
+        "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "patrol",
+        "question_1_3112b644eec409c20c346d2a393bd45e" => "soul",
+        "question_1_fb1b03eb201132f7c1a5824cf9ebecb7" => "toll",
+        "question_1_90811a00aaf122ea20ab5c28be681ac9" => "assplode",
+        "question_1_ce36b05cfdedbc990a188907fc29d37b" => "old",
+      })
+      user_answer[:correct].should be_true
+      user_answer[:points].should == 50.0
+
+      user_answer = QuizSubmission.score_question(q, {
+        "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "control",
+        "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "patrol",
+        "question_1_3112b644eec409c20c346d2a393bd45e" => "soul",
+        "question_1_fb1b03eb201132f7c1a5824cf9ebecb7" => "toll",
+        "question_1_90811a00aaf122ea20ab5c28be681ac9" => "wut",
+        "question_1_ce36b05cfdedbc990a188907fc29d37b" => "old",
+      })
+      user_answer[:correct].should == "partial"
+      user_answer[:points].should be_close(41.6, 0.1)
+
+      user_answer = QuizSubmission.score_question(q, {
+        "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "0",
+        "question_1_3112b644eec409c20c346d2a393bd45e" => "fail",
+        "question_1_fb1b03eb201132f7c1a5824cf9ebecb7" => "wrong",
+        "question_1_90811a00aaf122ea20ab5c28be681ac9" => "wut",
+        "question_1_ce36b05cfdedbc990a188907fc29d37b" => "oh well",
+      })
+      user_answer[:correct].should be_false
+      user_answer[:points].should == 0
+    end
   end
 end

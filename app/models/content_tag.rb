@@ -56,12 +56,12 @@ class ContentTag < ActiveRecord::Base
   end
   
   def self.touch_context_modules(ids=[])
-    ContextModule.update_all({:updated_at => Time.now}, {:id => ids}) unless ids.empty?
+    ContextModule.update_all({:updated_at => Time.now.utc}, {:id => ids}) unless ids.empty?
     true
   end
   
   def touch_context_if_learning_outcome
-    self.context_type.constantize.update_all({:updated_at => Time.now}, {:id => self.context_id}) if self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome'
+    self.context_type.constantize.update_all({:updated_at => Time.now.utc}, {:id => self.context_id}) if self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome'
   end
   
   def default_values
@@ -181,7 +181,7 @@ class ContentTag < ActiveRecord::Base
     tags = ContentTag.find(:all, :conditions => ['content_id = ? AND content_type = ?', asset.id, asset.class.to_s], :select => 'id, tag_type, context_module_id')
     tag_ids = tags.select{|t| t.sync_title_to_asset_title? }.map(&:id)
     module_ids = tags.select{|t| t.context_module_id }.map(&:context_module_id)
-    attr_hash = {:updated_at => Time.now}
+    attr_hash = {:updated_at => Time.now.utc}
     {:display_name => :title, :name => :title, :title => :title}.each do |attr, val|
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
     end

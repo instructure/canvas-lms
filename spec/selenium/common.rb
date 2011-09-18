@@ -150,10 +150,12 @@ module SeleniumTestsHelperMethods
     at_exit { shutdown.call }
     for i in 0..MAX_SERVER_START_TIME
       begin
+        s = nil
         Timeout::timeout(5) do
           s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
           break if s
         end
+        break if s
       rescue Timeout::Error
         # pass
       end
@@ -239,17 +241,28 @@ shared_examples_for "all selenium tests" do
         }, 1);
       });
     JS
-    dom_is_ready = false
+    dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
     until (dom_is_ready) do
+      sleep 1
       dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-      sleep 1 
     end
   end
   
   def wait_for_ajax_requests
-    keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlighRequests") == 0 }
+    return if driver.execute_script("return typeof($) == 'undefined' || typeof($.ajaxJSON) == 'undefined' || typeof($.ajaxJSON.inFlightRequests) == 'undefined'")
+    keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlightRequests") == 0 }
   end
-  
+ 
+  def wait_for_animations
+    return if driver.execute_script("return typeof($) == 'undefined'")
+    keep_trying_until { driver.execute_script("return $(':animated').length") == 0 }
+  end
+
+  def wait_for_ajaximations
+    wait_for_ajax_requests
+    wait_for_animations
+  end
+
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
     seconds.times do |i|
       puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
@@ -373,6 +386,7 @@ shared_examples_for "all selenium tests" do
   self.use_transactional_fixtures = false
 
   append_after(:each) do
+    wait_for_ajax_requests
     ALL_MODELS.each { |m| truncate_table(m) }
   end
 

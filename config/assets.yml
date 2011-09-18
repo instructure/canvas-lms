@@ -11,9 +11,14 @@ javascripts:
     - public/javascripts/datejs_to_iso_string_patch.js
     - public/javascripts/date.js
     - public/javascripts/jquery-1.5.2.js
-    - public/javascripts/jquery.ba-hashchange.js
     - public/javascripts/jquery-ui-1.8.js
+    - public/javascripts/i18n.js
     - public/javascripts/jquery.ba-throttle-debounce.js
+    - public/javascripts/jquery.ba-tinypubsub.js
+    - public/javascripts/jquery.ba-hashchange.js
+    - public/javascripts/spin.js
+    - public/javascripts/jquery.spin.js
+    - public/javascripts/jquery.disableWhileLoading.js
     - public/javascripts/jquery.fancyplaceholder.js
     - public/javascripts/jquery.autocomplete.js
     - public/javascripts/jquery.google-analytics.js
@@ -21,7 +26,6 @@ javascripts:
     - public/javascripts/jquery.inst_tree.js
     - public/javascripts/jquery.store.js
     - public/javascripts/jquery.scrollTo.js
-    - public/javascripts/i18n.js
     - public/javascripts/scribd.view.js
     - public/javascripts/swfobject/swfobject.js
     - public/javascripts/reminders.js
@@ -103,10 +107,10 @@ javascripts:
     - public/javascripts/context_inbox.js
   context_modules:
     - public/javascripts/context_modules.js
-  course_details:
+  course_settings:
     - public/javascripts/jquery.cookie.js
     - public/javascripts/user_lists.js
-    - public/javascripts/course_details.js
+    - public/javascripts/course_settings.js
     - public/javascripts/external_tools.js
     - public/javascripts/grading_standards.js
   grading_standards:
@@ -301,8 +305,8 @@ stylesheets:
     - public/stylesheets/compiled/gradebook_uploads.css
   calendar:
     - public/stylesheets/static/calendar.css
-  course_details:
-    - public/stylesheets/compiled/course_details.css
+  course_settings:
+    - public/stylesheets/compiled/course_settings.css
     - public/stylesheets/compiled/external_tools.css
     - public/stylesheets/compiled/grading_standards.css
   full_files:

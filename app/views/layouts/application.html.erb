@@ -67,7 +67,13 @@
     <a id="header-logo" href="<%= root_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> 
     <b id="header-logo-secondary"></b>  
     <div id="topbar"> 
-      <%= (identity = yield :identity) ? identity : render(:partial => 'shared/identity') %>
+      <% if (identity = yield :identity) %>
+        <%= identity %>
+      <% else %>
+        <%- cache([@current_user || 'nobody', 'identity-15m'], :expires_in => 15.minutes) do -%>
+          <%= render(:partial => 'shared/identity') %>
+        <%- end -%>
+      <% end %>
     </div>
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
     <% if @current_user %>
@@ -248,7 +254,7 @@
           <%= link_to(t('links.support', "Support"), url) %>
         <% end %>
         <%  if @headers == false && Setting.get_cached("show_feedback_link", "false") == "true" %>
-          <a href="#" id="feedback_link"><%= t('links.feedback', 'Feedback') %></a> 
+          <a href="#" id="feedback_link"><%= t('links.help', 'Help') %></a> 
         <% end %>
         <%= render :partial => 'shared/footer_links' %>
       </span>
@@ -256,7 +262,7 @@
   </div>
 </div>
 
-<%= render :partial => 'shared/feedback' %>
+<%= render :partial => 'shared/feedback' if Setting.get_cached('show_feedback_link', 'false') == 'true' %>
 
 
 <% if wizard %>

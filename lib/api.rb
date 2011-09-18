@@ -74,22 +74,22 @@ module Api
   end
   
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
-  # The collection needs to be a will_paginate collection
+  # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
     per_page = [(controller.params[:per_page] || 10).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
     collection = collection.paginate({ :page => controller.params[:page], :per_page => per_page }.merge(pagination_args))
     return unless collection.respond_to?(:next_page)
     links = []
-    template = "<#{base_url}?page=%s&per_page=#{collection.per_page}>; rel=\"%s\""
+    template = "<#{base_url}#{base_url =~ /\?/ ? '&': '?'}page=%s&per_page=#{collection.per_page}>; rel=\"%s\""
     if collection.next_page
       links << template % [collection.next_page, "next"]
     end
     if collection.previous_page
       links << template % [collection.previous_page, "prev"]
     end
-    if collection.total_pages > 1
-      links << template % [1, "first"]
+    links << template % [1, "first"]
+    if collection.total_pages && collection.total_pages > 1
       links << template % [collection.total_pages, "last"]
     end
     controller.response.headers["Link"] = links.join(',') if links.length > 0
@@ -104,7 +104,7 @@ module Api
         course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
       when "Group"
         group_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
-      when /Submission|User/
+      when /Submission|User|Assignment/
         return nil unless opts[:assignment]
         course_assignment_submission_url(@context, opts[:assignment], url_params.merge(:download => attachment.id))
       else
@@ -115,6 +115,20 @@ module Api
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
       'url' => url,
+    }
+  end
+
+  # stream an array of objects as a json response, without building a string of
+  # the whole response in memory.
+  def stream_json_array(array, json_opts)
+    response.content_type ||= Mime::JSON
+    render :text => proc { |r, o|
+      o.write('[')
+      array.each_with_index { |v,i|
+        o.write(v.to_json(json_opts));
+        o.write(',') unless i == array.length - 1
+      }
+      o.write(']')
     }
   end
 

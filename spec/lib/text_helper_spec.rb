@@ -149,6 +149,16 @@ describe TextHelper do
       html = Nokogiri::HTML::DocumentFragment.parse(str)
       link = html.css('a').first
       link['href'].should == "http://www.instructure.com/"
+
+      str = th.format_message("click here: http://www.instructure.com/courses/1/wiki/informação").first
+      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      link = html.css('a').first
+      link['href'].should == "http://www.instructure.com/courses/1/wiki/informa%C3%A7%C3%A3o"
+
+      str = th.format_message("click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline").first
+      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      link = html.css('a').first
+      link['href'].should == "http://www.instructure.com/%27onclick=alert(document.cookie)//"
     end
 
     it "should handle having the placeholder in the text body" do

@@ -156,7 +156,7 @@ class ContentImportsController < ApplicationController
           format.html { render :action => 'copy_course_content' }
         end
       else
-        @possible_courses = @current_user.manageable_courses - [@context]
+        @possible_courses = @current_user.manageable_courses.scoped(:include => :enrollment_term) - [@context]
         course_id = params[:copy] && params[:copy][:course_id].to_i
         course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
         @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id

@@ -205,8 +205,8 @@ class Quiz < ActiveRecord::Base
       self.context_module_tag.confirm_valid_module_requirements
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
-      self.quiz_submissions.each { |q| q.submission.try(:destroy); q.submission = nil; q.save }
+      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
+      self.quiz_submissions.each { |q| q.submission.try(:destroy); q.submission = nil; q.save! }
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
       ContentTag.delete_for(Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     end
@@ -398,23 +398,18 @@ class Quiz < ActiveRecord::Base
     s = nil
     state ||= 'untaken'
     attempts = 0
-    begin
-      if temporary || !user.is_a?(User)
-        user_code = "#{user.to_s}"
-        user_code = "user_#{user.id}" if user.is_a?(User)
-        s = QuizSubmission.find_by_quiz_id_and_temporary_user_code(self.id, user_code)
-        s ||= QuizSubmission.new(:quiz => self, :temporary_user_code => user_code)
-        s.workflow_state ||= state
-        s.save
-      else
-        s = QuizSubmission.find_by_quiz_id_and_user_id(self.id, user.id)
-        s ||= QuizSubmission.new(:quiz => self, :user => user)
-        s.workflow_state ||= state
-        s.save
-      end
-    rescue => e
-      attempts += 1
-      retry if attempts < 3
+    if temporary || !user.is_a?(User)
+      user_code = "#{user.to_s}"
+      user_code = "user_#{user.id}" if user.is_a?(User)
+      s = QuizSubmission.find_by_quiz_id_and_temporary_user_code(self.id, user_code)
+      s ||= QuizSubmission.new(:quiz => self, :temporary_user_code => user_code)
+      s.workflow_state ||= state
+      s.save!
+    else
+      s = QuizSubmission.find_by_quiz_id_and_user_id(self.id, user.id)
+      s ||= QuizSubmission.new(:quiz => self, :user => user)
+      s.workflow_state ||= state
+      s.save!
     end
     s
   end

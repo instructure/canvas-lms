@@ -687,10 +687,10 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-            if ((_ref = post_data.limit) != null) {
+            if ((_ref = post_data.per_page) != null) {
         _ref;
       } else {
-        post_data.limit = typeof (_base = this.options).limiter === "function" ? _base.limiter({
+        post_data.per_page = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
       };
@@ -719,7 +719,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, can_add_notes_for, close_menus, formatted_message, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, select_unloaded_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, can_add_notes_for, close_menus, formatted_message, html_audience_for_conversation, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, select_unloaded_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -772,15 +772,13 @@
     is_selected = function($conversation) {
       return $selected_conversation && $selected_conversation.attr('id') === ($conversation != null ? $conversation.attr('id') : void 0);
     };
-    select_unloaded_conversation = function(conversation_id) {
-      return $.ajaxJSON('/conversations/' + conversation_id, 'GET', {
-        include_conversation: 1
-      }, function(data) {
+    select_unloaded_conversation = function(conversation_id, params) {
+      return $.ajaxJSON('/conversations/' + conversation_id, 'GET', {}, function(data) {
         add_conversation(data.conversation, true);
         $("#conversation_" + conversation_id).hide();
-        return select_conversation($("#conversation_" + conversation_id), {
+        return select_conversation($("#conversation_" + conversation_id), $.extend(params, {
           data: data
-        });
+        }));
       });
     };
     select_conversation = function($conversation, params) {
@@ -813,13 +811,16 @@
       }
       if ($selected_conversation || $('#action_compose_message').length) {
         show_message_form();
+        if (params.message) {
+          $form.find('#body').val(params.message);
+        }
       } else {
         $form.parent().hide();
       }
       if ($selected_conversation) {
         $selected_conversation.scrollIntoView();
       } else {
-        if (params && params.user_id && params.user_name) {
+        if (params.user_id && params.user_name) {
           $('#recipients').data('token_input').add_token({
             value: params.user_id,
             text: params.user_name,
@@ -843,7 +844,7 @@
         _ref = data.participants;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           user = _ref[_i];
-          if (!((_ref2 = MessageInbox.user_cache[user.id]) != null ? _ref2.avatar : void 0)) {
+          if (!((_ref2 = MessageInbox.user_cache[user.id]) != null ? _ref2.avatar_url : void 0)) {
             MessageInbox.user_cache[user.id] = user;
             user.html_name = html_name_for_user(user);
           }
@@ -879,14 +880,14 @@
         });
       }
     };
-    MessageInbox.shared_contexts_for_user = function(user, limit) {
+    MessageInbox.context_list = function(contexts, limit) {
       var course, course_id, group, group_id, roles, shared_contexts;
       if (limit == null) {
         limit = 2;
       }
       shared_contexts = ((function() {
         var _ref, _results;
-        _ref = user.common_courses;
+        _ref = contexts.courses;
         _results = [];
         for (course_id in _ref) {
           roles = _ref[course_id];
@@ -897,7 +898,7 @@
         return _results;
       }).call(this)).concat((function() {
         var _ref, _results;
-        _ref = user.common_groups;
+        _ref = contexts.groups;
         _results = [];
         for (group_id in _ref) {
           roles = _ref[group_id];
@@ -907,7 +908,7 @@
         }
         return _results;
       }).call(this));
-      return shared_contexts.sort(function(a, b) {
+      return $.toSentence(shared_contexts.sort(function(a, b) {
         a = a.toLowerCase();
         b = b.toLowerCase();
         if (a < b) {
@@ -917,12 +918,17 @@
         } else {
           return 0;
         }
-      }).slice(0, limit).join(", ");
+      }).slice(0, limit));
     };
-    html_name_for_user = function(user) {
-      var shared_contexts;
-      shared_contexts = MessageInbox.shared_contexts_for_user(user);
-      return $.htmlEscape(user.name) + (shared_contexts.length ? " <em>" + $.htmlEscape(shared_contexts) + "</em>" : '');
+    html_name_for_user = function(user, contexts) {
+      var _ref, _ref2;
+      if (contexts == null) {
+        contexts = {
+          courses: user.common_courses,
+          groups: user.common_groups
+        };
+      }
+      return $.h(user.name) + (((_ref = contexts.courses) != null ? _ref.length : void 0) || ((_ref2 = contexts.groups) != null ? _ref2.length : void 0) ? " <em>" + $.h(MessageInbox.context_list(contexts)) + "</em>" : '');
     };
     can_add_notes_for = function(user) {
       var course_id, roles, _ref, _ref2;
@@ -949,7 +955,7 @@
       placeholder_blocks = [];
       message = message.replace(link_re, function(match, i) {
         var link;
-        placeholder_blocks.push(match === link_placeholder ? link_placeholder : (link = match, link.slice(0, 4) === 'www' ? link = "http://" + link : void 0, links.push(link), "<a href='" + link + "'>" + match + "</a>"));
+        placeholder_blocks.push(match === link_placeholder ? link_placeholder : (link = match, link.slice(0, 4) === 'www' ? link = "http://" + link : void 0, link = encodeURI(link).replace(/'/g, '%27'), links.push(link), "<a href='" + ($.h(link)) + "'>" + ($.h(match)) + "</a>"));
         return link_placeholder;
       });
       message = $.h(message);
@@ -988,7 +994,7 @@
       $message.data('id', data.id);
       $message.addClass(data.generated ? 'generated' : data.author_id === MessageInbox.user_id ? 'self' : 'other');
       user = MessageInbox.user_cache[data.author_id];
-      if (avatar = user != null ? user.avatar : void 0) {
+      if (avatar = user != null ? user.avatar_url : void 0) {
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
@@ -1144,7 +1150,7 @@
       $comment = blank.clone(true).attr('id', 'submission_comment_' + data.id);
       $comment.data('id', data.id);
       user = MessageInbox.user_cache[data.author_id];
-      if (avatar = user != null ? user.avatar : void 0) {
+      if (avatar = user != null ? user.avatar_url : void 0) {
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
@@ -1220,8 +1226,44 @@
       $conversation_list.append($("#conversations_loader"));
       return $conversation;
     };
+    html_audience_for_conversation = function(conversation, cutoff) {
+      var audience, context_info, id, id_or_array;
+      if (cutoff == null) {
+        cutoff = 2;
+      }
+      audience = conversation.audience;
+      if (audience.length === 0) {
+        return "<span>" + ($.h(I18n.t('notes_to_self', 'Monologue'))) + "</span>";
+      }
+      context_info = "<em>" + ($.h(MessageInbox.context_list(conversation.audience_contexts))) + "</em>";
+      if (audience.length === 1) {
+        return "<span>" + ($.h(MessageInbox.user_cache[audience[0]].name)) + "</span> " + context_info;
+      }
+      if (audience.length > cutoff) {
+        audience = audience.slice(0, cutoff).concat([audience.slice(cutoff, audience.length)]);
+      }
+      return $.toSentence((function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = audience.length; _i < _len; _i++) {
+          id_or_array = audience[_i];
+          _results.push(typeof id_or_array === 'number' ? "<span>" + ($.h(MessageInbox.user_cache[id_or_array].name)) + "</span>" : "<span class='others'>\n  " + ($.h(I18n.t('other_recipients', "other", {
+            count: id_or_array.length
+          }))) + "\n  <span>\n    <ul>\n      " + (((function() {
+            var _j, _len2, _results2;
+            _results2 = [];
+            for (_j = 0, _len2 = id_or_array.length; _j < _len2; _j++) {
+              id = id_or_array[_j];
+              _results2.push("<li>" + ($.h(MessageInbox.user_cache[id].name)) + "</li>");
+            }
+            return _results2;
+          })()).join('')) + "\n    </ul>\n  </span>\n</span>");
+        }
+        return _results;
+      })()) + " " + context_info;
+    };
     update_conversation = function($conversation, data, move_mode) {
-      var $a, $p, move_direction, property, _i, _len, _ref;
+      var $a, $p, move_direction, property, user, _i, _j, _len, _len2, _ref, _ref2;
       if (move_mode == null) {
         move_mode = 'slide';
       }
@@ -1229,8 +1271,18 @@
       $a = $conversation.find('a.details_link');
       $a.attr('href', $.replaceTags($a.attr('href'), 'id', data.id));
       $a.attr('add_url', $.replaceTags($a.attr('add_url'), 'id', data.id));
+      if (data.participants) {
+        _ref = data.participants;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          user = _ref[_i];
+          if (!MessageInbox.user_cache[user.id]) {
+            MessageInbox.user_cache[user.id] = user;
+          }
+        }
+      }
       if (data.audience) {
-        $conversation.find('.audience').html(data.audience);
+        $conversation.data('audience', data.audience.concat([MessageInbox.user_id]));
+        $conversation.find('.audience').html(html_audience_for_conversation(data));
       }
       $conversation.find('.actions a').click(function(e) {
         e.preventDefault();
@@ -1252,9 +1304,9 @@
       $p = $conversation.find('p');
       $p.text(data.last_message);
       if (data.properties.length) {
-        _ref = data.properties;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          property = _ref[_i];
+        _ref2 = data.properties;
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+          property = _ref2[_j];
           $conversation.addClass(property);
         }
       }
@@ -1452,10 +1504,9 @@
         success: function(data) {
           var $conversation, conversation, _i, _len, _ref2;
           $(this).loadingImage('remove');
-          if (data.conversations) {
-            _ref2 = data.conversations;
-            for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-              conversation = _ref2[_i];
+          if (data.length > 1) {
+            for (_i = 0, _len = data.length; _i < _len; _i++) {
+              conversation = data[_i];
               $conversation = $('#conversation_' + conversation.id);
               if ($conversation.length) {
                 update_conversation($conversation, conversation, 'immediate');
@@ -1463,15 +1514,16 @@
             }
             $.flashMessage(I18n.t('messages_sent', 'Messages Sent'));
           } else {
-            $conversation = $('#conversation_' + data.conversation.id);
+            conversation = (_ref2 = data[0]) != null ? _ref2 : data;
+            $conversation = $('#conversation_' + conversation.id);
             if ($conversation.length) {
               if (is_selected($conversation)) {
-                build_message(data.message).prependTo($message_list).slideDown('fast');
+                build_message(conversation.messages[0]).prependTo($message_list).slideDown('fast');
               }
-              update_conversation($conversation, data.conversation);
+              update_conversation($conversation, conversation);
             } else {
-              add_conversation(data.conversation);
-              set_hash('#/conversations/' + data.conversation.id);
+              add_conversation(conversation);
+              set_hash('#/conversations/' + conversation.id);
             }
             $.flashMessage(I18n.t('message_sent', 'Message Sent'));
           }
@@ -1500,8 +1552,8 @@
         },
         success: function(data) {
           $(this).loadingImage('remove');
-          build_message(data.message).prependTo($message_list).slideDown('fast');
-          update_conversation($selected_conversation, data.conversation);
+          build_message(data.messages[0]).prependTo($message_list).slideDown('fast');
+          update_conversation($selected_conversation, data);
           reset_message_form();
           return $(this).dialog('close');
         },
@@ -1555,6 +1607,7 @@
         e.preventDefault();
         e.stopImmediatePropagation();
         return inbox_action($(this), {
+          method: 'PUT',
           before: function($node) {
             if (MessageInbox.scope !== 'unread') {
               set_conversation_state($node, 'read');
@@ -1577,6 +1630,7 @@
         e.preventDefault();
         e.stopImmediatePropagation();
         return inbox_action($(this), {
+          method: 'PUT',
           before: function($node) {
             return set_conversation_state($node, 'unread');
           },
@@ -1662,18 +1716,9 @@
             }
           ],
           open: function() {
-            var node, token_input;
+            var token_input;
             token_input = $('#add_recipients').data('token_input');
-            token_input.base_exclude = (function() {
-              var _i, _len, _ref2, _results;
-              _ref2 = $selected_conversation.find('.participant');
-              _results = [];
-              for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-                node = _ref2[_i];
-                _results.push($(node).data('id'));
-              }
-              return _results;
-            })();
+            token_input.base_exclude = $selected_conversation.data('audience');
             return $(this).find("input[name!=authenticity_token]").val('').change();
           },
           close: function() {
@@ -1705,6 +1750,7 @@
       });
       $('#action_archive, #action_unarchive').click(function() {
         return inbox_action($(this), {
+          method: 'PUT',
           success: remove_conversation
         });
       });
@@ -1795,18 +1841,19 @@
           return $(this).loadingImage();
         },
         success: function(data) {
-          var $conversation;
+          var $conversation, conversation;
+          conversation = data[0];
           $(this).loadingImage('remove');
-          $conversation = $('#conversation_' + data.conversation.id);
+          $conversation = $('#conversation_' + conversation.id);
           if ($conversation.length) {
             if (is_selected($conversation)) {
-              build_message(data.message).prependTo($message_list).slideDown('fast');
+              build_message(conversation.messages[0]).prependTo($message_list).slideDown('fast');
             }
-            update_conversation($conversation, data.conversation);
+            update_conversation($conversation, conversation);
           } else {
-            add_conversation(data.conversation);
+            add_conversation(conversation);
           }
-          set_hash('#/conversations/' + data.conversation.id);
+          set_hash('#/conversations/' + conversation.id);
           reset_message_form();
           return $(this).dialog('close');
         },
@@ -1891,7 +1938,7 @@
           }
           if (!(data.id && ("" + data.id).match(/^(course|group)_/))) {
             data = $.extend({}, data);
-            delete data.avatar;
+            delete data.avatar_url;
             return (_ref3 = (_base = MessageInbox.user_cache)[_name = data.id]) != null ? _ref3 : _base[_name] = data;
           }
         },
@@ -1904,16 +1951,16 @@
             if (options == null) {
               options = {};
             }
-            if (data.avatar) {
+            if (data.avatar_url) {
               $img = $('<img class="avatar" />');
-              $img.attr('src', data.avatar);
+              $img.attr('src', data.avatar_url);
               $node.append($img);
             }
             $b = $('<b />');
             $b.text(data.name);
             $span = $('<span />');
             if (data.common_courses != null) {
-              $span.text(MessageInbox.shared_contexts_for_user(data));
+              $span.text(MessageInbox.context_list(data));
             } else if (data.type && (data.user_count != null)) {
               $span.text(I18n.t('people_count', 'person', {
                 count: data.user_count
@@ -1936,6 +1983,8 @@
           limiter: function(options) {
             if (options.level > 0) {
               return -1;
+            } else {
+              return 5;
             }
           },
           browser: {
@@ -1970,7 +2019,8 @@
           totalPages: Math.ceil(MessageInbox.initial_conversations_count / MessageInbox.conversation_page_size),
           container: $conversation_list,
           params: {
-            format: 'json'
+            format: 'json',
+            per_page: 25
           },
           loader: $("#conversations_loader"),
           scrape: function(data) {
@@ -1994,11 +2044,12 @@
       return $(window).bind('hashchange', function() {
         var $c, hash, match, params;
         hash = location.hash;
-        if (match = hash.match(/^#\/conversations\/(\d+)$/)) {
+        if (match = hash.match(/^#\/conversations\/(\d+)(\?(.*))?/)) {
+          params = match[3] ? parse_query_string(match[3]) : {};
           if (($c = $('#conversation_' + match[1])) && $c.length) {
-            return select_conversation($c);
+            return select_conversation($c, params);
           } else {
-            return select_unloaded_conversation(match[1]);
+            return select_unloaded_conversation(match[1], params);
           }
         } else if ($('#action_compose_message').length) {
           params = {};

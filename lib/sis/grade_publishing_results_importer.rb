@@ -25,7 +25,7 @@ module SIS
 
     def verify(csv, verify)
       enrollment_ids = (verify[:enrollment_ids] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         enrollment_id = row['enrollment_id']
         add_error(csv, "Duplicate enrollment id #{enrollment_id}") if enrollment_ids[enrollment_id]
         enrollment_ids[enrollment_id] = true
@@ -39,7 +39,7 @@ module SIS
     # enrollment_id,grade_publishing_status
     def process(csv)
       start = Time.now
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         update_progress
         logger.debug("Processing Enrollment #{row.inspect}")
 

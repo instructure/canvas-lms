@@ -30,7 +30,7 @@
     <li><a href="#tab-settings"><%= t(:tab_settings, "Settings") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
-    <% if @account.root_account? && !@account.site_admin? %>
+    <% if @account.root_account? %>
       <li><a href="#tab-announcements" id="tab-announcements-link"><%= t(:tab_announcements, "Announcements") %></a></li>
     <% end %>
     <% if !@available_reports.blank? %>
@@ -359,7 +359,7 @@
       <% end %>
     <% end %>
   </div>
-  <% if @account.root_account? && !@account.site_admin? %>
+  <% if @account.root_account? %>
     <div id="tab-announcements">
       <h2><%= t(:global_announcements_title, "Global Announcements") %></h2>
       <%= mt(:global_announcements_description,

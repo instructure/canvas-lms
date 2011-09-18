@@ -35,11 +35,11 @@
       <%= t('no_merge_undo', "This process cannot be undone, so please make sure you're certain before you continue.") %>
     </strong></p>
     <p>
-      <%= t('merge_result_explanation', "Are you sure you want to merge the account, %{user_name}
-      (%{user_email}) into this account, %{current_user_name} (%{current_user_email})? This
+      <%= t('merge_result_explanation', "Are you sure you want to merge the account, %{source_user_name}
+      (%{source_user_email}) into this account, %{target_user_name} (%{target_user_email})? This
       process will have the following end result:", 
-            :user_name => @user.name, :user_email => @user.email,
-            :current_user_name => @current_user.name, :current_user_email => @current_user.email) %>
+            :source_user_name => @user.name, :source_user_email => @user.email,
+            :target_user_name => @other_user.name, :target_user_email => @other_user.email) %>
     <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @other_user} %>
     </p>
     <% form_tag user_merge_path(@user, :new_user_uuid => @other_user.uuid), :method => :post do %>

@@ -63,7 +63,8 @@ shared_examples_for "dashboard selenium tests" do
     driver.find_element(:css, '.topic_message .add_entry_link').click
     driver.find_element(:name, 'discussion_entry[plaintext_message]').send_keys('first comment')
     driver.find_element(:css, '.add_sub_message_form').submit
-    wait_for_dom_ready
+    wait_for_ajax_requests
+    wait_for_animations
     driver.find_element(:css, '.topic_message .subcontent').should include_text('first comment')
   end
   

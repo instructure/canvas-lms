@@ -361,7 +361,7 @@ I18n.scoped('gradebook', function(I18n) {
             updateSubmission(submission);
             studentsToUpdate.push(submission.user_id);
           }
-          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%[count} Student scores updated'}, {'count': data.length}));
+          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%{count} Student scores updated'}, {'count': data.length}));
           $default_grade_form.find(".cancel_button").attr('disabled', false);
           $default_grade_form.dialog('close');
         }
@@ -1030,7 +1030,7 @@ I18n.scoped('gradebook', function(I18n) {
             updateSubmission(submission);
             studentsToUpdate.push(submission.user_id);
           }
-          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%[count} Student scores updated'}, {'count': data.length}));
+          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%{count} Student scores updated'}, {'count': data.length}));
           $curve_grade_dialog.find(".cancel_button").attr('disabled', false).dialog('close');
         },
         error: function(data) {

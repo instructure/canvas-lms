@@ -18,6 +18,11 @@
 
 module SIS
   class SisImporter
+    PARSE_ARGS = {:headers => :first_row, 
+                :skip_blanks => true, 
+                :header_converters => :downcase, 
+                :converters => lambda{|field|field ? field.strip : field}
+    }
     def initialize(sis_csv)
       @sis = sis_csv
       @root_account = @sis.root_account
@@ -46,6 +51,12 @@ module SIS
     
     def update_progress(count = 1)
       @sis.update_progress(count)
+    end
+    
+    def csv_rows(csv)
+      FasterCSV.foreach(csv[:fullpath], PARSE_ARGS) do |row|
+        yield row
+      end
     end
   end
 end

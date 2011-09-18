@@ -50,7 +50,13 @@ describe User do
     @user = User.find(@user)
     @user.name.should eql('bill')
   end
-  
+
+  it "should not find a user by non-email when searching by email" do
+    @user = User.create
+    @user.communication_channels.create!(:path => 'cody', :path_type => 'twitter')
+    User.find_by_email('cody').should be_nil
+  end
+
   it "should update account associations when a course account changes" do
     account1 = account_model
     account2 = account_model
@@ -418,6 +424,10 @@ describe User do
       messageable_users = @student.messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
+
+      messageable_users = @student.messageable_users(:context => "course_#{@course.id}").map(&:id)
+      messageable_users.should include @this_section_user.id
+      messageable_users.should_not include @other_section_user.id
     end
 
     it "should include users from all sections if visibility is not limited to sections" do
@@ -426,6 +436,32 @@ describe User do
       messageable_users = @student.messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should include @other_section_user.id
+    end
+
+    it "should return users for a specified group if the receiver can access the group" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      @group = @course.groups.create
+      @group.users = [@this_section_user]
+
+      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      # student can see it too, even though he's not in the group (since he can view the roster)
+      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+    end
+
+    it "should respect section visibility when returning users for a specified group" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
+
+      @group = @course.groups.create
+      @group.users = [@this_section_user, @other_section_user]
+
+      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
+      @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
+      # student can only see people in his section
+      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @student.group_membership_visibility[:user_counts][@group.id].should eql 1
     end
 
     it "should only show admins and the observed if the receiver is an observer" do

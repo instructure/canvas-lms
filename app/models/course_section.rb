@@ -45,12 +45,12 @@ class CourseSection < ActiveRecord::Base
 
   def touch_all_enrollments
     return if new_record?
-    self.enrollments.update_all(:updated_at => Time.now)
+    self.enrollments.update_all(:updated_at => Time.now.utc)
     case User.connection.adapter_name
     when 'MySQL'
       User.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_section_id=#{self.id}")
     else
-      User.update_all({:updated_at => Time.now}, "id IN (SELECT user_id FROM enrollments WHERE course_section_id=#{self.id})")
+      User.update_all({:updated_at => Time.now.utc}, "id IN (SELECT user_id FROM enrollments WHERE course_section_id=#{self.id})")
     end
   end
 

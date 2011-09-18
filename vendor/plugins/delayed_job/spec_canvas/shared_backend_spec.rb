@@ -287,6 +287,27 @@ shared_examples_for 'a backend' do
       @backend.get_and_lock_next_available('w3', 60).should == nil
     end
 
+    context "next_in_strand" do
+      # mysql non-transactional DDL strikes us here
+      self.use_transactional_fixtures = false
+      it "should migrate existing jobs to the new next_in_strand strategy" do
+        require 'db/migrate/20110831210257_add_delayed_jobs_next_in_strand'
+        AddDelayedJobsNextInStrand.down
+        Delayed::Job.reset_column_information
+        y1 = create_job(:strand => 'myjobs')
+        n1 = create_job(:strand => 'myjobs')
+        n2 = create_job(:strand => 'myjobs')
+        y2 = create_job(:strand => 'myjobs2')
+        n3 = create_job(:strand => 'myjobs2')
+        y3 = create_job()
+        AddDelayedJobsNextInStrand.up
+        Delayed::Job.reset_column_information
+        [y1, y2, y3].each { |j| j.reload.next_in_strand.should be_true }
+        [n1, n2, n3].each { |j| j.reload.next_in_strand.should be_false }
+        Delayed::Job.delete_all
+      end
+    end
+
     context 'clear' do
       it "should clear all jobs" do
         create_job(:strand => 'myjobs')

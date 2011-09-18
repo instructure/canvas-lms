@@ -226,26 +226,28 @@ class CoursesController < ApplicationController
   # For full documentation, see the API documentation for the user activity stream.
   def activity_stream
     get_context
-    render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+    if authorized_action(@context, @current_user, :read)
+      render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+    end
   end
 
   def destroy
     @context = Course.find(params[:id])
-    if authorized_action(@context, @current_user, :delete)
-      if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
-        @context.workflow_state = 'deleted'
-        @context.sis_source_id = nil
-        @context.save
-        flash[:notice] = t('notices.deleted', "Course successfully deleted")
-      else
-        @context.complete
-        flash[:notice] = t('notices.concluded', "Course successfully concluded")
-      end
-      @current_user.touch
-      respond_to do |format|
-        format.html {redirect_to dashboard_url}
-        format.json {render :json => {:deleted => true}.to_json}
-      end
+    if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
+      return unless authorized_action(@context, @current_user, :delete)
+      @context.workflow_state = 'deleted'
+      @context.sis_source_id = nil
+      @context.save
+      flash[:notice] = t('notices.deleted', "Course successfully deleted")
+    else
+      return unless authorized_action(@context, @current_user, :update)
+      @context.complete
+      flash[:notice] = t('notices.concluded', "Course successfully concluded")
+    end
+    @current_user.touch
+    respond_to do |format|
+      format.html {redirect_to dashboard_url}
+      format.json {render :json => {:deleted => true}.to_json}
     end
   end
   
@@ -287,13 +289,12 @@ class CoursesController < ApplicationController
     end
   end
 
-  def course_details
+  def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
       @alerts = @context.alerts
       @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
-      render :action => :course_details
     end
   end
   
@@ -327,7 +328,7 @@ class CoursesController < ApplicationController
         e.re_send_confirmation! if e.invited?
       end
       respond_to do |format|
-        format.html { redirect_to course_details_url }
+        format.html { redirect_to course_settings_url }
         format.json { render :json => {:re_sent => true}.to_json }
       end
     end
@@ -582,7 +583,7 @@ class CoursesController < ApplicationController
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
     @unauthorized_user = @finished_enrollment.user rescue nil
     if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
-      return redirect_to course_details_path(@context.id)
+      return redirect_to course_settings_path(@context.id)
     end
     if authorized_action(@context, @current_user, :read)
       
@@ -938,6 +939,6 @@ class CoursesController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :manage_content)
     @new_course = @context.reset_content
-    redirect_to course_details_path(@new_course.id)
+    redirect_to course_settings_path(@new_course.id)
   end
 end

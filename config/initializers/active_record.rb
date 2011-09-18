@@ -153,7 +153,7 @@ class ActiveRecord::Base
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      self.context_type.constantize.update_all({ :updated_at => Time.now }, { :id => self.context_id })
+      self.context_type.constantize.update_all({ :updated_at => Time.now.utc }, { :id => self.context_id })
     end
   rescue
     ErrorReport.log_exception(:touch_context, $!)
@@ -161,7 +161,7 @@ class ActiveRecord::Base
 
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
-      User.update_all({ :updated_at => Time.now }, { :id => self.user_id })
+      User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
       User.invalidate_cache(self.user_id)
     end
     true

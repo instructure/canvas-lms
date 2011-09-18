@@ -1,4 +1,4 @@
-<li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.workflow_state %>">
+<li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.state_based_on_date %>">
   <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: left;">
     <span class="name ellipsis" title="<%= enrollment.long_name %>">
       <%= enrollment.long_name %>
@@ -7,7 +7,7 @@
       <% end %>
     </span>
     <span class="subtitle ellipsis">
-      <%= enrollment.workflow_readable_type %>,
+      <%= Enrollment.workflow_readable_type(enrollment.state_based_on_date) %>,
       <%= 
         case enrollment.class.to_s
         when 'TeacherEnrollment'

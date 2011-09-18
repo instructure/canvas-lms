@@ -23,7 +23,7 @@ module SIS
     end
 
     def verify(csv, verify)
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         add_error(csv, "No group_id given for a group user") if row['group_id'].blank?
         add_error(csv, "No user_id given for a group user") if row['user_id'].blank?
         add_error(csv, "Improper status \"#{row['status']}\" for a group user") unless row['status'] =~ /\A(accepted|deleted)/i
@@ -36,7 +36,7 @@ module SIS
       start = Time.now
       groups_cache = {}
 
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         update_progress
         logger.debug("Processing Group User #{row.inspect}")
 

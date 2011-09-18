@@ -25,7 +25,7 @@
     <% end %>
     <div class="info">
       <span class="links">
-        <%= link_to t(:settings_link, "Settings"), course_details_path(course ? course : "{{ id }}") %> |
+        <%= link_to t(:settings_link, "Settings"), course_settings_path(course ? course : "{{ id }}") %> |
         <%= link_to t(:statistics_link, "Statistics"), course_statistics_path(course ? course : "{{ id }}") %> |
         <%= link_to t(:homepage_link, "Homepage"), course_path(course ? course : "{{ id }}") %>
       </span>
