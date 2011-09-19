@@ -2401,7 +2401,8 @@ I18n.scoped('instructure', function(I18n) {
         120:'f9', 121:'f10', 122:'f11', 123:'f12', 191:'/' };
     if ($.browser.mozilla){
         specialKeys = $.extend(specialKeys, { 96: '0', 97:'1', 98: '2', 99:
-            '3', 100: '4', 101: '5', 102: '6', 103: '7', 104: '8', 105: '9' });
+            '3', 100: '4', 101: '5', 102: '6', 103: '7', 104: '8', 105: '9',
+            0: '191' /* with shift, 191 becomes 0 #5200 */ });
     }
     if(typeof(options) == "string") {
       options = {keyCodes: options};
