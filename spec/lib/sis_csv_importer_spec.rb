@@ -1087,6 +1087,75 @@ describe SIS::SisCsv do
       section2_1.users.map(&:name).sort.should == ["User Cuatro", "User Cinco"].sort
       section2_2 = course2.course_sections.find_by_sis_source_id("S202")
       section2_2.users.first.name.should == "User Seis"
+
+      # exercise batch updating account associations
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_10,user10,User,Uno,user10@example.com,active",
+        "user_11,user11,User,Uno,user11@example.com,active",
+        "user_12,user12,User,Uno,user12@example.com,active",
+        "user_13,user13,User,Uno,user13@example.com,active",
+        "user_14,user14,User,Uno,user14@example.com,active",
+        "user_15,user15,User,Uno,user15@example.com,active",
+        "user_16,user16,User,Uno,user16@example.com,active",
+        "user_17,user17,User,Uno,user17@example.com,active",
+        "user_18,user18,User,Uno,user18@example.com,active",
+        "user_19,user19,User,Uno,user19@example.com,active",
+        "user_20,user20,User,Uno,user20@example.com,active",
+        "user_21,user21,User,Uno,user21@example.com,active",
+        "user_22,user22,User,Uno,user22@example.com,active",
+        "user_23,user23,User,Uno,user23@example.com,active",
+        "user_24,user24,User,Uno,user24@example.com,active",
+        "user_25,user25,User,Uno,user25@example.com,active",
+        "user_26,user26,User,Uno,user26@example.com,active",
+        "user_27,user27,User,Uno,user27@example.com,active",
+        "user_28,user28,User,Uno,user28@example.com,active",
+        "user_29,user29,User,Uno,user29@example.com,active",
+        "user_30,user30,User,Uno,user30@example.com,active",
+        "user_31,user31,User,Uno,user31@example.com,active",
+        "user_32,user32,User,Uno,user32@example.com,active",
+        "user_33,user33,User,Uno,user33@example.com,active",
+        "user_34,user34,User,Uno,user34@example.com,active",
+        "user_35,user35,User,Uno,user35@example.com,active",
+        "user_36,user36,User,Uno,user36@example.com,active",
+        "user_37,user37,User,Uno,user37@example.com,active",
+        "user_38,user38,User,Uno,user38@example.com,active",
+        "user_39,user39,User,Uno,user39@example.com,active"
+      )
+      # the enrollments
+      process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,user_10,student,,active,",
+        "test_1,user_11,student,,active,",
+        "test_1,user_12,student,,active,",
+        "test_1,user_13,student,,active,",
+        "test_1,user_14,student,,active,",
+        "test_1,user_15,student,,active,",
+        "test_1,user_16,student,,active,",
+        "test_1,user_17,student,,active,",
+        "test_1,user_18,student,,active,",
+        "test_1,user_19,student,,active,",
+        "test_1,user_20,student,,active,",
+        "test_1,user_21,student,,active,",
+        "test_1,user_22,student,,active,",
+        "test_1,user_23,student,,active,",
+        "test_1,user_24,student,,active,",
+        "test_2,user_25,student,,active,",
+        "test_2,user_26,student,,active,",
+        "test_2,user_27,student,,active,",
+        "test_2,user_28,student,,active,",
+        "test_2,user_29,student,,active,",
+        "test_2,user_30,student,,active,",
+        "test_2,user_31,student,,active,",
+        "test_2,user_32,student,,active,",
+        "test_2,user_33,student,,active,",
+        "test_2,user_34,student,,active,",
+        "test_2,user_35,student,,active,",
+        "test_2,user_36,student,,active,",
+        "test_2,user_37,student,,active,",
+        "test_2,user_38,student,,active,",
+        "test_2,user_39,student,,active,"
+      )
     end
   end
 

@@ -209,7 +209,7 @@ module SIS
         update_account_association_user_ids.merge(incrementally_update_account_associations_user_ids)
       else
         User.update_account_associations(incrementally_update_account_associations_user_ids.to_a,
-            :incremental,
+            :incremental => true,
             :precalculated_associations => User.calculate_account_associations_from_accounts(
                 [course.account_id, section.nonxlist_course.try(:account_id)].compact.uniq,
                 account_chain_cache
