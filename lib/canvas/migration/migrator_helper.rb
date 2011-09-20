@@ -67,6 +67,12 @@ module MigratorHelper
     error
   end
   
+  def add_warning(user_message, exception_or_info='')
+    if @settings[:content_migration].respond_to?(:add_warning)
+      @settings[:content_migration].add_warning(user_message, exception_or_info)
+    end
+  end
+  
   def logger
     Rails.logger
   end
@@ -137,30 +143,39 @@ module MigratorHelper
     @settings[:id_prepender]
   end
   
-  def prepend_id(id)
-    id_prepender ? "#{id_prepender}_#{id}" : id
+  def prepend_id(id, prepend_value=nil)
+    prepend_value ||= id_prepender
+    prepend_value ? "#{prepend_value}_#{id}" : id
   end
   
   def add_assessment_id_prepend
     if id_prepender
-      if @course[:assessment_questions]
-        @course[:assessment_questions][:assessment_questions].each do |q|
-          q[:migration_id] = prepend_id(q[:migration_id])
-          q[:question_bank_id] = prepend_id(q[:question_bank_id]) if q[:question_bank_id].present?
-        end
+      if @course[:assessment_questions] && @course[:assessment_questions][:assessment_questions]
+        prepend_id_to_questions(@course[:assessment_questions][:assessment_questions])
       end
-      if @course[:assessments]
-        @course[:assessments][:assessments].each do |a|
-          a[:migration_id] = prepend_id(a[:migration_id])
-          a[:questions].each do |q|
-            if q[:question_type] == "question_reference"
-              q[:migration_id] = prepend_id(q[:migration_id])
-            elsif q[:question_type] == "question_group"
-              q[:question_bank_migration_id] = prepend_id(q[:question_bank_migration_id]) if q[:question_bank_migration_id].present?
-              q[:questions].each do |gq|
-                gq[:migration_id] = prepend_id(gq[:migration_id])
-              end
-            end
+      if @course[:assessments] && @course[:assessments][:assessments]
+        prepend_id_to_assessments(@course[:assessments][:assessments])
+      end
+    end
+  end
+  
+  def prepend_id_to_questions(questions, prepend_value=nil)
+    questions.each do |q|
+      q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
+      q[:question_bank_id] = prepend_id(q[:question_bank_id], prepend_value) if q[:question_bank_id].present?
+    end
+  end
+  
+  def prepend_id_to_assessments(assessments, prepend_value=nil)
+    assessments.each do |a|
+      a[:migration_id] = prepend_id(a[:migration_id], prepend_value)
+      a[:questions].each do |q|
+        if q[:question_type] == "question_reference"
+          q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
+        elsif q[:question_type] == "question_group"
+          q[:question_bank_migration_id] = prepend_id(q[:question_bank_migration_id], prepend_value) if q[:question_bank_migration_id].present?
+          q[:questions].each do |gq|
+            gq[:migration_id] = prepend_id(gq[:migration_id], prepend_value)
           end
         end
       end

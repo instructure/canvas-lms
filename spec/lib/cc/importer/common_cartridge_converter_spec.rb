@@ -52,8 +52,6 @@ describe "Standard Common Cartridge importing" do
     
     mod1 = @course.context_modules.find_by_migration_id("I_00000")
     mod1.name.should == "Your Mom, Research, & You"
-    #mod1.content_tags.count.should == 5
-    #mod1.content_tags.each{|ct|puts ct.inspect}
     tag = mod1.content_tags[0]
     tag.content_type.should == 'Attachment'
     tag.content_id.should == @course.attachments.find_by_migration_id("I_00001_R").id
@@ -62,12 +60,16 @@ describe "Standard Common Cartridge importing" do
     tag.content_type.should == 'ContextModuleSubHeader'
     tag.title.should == "Study Guide"
     tag.indent.should == 0
-      # todo - once assessments are imported
-      #tag = mod1.content_tags[2]
-      #tag.title.should == "Pretest"
-      #tag.content_type.should == 'AssessmentSomething'
-      #tag.indent.should == 1
-    tag = mod1.content_tags[2]
+    index = 2
+    if Qti.qti_enabled?
+      tag = mod1.content_tags[index]
+      tag.title.should == "Pretest"
+      tag.content_type.should == 'Quiz'
+      tag.content_id.should == @course.quizzes.find_by_migration_id("I_00003_R").id
+      tag.indent.should == 1
+      index += 1
+    end
+    tag = mod1.content_tags[index]
     tag.content_type.should == 'ExternalUrl'
     tag.title.should == "Wikipedia - Your Mom"
     tag.url.should == "http://en.wikipedia.org/wiki/Maternal_insult"
@@ -115,17 +117,6 @@ describe "Standard Common Cartridge importing" do
     tag.title.should == "BLTI Test"
     tag.url.should == "http://www.imsglobal.org/developers/BLTI/tool.php"
     tag.indent.should == 0
-    
-  end
-
-  it "should get all the resources" do
-    @converter.resources['f4'][:intended_use].should == 'assignment'
-    @converter.resources['I_00004_R'][:intended_user_role].should == 'Instructor'
-    @converter.resources['I_00006_R'][:dependencies].should == ['I_00006_Media', 'I_media_R']
-    @converter.resources_by_type("webcontent").length.should == 5
-    @converter.resources_by_type("webcontent", "associatedcontent").length.should == 6
-    @converter.resources_by_type("imsdt").length.should == 2
-    @converter.resources_by_type("imswl").length.should == 3
   end
   
   it "should import external tools" do
@@ -137,5 +128,26 @@ describe "Standard Common Cartridge importing" do
     et.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}]
     @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
   end
+  
+  
+  it "should import assessment data" do
+    if Qti.qti_enabled?
+      quiz = @course.quizzes.find_by_migration_id("I_00003_R")
+      quiz.quiz_questions.count.should == 11
+      quiz.title.should == "Pretest"
+      quiz.quiz_type.should == 'assignment'
+      quiz.allowed_attempts.should == 2
+      quiz.time_limit.should == 120
 
+      question = quiz.quiz_questions.first
+      question.question_data[:points_possible].should == 2
+
+      bank = @course.assessment_question_banks.find_by_migration_id("I_00004_R_QDB_1")
+      bank.assessment_questions.count.should == 11
+      bank.title.should == "QDB_1"
+    else
+      pending("Can't import assessment data with python QTI tool.")
+    end
+  end
+  
 end

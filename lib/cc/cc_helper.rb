@@ -25,6 +25,7 @@ module CCHelper
   IMS_DATE = "%Y-%m-%d"
   IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
   CC_EXTENSION = 'imscc'
+  QTI_EXTENSION = ".xml.qti"
   CANVAS_PLATFORM = 'canvas.instructure.com'
   
   # Common Cartridge 1.0

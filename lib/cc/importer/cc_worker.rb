@@ -26,6 +26,7 @@ module Canvas::Migration
           settings[:content_migration_id] = migration_id
           settings[:user_id] = cm.user_id
           settings[:attachment_id] = cm.attachment.id rescue nil
+          settings[:content_migration] = cm
           
           converter_class = Worker::get_converter(settings)
           converter = converter_class.new(settings)

@@ -17,7 +17,6 @@ module Canvas::Migration
     end
 
     def identify_package
-      # todo verify it's a valid zip file
       zip_file = Zip::ZipFile.open(@archive.path)
       if zip_file.find_entry("AngelManifest.xml")
         :angel_7_4
