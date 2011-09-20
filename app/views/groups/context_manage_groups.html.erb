@@ -193,7 +193,7 @@ a.load_members_link, .loading_members {
     <div id="group_tabs" style="<%= hidden if @categories.empty? %>;">
       <ul id="category_list">
         <% @categories.each do |category| %>
-          <li class="category"><a href="#<%= category.unpack('H*') %>"><%= category %></a></li>
+          <li class="category <%= 'student_organized' if category == Group.student_organized_category %>"><a href="#<%= category.unpack('H*') %>"><%= category %></a></li>
         <% end %>
       </ul>
       <%= render :partial => "category", :collection => @categories %>

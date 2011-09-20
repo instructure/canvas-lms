@@ -19,7 +19,6 @@
 I18n.scoped('groups', function(I18n){
   window.contextGroups = {
     autoLoadGroupThreshold: 15,
-    studentGroupsCategoryName: $.encodeToHex(I18n.t('category_name', 'Student Groups')),
     
     loadMembersForGroup: function($group) {
       var url = $("#manage_group_urls .list_users_url").attr('href');
@@ -127,7 +126,7 @@ I18n.scoped('groups', function(I18n){
       
       var $student_instances = $student;
       contextGroups.insertIntoGroup($student, $group);
-      if(($group.parents(".group_category").attr('id') == contextGroups.studentGroupsCategoryName) &&
+      if($group.parents(".group_category").hasClass('student_organized') &&
           ($group.get(0) !== $group.parents(".group_category").find(".group_blank").get(0))) {
         var $s = $student.clone();
         $student_instances = $student_instances.add($s);
@@ -415,7 +414,7 @@ I18n.scoped('groups', function(I18n){
         $category.find(".category_name").text(name);
         
         var newIndex = $("#group_tabs").tabs('length');
-        if ($("li.category").last().find("a").attr('href') == '#' + contextGroups.studentGroupsCategoryName) {
+        if ($("li.category").last().hasClass('student_organized')) {
           newIndex -= 1;
         }
         $("#group_tabs").append($category);
@@ -443,7 +442,7 @@ I18n.scoped('groups', function(I18n){
           });
           $(this).slideUp(function() {
             var $category = $(this).parents(".group_category");
-            if ($category.attr('id') != contextGroups.studentGroupsCategoryName) {
+            if (!$category.hasClass('student_organized')) {
               $(this).find(".student").each(function() {
                 contextGroups.insertIntoGroup($(this), $blank_category);
               });

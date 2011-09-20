@@ -1,4 +1,4 @@
-<div id="<%= category ? category.unpack('H*') : "category_template" %>" class="group_category">
+<div id="<%= category ? category.unpack('H*') : "category_template" %>" class="group_category <%= 'student_organized' if category == Group.student_organized_category %>">
   <div class="category_header">
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><%= image_tag "add.png" %></a>
