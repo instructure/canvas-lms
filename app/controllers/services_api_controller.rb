@@ -20,18 +20,26 @@
 class ServicesApiController < ApplicationController
   
   # @API
-  # Return the config information for kaltura in json format.
+  # Return the config information for the Kaltura plugin in json format.
   #
-  # @response_field domain Main domain of the kaltura instance. This is the URL where the kaltura API resides.
-  # @response_field resources_domain Kaltura URL for grabbing thumbnails and other resources.
-  # @response_field partner_id Partner ID used for communicating with the kaltura instance
+  # @response_field enabled Enabled state of the Kaltura plugin
+  # @response_field domain Main domain of the Kaltura instance (This is the URL where the Kaltura API resides)
+  # @response_field resources_domain Kaltura URL for grabbing thumbnails and other resources
+  # @response_field partner_id Partner ID used for communicating with the Kaltura instance
   #
-  # Example response:
+  # Example responses:
   #
+  # For an enabled Kaltura plugin:
   # {
   #   'domain': 'kaltura.example.com',
-  #   'resource_domain': 'cdn.kaltura.example.com',
+  #   'enabled': true,
   #   'partner_id': '123456'
+  #   'resource_domain': 'cdn.kaltura.example.com',
+  # }
+  #
+  # For a disabled or unconfigured Kaltura plugin:
+  # {
+  #   'enabled': false,
   # }
   def show_kaltura_config
     if @current_user
