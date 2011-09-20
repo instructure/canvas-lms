@@ -8,3 +8,5 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 require 'tasks/rails'
+
+begin; require 'parallel_tests/tasks'; rescue LoadError; end
