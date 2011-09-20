@@ -253,7 +253,10 @@ class UsersController < ApplicationController
   #     'id': 1234,
   #     'title': 'Stream Item Subject',
   #     'message': 'This is the body text of the activity stream item. It is plain-text, and can be multiple paragraphs.',
-  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...'
+  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...',
+  #     'context_type': 'course', // course|group
+  #     'course_id': 1,
+  #     'group_id': null,
   #   }
   #
   # In addition, each item type has its own set of attributes available.
@@ -352,10 +355,57 @@ class UsersController < ApplicationController
       end
     end
   end
-  
+
+  include Api::V1::TodoItem
+  # @API
+  # Returns the current user's list of todo items, as seen on the user dashboard.
+  #
+  # There is a limit to the number of items returned.
+  #
+  # The `ignore` and `ignore_permanently` URLs can be used to update the user's
+  # preferences on what items will be displayed.
+  # Performing a DELETE request against the `ignore` URL will hide that item
+  # from future todo item requests, until the item changes.
+  # Performing a DELETE request against the `ignore_permanently` URL will hide
+  # that item forever.
+  #
+  # @example_response
+  #   [
+  #     {
+  #       'type': 'grading',        // an assignment that needs grading
+  #       'assignment': { .. assignment object .. },
+  #       'ignore': '.. url ..',
+  #       'ignore_permanently': '.. url ..',
+  #       'needs_grading_count': 3, // number of submissions that need grading
+  #       'context_type': 'course', // course|group
+  #       'course_id': 1,
+  #       'group_id': null,
+  #     },
+  #     {
+  #       'type' => 'submitting',   // an assignment that needs submitting soon
+  #       'assignment' => { .. assignment object .. },
+  #       'ignore' => '.. url ..',
+  #       'ignore_permanently' => '.. url ..',
+  #       'context_type': 'course',
+  #       'course_id': 1,
+  #     }
+  #   ]
+  def todo_items
+    unless @current_user
+      return render_unauthorized_action
+    end
+
+    grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, 'grading') }
+    submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, 'submitting') }
+    render :json => (grading + submitting)
+  end
+
   def ignore_item
+    unless %w[grading submitting].include?(params[:purpose])
+      return render(:json => { :ignored => false }, :status => 400)
+    end
     @current_user.ignore_item!(params[:asset_string], params[:purpose], params[:permanent] == '1')
-    render :json => @current_user.to_json
+    render :json => { :ignored => true }
   end
 
   def ignore_stream_item

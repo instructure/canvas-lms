@@ -41,6 +41,7 @@ end
 
 # like api_call, but don't assume success and a json response.
 def raw_api_call(method, path, params, body_params = {}, headers = {})
+  path = path.sub(%r{\Ahttps?://[^/]+}, '') # remove protocol+host
   enable_forgery_protection do
     params_from_with_nesting(method, path).should == params
 

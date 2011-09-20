@@ -550,7 +550,6 @@ ActionController::Routing::Routes.draw do |map|
     dashboard.grades "grades", :controller => "users", :action => "grades"
     dashboard.resources :rubrics, :as => :assessments
     dashboard.comment_session "comment_session", :controller => "users", :action => "kaltura_session"
-    dashboard.ignore_item 'ignore_item/:asset_string/:purpose', :controller => 'users', :action => 'ignore_item', :conditions => {:method => :delete}
     dashboard.ignore_stream_item 'ignore_stream_item/:id', :controller => 'users', :action => 'ignore_stream_item', :conditions => {:method => :delete}
   end
   map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
@@ -648,6 +647,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
+      courses.get 'courses/:course_id/todo', :action => :todo_items
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -684,12 +684,15 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :users) do |users|
-      users.get 'users/self/activity_stream', :action => 'activity_stream'
-      users.get 'users/activity_stream', :action => 'activity_stream' # deprecated
+      users.get 'users/self/activity_stream', :action => :activity_stream
+      users.get 'users/activity_stream', :action => :activity_stream # deprecated
+
+      users.get 'users/self/todo', :action => :todo_items
+      users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
     end
 
     api.with_options(:controller => :accounts) do |accounts|
-      accounts.get 'accounts', :action => :index, :path_name => 'accounts'
+      accounts.get 'accounts', :action => :index, :path_name => :accounts
       accounts.get 'accounts/:id', :action => :show
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
     end

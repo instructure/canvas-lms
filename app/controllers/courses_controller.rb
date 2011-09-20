@@ -236,11 +236,26 @@ class CoursesController < ApplicationController
   # @API
   # Returns the current user's course-specific activity stream.
   #
-  # For full documentation, see the API documentation for the user activity stream.
+  # For full documentation, see the API documentation for the user activity
+  # stream, in the user api.
   def activity_stream
     get_context
     if authorized_action(@context, @current_user, :read)
       render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+    end
+  end
+
+  include Api::V1::TodoItem
+  # @API
+  # Returns the current user's course-specific todo items.
+  #
+  # For full documentation, see the API documentation for the user todo items, in the user api.
+  def todo_items
+    get_context
+    if authorized_action(@context, @current_user, :read)
+      grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, 'grading') }
+      submitting = @current_user.assignments_needing_submitting(:contexts => [@context]).map { |a| todo_item_json(a, 'submitting') }
+      render :json => (grading + submitting)
     end
   end
 
