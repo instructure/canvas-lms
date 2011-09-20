@@ -284,7 +284,6 @@ class ContextController < ApplicationController
       end
       @secondary_users ||= {}
       @groups = @context.groups.active rescue []
-      @categories = @groups.map{|g| g.category}.uniq
     end
   end
   

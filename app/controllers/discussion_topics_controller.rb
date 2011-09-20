@@ -138,13 +138,12 @@ class DiscussionTopicsController < ApplicationController
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @topic.context_module_action(@current_user, :read) if !@locked
       if @topic.for_group_assignment?
+        @groups = @context.groups.active.for_category(@topic.assignment.group_category_name).select{|g| g.grants_right?(@current_user, session, :read) }
         if params[:combined]
-          @groups = @context.groups.active.find_all_by_category(@topic.assignment.group_category).select{|g| g.grants_right?(@current_user, session, :read) }
           @topic_agglomerated = true
           @topics = @topic.child_topics.select{|t| @groups.include?(t.context) }
           @entries = @topics.map{|t| t.discussion_entries.active.find(:all, :conditions => ['parent_id = ?', 0])}.flatten.sort_by{|e| e.created_at}
         else
-          @groups = @context.groups.active.find_all_by_category(@topic.assignment.group_category).select{|g| g.grants_right?(@current_user, session, :read) }
           @topics = @topic.child_topics.to_a
           @topics = @topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
           @group_entry = @topic.discussion_entries.build(:message => render_to_string(:partial => 'group_assignment_discussion_entry'))

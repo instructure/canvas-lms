@@ -317,7 +317,6 @@ class CoursesController < ApplicationController
       @students = @context.participating_students.find(:all, :order => 'sortable_name')
       @teachers = @context.admins.find(:all, :order => 'sortable_name')
       @groups = @context.groups.active
-      @categories = @groups.map{|g| g.category}.uniq
     end
   end
   

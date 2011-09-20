@@ -26,7 +26,7 @@ class Assignment < ActiveRecord::Base
   
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
-    :assignment_group, :unlock_at, :lock_at, :group_category,
+    :assignment_group, :unlock_at, :lock_at, :group_category_name,
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
@@ -722,8 +722,8 @@ class Assignment < ActiveRecord::Base
   def group_students(student)
     group = nil
     students = [student]
-    if self.group_category
-      group = self.context.groups.active.for_category(self.group_category).to_a.find{|g| g.users.include?(student)}
+    if self.group_category_name
+      group = self.context.groups.active.for_category(self.group_category_name).to_a.find{|g| g.users.include?(student)}
       students = (group.users & self.context.students) if group && !self.grade_group_students_individually
     end
     [group, students]
@@ -910,6 +910,12 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def as_json(options=nil)
+    json = super(options)
+    json['assignment']['group_category_name'] ||= json['assignment'].delete('group_category') if json && json['assignment']
+    json
+  end
+
   def speed_grader_json(as_json=false)
     @speed_grader = true
     Attachment.skip_thumbnails = true
@@ -977,11 +983,15 @@ class Assignment < ActiveRecord::Base
     [comments.compact, @ignored_files]
   end
   
-  def group_category
-    attr = read_attribute(:group_category)
-    attr && attr != "" ? attr : nil
+  def group_category_name
+    attr = self.read_attribute(:group_category)
+    attr.present? ? attr : nil
   end
-  
+
+  def group_category_name=(value)
+    self.write_attribute(:group_category, value)
+  end
+
   def assign_peer_review(reviewer, reviewee)
     reviewer_submission = self.find_or_create_submission(reviewer)
     reviewee_submission = self.find_or_create_submission(reviewee)
@@ -1289,7 +1299,7 @@ class Assignment < ActiveRecord::Base
       dup.send("#{key}=", val)
     end
 
-    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.group_category && !self.group_category.empty?
+    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.group_category_name
     context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
     
     dup.context = context

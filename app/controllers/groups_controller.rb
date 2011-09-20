@@ -32,16 +32,16 @@ class GroupsController < ApplicationController
   
   def unassigned_members
     category = params[:category]
-    page = params[:page].to_i rescue 1
+    page = (params[:page] || 1).to_i rescue 1
     users = []
     if @context.is_a?(Account)
-      groups = @context.account_groups.active.select {|g| g.category == category }
+      groups = @context.account_groups.active.for_category(category)
       users = @context.paginate_users_not_in_groups(groups, page)
     else
       if category == Group.student_organized_category
         groups = []
       else
-        groups = @context.groups.active.select {|g| g.category == category }
+        groups = @context.groups.active.for_category(category)
       end      
       users = @context.paginate_users_not_in_groups(groups, page)
     end
@@ -113,7 +113,7 @@ class GroupsController < ApplicationController
       # TODO i18n
       group_name = I18n.locale == :en ? name.singularize : name
       count.times do |idx|
-        @groups << Group.create(:name => "#{group_name} #{idx + 1}", :category => name, :max_membership => limit, :context => @context)
+        @groups << Group.create(:name => "#{group_name} #{idx + 1}", :group_category_name => name, :max_membership => limit, :context => @context)
       end
       if params[:category][:split_groups] == "1"
         @students = @context.students.sort_by{|s| rand}
@@ -128,7 +128,7 @@ class GroupsController < ApplicationController
   def delete_category
     if authorized_action(@context, @current_user, :manage_groups)
       groups = @context.is_a?(Account) ? @context.account_groups.active : @context.groups.active
-      groups.find_all_by_category(params[:category_name]).each do |group|
+      groups.for_category(params[:category_name]).each do |group|
         group.destroy
       end
       render :json => {:deleted => true}
@@ -158,7 +158,7 @@ class GroupsController < ApplicationController
   def create
     @group = @context.groups.build(params[:group])
     if authorized_action(@group, @current_user, :create)
-      @group.category = Group.student_organized_category unless @context.grants_right?(@current_user, session, :manage_groups)
+      @group.group_category_name = Group.student_organized_category unless @context.grants_right?(@current_user, session, :manage_groups)
       respond_to do |format|
         if @group.save
           if !@context.grants_right?(@current_user, session, :manage_groups)
@@ -263,7 +263,7 @@ class GroupsController < ApplicationController
     add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
     @active_tab = @context.is_a?(Account) ? "users" : "people"
     @groups = @context.is_a?(Account) ? @context.account_groups.active : @context.groups.active
-    @categories = @groups.map{|g| g.category}.uniq
+    @categories = @groups.map{|g| g.group_category_name}.uniq
     group_ids = @groups.map(&:id)
 
     @user_groups = @current_user.group_memberships_for(@context).select{|g| group_ids.include?(g.id) } if @current_user

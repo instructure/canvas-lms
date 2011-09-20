@@ -85,6 +85,45 @@ describe SubmissionsApiController, :type => :integration do
       }].sort_by { |h| h['user_id'] }
   end
 
+  it "should return student discussion entries from child topics for discussion_topic group assignments" do
+    @student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(@student).accept!
+    @group = @course.groups.create(:name => "Group", :group_category_name => "Category")
+    @group.add_user(@student)
+    @context = @course
+    @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model, :group_category_name => @group.group_category_name})
+    @topic.refresh_subtopics # since the DJ won't happen in time
+    @child_topic = @group.discussion_topics.find_by_root_topic_id(@topic.id)
+
+    e1 = @child_topic.discussion_entries.create!(:message => 'main entry', :user => @user)
+    se1 = @child_topic.discussion_entries.create!(:message => 'sub 1', :user => @student, :parent_entry => e1)
+    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+    se2 = @child_topic.discussion_entries.create!(:message => 'student 1', :user => @student)
+    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+    e1 = @child_topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s })
+
+    json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
+      [{
+        'message' => 'sub 1',
+        'user_id' => @student.id,
+        'created_at' => se1.created_at.as_json,
+        'updated_at' => se1.updated_at.as_json,
+      },
+      {
+        'message' => 'student 1',
+        'user_id' => @student.id,
+        'created_at' => se2.created_at.as_json,
+        'updated_at' => se2.updated_at.as_json,
+      }].sort_by { |h| h['user_id'] }
+  end
+
   it "should return a valid preview url for quiz submissions" do
     student1 = user(:active_all => true)
     course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below

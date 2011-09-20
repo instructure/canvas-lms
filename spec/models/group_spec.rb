@@ -40,11 +40,22 @@ describe Group do
   
   it "should find all peer groups" do
     context = course_model
-    group1 = Group.create!(:name=>"group1", :category=>"worldCup", :context => context)
-    group2 = Group.create!(:name=>"group2", :category=>"worldCup", :context => context)
+    group1 = Group.create!(:name=>"group1", :group_category_name=>"worldCup", :context => context)
+    group2 = Group.create!(:name=>"group2", :group_category_name=>"worldCup", :context => context)
+    group3 = Group.create!(:name=>"group3", :group_category_name=>"worldCup", :context => context)
+    group4 = Group.create!(:name=>"group4", :group_category_name=>"other group", :context => context)
+    group1.peer_groups.length.should == 2
     group1.peer_groups.should be_include(group2)
+    group1.peer_groups.should be_include(group3)
     group1.peer_groups.should_not be_include(group1)
-    group1.peer_groups.length.should == 1
+    group1.peer_groups.should_not be_include(group4)
+  end
+  
+  it "should not find peer groups for student organized groups" do
+    context = course_model
+    group1 = Group.create!(:name=>"group1", :group_category_name=>"Student Groups", :context => context)
+    group2 = Group.create!(:name=>"group2", :group_category_name=>"Student Groups", :context => context)
+    group1.peer_groups.should be_empty
   end
   
   context "atom" do
@@ -81,8 +92,8 @@ describe Group do
     
     it "adding a user should remove that user from peer groups" do
       context = course_model
-      group1 = Group.create!(:name=>"group1", :category=>"worldCup", :context => context)
-      group2 = Group.create!(:name=>"group2", :category=>"worldCup", :context => context)
+      group1 = Group.create!(:name=>"group1", :group_category_name=>"worldCup", :context => context)
+      group2 = Group.create!(:name=>"group2", :group_category_name=>"worldCup", :context => context)
       user_model
       pseudonym_model(:user_id => @user.id)
       group1.add_user(@user)
@@ -156,5 +167,110 @@ describe Group do
       group.account.should == new_sub_acct
       group.root_account.should == new_root_acct
     end
+  end
+
+  context "auto_accept?" do
+    it "should be false unless join level is 'parent_context_auto_join'" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group = @course.groups.create(:group_category_name => "Student Groups")
+      group.auto_accept?(student).should be_false
+    end
+
+    it "should be false unless the group is student organized" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group = @course.groups.create(:group_category_name => "random category", :join_level => 'parent_context_auto_join')
+      group.auto_accept?(student).should be_false
+    end
+
+    it "should be true otherwise" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group = @course.groups.create(:group_category_name => "Student Groups", :join_level => 'parent_context_auto_join')
+      group.auto_accept?(student).should be_true
+    end
+  end
+
+  context "allow_join_request?" do
+    it "should be false unless join level is 'parent_context_auto_join' or 'parent_context_request'" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group = @course.groups.create(:group_category_name => "Student Groups")
+      group.allow_join_request?(student).should be_false
+    end
+
+    it "should be false unless the group is student organized" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group = @course.groups.create(:group_category_name => "random category", :join_level => 'parent_context_auto_join')
+      group.allow_join_request?(student).should be_false
+    end
+
+    it "should be true otherwise" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group = @course.groups.create(:group_category_name => "Student Groups", :join_level => 'parent_context_auto_join')
+      group.allow_join_request?(student).should be_true
+
+      group = @course.groups.create(:group_category_name => "Student Groups", :join_level => 'parent_context_request')
+      group.allow_join_request?(student).should be_true
+    end
+  end
+
+  it "should default group_category_name to 'Student Groups' on save" do
+    course_with_teacher
+    group = @course.groups.create
+    group.group_category_name.should == 'Student Groups'
+
+    group = @course.groups.create(:group_category_name => "random category")
+    group.group_category_name.should == 'random category'
+  end
+
+  context "import_from_migration" do
+    it "should respect group_category from the hash" do
+      course_with_teacher
+      group = @course.groups.build
+      @course.imported_migration_items = []
+      Group.import_from_migration({:group_category => "random category"}, @course, group)
+      group.group_category_name.should == "random category"
+    end
+
+    it "should default group_category_name to 'Imported Groups' if not in the hash" do
+      course_with_teacher
+      group = @course.groups.build
+      @course.imported_migration_items = []
+      Group.import_from_migration({}, @course, group)
+      group.group_category_name.should == 'Imported Groups'
+    end
+  end
+
+  it "group_category_name should round trip through the db" do
+    group = Group.create(:group_category_name => "Something")
+    Group.find(group.id).group_category_name.should == "Something"
+  end
+
+  it "as_json should include group_category_name" do
+    group = Group.create(:group_category_name => "Something")
+    hash = ActiveSupport::JSON.decode(group.to_json)
+    hash["group"]["group_category_name"].should == "Something"
   end
 end

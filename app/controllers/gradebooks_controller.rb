@@ -194,7 +194,12 @@ class GradebooksController < ApplicationController
       # which means less AR -> JSON serialization overhead which means less data transfer over the wire and faster request.
       # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
       render :json => @context.assignments.active.gradeable.scoped(
-        :select => ["id", "title", "due_at", "unlock_at", "lock_at", "points_possible", "min_score", "max_score", "mastery_score", "grading_type", "submission_types", "assignment_group_id", "grading_scheme_id", "grading_standard_id", "group_category", "grade_group_students_individually"].join(", ")
+        :select => ["id", "title", "due_at", "unlock_at", "lock_at",
+                    "points_possible", "min_score", "max_score",
+                    "mastery_score", "grading_type", "submission_types",
+                    "assignment_group_id", "grading_scheme_id",
+                    "grading_standard_id", "group_category",
+                    "grade_group_students_individually"].join(", ")
       ) + groups_as_assignments
     elsif params[:students]
       # you need to specify specifically which student fields you want returned to the gradebook via json here

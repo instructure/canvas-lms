@@ -20,7 +20,7 @@ class Group < ActiveRecord::Base
   include Context
   include Workflow
 
-  attr_accessible :name, :context, :max_membership, :category, :join_level, :default_view
+  attr_accessible :name, :context, :max_membership, :group_category_name, :join_level, :default_view
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
@@ -77,13 +77,13 @@ class Group < ActiveRecord::Base
   
   def auto_accept?(user)
     return false unless user
-    (self.category == Group.student_organized_category && self.join_level == 'parent_context_auto_join' && self.context.users.include?(user))
+    (self.group_category_name == Group.student_organized_category && self.join_level == 'parent_context_auto_join' && self.context.users.include?(user))
   end
   
   def allow_join_request?(user)
     return false unless user
-    (self.category == Group.student_organized_category && self.join_level == 'parent_context_auto_join' && self.context.users.include?(user)) ||
-    (self.category == Group.student_organized_category && self.join_level == 'parent_context_request' && self.context.users.include?(user))
+    (self.group_category_name == Group.student_organized_category && self.join_level == 'parent_context_auto_join' && self.context.users.include?(user)) ||
+    (self.group_category_name == Group.student_organized_category && self.join_level == 'parent_context_request' && self.context.users.include?(user))
   end
   
   def participants
@@ -216,8 +216,8 @@ class Group < ActiveRecord::Base
   end
   
   def peer_groups
-    return [] if !self.context || self.category == Group.student_organized_category
-    self.context.groups.find(:all, :conditions => ["category = ? and id != ?", self.category, self.id])
+    return [] if !self.context || self.group_category_name == Group.student_organized_category
+    self.context.groups.for_category(self.group_category_name).find(:all, :conditions => ["id != ?", self.id])
   end
   
   def migrate_content_links(html, from_course)
@@ -248,7 +248,7 @@ class Group < ActiveRecord::Base
   def ensure_defaults
     self.name ||= AutoHandle.generate_securish_uuid
     self.uuid ||= AutoHandle.generate_securish_uuid
-    self.category ||= Group.student_organized_category
+    self.group_category_name ||= Group.student_organized_category
     self.join_level ||= 'invitation_only'
     if self.context && self.context.is_a?(Course)
       self.account = self.context.account if self.context
@@ -364,7 +364,7 @@ class Group < ActiveRecord::Base
     item.name = hash[:title]
     # TODO i18n
     t '#group.default_category', 'Imported Groups'
-    item.category = hash[:group_category] || 'Imported Groups'
+    item.group_category_name = hash[:group_category] || 'Imported Groups'
     
     item.save!
     context.imported_migration_items << item
@@ -373,5 +373,19 @@ class Group < ActiveRecord::Base
 
   def allow_media_comments?
     true
+  end
+
+  def group_category_name
+    self.read_attribute(:category)
+  end
+
+  def group_category_name=(value)
+    self.write_attribute(:category, value)
+  end
+
+  def as_json(options=nil)
+    json = super(options)
+    json['group']['group_category_name'] ||= json['group'].delete('category') if json && json['group']
+    json
   end
 end

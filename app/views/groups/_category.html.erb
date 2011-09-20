@@ -59,7 +59,7 @@
     </div>
   </div>
   <div class="left_side">
-  <% @groups.select{|g| g.category == category}.each do |group| %>
+  <% @groups.select{|g| g.group_category_name == category}.each do |group| %>
     <div class="group" id="group_<%= group.id %>">
       <div class="inner-wrapper">
         <div class="group_user_count">

@@ -172,7 +172,7 @@ window.submissionAttachmentIndex = -1;
       <tr>
         <td colspan="2">
           <%= t :upload_or_choose_file, "Upload a file, or choose a file you've already uploaded." %>
-            <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
+            <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category_name %>
         </td>
       </tr><tr>
         <td><%= blabel :attachment, :uploaded_data, :en => "File" %></td>
@@ -233,7 +233,7 @@ window.submissionAttachmentIndex = -1;
       <tr>
         <td>
         <%= t 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>
-            <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
+            <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category_name %>
         </td>
       </tr><tr>
         <td>
@@ -268,7 +268,7 @@ window.submissionAttachmentIndex = -1;
       <tr>
         <td colspan="2">
           <%= t 'instructions.online_url', "Copy and paste the link to the web site you'd like to submit for this assignment." %>
-            <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
+            <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category_name %>
           </td>
       </tr><tr>
         <td colspan="2">
@@ -329,7 +329,7 @@ window.submissionAttachmentIndex = -1;
           <tr>
             <td style="padding-bottom: 10px;" colspan="2">
               <%= t 'instructions.google_docs', "Select the file from the list below." %>
-              <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
+              <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category_name %>
               </td>
           </tr><tr>
             <td colspan="2">
@@ -442,7 +442,7 @@ window.submissionAttachmentIndex = -1;
           <tr>
             <td colspan="2" style="padding-bottom: 10px;">
               <%= t 'instructions.media_recording', "Use the link below to record your submission.  Click \"Save\" when you're finished and ready to submit." %>
-                <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
+                <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category_name %>
             </td>
           </tr><tr>
             <td>

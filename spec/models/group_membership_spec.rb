@@ -26,6 +26,18 @@ describe GroupMembership do
     @gm.save!
   end
   
+  it "should dispatch a 'new_student_organized_group' message if the first membership in a student organized group" do
+    course_with_teacher
+    student = user_model
+    @course.enroll_student(student)
+    group = @course.groups.create(:group_category_name => 'Student Groups')
+
+    Notification.create(:name => "New Student Organized Group", :category => "TestImmediately")
+    @teacher.communication_channels.create(:path => "test_channel_email_#{@teacher.id}", :path_type => "email").confirm
+
+    group_membership = group.group_memberships.create(:user => student)
+    group_membership.messages_sent.should be_include("New Student Organized Group")
+  end
 end
 
 def group_membership_model(opts={})

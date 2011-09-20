@@ -1542,7 +1542,7 @@ I18n.scoped('gradebook', function(I18n) {
       .find(".submission_comments").empty().end()
       .find(".comment_attachments").empty().end()
       .find(".save_buttons,.add_comment").showIf(!readOnlyGradebook).end()
-      .find(".group_comment").showIf(assignment && assignment.group_category).find(":checkbox").attr('checked', true).end().end();
+      .find(".group_comment").showIf(assignment && assignment.group_category_name).find(":checkbox").attr('checked', true).end().end();
 
     if(readOnlyGradebook) {
       $submission_information.find(".grade_entry").text(grade || "-");

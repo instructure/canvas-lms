@@ -71,7 +71,7 @@ class DiscussionTopic < ActiveRecord::Base
     if self.assignment_id
       self.assignment_id = nil unless (self.assignment && self.assignment.context == self.context) || (self.root_topic && self.root_topic.assignment_id == self.assignment_id)
       self.old_assignment_id = self.assignment_id if self.assignment_id
-      if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.group_category
+      if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.group_category_name
         self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
       end
     end
@@ -88,15 +88,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
   
   def update_subtopics
-    if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.group_category
+    if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.group_category_name
       send_later :refresh_subtopics
     end
   end
   
   def refresh_subtopics
-    category = self.assignment && self.assignment.group_category
-    return unless category && !category.empty? && self.context && self.context.respond_to?(:groups)
-    self.context.groups.active.select{|g| g.category == category }.map do |group|
+    category = self.assignment && self.assignment.group_category_name
+    return unless category && self.context && self.context.respond_to?(:groups)
+    self.context.groups.active.for_category(category).map do |group|
       topic = group.discussion_topics.active.find_or_initialize_by_root_topic_id(self.id)
       topic.message = self.message
       topic.title = "#{self.title} - #{group.name}"
@@ -137,7 +137,7 @@ class DiscussionTopic < ActiveRecord::Base
   def is_announcement; false end
   
   def root_topic?
-    !self.root_topic_id && self.assignment_id && self.assignment.group_category
+    !self.root_topic_id && self.assignment_id && self.assignment.group_category_name
   end
   
   def discussion_subentries
@@ -149,11 +149,11 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def for_assignment?
-    self.assignment && self.assignment.submission_types = 'discussion_topic'
+    self.assignment && self.assignment.submission_types =~ /discussion_topic/
   end
   
   def for_group_assignment?
-    self.for_assignment? && self.context == self.assignment.context && self.assignment.group_category
+    self.for_assignment? && self.context == self.assignment.context && self.assignment.group_category_name
   end
   
   def plaintext_message=(val)
@@ -221,7 +221,7 @@ class DiscussionTopic < ActiveRecord::Base
       false
     elsif self.cloned_item_id
       false
-    elsif self.assignment && self.root_topic_id && self.assignment.group_category && !self.assignment.group_category.empty?
+    elsif self.assignment && self.root_topic_id && self.assignment.group_category_name
       false
     elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now)
       false
