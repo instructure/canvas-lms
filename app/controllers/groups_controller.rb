@@ -152,7 +152,7 @@ class GroupsController < ApplicationController
   def create
     @group = @context.groups.build(params[:group])
     if authorized_action(@group, @current_user, :create)
-      @group.group_category_name = Group.student_organized_category unless @context.grants_right?(@current_user, session, :manage_groups)
+      @group.group_category_name = nil unless @context.grants_right?(@current_user, session, :manage_groups)
       respond_to do |format|
         if @group.save
           if !@context.grants_right?(@current_user, session, :manage_groups)

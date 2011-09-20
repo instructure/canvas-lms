@@ -1,8 +1,9 @@
-<div id="<%= category ? category.unpack('H*') : "category_template" %>" class="group_category <%= 'student_organized' if category == Group.student_organized_category %>">
+<% student_organized = (category == Group.student_organized_category) %>
+<div id="<%= category ? category.unpack('H*') : "category_template" %>" class="group_category <%= 'student_organized' if student_organized %>">
   <div class="category_header">
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><%= image_tag "add.png" %></a>
-      <% if category != Group.student_organized_category %>
+      <% unless student_organized %>
         <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_name => category || "{{ category_name }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
       <% end %>
     </div>
@@ -15,7 +16,7 @@
       </div>
       <span class="group_count"></span>
       <span style="color: #888;"> &nbsp; &nbsp; <%= t 'instructions.group_assignment', "drag students to assign to groups" %></span>
-      <% if category == Group.student_organized_category %>
+      <% if student_organized %>
         <div style="color: #444;"><%= image_tag "warning.png" %> <%= t 'warnings.studend_groups', "These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments." %></div>
       <% end %>
     </div>
@@ -36,12 +37,12 @@
           <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="delete_group_link no-hover"><%= image_tag "delete.png" %></a>
         </div>
         <h3 style="display: none;" class="group_name"><a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" target="_blank" class="name"><%= t :group_name, "Name" %></a></h3>
-        <% if category == Group.student_organized_category %>
+        <% if student_organized %>
           <h3 class="name blank_name"><%= t :group_category_all, "Everyone" %></h3>
         <% else %>
           <h3 class="name blank_name"><%= t :group_category_unassigned, "Unassigned" %></h3>
         <% end %>
-        <% unless @context.is_a?(Account) || category == Group.student_organized_category %>
+        <% unless @context.is_a?(Account) || student_organized %>
           <a href="#" class="assign_students_link no-hover" title="<%= t :random_distribution_explanation, "Distribute Unassigned Students Equally Among Groups" %>"><%= t :randomly_distribute_students, "randomly assign students" %></a>
         <% end %>
         <div style="display: none;">

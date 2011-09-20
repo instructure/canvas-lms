@@ -189,7 +189,7 @@
             <label for="assignment_group_category_select"><%= before_label :group_set, "Group Set" %></label>
             <select id="assignment_group_category_select" name="assignment[group_category_name]">
               <option value=""><%= t 'options.select_group_set', "[ Select Group Set ]" %></option>
-              <% @context.groups.active.select{|g| g.group_category_name && g.group_category_name != Group.student_organized_category }.map{|g| g.group_category_name }.uniq.each do |category| %>
+              <% @context.groups.active.select{|g| g.group_category_name && !g.student_organized? }.map{|g| g.group_category_name }.uniq.each do |category| %>
                 <option value="<%= category %>" <%= 'selected' if @assignment && category == @assignment.group_category_name %>><%= category %></option>
               <% end %>
               <option value="new"><%= t 'options.new_group_set', "[ New Group Set ]" %></option>

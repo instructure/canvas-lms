@@ -77,13 +77,14 @@ class Group < ActiveRecord::Base
   
   def auto_accept?(user)
     return false unless user
-    (self.group_category_name == Group.student_organized_category && self.join_level == 'parent_context_auto_join' && self.context.users.include?(user))
+    self.student_organized? && self.context.users.include?(user) &&
+    self.join_level == 'parent_context_auto_join'
   end
   
   def allow_join_request?(user)
     return false unless user
-    (self.group_category_name == Group.student_organized_category && self.join_level == 'parent_context_auto_join' && self.context.users.include?(user)) ||
-    (self.group_category_name == Group.student_organized_category && self.join_level == 'parent_context_request' && self.context.users.include?(user))
+    self.student_organized? && self.context.users.include?(user) &&
+    ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
   
   def participants
@@ -216,7 +217,7 @@ class Group < ActiveRecord::Base
   end
   
   def peer_groups
-    return [] if !self.context || self.group_category_name == Group.student_organized_category
+    return [] if !self.context || self.student_organized?
     self.context.groups.for_category(self.group_category_name).find(:all, :conditions => ["id != ?", self.id])
   end
   
@@ -245,6 +246,10 @@ class Group < ActiveRecord::Base
     "Student Groups"
   end
   
+  def student_organized?
+    self.group_category_name == Group.student_organized_category
+  end
+
   def ensure_defaults
     self.name ||= AutoHandle.generate_securish_uuid
     self.uuid ||= AutoHandle.generate_securish_uuid

@@ -63,7 +63,7 @@ class GroupMembership < ActiveRecord::Base
       record.group.context.is_a?(Course) && 
       record.just_created &&
       record.group.group_memberships.count == 1 &&
-      record.group.group_category_name == Group.student_organized_category
+      record.group.student_organized?
     }
   end
   
