@@ -30,7 +30,6 @@ class Account < ActiveRecord::Base
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_many :groups, :as => :context
-  has_many :account_groups, :as => :context, :class_name => 'Group', :foreign_key => 'account_id', :conditions => ['groups.context_type = ? and groups.context_id = #{id}', 'Account']
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']

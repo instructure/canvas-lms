@@ -34,17 +34,12 @@ class GroupsController < ApplicationController
     category = params[:category]
     page = (params[:page] || 1).to_i rescue 1
     users = []
-    if @context.is_a?(Account)
-      groups = @context.account_groups.active.for_category(category)
-      users = @context.paginate_users_not_in_groups(groups, page)
+    if !@context.is_a?(Account) && category == Group.student_organized_category
+      groups = []
     else
-      if category == Group.student_organized_category
-        groups = []
-      else
-        groups = @context.groups.active.for_category(category)
-      end      
-      users = @context.paginate_users_not_in_groups(groups, page)
+      groups = @context.groups.active.for_category(category)
     end
+    users = @context.paginate_users_not_in_groups(groups, page)
     
     if authorized_action(@context, @current_user, :manage)
       respond_to do |format|
@@ -127,8 +122,7 @@ class GroupsController < ApplicationController
   
   def delete_category
     if authorized_action(@context, @current_user, :manage_groups)
-      groups = @context.is_a?(Account) ? @context.account_groups.active : @context.groups.active
-      groups.for_category(params[:category_name]).each do |group|
+      @context.groups.active.for_category(params[:category_name]).each do |group|
         group.destroy
       end
       render :json => {:deleted => true}
@@ -262,7 +256,7 @@ class GroupsController < ApplicationController
     add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
     add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
     @active_tab = @context.is_a?(Account) ? "users" : "people"
-    @groups = @context.is_a?(Account) ? @context.account_groups.active : @context.groups.active
+    @groups = @context.groups.active
     @categories = @groups.map{|g| g.group_category_name}.uniq
     group_ids = @groups.map(&:id)
 
