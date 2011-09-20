@@ -61,10 +61,7 @@ $kyle-menu-border-radius: 10px;
   z-index: 9999;
   @include border-radius($kyle-menu-border-radius);
   @include box-shadow(rgba(0,0,0,0.4), 0px, 2px, 4px, -1px);
-
-  opacity: 0;
   &.ui-state-open{
-    opacity:1;
     -webkit-animation-duration:.5s;
     -webkit-animation-name:kylemenu-bounce;
     /* webkit-transform-origin-x will be set in js and will match the carat position */

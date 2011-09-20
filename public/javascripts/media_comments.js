@@ -102,33 +102,37 @@ I18n.scoped('media_comments', function(I18n) {
         showInline(id);
       }
     } else if(command == 'show') {
-      var width = this.width();
-      var flashVars = {};
-      var params = {
-        allowScriptAccess: 'always',
-        allowNetworking: 'all',
-        allowFullScreen: true,
-        bgcolor: "#000000"
-      };
-      var url = "/media_objects/" + id + "/redirect";
-      var $dialog = $("#media_comment_player_dialog");
-      if($dialog.length === 0) {
-        $dialog = $("<div id='media_comment_player_dialog'/>");
-        $("body").append($dialog);
+      var flashVars = {},
+          params = {
+            allowScriptAccess: 'always',
+            allowNetworking: 'all',
+            allowFullScreen: true,
+            bgcolor: "#000000",
+            wmode: 'opaque'
+          },
+          url = "/media_objects/" + id + "/redirect",
+          $dialog = $("#media_comment_player_dialog");
+
+      if (!$dialog.length) {
+        $dialog = $("<div id='media_comment_player_dialog'/>").appendTo('body');
       }
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
-        title: I18n.t('titles.play_comment', "Play Media Comment"),
-        width: 575,
-        height: 493,
-        modal: true,
-        draggable: false,
-        wmode: 'opaque'
-      }).dialog('open');
-      $dialog.empty();
-      $dialog.append("<div id='media_comment_play'/>");
-      $dialog.find("#media_comment_play").html(flashRequiredMessage);
-      swfobject.embedSWF(url, 'media_comment_play', "550", "448", "9.0.0", false, flashVars, params);
+
+      $dialog
+        .dialog('close')
+        .dialog({
+          autoOpen: false,
+          title: I18n.t('titles.play_comment', "Play Media Comment"),
+          width: 575,
+          height: 493,
+          modal: true,
+          draggable: false
+        })
+        .dialog('open')
+        .empty()
+        .css({padding: 0, overflow: 'hidden'})//get rid of scrollbars and whitespace, have to do oveflow:hidden because the swf <object> is display:inline not display:block
+        .append($('<div id="media_comment_play" />').html(flashRequiredMessage));
+
+      swfobject.embedSWF(url, 'media_comment_play', "100%", "100%", "9.0.0", false, flashVars, params);
     }
     return this;
   };

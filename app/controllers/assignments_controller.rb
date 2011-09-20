@@ -209,7 +209,7 @@ class AssignmentsController < ApplicationController
       redirect_to(args)
       return
     end
-    @assignment ||= @context.assignments.build
+    @assignment ||= Assignment.new(:context => @context)
     if params[:model_key] && session["assignment_#{params[:model_key]}"].present?
       @assignment = @context.assignments.find_by_id(session["assignment_#{params[:model_key]}"])
     else

@@ -47,7 +47,7 @@ class Account < ActiveRecord::Base
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :course_account_associations
-  has_many :associated_courses, :through => :course_account_associations, :source => :course
+  has_many :associated_courses, :through => :course_account_associations, :source => :course, :select => 'DISTINCT courses.*'
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted'], :order => 'attachments.display_name'
@@ -85,6 +85,7 @@ class Account < ActiveRecord::Base
   has_many :account_notifications
   has_many :alerts, :as => :context, :include => :criteria
   has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
+  has_many :user_account_associations
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -691,14 +692,10 @@ class Account < ActiveRecord::Base
   end
 
   def self.site_admin
-    # TODO i18n
-    t '#account.default_site_administrator_account_name', 'Site Admin'
     get_special_account('site_admin', 'Site Admin')
   end
 
   def self.default
-    # TODO i18n
-    t '#account.default_account_name', 'Default Account'
     get_special_account('default', 'Default Account')
   end
 
@@ -720,6 +717,9 @@ class Account < ActiveRecord::Base
       account = Account.find_by_id(account_id)
     end
     return @special_accounts[special_account_type] = account if account
+    # TODO i18n
+    t '#account.default_site_administrator_account_name', 'Site Admin'
+    t '#account.default_account_name', 'Default Account'
     account = Account.create!(:name => default_account_name)
     Setting.set("#{special_account_type}_account_id", account.id)
     return @special_accounts[special_account_type] = account
@@ -737,7 +737,7 @@ class Account < ActiveRecord::Base
   def update_account_associations
     account_chain_cache = {}
     all_user_ids = []
-    all_user_ids += Course.update_account_associations(self.associated_courses.uniq, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+    all_user_ids += Course.update_account_associations(self.associated_courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
 
     # Make sure we have all users with existing account associations.
     # (This should catch users with Pseudonyms associated with the account.)
@@ -784,7 +784,12 @@ class Account < ActiveRecord::Base
     self.sub_accounts.active.count
   end
   memoize :sub_account_count
-  
+
+  def user_count
+    self.user_account_associations.count
+  end
+  memoize :user_count
+
   def current_sis_batch
     if (current_sis_batch_id = self.read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
       self.sis_batches.find_by_id(current_sis_batch_id)
@@ -843,13 +848,13 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
       tabs = []
-      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
     else
       tabs = []
       tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, nil, :read_course_list)
       tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
       tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, nil, :view_statistics)
-      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
       if user && self.grants_right?(user, nil, :manage_outcomes)
         tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :css_class => 'outcomes', :href => :account_outcomes_path }
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
@@ -868,6 +873,10 @@ class Account < ActiveRecord::Base
 
   def is_a_context?
     true
+  end
+  
+  def custom_feedback_links
+    []
   end
   
   def self.allowable_services
@@ -930,10 +939,10 @@ class Account < ActiveRecord::Base
     allowed_service_names = (self.allowed_services || "").split(",").compact
     if allowed_service_names.count > 0 and not [ '+', '-' ].member?(allowed_service_names[0][0,1])
       # This account has a hard-coded list of services, so handle accordingly
-      allowed_service_names.reject! { |flag| flag.match(service.to_s) }
+      allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
       allowed_service_names << service if enable
     else
-      allowed_service_names.reject! { |flag| flag.match(service.to_s) }
+      allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
       if enable
         # only enable if it is not enabled by default
         allowed_service_names << "+#{service}" unless Account.default_allowable_services[service]

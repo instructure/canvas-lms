@@ -1,7 +1,7 @@
 <% 
   content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
-  jammit_css :course_details
-  jammit_js :course_details
+  jammit_css :course_settings
+  jammit_js :course_settings
   @active_tab = "settings"
 
   enrollment_hashes  = {} 
@@ -40,10 +40,12 @@
         <% form_tag context_url(@context, :context_unconclude_url) do %>
           <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %><%= t('buttons.unconclude', %{Un-Conclude Course}) %></button>
         <% end %>
-        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'delete') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.delete', %{Permanently Delete this Course}) %></a>
       <% else %>
         <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.conclude', %{End this Course}) %></a>
       <% end %>
+    <% end %>
+    <% if can_do(@context, @current_user, :delete) && !@context.deleted? %>
+      <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'delete') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.delete', %{Permanently Delete this Course}) %></a>
     <% end %>
     <% if show_user_create_course_button(@current_user) && can_do(@context, @current_user, :read) %>
       <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>

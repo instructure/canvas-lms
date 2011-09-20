@@ -98,7 +98,7 @@ class Attachment < ActiveRecord::Base
   def build_media_object
     return true if self.class.skip_media_object_creation?
     if self.content_type && self.content_type.match(/\A(video|audio)/)
-      MediaObject.send_later(:add_media_files, self, false)
+      MediaObject.send_later_enqueue_args(:add_media_files, {:locked_by => 'on hold', :locked_at => Time.zone.now, :attempts => Delayed::Job::ON_HOLD_COUNT}, self, false)
     end
   end
 
@@ -925,7 +925,7 @@ class Attachment < ActiveRecord::Base
     self.file_state = 'deleted' #destroy
     self.deleted_at = Time.now
     ContentTag.delete_for(self)
-    MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:attachment_id => self.id}) if self.id && delete_media_object
+    MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:attachment_id => self.id}) if self.id && delete_media_object
     save!
   end
   
@@ -1021,9 +1021,9 @@ class Attachment < ActiveRecord::Base
     self.submit_to_scribd!
   end
   
-  # Should be one of :processing, :displayable, :done, :error.  :done
-  # should mean indexed, :displayable is good enough for showing a user
-  # the iPaper.  I added a state, :not_submitted, for any attachment that
+  # Should be one of "PROCESSING", "DISPLAYABLE", "DONE", "ERROR".  "DONE"
+  # should mean indexed, "DISPLAYABLE" is good enough for showing a user
+  # the iPaper.  I added a state, "NOT SUBMITTED", for any attachment that
   # hasn't been submitted, regardless of whether it should be.  As long as
   # we go through the submit_to_scribd! gateway, we'll be fine.
   def conversion_status

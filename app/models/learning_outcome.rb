@@ -172,7 +172,7 @@ class LearningOutcome < ActiveRecord::Base
     ids.each do |id|
       to_delete << id unless tags.any?{|t| t.content_id == id }
     end
-    LearningOutcome.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => to_delete})
+    LearningOutcome.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => to_delete})
   end
   
   def self.enabled?

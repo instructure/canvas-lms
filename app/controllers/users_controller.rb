@@ -61,8 +61,18 @@ class UsersController < ApplicationController
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
-      @current_enrollments = @user.current_enrollments.scoped(:include => :course)
-      
+      @current_active_enrollments = @user.current_enrollments.scoped(:include => :course)
+      @prior_enrollments = []; @current_enrollments = []
+      @current_active_enrollments.each do |e|
+        case e.state_based_on_date
+        when :active
+          @current_enrollments << e
+        when :completed
+          #@prior_enrollments << e
+        end
+      end
+      #@prior_enrollments.concat @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
+
       @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
       
       @observer_enrollments = @current_enrollments.select{|e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
@@ -71,16 +81,15 @@ class UsersController < ApplicationController
         @observed_enrollments << StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
       end
       @observed_enrollments = @observed_enrollments.uniq.compact
-      Enrollment.send(:preload_associations, @observed_enrollments, :course)
-      
-      if @current_enrollments.length + @observed_enrollments.length == 1
+
+      if @current_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
         redirect_to course_grades_url(@current_enrollments.first.course_id)
         return
       end
-      
+      Enrollment.send(:preload_associations, @observed_enrollments, :course)
+
       @teacher_enrollments = @current_enrollments.select{|e| e.admin? }
-      @prior_enrollments = @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
-      Enrollment.send(:preload_associations, @prior_enrollments, :course)
+      #Enrollment.send(:preload_associations, @prior_enrollments, :course)
       @course_grade_summaries = {}
       @teacher_enrollments.each do |enrollment|
         @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', enrollment.course].cache_key) do
@@ -240,7 +249,7 @@ class UsersController < ApplicationController
   #     'id': 1234,
   #     'title': 'Stream Item Subject',
   #     'message': 'This is the body text of the activity stream item. It is plain-text, and can be multiple paragraphs.',
-  #     'type': 'DiscussionTopic|ContextMessage|Message|Submission|Conference|Collaboration|...'
+  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...'
   #   }
   #
   # In addition, each item type has its own set of attributes available.
@@ -269,18 +278,14 @@ class UsersController < ApplicationController
   #   }
   # For Announcement, the message is truncated at 4kb.
   #
-  # ContextMessage:
+  # Conversation:
   #
   #   {
-  #     'type': 'ContextMessage',
-  #     'context_message_id': 1234,
-  #     'sender': {
-  #       'user_id': 5678,
-  #       'user_name': 'joe user'
-  #     },
-  #     'recipients_count': 1
+  #     'type': 'Conversation',
+  #     'conversation_id': 1234,
+  #     'private': false,
+  #     'participant_count': 3,
   #   }
-  # For ContextMessage, the message is truncated at 4kb.
   #
   # Message:
   #
@@ -317,7 +322,11 @@ class UsersController < ApplicationController
   #     'collaboration_id': 1234
   #   }
   def activity_stream
-    render :json => @current_user.stream_items.map { |i| stream_item_json(i) }
+    if @current_user
+      render :json => @current_user.stream_items.map { |i| stream_item_json(i) }
+    else
+      render_unauthorized_action
+    end
   end
 
   def manageable_courses

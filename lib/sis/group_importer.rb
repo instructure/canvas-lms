@@ -25,7 +25,7 @@ module SIS
 
     def verify(csv, verify)
       group_ids = (verify[:group_ids] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         group_id = row['group_id']
         add_error(csv, "Duplicate group id #{group_id}") if group_ids[group_id]
         group_ids[group_id] = true
@@ -39,7 +39,7 @@ module SIS
       start = Time.now
       accounts_cache = {}
 
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         update_progress
         logger.debug("Processing Group #{row.inspect}")
 

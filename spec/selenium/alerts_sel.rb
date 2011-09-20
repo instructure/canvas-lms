@@ -14,41 +14,65 @@ describe "Alerts" do
   it "should be able to create, then update, then delete" do
     get "/accounts/#{@context.id}/settings"
 
+    @alerts.length.should == 0
+
     driver.find_element(:css, '#tab-alerts-link').click
     driver.find_element(:css, '.add_alert_link').click
+    wait_for_animations
     alert = driver.find_element(:css, '.alert.new')
     (add_criterion = alert.find_element(:css, '.add_criterion_link')).click
+    wait_for_animations
     alert.find_element(:css, '.add_recipient_link').click
+    wait_for_animations
     (submit = alert.find_element(:css, '.submit_button')).click
-    keep_trying_until { alert.attribute(:class) !~ /editing/ }
+    wait_for_animations
+    wait_for_ajax_requests
 
-    @alerts.should_not be_empty
+    keep_trying_until{
+      @alerts.reload
+      @alerts.length.should == 1
+    }
     @alerts.first.criteria.length.should == 1
 
+    wait_for_animations
     (edit = alert.find_element(:css, '.edit_link')).click
     add_criterion.click
+    wait_for_animations
     submit.click
-    keep_trying_until { alert.attribute(:class) !~ /editing/ }
+    wait_for_animations
+    wait_for_ajax_requests
 
+    keep_trying_until{
+      @alerts.first.criteria.reload
+      @alerts.first.criteria.length.should == 2
+    }
     @alerts.reload
-    @alerts.should_not be_empty
-    @alerts.first.criteria.length.should == 2
+    @alerts.length.should == 1
 
+    wait_for_animations
     edit.click
     alert.find_element(:css, '.criteria .delete_item_link').click
+    wait_for_animations
     keep_trying_until { find_all_with_jquery('.alert .criteria li').length == 1 }
     submit.click
-    keep_trying_until { alert.attribute(:class) !~ /editing/ }
 
+    keep_trying_until{
+      @alerts.first.criteria.reload
+      @alerts.first.criteria.length.should == 1
+    }
     @alerts.reload
-    @alerts.should_not be_empty
-    @alerts.first.criteria.length.should == 1
+    @alerts.length.should == 1
 
-    alert.find_element(:css, '.delete_link').click
-    keep_trying_until { find_with_jquery('.alert:visible').blank? }
+    wait_for_animations
+    alert.find_element(:css, '.delete_link img').click
 
-    @alerts.reload
-    @alerts.should be_empty
+    wait_for_animations
+    keep_trying_until{ find_with_jquery('.alert:visible').should be_blank }
+
+    keep_trying_until{
+      @alerts.reload
+      @alerts.length.should == 0
+    }
   end
 
   it "should delete alerts" do
@@ -82,6 +106,7 @@ describe "Alerts" do
     driver.find_element(:css, '.add_alert_link').click
     alert = driver.find_element(:css, '.alert.new')
     alert.find_element(:css, '.cancel_button').click
+    wait_for_animations
     keep_trying_until { find_with_jquery(".alert.new").blank? }
 
     @alerts.should be_empty

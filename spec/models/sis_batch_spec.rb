@@ -23,7 +23,7 @@ describe SisBatch do
     account_model
   end
 
-  def process_csv_data(data, opts = {})
+  def create_csv_data(data)
     i = 0
     tempfile = Tempfile.new(["sis_rspec", ".zip"])
     path = tempfile.path
@@ -39,11 +39,23 @@ describe SisBatch do
     # arrrgh attachment.rb
     def tmp.original_filename; File.basename(path); end
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', tmp)
-    batch.update_attributes(opts) if opts.present?
-    batch.process_without_send_later
-    batch
+    yield batch
   ensure
     FileUtils.rm(path) if path and File.file?(path)
+  end
+
+  def process_csv_data(data, opts = {})
+    create_csv_data(data) do |batch|
+      batch.update_attributes(opts) if opts.present?
+      batch.process_without_send_later
+      batch
+    end
+  end
+
+  it "should always set attachments to position 0" do
+    create_csv_data('abc') { |batch| batch.attachment.position.should == 0}
+    create_csv_data('abc') { |batch| batch.attachment.position.should == 0}
+    create_csv_data('abc') { |batch| batch.attachment.position.should == 0}
   end
 
   describe "batch mode" do

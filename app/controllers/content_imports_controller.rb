@@ -156,45 +156,42 @@ class ContentImportsController < ApplicationController
           format.html { render :action => 'copy_course_content' }
         end
       else
-        if request.format != :json
-          @possible_courses = @current_user.manageable_courses - [@context]
-          course_id = params[:copy] && params[:copy][:course_id].to_i
-          course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
-          @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id
-          if !@copy_context
-            @copy_context ||= Course.find_by_id(course_id) if course_id.present?
-            @copy_context = nil if @copy_context && !@copy_context.grants_rights?(@current_user, session, :manage)
-          end
+        @possible_courses = @current_user.manageable_courses.scoped(:include => :enrollment_term) - [@context]
+        course_id = params[:copy] && params[:copy][:course_id].to_i
+        course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
+        @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id
+        if !@copy_context
+          @copy_context ||= Course.find_by_id(course_id) if course_id.present?
+          @copy_context = nil if @copy_context && !@copy_context.grants_rights?(@current_user, session, :manage)
         end
-        @running_import = CourseImport.for_course(@context, 'instructure_copy').first
         respond_to do |format|
           format.html
-          format.json { render :json => @running_import.to_json }
         end
+      end
+    end
+  end
+  
+  def copy_course_status
+    if authorized_action(@context, @current_user, :manage_content)
+      import = @context.course_imports.find(params[:id])
+      respond_to do |format|
+        format.json { render :json => import.to_json }
       end
     end
   end
   
   def copy_course_content
     if authorized_action(@context, @current_user, :manage_content)
-      @copy_context = Course.find(params[:copy][:course_id]) #@current_user.available_courses.find(params[:copy][:course_id])
+      @copy_context = Course.find(params[:copy][:course_id]) # permissions on this course are verified below
       return render_unauthorized_action unless @copy_context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
-      @import = CourseImport.create!(:import_type => "instructure_copy", :source => @copy_context, :course => @context)
-      params[:copy][:import] = @import
-      @copies = []
-      begin
-        @copies = @context.merge_in(@copy_context, params[:copy])
-      rescue => e
-        @import.workflow_state = 'failed'
-        @import.log = {
-          :message => e.to_s,
-          :backtrace => e.backtrace.join("\n")
-        }
-        @import.save
-      end
-      @results = @context.merge_results || []
+      @import = CourseImport.create!(:import_type => "instructure_copy", :source => @copy_context, :course => @context, :parameters => params[:copy])
+      @import.perform_later
       respond_to do |format|
-        format.html
+        format.json {
+          info = @import.as_json
+          info['course_import']['check_url'] = named_context_url(@context, :context_import_copy_status_url, :id => @import.id)
+          render :json => info.to_json
+        }
       end
     end
   end

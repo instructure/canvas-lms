@@ -246,7 +246,7 @@ class I18nJsExtractor
   HASH_KEY = /['"]?(\w+)['"]?\s*:/
 
   INTERPOLATION_KEY = /%\{([^\}]+)\}|\{\{([^\}]+)\}\}/
-  CORE_KEY = /\A(number|time|date|datetime)\./
+  CORE_KEY = /\A(number|time|date|datetime|support)\./
 
   STRING_LITERAL = /'((\\'|[^'])*)'|"((\\"|[^"])*)"/m
   STRING_CONCATENATION = /(#{STRING_LITERAL})(\s*\+\s*(#{STRING_LITERAL})\s*)*/m

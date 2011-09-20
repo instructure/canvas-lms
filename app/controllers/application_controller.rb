@@ -20,16 +20,15 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  
+
   attr_accessor :active_tab
-  
+
   include LocaleSelection
   around_filter :set_locale
 
-  add_crumb(lambda { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
   helper :all
   filter_parameter_logging :password
-  
+
   include AuthenticationMethods
   protect_from_forgery
   before_filter :load_account, :load_user
@@ -42,8 +41,10 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes_and_active_tab
 
+  add_crumb(lambda { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
+
   protected
-  
+
   def set_locale
     I18n.localizer = lambda {
       infer_locale :context => @context,
@@ -82,7 +83,13 @@ class ApplicationController < ActionController::Base
   # retrieves the root account for the given domain
   def load_account
     @domain_root_account = request.env['canvas.domain_root_account'] || Account.default
-    @files_domain = request.host != HostUrl.context_host(@domain_root_account) && request.host == HostUrl.file_host(@domain_root_account)
+    @files_domain = request.host_with_port != HostUrl.context_host(@domain_root_account) && HostUrl.is_file_host?(request.host_with_port)
+    # we can't block frames on the files domain, since files domain requests
+    # are typically embedded in an iframe in canvas, but the hostname is
+    # different
+    if !@files_domain && Setting.get_cached('block_html_frames', 'false') == 'true'
+      response['X-Frame-Options'] = 'SAMEORIGIN'
+    end
     @domain_root_account
   end
 
@@ -301,14 +308,14 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.courses.active
+      courses = @context.current_enrollments.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
       groups = include_groups ? @context.groups.active : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        courses = course_ids.empty? ? [] : courses.find_all_by_id(course_ids)
+        courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
         group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
         groups = group_ids.empty? ? [] : groups.find_all_by_id(group_ids) if include_groups
       end
@@ -1003,7 +1010,7 @@ class ApplicationController < ActionController::Base
   helper_method :user_content
 
   def find_bank(id, check_context_chain=true)
-    bank = @context.assessment_question_banks.active.find_by_id(id)
+    bank = @context.assessment_question_banks.active.find_by_id(id) || @current_user.assessment_question_banks.active.find_by_id(id)
     if bank
       (block_given? ?
         authorized_action(bank, @current_user, :read) :

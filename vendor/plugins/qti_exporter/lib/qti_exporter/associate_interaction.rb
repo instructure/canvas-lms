@@ -119,6 +119,14 @@ class AssociateInteraction < AssessmentItemConverter
         end
       end
     end
+    all_matches = @doc.css('simpleChoice p, simpleChoice div').map { |e| clear_html(e.text) }
+    distractors = all_matches.delete_if { |m| @question[:matches].any? { |qm| qm[:text] == m } }
+    distractors.uniq.each do |distractor|
+      @question[:matches] << {
+        :text => distractor,
+        :match_id => unique_local_id,
+      }
+    end
   end
 
   def get_all_matches_from_body

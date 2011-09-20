@@ -65,7 +65,7 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
-    ContentTag.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:context_module_id => self.id})
+    ContentTag.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:context_module_id => self.id})
     self.send_later_if_production(:update_downstreams, self.position)
     save!
     true

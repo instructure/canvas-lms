@@ -41,7 +41,7 @@ class QuizQuestion < ActiveRecord::Base
   protected :infer_defaults
   
   def update_quiz
-    Quiz.update_all({:last_edited_at => Time.now}, {:id => self.quiz_id})
+    Quiz.update_all({:last_edited_at => Time.now.utc}, {:id => self.quiz_id})
   end
   
   def question_data=(data)

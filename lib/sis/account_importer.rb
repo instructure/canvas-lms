@@ -27,7 +27,7 @@ module SIS
     
     def verify(csv, verify)
       account_ids = (verify[:account_ids] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         account_id = row['account_id']
         add_error(csv, "Duplicate account id #{account_id}") if account_ids[account_id]
         account_ids[account_id] = true
@@ -41,7 +41,7 @@ module SIS
       start = Time.now
       accounts_cache = {}
       Account.skip_callback(:update_account_associations_if_changed) do
-        FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+        csv_rows(csv) do |row|
           update_progress
           logger.debug("Processing Account #{row.inspect}")
 

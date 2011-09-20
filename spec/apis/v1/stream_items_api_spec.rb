@@ -23,6 +23,18 @@ describe UsersController, :type => :integration do
     course_with_student(:active_all => true)
   end
 
+  it "should check for auth" do
+    get("/api/v1/users/activity_stream")
+    response.status.should == '401 Unauthorized'
+    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+
+    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    raw_api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream",
+                :controller => "courses", :action => "activity_stream", :format => "json", :course_id => @course.to_param)
+    response.status.should == '401 Unauthorized'
+    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+  end
+
   it "should return the activity stream" do
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
@@ -45,6 +57,7 @@ describe UsersController, :type => :integration do
       'title' => "value for title",
       'message' => 'value for message',
       'type' => 'DiscussionTopic',
+      'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
@@ -71,6 +84,7 @@ describe UsersController, :type => :integration do
       'title' => "value for title",
       'message' => 'value for message',
       'type' => 'Announcement',
+      'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
@@ -96,6 +110,7 @@ describe UsersController, :type => :integration do
       'id' => StreamItem.last.id,
       'conversation_id' => @conversation.id,
       'type' => 'Conversation',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'title' => nil,
@@ -129,14 +144,16 @@ describe UsersController, :type => :integration do
       'title' => "value for subject",
       'message' => 'value for body',
       'type' => 'Message',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
       'notification_category' => 'TestImmediately',
+      'url' => nil,
     }]
   end
 
-  it "should format Submission" do
+  it "should format graded Submission with comments" do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
@@ -152,6 +169,7 @@ describe UsersController, :type => :integration do
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
@@ -162,6 +180,59 @@ describe UsersController, :type => :integration do
         'id' => @assignment.id,
         'points_possible' => 14.2,
       },
+      
+      'submission_comments' => [{
+        'body' => '<p>c1</p>',
+        'user_name' => 'teacher',
+        'user_id' => @teacher.id,
+      },
+      {
+        'body' => '<p>c2</p>',
+        'user_name' => 'User',
+        'user_id' => @user.id,
+      },],
+      'course_id' => @course.id,
+    }]
+  end
+  
+  it "should format ungraded Submission with comments" do
+    @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
+    @teacher = User.create!(:name => 'teacher')
+    @course.enroll_teacher(@teacher)
+    @sub = @assignment.grade_student(@user, { :grade => nil }).first
+    @sub.workflow_state = 'submitted'
+    @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @user.id)
+    @sub.submission_comments.create!(:comment => 'c2', :author => @user, :recipient_id => @teacher.id)
+    @sub.save!
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == [{
+      'id' => StreamItem.last.id,
+      'title' => "assignment 1",
+      'message' => nil,
+      'type' => 'Submission',
+      'context_type' => nil,
+      'created_at' => StreamItem.last.created_at.as_json,
+      'updated_at' => StreamItem.last.updated_at.as_json,
+      'grade' => nil,
+      'score' => nil,
+
+      'assignment' => {
+        'title' => 'assignment 1',
+        'id' => @assignment.id,
+        'points_possible' => 14.2,
+      },
+      
+      'submission_comments' => [{
+        'body' => '<p>c1</p>',
+        'user_name' => 'teacher',
+        'user_id' => @teacher.id,
+      },
+      {
+        'body' => '<p>c2</p>',
+        'user_name' => 'User',
+        'user_id' => @user.id,
+      },],
       'course_id' => @course.id,
     }]
   end
@@ -176,6 +247,7 @@ describe UsersController, :type => :integration do
       'title' => "hey",
       'message' => nil,
       'type' => 'Collaboration',
+      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
     }]
@@ -196,6 +268,7 @@ describe UsersController, :type => :integration do
         'web_conference_id' => @conference.id,
         'title' => "myconf",
         'type' => 'WebConference',
+        'context_type' => nil,
         'message' => 'mydesc',
         'created_at' => StreamItem.last.created_at.as_json,
         'updated_at' => StreamItem.last.updated_at.as_json,

@@ -30,16 +30,25 @@ describe "context_modules selenium tests" do
     content_tag_2 = make_content_tag.call a2
 
     get "/courses/#{@course.id}/modules"
-    driver.execute_script("
-      $('#context_module_#{m.id}').find('.edit_module_link').click();
-      $('.add_completion_criterion_link:visible').click();
-      $('.assignment_picker').val(#{content_tag_1.id});
-      $('.assignment_requirement_picker').val('min_score').change();
-      return $('.points_possible_parent:visible').length; ").should > 0
-    driver.execute_script("
-      $('.assignment_picker').val(#{content_tag_2.id});
-      $('.assignment_requirement_picker').val('min_score').change();
-      return $('.points_possible_parent:visible').length; ").should == 0
 
+    keep_trying_until {
+      edit_link = driver.find_element(:css, '.edit_module_link')
+      driver.action.move_to(edit_link).click(edit_link).perform
+      wait_for_ajax_requests
+      driver.find_element(:id, 'add_context_module_form').should be_displayed
+    }
+    assignment_picker = keep_trying_until { 
+      driver.find_element(:css, '.add_completion_criterion_link').click
+      find_with_jquery('.assignment_picker:visible')
+    }
+
+    assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
+    requirement_picker = find_with_jquery('.assignment_requirement_picker:visible')
+    requirement_picker.find_element(:css, 'option[value="min_score"]').click
+    driver.execute_script('return $(".points_possible_parent:visible").length').should > 0
+
+    assignment_picker.find_element(:css, "option[value='#{content_tag_2.id}']").click
+    requirement_picker.find_element(:css, 'option[value="min_score"]').click
+    driver.execute_script('return $(".points_possible_parent:visible").length').should == 0
   end
 end

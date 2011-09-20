@@ -28,6 +28,7 @@ module Api::V1::StreamItem
       hash['title'] = data.title
       hash['message'] = data.body
       hash['type'] = data.type
+      hash['context_type'] = data.context_type
       # include context information, if a context exists
       case stream_item.context_code
       when %r{^course_(\d+)$}
@@ -80,10 +81,18 @@ module Api::V1::StreamItem
         # anything that gets send to communication channels
         hash['title'] = data.subject
         hash['notification_category'] = data.notification_category
+        hash['url'] = data.url
       when 'Submission'
         hash['title'] = data.assignment.try(:title)
         hash['grade'] = data.grade
         hash['score'] = data.score
+        hash['submission_comments'] = data.submission_comments.map do |comment|
+          {
+            'body' => comment.formatted_body,
+            'user_name' => comment.user_short_name,
+            'user_id' => comment.author_id,
+          }
+        end unless data.submission_comments.blank?
         hash['assignment'] = {
           'title' => hash['title'],
           'id' => data.assignment.try(:id),

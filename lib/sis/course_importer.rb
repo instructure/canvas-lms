@@ -27,7 +27,7 @@ module SIS
     
     def verify(csv, verify)
       course_ids = (verify[:course_ids] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         course_id = row['course_id']
         add_error(csv, "Duplicate course id #{course_id}") if course_ids[course_id]
         course_ids[course_id] = true
@@ -46,7 +46,7 @@ module SIS
       course_ids_to_update_associations = [].to_set
 
       Course.skip_callback(:update_enrollments_later) do
-        FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+        csv_rows(csv) do |row|
           update_progress
 
           Course.skip_updating_account_associations do

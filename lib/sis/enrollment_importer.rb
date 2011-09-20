@@ -23,11 +23,11 @@ module SIS
   class EnrollmentImporter < SisImporter
 
     def self.is_enrollment_csv?(row)
-      row.header?('course_id') and row.header?('user_id')
+      (row.header?('section_id') || row.header?('course_id')) && row.header?('user_id')
     end
 
     def verify(csv, verify)
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         add_error(csv, "No course_id or section_id given for an enrollment") if row['course_id'].blank? && row['section_id'].blank?
         add_error(csv, "No user_id given for an enrollment") if row['user_id'].blank?
         add_error(csv, "Improper role \"#{row['role']}\" for an enrollment") unless row['role'] =~ /\Astudent|\Ateacher|\Ata|\Aobserver|\Adesigner/i
@@ -49,7 +49,7 @@ module SIS
 
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
         User.skip_updating_account_associations do
-          FasterCSV.open(csv[:fullpath], "rb", :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |csv_object|
+          FasterCSV.open(csv[:fullpath], "rb", PARSE_ARGS) do |csv_object|
             row = csv_object.shift
             count = 0
 
@@ -167,6 +167,14 @@ module SIS
                     enrollment.workflow_state = 'inactive'
                   end
 
+                  begin
+                    enrollment.start_at = row['start_date'].blank? ? nil : DateTime.parse(row['start_date'])
+                    enrollment.end_at = row['end_date'].blank? ? nil : DateTime.parse(row['end_date'])
+                  rescue
+                    add_warning(csv, "Bad date format for user #{row['user_id']} in #{row['course_id'].blank? ? 'section' : 'course'} #{row['course_id'].blank? ? row['section_id'] : row['course_id']}")
+                  end
+
+
                   courses_to_touch_ids.add(enrollment.course)
                   if enrollment.should_update_user_account_association?
                     if enrollment.new_record? && !update_account_association_user_ids.include?(user.id)
@@ -194,7 +202,7 @@ module SIS
       Enrollment.update_all({:sis_batch_id => @batch.id}, {:id => enrollments_to_update_sis_batch_ids}) if @batch && !enrollments_to_update_sis_batch_ids.empty?
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
-      Course.update_all({:updated_at => Time.now}, {:id => courses_to_touch_ids.to_a}) unless courses_to_touch_ids.empty?
+      Course.update_all({:updated_at => Time.now.utc}, {:id => courses_to_touch_ids.to_a}) unless courses_to_touch_ids.empty?
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       if incrementally_update_account_associations_user_ids.length < 10
@@ -209,7 +217,7 @@ module SIS
       end
       User.update_account_associations(update_account_association_user_ids.to_a,
                                        :account_chain_cache => account_chain_cache)
-      User.update_all({:updated_at => Time.now}, {:id => users_to_touch_ids.to_a}) unless users_to_touch_ids.empty?
+      User.update_all({:updated_at => Time.now.utc}, {:id => users_to_touch_ids.to_a}) unless users_to_touch_ids.empty?
 
       logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
     end

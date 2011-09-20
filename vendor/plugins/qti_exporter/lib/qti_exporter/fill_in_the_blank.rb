@@ -14,6 +14,8 @@ class FillInTheBlank < AssessmentItemConverter
   def parse_question_data
     if @type == 'angel'
       process_angel
+    elsif @type == 'fillinmultiple'
+      process_respondus
     elsif @doc.at_css('itemBody extendedTextInteraction')
       process_d2l
     else
@@ -111,6 +113,21 @@ class FillInTheBlank < AssessmentItemConverter
     end
     
   end
-  
+
+  def process_respondus
+    @doc.css('responseCondition stringMatch baseValue[baseType=string]').each do |val_node|
+      if blank_id = val_node['identifier']
+        blank_id = blank_id.sub(%r{^RESPONSE_-([^-]*)-}, '\1')
+        @question[:answers] << {
+          :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
+          :id => unique_local_id,
+          :migration_id => blank_id,
+          :text => sanitize_html_string(val_node.text, true),
+          :blank_id => blank_id,
+        }
+      end
+    end
+  end
+
 end
 end

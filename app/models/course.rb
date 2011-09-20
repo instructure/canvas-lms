@@ -152,6 +152,7 @@ class Course < ActiveRecord::Base
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
   has_many :content_exports
+  has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
   attr_accessor :import_source
   
@@ -570,7 +571,7 @@ class Course < ActiveRecord::Base
         something_changed = true if section.send(field) != section.send("#{field}_was")
       end
       if something_changed
-        attr_hash = {:updated_at => Time.now}
+        attr_hash = {:updated_at => Time.now.utc}
         fields_to_possibly_rename.each { |key| attr_hash[key] = section.send(key) }
         CourseSection.update_all(attr_hash, {:id => section.id})
       end
@@ -592,8 +593,8 @@ class Course < ActiveRecord::Base
     when 'MySQL'
       Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
     else
-      Enrollment.update_all({:updated_at => Time.now}, :course_id => self.id)
-      User.update_all({:updated_at => Time.now}, "id IN (SELECT user_id FROM enrollments WHERE course_id=#{self.id})")
+      Enrollment.update_all({:updated_at => Time.now.utc}, :course_id => self.id)
+      User.update_all({:updated_at => Time.now.utc}, "id IN (SELECT user_id FROM enrollments WHERE course_id=#{self.id})")
     end
   end
   
@@ -837,18 +838,25 @@ class Course < ActiveRecord::Base
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
 
     # Active teachers
-    given { |user, session| (self.available? || self.created? || self.claimed? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read_as_admin and can :read and can :manage and can :update and can :delete
+    given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    can :read_as_admin and can :read and can :manage and can :update
 
-    given { |user| !self.deleted? && self.prior_enrollments.map(&:user_id).include?(user && user.id) }
+    given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    can :delete
+
+    # Prior users
+    given { |user| !self.deleted? && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
     can :read
 
     # Teacher of a concluded course
-    given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user && user.id) }
+    given { |user| !self.deleted? && user && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) }
     can :read_as_admin and can :read_user_notes and can :read_roster and can :view_all_grades and can :read_prior_users
 
+    given { |user| !self.deleted? && !self.sis_source_id && user && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) }
+    can :delete
+
     # Student of a concluded course
-    given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
+    given { |user| !self.deleted? && user && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) }
     can :read and can :read_grades
 
     # Viewing as different role type
@@ -864,6 +872,9 @@ class Course < ActiveRecord::Base
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
     can :read
+
+    given { |user, session| !self.deleted? && self.sis_source_id && self.account_membership_allows(user, session, :manage_sis) }
+    can :delete
 
     # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
     # because students can't see prior enrollments)
@@ -1104,6 +1115,7 @@ class Course < ActiveRecord::Base
       
       #Second Row
       row = ["    Points Possible", "", ""]
+      row.concat(["", ""]) if options[:include_sis_id]
       row.concat(assignments.map{|a| single ? [a.points_possible, ''] : a.points_possible})
       row.concat([read_only, read_only])
       row.concat([read_only]) if self.grading_standard_id
@@ -1290,9 +1302,9 @@ class Course < ActiveRecord::Base
   end
   
   
-  def merge_in(course, options={})
+  def merge_in(course, options = {}, import = nil)
     return [] if course == self
-    res = merge_into_course(course, options)
+    res = merge_into_course(course, options, import)
     course.course_sections.active.each do |section|
       if options[:all_sections] || options[section.asset_string.to_sym]
         section.move_to_course(self)
@@ -1609,7 +1621,7 @@ class Course < ActiveRecord::Base
   end
 
   def import_media_objects_and_attachments(mo_attachments, migration)
-    MediaObject.add_media_files(mo_attachments, true)
+    #MediaObject.add_media_files(mo_attachments, true)
     # attachments in /media_objects were created on export, soley to
     # download and include a media object in the export. now that they've
     # been sent to kaltura, we can remove them.
@@ -1674,8 +1686,7 @@ class Course < ActiveRecord::Base
   end
   
   attr_accessor :merge_mappings
-  def merge_into_course(course, options)
-    course_import = options[:import]
+  def merge_into_course(course, options, course_import = nil)
     @merge_mappings = {}
     @merge_results = []
     to_shift_dates = []
@@ -1905,8 +1916,6 @@ class Course < ActiveRecord::Base
     if course_import
       course_import.added_item_codes = added_items.map{|i| i.asset_string }
       course_import.log = merge_results
-      course_import.workflow_state = 'completed'
-      course_import.progress = 100
       course_import.save!
     end
     added_items.map{|i| i.asset_string }
@@ -1958,7 +1967,7 @@ class Course < ActiveRecord::Base
     result[:old_end_date] = Date.parse(options[:old_end_date]) rescue course.real_end_date
     result[:new_start_date] = Date.parse(options[:new_start_date]) rescue self.real_start_date
     result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
-    result[:day_substitions] = options[:day_substitions]
+    result[:day_substitutions] = options[:day_substitutions]
     result
   end
 
@@ -2155,7 +2164,7 @@ class Course < ActiveRecord::Base
       { :id => TAB_MODULES, :label => t('#tabs.modules', "Modules"), :css_class => 'modules', :href => :course_context_modules_path },
       { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :course_conferences_path },
       { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :course_collaborations_path },
-      { :id => TAB_SETTINGS, :label => t('#tabs.settings', "Settings"), :css_class => 'settings', :href => :course_details_path },
+      { :id => TAB_SETTINGS, :label => t('#tabs.settings', "Settings"), :css_class => 'settings', :href => :course_settings_path },
     ]
   end
   
@@ -2206,23 +2215,32 @@ class Course < ActiveRecord::Base
         tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
       end
-      tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read, :moderate_forum, :post_to_forum).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
-    end
-
-    if !user || !self.grants_right?(user, nil, :manage_content)
-      # remove some tabs for logged-out users or non-students
-      if self.grants_right?(user, nil, :read_as_admin)
-        tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) } 
-      elsif !self.grants_right?(user, nil, :participate_as_student)
-        tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } 
+      if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
+        tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
+        tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
+        tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
       end
+      tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
+      tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
+      tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_rights?(user, opts[:session], :manage_students, :manage_admin_users).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
+      tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :managed_files)
+      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read, :moderate_forum, :post_to_forum).values.any?
+      tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
+      tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
 
-      # remove hidden tabs from students
-      tabs.delete_if {|t| t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused]) }
+      if !user || !self.grants_right?(user, nil, :manage_content)
+        # remove some tabs for logged-out users or non-students
+        if self.grants_right?(user, nil, :read_as_admin)
+          tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) }
+        elsif !self.grants_right?(user, nil, :participate_as_student)
+          tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) }
+        end
+
+        # remove hidden tabs from students
+        tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
+      end
     end
     # Uncommenting these lines will always put hidden links after visible links
     # tabs.each_with_index{|t, i| t[:sort_index] = i }
@@ -2326,7 +2344,7 @@ class Course < ActiveRecord::Base
   def reset_content
     Course.transaction do
       new_course = Course.new
-      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at].include?(k.to_sym) }.each do |key, val|
+      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration].include?(k.to_sym) }.each do |key, val|
         new_course.send("#{key}=", val)
       end
       # The order here is important; we have to set our sis id to nil and save first
@@ -2334,13 +2352,19 @@ class Course < ActiveRecord::Base
       # get its id to move over sections and enrollments.  Setting this course to
       # deleted has to be last otherwise it would set all the enrollments to
       # deleted before they got moved
-      self.sis_source_id = self.sis_batch_id = nil;
+      self.uuid = self.sis_source_id = self.sis_batch_id = nil;
       self.save!
       new_course.save!
       self.course_sections.update_all(:course_id => new_course.id)
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
-      Enrollment.update_all({:course_id => new_course.id}, {:course_id => self.id})
+      case Enrollment.connection.adapter_name
+      when 'MySQL'
+        Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.course_id=#{new_course.id} WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
+      else
+        Enrollment.update_all({:course_id => new_course.id, :updated_at => Time.now.utc}, :course_id => self.id)
+        User.update_all({:updated_at => Time.now.utc}, "id IN (SELECT user_id FROM enrollments WHERE course_id=#{new_course.id})")
+      end
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!

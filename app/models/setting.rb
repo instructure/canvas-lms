@@ -54,6 +54,10 @@ class Setting < ActiveRecord::Base
     @@cache.delete(name)
   end
   
+  def self.reset_cache!
+    @@cache = {}
+  end
+  
   def self.remove(name)
     @@cache.delete(name)
     s = Setting.find_by_name(name)

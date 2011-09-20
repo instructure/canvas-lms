@@ -103,6 +103,33 @@ describe 'QtiExporter' do
     d['answers'].map { |a| a['comments_html'] }.should == [nil, %{yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">}, nil]
   end
 
+  it "should import respondus question types" do
+    setup_migration(File.expand_path("../fixtures/canvas_respondus_question_types.zip", __FILE__))
+    do_migration
+
+    quiz = @course.quizzes.last
+    quiz.should be_present
+    quiz.quiz_questions.size.should == 9
+    match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id])
+  end
+
+  def match_ignoring(a, b, ignoring = [])
+    case a
+    when Hash
+      a_ = a.reject { |k,v| ignoring.include?(k) }
+      b_ = b.reject { |k,v| ignoring.include?(k) }
+      a_.keys.sort.should == b_.keys.sort
+      a_.each { |k,v| match_ignoring(v, b[k], ignoring) }
+    when Array
+      a.size.should == b.size
+      a.each_with_index do |e,i|
+        match_ignoring(e, b[i], ignoring)
+      end
+    else
+      a.should == b
+    end
+  end
+
   def fname
     File.expand_path("../fixtures/spec-canvas-1.zip", __FILE__)
   end
@@ -131,6 +158,208 @@ describe 'QtiExporter' do
     @migration.import_content_without_send_later
     @migration.should be_imported
   end
+
+  RESPONDUS_QUESTIONS =
+    [{"position"=>1,
+      "correct_comments"=>"This is the correct answer feedback",
+      "question_type"=>"multiple_choice_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"18",
+      "neutral_comments"=>"This is some general feedback.",
+      "incorrect_comments"=>"This is the incorrect answer feedback",
+      "migration_id"=>"QUE_1006",
+      "points_possible"=>1.5,
+      "question_name"=>"MC Question 1",
+      "answers"=>
+       [{"comments"=>"choice 1 feedback",
+         "migration_id"=>"QUE_1008_A1",
+         "text"=>"Answer choice 1",
+         "weight"=>100,
+         "id"=>304},
+        {"comments"=>"choice 2 feedback",
+         "migration_id"=>"QUE_1009_A2",
+         "text"=>"Answer choice 2",
+         "weight"=>0,
+         "id"=>6301},
+        {"comments"=>"choice 3 feedback",
+         "migration_id"=>"QUE_1010_A3",
+         "text"=>"Answer choice 3",
+         "weight"=>0,
+         "id"=>6546},
+        {"comments"=>"choice 4 feedback",
+         "migration_id"=>"QUE_1011_A4",
+         "text"=>"Answer choice 4",
+         "weight"=>0,
+         "id"=>9001}],
+      "question_text"=>
+       "This is the question text.<br>\nThese are some symbol font characters: <span style=\"font-size: 12pt;\">&part;&hearts;&exist;&Delta;&fnof;</span>"},
+     {"position"=>2,
+      "correct_comments"=>"correct answer feedback",
+      "question_type"=>"true_false_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"19",
+      "neutral_comments"=>"general feedback",
+      "incorrect_comments"=>"incorrect answer feedback",
+      "migration_id"=>"QUE_1019",
+      "points_possible"=>1,
+      "question_name"=>"TF Question 1",
+      "answers"=>
+       [{"comments"=>"true answer feedback",
+         "migration_id"=>"QUE_1021_A1",
+         "text"=>"True",
+         "weight"=>100,
+         "id"=>55},
+        {"comments"=>"false answer feedback",
+         "migration_id"=>"QUE_1022_A2",
+         "text"=>"False",
+         "weight"=>0,
+         "id"=>3501}],
+      "question_text"=>"This is the question wording."},
+     {"position"=>3,
+      "correct_comments"=>"correct feed",
+      "question_type"=>"short_answer_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"20",
+      "neutral_comments"=>"general feed",
+      "incorrect_comments"=>"incorrect feed",
+      "migration_id"=>"QUE_1028",
+      "points_possible"=>1,
+      "question_name"=>"FIB Question 1",
+      "answers"=>
+       [{"comments"=>"", "text"=>"correct answer 1", "weight"=>100, "id"=>4954},
+        {"comments"=>"", "text"=>"correct answer 2", "weight"=>100, "id"=>6688}],
+      "question_text"=>"This is the question text."},
+     {"position"=>4,
+      "correct_comments"=>"correct feed",
+      "question_type"=>"fill_in_multiple_blanks_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"21",
+      "neutral_comments"=>"general feed",
+      "incorrect_comments"=>"incorrect feed",
+      "migration_id"=>"QUE_1034",
+      "points_possible"=>2,
+      "question_name"=>"FIMB Question 1",
+      "answers"=>
+       [{"text"=>"question", "weight"=>100, "id"=>346, "blank_id"=>"a"},
+        {"text"=>"interrogative", "weight"=>100, "id"=>7169, "blank_id"=>"a"},
+        {"text"=>"Fill in Multiple Blanks",
+         "weight"=>100,
+         "id"=>1578,
+         "blank_id"=>"b"}],
+      "question_text"=>"This is the [a] wording for a [b] question."},
+     {"position"=>5,
+      "correct_comments"=>"correct feed",
+      "question_type"=>"multiple_answers_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"22",
+      "neutral_comments"=>"general feed",
+      "incorrect_comments"=>"incorrect feed",
+      "migration_id"=>"QUE_1038",
+      "points_possible"=>2,
+      "question_name"=>"MA Question 1",
+      "answers"=>
+       [{"comments"=>"choice feed 1",
+         "migration_id"=>"QUE_1040_A1",
+         "text"=>"This is incorrect answer 1",
+         "weight"=>0,
+         "id"=>1897},
+        {"comments"=>"choice feed 2",
+         "migration_id"=>"QUE_1041_A2",
+         "text"=>"This is correct answer 1",
+         "weight"=>100,
+         "id"=>1865},
+        {"comments"=>"choice feed 3",
+         "migration_id"=>"QUE_1042_A3",
+         "text"=>"This is incorrect answer 2",
+         "weight"=>0,
+         "id"=>8381},
+        {"comments"=>"choice feed 4",
+         "migration_id"=>"QUE_1043_A4",
+         "text"=>"This is correct answer 2",
+         "weight"=>100,
+         "id"=>9111}],
+      "question_text"=>"This is the question text."},
+     {"position"=>6,
+      "correct_comments"=>"correct feed",
+      "question_type"=>"numerical_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"23",
+      "neutral_comments"=>"general feed",
+      "incorrect_comments"=>"incorrect feed",
+      "migration_id"=>"QUE_1051",
+      "points_possible"=>1,
+      "question_name"=>"NA Question 1",
+      "answers"=>
+       [{"comments"=>"",
+         "numerical_answer_type"=>"range_answer",
+         "exact"=>1.25,
+         "weight"=>100,
+         "end"=>1.3,
+         "id"=>9082,
+         "start"=>1.2}],
+      "question_text"=>"This is the question wording."},
+     {"position"=>7,
+      "correct_comments"=>"",
+      "question_type"=>"text_only_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"24",
+      "incorrect_comments"=>"",
+      "migration_id"=>"QUE_1053",
+      "points_possible"=>1,
+      "question_name"=>"TX Question 1",
+      "answers"=>[],
+      "question_text"=>"This is the question wording."},
+     {"position"=>8,
+      "correct_comments"=>"",
+      "question_type"=>"essay_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"25",
+      "neutral_comments"=>"correct answer feedback",
+      "incorrect_comments"=>"",
+      "migration_id"=>"QUE_1054",
+      "points_possible"=>1,
+      "question_name"=>"ES Question 1",
+      "answers"=>[],
+      "question_text"=>"This is the question text."},
+     {"position"=>9,
+      "correct_comments"=>"correct feed",
+      "question_type"=>"matching_question",
+      "question_bank_name"=>"Instructure Question Types",
+      "assessment_question_id"=>"26",
+      "neutral_comments"=>"general feed",
+      "incorrect_comments"=>"incorrect feed",
+      "migration_id"=>"QUE_1061",
+      "points_possible"=>1,
+      "question_name"=>"MT Question 1",
+      "answers"=>
+       [{"comments"=>"",
+         "match_id"=>342,
+         "text"=>"Matching left side 1",
+         "id"=>2740,
+         "right"=>"Matching right side 1"},
+        {"comments"=>"",
+         "match_id"=>8808,
+         "text"=>"Matching L2",
+         "id"=>6479,
+         "right"=>"Matching right side 2"},
+        {"comments"=>"",
+         "match_id"=>9565,
+         "text"=>"Matching left side 3",
+         "id"=>3074,
+         "right"=>"Matching right side 3"},
+        {"comments"=>"",
+         "match_id"=>1142,
+         "text"=>"Matching left side 4",
+         "id"=>7696,
+         "right"=>"Matching right side 4"}],
+      "matches"=>
+       [{"match_id"=>342, "text"=>"Matching right side 1"},
+        {"match_id"=>8808, "text"=>"Matching right side 2"},
+        {"match_id"=>9565, "text"=>"Matching right side 3"},
+        {"match_id"=>1142, "text"=>"Matching right side 4"},
+        {"match_id"=>5875, "text"=>"Distractor 1"},
+        {"match_id"=>2330, "text"=>"Distractor 2"}],
+      "question_text"=>"This is the question text."}]
 end
 
 end

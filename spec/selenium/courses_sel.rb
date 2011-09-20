@@ -3,6 +3,18 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "course selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  it "should not create two assignments when using more options in the wizard" do
+    course_with_teacher_logged_in
+
+    get "/getting_started?fresh=1"
+    expect {
+      expect_new_page_load { driver.find_element(:css, ".next_step_button").click }
+      driver.find_element(:css, ".add_assignment_link").click
+      expect_new_page_load { driver.find_element(:css, ".more_options_link").click }
+      expect_new_page_load { driver.find_element(:css, "#edit_assignment_form button[type='submit']").click }
+    }.to change(Assignment, :count).by(1)
+  end
+
   it "should properly hide the wizard and remember its hidden state" do
     course_with_teacher_logged_in
 
@@ -27,11 +39,11 @@ shared_examples_for "course selenium tests" do
     checklist_button = driver.find_element(:css, '#course_show_secondary .wizard_popup_link')
     checklist_button.click
     wizard_box = driver.find_element(:id, "wizard_box")
-    wait_for_dom_ready
+    wait_for_animations
     wizard_box.should be_displayed
     checklist_button.should_not be_displayed
     wizard_box.find_element(:css, ".close_wizard_link").click
-    wait_for_dom_ready
+    wait_for_animations
     wizard_box.displayed?.should be_false
     checklist_button.displayed?.should be_true
 
@@ -60,12 +72,26 @@ shared_examples_for "course selenium tests" do
     e.save!
     @second_course.reload
 
+    new_term = Account.default.enrollment_terms.create(:name => 'Test Term')
+    third_course = Course.create!(:name => 'third course', :enrollment_term => new_term)
+    e = third_course.enroll_teacher(@user)
+    e.workflow_state = 'active'
+    e.accept
+    e.save!
+
     get "/courses/#{@course.id}/details"
-    
+
     driver.find_element(:link, I18n.t('links.import','Import Content into this Course')).click
     driver.find_element(:css, '#content a.button').click
+
+    select_box = driver.find_element(:id, 'copy_from_course')
+    select_box.find_elements(:css, 'optgroup').length.should == 2
+    second_group = select_box.find_elements(:css, 'optgroup').last
+    second_group.find_elements(:css, 'option').length.should == 1
+    second_group.attribute('label').should == 'Test Term'
+
     option_value = find_option_value(:id, 'copy_from_course', 'second course')
-    driver.find_element(:css, '#copy_from_course > option[value="'+option_value+'"]').click
+    driver.find_element(:css, '#copy_from_course option[value="'+option_value+'"]').click
     driver.find_element(:css, '#content form').submit
 
     #modify course dates
@@ -85,7 +111,11 @@ shared_examples_for "course selenium tests" do
     driver.find_element(:css, '.substitutions > .substitution').should be_displayed
 
     driver.find_element(:id, 'copy_context_form').submit
-    wait_for_dom_ready
+    wait_for_ajaximations
+    
+    # since jobs aren't running
+    CourseImport.last.perform
+    
     keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
   end
 
@@ -97,9 +127,12 @@ shared_examples_for "course selenium tests" do
       driver.find_element(:css, "div#content form button[type=submit]").click
       wait_for_dom_ready
       driver.find_element(:id, 'copy_context_form').submit
-      wait_for_animations
+      wait_for_ajaximations
+      
+      CourseImport.last.perform
+      
       keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
-
+      
       @new_course = Course.last(:order => :id)
       get "/courses/#{@new_course.id}"
       driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")

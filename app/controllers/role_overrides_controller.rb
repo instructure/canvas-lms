@@ -38,7 +38,7 @@ class RoleOverridesController < ApplicationController
   def add_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
       @context.add_account_membership_type(params[:role_type])
-      redirect_to named_context_url(@context, :context_role_overrides_url, :account_roles => params[:account_roles])
+      redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
     end
   end
   
@@ -46,7 +46,7 @@ class RoleOverridesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_role_overrides)
       @context.remove_account_membership_type(params[:role])
       respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_role_overrides_url, :account_roles => '1') }
+        format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => '1') }
         format.json { render :json => @context.to_json(:only => [:membership_types, :id]) }
       end
     end
@@ -82,7 +82,7 @@ class RoleOverridesController < ApplicationController
         end
       end
       flash[:notice] = t 'notices.saved', "Changes Saved Successfully."
-      redirect_to named_context_url(@context, :context_role_overrides_url, :account_roles => params[:account_roles])
+      redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
     end
   end
 end

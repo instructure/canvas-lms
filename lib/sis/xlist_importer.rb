@@ -26,7 +26,7 @@ module SIS
     end
     
     def verify(csv, verify)
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         add_error(csv, "No xlist_course_id given for a cross-listing") if row['xlist_course_id'].blank?
         add_error(csv, "No section_id given for a cross-listing") if row['section_id'].blank?
         add_error(csv, "Improper status \"#{row['status']}\" for a cross-listing") unless row['status'] =~ /\A(active|deleted)\z/i
@@ -41,7 +41,7 @@ module SIS
       course_ids_to_update_associations = [].to_set
 
       Course.skip_callback(:update_enrollments_later) do
-        FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+        csv_rows(csv) do |row|
           update_progress
           logger.debug("Processing CrossListing #{row.inspect}")
           

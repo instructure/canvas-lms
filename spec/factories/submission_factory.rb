@@ -18,10 +18,10 @@
 
 def submission_model(opts={})
   assignment_model
-  @student = opts[:user] || User.create!(:name => "new student")
+  @student = opts.delete(:user) || User.create!(:name => "new student")
   @enrollment = @course.enroll_student(@student)
   @assignment.reload # it caches the course pre-student enrollment
-  @submission = @assignment.submit_homework(@student, :url => "http://www.instructure.com/")
+  @submission = @assignment.submit_homework(@student, (opts.presence || { :url => "http://www.instructure.com/" }))
 end
 
 def assignment_valid_attributes

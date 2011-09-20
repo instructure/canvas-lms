@@ -144,7 +144,7 @@
           <div class="clear"></div>
         </div>
         <div>
-          <div style="margin-bottom: 5px margin-top: 10px;"><%= mt 'labels.dates_range', "**%{course}** dates range", :course => @copy_context.name %></div>
+          <div style="margin-bottom: 5px margin-top: 10px;"><%= mt 'labels.dates_range', "**%{course}** dates range", :course => @context.name %></div>
           <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
                 :start_date => capture { %>
             <div style="float: left;"><%= text_field :copy, :new_start_date, :value => date_string(@context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
@@ -208,12 +208,28 @@
             <td><label for="copy_from_course"><%= before_label :select_course, "Or Select from the List" %></label></td>
             <td>
               <% if @possible_courses.length < 500 %>
-              <select style="font-size: 1.2em; width: 250px;" id="copy_from_course">
-                <option value="none"><%= t 'options.select_course', "[Select Course]" %></option>
-                <% @possible_courses.sort_by{|c| c.name || "zzzz"}.each do |course| %>
-                  <option value="<%= course.id %>"><%= course.name %></option>
-                <% end %>
-              </select>
+                <select style="font-size: 1.2em; width: 250px;" id="copy_from_course">
+                  <option value="none"><%= t 'options.select_course', "[Select Course]" %></option>
+                  <%
+                  term_map = @possible_courses.inject(Hash.new {|h, k| h[k] = [] }) {|h, c| h[c.enrollment_term] << c; h }
+                  term_names = term_map.keys.inject(Hash.new(0)) {|h, term| h[term.name] += 1; h}
+                  # sort by term start date (descending) and then by name
+                  term_map.keys.sort {|a,b|
+                    a.start_at == b.start_at ?
+                      a.name.try(:downcase) <=> b.name.try(:downcase) :
+                      (b.start_at || Time.at(0)) <=> (a.start_at || Time.at(0))
+                  }.each do |term| %>
+                    <% if term_names[term.name] > 1 %>
+                      <optgroup label="<%= t('term_with_account', '%{term_name} (%{account_name})', :term_name => term.name, :account_name => term.root_account.name) %>">
+                    <% else %>
+                      <optgroup label="<%= term.name %>">
+                    <% end %>
+                      <% term_map[term].sort_by {|c| c.name || "zzzz" }.each do |course| %>
+                        <option value="<%= course.id %>"><%= course.name %></option>
+                      <% end %>
+                    </optgroup>
+                  <% end %>
+                </select>
               <% end %>
             </td>
           </tr><tr>
@@ -248,32 +264,42 @@ $(document).ready(function() {
   $("body").append($frame.hide());
   $("#copy_context_form").attr('target', 'copy_course_target');
   $(".copy_progress").progressbar();
-  $("#copy_context_form").submit(function() {
-    $("#copy_context_form .submit_button").text(I18n.t('messages.copying', "Copying... this will take a few minutes")).attr('disabled', true);
-    $(".progress_bar_holder").show();
-    var checkup = function() {
-      var url = location.href;
-      $.ajaxJSON(url, 'GET', {}, function(data) {
-        var course_import = data.course_import;
-        if(course_import) { 
-          $(".copy_progress").progressbar('option', 'value', course_import.progress);
-        }
-        if(course_import && course_import.workflow_state == 'completed') {
-          location.href = location.href + "&import_id=" + course_import.id;
-        } else if(course_import && course_import.workflow_state == 'failed') {
-          var message = I18n.t('errors.failed', "Course Import failed with the following error:") + " \"import_" + course_import.id + "\"";
-          $.flashError(message);
-          $(".progress_bar_holder").after("<b>" + message + "</b>");
-        } else {
-          setTimeout(checkup, 1500);
-        }
-      }, function() {
-        setTimeout(checkup, 3000);
-      });
-    };
-    setTimeout(checkup, 5000);
-    return true;
-  });
+
+  var checkup = function(url) {
+    $.ajaxJSON(url, 'GET', {}, function(data) {
+      var course_import = data.course_import;
+      if(course_import) {
+        $(".copy_progress").progressbar('option', 'value', course_import.progress);
+      }
+      if(course_import && course_import.workflow_state == 'completed') {
+        location.href = location.href + "&import_id=" + course_import.id;
+      } else if(course_import && course_import.workflow_state == 'failed') {
+        var message = I18n.t('errors.failed', "Course Import failed with the following error:") + " \"import_" + course_import.id + "\"";
+        $.flashError(message);
+        $(".progress_bar_holder").after("<b>" + message + "</b>");
+      } else {
+        setTimeout(function() {
+          checkup(url);
+        }, 1500);
+      }
+    }, function() {
+      setTimeout(function() {
+        checkup(url);
+      }, 3000);
+    });
+  };
+
+  $("#copy_context_form").formSubmit({
+    beforeSubmit: function(data) {
+      $("#copy_context_form .submit_button").text(I18n.t('messages.copying', "Copying... this will take a few minutes")).attr('disabled', true);
+      $(".progress_bar_holder").show();
+    },
+    success: function(data) {
+      setTimeout(function() {
+        checkup(data.course_import.check_url);
+      }, 5000);
+    }
+  })
   $("#copy_entries_dialog button").click(function() {
     var $checkbox = $("#copy_all_topics");
     var include_secondaries = $(this).hasClass('include');

@@ -29,7 +29,7 @@ class SummaryMessageConsolidator
     cc_ids = CommunicationChannel.ids_with_pending_delayed_messages
     cc_ids.each do |cc_id|
       dm_ids = DelayedMessage.ids_for_messages_with_communication_channel_id(cc_id)
-      DelayedMessage.update_all({ :batched_at => Time.now, :workflow_state => 'sent', :updated_at => Time.now },
+      DelayedMessage.update_all({ :batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc },
                                 { :id => dm_ids })
       DelayedMessage.send_later(:summarize, dm_ids)
       

@@ -560,6 +560,15 @@ describe "security" do
         html = Nokogiri::HTML(response.body)
         html.css('#tab-users').should_not be_empty
         html.css('.add_users_link').should_not be_empty
+
+        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.save!
+
+        # Should still be able to see People tab even if disabled, because we can
+        # manage stuff in it
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /People/
       end
 
       it 'view_all_grades' do
@@ -627,12 +636,18 @@ describe "security" do
         response.body.should_not match /Export this Course/
 
         add_permission :read_course_content
+        add_permission :read_roster
 
         get "/courses/#{@course.id}"
         response.should be_success
+        response.body.should match /People/
+
+        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.save!
 
         get "/courses/#{@course.id}/assignments"
         response.should be_success
+        response.body.should_not match /People/
 
         get "/courses/#{@course.id}/assignments/syllabus"
         response.should be_success
@@ -670,8 +685,16 @@ describe "security" do
         response.body.should_not match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
+        response.body.should_not match /Delete this Course/
+        response.body.should_not match /End this Course/
         html.css('#course_account_id').should be_empty
         html.css('#course_enrollment_term_id').should be_empty
+
+        delete "/courses/#{@course.id}"
+        response.status.should == '401 Unauthorized'
+
+        delete "/courses/#{@course.id}", :event => 'delete'
+        response.status.should == '401 Unauthorized'
 
         add_permission :manage_courses
 
@@ -680,12 +703,19 @@ describe "security" do
         response.body.should match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
+        response.body.should match /Delete this Course/
+        response.body.should match /End this Course/
         html = Nokogiri::HTML(response.body)
         html.css('#course_account_id').should_not be_empty
         html.css('#course_enrollment_term_id').should_not be_empty
 
         get "/courses/#{@course.id}/copy"
         response.should be_success
+
+        delete "/courses/#{@course.id}", :event => 'delete'
+        response.should be_redirect
+
+        @course.reload.should be_deleted
       end
 
       it 'manage_content' do

@@ -295,8 +295,8 @@ module SIS
       # throttling can be set on individual SisBatch instances, and also
       # site-wide in the Setting table.
       @batch.reload(:select => 'data') # update to catch changes to pause vars
-      @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 50)).to_i
-      @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 1)).to_f
+      @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 100)).to_i
+      @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
     end
     
     def unzip_file(file, dest)
@@ -322,7 +322,7 @@ module SIS
         Attachment.skip_scribd_submits
         @csvs[importer].each do |csv|
           remaining_in_batch = 0
-          FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+          FasterCSV.foreach(csv[:fullpath], SisImporter::PARSE_ARGS) do |row|
             if remaining_in_batch == 0
               temp_file += 1
               if out_csv
@@ -368,7 +368,7 @@ module SIS
     def process_file(base, file)
       csv = { :base => base, :file => file, :fullpath => File.join(base, file) }
       if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
-        FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+        FasterCSV.foreach(csv[:fullpath], SisImporter::PARSE_ARGS) do |row|
           importer = IMPORTERS.index do |importer|
             if SIS.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
               @csvs[importer] << csv

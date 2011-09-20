@@ -2267,7 +2267,7 @@ es:
       all: Cualquiera
       only_teachers: "Sólo Profesores"
       teachers_students: "Profesor y Estudiantes"
-  course_details: 
+  course_settings:
     buttons: 
       add_section: "Agregar Sección"
       adding_section: "Agregando Sección..."
@@ -2396,7 +2396,7 @@ es:
         start_at: "Fecha de Inicio"
       titles: 
         copy_course: "Copiar el Curso"
-    course_details: 
+    course_settings:
       accepted_invitation: "%{user} ya ha recibido y aceptado la invitación a unirse al curso, pero todavía puede reenviar la invitación si la necesitan."
       admin_invitation_unaccepted: "%{user} aún no ha aceptado la invitación para unirse al curso. La invitación fue enviada: %{time}"
       buttons: 
@@ -8923,7 +8923,7 @@ es:
         user_id: "ID de Usuario"
       links: 
         select: Seleccionar
-      merge_result_explanation: "¿Seguro que quiere unir la cuenta, %{user_name} (%{user_email}) con esta cuenta, %{current_user_name} (%{current_user_email})? Este proceso tendrá los siguientes resultados:"
+      merge_result_explanation: "¿Seguro que quiere unir la cuenta, %{source_user_name} (%{source_user_email}) con esta cuenta, %{target_user_name} (%{target_user_email})? Este proceso tendrá los siguientes resultados:"
       merge_result_explanation_again: "Ha decidido unir el usuario, %{user_name} (%{user_email}) con la cuenta, %{pending_other_user_name} (%{pending_other_user_email}). Este proceso tendrá el siguiente resultado final:"
       merge_somone_else: "Unir a alguien más con %{user_name}"
       merge_user_initial_instructions: "Ha decidido unir el usuario, %{user_name} (%{user_email}) con otra cuenta. Puede buscar el usuario con el que quiere unirse usando el formulario a continuación, o sólo navegue a la página de ese usuario y haga click en \"Unir Usuario\" otra vez para unir a alguien más con este usuario."

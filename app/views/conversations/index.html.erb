@@ -64,7 +64,7 @@
         </li>
       </ul>
       <table>
-        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
+        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :finder_url => conversations_find_recipients_url(:blank_avatar_fallback => true), :class => "recipients" %></td></tr>
         <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
         <tr id="group_conversation_info"><th></th><td><%= check_box_tag :group_conversation %> <%= label_tag :group_conversation, :en => "This is a group conversation. Participants will see all messages" %></td></tr>
         <tr id="user_note_info"><th></th><td><%= check_box_tag :user_note, "1", false, :id => :add_to_faculty_journal %> <%= label_tag :add_to_faculty_journal, :en => "Add as a Faculty Journal entry" %></td></tr>
@@ -109,8 +109,8 @@
   <li id="conversation_blank">
     <%= link_to t('inbox_actions.add_label', "Add Label"), conversation_url('{{ id }}', :conversation => {:label => 'last'}), :title =>  t('inbox_actions.add_label', "Add Label"), :class => 'action_add_label label_icon' %>
     <%= link_to t('inbox_actions.remove_label', "Remove Label"), conversation_url('{{ id }}', :conversation => {:label => ''}), :title => t('inbox_actions.remove_label', "Remove Label"), :class => 'action_remove_label label_icon' %>
-    <%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_mark_as_unread_url('{{ id }}'), :title => t('inbox_actions.mark_as_unread', "Mark as Unread"), :class => :action_mark_as_unread %>
-    <%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_mark_as_read_url('{{ id }}'), :title => t('inbox_actions.mark_as_read', "Mark as Read"), :class => :action_mark_as_read %>
+    <%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :title => t('inbox_actions.mark_as_unread', "Mark as Unread"), :class => :action_mark_as_unread %>
+    <%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :title => t('inbox_actions.mark_as_read', "Mark as Read"), :class => :action_mark_as_read %>
     <span class="date"></span>
     <img class="attachments" src="/images/messages/attach-gray.png" title="<%= t('has_attachments', 'This conversation has one or more attachments') %>">
     <img class="media_objects" src="/images/messages/audio-gray.png" title="<%= t('has_audio', 'This conversation has one or more audio comments') %>">
@@ -174,8 +174,8 @@
   <span></span>
   <div>
     <ul>
-      <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_mark_as_unread_url('{{ id }}'), :id => 'action_mark_as_unread', :class => :action_mark_as_unread %></li>
-      <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_mark_as_read_url('{{ id }}'), :id => 'action_mark_as_read', :class => :action_mark_as_read %></li>
+      <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :id => 'action_mark_as_unread', :class => :action_mark_as_unread %></li>
+      <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => 'action_mark_as_read', :class => :action_mark_as_read %></li>
       <li class="label_group">
       <%= before_label t('labels.conversation_label', 'Label') %><br />
       <% ConversationParticipant.labels.each do |label, text| %>
@@ -189,8 +189,8 @@
       <li><%= link_to t('inbox_actions.subscribe', "Subscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 1}), :id => :action_subscribe %></li>
     </ul>
     <ul>
-      <li><%= link_to t('inbox_actions.archive', "Archive"), conversation_archive_url('{{ id }}'), :id => :action_archive %></li>
-      <li><%= link_to t('inbox_actions.unarchive', "Unarchive"), conversation_unarchive_url('{{ id }}'), :id => :action_unarchive %></li>
+      <li><%= link_to t('inbox_actions.archive', "Archive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "archived"}), :id => :action_archive %></li>
+      <li><%= link_to t('inbox_actions.unarchive', "Unarchive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => :action_unarchive %></li>
       <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_url('{{ id }}'), :id => :action_delete_all %></li>
     </ul>
   </div>
@@ -200,12 +200,12 @@
   <p>
     <%= t :add_recipients_instructions, "People you add to the conversation will see all previous messages." %>
   </p>
-  <%= text_field_tag :recipients, nil, :id => 'add_recipients', :finder_url => conversations_find_recipients_url, :class => "recipients", :style => "width: 370px" %>
+  <%= text_field_tag :recipients, nil, :id => 'add_recipients', :finder_url => conversations_find_recipients_url(:blank_avatar_fallback => true), :class => "recipients", :style => "width: 370px" %>
 </form>
 
 <% form_tag conversations_url, :id => 'forward_message_form' do %>
   <table>
-    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
+    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, :finder_url => conversations_find_recipients_url(:blank_avatar_fallback => true), :class => "recipients" %></td></tr>
     <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body, nil, :id => :forward_body %></td></tr>
   </table>
   <ul class="messages"></ul>

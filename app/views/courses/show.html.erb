@@ -81,7 +81,7 @@
   <% if @show_recent_feedback %>
     <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :display_count => 3, :period => t('period_name', "the last 2 weeks"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
   <% end %>
-  <% if can_do(@context, @current_user, :delete) && (@context.created? || @context.claimed? || @context.teacherless?) %>
+  <% if can_do(@context, @current_user, :delete) && !@context.deleted? %>
     <%= link_to image_tag("delete.png") + " " + t('links.delete', "Delete This Course"), context_url(@context, :context_confirm_action_url), :class => "button button-sidebar-wide" %>
   <% end %>
 <% end %>

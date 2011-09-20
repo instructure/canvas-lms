@@ -12,14 +12,15 @@ shared_examples_for "user_content selenium tests" do
     get "/"
     uri = nil
     name = driver.find_elements(:class_name, "user_content_iframe").first.attribute('name')
-    driver.switch_to.frame(name)
-    keep_trying_until {
-      driver.current_url.should match("/object_snippet")
+    in_frame(name) {
+      keep_trying_until {
+        driver.current_url.should match("/object_snippet")
+      }
+      html = Nokogiri::HTML(driver.page_source)
+      obj = html.at_css('object')
+      obj.should_not be_nil
+      obj['data'].should == '/javascripts/swfobject/test.swf'
     }
-    html = Nokogiri::HTML(driver.page_source)
-    obj = html.at_css('object')
-    obj.should_not be_nil
-    obj['data'].should == '/javascripts/swfobject/test.swf'
   end
 
   it "should iframe calendar json requests" do
@@ -29,14 +30,15 @@ shared_examples_for "user_content selenium tests" do
     event_el = keep_trying_until { driver.find_element(:id, "event_calendar_event_#{e.id}") }
     event_el.find_element(:tag_name, 'a').click
     name = keep_trying_until { driver.find_elements(:class_name, "user_content_iframe").first.attribute('name') }
-    driver.switch_to.frame(name)
-    keep_trying_until {
-      driver.current_url.should match("/object_snippet")
+    in_frame(name) {
+      keep_trying_until {
+        driver.current_url.should match("/object_snippet")
+      }
+      html = Nokogiri::HTML(driver.page_source)
+      obj = html.at_css('object')
+      obj.should_not be_nil
+      obj['data'].should == '/javascripts/swfobject/test.swf'
     }
-    html = Nokogiri::HTML(driver.page_source)
-    obj = html.at_css('object')
-    obj.should_not be_nil
-    obj['data'].should == '/javascripts/swfobject/test.swf'
   end
 
   def message_body

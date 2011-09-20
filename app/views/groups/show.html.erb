@@ -21,7 +21,7 @@
 
 <div style="float: right; text-align: left;" class="floating_links">
   <% if can_do(@context.announcements.new, @current_user, :create) %>
-    <div><a href="<%= context_url(@context, :controller => :announcements) %>#new" class='add'><%= t 'new_announcement', "New Announcement" %></a></div>
+    <div><a href="<%= group_announcements_path(@context) %>#new" class='add'><%= t 'new_announcement', "New Announcement" %></a></div>
   <% end %>
 </div>
 <div id="group_messages">

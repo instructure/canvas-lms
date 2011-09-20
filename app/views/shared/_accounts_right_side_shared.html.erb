@@ -18,7 +18,7 @@
           serviceUrl: $("#new_user")[0].action + ".json",
           onSelect: function(value, data){
             window.location = $("#new_user")[0].action + "/" + data
-          <% if @account.all_users.count < 500 %>
+          <% if @account.user_count < 500 %>
           },
           lookup: <%= raw({
             :suggestions =>  @account.fast_all_users.map{ |u| u.last_name_first || ""},

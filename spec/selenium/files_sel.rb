@@ -59,8 +59,14 @@ shared_examples_for "files selenium tests" do
     course_with_student_logged_in :user => @user
     login_as "nobody3@example.com", "asdfasdf3"
     get "/courses/#{@course.id}/files"
-    link = keep_trying_until { driver.find_element(:css, "div.links a.download_zip_link") }
-    link.should be_displayed
+    
+    #link = keep_trying_until { driver.find_element(:css, "div.links a.download_zip_link") }
+    link = keep_trying_until {
+      link = driver.find_element(:css, "div.links a.download_zip_link")
+      wait_for_ajaximations
+      link.should be_displayed
+      link
+    }
     link.attribute('href').should match(%r"/courses/#{@course.id}/folders/\d+/download")
   end
 
@@ -91,6 +97,7 @@ shared_examples_for "files selenium tests" do
       keep_trying_until { !driver.find_element(:css, "#edit_content_dialog").displayed?}
     end
   end
+
 end
 
 describe "files without s3 and forked tests" do
@@ -99,7 +106,13 @@ describe "files without s3 and forked tests" do
   it "should allow renaming folders" do
     course_with_teacher_logged_in
     get "/dashboard/files"
-    driver.find_element(:css, ".add_folder_link").click
+    wait_for_ajaximations
+
+    keep_trying_until {
+      driver.find_element(:css, ".add_folder_link").click
+      wait_for_animations
+      driver.find_element(:css, "#files_content .add_folder_form #folder_name").should be_displayed
+    }
     driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
     wait_for_ajax_requests
     Folder.last.name.should == "my folder"
@@ -129,3 +142,4 @@ describe "files Windows-Firefox-S3-Tests" do
     Setting.set("file_storage_test_override", "s3")
   }
 end
+

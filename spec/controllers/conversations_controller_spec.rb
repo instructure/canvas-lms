@@ -95,7 +95,7 @@ describe ConversationsController do
 
     it "should allow messages to be forwarded from the conversation" do
       course_with_student_logged_in(:active_all => true)
-      conversation.mark_as_unread
+      conversation.update_attribute(:workflow_state, "unread")
 
       new_user = User.create
       enrollment = @course.enroll_student(new_user)
@@ -153,22 +153,14 @@ describe ConversationsController do
   describe "POST 'update'" do
     it "should update the conversation" do
       course_with_student_logged_in(:active_all => true)
-      conversation.mark_as_unread
+      conversation(2).update_attribute(:workflow_state, "unread")
 
-      post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0"}
+      post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :label => "red"}
       response.should be_success
-      @conversation.reload.subscribed?.should be_false
-    end
-  end
-
-  describe "POST 'workflow_event'" do
-    it "should trigger the workflow event" do
-      course_with_student_logged_in(:active_all => true)
-      conversation
-
-      post 'workflow_event', :conversation_id => @conversation.conversation_id, :event => "mark_as_unread"
-      response.should be_success
-      @conversation.reload.unread?.should be_true
+      @conversation.reload
+      @conversation.subscribed?.should be_false
+      @conversation.should be_archived
+      @conversation.label.should eql 'red'
     end
   end
 
@@ -213,7 +205,7 @@ describe ConversationsController do
       enrollment.save
       post 'add_recipients', :conversation_id => @conversation.conversation_id, :recipients => [new_user.id.to_s]
       response.should be_success
-      @conversation.participants.size.should == 3 # doesn't include @user
+      @conversation.participants.size.should == 4 # includes @user
     end
   end
 

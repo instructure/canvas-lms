@@ -15,45 +15,55 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'iconv'
 
 class IncomingMessageProcessor
+  def self.utf8ify(string, encoding)
+    encoding ||= 'UTF-8'
+    encoding = encoding.upcase
+    # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
+    Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue Iconv.conv('UTF-8//IGNORE', 'UTF-8', string)
+  end
+
+  def self.process_single(message, secure_id, message_id)
+    if message.multipart? && part = message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
+      html_body = utf8ify(part.body.decoded, part.charset)
+    end
+    html_body = utf8ify(message.body.decoded, message.charset) if !message.multipart? && message.content_type.try(:match, %r{^text/html(;|$)})
+    if message.multipart? && part = message.parts.find { |p| p.content_type.try(:match, %r{^text/plain(;|$)}) }
+      body = utf8ify(part.body.decoded, part.charset)
+    end
+    body ||= utf8ify(message.body.decoded, message.charset)
+    if !html_body
+      self.extend TextHelper
+      html_body = format_message(body).first
+    end
+
+    msg = Message.find_by_id(message_id)
+    context = msg.context if msg && secure_id == msg.reply_to_secure_id
+    user = msg.try(:user)
+    if user && context && context.respond_to?(:reply_from)
+      context.reply_from({
+        :purpose => 'general',
+        :user => user,
+        :subject => utf8ify(message.subject, message.header[:subject].try(:charset)),
+        :html => html_body,
+        :text => body
+      })
+    else
+      IncomingMessageProcessor.ndr(message.from.first, message.subject) if message.from.try(:first)
+    end
+  end
+
   def self.process
     addr, domain = HostUrl.outgoing_email_address.split(/@/)
     regex = Regexp.new("#{Regexp.escape(addr)}\\+([0-9a-f]+)-(\\d+)@#{Regexp.escape(domain)}")
     Mailman::Application.run do
       to regex do
-        html_body = (message.parts.find { |p| p.content_type = 'text/html' }).body.decoded if message.multipart?
-        html_body = message.body.decoded if !message.multipart? && message.content_type = 'text/html'
-        body = (message.parts.find { |p| p.content_type = 'text/plain' }).body.decoded if message.multipart?
-        body ||= message.body.decoded
-        if !html_body
-          self.extend TextHelper
-          html_body = format_message(body).first
-        end
-
-        msg = Message.find_by_id(params['captures'][1].to_i)
-        context = begin
-          msg.context if msg && params['captures'][0] == msg.reply_to_secure_id
-        rescue => e
-          ErrorReport.log_exception(:default, e, :from => message.from.first,
-                                                 :to => message.to)
-          nil
-        end
-        user = msg.try(:user)
         begin
-          if user && context && context.respond_to?(:reply_from)
-            context.reply_from({
-              :purpose => 'general',
-              :user => user,
-              :subject => message.subject,
-              :html => html_body,
-              :text => body
-            })
-          else
-            IncomingMessageProcessor.ndr(message.from.first, message.subject)
-          end
+          process_single(message, params['captures'][0], params['captures'][1].to_i)
         rescue => e
-          ErrorReport.log_exception(:default, e, :from => message.from.first,
+          ErrorReport.log_exception(:default, e, :from => message.from.try(:first),
                                                  :to => message.to)
         end
       end

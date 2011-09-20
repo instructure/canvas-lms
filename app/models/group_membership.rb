@@ -89,7 +89,7 @@ class GroupMembership < ActiveRecord::Base
   def touch_groups
     groups_to_touch = [ self.group_id ]
     groups_to_touch << self.old_group_id if self.old_group_id
-    Group.update_all({ :updated_at => Time.now }, { :id => groups_to_touch })
+    Group.update_all({ :updated_at => Time.now.utc }, { :id => groups_to_touch })
   end
   protected :touch_groups
   

@@ -182,7 +182,7 @@ class DiscussionEntry < ActiveRecord::Base
   
   def update_topic
     if self.discussion_topic    
-      DiscussionTopic.update_all({:last_reply_at => Time.now, :updated_at => Time.now}, {:id => self.discussion_topic_id})
+      DiscussionTopic.update_all({:last_reply_at => Time.now.utc, :updated_at => Time.now.utc}, {:id => self.discussion_topic_id})
       if self.discussion_topic.for_assignment? && self.discussion_topic.assignment.context.students.include?(self.user)
         submission ||= self.discussion_topic.assignment.submit_homework(self.user, :submission_type => 'discussion_topic')
       end

@@ -37,6 +37,19 @@ describe QuizSubmissionsController do
     end
   end
   
+  describe "POST 'create'" do
+    it "should allow previewing" do
+      course_with_teacher_logged_in(:active_all => true)
+      @quiz = @course.quizzes.create!
+      @quiz.workflow_state = "available"
+      @quiz.quiz_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
+      @quiz.save!
+
+      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :preview => 1
+      response.should be_redirect
+    end
+  end
+  
   describe "PUT 'update'" do
     it "should require authentication" do
       quiz_with_submission

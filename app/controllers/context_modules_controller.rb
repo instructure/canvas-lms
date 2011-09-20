@@ -234,7 +234,7 @@ class ContextModulesController < ApplicationController
         item.context_module_id = @module.id
         item.save
       end
-      ContextModule.update_all({:updated_at => Time.now}, {:id => affected_module_ids})
+      ContextModule.update_all({:updated_at => Time.now.utc}, {:id => affected_module_ids})
       @context.touch
       @module.reload
       respond_to do |format|

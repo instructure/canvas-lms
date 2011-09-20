@@ -27,7 +27,7 @@ module SIS
     
     def verify(csv, verify)
       abstract_course_ids = (verify[:abstract_course_ids] ||= {})
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         abstract_course_id = row['abstract_course_id']
         add_error(csv, "Duplicate abstract course id #{abstract_course_id}") if abstract_course_ids[abstract_course_id]
         abstract_course_ids[abstract_course_id] = true
@@ -43,7 +43,7 @@ module SIS
     def process(csv)
       start = Time.now
       abstract_courses_to_update_sis_batch_id = []
-      FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
+      csv_rows(csv) do |row|
         update_progress
 
         logger.debug("Processing AbstractCourse #{row.inspect}")

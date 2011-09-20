@@ -119,9 +119,11 @@ shared_examples_for "plugins selenium tests" do
     
     driver.find_element(:css, "#settings_api_key").send_keys("asdf")
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
-    driver.find_element(:css, "button.save_button").click
-    
-    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until {
+      driver.find_element(:css, "button.save_button").click
+      wait_for_ajaximations
+      driver.find_element(:css, "#flash_error_message").should be_displayed
+    }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     ScribdAPI.stub(:config_check).and_return(nil)
