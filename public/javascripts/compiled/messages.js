@@ -1989,7 +1989,7 @@
           },
           browser: {
             data: {
-              limit: -1,
+              per_page: -1,
               type: 'context'
             }
           }

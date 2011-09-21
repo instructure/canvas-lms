@@ -65,10 +65,18 @@ class GradebookImporter
   end
   
   def process_header(row)
-    if row.length < 3 || row[0] !~ /Student/ || row[1] !~ /ID/ || row[2] !~ /Section/
+    if row.length < 3 || row[0] !~ /Student/ || row[1] !~ /ID/
       raise "Couldn't find header row"
     end
-    
+
+    if row[2] !~ /Section/
+      if row[4] !~ /Section/ || row[2] !~ /SIS\s+User\s+ID/ || row[3] !~ /SIS\s+Login\s+ID/
+        raise "Couldn't find header row"
+      else
+        @student_columns += 2
+      end
+    end
+
     row.shift(@student_columns)
     while row.last =~ /Current Score|Final Score|Final Grade/
       row.pop
