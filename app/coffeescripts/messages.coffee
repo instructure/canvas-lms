@@ -1465,7 +1465,7 @@ I18n.scoped 'conversations', (I18n) ->
           if options.level > 0 then -1 else 5
         browser:
           data:
-            limit: -1
+            per_page: -1
             type: 'context'
 
     token_input = $('#recipients').data('token_input')

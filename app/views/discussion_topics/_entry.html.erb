@@ -5,11 +5,13 @@
   user_id = entry.try_rescue(:user_id) || "{{ user_id }}"
   topic ||= nil
   discussion_topic_id = entry.try_rescue(:discussion_topic_id) || (topic && topic.id) || "{{ discussion_topic_id }}"
+  entry_key = entry.new_record? ? entry.try_rescue(:discussion_topic).try_rescue(:cache_key) : entry.try_rescue(:cache_key) if entry
+  entry_key ||= entry_context.try_rescue(:asset_string) || 'blank'
   skip_sub_entries ||= false
  %>
 <% cache([
     'entry_message_render', 
-    (entry.try_rescue(:cache_key) || (entry_context.try_rescue(:asset_string) || 'blank')), 
+    entry_key, 
     out_of_context, 
     skip_sub_entries,
     @topic_agglomerated,
