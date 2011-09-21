@@ -464,4 +464,27 @@ describe Account do
     a.user_count.should == 4
 
   end
+
+  it "group_categories should not include deleted categories" do
+    account = Account.default
+    account.group_categories.count.should == 0
+    category1 = account.group_categories.create(:name => 'category 1')
+    category2 = account.group_categories.create(:name => 'category 2')
+    account.group_categories.count.should == 2
+    category1.destroy
+    account.reload
+    account.group_categories.count.should == 1
+    account.group_categories.to_a.should == [category2]
+  end
+
+  it "all_group_categories should include deleted categories" do
+    account = Account.default
+    account.all_group_categories.count.should == 0
+    category1 = account.group_categories.create(:name => 'category 1')
+    category2 = account.group_categories.create(:name => 'category 2')
+    account.all_group_categories.count.should == 2
+    category1.destroy
+    account.reload
+    account.all_group_categories.count.should == 2
+  end
 end

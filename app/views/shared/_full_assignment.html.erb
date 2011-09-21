@@ -183,14 +183,14 @@
           <%= f.text_field :due_at, :value => datetime_string(assignment.due_at, :due_date), :style => "width: 120px;", :class => "date_field" %>
         </td>
         <td style="width: 50%;" class="more_assignment_values assignment_content" colspan="2">
-          <input type="checkbox" name="group_assignment" id="assignment_group_assignment" <%= 'checked' if @assignment && @assignment.group_category_name %>/>
+          <input type="checkbox" name="group_assignment" id="assignment_group_assignment" <%= 'checked' if @assignment && @assignment.has_group_category? %>/>
           <label for="assignment_group_assignment"><%= t 'labels.group_assignment', "This is a Group Assignment" %></label>
-          <div id="assignment_group_category" style="<%= hidden unless @assignment && @assignment.group_category_name %>; margin-left: 20px;">
+          <div id="assignment_group_category" style="<%= hidden unless @assignment && @assignment.has_group_category? %>; margin-left: 20px;">
             <label for="assignment_group_category_select"><%= before_label :group_set, "Group Set" %></label>
-            <select id="assignment_group_category_select" name="assignment[group_category_name]">
+            <select id="assignment_group_category_select" name="assignment[group_category]">
               <option value=""><%= t 'options.select_group_set', "[ Select Group Set ]" %></option>
-              <% @context.groups.active.select{|g| g.group_category_name && !g.student_organized? }.map{|g| g.group_category_name }.uniq.each do |category| %>
-                <option value="<%= category %>" <%= 'selected' if @assignment && category == @assignment.group_category_name %>><%= category %></option>
+              <% @context.group_categories.select{ |c| !c.student_organized? }.each do |category| %>
+                <option value="<%= category.name %>" <%= 'selected' if @assignment && category == @assignment.group_category %>><%= category.name %></option>
               <% end %>
               <option value="new"><%= t 'options.new_group_set', "[ New Group Set ]" %></option>
             </select><br/>

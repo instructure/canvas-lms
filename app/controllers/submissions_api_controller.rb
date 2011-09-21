@@ -326,7 +326,7 @@ class SubmissionsApiController < ApplicationController
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
-      if assignment.group_category_name
+      if assignment.has_group_category?
         entries = assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)

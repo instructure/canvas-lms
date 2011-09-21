@@ -1,13 +1,15 @@
-<% student_organized = (category == Group.student_organized_category) %>
-<div id="<%= category ? category.unpack('H*') : "category_template" %>" class="group_category <%= 'student_organized' if student_organized %>">
+<% category_name = category && category.name %>
+<% student_organized = category && category.student_organized? %>
+<% protected_category = category && category.protected? %>
+<div id="<%= category_name ? category_name.unpack('H*') : "category_template" %>" class="group_category <%= 'student_organized' if student_organized %>">
   <div class="category_header">
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><%= image_tag "add.png" %></a>
-      <% unless student_organized %>
-        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_name => category || "{{ category_name }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
+      <% unless protected_category %>
+        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_name => category_name || "{{ category_name }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
       <% end %>
     </div>
-    <h3 class="category_name"><%= category %></h3>
+    <h3 class="category_name"><%= category_name %></h3>
     <div class="clear"></div>
     <div style="margin-left: 20px;">
       <div style="float: right;">
@@ -42,7 +44,7 @@
         <% else %>
           <h3 class="name blank_name"><%= t :group_category_unassigned, "Unassigned" %></h3>
         <% end %>
-        <% unless @context.is_a?(Account) || student_organized %>
+        <% unless @context.is_a?(Account) || protected_category %>
           <a href="#" class="assign_students_link no-hover" title="<%= t :random_distribution_explanation, "Distribute Unassigned Students Equally Among Groups" %>"><%= t :randomly_distribute_students, "randomly assign students" %></a>
         <% end %>
         <div style="display: none;">
@@ -60,7 +62,7 @@
     </div>
   </div>
   <div class="left_side">
-  <% @groups.select{|g| g.group_category_name == category}.each do |group| %>
+  <% @groups.select{|g| g.group_category == category}.each do |group| %>
     <div class="group" id="group_<%= group.id %>">
       <div class="inner-wrapper">
         <div class="group_user_count">
@@ -79,7 +81,7 @@
           <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" target="_blank"><%= group.name %></a>
         </h3>
         <div style="display: none;">
-          <span class="category_name"><%= category || nbsp %></span>
+          <span class="category_name"><%= category_name || nbsp %></span>
           <span class="max_membership"><%= (group.max_membership || nbsp) rescue nbsp %></span>
           <span class="group_id"><%= group ? group.id : nbsp %></span>
         </div>

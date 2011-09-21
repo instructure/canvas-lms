@@ -9,10 +9,15 @@ describe "manage_groups selenium tests" do
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
-    @course.groups.create(:name => "Group 1", :group_category_name => "Group Category 1")
-    @course.groups.create(:name => "Group 2", :group_category_name => "Group Category 2")
-    @course.groups.create(:name => "Group 3", :group_category_name => "Group Category 2")
-    @course.groups.create(:name => "Group 4", :group_category_name => "Group Category 3")
+
+    group_category1 = @course.group_categories.create(:name => "Group Category 1")
+    group_category2 = @course.group_categories.create(:name => "Group Category 2")
+    group_category3 = @course.group_categories.create(:name => "Group Category 3")
+
+    @course.groups.create(:name => "Group 1", :group_category => group_category1)
+    @course.groups.create(:name => "Group 2", :group_category => group_category2)
+    @course.groups.create(:name => "Group 3", :group_category => group_category2)
+    @course.groups.create(:name => "Group 4", :group_category => group_category3)
 
     get "/courses/#{@course.id}/groups"
 
@@ -20,9 +25,9 @@ describe "manage_groups selenium tests" do
     group_divs.size.should == 4 # three groups + blank
 
     ids = group_divs.map{ |div| div.attribute(:id) }
-    ids.should be_include("Group Category 1".unpack('H*').first)
-    ids.should be_include("Group Category 2".unpack('H*').first)
-    ids.should be_include("Group Category 3".unpack('H*').first)
+    ids.should be_include(group_category1.name.unpack('H*').first)
+    ids.should be_include(group_category2.name.unpack('H*').first)
+    ids.should be_include(group_category3.name.unpack('H*').first)
     ids.should be_include("category_template")
   end
 
@@ -32,16 +37,20 @@ describe "manage_groups selenium tests" do
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
-    @course.groups.create(:name => "Group 1", :group_category_name => "Student Groups")
-    @course.groups.create(:name => "Group 2", :group_category_name => "Student Groups")
-    @course.groups.create(:name => "Group 3", :group_category_name => "Other Groups")
+
+    group_category1 = GroupCategory.student_organized_for(@course)
+    group_category2 = @course.group_categories.create(:name => "Other Groups")
+
+    @course.groups.create(:name => "Group 1", :group_category => group_category1)
+    @course.groups.create(:name => "Group 2", :group_category => group_category1)
+    @course.groups.create(:name => "Group 3", :group_category => group_category2)
 
     get "/courses/#{@course.id}/groups"
 
     find_all_with_jquery("div.group_category").size.should == 3
     find_all_with_jquery("div.group_category.student_organized").size.should == 1
     find_with_jquery("div.group_category.student_organized").attribute(:id).
-      should == "Student Groups".unpack('H*').first
+      should == group_category1.name.unpack('H*').first
   end
 
   it "should show one li.category per category" do
@@ -50,10 +59,15 @@ describe "manage_groups selenium tests" do
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
-    @course.groups.create(:name => "Group 1", :group_category_name => "Group Category 1")
-    @course.groups.create(:name => "Group 2", :group_category_name => "Group Category 2")
-    @course.groups.create(:name => "Group 3", :group_category_name => "Group Category 2")
-    @course.groups.create(:name => "Group 4", :group_category_name => "Group Category 3")
+
+    group_category1 = @course.group_categories.create(:name => "Group Category 1")
+    group_category2 = @course.group_categories.create(:name => "Group Category 2")
+    group_category3 = @course.group_categories.create(:name => "Group Category 3")
+
+    @course.groups.create(:name => "Group 1", :group_category => group_category1)
+    @course.groups.create(:name => "Group 2", :group_category => group_category2)
+    @course.groups.create(:name => "Group 3", :group_category => group_category2)
+    @course.groups.create(:name => "Group 4", :group_category => group_category3)
 
     get "/courses/#{@course.id}/groups"
 
@@ -61,9 +75,9 @@ describe "manage_groups selenium tests" do
     group_divs.size.should == 3 # three groups, no blank on this one
 
     labels = group_divs.map{ |div| div.find_element(:css, "a").text }
-    labels.should be_include("Group Category 1")
-    labels.should be_include("Group Category 2")
-    labels.should be_include("Group Category 3")
+    labels.should be_include(group_category1.name)
+    labels.should be_include(group_category2.name)
+    labels.should be_include(group_category3.name)
   end
 
   it "should flag li.category for student organized categories with student_organized class" do
@@ -72,15 +86,19 @@ describe "manage_groups selenium tests" do
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
-    @course.groups.create(:name => "Group 1", :group_category_name => "Student Groups")
-    @course.groups.create(:name => "Group 2", :group_category_name => "Student Groups")
-    @course.groups.create(:name => "Group 3", :group_category_name => "Other Groups")
+
+    group_category1 = GroupCategory.student_organized_for(@course)
+    group_category2 = @course.group_categories.create(:name => "Other Groups")
+
+    @course.groups.create(:name => "Group 1", :group_category => group_category1)
+    @course.groups.create(:name => "Group 2", :group_category => group_category1)
+    @course.groups.create(:name => "Group 3", :group_category => group_category2)
 
     get "/courses/#{@course.id}/groups"
 
     find_all_with_jquery("li.category").size.should == 2
     find_all_with_jquery("li.category.student_organized").size.should == 1
-    find_with_jquery("li.category.student_organized a").text.should == "Student Groups"
+    find_with_jquery("li.category.student_organized a").text.should == group_category1.name
   end
 
   context "dragging a user between groups" do
@@ -88,8 +106,11 @@ describe "manage_groups selenium tests" do
       course_with_teacher_logged_in
 
       @course.enroll_student(john = user_model(:name => "John Doe"))
-      group1 = @course.groups.create(:name => "Group 1", :group_category_name => "Other Groups")
-      group2 = @course.groups.create(:name => "Group 2", :group_category_name => "Other Groups")
+
+      group_category = @course.group_categories.create(:name => "Other Groups")
+
+      group1 = @course.groups.create(:name => "Group 1", :group_category => group_category)
+      group2 = @course.groups.create(:name => "Group 2", :group_category => group_category)
 
       get "/courses/#{@course.id}/groups"
 
@@ -135,8 +156,12 @@ describe "manage_groups selenium tests" do
       course_with_teacher_logged_in
 
       @course.enroll_student(john = user_model(:name => "John Doe"))
-      group1 = @course.groups.create(:name => "Group 1", :group_category_name => "Student Groups")
-      group2 = @course.groups.create(:name => "Group 2", :group_category_name => "Student Groups")
+
+      group_category = GroupCategory.student_organized_for(@course)
+
+      group2 = @course.groups.create(:name => "Group 2", :group_category => group_category)
+      group1 = @course.groups.create(:name => "Group 1", :group_category => group_category)
+      group2 = @course.groups.create(:name => "Group 2", :group_category => group_category)
 
       get "/courses/#{@course.id}/groups"
 
@@ -183,7 +208,8 @@ describe "manage_groups selenium tests" do
     course_with_teacher_logged_in
 
     @course.enroll_student(user_model(:name => "John Doe"))
-    @course.groups.create(:name => "Group 1", :group_category_name => "Existing Category")
+    group_category = @course.group_categories.create(:name => "Existing Category")
+    @course.groups.create(:name => "Group 1", :group_category => group_category)
 
     get "/courses/#{@course.id}/groups"
     driver.find_elements(:css, "#category_list li").size.should == 1
@@ -205,7 +231,8 @@ describe "manage_groups selenium tests" do
     course_with_teacher_logged_in
 
     @course.enroll_student(user_model(:name => "John Doe"))
-    @course.groups.create(:name => "Group 1", :group_category_name => "Student Groups")
+    group_category = GroupCategory.student_organized_for(@course)
+    @course.groups.create(:name => "Group 1", :group_category => group_category)
 
     get "/courses/#{@course.id}/groups"
     driver.find_elements(:css, "#category_list li").size.should == 1
@@ -221,16 +248,17 @@ describe "manage_groups selenium tests" do
 
     driver.find_elements(:css, "#category_list li").size.should == 2
     driver.find_elements(:css, "#category_list li a").first.text.should == "New Category"
-    driver.find_elements(:css, "#category_list li a").last.text.should == "Student Groups"
+    driver.find_elements(:css, "#category_list li a").last.text.should == group_category.name
   end
 
   it "should move students from a deleted group back to unassigned" do
     course_with_teacher_logged_in
 
     @course.enroll_student(john = user_model(:name => "John Doe"))
-    group = @course.groups.create(:name => "Group 1", :group_category_name => "Some Category")
+    group_category = @course.group_categories.create(:name => "Some Category")
+    group = @course.groups.create(:name => "Group 1", :group_category => group_category)
     group.add_user(john)
-    @course.groups.create(:name => "Group 2", :group_category_name => "Some Category")
+    @course.groups.create(:name => "Group 2", :group_category => group_category)
 
     get "/courses/#{@course.id}/groups"
 

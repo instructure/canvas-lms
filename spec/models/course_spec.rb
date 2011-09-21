@@ -110,6 +110,29 @@ describe Course do
     @course.wiki_id.should_not == @new_course.wiki_id
     @course.replacement_course_id.should == @new_course.id
   end
+
+  it "group_categories should not include deleted categories" do
+    course = course_model
+    course.group_categories.count.should == 0
+    category1 = course.group_categories.create(:name => 'category 1')
+    category2 = course.group_categories.create(:name => 'category 2')
+    course.group_categories.count.should == 2
+    category1.destroy
+    course.reload
+    course.group_categories.count.should == 1
+    course.group_categories.to_a.should == [category2]
+  end
+
+  it "all_group_categories should include deleted categories" do
+    course = course_model
+    course.all_group_categories.count.should == 0
+    category1 = course.group_categories.create(:name => 'category 1')
+    category2 = course.group_categories.create(:name => 'category 2')
+    course.all_group_categories.count.should == 2
+    category1.destroy
+    course.reload
+    course.all_group_categories.count.should == 2
+  end
 end
 
 describe Course, "account" do

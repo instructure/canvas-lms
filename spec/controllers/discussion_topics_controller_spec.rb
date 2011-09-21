@@ -104,13 +104,12 @@ describe DiscussionTopicsController do
       course_topic(:with_assignment => true)
 
       # set up groups
-      groups = []
-      3.times{ groups << @course.groups.create!(:group_category_name => 'category 1') }
-      groups.last.tap do |group|
-        group.group_category_name = 'category 2'
-        group.save!
-      end
-      @topic.assignment.group_category_name = 'category 1'
+      group_category1 = @course.group_categories.create(:name => 'category 1')
+      group_category2 = @course.group_categories.create(:name => 'category 2')
+      @course.groups.create!(:group_category => group_category1)
+      @course.groups.create!(:group_category => group_category1)
+      @course.groups.create!(:group_category => group_category2)
+      @topic.assignment.group_category = group_category1
       @topic.assignment.save!
 
       get 'show', :course_id => @course.id, :id => @topic.id

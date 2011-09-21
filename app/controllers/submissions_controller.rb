@@ -112,7 +112,7 @@ class SubmissionsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return
       end
-      @group = @assignment.context.groups.active.for_category(@assignment.group_category_name).to_a.find{|g| g.users.include?(@current_user)} if @assignment.group_category_name
+      @group = @assignment.group_category.groups.active.to_a.find{|g| g.users.include?(@current_user)} if @assignment.has_group_category?
       attachment_ids = (params[:submission][:attachment_ids] || "").split(",").select(&:present?)
       params[:submission][:attachments] = []
       attachment_ids.each do |id|

@@ -246,6 +246,7 @@ class AssignmentsController < ApplicationController
   
   def create
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
+    load_group_category_param
     group = get_assignment_group(params[:assignment])
     if params[:model_key] && session["assignment_#{params[:model_key]}"].present?
       @assignment = @context.assignments.find_by_id(session["assignment_#{params[:model_key]}"])
@@ -309,6 +310,7 @@ class AssignmentsController < ApplicationController
         end
         params[:assignment].delete :default_grade
         params[:assignment].delete :overwrite_existing_grades
+        load_group_category_param
         if params[:publish]
           @assignment.workflow_state = 'published'
         elsif params[:unpublish]
@@ -362,6 +364,15 @@ class AssignmentsController < ApplicationController
     return unless assignment_params
     if (group_id = assignment_params.delete(:assignment_group_id)).present?
       group = @context.assignment_groups.find(group_id)
+    end
+  end
+
+  # translate group_category as name to group_category as object
+  def load_group_category_param
+    if params[:assignment] && params[:assignment][:group_category].present?
+      category = params[:assignment].delete :group_category
+      category = @context.group_categories.find_or_initialize_by_name(category)
+      params[:assignment][:group_category] = category
     end
   end
 end

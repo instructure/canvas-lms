@@ -126,8 +126,9 @@ I18n.scoped('groups', function(I18n){
       
       var $student_instances = $student;
       contextGroups.insertIntoGroup($student, $group);
-      if($group.parents(".group_category").hasClass('student_organized') &&
-          ($group.get(0) !== $group.parents(".group_category").find(".group_blank").get(0))) {
+      $category = $group.parents(".group_category")
+      if($category.hasClass('student_organized') &&
+          ($group.get(0) !== $category.find(".group_blank").get(0))) {
         var $s = $student.clone();
         $student_instances = $student_instances.add($s);
         contextGroups.insertIntoGroup($s, $original_group);
@@ -227,13 +228,13 @@ I18n.scoped('groups', function(I18n){
       if($("#sidebar_group_" + group.id).length > 0) {
         return;
       }
-      var $category = $("#sidebar_category_" + $.encodeToHex(group.group_category_name));
+      var $category = $("#sidebar_category_" + $.encodeToHex(group.group_category));
       if($category.length == 0) {
         $category = $("#sidebar_category_blank").clone(true);
         $category.find("ul").empty();
         $category.fillTemplateData({
           data: group,
-          id: 'sidebar_category_' + $.encodeToHex(group.group_category_name)
+          id: 'sidebar_category_' + $.encodeToHex(group.group_category)
         });
         $(".sidebar_category:last").after($category.show());
       }
@@ -280,7 +281,7 @@ I18n.scoped('groups', function(I18n){
     $("#edit_group_form").formSubmit({
       object_name: "group",
       processData: function(data) {
-        data['group[group_category_name]'] = $(this).parents(".group_category").getTemplateData({textValues: ['category_name']}).category_name;
+        data['group[group_category]'] = $(this).parents(".group_category").getTemplateData({textValues: ['category_name']}).category_name;
         return data;
       },
       beforeSubmit: function(data) {
@@ -372,7 +373,7 @@ I18n.scoped('groups', function(I18n){
         for(var idx in data) {
           var group = data[idx].group || data[idx].course_assigned_group;
           group.group_id = group.id;
-          category.category_name = group.group_category_name;
+          category.category_name = group.group_category;
           $group = $group_template.clone(true).removeClass('group_blank');
           $group.attr('id', 'group_' + group.id);
           if (!group.users || group.users.length == 0) {
@@ -391,7 +392,7 @@ I18n.scoped('groups', function(I18n){
           contextGroups.addGroupToSidebar(group)
           
           if (group.users) {
-            var category_id = $.encodeToHex(group.group_category_name);
+            var category_id = $.encodeToHex(group.group_category);
             for(var jdx in group.users) {
               var user = group.users[jdx].user;
               var $span = $(document.createElement('span')).addClass(category_id + "_group_id");

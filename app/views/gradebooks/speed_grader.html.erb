@@ -173,7 +173,7 @@
                 <div id="media_media_recording" style="display: none;">
                   <div class="media_recording"></div>
                 </div>
-                <% if @assignment.group_category_name %>
+                <% if @assignment.has_group_category? %>
                   <div id="group_comment_wrapper">
                     <input type="checkbox" name="group_comment" id="submission_group_comment"/>
                     <label for="submission_group_comment"><%= t('labels.group_comment', "Send Comment to the Whole Group") %></label>

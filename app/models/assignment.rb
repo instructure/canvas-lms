@@ -27,7 +27,7 @@ class Assignment < ActiveRecord::Base
   
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
-    :assignment_group, :unlock_at, :lock_at, :group_category_name,
+    :assignment_group, :unlock_at, :lock_at, :group_category,
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
@@ -47,6 +47,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   belongs_to :grading_standard
+  belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
 
   validates_presence_of :context_id
@@ -90,7 +91,8 @@ class Assignment < ActiveRecord::Base
                 :infer_grading_type, 
                 :process_if_quiz,
                 :default_values,
-                :update_submissions_if_details_changed
+                :update_submissions_if_details_changed,
+                :maintain_group_category_attribute
   
   after_save    :update_grades_if_details_changed,
                 :generate_reminders_if_changed,
@@ -771,8 +773,8 @@ class Assignment < ActiveRecord::Base
   def group_students(student)
     group = nil
     students = [student]
-    if self.group_category_name
-      group = self.context.groups.active.for_category(self.group_category_name).to_a.find{|g| g.users.include?(student)}
+    if self.has_group_category?
+      group = self.group_category.groups.active.to_a.find{|g| g.users.include?(student)}
       students = (group.users & self.context.students) if group && !self.grade_group_students_individually
     end
     [group, students]
@@ -953,7 +955,17 @@ class Assignment < ActiveRecord::Base
   
   def as_json(options=nil)
     json = super(options)
-    json['assignment']['group_category_name'] ||= json['assignment'].delete('group_category') if json && json['assignment']
+    if json && json['assignment']
+      # remove anything coming automatically from deprecated db column
+      json['assignment'].delete('group_category')
+      if self.group_category
+        # put back version from association 
+        json['assignment']['group_category'] = self.group_category.name
+      elsif self.read_attribute('group_category').present?
+        # or failing that, version from query
+        json['assignment']['group_category'] = self.read_attribute('group_category')
+      end
+    end
     json
   end
 
@@ -1018,12 +1030,19 @@ class Assignment < ActiveRecord::Base
   end
   
   def group_category_name
-    attr = self.read_attribute(:group_category)
-    attr.present? ? attr : nil
+    self.read_attribute(:group_category)
   end
 
-  def group_category_name=(value)
-    self.write_attribute(:group_category, value)
+  def maintain_group_category_attribute
+    # keep this field up to date even though it's not used (group_category_name
+    # exists solely for the migration that introduces the GroupCategory model).
+    # this way group_category_name is correct if someone mistakenly uses it
+    # (modulo category renaming in the GroupCategory model).
+    self.write_attribute(:group_category, self.group_category && self.group_category.name)
+  end
+
+  def has_group_category?
+    self.group_category_id.present?
   end
 
   def assign_peer_review(reviewer, reviewee)
@@ -1333,7 +1352,7 @@ class Assignment < ActiveRecord::Base
       dup.send("#{key}=", val)
     end
 
-    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.group_category_name
+    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.has_group_category?
     context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
     
     dup.context = context

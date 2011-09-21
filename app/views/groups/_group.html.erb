@@ -1,5 +1,5 @@
 <% group ||= nil %>
   <li id="group_<%= group ? group.id : 'blank' %>" class="group <%= 'teacher_group' if group && @context.is_a?(Course) && !group.student_organized? %>" style="<%= hidden unless group %>">
     <%= link_to((group.name rescue nbsp), group_url(group ? group.id : '{{ id }}'), :class => 'name') %>
-    <%= "(#{group.group_category_name})" if group && !group.student_organized? %>
+    <%= "(#{group.group_category.name})" if group && !group.student_organized? %>
   </li>

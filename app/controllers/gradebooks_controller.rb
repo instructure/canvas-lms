@@ -198,9 +198,9 @@ class GradebooksController < ApplicationController
                     "points_possible", "min_score", "max_score",
                     "mastery_score", "grading_type", "submission_types",
                     "assignment_group_id", "grading_scheme_id",
-                    "grading_standard_id", "group_category",
-                    "grade_group_students_individually"].join(", ")
-      ) + groups_as_assignments
+                    "grading_standard_id", "grade_group_students_individually",
+                    "(select name from group_categories where
+                       id=assignments.group_category_id) AS group_category"].join(", ")) + groups_as_assignments
     elsif params[:students]
       # you need to specify specifically which student fields you want returned to the gradebook via json here
       render :json => @context.students_visible_to(@current_user).to_json(:only => ["id", "name", "sortable_name", "short_name"])

@@ -138,7 +138,7 @@ class DiscussionTopicsController < ApplicationController
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @topic.context_module_action(@current_user, :read) if !@locked
       if @topic.for_group_assignment?
-        @groups = @context.groups.active.for_category(@topic.assignment.group_category_name).select{|g| g.grants_right?(@current_user, session, :read) }
+        @groups = @topic.assignment.group_category.groups.active.select{|g| g.grants_right?(@current_user, session, :read) }
         if params[:combined]
           @topic_agglomerated = true
           @topics = @topic.child_topics.select{|t| @groups.include?(t.context) }

@@ -41,9 +41,10 @@ describe SubmissionsController do
 
     it "should use the appropriate group based on the assignment's category and the current user" do
       course_with_student_logged_in(:active_all => true)
-      @group = @course.groups.create(:name => "Group", :group_category_name => "Category")
+      group_category = @course.group_categories.create(:name => "Category")
+      @group = @course.groups.create(:name => "Group", :group_category => group_category)
       @group.add_user(@user)
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :group_category_name => @group.group_category_name)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :group_category => @group.group_category)
 
       post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}
       response.should be_redirect
@@ -53,7 +54,8 @@ describe SubmissionsController do
 
     it "should not use a group if the assignment has no category" do
       course_with_student_logged_in(:active_all => true)
-      @group = @course.groups.create(:name => "Group", :group_category_name => "Category")
+      group_category = @course.group_categories.create(:name => "Category")
+      @group = @course.groups.create(:name => "Group", :group_category => group_category)
       @group.add_user(@user)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
 

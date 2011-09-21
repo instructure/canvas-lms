@@ -30,7 +30,7 @@ describe GroupMembership do
     course_with_teacher
     student = user_model
     @course.enroll_student(student)
-    group = @course.groups.create(:group_category_name => 'Student Groups')
+    group = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course))
 
     Notification.create(:name => "New Student Organized Group", :category => "TestImmediately")
     @teacher.communication_channels.create(:path => "test_channel_email_#{@teacher.id}", :path_type => "email").confirm

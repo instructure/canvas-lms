@@ -635,10 +635,10 @@ describe Assignment do
       hash["permissions"]["read"].should eql(true)
     end
 
-    it "should include group_category_name" do
-      assignment_model(:group_category_name => "Something")
+    it "should include group_category" do
+      assignment_model(:group_category => "Something")
       hash = ActiveSupport::JSON.decode(@assignment.to_json)
-      hash["assignment"]["group_category_name"].should == "Something"
+      hash["assignment"]["group_category"].should == "Something"
     end
   end
   
@@ -1224,34 +1224,34 @@ describe Assignment do
   end
 
   context "group_students" do
-    it "should return [nil, [student]] unless the assignment has a group_category_name" do
+    it "should return [nil, [student]] unless the assignment has a group_category" do
       @assignment = assignment_model
       @student = user_model
       @assignment.group_students(@student).should == [nil, [@student]]
     end
 
     it "should return [nil, [student]] if the context doesn't have any active groups in the same category" do
-      @assignment = assignment_model(:group_category_name => "Fake Category")
+      @assignment = assignment_model(:group_category => "Fake Category")
       @student = user_model
       @assignment.group_students(@student).should == [nil, [@student]]
     end
 
     it "should return [nil, [student]] if the student isn't in any of the candidate groups" do
-      @assignment = assignment_model(:group_category_name => "Category")
-      @group = @course.groups.create(:name => "Group", :group_category_name => @assignment.group_category_name)
+      @assignment = assignment_model(:group_category => "Category")
+      @group = @course.groups.create(:name => "Group", :group_category => @assignment.group_category)
       @student = user_model
       @assignment.group_students(@student).should == [nil, [@student]]
     end
 
     it "should return [group, [students from group]] if the student is in one of the candidate groups" do
-      @assignment = assignment_model(:group_category_name => "Category")
+      @assignment = assignment_model(:group_category => "Category")
       @course.enroll_student(@student1 = user_model)
       @course.enroll_student(@student2 = user_model)
       @course.enroll_student(@student3 = user_model)
-      @group1 = @course.groups.create(:name => "Group 1", :group_category_name => @assignment.group_category_name)
+      @group1 = @course.groups.create(:name => "Group 1", :group_category => @assignment.group_category)
       @group1.add_user(@student1)
       @group1.add_user(@student2)
-      @group2 = @course.groups.create(:name => "Group 2", :group_category_name => @assignment.group_category_name)
+      @group2 = @course.groups.create(:name => "Group 2", :group_category => @assignment.group_category)
       @group2.add_user(@student3)
 
       # have to reload because the enrolled students above don't show up in
@@ -1262,30 +1262,32 @@ describe Assignment do
     end
   end
 
-  context "group_category_name" do
-    it "should convert '' to nil" do
-      @assignment = assignment_model
-      @assignment.group_category_name.should be_nil
-      
-      @assignment.group_category_name = ""
-      @assignment.group_category_name.should be_nil
-      
-      @assignment.group_category_name = "Something"
-      @assignment.group_category_name.should_not be_nil
-    end
+  it "should maintain the deprecated group_category attribute" do
+    assignment = assignment_model
+    assignment.read_attribute(:group_category).should be_nil
+    assignment.group_category = assignment.context.group_categories.create(:name => "my category")
+    assignment.save
+    assignment.reload
+    assignment.read_attribute(:group_category).should eql("my category")
+    assignment.group_category = nil
+    assignment.save
+    assignment.reload
+    assignment.read_attribute(:group_category).should be_nil
+  end
 
-    it "should round trip through the db" do
-      @assignment = assignment_model
-      @assignment.group_category_name = "Something"
-      @assignment.save
-      Assignment.find(@assignment.id).group_category_name.should == "Something"
-    end
+  it "should provide has_group_category?" do
+    assignment = assignment_model
+    assignment.has_group_category?.should be_false
+    assignment.group_category = assignment.context.group_categories.create(:name => "my category")
+    assignment.has_group_category?.should be_true
+    assignment.group_category = nil
+    assignment.has_group_category?.should be_false
   end
 end
 
 def setup_assignment_with_group
-  assignment_model(:group_category_name => "Study Groups")
-  @group = @a.context.groups.create!(:name => "Study Group 1", :group_category_name => "Study Groups")
+  assignment_model(:group_category => "Study Groups")
+  @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
   @u1 = @a.context.enroll_user(User.create(:name => "user 1")).user
   @u2 = @a.context.enroll_user(User.create(:name => "user 2")).user
   @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user

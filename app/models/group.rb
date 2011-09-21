@@ -20,7 +20,7 @@ class Group < ActiveRecord::Base
   include Context
   include Workflow
 
-  attr_accessible :name, :context, :max_membership, :group_category_name, :join_level, :default_view
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
@@ -28,6 +28,7 @@ class Group < ActiveRecord::Base
   has_many :invited_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'invited']
   has_many :invited_users, :source => :user, :through => :invited_group_memberships
   belongs_to :context, :polymorphic => true
+  belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
 
@@ -60,7 +61,7 @@ class Group < ActiveRecord::Base
   has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :media_objects, :as => :context
   
-  before_save :ensure_defaults
+  before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted
   
   include StickySisFields
@@ -165,10 +166,6 @@ class Group < ActiveRecord::Base
     end
   end
   
-  named_scope :for_category, lambda{|category|
-    {:conditions => {:category => category } }
-  }
-  
   def add_user(user)
     return nil if !user
     unless member = self.group_memberships.find_by_user_id(user.id)
@@ -219,7 +216,9 @@ class Group < ActiveRecord::Base
   
   def peer_groups
     return [] if !self.context || self.student_organized?
-    self.context.groups.for_category(self.group_category_name).find(:all, :conditions => ["id != ?", self.id])
+    category = self.group_category || GroupCategory.student_organized_for(self.context)
+    return [] unless category
+    category.groups.find(:all, :conditions => ["id != ?", self.id])
   end
   
   def migrate_content_links(html, from_course)
@@ -242,22 +241,17 @@ class Group < ActiveRecord::Base
     record_merge_result(text)
   end
 
-  
-  def self.student_organized_category
-    "Student Groups"
-  end
-  
   def student_organized?
-    self.group_category_name == Group.student_organized_category
+    self.group_category && self.group_category.student_organized?
   end
 
   def ensure_defaults
     self.name ||= AutoHandle.generate_securish_uuid
     self.uuid ||= AutoHandle.generate_securish_uuid
-    self.group_category_name ||= Group.student_organized_category
+    self.group_category ||= GroupCategory.student_organized_for(self.context)
     self.join_level ||= 'invitation_only'
     if self.context && self.context.is_a?(Course)
-      self.account = self.context.account if self.context
+      self.account = self.context.account
     elsif self.context && self.context.is_a?(Account)
       self.account = self.context
     end
@@ -368,9 +362,9 @@ class Group < ActiveRecord::Base
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     item.name = hash[:title]
-    # TODO i18n
-    t '#group.default_category', 'Imported Groups'
-    item.group_category_name = hash[:group_category] || 'Imported Groups'
+    item.group_category = hash[:group_category].present? ?
+      context.group_categories.find_or_initialize_by_name(hash[:group_category]) :
+      GroupCategory.imported_for(context)
     
     item.save!
     context.imported_migration_items << item
@@ -385,13 +379,24 @@ class Group < ActiveRecord::Base
     self.read_attribute(:category)
   end
 
-  def group_category_name=(value)
-    self.write_attribute(:category, value)
+  def maintain_category_attribute
+    # keep this field up to date even though it's not used (group_category_name
+    # exists solely for the migration that introduces the GroupCategory model).
+    # this way group_category_name is correct if someone mistakenly uses it
+    # (modulo category renaming in the GroupCategory model).
+    self.write_attribute(:category, self.group_category && self.group_category.name)
   end
 
   def as_json(options=nil)
     json = super(options)
-    json['group']['group_category_name'] ||= json['group'].delete('category') if json && json['group']
+    if json && json['group']
+      # remove anything coming automatically from deprecated db column
+      json['group'].delete('category')
+      if self.group_category
+        # put back version from association 
+        json['group']['group_category'] = self.group_category.name
+      end
+    end
     json
   end
 end
