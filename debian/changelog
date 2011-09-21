@@ -1,3 +1,15 @@
+canvas-lms (1.1-60) professional; urgency=low
+
+  * Package ref: cae03574dc360ffa10e69662caa71dda17e291ef
+  *
+  * [+8721916] fix cache key for discussion group assignments, fixes #5609
+  * [+c59f66a] fix conversation attachments in IE, closes #5700
+  * [+880370c] show all courses/groups in browse mode, fixes #5674
+  * [+e0bffe6] fix initial conversation attachment sending, closes #5606
+  * [+cae0357] handle the new sis id columns in gradebook csv uploads
+
+ -- JT Olds <jt@instructure.com>  Wed, 21 Sep 2011 14:08:19 -0600
+
 canvas-lms (1.1-59) professional; urgency=low
 
   * Package ref: bd910c91a86ef3076c211296a584f326a99bf5f9
