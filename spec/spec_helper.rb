@@ -130,7 +130,7 @@ Spec::Runner.configure do |config|
     user = opts[:user] || @user
     username = opts[:username] || "nobody@example.com"
     password = opts[:password] || "asdfasdf"
-    @pseudonym = user.pseudonyms.create!(:unique_id => username, :path => username, :password => password, :password_confirmation => password)
+    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :path => username, :password => password, :password_confirmation => password)
     @cc = @pseudonym.communication_channel
     @cc.should_not be_nil
     @cc.should_not be_new_record
