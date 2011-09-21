@@ -27,7 +27,9 @@ module SIS
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
-      yield importer
+      Group.process_as_sis(false) do
+        yield importer
+      end
       @logger.debug("Groups took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -66,9 +68,7 @@ module SIS
 
         group ||= account.groups.new
         # only update the name on new records, and ones that haven't had their name changed since the last sis import
-        if name.present? && (group.new_record? || (group.sis_name && group.sis_name == group.name))
-          group.name = group.sis_name = name
-        end
+        group.name = name if name.present? && (group.new_record? || (!group.stuck_sis_fields.include?(:name)))
 
         # must set .context, not just .account, since these are account-level groups
         group.context = account

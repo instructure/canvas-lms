@@ -34,8 +34,10 @@ module SIS
 
       importer = Work.new(@batch_id, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages)
       Course.skip_callback(:update_enrollments_later) do
-        Course.skip_updating_account_associations do
-          yield importer
+        Course.process_as_sis(false) do
+          Course.skip_updating_account_associations do
+            yield importer
+          end
         end
       end
 
@@ -68,7 +70,6 @@ module SIS
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed)/i
-
 
         term = @root_account.enrollment_terms.find_by_sis_source_id(term_id)
         course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id)
@@ -121,18 +122,18 @@ module SIS
 
         # only update the name/short_name on new records, and ones that haven't been changed
         # since the last sis import
-        if course.short_name.blank? || course.sis_course_code == course.short_name
+        if course.course_code.blank? || !course.stuck_sis_fields.include?(:course_code)
           if short_name.present?
-            course.short_name = course.sis_course_code = short_name
-          elsif abstract_course && course.short_name.blank?
-            course.short_name = course.sis_course_code = abstract_course.short_name
+            course.course_code = short_name
+          elsif abstract_course && course.course_code.blank?
+            course.course_code = abstract_course.short_name
           end
         end
-        if course.name.blank? || course.sis_name == course.name
+        if course.name.blank? || !course.stuck_sis_fields.include?(:name)
           if long_name.present?
-            course.name = course.sis_name = long_name
+            course.name = long_name
           elsif abstract_course && course.name.blank?
-            course.name = course.sis_name = abstract_course.name
+            course.name = abstract_course.name
           end
         end
 
@@ -141,14 +142,8 @@ module SIS
           course.templated_courses.each do |templated_course|
             templated_course.root_account = @root_account
             templated_course.account = course.account
-            if templated_course.sis_name && templated_course.sis_name == templated_course.name && course.sis_name && course.sis_name == course.name
-              templated_course.name = course.name
-              templated_course.sis_name = course.sis_name
-            end
-            if templated_course.sis_course_code && templated_course.sis_course_code == templated_course.short_name && course.sis_course_code && course.sis_course_code == course.short_name
-              templated_course.sis_course_code = course.sis_course_code
-              templated_course.short_name = course.short_name
-            end
+            templated_course.name = course.name if !templated_course.stuck_sis_fields.include?(:name) && !course.stuck_sis_fields.include?(:name)
+            templated_course.course_code = course.course_code if !templated_course.stuck_sis_fields.include?(:course_code) && !course.stuck_sis_fields.include?(:course_code)
             templated_course.enrollment_term = course.enrollment_term
             templated_course.sis_batch_id = @batch_id if @batch_id
             @course_ids_to_update_associations.add(templated_course.id) if templated_course.account_id_changed? || templated_course.root_account_id_changed?

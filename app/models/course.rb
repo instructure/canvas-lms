@@ -167,6 +167,9 @@ class Course < ActiveRecord::Base
   
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
   
+  include StickySisFields
+  are_sis_sticky :name, :course_code
+
   has_a_broadcast_policy
   
   def self.skip_updating_account_associations(&block)

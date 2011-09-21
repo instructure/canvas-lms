@@ -28,8 +28,12 @@ module SIS
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
       Course.skip_callback(:update_enrollments_later) do
-        Course.skip_updating_account_associations do
-          yield importer
+        Course.process_as_sis(false) do
+          CourseSection.process_as_sis(false) do
+            Course.skip_updating_account_associations do
+              yield importer
+            end
+          end
         end
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
@@ -69,8 +73,8 @@ module SIS
             @course = Course.new
             @course.root_account = @root_account
             @course.account_id = section.course.account_id
-            @course.name = @course.sis_name = section.course.name
-            @course.short_name = @course.sis_course_code = section.course.short_name
+            @course.name = section.course.name
+            @course.course_code = section.course.course_code
             @course.sis_source_id = xlist_course_id
             @course.enrollment_term_id = section.course.enrollment_term_id
             @course.sis_batch_id = @batch_id if @batch_id
@@ -81,7 +85,7 @@ module SIS
           end
         end
 
-        unless section.sticky_xlist
+        unless section.stuck_sis_fields.include?(:course_id)
           if status =~ /\Aactive\z/i
 
             if @course.deleted?
@@ -98,7 +102,7 @@ module SIS
 
             begin
               @course_ids_to_update_associations.merge [@course.id, section.course_id, section.nonxlist_course_id].compact
-              section.crosslist_to_course(@course, :run_jobs_immediately, :nonsticky)
+              section.crosslist_to_course(@course, :run_jobs_immediately)
             rescue => e
               raise ImportError, "An active cross-listing failed: #{e}"
             end

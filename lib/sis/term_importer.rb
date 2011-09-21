@@ -27,7 +27,9 @@ module SIS
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
-      yield importer
+      EnrollmentTerm.process_as_sis(false) do
+        yield importer
+      end
       @logger.debug("Terms took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -55,8 +57,8 @@ module SIS
 
         # only update the name on new records, and ones that haven't been
         # changed since the last sis import
-        if term.new_record? || (term.sis_name && term.sis_name == term.name)
-          term.name = term.sis_name = name
+        if term.new_record? || !term.stuck_sis_fields.include?(:name)
+          term.name = name
         end
 
         term.sis_source_id = term_id

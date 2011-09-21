@@ -98,6 +98,9 @@ class Account < ActiveRecord::Base
 
   validates_locale :default_locale, :allow_nil => true
 
+  include StickySisFields
+  are_sis_sticky :name
+
   def default_locale(recurse = false)
     read_attribute(:default_locale) ||
     (recurse && parent_account ? parent_account.default_locale(true) : nil)

@@ -42,4 +42,7 @@ class AbstractCourse < ActiveRecord::Base
     { :conditions => ['abstract_courses.workflow_state != ?', 'deleted'] }
   }
   
+  include StickySisFields
+  are_sis_sticky :name, :short_name
+
 end

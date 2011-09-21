@@ -28,7 +28,9 @@ module SIS
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
       Course.skip_updating_account_associations do
-        yield importer
+        CourseSection.process_as_sis(false) do
+          yield importer
+        end
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
       CourseSection.update_all({:sis_batch_id => @batch_id}, {:id => importer.sections_to_update_sis_batch_ids}) if @batch_id && !importer.sections_to_update_sis_batch_ids.empty?
@@ -71,12 +73,10 @@ module SIS
         @course_ids_to_update_associations.add section.course_id if section.account_id_changed?
 
         # only update the name on new records, and ones that haven't been changed since the last sis import
-        if section.new_record? || (section.sis_name && section.sis_name == section.name)
-          section.name = section.sis_name = name
-        end
+        section.name = name if section.new_record? || !section.stuck_sis_fields.include?(:name)
 
         # update the course id if necessary
-        if section.course_id != course.id
+        if section.course_id != course.id && !section.stuck_sis_fields.include?(:course_id)
           if section.nonxlist_course_id
             # this section is crosslisted
             if section.nonxlist_course_id != course.id
@@ -91,9 +91,9 @@ module SIS
             @course_ids_to_update_associations.merge [section.course_id, course.id]
             section.move_to_course(course, :run_jobs_immediately)
           end
-        end
 
-        @course_ids_to_update_associations.add section.course_id
+          @course_ids_to_update_associations.add section.course_id
+        end
 
         section.sis_source_id = section_id
         if status =~ /active/i

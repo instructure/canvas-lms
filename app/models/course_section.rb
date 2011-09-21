@@ -39,6 +39,9 @@ class CourseSection < ActiveRecord::Base
   before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
 
+  include StickySisFields
+  are_sis_sticky :course_id, :name
+
   def maybe_touch_all_enrollments
     self.touch_all_enrollments if self.start_at_changed? || self.end_at_changed? || self.restrict_enrollments_to_section_dates_changed? || self.course_id_changed?
   end
@@ -168,9 +171,6 @@ class CourseSection < ActiveRecord::Base
   def crosslist_to_course(course, *opts)
     return self if self.course_id == course.id
     self.nonxlist_course_id ||= self.course_id
-    if !self.sticky_xlist && !opts.include?(:nonsticky)
-      self.sticky_xlist = true
-    end
     self.move_to_course(course, *opts)
   end
   
@@ -182,7 +182,6 @@ class CourseSection < ActiveRecord::Base
     end
     nonxlist_course = self.nonxlist_course
     self.nonxlist_course = nil
-    self.sticky_xlist = false
     self.move_to_course(nonxlist_course, *opts)
   end
   

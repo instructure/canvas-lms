@@ -149,6 +149,48 @@ describe SIS::CSV::Import do
           "No long_name given for abstract course C005"]
     end
 
+    it 'should support sticky fields' do
+      before_count = AbstractCourse.count
+      process_csv_data_cleanly(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter13,active,,"
+      )
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      )
+      process_csv_data_cleanly(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "C001,Hum101,Humanities,A001,T001,active"
+      )
+      AbstractCourse.count.should == before_count + 1
+      AbstractCourse.last.tap do |c|
+        c.name.should == "Humanities"
+        c.short_name.should == "Hum101"
+      end
+      process_csv_data_cleanly(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "C001,Math101,Mathematics,A001,T001,active"
+      )
+      AbstractCourse.count.should == before_count + 1
+      AbstractCourse.last.tap do |c|
+        c.name.should == "Mathematics"
+        c.short_name.should == "Math101"
+        c.name = "Physics"
+        c.short_name = "Phys101"
+        c.save!
+      end
+      process_csv_data_cleanly(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "C001,Thea101,Theater,A001,T001,active"
+      )
+      AbstractCourse.count.should == before_count + 1
+      AbstractCourse.last.tap do |c|
+        c.name.should == "Physics"
+        c.short_name.should == "Phys101"
+      end
+    end
+
     it 'should create new abstract courses' do
       before_count = AbstractCourse.count
       process_csv_data_cleanly(
@@ -1187,6 +1229,28 @@ describe SIS::CSV::Import do
       Account.find_by_sis_source_id('A003').name.should == "English Literature"
 
     end
+
+    it 'should support sticky fields' do
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active"
+      )
+      Account.find_by_sis_source_id('A001').name.should == "Humanities"
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,Math,active"
+      )
+      Account.find_by_sis_source_id('A001').tap do |a|
+        a.name.should == "Math"
+        a.name = "Science"
+        a.save!
+      end
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,History,active"
+      )
+      Account.find_by_sis_source_id('A001').name.should == "Science"
+    end
   end
 
   context 'term importing' do
@@ -1233,6 +1297,29 @@ describe SIS::CSV::Import do
       importer.warnings.map{|r|r.last}.should == ["Bad date format for term T002"]
       importer.errors.should == []
     end
+
+    it 'should support stickiness' do
+      before_count = EnrollmentTerm.count
+      importer = process_csv_data(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
+      EnrollmentTerm.count.should == before_count + 1
+      EnrollmentTerm.last.name.should == "Winter11"
+      importer = process_csv_data(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter12,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
+      EnrollmentTerm.count.should == before_count + 1
+      EnrollmentTerm.last.tap do |t|
+        t.name.should == "Winter12"
+        t.name = "Fall11"
+        t.save!
+      end
+      importer = process_csv_data(
+        "term_id,name,status,start_date,end_date",
+        "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
+      EnrollmentTerm.count.should == before_count + 1
+      EnrollmentTerm.last.name.should == "Fall11"
+    end
   end
 
   context 'section importing' do
@@ -1260,6 +1347,33 @@ describe SIS::CSV::Import do
                         "Improper status \"inactive\" for section S003 in course C002",
                         "No name given for section S004 in course C002",
                         "Section S005 references course C001 which doesn't exist"]
+    end
+
+    it 'should support stickiness' do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      before_count = CourseSection.count
+      process_csv_data_cleanly(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active")
+      CourseSection.count.should == before_count + 1
+      CourseSection.last.name.should == "Sec1"
+      process_csv_data_cleanly(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active")
+      CourseSection.count.should == before_count + 1
+      CourseSection.last.tap do |s|
+        s.name.should == "Sec2"
+        s.name = "Sec3"
+        s.save!
+      end
+      process_csv_data_cleanly(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec4,2011-1-05 00:00:00,2011-4-14 00:00:00,active")
+      CourseSection.count.should == before_count + 1
+      CourseSection.last.name.should == "Sec3"
     end
 
     it 'should create sections' do
@@ -1395,9 +1509,7 @@ describe SIS::CSV::Import do
       course.associated_accounts.map(&:id).sort.should == [@account.id]
 
       xlist_course.name.should == "Test Course 101"
-      xlist_course.sis_name.should == "Test Course 101"
       xlist_course.short_name.should == "TC 101"
-      xlist_course.sis_course_code.should == "TC 101"
       xlist_course.sis_source_id.should == "X001"
       xlist_course.root_account_id.should == @account.id
       xlist_course.account_id.should == @account.id
@@ -1729,7 +1841,7 @@ describe SIS::CSV::Import do
       s1.crosslisted?.should be_false
     end
 
-    it 'should leave a section alone if a section has been crosslisted with the sticky_xlist flag set' do
+    it 'should leave a section alone if a section has been crosslisted manually' do
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
@@ -1784,6 +1896,8 @@ describe SIS::CSV::Import do
       check_section_crosslisted 'C002'
       with_section do |s|
         s.uncrosslist
+        s.clear_sis_stickiness :course_id
+        s.save!
       end
       check_section_not_crosslisted
       process_csv_data_cleanly(
@@ -2112,6 +2226,7 @@ describe SIS::CSV::Import do
   end
 
   describe "group importing" do
+
     it "should skip bad content" do
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",

@@ -28,9 +28,11 @@ module SIS
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       User.skip_updating_account_associations do
-        yield importer
-        while importer.any_left_to_process?
-          importer.process_batch
+        User.process_as_sis(false) do
+          yield importer
+          while importer.any_left_to_process?
+            importer.process_batch
+          end
         end
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
@@ -104,11 +106,11 @@ module SIS
               end
 
               user = pseudo.user
-              user.name = user.sis_name = "#{first_name} #{last_name}" if user.sis_name && user.sis_name == user.name
+              user.name = "#{first_name} #{last_name}" unless user.stuck_sis_fields.include?(:name)
 
             else
               user = User.new
-              user.name = user.sis_name = "#{first_name} #{last_name}"
+              user.name = "#{first_name} #{last_name}"
             end
 
             if status =~ /active/i

@@ -107,6 +107,10 @@ class User < ActiveRecord::Base
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
+
+  include StickySisFields
+  are_sis_sticky :name
+
   def conversations
     all_conversations.visible # i.e. exclude any where the user has deleted all the messages
   end

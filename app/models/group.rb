@@ -64,6 +64,8 @@ class Group < ActiveRecord::Base
   before_save :ensure_defaults
   after_save :close_memberships_if_deleted
   
+  include StickySisFields
+  are_sis_sticky :name
 
   def wiki
     res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
