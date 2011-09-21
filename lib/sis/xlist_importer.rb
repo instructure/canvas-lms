@@ -18,18 +18,19 @@
 
 module SIS
   class XlistImporter
-    def initialize(batch_id, root_account, logger)
+    def initialize(batch_id, root_account, logger, override_sis_stickiness)
       @batch_id = batch_id
       @root_account = root_account
       @logger = logger
+      @override_sis_stickiness = override_sis_stickiness
     end
 
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
       Course.skip_callback(:update_enrollments_later) do
-        Course.process_as_sis(false) do
-          CourseSection.process_as_sis(false) do
+        Course.process_as_sis(@override_sis_stickiness) do
+          CourseSection.process_as_sis(@override_sis_stickiness) do
             Course.skip_updating_account_associations do
               yield importer
             end

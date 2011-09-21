@@ -27,7 +27,7 @@ module SIS
       # expected columns
       # enrollment_id,grade_publishing_status
       def process(csv)
-        @sis.counts[:grade_publishing_results] += SIS::GradePublishingResultsImporter.new(@batch.try(:id), @root_account, logger).process do |importer|
+        @sis.counts[:grade_publishing_results] += SIS::GradePublishingResultsImporter.new(@batch.try(:id), @root_account, logger, @override_sis_stickiness).process do |importer|
           csv_rows(csv) do |row|
             update_progress
 

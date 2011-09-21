@@ -26,7 +26,7 @@ module SIS
       # expected columns
       # group_id,user_id,status
       def process(csv)
-        @sis.counts[:group_memberships] += SIS::GroupMembershipImporter.new(@batch.try(:id), @root_account, logger).process do |importer|
+        @sis.counts[:group_memberships] += SIS::GroupMembershipImporter.new(@batch.try(:id), @root_account, logger, @override_sis_stickiness).process do |importer|
           csv_rows(csv) do |row|
             update_progress
 

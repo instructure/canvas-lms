@@ -18,16 +18,17 @@
 
 module SIS
   class TermImporter
-    def initialize(batch_id, root_account, logger)
+    def initialize(batch_id, root_account, logger, override_sis_stickiness)
       @batch_id = batch_id
       @root_account = root_account
       @logger = logger
+      @override_sis_stickiness = override_sis_stickiness
     end
 
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
-      EnrollmentTerm.process_as_sis(false) do
+      EnrollmentTerm.process_as_sis(@override_sis_stickiness) do
         yield importer
       end
       @logger.debug("Terms took #{Time.now - start} seconds")

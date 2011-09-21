@@ -339,23 +339,27 @@ Spec::Runner.configure do |config|
     update_with_protected_attributes!(ar_instance, attrs) rescue false
   end
 
-  def process_csv_data(*lines)
+  def process_csv_data(*lines_or_opts)
     account_model unless @account
   
+    lines = lines_or_opts.reject{|thing| thing.is_a? Hash}
+    opts = lines_or_opts.select{|thing| thing.is_a? Hash}.inject({:allow_printing => false}, :merge)
+
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
     tmp.close!
     File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
+    opts[:files] = [path]
     
-    importer = SIS::CSV::Import.process(@account, :files => [ path ], :allow_printing=>false)
+    importer = SIS::CSV::Import.process(@account, opts)
     
     File.unlink path
     
     importer
   end
   
-  def process_csv_data_cleanly(*lines)
-    importer = process_csv_data(*lines)
+  def process_csv_data_cleanly(*lines_or_opts)
+    importer = process_csv_data(*lines_or_opts)
     importer.errors.should == []
     importer.warnings.should == []
   end

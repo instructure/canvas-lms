@@ -30,6 +30,7 @@ module SIS
         @sis = sis_csv
         @root_account = @sis.root_account
         @batch = @sis.batch
+        @override_sis_stickiness = @sis.override_sis_stickiness
       end
 
       def process(csv)

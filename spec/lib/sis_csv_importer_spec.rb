@@ -128,6 +128,67 @@ describe SIS::CSV::Import do
     )
   end
 
+  it 'should support sis stickiness overriding' do
+    before_count = AbstractCourse.count
+    process_csv_data_cleanly(
+      "term_id,name,status,start_date,end_date",
+      "T001,Winter13,active,,"
+    )
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,TestAccount,active"
+    )
+    process_csv_data_cleanly(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Hum101,Humanities,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Humanities"
+      c.short_name.should == "Hum101"
+    end
+    process_csv_data_cleanly(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Math101,Mathematics,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Mathematics"
+      c.short_name.should == "Math101"
+      c.name = "Physics"
+      c.short_name = "Phys101"
+      c.save!
+    end
+    process_csv_data_cleanly(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Thea101,Theater,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Physics"
+      c.short_name.should == "Phys101"
+    end
+    process_csv_data_cleanly(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Thea101,Theater,A001,T001,active",
+      {:override_sis_stickiness => true}
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Theater"
+      c.short_name.should == "Thea101"
+    end
+    process_csv_data_cleanly(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Fren101,French,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Theater"
+      c.short_name.should == "Thea101"
+    end
+  end
+
   context "abstract course importing" do
     it 'should skip bad content' do
       before_count = AbstractCourse.count

@@ -28,7 +28,7 @@ module SIS
       # user_id,login_id,first_name,last_name,email,status
       def process(csv)
         messages = []
-        @sis.counts[:users] += SIS::UserImporter.new(@batch.try(:id), @root_account, logger).process(@sis.updates_every, messages) do |importer|
+        @sis.counts[:users] += SIS::UserImporter.new(@batch.try(:id), @root_account, logger, @override_sis_stickiness).process(@sis.updates_every, messages) do |importer|
           csv_rows(csv) do |row|
             update_progress
 
