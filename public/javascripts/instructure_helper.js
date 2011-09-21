@@ -588,7 +588,13 @@ I18n.scoped('instructure', function(I18n) {
         if(window.FileList && (param instanceof FileList)) {
           param = param[0];
         }
-        fd.append(idx, param);
+        if (param instanceof Array) {
+          for (var i = 0; i < param.length; i++) {
+            fd.append(idx, param[i]);
+          }
+        } else {
+          fd.append(idx, param);
+        }
       }
       result.form_data = fd;
       callback(result);
