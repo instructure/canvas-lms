@@ -68,7 +68,7 @@ class ProfileController < ApplicationController
       format.json do
         hash = user_json(@user)
         hash['primary_email'] = @default_email_channel.try(:path)
-        hash['login_id'] ||= @default_pseudonym.unique_id
+        hash['login_id'] ||= @default_pseudonym.try(:unique_id)
         if service_enabled?(:avatars)
           hash['avatar_url'] = avatar_image_url(@user.id)
         end

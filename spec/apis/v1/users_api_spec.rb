@@ -45,6 +45,27 @@ describe "Users API", :type => :integration do
     }
   end
 
+  it "should return user info for users with no pseudonym" do
+    @me = @user
+    new_user = user(:name => 'new guy')
+    @user = @me
+    @course.enroll_user(new_user, 'ObserverEnrollment')
+    Account.site_admin.add_user(@user)
+    json = api_call(:get, "/api/v1/users/#{new_user.id}/profile",
+             :controller => "profile", :action => "show", :user_id => new_user.to_param, :format => 'json')
+    json.should == {
+      'id' => new_user.id,
+      'name' => 'new guy',
+      'sortable_name' => 'guy, new',
+      'short_name' => 'new guy',
+      'login_id' => nil,
+      'primary_email' => nil,
+      'avatar_url' => "http://www.example.com/images/users/#{new_user.id}",
+    }
+
+    get("/courses/#{@course.id}/students")
+  end
+
   it "should return this user's profile" do
     json = api_call(:get, "/api/v1/users/self/profile",
              :controller => "profile", :action => "show", :user_id => 'self', :format => 'json')
