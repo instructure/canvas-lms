@@ -84,6 +84,22 @@ I18n.scoped('instructure', function(I18n) {
           return false;
         }
       }
+      
+      if (options.disableWhileLoading) {
+        var loadingPromise = $.Deferred(),
+            oldHandlers = {};
+        $form.disableWhileLoading(loadingPromise);
+        $.each(['success', 'error'], function(i, successOrError){
+          oldHandlers[successOrError] = options[successOrError];
+          options[successOrError] = function() {
+            loadingPromise[successOrError === 'success' ? 'resolve': 'reject']();
+            if ($.isFunction(oldHandlers[successOrError])) {
+              return oldHandlers[successOrError].apply(this, arguments);
+            }
+          };
+        });
+      }
+      
       var doUploadFile = options.fileUpload;
       if($.isFunction(options.fileUpload)) {
         try {
@@ -97,6 +113,7 @@ I18n.scoped('instructure', function(I18n) {
         action = $form.attr('action');
       }
       if(error && !options.preventDegradeToFormSubmit) {
+        if (loadingPromise) loadingPromise.reject();
         if(INST && INST.environment == 'development') {
           $.flashError('formSubmit error, trying to gracefully degrade. See console for details');
         }
@@ -106,6 +123,7 @@ I18n.scoped('instructure', function(I18n) {
       event.stopPropagation();
       if(options.noSubmit) {
         if($.isFunction(options.success)) {
+          loadingPromise.resolve();
           options.success.call($form, formData, submitParam);
         }
       } else if(doUploadFile && options.preparedFileUpload && options.context_code) {
