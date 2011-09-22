@@ -89,7 +89,7 @@ class ConversationsController < ApplicationController
   #     }
   #   ]
   def index
-    @page_max = params[:per_page] = params[:per_page].try(:to_i) || 10
+    @page_max = params[:per_page] = 25 if params[:format] != 'json'
     conversations_scope = case params[:scope]
       when 'unread'
         @view_name = I18n.t('index.inbox_views.unread', 'Unread')
