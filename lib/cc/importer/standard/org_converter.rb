@@ -19,18 +19,31 @@ module CC::Importer::Standard
   module OrgConverter
     include CC::Importer
     include WeblinkConverter
-    
+
     def convert_organizations(doc)
       modules = []
       return modules unless doc
-      
+      misc_module = nil
+
       doc.css('organizations organization > item > item').each do |item_node|
-        mod = {:items=>[]}
-        mod[:migration_id] = item_node['identifier']
-        add_children(item_node, mod)
-        modules << mod
+        if item_node['identifierref']
+          # item points to a single item
+          if item = process_item(item_node, 0)
+            if !misc_module
+              misc_module = {:title => "Misc Module", :migration_id => "misc_module_top_level_items", :items => []}
+              modules << misc_module
+            end
+            misc_module[:items] << item
+          end
+        else
+          # It's a folder
+          mod = {:items=>[]}
+          mod[:migration_id] = item_node['identifier']
+          add_children(item_node, mod)
+          modules << mod
+        end
       end
-      
+
       modules
     end
 
@@ -47,48 +60,55 @@ module CC::Importer::Standard
         else
           if !item_node['identifierref']
             add_children(item_node, mod, indent + 1)
-          elsif resource = @resources[item_node['identifierref']]
-            
-            case resource[:type]
-              when /assessment\z/
-                mod[:items] << {
-                        :indent =>indent,
-                        :linked_resource_type => 'ASSESSMENT',
-                        :linked_resource_id => resource[:migration_id],
-                        :linked_resource_title => get_node_val(item_node, 'title'),
-                }
-              when /\Aimswl/
-                item = {:indent => indent, :linked_resource_type => 'URL'}
-                item[:linked_resource_title] = get_node_val(item_node, 'title')
-                title, item[:url] = get_weblink_title_and_url(resource)
-                item[:linked_resource_title] ||= title
-                mod[:items] << item unless item[:url].blank?
-              when /\Aimsbasiclti/
-                mod[:items] << {
-                        :indent =>indent,
-                        :linked_resource_type => 'CONTEXTEXTERNALTOOL',
-                        :linked_resource_id => resource[:migration_id],
-                        :linked_resource_title => get_node_val(item_node, 'title'),
-                        :url => resource[:url]
-                }
-              when /\Aimsdt/
-                mod[:items] << {
-                        :indent =>indent,
-                        :linked_resource_type => 'DISCUSSION',
-                        :linked_resource_id => resource[:migration_id],
-                        :linked_resource_title => get_node_val(item_node, 'title')
-                }
-              when /webcontent|learning-application-resource\z/
-                # todo check intended use
-                item = {:indent => indent, :linked_resource_type => 'FILE_TYPE'}
-                item[:linked_resource_id] = item_node['identifierref']
-                item[:linked_resource_title] = get_node_val(item_node, 'title')
-                mod[:items] << item
-            end
+          elsif item = process_item(item_node, indent)
+            mod[:items] << item
           end
         end
       end
     end
-    
+
+    def process_item(item_node, indent)
+      item = nil
+      if resource = @resources[item_node['identifierref']]
+        case resource[:type]
+          when /assessment\z/
+            item = {
+                    :indent =>indent,
+                    :linked_resource_type => 'ASSESSMENT',
+                    :linked_resource_id => resource[:migration_id],
+                    :linked_resource_title => get_node_val(item_node, 'title'),
+            }
+          when /\Aimswl/
+            item = {:indent => indent, :linked_resource_type => 'URL'}
+            item[:linked_resource_title] = get_node_val(item_node, 'title')
+            title, item[:url] = get_weblink_title_and_url(resource)
+            item[:linked_resource_title] ||= title
+            item = nil if item[:url].blank?
+          when /\Aimsbasiclti/
+            item = {
+                    :indent =>indent,
+                    :linked_resource_type => 'CONTEXTEXTERNALTOOL',
+                    :linked_resource_id => resource[:migration_id],
+                    :linked_resource_title => get_node_val(item_node, 'title'),
+                    :url => resource[:url]
+            }
+          when /\Aimsdt/
+            item = {
+                    :indent =>indent,
+                    :linked_resource_type => 'DISCUSSION',
+                    :linked_resource_id => resource[:migration_id],
+                    :linked_resource_title => get_node_val(item_node, 'title')
+            }
+          when /webcontent|learning-application-resource\z/
+            # todo check intended use
+            item = {:indent => indent, :linked_resource_type => 'FILE_TYPE'}
+            item[:linked_resource_id] = item_node['identifierref']
+            item[:linked_resource_title] = get_node_val(item_node, 'title')
+        end
+      end
+      
+      item
+    end
+
   end
 end

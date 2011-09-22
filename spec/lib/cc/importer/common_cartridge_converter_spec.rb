@@ -149,5 +149,127 @@ describe "Standard Common Cartridge importing" do
       pending("Can't import assessment data with python QTI tool.")
     end
   end
-  
+
+end
+
+describe "More Standard Common Cartridge importing" do
+  before(:each) do
+    @converter = get_standard_converter
+    @copy_to = course_model
+    @copy_to.name = "alt name"
+    @copy_to.course_code = "alt name"
+
+    @migration = Object.new
+    @migration.stub!(:to_import).and_return(nil)
+    @migration.stub!(:context).and_return(@copy_to)
+  end
+
+  it "should properly handle top-level resource references" do
+    orgs = <<-XML
+<organizations>
+  <organization structure="rooted-hierarchy" identifier="org_1">
+    <item identifier="LearningModules">
+      <item identifier="m1">
+        <title>some module</title>
+        <item identifier="ct2" identifierref="w1">
+          <title>some page</title>
+        </item>
+      </item>
+      <item identifier="ct5" identifierref="f3">
+        <title>Super exciting!</title>
+      </item>
+      <item identifier="m2">
+        <title>next module</title>
+      </item>
+      <item identifier="ct6" identifierref="f4">
+        <title>test answers</title>
+      </item>
+      <item identifier="ct7" identifierref="f5">
+        <title>test answers</title>
+      </item>
+    </item>
+  </organization>
+</organizations>
+    XML
+
+    #convert to json
+    # pretend there were resources for the referenced items
+    @converter.resources = {'w1' => {:type=>"webcontent"}, 'f3' => {:type=>"webcontent"}, 'f4' => {:type=>"webcontent"}, 'f5' => {:type=>"webcontent"}, }
+    doc = Nokogiri::XML(orgs)
+    hash = @converter.convert_organizations(doc)
+
+    # make all the fake attachments for the module items to link to
+    unfiled_folder = Folder.unfiled_folder(@copy_to)
+    w1 = Attachment.create!(:filename => 'w1.html', :uploaded_data => StringIO.new('w1'), :folder => unfiled_folder, :context => @copy_to)
+    w1.migration_id = "w1"; w1.save
+    f3 = Attachment.create!(:filename => 'f3.html', :uploaded_data => StringIO.new('f3'), :folder => unfiled_folder, :context => @copy_to)
+    f3.migration_id = "f3"; f3.save
+    f4 = Attachment.create!(:filename => 'f4.html', :uploaded_data => StringIO.new('f4'), :folder => unfiled_folder, :context => @copy_to)
+    f4.migration_id = "f4"; f4.save
+    f5 = Attachment.create!(:filename => 'f5.html', :uploaded_data => StringIO.new('f5'), :folder => unfiled_folder, :context => @copy_to)
+    f5.migration_id = "f5"; f5.save
+
+    #import json into new course
+    hash = hash.map { |h| h.with_indifferent_access }
+    ContextModule.process_migration({'modules' =>hash}, @migration)
+    @copy_to.save!
+
+    @copy_to.context_modules.count.should == 3
+
+    mod1 = @copy_to.context_modules.find_by_migration_id("m1")
+    mod1.name.should == "some module"
+    mod1.content_tags.count.should == 1
+    mod1.position.should == 1
+    tag = mod1.content_tags.last
+    tag.content_id.should == w1.id
+    tag.content_type.should == 'Attachment'
+    tag.indent.should == 0
+
+    mod2 = @copy_to.context_modules.find_by_migration_id("misc_module_top_level_items")
+    mod2.name.should == "Misc Module"
+    mod2.content_tags.count.should == 3
+    mod2.position.should == 2
+    tag = mod2.content_tags.first
+    tag.content_id.should == f3.id
+    tag.content_type.should == 'Attachment'
+    tag.indent.should == 0
+    tag = mod2.content_tags[1]
+    tag.content_id.should == f4.id
+    tag.content_type.should == 'Attachment'
+    tag.indent.should == 0
+    tag = mod2.content_tags[2]
+    tag.content_id.should == f5.id
+    tag.content_type.should == 'Attachment'
+    tag.indent.should == 0
+
+    mod3 = @copy_to.context_modules.find_by_migration_id("m2")
+    mod3.name.should == "next module"
+    mod3.content_tags.count.should == 0
+    mod3.position.should == 3
+  end
+
+  it "should handle back-slashed paths" do
+    resources = <<-XML
+<resources>
+  <resource href="a1\\a1.html" identifier="a1" type="webcontent" intendeduse="assignment">
+    <file href="a1\\a1.html"/>
+  </resource>
+  <resource identifier="w1" type="webcontent">
+    <file href="w1\\w1.html"/>
+    <file href="w1\\w2.html"/>
+  </resource>
+  <resource identifier="q1" type="imsqti_xmlv1p2/imscc_xmlv1p2/assessment">
+    <file href="q1\\q1.xml"/>
+  </resource>
+</resources>
+    XML
+
+    doc = Nokogiri::XML(resources)
+    @converter.unzipped_file_path = 'testing/'
+    @converter.get_all_resources(doc)
+    @converter.resources['a1'][:href].should == 'a1/a1.html'
+    @converter.resources['w1'][:files].first[:href].should == 'w1/w1.html'
+    @converter.resources['w1'][:files][1][:href].should == 'w1/w2.html'
+    @converter.resources['q1'][:files].first[:href].should == 'q1/q1.xml'
+  end
 end

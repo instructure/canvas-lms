@@ -86,13 +86,14 @@ module CC::Importer::Standard
         resource ||= {:migration_id=>id}
         resource[:type] = r_node['type']
         resource[:href] = r_node['href']
+        resource[:href] = resource[:href].gsub('\\', '/') if resource[:href]
         # Should be "Learner", "Instructor", or "Mentor"
         resource[:intended_user_role] = get_node_val(r_node, "#{@lom}|intendedEndUserRole #{@lom}|value", nil) if @lom
         # Should be "assignment", "lessonplan", "syllabus", or "unspecified"
         resource[:intended_use] = r_node['intendeduse']
         resource[:files] = []
         r_node.css('file').each do |file_node|
-          resource[:files] << {:href => file_node[:href]}
+          resource[:files] << {:href => file_node[:href].gsub('\\', '/')}
         end
         resource[:dependencies] = []
         r_node.css('dependency').each do |d_node|
