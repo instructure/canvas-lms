@@ -2020,7 +2020,7 @@
           container: $conversation_list,
           params: {
             format: 'json',
-            per_page: 25
+            per_page: MessageInbox.conversations_per_page
           },
           loader: $("#conversations_loader"),
           scrape: function(data) {
