@@ -29,7 +29,7 @@
           <%= image_tag "warning.png" %> <%= t('warnings.unpublished_changes', "You have made unpublished changes to this quiz.  These changes will not appear for students until you publish or re-publish the quiz.") %>
         </div>
         <div id="quiz_options" class="rs-margin-lr">
-          <table class="stylized-table" style="margin-bottom: 0;">
+          <table class="stylized" style="margin-bottom: 0;">
             <tr>
               <td><label for="quiz_assignment_id"><%= before_label(:this_is_a, "This is a") %> </label></td>
               <td><select name="quiz[quiz_type]" id="quiz_assignment_id">
@@ -78,7 +78,7 @@
           <span class="assignment_id" style="display: none;"><%= @assignment ? @assignment.id : nbsp %></span>
         </div>
         <div class="rs-margin-lr">
-          <table class="stylized-table" cellspacing="0">
+          <table class="stylized" cellspacing="0">
             <tr>
               <td colspan="2">
                 <%= check_box :quiz, :shuffle_answers %>

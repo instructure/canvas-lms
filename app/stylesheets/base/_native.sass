@@ -37,18 +37,31 @@ a
 
 /* Tables
   -------------------------------------------------------------- */
-table.stylized-table
+table.stylized
   margin-bottom: 1.4em
   width: 100%
   th
     font-weight: bold
   th, td, caption
     padding: 2px 5px 2px 2px
-  tr.even td
-    background: #e5ecf9
   tfoot
     font-style: italic
   caption
     background: #eee
 // img
    :vertical-align middle
+   
+table.striped
+  thead th
+    //for ie8
+    background-color: #ddd
+    //Better cause it just makes whatever it's on top of darker.
+    background-color: rgba(0, 0, 0, 0.06 )
+  tr.even td, tr:nth-child(2n) td
+    //for ie8
+    background-color: #FBFBFB
+    //Better cause it just makes whatever it's on top of darker.
+    background-color: rgba(0, 0, 0, 0.02 )
+table.bordered
+  th, td
+    border: 1px solid #ccc
