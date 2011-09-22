@@ -545,4 +545,11 @@ describe User do
       User.with_avatar_state('any').count.should == 1
     end
   end
+
+  it "should assert_by_email users into the correct account" do
+    account_model
+    data = User.assert_by_email('test@example.com', @account)
+    data[:new].should be_true
+    data[:user].account.should == @account
+  end
 end

@@ -1551,31 +1551,16 @@ class User < ActiveRecord::Base
     self.learning_outcome_results.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
   end
   
-  def self.assert_by_email(email, name=nil, password=nil)
-    user = Pseudonym.find_by_unique_id(email).user rescue nil
-    user ||= CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
+  def self.assert_by_email(email, account)
+    p = Pseudonym.find_by_unique_id(email)
+    cc = CommunicationChannel.find_by_path_and_path_type(email, 'email')
+    user = p.try(:user)
+    user ||= cc.try(:user)
     res = {:email => email}
-    if user
-      p = user.pseudonyms.active.find_by_unique_id(email)
-      if user.creation_pending? || user.pre_registered?
-        p ||= user.pseudonyms.build(:unique_id => email, :password => password, :password_confirmation => password)
-        p.password = password
-        p.password_confirmation = password
-        res[:password] = password
-      elsif !p
-        p ||= user.pseudonyms.create!(:unique_id => email, :password => password, :password_confirmation => password)
-        res[:password] = password
-      end
-      cc = user.communication_channels.unretired.find_by_path(email)
-      cc ||= user.communication_channels.create!(:path => email) unless CommunicationChannel.find_by_path(email)
-    else
-      user = User.create!(:name => name || email)
-      user.pseudonyms.create!(:unique_id => email, :path => email, :password => password, :password_confirmation => password)
-      cc = user.communication_channels.find_by_path_and_path_type(email, 'email') #pseudonym.communication_channel.confirm
-      cc.confirm if cc
-      res[:password] = password
-      res[:new] = true
-    end
+    res[:new] = !user
+    user ||= User.create!(:name => email)
+    user.pseudonyms.create!(:unique_id => email, :path => email, :account => account) unless p
+    user.communication_channels.create!(:path => email).confirm unless cc
     res[:user] = user
     res
   end

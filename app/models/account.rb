@@ -603,8 +603,8 @@ class Account < ActiveRecord::Base
     membership_type = args[:membership_type] || 'AccountAdmin'
     user = User.find_by_email(email)
     data = {}
-    if !user && true # check if can add password-based users
-      data = User.assert_by_email(email)
+    if !user
+      data = User.assert_by_email(email, self.root_account || self)
       user = data[:user]
     end
     if user
