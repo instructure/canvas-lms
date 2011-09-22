@@ -1106,29 +1106,6 @@ I18n.scoped('gradebook', function(I18n) {
         $("#hide_students_option").attr('checked', !show).change();
       });
 
-      var show = $.store.userGet('show_attendance_' + context_code) == 'true';
-      addOption('contact', show ? I18n.t('hide_attendance_columns', 'Hide Attendance Columns') : I18n.t('show_attendance_columns', 'Show Attendance Columns'), function() {
-        $.store.userSet('show_attendance_' + context_code, show ? 'false' : 'true');
-        var columns_to_toggle = [];
-        $(".cell.assignment_name.attendance").each(function() {
-          columns_to_toggle.push(this);
-        });
-        function nextColumn(i) {
-          var column = columns_to_toggle.shift();
-          if(column) {
-            datagrid.toggleColumn(datagrid.position($(column)).column, !show, {skipSizeGrid: true});
-            if(i > 5) {
-              setTimeout(function() { nextColumn(0); }, 500);
-            } else {
-              nextColumn(i + 1);
-            }
-          } else {
-            datagrid.sizeGrid();
-          }
-        }
-        setTimeout(function() { nextColumn(0); }, 50);
-      });
-
       addOption('check', ignoreUngradedSubmissions ? I18n.t('include_ungraded', 'Include Ungraded Assignments') : I18n.t('ignore_ungraded', 'Ignore Ungraded Assignments'), function() {
         ignoreUngradedSubmissions = !ignoreUngradedSubmissions;
         gradebook.updateAllStudentGrades(); 
