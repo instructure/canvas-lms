@@ -97,7 +97,7 @@ $.widget("ui.dialog", {
 		var self = this,
 			options = self.options,
 
-			title = options.title || '&#160;',
+			title = options.title || $('<span>&#160;</span>'),
 			titleId = $.ui.dialog.getTitleId(self.element),
 
 			uiDialog = (self.uiDialog = $('<div></div>'))
@@ -179,8 +179,12 @@ $.widget("ui.dialog", {
 			uiDialogTitle = $('<span></span>')
 				.addClass('ui-dialog-title')
 				.attr('id', titleId)
-				.html(title)
 				.prependTo(uiDialogTitlebar);
+			if (title.jquery ) {
+				uiDialogTitle.append(title);
+			} else {
+				uiDialogTitle.text(title);
+			}
 
 		//handling of deprecated beforeclose (vs beforeClose) option
 		//Ticket #4669 http://dev.jqueryui.com/ticket/4669
@@ -639,8 +643,14 @@ $.widget("ui.dialog", {
 				}
 				break;
 			case "title":
-				// convert whatever was passed in o a string, for html() to not throw up
-				$(".ui-dialog-title", self.uiDialogTitlebar).html("" + (value || '&#160;'));
+				if (!value) {
+					value = $('<span>&#160;</span>');
+				}
+				if ( value.jquery ) {
+					$(".ui-dialog-title", self.uiDialogTitlebar).html('').append(value);
+				} else {
+					$(".ui-dialog-title", self.uiDialogTitlebar).text("" + value);
+				}
 				break;
 		}
 

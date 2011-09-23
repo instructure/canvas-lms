@@ -43,6 +43,7 @@ javascripts:
     # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.shake.js
     - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.slide.js
     # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.transfer.js
+    - public/javascripts/instructure-jquery.ui.draggable-patch.js
     - public/javascripts/i18n.js
     - public/javascripts/jquery.ba-throttle-debounce.js
     - public/javascripts/jquery.ba-tinypubsub.js
