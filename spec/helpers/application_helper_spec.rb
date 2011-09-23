@@ -100,4 +100,11 @@ describe ApplicationHelper do
     account_admin_user
     show_user_create_course_button(@admin).should be_true
   end
+
+  describe "tomorrow_at_midnight" do
+    it "should always return a time in the future" do
+      now = 1.day.from_now.midnight - 5.seconds
+      tomorrow_at_midnight.should > now
+    end
+  end
 end
