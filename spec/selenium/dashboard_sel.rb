@@ -38,6 +38,19 @@ shared_examples_for "dashboard selenium tests" do
     test_hiding("/courses/#{@course.to_param}")
   end
 
+  it "should show conversation stream items on the dashboard" do
+    c = User.create.initiate_conversation([@user.id, User.create.id])
+    c.add_message('test')
+    c.add_participants([User.create.id])
+
+    items = @user.stream_item_instances
+    items.size.should == 1
+
+    get "/"
+    find_all_with_jquery("div.communication_message.conversation").size.should == 1
+    find_all_with_jquery("div.communication_message.conversation .communication_sub_message:visible").size.should == 3 # two messages, plus add message form
+  end
+
   it "should display assignment in to do list" do
     due_date = Time.now.utc + 2.days
     @assignment = @course.assignments.create(:name => 'test assignment', :due_at => due_date)
