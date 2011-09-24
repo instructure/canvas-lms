@@ -927,10 +927,12 @@ class Account < ActiveRecord::Base
         :description => "",
         :expose_to_ui => true
       },
+      # TODO: move avatars to :settings hash, it makes more sense there
       :avatars => {
         :name => "User Avatars",
         :description => "",
-        :default => false
+        :default => false,
+        :expose_to_ui => true
       }
     }.freeze
   end
