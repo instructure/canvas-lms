@@ -308,6 +308,9 @@ jQuery(function($){
       $("#assignment_group_category").val("");
     }
   }).change();
+  $("#assignment_turnitin_enabled").change(function() {
+    $("#assignment_turnitin_settings").showIf($(this).attr('checked'));
+  }).change();
   $("#assignment_peer_reviews").change(function() {
     $("#assignment_peer_reviews_options").showIf($(this).attr('checked'));
     if(!$(this).attr('checked')) {

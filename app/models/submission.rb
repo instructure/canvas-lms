@@ -170,6 +170,19 @@ class Submission < ActiveRecord::Base
     
     given {|user| user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
     can :read and can :comment
+    
+    given { |user, session|
+      grants_right?(user, session, :read) &&
+      turnitin_data &&
+      (assignment.cached_context_grants_right?(user, session, :manage_grades) ||
+        case assignment.turnitin_settings[:originality_report_visibility]
+          when 'immediate': true
+          when 'after_grading': graded?
+          when 'after_due_date': assignment.due_at && assignment.due_at < Time.now.utc
+        end
+      )
+    }
+    can :view_turnitin_report
   end
   
   on_update_send_to_streams do
@@ -275,9 +288,8 @@ class Submission < ActiveRecord::Base
     turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
     self.turnitin_data ||= {}
     submission_response = []
-    assignment_response = turnitin.createAssignment(self.assignment) unless turnitin_data[:assignment_id]
-    if assignment_response || true
-      enrollment_response = turnitin.enrollStudent(self.context, self.user) unless turnitin_data[:user_id]
+    if turnitin.createOrUpdateAssignment(self.assignment)
+      enrollment_response = turnitin.enrollStudent(self.context, self.user) # TODO: track this elsewhere so we don't have to do the API call on every submission
       if enrollment_response
         submission_response = turnitin.submitPaper(self)
       end

@@ -180,7 +180,7 @@
         <% 
           turntitin = nil 
           url = '#'
-          if submission && (submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades))
+          if can_do(submission, @current_user, :view_turnitin_report)
             if submission.submission_type == 'online_text_entry'
               turnitin = submission.turnitin_data && submission.turnitin_data[submission.asset_string]
               url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @student.id, submission.asset_string)

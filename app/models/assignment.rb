@@ -29,7 +29,7 @@ class Assignment < ActiveRecord::Base
     :assignment_group, :unlock_at, :lock_at, :group_category_name,
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-    :notify_of_update, :time_zone_edited, :turnitin_enabled,
+    :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :set_custom_field_values, :context, :position, :allowed_extensions
   attr_accessor :original_id
   
@@ -71,6 +71,7 @@ class Assignment < ActiveRecord::Base
     self.title = val
   end
 
+  serialize :turnitin_settings, Hash
   # file extensions allowed for online_upload submission
   serialize :allowed_extensions, Array
 
@@ -155,7 +156,47 @@ class Assignment < ActiveRecord::Base
     end
     true
   end
+
+  def turnitin_settings
+    read_attribute(:turnitin_settings) || default_turnitin_settings
+  end
+
+  def turnitin_settings=(settings)
+    unless settings.nil?
+      settings.delete_if { |key, value| !default_turnitin_settings.has_key?(key.to_sym) }
+      settings[:created] = turnitin_settings[:created] if turnitin_settings[:created]
   
+      settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date'].include?(settings[:originality_report_visibility])
+  
+      [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
+        settings[key] = '0' unless settings[key] == '1'
+      end
+  
+      exclude_value = settings[:exclude_value].to_i
+      settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
+      settings[:exclude_value] = case settings[:exclude_type]
+        when '0': ''
+        when '1': [exclude_value, 1].max.to_s
+        when '2': (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+      end
+    end
+
+    write_attribute :turnitin_settings, settings
+  end
+
+  def default_turnitin_settings
+    {
+      :originality_report_visibility => 'immediate',
+      :s_paper_check => '1',
+      :internet_check => '1',
+      :journal_check => '1',
+      :exclude_biblio => '1',
+      :exclude_quoted => '1',
+      :exclude_type => '0',
+      :exclude_value => ''
+    }
+  end
+
   def default_values
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"

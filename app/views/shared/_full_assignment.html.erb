@@ -262,6 +262,9 @@
               <div style="margin-top: 10px;">
                 <%= f.check_box :turnitin_enabled %>
                 <%= f.label :turnitin_enabled, :en => "Enable Turnitin Submission Evaluations" %>
+                <div id="assignment_turnitin_settings" style="<%= hidden unless assignment && assignment.turnitin_enabled %>; margin-left: 20px;">
+                  <a href="#" class="show_turnitin_settings" style="font-size: 0.9em"><%= t 'links.advanced_turnitin_settings', 'Advanced Settings...' %></a>
+                </div>
               </div>
             <% end %>
           </div>
@@ -300,3 +303,4 @@
 
   <%= render :partial => "shared/add_assignment_group" %>
   <%= render :partial => "groups/add_group_category" %>
+  <%= render :partial => "shared/turnitin_settings", :locals => {:assignment => assignment} %>
