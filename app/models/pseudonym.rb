@@ -28,7 +28,6 @@ class Pseudonym < ActiveRecord::Base
   has_many :group_memberships
   has_many :groups, :through => :group_memberships
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
-  validates_length_of :sis_update_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :unique_id, :maximum => maximum_string_length
   before_validation :validate_unique_id
   before_destroy :retire_channels

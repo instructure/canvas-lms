@@ -28,7 +28,6 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :enrollments, :through => :courses
   has_many :course_sections
   before_validation :verify_unique_sis_source_id
-  validates_length_of :sis_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   before_save :update_courses_later_if_necessary
 
   def update_courses_later_if_necessary
