@@ -70,6 +70,7 @@ group :test do
   gem 'selenium-webdriver', '2.5.0'
   gem 'webrat',       '0.7.2'
   gem 'yard',         '0.7.2'
+  gem 'jasmine',      '1.1.0'
 end
 
 group :development do
@@ -77,11 +78,15 @@ group :development do
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
+  gem 'guard', '0.7.0'
+  gem 'guard-coffeescript', '0.1.0'
+  gem 'execjs', '1.2.8'
 end
 
 group :redis do
   gem 'redis-store', '1.0.0.rc1'
 end
+
 
 # The closure-compiler gem has an undocumented
 # gem dependency on windows with ruby < 1.9.  I'm
