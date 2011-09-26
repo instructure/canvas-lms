@@ -60,6 +60,7 @@ class EportfolioCategoriesController < ApplicationController
       if params[:verifier] == @portfolio.uuid
         session[:eportfolio_ids] ||= []
         session[:eportfolio_ids] << @portfolio.id
+        session[:session_affects_permissions] = true
       end
       if authorized_action(@portfolio, @current_user, :read)
         if params[:id]
