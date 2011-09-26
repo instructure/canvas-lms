@@ -69,7 +69,7 @@
             event.preventDefault();
             event.stopPropagation();
             var text = $(this).find(".mathquill-editor").mathquill('latex');
-            var url = "http://latex.codecogs.com/gif.latex?" + escape(text);
+            var url = "/equation_images/" + encodeURIComponent(escape(text));
             var $div = $(document.createElement('div'));
             var $img = $(document.createElement('img'));
             $img.attr('src', url).attr('alt', text).attr('title', text).attr('class', 'equation_image');

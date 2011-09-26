@@ -710,6 +710,8 @@ ActionController::Routing::Routes.draw do |map|
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
 
+  map.resources :equation_images, :only => :show
+
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want
   # top-level assignments available, maybe we should change the specs instead.
