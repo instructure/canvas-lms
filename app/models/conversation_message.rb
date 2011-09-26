@@ -61,7 +61,7 @@ class ConversationMessage < ActiveRecord::Base
   def infer_values
     self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?
     if self.media_comment_id && self.media_comment_id_changed?
-      @media_comment = MediaObject.find_by_media_id(self.media_comment_id)
+      @media_comment = MediaObject.by_media_id(self.media_comment_id).first
       self.media_comment_id = nil unless @media_comment
       self.media_comment_type = @media_comment.media_type if @media_comment
     end
@@ -74,7 +74,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def media_comment
     if !@media_comment && self.media_comment_id
-      @media_comment = MediaObject.find_by_media_id(self.media_comment_id)
+      @media_comment = MediaObject.by_media_id(self.media_comment_id).first
     end
     @media_comment
   end

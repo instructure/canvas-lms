@@ -368,7 +368,7 @@ class Submission < ActiveRecord::Base
     end
     self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?
     if self.media_comment_id && (self.media_comment_id_changed? || !self.media_object_id)
-      mo = MediaObject.find_by_media_id(self.media_comment_id)
+      mo = MediaObject.by_media_id(self.media_comment_id).first
       self.media_object_id = mo && mo.id
     end
     self.media_comment_type = nil unless self.media_comment_id
