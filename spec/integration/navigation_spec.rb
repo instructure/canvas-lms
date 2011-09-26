@@ -35,11 +35,30 @@ describe "navigation" do
     get "/"
     page = Nokogiri::HTML(response.body)
     list = page.css(".menu-item-drop-column-list li")
-    list[0].text.should match /Summer Term/m # course 3, Summer Term
-    list[1].text.should match /Spring Term/m # course 3, Spring Term
+
+    # order of tests assumes alphabetical order of list
+    list[4].text.should match /Summer Term/m # course 3, Summer Term
+    list[3].text.should match /Spring Term/m # course 3, Spring Term
     list[2].text.should_not match /Term/ # don't show term cause it doesn't have a name collision
-    list[3].text.should_not match /Term/ # don't show term cause it's the default term
-    list[4].text.should_not match /Term/ # "
+    list[1].text.should_not match /Term/ # don't show term cause it's the default term
+    list[0].text.should_not match /Term/ # "
+  end
+
+  it "should not show enrollments with identical created_at and updated_at dates (bad SIS data)" do
+    @account = Account.default
+    user_with_pseudonym
+
+    course_with_teacher(:course_name => "Course 1", :user => @user)
+    @enrollment = course_with_teacher(:course_name => "Course 2", :user => @user)
+
+    Enrollment.update_all(["updated_at = ?", @enrollment.created_at], :id => @enrollment.id)
+
+    user_session(@user, @pseudonym)
+
+    get "/"
+    page = Nokogiri::HTML(response.body)
+    list = page.css(".menu-item-drop-column-list li")
+    list.length.should == 2
   end
 end
 

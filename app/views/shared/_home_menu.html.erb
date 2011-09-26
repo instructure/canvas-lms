@@ -1,0 +1,12 @@
+<a href="<%= dashboard_path %>" class="menu-item-title">
+  <%= @current_user.cached_current_group_memberships.empty? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
+  <span class="menu-item-title-icon"></span></a>
+<div class="menu-item-drop">
+  <table cellspacing="0">
+    <tr>
+      <%= render(:partial => "shared/menu_section", :locals => menu_enrollments_locals) %>
+      <%= render(:partial => "shared/menu_section", :locals => menu_groups_locals) %>
+      <%= render(:partial => "shared/menu_section", :locals => menu_accounts_locals) %>
+    </tr>
+  </table>
+</div>

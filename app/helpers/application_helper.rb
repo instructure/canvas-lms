@@ -509,4 +509,55 @@ var I18n = I18n || {};
     end
     super
   end
+
+  def menu_enrollments_locals
+    max = 12
+    {
+      :collection => @current_user.menu_data[:enrollments][0, max].sort_by{|e| e[:enrollment].long_name },
+      :collection_size => @current_user.menu_data[:enrollments_count],
+      :partial => "shared/menu_enrollment",
+      :max_to_show => max,
+      :more_link_for_over_max => courses_path,
+      :title => t('#menu.my_courses', "My Courses"),
+      :course_name_counts => @current_user.menu_data[:course_name_counts],
+      :link_text => raw(t('#layouts.menu.view_all_enrollments', 'View all courses'))
+    }
+  end
+
+  def menu_groups_locals
+    {
+      :collection => @current_user.cached_current_group_memberships,
+      :partial => "shared/menu_group_membership",
+      :collection_size => @current_user.cached_current_group_memberships.length,
+      :max_to_show => 8,
+      :more_link_for_over_max => groups_path,
+      :title => t('#menu.current_groups', "Current Groups"),
+      :course_name_counts => @current_user.menu_data[:course_name_counts],
+      :link_text => raw(t('#layouts.menu.view_all_groups', 'View all groups'))
+    }
+  end
+
+  def menu_accounts_locals
+    {
+      :collection => @current_user.accounts,
+      :partial => "shared/menu_account",
+      :collection_size => @current_user.accounts.length,
+      :max_to_show => 8,
+      :more_link_for_over_max => accounts_path,
+      :title => t('#menu.managed_accounts', "Managed Accounts"),
+      :course_name_counts => @current_user.menu_data[:course_name_counts],
+      :link_text => raw(t('#layouts.menu.view_all_accounts', 'View all accounts'))
+    }
+  end
+
+  def show_home_menu?
+    @current_user.set_menu_data(session[:enrollment_uuid])
+    [
+      @current_user.menu_data[:enrollments],
+      @current_user.accounts,
+      @current_user.cached_current_group_memberships,
+      @current_user.enrollments.ended
+    ].any?{ |e| e.respond_to?(:count) && e.count > 0 }
+  end
+
 end

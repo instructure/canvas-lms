@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
   include Context
 
   attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
-  attr_accessor :original_id
+  attr_accessor :original_id, :menu_data
   
   before_save :infer_defaults
   serialize :preferences
@@ -1849,4 +1849,58 @@ class User < ActiveRecord::Base
   # there's better solutions in AR 3.
   # See also e.g., http://makandra.com/notes/983-dynamic-conditions-for-belongs_to-has_many-and-has_one-associations
   has_many :submissions_for_given_assignments, :include => [:assignment, :submission_comments], :conditions => 'submissions.assignment_id IN (#{Api.assignment_ids_for_students_api.join(",")})', :class_name => 'Submission'
+
+  def set_menu_data(enrollment_uuid)
+    max_to_show = 8
+    coalesced_enrollments = []
+    course_name_counts = {}
+    has_completed_enrollment = false
+    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid)
+    cached_enrollments.each do |e|
+
+      # SIS "garbage" data, user auto-enrolled but has never done anything with it
+      next if e.updated_at == e.created_at
+
+      next if e.state_based_on_date == :inactive
+
+      if e.state_based_on_date == :completed
+        has_completed_enrollment = true
+        next
+      end
+
+      if !e.course
+        coalesced_enrollments << {
+          :enrollment => e,
+          :sortable => [e.rank_sortable, e.state_sortable, e.long_name],
+          :types => [ e.readable_type ]
+        }
+      end
+
+      existing_enrollment_info = coalesced_enrollments.find { |en|
+        # coalesce together enrollments for the same course and the same state
+        !e.course.nil? && en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
+      }
+
+      if existing_enrollment_info
+        existing_enrollment_info[:types] << e.readable_type
+        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || [999,999, 999], [e.rank_sortable, e.state_sortable, 0 - e.id]].min
+      else
+        coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
+        course_name_counts[e.course.name] ||= 0
+        course_name_counts[e.course.name] += 1
+      end
+    end
+    coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
+    @menu_data = {
+      :enrollments => coalesced_enrollments,
+      :enrollments_count => cached_enrollments.length,
+      :course_name_counts => course_name_counts,
+      :has_completed_enrollment => has_completed_enrollment,
+    }
+  end
+
+  def has_ended_enrollments?
+    self.enrollments.ended.length || self.menu_data[:has_completed_enrollment]
+  end
+
 end

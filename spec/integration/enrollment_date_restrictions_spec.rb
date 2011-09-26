@@ -21,9 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "enrollment_date_restrictions" do
   it "should not list inactive enrollments in the menu" do
     @student = user_with_pseudonym
-    course(:course_name => "Course 1", :active_all => 1)
+    @enrollment1 = course(:course_name => "Course 1", :active_all => 1)
     e1 = student_in_course(:user => @student, :active_all => 1)
-    course(:course_name => "Course 2", :active_all => 1)
+
+    @enrollment2 = course(:course_name => "Course 2", :active_all => 1)
+
     @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => true)
     e2 = student_in_course(:user => @student, :active_all => 1)
     e1.state.should == :active
@@ -31,12 +33,14 @@ describe "enrollment_date_restrictions" do
     e2.state.should == :active
     e2.state_based_on_date.should == :inactive
 
+    Enrollment.update_all(["created_at = ?", 1.minute.ago]) # need to make created_at and updated_at different
+
     user_session(@student, @pseudonym)
 
     get "/"
     page = Nokogiri::HTML(response.body)
     list = page.css(".menu-item-drop-column-list li")
-    list.length.should == 1
+    list.length.should == 2 # view all courses should always show up
     list[0].text.should match /Course 1/
     list[0].text.should_not match /Course 2/
     page.css(".menu-item-drop-padded").should be_empty
@@ -48,39 +52,6 @@ describe "enrollment_date_restrictions" do
     active_enrollments[0]['class'].should match /active/
 
     page.css(".past_enrollments li").should be_empty
-  end
-
-  it "should include see all enrollments link in menu for date completed courses" do
-    @student = user_with_pseudonym
-    course(:course_name => "Course 1", :active_all => 1)
-    e1 = student_in_course(:user => @student, :active_all => 1)
-    course(:course_name => "Course 2", :active_all => 1)
-    @course.update_attributes(:start_at => 4.days.ago, :conclude_at => 2.days.ago, :restrict_enrollments_to_course_dates => true)
-    e2 = student_in_course(:user => @student, :active_all => 1)
-    e1.state.should == :active
-    e1.state_based_on_date.should == :active
-    e2.state.should == :active
-    e2.state_based_on_date.should == :completed
-
-    user_session(@student, @pseudonym)
-
-    get "/"
-    page = Nokogiri::HTML(response.body)
-    list = page.css(".menu-item-drop-column-list li")
-    list.length.should == 1
-    list[0].text.should match /Course 1/
-    list[0].text.should_not match /Course 2/
-    page.css(".menu-item-drop-padded").should_not be_empty
-
-    get "/courses"
-    page = Nokogiri::HTML(response.body)
-    active_enrollments = page.css(".current_enrollments li")
-    active_enrollments.length.should == 1
-    active_enrollments[0]['class'].should match /active/
-
-    past_enrollments = page.css(".past_enrollments li")
-    past_enrollments.length.should == 1
-    past_enrollments[0]['class'].should match /completed/
   end
 
   it "should not show date inactive/completed courses in grades" do
