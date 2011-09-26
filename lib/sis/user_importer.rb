@@ -83,7 +83,8 @@ module SIS
         User.transaction do
           tx_end_time = Time.now + transaction_timeout
           user_row = nil
-          while !(user_row = @batched_users.shift).nil? && tx_end_time > Time.now
+          while !@batched_users.empty? && tx_end_time > Time.now
+            user_row = @batched_users.shift
             @logger.debug("Processing User #{user_row.inspect}")
             user_id, login_id, status, first_name, last_name, email, password, ssha_password = user_row
 

@@ -312,7 +312,7 @@ Spec::Runner.configure do |config|
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
     tmp.close!
-    File.open(path, "w+") { |f| f.puts lines.join "\n" }
+    File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
     
     importer = SIS::CSV::Import.process(@account, :files => [ path ], :allow_printing=>false)
     

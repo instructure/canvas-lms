@@ -98,7 +98,8 @@ module SIS
         Enrollment.transaction do
           tx_end_time = Time.now + transaction_timeout
           enrollment = nil
-          while !(enrollment = @enrollment_batch.shift).nil? && tx_end_time > Time.now
+          while !@enrollment_batch.empty? && tx_end_time > Time.now
+            enrollment = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment.inspect}")
             course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id = enrollment
 
