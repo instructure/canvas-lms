@@ -19,8 +19,14 @@
 var iTest;
 INST.errorURL = '/record_js_error';
 INST.errorCount = 0;
+INST.errorLastHandledTimes = {};
 INST.log_error = function(params) {
   params = params || {};
+  var timestamp = +new Date();
+  // log errors with the same message once every 5 seconds at most.
+  // (so we don't fill the DOM with logging gifs)
+  if (INST.errorLastHandledTimes[params.message] > timestamp - 5000) return;
+  INST.errorLastHandledTimes[params.message] = timestamp;
   var username = "";
   try {
     username = $ && $.fn && $.fn.text && $("#identity .user_name").text();
@@ -48,7 +54,8 @@ INST.log_error = function(params) {
   document.body.appendChild(img);
 }
 window.onerror = function (msg, url, line) {
-  var ignoredErrors = ["webkitSafeEl"];
+  // these are errors that the actionScript in scrbd creates.
+  var ignoredErrors = ["webkitSafeEl", "NPMethod called on non-NPObject wrapped JSObject!"];
   for(var idx in ignoredErrors) {
     if(ignoredErrors[idx] && msg && msg.match && msg.match(ignoredErrors[idx])) {
       return true;
