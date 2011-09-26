@@ -257,13 +257,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         <td>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>
-            <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only access the course between these dates" %>
+            <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only participate in the course between these dates" %>
             <div style="font-size: 0.8em; padding-left: 25px;">
               <%= t('course_overrides_term', %{This will override any term availability settings.}) %>
             </div>
           </div>
           <div class="course_info restrict_dates" style="font-size: 0.8em;">
-            <%= @context.restrict_enrollments_to_course_dates ? t('date_restricted', "Users can only access the course between these dates") : t('not_date_restricted', "These dates will not affect course availability") %>
+            <%= @context.restrict_enrollments_to_course_dates ? t('date_restricted', "Users can only participate in the course between these dates") : t('not_date_restricted', "These dates will not affect course availability") %>
           </div>
         </td>
       <% if available_locales.size > 1 %>

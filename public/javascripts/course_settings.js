@@ -274,7 +274,7 @@ I18n.scoped('course_settings', function(I18n) {
         course.is_public = course.is_public ? I18n.t('public_course', 'Public') : I18n.t('private_course', 'Private');
         course.indexed = course.indexed ? I18n.t('indexed_course', "Included in public course index") : "";
         course.grading_scheme_set = course.grading_standard_title || (course.grading_standard_id ? I18n.t('grading_standard_set', "Currently Set") : I18n.t('grading_standard_unset', "Not Set"));
-        course.restrict_dates = course.restrict_enrollments_to_course_dates ? I18n.t('course_dates_enforced', "Users can only access the course between these dates") : I18n.t('course_dates_unenforced', "These dates will not affect course availability");
+        course.restrict_dates = course.restrict_enrollments_to_course_dates ? I18n.t('course_dates_enforced', "Users can only participate in the course between these dates") : I18n.t('course_dates_unenforced', "These dates will not affect course availability");
         course.locale = $("#course_locale option[value='" + (course.locale || '') + "']").text();
         if (course.locale != $course_form.find('.locale').text()) {
           location.reload();
