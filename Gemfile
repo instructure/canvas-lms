@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'rails',          '2.3.11'
+gem 'rails',          '2.3.14'
 gem 'authlogic',      '2.1.3'
 gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
 gem 'barista',        '1.2.1'
