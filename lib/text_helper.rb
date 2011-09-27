@@ -1,3 +1,5 @@
+# encoding: UTF-8
+#
 # By Henrik Nyh <http://henrik.nyh.se> 2008-01-30.
 # Free to modify and redistribute with credit.
 
