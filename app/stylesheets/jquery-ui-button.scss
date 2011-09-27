@@ -35,8 +35,13 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 
 /* Instructure Changes */
 $button-text-color: #525252;
-.ui-button { 
+//the addition of the ui-widget-content selector prefix is to make sure this style
+//gets precendence over the .ui-state-default, .ui-widget-content .ui-state-default 
+//background image in jquery-ui-theme.css
+.ui-button, .ui-widget-content .ui-button { 
   @include vertical-gradiant(#f3f3f3, #cecece);
+}
+.ui-button { 
   @include border-radius(10px);
   @include box-shadow(rgba(0,0,0,0.5), 0px, 1px, 2px, 0);
   border: 1px solid #bdbdbd;
