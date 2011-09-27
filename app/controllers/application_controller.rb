@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes_and_active_tab
 
-  add_crumb(lambda { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
+  add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
 
   protected
 

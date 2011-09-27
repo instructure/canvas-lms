@@ -19,7 +19,7 @@
 class AssignmentsController < ApplicationController
   include GoogleDocs
   before_filter :require_context
-  add_crumb(lambda { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
   
   def index

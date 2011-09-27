@@ -27,7 +27,7 @@ class ConversationsController < ApplicationController
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
-  add_crumb(lambda { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
+  add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   # @API
   # Returns the list of conversations for the current user, most recent ones first.

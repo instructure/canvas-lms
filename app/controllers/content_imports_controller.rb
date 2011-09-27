@@ -18,7 +18,7 @@
 
 class ContentImportsController < ApplicationController
   before_filter :require_context
-  add_crumb(lambda { t 'crumbs.content_imports', "Content Imports" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
+  add_crumb(proc { t 'crumbs.content_imports', "Content Imports" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   

@@ -18,7 +18,7 @@
 
 class GradingStandardsController < ApplicationController
   before_filter :require_context
-  add_crumb(lambda{ t '#crumbs.grading_schemes', "Grading Schemes" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
+  add_crumb(proc { t '#crumbs.grading_schemes', "Grading Schemes" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
   before_filter { |c| c.active_tab = "grading_standards" }
   
   def default_data

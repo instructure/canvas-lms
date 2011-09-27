@@ -22,7 +22,7 @@
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
   
-  add_crumb(lambda { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
+  add_crumb(proc { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
   before_filter { |c| c.active_tab = "discussions" }  
   
   include Api::V1::DiscussionTopics
