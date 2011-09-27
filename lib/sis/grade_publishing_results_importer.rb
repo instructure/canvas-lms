@@ -51,7 +51,12 @@ module SIS
         raise ImportError, "Improper grade_publishing_status \"#{grade_publishing_status}\" for enrollment #{enrollment_id}" unless %w{ published error }.include?(grade_publishing_status.downcase)
 
         enrollment = Enrollment.find_by_id(enrollment_id)
-        enrollment = nil unless enrollment && (enrollment.course.root_account_id == @root_account.id || enrollment.course_section.root_account_id == @root_account.id)
+        if enrollment
+          found_root_account = enrollment.root_account_id == @root_account.id
+          found_root_account ||= enrollment.course && enrollment.course.root_account_id == @root_account.id
+          found_root_account ||= enrollment.course_section && enrollment.course_section.root_account_id == @root_account.id
+          enrollment = nil unless found_root_account
+        end
         raise ImportError, "Enrollment #{enrollment_id} doesn't exist" unless enrollment
 
         enrollment.grade_publishing_status = grade_publishing_status.downcase
