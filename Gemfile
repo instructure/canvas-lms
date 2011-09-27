@@ -9,7 +9,6 @@ gem 'compass',        '0.11.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.7.0'
-gem 'fastercsv',      '1.5.3'
 gem 'hairtrigger',    '0.1.11'
 gem 'haml',           '3.1.2'
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
@@ -103,6 +102,10 @@ if WINDOWS
   if !ONE_NINE
     gem 'win32-open3',  '0.3.2'
   end
+end
+
+if !ONE_NINE
+  gem 'fastercsv', '1.5.3'
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from

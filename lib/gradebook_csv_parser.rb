@@ -17,7 +17,6 @@
 #
 
 # This is used for the GradebookImporter
-require 'fastercsv'
 require 'ostruct'
 
 class CSVParser
