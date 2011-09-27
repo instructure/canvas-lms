@@ -34,9 +34,11 @@ module SIS
       i = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
         User.skip_updating_account_associations do
-          yield i
-          while i.any_left_to_process?
-            i.process_batch
+          Enrollment.process_as_sis(@override_sis_stickiness) do
+            yield i
+            while i.any_left_to_process?
+              i.process_batch
+            end
           end
         end
       end
@@ -194,8 +196,10 @@ module SIS
               enrollment.workflow_state = 'inactive'
             end
 
-            enrollment.start_at = start_date
-            enrollment.end_at = end_date
+            if (enrollment.stuck_sis_fields & [:start_at, :end_at]).empty?
+              enrollment.start_at = start_date
+              enrollment.end_at = end_date
+            end
 
             @courses_to_touch_ids.add(enrollment.course)
             if enrollment.should_update_user_account_association?

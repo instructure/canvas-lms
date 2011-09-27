@@ -40,7 +40,7 @@ class CourseSection < ActiveRecord::Base
   after_save :update_account_associations_if_changed
 
   include StickySisFields
-  are_sis_sticky :course_id, :name
+  are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
   def maybe_touch_all_enrollments
     self.touch_all_enrollments if self.start_at_changed? || self.end_at_changed? || self.restrict_enrollments_to_section_dates_changed? || self.course_id_changed?

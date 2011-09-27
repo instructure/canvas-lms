@@ -70,8 +70,10 @@ module SIS
           term.workflow_state = 'deleted'
         end
 
-        term.start_at = start_date
-        term.end_at = end_date
+        if (term.stuck_sis_fields & [:start_at, :end_at]).empty?
+          term.start_at = start_date
+          term.end_at = end_date
+        end
 
         term.save
         @success_count += 1

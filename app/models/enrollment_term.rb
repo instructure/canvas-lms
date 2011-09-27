@@ -31,7 +31,7 @@ class EnrollmentTerm < ActiveRecord::Base
   before_save :update_courses_later_if_necessary
 
   include StickySisFields
-  are_sis_sticky :name
+  are_sis_sticky :name, :start_at, :end_at
 
   def update_courses_later_if_necessary
     self.update_courses_later if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)

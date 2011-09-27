@@ -103,9 +103,11 @@ module SIS
           section.workflow_state = 'deleted'
         end
 
-        section.start_at = start_date
-        section.end_at = end_date
-        section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?)
+        if (section.stuck_sis_fields & [:start_at, :end_at]).empty?
+          section.start_at = start_date
+          section.end_at = end_date
+        end
+        section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?) unless section.stuck_sis_fields.include?(:restrict_enrollments_to_section_dates)
 
         if section.changed?
           section.sis_batch_id = @batch_id if @batch_id

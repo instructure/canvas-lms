@@ -517,6 +517,31 @@ describe SIS::CSV::Import do
       @account.courses.find_by_sis_source_id("test3").restrict_enrollments_to_course_dates.should be_true
       @account.courses.find_by_sis_source_id("test4").restrict_enrollments_to_course_dates.should be_true
     end
+
+    it 'should support start/end date and restriction stickiness' do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      )
+      @account.courses.find_by_sis_source_id("test4").tap do |course|
+        course.restrict_enrollments_to_course_dates.should be_true
+        course.start_at.should == DateTime.parse("2011-04-14 00:00:00")
+        course.conclude_at.should == DateTime.parse("2011-05-14 00:00:00")
+        course.restrict_enrollments_to_course_dates = false
+        course.start_at = DateTime.parse("2010-04-14 00:00:00")
+        course.conclude_at = DateTime.parse("2010-05-14 00:00:00")
+        course.save!
+      end
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      )
+      @account.courses.find_by_sis_source_id("test4").tap do |course|
+        course.restrict_enrollments_to_course_dates.should be_false
+        course.start_at.should == DateTime.parse("2010-04-14 00:00:00")
+        course.conclude_at.should == DateTime.parse("2010-05-14 00:00:00")
+      end
+    end
   end
 
   context "user importing" do
@@ -1057,6 +1082,42 @@ describe SIS::CSV::Import do
       siete.end_at.should == DateTime.new(2011, 8, 29)
     end
 
+    it "should support sis stickiness" do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active"
+      )
+      process_csv_data_cleanly(
+        "section_id,course_id,name,status,start_date,end_date",
+        "S001,test_1,Sec1,active,,"
+      )
+      process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "test_1,user_1,teacher,,active,,1985-08-24,2011-08-29"
+      )
+      course = @account.courses.find_by_sis_source_id("test_1")
+      course.teacher_enrollments.first.tap do |e|
+        e.start_at.should == DateTime.parse("1985-08-24")
+        e.end_at.should == DateTime.parse("2011-08-29")
+        e.start_at = DateTime.parse("1985-05-24")
+        e.end_at = DateTime.parse("2011-05-29")
+        e.save!
+      end
+      process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "test_1,user_1,teacher,,active,,1985-08-24,2011-08-29"
+      )
+      course.reload
+      course.teacher_enrollments.first.tap do |e|
+        e.start_at.should == DateTime.parse("1985-05-24")
+        e.end_at.should == DateTime.parse("2011-05-29")
+      end
+    end
+
     it "should not try looking up a section to enroll into if the section name is empty" do
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
@@ -1365,21 +1426,33 @@ describe SIS::CSV::Import do
         "term_id,name,status,start_date,end_date",
         "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
       EnrollmentTerm.count.should == before_count + 1
-      EnrollmentTerm.last.name.should == "Winter11"
+      EnrollmentTerm.last.tap do |t|
+        t.name.should == "Winter11"
+        t.start_at.should == DateTime.parse("2011-1-05 00:00:00")
+        t.end_at.should == DateTime.parse("2011-4-14 00:00:00")
+      end
       importer = process_csv_data(
         "term_id,name,status,start_date,end_date",
-        "T001,Winter12,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
+        "T001,Winter12,active,2010-1-05 00:00:00,2010-4-14 00:00:00")
       EnrollmentTerm.count.should == before_count + 1
       EnrollmentTerm.last.tap do |t|
         t.name.should == "Winter12"
+        t.start_at.should == DateTime.parse("2010-1-05 00:00:00")
+        t.end_at.should == DateTime.parse("2010-4-14 00:00:00")
         t.name = "Fall11"
+        t.start_at = DateTime.parse("2009-1-05 00:00:00")
+        t.end_at = DateTime.parse("2009-4-14 00:00:00")
         t.save!
       end
       importer = process_csv_data(
         "term_id,name,status,start_date,end_date",
         "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
       EnrollmentTerm.count.should == before_count + 1
-      EnrollmentTerm.last.name.should == "Fall11"
+      EnrollmentTerm.last.tap do |t|
+        t.name.should == "Fall11"
+        t.start_at.should == DateTime.parse("2009-1-05 00:00:00")
+        t.end_at.should == DateTime.parse("2009-4-14 00:00:00")
+      end
     end
   end
 
@@ -1488,6 +1561,37 @@ describe SIS::CSV::Import do
       course.course_sections.find_by_sis_source_id("sec3").restrict_enrollments_to_section_dates.should be_true
       course.course_sections.find_by_sis_source_id("sec4").restrict_enrollments_to_section_dates.should be_true
     end
+
+    it 'should support start/end date and restriction stickiness' do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "test1,TC 101,Test Course 1,,,active,,"
+      )
+      course = @account.courses.find_by_sis_source_id('test1')
+      process_csv_data_cleanly(
+        "section_id,course_id,name,status,start_date,end_date",
+        "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      )
+      course.course_sections.find_by_sis_source_id("sec4").tap do |section|
+        section.restrict_enrollments_to_section_dates.should be_true
+        section.start_at.should == DateTime.parse("2011-04-14 00:00:00")
+        section.end_at.should == DateTime.parse("2011-05-14 00:00:00")
+        section.restrict_enrollments_to_section_dates = false
+        section.start_at = DateTime.parse("2010-04-14 00:00:00")
+        section.end_at = DateTime.parse("2010-05-14 00:00:00")
+        section.save!
+      end
+      process_csv_data_cleanly(
+        "section_id,course_id,name,status,start_date,end_date",
+        "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      )
+      course.course_sections.find_by_sis_source_id("sec4").tap do |section|
+        section.restrict_enrollments_to_section_dates.should be_false
+        section.start_at.should == DateTime.parse("2010-04-14 00:00:00")
+        section.end_at.should == DateTime.parse("2010-05-14 00:00:00")
+      end
+    end
+
 
     it 'should verify xlist files' do
       importer = process_csv_data(

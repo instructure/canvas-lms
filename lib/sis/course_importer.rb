@@ -99,9 +99,11 @@ module SIS
           course.workflow_state = 'completed'
         end
 
-        course.start_at = start_date
-        course.conclude_at = end_date
-        course.restrict_enrollments_to_course_dates = (course.start_at.present? || course.conclude_at.present?)
+        if (course.stuck_sis_fields & [:start_at, :conclude_at]).empty?
+          course.start_at = start_date
+          course.conclude_at = end_date
+        end
+        course.restrict_enrollments_to_course_dates = (course.start_at.present? || course.conclude_at.present?) unless course.stuck_sis_fields.include?(:restrict_enrollments_to_course_dates)
 
         abstract_course = nil
         if abstract_course_id.present?
