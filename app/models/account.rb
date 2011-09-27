@@ -311,7 +311,7 @@ class Account < ActiveRecord::Base
   end
   
   def self.account_lookup_cache_key(id)
-    ['_account_lookup', id].cache_key
+    ['_account_lookup2', id].cache_key
   end
   
   def find_user_by_unique_id(unique_id)

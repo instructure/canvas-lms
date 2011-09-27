@@ -27,7 +27,7 @@ class AccountNotification < ActiveRecord::Base
     closed_ids = (user && user.preferences[:closed_notifications]) || []
     now = Time.now.utc
     # Refreshes every 10 minutes at the longest
-    current = AccountNotification.find_all_cached(['account_notifications', account, (now.to_i / 600).to_s].cache_key) do
+    current = Rails.cache.fetch(['account_notifications2', account].cache_key, :expires_in => 10.minutes) do
       AccountNotification.find(:all, :conditions => ['account_id IN (?,?) AND start_at < ? AND end_at > ?', Account.site_admin.id, account.id, now, now], :order => 'start_at DESC')
     end
     current ||= []
