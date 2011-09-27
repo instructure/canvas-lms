@@ -1,5 +1,7 @@
 source :rubygems
 
+ONE_NINE = RUBY_VERSION >= "1.9."
+
 gem 'rails',          '2.3.14'
 gem 'authlogic',      '2.1.3'
 #gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
@@ -13,6 +15,9 @@ gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.7.0'
 gem 'hairtrigger',    '0.1.13'
 gem 'haml',           '3.1.2'
+if !ONE_NINE
+  gem 'fastercsv', '1.5.3'
+end
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
 gem 'hpricot',        '0.8.2'
@@ -81,13 +86,20 @@ group :test do
   gem 'selenium-webdriver', '2.19.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
+  if ONE_NINE
+    gem 'test-unit',  '1.2.3'
+  end
 end
 
 group :development do
   gem 'coffee-script'
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'parallel',     '0.5.16'
-  gem 'ruby-debug',   '0.10.4'
+  if ONE_NINE
+    gem 'ruby-debug19', '0.11.6'
+  else
+    gem 'ruby-debug',   '0.10.4'
+  end
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
@@ -96,12 +108,6 @@ end
 
 group :redis do
   gem 'redis-store', '1.0.0.rc1'
-end
-
-
-ONE_NINE = RUBY_VERSION >= "1.9"
-if !ONE_NINE
-  gem 'fastercsv', '1.5.3'
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from
