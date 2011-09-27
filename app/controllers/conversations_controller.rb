@@ -89,7 +89,7 @@ class ConversationsController < ApplicationController
   #     }
   #   ]
   def index
-    @page_max = params[:per_page] = params[:per_page].try(:to_i) || 10
+    @page_max = params[:per_page] = 25 if params[:format] != 'json'
     conversations_scope = case params[:scope]
       when 'unread'
         @view_name = I18n.t('index.inbox_views.unread', 'Unread')
@@ -659,7 +659,7 @@ class ConversationsController < ApplicationController
       media_id = params[:media_comment_id]
       media_type = params[:media_comment_type]
       if media_id.present? && media_type.present?
-        media_comment = MediaObject.find_by_media_id_and_media_type(media_id, media_type)
+        media_comment = MediaObject.by_media_id.by_media_type(media_id, media_type).first
         if media_comment
           media_comment.context = @current_user
           media_comment.save

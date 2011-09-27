@@ -225,6 +225,7 @@
     <% # TODO: get note-enabled-ness per account, and cross reference with the recipient's associated account ids. this is already enforced in the model %>
     MessageInbox.notes_enabled = <%= raw @current_user.associated_accounts.any?{|a| a.enable_user_notes } %>;
     MessageInbox.can_add_notes_for_account = MessageInbox.notes_enabled && <%= raw @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) } %>;
+    MessageInbox.conversations_per_page = <%= @page_max.to_i %>;
     <% unless @current_user.watched_conversations_intro? %>
     $.conversationsIntroSlideshow()
     <% end %>

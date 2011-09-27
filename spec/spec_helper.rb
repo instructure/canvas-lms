@@ -258,6 +258,14 @@ Spec::Runner.configure do |config|
     user_session(@user)
   end
 
+  def conversation(*users)
+    options = users.last.is_a?(Hash) ? users.pop : {}
+    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users.map(&:id))
+    @conversation.add_message('test')
+    @conversation.update_attributes(options)
+    @conversation.reload
+  end
+
   def assert_status(status=500)
     response.status.to_i.should eql(status)
   end
