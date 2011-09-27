@@ -473,7 +473,7 @@ class User < ActiveRecord::Base
   end
   
   def self.user_lookup_cache_key(id)
-    ['_user_lookup', id].cache_key
+    ['_user_lookup2', id].cache_key
   end
   
   def self.invalidate_cache(id)
@@ -523,7 +523,7 @@ class User < ActiveRecord::Base
   
   def self.cached_name(id)
     key = user_lookup_cache_key(id)
-    user = find_cached(key) do
+    user = Rails.cache.fetch(key) do
       User.find_by_id(id)
     end
     user && user.name
