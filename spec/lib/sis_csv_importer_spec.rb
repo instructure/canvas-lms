@@ -214,7 +214,10 @@ describe SIS::CSV::Import do
       before_count = AbstractCourse.count
       process_csv_data_cleanly(
         "term_id,name,status,start_date,end_date",
-        "T001,Winter13,active,,"
+        "T001,Winter13,active,,",
+        "T002,Spring14,active,,",
+        "T003,Summer14,active,,",
+        "T004,Fall14,active,,"
       )
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
@@ -228,27 +231,31 @@ describe SIS::CSV::Import do
       AbstractCourse.last.tap do |c|
         c.name.should == "Humanities"
         c.short_name.should == "Hum101"
+        c.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T001')
       end
       process_csv_data_cleanly(
         "abstract_course_id,short_name,long_name,account_id,term_id,status",
-        "C001,Math101,Mathematics,A001,T001,active"
+        "C001,Math101,Mathematics,A001,T002,active"
       )
       AbstractCourse.count.should == before_count + 1
       AbstractCourse.last.tap do |c|
         c.name.should == "Mathematics"
         c.short_name.should == "Math101"
+        c.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T002')
         c.name = "Physics"
         c.short_name = "Phys101"
+        c.enrollment_term = EnrollmentTerm.find_by_sis_source_id('T003')
         c.save!
       end
       process_csv_data_cleanly(
         "abstract_course_id,short_name,long_name,account_id,term_id,status",
-        "C001,Thea101,Theater,A001,T001,active"
+        "C001,Thea101,Theater,A001,T004,active"
       )
       AbstractCourse.count.should == before_count + 1
       AbstractCourse.last.tap do |c|
         c.name.should == "Physics"
         c.short_name.should == "Phys101"
+        c.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T003')
       end
     end
 
@@ -409,6 +416,39 @@ describe SIS::CSV::Import do
       course.course_code.should eql("TC 101")
       course.name.should eql("Test Course 101")
       course.associated_accounts.map(&:id).sort.should == [@account.id]
+    end
+
+    it "should support term stickiness" do
+      process_csv_data_cleanly(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter13,active,,",
+        "T002,Spring14,active,,",
+        "T003,Summer14,active,,",
+        "T004,Fall14,active,,"
+      )
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,T001,active"
+      )
+      @account.courses.find_by_sis_source_id("test_1").tap do |course|
+        course.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T001')
+      end
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,T002,active"
+      )
+      @account.courses.find_by_sis_source_id("test_1").tap do |course|
+        course.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T002')
+        course.enrollment_term = EnrollmentTerm.find_by_sis_source_id('T003')
+        course.save!
+      end
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,T004,active"
+      )
+      @account.courses.find_by_sis_source_id("test_1").tap do |course|
+        course.enrollment_term.should == EnrollmentTerm.find_by_sis_source_id('T003')
+      end
     end
 
     it "shouldn't blow away the account id if it's already set" do

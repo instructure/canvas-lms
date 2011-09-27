@@ -168,7 +168,7 @@ class Course < ActiveRecord::Base
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
   
   include StickySisFields
-  are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates
+  are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id
 
   has_a_broadcast_policy
   

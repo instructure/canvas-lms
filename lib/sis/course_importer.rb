@@ -72,9 +72,9 @@ module SIS
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed)/i
 
-        term = @root_account.enrollment_terms.find_by_sis_source_id(term_id)
         course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id)
         course ||= Course.new
+        term = course.stuck_sis_fields.include?(:enrollment_term_id) ? nil : @root_account.enrollment_terms.find_by_sis_source_id(term_id)
         course.enrollment_term = term if term
         course.root_account = @root_account
 
@@ -112,7 +112,7 @@ module SIS
         end
 
         if abstract_course
-          if term_id.blank? && course.enrollment_term_id != abstract_course.enrollment_term
+          if term_id.blank? && course.enrollment_term_id != abstract_course.enrollment_term && !course.stuck_sis_fields.include?(:enrollment_term_id)
             course.send(:association_instance_set, :enrollment_term, nil)
             course.enrollment_term_id = abstract_course.enrollment_term_id
           end

@@ -43,6 +43,6 @@ class AbstractCourse < ActiveRecord::Base
   }
   
   include StickySisFields
-  are_sis_sticky :name, :short_name
+  are_sis_sticky :name, :short_name, :enrollment_term_id
 
 end
