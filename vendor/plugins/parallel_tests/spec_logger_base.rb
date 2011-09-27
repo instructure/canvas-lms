@@ -14,7 +14,7 @@ class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
     output ||= options # rspec 2 has output as first argument
 
     if String === output
-      FileUtils.mkdir_p(File.dirname(output+ENV['TEST_ENV_NUMBER']+'.log'))
+      FileUtils.mkdir_p(File.dirname(output))
       File.open(output, 'w'){} # overwrite previous results
       @output = File.open(output, 'a')
     elsif File === output

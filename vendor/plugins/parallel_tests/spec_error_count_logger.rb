@@ -1,7 +1,7 @@
 require 'parallel_specs'
 require File.join(File.dirname(__FILE__), 'spec_logger_base')
 
-class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
+class ParallelSpecs::SpecErrorCountLogger < ParallelSpecs::SpecLoggerBase
   def initialize(options, output=nil)
     super
     @passed_examples = []
@@ -27,12 +27,4 @@ class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
     end
     @output.flush
   end
-
-  def dump_failure(*args)
-    lock_output do
-      @output.print ''
-    end
-    @output.flush
-  end
-
 end

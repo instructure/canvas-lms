@@ -7,5 +7,6 @@ else
   require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unless defined?(RAILS_ROOT)
 end
 require 'spec/autorun'
-require 'vendor/plugins/parallel_tests/spec_summary_logger.rb' if ENV['TEST_ENV_NUMBER'] != nil
+require 'vendor/plugins/parallel_tests/spec_error_logger.rb' if ENV['TEST_ENV_NUMBER'] != nil
+require 'vendor/plugins/parallel_tests/spec_error_count_logger.rb' if ENV['TEST_ENV_NUMBER'] != nil
 exit ::Spec::Runner::CommandLine.run
