@@ -67,14 +67,14 @@ I18n.scoped('instructure', function(I18n) {
   };
   
   var $dummyElement = $('<div/>');
-  $.htmlEscape = function(str) {
+  $.htmlEscape = $.h = function(str) {
     return str && str.htmlSafe ?
       str.toString() :
       $dummyElement.text(str).html();
   }
 
   // escape all string values (not keys) in an object
-  $.htmlEscapeValues = $.h = function(obj) {
+  $.htmlEscapeValues = function(obj) {
     var k,v;
     for (k in obj) {
       v = obj[k];
