@@ -40,13 +40,12 @@ class ContextController < ApplicationController
   def media_object_inline
     @show_left_side = false
     @show_right_side = false
-    @media_object = MediaObject.find_by_media_id(params[:id])
+    @media_object = MediaObject.by_media_id(params[:id]).first
     render
   end
   
   def media_object_redirect
-    mo = MediaObject.find_by_media_id(params[:id])
-    mo ||= MediaObject.find_by_old_media_id(params[:id])
+    mo = MediaObject.by_media_id(params[:id]).first
     mo.viewed! if mo
     config = Kaltura::ClientV3.config
     if config
@@ -102,7 +101,7 @@ class ContextController < ApplicationController
           end
         elsif notification[:notification_type] == 'entry_delete'
           entry_id = notification[:entry_id]
-          mo = MediaObject.find_by_media_id(entry_id)
+          mo = MediaObject.by_media_id(entry_id).first
           mo.destroy_without_destroying_attachment
         end
       end

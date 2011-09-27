@@ -466,7 +466,7 @@ var I18n = I18n || {};
 
   # returns a time object at 00:00:00 tomorrow
   def tomorrow_at_midnight
-    1.day.from_now.to_date.to_time
+    1.day.from_now.midnight
   end
   
   # you should supply :all_folders to avoid a db lookup on every iteration

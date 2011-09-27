@@ -41,6 +41,13 @@ class MediaObject < ActiveRecord::Base
     @push_user_title = nil
   end
   
+  def self.find_by_media_id(media_id)
+    unless Rails.env.production?
+      raise "Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content."
+    end
+    super
+  end
+  
   # if wait_for_completion is true, this will wait SYNCHRONOUSLY for the bulk
   # upload to complete. Wrap it in a timeout if you ever want it to give up
   # waiting.
@@ -259,6 +266,14 @@ class MediaObject < ActiveRecord::Base
   
   named_scope :active, lambda{
     {:conditions => ['media_objects.workflow_state != ?', 'deleted'] }
+  }
+  
+  named_scope :by_media_id, lambda { |media_id|
+    { :conditions => [ 'media_objects.media_id = ? OR media_objects.old_media_id = ?', media_id, media_id ] }
+  }
+  
+  named_scope :by_media_type, lambda { |media_type|
+    { :conditions => [ 'media_objects.media_type = ?', media_type ]}
   }
   
   workflow do

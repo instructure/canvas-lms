@@ -96,5 +96,35 @@ describe GradebookUploadsController do
       upload.assignments[1].should eql(@assignment2)
       upload.students.length.should eql(1)
     end
+
+    it "should accept a valid csv upload with sis id columns" do
+      course_with_student(:active_all => true)
+      @course.grading_standard_id = 0
+      @course.save!
+      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @assignment.grade_student(@user, :grade => "10")
+      @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @assignment2.grade_student(@user, :grade => "8")
+      @course.recompute_student_scores
+      @user.reload
+      @course.reload
+      user_model
+      @course.enroll_teacher(@user).accept
+      user_session(@user)
+      file = Tempfile.new("csv.csv")
+      file.puts(@course.gradebook_to_csv(:include_sis_id => true))
+      file.close
+      require 'action_controller'
+      require 'action_controller/test_process.rb'
+      data = ActionController::TestUploadedFile.new(file.path, 'text/csv', true)
+      post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
+      response.should be_success
+      upload = assigns[:uploaded_gradebook]
+      upload.assignments.length.should eql(2)
+      upload.assignments[0].should eql(@assignment)
+      upload.assignments[1].should eql(@assignment2)
+      upload.students.length.should eql(1)
+    end
   end
 end

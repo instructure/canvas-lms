@@ -3,6 +3,26 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "conversations selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  context "conversation loading" do
+    before do
+      course_with_teacher_logged_in
+      @user.watched_conversations_intro
+      @user.save
+    end
+
+    it "should load all conversations" do
+      @me = @user
+      num = 51
+      num.times { conversation(@me, user) }
+      get "/conversations"
+      keep_trying_until{
+        elements = find_all_with_jquery("#conversations > ul > li:visible")
+        elements.last.location_once_scrolled_into_view
+        elements.size == num
+      }
+    end
+  end
+
   context "attachments" do
     def new_conversation
       get "/conversations"

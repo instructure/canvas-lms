@@ -1465,7 +1465,7 @@ I18n.scoped 'conversations', (I18n) ->
           if options.level > 0 then -1 else 5
         browser:
           data:
-            limit: -1
+            per_page: -1
             type: 'context'
 
     token_input = $('#recipients').data('token_input')
@@ -1491,7 +1491,7 @@ I18n.scoped 'conversations', (I18n) ->
         container: $conversation_list
         params:
           format: 'json'
-          per_page: 25
+          per_page: MessageInbox.conversations_per_page
         loader: $("#conversations_loader")
         scrape: (data) ->
           if typeof(data) == 'string'

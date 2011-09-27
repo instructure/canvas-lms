@@ -40,14 +40,6 @@ describe ConversationsController, :type => :integration do
     u
   end
 
-  def conversation(*users)
-    options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me).initiate_conversation(users.map(&:id))
-    @conversation.add_message('test')
-    @conversation.update_attributes(options)
-    @conversation.reload
-  end
-
   context "conversations" do
     it "should return the conversation list" do
       @c1 = conversation(@bob, :workflow_state => 'read', :label => "blue")
