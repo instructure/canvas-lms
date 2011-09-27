@@ -11,12 +11,19 @@
 #   - dist/**/*.js
 #
 src_files:
-   - public/javascripts/vendor/jquery-1.6.4.js
-   - public/javascripts/vendor/raphael.js
-   - public/javascripts/vendor/handlebars.vm.js
-   - public/javascripts/compiled/Template.js
-   - public/javascripts/i18n.js
-   - public/javascripts/jquery.instructure_misc_plugins.js
+  - public/javascripts/vendor/jquery-1.6.4.js
+  - public/javascripts/vendor/raphael.js
+  - public/javascripts/vendor/handlebars.vm.js
+  - public/javascripts/compiled/handlebars_helpers.js
+  - public/javascripts/compiled/Template.js
+  - public/javascripts/i18n.js
+  - public/javascripts/jquery.instructure_misc_plugins.js
+
+  - public/javascripts/compiled/util/objectCollection.js
+  - public/javascripts/jquery.ajaxJSON.js
+  - public/javascripts/jst/courseList/wrapper.js
+  - public/javascripts/jst/courseList/content.js
+  - public/javascripts/compiled/widget/CustomList.js
 
 # stylesheets
 #

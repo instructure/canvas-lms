@@ -54,6 +54,7 @@ jasmine.Fixtures.prototype.clearCache = function() {
 };
 
 jasmine.Fixtures.prototype.cleanUp = function() {
+  if (jasmine.Fixtures.noCleanup) return;
   $('#' + this.containerId).remove();
 };
 

@@ -106,6 +106,9 @@ class User < ActiveRecord::Base
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
+  has_many :favorites
+  has_many :favorite_courses, :source => :course, :through => :current_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
+
 
   include StickySisFields
   are_sis_sticky :name, :title, :given_name, :surname, :suffix
@@ -1468,13 +1471,14 @@ class User < ActiveRecord::Base
   end
   memoize :account
   
-  def courses_with_primary_enrollment
-    Rails.cache.fetch([self, 'courses_with_primary_enrollment'].cache_key) do
+  def courses_with_primary_enrollment(association = :courses)
+    Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
       postgres = (connection.adapter_name =~ /postgresql/i)
       prefix = postgres ? "DISTINCT ON (courses.id)" : nil
-      result = courses.find(:all,
-                            :select => "#{prefix} courses.*, enrollments.type AS primary_enrollment, #{Enrollment::ENROLLMENT_RANK_SQL} AS primary_enrollment_rank",
-                            :order => "courses.id, #{Enrollment::ENROLLMENT_RANK_SQL}")
+      result = send(association).find(:all,
+        :select => "#{prefix} courses.*, enrollments.type AS primary_enrollment, #{Enrollment::ENROLLMENT_RANK_SQL} AS primary_enrollment_rank",
+        :order => "courses.id, #{Enrollment::ENROLLMENT_RANK_SQL}"
+      )
       unless postgres
         result = result.inject([]) { |ary, course|
           ary << course unless ary.last && ary.last.id == course.id
@@ -2047,11 +2051,12 @@ class User < ActiveRecord::Base
   has_many :submissions_for_given_assignments, :include => [:assignment, :submission_comments], :conditions => 'submissions.assignment_id IN (#{Api.assignment_ids_for_students_api.join(",")})', :class_name => 'Submission'
 
   def set_menu_data(enrollment_uuid)
-    max_to_show = 8
-
+    return @menu_data if @menu_data
     coalesced_enrollments = []
     course_name_counts = {}
     has_completed_enrollment = false
+    favorite_courses = self.favorite_courses
+
     cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid)
     cached_enrollments.each do |e|
 
@@ -2104,8 +2109,10 @@ class User < ActiveRecord::Base
     }
   end
 
-  def has_ended_enrollments?
-    self.enrollments.ended.length || self.menu_data[:has_completed_enrollment]
+  def menu_courses
+    favorites = self.courses_with_primary_enrollment(:favorite_courses)
+    return favorites if favorites.length > 0
+    self.courses_with_primary_enrollment[0..11]
   end
 
   def user_can_edit_name?

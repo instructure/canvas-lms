@@ -26,7 +26,7 @@
       })).toEqual($("#checkbox1"));
       expect($("#checkbox1").showIf(true)).toEqual($("#checkbox1"));
       expect($("#checkbox1").showIf(false)).toEqual($("#checkbox1"));
-      return $('*').showIf(function() {
+      return $('#checkbox1').showIf(function() {
         expect(this.nodeType).toBeDefined();
         return expect(this.constructor).not.toBe(jQuery);
       });

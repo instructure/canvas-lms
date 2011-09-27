@@ -1,0 +1,11 @@
+{{#each items}}
+  <li class="customListItem" data-id="{{id}}">
+    <a href="{{href}}">
+      <span class="name ellipsis" title="{{longName}}">{{shortName}}</span>
+      {{#if term}}
+        <span class="subtitle ellipsis enrollment_term menu-item-drop-float-right">{{term}}</span>
+      {{/if}}
+      <span class="subtitle ellipsis">{{subtitle}}</span>
+    </a>
+  </li>
+{{/each}}

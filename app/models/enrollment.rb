@@ -127,7 +127,19 @@ class Enrollment < ActiveRecord::Base
   named_scope :ended,
               :joins => :course, 
               :conditions => "courses.workflow_state = 'aborted' or courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
-              
+
+
+  READABLE_TYPES = {
+    'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
+    'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
+    'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
+    'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
+    'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
+  }
+
+  def self.readable_type(type)
+    READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
+  end
 
   ENROLLMENT_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
   ENROLLMENT_RANK_SQL = ENROLLMENT_RANK.size.times.inject('CASE '){|s, i| s << "WHEN type = '#{ENROLLMENT_RANK[i]}' THEN #{i} "} << 'END'
@@ -467,24 +479,7 @@ class Enrollment < ActiveRecord::Base
       false
     end
   end
-  
-  def self.readable_type(type)
-    case type
-    when 'TeacherEnrollment'
-      t('#enrollment.roles.teacher', "Teacher")
-    when 'StudentEnrollment'
-      t('#enrollment.roles.student', "Student")
-    when 'TaEnrollment'
-      t('#enrollment.roles.ta', "TA")
-    when 'ObserverEnrollment'
-      t('#enrollment.roles.observer', "Observer")
-    when 'DesignerEnrollment'
-      t('#enrollment.roles.designer', "Designer")
-    else
-      t('#enrollment.roles.student', "Student")
-    end
-  end
-  
+    
   def self.workflow_readable_type(state)
     case state.to_s
       when 'active'

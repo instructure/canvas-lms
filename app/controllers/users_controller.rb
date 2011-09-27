@@ -806,6 +806,15 @@ class UsersController < ApplicationController
       return false
     end
   end
+
+  def menu_courses
+    render :json => @template.map_courses_for_menu(@current_user.menu_courses)
+  end
+
+  def all_menu_courses
+    render :json => @template.map_courses_for_menu(@current_user.courses_with_primary_enrollment)
+  end
+
   protected :require_open_registration
 
   def teacher_activity
@@ -890,4 +899,8 @@ class UsersController < ApplicationController
 
     data.values.sort_by { |e| e[:enrollment].user.sortable_name }
   end
+
 end
+
+
+

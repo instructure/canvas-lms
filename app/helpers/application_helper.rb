@@ -510,17 +510,43 @@ var I18n = I18n || {};
     super
   end
 
-  def menu_enrollments_locals
-    max = 12
+  def map_courses_for_menu(courses)
+    # so we can display the term for duplicate course names
+    name_counts = {}
+    courses.each do |course|
+      name_counts[course.short_name] ||= 0
+      name_counts[course.short_name] += 1
+    end
+
+    mapped = courses.map do |course|
+      term = course.enrollment_term.name if (name_counts[course.short_name] > 1 && !course.enrollment_term.default_term?)
+      subtitle = Enrollment.readable_type(course.primary_enrollment)
+      {
+        :longName => "#{course.name} - #{course.short_name}",
+        :shortName => course.name,
+        :href => course_path(course),
+        :term => term || nil,
+        :subtitle => subtitle,
+        :id => course.id
+      }
+    end
+
+    mapped
+  end
+
+  def menu_courses_locals
+    courses = @current_user.menu_courses
+    all_courses_count = @current_user.courses.count
+    too_many_courses = all_courses_count > courses.length
+
     {
-      :collection => @current_user.menu_data[:enrollments][0, max].sort_by{|e| e[:enrollment].long_name },
-      :collection_size => @current_user.menu_data[:enrollments_count],
-      :partial => "shared/menu_enrollment",
-      :max_to_show => max,
+      :collection             => map_courses_for_menu(courses),
+      :collection_size        => all_courses_count,
       :more_link_for_over_max => courses_path,
-      :title => t('#menu.my_courses', "My Courses"),
-      :course_name_counts => @current_user.menu_data[:course_name_counts],
-      :link_text => raw(t('#layouts.menu.view_all_enrollments', 'View all courses'))
+      :title                  => t('#menu.my_courses', "My Courses"),
+      :link_text              => raw(t('#layouts.menu.view_all_enrollments', 'View all courses')),
+      :too_many_courses       => too_many_courses,
+      :edit                   => t("#menu.customize", "Customize")
     }
   end
 
