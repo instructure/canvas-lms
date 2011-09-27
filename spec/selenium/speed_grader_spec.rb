@@ -27,7 +27,7 @@ describe "speedgrader selenium tests" do
     @course.enroll_user(student_2, "StudentEnrollment", :enrollment_state => 'active')
     submission_2 = @assignment.submit_homework(student_2, :body => 'second student submission text')
 
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@submission.student.id}%7D"
 
     #check for assignment text in speedgrader iframe
     keep_trying_until{ driver.find_element(:id, 'speedgrader_iframe') }
