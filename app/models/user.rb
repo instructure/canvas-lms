@@ -184,7 +184,7 @@ class User < ActiveRecord::Base
     conditions = {}
     if options[:dates]
       conditions.merge!({
-        :created_at, (options[:dates].first)..(options[:dates].last)
+        :created_at => (options[:dates].first)..(options[:dates].last)
       })
     end
     page_views_as_hash = {}

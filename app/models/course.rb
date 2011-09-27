@@ -2034,7 +2034,7 @@ class Course < ActiveRecord::Base
     }
     if options[:dates]
       conditions.merge!({
-        :created_at, (options[:dates].first)..(options[:dates].last)
+        :created_at => (options[:dates].first)..(options[:dates].last)
       })
     end
     PageView.count(

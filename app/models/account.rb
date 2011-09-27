@@ -400,8 +400,8 @@ class Account < ActiveRecord::Base
       :group => "date(created_at)", 
       :order => "date(created_at)",
       :conditions => {
-        :account_id, self_and_all_sub_accounts,
-        :created_at, (dates.first)..(dates.last)
+        :account_id => self_and_all_sub_accounts,
+        :created_at => (dates.first)..(dates.last)
       }
     )
   end
@@ -419,8 +419,8 @@ class Account < ActiveRecord::Base
       :group => group,
       :order => group,
       :conditions => {
-        :account_id, self_and_all_sub_accounts,
-        :created_at, (dates.first)..(dates.last)
+        :account_id => self_and_all_sub_accounts,
+        :created_at => (dates.first)..(dates.last)
       }
     )
   end
@@ -454,11 +454,11 @@ class Account < ActiveRecord::Base
   
   def most_popular_courses(options={})
     conditions = {
-      :account_id, self_and_all_sub_accounts
+      :account_id => self_and_all_sub_accounts
     }
     if options[:dates]
       conditions.merge!({
-        :created_at, (options[:dates].first)..(options[:dates].last)
+        :created_at => (options[:dates].first)..(options[:dates].last)
       })
     end
     PageView.scoped(

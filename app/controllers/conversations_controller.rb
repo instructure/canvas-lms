@@ -99,12 +99,12 @@ class ConversationsController < ApplicationController
         @label, @view_name = ConversationParticipant.labels.detect{ |l| l.first == params[:label] }
         @view_name ||= I18n.t('index.inbox_views.labeled', 'Labeled')
         @no_messages = case @label
-          when 'red': I18n.t('no_red_messages', 'You have no red messages')
-          when 'orange': I18n.t('no_orange_messages', 'You have no orange messages')
-          when 'yellow': I18n.t('no_yellow_messages', 'You have no yellow messages')
-          when 'green': I18n.t('no_green_messages', 'You have no green messages')
-          when 'blue': I18n.t('no_blue_messages', 'You have no blue messages')
-          when 'purple': I18n.t('no_purple_messages', 'You have no purple messages')
+          when 'red'; I18n.t('no_red_messages', 'You have no red messages')
+          when 'orange'; I18n.t('no_orange_messages', 'You have no orange messages')
+          when 'yellow'; I18n.t('no_yellow_messages', 'You have no yellow messages')
+          when 'green'; I18n.t('no_green_messages', 'You have no green messages')
+          when 'blue'; I18n.t('no_blue_messages', 'You have no blue messages')
+          when 'purple'; I18n.t('no_purple_messages', 'You have no purple messages')
           else I18n.t('no_labeled_messages', 'You have no labeled messages')
         end
         @current_user.conversations.labeled(@label)

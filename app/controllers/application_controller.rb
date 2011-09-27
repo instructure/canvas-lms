@@ -998,7 +998,7 @@ class ApplicationController < ActionController::Base
   end
 
   def verified_file_download_url(attachment, *opts)
-    file_download_url(attachment, :verifier => attachment.uuid, *opts)
+    file_download_url(attachment, { :verifier => attachment.uuid }, *opts)
   end
   helper_method :verified_file_download_url
 

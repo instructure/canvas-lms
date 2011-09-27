@@ -346,7 +346,7 @@ class I18nJsExtractor
   def process_js(source, options = {})
     line_offset = options[:line_offset] || 1
     scopes = find_matches(source, SCOPED_BLOCK_START, SCOPED_BLOCK, :start_prefix => /\s*/, :line_offset => line_offset, :expression => "I18n scope")
-    scopes.each do |(v, v, scope, scope_source, v, offset)|
+    scopes.each do |(_, _, scope, scope_source, _, offset)|
       process_block scope_source, scope.sub(/\A#/, ''), options.merge(:line_offset => offset)
     end
     # see if any other I18n calls happen outside of a scope
