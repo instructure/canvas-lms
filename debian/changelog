@@ -1,3 +1,10 @@
+canvas-lms (1.1-62) professional; urgency=low
+
+  * Package ref: cc7232f403095a858c15805b9bbdb4d6f403baee
+  *
+
+ -- JT Olds <jt@instructure.com>  Tue, 27 Sep 2011 14:04:50 -0600
+
 canvas-lms (1.1-61) professional; urgency=low
 
   * Package ref: 271deb4658e0d24fc7a07b1ae9b32eb297078505
