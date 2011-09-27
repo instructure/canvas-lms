@@ -1,3 +1,13 @@
+canvas-lms (1.1-63) professional; urgency=low
+
+  * Package ref: 7c747f34f9d012072dfba8abc73a3ece73711c67
+  *
+  * [+b4e0614] Revert "tmp blockage"
+  * [+271deb4] Revert "temporarily create add_media_files jobs as on hold"
+  * [+7c747f3] Merge remote branch 'origin/stable/2011-09-17' into stable/2011-09-17-uen
+
+ -- JT Olds <jt@instructure.com>  Tue, 27 Sep 2011 14:43:34 -0600
+
 canvas-lms (1.1-62) professional; urgency=low
 
   * Package ref: cc7232f403095a858c15805b9bbdb4d6f403baee
