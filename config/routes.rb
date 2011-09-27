@@ -549,7 +549,8 @@ ActionController::Routing::Routes.draw do |map|
     dashboard.eportfolios "eportfolios", :controller => "eportfolios", :action => "user_index"
     dashboard.grades "grades", :controller => "users", :action => "grades"
     dashboard.resources :rubrics, :as => :assessments
-    dashboard.comment_session "comment_session", :controller => "users", :action => "kaltura_session"
+    # comment_session can be removed once the iOS apps are no longer using it
+    dashboard.comment_session "comment_session", :controller => "services_api", :action => "start_kaltura_session"
     dashboard.ignore_stream_item 'ignore_stream_item/:id', :controller => 'users', :action => 'ignore_stream_item', :conditions => {:method => :delete}
   end
   map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
@@ -712,9 +713,10 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
     end
-    
+
     api.with_options(:controller => :services_api) do |services|
       services.get 'services/kaltura', :action => :show_kaltura_config
+      services.post 'services/kaltura_session', :action => :start_kaltura_session
     end
   end
 

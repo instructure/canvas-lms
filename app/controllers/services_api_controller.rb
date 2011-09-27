@@ -60,5 +60,36 @@ class ServicesApiController < ApplicationController
       render_unauthorized_action
     end
   end
+
+  # @API
+  # Start a new Kaltura session, so that new media can be recorded and uploaded
+  # to this Canvas instance's Kaltura instance.
+  #
+  # @response_field ks The kaltura session id, for use in the kaltura v3 API.
+  #     This can be used in the uploadtoken service, for instance, to upload a new
+  #     media file into kaltura.
+  #
+  # @example_response
+  #
+  # {
+  #   'ks': '1e39ad505f30c4fa1af5752b51bd69fe'
+  # }
+  def start_kaltura_session
+    @user = @current_user
+    if !@current_user
+      render :json => {:errors => {:base => t('must_be_logged_in', "You must be logged in to use Kaltura")}, :logged_in => false}.to_json
+    end
+    client = Kaltura::ClientV3.new
+    uid = "#{@user.id}_#{@domain_root_account.id}"
+    res = client.startSession(Kaltura::SessionType::USER, uid)
+    raise "Kaltura session failed to generate" if res.match(/START_SESSION_ERROR/)
+    render :json => {
+      :ks => res,
+      :subp_id => Kaltura::ClientV3.config['subpartner_id'],
+      :partner_id => Kaltura::ClientV3.config['partner_id'],
+      :uid => uid,
+      :serverTime => Time.now.to_i
+    }.to_json
+  end
   
 end

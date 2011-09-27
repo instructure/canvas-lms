@@ -606,25 +606,7 @@ class UsersController < ApplicationController
       end
     end
   end
-  
-  def kaltura_session
-    @user = @current_user
-    if !@current_user
-      render :json => {:errors => {:base => t('must_be_logged_in', "You must be logged in to use Kaltura")}, :logged_in => false}.to_json
-    end
-    client = Kaltura::ClientV3.new
-    uid = "#{@user.id}_#{@domain_root_account.id}"
-    res = client.startSession(Kaltura::SessionType::USER, uid)
-    raise "Kaltura session failed to generate" if res.match(/START_SESSION_ERROR/)
-    render :json => {
-      :ks => res,
-      :subp_id => Kaltura::ClientV3.config['subpartner_id'],
-      :partner_id => Kaltura::ClientV3.config['partner_id'],
-      :uid => uid,
-      :serverTime => Time.now.to_i
-    }.to_json
-  end
-  
+
   def media_download
     url = Rails.cache.fetch(['media_download_url', params[:entryId], params[:type]].cache_key, :expires_in => 30.minutes) do
       client = Kaltura::ClientV3.new
