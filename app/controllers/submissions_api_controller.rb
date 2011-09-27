@@ -264,7 +264,7 @@ class SubmissionsApiController < ApplicationController
                                                         sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a, :assignment => assignment, :url_params => {:comment_id => sc.id, :id => submission.user_id})
+          attachment_json(a)
         end unless sc.attachments.blank?
         sc_hash
       end
@@ -315,7 +315,7 @@ class SubmissionsApiController < ApplicationController
       attachments = attempt.versioned_attachments.dup
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
       hash['attachments'] = attachments.map do |attachment|
-        attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
+        attachment_json(attachment)
       end.compact unless attachments.blank?
     end
 
@@ -338,7 +338,7 @@ class SubmissionsApiController < ApplicationController
         )
         attachments = (entry.attachments.dup + [entry.attachment]).compact
         ehash['attachments'] = attachments.map do |attachment|
-          attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
+          attachment_json(attachment)
         end.compact unless attachments.blank?
         ehash
       end

@@ -414,5 +414,20 @@ Spec::Runner.configure do |config|
     end
     return server, server_thread, post_lines
   end
+ 
+  def stub_kaltura
+    # trick kaltura into being activated
+    Kaltura::ClientV3.stub!(:config).and_return({
+          :domain => 'kaltura.example.com',
+          :resource_domain => 'kaltura.example.com',
+          :partner_id => '100',
+          :subpartner_id => '10000',
+          :secret_key => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+          :user_secret_key => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+          :player_ui_conf => '1',
+          :kcw_ui_conf => '1',
+          :upload_ui_conf => '1'
+    })
+  end
 
 end

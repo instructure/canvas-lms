@@ -301,6 +301,49 @@ describe SubmissionsApiController, :type => :integration do
     JSON.parse(response.body).should == { 'status' => 'unauthorized' }
   end
 
+  it "should allow retrieving attachments without a session" do
+    student1 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => student1)] }
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s },
+          { :include => %w(submission_history submission_comments rubric_assessment) })
+    url = json[0]['attachments'][0]['url']
+    get_via_redirect(url)
+    response.should be_success
+    response['content-type'].should == 'image/png'
+  end
+
+  it "should allow retrieving media comments without a session" do
+    student1 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    MediaObject.create!(:media_id => "54321", :context => student1, :user => student1)
+    mock_kaltura = mock(Kaltura::ClientV3)
+    Kaltura::ClientV3.stub(:new).and_return(mock_kaltura)
+    mock_kaltura.should_receive :startSession
+    mock_kaltura.should_receive(:flavorAssetGetByEntryId).and_return([{:fileExt => 'mp4', :id => 'fake'}])
+    mock_kaltura.should_receive(:flavorAssetGetDownloadUrl).and_return("https://kaltura.example.com/some/url")
+    submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
+    stub_kaltura
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s },
+          { :include => %w(submission_history submission_comments rubric_assessment) })
+    url = json[0]['media_comment']['url']
+    get(url)
+    response.should be_redirect
+    response['Location'].should match(%r{https://kaltura.example.com/some/url})
+  end
+
   it "should return all submissions for an assignment" do
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
@@ -346,7 +389,7 @@ describe SubmissionsApiController, :type => :integration do
         "attachments" =>
          [
            { "content-type" => "application/loser",
-             "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
+             "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?verifier=#{sub1.attachments.first.uuid}",
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser" },
          ],
@@ -384,7 +427,7 @@ describe SubmissionsApiController, :type => :integration do
            "attachments" =>
             [
               { "content-type" => "application/loser",
-                "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
+                "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?verifier=#{sub1.attachments.first.uuid}",
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser" },
             ],
@@ -436,11 +479,11 @@ describe SubmissionsApiController, :type => :integration do
              {"content-type" => "image/png",
               "display_name" => "ss2.png",
               "filename" => "ss2.png",
-              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachments.first.id}",},
+              "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?verifier=#{sub2.attachments.first.uuid}",},
              {"content-type" => "image/png",
               "display_name" => "snapshot.png",
               "filename" => "snapshot.png",
-              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",},
+              "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?verifier=#{sub2.attachment.uuid}",},
             ],
            "score"=>9}],
         "attempt"=>1,
@@ -452,11 +495,11 @@ describe SubmissionsApiController, :type => :integration do
           {"content-type" => "image/png",
            "display_name" => "ss2.png",
            "filename" => "ss2.png",
-           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachments.first.id}",},
+           "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?verifier=#{sub2.attachments.first.uuid}",},
           {"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",},
+           "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?verifier=#{sub2.attachment.uuid}",},
          ],
         "submission_comments"=>[],
         "score"=>9,

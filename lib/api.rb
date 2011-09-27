@@ -124,20 +124,8 @@ module Api
     collection
   end
   
-  def attachment_json(attachment, opts={})
-    url_params = opts[:url_params] || {}
-
-    url = case attachment.context_type
-      when "Course"
-        course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
-      when "Group"
-        group_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
-      when /Submission|User|Assignment/
-        return nil unless opts[:assignment]
-        course_assignment_submission_url(@context, opts[:assignment], url_params.merge(:download => attachment.id))
-      else
-        return nil
-    end
+  def attachment_json(attachment)
+    url = file_download_url(attachment, :verifier => attachment.uuid, :download => '1')
     {
       'content-type' => attachment.content_type,
       'display_name' => attachment.display_name,

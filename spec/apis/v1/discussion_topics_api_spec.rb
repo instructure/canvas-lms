@@ -108,7 +108,7 @@ describe DiscussionTopicsController, :type => :integration do
                           "message"=>"<p>content here</p>",
                           "attachments"=>
                                   [{"content-type"=>"unknown/unknown",
-                                    "url"=>"http://www.example.com/groups/#{group.id}/files/#{att.id}/download",
+                                    "url"=>"http://www.example.com/files/#{att.id}/download?verifier=#{att.uuid}",
                                     "filename"=>"content.txt",
                                     "display_name"=>"content.txt"}],
                           "posted_at"=>gtopic.posted_at.as_json,

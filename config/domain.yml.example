@@ -1,5 +1,5 @@
 test:
-  domain: "localhost:3000"
+  domain: "www.example.com" # rails default domain for integration tests
 
 development:
   domain: "localhost:3000"

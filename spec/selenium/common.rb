@@ -364,13 +364,13 @@ shared_examples_for "all selenium tests" do
     Kaltura::ClientV3.stub!(:config).and_return({
           'domain' => 'www.instructuremedia.com',
           'resource_domain' => 'www.instructuremedia.com',
-          'partner_id' => '101',
-          'subpartner_id' => '10100',
-          'secret_key' => '3071bfe768e40ff6726ba2667c1e89d7',
-          'user_secret_key' => '9c95f13c01b0922a87242d0588c41d79',
-          'player_ui_conf' => '1727899',
-          'kcw_ui_conf' => '1727883',
-          'upload_ui_conf' => '1103'
+          'partner_id' => '100',
+          'subpartner_id' => '10000',
+          'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+          'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+          'player_ui_conf' => '1',
+          'kcw_ui_conf' => '1',
+          'upload_ui_conf' => '1'
     })
   end
 
