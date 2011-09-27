@@ -33,7 +33,7 @@ gem 'netaddr',        '1.5.0'
 gem 'nokogiri',       '1.4.1'
 gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
-gem 'rake',           '0.8.7'
+gem 'rake',           '< 0.10'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount',      '1.6.8'
 gem 'require_relative', '1.0.1'
