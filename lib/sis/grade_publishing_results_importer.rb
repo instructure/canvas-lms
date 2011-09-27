@@ -44,7 +44,7 @@ module SIS
         logger.debug("Processing Enrollment #{row.inspect}")
 
         enrollment = Enrollment.find_by_id(row['enrollment_id'])
-        enrollment = nil unless enrollment.course.root_account_id == @root_account.id || enrollment.course_section.root_account_id == @root_account.id
+        enrollment = nil if enrollment && ((enrollment.course && enrollment.course.root_account_id != @root_account.id) || (enrollment.course_section && enrollment.course_section.root_account_id != @root_account.id))
         unless enrollment
           add_warning(csv,"Enrollment #{row['enrollment_id']} doesn't exist")
           next
