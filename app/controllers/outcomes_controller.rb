@@ -37,7 +37,7 @@ class OutcomesController < ApplicationController
         if @context == @outcome.context
           codes = "all"
         else
-          codes = @context.all_courses.scoped({:select => [:id]}).map(&:asset_string)
+          codes = @context.all_courses.scoped({:select => 'id'}).map(&:asset_string)
         end
       end
       @tags = @outcome.content_tags.active.for_context(@context)
@@ -64,7 +64,7 @@ class OutcomesController < ApplicationController
         if @context == @outcome.context
           codes = "all"
         else
-          codes = @context.all_courses.scoped({:select => [:id]}).map(&:asset_string)
+          codes = @context.all_courses.scoped({:select => 'id'}).map(&:asset_string)
         end
       end
       @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)

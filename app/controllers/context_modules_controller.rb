@@ -24,7 +24,7 @@ class ContextModulesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       @modules = @context.context_modules.active
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
         ContextModule.send(:preload_associations, @modules, [:context_module_progressions, :content_tags])

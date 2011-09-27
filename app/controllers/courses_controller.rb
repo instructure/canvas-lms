@@ -606,7 +606,7 @@ class CoursesController < ApplicationController
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
         @modules = @context.context_modules.active
-        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
+        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
