@@ -49,6 +49,7 @@ describe "learning outcome test" do
     driver.find_element(:css, '#right-side a:last-child').click
     driver.find_element(:css, '.add_rubric_link').click
     driver.find_element(:css, '#rubric_new input[name="title"]').send_keys('New Rubric')
+
     #edit first criterion
     driver.execute_script('$(".links").show();')#couldn't get mouseover to work
     edit_desc_img = driver.
@@ -77,31 +78,31 @@ describe "learning outcome test" do
     driver.find_element(:id, 'find_outcome_criterion_dialog').should be_displayed
     outcome_div = driver.find_element(:css, '#find_outcome_criterion_dialog table tr td.right .outcome_' + @first_outcome.id.to_s)
     outcome_div.find_element(:css, '.short_description').text.should == @first_outcome.short_description
-    outcome_div.find_element(:css, '.criterion_for_scoring').click
+    unless is_checked("#find_outcome_criterion_dialog .criterion_for_scoring")
+      driver.find_element(:css, "#find_outcome_criterion_dialog .criterion_for_scoring").click
+    end
     outcome_div.find_element(:css, '.select_outcome_link').click
     driver.find_element(:id, 'find_outcome_criterion_dialog').should_not be_displayed
     driver.find_element(:css, '#criterion_3 .learning_outcome_flag').should be_displayed
-    driver.find_element(:css, '#criterion_3 td.points_form').should include_text('3 pts')
+    driver.find_element(:css, '#criterion_3 td.points_form').should include_text('3')
 
     #add second outcome
     driver.find_element(:css, '#rubric_new .find_outcome_link').click
     driver.find_element(:css, '#find_outcome_criterion_dialog .outcomes_select:last-child').click
     outcome_div = driver.find_element(:css, '#find_outcome_criterion_dialog table tr td.right .outcome_' + @second_outcome.id.to_s)
-
     outcome_div.find_element(:css, '.select_outcome_link').click
     driver.find_element(:id, 'find_outcome_criterion_dialog').should_not be_displayed
     driver.find_element(:css, '#criterion_4 .learning_outcome_flag').should be_displayed
 
     #save and check rubric
     driver.find_element(:id, 'edit_rubric_form').submit
-    wait_for_ajax_requests
-    wait_for_animations
+    wait_for_ajaximations
     driver.find_element(:css, '#rubrics .edit_rubric_link img').should be_displayed
     find_all_with_jquery('#rubrics tr.criterion:visible').size.should == 4
     driver.find_element(:css, '#left-side .outcomes').click
     driver.find_element(:link, "Outcomes").click
     driver.find_element(:css, '#right-side a:last-child').click
-    driver.find_element(:css, '#rubrics .details').should include_text('--')
+    driver.find_element(:css, '#rubrics .details').should include_text('14')
   end
 
 end

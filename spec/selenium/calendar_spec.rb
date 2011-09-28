@@ -51,10 +51,10 @@ describe "calendar selenium tests" do
     wait_for_ajax_requests
 
     #verify both assignments are visible
-    unless get_checkbox_state("#group_course_#{first_course.id}")
+    unless is_checked("#group_course_#{first_course.id}")
       driver.find_element(:id, "group_course_#{first_course.id}").click
     end
-    unless get_checkbox_state("#group_course_#{second_course.id}")
+    unless is_checked("#group_course_#{second_course.id}")
       driver.find_element(:id, "group_course_#{second_course.id}").click
     end
     date_holder_id = "day_#{due_date.year}_#{due_date.strftime('%m')}_#{due_date.strftime('%d')}"

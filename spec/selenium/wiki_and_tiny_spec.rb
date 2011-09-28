@@ -483,9 +483,9 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     driver.find_element(:css, '.mce_instructure_record').click
     keep_trying_until{ driver.find_element(:id, 'record_media_tab').should be_displayed }
-    driver.find_element(:css, '#media_comment_dialog #upload_media_tab').click
+    driver.find_element(:css, '#media_comment_dialog a[href="#upload_media_tab"]').click
     driver.find_element(:css, '#media_comment_dialog #audio_upload').should be_displayed
-    driver.find_element(:css, '#ui-dialog-title-media_comment_dialog + a .ui-icon-closethick').click
+    find_with_jquery('.ui-icon-closethick:visible').click
     driver.find_element(:id, 'media_comment_dialog').should_not be_displayed
   end
 

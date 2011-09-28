@@ -190,7 +190,7 @@ describe "speedgrader selenium tests" do
       driver.find_element(:id, "audio_record_option").should be_displayed
     }
     driver.find_element(:id, "video_record_option").should be_displayed
-    driver.find_element(:css, '.ui-icon-closethick').click
+    find_with_jquery('.ui-icon-closethick:visible').click
     driver.find_element(:id, "audio_record_option").should_not be_displayed 
 
     #check for file upload comment

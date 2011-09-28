@@ -103,14 +103,32 @@ shared_examples_for "dashboard selenium tests" do
 
   it "should display student groups in course menu" do
     course_with_student_logged_in
+    @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+    Enrollment.update_all(["created_at = ?", 1.minute.ago])
+
+    get "/"
+
+    course_menu = driver.find_element(:link, I18n.t('links.courses','Courses')).find_element(:xpath, '..')
+
+    driver.action.move_to(course_menu).perform
+    course_menu.should include_text(I18n.t('#menu.my_courses','My Courses'))
+    course_menu.should include_text(@course.name)
+  end
+
+
+  it "should display student groups in course menu" do
+    course_with_student_logged_in
     group = Group.create!(:name=>"group1", :context => @course)
     group.add_user(@user)
+    @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+    Enrollment.update_all(["created_at = ?", 1.minute.ago])
 
     get "/"
 
     course_menu = driver.find_element(:link, I18n.t('links.courses_and_groups','Courses & Groups')).find_element(:xpath, '..')
+
     driver.action.move_to(course_menu).perform
-    course_menu.should include_text(I18n.t('menu.current_groups','Current Groups'))
+    course_menu.should include_text(I18n.t('#menu.current_groups','Current Groups'))
     course_menu.should include_text(group.name)
   end
 

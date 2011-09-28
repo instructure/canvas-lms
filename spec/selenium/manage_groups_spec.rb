@@ -237,9 +237,7 @@ describe "manage_groups selenium tests" do
     category = find_with_jquery(".group_category:visible")
     category.find_elements(:css, ".group_blank .user_id_#{john.id}").should be_empty
 
-    group_div = category.find_element(:css, "#group_#{group.id}")
-    driver.action.move_to(group_div).perform
-    group_div.find_element(:css, ".delete_group_link").click
+    driver.execute_script("$('#group_#{group.id} .delete_group_link').hover().click()") #move_to occasionally breaks in the hudson build
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.accept
     wait_for_ajaximations

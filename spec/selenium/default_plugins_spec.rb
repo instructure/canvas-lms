@@ -7,7 +7,7 @@ shared_examples_for "plugins selenium tests" do
     user_logged_in
     Account.site_admin.add_user(@user)
   end
-  
+
   it "should allow configuring twitter plugin" do
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     settings.should be_nil
@@ -24,6 +24,7 @@ shared_examples_for "plugins selenium tests" do
     
     Twitter.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
+    wait_for_ajax_requests
     
     keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
@@ -48,7 +49,8 @@ shared_examples_for "plugins selenium tests" do
     
     driver.find_element(:css, "#settings_name").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
-    
+    wait_for_ajax_requests
+
     keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
@@ -74,7 +76,8 @@ shared_examples_for "plugins selenium tests" do
     
     GoogleDocs.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
-    
+    wait_for_ajax_requests
+
     keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
@@ -100,6 +103,7 @@ shared_examples_for "plugins selenium tests" do
     
     LinkedIn.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
+    wait_for_ajax_requests
     
     keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
@@ -109,7 +113,7 @@ shared_examples_for "plugins selenium tests" do
     settings[:api_key].should == 'asdf'
     settings[:secret_key].should == 'asdf'
   end
-  
+
   it "should allow configuring scribd plugin" do
     settings = Canvas::Plugin.find(:scribd).try(:settings)
     settings.should be_nil
@@ -128,6 +132,7 @@ shared_examples_for "plugins selenium tests" do
     
     ScribdAPI.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
+    wait_for_ajax_requests
     
     keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
@@ -137,7 +142,7 @@ shared_examples_for "plugins selenium tests" do
     settings[:api_key].should == 'asdf'
     settings[:secret_key].should == 'asdf'
   end
-  
+
   it "should allow configuring tinychat plugin" do
     settings = Canvas::Plugin.find(:tinychat).try(:settings)
     settings.should be_nil
@@ -154,6 +159,7 @@ shared_examples_for "plugins selenium tests" do
     
     Tinychat.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
+    wait_for_ajax_requests
     
     keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
@@ -163,6 +169,7 @@ shared_examples_for "plugins selenium tests" do
     settings[:api_key].should == 'asdf'
     settings[:secret_key].should == 'asdf'
   end
+
 end
 
 describe "plugins Windows-Firefox-Tests" do

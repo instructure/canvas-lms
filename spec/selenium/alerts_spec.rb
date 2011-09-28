@@ -87,19 +87,20 @@ describe "Alerts" do
     @alerts.should be_empty
   end
 
-  it "should remove non-created alerts" do
+  it "should remove non-created alerts by clicking delete link" do
     get "/accounts/#{@context.id}/settings"
 
     driver.find_element(:css, '#tab-alerts-link').click
     driver.find_element(:css, '.add_alert_link').click
     alert = driver.find_element(:css, '.alert.new')
     alert.find_element(:css, '.delete_link').click
+    wait_for_animations
     keep_trying_until { find_with_jquery(".alert.new").blank? }
 
     @alerts.should be_empty
   end
 
-  it "should remove non-created alerts" do
+  it "should remove non-created alerts by clicking cancel button" do
     get "/accounts/#{@context.id}/settings"
 
     driver.find_element(:css, '#tab-alerts-link').click
@@ -164,8 +165,8 @@ describe "Alerts" do
     alert = driver.find_element(:css, '.alert.new')
     alert.find_element(:css, 'input[name="repetition"][value="value"]').click
     alert.find_element(:css, '.submit_button').click
-    wait_for_ajaximations
-
+    sleep 1 #need to wait for javascript to process
+    wait_for_animations
     keep_trying_until { driver.find_elements(:css, '.error_box').length == 4 }
 
     # clicking "do not repeat" should remove the number of days error
@@ -178,7 +179,6 @@ describe "Alerts" do
     keep_trying_until { driver.find_elements(:css, '.error_box').length == 1 }
 
     alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
-    alert.find_element(:css, '.submit_button').click
     alert.find_element(:css, '.submit_button').click
     keep_trying_until { driver.find_elements(:css, '.error_box').length == 2 }
   end

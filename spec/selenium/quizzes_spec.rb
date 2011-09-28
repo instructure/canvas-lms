@@ -432,7 +432,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
     #### Numerical Answer
-  it "should create a quiz question with a matching question" do
+  it "should create a quiz question with a numerical question" do
     start_quiz_question
     quiz = Quiz.last
     
@@ -443,7 +443,7 @@ shared_examples_for "quiz selenium tests" do
 
     tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
     in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a matching question.')
+      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
     end
     
     answers = question.find_elements(:css, ".form_answers > .answer")

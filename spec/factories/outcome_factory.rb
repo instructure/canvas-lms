@@ -38,7 +38,7 @@ def valid_outcome_data
     {
           :enable => '1',
           :points_possible => 3,
-          :mastery_points => 4,
+          :mastery_points => 3,
           :description => "Outcome row",
           :ratings => {
              'first_rating' =>

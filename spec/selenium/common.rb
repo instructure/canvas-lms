@@ -163,7 +163,7 @@ module SeleniumTestsHelperMethods
         end
         break if s
       rescue Timeout::Error
-        # pass
+        puts "timeout error attempting to connect to forked webrick server"
       end
       sleep 1
     end
@@ -317,8 +317,8 @@ shared_examples_for "all selenium tests" do
     driver.switch_to.window saved_window_handle
   end
 
-  def get_checkbox_state(selector)
-    return driver.execute_script('return $("'+selector+'").attr("checked");')
+  def is_checked(selector)
+    return driver.execute_script('return $("'+selector+'").is(":checked")')
   end
 
   def find_option_value(selector_type, selector_css, option_text)
@@ -358,19 +358,19 @@ shared_examples_for "all selenium tests" do
     find_with_jquery('#ui-datepicker-div a:contains(15)').click
     datepicker
   end
- 
+
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stub!(:config).and_return({
-          :domain => 'kaltura.example.com',
-          :resource_domain => 'kaltura.example.com',
-          :partner_id => '100',
-          :subpartner_id => '10000',
-          :secret_key => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-          :user_secret_key => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-          :player_ui_conf => '1',
-          :kcw_ui_conf => '1',
-          :upload_ui_conf => '1'
+          'domain' => 'www.instructuremedia.com',
+          'resource_domain' => 'www.instructuremedia.com',
+          'partner_id' => '101',
+          'subpartner_id' => '10100',
+          'secret_key' => '3071bfe768e40ff6726ba2667c1e89d7',
+          'user_secret_key' => '9c95f13c01b0922a87242d0588c41d79',
+          'player_ui_conf' => '1727899',
+          'kcw_ui_conf' => '1727883',
+          'upload_ui_conf' => '1103'
     })
   end
 
@@ -391,6 +391,22 @@ shared_examples_for "all selenium tests" do
         window.resizeTo(window.screen.availWidth, window.screen.availHeight);
       }
     JS
+  end
+
+  def check_image(element)
+    require 'open-uri'
+    element.should be_displayed
+    element.tag_name.should == 'img'
+    temp_file = open(element.attribute('src'))
+    temp_file.size.should > 0
+  end
+
+  def check_file(element)
+    require 'open-uri'
+    element.should be_displayed
+    element.tag_name.should == 'a'
+    temp_file = open(element.attribute('href'))
+    temp_file.size.should > 0
   end
 
   def assert_flash_notice_message(okay_message_regex)
@@ -449,22 +465,6 @@ def get_file(filename)
     fullpath = "C:\\testfiles\\#{filename}"
   end
   [filename, fullpath, data, @file]
-end
-
-def check_image(element)
-  require 'open-uri'
-  element.should be_displayed
-  element.tag_name.should == 'img'
-  temp_file = open(element.attribute('src'))
-  temp_file.size.should > 0
-end
-
-def check_file(element)
-  require 'open-uri'
-  element.should be_displayed
-  element.tag_name.should == 'a'
-  temp_file = open(element.attribute('href'))
-  temp_file.size.should > 0
 end
 
 shared_examples_for "in-process server selenium tests" do
