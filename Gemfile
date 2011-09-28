@@ -79,9 +79,8 @@ group :development do
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
-  gem 'guard', '0.7.0'
-  gem 'guard-coffeescript', '0.1.0'
-  gem 'execjs', '1.2.8'
+  gem 'guard'
+  gem 'guard-coffeescript'
 end
 
 group :redis do
