@@ -105,4 +105,11 @@ class GroupMembership < ActiveRecord::Base
   end
   
   def self.serialization_excludes; [:uuid]; end
+
+  # true iff 'active' and the pair of user and group's course match one of the
+  # provided enrollments
+  def active_given_enrollments?(enrollments)
+    state != :requested && state != :deleted && 
+    enrollments.any?{ |e| e.user == self.user && e.course == self.group.context }
+  end
 end

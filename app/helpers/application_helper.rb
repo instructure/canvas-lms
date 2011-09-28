@@ -526,26 +526,24 @@ var I18n = I18n || {};
 
   def menu_groups_locals
     {
-      :collection => @current_user.cached_current_group_memberships,
+      :collection => @current_user.menu_data[:group_memberships],
+      :collection_size => @current_user.menu_data[:group_memberships_count],
       :partial => "shared/menu_group_membership",
-      :collection_size => @current_user.cached_current_group_memberships.length,
       :max_to_show => 8,
       :more_link_for_over_max => groups_path,
       :title => t('#menu.current_groups', "Current Groups"),
-      :course_name_counts => @current_user.menu_data[:course_name_counts],
       :link_text => raw(t('#layouts.menu.view_all_groups', 'View all groups'))
     }
   end
 
   def menu_accounts_locals
     {
-      :collection => @current_user.accounts,
+      :collection => @current_user.menu_data[:accounts],
+      :collection_size => @current_user.menu_data[:accounts_count],
       :partial => "shared/menu_account",
-      :collection_size => @current_user.accounts.length,
       :max_to_show => 8,
       :more_link_for_over_max => accounts_path,
       :title => t('#menu.managed_accounts', "Managed Accounts"),
-      :course_name_counts => @current_user.menu_data[:course_name_counts],
       :link_text => raw(t('#layouts.menu.view_all_accounts', 'View all accounts'))
     }
   end

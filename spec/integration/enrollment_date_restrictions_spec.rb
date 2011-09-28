@@ -54,6 +54,35 @@ describe "enrollment_date_restrictions" do
     page.css(".past_enrollments li").should be_empty
   end
 
+  it "should not list groups from inactive enrollments in the menu" do
+    @student = user_with_pseudonym
+    @course1 = course(:course_name => "Course 1", :active_all => 1)
+    e1 = student_in_course(:user => @student, :active_all => 1)
+    @group1 = @course1.groups.create(:name => "Group 1")
+    @group1.add_user(@student)
+
+    @course2 = course(:course_name => "Course 2", :active_all => 1)
+
+    @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => true)
+    e2 = student_in_course(:user => @student, :active_all => 1)
+    @group2 = @course2.groups.create(:name => "Group 1")
+    @group2.add_user(@student)
+
+    Enrollment.update_all(["created_at = ?", 1.minute.ago]) # need to make created_at and updated_at different
+
+    user_session(@student, @pseudonym)
+
+    get "/"
+    page = Nokogiri::HTML(response.body)
+    list = page.css(".menu-item-drop-column-list li").to_a
+    # course lis are still there and view all groups should always show up when
+    # there's at least one 'visible' group
+    list.size.should == 4
+    list.select{ |li| li.text =~ /Group 1/ }.should_not be_empty
+    list.select{ |li| li.text =~ /View all groups/ }.should_not be_empty
+    list.select{ |li| li.text =~ /Group 2/ }.should be_empty
+  end
+
   it "should not show date inactive/completed courses in grades" do
     @course1 = course(:active_all => 1)
     @course2 = course(:active_all => 1)

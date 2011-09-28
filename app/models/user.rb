@@ -1856,6 +1856,7 @@ class User < ActiveRecord::Base
 
   def set_menu_data(enrollment_uuid)
     max_to_show = 8
+
     coalesced_enrollments = []
     course_name_counts = {}
     has_completed_enrollment = false
@@ -1895,11 +1896,22 @@ class User < ActiveRecord::Base
       end
     end
     coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
+
+    active_enrollments = coalesced_enrollments.map{ |e| e[:enrollment] }
+    cached_group_memberships = self.cached_current_group_memberships
+    coalesced_group_memberships = cached_group_memberships.
+      select{ |gm| gm.active_given_enrollments?(active_enrollments) }.
+      sort_by{ |gm| gm.group.name }
+
     @menu_data = {
       :enrollments => coalesced_enrollments,
       :enrollments_count => cached_enrollments.length,
       :course_name_counts => course_name_counts,
       :has_completed_enrollment => has_completed_enrollment,
+      :group_memberships => coalesced_group_memberships,
+      :group_memberships_count => cached_group_memberships.length,
+      :accounts => self.accounts,
+      :accounts_count => self.accounts.length,
     }
   end
 
