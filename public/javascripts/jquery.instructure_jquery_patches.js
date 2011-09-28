@@ -17,6 +17,9 @@
  */
 
 (function($){
+  
+  // have UI dialogs default to modal:true
+  $.widget('instructure.dialog', $.ui.dialog, { options: {modal: true} });
 
   // This is so that if you disable an element, that it also gives it the class disabled.  
   // that way you can add css classes for our friend IE6. so rather than using selector:disabled, 
