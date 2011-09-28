@@ -1,0 +1,1 @@
+jQuery.widget('instructure.dialog', jQuery.ui.dialog, { options: {modal: true} });
