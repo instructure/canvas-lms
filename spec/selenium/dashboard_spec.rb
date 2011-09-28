@@ -169,6 +169,7 @@ shared_examples_for "dashboard selenium tests" do
     @enrollment.workflow_state = 'active'
     @enrollment.save!
     @second_course.reload
+    Enrollment.update_all(["created_at = ?", 1.minute.ago]) # need to make created_at and updated_at different
 
     get "/"
 
