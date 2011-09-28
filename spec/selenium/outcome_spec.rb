@@ -91,7 +91,7 @@ describe "learning outcome test" do
     driver.find_element(:css, '#left-side .outcomes').click
     driver.find_element(:link, "Outcomes").click
     driver.find_element(:css, '#right-side a:last-child').click
-    driver.find_element(:css, '#rubrics .details').should include_text('3')
+    driver.find_element(:css, '#rubrics .details').should include_text('--')
   end
 
 end
