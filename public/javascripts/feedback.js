@@ -20,46 +20,44 @@ I18n.scoped('feedback', function(I18n) {
 $(document).ready(function() {
   var dialogOpened = false;
   var $dialog = $("#feedback_dialog");
+  var $helpDialog = $("#help_dialog");
   var courses = [];
-  function helpInit() {
-    var $column = $("#menu .menu-item-drop-column:first")
-    var text = $column.find("h2:first").text();
-    if(text && text.match(/courses/i)) {
-      var added_ids = {};
-      $column.find("li").each(function() {
-        var type = $(this).find(".subtitle").text();
-        if(type && type.match(/student/i)) {
-          var name = $(this).find(".name").text();
-          var id = $(this).find("a:first").attr('href').split(/\//).pop();
-          if(name && id) {
-            if(name.length > 60) { 
-              name = name.substring(0, 60) + "...";
-            }
-            courses.push({
-              name: name,
-              id: id
-            });
-            added_ids[id] = true;
-          }
-        }
-      });
-    }
-    var role = 'user';
-    if($("#identity_feedback").hasClass('admin')) {
-      role = 'admin';
-    } else if($("#identity_feedback").hasClass('teacher')) {
-      role = 'teacher';
-    } else if($("#identity_feedback").hasClass('student') && courses.length) {
-      role = 'student';
-    }
-    $("#help_dialog").children("ul").addClass(role).end()
-      .dialog('close').dialog({
+  var inited = false;
+  function openHelp() {
+    helpInit(function() {
+      $helpDialog.dialog('close').dialog({
         autoOpen: false,
         resizable: false
-      }).dialog('open')
+      }).dialog('open');
+    });
+  }
+  function helpInit(callback) {
+    var needsCourseData = false;
+    if (!inited) {
+      var $identity_feedback = $("#identity_feedback");
+      var role = 'user';
+      if($identity_feedback.hasClass('admin')) {
+        role = 'admin';
+      } else if($identity_feedback.hasClass('teacher')) {
+        role = 'teacher';
+      } else if($identity_feedback.hasClass('student')) {
+        role = 'student';
+        needsCourseData = true;
+      }
+      $helpDialog.children("ul").addClass(role);
+    }
+    if (needsCourseData) {
+      $.ajaxJSON('/courses', 'GET', {}, function(data) {
+        courses = data;
+        callback();
+      });
+    } else {
+      callback();
+    }
+    inited = true;
   }
   var feedbackInit = function(open) {
-    $("#help_dialog").dialog('close');
+    $helpDialog.dialog('close');
     if(feedbackInit.already_initialized) { 
       $dialog.triggerHandler('feedback_click');
       return; 
@@ -172,7 +170,7 @@ $(document).ready(function() {
   });
   $("#feedback_link").click(function(event) {
     event.preventDefault();
-    helpInit();
+    openHelp();
   });
   $("#help_dialog .message_teacher_link").click(function(event) {
     event.preventDefault();

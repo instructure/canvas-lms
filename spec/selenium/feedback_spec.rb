@@ -14,8 +14,29 @@ describe "help" do
     driver.find_element(:css, '#feedback_link').should be_displayed
     driver.find_element(:css, "#help_dialog").should_not be_displayed
     driver.find_element(:css, '#feedback_link').click
+    wait_for_ajaximations
     driver.find_element(:css, "#help_dialog").should be_displayed
     driver.find_element(:css, "#help_dialog .message_teacher_link").should be_displayed
+  end
+  
+  it "should show the Help dialog on the speedgrader when 'help' is clicked and feedback is enabled" do
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(User.create).accept!
+    @assignment = @course.assignments.create
+    
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    driver.find_elements(:css, '#feedback_link').length.should == 0
+    
+    Setting.set('show_feedback_link', 'true')
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    feedback_link = driver.find_element(:css, '#feedback_link')
+    feedback_link.location_once_scrolled_into_view
+    feedback_link.should be_displayed
+    driver.find_element(:css, "#help_dialog").should_not be_displayed
+    feedback_link.click
+    wait_for_ajaximations
+    driver.find_element(:css, "#help_dialog").should be_displayed
+    driver.find_element(:css, "#help_dialog .file_ticket_link").should be_displayed
   end
   
   it "should allow sending the teacher a message" do
@@ -26,6 +47,7 @@ describe "help" do
     driver.find_element(:css, '#feedback_link').should be_displayed
     driver.find_element(:css, "#help_dialog").should_not be_displayed
     driver.find_element(:css, '#feedback_link').click
+    wait_for_ajaximations
     driver.find_element(:css, "#help_dialog").should be_displayed
     driver.find_element(:css, "#help_dialog .message_teacher_link").should be_displayed
     driver.find_element(:css, "#help_dialog .message_teacher_link").click
@@ -46,6 +68,7 @@ describe "help" do
     driver.find_element(:css, '#feedback_link').should be_displayed
     driver.find_element(:css, "#help_dialog").should_not be_displayed
     driver.find_element(:css, '#feedback_link').click
+    wait_for_ajaximations
     driver.find_element(:css, "#help_dialog").should be_displayed
     driver.find_element(:css, "#help_dialog .file_ticket_link").should be_displayed
     driver.find_element(:css, "#help_dialog .file_ticket_link").click
@@ -75,6 +98,7 @@ describe "help" do
     Setting.set('show_feedback_link', 'true')
     get "/dashboard"
     driver.find_element(:css, '#feedback_link').click
+    wait_for_ajaximations
     driver.find_element(:css, "#help_dialog").should be_displayed
     driver.find_element(:css, "#help_dialog .file_ticket_link").click
     keep_trying_until{ driver.find_elements(:css, '#feedback_dialog #feedback_form_subject').first.try(:displayed?) }
@@ -106,6 +130,7 @@ describe "help" do
     Setting.set('show_feedback_link', 'true')
     get "/dashboard"
     driver.find_element(:css, '#feedback_link').click
+    wait_for_ajaximations
     driver.find_element(:css, "#help_dialog").should be_displayed
     driver.find_element(:css, "#help_dialog .message_teacher_link").click
     keep_trying_until{ driver.find_elements(:css, '#feedback_dialog #feedback_form_subject').first.try(:displayed?) }

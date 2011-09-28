@@ -61,7 +61,13 @@
   </script>
 </head>
 <body class="<%= (@body_classes << @active_tab).uniq.join(" ") %>">
-  <% unless @body_class_no_headers %>
+  <% if @body_class_no_headers %>
+    <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
+      <%- cache([@current_user || 'nobody', 'identity-type-15m'], :expires_in => 15.minutes) do -%>
+      <div id="identity_feedback" style="display: none" class="feedback <%= @current_user.try(:highest_role) %>"></div>
+      <%- end -%>
+    <% end %>
+  <% else %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
     <a id="header-logo" href="<%= root_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> 
