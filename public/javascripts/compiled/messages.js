@@ -1,5 +1,5 @@
 (function() {
-  var $conversation_list, $conversations, $form, $last_label, $message_list, $messages, $selected_conversation, MessageInbox, TokenInput, TokenSelector;
+  var $conversation_list, $conversations, $form, $last_label, $message_list, $messages, $selected_conversation, MessageInbox, TokenInput, TokenSelector, page;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -13,6 +13,7 @@
   $form = [];
   $selected_conversation = null;
   $last_label = null;
+  page = {};
   MessageInbox = {};
   TokenInput = (function() {
     function TokenInput(node, options) {
@@ -1371,39 +1372,118 @@
     set_conversation_state = function($conversation, state) {
       return $conversation.removeClass('read unread archived').addClass(state);
     };
+    $('#conversations').delegate('.actions a', 'blur', function(e) {
+      return $(window).one('keyup', function(e) {
+        if (e.shiftKey) {
+          return close_menus();
+        }
+      });
+    });
     open_conversation_menu = function($node) {
-      var $container, $conversation, $groups, offset;
-      $node.parent().addClass('selected').closest('li').addClass('menu_active');
-      $container = $('#conversation_actions');
-      $container.addClass('selected');
-      $conversation = $node.closest('li');
-      $container.data('selected_conversation', $conversation);
-      $container.find('ul').removeClass('first last').hide();
-      $container.find('li').hide();
-      $('#action_mark_as_read').parent().showIf($conversation.hasClass('unread'));
-      $('#action_mark_as_unread').parent().showIf($conversation.hasClass('read'));
-      $container.find('.label_group').show().find('.label_icon').removeClass('checked');
-      $container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked');
-      if ($conversation.hasClass('private')) {
-        $('#action_subscribe, #action_unsubscribe').parent().hide();
+      var $container, $conversation, elements, offset;
+      elements = {
+        node: $node,
+        container: $('#conversation_actions'),
+        conversation: $node.closest('li'),
+        parent: $node.parent(),
+        lists: $('#conversation_actions ul'),
+        listElements: $('#conversation_actions li'),
+        focusable: $('a, input, select, textarea'),
+        actions: {
+          markAsRead: $('#action_mark_as_read').parent(),
+          markAsUnread: $('#action_mark_as_unread').parent(),
+          unsubscribe: $('#action_unsubscribe').parent(),
+          subscribe: $('#action_subscribe').parent(),
+          forward: $('#action_forward').parent(),
+          archive: $('#action_archive').parent(),
+          unarchive: $('#action_unarchive').parent(),
+          "delete": $('#action_delete').parent(),
+          deleteAll: $('#action_delete_all').parent()
+        },
+        labels: {
+          group: $('#conversation_actions .label_group'),
+          icon: $('#conversation_actions .label_icon')
+        }
+      };
+      page.activeActionMenu = elements.node;
+      elements.parent.addClass('selected');
+      elements.container.addClass('selected');
+      elements.conversation.addClass('menu_active');
+      $container = elements.container;
+      $conversation = elements.conversation;
+      elements.container.data('selected_conversation', elements.conversation);
+      elements.lists.removeClass('first last').hide();
+      elements.listElements.hide();
+      if (elements.conversation.hasClass('unread')) {
+        elements.actions.markAsRead.show();
+      }
+      if (elements.conversation.hasClass('read')) {
+        elements.actions.markAsUnread.show();
+      }
+      elements.labels.group.show();
+      elements.labels.icon.removeClass('checked');
+      elements.container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked');
+      if (elements.conversation.hasClass('private')) {
+        elements.actions.subscribe.hide();
+        elements.actions.unsubscribe.hide();
       } else {
-        $('#action_unsubscribe').parent().showIf(!$conversation.hasClass('unsubscribed'));
-        $('#action_subscribe').parent().showIf($conversation.hasClass('unsubscribed'));
+        if (!elements.conversation.hasClass('unsubscribed')) {
+          elements.actions.unsubscribe.show();
+        }
+        if (elements.conversation.hasClass('unsubscribed')) {
+          elements.actions.subscribe.show();
+        }
       }
-      $('#action_forward').parent().show();
-      $('#action_archive').parent().showIf(MessageInbox.scope !== 'archived');
-      $('#action_unarchive').parent().showIf(MessageInbox.scope === 'archived');
-      $('#action_delete').parent().show();
-      $('#action_delete_all').parent().show();
-      $container.find('li[style*="list-item"]').parent().show();
-      $groups = $container.find('ul[style*="block"]');
-      if ($groups.length) {
-        $($groups[0]).addClass('first');
-        $($groups[$groups.length - 1]).addClass('last');
+      elements.actions.forward.show();
+      elements.actions["delete"].show();
+      elements.actions.deleteAll.show();
+      if (MessageInbox.scope === 'archived') {
+        elements.actions.unarchive.show();
+      } else {
+        elements.actions.archive.show();
       }
-      offset = $node.offset();
-      $container.css('top', offset.top + ($node.height() * 0.9) - $container.offsetParent().offset().top);
-      return $container.css('left', offset.left + ($node.width() / 2) - $container.offsetParent().offset().left - ($container.width() / 2));
+      $(window).one('keydown', function(e) {
+        if (e.keyCode !== 9 || e.shiftKey) {
+          return;
+        }
+        return elements.focusable.one('focus.actions_menu', function(e) {
+          page.nextElement = $(e.target);
+          elements.focusable.unbind('.actions_menu');
+          elements.container.find('a:visible:first').focus();
+          elements.container.find('a:visible:first').bind('blur.actions_menu', e, function() {
+            return $(window).one('keyup', function(e) {
+              var actionMenuActive;
+              actionMenuActive = elements.container.find('a:focus').length;
+              if (!actionMenuActive) {
+                elements.container.find('a.visible').unbind('.actions_menu');
+                return page.activeActionMenu.focus();
+              }
+            });
+          });
+          return elements.container.find('a:visible:last').bind('blur.actions_menu', e, function() {
+            return $(window).one('keyup', function(e) {
+              var actionMenuActive;
+              actionMenuActive = elements.container.find('a:focus').length;
+              if (!actionMenuActive) {
+                elements.container.find('a.visible').unbind('.actions_menu');
+                page.nextElement.focus();
+                return close_menus();
+              }
+            });
+          });
+        });
+      });
+      elements.container.find('li[style*="list-item"]').parent().show();
+      elements.groups = elements.container.find('ul[style*="block"]');
+      if (elements.groups.length) {
+        elements.groups.first().addClass('first');
+        elements.groups.last().addClass('last');
+      }
+      offset = elements.node.offset();
+      return elements.container.css({
+        left: offset.left + (elements.node.width() / 2) - elements.container.offsetParent().offset().left - (elements.container.width() / 2),
+        top: offset.top + (elements.node.height() * 0.9) - elements.container.offsetParent().offset().top
+      });
     };
     close_menus = function() {
       $('#actions .menus > li, #conversation_actions, #conversations .actions').removeClass('selected');

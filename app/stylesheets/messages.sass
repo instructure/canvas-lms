@@ -481,9 +481,8 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       display: none
     .actions
       position: absolute
-      right: 17px
+      right: 9999px
       top: 5px
-      display: none
       > a
         display: block
         background: transparent url(/images/messages/actions-dd-sprite.png) 0 0 no-repeat
@@ -495,8 +494,11 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       background-position: 0 -22px
     .actions.selected
       display: block
+      right: 17px
       a, a:hover
         background-position: 0 -44px
+    .actions:focus
+      right: 17px
     .count
       display: none
       color: #fff
@@ -560,6 +562,7 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       cursor: pointer
       .actions
         display: block
+        right: 17px
       .date
         visibility: hidden
     > li.labeled

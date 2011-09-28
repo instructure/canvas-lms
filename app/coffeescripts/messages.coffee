@@ -5,6 +5,7 @@ $message_list = []
 $form = []
 $selected_conversation = null
 $last_label = null
+page = {}
 MessageInbox = {}
 
 class TokenInput
@@ -1005,39 +1006,102 @@ I18n.scoped 'conversations', (I18n) ->
   set_conversation_state = ($conversation, state) ->
     $conversation.removeClass('read unread archived').addClass state
 
+  $('#conversations').delegate '.actions a', 'blur', (e) ->
+    $(window).one 'keyup', (e) ->
+      close_menus() if e.shiftKey #or $('#conversation_actions a:focus').length == 0
+
   open_conversation_menu = ($node) ->
-    $node.parent().addClass('selected').closest('li').addClass('menu_active')
-    $container = $('#conversation_actions')
-    $container.addClass('selected')
+    # get elements
+    elements =
+      node         : $node
+      container    : $('#conversation_actions')
+      conversation : $node.closest 'li'
+      parent       : $node.parent()
+      lists        : $('#conversation_actions ul')
+      listElements : $('#conversation_actions li')
+      focusable    : $('a, input, select, textarea')
+      actions      :
+        markAsRead   : $('#action_mark_as_read').parent()
+        markAsUnread : $('#action_mark_as_unread').parent()
+        unsubscribe  : $('#action_unsubscribe').parent()
+        subscribe    : $('#action_subscribe').parent()
+        forward      : $('#action_forward').parent()
+        archive      : $('#action_archive').parent()
+        unarchive    : $('#action_unarchive').parent()
+        delete       : $('#action_delete').parent()
+        deleteAll    : $('#action_delete_all').parent()
+      labels:
+        group: $('#conversation_actions .label_group')
+        icon: $('#conversation_actions .label_icon')
 
-    $conversation = $node.closest('li')
-    $container.data('selected_conversation', $conversation)
-    $container.find('ul').removeClass('first last').hide()
-    $container.find('li').hide()
-    $('#action_mark_as_read').parent().showIf $conversation.hasClass('unread')
-    $('#action_mark_as_unread').parent().showIf $conversation.hasClass('read')
-    $container.find('.label_group').show().find('.label_icon').removeClass('checked')
-    $container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked')
-    if $conversation.hasClass('private')
-      $('#action_subscribe, #action_unsubscribe').parent().hide()
+    page.activeActionMenu = elements.node
+
+    # add selected classes
+    elements.parent.addClass 'selected'
+    elements.container.addClass 'selected'
+    elements.conversation.addClass 'menu_active'
+
+    $container    = elements.container
+    $conversation = elements.conversation
+
+    # prep action container
+    elements.container.data 'selected_conversation', elements.conversation
+    elements.lists.removeClass('first last').hide()
+    elements.listElements.hide()
+
+    # show/hide relevant links
+    elements.actions.markAsRead.show() if elements.conversation.hasClass 'unread'
+    elements.actions.markAsUnread.show() if elements.conversation.hasClass 'read'
+
+    elements.labels.group.show()
+    elements.labels.icon.removeClass 'checked'
+    elements.container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked')
+
+    if elements.conversation.hasClass('private')
+      elements.actions.subscribe.hide()
+      elements.actions.unsubscribe.hide()
     else
-      $('#action_unsubscribe').parent().showIf !$conversation.hasClass('unsubscribed')
-      $('#action_subscribe').parent().showIf $conversation.hasClass('unsubscribed')
-    $('#action_forward').parent().show()
-    $('#action_archive').parent().showIf MessageInbox.scope != 'archived'
-    $('#action_unarchive').parent().showIf MessageInbox.scope == 'archived'
-    $('#action_delete').parent().show()
-    $('#action_delete_all').parent().show()
+      elements.actions.unsubscribe.show() unless elements.conversation.hasClass 'unsubscribed'
+      elements.actions.subscribe.show() if elements.conversation.hasClass 'unsubscribed'
 
-    $container.find('li[style*="list-item"]').parent().show()
-    $groups = $container.find('ul[style*="block"]')
-    if $groups.length
-      $($groups[0]).addClass 'first'
-      $($groups[$groups.length - 1]).addClass 'last'
+    elements.actions.forward.show()
+    elements.actions.delete.show()
+    elements.actions.deleteAll.show()
+    if MessageInbox.scope is 'archived' then elements.actions.unarchive.show() else elements.actions.archive.show()
 
-    offset = $node.offset()
-    $container.css('top', offset.top + ($node.height() * 0.9) - $container.offsetParent().offset().top)
-    $container.css('left', offset.left + ($node.width() / 2) - $container.offsetParent().offset().left - ($container.width() / 2))
+    $(window).one 'keydown', (e) ->
+      return if e.keyCode isnt 9 or e.shiftKey
+
+      elements.focusable.one 'focus.actions_menu', (e) ->
+        page.nextElement = $(e.target)
+        elements.focusable.unbind '.actions_menu'
+        elements.container.find('a:visible:first').focus()
+
+        elements.container.find('a:visible:first').bind 'blur.actions_menu', (e), ->
+          $(window).one 'keyup', (e) ->
+            actionMenuActive = elements.container.find('a:focus').length
+            unless actionMenuActive
+              elements.container.find('a.visible').unbind '.actions_menu'
+              page.activeActionMenu.focus()
+        elements.container.find('a:visible:last').bind 'blur.actions_menu', (e), ->
+          $(window).one 'keyup', (e) ->
+            actionMenuActive = elements.container.find('a:focus').length
+            unless actionMenuActive
+              elements.container.find('a.visible').unbind '.actions_menu'
+              page.nextElement.focus()
+              close_menus()
+
+    elements.container.find('li[style*="list-item"]').parent().show()
+    elements.groups = elements.container.find('ul[style*="block"]')
+    if elements.groups.length
+      elements.groups.first().addClass 'first'
+      elements.groups.last().addClass 'last'
+
+    offset = elements.node.offset()
+    elements.container.css {
+      left: (offset.left + (elements.node.width() / 2) - elements.container.offsetParent().offset().left - (elements.container.width() / 2)),
+      top : (offset.top + (elements.node.height() * 0.9) - elements.container.offsetParent().offset().top)
+    }
 
   close_menus = () ->
     $('#actions .menus > li, #conversation_actions, #conversations .actions').removeClass('selected')
