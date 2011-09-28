@@ -647,7 +647,7 @@ describe Course, "backup" do
       html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
       html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
     end
-    
+
     it "should bring over linked files if not already brought over" do
       course_model
       attachment_model
@@ -655,6 +655,30 @@ describe Course, "backup" do
       @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
       html = @old_topic.message
       html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
+      @old_course = @course
+      @new_course = course_model
+      html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
+      @old_attachment.reload
+      @old_attachment.cloned_item_id.should_not be_nil
+      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
+      @new_attachment.should_not be_nil
+      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
+    end
+
+    it "should bring over linked files that have been replaced" do
+      course_model
+      attachment_model
+      @orig_attachment = @attachment
+
+      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
+      html = @old_topic.message
+      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
+
+      @orig_attachment.destroy
+      attachment_model
+      @old_attachment = @attachment
+      @old_attachment.handle_duplicates(:overwrite)
+
       @old_course = @course
       @new_course = course_model
       html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)

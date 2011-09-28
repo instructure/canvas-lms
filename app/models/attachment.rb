@@ -49,6 +49,43 @@ class Attachment < ActiveRecord::Base
   
   attr_accessor :podcast_associated_asset
 
+  # this mixin can be added to a has_many :attachments association, and it'll
+  # handle finding replaced attachments. In other words, if an attachment fond
+  # by id is deleted but an active attachment in the same context has the same
+  # path, it'll return that attachment.
+  module FindInContextAssociation
+    def find(*a, &b)
+      return super if a.first.is_a?(Symbol)
+      find_with_possibly_replaced(super)
+    end
+
+    def method_missing(method, *a, &b)
+      return super unless method.to_s =~ /^find(?:_all)?_by_id$/
+      find_with_possibly_replaced(super)
+    end
+
+    def find_with_possibly_replaced(a_or_as)
+      if a_or_as.is_a?(Attachment)
+        find_attachment_possibly_replaced(a_or_as)
+      elsif a_or_as.is_a?(Array)
+        a_or_as.map { |a| find_attachment_possibly_replaced(a) }
+      end
+    end
+
+    def find_attachment_possibly_replaced(att)
+      # if they found a deleted attachment by id, but there's an available
+      # attachment in the same context and the same full path, we return that
+      # instead, to emulate replacing a file without having to update every
+      # by-id reference in every user content field.
+      if att.deleted?
+        new_att = Folder.find_attachment_in_context_with_path(proxy_owner, att.full_display_path)
+        new_att || att
+      else
+        att
+      end
+    end
+  end
+
   def touch_context_if_appropriate
     touch_context unless context_type == 'ConversationMessage'
   end

@@ -110,8 +110,7 @@ class Course < ActiveRecord::Base
   has_many :discussion_entries, :through => :discussion_topics, :include => [:discussion_topic, :user], :dependent => :destroy
   has_many :announcements, :as => :context, :class_name => 'Announcement', :dependent => :destroy
   has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :order => 'created_at DESC'
-  has_many :attachments, :as => :context, :dependent => :destroy
-  has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted'], :order => 'attachments.display_name'
+  has_many :attachments, :as => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
   has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.title, assignments.position'
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
@@ -1378,8 +1377,9 @@ class Course < ActiveRecord::Base
     association_name = obj_class.table_name
     old_item = old_context.send(association_name).find_by_id(old_id)
     res = new_context.send(association_name).first(:conditions => { :cloned_item_id => old_item.cloned_item_id}, :order => 'id desc') if old_item
-    if !res
-      old_item = old_context.send(association_name).active.find_by_id(old_id)
+    if !res && old_item
+      # make sure it's active by re-finding it with the active scope ... active
+      old_item = old_context.send(association_name).active.find_by_id(old_item.id)
       res = old_item.clone_for(new_context) if old_item
       res.save if res
     end
