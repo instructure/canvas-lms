@@ -35,8 +35,6 @@ class Assignment < ActiveRecord::Base
   attr_accessor :original_id
   
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
-  has_many :terse_submissions, :class_name => 'Submission'
-  has_many :verbose_submissions, :class_name => 'Submission', :include => [:submission_comments, :versions, :attachments, :rubric_assessment]
   has_many :attachments, :as => :context, :dependent => :destroy
   has_one :quiz
   belongs_to :assignment_group
@@ -953,56 +951,41 @@ class Assignment < ActiveRecord::Base
     self.submissions_downloads && self.submissions_downloads > 0
   end
   
-  def submissions
-    if @speed_grader
-      self.verbose_submissions
-    else
-      self.terse_submissions
-    end
-  end
-
   def as_json(options=nil)
     json = super(options)
     json['assignment']['group_category_name'] ||= json['assignment'].delete('group_category') if json && json['assignment']
     json
   end
 
-  def speed_grader_json(as_json=false)
-    @speed_grader = true
+  def speed_grader_json(user)
     Attachment.skip_thumbnails = true
-    res = self.send(as_json ? "as_json" : "to_json", 
+    res = as_json( 
       :include => {
-        :context => {
-          :only => :id,
-          :include => {
-            :students => {
-              :only => nil
-            },
-            :enrollments  => {
-              :only => [:user_id, :course_section_id]
-            },
-            :active_course_sections => {
-              :only => [:id, :name]
-            }
-          }
-        },
-        :submissions => {
-          :include => {
-            :submission_comments => {},
-            :attachments => {:except => :thumbnail_url},
-            :rubric_assessment => {}
-          },
-          :methods => [:scribdable?, :scribd_doc, :submission_history]
-        },
-        :rubric_association => {
-          :except => {}
-        }
+        :context => { :only => :id },
+        :rubric_association => { :except => {} }
       },
       :include_root => false
     )
-    @speed_grader = false
-    Attachment.skip_thumbnails = nil
+    visible_students = context.students_visible_to(user)
+    res[:context][:students] = visible_students.
+      map{|u| u.as_json(:include_root => false)}
+    res[:context][:active_course_sections] = context.sections_visible_to(user).
+      map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
+    res[:context][:enrollments] = context.enrollments_visible_to(user).
+      map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
+    res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
+      s.as_json(:include_root => false,
+        :include => {
+          :submission_comments => {},
+          :attachments => {:except => :thumbnail_url},
+          :rubric_assessment => {},
+        },
+        :methods => [:scribdable?, :scribd_doc, :submission_history]
+      )
+    }
     res
+  ensure
+    Attachment.skip_thumbnails = nil
   end
 
   def visible_rubric_assessments_for(user)

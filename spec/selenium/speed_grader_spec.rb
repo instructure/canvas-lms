@@ -3,9 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "speedgrader selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  def student_submission()
-    @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
-    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+  def student_submission(options = {})
+    @student = user_with_pseudonym({:active_user => true, :username => 'student@example.com', :password => 'qwerty'}.merge(options))
+    @course.enroll_user(@student, "StudentEnrollment", {:enrollment_state => 'active'}.merge(options))
     @submission = @assignment.submit_homework(@student, :body => 'first student submission text')
     @submission.save!
   end
@@ -55,7 +55,7 @@ describe "speedgrader selenium tests" do
       driver.find_element(:css, '#gradebook_header .next').click
       wait_for_ajax_requests
       check_first_student
-   else
+    else
       check_first_student
       driver.find_element(:css, '#gradebook_header .next').click
       wait_for_ajax_requests
@@ -209,6 +209,18 @@ describe "speedgrader selenium tests" do
     driver.find_element(:css, '#x_of_x_students a').click
     driver.find_element(:css, 'body.grades').should be_displayed
 
+  end
+
+  it "should not show students in other sections if visibility is limited" do
+    @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+    student_submission
+    student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_animations
+
+    find_all_with_jquery('#students_selectmenu option').size.should eql(1) # just the one student
+    find_all_with_jquery('#section-menu ul li').size.should eql(1) # "Show all sections"
+    find_with_jquery('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
   end
 
 end

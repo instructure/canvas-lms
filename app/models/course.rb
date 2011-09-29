@@ -2055,6 +2055,7 @@ class Course < ActiveRecord::Base
       Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id } }
     end
   end
+  memoize :section_visibilities_for
 
   def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
     !visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
@@ -2077,6 +2078,18 @@ class Course < ActiveRecord::Base
       when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
       when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
       else scope.scoped({:conditions => "FALSE"})
+    end
+  end
+
+  def sections_visible_to(user, sections = active_course_sections)
+    visibilities = section_visibilities_for(user)
+    case enrollment_visibility_level_for(user, visibilities)
+      when :full
+        sections
+      when :sections
+        sections.scoped(:conditions => {:id => visibilities.map{ |s| s[:course_section_id] }})
+      else
+        []
     end
   end
 

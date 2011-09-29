@@ -318,7 +318,7 @@ class GradebooksController < ApplicationController
           log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
           render :action => "speed_grader"
         }
-        format.json { render :json => @assignment.speed_grader_json }
+        format.json { render :json => @assignment.speed_grader_json(@current_user) }
       end
     end
   end
