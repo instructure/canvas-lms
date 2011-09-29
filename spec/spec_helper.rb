@@ -25,10 +25,12 @@ require 'webrat'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
-ALL_MODELS = Dir.glob(File.expand_path(File.dirname(__FILE__) + '/../app/models') + '/*.rb').map{|x| 
-  model = File.basename(x, '.rb').split('_').map(&:capitalize).join
-  eval(model) rescue nil
-}.find_all{|x| x.respond_to? :delete_all and x.count >= 0 rescue false}
+ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
+      Dir["#{RAILS_ROOT}/app/models/*", "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"].collect { |file|
+        model = File.basename(file, ".*").camelize.constantize
+        next unless model < ActiveRecord::Base
+        model
+      }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
