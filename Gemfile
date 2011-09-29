@@ -64,12 +64,12 @@ end
 
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallel_tests', '0.6.2'
+  gem 'parallel_tests', '0.6.4'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.5.0'
-  gem 'webrat',       '0.7.2'
+  gem 'selenium-webdriver', '2.7.0'
+  gem 'webrat',       '0.7.3'
   gem 'yard',         '0.7.2'
   gem 'jasmine',      '1.1.0'
 end
