@@ -355,7 +355,7 @@ describe ConversationsController, :type => :integration do
       json.each { |c| c.delete("avatar_url") }
       json.should eql [
         {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6},
-        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3},
+        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course"},
         {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},

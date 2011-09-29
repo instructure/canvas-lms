@@ -688,9 +688,7 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-            if ((_ref = post_data.per_page) != null) {
-        _ref;
-      } else {
+      if ((_ref = post_data.per_page) == null) {
         post_data.per_page = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
@@ -2019,7 +2017,7 @@
             no_results: I18n.t('no_results', 'No results found')
           },
           populator: function($node, data, options) {
-            var $b, $img, $span;
+            var $b, $context_name, $img, $span, context_name;
             if (options == null) {
               options = {};
             }
@@ -2028,6 +2026,11 @@
               $img.attr('src', data.avatar_url);
               $node.append($img);
             }
+            context_name = data.context_name ? data.context_name : '';
+            context_name = context_name.length < 40 ? context_name : context_name.substr(0, 40) + '...';
+            $context_name = data.context_name ? $('<span />', {
+              "class": 'context_name'
+            }).text("(" + context_name + ")") : '';
             $b = $('<b />');
             $b.text(data.name);
             $span = $('<span />');
@@ -2038,7 +2041,7 @@
                 count: data.user_count
               }));
             }
-            $node.append($b, $span);
+            $node.append($b, $context_name, $span);
             $node.attr('title', data.name);
             $node.data('id', data.id);
             $node.data('user_data', data);

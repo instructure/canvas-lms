@@ -602,7 +602,7 @@ class ConversationsController < ApplicationController
       @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => true, :can_add_notes => can_add_notes_to?(course) }
     end
     @current_user.messageable_groups.each do |group|
-      @contexts[:groups][group.id] = {:id => group.id, :name => group.name, :type => :group, :active => group.active? }
+      @contexts[:groups][group.id] = {:id => group.id, :name => group.name, :type => :group, :active => group.active?, :context_name => group.context.name }
     end
   end
 
@@ -626,11 +626,13 @@ class ConversationsController < ApplicationController
       select{ |context| context[:active] }.
       sort_by{ |context| context[:name] }.
       map{ |context|
-        {:id => "#{context[:type]}_#{context[:id]}",
+        ret = {:id => "#{context[:type]}_#{context[:id]}",
          :name => context[:name],
          :avatar_url => avatar_url,
          :type => :context,
          :user_count => (context[:type] == :course ? course_user_counts : group_user_counts)[context[:id]]}
+        ret[:context_name] = context[:context_name] unless context[:context_name].nil?
+        ret
       }.
       reject{ |context|
         exclude.include?(context[:id])

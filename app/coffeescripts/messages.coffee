@@ -1507,6 +1507,9 @@ I18n.scoped 'conversations', (I18n) ->
             $img = $('<img class="avatar" />')
             $img.attr('src', data.avatar_url)
             $node.append($img)
+          context_name  = if data.context_name then data.context_name else ''
+          context_name  = if context_name.length < 40 then context_name else context_name.substr(0, 40) + '...'
+          $context_name = if data.context_name then $('<span />', class: 'context_name').text("(#{context_name})") else ''
           $b = $('<b />')
           $b.text(data.name)
           $span = $('<span />')
@@ -1514,7 +1517,7 @@ I18n.scoped 'conversations', (I18n) ->
             $span.text(MessageInbox.context_list(data))
           else if data.type and data.user_count?
             $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
-          $node.append($b, $span)
+          $node.append($b, $context_name, $span)
           $node.attr('title', data.name)
           $node.data('id', data.id)
           $node.data('user_data', data)
