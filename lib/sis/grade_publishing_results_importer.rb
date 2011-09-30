@@ -44,7 +44,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_grade_publishing_result(enrollment_id, grade_publishing_status)
+      def add_grade_publishing_result(enrollment_id, grade_publishing_status, message=nil)
         @logger.debug("Processing grade publishing result #{[enrollment_id, grade_publishing_status].inspect}")
 
         raise ImportError, "No enrollment_id given" if enrollment_id.blank?
@@ -61,7 +61,8 @@ module SIS
         raise ImportError, "Enrollment #{enrollment_id} doesn't exist" unless enrollment
 
         enrollment.grade_publishing_status = grade_publishing_status.downcase
-        enrollment.save
+        enrollment.grade_publishing_message = message.to_s
+        enrollment.save!
 
         @success_count += 1
       end

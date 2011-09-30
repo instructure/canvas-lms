@@ -2149,6 +2149,27 @@ describe SIS::CSV::Import do
       @enrollment.reload
       @enrollment.grade_publishing_status.should == 'published'
     end
+
+    it 'should properly pass in messages' do
+      course_with_student
+      @course.account = @account;
+      @course.save!
+
+      @enrollment.grade_publishing_status = 'publishing';
+      @enrollment.save!
+
+      @course.grade_publishing_status.should == 'publishing'
+
+      process_csv_data_cleanly(
+        "enrollment_id,grade_publishing_status,message",
+        "#{@enrollment.id},published,message1")
+
+      @course.grade_publishing_status.should == 'published'
+      @course.grade_publishing_messages.should == { "message1" => 1 }
+
+      @enrollment.reload
+      @enrollment.grade_publishing_status.should == 'published'
+    end
   end
 
   context 'account associations' do

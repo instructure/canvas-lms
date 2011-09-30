@@ -32,7 +32,7 @@ module SIS
             update_progress
 
             begin
-              importer.add_grade_publishing_result(row['enrollment_id'], row['grade_publishing_status'])
+              importer.add_grade_publishing_result(row['enrollment_id'], row['grade_publishing_status'], row['message'])
             rescue ImportError => e
               add_warning(csv, "#{e}")
             end
