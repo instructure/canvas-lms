@@ -303,13 +303,13 @@ class Attachment < ActiveRecord::Base
     end
     self.context = self.folder.context if self.folder && (!self.context || (self.context.respond_to?(:is_a_context? ) && self.context.is_a_context?))
 
-    if !self.scribd_mime_type_id
+    if !self.scribd_mime_type_id && !['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml'].include?(self.content_type)
       @@mime_ids ||= {}
-      @@mime_ids[self.after_extension] ||= self.after_extension && ScribdMimeType.find_by_extension(self.after_extension).try(:id)
-      self.scribd_mime_type_id = @@mime_ids[self.after_extension]
+      @@mime_ids[self.content_type] ||= self.content_type && ScribdMimeType.find_by_name(self.content_type).try(:id)
+      self.scribd_mime_type_id = @@mime_ids[self.content_type]
       if !self.scribd_mime_type_id
-        @@mime_ids[self.content_type] ||= self.content_type && ScribdMimeType.find_by_name(self.content_type).try(:id)
-        self.scribd_mime_type_id = @@mime_ids[self.content_type]
+        @@mime_ids[self.after_extension] ||= self.after_extension && ScribdMimeType.find_by_extension(self.after_extension).try(:id)
+        self.scribd_mime_type_id = @@mime_ids[self.after_extension]
       end
     end
 
