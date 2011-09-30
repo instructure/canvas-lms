@@ -1733,14 +1733,15 @@ class User < ActiveRecord::Base
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
-    user_condition_sql = "TRUE"
-    user_condition_sql << " AND users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
-    user_condition_sql << " AND users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
+    user_conditions = []
+    user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
+    user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
       parts.each do |part|
-        user_condition_sql << " AND (#{wildcard('users.name', 'users.short_name', part)})"
+        user_conditions << "(#{wildcard('users.name', 'users.short_name', part)})"
       end
     end
+    user_condition_sql = user_conditions.present? ? "AND " + user_conditions.join(" AND ") : ""
     user_sql = []
 
     course_sql = []
@@ -1755,7 +1756,7 @@ class User < ActiveRecord::Base
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
-        AND #{user_condition_sql}
+        #{user_condition_sql}
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
     SQL
 
@@ -1764,7 +1765,7 @@ class User < ActiveRecord::Base
       FROM users, group_memberships
       WHERE group_id IN (#{full_group_ids.join(',')}) AND users.id = user_id
         AND group_memberships.workflow_state = 'accepted'
-        AND #{user_condition_sql}
+        #{user_condition_sql}
     SQL
 
     # if this is an account admin who doesn't have any courses/groups in common
@@ -1783,7 +1784,7 @@ class User < ActiveRecord::Base
       FROM users, user_account_associations
       WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
         AND user_account_associations.user_id = users.id
-        AND #{user_condition_sql}
+        #{user_condition_sql}
     SQL
 
     if options[:ids]
@@ -1794,15 +1795,15 @@ class User < ActiveRecord::Base
         user_sql << <<-SQL
           SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users, conversation_participants
-          WHERE #{user_condition_sql}
-            AND conversation_participants.user_id = users.id
+          WHERE conversation_participants.user_id = users.id
             AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
+            #{user_condition_sql}
         SQL
       elsif options[:no_check_context]
         user_sql << <<-SQL
           SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users
-          WHERE #{user_condition_sql}
+          #{user_condition_sql.sub(/\AAND/, "WHERE")}
         SQL
       end
     end

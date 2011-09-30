@@ -101,7 +101,7 @@ class ConversationParticipant < ActiveRecord::Base
       }.map{ |m|
         m.forwarded_messages.map(&:author_id)
       }.flatten.uniq - participants.map(&:id)
-      participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups, TRUE AS secondary", :conditions => {:id => user_ids})
+      participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
     end
     return participants unless options[:include_context_info]
     # we do this to find out the contexts they share with the user
