@@ -1622,7 +1622,7 @@ class Course < ActiveRecord::Base
   end
 
   def import_media_objects_and_attachments(mo_attachments, migration)
-    #MediaObject.add_media_files(mo_attachments, true)
+    MediaObject.add_media_files(mo_attachments, true)
     # attachments in /media_objects were created on export, soley to
     # download and include a media object in the export. now that they've
     # been sent to kaltura, we can remove them.
