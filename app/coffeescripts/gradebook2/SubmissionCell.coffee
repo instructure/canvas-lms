@@ -1,4 +1,4 @@
-this.SubmissionCell = class SubmissionCell
+class @SubmissionCell
 
   constructor: (@opts) ->
     @init()
@@ -46,9 +46,6 @@ this.SubmissionCell = class SubmissionCell
     this.prototype.cellWrapper(submission.grade, {submission: submission, assignment: assignment, editable: false})
     # classes = []
     # "<div class='cell-content gradebook-cell #{classes.join(' ')}'>#{submission.grade}</div>"
-
-  @imageForCell: (image_id) ->
-    $(image_id)[0].outerHTML
 
   cellWrapper: (innerContents, options = {}) ->
     opts = $.extend({}, {

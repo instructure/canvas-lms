@@ -187,11 +187,21 @@ javascripts:
     - public/javascripts/jquery.ui.menu.inputmenu.js
     - public/javascripts/compiled/jquery.kylemenu.js
   gradebook2:
-    - public/javascripts/compiled/assignment_group_weights_dialog.js
+    - public/javascripts/jst/gradebook_uploads_form.js
+    - public/javascripts/jst/re_upload_submissions_form.js
+    - public/javascripts/message_students.js
     - public/javascripts/compiled/multi_grid.js
     - public/javascripts/compiled/grade_calculator.js
-    - public/javascripts/compiled/gradebook2.js
-    - public/javascripts/compiled/submission_cell.js
+    - public/javascripts/jst/SetDefaultGradeDialog.js
+    - public/javascripts/compiled/gradebook2/SetDefaultGradeDialog.js
+    - public/javascripts/jst/AssignmentGroupWeightsDialog.js
+    - public/javascripts/compiled/gradebook2/AssignmentGroupWeightsDialog.js
+    - public/javascripts/jst/CurveGradesDialog.js
+    - public/javascripts/compiled/gradebook2/CurveGradesDialog.js
+    - public/javascripts/jst/gradebook2/GradebookHeaderMenu.js
+    - public/javascripts/compiled/gradebook2/GradebookHeaderMenu.js
+    - public/javascripts/compiled/gradebook2/Gradebook.js
+    - public/javascripts/compiled/gradebook2/SubmissionCell.js
   gradebooks:
     - public/javascripts/gradebooks.js
     - public/javascripts/message_students.js
@@ -364,6 +374,7 @@ stylesheets:
     - public/stylesheets/compiled/gradebooks.css
     - public/stylesheets/compiled/message_students.css
   gradebook2:
+    - public/stylesheets/compiled/message_students.css
     - public/stylesheets/compiled/gradebook2.css
     - public/stylesheets/compiled/assignment_group_weights_dialog.css
   attendance:

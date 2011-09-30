@@ -1,7 +1,6 @@
-# This class both creates the slickgrid instance, and acts as the data source
-# for that instance.
+# This class both creates the slickgrid instance, and acts as the data source for that instance.
 I18n.scoped 'gradebook2', (I18n) ->
-  this.Gradebook = class Gradebook
+  class @Gradebook
     minimumAssignmentColumWidth = 10
 
     constructor: (@options) ->
@@ -13,13 +12,20 @@ I18n.scoped 'gradebook2', (I18n) ->
       @sectionToShow = Number($.store.userGet("grading_show_only_section#{@options.context_id}")) || undefined
       @show_attendance = $.store.userGet("show_attendance_#{@options.context_code}") == 'true'
       @include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_#{@options.context_code}") == 'true'
-      $.subscribe('assignment_group_weights_changed', @buildRows)
-      $.when(
+      $.subscribe 'assignment_group_weights_changed', @buildRows
+      $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
+      promise = $.when(
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
         $.ajaxJSON( @options.sections_and_students_url, "GET", @sectionToShow && {sections: [@sectionToShow]})
       ).then (assignmentGroupsArgs, studentsArgs) =>
         @gotStudents.apply(this, studentsArgs)
         @initHeader()
+      @spinner = new Spinner()
+      $(@spinner.spin().el).css(
+        opacity: 0.5
+        top: '50%'
+        left: '50%'
+      ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
 
     gotAssignmentGroups: (assignmentGroups) =>
       @assignmentGroups = {}
@@ -27,7 +33,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       
       # purposely passing the @options and assignmentGroups by reference so it can update 
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
-      new AssignmentGroupWeightsDialog { context: @options, assignmentGroups }
+      new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
         $.htmlEscapeValues(group)
         @assignmentGroups[group.id] = group
@@ -92,10 +98,12 @@ I18n.scoped 'gradebook2', (I18n) ->
       @multiGrid.updateRowCount()
       @multiGrid.render()
 
-    getSubmissionsChunks: () ->
+    getSubmissionsChunks: =>
       loop
         students = @rows[@chunk_start...(@chunk_start+@options.chunk_size)]
-        break unless students.length
+        unless students.length
+          @allSubmissionsLoaded = true
+          break
         params =
           student_ids: (student.id for student in students)
           assignment_ids: (id for id, assignment of @assignments)
@@ -106,16 +114,29 @@ I18n.scoped 'gradebook2', (I18n) ->
     gotSubmissionsChunk: (student_submissions) =>
       for data in student_submissions
         student = @students[data.user_id]
-        student.submissionsAsArray = []
-        for submission in data.submissions
-          submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
-          student["assignment_#{submission.assignment_id}"] = submission
-          student.submissionsAsArray.push(submission)
+        @updateSubmission(submission) for submission in data.submissions
         student.loaded = true
         @multiGrid.removeRow(student.row)
         @calculateStudentGrade(student)
       @multiGrid.render()
 
+    updateSubmission: (submission) =>
+      student = @students[submission.user_id]
+      submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
+      student["assignment_#{submission.assignment_id}"] = submission
+
+    # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api 
+    # because there is no *bulk* submissions#update endpoint in the api.
+    # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
+    # where each student has an array of submissions.  This one just expects an array of submissions,
+    # they are not grouped by student.
+    updateSubmissionsFromExternal: (submissions) =>
+      for submission in submissions
+        student = @students[submission.user_id]
+        @updateSubmission(submission)
+        @multiGrid.removeRow(student.row)
+        @calculateStudentGrade(student)
+      @multiGrid.render()
 
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
@@ -152,7 +173,8 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     calculateStudentGrade: (student) =>
       if student.loaded
-        result = INST.GradeCalculator.calculate(student.submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
+        submissionsAsArray = (value for key, value of student when key.match /^assignment_/)
+        result = INST.GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[if @include_ungraded_assignments then 'final' else 'current']
         student["total_grade"] = result[if @include_ungraded_assignments then 'final' else 'current']
@@ -170,7 +192,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       @$grid.find('.hovered-column').removeClass('hovered-column')
 
     showCommentDialog: =>
-      $('<div>TODO: show comments and stuff</div>').dialog()
+      $('<div>TODO: show comments and stuff</div>').dialog(modal:true)
       return false
 
     # this is a workaroud to make it so only assignments are sortable but at the same time
@@ -184,6 +206,13 @@ I18n.scoped 'gradebook2', (I18n) ->
         $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers))
         $notAssignments.data('sortable-item', null)
       )()
+      (initHeaderDropMenus = =>
+        $headers.find('.gradebook-header-drop').click (event) =>
+          $link = $(event.target)
+          unless $link.data('gradebookHeaderMenu')
+            new GradebookHeaderMenu(@assignments[$link.data('assignmentId')], $link, this)
+            return false
+      )()
       originalStopFn = $headers.sortable 'option', 'stop'
       (fixupStopCallback = ->
         $headers.sortable 'option', 'stop', (event, ui) ->
@@ -193,6 +222,7 @@ I18n.scoped 'gradebook2', (I18n) ->
           $headers.sortable 'option', 'items', originalItemsSelector
           returnVal = originalStopFn.apply(this, arguments)
           makeOnlyAssignmentsSortable() # set it back
+          initHeaderDropMenus()
           fixupStopCallback() # originalStopFn re-creates sortable widget so we need to re-fix
           returnVal
       )()
@@ -217,7 +247,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       columnDef.name = columnDef.unminimizedName
       @$grid.find(".c#{colIndex}").add($columnHeader).removeClass('minimized')
       $columnHeader.removeData('minimized')
-      assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
+      @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
       $.store.userSet("hidden_columns_#{@options.context_code}", $.uniq(@assignmentsToHide).join(','))
 
     hoverMinimizedCell: (event) =>
@@ -260,6 +290,8 @@ I18n.scoped 'gradebook2', (I18n) ->
     onGridInit: () ->
       @fixColumnReordering()
       tooltipTexts = {}
+      $(@spinner.el).remove()
+      $('#gradebook_wrapper').show()
       @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
           alsoResize: '#gradebook_students_grid',
@@ -277,7 +309,7 @@ I18n.scoped 'gradebook2', (I18n) ->
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
-
+      
       $('#gradebook_grid .slick-resizable-handle').live 'drag', (e,dd) =>
         @$grid.find('.slick-header-column').each (i, elem) =>
           $columnHeader = $(elem)
@@ -286,7 +318,6 @@ I18n.scoped 'gradebook2', (I18n) ->
             @minimizeColumn($columnHeader) unless isMinimized
           else if isMinimized
             @unminimizeColumn($columnHeader)
-
       $(document).trigger('gridready')
 
       # # debugging stuff, remove
@@ -352,17 +383,26 @@ I18n.scoped 'gradebook2', (I18n) ->
       $('#gradebook_settings').show().kyleMenu
         buttonOpts: {icons: {primary: "ui-icon-cog", secondary: "ui-icon-droparrow"}}
 
-      $settingsMenu.find('.gradebook_upload_link').click (event) ->
+      $upload_modal = null
+      $settingsMenu.find('.gradebook_upload_link').click (event) =>
         event.preventDefault()
-        dialogData =
-          bgiframe: true
-          autoOpen: false
-          modal: true
-          width: 410
-          resizable: false
-          buttons: {}
-        dialogData['buttons'][I18n.t('buttons.upload_data', 'Upload Data')] = -> $(this).submit()
-        $("#upload_modal").dialog(dialogData).dialog('open')
+        unless $upload_modal
+          locals = {
+            download_gradebook_csv_url: "#{@options.context_url}/gradebook.csv"
+            action: "#{@options.context_url}/gradebook_uploads"
+          }
+          $upload_modal = $(Template('gradebook_uploads_form', locals))
+            .dialog
+              bgiframe: true
+              autoOpen: false
+              modal: true
+              width: 720
+              resizable: false
+            .fixDialogButtons()
+            .delegate '#gradebook-upload-help-trigger', 'click', -> 
+              $(this).hide()
+              $('#gradebook-upload-help').show()
+        $upload_modal.dialog('open')
 
     initGrid: () ->
       #this is used to figure out how wide to make each column
@@ -389,13 +429,15 @@ I18n.scoped 'gradebook2', (I18n) ->
       }]
 
       for id, assignment of @assignments
-        html = "<div class='assignment-name'>#{assignment.name}</div>"
+        href = "#{@options.context_url}/assignments/#{assignment.id}"
+        html = "<a class='assignment-name' href='#{href}'>#{assignment.name}</a>
+                <a class='gradebook-header-drop' data-assignment-id='#{assignment.id}' href='#' role='button'>#{I18n.t 'assignment_options', 'Assignment Options'}</a>"
         html += "<div class='assignment-points-possible'>#{I18n.t 'points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible}</div>" if assignment.points_possible?
         outOfFormatter = assignment &&
                          assignment.grading_type == 'points' &&
                          assignment.points_possible? &&
                          SubmissionCell.out_of
-        minWidth = if outOfFormatter then 70 else 50
+        minWidth = if outOfFormatter then 70 else 90
         fieldName = "assignment_#{id}"
         columnDef =
           id: fieldName
@@ -413,9 +455,9 @@ I18n.scoped 'gradebook2', (I18n) ->
           toolTip: true
 
         if ''+assignment.submission_types is "not_graded"
-          columnDef.cssClass = 'ungraded'
+          columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded'
           columnDef.unselectable = true
-        else if ($.inArray(fieldName, @assignmentsToHide) != -1)
+        if fieldName in @assignmentsToHide
           columnDef.width = 10
           do (fieldName) =>
             $(document)

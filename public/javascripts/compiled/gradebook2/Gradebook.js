@@ -1,8 +1,12 @@
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   I18n.scoped('gradebook2', function(I18n) {
-    var Gradebook;
-    return this.Gradebook = Gradebook = (function() {
+    return this.Gradebook = (function() {
       var minimumAssignmentColumWidth;
       minimumAssignmentColumWidth = 10;
       function Gradebook(options) {
@@ -229,7 +233,7 @@
         return student["assignment_" + submission.assignment_id] = submission;
       };
       Gradebook.prototype.updateSubmissionsFromExternal = function(submissions) {
-        debugger;        var student, submission, _i, _len;
+        var student, submission, _i, _len;
         for (_i = 0, _len = submissions.length; _i < _len; _i++) {
           submission = submissions[_i];
           student = this.students[submission.user_id];
@@ -370,7 +374,7 @@
         return $.store.userSet("hidden_columns_" + this.options.context_code, $.uniq(this.assignmentsToHide).join(','));
       };
       Gradebook.prototype.unminimizeColumn = function($columnHeader) {
-        var assignmentsToHide, colIndex, columnDef;
+        var colIndex, columnDef;
         colIndex = $columnHeader.index();
         columnDef = this.gradeGrid.getColumns()[colIndex];
         columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '');
@@ -378,7 +382,7 @@
         columnDef.name = columnDef.unminimizedName;
         this.$grid.find(".c" + colIndex).add($columnHeader).removeClass('minimized');
         $columnHeader.removeData('minimized');
-        assignmentsToHide = $.grep(this.assignmentsToHide, function(el) {
+        this.assignmentsToHide = $.grep(this.assignmentsToHide, function(el) {
           return el !== columnDef.id;
         });
         return $.store.userSet("hidden_columns_" + this.options.context_code, $.uniq(this.assignmentsToHide).join(','));
@@ -472,7 +476,7 @@
         return $(document).trigger('gridready');
       };
       Gradebook.prototype.initHeader = function() {
-        var $courseSectionTemplate, $sectionToShowMenu, $settingsMenu, allSectionsText, i, section, _ref;
+        var $courseSectionTemplate, $sectionToShowMenu, $settingsMenu, $upload_modal, allSectionsText, i, section, _ref;
         if (this.sections_enabled) {
           $courseSectionTemplate = $('#course_section_template').removeAttr('id').detach();
           $sectionToShowMenu = $('#section_to_show').next();
@@ -519,12 +523,16 @@
             }
           }
         });
-        return $settingsMenu.find('.gradebook_upload_link').click(function(event) {
-          var $upload_modal;
+        $upload_modal = null;
+        return $settingsMenu.find('.gradebook_upload_link').click(__bind(function(event) {
+          var locals;
           event.preventDefault();
-          $upload_modal = $("#upload_modal");
-          if (!$upload_modal.data('dialog')) {
-            $upload_modal.dialog({
+          if (!$upload_modal) {
+            locals = {
+              download_gradebook_csv_url: "" + this.options.context_url + "/gradebook.csv",
+              action: "" + this.options.context_url + "/gradebook_uploads"
+            };
+            $upload_modal = $(Template('gradebook_uploads_form', locals)).dialog({
               bgiframe: true,
               autoOpen: false,
               modal: true,
@@ -536,7 +544,7 @@
             });
           }
           return $upload_modal.dialog('open');
-        });
+        }, this));
       };
       Gradebook.prototype.initGrid = function() {
         var $widthTester, assignment, columnDef, fieldName, grids, group, href, html, id, minWidth, options, outOfFormatter, sortRowsBy, testWidth, _ref, _ref2;
@@ -566,7 +574,7 @@
         _ref = this.assignments;
         for (id in _ref) {
           assignment = _ref[id];
-          href = $.replaceOneTag(this.options.assignment_url, 'id', assignment.id);
+          href = "" + this.options.context_url + "/assignments/" + assignment.id;
           html = "<a class='assignment-name' href='" + href + "'>" + assignment.name + "</a>                <a class='gradebook-header-drop' data-assignment-id='" + assignment.id + "' href='#' role='button'>" + (I18n.t('assignment_options', 'Assignment Options')) + "</a>";
           if (assignment.points_possible != null) {
             html += "<div class='assignment-points-possible'>" + (I18n.t('points_out_of', "out of %{points_possible}", {
@@ -590,9 +598,10 @@
             toolTip: true
           };
           if ('' + assignment.submission_types === "not_graded") {
-            columnDef.cssClass = 'ungraded';
+            columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded';
             columnDef.unselectable = true;
-          } else if ($.inArray(fieldName, this.assignmentsToHide) !== -1) {
+          }
+          if (__indexOf.call(this.assignmentsToHide, fieldName) >= 0) {
             columnDef.width = 10;
             __bind(function(fieldName) {
               return $(document).bind('gridready', __bind(function() {
