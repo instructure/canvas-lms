@@ -30,17 +30,19 @@ module ConversationsHelper
   end
 
   def avatar_url_for_group(blank_fallback=false)
-    blank_fallback ?
+    "#{request.protocol}#{request.host_with_port}" + (blank_fallback ?
       "/images/blank.png" :
       "/images/messages/avatar-group-#{avatar_size}.png"
+    )
   end
 
   def avatar_url_for_user(user, blank_fallback=false)
-    default_avatar = blank_fallback ?
+    default_avatar = "#{request.protocol}#{request.host_with_port}" + (blank_fallback ?
       "/images/blank.png" :
       "/images/messages/avatar-#{avatar_size}.png"
+    )
     if service_enabled?(:avatars)
-      user.avatar_url(avatar_size, nil, "#{request.protocol}#{request.host_with_port}#{default_avatar}")
+      user.avatar_url(avatar_size, nil, default_avatar).sub(%r{\A/}, "#{request.protocol}#{request.host_with_port}/")
     else
       default_avatar
     end
