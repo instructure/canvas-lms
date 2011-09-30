@@ -52,6 +52,17 @@ end
 # cleaning up after themselves
 ALL_MODELS.each { |m| truncate_table(m) }
 
+
+# Make AR not puke if MySQL auto-commits the transaction
+class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
+  def outside_transaction?
+    # MySQL ignores creation of savepoints outside of a transaction; so if we can create one
+    # and then can't release it because it doesn't exist, we're not in a transaction
+    execute('SAVEPOINT outside_transaction')
+    !!execute('RELEASE SAVEPOINT outside_transaction') rescue true
+  end
+end
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
