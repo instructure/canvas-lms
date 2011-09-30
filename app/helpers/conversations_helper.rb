@@ -20,10 +20,11 @@ module ConversationsHelper
   end
 
   def avatar_url_for(conversation)
-    if conversation.participants.size == 1
-      avatar_url_for_user(conversation.participants.first)
-    elsif conversation.participants.size == 2
-      avatar_url_for_user(conversation.participants.select{ |u| u.id != conversation.user_id }.first)
+    participants = conversation.participants
+    if participants.size == 1
+      avatar_url_for_user(participants.first)
+    elsif participants.size == 2
+      avatar_url_for_user(participants.select{ |u| u.id != conversation.user_id }.first)
     else
       avatar_url_for_group
     end

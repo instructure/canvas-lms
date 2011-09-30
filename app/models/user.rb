@@ -1650,6 +1650,7 @@ class User < ActiveRecord::Base
       }
     end
   end
+  memoize :enrollment_visibility
 
   def messageable_groups
     group_visibility = group_membership_visibility
@@ -1663,6 +1664,7 @@ class User < ActiveRecord::Base
       }.map(&:id)
     end
   end
+  memoize :visible_group_ids
 
   def group_membership_visibility
     Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.hour) do
@@ -1694,6 +1696,7 @@ class User < ActiveRecord::Base
       }
     end
   end
+  memoize :group_membership_visibility
 
   MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")

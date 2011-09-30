@@ -113,6 +113,7 @@ class ConversationParticipant < ActiveRecord::Base
       user.common_groups = user.id == self.user_id ? {} : context_info[user.id].common_groups
     }
   end
+  memoize :participants
 
   def infer_defaults
     self.has_attachments = conversation.has_attachments?
