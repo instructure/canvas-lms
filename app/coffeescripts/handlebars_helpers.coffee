@@ -7,3 +7,9 @@ Handlebars.registerHelper "t", (key, defaultValue, options) ->
   options.wrapper = wrappers if wrappers['*']
   options = $.extend(options, this) unless this instanceof String or typeof this is 'string'
   I18n.scoped(options.scope).t(key, defaultValue, options)
+
+Handlebars.registerHelper "hiddenIf", (condition) -> 
+  " display:none; " if condition
+
+Handlebars.registerHelper "hiddenUnless", (condition) -> 
+  " display:none; " unless condition

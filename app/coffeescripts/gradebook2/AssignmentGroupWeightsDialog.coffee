@@ -1,9 +1,8 @@
-this.AssignmentGroupWeightsDialog = class AssignmentGroupWeightsDialog
+class @AssignmentGroupWeightsDialog
   constructor: (options) ->
-    @$dialog = $('#assignment_group_weights_dialog')
+    @$dialog = $(Template('AssignmentGroupWeightsDialog'))
     @$dialog.dialog
       autoOpen: false
-      modal: true
       resizable: false
       width: 350
       buttons: [{ 

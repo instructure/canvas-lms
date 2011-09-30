@@ -1,0 +1,15 @@
+<form action="." enctype="multipart/form-data" id="re_upload_submissions_form" method="post" style="display: none;" title="{{#t "reupload_submission_files"}}Re-Upload Submission Files{{/t}}">
+  <p>
+    {{#t "upload_info"}}
+      If you made changes to the student submission files you downloaded
+      before, just zip them back up and upload the zip with the form below.
+      Students will see the modified files in their comments for the
+      submission.
+    {{/t}}
+  </p>
+  <p>
+    <i>{{#t "upload_warning"}}Make sure you don't change the names of the submission files so we can recognize them.{{/t}}</i>
+  </p>
+  <input type="file" name="submissions_zip"/>
+  <button type="submit" class="button">{{#t "buttons.upload"}}Upload Files{{/t}}</button>
+</form>

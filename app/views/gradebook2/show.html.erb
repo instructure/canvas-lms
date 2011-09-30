@@ -10,38 +10,43 @@
     :sections_and_students_url => api_v1_course_sections_url(@context, :include => [:students]),
     :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
     :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
+    :context_url => context_url(@context, :context_url),
+    :download_assignment_submissions_url => context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
+    :re_upload_submissions_url => context_url(@context, :context_gradebook_submissions_upload_url, "{{ assignment_id }}"),
     :context_id => @context.id,
     :context_code => @context.asset_string,
     :group_weighting_scheme => @context.group_weighting_scheme
   }
 %>
-<div id="gradebook-toolbar">
-  <button style="display:none;" id="section_to_show">Showing: <span id="section_being_shown">All Sections</span></button>
-  <ul style="display: none; width: 200px;">
-    <li>Choose a section to show</li>
-    <li><a href="#"><label for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" checked /></a></li>
-    <li id="course_section_template"><a href="#"><label class="section_name" for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" /></a></li>
-  </ul>
-  <button id="gradebook_settings">&nbsp;</button>
-  <ul style="display: none; width: 210px;">
-    <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
-    <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
-    <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
-    <% if PluginSetting.settings_for_plugin('grade_export')[:enabled] %>
-    <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url, :fragment => "tab-grade-publishing") %>"><%= t('publish_to_sis', 'Publish grades to SIS') %></a></li>
-    <% end %>
-    <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('set_group_weights', 'Set Group Weights') %></a></li>
-    <li><a href="#"><label><%= t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
-    <li><a href="#"><label><%= t('include_ungraded', 'Include Ungraded Assignments') %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
-  </ul>
-</div>
-<div id="gradebook-grid-wrapper">
-  <div id="gradebook_students_grid"></div>
-  <div id="gradebook_grid"></div>
-</div>
-<div style="display:none;">
-  <%= render :partial => 'gradebook_uploads/form' %>
-  <%= render :partial => 'assignment_group_weights_dialog' %>
+<div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
+  <div id="gradebook-toolbar">
+    <button style="display:none;" id="section_to_show">Showing: <span id="section_being_shown">All Sections</span></button>
+    <ul style="display: none; width: 200px;">
+      <li>Choose a section to show</li>
+      <li><a href="#"><label for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" checked /></a></li>
+      <li id="course_section_template"><a href="#"><label class="section_name" for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" /></a></li>
+    </ul>
+    <button id="gradebook_settings">&nbsp;</button>
+    <ul style="display: none; width: 210px;">
+      <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
+      <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
+      <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
+      <% if PluginSetting.settings_for_plugin('grade_export')[:enabled] %>
+      <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url, :fragment => "tab-grade-publishing") %>"><%= t('publish_to_sis', 'Publish grades to SIS') %></a></li>
+      <% end %>
+      <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('set_group_weights', 'Set Group Weights') %></a></li>
+      <li><a href="#"><label><%= t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
+      <li><a href="#"><label><%= t('include_ungraded', 'Include Ungraded Assignments') %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
+    </ul>
+  </div>
+  <div id="gradebook-grid-wrapper">
+    <div id="gradebook_students_grid"></div>
+    <div id="gradebook_grid"></div>
+  </div>
+  <div style="display:none;">
+    <%= render :partial => "shared/message_students" %>
+    <%= render :partial => 'submissions/submission_download' %>
+  </div>
 </div>
 
 <% js_block do %>

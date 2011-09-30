@@ -1,0 +1,138 @@
+<form action="{{action}}" enctype="multipart/form-data" id="upload_modal" method="post" title="{{#t "titles.upload_form"}}Choose a CSV file to upload{{/t}}">
+  <style>
+    #gradebook-upload-help {
+      display: none;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 1.4em;
+      background-color: rgba(0,0,0,0.02);
+    }
+    tr.table-callout-notes td div {
+      padding: 6px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    tr.table-callout-notes-spacer td, tr.table-callout-notes td{
+      padding: 0 10px;
+      border: none;
+      background-color: transparent !important;
+      text-align: center;
+      vertical-align: bottom;
+    }
+    .table-callout-notes-spacer span {
+      width: 0;
+      border-style: solid;
+      border-color: #FBD850 transparent;
+      border-width: 15px 15px 0px ;
+      margin: 0 auto;
+      display: block;
+    }
+  </style>
+  <p><a class="help" id="gradebook-upload-help-trigger" href="#">{{#t "what_should_csv_look_like"}}What should the CSV file look like?{{/t}}</a></p>
+  <div id="gradebook-upload-help">
+    <h3 style="margin:0">{{#t "example_csv_file"}}Example CSV file{{/t}}</h3>
+    <table class="stylized striped bordered">
+      <thead>
+        <tr class="table-callout-notes">
+          <td colspan="4"><div class="ui-state-active">{{#t "explanation_of_required_columns"}}You Must have <em>all</em> of these columns, you only <em>need</em> one per row.{{/t}}</div></td>
+          <td><div class="ui-state-active">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
+          <td colspan="2"><div class="ui-state-active">{{#t "leaving_id_will_match_better_can_add_new_assignment"}}Leaving the ID (the "(581)" part in this case) in tact will help match better.  You can also add new assignments that will be created on the fly.{{/t}}</div></td>
+          <td colspan="2"><div class="ui-state-active">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
+        </tr>
+        <tr class="table-callout-notes-spacer">
+          <td colspan="4"><span /></td>
+          <td><span /></td>
+          <td colspan="2"><span /></td>
+          <td colspan="2"><span /></td>
+        </tr>
+        <tr>
+          <th>Student</th>
+          <th>ID</th>
+          <th>SIS User ID</th>
+          <th>SIS Login ID</th>
+          <th>Section</th>
+          <th>{{#t "existing_assignment_assignment_id"}}Existing Assignment (581){{/t}}</th>
+          <th>{{#t "a_new_assignment"}}A New Assignment{{/t}}</th>
+          <th>Current Score</th>
+          <th>Final Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="2">Points Possible</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>50</td>
+          <td>10</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Smith, John</td>
+          <td>12345</td>
+          <td>2122</td>
+          <td>12321</td>
+          <td>night</td>
+          <td>46</td>
+          <td>8</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>King, Ben</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>34</td>
+          <td>60</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>12347</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>38</td>
+          <td>3</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td>123</td>
+          <td></td>
+          <td></td>
+          <td>40</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>3232</td>
+          <td></td>
+          <td>44</td>
+          <td>7</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>If in doubt, you can always <a href="{{download_gradebook_csv_url}}">download a CSV</a>, change the grades you want and re-upload the same file.</p>
+  </div>
+
+  <p style="font-size: 1.2em;">
+    <label for="gradebook_upload_uploaded_data">{{#t "labels.upload"}}Choose a CSV file to upload:{{/t}}</label>
+    <input id="gradebook_upload_uploaded_data" name="gradebook_upload[uploaded_data]" type="file" />
+  </p>
+  
+  <button class="button" type="submit">{{#t "buttons.upload_data"}}Upload Data{{/t}}</button>
+</form>

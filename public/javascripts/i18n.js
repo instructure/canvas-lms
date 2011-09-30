@@ -13,7 +13,15 @@ I18n.locale = null;
 // Set the placeholder format. Accepts `{{placeholder}}` and `%{placeholder}`.
 I18n.PLACEHOLDER = /(?:\{\{|%\{)(.*?)(?:\}\}?)/gm;
 
-I18n.isValidNode = function(obj, node) { return (node in obj); }
+I18n.isValidNode = function(obj, node) { 
+  // handle names like "foo.bar.baz"
+  var nameParts = node.split('.');
+  for (var j=0; j < nameParts.length; j++) {
+    if (!(nameParts[j] in obj)) return false;
+    obj = obj[nameParts[j]];
+  }
+  return true; 
+};
 
 I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);
@@ -87,7 +95,12 @@ I18n.interpolate = function(message, options) {
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
 
-    value = options[name];
+    // handle names like "foo.bar.baz"
+    var nameParts = name.split('.');
+    value = options;
+    for (var j=0; j < nameParts.length; j++) {
+      value = value[nameParts[j]];
+    }
 
     if (!this.isValidNode(options, name)) {
       value = "[missing " + placeholder + " value]";
