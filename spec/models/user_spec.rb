@@ -453,6 +453,7 @@ describe User do
 
     def set_up_course_with_users
       @course = course_model
+      @this_section_teacher = @teacher
       @course.offer!
 
       @this_section_user = user_model
@@ -461,6 +462,33 @@ describe User do
       @other_section_user = user_model
       @other_section = @course.course_sections.create
       @course.enroll_user(@other_section_user, 'StudentEnrollment', :enrollment_state => 'active', :section => @other_section)
+      @other_section_teacher = user_model
+      @course.enroll_user(@other_section_teacher, 'TeacherEnrollment', :enrollment_state => 'active', :section => @other_section)
+
+      @group = @course.groups.create
+      @group.users = [@this_section_user]
+
+      @unrelated_user = user_model
+    end
+
+    it "should only return users from the specified context and type" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+        should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
+
+      @student.messageable_users(:context => "course_#{@course.id}_students").map(&:id).sort.
+        should eql [@student, @this_section_user, @other_section_user].map(&:id).sort
+
+      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.
+        should eql [@this_section_user].map(&:id).sort
+
+      @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id).sort.
+        should eql [@other_section_user, @other_section_teacher].map(&:id).sort
+
+      @student.messageable_users(:context => "section_#{@other_section.id}_teachers").map(&:id).sort.
+        should eql [@other_section_teacher].map(&:id).sort
     end
 
     it "should not include users from other sections if visibility is limited to sections" do
@@ -473,6 +501,21 @@ describe User do
       messageable_users = @student.messageable_users(:context => "course_#{@course.id}").map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
+
+      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users.should be_empty
+    end
+
+    it "should only include users from the specified section" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      messageable_users = @student.messageable_users(:context => "section_#{@course.default_section.id}").map(&:id)
+      messageable_users.should include @this_section_user.id
+      messageable_users.should_not include @other_section_user.id
+
+      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users.should_not include @this_section_user.id
+      messageable_users.should include @other_section_user.id
     end
 
     it "should include users from all sections if visibility is not limited to sections" do
@@ -487,9 +530,6 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @group = @course.groups.create
-      @group.users = [@this_section_user]
-
       @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
       # student can see it too, even though he's not in the group (since he can view the roster)
       @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
@@ -499,8 +539,7 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
 
-      @group = @course.groups.create
-      @group.users = [@this_section_user, @other_section_user]
+      @group.users << @other_section_user
 
       @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
       @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
@@ -570,9 +609,9 @@ describe User do
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      @admin.messageable_users(:context => ["course_#{course1.id}"], :ids => [@student.id]).should be_empty
-      @admin.messageable_users(:context => ["course_#{course2.id}"], :ids => [@student.id]).should_not be_empty
-      @student.messageable_users(:context => ["course_#{course2.id}"], :ids => [@admin.id]).should_not be_empty
+      @admin.messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
+      @admin.messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
+      @student.messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
     end
   end
   

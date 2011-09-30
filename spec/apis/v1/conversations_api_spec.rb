@@ -22,18 +22,21 @@ describe ConversationsController, :type => :integration do
   before do
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
+    @course.default_section.update_attributes(:name => "the section")
+    @other_section = @course.course_sections.create(:name => "the other section")
     @me = @user
 
     @bob = student_in_course(:name => "bob")
     @billy = student_in_course(:name => "billy")
     @jane = student_in_course(:name => "jane")
     @joe = student_in_course(:name => "joe")
-    @tommy = student_in_course(:name => "tommy")
+    @tommy = student_in_course(:name => "tommy", :section => @other_section)
   end
 
   def student_in_course(options = {})
+    section = options.delete(:section)
     u = User.create(options)
-    enrollment = @course.enroll_student(u)
+    enrollment = @course.enroll_user(u, 'StudentEnrollment', :section => section)
     enrollment.workflow_state = 'active'
     enrollment.save
     u.associated_accounts << Account.default
@@ -356,6 +359,8 @@ describe ConversationsController, :type => :integration do
       json.should eql [
         {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6},
         {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course"},
+        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1},
+        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5},
         {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
@@ -386,6 +391,62 @@ describe ConversationsController, :type => :integration do
         {"id" => @joe.id, "name" => "joe", "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}}
       ]
+    end
+
+    it "should return recipients for a given section" do
+      json = api_call(:get, "/api/v1/conversations/find_recipients.json?context=section_#{@course.default_section.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "section_#{@course.default_section.id}" })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}}
+      ]
+    end
+
+    context "synthetic contexts" do
+      it "should return synthetic contexts within a course" do
+        json = api_call(:get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}&synthetic_contexts=1",
+                { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}", :synthetic_contexts => "1" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+          {"id" => "course_#{@course.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1},
+          {"id" => "course_#{@course.id}_students", "name" => "Students", "type" => "context", "user_count" => 5},
+          {"id" => "course_#{@course.id}_sections", "name" => "Course Sections", "type" => "context", "item_count" => 2},
+          {"id" => "course_#{@course.id}_groups", "name" => "Student Groups", "type" => "context", "item_count" => 1}
+        ]
+      end
+
+      it "should return synthetic contexts within a section" do
+        json = api_call(:get, "/api/v1/conversations/find_recipients.json?context=section_#{@course.default_section.id}&synthetic_contexts=1",
+                { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "section_#{@course.default_section.id}", :synthetic_contexts => "1" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+          {"id" => "section_#{@course.default_section.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1},
+          {"id" => "section_#{@course.default_section.id}_students", "name" => "Students", "type" => "context", "user_count" => 4}
+        ]
+      end
+
+      it "should return groups within a course" do
+        json = api_call(:get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
+                { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}_groups", :synthetic_contexts => "1" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+          {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3}
+        ]
+      end
+
+      it "should return sections within a course" do
+        json = api_call(:get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}_sections&synthetic_contexts=1",
+                { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}_sections", :synthetic_contexts => "1" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+          {"id" => "section_#{@other_section.id}", "name" => @other_section.name, "type" => "context", "user_count" => 1},
+          {"id" => "section_#{@course.default_section.id}", "name" => @course.default_section.name, "type" => "context", "user_count" => 5}
+        ]
+      end
     end
 
     context "pagination" do

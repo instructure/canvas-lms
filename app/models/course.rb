@@ -2096,12 +2096,11 @@ class Course < ActiveRecord::Base
     visibilities = section_visibilities_for(user)
     case enrollment_visibility_level_for(user, visibilities)
       when :full
-        sections
+        return sections
       when :sections
-        sections.scoped(:conditions => {:id => visibilities.map{ |s| s[:course_section_id] }})
-      else
-        []
+        return sections.scoped(:conditions => {:id => visibilities.map{ |s| s[:course_section_id] }}) unless visibilities.all?{ |v| ['StudentEnrollment', 'ObserverEnrollment'].include? v[:type] } 
     end
+    []
   end
 
   def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))

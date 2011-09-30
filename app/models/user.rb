@@ -1642,11 +1642,12 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch([self, 'enrollment_visibility'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.hour) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
       user_counts = {}
+      section_user_counts = {}
       (courses + concluded_courses).each do |course|
         section_visibilities = course.section_visibilities_for(self)
         conditions = nil
@@ -1663,13 +1664,22 @@ class User < ActiveRecord::Base
             end
             conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
-        user_counts[course.id] = course.enrollments.scoped(:conditions => self.class.reflections[:current_and_invited_enrollments].options[:conditions]).scoped(:conditions => conditions).size +
-                                 course.enrollments.scoped(:conditions => self.class.reflections[:concluded_enrollments].options[:conditions]).scoped(:conditions => conditions).size
+        base_conditions = self.class.reflections[:current_and_invited_enrollments].options[:conditions] + " OR " +  self.class.reflections[:concluded_enrollments].options[:conditions]
+        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).count("DISTINCT user_id")
+
+        sections = course.sections_visible_to(self)
+        if sections.size > 1
+          sections.each{ |section| section_user_counts[section.id] = 0 }
+          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} GROUP BY course_section_id").each do |row|
+            section_user_counts[row["course_section_id"].to_i] = row["user_count"].to_i
+          end
+        end
       end
       {:full_course_ids => full_course_ids,
        :section_id_hash => section_id_hash,
        :restricted_course_hash => restricted_course_hash,
-       :user_counts => user_counts
+       :user_counts => user_counts,
+       :section_user_counts => section_user_counts
       }
     end
   end
@@ -1677,7 +1687,7 @@ class User < ActiveRecord::Base
 
   def messageable_groups
     group_visibility = group_membership_visibility
-    Group.find_all_by_id(visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 } + [0])
+    Group.scoped(:conditions => {:id => visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 } + [0]})
   end
 
   def visible_group_ids
@@ -1723,6 +1733,7 @@ class User < ActiveRecord::Base
 
   MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
+  MESSAGEABLE_USER_CONTEXT_REGEX = /\A(course|section|group)_(\d+)(_([a-z]+))?\z/
   def messageable_users(options = {})
     course_hash = enrollment_visibility
     full_course_ids = course_hash[:full_course_ids]
@@ -1734,30 +1745,38 @@ class User < ActiveRecord::Base
 
     account_ids = []
 
+    limited_id = {}
+    enrollment_type_sql = nil
+
     if options[:context]
-      limited_course_ids = []
-      limited_group_ids = []
-      Array(options[:context]).each do |context|
-        if context =~ /\Acourse_(\d+)\z/
-          limited_course_ids << $1.to_i
-        elsif context =~ /\Agroup_(\d+)\z/
-          limited_group_ids << $1.to_i
+      if options[:context].sub(/_all\z/, '') =~ MESSAGEABLE_USER_CONTEXT_REGEX
+        type = $1
+        limited_id[type] = $2.to_i
+        enrollment_type = $4
+        if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
+          enrollment_type_sql = " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
         end
       end
-      full_course_ids &= limited_course_ids
-      course_section_ids = course_hash[:section_id_hash].values_at(*limited_course_ids).flatten.compact
-      group_section_ids = group_hash[:section_id_hash].values_at(*limited_group_ids).flatten.compact
-      restricted_course_hash.delete_if{|course_id, ids| !limited_course_ids.include?(course_id)}
-      full_group_ids &= limited_group_ids
+      full_course_ids &= [limited_id['course']]
+      full_group_ids &= [limited_id['group']]
+      restricted_course_hash.delete_if{ |course_id, ids| course_id != limited_id['course']}
+      if limited_id['section'] && section = CourseSection.find_by_id(limited_id['section'])
+        course_section_ids = course_hash[:full_course_ids].include?(section.course_id) ?
+          [limited_id['section']] :
+          (course_hash[:section_id_hash][section.course_id] || []) & [limited_id['section']]
+      else
+        course_section_ids = course_hash[:section_id_hash].values_at(limited_id['course']).flatten.compact
+        group_section_ids = group_hash[:section_id_hash].values_at(limited_id['group']).flatten.compact
+      end
     else
       course_section_ids = course_hash[:section_id_hash].values.flatten
-      # if we're not searching with context(s) in mind, include any users we
+      # if we're not searching with a context in mind, include any users we
       # have admin access to know about
       account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
       account_ids &= options[:account_ids] if options[:account_ids]
     end
 
-    # if :ids is present but empty (different than just not present), don't
+    # if :ids is specified but empty (different than just not specified), don't
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
@@ -1775,7 +1794,7 @@ class User < ActiveRecord::Base
     course_sql = []
     course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
     course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
-    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id IN (#{limited_group_ids.join(',')})) )" if group_section_ids.present?
+    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id = #{limited_id['group']}) )" if limited_id['group'] && group_section_ids.present?
     course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
     user_sql << <<-SQL if course_sql.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
@@ -1784,6 +1803,7 @@ class User < ActiveRecord::Base
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
+        #{enrollment_type_sql}
         #{user_condition_sql}
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
     SQL
