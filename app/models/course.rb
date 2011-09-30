@@ -976,9 +976,12 @@ class Course < ActiveRecord::Base
     WikiNamespace.default_for_context(self)
   end
 
+  def grade_publishing_messages
+    student_enrollments.count(:all, :group => :grade_publishing_message, :conditions => "grade_publishing_message IS NOT NULL AND grade_publishing_message != ''")
+  end
+
   def grade_publishing_status
     statuses = {}
-    success_deadline = PluginSetting.settings_for_plugin('grade_export')[:success_timeout].to_i.seconds.ago.to_s(:db)
     student_enrollments.find(:all, :select => "DISTINCT grade_publishing_status, 0 AS user_id").each do |enrollment|
         status = enrollment.grade_publishing_status
         status ||= "unpublished"
