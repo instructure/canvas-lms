@@ -17,73 +17,65 @@
 #
 
 module SIS
-  # note these are account-level groups, not course groups
-  class GroupImporter < SisImporter
-    def self.is_group_csv?(row)
-      row.header?('group_id') && row.header?('account_id')
+  class GroupImporter
+    def initialize(batch_id, root_account, logger)
+      @batch_id = batch_id
+      @root_account = root_account
+      @logger = logger
     end
 
-    def verify(csv, verify)
-      group_ids = (verify[:group_ids] ||= {})
-      csv_rows(csv) do |row|
-        group_id = row['group_id']
-        add_error(csv, "Duplicate group id #{group_id}") if group_ids[group_id]
-        group_ids[group_id] = true
-        add_error(csv, "No group_id given for a group") if row['group_id'].blank?
-      end
-    end
-
-    # expected columns
-    # group_id,account_id,name,status
-    def process(csv)
+    def process
       start = Time.now
-      accounts_cache = {}
+      importer = Work.new(@batch_id, @root_account, @logger)
+      yield importer
+      @logger.debug("Groups took #{Time.now - start} seconds")
+      return importer.success_count
+    end
 
-      csv_rows(csv) do |row|
-        update_progress
-        logger.debug("Processing Group #{row.inspect}")
+  private
+    class Work
+      attr_accessor :success_count
+
+      def initialize(batch_id, root_account, logger)
+        @batch_id = batch_id
+        @root_account = root_account
+        @logger = logger
+        @success_count = 0
+        @accounts_cache = {}
+      end
+
+      def add_group(group_id, account_id, name, status)
+        raise ImportError, "No group_id given for a group" unless group_id.present?
+
+        @logger.debug("Processing Group #{[group_id, account_id, name, status].inspect}")
 
         account = nil
-        if row['account_id'].present?
-          account = accounts_cache[row['account_id']]
-          account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
-          unless account
-            add_warning(csv, "Parent account didn't exist for #{row['account_id']}")
-            next
-          end
-          accounts_cache[account.sis_source_id] = account
+        if account_id.present?
+          account = @accounts_cache[account_id]
+          account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, account_id)
+          raise ImportError, "Parent account didn't exist for #{account_id}" unless account
+          @accounts_cache[account.sis_source_id] = account
         end
         account ||= @root_account
 
-        group = Group.first(:conditions => {
-          :root_account_id => @root_account,
-          :sis_source_id => row['group_id'] })
-
-        if group.nil?
-          abort = false
-          if row['name'].blank?
-            add_warning(csv, "No name given for group #{row['group_id']}, skipping")
-            abort = true
-          end
-          unless row['status'] =~ /\A(available|closed|completed|deleted)/i
-            add_warning(csv, "Improper status \"#{row['status']}\" for group #{row['group_id']}, skipping")
-            abort = true
-          end
-          next if abort
+        group = Group.find_by_root_account_id_and_sis_source_id(@root_account.id, group_id)
+        unless group
+          raise ImportError, "No name given for group #{group_id}, skipping" if name.blank?
+          raise ImportError, "Improper status \"#{status}\" for group #{group_id}, skipping" unless status =~ /\A(available|closed|completed|deleted)/i
         end
 
         group ||= account.groups.new
         # only update the name on new records, and ones that haven't had their name changed since the last sis import
-        if row['name'].present? && (group.new_record? || (group.sis_name && group.sis_name == group.name))
-          group.name = group.sis_name = row['name']
+        if name.present? && (group.new_record? || (group.sis_name && group.sis_name == group.name))
+          group.name = group.sis_name = name
         end
 
         # must set .context, not just .account, since these are account-level groups
         group.context = account
-        group.sis_source_id = row['group_id']
-        group.sis_batch_id = @batch.try(:id)
+        group.sis_source_id = group_id
+        group.sis_batch_id = @batch_id
 
-        case row['status']
+        case status
         when /available/i
           group.workflow_state = 'available'
         when /closed/i
@@ -95,10 +87,10 @@ module SIS
         end
 
         group.save
-        @sis.counts[:groups] += 1
+        @success_count += 1
       end
 
-      logger.debug("Groups took #{Time.now - start} seconds")
     end
+
   end
 end

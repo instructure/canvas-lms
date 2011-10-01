@@ -1,6 +1,6 @@
 module Qti
 class ChoiceInteraction < AssessmentItemConverter
-  extend Canvas::XMLHelper
+  extend Canvas::Migration::XMLHelper
   TEST_FILE = "/home/bracken/projects/QTIMigrationTool/assessments/out/assessmentItems/ID_4388459047391.xml"
   DEFAULT_ANSWER_TEXT = "No answer text provided."
 

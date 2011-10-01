@@ -124,16 +124,33 @@ Canvas::Plugin.register('tinychat', nil, {
   :validator => 'TinychatValidator'
 })
 require_dependency 'cc/importer/cc_worker'
+Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
+  :name => lambda{ t :name, 'Canvas Cartridge Importer' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :description => lambda{ t :description, 'This enables converting a canvas export to the intermediary json format to be imported' },
+  :version => '1.0.0',
+  :select_text => lambda{ t :file_description, "Canvas Course Export Package" },
+  :settings => {
+    :worker => 'CCWorker',
+    :migration_partial => 'canvas_config',
+    :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter}
+  },
+}
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :name => lambda{ t :name, 'Common Cartridge Importer' },
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :description => lambda{ t :description, 'This enables converting a canvas CC export to the intermediary json format to be imported' },
+  :description => lambda{ t :description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
   :version => '1.0.0',
-  :select_text => lambda{ t :file_description, "Canvas Course Export" },
+  :select_text => lambda{ t :file_description, "Common Cartridge 1.0/1.1/1.2 Package" },
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
+    :provides =>{:common_cartridge=>CC::Importer::Standard::Converter, 
+                 :common_cartridge_1_0=>CC::Importer::Standard::Converter, 
+                 :common_cartridge_1_1=>CC::Importer::Standard::Converter, 
+                 :common_cartridge_1_2=>CC::Importer::Standard::Converter},
   },
 }
 Canvas::Plugin.register('grade_export', :sis, {

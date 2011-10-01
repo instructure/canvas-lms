@@ -20,28 +20,28 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradebookImporter do
   context "construction" do
-    
+
     it "should require a context, usually a course" do
       lambda{GradebookImporter.new(1)}.should raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
       lambda{GradebookImporter.new(course_model, valid_gradebook_contents)}.should_not raise_error
     end
-    
+
     it "should store the context and make it available" do
       course_model
       new_gradebook_importer
       @gi.context.should be_is_a(Course)
     end
-    
+
     it "should require the contents of an upload" do
       lambda{GradebookImporter.new(course_model)}.should raise_error(ArgumentError, "Must provide CSV contents.")
     end
-    
+
     it "should store the contents and make them available" do
       course_model
       new_gradebook_importer
       @gi.contents.should_not be_nil
     end
-    
+
     it "should handle points possible being sorted in weird places" do
       course_model
       importer_with_rows(
@@ -54,13 +54,60 @@ describe GradebookImporter do
       @gi.students.length.should == 2
     end
   end
-  
+
+  context "User lookup" do
+    it "should Lookup with either Student Name, ID, SIS User ID, or SIS Login ID" do
+      course_model
+
+      student_in_course(:name => "Some Name")
+      @u1 = @user
+
+      user_with_pseudonym(:active_all => true)
+      @user.pseudonym.sis_user_id = "SISUSERID"
+      student_in_course(:user => @user)
+      @user.pseudonym.save!
+      @u2 = @user
+
+      user_with_pseudonym(:active_all => true, :username => "something_that_has_not_been_taken")
+      @user.pseudonym.sis_source_id = "SISLOGINID"
+      student_in_course(:user => @user)
+      @user.pseudonym.save!
+      @u3 = @user
+
+      uploaded_csv = FasterCSV.generate do |csv|
+        csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
+        csv << ["    Points Possible", "", "","", ""]
+        csv << [@u1.name , "", "", "", "", 99]
+        csv << ["" , "", @u2.pseudonym.sis_user_id, "", "", 99]
+        csv << ["" , "", "", @u3.pseudonym.sis_source_id, "", 99]
+        csv << ["" , "", "bogusSISid", "", "", 99]
+      end
+
+      importer_with_rows(uploaded_csv)
+      hash = ActiveSupport::JSON.decode(@gi.to_json)
+
+      hash['students'][0]['id'].should == @u1.id
+      hash['students'][0]['original_id'].should == @u1.id
+      hash['students'][0]['name'].should eql(@u1.name)
+
+      hash['students'][1]['id'].should == @u2.id
+      hash['students'][1]['original_id'].should == @u2.id
+
+      hash['students'][2]['id'].should == @u3.id
+      hash['students'][2]['original_id'].should == @u3.id
+
+      hash['students'][3]['id'].should <  0
+      hash['students'][3]['original_id'].should be_nil
+
+    end
+  end
+
   context "to_json" do
     before do
       course_model
       new_gradebook_importer
     end
-    
+
     it "should have a simplified json output" do
       hash = ActiveSupport::JSON.decode(@gi.to_json)
       hash.keys.sort.should eql(["assignments", "students"])

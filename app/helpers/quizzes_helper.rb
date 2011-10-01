@@ -109,4 +109,14 @@ module QuizzesHelper
       hash_get(hash, field)
     end
   end
+
+  def fill_in_multiple_blanks_question(options)
+    question = hash_get(options, :question)
+    answers  = hash_get(options, :answers).dup
+    res      = user_content hash_get(question, :question_text)
+    answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
+    answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
+
+    res.gsub /\{\{question_[^}]+\}\}/, ""
+  end
 end

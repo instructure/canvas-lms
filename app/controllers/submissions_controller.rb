@@ -146,6 +146,12 @@ class SubmissionsController < ApplicationController
       elsif params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
         params[:submission][:submission_type] = 'online_upload'
         doc_response, display_name, file_extension = google_docs_download(params[:google_doc][:document_id])
+        unless doc_response && doc_response.is_a?(Net::HTTPOK)
+          # couldn't get document
+          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
+          redirect_to course_assignment_url(@context, @assignment)
+          return
+        end
         filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
         path = File.join("tmp", filename)
         f = File.new(path, 'wb')
@@ -277,7 +283,7 @@ class SubmissionsController < ApplicationController
       @attachment.save!
     end
     if params[:compile] && @attachment.to_be_zipped?
-      ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY }, @attachment)
+      ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
       render :json => @attachment.to_json
     else
       respond_to do |format|

@@ -8,10 +8,10 @@
   </div>
   <div class="content">
     <div class="message user_content"><%=
-      case message.event_data.event_type
+      case message.event_data[:event_type]
       when :users_added
         author_name = "<a href=\"#{user_path(author.id)}\" class=\"user_name\">#{h(author.short_name)}</a>".html_safe
-        user_names = message.event_data.users.map do |user| 
+        user_names = User.find_all_by_id(message.event_data[:user_ids]).map do |user| 
           "<a href=\"#{user_path(user.id)}\" class=\"user_name\">#{h(user.short_name)}</a>".html_safe
         end
         ConversationMessage::EventFormatter.users_added(author_name, user_names)

@@ -61,6 +61,38 @@ describe BasicLTI do
       }, 'http://dr-chuck.com/ims/php-simple/tool.php?a=1&b=2', '12345', 'secret')
       res['oauth_signature'].should eql('eCJ7qILcordyJC2/Unhchp6RAcs=')
     end
+    
+    it "should generate a correct signature with a non-standard port" do
+      # signatures generated using http://oauth.googlecode.com/svn/code/javascript/example/signature.html
+      BasicLTI.explicit_signature_settings('1251600739', 'c8350c0e47782d16d2fa48b2090c1d8f')
+      res = BasicLTI.generate_params({
+      }, 'http://dr-chuck.com:123/ims/php-simple/tool.php', '12345', 'secret')
+      res['oauth_signature'].should eql('ghEdPHwN4iJmsM3Nr4AndDx2Kx8=')
+      
+      res = BasicLTI.generate_params({
+      }, 'http://dr-chuck.com/ims/php-simple/tool.php', '12345', 'secret')
+      res['oauth_signature'].should eql('WoSpvCr2HEsLzao6Do0eukxwAsk=')
+      
+      res = BasicLTI.generate_params({
+      }, 'http://dr-chuck.com:80/ims/php-simple/tool.php', '12345', 'secret')
+      res['oauth_signature'].should eql('WoSpvCr2HEsLzao6Do0eukxwAsk=')
+      
+      res = BasicLTI.generate_params({
+      }, 'http://dr-chuck.com:443/ims/php-simple/tool.php', '12345', 'secret')
+      res['oauth_signature'].should eql('KqAV7eIS/+iWIDpvCyDfY8ZpmT4=')
+      
+      res = BasicLTI.generate_params({
+      }, 'https://dr-chuck.com/ims/php-simple/tool.php', '12345', 'secret')
+      res['oauth_signature'].should eql('wFRB/1ZXi/91dop6GwahfboWPvQ=')
+      
+      res = BasicLTI.generate_params({
+      }, 'https://dr-chuck.com:443/ims/php-simple/tool.php', '12345', 'secret')
+      res['oauth_signature'].should eql('wFRB/1ZXi/91dop6GwahfboWPvQ=')
+      
+      res = BasicLTI.generate_params({
+      }, 'https://dr-chuck.com:80/ims/php-simple/tool.php', '12345', 'secret')
+      res['oauth_signature'].should eql('X8Aq2HXSHnr6u/6z/G9zI5aDoR0=')
+    end
   end
   
   describe "generate" do

@@ -36,13 +36,25 @@ class GoogleDocEntry
     "http://docs.google.com/feeds/documents/private/full/#{@document_id}"
   end
   
-  def self.trim_document_id(document_id="")
-    document_id.gsub(/\A(document:|spreadsheet:|presentation:)/, "")
-  end
-  
   def extension
-    return "xls" if @document_id.match(/\Aspreadsheet/)
-    return "ppt" if @document_id.match(/\Apresentation/)
-    return "doc"
+    case @document_id
+    when /\Aspreadsheet/ then "xls"
+    when /\Apresentation/ then "ppt"
+    when /\Adocument/ then "doc"
+    else
+      case @entry.content.type
+      # TODO more of these
+      when 'application/pdf' then 'pdf'
+      else nil
+      end
+    end
+  end
+
+  def display_name
+    @entry.title || "google_doc.#{extension}"
+  end
+
+  def download_url
+    @entry.content.src
   end
 end

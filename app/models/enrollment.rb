@@ -140,7 +140,12 @@ class Enrollment < ActiveRecord::Base
   end
   
   def update_user_account_associations_if_necessary
-    self.user.update_account_associations_later if should_update_user_account_association?
+    if self.new_record?
+      associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
+      self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
+    elsif should_update_user_account_association?
+      self.user.update_account_associations_later
+    end
   end
   protected :update_user_account_associations_if_necessary
 
@@ -577,16 +582,7 @@ class Enrollment < ActiveRecord::Base
       end
     end
   end
-  
-  # this is just used to get a pseudonym_id in the user_lists.js stuff. 
-  def users_pseudonym_id
-    self.user.pseudonym.id
-  end
-  # this is also just used to get a communication_channel_id in the user_lists.js stuff
-  def communication_channel_id
-    self.user.communication_channel.id rescue nil
-  end
-  
+
   def self.serialization_excludes; [:uuid,:computed_final_score, :computed_current_score]; end
 
   # enrollment term per-section is deprecated; a section's term is inherited from the

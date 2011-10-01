@@ -21,7 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 CC_XML_EXPORT_DIR = File.dirname(__FILE__) + '/../../fixtures/cc/cc_export'
 
 def get_cc_converter
-  CC::Importer::CCConverter.new({:testing=>true})
+  CC::Importer::Canvas::Converter.new({:testing=>true})
+end
+
+def get_standard_converter
+  CC::Importer::Standard::Converter.new({:testing=>true})
 end
 
 def get_cc_export_file(rel_path)

@@ -1,6 +1,6 @@
 module Qti
 class AssessmentItemConverter
-  include Canvas::XMLHelper
+  include Canvas::Migration::XMLHelper
   DEFAULT_CORRECT_WEIGHT = 100
   DEFAULT_INCORRECT_WEIGHT = 0
   DEFAULT_POINTS_POSSIBLE = 1
@@ -254,7 +254,7 @@ class AssessmentItemConverter
   end
 
   def self.create_instructure_question(opts)
-    extend Canvas::XMLHelper
+    extend Canvas::Migration::XMLHelper
     q = nil
     manifest_node = opts[:manifest_node]
 

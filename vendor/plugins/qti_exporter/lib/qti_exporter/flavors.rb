@@ -6,5 +6,6 @@ module Qti
     D2L = 'd2l'
     RESPONDUS = 'respondus'
     WEBCT = 'webct'
+    COMMON_CARTRIDGE = 'common_cartridge'
   end
 end 

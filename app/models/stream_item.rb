@@ -51,34 +51,6 @@ class StreamItem < ActiveRecord::Base
     if res['participant_count'] <= 8
       res['participants'] = conversation.participants.map{ |u| prepare_user(u) }
     end
-    res['message_count'] = conversation.conversation_messages.size
-    # .first(10) instead of (:limit => 10) since the association has already
-    # been loaded at this point
-    res['recent_messages'] = conversation.conversation_messages.first(10).map do |message|
-      prepare_conversation_message(message)
-    end
-    res
-  end
-  
-  def prepare_conversation_message(message)
-    res = message.attributes.slice('id', 'created_at', 'generated', 'body')
-    res['author'] = prepare_user(message.author)
-    if res['generated']
-      event = message.event_data
-      if event[:event_type] == :users_added
-        event[:users] = User.find_all_by_id(event[:user_ids]).map{ |u| prepare_user(u) }
-      end
-      res['event_data'] = event
-    else
-      res['formatted_body'] = message.formatted_body(250)
-    end
-    res['body'] = res['body'][0, 4.kilobytes] if res['body'].present?
-    res['attachments'] = message.attachments.map do |file|
-      hash = file.attributes
-      hash['readable_size'] = file.readable_size
-      hash['scribdable?'] = file.scribdable?
-      hash
-    end
     res
   end
   

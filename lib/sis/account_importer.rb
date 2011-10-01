@@ -19,85 +19,84 @@
 require "skip_callback"
 
 module SIS
-  class AccountImporter < SisImporter
-    
-    def self.is_account_csv?(row)
-      row.header?('account_id') && row.header?('parent_account_id')
+  class AccountImporter
+
+    def initialize(batch_id, root_account, logger)
+      @batch_id = batch_id
+      @root_account = root_account
+      @logger = logger
     end
-    
-    def verify(csv, verify)
-      account_ids = (verify[:account_ids] ||= {})
-      csv_rows(csv) do |row|
-        account_id = row['account_id']
-        add_error(csv, "Duplicate account id #{account_id}") if account_ids[account_id]
-        account_ids[account_id] = true
-        add_error(csv, "No account_id given for an account") if row['account_id'].blank?
-      end
-    end
-    
-    # expected columns
-    # account_id,parent_account_id
-    def process(csv)
+
+    def process
       start = Time.now
-      accounts_cache = {}
+      importer = Work.new(@batch_id, @root_account, @logger)
       Account.skip_callback(:update_account_associations_if_changed) do
-        csv_rows(csv) do |row|
-          update_progress
-          logger.debug("Processing Account #{row.inspect}")
-
-          parent = nil
-          if !row['parent_account_id'].blank?
-            parent = accounts_cache[row['parent_account_id']]
-            parent ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['parent_account_id'])
-            unless parent
-              add_warning(csv, "Parent account didn't exist for #{row['account_id']}")
-              next
-            end
-          end
-
-          account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
-          if account.nil?
-            abort = false
-            if row['name'].blank?
-              add_warning(csv, "No name given for account #{row['account_id']}, skipping")
-              abort = true
-            end
-            unless row['status'] =~ /\A(active|deleted)/i
-              add_warning(csv, "Improper status \"#{row['status']}\" for account #{row['account_id']}, skipping")
-              abort = true
-            end
-            next if abort
-          end
-
-          account ||= @root_account.sub_accounts.new
-
-          account.root_account_id = @root_account.id
-          account.parent_account_id = parent ? parent.id : @root_account.id
-
-          # only update the name on new records, and ones that haven't been changed since the last sis import
-          if row['name'].present? && (account.new_record? || (account.sis_name && account.sis_name == account.name))
-            account.name = account.sis_name = row['name']
-          end
-
-          account.sis_source_id = row['account_id']
-          account.sis_batch_id = @batch.id if @batch
-
-          if row['status'].present?
-            if row['status'] =~ /active/i
-              account.workflow_state = 'active'
-            elsif  row['status'] =~ /deleted/i
-              account.workflow_state = 'deleted'
-            end
-          end
-
-          update_account_associations = account.root_account_id_changed? || account.parent_account_id_changed?
-          account.save
-          account.update_account_associations if update_account_associations
-          @sis.counts[:accounts] += 1
-          accounts_cache[account.sis_source_id] = account
-        end
+        yield importer
       end
-      logger.debug("Accounts took #{Time.now - start} seconds")
+      @logger.debug("Accounts took #{Time.now - start} seconds")
+      return importer.success_count
+    end
+
+  private
+
+    class Work
+      attr_accessor :success_count
+
+      def initialize(batch_id, root_account, logger)
+        @batch_id = batch_id
+        @root_account = root_account
+        @accounts_cache = {}
+        @logger = logger
+        @success_count = 0
+      end
+
+      def add_account(account_id, parent_account_id, status, name)
+        @logger.debug("Processing Account #{[account_id, parent_account_id, status, name].inspect}")
+
+        raise ImportError, "No account_id given for an account" if account_id.blank?
+
+        parent = nil
+        if !parent_account_id.blank?
+          parent = @accounts_cache[parent_account_id]
+          parent ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, parent_account_id)
+          raise ImportError, "Parent account didn't exist for #{account_id}" unless parent
+          @accounts_cache[parent.sis_source_id] = parent
+        end
+
+        account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, account_id)
+        if account.nil?
+          raise ImportError, "No name given for account #{account_id}, skipping" if name.blank?
+          raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless status =~ /\A(active|deleted)/i
+        end
+
+        account ||= @root_account.sub_accounts.new
+
+        account.root_account_id = @root_account.id
+        account.parent_account_id = parent ? parent.id : @root_account.id
+
+        # only update the name on new records, and ones that haven't been changed since the last sis import
+        if name.present? && (account.new_record? || (account.sis_name && account.sis_name == account.name))
+          account.name = account.sis_name = name
+        end
+
+        account.sis_source_id = account_id
+        account.sis_batch_id = @batch_id if @batch_id
+
+        if status.present?
+          if status =~ /active/i
+            account.workflow_state = 'active'
+          elsif status =~ /deleted/i
+            account.workflow_state = 'deleted'
+          end
+        end
+
+        update_account_associations = account.root_account_id_changed? || account.parent_account_id_changed?
+        account.save
+        account.update_account_associations if update_account_associations
+        @accounts_cache[account.sis_source_id] = account
+
+        @success_count += 1
+      end
     end
   end
 end

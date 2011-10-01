@@ -1847,7 +1847,7 @@ var fileStructureData = [];
       var item_type = $(this).parents(".folder_item").hasClass('file') ? 'file' : 'folder';
       if($(this).parents(".folder_item").hasClass('collaboration')) { item_type = 'collaboration'; }
       $(this).parents(".folder_item").confirmDelete({
-        message: ($(this).parents(".folder_item").hasClass('folder') ? I18n.t('prompts.delete_folder', "Are you sure you want to delete this folder and all of its contents?") : I18n.t('prompts.delete_file', "Are you sure you want to delete this file?")),
+        message: ($(this).parents(".folder_item").hasClass('folder') || $(this).hasClass('folder_url') ? I18n.t('prompts.delete_folder', "Are you sure you want to delete this folder and all of its contents?") : I18n.t('prompts.delete_file', "Are you sure you want to delete this file?")),
         url: $(this).attr('href'),
         success: function() {
           if($files_structure.find(".file_" + data.id + ",.folder_" + data.id).filter(".active-node,.active-leaf").length > 0) {

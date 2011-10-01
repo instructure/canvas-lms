@@ -68,7 +68,7 @@ module GoogleDocs
   
   def google_docs_request_token_url(return_to)
     consumer = google_consumer
-    request_token = consumer.get_request_token({}, {:scope => "http://docs.google.com/feeds/ http://spreadsheets.google.com/feeds/"})
+    request_token = consumer.get_request_token({}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
     session[:oauth_gdocs_token] = request_token.token
     session[:oauth_gdocs_secret] = request_token.secret
     session[:oauth_gdocs_user_secret] = AutoHandle.generate(nil, 16)
@@ -87,45 +87,18 @@ module GoogleDocs
   def google_docs_download(document_id)
     access_token = google_docs_retrieve_access_token
     entry = google_doc_list(access_token).files.find{|e| e.document_id == document_id}
-    url, extension = google_docs_download_url(document_id)
-    filename = entry.entry.title || "google_doc.#{extension}" rescue "google_doc.#{extension}"
-    response = access_token.get(url)
-    if response.is_a?(Net::HTTPFound)
-      response = access_token.get(response['Location'])
+    if entry
+      response = access_token.get(entry.download_url)
+      response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
+      [response, entry.display_name, entry.extension]
+    else
+      [nil, nil, nil]
     end
-    [response, filename, extension]
-  end
-  
-  def google_docs_download_url(document_id, format=nil)
-    short_id = GoogleDocEntry.trim_document_id(document_id)
-    format = format.downcase rescue nil
-    url = "http://docs.google.com/feeds/download/documents/Export?docID=#{short_id}&exportFormat=pdf"
-    if document_id.match(/\Aspreadsheet/)
-      format ||= "xls"
-      ids = {
-        :xls => 4,
-        :csv => 5,
-        :pdf => 12,
-        :ods => 13,
-        :tsv => 23,
-        :html => 102
-      }
-      fmcmd = ids[format.to_sym]
-      url = "http://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=#{short_id}&fmcmd=#{fmcmd.to_s}"
-    elsif document_id.match(/\Apresentation/)
-      format ||= "ppt"
-      url = "http://docs.google.com/feeds/download/presentations/Export?docID=#{short_id}&exportFormat=#{format}"
-    elsif document_id.match(/\Adocument/)
-      format ||= "doc"
-      url = "http://docs.google.com/feeds/download/documents/Export?docID=#{short_id}&exportFormat=#{format}"
-    end
-    extension = format
-    [url, extension]
   end
   
   def google_doc_list(access_token=nil, only_extensions=nil)
     access_token ||= google_docs_retrieve_access_token
-    docs = Atom::Feed.load_feed(access_token.get("http://docs.google.com/feeds/documents/private/full").body)
+    docs = Atom::Feed.load_feed(access_token.get("https://docs.google.com/feeds/documents/private/full").body)
     folders = []
     entries = []
     docs.entries.each do |entry|
@@ -224,7 +197,7 @@ module GoogleDocs
     name ||= I18n.t('lib.google_docs.default_document_name', "Instructure Doc")
     name += ": #{Time.now.strftime("%d %b %Y, %I:%M %p")}" if include_time
     access_token ||= google_docs_retrieve_access_token
-    url = "http://docs.google.com/feeds/documents/private/full"
+    url = "https://docs.google.com/feeds/documents/private/full"
     entry = Atom::Entry.new do |entry|
       entry.title = name
       entry.categories << Atom::Category.new do |category|
@@ -245,7 +218,7 @@ module GoogleDocs
   
   def google_docs_acl_remove(document_id, users)
     access_token = google_docs_retrieve_access_token
-    url = "http://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    url = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new{|category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
@@ -276,7 +249,7 @@ module GoogleDocs
   
   def google_docs_acl_add(document_id, users)
     access_token = google_docs_retrieve_access_token
-    url = "http://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    url = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new{|category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
@@ -310,7 +283,7 @@ module GoogleDocs
     o = Object.new
     o.extend(GoogleDocs)
     consumer = o.google_consumer(settings[:api_key], settings[:secret_key])
-    token = consumer.get_request_token({}, {:scope => "http://docs.google.com/feeds/"}) rescue nil
+    token = consumer.get_request_token({}, {:scope => "https://docs.google.com/feeds/"}) rescue nil
     token ? nil : "Configuration check failed, please check your settings"
   end
   

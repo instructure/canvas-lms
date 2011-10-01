@@ -6,6 +6,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates_presence_of :name
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
+  serialize :settings
   
   before_save :infer_defaults
 
@@ -173,7 +174,8 @@ class ContextExternalTool < ActiveRecord::Base
     to_import = migration.to_import 'external_tools'
     tools.each do |tool|
       if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-        import_from_migration(tool, migration.context)
+        item = import_from_migration(tool, migration.context)
+        migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
       end
     end
   end
@@ -188,9 +190,25 @@ class ContextExternalTool < ActiveRecord::Base
     item.description = hash[:description]
     item.url = hash[:url] unless hash[:url].blank?
     item.domain = hash[:domain] unless hash[:domain].blank?
-    item.privacy_level = hash[:privacy_level]
+    item.privacy_level = hash[:privacy_level] || 'name_only'
     item.consumer_key = 'fake'
     item.shared_secret = 'fake'
+    if hash[:custom_fields].is_a? Hash
+      item.settings[:custom_fields] ||= {}
+      item.settings[:custom_fields].merge! hash[:custom_fields] 
+    end
+    if hash[:extensions].is_a? Array
+      item.settings[:vendor_extensions] ||= []
+      hash[:extensions].each do |ext|
+        next unless ext[:custom_fields].is_a? Hash
+        if existing = item.settings[:vendor_extensions].find { |ve| ve[:platform] == ext[:platform] }
+          existing[:custom_fields] ||= {}
+          existing[:custom_fields].merge! ext[:custom_fields]
+        else
+          item.settings[:vendor_extensions] << {:platform => ext[:platform], :custom_fields => ext[:custom_fields]}
+        end
+      end
+    end
     
     item.save!
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?

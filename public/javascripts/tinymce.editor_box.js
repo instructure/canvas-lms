@@ -398,8 +398,8 @@
   };
   
   $.fn._justGetCode = function() {
-    var id = this.attr('id');
-    var content = "";
+    var id = this.attr('id') || '';
+    var content = '';
     try {
       if($instructureEditorBoxList._getEditor(id).isHidden()) {
         content = $instructureEditorBoxList._getTextArea(id).val();
@@ -410,7 +410,7 @@
       if(tinyMCE && tinyMCE.getInstanceById(id)) {
         content = tinyMCE.getInstanceById(id).getContent();
       } else {
-        content = this.val() || "";
+        content = this.val() || '';
       }
     }
     return content;

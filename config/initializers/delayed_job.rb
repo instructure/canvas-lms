@@ -49,4 +49,12 @@ class Object
       send_later(*args)
     end
   end
+
+  def send_now_or_later_if_production(_when, *args)
+    if _when == :now
+      send(*args)
+    else
+      send_later_if_production(*args)
+    end
+  end
 end
