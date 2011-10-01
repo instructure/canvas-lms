@@ -140,6 +140,12 @@ TEXT
             </select>
           </td>
         </tr>
+        <tr class="external_tool">
+          <td colspan="2">
+            <%= f.check_box :new_tab %>
+            <%= f.label :new_tab, :en => "Load this tool in a new tab" %>
+          </td>
+        </tr>
         <tr>
           <td colspan="2">
             <button type="submit" class="button"><%= t('#buttons.update', %{Update}) %></button>

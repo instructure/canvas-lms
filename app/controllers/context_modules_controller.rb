@@ -303,6 +303,7 @@ class ContextModulesController < ApplicationController
       @tag.title = params[:content_tag][:title] if params[:content_tag] && params[:content_tag][:title]
       @tag.url = params[:content_tag][:url] if @tag.content_type == 'ExternalUrl' && params[:content_tag] && params[:content_tag][:url]
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
+      @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
       @tag.save
       @tag.update_asset_name! if params[:content_tag][:title]
       render :json => @tag.to_json

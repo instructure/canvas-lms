@@ -48,7 +48,7 @@
           if(options.except && $.inArray(item, options.except) != -1) {
             continue;
           }
-          if (options.dataValues && $.inArray(item, options.dataValues) != -1) {
+          if (options.data[item] && options.dataValues && $.inArray(item, options.dataValues) != -1) {
             this.data(item, options.data[item].toString());
           }
           var $found_all = this.find("." + item);

@@ -38,7 +38,8 @@
       <span class="requirement" style="display: none;">&nbsp;</span>
       <span class="completion_requirement" style="display: none;">&nbsp;</span>
       <span class="position" style="display: none;"><%= tag && tag.position %></span>
-      <span class="url" style="display: none;"><%= tag.try_rescue(:url) if editable %></span>
+      <span class="url" style="display: none;"><%= tag.try(:url) if editable %></span>
+      <span class="new_tab" style="display: none;"><%= tag.try(:new_tab) ? '1' : '0' if editable %></span>
       <div class="completion_requirement">
         <div class="requirement_type min_score_requirement">
           <% score_display = %{<span class='min_score'>#{(criterion && criterion[:min_score]) || nbsp}</span>}.html_safe %>

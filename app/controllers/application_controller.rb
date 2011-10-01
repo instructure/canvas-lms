@@ -814,6 +814,7 @@ class ApplicationController < ActionController::Base
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
       @tool = ContextExternalTool.find_external_tool(tag.url, context)
+      @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
