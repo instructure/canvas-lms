@@ -281,6 +281,7 @@ class DiscussionTopicsController < ApplicationController
       unless @context.grants_right?(@current_user, session, :moderate_forum)
         params[:discussion_topic].delete :podcast_enabled
         params[:discussion_topic].delete :podcast_has_student_posts
+        params[:discussion_topic].delete :event
       end
       delay_posting = params[:discussion_topic].delete :delay_posting
       delayed_post_at = params[:discussion_topic].delete :delayed_post_at
@@ -293,6 +294,7 @@ class DiscussionTopicsController < ApplicationController
             params[:attachment][:uploaded_data].size > 1.kilobytes && 
             @topic.grants_right?(@current_user, session, :attach) &&
             quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
+      @topic.process_event(params[:discussion_topic].delete(:event)) if params[:discussion_topic][:event]
       respond_to do |format|
         @topic.content_being_saved_by(@current_user)
         @topic.editor = @current_user

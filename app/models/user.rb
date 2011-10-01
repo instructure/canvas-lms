@@ -213,8 +213,8 @@ class User < ActiveRecord::Base
     self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_account_associations?
   end
   
-  def update_account_associations
-    User.update_account_associations([self])
+  def update_account_associations(opts = {})
+    User.update_account_associations([self], opts)
   end
 
   def self.add_to_account_chain_cache(account_id, account_chain_cache)
@@ -228,7 +228,7 @@ class User < ActiveRecord::Base
     account_chain_cache[account.id] = [account.id] + add_to_account_chain_cache(account.parent_account_id, account_chain_cache)
   end
 
-  def self.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
+  def self.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache = {})
     results = {}
     remaining_ids = []
     starting_account_ids.each do |account_id|
@@ -1551,31 +1551,16 @@ class User < ActiveRecord::Base
     self.learning_outcome_results.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
   end
   
-  def self.assert_by_email(email, name=nil, password=nil)
-    user = Pseudonym.find_by_unique_id(email).user rescue nil
-    user ||= CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
+  def self.assert_by_email(email, account)
+    p = Pseudonym.find_by_unique_id(email)
+    cc = CommunicationChannel.find_by_path_and_path_type(email, 'email')
+    user = p.try(:user)
+    user ||= cc.try(:user)
     res = {:email => email}
-    if user
-      p = user.pseudonyms.active.find_by_unique_id(email)
-      if user.creation_pending? || user.pre_registered?
-        p ||= user.pseudonyms.build(:unique_id => email, :password => password, :password_confirmation => password)
-        p.password = password
-        p.password_confirmation = password
-        res[:password] = password
-      elsif !p
-        p ||= user.pseudonyms.create!(:unique_id => email, :password => password, :password_confirmation => password)
-        res[:password] = password
-      end
-      cc = user.communication_channels.unretired.find_by_path(email)
-      cc ||= user.communication_channels.create!(:path => email) unless CommunicationChannel.find_by_path(email)
-    else
-      user = User.create!(:name => name || email)
-      user.pseudonyms.create!(:unique_id => email, :path => email, :password => password, :password_confirmation => password)
-      cc = user.communication_channels.find_by_path_and_path_type(email, 'email') #pseudonym.communication_channel.confirm
-      cc.confirm if cc
-      res[:password] = password
-      res[:new] = true
-    end
+    res[:new] = !user
+    user ||= User.create!(:name => email)
+    user.pseudonyms.create!(:unique_id => email, :path => email, :account => account) unless p
+    user.communication_channels.create!(:path => email).confirm unless cc
     res[:user] = user
     res
   end
@@ -1852,6 +1837,10 @@ class User < ActiveRecord::Base
   def mark_all_conversations_as_read!
     conversations.unread.update_all(:workflow_state => 'read')
     User.update_all 'unread_conversations_count = 0', :id => id
+  end
+
+  def conversation_participant(conversation_id)
+    all_conversations.find_by_conversation_id(conversation_id)
   end
 
   # association with dynamic, filtered join condition for submissions.

@@ -62,19 +62,6 @@ module Api::V1::StreamItem
         hash['conversation_id'] = data.id
         hash['private'] = data.private
         hash['participant_count'] = data.participant_count
-        hash['message_count'] = data.message_count
-        hash['recent_messages'] = data.recent_messages.map do |message|
-          {
-            'id' => message.id,
-            'created_at' => message.created_at,
-            'generated' => message.generated,
-            'body' => message.body,
-            'author' => {
-              'user_id' => message.author.try(:id),
-              'user_name' => message.author.try(:name),
-            },
-          }
-        end
       when 'Message'
         hash['message_id'] = data.id
         # this type encompasses a huge number of different types of messages,

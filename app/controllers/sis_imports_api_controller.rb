@@ -111,7 +111,7 @@ class SisImportsApiController < ApplicationController
       if params[:batch_mode] == '1'
         batch.batch_mode = true
         if params[:batch_mode_term_id].present?
-          batch.batch_mode_term = Api.find(@account.enrollment_terms.active,
+          batch.batch_mode_term = api_find(@account.enrollment_terms.active,
                                            params[:batch_mode_term_id])
         end
         batch.save!

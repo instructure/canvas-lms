@@ -36,7 +36,6 @@ class Course < ActiveRecord::Base
                   :hashtag,
                   :show_public_context_messages,
                   :syllabus_body,
-                  :hidden_tabs,
                   :allow_student_forum_attachments,
                   :default_wiki_editing_roles,
                   :allow_student_organized_groups,
@@ -188,11 +187,12 @@ class Course < ActiveRecord::Base
 
   def set_update_account_associations_if_changed
     @should_update_account_associations = self.root_account_id_changed? || self.account_id_changed?
+    @should_delay_account_associations = !self.new_record?
     true
   end
   
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations && !self.class.skip_updating_account_associations?
+    send_now_or_later_if_production(@should_delay_account_associations ? :later : :now, :update_account_associations) if @should_update_account_associations && !self.class.skip_updating_account_associations?
   end
   
   def module_based?
@@ -976,9 +976,12 @@ class Course < ActiveRecord::Base
     WikiNamespace.default_for_context(self)
   end
 
+  def grade_publishing_messages
+    student_enrollments.count(:all, :group => :grade_publishing_message, :conditions => "grade_publishing_message IS NOT NULL AND grade_publishing_message != ''")
+  end
+
   def grade_publishing_status
     statuses = {}
-    success_deadline = PluginSetting.settings_for_plugin('grade_export')[:success_timeout].to_i.seconds.ago.to_s(:db)
     student_enrollments.find(:all, :select => "DISTINCT grade_publishing_status, 0 AS user_id").each do |enrollment|
         status = enrollment.grade_publishing_status
         status ||= "unpublished"
@@ -1173,6 +1176,7 @@ class Course < ActiveRecord::Base
     e = self.enrollments.find_by_user_id_and_type(user.id, type) if user
     e.update_attributes(:workflow_state => 'invited', :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section) if e && (e.completed? || e.rejected?)
     e ||= self.send(type.underscore.pluralize).create(:user => user, :workflow_state => enrollment_state, :course_section => section, :invitation_email => invitation_email, :limit_priveleges_to_course_section => limit_priveleges_to_course_section)
+    e.user = user
     self.claim if self.created? && e && e.admin?
     user.try(:touch) unless opts[:skip_touch_user]
     e
@@ -1549,21 +1553,21 @@ class Course < ActiveRecord::Base
     ExternalFeed.process_migration(data, migration); migration.fast_update_progress(39.5)
     GradingStandard.process_migration(data, migration); migration.fast_update_progress(40)
     Quiz.process_migration(data, migration, question_data); migration.fast_update_progress(50)
-    #todo - Import external tools when there are post-migration messages to tell the user to add shared secret/password
-    #ContextExternalTool.process_migration(data, migration)
+    ContextExternalTool.process_migration(data, migration); migration.fast_update_progress(54)
 
-    2.times do |i|
-      DiscussionTopic.process_migration(data, migration)
-      WikiPage.process_migration(data, migration)
-      migration.fast_update_progress((i==0 ? 55 : 75))
-      Assignment.process_migration(data, migration)
-      ContextModule.process_migration(data, migration)
-      migration.fast_update_progress((i==0 ? 65 : 80))
-    end
+    #These need to be ran twice because they can reference each other
+    DiscussionTopic.process_migration(data, migration);migration.fast_update_progress(55)
+    WikiPage.process_migration(data, migration);migration.fast_update_progress(60)
+    Assignment.process_migration(data, migration);migration.fast_update_progress(65)
+    ContextModule.process_migration(data, migration);migration.fast_update_progress(70)
+    # and second time...
+    DiscussionTopic.process_migration(data, migration);migration.fast_update_progress(75)
+    WikiPage.process_migration(data, migration);migration.fast_update_progress(80)
+    Assignment.process_migration(data, migration);migration.fast_update_progress(85)
+    
     #These aren't referenced by anything, but reference other things
-    CalendarEvent.process_migration(data, migration)
-    WikiPage.process_migration_course_outline(data, migration)
-    migration.fast_update_progress(90)
+    CalendarEvent.process_migration(data, migration);migration.fast_update_progress(90)
+    WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
     
     begin
       #Adjust dates
@@ -1610,11 +1614,11 @@ class Course < ActiveRecord::Base
   def import_settings_from_migration(data)
     return unless data[:course]
     settings = data[:course]
-    self.conclude_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
-    self.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
+    self.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
+    self.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
     self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
     atts = Course.clonable_attributes
-    atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
+    atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
       self.send("#{key}=", val)
     end
@@ -1925,7 +1929,7 @@ class Course < ActiveRecord::Base
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
       :publish_grades_immediately, :allow_student_wiki_edits,
       :allow_student_assignment_edits, :hashtag, :show_public_context_messages,
-      :syllabus_body, :hidden_tabs, :allow_student_forum_attachments,
+      :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,

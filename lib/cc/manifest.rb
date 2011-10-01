@@ -27,7 +27,6 @@ module CC
       @file = nil
       @document = nil
       @weblinks = []
-      @basic_ltis = []
     end
     
     def course

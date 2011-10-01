@@ -505,3 +505,41 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
     end
   end
 end
+
+class ActiveRecord::Migrator
+  def self.migrations_paths
+    @@migration_paths ||= [migrations_path]
+  end
+
+  def migrations
+    @migrations ||= begin
+      files = self.class.migrations_paths.map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
+
+      migrations = files.inject([]) do |klasses, file|
+        version, name = file.scan(/([0-9]+)_([_a-z0-9]*).rb/).first
+
+        raise ActiveRecord::IllegalMigrationNameError.new(file) unless version
+        version = version.to_i
+
+        if klasses.detect { |m| m.version == version }
+          raise ActiveRecord::DuplicateMigrationVersionError.new(version)
+        end
+
+        if klasses.detect { |m| m.name == name.camelize }
+          raise ActiveRecord::DuplicateMigrationNameError.new(name.camelize)
+        end
+
+        klasses << (ActiveRecord::MigrationProxy.new).tap do |migration|
+          migration.name     = name.camelize
+          migration.version  = version
+          migration.filename = file
+        end
+      end
+
+      migrations = migrations.sort_by(&:version)
+      down? ? migrations.reverse : migrations
+    end
+  end
+end
+
+ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]

@@ -61,7 +61,8 @@ describe User do
     account1 = account_model
     account2 = account_model
     course_with_student
-    @user.associated_accounts.length.should eql(0)
+    @user.associated_accounts.length.should eql(1)
+    @user.associated_accounts.first.should eql(Account.default)
     
     @course.account = account1
     @course.save!
@@ -543,5 +544,12 @@ describe User do
       User.with_avatar_state('submitted').count.should == 1
       User.with_avatar_state('any').count.should == 1
     end
+  end
+
+  it "should assert_by_email users into the correct account" do
+    account_model
+    data = User.assert_by_email('test@example.com', @account)
+    data[:new].should be_true
+    data[:user].account.should == @account
   end
 end

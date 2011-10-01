@@ -58,6 +58,32 @@ describe DiscussionTopic do
     a.reload
     a.should be_deleted
   end
+
+  it "should not grant permissions if it is locked" do
+    course_with_teacher(:active_all => 1)
+    student_in_course(:active_all => 1)
+    @topic = @course.discussion_topics.create!(:user => @teacher)
+    relevant_permissions = [:read, :reply, :update, :delete]
+    (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
+    (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
+    @topic.lock!
+    (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'update', 'delete'].sort
+    (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).should == ['read']
+    @topic.unlock!
+    (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
+    (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
+
+    @entry = @topic.discussion_entries.create!(:user => @teacher)
+    @entry.discussion_topic = @topic
+    (@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
+    (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
+    @topic.lock!
+    (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'update', 'delete'].sort
+    (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).should == ['read']
+    @topic.unlock!
+    (@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
+    (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
+  end
   
   context "delayed posting" do
     def delayed_discussion_topic(opts = {})

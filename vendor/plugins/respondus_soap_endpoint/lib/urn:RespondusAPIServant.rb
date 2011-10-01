@@ -5,9 +5,12 @@ class RespondusAPIPort
   attr_reader :session, :user
   attr_accessor :rack_env
 
+  OAUTH_TOKEN_USERNAME = 'oauth_access_token'
+
   protected
 
   class BadAuthError < Exception; end
+  class NeedDelegatedAuthError < Exception; end
   class CantReplaceError < Exception; end
   class OtherError < Exception
     attr_reader :errorStatus
@@ -42,13 +45,30 @@ class RespondusAPIPort
     @verifier.generate(session)
   end
 
+  def load_user_with_oauth(token, domain_root_account)
+    token = AccessToken.find_by_token(token)
+    if !token.try(:usable?) || !token.try(:user)
+      raise(BadAuthError)
+    end
+    token.used!
+    @user = token.user
+  end
+
   def load_user(method, userName, password)
     return nil if %w(identifyServer).include?(method.to_s)
     domain_root_account = rack_env['canvas.domain_root_account'] || Account.default
+    if userName == OAUTH_TOKEN_USERNAME
+      # password is the oauth token
+      return load_user_with_oauth(password, domain_root_account)
+    end
+
     scope = domain_root_account.require_account_pseudonym? ?
       domain_root_account.pseudonyms :
       Pseudonym
     pseudonym = scope.find_by_unique_id(userName) || raise(BadAuthError)
+    if pseudonym.account.try(:delegated_authentication?)
+      raise(NeedDelegatedAuthError)
+    end
     raise(BadAuthError) unless pseudonym.valid_arbitrary_credentials?(password)
     @user = pseudonym.user
   end
@@ -72,6 +92,8 @@ class RespondusAPIPort
       ["Function not implemented"]
     when BadAuthError
       ["Invalid credentials"]
+    when NeedDelegatedAuthError
+      ["Access token required"]
     when ActiveSupport::MessageVerifier::InvalidSignature
       ["Invalid context"]
     when CantReplaceError
@@ -439,6 +461,10 @@ Implemented for: Canvas LMS}]
   ATTACHMENT_FOLDER_NAME = 'imported qti files'
 
   def do_import(item, itemType, uploadType, fileName, fileData)
+    if fileData == "\x0" && session['pending_migration_id']
+      return poll_for_completion()
+    end
+
     unless %w(quiz qdb).include?(itemType)
       raise OtherError, "Invalid item type"
     end
@@ -492,17 +518,36 @@ Implemented for: Canvas LMS}]
     migration.attachment = attachment
     migration.export_content
 
-    # This is a sad excuse for a notification system, but we're just going to
-    # check the migration every couple seconds, see if it's done.
-    timeout(5.minutes.to_i) do
-      while %w[pre_processing exporting exported importing].include?(migration.workflow_state)
-        sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
-        ContentMigration.uncached { migration.reload }
+    session['pending_migration_id'] = migration.id
+    session['pending_migration_itemType'] = itemType
+
+    if Setting.get_cached('respondus_endpoint.polling_api', 'true') != 'false'
+      return poll_for_completion()
+    else
+      # Deprecated in-line waiting for the migration. We've worked with Respondus
+      # to implement an asynchronous, polling solution now.
+      timeout(5.minutes.to_i) do
+        loop do
+          ret = poll_for_completion()
+          if ret == ['pending']
+            sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
+          else
+            return ret
+          end
+        end
       end
     end
+  end
 
-    assets = migration.migration_settings[:imported_assets]
-    a_type = ASSET_TYPES[itemType]
+  def poll_for_completion
+    migration = ContentMigration.uncached { ContentMigration.find(session['pending_migration_id']) }
+
+    unless migration.complete?
+      return [ 'pending' ]
+    end
+
+    assets = migration.migration_settings[:imported_assets] || []
+    a_type = ASSET_TYPES[session['pending_migration_itemType']]
     asset = assets.find { |a| a =~ a_type }
     raise(OtherError, "Invalid file data") unless asset
 

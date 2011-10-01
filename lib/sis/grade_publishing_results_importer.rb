@@ -17,51 +17,51 @@
 #
 
 module SIS
-  class GradePublishingResultsImporter < SisImporter
-
-    def self.is_grade_publishing_results_csv?(row)
-      row.header?('enrollment_id') && row.header?('grade_publishing_status')
+  class GradePublishingResultsImporter
+    def initialize(batch_id, root_account, logger)
+      @batch_id = batch_id
+      @root_account = root_account
+      @logger = logger
     end
 
-    def verify(csv, verify)
-      enrollment_ids = (verify[:enrollment_ids] ||= {})
-      csv_rows(csv) do |row|
-        enrollment_id = row['enrollment_id']
-        add_error(csv, "Duplicate enrollment id #{enrollment_id}") if enrollment_ids[enrollment_id]
-        enrollment_ids[enrollment_id] = true
-        add_error(csv, "No enrollment_id given") if row['enrollment_id'].blank?
-        add_error(csv, "No grade_publishing_status given for enrollment #{enrollment_id}") if row['grade_publishing_status'].blank?
-        add_error(csv, "Improper grade_publishing_status \"#{row['grade_publishing_status']}\" for enrollment #{enrollment_id}") unless %w{ published error }.include?(row['grade_publishing_status'].downcase)
-      end
-    end
-
-    # expected columns
-    # enrollment_id,grade_publishing_status
-    def process(csv)
+    def process
       start = Time.now
-      csv_rows(csv) do |row|
-        update_progress
-        logger.debug("Processing Enrollment #{row.inspect}")
-
-        enrollment = Enrollment.find_by_id(row['enrollment_id'])
-        if enrollment
-          found_root_account = enrollment.root_account_id == @root_account.id
-          found_root_account ||= enrollment.course && enrollment.course.root_account_id == @root_account.id
-          found_root_account ||= enrollment.course_section && enrollment.course_section.root_account_id == @root_account.id
-          enrollment = nil unless found_root_account
-        end
-        unless enrollment
-          add_warning(csv,"Enrollment #{row['enrollment_id']} doesn't exist")
-          next
-        end
-
-        enrollment.grade_publishing_status = row['grade_publishing_status'].downcase
-
-        enrollment.save
-
-        @sis.counts[:grade_publishing_results] += 1
-      end
-      logger.debug("Grade publishing results took #{Time.now - start} seconds")
+      importer = Work.new(@batch_id, @root_account, @logger)
+      yield importer
+      @logger.debug("Grade publishing results took #{Time.now - start} seconds")
+      return importer.success_count
     end
+
+  private
+    class Work
+      attr_accessor :success_count
+
+      def initialize(batch_id, root_account, logger)
+        @batch_id = batch_id
+        @root_account = root_account
+        @logger = logger
+        @success_count = 0
+      end
+
+      def add_grade_publishing_result(enrollment_id, grade_publishing_status, message=nil)
+        @logger.debug("Processing grade publishing result #{[enrollment_id, grade_publishing_status].inspect}")
+
+        raise ImportError, "No enrollment_id given" if enrollment_id.blank?
+        raise ImportError, "No grade_publishing_status given for enrollment #{enrollment_id}" if grade_publishing_status.blank?
+        raise ImportError, "Improper grade_publishing_status \"#{grade_publishing_status}\" for enrollment #{enrollment_id}" unless %w{ published error }.include?(grade_publishing_status.downcase)
+
+        enrollment = Enrollment.find_by_id(enrollment_id)
+        enrollment = nil unless enrollment && (enrollment.course.root_account_id == @root_account.id || enrollment.course_section.root_account_id == @root_account.id)
+        raise ImportError, "Enrollment #{enrollment_id} doesn't exist" unless enrollment
+
+        enrollment.grade_publishing_status = grade_publishing_status.downcase
+        enrollment.grade_publishing_message = message.to_s
+        enrollment.save!
+
+        @success_count += 1
+      end
+
+    end
+
   end
 end

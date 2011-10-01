@@ -1,5 +1,9 @@
 <% conversation = dashboard_conversation %>
 <% conversation_path = conversation_path(conversation ? conversation.id : '{{ id }}') %>
+<% conversation_participant = @current_user.conversation_participant(conversation.id) %>
+<% messages = conversation_participant.recent_messages %>
+<% message_count = messages.count %>
+<% if messages.present? %>
 <div class="communication_message conversation message_no_context" style="<%= hidden unless conversation %>" id="conversation_<%= conversation ? conversation.id : "blank" %>">
   <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <% if conversation %><a name="conversation_<%= conversation.id %>"></a><% end %>
@@ -25,12 +29,11 @@
   <div class="content">
     <div class="subcontent">
       <% if conversation %>
-        <% messages = conversation.recent_messages.reverse %>
-        <% if conversation.message_count > 3 %>
+        <% if message_count > 3 %>
           <div class="communication_sub_message">
             <div class="content behavior_content">
-              <% show_more_link_text = t('links.show_messages', { :one => "Show %{count} More Message", :other => "Show %{count} More Messages" }, :count => conversation.message_count - 2) %>
-              <% if conversation.message_count > messages.length %>
+              <% show_more_link_text = t('links.show_messages', { :one => "Show %{count} More Message", :other => "Show %{count} More Messages" }, :count => message_count - 2) %>
+              <% if conversation_participant.message_count > message_count %>
                 <a href="<%= conversation_path %>"><%= show_more_link_text %></a>
               <% else %>
                 <a href="#" class="show_sub_messages_link"><%= show_more_link_text %></a>
@@ -40,7 +43,7 @@
         <% end %>
         <% messages.each_with_index do |m, idx| %>
           <% type = m.generated ? :event : :message %>
-          <%= render :partial => "context/dashboard_conversation_#{type}", :object => m, :locals => {:hide_message => conversation.message_count > 3 && idx < messages.size - 2, :conversation => conversation} %>
+          <%= render :partial => "context/dashboard_conversation_#{type}", :object => m, :locals => {:hide_message => message_count > 3 && idx < message_count - 2, :conversation => conversation} %>
         <% end %>
       <% end %>
       <div class="communication_sub_message reply_message">
@@ -53,3 +56,4 @@
     <div class="clear"></div>
   </div>
 </div>
+<% end %>

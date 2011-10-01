@@ -17,181 +17,185 @@
 #
 
 module SIS
-  class UserImporter < SisImporter
-
-    def self.is_user_csv?(row)
-      row.header?('user_id') && row.header?('login_id')
+  class UserImporter
+    def initialize(batch_id, root_account, logger)
+      @batch_id = batch_id
+      @root_account = root_account
+      @logger = logger
     end
 
-    def verify(csv, verify)
-      user_ids = (verify[:user_ids] ||= {})
-      identical_row_checker = (verify[:user_rows] ||= {})
-      csv_rows(csv) do |row|
-        user_id = row['user_id']
-        if user_ids[user_id]
-          if identical_row_checker[user_id] != row
-            add_error(csv, "Non-identical duplicate user rows for #{user_id}")
-          else
-            add_warning(csv, "Duplicate user id #{user_id}")
-          end
-        else
-          identical_row_checker[user_id] = row
-        end
-        user_ids[user_id] = true
-        add_error(csv, "No user_id given for a user") if row['user_id'].blank?
-        add_error(csv, "No login_id given for user #{user_id}") if row['login_id'].blank?
-#        add_error(csv, "No email given for user #{user_id}") if row['email'].blank?
-        add_error(csv, "Improper status for user #{user_id}") unless row['status'] =~ /active|deleted/i
-      end
-    end
-
-    # expected columns:
-    # user_id,login_id,first_name,last_name,email,status
-    def process(csv)
+    def process(updates_every, messages)
       start = Time.now
-      users_to_set_sis_batch_ids = []
-      pseudos_to_set_sis_batch_ids = []
-      users_to_add_account_associations = []
-      users_to_update_account_associations = []
-
+      importer = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       User.skip_updating_account_associations do
-        FasterCSV.open(csv[:fullpath], "rb", PARSE_ARGS) do |csv_object|
-          row = csv_object.shift
-          count = 0
-          until row.nil?
-            update_progress(count)
-            count = 0
-            # this transaction assumes that the users and pseudonyms are in the same database
-            User.transaction do
-              remaining_in_transaction = @sis.updates_every
-              tx_end_time = Time.now + Setting.get('sis_transaction_seconds', '1').to_i.seconds
+        yield importer
+        while importer.any_left_to_process?
+          importer.process_batch
+        end
+      end
+      User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
+      User.update_account_associations(importer.users_to_update_account_associations)
+      User.update_all({:creation_sis_batch_id => @batch_id}, {:id => importer.users_to_set_sis_batch_ids}) if @batch_id && !importer.users_to_set_sis_batch_ids.empty?
+      Pseudonym.update_all({:sis_batch_id => @batch_id}, {:id => importer.pseudos_to_set_sis_batch_ids}) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
+      @logger.debug("Users took #{Time.now - start} seconds")
+      return importer.success_count
+    end
 
-              begin
-                logger.debug("Processing User #{row.inspect}")
+  private
+    class Work
+      attr_accessor :success_count, :users_to_set_sis_batch_ids,
+          :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
+          :users_to_update_account_associations
 
-                count += 1
-                remaining_in_transaction -= 1
+      def initialize(batch_id, root_account, logger, updates_every, messages)
+        @batch_id = batch_id
+        @root_account = root_account
+        @logger = logger
+        @updates_every = updates_every
+        @batched_users = []
+        @messages = messages
+        @success_count = 0
 
-                update_account_association = false
+        @users_to_set_sis_batch_ids = []
+        @pseudos_to_set_sis_batch_ids = []
+        @users_to_add_account_associations = []
+        @users_to_update_account_associations = []
+      end
 
-                pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['user_id'])
-                pseudo_by_login = Pseudonym.find_by_unique_id_and_account_id(row['login_id'], @root_account.id)
-                pseudo ||= pseudo_by_login
-                pseudo ||= Pseudonym.find_by_unique_id_and_account_id(row['email'], @root_account.id) if row['email'].present?
+      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil)
+        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password].inspect}")
 
-                if pseudo
-                  if pseudo.sis_user_id.present? && pseudo.sis_user_id != row['user_id']
-                    add_warning(csv, "user #{pseudo.sis_user_id} has already claimed #{row['user_id']}'s requested login information, skipping")
-                    @sis.counts[:users] += 1
-                    next
-                  end
-                  if !pseudo_by_login.nil? && pseudo.unique_id != row['login_id']
-                    add_warning(csv, "user #{pseudo_by_login.sis_user_id} has already claimed #{row['user_id']}'s requested login information, skipping")
-                    @sis.counts[:users] += 1
-                    next
-                  end
+        raise ImportError, "No user_id given for a user" if user_id.blank?
+        raise ImportError, "No login_id given for user #{user_id}" if login_id.blank?
+        raise ImportError, "Improper status for user #{user_id}" unless status =~ /\A(active|deleted)/i
 
-                  user = pseudo.user
-                  user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}" if user.sis_name && user.sis_name == user.name
+        @batched_users << [user_id, login_id, status, first_name, last_name, email, password, ssha_password]
+        process_batch if @batched_users.size >= @updates_every
+      end
 
-                else
-                  user = User.new
-                  user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}"
-                end
+      def any_left_to_process?
+        return @batched_users.size > 0
+      end
 
-                if row['status']=~ /active/i
-                  user.workflow_state = 'registered'
-                elsif row['status']=~ /deleted/i
-                  user.workflow_state = 'deleted'
-                  user.enrollments.scoped(:conditions => {:root_account_id => @root_account.id }).update_all(:workflow_state => 'deleted')
-                  users_to_update_account_associations << user.id unless user.new_record?
-                end
+      def process_batch
+        return unless any_left_to_process?
+        transaction_timeout = Setting.get('sis_transaction_seconds', '1').to_i.seconds
+        User.transaction do
+          tx_end_time = Time.now + transaction_timeout
+          user_row = nil
+          while !@batched_users.empty? && tx_end_time > Time.now
+            user_row = @batched_users.shift
+            @logger.debug("Processing User #{user_row.inspect}")
+            user_id, login_id, status, first_name, last_name, email, password, ssha_password = user_row
 
-                pseudo ||= Pseudonym.new
-                pseudo.unique_id = row['login_id']
-                pseudo.sis_source_id = row['login_id']
-                pseudo.sis_user_id = row['user_id']
-                pseudo.account = @root_account
-                pseudo.workflow_state = row['status']=~ /active/i ? 'active' : 'deleted'
-                # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
-                # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
-                if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(row['password']))
-                  pseudo.password = row['password']
-                  pseudo.password_confirmation = row['password']
-                  pseudo.password_auto_generated = true
-                end
-                pseudo.sis_ssha = row['ssha_password'] if !row['ssha_password'].blank?
-                pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
+            pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, user_id)
+            pseudo_by_login = Pseudonym.find_by_unique_id_and_account_id(login_id, @root_account.id)
+            pseudo ||= pseudo_by_login
+            pseudo ||= Pseudonym.find_by_unique_id_and_account_id(email, @root_account.id) if email.present?
 
-                begin
-                  User.transaction(:requires_new => true) do
-                    if user.changed?
-                      user.creation_sis_batch_id = @batch.id if @batch
-                      new_record = user.new_record?
-                      raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
-                      users_to_add_account_associations << user.id if new_record && user.workflow_state != 'deleted'
-                    elsif @batch
-                      users_to_set_sis_batch_ids << user.id
-                    end
-                    pseudo.user_id = user.id
-                    if pseudo.changed?
-                      pseudo.sis_batch_id = @batch.id if @batch
-                      raise pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
-                    # we do the elsif @batch thing later
-                    end
-                  end
-                rescue => e
-                  add_warning(csv, "Failed saving user. Internal error: #{e}")
-                  next
-                end
+            if pseudo
+              if pseudo.sis_user_id.present? && pseudo.sis_user_id != user_id
+                @messages << "user #{pseudo.sis_user_id} has already claimed #{user_id}'s requested login information, skipping"
+                next
+              end
+              if !pseudo_by_login.nil? && pseudo.unique_id != login_id
+                @messages << "user #{pseudo_by_login.sis_user_id} has already claimed #{user_id}'s requested login information, skipping"
+                next
+              end
 
-                if row['email'].present?
-                  comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')
-                  if !comm and row['status']=~ /active/i
-                    begin
-                      comm = pseudo.sis_communication_channel || CommunicationChannel.new
-                      if comm.new_record?
-                        comm.user_id = user.id
-                        comm.pseudonym_id = pseudo.id
-                        pseudo.sis_communication_channel = comm
-                      end
-                      comm.path = row['email']
-                      comm.workflow_state = 'active'
-                      comm.do_delayed_jobs_immediately = true
-                      comm.save_without_broadcasting if comm.changed?
-                      pseudo.communication_channel_id = comm.id
-                    rescue => e
-                      add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
-                    end
-                  elsif row['status'] =~ /active/i
-                    if comm.user_id != pseudo.user_id
-                      add_warning(csv, "E-mail address #{row['email']} for user #{row['login_id']} is already claimed; ignoring")
-                    else
-                      pseudo.sis_communication_channel.destroy if pseudo.sis_communication_channel != comm and !pseudo.sis_communication_channel.nil?
-                      pseudo.sis_communication_channel = comm
-                      pseudo.communication_channel_id = comm.id
-                      comm.do_delayed_jobs_immediately = true
-                      comm.save_without_broadcasting if comm.changed?
-                    end
-                  end
-                end
+              user = pseudo.user
+              user.name = user.sis_name = "#{first_name} #{last_name}" if user.sis_name && user.sis_name == user.name
 
-                if pseudo.changed?
-                  pseudo.sis_batch_id = @batch.id if @batch
-                  pseudo.save_without_broadcasting
-                elsif @batch && pseudo.sis_batch_id != @batch.id
-                  pseudos_to_set_sis_batch_ids << pseudo.id
-                end
-
-                @sis.counts[:users] += 1
-              end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0 && tx_end_time > Time.now
+            else
+              user = User.new
+              user.name = user.sis_name = "#{first_name} #{last_name}"
             end
+
+            if status =~ /active/i
+              user.workflow_state = 'registered'
+            elsif status =~ /deleted/i
+              user.workflow_state = 'deleted'
+              user.enrollments.scoped(:conditions => {:root_account_id => @root_account.id }).update_all(:workflow_state => 'deleted')
+              @users_to_update_account_associations << user.id unless user.new_record?
+            end
+
+            pseudo ||= Pseudonym.new
+            pseudo.unique_id = login_id
+            pseudo.sis_source_id = login_id
+            pseudo.sis_user_id = user_id
+            pseudo.account = @root_account
+            pseudo.workflow_state = status =~ /active/i ? 'active' : 'deleted'
+            # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
+            # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
+            if !password.blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(password))
+              pseudo.password = password
+              pseudo.password_confirmation = password
+              pseudo.password_auto_generated = true
+            end
+            pseudo.sis_ssha = ssha_password if !ssha_password.blank?
+            pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
+
+            begin
+              User.transaction(:requires_new => true) do
+                if user.changed?
+                  user.creation_sis_batch_id = @batch_id if @batch_id
+                  new_record = user.new_record?
+                  raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                  @users_to_add_account_associations << user.id if new_record && user.workflow_state != 'deleted'
+                elsif @batch_id
+                  @users_to_set_sis_batch_ids << user.id
+                end
+                pseudo.user_id = user.id
+                if pseudo.changed?
+                  pseudo.sis_batch_id = @batch_id if @batch_id
+                  raise pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
+                end
+              end
+            rescue => e
+              @messages << "Failed saving user. Internal error: #{e}"
+              next
+            end
+
+            if email.present?
+              comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(email, 'active', 'email')
+              if !comm and status =~ /active/i
+                begin
+                  comm = pseudo.sis_communication_channel || CommunicationChannel.new
+                  if comm.new_record?
+                    comm.user_id = user.id
+                    comm.pseudonym_id = pseudo.id
+                    pseudo.sis_communication_channel = comm
+                  end
+                  comm.path = email
+                  comm.workflow_state = 'active'
+                  comm.do_delayed_jobs_immediately = true
+                  comm.save_without_broadcasting if comm.changed?
+                  pseudo.communication_channel_id = comm.id
+                rescue => e
+                  @messages << "Failed adding communication channel #{email} to user #{login_id}"
+                end
+              elsif status =~ /active/i
+                if comm.user_id != pseudo.user_id
+                  @messages << "E-mail address #{email} for user #{login_id} is already claimed; ignoring"
+                else
+                  pseudo.sis_communication_channel.destroy if pseudo.sis_communication_channel != comm and !pseudo.sis_communication_channel.nil?
+                  pseudo.sis_communication_channel = comm
+                  pseudo.communication_channel_id = comm.id
+                  comm.do_delayed_jobs_immediately = true
+                  comm.save_without_broadcasting if comm.changed?
+                end
+              end
+            end
+
+            if pseudo.changed?
+              pseudo.sis_batch_id = @batch_id if @batch_id
+              pseudo.save_without_broadcasting
+            elsif @batch_id && pseudo.sis_batch_id != @batch_id
+              @pseudos_to_set_sis_batch_ids << pseudo.id
+            end
+
+            @success_count += 1
           end
-          User.update_account_associations(users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
-          User.update_account_associations(users_to_update_account_associations)
-          User.update_all({:creation_sis_batch_id => @batch.id}, {:id => users_to_set_sis_batch_ids}) if @batch && !users_to_set_sis_batch_ids.empty?
-          Pseudonym.update_all({:sis_batch_id => @batch.id}, {:id => pseudos_to_set_sis_batch_ids}) if @batch && !pseudos_to_set_sis_batch_ids.empty?
-          logger.debug("Users took #{Time.now - start} seconds")
         end
       end
     end

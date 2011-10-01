@@ -1,9 +1,15 @@
 require 'nokogiri'
 
 module Qti
+  def self.qti_enabled?
+    if plugin = Canvas::Plugin.find(:qti_exporter)
+      return plugin.settings[:enabled].to_s == 'true'
+    end
+    false
+  end
 end
 
-require 'canvas_migration'
+require 'canvas/migration'
 require 'qti_exporter/flavors'
 require 'qti_exporter/qti'
 require 'qti_exporter/qti_plugin_validator'

@@ -1420,7 +1420,7 @@ I18n.scoped 'conversations', (I18n) ->
 
     for conversation in MessageInbox.initial_conversations
       add_conversation conversation, true
-    $('#no_messages').showIf !$conversation_list.find('li').length
+    $('#no_messages').showIf !$conversation_list.find('li:not([id=conversations_loader])').length
 
     $('.recipients').tokenInput
       placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")

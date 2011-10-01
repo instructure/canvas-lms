@@ -16,74 +16,81 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "skip_callback"
-
 module SIS
-  class AbstractCourseImporter < SisImporter
-    
-    def self.is_abstract_course_csv?(row)
-      row.header?('abstract_course_id') && !row.header?('course_id') && row.header?('short_name')
-    end
-    
-    def verify(csv, verify)
-      abstract_course_ids = (verify[:abstract_course_ids] ||= {})
-      csv_rows(csv) do |row|
-        abstract_course_id = row['abstract_course_id']
-        add_error(csv, "Duplicate abstract course id #{abstract_course_id}") if abstract_course_ids[abstract_course_id]
-        abstract_course_ids[abstract_course_id] = true
-        add_error(csv, "No abstract_course_id given for an abstract course") if row['abstract_course_id'].blank?
-        add_error(csv, "No short_name given for abstract course #{abstract_course_id}") if row['short_name'].blank?
-        add_error(csv, "No long_name given for abstract course #{abstract_course_id}") if row['long_name'].blank?
-        add_error(csv, "Improper status \"#{row['status']}\" for abstract course #{abstract_course_id}") unless row['status'] =~ /\Aactive|\Adeleted/i
-      end
-    end
-    
-    # expected columns
-    # abstract_course_id,short_name,long_name,account_id,term_id,status
-    def process(csv)
-      start = Time.now
-      abstract_courses_to_update_sis_batch_id = []
-      csv_rows(csv) do |row|
-        update_progress
+  class AbstractCourseImporter
 
-        logger.debug("Processing AbstractCourse #{row.inspect}")
-        term = @root_account.enrollment_terms.find_by_sis_source_id(row['term_id'])
-        course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, row['abstract_course_id'])
+    def initialize(batch_id, root_account, logger)
+      @batch_id = batch_id
+      @root_account = root_account
+      @logger = logger
+    end
+
+    def process
+      start = Time.now
+      importer = Work.new(@batch_id, @root_account, @logger)
+      yield importer
+      AbstractCourse.update_all({:sis_batch_id => @batch_id}, {:id => importer.abstract_courses_to_update_sis_batch_id}) if @batch_id && !importer.abstract_courses_to_update_sis_batch_id.empty?
+      @logger.debug("AbstractCourses took #{Time.now - start} seconds")
+      return importer.success_count
+    end
+
+  private
+    class Work
+      attr_accessor :success_count, :abstract_courses_to_update_sis_batch_id
+
+      def initialize(batch_id, root_account, logger)
+        @batch_id = batch_id
+        @root_account = root_account
+        @abstract_courses_to_update_sis_batch_id = []
+        @logger = logger
+        @success_count = 0
+      end
+
+      def add_abstract_course(abstract_course_id, short_name, long_name, status, term_id=nil, account_id=nil, fallback_account_id=nil)
+        @logger.debug("Processing AbstractCourse #{[abstract_course_id, short_name, long_name, status, term_id, account_id, fallback_account_id].inspect}")
+
+        raise ImportError, "No abstract_course_id given for an abstract course" if abstract_course_id.blank?
+        raise ImportError, "No short_name given for abstract course #{abstract_course_id}" if short_name.blank?
+        raise ImportError, "No long_name given for abstract course #{abstract_course_id}" if long_name.blank?
+        raise ImportError, "Improper status \"#{status}\" for abstract course #{abstract_course_id}" unless status =~ /\Aactive|\Adeleted/i
+
+        term = @root_account.enrollment_terms.find_by_sis_source_id(term_id)
+        course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, abstract_course_id)
         course ||= AbstractCourse.new
         course.enrollment_term = term if term
         course.root_account = @root_account
 
         account = nil
-        account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) if row['account_id'].present?
-        account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['fallback_account_id']) if row['fallback_account_id'].present?
+        account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, account_id) if account_id.present?
+        account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, fallback_account_id) if fallback_account_id.present?
         course.account = account if account
         course.account ||= @root_account
 
         # only update the name/short_name on new records, and ones that haven't been changed
         # since the last sis import
         if course.new_record? || (course.sis_course_code && course.sis_course_code == course.short_name)
-          course.short_name = course.sis_course_code = row['short_name']
+          course.short_name = course.sis_course_code = short_name
         end
         if course.new_record? || (course.sis_name && course.sis_name == course.name)
-          course.name = course.sis_name = row['long_name']
+          course.name = course.sis_name = long_name
         end
-        course.sis_source_id = row['abstract_course_id']
-        if row['status'] =~ /active/i
+        course.sis_source_id = abstract_course_id
+        if status =~ /active/i
           course.workflow_state = 'active'
-        elsif row['status'] =~ /deleted/i
+        elsif status =~ /deleted/i
           course.workflow_state = 'deleted'
         end
 
         if course.changed?
-          course.sis_batch_id = @batch.id if @batch
+          course.sis_batch_id = @batch_id if @batch_id
           course.save!
-        elsif @batch
-          abstract_courses_to_update_sis_batch_id << course.id
+        elsif @batch_id
+          @abstract_courses_to_update_sis_batch_id << course.id
         end
-        @sis.counts[:abstract_courses] += 1
+        @success_count += 1
       end
-      AbstractCourse.update_all({:sis_batch_id => @batch.id}, {:id => abstract_courses_to_update_sis_batch_id}) if @batch && !abstract_courses_to_update_sis_batch_id.empty?
-      logger.debug("AbstractCourses took #{Time.now - start} seconds")
+
     end
+
   end
 end

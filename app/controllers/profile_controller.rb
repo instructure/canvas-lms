@@ -16,13 +16,41 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Users
 class ProfileController < ApplicationController
   before_filter :require_user
   before_filter { |c| c.active_tab = "profile" }
-  
+
+  include Api::V1::User
+
+  # @API
+  # Returns user profile data, including user id, name, and profile pic.
+  #
+  # When requesting the profile for the user accessing the API, the user's
+  # calendar feed URL will be returned as well.
+  #
+  # @example_response
+  #
+  #   {
+  #     'id': 1234,
+  #     'name': 'Sample User',
+  #     'sortable_name': 'user, sample',
+  #     'email': 'sample_user@example.com',
+  #     'login_id': 'sample_user@example.com',
+  #     'sis_user_id': 'sis1',
+  #     'sis_login_id': 'sis1-login',
+  #     'avatar_url': '..url..',
+  #     'calendar': { 'ics' => '..url..' }
+  #   }
   def show
-    @user = @current_user
-    add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), profile_path )
+    if api_request?
+      # allow querying this basic profile data for the current user, or any
+      # user the current user has view_statistics access to
+      @user = api_find(User, params[:user_id])
+      return unless @user == @current_user || authorized_action(@user, @current_user, :view_statistics)
+    else
+      @user = @current_user
+    end
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select{|c| c.path_type == "email"}
     @sms_channels = @channels.select{|c| c.path_type == 'sms'}
@@ -31,14 +59,27 @@ class ProfileController < ApplicationController
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
-    @courses = @user.courses
     @context = UserProfile.new(@user)
     respond_to do |format|
-      format.html { render :action => "profile" }
-      format.xml  { render :xml => @user.to_xml }
+      format.html do
+        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), profile_path )
+        render :action => "profile"
+      end
+      format.json do
+        hash = user_json(@user)
+        hash['primary_email'] = @default_email_channel.try(:path)
+        hash['login_id'] ||= @default_pseudonym.try(:unique_id)
+        if service_enabled?(:avatars)
+          hash['avatar_url'] = avatar_image_url(@user.id)
+        end
+        if @user == @current_user
+          hash['calendar'] = { 'ics' => "#{feeds_calendar_url(@user.feed_code)}.ics" }
+        end
+        render :json => hash
+      end
     end
   end
-  
+
   def update_communication
     params[:root_account] = @domain_root_account
     @policies = NotificationPolicy.setup_for(@current_user, params)

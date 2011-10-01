@@ -39,7 +39,6 @@ end
 def course_valid_attributes
   {
     :name => 'value for name',
-    :section => 'value for section',
     :group_weighting_scheme => 'value for group_weighting_scheme',
     :start_at => Time.now,
     :conclude_at => Time.now + 100,

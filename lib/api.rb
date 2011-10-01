@@ -17,59 +17,73 @@
 #
 
 module Api
-  # find id in collection
-  def self.find(collection, id, &block)
-    find_by_sis = block ? block :
-      proc { |sis_column, sis_id| self.find_by_sis_id(collection, sis_id, sis_column) }
+  # find id in collection, by either id or sis_*_id
+  # if the collection is over the users table, `self` is replaced by @current_user.id
+  def api_find(collection, id)
+    if collection.table_name == User.table_name && id == 'self' && @current_user
+      id = @current_user.id
+    end
 
-    self.switch_on_id_type(id, self.valid_sis_columns_for_collection(collection),
-              proc { |id| self.find_by_id(collection, id) },
-              find_by_sis)
-  end
-
-  def self.find_by_id(collection, id)
-    collection.find(id)
-  end
-
-  def self.find_by_sis_id(collection, sis_id, sis_column)
-    collection.first(:conditions => { sis_column => sis_id}) || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with #{sis_column}=#{sis_id}")
+    sis_column, sis_id, sis_find_params = Api.sis_find_params_for_collection(collection, id)
+    if sis_find_params
+      collection.first(sis_find_params) || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with #{sis_column}=#{sis_id}")
+    else
+      collection.find(id)
+    end
   end
 
   # map a list of ids and/or sis ids to plain ids.
-  def self.map_ids(ids, collection, &block)
-    block ||= proc { |sis_column, sis_id| collection.first(:conditions => { sis_column => sis_id }, :select => :id).try(:id) }
-    ids.map { |id| self.switch_on_id_type(id, self.valid_sis_columns_for_collection(collection), nil, block) }
-  end
-
-  def self.switch_on_id_type(id, valid_columns, if_id = nil, if_sis_id = nil)
-    case id
-    when Numeric
-      if_id ? if_id.call(id) : id
-    else
-      id = id.to_s
-      if id =~ %r{^hex:(sis_[\w_]+):(.+)$} && valid_columns.key?($1)
-        val = [$2].pack('H*')
-        if_sis_id ? if_sis_id.call(valid_columns[$1], val) : val
-      elsif id =~ %r{^(sis_[\w_]+):(.+)$} && valid_columns.key?($1)
-        if_sis_id ? if_sis_id.call(valid_columns[$1], $2) : $2
+  def self.map_ids(ids, collection)
+    ids.map do |id|
+      sis_column, sis_id, sis_find_params = Api.sis_find_params_for_collection(collection, id)
+      if sis_find_params
+        collection.first(sis_find_params.merge(:select => :id)).try(:id)
       else
-        if_id ? if_id.call(id) : id
+        collection.find_by_id(id)
       end
     end
   end
 
-  def self.valid_sis_columns_for_collection(collection)
-    case collection.table_name
-    when Course.table_name
-      { 'sis_course_id' => 'sis_source_id' }
-    when EnrollmentTerm.table_name
-      { 'sis_term_id' => 'sis_source_id' }
-    when User.table_name
-      { 'sis_user_id' => 'sis_user_id', 'sis_login_id' => 'sis_source_id' }
-    when Account.table_name
-      { 'sis_account_id' => 'sis_source_id' }
+  VALID_SIS_COLUMNS = {
+    Course.table_name =>
+      { 'sis_course_id' => 'sis_source_id' },
+    EnrollmentTerm.table_name =>
+      { 'sis_term_id' => 'sis_source_id' },
+    User.table_name =>
+      { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.sis_source_id' },
+    Account.table_name =>
+      { 'sis_account_id' => 'sis_source_id' },
+  }
+
+  def self.sis_find_params_for_collection(collection, id)
+    case id
+    when Numeric
+      return
     else
-      raise ArgumentError, "need to add support for table name: #{collection.table_name}"
+      id = id.to_s
+      if id =~ %r{^hex:(sis_[\w_]+):(.+)$}
+        sis_column = $1
+        sis_id = [$2].pack('H*')
+      elsif id =~ %r{^(sis_[\w_]+):(.+)$}
+        sis_column = $1
+        sis_id = $2
+      else
+        return
+      end
+
+      valid_sis_columns = VALID_SIS_COLUMNS[collection.table_name] or
+        raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
+
+      if column = valid_sis_columns[sis_column]
+        sis_find_params = { :conditions => { column => sis_id } }
+        # the "user" sis columns are actually on the pseudonym
+        if collection.table_name == User.table_name
+          sis_find_params[:include] = :pseudonym
+        end
+        return sis_column, sis_id, sis_find_params
+      else
+        return
+      end
     end
   end
   
@@ -98,7 +112,7 @@ module Api
   
   def attachment_json(attachment, opts={})
     url_params = opts[:url_params] || {}
-    
+
     url = case attachment.context_type
       when "Course"
         course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))

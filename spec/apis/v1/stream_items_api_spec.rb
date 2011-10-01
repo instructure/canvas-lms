@@ -118,19 +118,7 @@ describe UsersController, :type => :integration do
 
       'private' => false,
 
-      'recent_messages' => [{
-        'id' => @message.id,
-        'created_at' => @message.created_at.as_json,
-        'generated' => false,
-        'body' => 'hello',
-        'author' => {
-          'user_id' => @sender.id,
-          'user_name' => 'sender',
-        },
-      }],
-
-      'participant_count' => 2,
-      'message_count' => 1,
+      'participant_count' => 2
     }
   end
 
@@ -235,6 +223,48 @@ describe UsersController, :type => :integration do
       },],
       'course_id' => @course.id,
     }]
+  end
+  
+  it "should format graded Submission without comments" do
+    @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
+    @teacher = User.create!(:name => 'teacher')
+    @course.enroll_teacher(@teacher)
+    @sub = @assignment.grade_student(@user, { :grade => '12' }).first
+    @sub.workflow_state = 'submitted'
+    @sub.save!
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == [{
+      'id' => StreamItem.last.id,
+      'title' => "assignment 1",
+      'message' => nil,
+      'type' => 'Submission',
+      'context_type' => nil,
+      'created_at' => StreamItem.last.created_at.as_json,
+      'updated_at' => StreamItem.last.updated_at.as_json,
+      'grade' => '12',
+      'score' => 12,
+
+      'assignment' => {
+        'title' => 'assignment 1',
+        'id' => @assignment.id,
+        'points_possible' => 14.2,
+      },
+      
+      'course_id' => @course.id,
+    }]
+  end
+  
+  it "should not format ungraded Submission without comments" do
+    @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
+    @teacher = User.create!(:name => 'teacher')
+    @course.enroll_teacher(@teacher)
+    @sub = @assignment.grade_student(@user, { :grade => nil }).first
+    @sub.workflow_state = 'submitted'
+    @sub.save!
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == []
   end
 
   it "should format Collaboration" do
