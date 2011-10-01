@@ -123,7 +123,7 @@ module GoogleDocs
     key ||= GoogleDocs.config['api_key']
     secret ||= GoogleDocs.config['secret_key']
     consumer = OAuth::Consumer.new(key, secret, {
-      :site => "http://www.google.com",
+      :site => "https://www.google.com",
       :request_token_path => "/accounts/OAuthGetRequestToken",
       :access_token_path => "/accounts/OAuthGetAccessToken",
       :authorize_path=> "/accounts/OAuthAuthorizeToken",
