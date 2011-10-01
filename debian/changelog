@@ -1,3 +1,68 @@
+canvas-lms (1.1-64) professional; urgency=low
+
+  * Package ref: df1d3813646a99c2f7566ca949097fd1ec30ce6e
+  *
+  * [-7c747f3] Merge remote branch 'origin/stable/2011-09-17' into stable/2011-09-17-uen
+  * [-cc7232f] for grade result importing, handle root_account_id on enrollments too
+  * [-aedcc01] quick fix to current grade passback problem
+  * [+fa1660f] separate out permission for viewing error reports
+  * [+786212f] drop role_overrides.context_code
+  * [+fa2366e] grade was sometimes getting serialized to stream item as int
+  * [+b317f0d] clean up user querying in the api, refs #4756, #4746
+  * [+2448524] remove unused columns from courses
+  * [+c580847] add link to the course .ics feed in the course api
+  * [+34c407d] only attempt ContentZipper#process_attachment once
+  * [+6211f06] api read access to the user profile
+  * [+4087f9e] fix keep_trying_until properly propagating exceptions
+  * [+18440ed] remove never-used column and index
+  * [+aca57db] oauth token support in the respondus soap api, closes #5564
+  * [+973b04c] update_account_associations immediately for new objects
+  * [+35127dd] allow administrators to manually confirm communication channels
+  * [+735b6d9] don't set val to the value of the block in keep_trying_until
+  * [+e7ee240] fix an speedGrader js error that was filling our error_reports
+  * [+fb47b69] find migrations in plugins
+  * [+ca71deb] switch globbing of plugin db/migrate dirs
+  * [+c07f069] implement the new respondus polling publish api, closes #5479
+  * [+8734aa7] fixed typo in file/folder delete popup. fixes #5416
+  * [+2dd233c] save user answers for _fill_in_the_blank questions. fixes #5376
+  * [+77acc30] Remove a literal "<br/>" in fill in the blank quiz description. Fixes #5681.
+  * [+483786b] fix the -and-a-half of precalculated account associations importing enrollments
+  * [+3836692] Fixes #5200 - FireFox Keyboard Shortcuts Popup
+  * [+48d14d7] Update services api doc to match the code.
+  * [+29bf7b2] allow specifying the account for the pseudonym in a spec
+  * [+3115001] user_json when the user has no pseudonym, fixes #5489
+  * [+2a1ede6] locking of discussion topics closes #5417
+  * [+c330df9] when adding new admin users, create them in the target account
+  * [+488da4f] only display undeleted messages in dashboard. fixes #5460
+  * [+502fece] allow uploading gradebook csv with just sis_id
+  * [+0db446b] start standard common cartridge importing
+  * [+bfb4378] move canvas-specific import code into its own namespace
+  * [+81a10db] moved migration classes into a proper namespace
+  * [+d6a0230] added an import package identifier
+  * [+58dcf16] add links and discussions to cc importer
+  * [+169e54d] added blti links to cc importer
+  * [+349eacb] add assessment importing to common cartridge importer
+  * [+1b05087] some common cartridge tweaks to accomodate another vendor
+  * [+4b511be] track ajax response times in google analytics
+  * [+b5de597] use async version of google analytics
+  * [+63bc6b1] css3 transitions only if support transitionEnd event
+  * [+ebe110a] fix dashboard conversation render bug
+  * [+ab40ccd] add noButton option to kyleMenu
+  * [+8076a96] hide "show attendance column" option in current gradebook.
+  * [+ba7e01e] display "no messages" message on empty filter. fixes #5493
+  * [+006cde7] new generic-format importer classes
+  * [+7aca996] eportofolio verifier behavior needs :session_affects_permissions
+  * [+f886dc1] throttle js error reports to 1 per 5 secs.
+  * [+e369390] hide soon-to-be-dropped columns from activerecord, closes #5758
+  * [+b062006] don't drop sis rows if transaction timeout is reached
+  * [+6860aff] include the port in BLTI Oauth request if it's non-standard
+  * [+8843467] add index to discussion_topics.assignment_id
+  * [+2259957] edit quizzes with fill in multiple blank questions. fixes #5783
+  * [+ac35eb0] fix google docs integration
+  * [+df1d381] store grade publishing messages
+
+ -- JT Olds <jt@instructure.com>  Fri, 30 Sep 2011 18:02:50 -0600
+
 canvas-lms (1.1-63) professional; urgency=low
 
   * Package ref: 7c747f34f9d012072dfba8abc73a3ece73711c67
