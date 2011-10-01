@@ -37,8 +37,6 @@ describe AccountsController do
     @course2.account = @account2
     @course2.save!
     @course2.course_sections.first.crosslist_to_course(@course1)
-    @course1.update_account_associations
-    @course2.update_account_associations
   end
 
   describe "SIS imports" do

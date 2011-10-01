@@ -560,6 +560,12 @@ class RoleOverride < ActiveRecord::Base
         :account_only => :site_admin,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
+      },
+      :view_error_reports => {
+        :label => lambda { t('permissions.view_error_reports', "View error reports") },
+        :account_only => :site_admin,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
       }
     }.freeze
   def self.permissions

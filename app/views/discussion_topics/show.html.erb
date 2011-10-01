@@ -42,21 +42,25 @@
               <span style="font-size: 0.8em; padding-left: 10px;">( <%= t :total_message_count, "*%{count}* including subtopics", :wrapper => '<span class="total_message_count">\1</span>', :count => @topic.discussion_entries.active.length %> )</span>
             <% end %>
           </p>
-          <p>
-            <% if @topic_agglomerated %>
+          <% if @topic_agglomerated %>
+            <p>
               <%= t :topic_agglomerated_notice, "This view shows all the messages from all this topic's group topics.  If you want to comment or edit posts, you'll have to visit each topic individually." %>
               <ul class="unstyled_list" style="line-height: 1.8em; margin: 5px 20px 10px;">
-              <% @groups.select{|g| can_do(g, @current_user, :read) }.each do |group| %>
-                <li class="unstyled_list">
-                  <% cnt = (@topics || []).find{|t| t.context == group}.discussion_entries.count rescue 0 %>
-                  <b><a href="<%= context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group.name %></a></b> - <%= t :post_count, "Post", :count => cnt %>
-                </li>
-              <% end %>
+                <% @groups.select{|g| can_do(g, @current_user, :read) }.each do |group| %>
+                  <li class="unstyled_list">
+                    <% cnt = (@topics || []).find{|t| t.context == group}.discussion_entries.count rescue 0 %>
+                    <b><a href="<%= context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group.name %></a></b> - <%= t :post_count, "Post", :count => cnt %>
+                  </li>
+                <% end %>
               </ul>
-            <% else %>
-            <% end %>
-          </p>
-          <p>
+            </p>
+          <% end %>
+          <% if @topic.locked? %>
+            <p>
+              <%= image_tag 'lock.png' %><%= t :topic_locked_notice, "This topic is closed for comments." %>
+            </p>
+          <% end %>
+          <div>
             <% if can_do(@topic, @current_user, :update) %>
               <a href="#" class="edit_topic_link button button-sidebar-wide"><%= image_tag "edit.png", :alt => "" %> <%= t :edit_topic, "Edit Topic" %></a>
             <% end %>
@@ -66,7 +70,20 @@
             <% if can_do(@topic, @current_user, :delete) && !params[:combined] %>
               <%= link_to image_tag('delete.png') + " " + t(:delete_topic, "Delete Topic"), context_url(@context, :context_discussion_topic_url, @topic), :method => :delete, :confirm => t(:delete_confirm, "Are you sure you want to delete this topic?"), :class => "button button-sidebar-wide" %>
             <% end %>
-          </p>
+            <% if can_do(@context, @current_user, :moderate_forum) %>
+              <% if !@topic.locked? && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at >= Time.now) %>
+                <% form_for @topic, :url => context_url(@context, :context_discussion_topic_url, @topic.id), :html => {:method => :put} do |f| %>
+                  <input type="hidden" name="discussion_topic[event]" value="lock"/>
+                  <button type="submit" class="button button-sidebar-wide"><%= image_tag('lock.png') %> <%= t(:lock_topic, %{Close for Comments}) %></button>
+                <% end %>
+              <% elsif @topic.locked? %>
+                <% form_for @topic, :url => context_url(@context, :context_discussion_topic_url, @topic.id), :html => {:method => :put} do |f| %>
+                  <input type="hidden" name="discussion_topic[event]" value="unlock"/>
+                  <button type="submit" class="button button-sidebar-wide"><%= image_tag('unlock.png') %><%= t(:unlock_topic, %{Re-Open for Comments}) %></button>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
           <div id="podcast_link_holder" style="<%= hidden unless @topic.podcast_enabled %>">
             <% if @context_enrollment %>
               <p>
@@ -156,6 +173,10 @@
   <% if !@topic_uneditable && can_do(@topic, @current_user, :reply) && !params[:combined]%>
     <div style="text-align: center; margin: 10px;">
       <a href="#" class="add_entry_link add button big-button"> <%= image_tag "add.png" %> <%= t :add_new_entry, "Add New Entry" %></a><br/>
+    </div>
+  <% elsif @topic.locked? %>
+    <div style="text-align: center; margin: 10px;">
+      <%= image_tag 'lock.png' %><%= t :topic_locked, "This topic is closed for comments" %>
     </div>
   <% end %>
   <%= render :partial => "entry", :object => nil, :locals => {:topic => @topic} %>

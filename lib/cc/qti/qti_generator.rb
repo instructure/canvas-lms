@@ -76,7 +76,7 @@ module CC
         end
 
         # Create the Canvas-specific QTI data
-        canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + ".xml")
+        canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + QTI_EXTENSION)
         canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
         File.open(canvas_qti_path, 'w') do |file|
           doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
@@ -112,7 +112,7 @@ module CC
       def generate_question_bank(bank)
         bank_mig_id = create_key(bank)
 
-        rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, bank_mig_id + ".xml")
+        rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, bank_mig_id + QTI_EXTENSION)
         full_path = File.join(@export_dir, rel_path)
         File.open(full_path, 'w') do |file|
           doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)

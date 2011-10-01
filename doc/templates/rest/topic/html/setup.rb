@@ -28,6 +28,6 @@ def method_details_list
 end
 
 def topic_doc
-  @docstring = options[:controllers].map { |c| c.docstring }.join("\n<br>\n")
-  htmlify(@docstring.strip)
+  @docstring = options[:controllers].map { |c| c.docstring }.join("\n\n")
+  htmlify(@docstring.strip, :markdown)
 end

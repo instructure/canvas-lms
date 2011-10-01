@@ -44,23 +44,11 @@ describe Account do
     # account_model
     # @a.to_atom.should be_is_a(Atom::Entry)
   # end
-  
-  def process_csv_data(account, lines)
-    tmp = Tempfile.new("sis_rspec")
-    path = "#{tmp.path}.csv"
-    tmp.close!
-    File.open(path, "w+") { |f| f.puts lines.join "\n" }
-    importer = SIS::SisCsv.process(@account, :files => [path],
-        :allow_printing => false)
-    File.unlink path
-    importer.warnings.should == []
-    importer.errors.should == []
-  end
 
   context "course lists" do
     before(:each) do
       @account = Account.create!
-      process_csv_data(@account, [
+      process_csv_data_cleanly([
         "user_id,login_id,first_name,last_name,email,status",
         "U001,user1,User,One,user1@example.com,active",
         "U002,user2,User,Two,user2@example.com,active",
@@ -74,13 +62,13 @@ describe Account do
         "U010,user10,User,Ten,user10@example.com,active",
         "U011,user11,User,Eleven,user11@example.com,deleted"
       ])
-      process_csv_data(@account, [
+      process_csv_data_cleanly([
         "term_id,name,status,start_date,end_date",
         "T001,Term 1,active,,",
         "T002,Term 2,active,,",
         "T003,Term 3,active,,"
       ])
-      process_csv_data(@account, [
+      process_csv_data_cleanly([
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,C001,Test Course 1,,T001,active",
         "C002,C002,Test Course 2,,T001,deleted",
@@ -101,7 +89,7 @@ describe Account do
         "C008S,C008S,Test search Course 8,,T003,active",
         "C009S,C009S,Test search Course 9,,T003,active"
       ])
-      process_csv_data(@account, [
+      process_csv_data_cleanly([
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,,,active",
         "S002,C002,Sec2,,,active",
@@ -122,7 +110,7 @@ describe Account do
         "S008S,C001S,Sec8,,,deleted",
         "S009S,C008S,Sec9,,,active"
       ])
-      process_csv_data(@account, [
+      process_csv_data_cleanly([
         "course_id,user_id,role,section_id,status,associated_user_id",
         ",U001,student,S001,active,",
         ",U002,student,S002,active,",

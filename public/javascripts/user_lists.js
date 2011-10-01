@@ -155,11 +155,6 @@ I18n.scoped('user_lists', function(I18n) {
       }
       $list.find(".none").remove();
       enrollment.invitation_sent_at = I18n.t("just_now", "Just Now");
-      try {
-        enrollment.name = enrollment.user.last_name_first || enrollment.user.name;
-        enrollment.pseudonym_id = enrollment.user.pseudonym.id;
-        enrollment.communication_channel_id = enrollment.user.pseudonym.communication_channel.id;
-      } catch(e) {}
       var $before = null;
       $list.find(".user").each(function() {
         var name = $(this).getTemplateData({textValues: ['name']}).name;
@@ -169,7 +164,6 @@ I18n.scoped('user_lists', function(I18n) {
         }
       });
       if(!$("#enrollment_" + enrollment.id).length) {
-        enrollment.pseudonym_id = enrollment.users_pseudonym_id;
         var $enrollment = $enrollment_blank
           .clone(true)
           .fillTemplateData({

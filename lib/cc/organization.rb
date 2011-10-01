@@ -67,7 +67,6 @@ module CC
           elsif ct.content_type == 'ContextExternalTool'
             attributes[:identifierref] = attributes[:identifier]
             attributes[:identifier] = CCHelper.create_key(ct, "module_item")
-            @manifest.basic_ltis << ct
           end
           module_node.item(attributes) do |tag_node|
             tag_node.title ct.title

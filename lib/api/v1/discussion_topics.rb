@@ -17,8 +17,6 @@
 #
 
 module Api::V1::DiscussionTopics
-  include Api
-  
   def discussion_topic_api_json(topics)
     topics.map do |topic|
 

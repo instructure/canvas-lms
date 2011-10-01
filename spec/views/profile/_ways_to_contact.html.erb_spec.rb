@@ -26,9 +26,68 @@ describe "/profile/_ways_to_contact" do
     assigns[:email_channels] = []
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
+    assigns[:user] = @user
     
     render :partial => "profile/ways_to_contact"
     response.should_not be_nil
+  end
+
+  it "should not show a student the confirm link" do
+    course_with_student
+    view_context
+    @user.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
+    @user.communication_channels.first.state.should == :unconfirmed
+    assigns[:email_channels] = @user.communication_channels.to_a
+    assigns[:other_channels] = []
+    assigns[:sms_channels] = []
+    assigns[:user] = @user
+
+    render :partial => "profile/ways_to_contact"
+    response.body.should_not match /confirm_channel_link/
+  end
+
+  it "should show an admin the confirm link" do
+    account_admin_user
+    view_context
+    @user.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
+    @user.communication_channels.first.state.should == :unconfirmed
+    assigns[:email_channels] = @user.communication_channels.to_a
+    assigns[:other_channels] = []
+    assigns[:sms_channels] = []
+    assigns[:user] = @user
+
+    render :partial => "profile/ways_to_contact"
+    response.body.should match /confirm_channel_link/
+  end
+
+  it "should not show confirm link for confirmed channels" do
+    account_admin_user
+    view_context
+    @user.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
+    @user.communication_channels.first.confirm
+    @user.communication_channels.first.state.should == :active
+    assigns[:email_channels] = @user.communication_channels.to_a
+    assigns[:other_channels] = []
+    assigns[:sms_channels] = []
+    assigns[:user] = @user
+
+    render :partial => "profile/ways_to_contact"
+    response.body.should_not match /confirm_channel_link/
+  end
+
+  it "should show an admin masquerading as a user the confirm link" do
+    course_with_student
+    account_admin_user
+    view_context(@course, @student, @admin)
+    @student.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
+    @student.communication_channels.first.state.should == :unconfirmed
+    assigns[:email_channels] = @student.communication_channels.to_a
+    assigns[:other_channels] = []
+    assigns[:sms_channels] = []
+    assigns[:user] = @student
+
+    render :partial => "profile/ways_to_contact"
+    response.body.should match /confirm_channel_link/
   end
 end
 

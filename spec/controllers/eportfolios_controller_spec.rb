@@ -55,7 +55,8 @@ describe EportfoliosController do
       a = Account.default
       a.settings[:enable_eportfolios] = false
       a.save
-      eportfolio_with_user_logged_in(:active_all => true, :account => a)
+      course_with_student_logged_in(:active_all => true)
+      @user.eportfolios.create!
       get 'user_index'
       response.should be_redirect
     end
@@ -88,7 +89,8 @@ describe EportfoliosController do
       a = Account.default
       a.settings[:enable_eportfolios] = false
       a.save
-      eportfolio_with_user_logged_in(:active_all => true, :account => a)
+      course_with_student_logged_in(:active_all => true)
+      @portfolio = @user.eportfolios.create!
       get 'show', :id => @portfolio.id
       assert_unauthorized
     end

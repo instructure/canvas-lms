@@ -17,6 +17,18 @@
  */
 
 I18n.scoped('instructure', function(I18n) {
+
+  // sends timing info of XHRs to google analytics so we can track ajax speed.
+  $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+    var urlWithoutPageViewParam = options.url;
+    var start = new Date().getTime();
+    jqXHR.done(function(data, textStatus, jqXHR){
+      var duration = new Date().getTime() - start,
+          label = '{"requestingPage": "' + window.location + '," "status": "' + textStatus + '", "X-Request-Context-Id" : "' + jqXHR.getResponseHeader('X-Request-Context-Id') + '", "X-Runtime": ' + jqXHR.getResponseHeader('X-Runtime') + '}';
+      $.trackEvent('XHRs', urlWithoutPageViewParam, label, duration );
+    });
+  });
+
 jQuery(function($) {
   
   // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)

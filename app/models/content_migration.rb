@@ -184,9 +184,9 @@ class ContentMigration < ActiveRecord::Base
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])
     if plugin
       begin
-        if Canvas::MigrationWorker.const_defined?(plugin.settings['worker'])
+        if Canvas::Migration::Worker.const_defined?(plugin.settings['worker'])
           self.workflow_state = :exporting
-          Canvas::MigrationWorker.const_get(plugin.settings['worker']).enqueue(self)
+          Canvas::Migration::Worker.const_get(plugin.settings['worker']).enqueue(self)
           self.save
         else
           raise NameError
@@ -269,7 +269,11 @@ class ContentMigration < ActiveRecord::Base
   named_scope :running, :conditions=>"workflow_state IN ('exporting', 'importing')"
   named_scope :waiting, :conditions=>"workflow_state IN ('exported')"
   named_scope :failed, :conditions=>"workflow_state IN ('failed', 'pre_process_error')"
-  
+
+  def complete?
+    %w[imported failed pre_process_error].include?(workflow_state)
+  end
+
   def download_exported_data
     raise "No exported data to import" unless self.exported_attachment
     config = Setting.from_config('external_migration')

@@ -122,7 +122,6 @@ Spec::Runner.configure do |config|
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
-    @user.associated_accounts << opts[:account] if opts[:account]
     @user
   end
 
@@ -131,7 +130,7 @@ Spec::Runner.configure do |config|
     user = opts[:user] || @user
     username = opts[:username] || "nobody@example.com"
     password = opts[:password] || "asdfasdf"
-    @pseudonym = user.pseudonyms.create!(:unique_id => username, :path => username, :password => password, :password_confirmation => password)
+    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :path => username, :password => password, :password_confirmation => password)
     @cc = @pseudonym.communication_channel
     @cc.should_not be_nil
     @cc.should_not be_new_record
@@ -313,9 +312,9 @@ Spec::Runner.configure do |config|
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
     tmp.close!
-    File.open(path, "w+") { |f| f.puts lines.join "\n" }
+    File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
     
-    importer = SIS::SisCsv.process(@account, :files => [ path ], :allow_printing=>false)
+    importer = SIS::CSV::Import.process(@account, :files => [ path ], :allow_printing=>false)
     
     File.unlink path
     

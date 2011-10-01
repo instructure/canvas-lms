@@ -36,8 +36,6 @@ class AssignmentGroupsController < ApplicationController
   #   groups for this context.
   #
   # @example_response
-  #   ?include[]=assignments
-  #
   #   [
   #     {
   #       "position": 7,

@@ -797,7 +797,8 @@ I18n.scoped('gradebook', function(I18n) {
       try {
         var submissionToViewVal = $submission_to_view.filter(":visible").val(),
             currentSelectedIndex = Number(submissionToViewVal) || 
-                                  ( this.currentStudent.submission &&
+                                  ( this.currentStudent &&
+                                    this.currentStudent.submission &&
                                     this.currentStudent.submission.currentSelectedIndex ) 
                                   || 0,
             submission  = this.currentStudent.submission.submission_history[currentSelectedIndex].submission,
@@ -896,7 +897,7 @@ I18n.scoped('gradebook', function(I18n) {
       var dueAt = jsonData.due_at && $.parseFromISO(jsonData.due_at);
 
       //if there are multiple submissions
-      if (this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
+      if (this.currentStudent && this.currentStudent.submission && this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
         var innerHTML = "",
             submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
 

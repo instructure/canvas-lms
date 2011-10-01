@@ -1,0 +1,18 @@
+<div class="migration_config"></div>
+
+<% js_block do %>
+  <script>
+    $(function() {
+
+      $("#plugin_qti_exporter").bind("pluginShown", function(event, enableFileUpload) {
+        enableFileUpload(".imscc");
+        $(".migration_part_selection").hide();
+      });
+      
+      $("#plugin_qti_exporter").bind("pluginHidden", function(event) {
+        $(".migration_part_selection").show();
+      });
+
+    });
+  </script>
+<% end %>

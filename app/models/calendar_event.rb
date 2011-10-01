@@ -269,8 +269,8 @@ class CalendarEvent < ActiveRecord::Base
     
     hash[:start_at] ||= hash[:start_date]
     hash[:end_at] ||= hash[:end_date]
-    item.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) unless hash[:start_at].nil?
-    item.end_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
+    item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) unless hash[:start_at].nil?
+    item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
     
     item.save_without_broadcasting!
     context.imported_migration_items << item if context.imported_migration_items

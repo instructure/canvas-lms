@@ -30,15 +30,25 @@ class AccountUser < ActiveRecord::Base
 
   def set_update_account_associations_if_changed
     @should_update_account_associations = (self.account_id_changed? || self.user_id_changed?) && !self.user_id.nil?
+    @should_update_account_associations_immediately = self.new_record?
     true
   end
 
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations
+    if @should_update_account_associations
+      if @should_update_account_associations_immediately
+        account_chain = self.account.account_chain
+        associations = {}
+        account_chain.each_with_index { |account, idx| associations[account.id] = idx }
+        self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
+      else
+        self.update_account_associations
+      end
+    end
   end
 
   def update_account_associations
-    self.user.update_account_associations if self.user
+    self.user.update_account_associations_later if self.user
   end
 
   def infer_defaults

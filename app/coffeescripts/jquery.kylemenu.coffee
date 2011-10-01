@@ -2,7 +2,8 @@
   $.fn.kyleMenu = (options) ->
     this.each ->
       opts = $.extend(true, {}, $.fn.kyleMenu.defaults, options)
-      $menu = $(this).button(opts.buttonOpts).next()
+      $(this).button(opts.buttonOpts) unless opts.noButton
+      $menu = $(this).next()
                 .menu(opts.menuOpts)
                 .popup(opts.popupOpts)
                 .addClass("ui-kyle-menu use-css-transitions-for-show-hide")

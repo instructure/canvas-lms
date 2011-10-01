@@ -1,6 +1,6 @@
 module Qti
 class AssessmentTestConverter
-  include Canvas::XMLHelper
+  include Canvas::Migration::XMLHelper
   DEFAULT_POINTS_POSSIBLE = 1
 
   attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :quiz

@@ -25,10 +25,7 @@ module ContentImportsHelper
   end
 
   def qti_enabled?
-    if plugin = Canvas::Plugin.find(:qti_exporter)
-      return plugin.settings[:enabled].to_s == 'true'
-    end
-    false
+    Qti.qti_enabled?
   end
 
   def exports_enabled?

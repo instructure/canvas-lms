@@ -76,11 +76,17 @@ class Pseudonym < ActiveRecord::Base
   
   def set_update_account_associations_if_account_changed
     @should_update_user_account_associations = self.account_id_changed?
+    @should_update_account_associations_immediately = self.new_record?
     true
   end
   
   def update_account_associations_if_account_changed
-    self.user.update_account_associations_later if self.user && @should_update_user_account_associations
+    return unless self.user && !User.skip_updating_account_associations?
+    if @should_update_account_associations_immediately
+      self.user.update_account_associations(:incremental => true, :precalculated_associations => {self.account_id => 0})
+    else
+      self.user.update_account_associations_later if self.user && @should_update_user_account_associations
+    end
   end
   
   def send_registration_notification!

@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sis/sis_importer'
-require 'sis/course_importer'
-require 'sis/account_importer'
-require 'sis/enrollment_importer'
-require 'sis/user_importer'
-require 'sis/term_importer'
-require 'sis/section_importer'
-require 'sis/xlist_importer'
-require 'sis/sis_csv'
+require 'sis/csv/base_importer'
+require 'sis/csv/course_importer'
+require 'sis/csv/account_importer'
+require 'sis/csv/enrollment_importer'
+require 'sis/csv/user_importer'
+require 'sis/csv/term_importer'
+require 'sis/csv/section_importer'
+require 'sis/csv/xlist_importer'
+require 'sis/csv/import'

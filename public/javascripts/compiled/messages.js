@@ -693,7 +693,7 @@
         post_data.per_page = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
-      };
+      }
       return post_data;
     };
     return TokenSelector;
@@ -998,11 +998,9 @@
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1091,11 +1089,9 @@
       $header.find('a').attr('href', href);
       user = MessageInbox.user_cache[data.author_id];
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $header.find('.title').html($.h(data.title));
@@ -1154,11 +1150,9 @@
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1564,9 +1558,7 @@
       });
       $message_list.click(function(e) {
         var $message;
-        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
-          ;
-        } else {
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {} else {
           $message = $(e.target).closest('#messages > ul > li');
           if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
@@ -1920,7 +1912,7 @@
         conversation = _ref2[_i];
         add_conversation(conversation, true);
       }
-      $('#no_messages').showIf(!$conversation_list.find('li').length);
+      $('#no_messages').showIf(!$conversation_list.find('li:not([id=conversations_loader])').length);
       $('.recipients').tokenInput({
         placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group"),
         added: function(data, $token, new_token) {

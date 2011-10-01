@@ -153,7 +153,7 @@ describe 'QtiExporter' do
   end
 
   def do_migration
-    Canvas::MigrationWorker::QtiWorker.new(@migration.id).perform
+    Canvas::Migration::Worker::QtiWorker.new(@migration.id).perform
     @migration.reload
     @migration.import_content_without_send_later
     @migration.should be_imported

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe CoursesController, :type => :integration do
-  USER_API_FIELDS = %w(id name sortable_name)
+  USER_API_FIELDS = %w(id name sortable_name short_name)
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
@@ -41,6 +41,7 @@ describe CoursesController, :type => :integration do
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
       },
       {
         'id' => @course2.id,
@@ -48,6 +49,7 @@ describe CoursesController, :type => :integration do
         'course_code' => @course2.course_code,
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
       },
     ]
   end
@@ -62,6 +64,7 @@ describe CoursesController, :type => :integration do
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
       },
     ]
   end
@@ -202,6 +205,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'needs_grading_count' => 1,
         'sis_course_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
       },
     ]
   end
@@ -219,6 +223,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'syllabus_body' => @course1.syllabus_body,
         'sis_course_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
       },
     ]
   end

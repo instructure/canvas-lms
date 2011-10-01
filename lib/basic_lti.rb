@@ -9,10 +9,18 @@ module BasicLTI
     require 'oauth'
     require 'oauth/consumer'
     uri = URI.parse(url)
+
+    if uri.port == uri.default_port
+      host = uri.host
+    else
+      host = "#{uri.host}:#{uri.port}"
+    end
+
     consumer = OAuth::Consumer.new(key, secret, {
-      :site => "#{uri.scheme}://#{uri.host}",
+      :site => "#{uri.scheme}://#{host}",
       :signature_method => "HMAC-SHA1"
     })
+
     path = uri.path
     path = '/' if path.empty?
     if !uri.query.blank?
