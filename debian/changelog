@@ -1,3 +1,11 @@
+canvas-lms (1.1-65) professional; urgency=low
+
+  * Package ref: 7a4c7bea23ffeff9df21d4b7cf3ad69e246aa1bd
+  *
+  * [+7a4c7be] https => http was an accident
+
+ -- JT Olds <jt@instructure.com>  Sat, 01 Oct 2011 08:20:24 -0600
+
 canvas-lms (1.1-64) professional; urgency=low
 
   * Package ref: df1d3813646a99c2f7566ca949097fd1ec30ce6e
