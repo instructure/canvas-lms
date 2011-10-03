@@ -247,6 +247,30 @@ describe Course, "gradebook_to_csv" do
     rows[2][-2].should == "100"
   end
   
+  it "should order assignments by due date" do
+    course_with_student(:active_all => true)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 1", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 1.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 2.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 3", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 3.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 5", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 4.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 4", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 5.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 6", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 7.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 7", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 6.days)
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+
+    csv = @course.gradebook_to_csv
+    csv.should_not be_nil
+    rows = FasterCSV.parse(csv)
+    rows.length.should equal(3)
+    assignments = []
+    rows[0].each do |column|
+      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Some Assignment/
+    end
+    assignments.should == ["Some Assignment 1", "Some Assignment 2", "Some Assignment 3", "Some Assignment 5", "Some Assignment 4", "Some Assignment 7", "Some Assignment 6"]
+  end
+
   it "should generate csv with final grade if enabled" do
     course_with_student(:active_all => true)
     @course.grading_standard_id = 0

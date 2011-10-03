@@ -1097,7 +1097,11 @@ class Course < ActiveRecord::Base
 
   def gradebook_to_csv(options = {})
     assignments = self.assignments.active.gradeable
-    assignments = [assignments.find(options[:assignment_id])] if options[:assignment_id]
+    if options[:assignment_id]
+      assignments = [assignments.find(options[:assignment_id])]
+    else
+      assignments = assignments.find(:all, :order => 'due_at, title')
+    end
     single = assignments.length == 1
     student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
     submissions = self.submissions.inject({}) { |h, sub|
