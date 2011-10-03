@@ -76,7 +76,7 @@ class UserService < ActiveRecord::Base
   }
   
   named_scope :to_be_polled, lambda {
-    { :conditions => ['refresh_at < ?', Time.now], :order => :refresh_at, :limit => 1 }
+    { :conditions => ['refresh_at < ?', Time.now.utc], :order => :refresh_at, :limit => 1 }
   }
   named_scope :for_user, lambda{|user|
     users = Array(user)
