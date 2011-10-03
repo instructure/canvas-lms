@@ -323,7 +323,7 @@ describe "assignment selenium tests" do
     end
 
     def change_turnitin_settings
-      driver.find_element(:css, '.submission_type_option').should be_displayed
+      keep_trying_until { driver.find_element(:css, '.submission_type_option').should be_displayed }
       driver.find_element(:css, '.submission_type_option > option[value="online"]').click
       driver.find_element(:id, 'assignment_online_text_entry').click
       driver.find_element(:id, 'assignment_turnitin_settings').should_not be_displayed

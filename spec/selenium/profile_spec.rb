@@ -47,7 +47,8 @@ shared_examples_for "profile selenium tests" do
     wait_for_animations
     email_select_css = '#content > table > tbody > tr:nth-child(4) > td > span > select'
     option_value = find_option_value(:css, email_select_css, second_email)
-    driver.find_element(:css, email_select_css+' > option[value="'+option_value+'"]').click
+
+    find_with_jquery("#{email_select_css} > option[value=\"#{option_value}\"]'").click
     #change notification setting for first notification
     daily_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(4) > div')
     daily_select.click
@@ -59,7 +60,8 @@ shared_examples_for "profile selenium tests" do
     driver.find_element(:css, '#content .save_preferences_button').click
     wait_for_ajax_requests
     refresh_page
-    driver.find_element(:css, email_select_css + ' > option[selected]').text.should == second_email 
+
+    find_with_jquery(email_select_css + ' > option[selected]').text.should == second_email 
   end
 
   it "should successfully upload profile pictures" do

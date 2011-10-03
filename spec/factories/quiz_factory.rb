@@ -31,3 +31,23 @@ def valid_quiz_attributes
     :description => "Test Quiz Description"
   }
 end
+
+def quiz_with_submission
+  test_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
+  @course ||= course_model(:reusable => true)
+  @student ||= user_model
+  @course.enroll_student(@student).accept
+  @quiz = @course.quizzes.create
+  @quiz.workflow_state = "available"
+  @quiz.quiz_data = test_data
+  @quiz.save!
+  @quiz
+  @qsub = @quiz.find_or_create_submission(@student)
+  @qsub.quiz_data = test_data
+  @qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
+  @qsub.workflow_state = 'complete'
+  @qsub.with_versioning(true) do
+    @qsub.save!
+  end
+  @qsub
+end

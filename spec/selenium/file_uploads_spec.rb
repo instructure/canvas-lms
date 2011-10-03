@@ -25,53 +25,6 @@ shared_examples_for "file uploads selenium tests" do
     @course.reload
   end
 
-  it "should upload a file on the discussions page" do
-    # set up basic user with enrollment
-    login_as(@teacher.email, @password)
-
-    first_time = true
-    # try with three files. the first two are identical, so our md5-based single-instance-storing on s3 should not break.
-    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|
-      filename, fullpath, data = get_file(orig_filename)
-
-      # go to our new course's discussion page
-      get "/courses/#{@course.id}/discussion_topics"
-
-      # start a new topic and prepare for new file
-      driver.execute_script <<-JS
-        $('.add_topic_link:first').click();
-        $('#editor_tabs ul li:eq(1) a').click();
-      JS
-      
-      driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
-      driver.find_element(:css, '#tree1 .folder .sign.plus').click
-      keep_trying_until { find_with_jquery('#tree1 .folder .loading').blank? }
-      files = driver.find_elements(:css, '#tree1 .folder .file')
-      if first_time
-        files.should be_empty
-      else
-        files.should_not be_empty
-      end
-      first_time = false
-
-      # upload the file
-      driver.find_element(:css, '.upload_new_file_link').click
-      driver.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-      driver.find_element(:css, '#sidebar_upload_file_form button').click
-      keep_trying_until { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
-      
-      # let's go check out if the file is in the files controller
-      get "/courses/#{@course.id}/files"
-      keep_trying_until { driver.execute_script("return $('a:contains(#{filename})')[0]") }
-      
-      # check out the file content, make sure it's good
-      get "/courses/#{@course.id}/files/#{Attachment.last.id}/download?wrap=1"
-      in_frame('file_content') do
-        driver.page_source.should match data
-      end
-    end
-  end
-
   it "should upload a file on the homework submissions page, even over quota" do
     a = @course.assignments.create!(:submission_types => "online_upload")
 
@@ -95,10 +48,11 @@ shared_examples_for "file uploads selenium tests" do
       link.text.should eql("Submission Details")
 
       link.click
-      keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
       wait_for_dom_ready
+      keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
       in_frame('preview_frame') do
         driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
+        wait_for_ajax_requests
         keep_trying_until { driver.page_source =~ /#{Regexp.quote(data)}/ }
       end
     end
@@ -134,9 +88,57 @@ describe "file uploads Windows-Firefox-Local-Tests" do
   prepend_before(:each) {
     Setting.set("file_storage_test_override", "local")
   }
-  prepend_before(:all) {
+  prepend_before(:all) {63/5963/18
     Setting.set("file_storage_test_override", "local")
   }
+
+  it "should upload a file on the discussions page" do
+    # set up basic user with enrollment
+    login_as(@teacher.email, @password)
+
+    first_time = true
+    # try with three files. the first two are identical, so our md5-based single-instance-storing on s3 should not break.
+    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|
+      filename, fullpath, data = get_file(orig_filename)
+
+      # go to our new course's discussion page
+      get "/courses/#{@course.id}/discussion_topics"
+
+      # start a new topic and prepare for new file
+      driver.execute_script <<-JS
+        $('.add_topic_link:first').click();
+        $('#editor_tabs ul li:eq(1) a').click();
+      JS
+      
+      driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
+      driver.find_element(:css, '#tree1 .folder .sign.plus').click
+      keep_trying_until { find_with_jquery('#tree1 .folder .loading').blank? }
+      files = driver.find_elements(:css, '#tree1 .folder .file')
+      if first_time
+        files.should be_empty
+      else
+        files.should_not be_empty
+      end
+      first_time = false
+
+      # upload the file
+      driver.find_element(:css, '.upload_new_file_link').click
+      driver.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
+      driver.find_element(:css, '#sidebar_upload_file_form button').click
+      wait_for_ajax_requests
+      keep_trying_until { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
+      
+      # let's go check out if the file is in the files controller
+      get "/courses/#{@course.id}/files"
+      keep_trying_until { driver.execute_script("return $('a:contains(#{filename})')[0]") }
+      
+      # check out the file content, make sure it's good
+      get "/courses/#{@course.id}/files/#{Attachment.last.id}/download?wrap=1"
+      in_frame('file_content') do
+        driver.page_source.should match data
+      end
+    end
+  end
 end
 
 describe "file uploads Windows-Firefox-S3-Tests" do

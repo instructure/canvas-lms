@@ -237,7 +237,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def wait_for_dom_ready
-    keep_trying_until{ driver.execute_script("return $") != nil }
+    keep_trying_until(120) { driver.execute_script("return $") != nil }
     driver.execute_script <<-JS
       window.seleniumDOMIsReady = false; 
       $(function(){ 

@@ -93,6 +93,7 @@ describe "learning outcome test" do
     outcome_div.find_element(:css, '.select_outcome_link').click
     driver.find_element(:id, 'find_outcome_criterion_dialog').should_not be_displayed
     driver.find_element(:css, '#criterion_4 .learning_outcome_flag').should be_displayed
+    sleep 1 #wait for points to recalculate
 
     #save and check rubric
     driver.find_element(:id, 'edit_rubric_form').submit
@@ -102,7 +103,7 @@ describe "learning outcome test" do
     driver.find_element(:css, '#left-side .outcomes').click
     driver.find_element(:link, "Outcomes").click
     driver.find_element(:css, '#right-side a:last-child').click
-    driver.find_element(:css, '#rubrics .details').should include_text('14')
+    driver.find_element(:css, '#rubrics .details').should include_text('15')
   end
 
 end

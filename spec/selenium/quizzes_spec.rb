@@ -841,6 +841,17 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:id, 'quiz_title').text.should == q.title
   end
 
+  it "should display quiz statistics" do
+    course_with_teacher_logged_in
+    quiz_with_submission
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+    driver.find_element(:link, I18n.t("links.quiz_statistics", "Quiz Statistics")).click
+
+    driver.find_element(:css, '#content .question_name').should include_text("Question 1")
+
+
+  end
 end
 
 describe "quiz Windows-Firefox-Tests" do

@@ -19,24 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe QuizSubmissionsController do
-  def quiz_with_submission
-    course_with_teacher(:active_all => true)
-    @student = user_model
-    @course.enroll_student(@student).accept
-    @quiz = @course.quizzes.create
-    @quiz.workflow_state = "available"
-    @quiz.quiz_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
-    @quiz.save!
-    @quiz
-    @qsub = @quiz.find_or_create_submission(@student)
-    @qsub.quiz_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
-    @qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
-    @qsub.workflow_state = 'complete'
-    @qsub.with_versioning(true) do
-      @qsub.save!
-    end
-  end
-  
+
   describe "POST 'create'" do
     it "should allow previewing" do
       course_with_teacher_logged_in(:active_all => true)
@@ -52,12 +35,14 @@ describe QuizSubmissionsController do
   
   describe "PUT 'update'" do
     it "should require authentication" do
+    course_with_teacher(:active_all => true)
       quiz_with_submission
       put 'update', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id
       assert_unauthorized
     end
     
     it "should allow updating scores if the teacher is logged in" do
+      course_with_teacher(:active_all => true)
       quiz_with_submission
       user_session(@teacher)
       put 'update', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2"
@@ -67,6 +52,7 @@ describe QuizSubmissionsController do
     end
     
     it "should not allow updating if the course is concluded" do
+      course_with_teacher(:active_all => true)
       quiz_with_submission
       @enrollment.conclude
       put 'update', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id

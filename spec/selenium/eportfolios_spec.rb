@@ -36,7 +36,8 @@ describe "eportfolios" do
     driver.find_element(:css, '#section_list_manage .add_section_link').click
     driver.find_element(:css, '#section_list input').send_keys("test section name")
     driver.execute_script('$("#section_list input").blur();')
-    driver.find_element(:css, '#section_list li:last-child .name').text.should == "test section name"
+    wait_for_ajax_requests
+    find_with_jquery('#section_list li:last-child .name').text.should == "test section name"
   end
 
   it "should edit ePortfolio settings" do
