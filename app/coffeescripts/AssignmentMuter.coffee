@@ -1,0 +1,44 @@
+I18n.scoped 'AssignmentMuter', (I18n) ->
+  class @AssignmentMuter
+    constructor: (@$link, @assignment, @url) ->
+      @$link = $(@$link)
+      @updateLink()
+      @$link.click (event) =>
+        event.preventDefault()
+        if @assignment.muted then @confirmUnmute() else @showDialog()
+
+    updateLink: =>
+      @$link.text(if @assignment.muted then I18n.t('unmute_assignment', 'Unmute Assignment') else I18n.t('mute_assignment', 'Mute Assignment'))
+
+    showDialog: =>
+      @$dialog = $(Template('mute_dialog')).dialog
+        buttons: [{
+          text: I18n.t('mute_assignment', 'Mute Assignment')
+          'data-text-while-loading': I18n.t('muting_assignment', 'Muting Assignment...')
+          click: =>
+            @$dialog.disableWhileLoading $.ajaxJSON(@url, 'put', { status : true }, @afterUpdate)
+        }]
+        close: => @$dialog.remove()
+        resizable: false
+        width: 400
+
+    afterUpdate: (serverResponse) =>
+      @assignment.muted = serverResponse.assignment.muted
+      @updateLink()
+      @$dialog.dialog('close')
+      $.publish('assignment_muting_toggled', [@assignment])
+
+    confirmUnmute: =>
+      @$dialog = $('<div />')
+        .text(I18n.t('unmute_dialog', "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"))
+        .dialog
+          buttons: [{ 
+            text: I18n.t('unmute_button', 'Unmute Assignment')
+            'data-text-while-loading': I18n.t('unmuting_assignment', 'Unmuting Assignment...')
+            click: =>
+              @$dialog.disableWhileLoading $.ajaxJSON(@url, 'put', { status : false }, @afterUpdate)
+          }]
+          close: => @$dialog.remove()
+          resizable: false
+          title: I18n.t("unmute_assignment", "Unmute Assignment")
+          width: 400

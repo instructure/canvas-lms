@@ -47,6 +47,7 @@
           }
           return _results;
         }, this)).popup('open');
+        new AssignmentMuter(this.$menu.find("[data-action=toggleMuting]"), this.assignment, "" + this.gradebook.options.context_url + "/assignments/" + this.assignment.id + "/mute");
       }
       GradebookHeaderMenu.prototype.showAssignmentDetails = function() {
         return new AssignmentDetailsDialog(this.assignment, this.gradebook);

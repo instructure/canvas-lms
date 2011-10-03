@@ -43,6 +43,7 @@
         this.show_attendance = $.store.userGet("show_attendance_" + this.options.context_code) === 'true';
         this.include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_" + this.options.context_code) === 'true';
         $.subscribe('assignment_group_weights_changed', this.buildRows);
+        $.subscribe('assignment_muting_toggled', this.buildRows);
         $.subscribe('submissions_updated', this.updateSubmissionsFromExternal);
         promise = $.when($.ajaxJSON(this.options.assignment_groups_url, "GET", {}, this.gotAssignmentGroups), $.ajaxJSON(this.options.sections_and_students_url, "GET", this.sectionToShow && {
           sections: [this.sectionToShow]
@@ -342,9 +343,9 @@
             var $link;
             $link = $(event.target);
             if (!$link.data('gradebookHeaderMenu')) {
-              new GradebookHeaderMenu(this.assignments[$link.data('assignmentId')], $link, this);
-              return false;
+              $link.data('gradebookHeaderMenu', new GradebookHeaderMenu(this.assignments[$link.data('assignmentId')], $link, this));
             }
+            return false;
           }, this));
         }, this))();
         originalStopFn = $headers.sortable('option', 'stop');

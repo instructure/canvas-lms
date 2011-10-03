@@ -27,6 +27,7 @@ I18n.scoped 'gradebook2', (I18n) ->
           }
         )
         .popup('open')
+      new AssignmentMuter(@$menu.find("[data-action=toggleMuting]"), @assignment, "#{@gradebook.options.context_url}/assignments/#{@assignment.id}/mute")
 
     showAssignmentDetails: =>
       new AssignmentDetailsDialog(@assignment, @gradebook)
