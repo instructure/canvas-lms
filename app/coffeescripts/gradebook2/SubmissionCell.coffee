@@ -72,6 +72,7 @@ class @SubmissionCell
     classes.push('late') if assignment.due_at && submission.submitted_at && (submission.submitted_at.timestamp > assignment.due_at.timestamp)
     classes.push('dropped') if submission.drop
     classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
+    classes.push('muted') if assignment.muted
     classes
 
 class SubmissionCell.out_of extends SubmissionCell

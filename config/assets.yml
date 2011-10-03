@@ -86,6 +86,9 @@ javascripts:
     - public/javascripts/compiled/license_help.js
     - public/javascripts/wiki_sidebar.js
     - public/javascripts/translations/_core_en.js
+  assignmentMuter:
+    - public/javascripts/compiled/AssignmentMuter.js
+    - public/javascripts/jst/mute_dialog.js
   speed_grader:
     - public/javascripts/vendor/jquery.elastic.js
     - public/javascripts/vendor/ui.selectmenu.js

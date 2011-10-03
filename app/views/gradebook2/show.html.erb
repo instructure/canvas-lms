@@ -2,7 +2,7 @@
   content_for :page_title, "Gradebook - #{@context.name}"
   @body_classes << "gradebook2"
   @show_left_side = false
-  jammit_js :jquery_ui_menu, :slickgrid, :gradebook2
+  jammit_js :jquery_ui_menu, :slickgrid, :assignmentMuter, :gradebook2
   jammit_css :slickgrid, :gradebook2
   options = {
     :chunk_size => Setting.get_cached('gradebook2.submissions_chunk_size', '35').to_i,
@@ -54,8 +54,9 @@
     GRADEBOOK_TRANSLATIONS = <%= {
       :submission_tooltip_dropped => t('dropped_for_grading', 'Dropped for grading purposes'),
       :submission_tooltip_late => t('submitted_late', 'Submitted late'),
+      :submission_tooltip_muted => t('muted_students_wont_see', 'This assignment is muted, students will not see changes'),
       :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
-      :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading')
+      :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading'),
     }.to_json.html_safe %>;
     new Gradebook(<%= options.to_json.html_safe %>);
   </script>

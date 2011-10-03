@@ -105,6 +105,9 @@
       if ('' + assignment.submission_types === "not_graded") {
         classes.push('ungraded');
       }
+      if (assignment.muted) {
+        classes.push('muted');
+      }
       return classes;
     };
     return SubmissionCell;

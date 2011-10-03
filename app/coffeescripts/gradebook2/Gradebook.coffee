@@ -13,6 +13,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       @show_attendance = $.store.userGet("show_attendance_#{@options.context_code}") == 'true'
       @include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_#{@options.context_code}") == 'true'
       $.subscribe 'assignment_group_weights_changed', @buildRows
+      $.subscribe 'assignment_muting_toggled', @buildRows
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
       promise = $.when(
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
@@ -210,8 +211,8 @@ I18n.scoped 'gradebook2', (I18n) ->
         $headers.find('.gradebook-header-drop').click (event) =>
           $link = $(event.target)
           unless $link.data('gradebookHeaderMenu')
-            new GradebookHeaderMenu(@assignments[$link.data('assignmentId')], $link, this)
-            return false
+            $link.data('gradebookHeaderMenu', new GradebookHeaderMenu(@assignments[$link.data('assignmentId')], $link, this))
+          return false
       )()
       originalStopFn = $headers.sortable 'option', 'stop'
       (fixupStopCallback = ->
