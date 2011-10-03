@@ -2243,7 +2243,7 @@ describe SIS::CSV::Import do
         "#{@enrollment.id},published,message1")
 
       @course.grade_publishing_status.should == 'published'
-      @course.grade_publishing_messages.should == { "message1" => 1 }
+      @course.grade_publishing_messages.should == { "Published: message1" => 1 }
 
       @enrollment.reload
       @enrollment.grade_publishing_status.should == 'published'

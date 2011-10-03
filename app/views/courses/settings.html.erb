@@ -645,11 +645,9 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
-      <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %>
-      <a href="<%= context_url(@context, :context_publish_to_sis_url) %>" id="sis_publish_link" style="display: none;">&nbsp;</a>
-      <% end %>
-      <a href="#" id="publish_grades_link" class="button disabled"><%= t('links.publishing_to_sis', %{Publishing grades to SIS...}) %></a>
-      <span id="publish_grades_error" style="display: none;">&nbsp;<%= t('errors.sis_publish', %{An error occurred on the last attempt to publish grades to SIS.}) %></span>
+      <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
+      <a href="#" id="publish_grades_link" class="button disabled">...</a>
+      <ul id="publish_grades_messages"></ul>
     </div>
   <% end %>
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
@@ -686,7 +684,6 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
   </div>
 <% end %>
 <script>
-  var sisPublishStatus = "<%= @context.grade_publishing_status %>";
   var sisPublishEnabled = "<%= publishing_enabled %>";
 </script>
 <div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
