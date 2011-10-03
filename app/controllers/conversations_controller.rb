@@ -529,7 +529,7 @@ class ConversationsController < ApplicationController
 
     recipients = []
     if (params[:context] || params[:search]) && ['user', 'context', nil].include?(params[:type])
-      options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset}
+      options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :only_active => true}
 
       contexts = params[:type] != 'user' ? matching_contexts(options.merge(:exclude_ids => exclude.grep(/\A(course|group)_\d+\z/))) : []
       participants = params[:type] != 'context' ? matching_participants(options.merge(:exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))) : []

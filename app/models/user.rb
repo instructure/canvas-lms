@@ -1738,6 +1738,7 @@ class User < ActiveRecord::Base
     user_conditions = []
     user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
+    user_condition_sql << " AND users.workflow_state = 'registered'" if options[:only_active].present? && options[:only_active] == true
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
       parts.each do |part|
         user_conditions << "(#{wildcard('users.name', 'users.short_name', part)})"
