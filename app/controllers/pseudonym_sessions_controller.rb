@@ -82,7 +82,7 @@ class PseudonymSessionsController < ApplicationController
 
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
-      initiate_saml_login
+      initiate_saml_login(request.env['canvas.account_domain'])
     else
       render :action => "new"
     end
@@ -166,7 +166,7 @@ class PseudonymSessionsController < ApplicationController
     if @domain_root_account.saml_authentication? and session[:name_id]
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
-      settings = @domain_root_account.account_authorization_config.saml_settings
+      settings = @domain_root_account.account_authorization_config.saml_settings(request.env['canvas.account_domain'])
       request = Onelogin::Saml::LogOutRequest.create(settings, session)
       reset_session
       session[:delegated_message] = message if message
@@ -204,7 +204,7 @@ class PseudonymSessionsController < ApplicationController
   
   def saml_consume
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
-      settings = @domain_root_account.account_authorization_config.saml_settings
+      settings = @domain_root_account.account_authorization_config.saml_settings(request.env['canvas.account_domain'])
       response = saml_response(params[:SAMLResponse], settings)
 
       logger.info "Attempting SAML login for #{response.name_id} in account #{@domain_root_account.id}"
