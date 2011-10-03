@@ -43,11 +43,12 @@ class Pseudonym < ActiveRecord::Base
   attr_accessor :path, :path_type
   
   acts_as_authentic do |config|
-    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]+\z/}
+    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]*\z/}
     config.login_field :unique_id
     config.validations_scope = :account_id
     config.perishable_token_valid_for = 30.minutes
     config.validates_length_of_password_field_options = { :minimum => 6, :if => :require_password? }
+    config.validates_length_of_login_field_options = {:within => 1..100}
   end
 
   def require_password?

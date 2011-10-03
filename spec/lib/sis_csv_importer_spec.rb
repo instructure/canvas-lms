@@ -782,18 +782,18 @@ describe SIS::CSV::Import do
 
     end
 
-    it "should catch active-record-level errors, like too short unique_id" do
+    it "should catch active-record-level errors, like invalid unique_id" do
       before_user_count = User.count
       before_pseudo_count = Pseudonym.count
       importer = process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",
-        "U1,u1,User,Uno,user@example.com,active"
+        "U1,@,User,Uno,user@example.com,active"
       )
       user = User.find_by_email('user@example.com')
       user.should be_nil
 
       importer.errors.map(&:last).should == []
-      importer.warnings.map(&:last).should == ["Failed saving user. Internal error: unique_id is too short (minimum is 3 characters)"]
+      importer.warnings.map(&:last).should == ["Failed saving user. Internal error: unique_id is invalid"]
       [User.count, Pseudonym.count].should == [before_user_count, before_pseudo_count]
     end
 

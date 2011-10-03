@@ -24,6 +24,13 @@ describe Pseudonym do
     user_model
     factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes)
   end
+
+  it "should allow single character usernames" do
+    user_model
+    pseudonym_model
+    @pseudonym.unique_id = 'c'
+    @pseudonym.save!
+  end
   
   it "should associate to another user" do
     user_model
