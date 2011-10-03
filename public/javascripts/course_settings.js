@@ -17,40 +17,83 @@
  */
 
 I18n.scoped('course_settings', function(I18n) {
-  function checkup() {
-    $.ajaxJSON($("#sis_publish_link").attr('href'), 'GET', {}, function(data) {
-      if (!data.hasOwnProperty("sis_publish_status")) {
+
+  var GradePublishing = {
+    status: null,
+    checkup: function() {
+      $.ajaxJSON($("#publish_to_sis_form").attr('action'), 'GET', {}, function(data) {
+        if (!data.hasOwnProperty("sis_publish_status")) {
+          return;
+        }
+        GradePublishing.status = data.sis_publish_status;
+        GradePublishing.update(data.hasOwnProperty("sis_publish_messages") ? data.sis_publish_messages : {});
+      });
+    },
+    update: function(messages, requestInProgress) {
+      var $publish_grades_link = $("#publish_grades_link"),
+          $publish_grades_error = $("#publish_grades_error");
+      if (GradePublishing.status == 'published') {
+        $publish_grades_error.hide();
+        $publish_grades_link.html(I18n.t('links.republish', "Republish grades to SIS"));
+        $publish_grades_link.removeClass("disabled");
+      } else if (GradePublishing.status == 'publishing' || GradePublishing.status == 'pending') {
+        $publish_grades_error.hide();
+        $publish_grades_link.html(I18n.t('links.publishing', "Publishing grades to SIS..."));
+        if (!requestInProgress) {
+          setTimeout(GradePublishing.checkup, 5000);
+        }
+        $publish_grades_link.addClass("disabled");
+      } else if (GradePublishing.status == 'unpublished') {
+        $publish_grades_error.hide();
+        $publish_grades_link.html(I18n.t('links.publish', "Publish grades to SIS"));
+        $publish_grades_link.removeClass("disabled");
+      } else {
+        $publish_grades_error.show();
+        $publish_grades_link.html(I18n.t('links.republish', "Republish grades to SIS"));
+        $publish_grades_link.removeClass("disabled");
+      }
+      $messages = $("#publish_grades_messages");
+      $messages.empty();
+      $.each(messages, function(message, count) {
+        var $message = $("<span/>");
+        $message.text(message);
+        var $item = $("<li/>");
+        $item.append($message);
+        $item.append(" - <b>" + count + "</b>");
+        $messages.append($item);
+      });
+    },
+    publish: function() {
+      if (GradePublishing.status == 'publishing' || GradePublishing.status == 'pending' || GradePublishing.status == null) {
         return;
       }
-      sisPublishStatus = data["sis_publish_status"];
-      updatePublishingStatus();
-    });
-  }
-
-  function updatePublishingStatus(requestInProgress) {
-    var $publish_grades_link = $("#publish_grades_link"),
-        $publish_grades_error = $("#publish_grades_error");
-    if (sisPublishStatus == 'published') {
-      $publish_grades_error.hide();
-      $publish_grades_link.html(I18n.t('links.republish', "Republish grades to SIS"));
-      $publish_grades_link.removeClass("disabled");
-    } else if (sisPublishStatus == 'publishing' || sisPublishStatus == 'pending') {
-      $publish_grades_error.hide();
-      $publish_grades_link.html(I18n.t('links.publishing', "Publishing grades to SIS..."));
-      if (!requestInProgress) {
-        setTimeout(checkup, 5000);
+      if (GradePublishing.status == 'published') {
+        if (!confirm(I18n.t('confirm.re_publish_grades', "Are you sure you want to republish these grades to the student information system?")))
+          return;
+      } else {
+        if (!confirm(I18n.t('confirm.publish_grades', "Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized.")))
+          return;
       }
-      $publish_grades_link.addClass("disabled");
-    } else if (sisPublishStatus == 'unpublished') {
-      $publish_grades_error.hide();
-      $publish_grades_link.html(I18n.t('links.publish', "Publish grades to SIS"));
-      $publish_grades_link.removeClass("disabled");
-    } else {
-      $publish_grades_error.show();
-      $publish_grades_link.html(I18n.t('links.republish', "Republish grades to SIS"));
-      $publish_grades_link.removeClass("disabled");
+      var $publish_to_sis_form = $("#publish_to_sis_form");
+      GradePublishing.status = "publishing";
+      GradePublishing.update({}, true);
+      var successful_statuses = { "published": 1, "publishing": 1, "pending": 1 };
+      var error = function(data, xhr, status, error) {
+        GradePublishing.status = "unknown";
+        $.flashError(I18n.t('errors.publish_grades', "Something went wrong when trying to publish grades to the student information system. Please try again later."));
+        GradePublishing.update({});
+      };
+      $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
+        if (!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
+          error(null, null, I18n.t('errors.invalid_sis_status', "Invalid SIS publish status"), null);
+          return;
+        }
+        GradePublishing.status = data.sis_publish_status;
+        GradePublishing.update(data.hasOwnProperty("sis_publish_messages") ? data.sis_publish_messages : {});
+      }, error);
     }
   }
+
 
   $(document).ready(function() {
     var $add_section_form = $("#add_section_form"),
@@ -452,39 +495,14 @@ I18n.scoped('course_settings', function(I18n) {
       $(".open_enrollment_holder").showIf($(this).attr('checked'));
     }).change();
 
-    var $publish_to_sis_form = $("#publish_to_sis_form");
     $("#publish_grades_link").click(function(event) {
       event.preventDefault();
-      if (sisPublishStatus == 'publishing' || sisPublishStatus == 'pending') {
-        return;
-      }
-      if (sisPublishStatus == 'published') {
-        if (!confirm(I18n.t('confirm.re_publish_grades', "Are you sure you want to republish these grades to the student information system?")))
-          return;
-      } else {
-        if (!confirm(I18n.t('confirm.publish_grades', "Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized.")))
-          return;
-      }
-      sisPublishStatus = "publishing";
-      updatePublishingStatus(true);
-      var successful_statuses = { "published": 1, "publishing": 1, "pending": 1 };
-      var error = function(data, xhr, status, error) {
-        sisPublishStatus = "unknown";
-        $.flashError(I18n.t('errors.publish_grades', "Something went wrong when trying to publish grades to the student information system. Please try again later."));
-        updatePublishingStatus();
-      };
-      $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
-        if (!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
-          error(null, null, I18n.t('errors.invalid_sis_status', "Invalid SIS publish status"), null);
-          return;
-        }
-        sisPublishStatus = data["sis_publish_status"];
-        updatePublishingStatus();
-      }, error);
+      GradePublishing.publish();
     });
     if (typeof(sisPublishEnabled) != 'undefined' && sisPublishEnabled) {
-      updatePublishingStatus();
+      GradePublishing.checkup();
     }
+
     $(".reset_course_content_button").click(function(event) {
       event.preventDefault();
       $("#reset_course_content_dialog").dialog('close').dialog({

@@ -152,28 +152,6 @@ I18n.scoped('gradebook', function(I18n) {
           return "th_assignment_"+assignment_id+" th_student_"+student_id;
         }
       });
-    },
-    publishGradesToSis: function() {
-      if(sisPublishStatus == 'published') {
-        if(!confirm(I18n.t('confirms.republish_to_sis', "Are you sure you want to republish these grades to the student information system?")))
-          return;
-      } else {
-        if(!confirm(I18n.t('confirms.publish_to_sis', "Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized.")))
-          return;
-      }
-      sisPublishStatus = "publishing";
-      var successful_statuses = { "published": 1, "publishing": 1, "pending": 1 };
-      var error = function(data, xhr, status, error) {
-        sisPublishStatus = "unknown";
-        $.flashError(I18n.t('errors.publishing_failed', "Something went wrong when trying to publish grades to the student information system. Please try again later."));
-      };
-      $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
-        if(!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
-          error(null, null, I18n.t('errors.invalid_publishing_response', "Invalid SIS publish status"), null);
-          return;
-        }
-        sisPublishStatus = data["sis_publish_status"];
-      }, error);
     }
   };
   

@@ -973,16 +973,15 @@ class CoursesController < ApplicationController
   end
 
   def publish_to_sis
-    get_context
-    return unless authorized_action(@context, @current_user, :manage_grades)
-    @context.publish_final_grades(@current_user)
-    render :json => {:sis_publish_status => @context.grade_publishing_status}.to_json
+    sis_publish_status(true)
   end
 
-  def sis_publish_status
+  def sis_publish_status(publish_grades=false)
     get_context
     return unless authorized_action(@context, @current_user, :manage_grades)
-    render :json => {:sis_publish_status => @context.grade_publishing_status}
+    @context.publish_final_grades(@current_user) if publish_grades
+    render :json => {:sis_publish_messages => @context.grade_publishing_messages,
+                     :sis_publish_status => @context.grade_publishing_status}
   end
 
   def reset_content
@@ -991,4 +990,5 @@ class CoursesController < ApplicationController
     @new_course = @context.reset_content
     redirect_to course_settings_path(@new_course.id)
   end
+
 end

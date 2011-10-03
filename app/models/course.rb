@@ -986,19 +986,68 @@ class Course < ActiveRecord::Base
   end
 
   def grade_publishing_messages
-    student_enrollments.count(:all, :group => :grade_publishing_message, :conditions => "grade_publishing_message IS NOT NULL AND grade_publishing_message != ''")
+    messages = {}
+    student_enrollments.count(:all, :group => [:grade_publishing_message, :grade_publishing_status]).each do |key, count|
+      status = key.last
+      status = "unpublished" if status.blank?
+      message = key.first
+      case status
+      when 'error'
+        if message.present?
+          message = t('grade_publishing_status.error_with_message', "Error: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.error', "Error")
+        end
+      when 'unpublished'
+        if message.present?
+          message = t('grade_publishing_status.unpublished_with_message', "Unpublished: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.unpublished', "Unpublished")
+        end
+      when 'pending'
+        if message.present?
+          message = t('grade_publishing_status.pending_with_message', "Pending: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.pending', "Pending")
+        end
+      when 'publishing'
+        if message.present?
+          message = t('grade_publishing_status.publishing_with_message', "Publishing: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.publishing', "Publishing")
+        end
+      when 'published'
+        if message.present?
+          message = t('grade_publishing_status.published_with_message', "Published: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.published', "Published")
+        end
+      when 'unpublishable'
+        if message.present?
+          message = t('grade_publishing_status.unpublishable_with_message', "Unpublishable: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.unpublishable', "Unpublishable")
+        end
+      else
+        if message.present?
+          message = t('grade_publishing_status.unknown_with_message', "Unknown status, %{status}: %{message}", :message => message, :status => status)
+        else
+          message = t('grade_publishing_status.unknown', "Unknown status, %{status}", :status => status)
+        end
+      end
+      messages[message] ||= 0
+      messages[message] += count
+    end
+    messages
   end
 
   def grade_publishing_status
+    # this will return the overall course grade publishing status
     statuses = {}
-    student_enrollments.find(:all, :select => "DISTINCT grade_publishing_status, 0 AS user_id").each do |enrollment|
-        status = enrollment.grade_publishing_status
-        status ||= "unpublished"
-        statuses[status] = true
+    student_enrollments.count(:all, :group => [:grade_publishing_status]).each do |key, count|
+      statuses[key || "unpublished"] = true
     end
     return "unpublished" unless statuses.size > 0
-    # to fake a course-level grade publishing status, we look at all possible
-    # enrollments, and return statuses if we find any, in this order.
     ["error", "unpublished", "pending", "publishing", "published", "unpublishable"].each do |status|
       return status if statuses.has_key?(status)
     end
