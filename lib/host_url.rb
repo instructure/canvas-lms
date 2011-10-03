@@ -24,7 +24,7 @@ class HostUrl
     @@file_host = nil
     @@domain_config = nil
 
-    def context_host(context=nil)
+    def context_host(context=nil, preferred_account_domain=nil)
       default_host
     end
     
