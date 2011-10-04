@@ -50,6 +50,8 @@ javascripts:
     - public/javascripts/vendor/jquery.ba-hashchange.js
     - public/javascripts/vendor/spin.js
     - public/javascripts/vendor/jquery.spin.js
+    - public/javascripts/compiled/Template.js
+    - public/javascripts/compiled/handlebars_helpers.js
     - public/javascripts/jquery.disableWhileLoading.js
     - public/javascripts/jquery.fancyplaceholder.js
     - public/javascripts/vendor/jquery.autocomplete.js

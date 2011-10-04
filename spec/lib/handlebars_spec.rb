@@ -1,0 +1,45 @@
+# encoding: UTF-8
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'lib/handlebars/handlebars'
+
+describe Handlebars do
+
+  context "i18n" do
+
+    it "should convert translate helper blocks to inline calls" do
+      Handlebars.prepare_i18n('{{#t "test"}}this is a test of {{foo}}{{/t}}', 'test').
+        should eql('{{{t "test" "this is a test of %{foo}" scope="test"}}}')
+    end
+
+    it "should extract wrappers" do
+      Handlebars.prepare_i18n('{{#t "test"}}<b>{{person}}</b> is <b>so</b> <b><i>cool</i></b>{{/t}}', 'test').
+        should eql('{{{t "test" "*%{person}* is *so* **cool**" scope="test" w0="<b>$1</b>" w1="<b><i>$1</i></b>"}}}')
+    end
+
+    it "should not allow nested helper calls" do
+      lambda {
+        Handlebars.prepare_i18n('{{#t "test"}}{{call a helper}}{{/t}}', 'test')
+      }.should raise_error
+    end
+
+  end
+
+end
