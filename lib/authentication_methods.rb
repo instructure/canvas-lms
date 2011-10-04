@@ -67,15 +67,10 @@ module AuthenticationMethods
     end
 
     if !@access_token
-      @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
-      key = @pseudonym_session.send(:session_credentials)[1] rescue nil
-      if key
-        @current_pseudonym = Pseudonym.find_cached(['_pseudonym_lookup', key].cache_key) do
-          @pseudonym_session && @pseudonym_session.record
-        end
-      elsif @policy_pseudonym_id
+      if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
       else
+        @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
         @current_pseudonym = @pseudonym_session && @pseudonym_session.record
       end
       if params[:login_success] == '1' && !@current_pseudonym
