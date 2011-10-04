@@ -49,7 +49,7 @@ module CC
       migration_id = CCHelper.create_key(group)
       node.learningOutcomeGroup(:identifier=>migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
-        group_node.description @html_exporter.html_content(group.description, @course, @manifest.exporter.user) unless group.description.blank?
+        group_node.description @html_exporter.html_content(group.description) unless group.description.blank?
         group_node.learningOutcomes do |lo_node|
           process_outcome_group_content(lo_node, group)
         end
@@ -70,7 +70,7 @@ module CC
       migration_id = CCHelper.create_key(item)
       node.learningOutcome(:identifier=>migration_id) do |out_node|
         out_node.title item.short_description unless item.short_description.blank?
-        out_node.description @html_exporter.html_content(item.description, @course, @manifest.exporter.user) unless item.description.blank?
+        out_node.description @html_exporter.html_content(item.description) unless item.description.blank?
         criterion = item.data[:rubric_criterion]
         if criterion
           out_node.points_possible criterion[:points_possible] if criterion[:points_possible]

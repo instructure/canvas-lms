@@ -1389,68 +1389,47 @@ class Course < ActiveRecord::Base
   end
   
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
-    return html unless from_context
+    return html unless html.present? && to_context
+
+    from_name = from_context.class.name.tableize
+    to_name = to_context.class.name.tableize
+
     @merge_mappings ||= {}
+    rewriter = UserContent::HtmlRewriter.new(from_context, user_to_check_for_permission)
     limit_migrations_to_listed_types = !!supported_types
-    from_name = "courses"
-    from_name = "users" if from_context.is_a?(User)
-    from_name = "groups" if from_context.is_a?(Group)
-    to_name = "courses"
-    to_name = "users" if to_context.is_a?(User)
-    to_name = "groups" if to_context.is_a?(Group)
-    regex = Regexp.new("/#{from_name}/#{from_context.id}/([^\\s]*)")
-    html ||= ""
-    html = html.gsub(regex) do |relative_url|
-      sub_spot = $1
-      matched = false
-      is_sub_item = false
-      {'assignments' => Assignment,
-        'calendar_events' => CalendarEvent,
-        'discussion_topics' => DiscussionTopic,
-        'collaborations' => Collaboration,
-        'files' => Attachment,
-        'conferences' => WebConference,
-        'quizzes' => Quiz,
-        'groups' => Group,
-        'modules' => ContextModule
-      }.each do |type, obj_class|
-        sub_regex = Regexp.new("#{type}/(\\d+)[^\\s]*$")
-        is_sub_item ||= sub_spot.match(sub_regex)
-        next if matched || (supported_types && !supported_types.include?(type))
-        if item = sub_spot.match(sub_regex)
-          matched = sub_spot.match(sub_regex)
-          new_id = @merge_mappings["#{obj_class.to_s.underscore}_#{item[1]}"]
-          allow_migrate_content = true
-          if user_to_check_for_permission
-            allow_migrate_content = from_context.grants_right?(user_to_check_for_permission, nil, :manage_content)
-            if !allow_migrate_content
-              obj = obj_class.find(item[1]) rescue nil
-              allow_migrate_content = true if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user_to_check_for_permission, nil, :read)
-              allow_migrate_content = false if obj && obj.respond_to?(:locked_for?) && obj.locked_for?(user_to_check_for_permission)
-            end
-          end
-          if !new_id && allow_migrate_content && to_context != from_context
-            new_obj = self.find_or_create_for_new_context(obj_class, to_context, from_context, item[1])
-            new_id ||= new_obj.id if new_obj
-          end
-          if !limit_migrations_to_listed_types || new_id
-            relative_url = relative_url.gsub("#{type}/#{item[1]}", new_id ? "#{type}/#{new_id}" : "#{type}")
-          end
-        end
+    rewriter.allowed_types = %w(assignments calendar_events discussion_topics collaborations files conferences quizzes groups modules)
+
+    rewriter.set_default_handler do |match|
+      new_url = match.url
+      break(new_url) if supported_types && !supported_types.include?(match.type)
+      new_id = @merge_mappings["#{match.obj_class.name.underscore}_#{match.obj_id}"]
+      break(new_url) unless rewriter.user_can_view_content? { match.obj_class.find_by_id(match.obj_id) }
+      if !new_id && to_context != from_context
+        new_obj = self.find_or_create_for_new_context(match.obj_class, to_context, from_context, match.obj_id)
+        new_id = new_obj.id if new_obj
       end
-      if is_sub_item && !matched
-        relative_url
-      else
-        relative_url = relative_url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
+      if !limit_migrations_to_listed_types || new_id
+        new_url = new_url.gsub("#{match.type}/#{match.obj_id}", new_id ? "#{match.type}/#{new_id}" : "#{match.type}")
       end
+      new_url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
     end
+
+    rewriter.set_unknown_handler do |match|
+      match.url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
+    end
+
+    html = rewriter.translate_content(html)
+
     if !limit_migrations_to_listed_types
+      # for things like calendar urls, swap out the old context id with the new one
       regex = Regexp.new("include_contexts=[^\\s&]*#{from_context.asset_string}")
       html = html.gsub(regex) do |match|
         match.gsub("#{from_context.asset_string}", "#{to_context.asset_string}")
       end
+      # swap out the old host with the new host
       html = html.gsub(HostUrl.context_host(from_context), HostUrl.context_host(to_context))
     end
+
     html
   end
   

@@ -65,7 +65,7 @@ module CC
         path = File.join(@canvas_resource_dir, CCHelper::SYLLABUS)
         io_object = File.open(path, 'w')
       end
-      io_object << @html_exporter.html_page(@course.syllabus_body || '', "Syllabus", @course, @manifest.exporter.user)
+      io_object << @html_exporter.html_page(@course.syllabus_body || '', "Syllabus")
       io_object.close
         
       syl_rel_path

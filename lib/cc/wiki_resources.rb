@@ -30,9 +30,9 @@ module CC
           path = File.join(wiki_folder, file_name)
 
           File.open(path, 'w') do |file|
-            file << @html_exporter.html_page(page.body, page.title, @course, @manifest.exporter.user, migration_id)
+            file << @html_exporter.html_page(page.body, page.title, migration_id)
           end
-          
+
           @resources.resource(
                   :identifier => migration_id,
                   "type" => CCHelper::WEBCONTENT,
