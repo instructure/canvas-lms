@@ -78,11 +78,17 @@ class SubmissionsApiController < ApplicationController
 
       includes = Array(params[:include])
 
-      assignment_ids = @context.assignments.active.all(:select => :id).map(&:id)
+      assignment_scope = @context.assignments.active
       requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
-      assignment_ids &= requested_assignment_ids if requested_assignment_ids.present?
+      if requested_assignment_ids.present?
+        assignment_scope = assignment_scope.scoped(:conditions => { 'assignments.id' => requested_assignment_ids })
+      end
+      assignments = assignment_scope.all
+      assignments_hash = {}
+      assignments.each { |a| assignments_hash[a.id] = a }
 
-      Api.assignment_ids_for_students_api = assignment_ids
+      # sadly hackish -- see User.submissions_for_given_assignments
+      Api.assignment_ids_for_students_api = assignments.map(&:id)
       scope = @context.student_enrollments.scoped(
         :include => { :user => :submissions_for_given_assignments },
         :conditions => { 'users.id' => student_ids })
@@ -91,6 +97,9 @@ class SubmissionsApiController < ApplicationController
         student = enrollment.user
         hash = { :user_id => student.id, :submissions => [] }
         student.submissions_for_given_assignments.each do |submission|
+          # we've already got all the assignments loaded, so bypass AR loading
+          # here and just give the submission its assignment
+          submission.assignment = assignments_hash[submission.assignment_id]
           hash[:submissions] << submission_json(submission, submission.assignment, includes)
         end
         if includes.include?('total_scores') && params[:grouped].present?
@@ -265,11 +274,23 @@ class SubmissionsApiController < ApplicationController
   end
 
   SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission).freeze
+  SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
 
   def submission_attempt_json(attempt, assignment, version_idx = nil)
     json_fields = SUBMISSION_JSON_FIELDS
     if params[:response_fields]
       json_fields = json_fields & params[:response_fields]
+    end
+    if params[:exclude_response_fields]
+      json_fields -= params[:exclude_response_fields]
+    end
+
+    other_fields = SUBMISSION_OTHER_FIELDS
+    if params[:response_fields]
+      other_fields = other_fields & params[:response_fields]
+    end
+    if params[:exclude_response_fields]
+      other_fields -= params[:exclude_response_fields]
     end
 
     hash = attempt.as_json(
@@ -284,14 +305,17 @@ class SubmissionsApiController < ApplicationController
       hash['media_comment'] = media_comment_json(attempt.media_comment_id,
                                                  attempt.media_comment_type)
     end
-    attachments = attempt.versioned_attachments.dup
-    attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
-    hash['attachments'] = attachments.map do |attachment|
-      attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
-    end.compact unless attachments.blank?
+    if other_fields.include?('attachments')
+      attachments = attempt.versioned_attachments.dup
+      attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
+      hash['attachments'] = attachments.map do |attachment|
+        attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
+      end.compact unless attachments.blank?
+    end
 
     # include the discussion topic entries
-    if assignment.submission_types =~ /discussion_topic/ &&
+    if other_fields.include?('discussion_entries') &&
+           assignment.submission_types =~ /discussion_topic/ &&
            assignment.discussion_topic
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the

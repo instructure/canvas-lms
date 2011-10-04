@@ -25,7 +25,7 @@ module Api
     end
 
     sis_column, sis_id, sis_find_params = Api.sis_find_params_for_collection(collection, id)
-    if sis_find_params
+    if sis_id
       collection.first(sis_find_params) || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with #{sis_column}=#{sis_id}")
     else
       collection.find(id)
@@ -33,15 +33,22 @@ module Api
   end
 
   # map a list of ids and/or sis ids to plain ids.
+  # sis ids that can't be found in the db won't appear in the result, however
+  # AR object ids aren't verified to exist in the db so they'll still be
+  # returned in the result.
   def self.map_ids(ids, collection)
-    ids.map do |id|
-      sis_column, sis_id, sis_find_params = Api.sis_find_params_for_collection(collection, id)
-      if sis_find_params
-        collection.first(sis_find_params.merge(:select => :id)).try(:id)
-      else
-        collection.find_by_id(id)
+    result = []
+    sis_find = {}
+    ids.each do |id|
+      sis_column, sis_id, sis_find = Api.sis_find_params_for_collection(collection, id, sis_find)
+      unless sis_id
+        result << id
       end
     end
+    unless sis_find.blank?
+      result.concat collection.all(sis_find.merge(:select => :id)).map(&:id)
+    end
+    result
   end
 
   VALID_SIS_COLUMNS = {
@@ -55,10 +62,10 @@ module Api
       { 'sis_account_id' => 'sis_source_id' },
   }
 
-  def self.sis_find_params_for_collection(collection, id)
+  def self.sis_find_params_for_collection(collection, id, sis_find_params = nil)
     case id
     when Numeric
-      return
+      return nil, nil, sis_find_params
     else
       id = id.to_s
       if id =~ %r{^hex:(sis_[\w_]+):(.+)$}
@@ -68,21 +75,26 @@ module Api
         sis_column = $1
         sis_id = $2
       else
-        return
+        return nil, nil, sis_find_params
       end
 
       valid_sis_columns = VALID_SIS_COLUMNS[collection.table_name] or
         raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
 
+      sis_find_params ||= {}
+
       if column = valid_sis_columns[sis_column]
-        sis_find_params = { :conditions => { column => sis_id } }
+        sis_find_params[:conditions] ||= {}
+        sis_find_params[:conditions][column] ||= []
+        sis_find_params[:conditions][column] << sis_id
         # the "user" sis columns are actually on the pseudonym
         if collection.table_name == User.table_name
-          sis_find_params[:include] = :pseudonym
+          sis_find_params[:include] ||= []
+          sis_find_params[:include] << :pseudonym
         end
         return sis_column, sis_id, sis_find_params
       else
-        return
+        return nil, nil, sis_find_params
       end
     end
   end

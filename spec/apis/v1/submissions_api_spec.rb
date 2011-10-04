@@ -83,6 +83,23 @@ describe SubmissionsApiController, :type => :integration do
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
       }].sort_by { |h| h['user_id'] }
+
+    # don't include discussion entries if response_fields limits the response
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s },
+          { :response_fields => SubmissionsApiController::SUBMISSION_JSON_FIELDS })
+    json['discussion_entries'].should be_nil
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s },
+          { :exclude_response_fields => %w(discussion_entries) })
+    json['discussion_entries'].should be_nil
   end
 
   it "should return student discussion entries from child topics for discussion_topic group assignments" do
