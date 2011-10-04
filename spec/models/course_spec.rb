@@ -706,6 +706,33 @@ describe Course, "backup" do
     end
   end
   
+  it "should not cross learning outcomes with learning outcome groups in the association" do
+    # set up two courses with two outcomes
+    course = course_model
+    default_group = LearningOutcomeGroup.default_for(course)
+    outcome = course.created_learning_outcomes.create!
+    default_group.add_item(outcome)
+
+    other_course = course_model
+    other_default_group = LearningOutcomeGroup.default_for(other_course)
+    other_outcome = other_course.created_learning_outcomes.create!
+    other_default_group.add_item(other_outcome)
+
+    # add another group to the first course, which "coincidentally" has the
+    # same id as the second course's outcome
+    other_group = course.learning_outcome_groups.build
+    other_group.id = other_outcome.id
+    other_group.save!
+    default_group.add_item(other_group)
+
+    # reload and check
+    course.reload
+    other_course.reload
+    course.learning_outcomes.should be_include(outcome)
+    course.learning_outcomes.should_not be_include(other_outcome)
+    other_course.learning_outcomes.should be_include(other_outcome)
+  end
+
   it "should copy learning outcomes into the new course" do
     old_course = course_model
     lo = old_course.learning_outcomes.new
