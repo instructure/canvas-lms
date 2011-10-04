@@ -89,8 +89,10 @@ class SubmissionsApiController < ApplicationController
 
       # sadly hackish -- see User.submissions_for_given_assignments
       Api.assignment_ids_for_students_api = assignments.map(&:id)
+      sql_includes = { :user => [] }
+      sql_includes[:user] << :submissions_for_given_assignments unless assignments.empty?
       scope = @context.student_enrollments.scoped(
-        :include => { :user => :submissions_for_given_assignments },
+        :include => sql_includes,
         :conditions => { 'users.id' => student_ids })
 
       result = scope.map do |enrollment|
@@ -101,7 +103,7 @@ class SubmissionsApiController < ApplicationController
           # here and just give the submission its assignment
           submission.assignment = assignments_hash[submission.assignment_id]
           hash[:submissions] << submission_json(submission, submission.assignment, includes)
-        end
+        end unless assignments.empty?
         if includes.include?('total_scores') && params[:grouped].present?
           hash.merge!(
             :computed_final_score => enrollment.computed_final_score,

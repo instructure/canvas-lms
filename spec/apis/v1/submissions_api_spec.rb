@@ -386,6 +386,41 @@ describe SubmissionsApiController, :type => :integration do
     json.sort_by { |h| h['user_id'] }.should == res.sort_by { |h| h['user_id'] }
   end
 
+  it "should return nothing if no assignments in the course" do
+    student1 = user(:active_all => true)
+    student2 = user_with_pseudonym(:active_all => true)
+    student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
+    student2.pseudonym.update_attribute(:sis_source_id, 'my-login-id')
+
+    course_with_teacher(:active_all => true)
+
+    @course.enroll_student(student1).accept!
+    @course.enroll_student(student2).accept!
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, student2.to_param], :grouped => 1 })
+    json.sort_by { |h| h['user_id'] }.should == [
+      {
+        'user_id' => student1.id,
+        'submissions' => [],
+      },
+      {
+        'user_id' => student2.id,
+        'submissions' => [],
+      },
+    ]
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, student2.to_param] })
+    json.should == []
+  end
+
   it "should return all submissions for a student" do
     student1 = user(:active_all => true)
     student2 = user_with_pseudonym(:active_all => true)
