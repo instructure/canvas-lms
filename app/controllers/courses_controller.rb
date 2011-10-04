@@ -155,6 +155,7 @@ class CoursesController < ApplicationController
   #
   # @response_field id The unique identifier for the course section.
   # @response_field name The name of the section.
+  # @response_field sis_section_id The sis id of the section.
   #
   # @example_response
   #   ?include[]=students
@@ -163,11 +164,13 @@ class CoursesController < ApplicationController
   #   {
   #     "id": 1,
   #     "name": "Section A",
+  #     "sis_section_id": null,
   #     "students": [...]
   #   },
   #   {
   #     "id": 2,
   #     "name": "Section B",
+  #     "sis_section_id": "section-b",
   #     "students": [...]
   #   }
   # ]
