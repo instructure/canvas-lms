@@ -196,6 +196,8 @@ javascripts:
     - public/javascripts/compiled/gradebook2/SetDefaultGradeDialog.js
     - public/javascripts/jst/AssignmentGroupWeightsDialog.js
     - public/javascripts/compiled/gradebook2/AssignmentGroupWeightsDialog.js
+    - public/javascripts/jst/AssignmentDetailsDialog.js
+    - public/javascripts/compiled/AssignmentDetailsDialog.js
     - public/javascripts/jst/CurveGradesDialog.js
     - public/javascripts/compiled/gradebook2/CurveGradesDialog.js
     - public/javascripts/jst/gradebook2/GradebookHeaderMenu.js
@@ -375,6 +377,7 @@ stylesheets:
     - public/stylesheets/compiled/message_students.css
   gradebook2:
     - public/stylesheets/compiled/message_students.css
+    - public/stylesheets/compiled/AssignmentDetailsDialog.css
     - public/stylesheets/compiled/gradebook2.css
     - public/stylesheets/compiled/assignment_group_weights_dialog.css
   attendance:

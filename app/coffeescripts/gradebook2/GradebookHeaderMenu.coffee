@@ -29,7 +29,7 @@ I18n.scoped 'gradebook2', (I18n) ->
         .popup('open')
 
     showAssignmentDetails: =>
-      $('<div>TODO: show assignment stats, is doing what we were doing best? look at: http://www.highcharts.com/demo/scatter/grid</div>').dialog()
+      new AssignmentDetailsDialog(@assignment, @gradebook)
 
     messageStudentsWho: =>
       students = ($.extend({ id: student.id, name: student.name}, student["assignment_#{@assignment.id}"]) for i, student of @gradebook.students)

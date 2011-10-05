@@ -49,7 +49,7 @@
         }, this)).popup('open');
       }
       GradebookHeaderMenu.prototype.showAssignmentDetails = function() {
-        return $('<div>TODO: show assignment stats, is doing what we were doing best? look at: http://www.highcharts.com/demo/scatter/grid</div>').dialog();
+        return new AssignmentDetailsDialog(this.assignment, this.gradebook);
       };
       GradebookHeaderMenu.prototype.messageStudentsWho = function() {
         var i, student, students;
