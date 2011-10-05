@@ -20,7 +20,7 @@ def init
   sections :header, [:method_signature, T('docstring')]
   @controller = object.parent.path.underscore.sub("_controller", '')
   @action = object.path.sub(/^.*#/, '')
-  @route = ApiRouteSet.apis.first.api_methods_for_controller_and_action(@controller, @action).first
+  @routes = ApiRouteSet.apis.first.api_methods_for_controller_and_action(@controller, @action)
 end
 
 def header

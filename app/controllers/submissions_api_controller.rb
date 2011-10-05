@@ -21,8 +21,12 @@
 # API for accessing and updating submissions for an assignment. The submission
 # id in these URLs is the id of the student in the course, there is no separate
 # submission id exposed in these APIs.
+#
+# All submission actions can be performed with either the course id, or the
+# course section id. SIS ids can be used, prefixed by "sis_course_id:" or
+# "sis_section_id:" as described in the API documentation on SIS IDs.
 class SubmissionsApiController < ApplicationController
-  before_filter :require_context
+  before_filter :get_course_from_section, :require_context
 
   # @API
   #
@@ -33,7 +37,7 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submissions = @assignment.submissions.all(
-        :conditions => { :user_id => @context.student_ids })
+        :conditions => { :user_id => (@section || @context).student_ids })
 
       includes = Array(params[:include])
 
@@ -91,7 +95,7 @@ class SubmissionsApiController < ApplicationController
       Api.assignment_ids_for_students_api = assignments.map(&:id)
       sql_includes = { :user => [] }
       sql_includes[:user] << :submissions_for_given_assignments unless assignments.empty?
-      scope = @context.student_enrollments.scoped(
+      scope = (@section || @context).student_enrollments.scoped(
         :include => sql_includes,
         :conditions => { 'users.id' => student_ids })
 
@@ -127,8 +131,8 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    params[:id] = map_user_ids([params[:id]]).first
-    @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
+    @user = get_user_considering_section(params[:id])
+    @submission = @assignment.submissions.find_by_user_id(@user.id) or raise ActiveRecord::RecordNotFound
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
       render :json => submission_json(@submission, @assignment, includes).to_json
@@ -191,7 +195,7 @@ class SubmissionsApiController < ApplicationController
   def update
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @user = api_find(@context.students_visible_to(@current_user), params[:id])
+      @user = get_user_considering_section(params[:id])
 
       submission = {}
       if params[:submission].is_a?(Hash)
@@ -354,7 +358,21 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User).compact
+    Api.map_ids(user_ids, User).compact unless user_ids.blank?
   end
 
+  def get_course_from_section
+    if params[:section_id]
+      @section = api_find(CourseSection, params.delete(:section_id))
+      params[:course_id] = @section.course_id
+    end
+  end
+
+  def get_user_considering_section(user_id)
+    scope = @context.students_visible_to(@current_user)
+    if @section
+      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => @section.id })
+    end
+    api_find(scope, user_id)
+  end
 end

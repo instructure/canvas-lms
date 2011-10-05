@@ -60,6 +60,8 @@ module Api
       { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.sis_source_id' },
     Account.table_name =>
       { 'sis_account_id' => 'sis_source_id' },
+    CourseSection.table_name =>
+      { 'sis_section_id' => 'sis_source_id' },
   }
 
   def self.sis_find_params_for_collection(collection, id, sis_find_params = nil)

@@ -50,6 +50,86 @@ describe SubmissionsApiController, :type => :integration do
     response.status.should match /404/
   end
 
+  describe "using section ids" do
+    before do
+      @student1 = user(:active_all => true)
+      course_with_teacher(:active_all => true)
+      @default_section = @course.default_section
+      @section = factory_with_protected_attributes(@course.course_sections, :sis_source_id => 'my-section-sis-id', :name => 'section2')
+      @course.enroll_user(@student1, 'StudentEnrollment', :section => @section).accept!
+    end
+
+    it "should list submissions" do
+      quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+      quiz.did_edit!
+      quiz.offer!
+      a1 = quiz.assignment
+      sub = a1.find_or_create_submission(@student1)
+      sub.submission_type = 'online_quiz'
+      sub.workflow_state = 'submitted'
+      sub.save!
+
+      json = api_call(:get,
+            "/api/v1/sections/#{@default_section.id}/assignments/#{a1.id}/submissions.json",
+            { :controller => 'submissions_api', :action => 'index',
+              :format => 'json', :section_id => @default_section.id.to_s,
+              :assignment_id => a1.id.to_s },
+            { :include => %w(submission_history submission_comments rubric_assessment) })
+      json.size.should == 0
+
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{a1.id}/submissions.json",
+            { :controller => 'submissions_api', :action => 'index',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+              :assignment_id => a1.id.to_s },
+            { :include => %w(submission_history submission_comments rubric_assessment) })
+      json.size.should == 1
+      json.first['user_id'].should == @student1.id
+
+      json = api_call(:get,
+            "/api/v1/sections/#{@default_section.id}/students/submissions",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :section_id => @default_section.id.to_s },
+              :student_ids => [@student1.id])
+      json.size.should == 0
+
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
+              :student_ids => [@student1.id])
+      json.size.should == 1
+    end
+
+    it "should post to submissions" do
+      a1 = @course.assignments.create!({:title => 'assignment1', :grading_type => 'percent', :points_possible => 10})
+
+      raw_api_call(:put,
+                      "/api/v1/sections/#{@default_section.id}/assignments/#{a1.id}/submissions/#{@student1.id}",
+      { :controller => 'submissions_api', :action => 'update',
+        :format => 'json', :section_id => @default_section.id.to_s,
+        :assignment_id => a1.id.to_s, :id => @student1.id.to_s },
+        { :submission => { :posted_grade => '75%' } })
+      response.status.should == "404 Not Found"
+
+      json = api_call(:put,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{a1.id}/submissions/#{@student1.id}",
+      { :controller => 'submissions_api', :action => 'update',
+        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+        :assignment_id => a1.id.to_s, :id => @student1.id.to_s },
+        { :submission => { :posted_grade => '75%' } })
+
+      Submission.count.should == 1
+      @submission = Submission.first
+
+      json['score'].should == 7.5
+      json['grade'].should == '75%'
+    end
+
+    it "should return submissions for a section" do
+    end
+  end
+
   it "should return student discussion entries for discussion_topic assignments" do
     @student = user(:active_all => true)
     course_with_teacher(:active_all => true)
