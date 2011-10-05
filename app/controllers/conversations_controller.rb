@@ -661,7 +661,7 @@ class ConversationsController < ApplicationController
       media_id = params[:media_comment_id]
       media_type = params[:media_comment_type]
       if media_id.present? && media_type.present?
-        media_comment = MediaObject.by_media_id.by_media_type(media_id, media_type).first
+        media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
         if media_comment
           media_comment.context = @current_user
           media_comment.save
