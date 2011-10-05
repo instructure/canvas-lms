@@ -597,6 +597,10 @@ class CoursesController < ApplicationController
     if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
       return redirect_to course_settings_path(@context.id)
     end
+
+    start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment && @context_enrollment.state_based_on_date == :inactive
+    @unauthorized_message = t('unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context_enrollment && @context.claimed?
+    @unauthorized_message = t('unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now
     if authorized_action(@context, @current_user, :read)
       
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)

@@ -152,7 +152,7 @@ module TextHelper
     (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time
   end
 
-  def date_string(start_date, style=:normal)
+  def self.date_string(start_date, style=:normal)
     return nil unless start_date
     start_date = start_date.in_time_zone.to_date rescue start_date.to_date
     today = Time.zone.now.to_date
@@ -167,6 +167,9 @@ module TextHelper
       return I18n.l(start_date, :format => :short) if start_date.year == today.year || style == :short
     end
     return I18n.l(start_date, :format => :medium)
+  end
+  def date_string(*args)
+    TextHelper.date_string(*args)
   end
 
   def time_string(start_time, end_time=nil)
