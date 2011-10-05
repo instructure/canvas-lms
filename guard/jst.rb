@@ -7,9 +7,14 @@ module Guard
     # Compiles templates from app/views/jst to public/javascripts/jst
     def run_on_change(paths)
       paths.each do |path|
-        puts "Running #{path}"
-        Handlebars.compile_file path, 'app/views/jst', @options[:output]
+        begin
+          puts "Compiling: #{path}"
+          Handlebars.compile_file path, 'app/views/jst', @options[:output]
+        rescue Exception => e
+          ::Guard::Notifier.notify(e.to_s, :title => path.sub('app/views/jst/', ''), :image => :failed)
+        end
       end
     end
+
   end
 end
