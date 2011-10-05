@@ -86,10 +86,10 @@ describe Attachment do
       Setting.set("file_storage_test_override", "local")
     }
     
-    it "should not return the protocol by default" do
+    it "should return http as the protocol by default" do
       course_model
       attachment_with_context(@course)
-      @attachment.authenticated_s3_url.should match(/^\/\//)
+      @attachment.authenticated_s3_url.should match(/^http:\/\//)
     end
     
     it "should return the protocol if specified" do

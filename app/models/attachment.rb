@@ -483,7 +483,9 @@ class Attachment < ActiveRecord::Base
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
     @file_store_config ||= YAML.load_file(RAILS_ROOT + "/config/file_store.yml")[RAILS_ENV] rescue nil
-    @file_store_config ||= {'storage' => 'local'}
+    @file_store_config ||= { 'storage' => 'local' }
+    # default the secure setting to true only in production
+    @file_store_config['secure'] = Rails.env.production? unless @file_store_config.has_key?('secure')
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
     if RAILS_ENV == "test"
       # yes, a rescue nil; the problem is that in an automated test environment, this may be
@@ -523,7 +525,10 @@ class Attachment < ActiveRecord::Base
     )
     def authenticated_s3_url(*args)
       return root_attachment.authenticated_s3_url(*args) if root_attachment
-      "#{(args[0].is_a?(Hash) && args[0][:protocol]) || '//'}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
+      protocol = args[0].is_a?(Hash) && args[0][:protocol]
+      protocol ||= self.class.file_store_config['secure'] ? "https://" : "http://"
+      protocol ||= "//"
+      "#{protocol}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
     end
 
     alias_method :attachment_fu_filename=, :filename=
