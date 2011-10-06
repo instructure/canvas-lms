@@ -25,6 +25,7 @@ describe "Services API", :type => :integration do
     Kaltura::ClientV3.stub!(:config).and_return({
       'domain' => 'kaltura.fake.local',
       'resource_domain' => 'cdn.kaltura.fake.local',
+      'rtmp_domain' => 'rtmp-kaltura.fake.local',
       'partner_id' => '420',
     })
   end
@@ -42,6 +43,7 @@ describe "Services API", :type => :integration do
       'enabled' => true,
       'domain' => 'kaltura.fake.local',
       'resource_domain' => 'cdn.kaltura.fake.local',
+      'rtmp_domain' => 'rtmp-kaltura.fake.local',
       'partner_id' => '420',
     }
   end

@@ -458,7 +458,7 @@ I18n.scoped('media_comments', function(I18n) {
       setTimeout(function() {
         var recordVars = {
           host:location.protocol + "//" + INST.kalturaSettings.domain,
-          rtmpHost:"rtmp://" + INST.kalturaSettings.domain,
+          rtmpHost:"rtmp://" + (INST.kalturaSettings.rtmp_domain || INST.kalturaSettings.domain),
           kshowId:"-1",
           pid:INST.kalturaSettings.partner_id,
           subpid:INST.kalturaSettings.subpartner_id,

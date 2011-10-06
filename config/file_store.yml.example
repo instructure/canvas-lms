@@ -1,5 +1,6 @@
 development:
   storage: local
+  secure: false # defaults to true in production, false elsewhere
   path_prefix: tmp/files
 
 test:
