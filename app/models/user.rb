@@ -920,7 +920,7 @@ class User < ActiveRecord::Base
           url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
           data = JSON.parse(Net::HTTP.get(url)) rescue nil
           if data
-            self.avatar_image_url = data['profile_image_url'] || self.avatar_image_url
+            self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
             self.avatar_image_updated_at = Time.now
           end
         end
@@ -958,7 +958,7 @@ class User < ActiveRecord::Base
         data = JSON.parse(Net::HTTP.get(url)) rescue nil
         if data
           self.avatar_image_source = 'twitter'
-          self.avatar_image_url = data['profile_image_url'] || self.avatar_image_url
+          self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
           self.avatar_image_updated_at = Time.now
           self.avatar_state = 'submitted'
         end

@@ -137,7 +137,7 @@ class ProfileController < ApplicationController
       data = JSON.parse(Net::HTTP.get(url)) rescue nil
       if data
         @pics << {
-          :url => data['profile_image_url'],
+          :url => data['profile_image_url_https'],
           :type => 'twitter',
           :alt => 'twitter pic'
         }
