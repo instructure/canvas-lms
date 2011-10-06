@@ -66,8 +66,8 @@ module Worker
       content_migration.exported_attachment = att
       content_migration.save
     rescue => e
-      content_migration.migration_settings[:last_error] = "#{e.to_s}: #{e.backtrace.join("\n")}"
       Rails.logger.warn "Error while uploading exported data for content_migration #{content_migration.id} - #{e.to_s}"
+      raise e
     end
 
     att

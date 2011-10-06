@@ -153,7 +153,7 @@ class AssessmentTestConverter
 
     # if we didn't get a question weight, and all the questions have the same
     # points possible, use that as the group points possible per question
-    if select && select > 0 && group[:question_points].blank? && group[:questions].present?
+    if @converted_questions && select && select > 0 && group[:question_points].blank? && group[:questions].present?
       migration_ids = group[:questions].map { |q| q[:migration_id] }
       questions = @converted_questions.find_all { |q| migration_ids.include?(q[:migration_id]) }
 
