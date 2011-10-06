@@ -118,7 +118,10 @@ class EnrollmentTerm < ActiveRecord::Base
   
   def enrollment_dates_for(enrollment)
     return [nil, nil] if ignore_term_date_restrictions
-    override = EnrollmentDatesOverride.find_by_enrollment_term_id_and_enrollment_type(self.id, enrollment.type.to_s)
+    # detect will cause the whole collection to load; that's fine, it's a small collection, and
+    # we'll probably call enrollment_dates_for multiple times in a single request, so we want
+    # it cached, rather than using .scoped which would force a re-query every time
+    override = enrollment_dates_overrides.detect { |override| override.enrollment_type == enrollment.type.to_s}
     [ override.try(:start_at) || start_at, override.try(:end_at) || end_at ]
   end
   

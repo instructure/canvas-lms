@@ -427,19 +427,15 @@ class UsersController < ApplicationController
     if current_user_is_site_admin? || authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? profile_path : user_path(@user) )
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC'
-      
-      # TODO this is ugly
-      @enrollments = []
-      @enrollments = @user.enrollments.select{|e| !e.deleted? && e.course && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
-      @group_memberships = @user.group_memberships
-      @pending_enrollments = if @context.is_a?(Account)
-                               @user.enrollments
-                             else
-                               @enrollments
-                             end.select{|e| e.invited? }
-      pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid]
-      @pending_enrollments.unshift(pending_enrollment) unless !pending_enrollment || @pending_enrollments.include?(pending_enrollment)
-      
+
+      # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
+      # maybe should just look at the first enrollment and check if it's cached to decide if we should include
+      # them here
+      @enrollments = @user.enrollments.scoped(:conditions => "workflow_state<>'deleted'", :include => [{:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section]).select{|e| e.course && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
+      # pre-populate the reverse association
+      @enrollments.each { |e| e.user = @user }
+      @group_memberships = @user.group_memberships.scoped(:include => :group)
+
       respond_to do |format|
         format.html
       end
