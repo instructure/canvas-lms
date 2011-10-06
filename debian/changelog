@@ -1,3 +1,14 @@
+canvas-lms (1.1-66) professional; urgency=low
+
+  * Package ref: 6e60ef415da44a261e66b02073414b3830d99f39
+  *
+  * [+084481c] add rtmp host to kaltura options
+  * [+1a04ad3] fix media comments in conversations, closes #5826
+  * [+e8e06cf] don't ever query scribd in attachment#conversion_status
+  * [+6e60ef4] add protocol to all file download urls, default to https; fixes #5712
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 05 Oct 2011 18:48:11 -0600
+
 canvas-lms (1.1-65) professional; urgency=low
 
   * Package ref: 7a4c7bea23ffeff9df21d4b7cf3ad69e246aa1bd
