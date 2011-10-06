@@ -177,6 +177,10 @@ class ProfileController < ApplicationController
   def update
     @user = @current_user
     respond_to do |format|
+      unless @user.user_can_edit_name?
+        params[:user].delete(:name)
+        params[:user].delete(:short_name)
+      end
       if @user.update_attributes(params[:user])
         pseudonymed = false
         if params[:default_email_id].present?

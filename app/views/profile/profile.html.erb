@@ -23,15 +23,16 @@
 <% form_for @user, :url => profile_url, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;"} do |f| %>
 <table class="profile_table">
   <tr>
+    <% editable_name = @user.user_can_edit_name? %>
     <td><%= f.blabel :name, :en => "Full Name" %></td>
-    <td><span class="full_name display_data"><%=h @user.name %></span>
-      <%= f.text_field :name, :class => "edit_data" %>
+    <td><span class="full_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.name %></span>
+      <%= f.text_field :name, :class => "edit_data" if editable_name %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.name', "This name will be used by teachers for grading.") %></span>
   </tr>
   <tr>
     <td><%= f.blabel :short_name, :en => "Display Name" %></td>
-    <td><span class="short_name display_data"><%=h @user.short_name %></span>
-      <%= f.text_field :short_name, :class => "edit_data" %>
+    <td><span class="short_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.short_name %></span>
+      <%= f.text_field :short_name, :class => "edit_data"  if editable_name %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
     </td>
   </tr>

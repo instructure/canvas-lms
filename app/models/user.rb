@@ -1968,4 +1968,8 @@ class User < ActiveRecord::Base
     self.enrollments.ended.length || self.menu_data[:has_completed_enrollment]
   end
 
+  def user_can_edit_name?
+    associated_root_accounts.any? { |a| a.settings[:users_can_edit_name] != false } || associated_root_accounts.empty?
+  end
+
 end
