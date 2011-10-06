@@ -44,6 +44,16 @@ class CoursesController < ApplicationController
   #   When syllabus_body is given the user-generated html for the course 
   #   syllabus is returned.
   #
+  # @argument include[] ["total_scores"] Optional information to include with each Course.
+  #   When total_scores is given, any enrollments with type 'student' will also
+  #   include the fields 'calculated_current_score', 'calculated_final_score',
+  #   and 'calculated_final_grade'. calculated_current_score is the student's
+  #   score in the course, ignoring ungraded assignments. calculated_final_score
+  #   is the student's score in the course including ungraded assignments with
+  #   a score of 0. calculated_final_grade is the letter grade equivalent of
+  #   calculated_final_score (if available). This argument is ignored if the
+  #   course is configured to hide final grades.
+  #
   # @response_field id The unique identifier for the course.
   # @response_field name The name of the course.
   # @response_field course_code The course code.
@@ -56,7 +66,7 @@ class CoursesController < ApplicationController
   #   include[]=needs_grading_count
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student'}], 'calendar': { 'ics': '..url..' } },
+  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student', 'computed_current_score': 84.8, 'computed_final_score': 62.9, 'computed_final_grade': 'D-'}], 'calendar': { 'ics': '..url..' } },
   #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'enrollments': [{'type': 'teacher'}], 'calendar': { 'ics': '..url..' } } ]
   def index
     respond_to do |format|

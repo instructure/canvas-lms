@@ -54,6 +54,71 @@ describe CoursesController, :type => :integration do
     ]
   end
 
+  it "should include scores in course list if requested" do
+    @course2.grading_standard_enabled = true
+    @course2.save
+    expected_current_score = 80
+    expected_final_score = 70
+    expected_final_grade = @course2.score_to_grade(expected_final_score)
+    @course2.all_student_enrollments.update_all(
+      :computed_current_score => expected_current_score,
+      :computed_final_score => expected_final_score)
+
+    json = api_call(:get, "/api/v1/courses.json",
+            { :controller => 'courses', :action => 'index', :format => 'json' },
+            { :include => ['total_scores'] })
+    json.should == [
+      {
+        'id' => @course1.id,
+        'name' => @course1.name,
+        'course_code' => @course1.course_code,
+        'enrollments' => [{'type' => 'teacher'}],
+        'sis_course_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+      },
+      {
+        'id' => @course2.id,
+        'name' => @course2.name,
+        'course_code' => @course2.course_code,
+        'enrollments' => [{'type' => 'student',
+                           'computed_current_score' => expected_current_score,
+                           'computed_final_score' => expected_final_score,
+                           'computed_final_grade' => expected_final_grade}],
+        'sis_course_id' => 'TEST-SIS-ONE.2011',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+      },
+    ]
+  end
+
+  it "should not include scores in course list, even if requested, if final grades are hidden" do
+    @course2.grading_standard_enabled = true
+    @course2.settings[:hide_final_grade] = true
+    @course2.save
+    @course2.all_student_enrollments.update_all(:computed_current_score => 80, :computed_final_score => 70)
+
+    json = api_call(:get, "/api/v1/courses.json",
+            { :controller => 'courses', :action => 'index', :format => 'json' },
+            { :include => ['total_scores'] })
+    json.should == [
+      {
+        'id' => @course1.id,
+        'name' => @course1.name,
+        'course_code' => @course1.course_code,
+        'enrollments' => [{'type' => 'teacher'}],
+        'sis_course_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+      },
+      {
+        'id' => @course2.id,
+        'name' => @course2.name,
+        'course_code' => @course2.course_code,
+        'enrollments' => [{'type' => 'student'}],
+        'sis_course_id' => 'TEST-SIS-ONE.2011',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+      },
+    ]
+  end
+
   it "should only return teacher enrolled courses on ?enrollment_type=teacher" do
     json = api_call(:get, "/api/v1/courses.json?enrollment_type=teacher",
             { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_type => 'teacher' })

@@ -475,6 +475,39 @@ class Enrollment < ActiveRecord::Base
     end
   end
   
+  # This is called to recompute the users' cached scores for a given course
+  # when:
+  # 
+  # * The user is merged with another user; the scores are recomputed for the
+  #   new user in each of his/her courses.
+  # 
+  # * An assignment's default grade is changed; all users in the assignment's
+  #   course have their scores for that course recomputed.
+  # 
+  # * A course is merged into another, a section is crosslisted/uncrosslisted,
+  #   or a section is otherwise moved between courses; scores are recomputed
+  #   for all users in the target course.
+  # 
+  # * A course's group_weighting_scheme is changed; scores are recomputed for
+  #   all users in the course.
+  # 
+  # * Assignments are reordered (since an assignment may change groups, which
+  #   may have weights); scores are recomputed for all users in the associated
+  #   course.
+  # 
+  # * An assignment's points_possible is changed; scores are recomputed for all
+  #   users in the associated course.
+  # 
+  # * An assignment group's rules or group_weight are changed; scores are
+  #   recomputed for all users in the associated course.
+  # 
+  # * A submission's score is changed; scores for the submission owner in the
+  #   associated course are recomputed.
+  #
+  # If some new feature comes up that affects calculation of a user's score,
+  # please add appropriate calls to this so that the cached values don't get
+  # stale! And once you've added the call, add the condition to the comment
+  # here for future enlightenment.
   def self.recompute_final_score(user_ids, course_id)
     GradeCalculator.recompute_final_score(user_ids, course_id)
   end
