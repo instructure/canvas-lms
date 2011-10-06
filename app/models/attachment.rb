@@ -483,7 +483,9 @@ class Attachment < ActiveRecord::Base
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
     @file_store_config ||= YAML.load_file(RAILS_ROOT + "/config/file_store.yml")[RAILS_ENV] rescue nil
-    @file_store_config ||= {'storage' => 'local'}
+    @file_store_config ||= { 'storage' => 'local' }
+    # default the secure setting to true only in production
+    @file_store_config['secure'] = Rails.env.production? unless @file_store_config.has_key?('secure')
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
     if RAILS_ENV == "test"
       # yes, a rescue nil; the problem is that in an automated test environment, this may be
@@ -523,7 +525,10 @@ class Attachment < ActiveRecord::Base
     )
     def authenticated_s3_url(*args)
       return root_attachment.authenticated_s3_url(*args) if root_attachment
-      "#{(args[0].is_a?(Hash) && args[0][:protocol]) || '//'}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
+      protocol = args[0].is_a?(Hash) && args[0][:protocol]
+      protocol ||= self.class.file_store_config['secure'] ? "https://" : "http://"
+      protocol ||= "//"
+      "#{protocol}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
     end
 
     alias_method :attachment_fu_filename=, :filename=
@@ -1026,25 +1031,41 @@ class Attachment < ActiveRecord::Base
   # the iPaper.  I added a state, "NOT SUBMITTED", for any attachment that
   # hasn't been submitted, regardless of whether it should be.  As long as
   # we go through the submit_to_scribd! gateway, we'll be fine.
+  #
+  # This is a cached view of the status, it doesn't query scribd directly. That
+  # happens in a periodic job. Our javascript is set up to check scribd for the
+  # document if status is "PROCESSING" so we don't have to actually wait for
+  # the periodic job to find the doc is done.
   def conversion_status
     return 'DONE' if !ScribdAPI.enabled?
     return 'ERROR' if self.errored?
     if !self.scribd_doc
-      if self.scribdable?
-        self.send_at(10.minutes.from_now, :resubmit_to_scribd!)
-      else
-        self.process unless self.processed?
+      if !self.scribdable?
+        self.process
       end
-      return 'NOT SUBMITTED' unless self.scribd_doc
+      return 'NOT SUBMITTED'
     end
     return 'DONE' if self.processed?
-    ScribdAPI.set_user(self.scribd_account) rescue nil
-    res = ScribdAPI.get_status(self.scribd_doc) rescue 'ERROR'
-    self.process if res == 'DONE'
-    self.mark_errored if res == 'ERROR'
-    res.to_s.upcase
+    return 'PROCESSING'
   end
-  
+
+  def query_conversion_status!
+    return unless ScribdAPI.enabled? && self.scribdable?
+    if self.scribd_doc
+      ScribdAPI.set_user(self.scribd_account) rescue nil
+      res = ScribdAPI.get_status(self.scribd_doc) rescue 'ERROR'
+      case res
+      when 'DONE'
+        self.process
+      when 'ERROR'
+        self.mark_errored
+      end
+      res.to_s.upcase
+    else
+      self.send_at(10.minutes.from_now, :resubmit_to_scribd!)
+    end
+  end
+
   # Returns a link to get the document remotely.
   def download_url(format='original')
     return @download_url if @download_url
@@ -1168,7 +1189,7 @@ class Attachment < ActiveRecord::Base
     # Runs periodically
     @attachments = Attachment.needing_scribd_conversion_status
     @attachments.each do |attachment|
-      attachment.conversion_status
+      attachment.query_conversion_status!
     end
     @attachments = Attachment.scribdable?.recyclable
     @attachments.each do |attachment|

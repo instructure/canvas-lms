@@ -86,10 +86,10 @@ describe Attachment do
       Setting.set("file_storage_test_override", "local")
     }
     
-    it "should not return the protocol by default" do
+    it "should return http as the protocol by default" do
       course_model
       attachment_with_context(@course)
-      @attachment.authenticated_s3_url.should match(/^\/\//)
+      @attachment.authenticated_s3_url.should match(/^http:\/\//)
     end
     
     it "should return the protocol if specified" do
@@ -235,12 +235,12 @@ describe Attachment do
       ScribdAPI.stub!(:set_user).and_return(true)
       ScribdAPI.stub!(:upload).and_return(Scribd::Document.new)
     end
-    
+
     it "should have a default conversion_status of :not_submitted for attachments that haven't been submitted" do
       attachment_model
       @attachment.conversion_status.should eql('NOT SUBMITTED')
     end
-    
+
     it "should ask Scribd for the status" do
       ScribdAPI.should_receive(:get_status).and_return(:status_from_scribd)
       scribdable_attachment_model
@@ -248,9 +248,19 @@ describe Attachment do
       ScribdAPI.should_receive(:upload).and_return(@doc_obj)
       @doc_obj.stub!(:thumbnail).and_return("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!
-      @attachment.conversion_status
+      @attachment.query_conversion_status!
     end
-    
+
+    it "should not ask Scribd for the status" do
+      ScribdAPI.should_not_receive(:get_status)
+      scribdable_attachment_model
+      @doc_obj = Scribd::Document.new
+      ScribdAPI.should_receive(:upload).and_return(@doc_obj)
+      @doc_obj.stub!(:thumbnail).and_return("the url to the scribd doc thumbnail")
+      @attachment.submit_to_scribd!
+      @attachment.conversion_status.should == "PROCESSING"
+    end
+
   end
   
   context "download_url" do
