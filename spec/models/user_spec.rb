@@ -299,6 +299,29 @@ describe User do
     @user.recent_feedback(:contexts => [@course]).should_not be_empty
   end
 
+  it "should return appropriate courses with primary enrollment" do
+    user
+    @course1 = course(:course_name => "course", :active_course => true)
+    @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+
+    @course2 = course(:course_name => "other course", :active_course => true)
+    @course2.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+
+    @course3 = course(:course_name => "yet another course", :active_course => true)
+    @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+    @course3.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+
+    @course4 = course(:course_name => "not yet active")
+    @course4.enroll_user(@user, 'StudentEnrollment')
+
+    # only three, in the right order (type, then name), and with the top type per course
+    @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
+      [@course2.id, 'TeacherEnrollment'],
+      [@course3.id, 'TeacherEnrollment'],
+      [@course1.id, 'StudentEnrollment']
+    ]
+  end
+
   context "move_to_user" do
     it "should delete the old user" do
       @user1 = user_model

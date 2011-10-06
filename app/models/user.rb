@@ -1329,6 +1329,24 @@ class User < ActiveRecord::Base
   end
   memoize :account
   
+  def courses_with_primary_enrollment
+    Rails.cache.fetch([self, 'courses_with_primary_enrollment'].cache_key) do
+      postgres = (connection.adapter_name =~ /postgresql/i)
+      prefix = postgres ? "DISTINCT ON (courses.id)" : nil
+      result = courses.find(:all,
+                            :select => "#{prefix} courses.*, enrollments.type AS primary_enrollment, #{Enrollment::ENROLLMENT_RANK_SQL} AS primary_enrollment_rank",
+                            :order => "courses.id, #{Enrollment::ENROLLMENT_RANK_SQL}")
+      unless postgres
+        result = result.inject([]) { |ary, course|
+          ary << course unless ary.last && ary.last.id == course.id
+          ary
+        }
+      end
+      result.sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
+    end
+  end
+  memoize :courses_with_primary_enrollment
+
    # activesupport/lib/active_support/memoizable.rb from rails and
    # http://github.com/seamusabshere/cacheable/blob/master/lib/cacheable.rb from the cacheable gem
    # to get a head start
