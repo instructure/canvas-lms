@@ -126,13 +126,12 @@ module AuthenticationMethods
       end
     end
 
-    if session[:become_user_id]
-      user = User.find_by_id(session[:become_user_id])
-      if user && user.grants_right?(@current_user, session, :become_user)
-        @real_current_user = @current_user
-        @current_user = user
-        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
-      end
+    as_user_id = api_request? && params[:as_user_id]
+    as_user_id ||= session[:become_user_id]
+    if as_user_id && (user = User.find_by_id(as_user_id)) && user.grants_right?(@current_user, session, :become_user)
+      @real_current_user = @current_user
+      @current_user = user
+      logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
     end
 
     @current_user
