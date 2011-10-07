@@ -50,13 +50,12 @@ I18n.scoped('instructure', function(I18n) {
     });
   });
 
-
   // add ability to handle css3 opacity transitions on show or hide
   // if you want to use this just add the class 'use-css-transitions-for-show-hide' to an element.
-  // whenever that element is .show()n or .hide()n it will use a css opacity transition (in non-IE browsers). 
+  // whenever that element is .show()n or .hide()n it will use a css opacity transition (in non-IE browsers).
   // if you want to override the length or details of the transition, just specify it in a css file.
   // purposely only supporting ff, webkit & opera because they are the only ones that fire the transitionEnd event, add others when supported
-  if ($.detect(["WebkitTransitionProperty", "MozTransitionProperty", "OTransitionProperty"], function(){ return document.body.style[this] !== undefined })) {
+  if (document.body.style.WebkitTransitionProperty !== undefined || document.body.style.MozTransitionProperty !== undefined || document.body.style.OTransitionProperty !== undefined) {
 
     // if you can't add the class .use-css-transitions-for-show-hide to your element, you need to add it to this
     var selectorForThingsToUseCssTransitions = '.use-css-transitions-for-show-hide, .ui-widget-overlay',
@@ -76,7 +75,10 @@ I18n.scoped('instructure', function(I18n) {
         if (!arguments.length) {
           return this.each(function() {
             var $this = $(this);
-            if ($this.is(selectorForThingsToUseCssTransitions)) {
+
+            // this.parentNode is to check to make sure it is on the page. because we don't want this:
+            // node is not on page, call .remove() on it (sets timeout), put it in page, then afterTransition fires (.remove()ing it from the page again).
+            if (this.parentNode && $this.is(selectorForThingsToUseCssTransitions)) {
               $this.queue(function(){
                 var oldOpacityCssAttribute = this.style.opacity,
                     oldComputedOpacity = $this.css('opacity'),
@@ -96,7 +98,7 @@ I18n.scoped('instructure', function(I18n) {
                     $this.dequeue();
                   }
                 }
-                var timeoutToRunIfTransitionEndNeverFires = setTimeout(afterTransition, secondsToUseForCssTransition*1000+1) //1ms after it should have fired
+                var timeoutToRunIfTransitionEndNeverFires = setTimeout(afterTransition, secondsToUseForCssTransition*1000+100) //100ms after it should have fired
                 $this.bind(eventsToBindTo, afterTransition);
                 $this.css('opacity', newOpacity);
               });
