@@ -350,6 +350,8 @@ class SubmissionsApiController < ApplicationController
   # a media comment looks just like an attachment to the API
   def media_comment_json(media_comment_id, media_comment_type)
     {
+      'media_comment_id' => media_comment_id,
+      'media_comment_type' => media_comment_type,
       'content-type' => "#{media_comment_type}/mp4",
       'url' => course_media_download_url(:entryId => media_comment_id,
                                          :type => "mp4",

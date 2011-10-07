@@ -281,6 +281,8 @@ describe SubmissionsApiController, :type => :integration do
         "submission_comments"=>
          [{"comment"=>"Well here's the thing...",
            "media_comment" => {
+             "media_comment_id"=>"3232",
+             "media_comment_type"=>"audio",
              "content-type" => "audio/mp4",
              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
            },
@@ -408,7 +410,9 @@ describe SubmissionsApiController, :type => :integration do
           {"grade"=>nil,
             "assignment_id" => a1.id,
            "media_comment" =>
-            { "content-type" => "video/mp4",
+            { "media_comment_type"=>"video",
+              "media_comment_id"=>"54321",
+              "content-type" => "video/mp4",
               "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T02:00:00Z",
@@ -422,7 +426,8 @@ describe SubmissionsApiController, :type => :integration do
           {"grade"=>"A-",
             "assignment_id" => a1.id,
            "media_comment" =>
-            { "content-type" => "video/mp4",
+            { "media_comment_type"=>"video",
+              "media_comment_id"=>"54321","content-type" => "video/mp4",
               "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
            "attachments" =>
             [
@@ -447,6 +452,8 @@ describe SubmissionsApiController, :type => :integration do
         "submission_comments"=>
          [{"comment"=>"Well here's the thing...",
            "media_comment" => {
+             "media_comment_type"=>"audio",
+             "media_comment_id"=>"3232",
              "content-type" => "audio/mp4",
              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
            },
@@ -454,7 +461,9 @@ describe SubmissionsApiController, :type => :integration do
            "author_name"=>"User",
            "author_id"=>student1.id}],
         "media_comment" =>
-         { "content-type" => "video/mp4",
+         { "media_comment_type"=>"video",
+           "media_comment_id"=>"54321",
+           "content-type" => "video/mp4",
            "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
         "score"=>13.5},
        {"grade"=>"F",
