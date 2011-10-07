@@ -17,13 +17,15 @@
 #
 
 def assignment_model(opts={})
-  unless opts.delete :course
-    course_model(:reusable => true)
+  if opts[:course]
+    course = opts.delete(:course)
+  else
+    course = course_model(:reusable => true)
   end
-  @assignment = factory_with_protected_attributes(@course.assignments, assignment_valid_attributes.merge(opts))
-  @assignment.context.should eql(@course) rescue false
+  @assignment = factory_with_protected_attributes(course.assignments, assignment_valid_attributes.merge(opts))
+  @assignment.context.should eql(course) rescue false
   @a = @assignment
-  @c = @course
+  @c = course
   @a
 end
 
