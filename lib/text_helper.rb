@@ -125,8 +125,10 @@ module TextHelper
     ellipsis = options[:ellipsis] || I18n.t('lib.text_helper.ellipsis', '...')
     ellipsis_length = ellipsis.length
     actual_length = max_length - ellipsis_length
-
-    truncated = (text || "")[/.{0,#{actual_length}}/mu]
+    
+    # First truncate the text down to the bytes max, then lop off any invalid
+    # unicode characters at the end.
+    truncated = (text || "")[0,actual_length][/.{0,#{actual_length}}/mu]
     if truncated.length < text.length
       truncated + ellipsis
     else
