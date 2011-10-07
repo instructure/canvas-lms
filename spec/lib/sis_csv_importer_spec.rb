@@ -2117,6 +2117,58 @@ describe SIS::CSV::Import do
       check_section_not_crosslisted
     end
 
+    it 'should leave a section alone if a section has been decrosslisted manually' do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active",
+        "C002,TC 102,Test Course 102,,,active",
+        "C003,TC 103,Test Course 103,,,active"
+      )
+      process_csv_data_cleanly(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+
+      def with_section(&block)
+        CourseSection.find_by_root_account_id_and_sis_source_id(@account.id, 'S001').tap(&block)
+      end
+      def check_section_crosslisted(sis_id)
+        with_section do |s|
+          s.course.sis_source_id.should == sis_id
+          s.nonxlist_course.sis_source_id.should == 'C001'
+        end
+      end
+      def check_section_not_crosslisted
+        with_section do |s|
+          s.course.sis_source_id.should == 'C001'
+          s.nonxlist_course.should be_nil
+        end
+      end
+
+      check_section_not_crosslisted
+      process_csv_data_cleanly(
+        "xlist_course_id,section_id,status",
+        "C002,S001,active"
+      )
+      check_section_crosslisted 'C002'
+      with_section { |s| s.uncrosslist }
+      check_section_not_crosslisted
+      process_csv_data_cleanly(
+        "xlist_course_id,section_id,status",
+        "C002,S001,active"
+      )
+      with_section do |s|
+        s.clear_sis_stickiness :course_id
+        s.save!
+      end
+      check_section_not_crosslisted
+      process_csv_data_cleanly(
+        "xlist_course_id,section_id,status",
+        "C002,S001,active"
+      )
+      check_section_crosslisted 'C002'
+    end
+
   end
 
   context 'grade publishing results importing' do
