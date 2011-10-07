@@ -28,6 +28,7 @@ class GroupMembership < ActiveRecord::Base
   before_save :ensure_mutually_exclusive_membership
   before_save :assign_uuid
   before_save :capture_old_group_id
+  before_validation :verify_section_homogeneity_if_necessary
   
   after_save :touch_groups
   
@@ -69,7 +70,7 @@ class GroupMembership < ActiveRecord::Base
   
   def assign_uuid
     self.uuid ||= AutoHandle.generate_securish_uuid
-    self.workflow_state = 'accepted' if self.requested? && self.group && self.group.auto_accept?(self.user)
+    self.workflow_state = 'accepted' if self.requested? && self.group && self.group.free_association?(self.user)
   end
   protected :assign_uuid
 
@@ -79,6 +80,14 @@ class GroupMembership < ActiveRecord::Base
     GroupMembership.find(:all, :conditions => { :group_id => peer_groups, :user_id => self.user_id }).each {|gm| gm.destroy }
   end
   protected :ensure_mutually_exclusive_membership
+  
+  def verify_section_homogeneity_if_necessary
+    return true unless self.group.group_category && self.group.group_category.restricted_self_signup?
+    return true if self.group.has_common_section_with_user?(self.user)
+    self.errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => self.user.name, :group => self.group.name))
+    return false
+  end
+  protected :verify_section_homogeneity_if_necessary
   
   attr_accessor :old_group_id
   def capture_old_group_id

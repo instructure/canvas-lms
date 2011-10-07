@@ -108,9 +108,11 @@ describe GroupsController do
       e6 = @course.enroll_student(user_model)
       post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :group_count => 2, :split_groups => '1'}
       response.should be_success
-      assigns[:groups].length.should eql(2)
-      assigns[:groups][0].users.length.should eql(3)
-      assigns[:groups][1].users.length.should eql(3)
+      assigns[:group_category].should_not be_nil
+      groups = assigns[:group_category].groups
+      groups.length.should eql(2)
+      groups[0].users.length.should eql(3)
+      groups[1].users.length.should eql(3)
     end
     
     it "should give the new groups the right group_category" do
@@ -118,8 +120,8 @@ describe GroupsController do
       student_in_course
       post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :group_count => 1, :split_groups => '1'}
       response.should be_success
-      assigns[:groups].length.should eql(1)
-      assigns[:groups][0].group_category.name.should == "Study Groups"
+      assigns[:group_category].should_not be_nil
+      assigns[:group_category].groups[0].group_category.name.should == "Study Groups"
     end
 
     it "should error if the group name is protected" do
@@ -130,10 +132,91 @@ describe GroupsController do
 
     it "should error if the group name is already in use" do
       course_with_teacher_logged_in(:active_all => true)
-      @course.group_categories.create(:name => "My Group Category")
-      post 'create_category', :course_id => @course.id, :category => {:name => "My Group Category"}
+      @course.group_categories.create(:name => "My Category")
+      post 'create_category', :course_id => @course.id, :category => {:name => "My Category"}
       response.should_not be_success
     end
+
+    it "should default an empty or missing name to 'Study Groups'" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create_category', :course_id => @course.id, :category => {}
+      response.should be_success
+      assigns[:group_category].name.should == "Study Groups"
+      assigns[:group_category].destroy
+
+      post 'create_category', :course_id => @course.id, :category => {:name => ''}
+      response.should be_success
+      assigns[:group_category].name.should == "Study Groups"
+    end
+  end
+  
+  describe "PUT update_category" do
+    before :each do
+      course_with_teacher(:active_all => true)
+      @group_category = @course.group_categories.create(:name => "My Category")
+    end
+
+    it "should require authorization" do
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {}
+      assert_unauthorized
+    end
+    
+    it "should update category" do
+      user_session(@user)
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "Different Category", :enable_self_signup => "1"}
+      response.should be_success
+      assigns[:group_category].should eql(@group_category)
+      assigns[:group_category].name.should eql("Different Category")
+      assigns[:group_category].should be_self_signup
+    end
+
+    it "should leave the name alone if not given" do
+      user_session(@user)
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {}
+      response.should be_success
+      assigns[:group_category].name.should == "My Category"
+    end
+
+    it "should treat a sent but empty name as 'Study Groups'" do
+      user_session(@user)
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => ''}
+      response.should be_success
+      assigns[:group_category].name.should == "Study Groups"
+    end
+
+    it "should error if the name is protected" do
+      user_session(@user)
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "Student Groups"}
+      response.should_not be_success
+    end
+
+    it "should error if the name is already in use" do
+      user_session(@user)
+      @course.group_categories.create(:name => "Other Category")
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "Other Category"}
+      response.should_not be_success
+    end
+
+    it "should not error if the name is the current name" do
+      user_session(@user)
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "My Category"}
+      response.should be_success
+      assigns[:group_category].name.should eql("My Category")
+    end
+
+    it "should error if restrict_self_signups is specified but the category has heterogenous groups" do
+      section1 = @course.course_sections.create
+      section2 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      group = @group_category.groups.create(:context => @course)
+      group.add_user(user1)
+      group.add_user(user2)
+
+      user_session(@teacher)
+      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:enable_self_signup => '1', :restrict_self_signup => '1'}
+      response.should_not be_success
+    end 
   end
   
   describe "DELETE delete_category" do
@@ -190,6 +273,25 @@ describe GroupsController do
       assigns[:membership].should_not be_nil
       assigns[:membership].user.should eql(@user)
     end
+
+    it "should check user section in restricted self-signup category" do
+      course_with_teacher_logged_in(:active_all => true)
+      section1 = @course.course_sections.create
+      section2 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      group_category = @course.group_categories.build(:name => "My Category")
+      group_category.configure_self_signup(true, true)
+      group_category.save
+      group = group_category.groups.create(:context => @course)
+      group.add_user(user1)
+
+      post 'add_user', :group_id => group.id, :user_id => user2.id
+      response.should_not be_success
+      assigns[:membership].should_not be_nil
+      assigns[:membership].user.should eql(user2)
+      assigns[:membership].errors[:user_id].should_not be_nil
+    end 
   end
   
   describe "DELETE remove_user" do
@@ -383,6 +485,34 @@ describe GroupsController do
       data = JSON.parse(response.body) rescue nil
       data.should_not be_nil
       data['users'].map{ |u| u['user_id'] }.should == [ u1.id ]
+    end
+
+    it "should include the users' sections when available" do
+      course_with_teacher_logged_in(:active_all => true)
+      u1 = @course.enroll_student(user_model).user
+      u2 = @course.enroll_student(user_model).user
+
+      group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
+      group.add_user(u1)
+
+      get 'unassigned_members', :course_id => @course.id, :category_id => group.group_category.id
+      data = JSON.parse(response.body) rescue nil
+      data['users'].first['section_id'].should == @course.default_section.id
+      data['users'].first['section_code'].should == @course.default_section.section_code
+    end
+  end
+
+  describe "GET 'context_group_members'" do
+    it "should include the users' sections when available" do
+      course_with_teacher_logged_in(:active_all => true)
+      u1 = @course.enroll_student(user_model).user
+      group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
+      group.add_user(u1)
+
+      get 'context_group_members', :group_id => group.id
+      data = JSON.parse(response.body) rescue nil
+      data.first['section_id'].should == @course.default_section.id
+      data.first['section_code'].should == @course.default_section.section_code
     end
   end
 end

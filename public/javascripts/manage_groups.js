@@ -127,8 +127,7 @@ I18n.scoped('groups', function(I18n){
       var $student_instances = $student;
       contextGroups.insertIntoGroup($student, $group);
       $category = $group.parents(".group_category")
-      if($category.hasClass('student_organized') &&
-          ($group.get(0) !== $category.find(".group_blank").get(0))) {
+      if($category.hasClass('student_organized') && !$group.hasClass('group_blank')) {
         var $s = $student.clone();
         $student_instances = $student_instances.add($s);
         contextGroups.insertIntoGroup($s, $original_group);
@@ -150,6 +149,10 @@ I18n.scoped('groups', function(I18n){
         
         $student.removeClass('event_pending');
         contextGroups.updateCategoryCounts($group.parents(".group_category"));
+
+        var groups = $($original_group);
+        groups = groups.add($group);
+        contextGroups.updateCategoryHeterogeneity($group.parents(".group_category"), groups);
         
         var unassigned_group = $group.parents(".group_category").find(".group_blank");
         var students_visible = unassigned_group.find(".student_list .student").length;
@@ -158,6 +161,24 @@ I18n.scoped('groups', function(I18n){
         if (students_visible <= 5 && students_hidden > 0) {
           contextGroups.loadUnassignedMembersPage(unassigned_group, 0);
         }
+      },
+      function(data) {
+        // move failed, undo it
+        $student.remove();
+        $student = $student.first();
+        contextGroups.insertIntoGroup($student, $original_group);
+        $student.removeClass('event_pending');
+        contextGroups.updateCategoryCounts($category);
+
+        var message;
+        if (data.errors && data.errors.user_id) {
+          // attempted group membership claims the user was unacceptable for
+          // some reason (probably section).
+          message = data.errors.user_id[0].message;
+        } else {
+          message = I18n.t('errors.unknown', 'An unexpected error occurred.');
+        }
+        $.flashError(message);
       });
     },
     
@@ -207,6 +228,28 @@ I18n.scoped('groups', function(I18n){
       });
     },
     
+    updateCategoryHeterogeneity: function($category, groups) {
+      // check if any of the provided groups are heterogenous now (skipping the
+      // "unassigned" group should it be involved). this assumes exactly one
+      // section per student, which isn't enforced by the server data model,
+      // but should be true of students for the forseeable future.
+      var heterogenous = false;
+      groups.each(function() {
+        var section_id = null;
+        if (!$(this).hasClass('group_blank')) {
+          $(this).find(".student_list .student .section_id").each(function() {
+            other_section_id = $(this).text();
+            if (section_id === null || section_id === "") {
+              section_id = other_section_id;
+            } else if (other_section_id !== "" && section_id !== other_section_id) {
+              heterogenous = true;
+            }
+          });
+        }
+      });
+      $category.find('.heterogenous').text(heterogenous ? 'true' : 'false');
+    },
+    
     populateCategory: function(panel) {
       var $category = $(panel);
       
@@ -224,6 +267,19 @@ I18n.scoped('groups', function(I18n){
       }
     },
     
+    updateCategory: function($category, category) {
+      // update name in $category, tab, and sidebar
+      $category.find('.category_name').text(category.name);
+      $($category.data('tab_link')).text(category.name);
+      $('#sidebar_category_' + category.id + ' .category').text(category.name);
+
+      // put self_signup value in $category template data, and toggle
+      // appropriate self signup text
+      $category.find('.self_signup').text(category.self_signup || '');
+      $category.find('.self_signup_text').showIf(category.self_signup);
+      $category.find('.restricted_self_signup_text').showIf(category.self_signup == 'restricted');
+    },
+
     addGroupToSidebar: function(group) {
       if($("#sidebar_group_" + group.id).length > 0) {
         return;
@@ -341,6 +397,76 @@ I18n.scoped('groups', function(I18n){
         $group.remove();
       }
     });
+    $("#edit_category_form").formSubmit({
+      object_name: "category",
+      property_validations: {
+        'name': function(val, data) {
+          var $category = $(this).parents('.group_category');
+          var original_name = $category.find('.category_name:first').text();
+          if (original_name.toLowerCase() == val.toLowerCase()) {
+            return;
+          }
+          var found = false;
+          $("#category_list .category").each(function() {
+            if($(this).text().toLowerCase() == val.toLowerCase()) {
+              found = true;
+              return false;
+            }
+          });
+          if(found) {
+            return I18n.t('errors.category_in_use', "\"%{category_name}\" is already in use", {category_name: val});
+          }
+        }
+      },
+      beforeSubmit: function(data) {
+        var $category = $(this).parents(".group_category");
+        var tab_index = $("#group_tabs").tabs('option', 'selected');
+        var tab_link = $($('#category_list .category')[tab_index]).find('a');
+        $category.data('tab_link', tab_link);
+        $(this).find("button").attr('disabled', true);
+        $(this).find(".submit_button").text(I18n.t('status.updating', "Updating..."));
+        $(this).loadingImage();
+        return $category;
+      },
+      success: function(data, $category) {
+        contextGroups.updateCategory($category, data.group_category);
+        $(this).loadingImage('remove');
+        $(this).remove();
+        $category.removeClass('editing');
+      },
+      error: function(data) {
+        $(this).loadingImage('remove');
+        $(this).find("button").attr('disabled', false);
+        $(this).find(".submit_button").text(I18n.t('errors.update_failed', "Update Failed, Try Again"));
+        $(this).formErrors(data);
+      }
+    });
+    $(".edit_category_link").click(function(event) {
+      event.preventDefault();
+      var $category = $(this).parents(".group_category");
+      var $form = $("#edit_category_form").clone(true);
+
+      // fill out form given the current category values
+      var data = $category.getTemplateData({textValues: ['category_name', 'self_signup', 'heterogenous']});
+      var form_data = {
+        name: data.category_name,
+        enable_self_signup: data.self_signup !== null && data.self_signup !== '',
+        restrict_self_signup: data.self_signup == 'restricted'
+      };
+      $form.fillFormData(form_data, { object_name: 'category' });
+      $form.find("#category_restrict_self_signup").prop('disabled', !form_data.enable_self_signup || data.heterogenous == 'true');
+
+      $category.addClass('editing');
+      $category.prepend($form.show());
+      $form.find(":input:visible:first").focus().select();
+      $form.attr('method', 'PUT').attr('action', $category.find(".edit_category_link").attr('href'));
+      $category.scrollTo($form.find(":input:visible:first"));
+    });
+    $("#edit_category_form .cancel_button").click(function() {
+      var $category = $(this).parents(".group_category");
+      $category.removeClass('editing');
+      $(this).parents("form").remove();
+    });
     $(".delete_category_link").click(function(event) {
       event.preventDefault();
       var index = $("#group_tabs").tabs('option', 'selected')
@@ -415,12 +541,17 @@ I18n.scoped('groups', function(I18n){
           $group.find(".group_user_count").show();
         }
         $category.fillTemplateData({
-          data: {category_name: group_category.name},
-          hrefValues: ['category_name']
+          data: {
+            category_id: group_category.id,
+            category_name: group_category.name,
+            self_signup: group_category.self_signup
+          },
+          hrefValues: ['category_id']
         });
         $category.attr('id', 'category_' + group_category.id);
         $category.data('category_id', group_category.id);
-        $category.find(".category_name").text(group_category.name);
+        $category.find('.self_signup_text').showIf(group_category.self_signup);
+        $category.find('.restricted_self_signup_text').showIf(group_category.self_signup == 'restricted');
         
         var newIndex = $("#group_tabs").tabs('length');
         if ($("li.category").last().hasClass('student_organized')) {
@@ -433,6 +564,68 @@ I18n.scoped('groups', function(I18n){
         contextGroups.updateCategoryCounts($category);
         $(window).triggerHandler('resize');
       });
+    });
+    $("#add_category_form").formSubmit({
+      property_validations: {
+        'category[name]': function(val, data) {
+          var found = false;
+          $("#category_list .category").each(function() {
+            if($(this).text().toLowerCase() == val.toLowerCase()) {
+              found = true;
+              return false;
+            }
+          });
+          if(found) {
+            return I18n.t('errors.category_in_use', "\"%{category_name}\" is already in use", {category_name: val});
+          }
+        }
+      },
+      beforeSubmit: function(data) {
+        $(this).loadingImage();
+        $(this).data('category_name', data['category[name]']);
+        $(this).find("button").attr('disabled', true);
+        $(this).find(".submit_button").text(I18n.t('status.creating_groups', "Creating Category..."));
+      },
+      success: function(data) {
+        $(this).loadingImage('remove');
+        var callbacks = $(this).data('callbacks') || [];
+        for(var idx in callbacks) {
+          var callback = callbacks[idx];
+          if(callback && $.isFunction(callback)) {
+            callback.call(this, data);
+          }
+        }
+        $(this).data('callbacks', [])
+        $(this).find("button").attr('disabled', false);
+        $(this).find(".submit_button").text(I18n.t('button.create_category', "Create Category"));
+        $(this).dialog('close');
+      },
+      error: function(data) {
+        $(this).loadingImage('remove');
+        $(this).find("button").attr('disabled', false);
+        $(this).find(".submit_button").text(I18n.t('errors.creating_category_failed', "Category Creation Failed, Try Again"));
+        $(this).formErrors(data);
+      }
+    });
+    $("#add_category_form .cancel_button").click(function() {
+      $("#add_category_form").dialog('close');
+    });
+    $("#add_category_form #category_enable_self_signup").change(function() {
+      var self_signup = $(this).prop('checked')
+      $("#add_category_form #category_restrict_self_signup").prop('disabled', !self_signup);
+      if (!self_signup && $("#add_category_form #category_restrict_self_signup").prop('checked')) {
+        $("#add_category_form #category_restrict_self_signup").prop('checked', false);
+      }
+      $("#add_category_form #spread_students").showIf(!self_signup);
+    });
+    $("#edit_category_form #category_enable_self_signup").change(function() {
+      var self_signup = $(this).prop('checked');
+      var heterogenous = $(this).parents('.group_category').find('.heterogenous').text() == 'true';
+      var disable_restrict = !self_signup || heterogenous;
+      $("#edit_category_form #category_restrict_self_signup").prop('disabled', disable_restrict);
+      if (disable_restrict && $("#edit_category_form #category_restrict_self_signup").prop('checked')) {
+        $("#edit_category_form #category_restrict_self_signup").prop('checked', false);
+      }
     });
     $(".load_members_link").click(function(event) {
       event.preventDefault();
@@ -491,6 +684,14 @@ I18n.scoped('groups', function(I18n){
           $lowest.data('student_count', $lowest.data('student_count') + 1);
         }
       });
+    });
+    $(".self_signup_help_link").click(function(event) {
+      event.preventDefault();
+      $("#self_signup_help_dialog").dialog('close').dialog({
+        autoOpen: false,
+        title: I18n.t('titles.self_signup_help', "Self Sign-Up Groups"),
+        width: 400
+      }).dialog('open');
     });
     contextGroups.populateCategory($("#group_tabs .group_category:first"));
     $(window).resize(function() {

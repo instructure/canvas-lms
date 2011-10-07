@@ -15,76 +15,46 @@
     callbacks.push(callback);
     $("#add_category_form").data('callbacks', callbacks);
   }
-  $(document).ready(function() {
-    $("#add_category_form .cancel_button").click(function() {
-      $("#add_category_form").dialog('close');
-    });
-    $("#add_category_form").formSubmit({
-      property_validations: {
-        'category[name]': function(val, data) {
-          var found = false;
-          $("#category_list .category").each(function() {
-            if($(this).text().toLowerCase() == val.toLowerCase()) {
-              found = true;
-              return false;
-            }
-          });
-          if(found) {
-            return I18n.t('errors.category_in_use', "\"%{category_name}\" is already in use", {category_name: val});
-          }
-        }
-      },
-      beforeSubmit: function(data) {
-        $(this).loadingImage();
-        $(this).data('category_name', data['category[name]']);
-      },
-      success: function(data) {
-        $(this).loadingImage('remove');
-        var callbacks = $(this).data('callbacks') || [];
-        for(var idx in callbacks) {
-          var callback = callbacks[idx];
-          if(callback && $.isFunction(callback)) {
-            callback.call(this, data);
-          }
-        }
-        $(this).data('callbacks', [])
-        $(this).dialog('close');
-      }
-    });
-  });
 </script>
 <% end %>
 <% form_tag context_url(@context, :create_category_context_groups_url), {:id => "add_category_form", :style => "display: none;"} do %>
   <table>
     <tr>
-      <td><%= before_label :name_for_groups, "Name for Groups" %></td>
-      <td><input type="text" name="category[name]" value="<%= t :default_name_for_groups, "Project Groups" %>"/></td>
+      <td style="vertical-align: top; padding: 0.5em;"><%= before_label :name_for_groups, "Name for Groups" %></td>
+      <td style="padding: 0.5em;"><input type="text" name="category[name]" value="<%= t :default_name_for_groups, "Project Groups" %>"/></td>
     </tr>
     <% if @context.is_a?(Account) %>
       <input type="hidden" name="category[split_groups]" value="0">
+      <input type="hidden" name="category[enable_self_signup]" value="0"/>
     <% else %>
       <tr>
-        <td style="vertical-align: top;"><%= before_label :group_structure, "Group Structure" %></td>
-        <td>
+        <td style="vertical-align: top; padding: 0.5em;"><%= before_label :self_signup, "Self Sign-Up" %></td>
+        <td style="padding: 0.5em;">
+          <input type="checkbox" name="category[enable_self_signup]" id="category_enable_self_signup" value="1" />
+          <label for="category_enable_self_signup"><%= t :allow_self_signup, "Allow self sign-up" %></label>
+          <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
+                      :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
+          <br/>
+          <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" />
+          <label for="category_restrict_self_signup"><%= t :restricted_self_signup, "Require group members to be in the same section" %></label>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top; padding: 0.5em;"><%= before_label :group_structure, "Group Structure" %></td>
+        <td style="padding: 0.5em;">
           <input type="radio" name="category[split_groups]" id="category_split_groups" value="1"/>
-          <%= t :group_structure, "*Split students into* %{number_of_groups} equal groups",
-               :number_of_groups => '<input type="text" name="category[group_count]" style="width: 25px;"/>'.html_safe,
-               :wrapper => '<label for="category_split_groups">\1</label>'
-          %><br/>
-          <div style="display: none;">
-          <input type="checkbox" name="category[limit_groups]" value="1"/>
-          <%= t :max_students_per_group, "Maximum of %{number_of_students} students per group",
-                :number_of_students => '<input type="text" name="category[max_membership]" style="width: 25px;"/>'.html_safe
-          %>
-          </div>
+          <%= t :group_structure, "*Create* %{number_of_groups} groups now",
+            :number_of_groups => '<input type="text" name="category[group_count]" style="width: 25px;"/>'.html_safe,
+            :wrapper => '<label for="category_split_groups">\1</label>' %><br/>
+          <span id="spread_students" style="padding-left: 2em;"><%= t :group_structure_footnote, "(Students will be split equally among these groups.)" %><br/></span>
           <input type="radio" name="category[split_groups]" id="category_no_groups" value="0" checked="true"/>
           <label for="category_no_groups"><%= t 'labels.manually_create_groups', "I'll create groups manually" %></label>
         </td>
       </tr>
     <% end %>
     <tr>
-      <td colspan="2" class="button-container-right-aligned">
-        <button type="submit" class="button"><%= t 'buttons.create_groups', "Create Groups" %></button>
+      <td colspan="2" class="button-container-right-aligned" style="padding: 0.5em;">
+        <button type="submit" class="button submit_button"><%= t 'buttons.create_category', "Create Category" %></button>
       </td>
     </tr>
   </table>

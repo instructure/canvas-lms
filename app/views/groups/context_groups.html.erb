@@ -23,19 +23,19 @@ more focused project.
 TEXT
 %>
 </p>
-<ul class="unstyled_list group_list" style="font-size: 1.5em;" %>
-  <% if !@user_groups || @user_groups.empty? %>
-    <li id="no_groups_message"><%= t :no_groups_assigned, "No Groups Assigned" %></li>
-  <% end %>
-  <%= render :partial => 'group', :collection => @user_groups %>
-  <%= render :partial => 'group', :object => nil %>
+
+<ul class="group_list">
+  <%= render :partial => 'group', :collection => @user_groups, :locals => {:in_group => true} %>
+  <%= render :partial => 'group', :object => nil, :locals => {:in_group => true} %>
 </ul>
+
 <% if @available_groups && !@available_groups.empty? %>
   <h2><%= t 'headings.available_groups', "Available Groups" %></h2>
-  <ul class="unstyled_list group_list" style="font-size: 1.1em;" %>
-    <%= render :partial => 'group_detailed', :collection => @available_groups %>
+  <ul class="group_list">
+    <%= render :partial => 'group', :collection => @available_groups, :locals => {:in_categories => @user_groups.map{ |g| g.group_category }.compact.uniq, :in_group => false} %>
   </ul>
 <% end %>
+
 <% form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
 <h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
 <%= image_tag "warning.png" %>

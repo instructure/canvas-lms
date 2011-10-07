@@ -137,4 +137,80 @@ describe GroupCategory do
       course.groups.count.should == 2
     end
   end
+
+  context 'configure_self_signup(enabled, restricted)' do
+    before :each do
+      @category = GroupCategory.new
+    end
+
+    it "should make self_signup? true and unrestricted_self_signup? true given (true, false)" do
+      @category.configure_self_signup(true, false)
+      @category.self_signup?.should be_true
+      @category.unrestricted_self_signup?.should be_true
+    end
+
+    it "should make self_signup? true and unrestricted_self_signup? false given (true, true)" do
+      @category.configure_self_signup(true, true)
+      @category.self_signup?.should be_true
+      @category.unrestricted_self_signup?.should be_false
+    end
+
+    it "should make self_signup? false and unrestricted_self_signup? false given (false, *)" do
+      @category.configure_self_signup(false, false)
+      @category.self_signup?.should be_false
+      @category.unrestricted_self_signup?.should be_false
+
+      @category.configure_self_signup(false, true)
+      @category.self_signup?.should be_false
+      @category.unrestricted_self_signup?.should be_false
+    end
+
+    it "should persist to the DB" do
+      @category.configure_self_signup(true, true)
+      @category.save!
+      @category.reload
+      @category.self_signup?.should be_true
+      @category.unrestricted_self_signup?.should be_false
+    end
+  end
+
+  it "should default to no self signup" do
+    category = GroupCategory.new
+    category.self_signup?.should be_false
+    category.unrestricted_self_signup?.should be_false
+  end
+
+  context "has_heterogenous_group?" do
+    it "should be false for accounts" do
+      account = Account.default
+      category = account.group_categories.create
+      group = category.groups.create(:context => account)
+      category.should_not have_heterogenous_group
+    end
+
+    it "should be true if two students that don't share a section are in the same group" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      section2 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      category = @course.group_categories.create
+      group = category.groups.create(:context => @course)
+      group.add_user(user1)
+      group.add_user(user2)
+      category.should have_heterogenous_group
+    end
+
+    it "should be false if all students in each group have a section in common" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      category = @course.group_categories.create
+      group = category.groups.create(:context => @course)
+      group.add_user(user1)
+      group.add_user(user2)
+      category.should_not have_heterogenous_group
+    end
+  end
 end

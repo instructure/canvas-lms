@@ -222,4 +222,8 @@ class CourseSection < ActiveRecord::Base
   named_scope :sis_sections, lambda{|account, *source_ids|
     {:conditions => {:root_account_id => account.id, :sis_source_id => source_ids}, :order => :sis_source_id}
   }
+
+  def common_to_users?(users)
+    users.all?{ |user| self.student_enrollments.active.for_user(user).count > 0 }
+  end
 end

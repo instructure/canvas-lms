@@ -682,4 +682,9 @@ describe User do
     data[:new].should be_true
     data[:user].account.should == @account
   end
+
+  it "should find section for course" do
+    course_with_student
+    @student.section_for_course(@course).should == @course.default_section
+  end
 end

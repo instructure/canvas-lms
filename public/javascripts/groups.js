@@ -41,7 +41,7 @@ I18n.scoped('groups', function(I18n) {
           data: data.group || data.course_assigned_group,
           hrefValues: ['id']
         });
-        $(".group_list").append($group.show());
+        $("#group_blank").before($group.show());
         $("html,body").scrollTo($group);
         $group.animate({'backgroundColor': '#FFEE88'}, 1000)
             .animate({'display': 'block'}, 2000)

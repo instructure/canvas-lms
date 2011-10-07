@@ -50,10 +50,10 @@
 }
 
 #group_tabs .group_category .category_header {
-  margin-bottom: 5px; 
   text-align: left; 
   -moz-border-radius: 5px;
   padding: 5px;
+  margin-bottom: 1em; 
 }
 #group_tabs .group_category .category_header .category_name {
   font-weight: bold;
@@ -61,6 +61,9 @@
 #group_tabs .group_category .category_header .links {
   float: right;
   clear: right;
+}
+#group_tabs .group_category.editing .category_header {
+  display: none;
 }
 #group_tabs .group_category .group h3 {
   
@@ -129,7 +132,16 @@ a.load_members_link, .loading_members {
   background-color: #fff;
   list-style-type: none;
   cursor: move;
-  padding: 1px 3px;
+  padding: 2px 5px;
+}
+.student .name {
+  margin-bottom: -2px;
+}
+.student .section_code {
+  margin-left: 1.5em;
+  margin-top: -2px;
+  font-size: 0.9em;
+  color: #888;
 }
 .student:hover, .student.dragging {
   background-color: #eee;
@@ -202,8 +214,12 @@ a.load_members_link, .loading_members {
 
   <ul style="display: none;">
     <li class="student user_template" title="<%= t :drag_and_drop_instructions, "Click and drag to move student to another group." %>">
-      <span class="name"></span>
-      <span class="user_id" style="display: none"></span>
+      <div class="name"></div>
+      <div class="section_code"></div>
+      <div style="display: none;" class="data">
+        <span class="user_id"></span>
+        <span class="section_id"></span>
+      </div>
     </li>
   </ul>
 
@@ -222,4 +238,19 @@ a.load_members_link, .loading_members {
     <%= render :partial => "category", :object => nil %>
   </div>
   <%= render :partial => "groups/add_group_category" %>
+  <%= render :partial => "groups/edit_group_category" %>
+  <div id="self_signup_help_dialog" style="display: none;">
+    <%= mt(:self_signup_help_message, <<-TEXT)
+You can create sets of groups where students can sign up on their own.
+Students are still limited to being in only one group in the set, but this way
+students can organize themselves into groups instead of needing the teacher to
+do the work. You can also require that group members all be part of the same
+course section.
+
+Keep in mind, students can move themselves from one group to another, so when
+your students are done organizing themselves you may want to disable self
+sign-ups.
+TEXT
+    %>
+  </div>
 <% end %>

@@ -89,6 +89,16 @@ class Group < ActiveRecord::Base
     ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
   
+  def allow_self_signup?(user)
+    return false unless user && self.group_category
+    self.group_category.unrestricted_self_signup? ||
+    (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user))
+  end
+
+  def free_association?(user)
+    allow_join_request?(user) || allow_self_signup?(user)
+  end
+  
   def participants
     participating_users.uniq
   end
@@ -305,7 +315,13 @@ class Group < ActiveRecord::Base
 
   def members_json_cached
     Rails.cache.fetch(['group_members_json', self].cache_key) do
-      self.users.map {|u| { :user_id => u.id, :name => u.last_name_first } }
+      self.users.map do |u|
+        h = { :user_id => u.id, :name => u.last_name_first }
+        if self.context && self.context.is_a?(Course) && (section = u.section_for_course(self.context))
+          h = h.merge(:section_id => section.id, :section_code => section.section_code)
+        end
+        h
+      end
     end
   end
 
@@ -398,5 +414,16 @@ class Group < ActiveRecord::Base
       end
     end
     json
+  end
+
+  def has_common_section?
+    self.context && self.context.is_a?(Course) &&
+    self.context.course_sections.active.any?{ |section| section.common_to_users?(self.users) }
+  end
+
+  def has_common_section_with_user?(user)
+    return false unless self.context && self.context.is_a?(Course)
+    users = self.users + [user]
+    self.context.course_sections.active.any?{ |section| section.common_to_users?(users) }
   end
 end

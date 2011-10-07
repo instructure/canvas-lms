@@ -174,7 +174,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
-    course.resources :groups, :collection => {:create_category => :post, :delete_category => :delete}
+    course.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
     course.resources :wiki_pages, :as => 'wiki' do |wiki_page|
       wiki_page.latest_version_number 'revisions/latest', :controller => 'wiki_page_revisions', :action => 'latest_version_number'
       wiki_page.resources :wiki_page_revisions, :as => "revisions"
@@ -444,7 +444,7 @@ ActionController::Routing::Routes.draw do |map|
     end
     account.media_download 'media_download', :controller => 'users', :action => 'media_download'
     account.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
-    account.resources :groups, :collection => {:create_category => :post, :delete_category => :delete}
+    account.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
     account.resources :outcomes
     account.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
     account.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
