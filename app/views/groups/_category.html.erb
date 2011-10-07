@@ -3,9 +3,14 @@
 <% protected_category = category && category.protected? %>
 <div id="<%= "category_#{category ? category.id : "template"}" %>" data-category_id="<%= category && category.id %>" class="group_category <%= 'student_organized' if student_organized %>">
   <div class="category_header">
+    <div style="display: none;">
+      <span class="self_signup"><%= category && category.self_signup %></span>
+      <span class="heterogenous"><%= category && category.has_heterogenous_group? %></span>
+    </div>
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><%= image_tag "add.png" %></a>
       <% unless protected_category %>
+        <a href="<%= context_url(@context, :update_category_context_groups_url, :category_id => category ? category.id : "{{ category_id }}") %>" class="edit_category_link no-hover" title="<%= t 'buttons.edit_category', "Edit This Set of Groups" %>"><%= image_tag "edit.png" %></a>
         <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_id => category ? category.id : "{{ category_id }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
       <% end %>
     </div>
@@ -16,11 +21,19 @@
       <a href="#" class="expand_groups_link"><%= t 'actions.expand_all', "Expand All" %></a> |
       <a href="#" class="collapse_groups_link"><%= t 'actions.collapse_all', "Collapse All" %></a>
       </div>
+      <div style="margin-top: 0.5em; margin-bottom: 0.5em;">
       <span class="group_count"></span>
       <span style="color: #888;"> &nbsp; &nbsp; <%= t 'instructions.group_assignment', "drag students to assign to groups" %></span>
+      </div>
       <% if student_organized %>
         <div style="color: #444;"><%= image_tag "warning.png" %> <%= t 'warnings.studend_groups', "These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments." %></div>
       <% end %>
+      <div style="color: #444;<%= hidden unless category && category.self_signup? %>" class="self_signup_text">
+        <%= t 'self_signup_blurb', "Self sign-up is enabled for these groups." %>
+        <span class="restricted_self_signup_text" style="<%= hidden unless category && category.restricted_self_signup? %>"><%= t 'restricted_self_signup_blurb', "All students in a group are required to be in the same section." %></span>
+        <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
+                    :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
+      </div>
     </div>
   </div>
   <div class="right_side">

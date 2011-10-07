@@ -1,5 +1,46 @@
-<% group ||= nil %>
-  <li id="group_<%= group ? group.id : 'blank' %>" class="group <%= 'teacher_group' if group && @context.is_a?(Course) && !group.student_organized? %>" style="<%= hidden unless group %>">
-    <%= link_to((group.name rescue nbsp), group_url(group ? group.id : '{{ id }}'), :class => 'name') %>
-    <%= "(#{group.group_category.name})" if group && !group.student_organized? %>
-  </li>
+<% in_categories ||= [] %>
+<% in_group ||= false %>
+<li id="group_<%= group ? group.id : 'blank' %>" class="group <%= 'teacher_group' if group && @context.is_a?(Course) && !group.student_organized? %>" style="<%= hidden unless group %>">
+  <div class="group_name">
+    <% spanned_group_name = raw('<span class="name">') + (group ? group.name : nbsp) + raw('</span>') %>
+    <% if in_group %>
+      <%= link_to(spanned_group_name, group_url(group ? group.id : '{{ id }}')) %>
+    <% else %>
+      <%= spanned_group_name %>
+    <% end %>
+    <% if in_group
+         if !group || group.free_association?(@current_user)
+           management_url = context_url @context, :context_group_url, (group ? group.id : '{{ id }}'), :leave => 1
+           management_text = t 'actions.leave_group', 'leave this group' 
+         end
+       else
+         # a group should always be present if in_group is false, and for the
+         # group to be being displayed with in_group false, it must be free
+         # associative
+         management_url = context_url @context, :context_group_url, group.id, :join => 1
+         management_text = 
+           if group.auto_accept?(@current_user)
+             t 'actions.join_group', 'join this group'
+           elsif group.allow_self_signup?(@current_user)
+             if in_categories.include?(group.group_category)
+               t 'actions.switch_group', 'switch to this group'
+             else
+               t 'actions.join_group', 'join this group'
+             end
+           else
+             t 'actions.ask_to_join_group', 'ask to join this group'
+           end
+       end %>
+    <% if management_url %>
+      <span class="management"><%= link_to(management_text, management_url) %></span>
+    <% end %>
+  </div>
+  <div class="group_info">
+    <% items = [] %>
+    <%# 1 by default since when creating a group the creating user will be in
+        it, but will be the only user in it %>
+    <% items << t(:member, 'member', :count => group ? group.participating_users.length : 1) %>
+    <% items << group.group_category.name if group && !group.student_organized? %>
+    <%= items.join(", ") %>
+  </div>
+</li>

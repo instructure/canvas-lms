@@ -1973,4 +1973,8 @@ class User < ActiveRecord::Base
     associated_root_accounts.any? { |a| a.settings[:users_can_edit_name] != false } || associated_root_accounts.empty?
   end
 
+  def section_for_course(course)
+    enrollment = course.student_enrollments.active.for_user(self).first
+    enrollment && enrollment.course_section
+  end
 end

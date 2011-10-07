@@ -296,4 +296,64 @@ describe Group do
     group.reload
     group.read_attribute(:category).should eql(default_category.name)
   end
+
+  context "has_common_section?" do
+    it "should be false for accounts" do
+      account = Account.default
+      group = account.groups.create
+      group.should_not have_common_section
+    end
+
+    it "should not be true if two members don't share a section" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      section2 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.add_user(user2)
+      group.should_not have_common_section
+    end
+
+    it "should be true if all members group have a section in common" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.add_user(user2)
+      group.should have_common_section
+    end
+  end
+
+  context "has_common_section_with_user?" do
+    it "should be false for accounts" do
+      account = Account.default
+      group = account.groups.create
+      group.should_not have_common_section_with_user(user_model)
+    end
+
+    it "should not be true if the new member does't share a section with an existing member" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      section2 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.should_not have_common_section_with_user(user2)
+    end
+
+    it "should be true if all members group have a section in common with the new user" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.should have_common_section_with_user(user2)
+    end
+  end
 end
