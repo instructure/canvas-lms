@@ -614,12 +614,8 @@ I18n.scoped 'conversations', (I18n) ->
       for user in data.participants when !MessageInbox.user_cache[user.id]?.avatar_url
         MessageInbox.user_cache[user.id] = user
         user.html_name = html_name_for_user(user)
-      $form.find('#user_note_info').showIf(
-          $c.hasClass('private') and
-          (user_id = $c.find('.participant').first().data('id')) and
-          (user = MessageInbox.user_cache[user_id]) and
-          can_add_notes_for(user)
-        )
+      if data['private'] and user = (user for user in data.participants when user.id isnt MessageInbox.user_id)[0] and can_add_notes_for(user)
+        $form.find('#user_note_info').show()
       inbox_resize()
       $messages.show()
       i = j = 0
@@ -1499,7 +1495,8 @@ I18n.scoped 'conversations', (I18n) ->
         unless data.id and "#{data.id}".match(/^(course|group)_/)
           data = $.extend({}, data)
           delete data.avatar_url # since it's the wrong size and possibly a blank image
-          MessageInbox.user_cache[data.id] ?= data
+          current_data = MessageInbox.user_cache[data.id] ? {}
+          MessageInbox.user_cache[data.id] = $.extend(current_data, data)
       selector:
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
@@ -1514,7 +1511,7 @@ I18n.scoped 'conversations', (I18n) ->
           $b.text(data.name)
           $span = $('<span />')
           if data.common_courses?
-            $span.text(MessageInbox.context_list(data))
+            $span.text(MessageInbox.context_list(courses: data.common_courses, groups: data.common_groups))
           else if data.type and data.user_count?
             $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
           $node.append($b, $context_name, $span)

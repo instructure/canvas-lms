@@ -836,7 +836,7 @@
       $form.loadingImage();
       $c = $selected_conversation;
       completion = function(data) {
-        var i, j, message, submission, user, user_id, _i, _len, _ref, _ref2;
+        var i, j, message, submission, user, _i, _len, _ref, _ref2;
         if (!is_selected($c)) {
           return;
         }
@@ -848,7 +848,20 @@
             user.html_name = html_name_for_user(user);
           }
         }
-        $form.find('#user_note_info').showIf($c.hasClass('private') && (user_id = $c.find('.participant').first().data('id')) && (user = MessageInbox.user_cache[user_id]) && can_add_notes_for(user));
+        if (data['private'] && (user = ((function() {
+          var _j, _len2, _ref3, _results;
+          _ref3 = data.participants;
+          _results = [];
+          for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
+            user = _ref3[_j];
+            if (user.id !== MessageInbox.user_id) {
+              _results.push(user);
+            }
+          }
+          return _results;
+        })())[0] && can_add_notes_for(user))) {
+          $form.find('#user_note_info').show();
+        }
         inbox_resize();
         $messages.show();
         i = j = 0;
@@ -1994,7 +2007,7 @@
       $('.recipients').tokenInput({
         placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group"),
         added: function(data, $token, new_token) {
-          var $details, _base, _name, _ref3;
+          var $details, current_data, _ref3;
           if (new_token && data.type) {
             $token.addClass(data.type);
             if (data.user_count != null) {
@@ -2009,7 +2022,8 @@
           if (!(data.id && ("" + data.id).match(/^(course|group)_/))) {
             data = $.extend({}, data);
             delete data.avatar_url;
-            return (_ref3 = (_base = MessageInbox.user_cache)[_name = data.id]) != null ? _ref3 : _base[_name] = data;
+            current_data = (_ref3 = MessageInbox.user_cache[data.id]) != null ? _ref3 : {};
+            return MessageInbox.user_cache[data.id] = $.extend(current_data, data);
           }
         },
         selector: {
@@ -2035,7 +2049,10 @@
             $b.text(data.name);
             $span = $('<span />');
             if (data.common_courses != null) {
-              $span.text(MessageInbox.context_list(data));
+              $span.text(MessageInbox.context_list({
+                courses: data.common_courses,
+                groups: data.common_groups
+              }));
             } else if (data.type && (data.user_count != null)) {
               $span.text(I18n.t('people_count', 'person', {
                 count: data.user_count

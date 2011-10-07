@@ -17,8 +17,9 @@ shared_examples_for "conversations selenium tests" do
   def submit_message_form(opts={})
     opts[:message] ||= "Test Message"
     opts[:attachments] ||= []
+    opts[:add_recipient] = true unless opts.has_key?(:add_recipient)
 
-    if browser = find_with_jquery("#create_message_form .browser:visible")
+    if opts[:add_recipient] && browser = find_with_jquery("#create_message_form .browser:visible")
       browser.click
       keep_trying_until{
         if elem = find_with_jquery('.selectable:visible')
@@ -169,6 +170,69 @@ shared_examples_for "conversations selenium tests" do
       find_all_with_jquery("#{message} .message_attachments li").size.should == 2
       find_with_jquery("#{message} .message_attachments li:first a .title").text.should == file1[0]
       find_with_jquery("#{message} .message_attachments li:last a .title").text.should == file2[0]
+    end
+  end
+
+  context "user notes" do
+    before do
+      @the_teacher = User.create(:name => "teacher bob")
+      @course.enroll_teacher(@the_teacher)
+      @the_student = User.create(:name => "student bob")
+      @course.enroll_student(@the_student)
+    end
+
+    def add_recipient(search)
+      input = find_with_jquery("#create_message_form input:visible")
+      input.send_keys(search)
+      keep_trying_until{ driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
+      input.send_keys(:return)
+    end
+
+    it "should not allow user notes if not enabled" do
+      @course.account.update_attribute :enable_user_notes, false
+      new_conversation
+      add_recipient("student bob")
+      driver.find_element(:id, "add_to_faculty_journal").should_not be_displayed
+    end
+
+    it "should not allow user notes to teachers" do
+      @course.account.update_attribute :enable_user_notes, true
+      new_conversation
+      add_recipient("teacher bob")
+      driver.find_element(:id, "add_to_faculty_journal").should_not be_displayed
+    end
+
+    it "should not allow user notes on group conversations" do
+      @course.account.update_attribute :enable_user_notes, true
+      new_conversation
+      add_recipient("student bob")
+      add_recipient("teacher bob")
+      driver.find_element(:id, "add_to_faculty_journal").should_not be_displayed
+      find_with_jquery("#create_message_form input:visible").send_keys :backspace
+      driver.find_element(:id, "add_to_faculty_journal").should be_displayed
+    end
+
+    it "should allow user notes on new private conversations with students" do
+      @course.account.update_attribute :enable_user_notes, true
+      new_conversation
+      add_recipient("student bob")
+      checkbox = driver.find_element(:id, "add_to_faculty_journal")
+      checkbox.should be_displayed
+      checkbox.click
+      submit_message_form(:add_recipient => false)
+      @the_student.user_notes.size.should eql(1)
+    end
+
+    it "should allow user notes on existing private conversations with students" do
+      @course.account.update_attribute :enable_user_notes, true
+      new_conversation
+      add_recipient("student bob")
+      submit_message_form(:add_recipient => false)
+      checkbox = driver.find_element(:id, "add_to_faculty_journal")
+      checkbox.should be_displayed
+      checkbox.click
+      submit_message_form
+      @the_student.user_notes.size.should eql(1)
     end
   end
 end
