@@ -527,7 +527,21 @@ describe ConversationsController, :type => :integration do
   context "conversation" do
     it "should return the conversation" do
       conversation = conversation(@bob)
-      conversation.add_message("another")
+      attachment = nil
+      media_object = nil
+      conversation.add_message("another") do |message|
+        attachment = message.attachments.create(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
+        media_object = MediaObject.new
+        media_object.media_id = '0_12345678'
+        media_object.media_type = 'audio'
+        media_object.context = @me
+        media_object.user = @me
+        media_object.title = "test title"
+        media_object.save!
+        message.media_comment = media_object
+        message.save
+      end
+
       conversation.reload
 
       json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
@@ -545,7 +559,7 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => true,
         "label" => nil,
-        "properties" => ["last_author"],
+        "properties" => ["last_author", "attachments", "media_objects"],
         "audience" => [@bob.id],
         "audience_contexts" => {
           "groups" => {},
@@ -556,7 +570,29 @@ describe ConversationsController, :type => :integration do
           {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
-          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "another", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []},
+          {
+            "id" => conversation.messages.first.id,
+            "created_at" => conversation.messages.first.created_at.to_json[1, 20], 
+            "body" => "another", 
+            "author_id" => @me.id, 
+            "generated" => false, 
+            "media_comment" => {
+              "media_type" => "audio",
+              "media_id" => "0_12345678",
+              "display_name" => "test title",
+              "content-type" => "audio/mp4",
+              "url" => "http://www.example.com/users/#{@me.id}/media_download?entryId=0_12345678&redirect=1&type=mp4"
+            }, 
+            "forwarded_messages" => [], 
+            "attachments" => [
+              {
+                "filename" => "test.txt",
+                "url" => "http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}",
+                "content-type" => "unknown/unknown",
+                "display_name" => "test.txt",
+              }
+            ]
+          },
           {"id" => conversation.messages.last.id, "created_at" => conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
         ],
         "submissions" => []

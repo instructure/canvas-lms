@@ -258,6 +258,7 @@ describe SubmissionsApiController, :type => :integration do
 
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     sub1 = submit_homework(a1, student1)
+    media_object(:media_id => "3232", :media_type => "audio")
     a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
     comment = sub1.submission_comments.first
 
@@ -282,10 +283,11 @@ describe SubmissionsApiController, :type => :integration do
         "submission_comments"=>
          [{"comment"=>"Well here's the thing...",
            "media_comment" => {
-             "media_comment_id"=>"3232",
-             "media_comment_type"=>"audio",
+             "media_id"=>"3232",
+             "media_type"=>"audio",
              "content-type" => "audio/mp4",
-             "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "display_name" => nil
            },
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
@@ -327,7 +329,7 @@ describe SubmissionsApiController, :type => :integration do
     course_with_teacher(:active_all => true)
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    MediaObject.create!(:media_id => "54321", :context => student1, :user => student1)
+    media_object(:media_id => "54321", :context => student1, :user => student1)
     mock_kaltura = mock(Kaltura::ClientV3)
     Kaltura::ClientV3.stub(:new).and_return(mock_kaltura)
     mock_kaltura.should_receive :startSession
@@ -362,11 +364,13 @@ describe SubmissionsApiController, :type => :integration do
     a1.create_rubric_association(:rubric => rubric, :purpose => 'grading', :use_for_grading => true)
 
     submit_homework(a1, student1)
+    media_object(:media_id => "54321", :context => student1, :user => student1)
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:context => student1, :folder => nil)] }
 
     sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s| s.attachment = attachment_model(:context => s, :filename => 'snapshot.png', :content_type => 'image/png'); s.attachments = [attachment_model(:context => a1, :filename => 'ss2.png', :content_type => 'image/png')] }
 
+    media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
     a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
     sub1.reload
     sub1.submission_comments.size.should == 1
@@ -411,10 +415,11 @@ describe SubmissionsApiController, :type => :integration do
           {"grade"=>nil,
             "assignment_id" => a1.id,
            "media_comment" =>
-            { "media_comment_type"=>"video",
-              "media_comment_id"=>"54321",
+            { "media_type"=>"video",
+              "media_id"=>"54321",
               "content-type" => "video/mp4",
-              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+              "display_name" => nil },
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T02:00:00Z",
            "attempt"=>2,
@@ -427,9 +432,10 @@ describe SubmissionsApiController, :type => :integration do
           {"grade"=>"A-",
             "assignment_id" => a1.id,
            "media_comment" =>
-            { "media_comment_type"=>"video",
-              "media_comment_id"=>"54321","content-type" => "video/mp4",
-              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+            { "media_type"=>"video",
+              "media_id"=>"54321","content-type" => "video/mp4",
+              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+              "display_name" => nil },
            "attachments" =>
             [
               { "content-type" => "application/loser",
@@ -453,19 +459,21 @@ describe SubmissionsApiController, :type => :integration do
         "submission_comments"=>
          [{"comment"=>"Well here's the thing...",
            "media_comment" => {
-             "media_comment_type"=>"audio",
-             "media_comment_id"=>"3232",
+             "media_type"=>"audio",
+             "media_id"=>"3232",
              "content-type" => "audio/mp4",
-             "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "display_name" => nil
            },
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
            "author_id"=>student1.id}],
         "media_comment" =>
-         { "media_comment_type"=>"video",
-           "media_comment_id"=>"54321",
+         { "media_type"=>"video",
+           "media_id"=>"54321",
            "content-type" => "video/mp4",
-           "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+           "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+           "display_name" => nil },
         "score"=>13.5},
        {"grade"=>"F",
         "assignment_id" => a1.id,
@@ -937,6 +945,7 @@ describe SubmissionsApiController, :type => :integration do
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    media_object(:media_id => "1234", :media_type => 'audio')
 
     json = api_call(:put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
@@ -951,7 +960,7 @@ describe SubmissionsApiController, :type => :integration do
     json['submission_comments'].size.should == 1
     comment = json['submission_comments'].first
     comment['comment'].should == 'This is a media comment.'
-    comment['media_comment']['url'].should == "http://www.example.com/courses/#{@course.id}/media_download?entryId=1234&redirect=1&type=mp4"
+    comment['media_comment']['url'].should == "http://www.example.com/users/#{@user.id}/media_download?entryId=1234&redirect=1&type=mp4"
     comment['media_comment']["content-type"].should == "audio/mp4"
   end
 

@@ -852,9 +852,8 @@ I18n.scoped 'conversations', (I18n) ->
     $message
 
   build_media_object = (blank, data) ->
-    $media_object = blank.clone(true).attr('id', 'media_object_' + data.id)
-    $media_object.data('id', data.id)
-    $media_object.find('span.title').html $.h(data.title)
+    $media_object = blank.clone(true).attr('id', 'media_comment_' + data.media_id)
+    $media_object.find('span.title').html $.h(data.display_name)
     $media_object.find('span.media_comment_id').html $.h(data.media_id)
     $media_object
 
@@ -863,7 +862,7 @@ I18n.scoped 'conversations', (I18n) ->
     $attachment.data('id', data.id)
     $attachment.find('span.title').html $.h(data.display_name)
     $link = $attachment.find('a')
-    $link.attr('href', $.replaceTags($link.attr('href'), id: data.id, uuid: data.uuid))
+    $link.attr('href', data.url)
     $link.click (e) ->
       e.stopPropagation()
     $attachment

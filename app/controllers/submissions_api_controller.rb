@@ -260,8 +260,7 @@ class SubmissionsApiController < ApplicationController
           :include_root => false,
           :only => %w(author_id author_name created_at comment))
         if sc.media_comment?
-          sc_hash['media_comment'] = media_comment_json(sc.media_comment_id,
-                                                        sc.media_comment_type)
+          sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
           attachment_json(a)
@@ -308,8 +307,7 @@ class SubmissionsApiController < ApplicationController
       'version' => version_idx)
 
     unless attempt.media_comment_id.blank?
-      hash['media_comment'] = media_comment_json(attempt.media_comment_id,
-                                                 attempt.media_comment_type)
+      hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
     end
     if other_fields.include?('attachments')
       attachments = attempt.versioned_attachments.dup
@@ -345,18 +343,6 @@ class SubmissionsApiController < ApplicationController
     end
 
     hash
-  end
-
-  # a media comment looks just like an attachment to the API
-  def media_comment_json(media_comment_id, media_comment_type)
-    {
-      'media_comment_id' => media_comment_id,
-      'media_comment_type' => media_comment_type,
-      'content-type' => "#{media_comment_type}/mp4",
-      'url' => course_media_download_url(:entryId => media_comment_id,
-                                         :type => "mp4",
-                                         :redirect => "1"),
-    }
   end
 
   def map_user_ids(user_ids)

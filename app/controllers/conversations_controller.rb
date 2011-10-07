@@ -188,9 +188,9 @@ class ConversationsController < ApplicationController
   #   body:: The actual message body
   #   author_id:: The id of the user who sent the message (see audience, participants)
   #   generated:: If true, indicates this is a system-generated message (e.g. "Bob added Alice to the conversation")
-  #   media_comment:: Audio comment data for this message (if applicable). Fields include: id, title, media_id
+  #   media_comment:: Audio comment data for this message (if applicable). Fields include: display_name, content-type, media_id, media_type, url
   #   forwarded_messages:: If this message contains forwarded messages, they will be included here (same format as this list). Note that those messages may have forwarded messages of their own, etc.
-  #   attachments:: Array of attachments for this message. Fields include: id, display_name, uuid
+  #   attachments:: Array of attachments for this message. Fields include: display_name, content-type, filename, url
   # @response_field submissions Array of assignment submissions having
   #   comments relevant to this conversation. These should be interleaved with
   #   the messages when displaying to the user. Fields include:
@@ -767,13 +767,22 @@ class ConversationsController < ApplicationController
   def jsonify_conversation(conversation, options = {})
     result = conversation.as_json(options)
     audience = conversation.participants.reject{ |u| u.id == conversation.user_id }
-    result[:messages] = options[:messages] if options[:messages]
+    result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
     result[:submissions] = options[:submissions] if options[:submissions]
     result[:audience] = audience.map(&:id)
     result[:audience_contexts] = contexts_for(audience)
     result[:avatar_url] = avatar_url_for(conversation)
     result[:participants] = jsonify_users(conversation.participants(options), options)
     result
+  end
+
+  def jsonify_messages(messages)
+    messages.map{ |message|
+      message = message.as_json
+      message['media_comment'] = media_comment_json(message['media_comment']) if message['media_comment']
+      message['attachments'] = message['attachments'].map{ |attachment| attachment_json(attachment) }
+      message
+    }
   end
 
   def jsonify_users(users, options = {})

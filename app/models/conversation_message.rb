@@ -152,8 +152,8 @@ class ConversationMessage < ActiveRecord::Base
   def as_json(options = {})
     super(:only => [:id, :created_at, :body, :generated, :author_id])['conversation_message'].merge({
       'forwarded_messages' => forwarded_messages,
-      'attachments' => attachments.map{ |a| a.as_json(:only => [:id, :display_name], :methods => ['uuid'])['attachment'] },
-      'media_comment' => media_comment.as_json(:only => [:id, :title, :media_id])['media_object']
+      'attachments' => attachments,
+      'media_comment' => media_comment
     })
   end
 

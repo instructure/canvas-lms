@@ -511,6 +511,7 @@ ActionController::Routing::Routes.draw do |map|
     user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
+    user.media_download 'media_download', :controller => 'users', :action => 'media_download'
   end
   map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)

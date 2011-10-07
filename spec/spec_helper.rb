@@ -309,6 +309,15 @@ Spec::Runner.configure do |config|
     @conversation.reload
   end
 
+  def media_object(opts={})
+    mo = MediaObject.new
+    mo.media_id = opts[:media_id] || "1234"
+    mo.media_type = opts[:media_type] || "video"
+    mo.context = opts[:context] || @user || @course
+    mo.user = opts[:user] || @user
+    mo.save!
+  end
+
   def assert_status(status=500)
     response.status.to_i.should eql(status)
   end

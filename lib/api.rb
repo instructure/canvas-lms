@@ -134,6 +134,20 @@ module Api
     }
   end
 
+  def media_comment_json(media_object_or_hash)
+    media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
+    {
+      'content-type' => "#{media_object_or_hash.media_type}/mp4",
+      'display_name' => media_object_or_hash.title,
+      'media_id' => media_object_or_hash.media_id,
+      'media_type' => media_object_or_hash.media_type,
+      'url' => user_media_download_url(:user_id => @current_user.id,
+                                       :entryId => media_object_or_hash.media_id,
+                                       :type => "mp4",
+                                       :redirect => "1")
+    }
+  end
+
   # stream an array of objects as a json response, without building a string of
   # the whole response in memory.
   def stream_json_array(array, json_opts)
