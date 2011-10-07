@@ -639,9 +639,9 @@ class Attachment < ActiveRecord::Base
       self.thumbnail.cached_s3_url
     elsif self.media_object && self.media_object.media_id
       Kaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
-                                          options[:width] | 140,
-                                          options[:height] || 100,
-                                          options[:video_seconds] || 5)
+                                          :width => options[:width] || 140,
+                                          :height => options[:height] || 100,
+                                          :vid_sec => options[:video_seconds] || 5)
     else
       # "still need to handle things that are not images with thumbnails, scribd_docs, or kaltura docs"
     end

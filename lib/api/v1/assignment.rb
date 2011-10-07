@@ -22,6 +22,7 @@ module Api::V1::Assignment
   hash = assignment.as_json(:include_root => false, :only => %w(id grading_type points_possible position due_at))
 
   hash['name'] = assignment.title
+  hash['description'] = api_user_content(assignment.description)
 
   if show_admin_fields
     hash['needs_grading_count'] = assignment.needs_grading_count

@@ -164,4 +164,33 @@ module Api
 
   # See User.submissions_for_given_assignments and SubmissionsApiController#for_students
   mattr_accessor :assignment_ids_for_students_api
+
+  def api_user_content(html, context = @context, user = @current_user)
+    rewriter = UserContent::HtmlRewriter.new(context, user)
+    rewriter.set_handler('files') do |match|
+      obj = match.obj_class.find_by_id(match.obj_id)
+      break unless obj && rewriter.user_can_view_content?(obj)
+      file_download_url(obj.id, :verifier => obj.uuid, :download => '1')
+    end
+    html = rewriter.translate_content(html)
+
+    return html if html.blank?
+
+    # translate media comments into html5 video tags
+    doc = Nokogiri::HTML::DocumentFragment.parse(html)
+    doc.css('a.instructure_inline_media_comment').each do |anchor|
+      media_id = anchor['id'].gsub(/^media_comment_/, '')
+      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1')
+      thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3)
+      video_node = Nokogiri::XML::Node.new('video', doc)
+      video_node['controls'] = 'controls'
+      video_node['poster'] = thumbnail
+      video_node['src'] = media_redirect
+      video_node['width'] = '550'
+      video_node['height'] = '448'
+      anchor.replace(video_node)
+    end
+
+    return doc.to_s
+  end
 end

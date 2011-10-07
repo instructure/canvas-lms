@@ -56,8 +56,19 @@ module Kaltura
       res
     end
 
-    def thumbnail_url(entryId, width, height, vid_sec = 5, bgcolor = "ffffff", type = "2")
-      "//#{@resource_domain}/p/#{@partnerId}/thumbnail/entry_id/#{entryId}/width/#{width}/height/#{height}/bgcolor/#{bgcolor}/type/#{type}/vid_sec/#{vid_sec}"
+    def thumbnail_url(entryId, opts = {})
+      opts = {
+        :width => 140,
+        :height => 100,
+        :vid_sec => 5,
+        :bgcolor => "ffffff",
+        :type => "2",
+        :protocol => ""
+      }.merge(opts)
+      "#{opts[:protocol] + ":" unless opts[:protocol].blank?}" + 
+        "//#{@resource_domain}/p/#{@partnerId}/thumbnail/entry_id/#{entryId}" +
+        "/width/#{opts[:width]}/height/#{opts[:height]}/bgcolor/#{opts[:bgcolor]}" +
+        "/type/#{opts[:type]}/vid_sec/#{opts[:vid_sec]}"
     end
 
     def startSession(type = SessionType::USER, userId = nil)
