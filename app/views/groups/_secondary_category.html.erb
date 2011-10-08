@@ -1,5 +1,5 @@
 <% category = secondary_category || nil %>
-<div id="sidebar_category_<%= category ? category.name.unpack('H*') : 'blank' %>" class="sidebar_category">
+<div id="sidebar_category_<%= category ? category.id : 'blank' %>" class="sidebar_category">
   <h3 style="margin: 0;" class="category"><%= category && category.name %></h3>
   <ul class="unstyled_list" style="margin-bottom: 10px; margin-left: 10px;">
   <% @groups.select{|g| g.group_category == category}.each do |group| %>

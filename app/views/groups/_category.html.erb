@@ -1,12 +1,12 @@
 <% category_name = category && category.name %>
 <% student_organized = category && category.student_organized? %>
 <% protected_category = category && category.protected? %>
-<div id="<%= category_name ? category_name.unpack('H*') : "category_template" %>" class="group_category <%= 'student_organized' if student_organized %>">
+<div id="<%= "category_#{category ? category.id : "template"}" %>" data-category_id="<%= category && category.id %>" class="group_category <%= 'student_organized' if student_organized %>">
   <div class="category_header">
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><%= image_tag "add.png" %></a>
       <% unless protected_category %>
-        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_name => category_name || "{{ category_name }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
+        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_id => category ? category.id : "{{ category_id }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
       <% end %>
     </div>
     <h3 class="category_name"><%= category_name %></h3>

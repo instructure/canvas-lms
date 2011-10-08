@@ -31,7 +31,8 @@ class GroupsController < ApplicationController
   end
   
   def unassigned_members
-    category = @context.group_categories.find_by_name(params[:category])
+    category = @context.group_categories.find_by_id(params[:category_id])
+    return render :json => {}, :status => :not_found unless category
     page = (params[:page] || 1).to_i rescue 1
     if category && !category.student_organized?
       groups = category.groups.active
@@ -96,7 +97,7 @@ class GroupsController < ApplicationController
       name = (params[:category][:name] || t(:default_category_title, "Study Groups")).titleize
       if GroupCategory.protected_name_for_context?(name, @context)
         flash[:error] = t('errors.group_category_reserved_name', "That is a reserved category name.")
-        render :json => {}, :status => :bad_request
+        render :json => {}, :status => :unauthorized
       elsif @context.group_categories.find_by_name(name)
         flash[:error] = t('errors.group_category_already_exists', "A category with that name already exists.")
         render :json => {}, :status => :bad_request
@@ -113,9 +114,9 @@ class GroupsController < ApplicationController
         @groups = []
         # TODO i18n
         group_name = I18n.locale == :en ? name.singularize : name
-        group_category = @context.group_categories.create(:name => name)
+        @group_category = @context.group_categories.create(:name => name)
         count.times do |idx|
-          @groups << group_category.groups.create(:name => "#{group_name} #{idx + 1}", :max_membership => limit, :context => @context)
+          @groups << @group_category.groups.create(:name => "#{group_name} #{idx + 1}", :max_membership => limit, :context => @context)
         end
         if params[:category][:split_groups] == "1"
           @students = @context.students.sort_by{|s| rand}
@@ -124,22 +125,19 @@ class GroupsController < ApplicationController
           end
         end
         flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
-        render :json => @groups.to_json(:include => :users)
+        render :json => [@group_category.as_json, @groups.map{ |g| g.as_json(:include => :users) }].to_json
       end
     end
   end
   
   def delete_category
     if authorized_action(@context, @current_user, :manage_groups)
-      category = @context.group_categories.find_by_name(params[:category_name])
-      if !category
-        flash[:error] = t('errors.group_category_doesnt_exist', "No such category.")
-        render :json => {}, :status => :not_found
-      elsif category.protected?
-        flash[:error] = t('errors.group_category_cannot_delete', "System categories cannot be removed.")
-        render :json => {}, :status => :bad_request
+      @group_category = @context.group_categories.find_by_id(params[:category_id])
+      return render :json => {}, :status => :not_found unless @group_category
+      if @group_category.protected?
+        render :json => {}, :status => :unauthorized
       else
-        category.destroy
+        @group_category.destroy
         flash[:notice] = t('notices.delete_category_success', "Category successfully deleted")
         render :json => {:deleted => true}
       end
@@ -168,17 +166,12 @@ class GroupsController < ApplicationController
 
   def create
     if params[:group]
-      if params[:group][:group_category] && @context.grants_right?(@current_user, session, :manage_groups)
-        params[:group][:group_category] = @context.group_categories.find_by_name(params[:group][:group_category])
-        unless params[:group][:group_category]
-          # TODO error feedback
-          respond_to do |format|
-            flash[:error] = t('errors.group_category_doesnt_exist', "No such category.")
-            format.html { render :action => "new" }
-            format.xml  { render :xml => {}, :status => :bad_request }
-            format.json { render :json => {}, :status => :bad_request }
-          end
-        end
+      group_category_id = params[:group].delete :group_category_id
+      if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
+        group_category = @context.group_categories.find_by_id(group_category_id)
+        return render :json => {}, :status => :bad_request unless group_category
+        params[:group][:group_category] = group_category
+
       else
         params[:group][:group_category] = nil
       end
@@ -213,6 +206,12 @@ class GroupsController < ApplicationController
 
   def update
     @group = (@context ? @context.groups : Group).find(params[:id])
+    if params[:group] && params[:group][:group_category_id]
+      group_category_id = params[:group].delete :group_category_id
+      group_category = @context.group_categories.find_by_id(group_category_id)
+      return render :json => {}, :status => :bad_request unless group_category
+      params[:group][:group_category] = group_category
+    end
     if authorized_action(@group, @current_user, :manage)
       respond_to do |format|
         if @group.update_attributes(params[:group])

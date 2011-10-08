@@ -93,7 +93,7 @@ describe GroupsController do
     it "should require authorization" do
       @course = course_model(:reusable => true)
       @group = @course.groups.create(:name => "some groups")
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :group_count => 2}
+      post 'create_category', :course_id => @course.id, :category => {}
       assert_unauthorized
     end
     
@@ -115,7 +115,8 @@ describe GroupsController do
     
     it "should give the new groups the right group_category" do
       course_with_teacher_logged_in(:active_all => true)
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :group_count => 1}
+      student_in_course
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :group_count => 1, :split_groups => '1'}
       response.should be_success
       assigns[:groups].length.should eql(1)
       assigns[:groups][0].group_category.name.should == "Study Groups"
@@ -123,14 +124,14 @@ describe GroupsController do
 
     it "should error if the group name is protected" do
       course_with_teacher_logged_in(:active_all => true)
-      post 'create_category', :course_id => @course.id, :category => {:name => "Student Groups", :group_count => 1}
+      post 'create_category', :course_id => @course.id, :category => {:name => "Student Groups"}
       response.should_not be_success
     end
 
     it "should error if the group name is already in use" do
       course_with_teacher_logged_in(:active_all => true)
       @course.group_categories.create(:name => "My Group Category")
-      post 'create_category', :course_id => @course.id, :category => {:name => "My Group Category", :group_count => 1}
+      post 'create_category', :course_id => @course.id, :category => {:name => "My Group Category"}
       response.should_not be_success
     end
   end
@@ -139,7 +140,7 @@ describe GroupsController do
     it "should require authorization" do
       @course = course_model(:reusable => true)
       group_category = @course.group_categories.create(:name => "Study Groups")
-      delete 'delete_category', :course_id => @course.id, :category_name => group_category.name
+      delete 'delete_category', :course_id => @course.id, :category_id => group_category.id
       assert_unauthorized
     end
     
@@ -149,7 +150,7 @@ describe GroupsController do
       category2 = @course.group_categories.create(:name => "Other Groups")
       @course.groups.create(:name => "some group", :group_category => category1)
       @course.groups.create(:name => "another group", :group_category => category2)
-      delete 'delete_category', :course_id => @course.id, :category_name => category1.name
+      delete 'delete_category', :course_id => @course.id, :category_id => category1.id
       response.should be_success
       @course.reload
       @course.all_group_categories.length.should eql(2)
@@ -160,13 +161,13 @@ describe GroupsController do
     
     it "should fail if category doesn't exist" do
       course_with_teacher_logged_in(:active_all => true)
-      delete 'delete_category', :course_id => @course.id, :category_name => "Random Category"
+      delete 'delete_category', :course_id => @course.id, :category_id => 11235
       response.should_not be_success
     end
     
     it "should fail if category is protected" do
       course_with_teacher_logged_in(:active_all => true)
-      delete 'delete_category', :course_id => @course.id, :category_name => GroupCategory.student_organized_for(@course).name
+      delete 'delete_category', :course_id => @course.id, :category_id => GroupCategory.student_organized_for(@course).id
       response.should_not be_success
     end
   end
@@ -227,28 +228,28 @@ describe GroupsController do
       assigns[:group].name.should eql("some group")
     end
 
-    it "should honor group[group_category] when permitted" do
+    it "should honor group[group_category_id] when permitted" do
       course_with_teacher_logged_in(:active_all => true)
       group_category = @course.group_categories.create(:name => 'some category')
-      post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category => group_category.name}
+      post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}
       response.should be_redirect
       assigns[:group].should_not be_nil
       assigns[:group].group_category.should == group_category
     end
 
-    it "should not honor group[group_category] when not permitted" do
+    it "should not honor group[group_category_id] when not permitted" do
       course_with_student_logged_in(:active_all => true)
       group_category = @course.group_categories.create(:name => 'some category')
-      post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category => group_category.name}
+      post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}
       response.should be_redirect
       assigns[:group].should_not be_nil
       assigns[:group].group_category.should == GroupCategory.student_organized_for(@course)
     end
 
-    it "should fail when group[group_category] would be honored but doesn't exist" do
+    it "should fail when group[group_category_id] would be honored but doesn't exist" do
       course_with_student_logged_in(:active_all => true)
       group_category = @course.group_categories.create(:name => 'some category')
-      post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category => 'random category'}
+      post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => 11235}
       response.should_not be_success
     end
   end
@@ -285,6 +286,24 @@ describe GroupsController do
       assigns[:group].should eql(@group)
       assigns[:group].name.should eql("new name")
     end
+
+    it "should honor group[group_category_id]" do
+      course_with_teacher_logged_in(:active_all => true)
+      group_category = @course.group_categories.create(:name => 'some category')
+      @group = @course.groups.create!(:name => "some group")
+      put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => group_category.id}
+      response.should be_redirect
+      assigns[:group].should eql(@group)
+      assigns[:group].group_category.should == group_category
+    end
+
+    it "should fail when group[group_category_id] doesn't exist" do
+      course_with_teacher_logged_in(:active_all => true)
+      group_category = @course.group_categories.create(:name => 'some category')
+      @group = @course.groups.create!(:name => "some group", :group_category => group_category)
+      put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}
+      response.should_not be_success
+    end
   end
   
   describe "DELETE destroy" do
@@ -318,7 +337,7 @@ describe GroupsController do
       group.add_user(u1)
       group.add_user(u2)
 
-      get 'unassigned_members', :course_id => @course.id, :category => group.group_category.name
+      get 'unassigned_members', :course_id => @course.id, :category_id => group.group_category.id
       response.should be_success
       data = JSON.parse(response.body) rescue nil
       data.should_not be_nil
@@ -345,21 +364,21 @@ describe GroupsController do
       group3.add_user(u2)
       group3.add_user(u3)
 
-      get 'unassigned_members', :course_id => @course.id, :category => group1.group_category.name
+      get 'unassigned_members', :course_id => @course.id, :category_id => group1.group_category.id
       response.should be_success
       data = JSON.parse(response.body) rescue nil
       data.should_not be_nil
       data['users'].map{ |u| u['user_id'] }.sort.
         should == [u2, u3].map{ |u| u.id }.sort
 
-      get 'unassigned_members', :course_id => @course.id, :category => group2.group_category.name
+      get 'unassigned_members', :course_id => @course.id, :category_id => group2.group_category.id
       response.should be_success
       data = JSON.parse(response.body) rescue nil
       data.should_not be_nil
       data['users'].map{ |u| u['user_id'] }.sort.
         should == [u1, u3].map{ |u| u.id }.sort
 
-      get 'unassigned_members', :course_id => @course.id, :category => group3.group_category.name
+      get 'unassigned_members', :course_id => @course.id, :category_id => group3.group_category.id
       response.should be_success
       data = JSON.parse(response.body) rescue nil
       data.should_not be_nil

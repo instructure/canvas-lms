@@ -64,9 +64,9 @@ I18n.scoped('groups', function(I18n){
       }
       
       // This is lots of duplicated code from above, with tweaks. TODO: Refactor
-      var category = $group.closest(".group_category").find(".category_name").first().text();
+      var category_id = $group.closest(".group_category").data('category_id');
       var url = $("#manage_group_urls .list_unassigned_users_url").attr('href');
-      url += "?category=" + encodeURIComponent(category) + "&page=" + page;
+      url += "?category_id=" + category_id + "&page=" + page;
       
       $group.find(".load_members_link").hide();
       $group.find(".loading_members").text(I18n.t('status.loading', "Loading..."));
@@ -137,12 +137,12 @@ I18n.scoped('groups', function(I18n){
       $student.addClass('event_pending');
       contextGroups.updateCategoryCounts($group.parents(".group_category"));
       $.ajaxJSON(url, method, data, function(data) {
-        var category_id = $.encodeToHex($group.parents(".group_category").getTemplateData({textValues: ['category_name']}).category_name);
+        var category_id = $group.parents(".group_category").data('category_id');
         $(".student.user_" + user_id).each(function() {
-          var $span = $(this).find("." + category_id + "_group_id");
+          var $span = $(this).find(".category_" + category_id + "_group_id");
           if(!$span || $span.length == 0) {
             $span = $(document.createElement('span'));
-            $span.addClass(category_id + '_group_id');
+            $span.addClass('category_' + category_id + '_group_id');
             $(this).find(".data").append($span);
           }
           $span.text(data.group_membership.group_id || "");
@@ -228,13 +228,13 @@ I18n.scoped('groups', function(I18n){
       if($("#sidebar_group_" + group.id).length > 0) {
         return;
       }
-      var $category = $("#sidebar_category_" + $.encodeToHex(group.group_category));
+      var $category = $("#sidebar_category_" + group.group_category_id);
       if($category.length == 0) {
         $category = $("#sidebar_category_blank").clone(true);
         $category.find("ul").empty();
         $category.fillTemplateData({
           data: group,
-          id: 'sidebar_category_' + $.encodeToHex(group.group_category)
+          id: 'sidebar_category_' + group.group_category_id
         });
         $(".sidebar_category:last").after($category.show());
       }
@@ -281,7 +281,7 @@ I18n.scoped('groups', function(I18n){
     $("#edit_group_form").formSubmit({
       object_name: "group",
       processData: function(data) {
-        data['group[group_category]'] = $(this).parents(".group_category").getTemplateData({textValues: ['category_name']}).category_name;
+        data['group[group_category_id]'] = $(this).parents(".group_category").data('category_id');
         return data;
       },
       beforeSubmit: function(data) {
@@ -347,17 +347,26 @@ I18n.scoped('groups', function(I18n){
       if(index == -1) {
         index = $("#category_list li").index($("#category_list li.ui-tabs-selected"));
       }
-      $(this).parents(".group_category").confirmDelete({
-        url: $(this).attr('href'),
+      var $category = $(this).parents(".group_category");
+      var url = $.replaceTags($(this).attr('href'), "category_id", $category.data('category_id'))
+      $category.confirmDelete({
+        url: url,
         message: I18n.t('confirm.remove_category', "Are you sure you want to remove this set of groups?"),
         success: function() {
+          categories_remaining = $("#category_list li").length;
           $("#group_tabs").tabs('remove', index);
-          $("#group_tabs").showIf($("#category_list li").length > 0);
-          var category_name = $(this).getTemplateData({textValues: ['category_name']}).category_name;
-          $("#sidebar_category_" + $.encodeToHex(category_name)).slideUp(function() {
+          $("#group_tabs").showIf(categories_remaining > 0);
+          var category_id = $(this).data('category_id');
+          if (categories_remaining > 0) {
+            if (index > categories_remaining) {
+              index = categories_remaining;
+            }
+            $("#group_tabs").tabs('select', index);
+          }
+          $("#sidebar_category_" + category_id).slideUp(function() {
             $(this).remove();
           });
-          $("#no_groups_message").showIf($("#category_list li").length == 0);
+          $("#no_groups_message").showIf(categories_remaining == 0);
         }
       });
     });
@@ -369,11 +378,12 @@ I18n.scoped('groups', function(I18n){
         var $category = $("#category_template").clone(true).removeAttr('id');
         var $group_template = $("#category_template").find(".group_blank");
         $category.find(".group").droppable(contextGroups.droppable_options);
-        var category = {};
-        for(var idx in data) {
-          var group = data[idx].group || data[idx].course_assigned_group;
+        var group_category = data[0].group_category;
+        var groups = data[1];
+        for(var idx in groups) {
+          var group = groups[idx].group || groups[idx].course_assigned_group;
+
           group.group_id = group.id;
-          category.category_name = group.group_category;
           $group = $group_template.clone(true).removeClass('group_blank');
           $group.attr('id', 'group_' + group.id);
           if (!group.users || group.users.length == 0) {
@@ -392,10 +402,9 @@ I18n.scoped('groups', function(I18n){
           contextGroups.addGroupToSidebar(group)
           
           if (group.users) {
-            var category_id = $.encodeToHex(group.group_category);
             for(var jdx in group.users) {
               var user = group.users[jdx].user;
-              var $span = $(document.createElement('span')).addClass(category_id + "_group_id");
+              var $span = $(document.createElement('span')).addClass('category_' + group_category.id + "_group_id");
               $span.text(group.id);
               $(".student.user_" + user.id).find(".data").append($span);
             }
@@ -406,20 +415,19 @@ I18n.scoped('groups', function(I18n){
           $group.find(".group_user_count").show();
         }
         $category.fillTemplateData({
-          data: category,
+          data: {category_name: group_category.name},
           hrefValues: ['category_name']
         });
-        var name = $(this).data('category_name');
-        var id = $.encodeToHex(name);
-        $category.attr('id', id);
-        $category.find(".category_name").text(name);
+        $category.attr('id', 'category_' + group_category.id);
+        $category.data('category_id', group_category.id);
+        $category.find(".category_name").text(group_category.name);
         
         var newIndex = $("#group_tabs").tabs('length');
         if ($("li.category").last().hasClass('student_organized')) {
           newIndex -= 1;
         }
         $("#group_tabs").append($category);
-        $("#group_tabs").tabs('add', '#' + id, name, newIndex);
+        $("#group_tabs").tabs('add', '#category_' + group_category.id, group_category.name, newIndex);
         $("#group_tabs").tabs('select', newIndex);
         contextGroups.populateCategory($category);
         contextGroups.updateCategoryCounts($category);
