@@ -176,9 +176,6 @@ I18n.scoped('instructure', function(I18n) {
     return (date && date.toString('h:mmtt').toLowerCase()) || "";
   };
   $.friendlyDatetime = function(datetime, perspective) {
-    if (perspective == null) {
-      perspective = 'past';
-    }
     var today = Date.today();
     if (Date.equals(datetime.clone().clearTime(), today)) {
       return I18n.l('#time.formats.tiny', datetime);
