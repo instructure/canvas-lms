@@ -226,7 +226,7 @@ jQuery(function($) {
       var $link = $(this),
           $div = $("<span><span></span></span>"),
           mediaType = 'video',
-          id = $link.find(".media_comment_id:first").text();
+          id = $link.data('media_comment_id') || $link.find(".media_comment_id:first").text();
       $div.css('display', 'block');
       
       if(!id && $link.attr('id') && $link.attr('id').match(/^media_comment_/)) {
@@ -234,7 +234,7 @@ jQuery(function($) {
       }
       $link.after($div);
       $link.hide(); //remove();
-      if($(this).hasClass('audio_playback') || $(this).hasClass('audio_comment') || $(this).hasClass('instructure_audio_link')) { mediaType = 'audio'; }
+      if($link.data('media_comment_type') === 'audio' || $link.is('.audio_playback, .audio_comment, .instructure_audio_link')) { mediaType = 'audio'; }
       $div.children("span").mediaComment('show_inline', id, mediaType, $link.attr('href'));
       $div.append("<br/><a href='#' style='font-size: 0.8em;' class='hide_flash_embed_link'>" + I18n.t('links.minimize_embedded_kaltura_content', "Minimize Embedded Content") + "</a>");
       $div.find(".hide_flash_embed_link").click(function(event) {

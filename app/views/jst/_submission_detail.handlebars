@@ -1,0 +1,25 @@
+<div class="submission_detail">
+  {{#if submission_type}}
+    {{#if url}}
+      Submission URL: <a href="{{url}}" title="{{#t "go_to_submission_url"}}Go to submission URL{{/t}}" target="_blank">{{url}}</a>
+    {{/if}}
+    {{#if attachments}}
+      <label>{{#t "submitted_files"}}Submitted files:{{/t}}</label>
+      <div>
+        {{#each attachments}}
+          <div class="submisison-attachment">
+            {{#if turnitinUrl}}
+              <a class="turnitin_similarity_score" href="{{turnitinUrl}}" target="_blank" title="{{#t "titles.turnitin_score"}}Turnitin similarity score -- more information{{/t}}"><span class="similarity_score">{{turnitin_data.similarity_score}}</span>%</a>
+            {{/if}}
+            <a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a>
+          </div>
+        {{/each}}
+      </div>
+    {{/if}}
+    {{#if submission_type_is_online_text_entry}}
+      {{#t "online_text_entry_see_details_in_the_speedgrader."}}Online Text Entry, <a href="%{speedGraderUrl}">see details in the SpeedGrader</a>.{{/t}}
+    {{/if}}
+  {{else}}
+    {{#t "no_submission"}}No submission{{/t}}
+  {{/if}}
+</div>

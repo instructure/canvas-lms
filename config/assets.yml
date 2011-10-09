@@ -190,6 +190,7 @@ javascripts:
     - public/javascripts/jquery.ui.menu.inputmenu.js
     - public/javascripts/compiled/jquery.kylemenu.js
   gradebook2:
+    - public/javascripts/jst/_grading_box.js
     - public/javascripts/jst/gradebook_uploads_form.js
     - public/javascripts/jst/re_upload_submissions_form.js
     - public/javascripts/message_students.js
@@ -205,6 +206,9 @@ javascripts:
     - public/javascripts/compiled/gradebook2/CurveGradesDialog.js
     - public/javascripts/jst/gradebook2/GradebookHeaderMenu.js
     - public/javascripts/compiled/gradebook2/GradebookHeaderMenu.js
+    - public/javascripts/jst/_submission_detail.js
+    - public/javascripts/jst/SubmissionDetailsDialog.js
+    - public/javascripts/compiled/SubmissionDetailsDialog.js
     - public/javascripts/compiled/gradebook2/Gradebook.js
     - public/javascripts/compiled/gradebook2/SubmissionCell.js
   gradebooks:
@@ -380,6 +384,7 @@ stylesheets:
     - public/stylesheets/compiled/message_students.css
   gradebook2:
     - public/stylesheets/compiled/message_students.css
+    - public/stylesheets/compiled/submissionDetailsDialog.css
     - public/stylesheets/compiled/AssignmentDetailsDialog.css
     - public/stylesheets/compiled/gradebook2.css
     - public/stylesheets/compiled/assignment_group_weights_dialog.css
