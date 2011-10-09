@@ -17,7 +17,6 @@
         this.unminimizeColumn = __bind(this.unminimizeColumn, this);
         this.minimizeColumn = __bind(this.minimizeColumn, this);
         this.fixColumnReordering = __bind(this.fixColumnReordering, this);
-        this.showCommentDialog = __bind(this.showCommentDialog, this);
         this.unhighlightColumns = __bind(this.unhighlightColumns, this);
         this.highlightColumn = __bind(this.highlightColumn, this);
         this.calculateStudentGrade = __bind(this.calculateStudentGrade, this);
@@ -321,12 +320,6 @@
       Gradebook.prototype.unhighlightColumns = function() {
         return this.$grid.find('.hovered-column').removeClass('hovered-column');
       };
-      Gradebook.prototype.showCommentDialog = function() {
-        $('<div>TODO: show comments and stuff</div>').dialog({
-          modal: true
-        });
-        return false;
-      };
       Gradebook.prototype.fixColumnReordering = function() {
         var $headers, fixupStopCallback, initHeaderDropMenus, makeOnlyAssignmentsSortable, onlyAssignmentColsSelector, originalItemsSelector, originalStopFn;
         $headers = $('#gradebook_grid').find('.slick-header-columns');
@@ -456,7 +449,12 @@
           'mouseleave focusout': function() {
             return $(this).removeClass('hover focus');
           }
-        }).delegate('.gradebook-cell-comment', 'click.gradebook', this.showCommentDialog).delegate('.minimized', {
+        }).delegate('.gradebook-cell-comment', 'click.gradebook', __bind(function(event) {
+          var data;
+          event.preventDefault();
+          data = $(event.currentTarget).data();
+          return SubmissionDetailsDialog.open(this.assignments[data.assignmentId], this.students[data.userId], this.options);
+        }, this)).delegate('.minimized', {
           'mouseenter': this.hoverMinimizedCell,
           'mouseleave': this.unhoverMinimizedCell
         });

@@ -61,7 +61,7 @@ class @SubmissionCell
     """
     #{ if tooltipText then '<div class="gradebook-tooltip">'+ tooltipText + '</div>' else ''}
     <div class="gradebook-cell #{ if opts.editable then 'gradebook-cell-editable focus' else ''} #{opts.classes} #{specialClasses.join(' ')}">
-      <a href="#" class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
+      <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
       #{innerContents}
     </div>
     """

@@ -192,10 +192,6 @@ I18n.scoped 'gradebook2', (I18n) ->
     unhighlightColumns: () =>
       @$grid.find('.hovered-column').removeClass('hovered-column')
 
-    showCommentDialog: =>
-      $('<div>TODO: show comments and stuff</div>').dialog(modal:true)
-      return false
-
     # this is a workaroud to make it so only assignments are sortable but at the same time
     # so that the total and final grade columns don't dissapear after reordering columns
     fixColumnReordering: =>
@@ -306,7 +302,10 @@ I18n.scoped 'gradebook2', (I18n) ->
             grid.find('.hover, .focus').removeClass('hover focus')
             $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
           'mouseleave focusout' : -> $(this).removeClass('hover focus')
-        .delegate('.gradebook-cell-comment', 'click.gradebook', @showCommentDialog)
+        .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
+          event.preventDefault()
+          data = $(event.currentTarget).data()
+          SubmissionDetailsDialog.open @assignments[data.assignmentId], @students[data.userId], @options
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
