@@ -39,8 +39,16 @@ class Handlebars
 
     def compile_template(source, id)
       require 'execjs'
+      # if the first letter of the template name is "_", register it as a partial
+      # ex: _foobar.handlebars or subfolder/_something.handlebars
+      filename = File.basename(id)
+      if filename.match(/^_/)
+        partial_name = filename.sub(/^_/, "")
+        partial_path = id.sub(filename, partial_name)
+        partial_registration = "\nHandlebars.registerPartial('#{partial_path}', templates['#{id}']);\n"
+      end
       template = context.call "Handlebars.precompile", prepare_i18n(source, id)
-      "#{@@header}\ntemplates['#{id}'] = template(#{template}); #{@@footer}"
+      "#{@@header}\ntemplates['#{id}'] = template(#{template}); #{partial_registration}#{@@footer}"
     end
 
     def prepare_i18n(source, scope)
