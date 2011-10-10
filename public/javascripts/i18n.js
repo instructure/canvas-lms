@@ -87,10 +87,15 @@ I18n.prepareOptions = function() {
 };
 
 I18n.interpolate = function(message, options) {
-  options = this.prepareOptions(options);
-  var matches = message.match(this.PLACEHOLDER) || [];
+  var placeholder, value, name, matches, needsEscaping = false;
 
-  var placeholder, value, name, needsEscaping;
+  options = this.prepareOptions(options);
+  if (options.wrapper) {
+    needsEscaping = true;
+    message = this.applyWrappers(message, options.wrapper);
+  }
+
+  matches = message.match(this.PLACEHOLDER) || [];
 
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
@@ -118,9 +123,6 @@ I18n.interpolate = function(message, options) {
     message = message.replace(regex, value);
   }
 
-  if (options.wrapper) {
-    message = this.applyWrappers(needsEscaping ? $.raw(message) : message, options.wrapper)
-  }
   return message;
 };
 
