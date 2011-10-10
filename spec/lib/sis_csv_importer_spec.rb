@@ -1032,6 +1032,32 @@ describe SIS::CSV::Import do
       p.communication_channel_id.should == user1.communication_channels.unretired.first.id
     end
 
+    it "should handle stickiness" do
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,,active"
+      )
+      p = Pseudonym.find_by_unique_id('user1')
+      p.unique_id = 'user5'
+      p.save!
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user3,User,Uno,,active"
+      )
+      p.reload
+      p.unique_id.should == 'user5'
+      Pseudonym.find_by_unique_id('user1').should be_nil
+      Pseudonym.find_by_unique_id('user3').should be_nil
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user3,User,Uno,,active",
+        {:override_sis_stickiness => true}
+      )
+      p.reload
+      p.unique_id.should == 'user3'
+      Pseudonym.find_by_unique_id('user1').should be_nil
+      Pseudonym.find_by_unique_id('user5').should be_nil
+    end
   end
 
   context 'enrollment importing' do

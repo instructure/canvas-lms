@@ -30,9 +30,11 @@ module SIS
       importer = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       User.skip_updating_account_associations do
         User.process_as_sis(@override_sis_stickiness) do
-          yield importer
-          while importer.any_left_to_process?
-            importer.process_batch
+          Pseudonym.process_as_sis(@override_sis_stickiness) do
+            yield importer
+            while importer.any_left_to_process?
+              importer.process_batch
+            end
           end
         end
       end
@@ -123,7 +125,7 @@ module SIS
             end
 
             pseudo ||= Pseudonym.new
-            pseudo.unique_id = login_id
+            pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
             pseudo.sis_source_id = login_id
             pseudo.sis_user_id = user_id
             pseudo.account = @root_account

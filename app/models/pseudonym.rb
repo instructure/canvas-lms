@@ -41,7 +41,10 @@ class Pseudonym < ActiveRecord::Base
   has_a_broadcast_policy
   
   attr_accessor :path, :path_type
-  
+
+  include StickySisFields
+  are_sis_sticky :unique_id
+
   acts_as_authentic do |config|
     config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]*\z/}
     config.login_field :unique_id
