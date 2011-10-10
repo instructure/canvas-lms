@@ -81,6 +81,10 @@ group :development do
   gem 'ya2yaml', '0.30'
   gem 'guard'
   gem 'guard-coffeescript'
+
+  # for faster guard filesystem polling on various systems
+  gem 'rb-fsevent' if RbConfig::CONFIG['host_os'] =~ /darwin/
+  gem 'rb-inotify' if RbConfig::CONFIG['host_os'] =~ /linux/
 end
 
 group :redis do
