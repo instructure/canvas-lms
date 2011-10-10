@@ -16,14 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-require 'i18n_extractor' unless defined?(I18nJsExtractor)
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe I18nJsExtractor do
+describe I18nExtraction::JsExtractor do
   def extract(source, scope = 'asdf', options = {})
     scope_results = scope && (options.has_key?(:scope_results) ? options.delete(:scope_results) : true)
 
-    extractor = I18nJsExtractor.new
+    extractor = I18nExtraction::JsExtractor.new
     source = "I18n.scoped('#{scope}', function(I18n) {\n#{source}\n});" if scope
     extractor.process(source, options)
     (scope_results ?

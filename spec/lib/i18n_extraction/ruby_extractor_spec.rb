@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe I18nExtractor do
+describe I18nExtraction::RubyExtractor do
   def extract(source, scope = 'asdf.', scope_results = true)
     sexps = RubyParser.new.parse(source)
-    extractor = I18nExtractor.new
+    extractor = I18nExtraction::RubyExtractor.new
     extractor.scope = scope
     extractor.process(sexps)
     (scope_results ?
