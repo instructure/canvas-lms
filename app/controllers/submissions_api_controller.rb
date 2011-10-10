@@ -309,6 +309,13 @@ class SubmissionsApiController < ApplicationController
     unless attempt.media_comment_id.blank?
       hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
     end
+    
+    if attempt.turnitin_data && @submission.grants_right?(@current_user, :view_turnitin_report)
+      turnitin_hash = attempt.turnitin_data.dup
+      turnitin_hash.delete(:last_processed_attempt)
+      hash['turnitin_data'] = turnitin_hash
+    end
+    
     if other_fields.include?('attachments')
       attachments = attempt.versioned_attachments.dup
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
