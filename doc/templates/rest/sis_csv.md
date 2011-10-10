@@ -518,7 +518,7 @@ groups_membership.csv
 <td>status</td>
 <td>enum</td>
 <td>active</td>
-<td>accepted deleted</td>
+<td>accepted, deleted</td>
 </tr>
 </table>
 
@@ -530,3 +530,51 @@ G411208,U001,accepted
 G411208,U002,accepted
 G411208,U003,deleted
 </pre>
+
+xlists.csv
+----------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>xlist_course_id</td>
+<td>text</td>
+<td>required</td>
+<td>The course identifier from courses.csv</td>
+</tr>
+<tr>
+<td>section_id</td>
+<td>text</td>
+<td>required</td>
+<td>The section identifier from sections.csv</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td>active</td>
+<td>active, deleted</td>
+</tr>
+</table>
+
+xlists.csv is optional. The goal of xlists.csv is to provide a way to add cross-listing
+information to an existing course and section hierarchy. Section ids are expected to exist
+already and already reference other course ids. If a section id is provided in this file,
+it will be moved from its existing course id to a new course id, such that if that new course
+is removed or the cross-listing is removed, the section will revert to its previous course id.
+If xlist_course_id does not reference an existing course, it will be created. If you want to
+provide more information about the cross-listed course, please do so in courses.csv.
+
+Sample:
+
+<pre>
+xlist_course_id,section_id,status
+E411208,1B,active
+E411208,2A,active
+E411208,2A,active
+</pre>
+
