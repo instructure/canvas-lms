@@ -24,14 +24,25 @@ class HostUrl
     @@file_host = nil
     @@domain_config = nil
 
+    def domain_config
+      if @@domain_config
+      elsif Rails.env.test?
+        # we don't want this config to be changeable in the test environment
+        @@domain_config = { :domain => 'www.example.com' }
+      else
+        @@domain_config = File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
+        @@domain_config ||= {}
+      end
+      @@domain_config
+    end
+
     def context_host(context=nil, preferred_account_domain=nil)
       default_host
     end
     
     def default_host
       if !@@default_host
-        @@domain_config ||= File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
-        @@default_host = @@domain_config[:domain] if @@domain_config && @@domain_config.has_key?(:domain)
+        @@default_host = domain_config[:domain] if domain_config.has_key?(:domain)
       end
       res = @@default_host
       res ||= ENV['RAILS_HOST_WITH_PORT']
@@ -41,8 +52,7 @@ class HostUrl
     def file_host(account)
       return @@file_host if @@file_host
       res = nil
-      @@domain_config ||= File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
-      res = @@file_host = @@domain_config[:files_domain] if @@domain_config && @@domain_config.has_key?(:files_domain)
+      res = @@file_host = domain_config[:files_domain] if domain_config.has_key?(:files_domain)
       Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
       res ||= @@file_host = default_host
     end
