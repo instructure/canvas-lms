@@ -84,7 +84,7 @@ namespace :i18n do
       hash
     }
     default_translations = I18n.backend.send(:translations)[:en].inject({}, &stringifier)
-    @extractor = I18nExtractor.new(:translations => default_translations)
+    @extractor = I18nExtraction::RubyExtractor.new(:translations => default_translations)
     @errors = []
     files.each do |file|
       begin
@@ -106,7 +106,7 @@ namespace :i18n do
     files = (Dir.glob('./public/javascripts/*.js') + Dir.glob('./app/views/**/*.erb')).
       reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
     files &= only if only
-    @js_extractor = I18nJsExtractor.new(:translations => @extractor.translations)
+    @js_extractor = I18nExtraction::JsExtractor.new(:translations => @extractor.translations)
 
     files.each do |file|
       begin
@@ -153,7 +153,7 @@ namespace :i18n do
     require 'i18n'
     require 'sexp_processor'
     require 'jammit'
-    require 'lib/i18n_extractor.rb'
+    require 'lib/i18n_extraction/js_extractor.rb'
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
                       Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
 
@@ -173,7 +173,7 @@ namespace :i18n do
     end
 
     files.each do |file|
-      extractor = I18nJsExtractor.new
+      extractor = I18nExtraction::JsExtractor.new
       begin
         extractor.process(File.read(file), :filename => file) or next
       rescue
