@@ -2515,8 +2515,8 @@ describe SIS::CSV::Import do
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,deleted"
       )
-      user1 = @account.pseudonyms.find_by_sis_source_id('user1')
-      user2 = @account.pseudonyms.find_by_sis_source_id('user2')
+      user1 = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user2 = @account.pseudonyms.find_by_sis_user_id('user_2')
       user1.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
       user2.user.user_account_associations.should be_empty
 

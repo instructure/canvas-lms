@@ -48,7 +48,7 @@ describe "/profile/profile" do
     assigns[:notification_categories] = Notification.dashboard_categories
     assigns[:policies] = @user.notification_policies
     default_pseudonym = assigns[:default_pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaa", :password_confirmation => "asdfaa")
-    sis_pseudonym = @user.pseudonyms.create!(:unique_id => 'sis_unique@example.com') { |p| p.sis_source_id = 'sis_unique@example.com'; p.sis_user_id = 'sis_id' }
+    sis_pseudonym = @user.pseudonyms.create!(:unique_id => 'sis_unique@example.com') { |p| p.sis_user_id = 'sis_id' }
     assigns[:pseudonyms] = @user.pseudonyms
     assigns[:password_pseudonyms] = []
     render "profile/profile"

@@ -254,7 +254,7 @@ describe User do
     user = User.create!
     user.register!
     p1 = user.pseudonyms.new :unique_id => "id1", :account => account1
-    p1.sis_source_id = 'sis_id1'
+    p1.sis_user_id = 'sis_id1'
     p1.save!
     user.pseudonyms.create! :unique_id => "id2", :account => account2
     lambda { p1.destroy }.should raise_error /Cannot delete system-generated pseudonyms/

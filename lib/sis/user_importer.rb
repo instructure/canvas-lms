@@ -126,7 +126,6 @@ module SIS
 
             pseudo ||= Pseudonym.new
             pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
-            pseudo.sis_source_id = login_id
             pseudo.sis_user_id = user_id
             pseudo.account = @root_account
             pseudo.workflow_state = status =~ /active/i ? 'active' : 'deleted'

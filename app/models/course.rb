@@ -1197,7 +1197,7 @@ class Course < ActiveRecord::Base
         end
         #Last Row
         row = [student.last_name_first, student.id]
-        row.concat([student.pseudonym.try(:sis_user_id), student.pseudonym.try(:sis_source_id)]) if options[:include_sis_id]
+        row.concat([student.pseudonym.try(:sis_user_id), student.pseudonym.try(:unique_id)]) if options[:include_sis_id]
         row << student_section
         row.concat(student_submissions)
         row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])
