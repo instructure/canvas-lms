@@ -280,21 +280,18 @@ I18n.scoped('instructure', function(I18n) {
         var cur = $.datepicker._curInst;
         if(cur) {
           var val = $(this).val();
-          $(this).val(val);
           cur.input.data('time-hour', val);
         }
       }).delegate(".ui-datepicker-time-minute", 'change keypress focus blur', function(event) {
         var cur = $.datepicker._curInst;
         if(cur) {
           var val = $(this).val();
-          $(this).val(val);
           cur.input.data('time-minute', val);
         }
       }).delegate(".ui-datepicker-time-ampm", 'change keypress focus blur', function(event) {
         var cur = $.datepicker._curInst;
         if(cur) {
           var val = $(this).val();
-          $(this).val(val);
           cur.input.data('time-ampm', val);
         }
       });
