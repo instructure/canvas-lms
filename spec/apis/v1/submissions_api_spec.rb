@@ -576,6 +576,61 @@ describe SubmissionsApiController, :type => :integration do
     json.should == []
   end
 
+  it "should return turnitin data if present" do
+    student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1.turnitin_settings = {:originality_report_visibility => 'after_grading'}
+    a1.save!
+    submission = submit_homework(a1, student)
+    sample_turnitin_data = {
+      :last_processed_attempt=>1,
+      "attachment_504177"=> {
+        :web_overlap=>73,
+        :publication_overlap=>0,
+        :error=>true,
+        :student_overlap=>100,
+        :state=>"failure",
+        :similarity_score=>100,
+        :object_id=>"123345"
+      }
+    }
+    submission.turnitin_data = sample_turnitin_data
+    submission.save!
+    
+    # as teacher
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+    json.should have_key 'turnitin_data'
+    sample_turnitin_data.delete :last_processed_attempt
+    json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
+    
+    # as student before graded
+    @user = student
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+    json.should_not have_key 'turnitin_data'
+    
+    # as student after grading
+    a1.grade_student(student, {:grade => 11})
+    @user = student
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+    json.should have_key 'turnitin_data'
+    json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
+    
+  end
+
   it "should return all submissions for a student" do
     student1 = user(:active_all => true)
     student2 = user_with_pseudonym(:active_all => true)
