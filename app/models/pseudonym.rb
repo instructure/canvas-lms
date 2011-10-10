@@ -48,10 +48,11 @@ class Pseudonym < ActiveRecord::Base
   acts_as_authentic do |config|
     config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]*\z/}
     config.login_field :unique_id
-    config.validations_scope = :account_id
+    config.validations_scope = [:account_id, :workflow_state]
     config.perishable_token_valid_for = 30.minutes
     config.validates_length_of_password_field_options = { :minimum => 6, :if => :require_password? }
     config.validates_length_of_login_field_options = {:within => 1..100}
+    config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| p.unique_id_changed? && p.active? } }
   end
 
   def require_password?
@@ -216,10 +217,8 @@ class Pseudonym < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy(even_if_managed_password=false)
     raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
-    self.deleted_unique_id = self.unique_id unless self.deleted?
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
-    self.unique_id = self.unique_id.to_s + "--" + AutoHandle.generate
     self.save
   end
   

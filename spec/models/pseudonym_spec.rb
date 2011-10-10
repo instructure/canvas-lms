@@ -31,6 +31,20 @@ describe Pseudonym do
     @pseudonym.unique_id = 'c'
     @pseudonym.save!
   end
+
+  it "should not allow active duplicates" do
+    p1 = Pseudonym.create!(:unique_id => 'cody@instructure.com')
+    p2 = Pseudonym.create(:unique_id => 'cody@instructure.com')
+    # Failed; p1 is still active
+    p2.should be_new_record
+    p2.workflow_state = 'deleted'
+    p2.save!
+    # Duplicates okay in the deleted state
+    p1.workflow_state = 'deleted'
+    p1.save!
+    # Should allow creating a new active one if the others are deleted
+    Pseudonym.create!(:unique_id => 'cody@instructure.com')
+  end
   
   it "should associate to another user" do
     user_model
