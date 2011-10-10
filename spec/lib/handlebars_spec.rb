@@ -30,8 +30,8 @@ describe Handlebars do
     end
 
     it "should extract wrappers" do
-      Handlebars.prepare_i18n('{{#t "test"}}<b>{{person}}</b> is <b>so</b> <b><i>cool</i></b>{{/t}}', 'test').
-        should eql('{{{t "test" "*%{person}* is *so* **cool**" scope="test" w0="<b>$1</b>" w1="<b><i>$1</i></b>"}}}')
+      Handlebars.prepare_i18n('{{#t "test"}}<b>{{person}}</b> is <b>so</b> <b title="{{definition}}"><i>cool</i></b>{{/t}}', 'test').
+        should eql('{{{t "test" "*%{person}* is *so* **cool**" scope="test" w0="<b>$1</b>" w1="<b title=\\"%{definition}\\"><i>$1</i></b>"}}}')
     end
 
     it "should not allow nested helper calls" do

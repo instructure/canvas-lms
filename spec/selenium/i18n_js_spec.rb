@@ -46,6 +46,15 @@ describe "i18n js selenium tests" do
         return I18n.scoped('foo').translate('bar', '*1 + 1* == *2*', {wrapper: '<i>$1</i>'})
       JS
     end
+
+    it "should interpolate placeholders in wrappers" do
+      # this functionality is primarily useful in handlebars templates where
+      # wrappers are auto-generated ... in normal js you'd probably just
+      # manually concatenate it into your wrapper
+      driver.execute_script(<<-JS).should == 'you need to <a href="http://foo.bar">log in</a>'
+        return I18n.scoped('foo').translate('bar', 'you need to *log in*', {wrapper: '<a href="%{url}">$1</a>', url: 'http://foo.bar'})
+      JS
+    end
   end
 
   context "strftime" do
