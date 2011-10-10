@@ -1052,16 +1052,15 @@ class User < ActiveRecord::Base
     }.uniq
   end
   
-  def avatar_url(size=nil, avatar_setting=nil, fallback=nil)
+  def avatar_url(size=nil, avatar_setting=nil, fallback='/images/no_pic.gif')
     size ||= 50
     avatar_setting ||= 'enabled'
     if avatar_setting == 'enabled' || (avatar_setting == 'enabled_pending' && avatar_approved?) || (avatar_setting == 'sis_only')
       @avatar_url ||= self.avatar_image_url 
     end
-    @avatar_url ||= '/images/no_pic.gif' if self.avatar_image_source == 'no_pic'
+    @avatar_url ||= fallback if self.avatar_image_source == 'no_pic'
     @avatar_url ||= gravatar_url(size, fallback) if avatar_setting == 'enabled'
-    @avatar_url ||= '/images/no_pic.gif'
-    @avatar_url
+    @avatar_url ||= fallback
   end
   
   named_scope :with_avatar_state, lambda{|state|
