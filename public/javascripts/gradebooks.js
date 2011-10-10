@@ -792,6 +792,19 @@ I18n.scoped('gradebook', function(I18n) {
               columns_to_hide.push(this);
             });
           }
+          function updateMutedColumnWidths(){
+            var $icons = $('.mute_icon:visible'),
+                $rows = $('#datagrid_data .row, #datagrid_top .row');
+            $icons.each(function(i, el){
+              var $el     = $(el),
+                  $cell   = $el.parents('.column_header');
+                  index   = $cell.data('column'),
+                  $column = $('.content div[data-column= ' + index + ']');
+
+              $column.width($column.width() + 20);
+            });
+            $rows.width($rows.width() + $icons.length * 20);
+          }
           function nextColumn(i) {
             var column = columns_to_hide.shift();
             if(column) {
@@ -803,6 +816,7 @@ I18n.scoped('gradebook', function(I18n) {
               }
             } else {
               datagrid.sizeGrid();
+              updateMutedColumnWidths();
             }
           }
           setTimeout(function() { nextColumn(0); }, 50);
@@ -1283,7 +1297,7 @@ I18n.scoped('gradebook', function(I18n) {
       });
     });
   });
-    
+
 
   function objectData($td) {
     var id = $td.data('object_id');
