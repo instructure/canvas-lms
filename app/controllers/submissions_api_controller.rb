@@ -132,7 +132,7 @@ class SubmissionsApiController < ApplicationController
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:id])
-    @submission = @assignment.submissions.find_by_user_id(@user.id) or raise ActiveRecord::RecordNotFound
+    @submission = @assignment.submissions.find_or_initialize_by_user_id(@user.id) or raise ActiveRecord::RecordNotFound
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
       render :json => submission_json(@submission, @assignment, includes).to_json
