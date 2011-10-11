@@ -498,7 +498,7 @@
             }
           });
           $sectionToShowMenu.bind('menuselect', __bind(function(event, ui) {
-            this.sectionToShow = Number($sectionToShowMenu.find('input[name="section_to_show_radio"]:checked').val()) || void 0;
+            this.sectionToShow = Number($sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()) || void 0;
             $.store[this.sectionToShow ? 'userSet' : 'userRemove']("grading_show_only_section" + this.options.context_id, this.sectionToShow);
             $('#section_being_shown').text(this.sectionToShow ? this.sections[this.sectionToShow].name : allSectionsText);
             return this.buildRows();
