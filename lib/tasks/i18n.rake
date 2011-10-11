@@ -69,10 +69,17 @@ namespace :i18n do
       color(text, "\e[31m")
     end
 
-    files = Dir.glob('./**/*rb').
-      reject{ |file| file =~ /\A\.\/(vendor\/plugins\/rails_xss|db|spec)\// }
-    files &= only if only
-    file_count = files.size
+    @errors = []
+    def process_files(files)
+      files.each do |file|
+        begin
+          print green "." if yield file
+        rescue SyntaxError, StandardError
+          @errors << "#{$!}\n#{file}"
+          print red "F"
+        end
+      end
+    end
 
     t = Time.now
 
@@ -83,41 +90,42 @@ namespace :i18n do
         value
       hash
     }
-    default_translations = I18n.backend.send(:translations)[:en].inject({}, &stringifier)
-    @extractor = I18nExtraction::RubyExtractor.new(:translations => default_translations)
-    @errors = []
-    files.each do |file|
-      begin
-        source = File.read(file)
-        source = Erubis::Eruby.new(source).src if file =~ /\.erb\z/
+    @translations = I18n.backend.send(:translations)[:en].inject({}, &stringifier)
 
-        sexps = RubyParser.new.parse(source)
-        @extractor.scope = infer_scope(file)
-        @extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
-        @extractor.process(sexps)
-        print green "."
-      rescue SyntaxError, StandardError
-        @errors << "#{$!}\n#{file}"
-        print red "F"
-      end
+
+    # Ruby
+    files = Dir.glob('./**/*rb').
+      reject{ |file| file =~ /\A\.\/(vendor\/plugins\/rails_xss|db|spec)\// }
+    files &= only if only
+    file_count = files.size
+    rb_extractor = I18nExtraction::RubyExtractor.new(:translations => @translations)
+    process_files(files) do |file|
+      source = File.read(file)
+      source = Erubis::Eruby.new(source).src if file =~ /\.erb\z/
+
+      sexps = RubyParser.new.parse(source)
+      rb_extractor.scope = infer_scope(file)
+      rb_extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
+      rb_extractor.process(sexps)
     end
 
 
+    # JavaScript
     files = (Dir.glob('./public/javascripts/*.js') + Dir.glob('./app/views/**/*.erb')).
       reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
     files &= only if only
-    @js_extractor = I18nExtraction::JsExtractor.new(:translations => @extractor.translations)
+    js_extractor = I18nExtraction::JsExtractor.new(:translations => @translations)
+    process_files(files) do |file|
+      file_count += 1 if js_extractor.process(File.read(file), :erb => (file =~ /\.erb\z/), :filename => file)
+    end
 
-    files.each do |file|
-      begin
-        if @js_extractor.process(File.read(file), :erb => (file =~ /\.erb\z/), :filename => file)
-          file_count += 1
-          print green "."
-        end
-      rescue
-        @errors << "#{$!}\n#{file}"
-        print red "F"
-      end
+
+    # Handlebars
+    files = Dir.glob('./app/views/jst/**/*.handlebars')
+    files &= only if only
+    handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
+    process_files(files) do |file|
+      file_count += 1 if handlebars_extractor.process(File.read(file), file.gsub(/.*app\/views\/jst\/|\.handlebars\z/, '').underscore.gsub(/\/_?/, '.'))
     end
 
     print "\n\n"
@@ -130,7 +138,8 @@ namespace :i18n do
     end
 
     print "Finished in #{Time.now - t} seconds\n\n"
-    puts send((failure ? :red : :green), "#{file_count} files, #{@extractor.total_unique + @js_extractor.total_unique} strings, #{@errors.size} failures")
+    total_strings = rb_extractor.total_unique + js_extractor.total_unique + handlebars_extractor.total_unique
+    puts send((failure ? :red : :green), "#{file_count} files, #{total_strings} strings, #{@errors.size} failures")
     raise "check command encountered errors" if failure
   end
 
@@ -140,7 +149,7 @@ namespace :i18n do
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
     File.open(File.join(RAILS_ROOT, yaml_file), "w") do |file|
-      file.write({'en' => @extractor.translations}.ya2yaml(:syck_compatible => true))
+      file.write({'en' => @translations}.ya2yaml(:syck_compatible => true))
     end
     print "Wrote new #{yaml_file}\n\n"
   end

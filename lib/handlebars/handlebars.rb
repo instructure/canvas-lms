@@ -52,28 +52,12 @@ class Handlebars
     end
 
     def prepare_i18n(source, scope)
+      @extractor ||= I18nExtraction::HandlebarsExtractor.new
       scope = scope.sub('/', '.')
-      source.gsub(/\{\{#t "(.*?)"([^\}]*)\}\}(.*?)\{\{\/t\}\}/m){
-        key = $1
-        options = $2
-        content = $3
-        content.strip!
-        content.gsub!(/\s+/, ' ')
-        content.gsub!(/\{\{(.*?)\}\}/){
-          var = $1
-          raise "helpers may not be used inside translate calls" unless var =~ /\A[a-z0-9_\.]+\z/
-          "%{#{var}}"
-        }
-        wrappers = {}
-        content.gsub!(/((<([a-zA-Z])[^>]*>)+)([^<]+)((<\/\3>)+(<\/[^>]+>)*)/){
-          value = "#{$1}$1#{$5}"
-          delimiter = wrappers[value] ||= '*' * (wrappers.size + 1)
-          "#{delimiter}#{$4}#{delimiter}"
-        }
-        wrappers = wrappers.map{ |value, delimiter| "w#{delimiter.size-1}=#{value.inspect}" }.join(' ')
-        wrappers = ' ' + wrappers unless wrappers.empty?
-        "{{{t #{key.inspect} #{content.inspect} scope=#{scope.inspect}#{wrappers}#{options}}}}"
-      }
+      @extractor.scan(source, :method => :gsub) do |data|
+        wrappers = data[:wrappers].map{ |value, delimiter| " w#{delimiter.size-1}=#{value.inspect}" }.join
+        "{{{t #{data[:key].inspect} #{data[:value].inspect} scope=#{scope.inspect}#{wrappers}#{data[:options]}}}}"
+      end
     end
 
     protected

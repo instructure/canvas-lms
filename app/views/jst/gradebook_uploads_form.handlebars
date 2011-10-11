@@ -37,7 +37,7 @@
         <tr class="table-callout-notes">
           <td colspan="4"><div class="ui-state-active">{{#t "explanation_of_required_columns"}}You Must have <em>all</em> of these columns, you only <em>need</em> one per row.{{/t}}</div></td>
           <td><div class="ui-state-active">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
-          <td colspan="2"><div class="ui-state-active">{{#t "leaving_id_will_match_better_can_add_new_assignment"}}Leaving the ID (the "(581)" part in this case) in tact will help match better.  You can also add new assignments that will be created on the fly.{{/t}}</div></td>
+          <td colspan="2"><div class="ui-state-active">{{#t "leaving_id_will_match_better_can_add_new_assignment"}}Leaving the ID intact (the "(581)" part in this case) will help match better.  You can also add new assignments that will be created on the fly.{{/t}}</div></td>
           <td colspan="2"><div class="ui-state-active">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
         </tr>
         <tr class="table-callout-notes-spacer">
@@ -52,8 +52,8 @@
           <th>SIS User ID</th>
           <th>SIS Login ID</th>
           <th>Section</th>
-          <th>{{#t "existing_assignment_assignment_id"}}Existing Assignment (581){{/t}}</th>
-          <th>{{#t "a_new_assignment"}}A New Assignment{{/t}}</th>
+          <th>{{#t "existing_assignment_example"}}Existing Assignment (581){{/t}}</th>
+          <th>{{#t "new_assignment_example"}}A New Assignment{{/t}}</th>
           <th>Current Score</th>
           <th>Final Score</th>
         </tr>
@@ -126,7 +126,7 @@
         </tr>
       </tbody>
     </table>
-    <p>If in doubt, you can always <a href="{{download_gradebook_csv_url}}">download a CSV</a>, change the grades you want and re-upload the same file.</p>
+    <p>{{#t "instructions.csv_download_and_upload"}}If in doubt, you can always <a href="{{download_gradebook_csv_url}}">download a CSV</a>, change the grades you want and re-upload the same file.{{/t}}</p>
   </div>
 
   <p style="font-size: 1.2em;">
