@@ -4,7 +4,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       templateLocals =
         assignmentUrl: "#{@gradebook.options.context_url}/assignments/#{@assignment.id}"
         speedGraderUrl: "#{@gradebook.options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      @$menu = $(Template 'GradebookHeaderMenu', templateLocals).insertAfter(@$trigger)
+      @$menu = $(Template 'gradebook2/GradebookHeaderMenu', templateLocals).insertAfter(@$trigger)
       @$trigger.kyleMenu(noButton:true)
       @$menu
         # need it to be a child of #gradebook_grid (not the header cell) to get over overflow:hidden obstacles.

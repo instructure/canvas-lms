@@ -17,7 +17,7 @@
           assignmentUrl: "" + this.gradebook.options.context_url + "/assignments/" + this.assignment.id,
           speedGraderUrl: "" + this.gradebook.options.context_url + "/gradebook/speed_grader?assignment_id=" + this.assignment.id
         };
-        this.$menu = $(Template('GradebookHeaderMenu', templateLocals)).insertAfter(this.$trigger);
+        this.$menu = $(Template('gradebook2/GradebookHeaderMenu', templateLocals)).insertAfter(this.$trigger);
         this.$trigger.kyleMenu({
           noButton: true
         });
