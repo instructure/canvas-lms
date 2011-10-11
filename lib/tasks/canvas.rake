@@ -111,11 +111,16 @@ namespace :canvas do
   end
   
   desc "Compile javascript and css assets."
-  task :compile_assets do
+  task :compile_assets => :environment do
     puts "--> Compiling static assets [compass compile -e production --force]"
     output = `bundle exec compass compile -e production --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
-    
+
+    puts "--> Pre-compiling all handlebars templates"
+    Rake::Task['jst:compile'].invoke
+    puts "--> Compiling all Coffeescript using barista"
+    Barista.compile_all! true, false
+
     puts "--> Generating js localization bundles"
     Rake::Task['i18n:generate_js'].invoke
 
