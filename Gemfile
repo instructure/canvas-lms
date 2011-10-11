@@ -3,11 +3,9 @@ source :rubygems
 gem 'rails',          '2.3.14'
 gem 'authlogic',      '2.1.3'
 gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
-gem 'barista',        '1.2.1'
 gem 'builder',        '2.1.2'
 gem 'closure-compiler','1.0.0'
 gem 'compass',        '0.11.5'
-gem 'coffee-script-source',  '1.1.2' #pinned just so everyone's compiled output matches
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.7.0'
@@ -75,6 +73,8 @@ group :test do
 end
 
 group :development do
+  gem 'barista',        '1.2.1'
+  gem 'coffee-script-source',  '1.1.2' #pinned just so everyone's compiled output matches
   gem 'ruby-debug',   '0.10.4'
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'

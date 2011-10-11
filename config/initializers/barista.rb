@@ -7,6 +7,7 @@
 # So if you make changes to this file, check out lib/tasks/canvas.rake as well.
 #
 # This isn't ideal.
+if defined?(Barista)
 Barista.configure do |c|
   c.add_preamble = false
   
@@ -55,4 +56,5 @@ Barista.configure do |c|
   # e.g. vendoring CoffeeScript in your application:
   # c.js_path = Rails.root.join('public', 'javascripts', 'coffee-script.js')
   
+end
 end
