@@ -195,7 +195,7 @@ var swfobject = function() {
 		if (hasStorage) {
 			storedVersion = localStorage.getItem('flashversion')
 			if (storedVersion) {
-				ua.pv = storedVersion;
+				ua.pv = JSON.parse(storedVersion);
 				matchVersions();
 				return;
 			}
@@ -213,7 +213,7 @@ var swfobject = function() {
 					if (d) {
 						d = d.split(" ")[1].split(",");
 						ua.pv = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
-						if (hasStorage) localStorage.setItem('flashversion', ua.pv);
+						if (hasStorage) localStorage.setItem('flashversion', JSON.stringify(ua.pv));
 					}
 				}
 				else if (counter < 10) {
