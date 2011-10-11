@@ -943,6 +943,13 @@ class User < ActiveRecord::Base
   def avatar_image=(val)
     return false if avatar_state == :locked
     val ||= {}
+
+    # clear out the old avatar first, in case of failure to get new avatar
+    self.avatar_image_url = nil
+    self.avatar_image_source = 'no_pic'
+    self.avatar_image_updated_at = Time.now
+    self.avatar_state = 'approved'
+
     if val['type'] == 'facebook'
       # TODO: support this
     elsif val['type'] == 'gravatar'
@@ -978,11 +985,6 @@ class User < ActiveRecord::Base
       self.avatar_image_source = 'attachment'
       self.avatar_image_updated_at = Time.now
       self.avatar_state = 'submitted'
-    else
-      self.avatar_image_url = nil
-      self.avatar_image_source = 'no_pic'
-      self.avatar_image_updated_at = Time.now
-      self.avatar_state = 'approved'
     end
   end
   

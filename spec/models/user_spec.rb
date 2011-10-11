@@ -667,6 +667,13 @@ describe User do
       User.with_avatar_state('submitted').count.should == 1
       User.with_avatar_state('any').count.should == 1
     end
+
+    it "should clear avatar state when assigning by service that no longer exists" do
+      user_model
+      @user.avatar_image_url = 'http://www.example.com'
+      @user.avatar_image = { 'type' => 'twitter' }
+      @user.avatar_image_url.should be_nil
+    end
   end
 
   it "should assert_by_email users into the correct account" do
