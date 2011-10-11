@@ -366,7 +366,7 @@ I18n.scoped 'gradebook2', (I18n) ->
         $('#section_to_show').show().kyleMenu
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
         $sectionToShowMenu.bind 'menuselect', (event, ui) =>
-          @sectionToShow = Number($sectionToShowMenu.find('input[name="section_to_show_radio"]:checked').val()) || undefined
+          @sectionToShow = Number($sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()) || undefined
           $.store[ if @sectionToShow then 'userSet' else 'userRemove']("grading_show_only_section#{@options.context_id}", @sectionToShow)
           $('#section_being_shown').text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
           @buildRows()

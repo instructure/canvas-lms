@@ -7,7 +7,8 @@ $.fn.kyleMenu = (options) ->
               .menu(opts.menuOpts)
               .popup(opts.popupOpts)
               .addClass("ui-kyle-menu use-css-transitions-for-show-hide")
-    $menu.bind "menuselect", -> $(this).removeClass "ui-state-open"
+    $menu.bind "menuselect", ->
+      $(this).popup('close').removeClass "ui-state-open"
 
 $.fn.kyleMenu.defaults =
   popupOpts:

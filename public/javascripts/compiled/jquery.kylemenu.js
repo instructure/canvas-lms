@@ -10,7 +10,7 @@
       }
       $menu = $(this).next().menu(opts.menuOpts).popup(opts.popupOpts).addClass("ui-kyle-menu use-css-transitions-for-show-hide");
       return $menu.bind("menuselect", function() {
-        return $(this).removeClass("ui-state-open");
+        return $(this).popup('close').removeClass("ui-state-open");
       });
     });
   };
