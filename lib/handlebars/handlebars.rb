@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'lib/i18n_extraction/handlebars_extractor'
 
 # Precompiles handlebars templates into JavaScript function strings
 class Handlebars
