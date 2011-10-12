@@ -121,7 +121,6 @@ javascripts:
     - public/javascripts/vendor/slickgrid-googlecode/slick.globaleditorlock.js
     - public/javascripts/gradebook_uploads.js
   gradebook_history:
-    - public/javascripts/vendor/jquery.metadata.js 
     - public/javascripts/gradebook-history.js
   jobs:
     - public/javascripts/compiled/jobs.js

@@ -34,8 +34,8 @@ I18n.scoped('gradebook', function(I18n) {
       event.preventDefault();
       // 'this' should be the <a href> that they clicked on 
 
-      var assignment_id = $(this).parents('tr').metadata('id').assignment_id,
-          user_id = $(this).parents('tr').metadata().user_id,
+      var assignment_id = $(this).parents('tr').data('assignment-id'),
+          user_id = $(this).parents('tr').data('user-id'),
           grade = $(this).find('.grade').text().replace("--", ""),
           url = $(".update_submission_grade_url").attr('href'),
           method = $(".update_submission_grade_url").attr('title');  

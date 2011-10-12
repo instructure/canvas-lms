@@ -62,6 +62,13 @@ describe Submission do
     @submission.should be_respond_to(:versions)
   end
 
+  it "should not save new versions by default" do
+    submission_spec_model
+    lambda {
+      @submission.save!
+    }.should_not change(@submission.versions, :count)
+  end
+
   context "broadcast policy" do
     it "should have a broadcast policy" do
       submission_spec_model

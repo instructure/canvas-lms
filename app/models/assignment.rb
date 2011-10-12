@@ -810,6 +810,7 @@ class Assignment < ActiveRecord::Base
       submission_updated = false
       submission = self.find_or_create_submission(student) #submissions.find_or_create_by_user_id(student.id) #(:first, :conditions => {:assignment_id => self.id, :user_id => student.id})
       if student == original_student || !grade_group_students_individually
+        previously_graded = submission.grade.present?
         submission.attributes = opts
         submission.assignment_id = self.id
         submission.user_id = student.id
@@ -831,7 +832,7 @@ class Assignment < ActiveRecord::Base
         submission_updated = true if submission.changed?
         submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
         submission.group = group
-        submission.save!
+        previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
         tags.each do |tag|
           tag.create_outcome_result(student, self, submission)
         end
