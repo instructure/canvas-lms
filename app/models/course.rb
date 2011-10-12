@@ -2122,11 +2122,16 @@ class Course < ActiveRecord::Base
 
   def sections_visible_to(user, sections = active_course_sections)
     visibilities = section_visibilities_for(user)
+    section_ids = visibilities.map{ |s| s[:course_section_id] }
     case enrollment_visibility_level_for(user, visibilities)
       when :full
-        return sections
+        if visibilities.all?{ |v| ['StudentEnrollment', 'ObserverEnrollment'].include? v[:type] }
+          return sections.find_all_by_id(section_ids)
+        else
+          return sections
+        end
       when :sections
-        return sections.scoped(:conditions => {:id => visibilities.map{ |s| s[:course_section_id] }}) unless visibilities.all?{ |v| ['StudentEnrollment', 'ObserverEnrollment'].include? v[:type] } 
+        return sections.find_all_by_id(section_ids)
     end
     []
   end

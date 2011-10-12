@@ -1242,3 +1242,61 @@ describe Course, "inherited_assessment_question_banks" do
     banks.find_by_id(root_bank.id).should eql root_bank
   end
 end
+
+describe Course, "section_visibility" do
+  before do
+    @course = course(:active_course => true)
+    @course.default_section
+    @other_section = @course.course_sections.create
+
+    @teacher = User.create
+    @course.enroll_teacher(@teacher)
+
+    @ta = User.create
+    @course.enroll_user(@ta, "TaEnrollment", :limit_priveleges_to_course_section => true)
+
+    @student1 = User.create
+    @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
+
+    @student2 = User.create
+    @course.enroll_user(@student2, "StudentEnrollment", :section => @other_section, :enrollment_state => 'active')
+
+    @observer = User.create
+    @course.enroll_user(@observer, "ObserverEnrollment")
+  end
+
+  context "full" do
+    it "should return students from all sections" do
+      @course.students_visible_to(@teacher).sort_by(&:id).should eql [@student1, @student2]
+      @course.students_visible_to(@student1).sort_by(&:id).should eql [@student1, @student2]
+    end
+
+    it "should return all sections if a teacher" do
+      @course.sections_visible_to(@teacher).sort_by(&:id).should eql [@course.default_section, @other_section]
+    end
+
+    it "should return user's sections if a student" do
+      @course.sections_visible_to(@student1).should eql [@course.default_section]
+    end
+  end
+
+  context "sections" do
+    it "should return students from user's sections" do
+      @course.students_visible_to(@ta).should eql [@student1]
+    end
+
+    it "should return user's sections" do
+      @course.sections_visible_to(@ta).should eql [@course.default_section]
+    end
+  end
+
+  context "restricted" do
+    it "should return no students" do
+      @course.students_visible_to(@observer).should eql []
+    end
+
+    it "should return no sections" do
+      @course.sections_visible_to(@observer).should eql []
+    end
+  end
+end
