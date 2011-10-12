@@ -17,19 +17,12 @@
 #
 
 module SIS
-  class AbstractCourseImporter
-
-    def initialize(batch_id, root_account, logger, override_sis_stickiness)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-      @override_sis_stickiness = override_sis_stickiness
-    end
+  class AbstractCourseImporter < BaseImporter
 
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
-      AbstractCourse.process_as_sis(@override_sis_stickiness) do
+      AbstractCourse.process_as_sis(@sis_options) do
         yield importer
       end
       AbstractCourse.update_all({:sis_batch_id => @batch_id}, {:id => importer.abstract_courses_to_update_sis_batch_id}) if @batch_id && !importer.abstract_courses_to_update_sis_batch_id.empty?

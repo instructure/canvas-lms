@@ -86,13 +86,16 @@ describe Course do
     @course.assignments.create!
     @course.wiki.wiki_page.save!
     @course.sis_source_id = 'sis_id'
+    @course.stuck_sis_fields = [].to_set
     @course.save!
     @course.course_sections.should_not be_empty
     @course.students.should == [@student]
+    @course.stuck_sis_fields.should == [].to_set
 
     @new_course = @course.reset_content
 
     @course.reload
+    @course.stuck_sis_fields.should == [].to_set
     @course.course_sections.should be_empty
     @course.students.should be_empty
     @course.sis_source_id.should be_nil
@@ -105,9 +108,35 @@ describe Course do
     @new_course.assignments.should be_empty
     @new_course.sis_source_id.should == 'sis_id'
     @new_course.syllabus_body.should be_blank
+    @new_course.stuck_sis_fields.should == [].to_set
 
     @course.uuid.should_not == @new_course.uuid
     @course.wiki_id.should_not == @new_course.wiki_id
+    @course.replacement_course_id.should == @new_course.id
+  end
+
+  it "should preserve sticky fields when resetting content" do
+    course_with_student
+    @course.sis_source_id = 'sis_id'
+    @course.course_code = "cid"
+    @course.save!
+    @course.stuck_sis_fields = [].to_set
+    @course.name = "course_name"
+    @course.stuck_sis_fields.should == [:name].to_set
+    @course.save!
+    @course.stuck_sis_fields.should == [:name].to_set
+
+    @new_course = @course.reset_content
+
+    @course.reload
+    @course.stuck_sis_fields.should == [:name].to_set
+    @course.sis_source_id.should be_nil
+
+    @new_course.reload
+    @new_course.sis_source_id.should == 'sis_id'
+    @new_course.stuck_sis_fields.should == [:name].to_set
+
+    @course.uuid.should_not == @new_course.uuid
     @course.replacement_course_id.should == @new_course.id
   end
 

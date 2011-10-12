@@ -20,17 +20,27 @@ I18n.scoped('sis_import', function(I18n) {
 $(document).ready(function(event) {
   var state = 'nothing';
   
-  $("#import_type").change(function(event) {
-      event.preventDefault();
-      new_type = $(this).find(":selected").val();
-      $("#batch_check").hide();
-      $("#import_log_holder").hide();
-  });
-
   $("#batch_mode").change(function(event) {
     $("#batch_mode_term_id").showIf($(this).attr('checked'));
   }).change();
   
+  var $override_sis_stickiness = $("#override_sis_stickiness");
+  var $add_sis_stickiness = $("#add_sis_stickiness");
+  var $clear_sis_stickiness = $("#clear_sis_stickiness");
+  var $add_sis_stickiness_container = $("#add_sis_stickiness_container");
+  var $clear_sis_stickiness_container = $("#clear_sis_stickiness_container");
+  function updateSisCheckboxes(event) {
+    $add_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'));
+    $clear_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'));
+    $add_sis_stickiness.disableIf($clear_sis_stickiness.attr('checked'));
+    $clear_sis_stickiness.disableIf($add_sis_stickiness.attr('checked'));
+  }
+
+  $override_sis_stickiness.change(updateSisCheckboxes);
+  $add_sis_stickiness.change(updateSisCheckboxes);
+  $clear_sis_stickiness.change(updateSisCheckboxes);
+  updateSisCheckboxes(null);
+
   function createMessageHtml(batch){
     var output = "";
     if(batch.processing_errors && batch.processing_errors.length > 0){

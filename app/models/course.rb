@@ -2403,7 +2403,7 @@ class Course < ActiveRecord::Base
     Course.transaction do
       new_course = Course.new
       self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration].include?(k.to_sym) }.each do |key, val|
-        new_course.send("#{key}=", val)
+        new_course.write_attribute(key, val)
       end
       # The order here is important; we have to set our sis id to nil and save first
       # so that the new course can be saved, then we need the new course saved to
@@ -2412,7 +2412,7 @@ class Course < ActiveRecord::Base
       # deleted before they got moved
       self.uuid = self.sis_source_id = self.sis_batch_id = nil;
       self.save!
-      new_course.save!
+      Course.process_as_sis { new_course.save! }
       self.course_sections.update_all(:course_id => new_course.id)
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
@@ -2426,7 +2426,7 @@ class Course < ActiveRecord::Base
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!
-      new_course
+      Course.find(new_course.id)
     end
   end
 end

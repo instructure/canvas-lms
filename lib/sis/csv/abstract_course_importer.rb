@@ -27,7 +27,7 @@ module SIS
       # expected columns
       # abstract_course_id,short_name,long_name,account_id,term_id,status
       def process(csv)
-        @sis.counts[:abstract_courses] += SIS::AbstractCourseImporter.new(@batch.try(:id), @root_account, logger, @override_sis_stickiness).process do |importer|
+        @sis.counts[:abstract_courses] += SIS::AbstractCourseImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv) do |row|
             update_progress
 

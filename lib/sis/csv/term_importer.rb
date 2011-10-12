@@ -28,7 +28,7 @@ module SIS
       # expected columns
       # account_id,parent_account_id,name,status
       def process(csv)
-        @sis.counts[:terms] += SIS::TermImporter.new(@batch.try(:id), @root_account, logger, @override_sis_stickiness).process do |importer|
+        @sis.counts[:terms] += SIS::TermImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv) do |row|
             update_progress
 

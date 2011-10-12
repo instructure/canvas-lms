@@ -220,6 +220,12 @@ I18n.scoped('instructure', function(I18n) {
     return this;
   };
 
+  $.fn.disableIf = function(bool) {
+    if ($.isFunction(bool)) { bool = bool.call(this); }
+    this.prop('disabled', !!bool);
+    return this;
+  };
+
   $.fn.indicate = function(options) {
     options = options || {};
     var $indicator;
