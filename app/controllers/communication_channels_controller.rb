@@ -17,129 +17,170 @@
 #
 
 class CommunicationChannelsController < ApplicationController
-  before_filter :require_user, :only => [:create, :show, :edit, :update, :merge, :try_merge, :confirm]
+  before_filter :require_user, :only => [:create, :destroy]
   
   def create
-    if params[:pseudonym][:unique_id]
-      params[:pseudonym][:path] = params[:pseudonym][:unique_id]
-      params[:pseudonym][:path_type] = params[:path_type] || "email"
-    end
-    if !params[:pseudonym][:password]
-      @existing_pseudonym = @current_user.pseudonyms.active.select{|p| p.account == Account.default }.first
-    end
-    params[:pseudonym][:account] = @domain_root_account
     if params[:build_pseudonym]
+      params[:pseudonym][:account] = @domain_root_account
       @pseudonym = @current_user.pseudonyms.build(params[:pseudonym])
-      @pseudonym.generate_temporary_password if !params[:pseudonym][:password] 
-      if !@pseudonym.valid?
-        respond_to do |format|
-          format.html { render :action => :new }
-          format.json { render :json => @pseudonym.errors.to_json }
-        end
-        return
-      end
+      @pseudonym.generate_temporary_password
+      return render :json => @pseudonym.errors.to_json, :status => :bad_request unless @pseudonym.valid?
     end
-    @cc = @current_user.communication_channels.build(:path => params[:pseudonym][:path], :path_type => (params[:path_type] || 'email'), :build_pseudonym_on_confirm => params[:build_pseudonym] == '1')
+    @cc = @current_user.communication_channels.find_or_initialize_by_path_and_path_type(params[:pseudonym][:unique_id], params[:path_type])
+    if (!@cc.new_record? && !@cc.retired?)
+      @cc.errors.add(:path, "unique!")
+      return render :json => @cc.errors.to_json, :status => :bad_request
+    end
+
+    @cc.user = @current_user
+    @cc.workflow_state = 'unconfirmed'
+    @cc.build_pseudonym_on_confirm = params[:build_pseudonym] == '1'
     if @cc.save
       @cc.send_confirmation!
-      respond_to do |format|
-        flash[:notice] = "Contact method registered!"
-        format.html { redirect_to profile_url }
-        format.json { render :json => @cc.to_json(:only => [:id, :user_id, :path, :path_type], :include => {:pseudonym => {:only => [:id, :unique_id]}}) }
-      end
+      flash[:notice] = "Contact method registered!"
+      render :json => @cc.to_json(:only => [:id, :user_id, :path, :path_type])
     else
-      respond_to do |format|
-        format.html { render :action => :new }
-        format.json { render :json => @cc.errors.to_json }
-      end
+      render :json => @cc.errors.to_json, :status => :bad_request
     end
   end
-  
+
   def confirm
-    id = params[:communication_channel_id]
     nonce = params[:nonce]
-    cc = @current_user.communication_channels.find_by_id_and_confirmation_code(id, nonce) if id.present?
-    # cc = nil if cc && cc.confirmation_code != nonce
+    cc = CommunicationChannel.unretired.find_by_confirmation_code(nonce)
+    @enrollment = Enrollment.find_by_uuid_and_workflow_state(params[:enrollment], 'invited') if params[:enrollment]
+    @course = @enrollment && @enrollment.course
+    @headers = false
+    @root_account = @course.root_account if @course
+    @root_account ||= @domain_root_account
     if cc
       @communication_channel = cc
-      if cc.active? || cc.confirm
-        flash[:notice] = "Registration confirmed."
-        @current_user.register
-        respond_to do |format|
-          format.html { redirect_to profile_url }
-          format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
+      @user = cc.user
+
+      # load merge opportunities
+      other_ccs = CommunicationChannel.find(:all, :conditions => ["path=? AND path_type=? AND user_id<>? AND workflow_state='active'", cc.path, cc.path_type, @user.id])
+      CommunicationChannel.send(:preload_associations, other_ccs, :user)
+      @merge_opportunities = other_ccs.map(&:user).uniq
+      @merge_opportunities.reject! { |u| u == @current_user }
+      User.send(:preload_associations, @merge_opportunities, { :pseudonyms => :account })
+      @merge_opportunities.reject! { |u| u.pseudonyms.all? { |p| p.deleted? } }
+
+      if @current_user && params[:merge] == 'self'
+        cc.confirm
+        @enrollment.accept if @enrollment
+        @user.move_to_user(@current_user)
+      elsif @current_user && @enrollment && params[:transfer_enrollment]
+        cc.active? || cc.confirm
+        @enrollment.user = @current_user
+        # accept will save it
+        @enrollment.accept
+      elsif @user.registered?
+        unless @current_user
+          session[:return_to] = request.url
+          return redirect_to login_url
         end
+        # Present merge opportunities to a registered user
+        return if (!@merge_opportunities.empty? || @current_user != @user) && !params[:confirm]
+
+        # Auto-confirm a CC that has been added to a registered account, and no merge opportunities
+        # OR the user clicked "confirm" on confirmation page
+        failed = true unless cc.active? || cc.confirm
+        @enrollment.accept if !failed && @enrollment
+      elsif cc.active?
+        # !user.registered? && cc.active? ?!?
+        # This state really isn't supported; just error out
+        failed = true
       else
-        @failed = "Can't Confirm"
+        # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
+        # set up a password yet
+        @pseudonym = @user.pseudonyms.active.find(:first, :conditions => {:password_auto_generated => true, :account_id => @root_account.id} ) if @user.pre_registered?
+        # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
+        @pseudonym = @user.pseudonyms.build(:account => @root_account, :unique_id => cc.path) if @user.creation_pending?
+        # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
+        # up with something new
+        @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.find_by_unique_id(@pseudonym.unique_id)
+
+        # Have to either have a pseudonym to register with, or be registered, or be looking at merge opportunities
+        return render :action => 'confirm_failed', :status => :bad_request unless @user.registered? || @pseudonym || !@merge_opportunities.empty? || (@current_user && @current_user != @user)
+
+        # User chose to continue with this cc/pseudonym/user combination on confirmation page
+        if params[:register]
+          @user.name = params[:user].try(:[], :name) || @user.name
+          @user.name = @pseudonym.unique_id if !@user.name || @user.name.empty?
+          @user.time_zone = params[:user].try(:[], :time_zone) || @user.time_zone
+          @user.short_name = params[:user].try(:[], :short_name) || @user.short_name
+          @user.subscribe_to_emails = params[:user].try(:[], :subscribe_to_emails) || @user.subscribe_to_emails
+          @pseudonym.unique_id = params[:pseudonym].try(:[], :unique_id) || @pseudonym.unique_id
+          if params[:pseudonym].try(:[], :password)
+            @pseudonym.password = params[:pseudonym][:password]
+            @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
+          end
+          @pseudonym.communication_channel = cc
+
+          # trick pseudonym into validating the e-mail address
+          @pseudonym.account = nil
+          unless @pseudonym.valid?
+            return
+          end
+          @pseudonym.account = @root_account
+
+          return unless @pseudonym.valid?
+
+          # They may have switched e-mail address when they logged in; create a CC if so
+          if @pseudonym.unique_id != cc.path
+            new_cc = @user.communication_channels.find_or_initialize_by_path_and_path_type(@pseudonym.unique_id, 'email')
+            new_cc.user = @user
+            new_cc.workflow_state = 'unconfirmed' if new_cc.retired?
+            new_cc.send_confirmation! if new_cc.unconfirmed?
+            new_cc.save! if new_cc.changed?
+            @pseudonym.communication_channel = new_cc
+          end
+          @pseudonym.communication_channel.pseudonym = @pseudonym
+
+          @user.save!
+          @pseudonym.save!
+
+          if cc.confirm
+            @enrollment.accept if @enrollment
+            reset_session_saving_keys(:return_to)
+            @user.register
+
+            # Login, since we're satisfied that this person is the right person.
+            @pseudonym_session = PseudonymSession.new(@pseudonym, true)
+            @pseudonym_session.save
+          else
+            failed = true
+          end
+        else
+          return # render
+        end
       end
     else
-      @failed = "Invalid Confirmation"
+      failed = true
     end
-    if @failed
-      #flash[:notice] = "Registration failed."
+    if failed
       respond_to do |format|
-        flash[:error] = "Confirmation failed"
-        format.html { redirect_to profile_url }
-        format.json { render :json => {:error => @failed}.to_json, :status => :bad_request }
+        format.html { render :action => "confirm_failed", :status => :bad_request }
+        format.json { render :json => {}.to_json, :status => :bad_request }
       end
-    end
-  end
-  
-  def try_merge
-    @ccs = CommunicationChannel.find_all_by_path(params[:path] || params[:communication_channel][:path]).sort_by{|cc| cc.active? ? 0 : 1 }
-    @cc = @ccs.first
-    respond_to do |format|
-      if @cc
-        @cc.send_merge_notification!
-        format.html
-        format.json { render :json => @cc.to_json }
-      else
-        flash[:error] = "Email address not found"
-        format.html { redirect_to profile_url }
-        format.json { render :json => {:errors => {:base => "Email address not found"}} }
-      end
-    end
-  end
-  
-  def merge
-    @cc = if params[:communication_channel_id].present?
-      CommunicationChannel.find_by_id_and_confirmation_code_and_path_type(params[:communication_channel_id], params[:code], 'email')
-    end
-    if @cc.user_id == @current_user.id
-      flash[:notice] = "You have already claimed that email address"
-      redirect_to profile_url
-      return
-    end
-    if !params[:communication_channel]
-      render
     else
-      success = false
-      if @cc && params[:communication_channel] && params[:communication_channel][:event]
-        if params[:communication_channel][:event] == 'merge_users'
-          if @cc.user.pseudonyms.all?{|p| p.never_logged_in? }
-            @cc.user.move_to_user(@current_user)
-            flash[:notice] = "User accounts successfully merged!"
-            success = true
-          else
-            flash[:error] = "User accounts could not be merged."
-          end
-        elsif params[:communication_channel][:event] == 'claim_channel'
-          if @cc.user.communication_channels.email.unretired.count > 1
-            @cc.move_to_user(@current_user)
-            flash[:notice] = "Email address successfully claimed!"
-            success = true
-          else
-            flash[:error] = "Email address could not be claimed."
-          end
-        end
+      flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
+      respond_to do |format|
+        format.html { @enrollment ? redirect_to(course_url(@course)) : redirect_back_or_default(dashboard_url) }
+        format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
       end
-      if !success
-        flash[:notice] = nil
-        flash[:error] = "Failed to claim the email address"
-        flash[:error] = "Failed to merge users" if params[:communication_channel] && params[:communication_channel][:event] == 'merge_users'
-      end
-      redirect_to profile_url
     end
+  end
+
+  def re_send_confirmation
+    @user = User.find(params[:user_id])
+    @enrollment = params[:enrollment_id] && @user.enrollments.find(params[:enrollment_id])
+    if @enrollment && (@enrollment.invited? || @enrollment.active?)
+      @enrollment.re_send_confirmation!
+    else
+      @cc = @user.communication_channels.find(params[:id])
+      @cc.send_confirmation!
+    end
+    render :json => {:re_sent => true}
   end
 
   def destroy

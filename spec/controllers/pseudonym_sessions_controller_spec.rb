@@ -20,6 +20,29 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe PseudonymSessionsController do
 
+  it "should re-render if no user" do
+    post 'create'
+    response.status.should == '400 Bad Request'
+    response.should render_template('new')
+  end
+
+  it "should re-render if incorrect password" do
+    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+    post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'dvorak'}
+    response.status.should == '400 Bad Request'
+    response.should render_template('new')
+  end
+
+  it "password auth should work" do
+    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+    post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
+    response.should be_redirect
+    response.should redirect_to(dashboard_url(:login_success => 1))
+    assigns[:user].should == @user
+    assigns[:pseudonym].should == @pseudonym
+    assigns[:pseudonym_session].should_not be_nil
+  end
+
   context "saml" do
     it "should scope logins to the correct domain root account" do
       Setting.set_config("saml", {})

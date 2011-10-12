@@ -94,51 +94,31 @@ describe CoursesController do
       assigns[:pending_enrollment].should be_active
     end
     
-    it "should log in the user and redirect to enrollment_invitation for registered not-logged-in user" do
+    it "should ask user to login for registered not-logged-in user" do
       user_with_pseudonym(:active_course => true, :active_user => true)
       course(:active_all => true)
       @enrollment = @course.enroll_user(@user)
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @enrollment.uuid
       response.should be_redirect
-      assigns[:pseudonym_session].should_not be_nil
-      assigns[:pseudonym_session].unauthorized_record.user.should eql(@user)
-      response.should redirect_to(course_enrollment_invitation_url(@course, :accept => '1', :invitation => @enrollment.uuid))
-      assigns[:pending_enrollment].should eql(@enrollment)
-      assigns[:pending_enrollment].should be_invited
+      response.should redirect_to(login_url)
     end
     
-    it "should redirect to registration_confirmation for unregistered not-logged-in user" do
+    it "should defer to registration_confirmation for pre-registered not-logged-in user" do
       user_with_pseudonym
       course(:active_course => true, :active_user => true)
       @enrollment = @course.enroll_user(@user)
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @enrollment.uuid
       response.should be_redirect
-      response.should redirect_to(registration_confirmation_url(@pseudonym.id, @pseudonym.communication_channel.confirmation_code, :enrollment => @enrollment.uuid))
-      assigns[:pending_enrollment].should eql(@enrollment)
-      assigns[:pending_enrollment].should be_invited
+      response.should redirect_to(registration_confirmation_url(@pseudonym.communication_channel.confirmation_code, :enrollment => @enrollment.uuid))
     end
-    
-    it "should redirect to claim pseudonym if logged-in user does not match enrollment user" do
-      user_with_pseudonym
-      @u2 = @user
-      course_with_student_logged_in(:active_course => true) #, :active_user => true)
-      @e2 = @course.enroll_user(@u2)
-      post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @e2.uuid
-      response.should be_redirect
-      response.should redirect_to(claim_pseudonym_url(:id => @pseudonym.id, :nonce => @pseudonym.communication_channel.confirmation_code))
-      assigns[:pending_enrollment].should eql(@e2)
-      assigns[:pending_enrollment].should be_invited
-    end
-  
-    it "should redirect to claim pseudonym if logged-in user does not match enrollment user" do
+
+    it "should defer to registration_confirmation if logged-in user does not match enrollment user" do
       user_with_pseudonym
       @u2 = @user
       course_with_student_logged_in(:active_course => true, :active_user => true)
       @e2 = @course.enroll_user(@u2)
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @e2.uuid
-      response.should render_template('transfer_enrollment')
-      assigns[:pending_enrollment].should eql(@e2)
-      assigns[:pending_enrollment].should be_invited
+      response.should redirect_to(registration_confirmation_url(:nonce => @pseudonym.communication_channel.confirmation_code, :enrollment => @e2.uuid))
     end
   end
   
@@ -191,6 +171,49 @@ describe CoursesController do
       response.status.should == '401 Unauthorized'
       assigns[:unauthorized_message].should_not be_nil
     end
+
+    context "invitations" do
+      it "should allow an invited user to see the course" do
+        course_with_student(:active_course => 1)
+        @enrollment.should be_invited
+        get 'show', :id => @course.id, :invitation => @enrollment.uuid
+        response.should be_success
+        assigns[:pending_enrollment].should == @enrollment
+      end
+
+      it "should re-invite an enrollment that has previously been rejected" do
+        course_with_student(:active_course => 1)
+        @enrollment.should be_invited
+        @enrollment.reject!
+        get 'show', :id => @course.id, :invitation => @enrollment.uuid
+        response.should be_success
+        @enrollment.reload
+        @enrollment.should be_invited
+      end
+
+      it "should auto-redirect to accept if previews are not allowed" do
+        # Currently, previews are only allowed for the default account
+        @account = Account.create!
+        course_with_student(:active_course => 1, :account => @account)
+        get 'show', :id => @course.id, :invitation => @enrollment.uuid
+        response.should be_redirect
+        response.should redirect_to(course_enrollment_invitation_url(@course, :invitation => @enrollment.uuid, :accept => 1))
+      end
+
+      it "should ignore invitations that have been accepted" do
+        course_with_student(:active_course => 1, :active_enrollment => 1)
+        @course.grants_right?(@user, nil, :read).should be_true
+        get 'show', :id => @course.id, :invitation => @enrollment.uuid
+        response.status.should == '401 Unauthorized'
+
+        # Force reload permissions
+        controller.instance_variable_set(:@context_all_permissions, nil)
+        user_session(@user)
+        get 'show', :id => @course.id, :invitation => @enrollment.uuid
+        response.should be_success
+        assigns[:pending_enrollment].should be_nil
+      end
+    end
   end
   
   describe "POST 'unenroll'" do
@@ -232,6 +255,12 @@ describe CoursesController do
   end
   
   describe "POST 'enroll_users'" do
+    before :each do
+      account = Account.default
+      account.settings = { :open_registration => true }
+      account.save!
+    end
+
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'enroll_users', :course_id => @course.id, :user_list => "sam@yahoo.com"

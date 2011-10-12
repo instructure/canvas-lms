@@ -432,10 +432,6 @@ class User < ActiveRecord::Base
     []
   end
   
-  def self.find_by_email(email)
-    CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
-  end
-
   def last_name_first
     _title, _given, _surname, _suffix = title, given_name, surname, suffix
     _title, _given, _surname, _suffix = User.name_parts(read_attribute(:name)) if !_title && !_given && !_surname && !_suffix
@@ -1403,18 +1399,7 @@ class User < ActiveRecord::Base
     res[:folders] = res[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
     res
   end
-  
-  def assert_pseudonym_and_communication_channel
-    if !self.communication_channel && !self.pseudonym
-      raise "User must have at least one pseudonym or communication channel"
-    elsif self.communication_channel && !self.pseudonym
-      self.reload
-    elsif self.pseudonym && !self.communication_channel
-      self.pseudonym.assert_communication_channel
-      self.reload
-    end
-  end
-  
+
   def generate_reminders_if_changed
     send_later(:generate_reminders!) if @reminder_times_changed
   end
@@ -1733,20 +1718,6 @@ class User < ActiveRecord::Base
   
   def last_mastered_assignment
     self.learning_outcome_results.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
-  end
-  
-  def self.assert_by_email(email, account)
-    p = Pseudonym.find_by_unique_id(email)
-    cc = CommunicationChannel.find_by_path_and_path_type(email, 'email')
-    user = p.try(:user)
-    user ||= cc.try(:user)
-    res = {:email => email}
-    res[:new] = !user
-    user ||= User.create!(:name => email)
-    user.pseudonyms.create!(:unique_id => email, :path => email, :account => account) unless p
-    user.communication_channels.create!(:path => email).confirm unless cc
-    res[:user] = user
-    res
   end
   
   def profile_pics_folder

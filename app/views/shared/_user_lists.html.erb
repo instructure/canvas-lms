@@ -1,8 +1,8 @@
 <div id="user_list_boxes">
-  <a id="user_lists_path" style="display:none;" href="<%= url_for course_user_lists_path(@context, :format => :json) %>"></a>
+  <a id="user_lists_path" style="display:none;" href="<%= polymorphic_path([@context, :user_lists], :format => :json) %>"></a>
   <div id="user_list_textarea_container" style="z-index: 2;">
     <input type="hidden" name="enrollment_type" value="StudentEnrollment" />
-    <span style="font-size: 0.8em;"><%= @context.root_account.login_handle_name_is_customized? ? t(:copy_and_paste_notice_with_login_handle, "Copy and paste a list of users to add to this course. You can use their email address or %{login_handle_name}.", :login_handle_name => @context.root_account.login_handle_name) : t(:copy_and_paste_notice_just_email, "Copy and paste a list of email addresses to add users to this course.") %></span>
+    <span style="font-size: 0.8em;"><%= (@context.root_account || @context).login_handle_name_is_customized? ? t(:copy_and_paste_notice_with_login_handle, "Copy and paste a list of users. You can use their email address or %{login_handle_name}.", :login_handle_name => @context.root_account.login_handle_name) : t(:copy_and_paste_notice_just_email, "Copy and paste a list of email addresses to add users.") %></span>
     <textarea name="user_list" class="user_list"><% if @students && @students.empty? %><%= t :example_user_list, '"Example Student" <student@example.com>
 "Other Student" <otherstudent@example.com>
 "Lastname, Firstname" <firstlast@example.com>

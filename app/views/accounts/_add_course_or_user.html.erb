@@ -1,7 +1,7 @@
 <%
   hide_add_course ||= false; hide_add_user ||= false
   show_course = !hide_add_course && can_do(@account, @current_user, :manage_courses)
-  show_user = !hide_add_user && can_do(@account, @current_user, :manage_admin_users)
+  show_user = !hide_add_user && can_do(@account, @current_user, :manage_user_logins)
 %>
 
 <% if show_course || show_user %>
@@ -19,7 +19,6 @@
   <div id="add_user_dialog">
     <h2><%= t(:add_user_title, "Add a New User") %></h2>
     <% form_for :user, :url => account_add_user_url(@account), :html => {:id => "add_user_form"} do |f| %>
-    <input type="hidden" name="root_account_id" value="<%= @root_account.id %>"/>
     <table class="formtable">
       <tr>
         <td><%= f.blabel :name, :full_name, :en => "Full Name" %></td>
@@ -115,18 +114,10 @@
         var user = data.user.user || data.user;
         var link = "<a href='/users/" + user.id + "'>" + $.htmlEscape(user.name) + "</a>"
         var message = '';
-        if(data.new_user) {
-            if(data.message_sent) {
-                message = I18n.t('user_added_message_sent_message', '%{user} successfully added! They should receive an email confirmation shortly.', {user: link});
-            } else {
-                message = I18n.t('user_added_message', '%{user} successfully added!', {user: link});
-            }
+        if(data.message_sent) {
+            message = I18n.t('user_added_message_sent_message', '%{user} successfully added! They should receive an email confirmation shortly.', {user: link});
         } else {
-            if(data.message_sent) {
-                message = I18n.t('user_updated_message_sent_message', '%{user} successfully updated! They should receive an email confirmation shortly.', {user: link});
-            } else {
-                message = I18n.t('user_updated_message', '%{user} successfully updated!', {user: link});
-            }
+            message = I18n.t('user_added_message', '%{user} successfully added!', {user: link});
         }
         $.flashMessage(message);
         $("#add_user_dialog").dialog('close');

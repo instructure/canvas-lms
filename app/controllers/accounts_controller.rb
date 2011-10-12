@@ -141,60 +141,9 @@ class AccountsController < ApplicationController
       @role_types = RoleOverride.account_membership_types(@account)
     end
   end
-  
-  def add_user
-    if authorized_action(@account, @current_user, :manage_admin_users)
-      @root_account = @account.root_account || @account
-      params[:pseudonym][:unique_id] ||= params[:pseudonym][:path]
-      @pseudonym = Pseudonym.find_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @root_account.id)
-      @pseudonym ||= Pseudonym.new(:unique_id => params[:pseudonym][:unique_id], :account => @root_account)
-      new_login = @pseudonym.new_record?
-      if !@pseudonym.new_record?
-        user = @pseudonym.user
-        self.extend TextHelper
-        render :json => {:errors => {'pseudonym[unique_id]' => mt(:login_in_use_notice, "The login specified is already in use by [%{username}](%{url})", :username => user.name, :url => "/users/#{user.id}")}}.to_json, :status => :bad_request
-        return
-      end
-      notify = (params[:pseudonym].delete :send_confirmation) == '1'
-      email = params[:pseudonym][:path] || params[:pseudonym][:unique_id]
-      @active_cc = CommunicationChannel.find_by_path_and_path_type_and_workflow_state(email, 'email', 'active')
-      if @active_cc && @active_cc.user && !@pseudonym.user
-        @user = @active_cc.user
-      end
-      @user ||= User.new
-      new_user = @user.new_record?
-      @user.attributes = params[:user]
-      @user.name ||= params[:pseudonym][:unique_id]
-      if @user.save
-        @pseudonym.user = @user
-        @pseudonym.workflow_state = 'active'
-        if @active_cc
-        else
-          @pseudonym.path = email
-        end
-        @pseudonym.errors.clear
-        if @pseudonym.valid?
-          @pseudonym.save_without_session_maintenance
-          @pseudonym.assert_communication_channel(true)
-          message_sent = notify && new_login
-          @pseudonym.send_registration_notification! if notify && (new_login || @user.pre_registered?)
-          @user.reload
-          data = OpenObject.new(:user => @user, :pseudonym => @pseudonym, :channel => @user.communication_channel, :new_login => new_login, :new_user => new_user, :message_sent => message_sent)
-          respond_to do |format|
-            format.json { render :json => data.to_json }
-          end
-        else
-          @user.destroy if @user.pseudonyms.select{|p| !p.new_record? }.empty?
-          render :json => {:errors => {:base => t(:invalid_login_message, "Invalid login")}}.to_json, :status => :bad_request
-        end
-      else
-        render :json => {:errors => {:base => t(:invalid_login_message, "Invalid login")}}.to_json, :status => :bad_request
-      end
-    end
-  end
-  
+
   def confirm_delete_user
-    if authorized_action(@account, @current_user, :manage_admin_users)
+    if authorized_action(@account, @current_user, :manage_user_logins)
       @context = @account
       @user = @account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
       if !@user
@@ -205,7 +154,7 @@ class AccountsController < ApplicationController
   end
   
   def remove_user
-    if authorized_action(@account, @current_user, :manage_admin_users)
+    if authorized_action(@account, @current_user, :manage_user_logins)
       @user = UserAccountAssociation.find_by_account_id_and_user_id(@account.id, params[:user_id]).user rescue nil
       # if the user is in any account other then the
       # current one, remove them from the current account
@@ -433,13 +382,28 @@ class AccountsController < ApplicationController
   
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      res = @context.add_admin(params[:admin])
-      if res
-        redirect_to account_settings_url(@context, :anchor => "tab-users")
-      else
-        flash[:error] = t(:no_user_found_notice, "No user with that email address was found")
-        redirect_to account_settings_url(@context, :anchor => "tab-users")
+      list = UserList.new(params[:user_list], @context, @context.grants_right?(@current_user, session, :manage_user_logins))
+      users = list.users
+      account_users = users.map do |user|
+        account_user = @context.add_user(user, params[:membership_type])
+
+        if user.registered?
+          account_user.account_user_notification!
+        else
+          account_user.account_user_registration!
+        end
+
+        { :enrollment => {
+          :id => account_user.id,
+          :name => user.name,
+          :membership_type => account_user.membership_type,
+          :workflow_state => 'active',
+          :user_id => user.id,
+          :type => 'admin',
+          :email => user.email
+        }}
       end
+      render :json => account_users
     end
   end
   

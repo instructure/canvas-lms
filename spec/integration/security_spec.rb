@@ -131,7 +131,8 @@ describe "security" do
   end
   
   it "should only allow user list username resolution if the current user has appropriate rights" do
-    Account.default.pseudonyms.create!(:unique_id => "A1234567").assert_user{|u| u.name = "test user"}
+    u = User.create!(:name => 'test user')
+    u.pseudonyms.create!(:unique_id => "A1234567", :account => Account.default)
     @course = Account.default.courses.create!
     @course.offer!
     @teacher = user :active_all => true
@@ -148,29 +149,15 @@ describe "security" do
 
     user_session(@student)
     post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
-    assert_response :success
-    ActiveSupport::JSON.decode(response.body).should == {
-      "duplicates" => [],
-      "errored_users" => [],
-      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
-    }
-    
+    response.should_not be_success
+
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
     assert_response :success
     ActiveSupport::JSON.decode(response.body).should == {
       "duplicates" => [],
-      "errored_users" => ["A345678"],
-      "users" => [{"login" => "A1234567", "name" => "test user"}]
-    }
-    
-    user_session(@student)
-    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
-    assert_response :success
-    ActiveSupport::JSON.decode(response.body).should == {
-      "duplicates" => [],
-      "errored_users" => [],
-      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
+      "errored_users" => [{"address" => "A345678", "details" => "not_found"}],
+      "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id.to_s }]
     }
   end
 

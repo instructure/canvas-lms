@@ -21,7 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
 
   def new
-    if @current_user && !params[:re_login]
+    if @current_user && !params[:re_login] && !params[:confirm]
       redirect_to dashboard_url
       return
     end
@@ -30,6 +30,10 @@ class PseudonymSessionsController < ApplicationController
       @needs_cookies = true
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
+    @unique_id = params[:unique_id]
+
+    session[:confirm] = params[:confirm]
+    session[:enrollment] = params[:enrollment]
 
     @pseudonym_session = PseudonymSession.new
     @headers = false
@@ -62,7 +66,7 @@ class PseudonymSessionsController < ApplicationController
             # Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             session[:cas_login] = true
-            @user = @pseudonym.login_assertions_for_user rescue nil
+            @user = @pseudonym.login_assertions_for_user
 
             successful_login(@user, @pseudonym)
             return
@@ -83,8 +87,6 @@ class PseudonymSessionsController < ApplicationController
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
       initiate_saml_login(request.env['canvas.account_domain'])
-    else
-      render :action => "new"
     end
   end
 
@@ -119,36 +121,17 @@ class PseudonymSessionsController < ApplicationController
     end
     
     # Call for some cleanups that should be run when a user logs in
-    @user = @pseudonym.login_assertions_for_user rescue nil
+    @pseudonym.login_assertions_for_user if found
+    @user = @pseudonym.user if found
     
-    # Boy there's a lot of code ended up in here...
-    
-    # When a user logs in we get acccess to their email address as well as their
-    # handle.  If the email address that the authentication system returns is
-    # different than the email address that the SIS returns, we should give the
-    # user the option to add the new address to their account
-    if @pseudonym
-      begin
-        channel = @pseudonym.ldap_channel_to_possibly_merge(params[:pseudonym_session][:password]) rescue nil
-        session[:channel_conflict] = channel if channel && @pseudonym.login_path_to_ignore != channel.path
-      rescue => e
-        ErrorReport.log_exception(:default, e, {
-          :message => "LDAP email merge, unexpected error",
-        })
-      end
-    end
-
     # If the user is registered and logged in, redirect them to their dashboard page
-    if @user && @user.registered? && found
+    if found
       successful_login(@user, @pseudonym)
     # Otherwise re-render the login page to show the error
     else
       respond_to do |format|
         flash[:error] = t 'errors.invalid_credentials', "Incorrect username and/or password"
         @errored = true
-        if @user && @user.creation_pending?
-          @user.update_attribute(:workflow_state, "pre_registered")
-        end
         @pre_registered = @user if @user && !@user.registered?
         @headers = false
         format.html { render :action => "new", :status => :bad_request }
@@ -221,7 +204,7 @@ class PseudonymSessionsController < ApplicationController
             reset_session_for_login
             #Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
-            @user = @pseudonym.login_assertions_for_user rescue nil
+            @user = @pseudonym.login_assertions_for_user
 
             session[:name_id] = response.name_id
             session[:name_qualifier] = response.name_qualifier
@@ -299,7 +282,6 @@ class PseudonymSessionsController < ApplicationController
         # this is where we will verify client authorization and scopes, once implemented
         # .....
         # now generate the temporary code, and respond/redirect
-        # (right now we don't support redirect, just oob response using a canvas url)
         code = ActiveSupport::SecureRandom.hex(64)
         code_data = { 'user' => user.id, 'client_id' => session[:oauth2][:client_id] }
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
@@ -312,6 +294,11 @@ class PseudonymSessionsController < ApplicationController
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
+      elsif session[:confirm]
+        format.html { redirect_to(registration_confirmation_path(session.delete(:confirm), :enrollment => session.delete(:enrollment), :login_success => 1))}
+      elsif session[:enrollment]
+        @enrollment = Enrollment.find_by_uuid_and_workflow_state(session.delete(:enrollment), 'invited')
+        format.html { redirect_to(course_url(@enrollment.course, :invitation => @enrollment.uuid, :login_success => 1))}
       else
         # the URL to redirect back to is stored in the session, so it's
         # assumed that if that URL is found rather than using the default,

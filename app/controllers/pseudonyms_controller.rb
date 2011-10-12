@@ -29,7 +29,6 @@ class PseudonymsController < ApplicationController
     end
     if @domain_root_account && email && !email.empty?
       @domain_root_account.pseudonyms.active.find_all_by_unique_id(email).each do |p|
-        p.assert_communication_channel(true)
         cc = p.communication_channel if p.communication_channel && p.user
         cc ||= p.user.communication_channel rescue nil
         @ccs << cc
@@ -39,7 +38,6 @@ class PseudonymsController < ApplicationController
       if !cc.user
         false
       else
-        cc.user.pseudonyms.active.each{|p| p.assert_communication_channel(true) }
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
         !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (!@domain_root_account.require_account_pseudonym? && p.account && p.account.password_authentication?) }
@@ -101,148 +99,6 @@ class PseudonymsController < ApplicationController
     end
   end
 
-  def re_send_confirmation
-    @user = User.find(params[:user_id])
-    @cc = @user.communication_channels.find(params[:id])
-    @enrollment = params[:enrollment_id] && @user.enrollments.find(params[:enrollment_id])
-    if @enrollment && (@enrollment.invited? || @enrollment.active?)
-      @enrollment.re_send_confirmation!
-    elsif @cc.unconfirmed?
-      @cc.send_confirmation!
-    else
-      @cc.send_confirmation!
-    end
-    render :json => {:re_sent => true}
-  end
-  
-  def claim_pseudonym
-    @pseudonym = Pseudonym.find(params[:id])
-    @headers = false
-    nonce = params[:nonce]
-    cc = CommunicationChannel.find_by_user_id_and_confirmation_code(@pseudonym.user_id, nonce)
-    cc = nil if cc && (!cc.unconfirmed? || cc.confirmation_code != nonce)
-    if @pseudonym && !cc
-      flash[:error] = t 'errors.already_registered', "The login %{email} has already been registered.  If you're not sure how to log in, click \"Don't Know My Password\" and enter the login \"%{email}\"", :email => @pseudonym.unique_id
-      redirect_to root_url #"/"
-      return
-    end
-    if params[:claim] && @current_user
-      already_confirmed = !cc.unconfirmed?
-      if cc and cc.confirm
-        unless already_confirmed
-          cc.user = @current_user
-          cc.save
-          @pseudonym.move_to_user(@current_user)
-        end
-        flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
-        respond_to do |format|
-          format.html { redirect_to_enrollment_or_profile }
-          format.json { render :json => cc.to_json }
-        end
-      else
-        flash[:notice] = t 'notices.registration_failed', "Registration failed."
-        respond_to do |format|
-          format.html { redirect_to claim_pseudonym_url(@pseudonym.id, nonce) }
-          format.json { render :json => cc.to_json }
-        end
-      end
-    else
-      session[:return_to] = claim_pseudonym_url(params[:id], params[:nonce])
-      @communication_channel = cc
-      respond_to do |format|
-        format.html
-      end
-    end
-  end
-  
-  def redirect_to_enrollment_or_profile(redirect_back=false)
-    if session[:enrollment_uuid] || session[:to_be_accepted_enrollment_uuid]
-      @enrollment = Enrollment.find_by_uuid_and_workflow_state(session[:to_be_accepted_enrollment_uuid], "invited")
-      @enrollment ||= Enrollment.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited")
-      @enrollment = nil unless @enrollment && @enrollment.user_id == @pseudonym.user_id
-    end
-    if @enrollment 
-      @enrollment.accept! if @enrollment.invited?
-      session[:accepted_enrollment_uuid] = @enrollment.uuid
-      redirect_to course_url(@enrollment.course_id)
-    else
-      if redirect_back  
-        redirect_back_or_default dashboard_url
-      else
-        redirect_to dashboard_url 
-      end
-    end
-  end
-  protected :redirect_to_enrollment_or_profile
-  
-  # Used for the initial student registration.  This is a good candidate
-  # for refactoring, swapping out the common code in
-  # registration_confirmation and claim_pseudonym.  The reason these are
-  # both here is the case where the teacher invites a group of students,
-  # some of them already have an account with us.  claim_pseudonym is used
-  # for using an existing pseudonym.  registration_confirmation is used
-  # for setting up a new one. 
-  def registration_confirmation
-    id = params[:id]
-    nonce = params[:nonce]
-    pseudonym = Pseudonym.find(id)
-    cc = pseudonym.user.communication_channels.find_by_confirmation_code(nonce)
-    enrollment = pseudonym.user.enrollments.find_by_uuid_and_workflow_state(params[:enrollment], 'invited')
-    @course = enrollment && enrollment.course
-    @headers = false
-    if cc
-      @communication_channel = cc
-      @pseudonym = pseudonym
-      @user = @pseudonym.user
-      if params[:register] && params[:user]
-        user = pseudonym.user
-        user.name = params[:user][:name] || user.name
-        user.name = pseudonym.unique_id if !user.name || user.name.empty?
-        user.time_zone = params[:user][:time_zone]
-        user.short_name = params[:user][:short_name] || user.short_name
-        user.subscribe_to_emails = params[:user][:subscribe_to_emails] || user.subscribe_to_emails
-        user.save
-      end
-      if params[:register] && pseudonym.password_auto_generated && params[:pseudonym][:password]
-        pseudonym.password = params[:pseudonym][:password]
-        pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-        if params[:pseudonym][:password].empty? 
-          flash[:error] = t 'errors.password_too_short', "You must type a password of at least 6 characters."
-        else 
-          pseudonym.save
-        end
-      end
-      if pseudonym.password_auto_generated
-        respond_to do |format|
-          format.html
-        end
-      elsif cc.active? || cc.confirm
-        reset_session_saving_keys(:return_to)
-        flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
-        pseudonym.user.register
-        # Login, since we're satisfied that this person is the right person.
-        @pseudonym_session = PseudonymSession.new(pseudonym, true)
-        @pseudonym_session.save
-
-        respond_to do |format|
-          session[:return_to] = nil if session[:return_to] == claim_pseudonym_url(params[:id], params[:nonce])
-          format.html { redirect_to_enrollment_or_profile true }
-          format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
-        end
-      else
-        @failed = "cant_confirm"
-      end
-    else
-      @failed = "invalid_cc"
-    end
-    if @failed
-      respond_to do |format|
-        format.html { render :action => "registration_confirmation_failed" }
-        format.json { render :json => {}.to_json, :status => :bad_request }
-      end
-    end
-  end
-  
   def show
     @user = @current_user
     @pseudonym = @current_pseudonym

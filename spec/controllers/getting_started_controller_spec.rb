@@ -19,6 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GettingStartedController do
+  before do
+    account = Account.default
+    account.settings = {:teachers_can_create_courses => true, :no_enrollments_can_create_courses => true}
+    account.save!
+  end
 
   it "should use GettingStartedController" do
     controller.should be_an_instance_of(GettingStartedController)

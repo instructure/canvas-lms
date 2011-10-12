@@ -21,13 +21,14 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   # So, this will look like:
-  # http://instructure.com/pseudonyms/3/register/5R32s9iqwLK75Jbbj0
-  map.registration_confirmation 'pseudonyms/:id/register/:nonce', 
-    :controller => 'pseudonyms', :action => 'registration_confirmation'
-  map.claim_pseudonym 'pseudonyms/:id/claim/:nonce',
-    :controller => 'pseudonyms', :action => 'claim_pseudonym'
+  # http://instructure.com/register/5R32s9iqwLK75Jbbj0
+  map.registration_confirmation 'register/:nonce',
+    :controller => 'communication_channels', :action => 'confirm'
+  # deprecated
+  map.registration_confirmation_deprecated 'pseudonyms/:id/register/:nonce',
+    :controller => 'communication_channels', :action => 'confirm'
   map.re_send_confirmation 'confirmations/:user_id/re_send/:id',
-    :controller => 'pseudonyms', :action => 're_send_confirmation'
+    :controller => 'communication_channels', :action => 're_send_confirmation'
   map.forgot_password "forgot_password",
     :controller => 'pseudonyms', :action => 'forgot_password'
   map.confirm_change_password "pseudonyms/:pseudonym_id/change_password/:nonce",
@@ -396,7 +397,7 @@ ActionController::Routing::Routes.draw do |map|
     account.avatars 'avatars', :controller => 'accounts', :action => 'avatars'
     account.sis_import 'sis_import', :controller => 'accounts', :action => 'sis_import'
     account.sis_import_submit 'sis_import_submit', :controller => 'accounts', :action => 'sis_import_submit'
-    account.add_user 'users', :controller => 'accounts', :action => 'add_user', :conditions => {:method => :post}
+    account.add_user 'users', :controller => 'users', :action => 'create', :conditions => {:method => :post}
     account.confirm_delete_user 'users/:user_id/delete', :controller => 'accounts', :action => 'confirm_delete_user'
     account.delete_user 'users/:user_id', :controller => 'accounts', :action => 'remove_user', :conditions => {:method => :delete}
     account.resources :users
@@ -455,6 +456,7 @@ ActionController::Routing::Routes.draw do |map|
     account.run_report 'run_report', :controller => 'accounts', :action => 'run_report'
     account.resources :alerts
     account.resources :question_banks, &question_bank_resources
+    account.resources :user_lists, :only => :create
   end
   map.avatar_image 'images/users/:user_id', :controller => 'info', :action => 'avatar_image_url', :conditions => {:method => :get}
   map.thumbnail_image 'images/thumbnails/:id/:uuid', :controller => 'files', :action => 'image_thumbnail'
@@ -522,11 +524,7 @@ ActionController::Routing::Routes.draw do |map|
     profile.user_service "user_services/:id", :controller => "users", :action => "delete_user_service", :conditions => {:method => :delete}
     profile.create_user_service "user_services", :controller => "users", :action => "create_user_service", :conditions => {:method => :post}
   end
-  map.resources :communication_channels, :collection => {:try_merge => :post} do |channel|
-    channel.merge "merge/:code", :controller => "communication_channels", :action => "merge"
-    channel.confirm "confirm/:nonce", :controller => 'communication_channels', :action => 'confirm'
-
-  end
+  map.resources :communication_channels
   map.resource :pseudonym_session
 
   # dashboard_url is / , not /dashboard
@@ -556,7 +554,6 @@ ActionController::Routing::Routes.draw do |map|
     dashboard.comment_session "comment_session", :controller => "services_api", :action => "start_kaltura_session"
     dashboard.ignore_stream_item 'ignore_stream_item/:id', :controller => 'users', :action => 'ignore_stream_item', :conditions => {:method => :delete}
   end
-  map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
 
   map.resources :plugins, :only => [:index, :show, :update]
 

@@ -347,6 +347,8 @@ end
 
 # The opts pertain to user only
 def create_user_with_cc(opts={})
+  user_model(opts)
+
   if @notification
     notification_policy_model(:notification_id => @notification.id)
     communication_channel_model
@@ -354,9 +356,7 @@ def create_user_with_cc(opts={})
   else
     communication_channel_model
   end
-  
-  user_model(opts)
-  @communication_channel.update_attribute(:user_id, @user.id)
+
   @user.reload
   @user
 end

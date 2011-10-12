@@ -103,7 +103,7 @@ Spec::Runner.configure do |config|
   end
 
   def course(opts={})
-    @course = Course.create!(:name => opts[:course_name])
+    @course = Course.create!(:name => opts[:course_name], :account => opts[:account])
     @course.offer! if opts[:active_course] || opts[:active_all]
     if opts[:active_all]
       u = User.create!
@@ -143,11 +143,14 @@ Spec::Runner.configure do |config|
     user = opts[:user] || @user
     username = opts[:username] || "nobody@example.com"
     password = opts[:password] || "asdfasdf"
-    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :path => username, :password => password, :password_confirmation => password)
-    @cc = @pseudonym.communication_channel
+    password = nil if password == :autogenerate
+    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
+    @cc = @pseudonym.communication_channel = user.communication_channels.create!(:path_type => 'email', :path => username) do |cc|
+      cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
+      cc.workflow_state = opts[:cc_state] if opts[:cc_state]
+    end
     @cc.should_not be_nil
     @cc.should_not be_new_record
-    user.communication_channels << @cc
     user
   end
 

@@ -195,5 +195,36 @@ describe Pseudonym do
     p.sis_user_id = nil
     p.should_not be_managed_password
   end
+
+  context "login assertions" do
+    it "should create a CC if LDAP gave an e-mail we don't have" do
+      account = Account.create!
+      account.account_authorization_configs.create!(:auth_type => 'ldap')
+      u = User.create!
+      u.register
+      p = u.pseudonyms.create!(:unique_id => 'jt', :account => account) { |p| p.sis_user_id = 'jt' }
+      p.instance_variable_set(:@ldap_result, {:mail => ['jt@instructure.com']})
+
+      p.add_ldap_channel
+      u.reload
+      u.communication_channels.length.should == 1
+      u.email_channel.path.should == 'jt@instructure.com'
+      u.email_channel.should be_active
+      u.email_channel.destroy
+
+      p.add_ldap_channel
+      u.reload
+      u.communication_channels.length.should == 1
+      u.email_channel.path.should == 'jt@instructure.com'
+      u.email_channel.should be_active
+      u.email_channel.update_attribute(:workflow_state, 'unconfirmed')
+
+      p.add_ldap_channel
+      u.reload
+      u.communication_channels.length.should == 1
+      u.email_channel.path.should == 'jt@instructure.com'
+      u.email_channel.should be_active
+    end
+  end
 end
 

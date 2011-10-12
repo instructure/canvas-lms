@@ -160,32 +160,34 @@ module SIS
             end
 
             if email.present?
-              comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(email, 'active', 'email')
-              if !comm and status =~ /active/i
-                begin
-                  comm = pseudo.sis_communication_channel || CommunicationChannel.new
-                  if comm.new_record?
-                    comm.user_id = user.id
-                    comm.pseudonym_id = pseudo.id
-                    pseudo.sis_communication_channel = comm
-                  end
-                  comm.path = email
-                  comm.workflow_state = 'active'
-                  comm.do_delayed_jobs_immediately = true
-                  comm.save_without_broadcasting if comm.changed?
-                  pseudo.communication_channel_id = comm.id
-                rescue => e
-                  @messages << "Failed adding communication channel #{email} to user #{login_id}"
-                end
-              elsif status =~ /active/i
-                if comm.user_id != pseudo.user_id
-                  @messages << "E-mail address #{email} for user #{login_id} is already claimed; ignoring"
-                else
-                  pseudo.sis_communication_channel.destroy if pseudo.sis_communication_channel != comm and !pseudo.sis_communication_channel.nil?
-                  pseudo.sis_communication_channel = comm
-                  pseudo.communication_channel_id = comm.id
-                  comm.do_delayed_jobs_immediately = true
-                  comm.save_without_broadcasting if comm.changed?
+              conditions = [ "path=? AND path_type='email' AND ", email, user.id]
+              # find all CCs for this user, and active conflicting CCs for all users
+              # unless we're deleting this user, then only find CCs for this user
+              conditions.first << (status =~ /deleted/i ? 'user_id=?' : "(workflow_state='active' OR user_id=?)")
+
+              ccs = CommunicationChannel.find(:all, :conditions => conditions)
+              sis_cc = ccs.find { |cc| cc.id == pseudo.sis_communication_channel_id } if pseudo.sis_communication_channel_id
+              # Have to explicitly load the old sis communication channel, in case it changed (should only happen if user_id got messed up)
+              sis_cc ||= pseudo.sis_communication_channel
+              other_cc = ccs.find { |cc| cc.path = email && cc.user_id == user.id && cc.id != sis_cc.try(:id) }
+              # Handle the case where the SIS CC changes to match an already existing CC
+              if sis_cc && other_cc
+                sis_cc.destroy
+                sis_cc = nil
+              end
+              cc = sis_cc || other_cc || CommunicationChannel.new
+              cc.user_id = user.id
+              cc.pseudonym_id = pseudo.id
+              cc.path = email
+              cc.workflow_state = (status =~ /active/i) ? 'active' : 'retired'
+              newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
+              cc.save_without_broadcasting if cc.changed?
+              pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
+
+              if newly_active
+                other_ccs = ccs.reject { |cc_but_i_cant_call_it_cc_because_ruby_is_jacked_up_in_my_opinion| cc_but_i_cant_call_it_cc_because_ruby_is_jacked_up_in_my_opinion.user_id == user.id }
+                unless other_ccs.empty?
+                  cc.send_merge_notification!
                 end
               end
             end

@@ -230,9 +230,9 @@ describe CommunicationChannel do
     @u2 = User.create!
     @u1.should_not eql(@u2)
     @u1.id.should_not eql(@u2.id)
-    @cc1 = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(:user => @u1))
-    @cc2 = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(:user => @u1))
-    @cc3 = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(:user => @u2))
+    @cc1 = @u1.communication_channels.create!(:path => 'jt@instructure.com')
+    @cc2 = @u1.communication_channels.create!(:path => 'cody@instructure.com')
+    @cc3 = @u2.communication_channels.create!(:path => 'brianp@instructure.com')
     @cc1.user.should eql(@u1)
     @cc2.user.should eql(@u1)
     @cc3.user.should eql(@u2)

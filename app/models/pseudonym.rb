@@ -34,14 +34,11 @@ class Pseudonym < ActiveRecord::Base
   
   before_save :set_password_changed
   before_validation :infer_defaults, :verify_unique_sis_user_id
-  before_save :assert_communication_channel
   before_save :set_update_account_associations_if_account_changed
   after_save :update_passwords_on_related_pseudonyms
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
   
-  attr_accessor :path, :path_type
-
   include StickySisFields
   are_sis_sticky :unique_id
 
@@ -151,6 +148,8 @@ class Pseudonym < ActiveRecord::Base
     
     user = self.user
     user.workflow_state = 'registered' unless user.registered?
+
+    add_ldap_channel
     
     # Assert a time zone for the user if none provided
     if user && !user.time_zone
@@ -201,12 +200,6 @@ class Pseudonym < ActiveRecord::Base
     
     self.errors.add(:sis_user_id, t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id))
     false
-  end
-
-  def assert_user(params={}, &block)
-    self.user ||= User.create!({:name => self.path}.merge(params), &block)
-    self.save
-    self.user
   end
 
   workflow do
@@ -350,51 +343,18 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
   
-  def ldap_channel_to_possibly_merge(password_plaintext)
+  def add_ldap_channel
     return nil unless managed_password?
-    res = @ldap_result ||= (self.ldap_bind_result(password_plaintext)[0] rescue nil)
+    res = @ldap_result
     if res && res[:mail] && res[:mail][0]
       email = res[:mail][0]
-      @ldap_result = res
-      ccs = CommunicationChannel.find_all_by_path_and_path_type(email, "email") rescue []
-      if cc = ccs.detect{|cc| cc.active? && cc.user_id == self.user_id }
-        # If it's already owned by this user, just run the cleanup
-        # to get rid of any straggling duplicates
-        cc.touch if ccs.length > 1
-      elsif cc = ccs.detect{|cc| cc.active? }
-        # If it belongs to someone else, we should remind them about
-        # merging the paths
-        return ccs.detect{|cc| cc.active? }
-      elsif ccs.any?{|cc| cc.user.pre_registered? || cc.user.creation_pending? }
-        # If any one of the users is not registered, merge those users in
-        # and claim the channel, thus stealing it out from beneath
-        # the others
-        first_cc = nil
-        ccs.select{|cc| cc.user.pre_registered? || cc.user.creation_pending? }.each do |cc|
-          first_cc ||= cc
-          cc.user.move_to_user(self.user)
-        end
-        first_cc.confirm
-      else
-        # Else should mean it only exists in a deleted or unclaimed state, 
-        # which means we can just create it
-        CommunicationChannel.create({
-          :path => email,
-          :path_type => "email",
-          :user => self.user,
-          :pseudonym => self
-        }) { |cc| cc.workflow_state = 'active' }
-      end
+      cc = self.user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
+      cc.workflow_state = 'active'
+      cc.user = self.user
+      cc.save if cc.changed?
+      self.communication_channel = cc
+      self.save_without_session_maintenance if self.changed?
     end
-    nil
-  rescue => e
-    ErrorReport.log_exception(:default, e, {
-      :message => "LDAP email conflict",
-      :user => self.unique_id,
-      :object => self.inspect.to_s,
-      :email => (res[:email] rescue ''),
-    })
-    nil
   end
 
   attr_reader :ldap_result
@@ -414,14 +374,6 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  # To get the communication_channel for free, call this with :path => 'somepath@example.com' 
-  def assert_communication_channel(merge=false)
-    if self.path
-      cc = CommunicationChannel.create(:user => self.user, :path => self.path, :path_type => self.path_type || 'email')
-      self.communication_channel_id ||= cc.id
-    end
-  end
-  
   named_scope :account_unique_ids, lambda{|account, *unique_ids|
     {:conditions => {:account_id => account.id, :unique_id => unique_ids}, :order => :unique_id}
   }

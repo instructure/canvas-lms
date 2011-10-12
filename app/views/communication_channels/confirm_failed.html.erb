@@ -1,7 +1,7 @@
-<% 
+<%
   jammit_css :login
   @headers = false
-  @body_classes << "modal" 
+  @body_classes << "modal"
   content_for :page_title, t(:page_title, "Registration Confirmation Failed")
 %>
 
@@ -12,7 +12,7 @@
     with the email address and password you registered.  If you can't remember
     your password, click the "Forgot Password" link and you should get a new link
     that you can use to log in and re-set your password.},
-    :wrapper => '<a href="#{login_url}"><b>\1</b>' %></a></p>
+    :wrapper => %{<a href="#{login_url}"><b>\\1</b></a>} %></p>
     <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
       <p><%= t :feedback, %{If you keep having problems, click the "Feedback" tab at the top right
       and let us know what's going on.} %>

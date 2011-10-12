@@ -157,14 +157,7 @@ class UsersController < ApplicationController
       end
     end
   end
-  
-  def ignore_channel
-    @current_pseudonym.update_attribute(:login_path_to_ignore, params[:path])
-    session[:conflict_channel] = nil
-    flash[:notice] = t('remove_warning', "You'll no longer receive warnings about the address %{email} from this login", :email => params[:path])
-    redirect_to dashboard_url
-  end
-  
+
   def index
     get_context
     if authorized_action(@context, @current_user, :read_roster)
@@ -486,74 +479,64 @@ class UsersController < ApplicationController
   
   def new
     @user = User.new
-    @pseudonym = @current_user ? @current_user.pseudonyms.build(:account => @domain_root_account) : Pseudonym.new(:account => @domain_root_account)
+    @pseudonym = @current_user ? @current_user.pseudonyms.build(:account => @context) : Pseudonym.new(:account => @context)
     render :action => "new"
   end
 
   def create
-    @pseudonym = Pseudonym.find_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @domain_root_account.id)
-    @pseudonym ||= Pseudonym.new(:unique_id => params[:pseudonym][:unique_id], :account => @domain_root_account)
-    @pseudonym.save_without_session_maintenance if @pseudonym.new_record?
-    @active_cc = CommunicationChannel.find_by_path_and_path_type_and_workflow_state(params[:pseudonym][:unique_id], 'email', 'active')
-    @any_cc = CommunicationChannel.find_by_path_and_path_type(params[:pseudonym][:unique_id], 'email') unless @active_cc
-    # If a teacher created the student, and the student then comes to register, they
-    # should still be allowed to.
-    if @active_cc && @active_cc.user && !@pseudonym.user
-      @user ||= @active_cc.user
-    elsif @any_cc && @any_cc.user && !@pseudonym.user
-      @user ||= @any_cc.user
-    elsif @pseudonym && (!@pseudonym.user || @pseudonym.user.creation_pending?)
-      @user ||= @pseudonym.user
-    else
-      # If not creation_pending, we want to throw an already_exists error, which
-      # we'll get if we set this to nil, since then a few lines down will try to
-      # create a new pseudonym with the same id.
-      @pseudonym = nil
-    end
+    # Look for an incomplete registration with this pseudonym
+    @pseudonym = @context.pseudonyms.find_by_unique_id_and_workflow_state(params[:pseudonym][:unique_id], 'active')
+    # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
+    @pseudonym = nil if @pseudonym && !['creation_pending', 'pre_registered', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+
+    notify = params[:pseudonym].delete(:send_confirmation) == '1'
+    notify = :self_registration unless @context.grants_right?(@current_user, session, :manage_user_logins)
+    email = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+
+    @user = @pseudonym && @pseudonym.user
     @user ||= User.new
     @user.attributes = params[:user]
     @user.name ||= params[:pseudonym][:unique_id]
-    if @user.errors.empty? && @user.save
-      @pseudonym ||= @user.pseudonyms.build
-      @pseudonym.attributes = params[:pseudonym]
-      @pseudonym.account_id = @domain_root_account.id
-      @pseudonym.user = @user
-      @pseudonym.workflow_state = 'active'
-      @pseudonym.path = params[:pseudonym][:unique_id]
-      @pseudonym.errors.clear
-      if @pseudonym.new_record? && CommunicationChannel.find_by_path_and_workflow_state(@pseudonym.unique_id, 'active')
-        @pseudonym.errors.add(:unique_id, t('login_taken', "That login has already been taken"))
-      end
-      if @pseudonym.valid?
-        @pseudonym.save_without_session_maintenance
-        @pseudonym.assert_communication_channel(true)
-        @user.reload
-        
-        if @user.registration_approval_required? && params[:new_teacher]
-          @user.workflow_state = 'pending_approval'
-          @user.save
-        else
-          @user.workflow_state = 'pre_registered'
-          @user.save
+
+    @pseudonym ||= @user.pseudonyms.build(:account => @context)
+    @pseudonym.attributes = params[:pseudonym]
+    @pseudonym.account = @context
+    @pseudonym.workflow_state = 'active'
+    @cc = @user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
+    @cc.user = @user
+    @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+    @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
+    if @pseudonym.valid?
+      @pseudonym.save_without_session_maintenance
+      @user.save!
+      @cc.save!
+      message_sent = false
+      if notify == :self_registration
+        unless @user.workflow_state == 'pending_approval'
+          message_sent = true
           @pseudonym.send_confirmation!
         end
-        @user.new_teacher_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip})) if params[:new_teacher]
-        
-        data = OpenObject.new(:user => @user, :pseudonym => @pseudonym, :channel => @pseudonym.communication_channel)
-        respond_to do |format|
-          flash[:user_id] = @user.id
-          flash[:pseudonym_id] = @pseudonym.id
-          format.html { redirect_to registered_url }
-          format.json { render :json => data.to_json }
-        end
+        @user.new_teacher_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip}))
+      elsif notify && !@user.registered?
+        message_sent = true
+        @pseudonym.send_registration_notification!
       else
-        # User can't exist without pseudonyms, since there'd be no way to log in or contact
-        @user.reload
-        @user.destroy if @user.pseudonyms.select{|p| !p.new_record? }.empty?
-        render :action => :new
+        other_cc_count = CommunicationChannel.count(:all, :conditions => ["path=? AND path_type='email' AND user_id<>? AND workflow_state='active'", @cc.path, @user.id])
+        @cc.send_merge_notification! if other_cc_count != 0
+      end
+
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent }
+      respond_to do |format|
+        flash[:user_id] = @user.id
+        flash[:pseudonym_id] = @pseudonym.id
+        format.html { redirect_to registered_url }
+        format.json { render :json => data }
       end
     else
-      render :action => :new
+      respond_to do |format|
+        format.html { render :action => :new }
+        format.json { render :json => @pseudonym.errors.to_json, :status => :bad_request }
+      end
     end
   end
   
@@ -565,7 +548,6 @@ class UsersController < ApplicationController
       @email_address ||= @user.email
       @pseudonym ||= @user.pseudonym
       @cc = @pseudonym.communication_channel || @user.communication_channel
-      render :action => "registered"
     else
       redirect_to root_url
     end
@@ -812,9 +794,15 @@ class UsersController < ApplicationController
   end
   
   def require_open_registration
-    if @domain_root_account && !@domain_root_account.settings[:open_registration]
+    get_context
+    @context = @domain_root_account || Account.default unless @context.is_a?(Account)
+    @context = @context.root_account || @context
+    if !@context.grants_right?(@current_user, session, :manage_user_logins) && (!@context.open_registration? || !@context.no_enrollments_can_create_courses?)
       flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
-      redirect_to root_url
+      respond_to do |format|
+        format.html { redirect_to root_url }
+        format.json { render :json => {}, :status => 403 }
+      end
       return false
     end
   end

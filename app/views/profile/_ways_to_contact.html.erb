@@ -31,21 +31,6 @@
 }
 </style>
 <% end %>
-<%# set up separately scoped error checker to match model scope; this is way
-    fragile. It's just the list of possible "already been activated" errors
-    from the CommunicationChannel model. if one is added there, it needs to be
-    added here as well. %>
-<% js_block :i18n_scope => 'communication_channel.errors' do %>
-<script>
-var alreadyActivatedPattern = new RegExp(
-  I18n.t('duplicate_email', "The email address %{email} has already been activated for another account", {'email': '.*'}) + '|' +
-  I18n.t('duplicate_sms', "The SMS address %{email} has already been activated for another account", {'email': '.*'}) + '|' +
-  I18n.t('duplicate_facebook', "The Facebook account %{email} has already been activated for another account", {'email': '.*'}) + '|' +
-  I18n.t('duplicate_twitter', "The Twitter handle %{handle} has already been activated for another account", {'handle': '.*'}) + '|' +
-  I18n.t('duplicate', "The address %{address} has already been activated for another account", {'address': '.*'}));
-window.isAlreadyActivatedError = function(message) { return message.match(alreadyActivatedPattern); };
-</script>
-<% end %>
 
 <% js_block :i18n_scope => 'profile._ways_to_contact' do %>
 <script>
@@ -165,33 +150,12 @@ $(document).ready(function() {
     },
     error: function(data, $channel) {
       $channel.loadingImage('remove');
-      var errored = false;
-      if(data && data.path) {
-        for(var idx in data.path) {
-          var error = data.path[idx];
-          if(error && isAlreadyActivatedError(error.message)) {
-            var email = $(this).data('email');
-            $("#claim_email_address_dialog")
-              .find(":text").val(email || "").end()
-              .find(".user_email").text(email);
-            $("#claim_email_address_dialog").dialog('close').dialog({
-              autoOpen: false,
-              width: 400,
-              title: I18n.t('titles.email_address_already_taken', "Email Address Already Taken")
-            }).dialog('open');
-            errored = true;
-          }
-        }
-      }
       $channel.remove();
     }
   });
   $("a.email_address_taken_learn_more").live('click', function(event) {
     event.preventDefault();
     
-  });
-  $("#claim_email_address_dialog .cancel_button").click(function() {
-    $("#claim_email_address_dialog").dialog('close');
   });
   $(".channel_list .channel .delete_channel_link").click(function(event) {
     event.preventDefault();
@@ -202,7 +166,6 @@ $(document).ready(function() {
         $(this).remove();
         $list.toggleClass('single', $list.find(".channel:visible").length <= 1);
       }
-      
     });
   });
   $("#confirm_communication_channel .cancel_button").click(function(event) {
@@ -326,7 +289,7 @@ $(document).ready(function() {
       </div></div></td>
       <td style="padding: 0; text-align: center;" class="hidden_for_single">
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, nil, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, nil, :manage_user_details))) %>
-            <a href="<%= communication_channel_confirm_url(c.id, c.confirmation_code) %>" class="confirm_channel_link no-hover"><%= image_tag "pass.png", :title => t('titles.confirm_email_address', "Confirm email address") %></a>
+            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><%= image_tag "pass.png", :title => t('titles.confirm_email_address', "Confirm email address") %></a>
         <% end %>
         <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => t('titles.remove_email_address', "Remove email address") %></a>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
@@ -370,7 +333,7 @@ $(document).ready(function() {
       <td><%= c.path_type %></td>
       <td style="padding: 0; text-align: center;">
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, nil, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, nil, :manage_user_details))) %>
-            <a href="<%= communication_channel_confirm_url(c.id, c.confirmation_code) %>" class="confirm_channel_link no-hover"><%= image_tag "pass.png", :title => t('titles.confirm_email_address', "Confirm email address") %></a>
+            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><%= image_tag "pass.png", :title => t('titles.confirm_email_address', "Confirm email address") %></a>
         <% end %>
         <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => t('titles.remove_email_address', "Remove email address"), :style => (c.first?) ? "display: none;" : "" %></a>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
@@ -489,7 +452,7 @@ $(document).ready(function() {
   <div style="text-align: center;">
     <input type="text" style="width: 100px; font-size: 1.5em;" name="code"/><br/>
     <span style="display: none;" class="channel_id">&nbsp;</span>
-    <a href="<%= communication_channel_confirm_path("{{ id }}", "{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
+    <a href="<%= registration_confirmation_path("{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
   </div>
   <div style="margin: 0 0 5px; text-align: center; font-size: 0.8em;">
     <a href="#" class="re_send_confirmation_link"><%= t('links.resend_confirmation', "Re-Send Confirmation") %></a>
@@ -499,25 +462,6 @@ $(document).ready(function() {
     <button type="submit" class="button"><%= t('buttons.confirm', "Confirm") %></button>
   </div>
 <% end %>
-<div id="claim_email_address_dialog" style="display: none;">
-  <%= image_tag "email_big.png", :style => "float: left; padding-right: 5px; padding-bottom: 3px;" %>
-  <%= t('errors.address_already_claimed', <<-TEXT, :email => raw('<b class="user_email">email</b>'))
-  The address you entered (%{email}) is currently assigned to another user.
-  Email addresses can only be tied to one user at a time. If you're sure this
-  address belongs to you and you want to claim it, enter it again in the form
-  below:
-  TEXT
-  %>
-  <% form_for :communication_channel, :url => try_merge_communication_channels_url, :html => {:id => ""} do |f| %>
-    <div style="margin: 10px; text-align: center;">
-      <%= f.text_field :path %>
-    </div>
-    <div class="button-container">
-      <button type="submit" class="button"><%= t('buttons.find_email_address', "Find Email Address") %></button>
-      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
-    </div>
-  <% end %>
-</div>
 <div style="display: none;" id="select_templates">
   <%= render :partial => "email_select" %>
   <%= render :partial => "sms_select" %>
