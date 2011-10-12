@@ -11,7 +11,12 @@
 #   - dist/**/*.js
 #
 src_files:
-  - public/javascripts/**/*.js
+   - public/javascripts/vendor/jquery-1.6.4.js
+   - public/javascripts/vendor/raphael.js
+   - public/javascripts/vendor/handlebars.vm.js
+   - public/javascripts/compiled/Template.js
+   - public/javascripts/i18n.js
+   - public/javascripts/jquery.instructure_misc_plugins.js
 
 # stylesheets
 #

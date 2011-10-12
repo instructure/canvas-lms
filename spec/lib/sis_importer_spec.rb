@@ -26,7 +26,7 @@ describe SIS do
     # this is the fun bit where we get to stub User.new to insert a sleep into
     # the transaction loop.
     User.stub!(:new) { sleep 1; User.allocate.tap { |u| u.send(:initialize) } }
-    SIS::UserImporter.new(nil, @account, Rails.logger, false).process(2, messages) do |importer|
+    SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
       importer.add_user(*"U001,user1,active,User,One,user1@example.com".split(','))
       importer.add_user(*"U002,user2,active,User,Two,user2@example.com".split(','))
       importer.add_user(*"U003,user3,active,User,Three,user3@example.com".split(','))

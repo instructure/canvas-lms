@@ -19,14 +19,7 @@
 require "skip_callback"
 
 module SIS
-  class CourseImporter
-
-    def initialize(batch_id, root_account, logger, override_sis_stickiness)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-      @override_sis_stickiness = override_sis_stickiness
-    end
+  class CourseImporter < BaseImporter
 
     def process(messages)
       start = Time.now
@@ -35,7 +28,7 @@ module SIS
 
       importer = Work.new(@batch_id, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages)
       Course.skip_callback(:update_enrollments_later) do
-        Course.process_as_sis(@override_sis_stickiness) do
+        Course.process_as_sis(@sis_options) do
           Course.skip_updating_account_associations do
             yield importer
           end
@@ -74,7 +67,8 @@ module SIS
 
         course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id)
         course ||= Course.new
-        term = course.stuck_sis_fields.include?(:enrollment_term_id) ? nil : @root_account.enrollment_terms.find_by_sis_source_id(term_id)
+        course_enrollment_term_id_stuck = course.stuck_sis_fields.include?(:enrollment_term_id)
+        term = course_enrollment_term_id_stuck ? nil : @root_account.enrollment_terms.find_by_sis_source_id(term_id)
         course.enrollment_term = term if term
         course.root_account = @root_account
 
@@ -99,11 +93,12 @@ module SIS
           course.workflow_state = 'completed'
         end
 
-        if (course.stuck_sis_fields & [:start_at, :conclude_at]).empty?
+        course_dates_stuck = !(course.stuck_sis_fields & [:start_at, :conclude_at, :restrict_enrollments_to_course_dates]).empty?
+        if !course_dates_stuck
           course.start_at = start_date
           course.conclude_at = end_date
+          course.restrict_enrollments_to_course_dates = (course.start_at.present? || course.conclude_at.present?)
         end
-        course.restrict_enrollments_to_course_dates = (course.start_at.present? || course.conclude_at.present?) unless course.stuck_sis_fields.include?(:restrict_enrollments_to_course_dates)
 
         abstract_course = nil
         if abstract_course_id.present?
@@ -112,7 +107,7 @@ module SIS
         end
 
         if abstract_course
-          if term_id.blank? && course.enrollment_term_id != abstract_course.enrollment_term && !course.stuck_sis_fields.include?(:enrollment_term_id)
+          if term_id.blank? && course.enrollment_term_id != abstract_course.enrollment_term && !course_enrollment_term_id_stuck
             course.send(:association_instance_set, :enrollment_term, nil)
             course.enrollment_term_id = abstract_course.enrollment_term_id
           end
@@ -125,14 +120,16 @@ module SIS
 
         # only update the name/short_name on new records, and ones that haven't been changed
         # since the last sis import
-        if course.course_code.blank? || !course.stuck_sis_fields.include?(:course_code)
+        course_course_code_stuck = course.stuck_sis_fields.include?(:course_code)
+        if course.course_code.blank? || !course_course_code_stuck
           if short_name.present?
             course.course_code = short_name
           elsif abstract_course && course.course_code.blank?
             course.course_code = abstract_course.short_name
           end
         end
-        if course.name.blank? || !course.stuck_sis_fields.include?(:name)
+        course_name_stuck = course.stuck_sis_fields.include?(:name)
+        if course.name.blank? || !course_name_stuck
           if long_name.present?
             course.name = long_name
           elsif abstract_course && course.name.blank?
@@ -141,13 +138,19 @@ module SIS
         end
 
         update_enrollments = !course.new_record? && !(course.changes.keys & ['workflow_state', 'name', 'course_code']).empty?
+
         if course.changed?
           course.templated_courses.each do |templated_course|
             templated_course.root_account = @root_account
             templated_course.account = course.account
-            templated_course.name = course.name if !templated_course.stuck_sis_fields.include?(:name) && !course.stuck_sis_fields.include?(:name)
-            templated_course.course_code = course.course_code if !templated_course.stuck_sis_fields.include?(:course_code) && !course.stuck_sis_fields.include?(:course_code)
-            templated_course.enrollment_term = course.enrollment_term
+            templated_course.name = course.name if !templated_course.stuck_sis_fields.include?(:name) && !course_name_stuck
+            templated_course.course_code = course.course_code if !templated_course.stuck_sis_fields.include?(:course_code) && !course_course_code_stuck
+            templated_course.enrollment_term = course.enrollment_term if !templated_course.stuck_sis_fields.include?(:enrollment_term_id) && !course_enrollment_term_id_stuck
+            if (templated_course.stuck_sis_fields & [:start_at, :conclude_at, :restrict_enrollments_to_course_dates]).empty? && !course_dates_stuck
+              templated_course.start_at = course.start_at
+              templated_course.conclude_at = course.conclude_at
+              templated_course.restrict_enrollments_to_course_dates = course.restrict_enrollments_to_course_dates
+            end
             templated_course.sis_batch_id = @batch_id if @batch_id
             @course_ids_to_update_associations.add(templated_course.id) if templated_course.account_id_changed? || templated_course.root_account_id_changed?
             templated_course.save_without_broadcasting!

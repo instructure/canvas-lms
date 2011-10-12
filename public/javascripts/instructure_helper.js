@@ -149,4 +149,3 @@ I18n.scoped('instructure', function(I18n) {
 
 
 });
-

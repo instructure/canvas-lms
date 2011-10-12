@@ -32,6 +32,37 @@ describe SisImportsApiController, :type => :integration do
     @batch_count = SisBatch.count
   end
 
+  def post_csv(*lines_or_opts)
+    lines = lines_or_opts.reject{|thing| thing.is_a? Hash}
+    opts = lines_or_opts.select{|thing| thing.is_a? Hash}.inject({}, :merge)
+
+    tmp = Tempfile.new("sis_rspec")
+    path = "#{tmp.path}.csv"
+    tmp.close!
+    File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
+
+    json = api_call(:post,
+        "/api/v1/accounts/#{@account.id}/sis_imports.json",
+        { :controller => "sis_imports_api", :action => "create",
+          :format => "json", :account_id => @account.id.to_s },
+        opts.merge({ :import_type => "instructure_csv",
+          :attachment => ActionController::TestUploadedFile.new(path)}))
+    json.has_key?("created_at").should be_true
+    json.delete("created_at")
+    json.has_key?("updated_at").should be_true
+    json.delete("updated_at")
+    json.has_key?("ended_at").should be_true
+    json.delete("ended_at")
+    batch = SisBatch.last
+    json.should == {
+          "data" => { "import_type"=>"instructure_csv"},
+          "progress" => 0,
+          "id" => batch.id,
+          "workflow_state"=>"created" }
+    batch.process_without_send_later
+    return batch
+  end
+
   it 'should kick off a sis import via multipart attachment' do
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -95,9 +126,248 @@ describe SisImportsApiController, :type => :integration do
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
             :batch_mode => '1' })
-    batch = SisBatch.last
+    batch = SisBatch.find(json["id"])
     batch.batch_mode.should be_true
     batch.batch_mode_term.should be_nil
+  end
+
+  it "should enable sis stickiness options" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s },
+          { :import_type => 'instructure_csv',
+            :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv')})
+    batch = SisBatch.find(json["id"])
+    batch.options.should == {}
+    batch.destroy
+
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s },
+          { :import_type => 'instructure_csv',
+            :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            :override_sis_stickiness => "1"})
+    batch = SisBatch.find(json["id"])
+    batch.options.should == {:override_sis_stickiness => true}
+    batch.destroy
+
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s },
+          { :import_type => 'instructure_csv',
+            :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            :override_sis_stickiness => "1",
+            :add_sis_stickiness => "1"})
+    batch = SisBatch.find(json["id"])
+    batch.options.should == {:override_sis_stickiness => true,
+                             :add_sis_stickiness => true}
+    batch.destroy
+
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s },
+          { :import_type => 'instructure_csv',
+            :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            :override_sis_stickiness => "1",
+            :clear_sis_stickiness => "1"})
+    batch = SisBatch.find(json["id"])
+    batch.options.should == {:override_sis_stickiness => true,
+                             :clear_sis_stickiness => true}
+    batch.destroy
+
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s },
+          { :import_type => 'instructure_csv',
+            :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            :add_sis_stickiness => "1"})
+    batch = SisBatch.find(json["id"])
+    batch.options.should == {}
+    batch.destroy
+
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s },
+          { :import_type => 'instructure_csv',
+            :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            :clear_sis_stickiness => "1"})
+    batch = SisBatch.find(json["id"])
+    batch.options.should == {}
+    batch.destroy
+  end
+
+  it 'should support sis stickiness overriding' do
+    before_count = AbstractCourse.count
+    post_csv(
+      "term_id,name,status,start_date,end_date",
+      "T001,Winter13,active,,"
+    )
+    post_csv(
+      "account_id,parent_account_id,name,status",
+      "A001,,TestAccount,active"
+    )
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Hum101,Humanities,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Humanities"
+      c.short_name.should == "Hum101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Math101,Mathematics,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Mathematics"
+      c.short_name.should == "Math101"
+      c.name = "Physics"
+      c.short_name = "Phys101"
+      c.save!
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Thea101,Theater,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Physics"
+      c.short_name.should == "Phys101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Thea101,Theater,A001,T001,active",
+      {:override_sis_stickiness => "1"}
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Theater"
+      c.short_name.should == "Thea101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Fren101,French,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Theater"
+      c.short_name.should == "Thea101"
+    end
+  end
+
+  it 'should allow turning on stickiness' do
+    before_count = AbstractCourse.count
+    post_csv(
+      "term_id,name,status,start_date,end_date",
+      "T001,Winter13,active,,"
+    )
+    post_csv(
+      "account_id,parent_account_id,name,status",
+      "A001,,TestAccount,active"
+    )
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Hum101,Humanities,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Humanities"
+      c.short_name.should == "Hum101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Math101,Mathematics,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Mathematics"
+      c.short_name.should == "Math101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Phys101,Physics,A001,T001,active",
+      { :override_sis_stickiness => "1",
+        :add_sis_stickiness => "1"}
+    )
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Thea101,Theater,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Physics"
+      c.short_name.should == "Phys101"
+    end
+  end
+
+  it 'should allow turning off stickiness' do
+    before_count = AbstractCourse.count
+    post_csv(
+      "term_id,name,status,start_date,end_date",
+      "T001,Winter13,active,,"
+    )
+    post_csv(
+      "account_id,parent_account_id,name,status",
+      "A001,,TestAccount,active"
+    )
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Hum101,Humanities,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Humanities"
+      c.short_name.should == "Hum101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Math101,Mathematics,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Mathematics"
+      c.short_name.should == "Math101"
+      c.name = "Physics"
+      c.short_name = "Phys101"
+      c.save!
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Fren101,French,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Physics"
+      c.short_name.should == "Phys101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Thea101,Theater,A001,T001,active",
+      { :override_sis_stickiness => "1",
+        :clear_sis_stickiness => "1" }
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "Theater"
+      c.short_name.should == "Thea101"
+    end
+    post_csv(
+      "abstract_course_id,short_name,long_name,account_id,term_id,status",
+      "C001,Fren101,French,A001,T001,active"
+    )
+    AbstractCourse.count.should == before_count + 1
+    AbstractCourse.last.tap do |c|
+      c.name.should == "French"
+      c.short_name.should == "Fren101"
+    end
   end
 
   it "should allow selecting a term for batch mode" do

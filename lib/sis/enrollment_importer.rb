@@ -20,21 +20,14 @@ require "set"
 require "skip_callback"
 
 module SIS
-  class EnrollmentImporter
-
-    def initialize(batch_id, root_account, logger, override_sis_stickiness)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-      @override_sis_stickiness = override_sis_stickiness
-    end
+  class EnrollmentImporter < BaseImporter
 
     def process(messages, updates_every)
       start = Time.now
       i = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
         User.skip_updating_account_associations do
-          Enrollment.process_as_sis(@override_sis_stickiness) do
+          Enrollment.process_as_sis(@sis_options) do
             yield i
             while i.any_left_to_process?
               i.process_batch

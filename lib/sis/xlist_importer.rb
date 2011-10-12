@@ -17,20 +17,14 @@
 #
 
 module SIS
-  class XlistImporter
-    def initialize(batch_id, root_account, logger, override_sis_stickiness)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-      @override_sis_stickiness = override_sis_stickiness
-    end
+  class XlistImporter < BaseImporter
 
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
       Course.skip_callback(:update_enrollments_later) do
-        Course.process_as_sis(@override_sis_stickiness) do
-          CourseSection.process_as_sis(@override_sis_stickiness) do
+        Course.process_as_sis(@sis_options) do
+          CourseSection.process_as_sis(@sis_options) do
             Course.skip_updating_account_associations do
               yield importer
             end
@@ -76,8 +70,11 @@ module SIS
             @course.account_id = section.course.account_id
             @course.name = section.course.name
             @course.course_code = section.course.course_code
-            @course.sis_source_id = xlist_course_id
             @course.enrollment_term_id = section.course.enrollment_term_id
+            @course.start_at = section.course.start_at
+            @course.conclude_at = section.course.conclude_at
+            @course.restrict_enrollments_to_course_dates = section.course.restrict_enrollments_to_course_dates
+            @course.sis_source_id = xlist_course_id
             @course.sis_batch_id = @batch_id if @batch_id
             @course.workflow_state = 'claimed'
             @course.template_course = section.course

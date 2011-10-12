@@ -17,13 +17,7 @@
 #
 
 module SIS
-  class GradePublishingResultsImporter
-    def initialize(batch_id, root_account, logger, override_sis_stickiness)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-      @override_sis_stickiness = override_sis_stickiness
-    end
+  class GradePublishingResultsImporter < BaseImporter
 
     def process
       start = Time.now

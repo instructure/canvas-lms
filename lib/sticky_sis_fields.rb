@@ -16,31 +16,60 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'skip_callback'
+
 module StickySisFields
 
   module InstanceMethods
 
+    # this method is set as a before_update callback
     def set_sis_stickiness
-      @sis_fields_to_unstick ||= [].to_set
-      currently_stuck_sis_fields = (load_stuck_sis_fields_cache | (self.class.sticky_sis_fields & (self.changed).map(&:to_sym).to_set)) - @sis_fields_to_unstick
-      write_attribute(:stuck_sis_fields, currently_stuck_sis_fields.map(&:to_s).sort.join(',')) if load_stuck_sis_fields_cache != currently_stuck_sis_fields
+      self.class.sis_stickiness_options ||= {}
+      currently_stuck_sis_fields = if self.class.sis_stickiness_options[:clear_sis_stickiness]
+                                     [].to_set
+                                   else
+                                     calculate_currently_stuck_sis_fields
+                                   end
+      if load_stuck_sis_fields_cache != currently_stuck_sis_fields
+        write_attribute(:stuck_sis_fields, currently_stuck_sis_fields.map(&:to_s).sort.join(','))
+      end
       @stuck_sis_fields_cache = currently_stuck_sis_fields
+      @sis_fields_to_stick = [].to_set
       @sis_fields_to_unstick = [].to_set
     end
 
+    # this method is what you want to use to determine which fields are currently stuck
     def stuck_sis_fields
-      if (self.class.override_stuck_fields ||= false)
+      self.class.sis_stickiness_options ||= {}
+      if self.class.sis_stickiness_options[:override_sis_stickiness]
         return [].to_set
       else
-        @sis_fields_to_unstick ||= [].to_set
-        return load_stuck_sis_fields_cache - @sis_fields_to_unstick
+        return calculate_currently_stuck_sis_fields
       end
     end
 
+    def stuck_sis_fields=(fields)
+      clear_sis_stickiness(*(stuck_sis_fields.to_a))
+      add_sis_stickiness(*(fields.map(&:to_sym).to_set))
+    end
+
+    # clear stickiness on a set of fields
     def clear_sis_stickiness(*fields)
+      @sis_fields_to_stick ||= [].to_set
       @sis_fields_to_unstick ||= [].to_set
-      fields.each do |field|
-        @sis_fields_to_unstick.add field.to_sym
+      fields.map(&:to_sym).each do |field|
+        @sis_fields_to_stick.delete field
+        @sis_fields_to_unstick.add field
+      end
+    end
+
+    # make some fields sticky
+    def add_sis_stickiness(*fields)
+      @sis_fields_to_stick ||= [].to_set
+      @sis_fields_to_unstick ||= [].to_set
+      fields.map(&:to_sym).each do |field|
+        @sis_fields_to_stick.add field
+        @sis_fields_to_unstick.delete field
       end
     end
 
@@ -48,23 +77,52 @@ module StickySisFields
     def load_stuck_sis_fields_cache
       @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || '').split(',').map(&:to_sym).to_set
     end
+
+    def calculate_currently_stuck_sis_fields
+      @sis_fields_to_stick ||= [].to_set
+      @sis_fields_to_unstick ||= [].to_set
+      changed_sis_fields = self.class.sticky_sis_fields & (self.changed.map(&:to_sym).to_set | @sis_fields_to_stick)
+      return (load_stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
+    end
   end
 
   module ClassMethods
 
+    # specify which fields are able to be stuck
     def are_sis_sticky(*fields)
       self.sticky_sis_fields = fields.map(&:to_sym).to_set
     end
 
-    def process_as_sis(override_stuck_fields)
-      old_setting = self.override_stuck_fields
-      self.override_stuck_fields = override_stuck_fields
+    # takes a block and runs it with the following options:
+    #   override_sis_stickiness: default false,
+    #       if true, all code inside the block will be run as if the class
+    #       mixing in this module has no stuck sis fields
+    #   add_sis_stickiness: default false,
+    #       unless add_sis_stickiness (or clear_sis_stickiness) is true, the
+    #       set_sis_stickiness callback is skipped, so no sis stickiness is
+    #       modified. if true, the set_sis_stickiness is enabled like normal,
+    #       such that everything is processed like non-sis. it doesn't really
+    #       make tons of sense to use this feature without
+    #       override_sis_stickiness.
+    #   clear_sis_stickiness: default false,
+    #       if true, the set_sis_stickiness callback is enabled and configured
+    #       to write out an empty stickiness list on every save.
+    def process_as_sis(opts={})
+      self.sis_stickiness_options ||= {}
+      old_options = self.sis_stickiness_options.clone
+      [:override_sis_stickiness, :clear_sis_stickiness].each do |option|
+        self.sis_stickiness_options[option] = opts[option]
+      end
       begin
-        self.skip_callback(:set_sis_stickiness) do
+        if opts[:add_sis_stickiness] || opts[:clear_sis_stickiness]
           yield
+        else
+          self.skip_callback(:set_sis_stickiness) do
+            yield
+          end
         end
       ensure
-        self.override_stuck_fields = old_setting
+        self.sis_stickiness_options = old_options
       end
     end
 
@@ -75,7 +133,7 @@ module StickySisFields
       klass.send :extend, ClassMethods
       klass.send :include, InstanceMethods
       klass.cattr_accessor :sticky_sis_fields
-      klass.cattr_accessor :override_stuck_fields
+      klass.cattr_accessor :sis_stickiness_options
       klass.before_update :set_sis_stickiness
     end
   end

@@ -17,20 +17,14 @@
 #
 
 module SIS
-  class UserImporter
-    def initialize(batch_id, root_account, logger, override_sis_stickiness)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-      @override_sis_stickiness = override_sis_stickiness
-    end
+  class UserImporter < BaseImporter
 
     def process(updates_every, messages)
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       User.skip_updating_account_associations do
-        User.process_as_sis(@override_sis_stickiness) do
-          Pseudonym.process_as_sis(@override_sis_stickiness) do
+        User.process_as_sis(@sis_options) do
+          Pseudonym.process_as_sis(@sis_options) do
             yield importer
             while importer.any_left_to_process?
               importer.process_batch

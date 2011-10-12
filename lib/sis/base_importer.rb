@@ -17,29 +17,16 @@
 #
 
 module SIS
-  module CSV
-    class AccountImporter < BaseImporter
-
-      def self.is_account_csv?(row)
-        row.header?('account_id') && row.header?('parent_account_id')
-      end
-
-      # expected columns
-      # account_id,parent_account_id
-      def process(csv)
-        @sis.counts[:accounts] += SIS::AccountImporter.new(@root_account, importer_opts).process do |importer|
-          csv_rows(csv) do |row|
-            update_progress
-
-            begin
-              importer.add_account(row['account_id'], row['parent_account_id'],
-                  row['status'], row['name'])
-            rescue ImportError => e
-              add_warning(csv, "#{e}")
-            end
-          end
-        end
-      end
+  class BaseImporter
+    def initialize(root_account, opts)
+      @root_account = root_account
+      @batch_id = opts[:batch_id]
+      @logger = opts[:logger] || Rails.logger
+      @sis_options = {
+          :override_sis_stickiness => opts[:override_sis_stickiness],
+          :add_sis_stickiness => opts[:add_sis_stickiness],
+          :clear_sis_stickiness => opts[:clear_sis_stickiness]
+        }
     end
   end
 end

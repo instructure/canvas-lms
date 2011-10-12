@@ -30,7 +30,6 @@ module SIS
         @sis = sis_csv
         @root_account = @sis.root_account
         @batch = @sis.batch
-        @override_sis_stickiness = @sis.override_sis_stickiness
       end
 
       def process(csv)
@@ -57,6 +56,14 @@ module SIS
         FasterCSV.foreach(csv[:fullpath], PARSE_ARGS) do |row|
           yield row
         end
+      end
+
+      def importer_opts
+        { :batch_id => @batch.try(:id),
+          :logger => @sis.logger,
+          :override_sis_stickiness => @sis.override_sis_stickiness,
+          :add_sis_stickiness => @sis.add_sis_stickiness,
+          :clear_sis_stickiness => @sis.clear_sis_stickiness }
       end
     end
   end
