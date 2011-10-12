@@ -266,13 +266,12 @@
         return "<div class='cell-content gradebook-cell'>" + val + "</div>";
       };
       Gradebook.prototype.groupTotalFormatter = function(row, col, val, columnDef, student) {
-        var gradeToShow, percentage, res;
+        var gradeToShow, percentage;
         if (val == null) {
           return '';
         }
         gradeToShow = val;
-        percentage = columnDef.field === 'total_grade' ? gradeToShow.score : (gradeToShow.score / gradeToShow.possible) * 100;
-        percentage = Math.round(percentage);
+        percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 100);
         if (isNaN(percentage)) {
           percentage = 0;
         }
@@ -281,8 +280,7 @@
         } else {
           percentage += "%";
         }
-        res = "<div class=\"gradebook-cell\">\n  " + (columnDef.field === 'total_grade' ? '' : '<div class="gradebook-tooltip">' + gradeToShow.score + ' / ' + gradeToShow.possible + '</div>') + "\n  " + percentage + "\n</div>";
-        return res;
+        return "<div class=\"gradebook-cell\">\n  <div class=\"gradebook-tooltip\">" + gradeToShow.score + " / " + gradeToShow.possible + "</div>\n  " + percentage + "\n</div>";
       };
       Gradebook.prototype.calculateStudentGrade = function(student) {
         var group, key, result, submissionsAsArray, value, _i, _len, _ref;

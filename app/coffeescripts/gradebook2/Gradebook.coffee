@@ -160,17 +160,15 @@ I18n.scoped 'gradebook2', (I18n) ->
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
       gradeToShow = val
-      percentage = if columnDef.field == 'total_grade' then gradeToShow.score else (gradeToShow.score/gradeToShow.possible)*100
-      percentage = Math.round(percentage)
+      percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 100)
       percentage = 0 if isNaN(percentage)
-      if !gradeToShow.possible then percentage = '-' else percentage+= "%"
-      res = """
+      if !gradeToShow.possible then percentage = '-' else percentage += "%"
+      """
       <div class="gradebook-cell">
-        #{if columnDef.field == 'total_grade' then '' else '<div class="gradebook-tooltip">'+ gradeToShow.score + ' / ' + gradeToShow.possible + '</div>'}
+        <div class="gradebook-tooltip">#{gradeToShow.score} / #{gradeToShow.possible}</div>
         #{percentage}
       </div>
       """
-      res
 
     calculateStudentGrade: (student) =>
       if student.loaded
