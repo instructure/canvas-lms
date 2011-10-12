@@ -42,13 +42,19 @@
       <tr>
         <td style="vertical-align: top; padding: 0.5em;"><%= before_label :group_structure, "Group Structure" %></td>
         <td style="padding: 0.5em;">
-          <input type="radio" name="category[split_groups]" id="category_split_groups" value="1"/>
-          <%= t :group_structure, "*Create* %{number_of_groups} groups now",
-            :number_of_groups => '<input type="text" name="category[group_count]" style="width: 25px;"/>'.html_safe,
-            :wrapper => '<label for="category_split_groups">\1</label>' %><br/>
-          <span id="spread_students" style="padding-left: 2em;"><%= t :group_structure_footnote, "(Students will be split equally among these groups.)" %><br/></span>
-          <input type="radio" name="category[split_groups]" id="category_no_groups" value="0" checked="true"/>
-          <label for="category_no_groups"><%= t 'labels.manually_create_groups', "I'll create groups manually" %></label>
+          <div id="group_structure_standard_subcontainer">
+            <input type="radio" name="category[split_groups]" id="category_split_groups" value="1"/>
+            <%= t :group_structure_standard, "*Split students into* %{number_of_groups} *equal groups*",
+              :number_of_groups => '<input type="text" name="category[split_group_count]" id="category_split_group_count" style="width: 25px;"/>'.html_safe,
+              :wrapper => '<label for="category_split_groups">\1</label>' %><br/>
+            <input type="radio" name="category[split_groups]" id="category_no_groups" value="0" checked="true"/>
+            <label for="category_no_groups"><%= t 'labels.manually_create_groups', "I'll create groups manually" %></label>
+          </div>
+          <div id="group_structure_self_signup_subcontainer" style="display:none;">
+            <%= t :group_structure_self_signup, "*Create* %{number_of_groups} *groups now*",
+              :number_of_groups => '<input type="text" name="category[create_group_count]" id="category_create_group_count" value="0" style="width: 25px;"/>'.html_safe,
+              :wrapper => '<label for="category_create_group_count">\1</label>' %><br/>
+          </div>
         </td>
       </tr>
     <% end %>

@@ -116,7 +116,7 @@ class GroupsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_groups)
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
-        create_default_groups_in_category if params[:category][:split_groups] == "1"
+        create_default_groups_in_category
         flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
         render :json => [@group_category.as_json, @group_category.groups.map{ |g| g.as_json(:include => :users) }].to_json
       end
@@ -347,9 +347,12 @@ class GroupsController < ApplicationController
   end
   
   def create_default_groups_in_category
-    distribute_students = params[:category][:enable_self_signup] != "1"
-    count = params[:category][:group_count].to_i
+    self_signup = params[:category][:enable_self_signup] == "1"
+    distribute_students = !self_signup && params[:category][:split_groups] == "1"
+    return unless self_signup || distribute_students
 
+    count_field = self_signup ? :create_group_count : :split_group_count
+    count = params[:category][count_field].to_i
     count = 0 if count < 0
     count = @context.students.length if distribute_students && count > @context.students.length
     return if count.zero?
