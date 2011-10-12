@@ -623,7 +623,8 @@ class ConversationsController < ApplicationController
         :name => section.name,
         :type => :section,
         :active => @contexts[:courses][section.course_id][:active],
-        :parent => {:course => section.course_id}
+        :parent => {:course => section.course_id},
+        :context_name =>  @contexts[:courses][section.course_id][:name]
       }
     end if section_ids.present?
 
