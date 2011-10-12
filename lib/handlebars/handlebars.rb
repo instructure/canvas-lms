@@ -5,7 +5,7 @@ require 'lib/i18n_extraction/handlebars_extractor'
 class Handlebars
 
   @@header = '!function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};'
-  @@footer = '}()'
+  @@footer = '}();'
 
   class << self
 
