@@ -221,6 +221,10 @@
           q: this.query,
           update_action: action
         };
+        if (this.grid.getSelectedRows().length < 1) {
+          alert('No jobs are selected');
+          return;
+        }
         all_jobs = this.grid.getSelectedRows().length === this.data.length;
         if (all_jobs && action === 'destroy') {
           if (!confirm(I18n.t('confirm.delete_all', "Are you sure you want to delete *all* jobs of this type and matching this query?"))) {
