@@ -76,14 +76,12 @@ describe "grade exchange course settings tab" do
     Pseudonym.find_by_sis_user_id("S5").tap do |p|
       @stud5 = p
       p.sis_user_id = nil
-      p.sis_source_id = nil
       p.save
     end
 
     Pseudonym.find_by_sis_user_id("S6").tap do |p|
       @stud6 = p
       p.sis_user_id = nil
-      p.sis_source_id = nil
       p.save
     end
 
