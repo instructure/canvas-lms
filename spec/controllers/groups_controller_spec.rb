@@ -554,5 +554,26 @@ describe GroupsController do
       data.first['section_id'].should == @course.default_section.id
       data.first['section_code'].should == @course.default_section.section_code
     end
+
+    it "should require :read_roster permission" do
+      course(:active_course => true)
+      u1 = @course.enroll_student(user_model).user
+      u2 = @course.enroll_student(user_model).user
+      group = @course.groups.create(:name => "Group 1")
+      group.add_user(u1)
+
+      # u1 in the group has :read_roster permission
+      user_session(u1)
+      get 'context_group_members', :group_id => group.id
+      response.should be_success
+
+      # u2 outside the group doesn't have :read_roster permission, since the
+      # group isn't self-signup and is invitation only (clear controller
+      # context permission cache, though)
+      controller.instance_variable_set(:@context_all_permissions, nil)
+      user_session(u2)
+      get 'context_group_members', :group_id => group.id
+      response.should_not be_success
+    end
   end
 end

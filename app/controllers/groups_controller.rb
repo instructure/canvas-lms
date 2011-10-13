@@ -23,7 +23,7 @@ class GroupsController < ApplicationController
   
   def context_group_members
     @group = @context
-    if authorized_action(@group, @current_user, :manage)
+    if authorized_action(@group, @current_user, :read_roster)
       respond_to do |format|
         format.json { render :json => @group.members_json_cached }
       end
