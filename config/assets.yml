@@ -7,6 +7,8 @@ css_compressor_options:
 <% saved = _erbout; _erbout = '' %>
 javascripts:
   common:
+    - public/javascripts/curlConfig.js
+    - public/javascripts/vendor/curl.js
     - public/javascripts/vendor/firebugx.js
     - public/javascripts/datejs_to_iso_string_patch.js
     - public/javascripts/vendor/date.js

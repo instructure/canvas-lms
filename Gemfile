@@ -73,7 +73,6 @@ group :test do
   gem 'selenium-webdriver', '2.7.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.7.2'
-  gem 'jasmine',      '1.1.0'
 end
 
 group :development do

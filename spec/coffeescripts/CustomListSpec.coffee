@@ -1,90 +1,94 @@
-describe "CustomList", ->
+define [
+  'js!vendor/jquery-1.6.4.js!order'
+  'js!jquery.ajaxJSON.js!order'
 
-  beforeEach =>
-    loadFixtures 'CustomList.html'
-    items = []
-    for index in [0..100]
-      items.push
-        id: index
-        shortName: "Course #{index}"
-        longName: "Course long #{index}"
-        subtitle: "Enrolled as Teacher"
-        href: "/courses/#{index}"
+  'js!i18n.js!order'
+  'js!vendor/handlebars.vm.js!order'
+  'js!compiled/handlebars_helpers.js!order'
+  'js!compiled/Template.js!order'
+  'js!jst/courseList/wrapper.js!order'
+  'js!jst/courseList/content.js!order'
 
-    @list = new CustomList '#customList', items,
-      url: '/spec/javascripts/fixtures/ok.json'
-      appendTarget: '#customList'
+  'js!compiled/util/objectCollection.js!order'
+  'js!compiled/widget/CustomList.js!order'
+], ->
 
-    @list.open()
-    @lis = jQuery '.customListItem'
 
-  afterEach =>
-    @list.teardown()
+  module 'CustomList',
+    setup: ->
+      loadFixture 'CustomList'
+      items = window.items = []
+      for index in [0..100]
+        items.push
+          id: index
+          shortName: "Course #{index}"
+          longName: "Course long #{index}"
+          subtitle: "Enrolled as Teacher"
+          href: "/courses/#{index}"
 
-  it 'should open and close', =>
+      @list = new CustomList '#customList', items,
+        url: 'fixtures/ok.json'
+        appendTarget: '#customList'
+      @list.open()
+      @lis = jQuery '.customListItem'
+
+    teardown: ->
+      removeFixture('CustomList')
+
+  test 'should open and close', ->
     @list.close()
-    expect(@list.wrapper).toBeHidden()
+    equal @list.wrapper.is(':visible'), false, 'starts hidden'
     @list.open()
-    expect(@list.wrapper).toBeVisible()
+    equal @list.wrapper.is(':visible'), true, 'displays on open'
 
-  it 'should remove and add the first item', =>
+  asyncTest 'should remove and add the first item', 2, ->
+    # store original length to compare to later
     originalLength = @list.targetList.children().length
 
-    runs =>
-      simulateClick( @lis[0] )
+    # click an element to remove it from the list
+    simulateClick( @lis[0] )
 
-      # this next click should get ignored beacuse the DOM is animating, if it's
-      # not, the first test in the next "runs" block will fail.
-      simulateClick( @lis[1] )
+    # this next click should get ignored because the previous element is animating
+    simulateClick( @lis[1] )
 
-    # wait for the animation to complete, that's when the data gets updated
-    waits @list.options.animationDuration + 1
-
-    runs =>
+    setTimeout =>
       expectedLength = originalLength - 1
-      expect(@list.pinned.length).toEqual(expectedLength)
-
-      # click again to put it back
+      equal @list.pinned.length, expectedLength, 'only one item should have been removed'
       simulateClick( @lis[0] )
-      expect(@list.pinned.length).toEqual(originalLength)
+      equal @list.pinned.length, originalLength, 'item should be restored'
+      start()
+    , 300
 
-  it 'should cancel pending add request on remove', =>
-
+  test 'should cancel pending add request on remove', ->
     # Add one that doesn't exist
     el = jQuery @lis[16]
     @list.add(16, el)
-    expect(@list.requests.add[16]).toBeDefined();
+    ok @list.requests.add[16], 'create an "add" request'
 
     # then immediately remove it before the request has time to come back
-    item = @list.pinned.findBy('id', 16)
-    @list.remove(item, el)
-    expect(@list.requests.add[16]).toBeUndefined();
+    item = @list.pinned.findBy 'id', 16
+    @list.remove item, el
+    equal @list.requests.add[16], undefined, 'delete "add" request'
 
-  it 'should cancel pending remove request on add', =>
+  test 'should cancel pending remove request on add', ->
     el = jQuery @lis[1]
     item = @list.pinned.findBy('id', 1)
     @list.remove(item, el)
-    expect(@list.requests.remove[1]).toBeDefined();
+    ok @list.requests.remove[1], 'create a "remove" request'
 
-    @list.add(1, el)
-    expect(@list.requests.remove[1]).toBeUndefined();
+    @list.add 1, el
+    equal @list.requests.remove[1], undefined, 'delete "remove" request'
 
-  it 'should reset', =>
-
+  asyncTest 'should reset', 2, ->
     originalLength = @list.targetList.children().length
+    simulateClick @lis[0]
+    setTimeout =>
+      ok originalLength isnt @list.targetList.children().length, 'length should be different'
 
-    runs =>
-      simulateClick @lis[0]
-
-    waits 251 #animation
-
-    runs =>
       button = jQuery('.customListRestore')[0]
-      expect(@list.requests.reset).toBeUndefined('request should not be defined yet')
-
       simulateClick button
-      expect(@list.requests.reset).toBeDefined('reset request should be defined')
-
       length = @list.targetList.children().length
-      expect(length).toEqual(originalLength, 'targetList items restored')
-      jasmine.Fixtures.noCleanup = true
+      equal length, originalLength, 'targetList items restored'
+      start()
+    , 600
+

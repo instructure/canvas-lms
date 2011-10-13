@@ -1,86 +1,82 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  describe("CustomList", function() {
-    beforeEach(__bind(function() {
-      var index, items;
-      loadFixtures('CustomList.html');
-      items = [];
-      for (index = 0; index <= 100; index++) {
-        items.push({
-          id: index,
-          shortName: "Course " + index,
-          longName: "Course long " + index,
-          subtitle: "Enrolled as Teacher",
-          href: "/courses/" + index
+  define(['js!vendor/jquery-1.6.4.js!order', 'js!jquery.ajaxJSON.js!order', 'js!i18n.js!order', 'js!vendor/handlebars.vm.js!order', 'js!compiled/handlebars_helpers.js!order', 'js!compiled/Template.js!order', 'js!jst/courseList/wrapper.js!order', 'js!jst/courseList/content.js!order', 'js!compiled/util/objectCollection.js!order', 'js!compiled/widget/CustomList.js!order'], function() {
+    module('CustomList', {
+      setup: function() {
+        var index, items;
+        loadFixture('CustomList');
+        items = window.items = [];
+        for (index = 0; index <= 100; index++) {
+          items.push({
+            id: index,
+            shortName: "Course " + index,
+            longName: "Course long " + index,
+            subtitle: "Enrolled as Teacher",
+            href: "/courses/" + index
+          });
+        }
+        this.list = new CustomList('#customList', items, {
+          url: 'fixtures/ok.json',
+          appendTarget: '#customList'
         });
+        this.list.open();
+        return this.lis = jQuery('.customListItem');
+      },
+      teardown: function() {
+        return removeFixture('CustomList');
       }
-      this.list = new CustomList('#customList', items, {
-        url: '/spec/javascripts/fixtures/ok.json',
-        appendTarget: '#customList'
-      });
-      this.list.open();
-      return this.lis = jQuery('.customListItem');
-    }, this));
-    afterEach(__bind(function() {
-      return this.list.teardown();
-    }, this));
-    it('should open and close', __bind(function() {
+    });
+    test('should open and close', function() {
       this.list.close();
-      expect(this.list.wrapper).toBeHidden();
+      equal(this.list.wrapper.is(':visible'), false, 'starts hidden');
       this.list.open();
-      return expect(this.list.wrapper).toBeVisible();
-    }, this));
-    it('should remove and add the first item', __bind(function() {
+      return equal(this.list.wrapper.is(':visible'), true, 'displays on open');
+    });
+    asyncTest('should remove and add the first item', 2, function() {
       var originalLength;
       originalLength = this.list.targetList.children().length;
-      runs(__bind(function() {
-        simulateClick(this.lis[0]);
-        return simulateClick(this.lis[1]);
-      }, this));
-      waits(this.list.options.animationDuration + 1);
-      return runs(__bind(function() {
+      simulateClick(this.lis[0]);
+      simulateClick(this.lis[1]);
+      return setTimeout(__bind(function() {
         var expectedLength;
         expectedLength = originalLength - 1;
-        expect(this.list.pinned.length).toEqual(expectedLength);
+        equal(this.list.pinned.length, expectedLength, 'only one item should have been removed');
         simulateClick(this.lis[0]);
-        return expect(this.list.pinned.length).toEqual(originalLength);
-      }, this));
-    }, this));
-    it('should cancel pending add request on remove', __bind(function() {
+        equal(this.list.pinned.length, originalLength, 'item should be restored');
+        return start();
+      }, this), 300);
+    });
+    test('should cancel pending add request on remove', function() {
       var el, item;
       el = jQuery(this.lis[16]);
       this.list.add(16, el);
-      expect(this.list.requests.add[16]).toBeDefined();
+      ok(this.list.requests.add[16], 'create an "add" request');
       item = this.list.pinned.findBy('id', 16);
       this.list.remove(item, el);
-      return expect(this.list.requests.add[16]).toBeUndefined();
-    }, this));
-    it('should cancel pending remove request on add', __bind(function() {
+      return equal(this.list.requests.add[16], void 0, 'delete "add" request');
+    });
+    test('should cancel pending remove request on add', function() {
       var el, item;
       el = jQuery(this.lis[1]);
       item = this.list.pinned.findBy('id', 1);
       this.list.remove(item, el);
-      expect(this.list.requests.remove[1]).toBeDefined();
+      ok(this.list.requests.remove[1], 'create a "remove" request');
       this.list.add(1, el);
-      return expect(this.list.requests.remove[1]).toBeUndefined();
-    }, this));
-    return it('should reset', __bind(function() {
+      return equal(this.list.requests.remove[1], void 0, 'delete "remove" request');
+    });
+    return asyncTest('should reset', 2, function() {
       var originalLength;
       originalLength = this.list.targetList.children().length;
-      runs(__bind(function() {
-        return simulateClick(this.lis[0]);
-      }, this));
-      waits(251);
-      return runs(__bind(function() {
+      simulateClick(this.lis[0]);
+      return setTimeout(__bind(function() {
         var button, length;
+        ok(originalLength !== this.list.targetList.children().length, 'length should be different');
         button = jQuery('.customListRestore')[0];
-        expect(this.list.requests.reset).toBeUndefined('request should not be defined yet');
         simulateClick(button);
-        expect(this.list.requests.reset).toBeDefined('reset request should be defined');
         length = this.list.targetList.children().length;
-        expect(length).toEqual(originalLength, 'targetList items restored');
-        return jasmine.Fixtures.noCleanup = true;
-      }, this));
-    }, this));
+        equal(length, originalLength, 'targetList items restored');
+        return start();
+      }, this), 600);
+    });
   });
 }).call(this);
