@@ -25,12 +25,8 @@ class HostUrl
     @@domain_config = nil
 
     def domain_config
-      if @@domain_config
-      elsif Rails.env.test?
-        # we don't want this config to be changeable in the test environment
-        @@domain_config = { :domain => 'www.example.com' }
-      else
-        @@domain_config = File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
+      if !@@domain_config
+        @@domain_config = File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].try(:with_indifferent_access)
         @@domain_config ||= {}
       end
       @@domain_config
