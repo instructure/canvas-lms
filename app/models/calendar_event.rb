@@ -150,20 +150,10 @@ class CalendarEvent < ActiveRecord::Base
     loc_string << self.location_address if !self.location_address.blank?
 
     event = Icalendar::Event.new
-    event.klass =       "PUBLIC"
-    event.start =       DateTime.civil(
-                          self.start_at.utc.strftime("%Y").to_i, 
-                          self.start_at.utc.strftime("%m").to_i,
-                          self.start_at.utc.strftime("%d").to_i,
-                          self.start_at.utc.strftime("%H").to_i, 
-                          self.start_at.utc.strftime("%M").to_i) rescue nil
-    event.end =        DateTime.civil(
-                          self.end_at.utc.strftime("%Y").to_i, 
-                          self.end_at.utc.strftime("%m").to_i, 
-                          self.end_at.utc.strftime("%d").to_i,
-                          self.end_at.utc.strftime("%H").to_i, 
-                          self.end_at.utc.strftime("%M").to_i) rescue nil
+    event.klass = "PUBLIC"
+    event.start = self.start_at.utc_datetime if self.start_at
     event.start.icalendar_tzid = 'UTC' if event.start
+    event.end = self.end_at.utc_datetime if self.end_at
     event.end.icalendar_tzid = 'UTC' if event.end
     if self.all_day
       event.start = Date.new(self.all_day_date.year, self.all_day_date.month, self.all_day_date.day)
@@ -171,11 +161,11 @@ class CalendarEvent < ActiveRecord::Base
       event.end = event.start
       event.end.ical_params = {"VALUE"=>["DATE"]}
     end
-    event.summary =     self.title
+    event.summary = self.title
     event.description = self.description
-    event.location =    loc_string
-    event.dtstamp =     self.updated_at.to_datetime
-    event.tzid =        'Europe/UTC'
+    event.location = loc_string
+    event.dtstamp = self.updated_at.utc_datetime if self.updated_at
+    event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
     # This will change when there are other things that have calendars...
     # can't call calendar_url or calendar_url_for here, have to do it manually
     event.url           "http://#{HostUrl.context_host(self.context)}/calendar?include_contexts=#{self.context.asset_string}&month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{self.id.to_s}"

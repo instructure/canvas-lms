@@ -675,25 +675,61 @@ describe Assignment do
     end
     
     it ".to_ics should return string data for assignments with due dates" do
-      Account.default.update_attribute(:default_time_zone, 'UTC')
+      Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am")
+      # force known value so we can check serialization
+      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
       res.should_not be_nil
       res.match(/DTEND:20080903T115500Z/).should_not be_nil
       res.match(/DTSTART:20080903T115500Z/).should_not be_nil
+      res.match(/DTSTAMP:20080903T120500Z/).should_not be_nil
+    end
+    
+    it ".to_ics should return string data for assignments with due dates in correct tz" do
+      Time.zone = 'Alaska' # -0800
+      assignment_model(:due_at => "Sep 3 2008 11:55am")
+      # force known value so we can check serialization
+      @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
+      res = @assignment.to_ics
+      res.should_not be_nil
+      res.match(/DTEND:20080903T195500Z/).should_not be_nil
+      res.match(/DTSTART:20080903T195500Z/).should_not be_nil
+      res.match(/DTSTAMP:20080903T200500Z/).should_not be_nil
     end
 
     it ".to_ics should return data for assignments with due dates" do
-      Account.default.update_attribute(:default_time_zone, 'UTC')
+      Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am")
+      # force known value so we can check serialization
+      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics(false)
       res.should_not be_nil
-      res.start.strftime('%Y-%m-%dT%H:%M:00z').should eql(ActiveSupport::TimeWithZone.new(Time.parse("Sep 3 2008 11:55am"), Time.zone).strftime('%Y-%m-%dT%H:%M:00z'))
-      res.end.strftime('%Y-%m-%dT%H:%M:00z').should eql(ActiveSupport::TimeWithZone.new(Time.parse("Sep 3 2008 11:55am"), Time.zone).strftime('%Y-%m-%dT%H:%M:00z'))
+      res.start.icalendar_tzid.should == 'UTC'
+      res.start.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      res.end.icalendar_tzid.should == 'UTC'
+      res.end.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      res.dtstamp.icalendar_tzid.should == 'UTC'
+      res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+    end
+
+    it ".to_ics should return data for assignments with due dates in correct tz" do
+      Time.zone = 'Alaska' # -0800
+      assignment_model(:due_at => "Sep 3 2008 11:55am")
+      # force known value so we can check serialization
+      @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
+      res = @assignment.to_ics(false)
+      res.should_not be_nil
+      res.start.icalendar_tzid.should == 'UTC'
+      res.start.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      res.end.icalendar_tzid.should == 'UTC'
+      res.end.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      res.dtstamp.icalendar_tzid.should == 'UTC'
+      res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
     end
     
     it ".to_ics should return string dates for all_day events" do
-      Account.default.update_attribute(:default_time_zone, 'UTC')
+      Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:59pm")
       @assignment.all_day.should eql(true)
       res = @assignment.to_ics

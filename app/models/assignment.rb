@@ -599,13 +599,8 @@ class Assignment < ActiveRecord::Base
     cal.custom_property("METHOD","PUBLISH")
 
     event = Icalendar::Event.new
-    event.klass =       "PUBLIC"
-    event.start =       DateTime.civil(
-                          self.due_at.utc.strftime("%Y").to_i, 
-                          self.due_at.utc.strftime("%m").to_i,
-                          self.due_at.utc.strftime("%d").to_i,
-                          self.due_at.utc.strftime("%H").to_i, 
-                          self.due_at.utc.strftime("%M").to_i) if self.due_at
+    event.klass = "PUBLIC"
+    event.start = self.due_at.utc_datetime if self.due_at
     event.start.icalendar_tzid = 'UTC' if event.start
     event.end = event.start if event.start
     event.end.icalendar_tzid = 'UTC' if event.end
@@ -615,10 +610,11 @@ class Assignment < ActiveRecord::Base
       event.end = event.start
       event.end.ical_params = {"VALUE"=>["DATE"]}
     end
-    event.summary =     self.title
+    event.summary = self.title
     event.description = self.description
-    event.location =    self.location
-    event.dtstamp =     self.updated_at.to_datetime
+    event.location = self.location
+    event.dtstamp = self.updated_at.utc_datetime if self.updated_at
+    event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
     # This will change when there are other things that have calendars...
     # can't call calendar_url or calendar_url_for here, have to do it manually
     event.url           "http://#{HostUrl.context_host(self.context)}/calendar?include_contexts=#{self.context.asset_string}&month=#{self.due_at.strftime("%m") rescue ""}&year=#{self.due_at.strftime("%Y") rescue ""}#assignment_#{self.id.to_s}"
