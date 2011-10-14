@@ -26,8 +26,11 @@ shared_examples_for "discussions selenium tests" do
     start_images = driver.find_elements(:css, ".image_list .img_holder").length
 
     # go to Images tab to trigger pageless for .image_list
-    driver.find_element(:css, '.add_topic_link').click()
-    driver.find_elements(:css, '#editor_tabs .ui-tabs-nav li a').last.click()
+    keep_trying_until {
+      driver.find_element(:css, '.add_topic_link').click()
+      driver.find_elements(:css, '#editor_tabs .ui-tabs-nav li a').last.should be_displayed
+    }
+    driver.find_elements(:css, '#editor_tabs .ui-tabs-nav li a').last.click
 
     # scroll window to trigger pageless for #topic_list
     driver.execute_script('window.scrollTo(0, 100000)')
