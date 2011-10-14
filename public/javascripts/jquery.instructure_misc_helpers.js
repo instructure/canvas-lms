@@ -183,9 +183,15 @@ I18n.scoped('instructure', function(I18n) {
               notRightSideIsTallerThanRightSide = notRightSideHeight > rightSideHeight,
               rightSideBottomIsBelowMainBottom = ( headerHeight + $main.height() - windowScrollTop ) <= ( rightSideHeight + rightSideMarginBottom );
         }
-        $body
-          .toggleClass('with-scrolling-right-side',     windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && !rightSideBottomIsBelowMainBottom)
-          .toggleClass('with-sidebar-pinned-to-bottom', windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide &&  rightSideBottomIsBelowMainBottom);
+        // windows chrome repaints when you set the class, even if the classes
+        // aren't truly changing, which wreaks havoc on open select elements.
+        // so we only toggle if we really need to
+        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && !rightSideBottomIsBelowMainBottom) ^ $body.hasClass('with-scrolling-right-side')) {
+          $body.toggleClass('with-scrolling-right-side');
+        }
+        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && rightSideBottomIsBelowMainBottom) ^ $body.hasClass('with-sidebar-pinned-to-bottom')) {
+          $body.toggleClass('with-sidebar-pinned-to-bottom');
+        }
       }
       onScroll();
       $window.scroll(onScroll);
