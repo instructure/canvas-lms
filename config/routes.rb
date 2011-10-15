@@ -701,7 +701,7 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
     end
 
-    api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index
+    api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
     api.get 'users/:user_id/profile', :controller => :profile, :action => :show
 
     api.with_options(:controller => :conversations) do |conversations|
