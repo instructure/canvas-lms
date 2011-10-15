@@ -1,13 +1,14 @@
 <h2 id="dialog_message" style="color: #666; font-size: 24px;"><%= t :retrieving_content, "Retrieving Content..." %></h2>
 <% js_block do %>
 <script>
-var data = <%= raw((@equella_data || {}).to_json) %>;
+var data = <%= raw((@retrieved_data || {}).to_json) %>;
+var callback = '<%= params[:service] %>';
 var parentWindow = window.parent;
-while(parentWindow && !parentWindow.equella) {
+while(parentWindow && parentWindow.parent != parentWindow && !parentWindow[callback]) {
   parentWindow = parentWindow.parent;
 }
-if(parentWindow.equella && parentWindow.equella.ready) {
-  parentWindow.equella.ready(data);
+if(parentWindow[callback] && parentWindow[callback].ready) {
+  parentWindow[callback].ready(data);
   setTimeout(function() {
     $("#dialog_message").text("<%= t :popup_success, "Success! This popup should close on its own..." %>");
   }, 1000);

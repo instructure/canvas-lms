@@ -11,11 +11,11 @@
 <% end %>
 
 <% jammit_js :tool_inline %>
-<form action="<%= @resource_url %>" method="POST" target="<%= @target || 'tool_content' %>" id="tool_form" class="<%= 'new_tab' if @tag.new_tab %>">
+<form action="<%= @resource_url %>" method="POST" <%= raw("target='#{@target || 'tool_content'}'") unless @self_target %> id="tool_form" class="<%= 'new_tab' if @tag.try(:new_tab) %>">
   <% @tool_settings.each do |key, value| %>
     <%= hidden_field_tag key, value %>
   <% end %>
-  <% if @tag.new_tab %>
+  <% if @tag.try(:new_tab) %>
     <div style="margin-bottom: 20px;">
       <div class="load_tab">
         <%= t :new_tab, "This tool needs to be loaded in a new browser window" %>
@@ -31,7 +31,7 @@
     <button class="button" type="submit"><%= t :load_tool_button, "Load %{tool}", :tool => @tool.name %></button>
   <% end %>
 </form>
-<% unless @tag.try(:new_tab) %>
+<% if !@tag.try(:new_tab) && !@self_target %>
   <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
 <% end %>
 <% if @tag %>

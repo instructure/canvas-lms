@@ -264,6 +264,10 @@ class ContextExternalTool < ActiveRecord::Base
     
     new_tool
   end
+
+  def resource_selection_settings
+    settings[:resource_selection]
+  end
   
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access

@@ -9,7 +9,7 @@ class ExternalToolsController < ApplicationController
         @tools = @context.context_external_tools.active
       end
       respond_to do |format|
-        format.json { render :json => @tools.to_json(:include_root => false) }
+        format.json { render :json => @tools.to_json(:include_root => false, :methods => :resource_selection_settings) }
       end
     end
   end
@@ -40,16 +40,43 @@ class ExternalToolsController < ApplicationController
   
   def show
     get_context
-    @tool = ContextExternalTool.find_for(params[:id], @context, "#{@context.class.base_ar_class.to_s.downcase}_navigation")
-    @resource_title = @tool.label_for(:course_navigation)
-    @resource_url = @tool.settings[:course_navigation][:url]
-    @opaque_id = @context.opaque_identifier(:asset_string)
-    @resource_type = 'user_navigation'
-    add_crumb(@context.name, named_context_url(@context, :context_url))
-    @return_url = url_for(@context)
+    selection_type = "#{@context.class.base_ar_class.to_s.downcase}_navigation"
+    render_tool(params[:id], selection_type)
     @active_tab = @tool.asset_string
+    add_crumb(@context.name, named_context_url(@context, :context_url))
+  end
+  
+  def resource_selection
+    get_context
+    if authorized_action(@context, @current_user, :update)
+      selection_type = params[:editor] ? 'editor_button' : 'resource_selection'
+      add_crumb(@context.name, named_context_url(@context, :context_url))
+      @return_url = external_content_success_url('external_tool')
+      @headers = false
+      @self_target = true
+      render_tool(params[:external_tool_id], selection_type)
+    end
+  end
+  
+  def render_tool(id, selection_type)
+    begin
+      @tool = ContextExternalTool.find_for(id, @context, selection_type) 
+    rescue ActiveRecord::RecordNotFound; end
+    if !@tool
+      flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
+      redirect_to named_context_url(@context, :context_url)
+      return
+    end
+    @resource_title = @tool.label_for(selection_type.to_sym)
+    @resource_url = @tool.settings[selection_type.to_sym][:url]
+    @opaque_id = @context.opaque_identifier(:asset_string)
+    @resource_type = selection_type
+    @return_url ||= url_for(@context)
+    @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
+    @tool_settings = @launch.generate
     render :template => 'external_tools/tool_show'
   end
+  protected :render_tool
   
   def create
     if authorized_action(@context, @current_user, :update)

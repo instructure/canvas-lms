@@ -17,13 +17,36 @@
 #
 
 class ExternalContentController < ApplicationController
+  protect_from_forgery :except => [:selection_test]
   def success
-    @equella_data = {}
-    params.each do |key, value|
-      if key.to_s.match(/\Aeq_/)
-        @equella_data[key.to_s.gsub(/\Aeq_/, "")] = value
+    @retrieved_data = {}
+    # TODO: poll for data if it's oembed
+    if params[:service] == 'equella'
+      params.each do |key, value|
+        if key.to_s.match(/\Aeq_/)
+          @retrieved_data[key.to_s.gsub(/\Aeq_/, "")] = value
+        end
+      end
+    elsif params[:service] == 'external_tool'
+      params[:embed_type] = nil unless ['basic_lti', 'link', 'image', 'iframe'].include?(params[:embed_type])
+      @retrieved_data = request.query_parameters
+      if @retrieved_data[:url]
+        begin
+          uri = URI.parse(@retrieved_data[:url])
+          unless uri.scheme
+            value = "http://#{value}"
+            uri = URI.parse(value)
+          end
+          @retrieved_data[:url] = uri.to_s
+        rescue URI::InvalidURIError
+          @retrieved_data[:url] = nil
+        end
       end
     end
+    @headers = false
+  end
+  
+  def selection_test
     @headers = false
   end
   

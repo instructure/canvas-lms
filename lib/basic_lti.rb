@@ -107,6 +107,9 @@ module BasicLTI
       hash['tool_consumer_instance_name'] = root_context.name
       hash['tool_consumer_instance_contact_email'] = HostUrl.outgoing_email_address # TODO: find a better email address to use here
       tool.set_custom_fields(hash, resource_type)
+      if resource_type == 'resource_selection'
+        hash['selection_directive'] = 'select_link'
+      end
 
       hash['oauth_callback'] = 'about:blank'
       BasicLTI.generate_params(hash, url, tool.consumer_key, tool.shared_secret)

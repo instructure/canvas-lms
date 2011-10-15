@@ -156,6 +156,7 @@ ActionController::Routing::Routes.draw do |map|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
     course.resources :external_tools, :collection => {:retrieve => :get} do |tools|
+      tools.resource_selection 'resource_selection', :controller => 'external_tools', :action => 'resource_selection'
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     course.resources :submissions
@@ -354,6 +355,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    group.resources :external_tools, :only => [:show], :collection => {:retrieve => :get}
     group.images 'images', :controller => 'files', :action => 'images'
     group.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -761,6 +763,7 @@ ActionController::Routing::Routes.draw do |map|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
   map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
+  map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
   # See how all your routes lay out with "rake routes"
 end

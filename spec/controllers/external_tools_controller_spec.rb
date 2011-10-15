@@ -55,4 +55,40 @@ describe ExternalToolsController do
       flash[:error].should == "Couldn't find valid settings for this link"
     end
   end
+  
+  describe "GET 'resource_selection'" do
+    it "should require authentication" do
+      course_with_teacher(:active_all => true)
+      user_model
+      user_session(@user)
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => 0
+      assert_unauthorized
+    end
+    
+    it "should redirect if no matching tools are found" do
+      course_with_teacher_logged_in(:active_all => true)
+      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool.url = "http://www.example.com/basic_lti"
+      # this tool exists, but isn't properly configured
+      tool.save!
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
+      response.should be_redirect
+      flash[:error].should == "Couldn't find valid settings for this tool"
+    end
+    
+    it "should find a valid tool if one exists" do
+      course_with_teacher_logged_in(:active_all => true)
+      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool.url = "http://www.example.com/basic_lti"
+      tool.settings[:resource_selection] = {
+        :url => "http://#{HostUrl.default_host}/selection_test",
+        :selection_width => 400,
+        :selection_height => 400
+      }
+      tool.save!
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
+      response.should be_success
+      assigns[:tool].should == tool
+    end
+  end
 end
