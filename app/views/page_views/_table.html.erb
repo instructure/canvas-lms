@@ -25,7 +25,7 @@
     $(function(){
       $('#page_view_results').pageless({
         totalPages: <%= @page_views.total_pages %>,
-        url: <%= raw user_page_views_path(@user, :format => :html, :html_xhr => true, :per_page => 50).to_json %>,
+        url: <%= raw user_page_views_path(@user, :format => :html, :html_xhr => true, :per_page => @page_views.per_page).to_json %>,
         loaderMsg: I18n.t('loading_more_results', "Loading more results"),
         complete: function() {
           $(document).triggerHandler('page_views_added');
