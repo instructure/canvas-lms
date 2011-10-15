@@ -93,53 +93,13 @@
   </fieldset>
   </div>
   
-  <% unless !page_views_enabled? || @page_views.total_pages == 0 %>
+  <% if page_views_enabled? %>
     <h3>
       <%= t('page_views', 'Page Views') %>
     </h3>
-  
-    <% if @page_views.total_pages < 5 %>
-      <h2 style="clear:both;"><%= t('page_views_over_time', 'Page views over time') %></h2>
-      <div id='chart_div' style='width: 960px; height: 240px;'></div>
-    <% end %>
-  
+
     <%= render :partial => 'page_views/table' %>
   <% end %>
 </div>
 
-
 <% jammit_js :user %>
-<% if page_views_enabled? && @page_views.total_pages < 5 %>
-<% js_block do %>
-  <!--Load the GOOGLE AJAX API-->
-  <script type="text/javascript" src="//www.google.com/jsapi"></script>
-
-  <script type="text/javascript">
-    var pageViewData = <%= raw(@user.page_view_data.to_json) rescue '{}' %>;
-    google.load('visualization', '1', {'packages':['annotatedtimeline']});
-    google.setOnLoadCallback(function(){
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Date');
-      $.each(pageViewData.labels, function(i){
-        data.addColumn('number', this);
-        data.addColumn('string', 'title'+i);
-        data.addColumn('string', 'text'+i);
-      });
-      
-      var rows = [];
-      
-      $.each(pageViewData.days, function(i) {
-        var date = new Date();
-        date.setTime(this[0]);
-        this[0] = date;
-        rows.push(this);
-      });
-      data.addRows(rows);
-
-      var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-      chart.draw(data, {displayAnnotations: false});
-      
-    });
-  </script>
-<% end %>
-<% end %>
