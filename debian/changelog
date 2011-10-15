@@ -1,3 +1,188 @@
+canvas-lms (1.1-67) professional; urgency=low
+
+  * Package ref: ef152a33edfda7bfd3bdf73c1da34d6bf0ba7493
+  *
+  * [-40cb545] Revert "temporarily create add_media_files jobs as on hold"
+  * [-c3e1c15] Revert "tmp blockage"
+  * [-af91276] tmp blockage
+  * [-fe3db5d] temporarily create add_media_files jobs as on hold
+  * [+801d9b2] remove unused sis_data columns
+  * [+d259963] enable parallelization of selenium tests
+  * [+16f6757] s/access/participate in/
+  * [+e85e98c] Better "Courses" menu, updated sort, count, etc.
+  * [+0f9d86d] Added JavaScript Specs and Client-side Templates
+  * [+3266429] some css classes to make tables pretty
+  * [+589fbe2] upgrade jquery to 1.6.4 and jquery-ui to 1.8.16
+  * [+28bf511] Our jQueryUI patches
+  * [+61ac871] add a rackup file to work with any rack-compatible server
+  * [+6e1b791] ignore a model from an old migration for attr_accessible check
+  * [+5184a7f] break instructure_helper.js into smaller, modular chunks
+  * [+60aa7ba] add encoding magic comments to files with utf-8 chars
+  * [+0432c66] remove deprecated ruby syntax
+  * [+0279c64] fix crummy return value
+  * [+21b4db0] change some lambdas to procs
+  * [+bda484a] use instance_exec for plugin t calls in 1.9
+  * [+766ac9b] fix $.h regression in js refactor
+  * [+ead2a33] add rails root to load path
+  * [+4719436] AR select and order options do not take an array
+  * [+07a27a2] Fixes #5112 - Proxy codecogs image urls
+  * [+0b70580] Revert "break instructure_helper.js into smaller, modular chunks"
+  * [+530c5e1] group_category_name
+  * [+9bcf8d9] remove Account#account_groups
+  * [+3563529] remove special group name from manage_groups.js
+  * [+e749446] Group#student_organized?
+  * [+51d48f8] avoid comparing ids directly for Authlogic internal stuff
+  * [+5125efc] fix speedGrader spec, ensure right student is visible
+  * [+d48772c] fix attr() regression in jquery 1.6.4
+  * [+b3cd356] assignment-level turnitin settings, closes #4938
+  * [+02e4132] refactor sticky sis fields
+  * [+f5cdcc8] Updated spec for issue #5112, codecogs images
+  * [+0cd325b] tab order working on conversations page. fixes #5372
+  * [+593f369] include groups in .../files?show_all_contexts=1
+  * [+23edefc] allow <environment>-local.rb to overwrite cache configuration
+  * [+a3ca09d] fix jquery button styles for current theme
+  * [+6db73cb] revert spec back to how it was, it was good as is.
+  * [+7491111] exclude selenium specs from rcov task
+  * [+4f86bc3] finish selenium tests for sales demonstrations
+  * [+103d3bf] make dialogs modal by default again
+  * [+e3178db] simplify references to enrollment for home menu
+  * [+642e477] add recently removed columns to the list, refs #5758
+  * [+bed2875] fix help dialog in speedgrader, closes #5695
+  * [+57106fe] Adjusted spec to get all courses in the menu
+  * [+44089f8] pin coffee-script-source so generated code is same from all devs
+  * [+dbe7197] fix Gaurdfile to handle nested directories
+  * [+2682d0e] break instructure_helper.js into smaller, modular chunks
+  * [+ff0b075] allow passing textWhileLoading to disableWhileLoading
+  * [+206a877] add disableWhileLoading option to formSubmit
+  * [+dc162ba] plugin to convert normal buttons to dialog buttons
+  * [+f9acb06] upgrade compass to latest version
+  * [+936eb18] move js that is not ours to vendor
+  * [+72211da] clear out tables from plugins when running specs
+  * [+ec1a042] show course name with group in conversations search. fixes #5795
+  * [+f86aacc] don't list groups from inactive enrollments in menu
+  * [+ba64a08] handle grade result passback when there is either no course or section
+  * [+9631287] plumb sis stickiness override option through to the csv importer
+  * [+8ac681f] adding start and end date stickiness
+  * [+858b335] make course terms sticky
+  * [+38aac04] conversations fixes for sqlite
+  * [+03088f4] show help if no option given to script/delayed_job
+  * [+db2bca8] detect if mysql is in a transaction
+  * [+9572eb1] add "mute" function to assignments. fixes #5101
+  * [+8465a62] full avatar URIs for conversations UI and API
+  * [+7c29dab] chmod +x script/ssl_server
+  * [+9f09901] don't include correct answers in the dom
+  * [+051f919] enforce section visibility in speedgrader, fixes #5337
+  * [+28a73ac] fix error in selenium outcome spec and some selenium cleanup
+  * [+a13ae7c] update test gems
+  * [+20535f8] create a text log of failed parallel tests
+  * [+1697989] allow single character usernames fixes #5818
+  * [+6ac38f9] move UI dialog modal patch with other jquery patches
+  * [+c5b38eb] conversation loading speedup
+  * [+027b53b] fix user_service utc bug
+  * [+ab1fddb] basic lti tweaks for certification
+  * [+7e54f4f] basic lti custom fields
+  * [+5cd5e64] optimizations for submissions for_students api, refs #5806
+  * [+b61354b] order assignments in gradebooks csv. fixes #5824
+  * [+3b06885] i18n handlebars block helper magic
+  * [+e4e590b] don't error for_students api if no assignments in the course
+  * [+1dc8f60] don't cross outcome groups and outcomes
+  * [+df7323c] fix asymmetry in rails association patch
+  * [+2a86db2] delayed job in_delayed_job flag
+  * [+fbbdf75] use the current account domain in context_host saml settings lookups
+  * [+5c08799] Remove ActiveRecord::Base.find(_all)?_cached
+  * [+57c1a08] add assignment group weights dialog to gradebook2
+  * [+41abe52] don't bother looking up the current pseudonym in a cache
+  * [+cccf849] update vista qti specs to use full conversion process
+  * [+26a65f4] fix css3 transitions for show-hide
+  * [+84c3f36] dont let JST guard die and don't have leading slash
+  * [+0393f8d] update course sections api doc
+  * [+718c3d0] support section ids in the submissions api, refs #5835
+  * [+c56b739] optimize UsersController#show a bit
+  * [+6acf93e] don't try and scribd html
+  * [+5dbb29e] remove generated view 'specs' clutter
+  * [+bcab31a] use https url for twitter avatars refs #5194
+  * [+8cbac7e] add a migration to update account associations for users with duplicates; refs #4565
+  * [+48b920d] support as_user_id for api requests closes #5809
+  * [+6120285] optionally include scores/grade in /courses.json
+  * [+87e3b7e] method to get user's courses w/ highest enrollment
+  * [+743c5b2] Quiz statistics selenium test. Fix selenium tests.
+  * [+522abc2] option to open BLTI links in a new tab
+  * [+94b8560] don't send email for exported state if configured not to
+  * [+c780d10] dashboards for users with nil root_discussion_entries. fixes #5854
+  * [+d36bb80] fix rendering of error page when no domain_root_account
+  * [+94ddf36] use the :course parameter to assignment_model
+  * [+6ad5852] provide more helpful access denied messages for students.  fixes #5517
+  * [+cb39e6e] api for accessing user/course todo items, closes #5426
+  * [+b71257b] fix todo api specs
+  * [+2a710b2] course copy with replaced files, fixes #5536
+  * [+d51b5d9] don't require a session to download attachments through the api
+  * [+99faa3a] Added SIS CSV page, added sis_csv table to css, changed h2 css to top margin 30px for all documentation
+  * [+87588f5] add media_comment_id and media_comment_type to api
+  * [+7d05603] api to generate a media comment session, closes #4068
+  * [+a72755b] update to rails 2.3.14
+  * [+bc0b1f6] truncate text to max bytes; fixes #5881
+  * [+0bf7f60] google docs won't show text/plain files
+  * [+c8aa8f6] allow enabling avatars at the root account level
+  * [+f7c8ac9] fix css3 transitions again to handle .ui-widget-overlay
+  * [+5c8406b] GroupCategory model
+  * [+13b83cd] use model ids instead of names to identify group categories
+  * [+dc2a8fd] make sure decrosslisting is sticky too
+  * [+6e2f7ac] fix faculty journal regression, closes #5724
+  * [+71a650d] revised address book, fixes #5639
+  * [+a24edff] remove the sis documentation pdf, link to the new api doc version
+  * [+6c6dc11] filenames starting with a "_" can be used as Handlebars partials
+  * [+cf3de51] force domain.yml config in test env
+  * [+f41047c] account setting to disable name editing fixes #5851
+  * [+51f7ecf] add fs-events gem on osx/linux to make guard happy
+  * [+4e884ad] return attachment and media comment urls, closes #5850
+  * [+2ff3d60] Gemfile: allow rake 0.9.x
+  * [+31c83ef] update avatar urls for twitter to https in migration
+  * [+deb4b30] fix typo in qti_exporter
+  * [+c761811] require :manage_sis permission to remove sis pseudonyms fixes #5634
+  * [+150491a] refactor user content rewriters
+  * [+9f0aa5f] rewrite user content in the api for file links and media comments
+  * [+cd31b72] add description to todo item assignment return
+  * [+cccba00] fix creating/editing assignments after group category model
+  * [+c926711] temporarily remove fsevent/inotify gems
+  * [+7b31a83] compile jst and coffeescripts in canvas:compile_assets
+  * [+45b5396] compile_assets without loading the canvas/rails environment
+  * [+0080965] move barista gems to the development Gemfile group
+  * [+95d868e] add missing xlists docs
+  * [+525e820] get some of the grade book column header menus working
+  * [+c671c37] add assignment details dialog to gradebook2
+  * [+5cd12fc] add muting to gradebook2
+  * [+1379811] i18n.js: apply wrappers prior to interpolation
+  * [+1fff010] reorganized i18n extraction classes
+  * [+d55b715] don't 404 for submission that was not created yet
+  * [+179473e] add ability to pass fallback to /images/users/x
+  * [+215f9d4] handlebars string extraction, a couple i18n fixes
+  * [+7f4a996] send turnitin data back in api
+  * [+b59f299] require handlebars extractor in jst guard
+  * [+ec4a77d] Add submission comment dialog to gradebook2
+  * [+418abfc] inverted logic fix for stickiness migration
+  * [+798212b] submit_to_scribd on a job strand
+  * [+696a199] check attempt not @submission in submissions api
+  * [+6f3c17f] clear avatar state when assigning by non-existent service
+  * [+2b212e0] self signup group categories
+  * [+3bde54f] fix jammitified js by adding a ; to the end of each handlebars template
+  * [+8ebef33] make kylemenu look like coffeescript
+  * [+e607e5d] fix path to handlebars template in GradebookHeaderMenu
+  * [+d8fa350] total grades were being displayed wrong in gradebook2
+  * [+082c941] fix "section to show" popup not changing
+  * [+865aad6] fix path to html5.js so styles work in ie8
+  * [+a0b56a6] show individual grade publishing status results on the course settings page
+  * [+f52fc1e] make Pseudonym#unique_id sis sticky refs #5897
+  * [+05c12a6] allow sis imports to make things sticky or clear stickiness altogether
+  * [+e2514e7] show course name next to section in recipient finder
+  * [+76f7d52] hide sections from students/observers in recipient finder
+  * [+795aebc] update sis import api docs
+  * [+37da2e1] set max_attempts to 1 for submit_to_scribd
+  * [+8d5d04f] fix incoming message processing; fixes #5962
+  * [+3fc9530] fix page views loading in the wrong order; fixes #5802
+  * [+ef152a3] fix first page of user page views having the wrong per_page
+
+ -- JT Olds <jt@instructure.com>  Sat, 15 Oct 2011 12:27:29 -0600
+
 canvas-lms (1.1-66) professional; urgency=low
 
   * Package ref: 6e60ef415da44a261e66b02073414b3830d99f39
