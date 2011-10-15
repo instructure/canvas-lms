@@ -125,7 +125,7 @@ namespace :i18n do
     files &= only if only
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
     process_files(files) do |file|
-      file_count += 1 if handlebars_extractor.process(File.read(file), file.gsub(/.*app\/views\/jst\/|\.handlebars\z/, '').underscore.gsub(/\/_?/, '.'))
+      file_count += 1 if handlebars_extractor.process(File.read(file), file.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').underscore.gsub(/\/_?/, '.'))
     end
 
     print "\n\n"

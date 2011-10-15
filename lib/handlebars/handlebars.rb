@@ -54,7 +54,7 @@ class Handlebars
 
     def prepare_i18n(source, scope)
       @extractor ||= I18nExtraction::HandlebarsExtractor.new
-      scope = scope.sub('/', '.')
+      scope = scope.sub(/\A_/, '').gsub(/\/_?/, '.')
       @extractor.scan(source, :method => :gsub) do |data|
         wrappers = data[:wrappers].map{ |value, delimiter| " w#{delimiter.size-1}=#{value.inspect}" }.join
         "{{{t #{data[:key].inspect} #{data[:value].inspect} scope=#{scope.inspect}#{wrappers}#{data[:options]}}}}"
