@@ -1,3 +1,12 @@
+canvas-lms (1.1-68) professional; urgency=low
+
+  * Package ref: ef152a33edfda7bfd3bdf73c1da34d6bf0ba7493
+  *
+  * [+af23077] use bundle exec for rake in debian scripts
+
+
+ -- JT Olds <jt@instructure.com>  Sat, 15 Oct 2011 13:55:41 -0600
+
 canvas-lms (1.1-67) professional; urgency=low
 
   * Package ref: ef152a33edfda7bfd3bdf73c1da34d6bf0ba7493
