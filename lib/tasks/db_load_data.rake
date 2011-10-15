@@ -362,6 +362,20 @@ namespace :db do
       <%= asset.title %>, <%= assset.context.name %> has been graded.
     }
 
+    create_notification 'Assignment', 'Grading', 0, 
+    'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>', %{
+      Assignment Unmuted
+
+      Assignment Unmuted: <%= asset.title %>, <%= asset.context.name %>
+
+      Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+
+      Your can view it here:
+      %{url}
+    }, %{
+      <%= asset.title %>, <%= asset.context.name %>  has been unmuted.
+    }
+
     create_notification 'CalendarEvent', 'Calendar', 0,
     'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>', %{
       New Event Created

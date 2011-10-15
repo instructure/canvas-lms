@@ -62,9 +62,9 @@ class ContentZipper
     
     begin
       case attachment.context
-      when Assignment: zip_assignment(attachment, attachment.context)
-      when Eportfolio: zip_eportfolio(attachment, attachment.context)
-      when Folder: zip_base_folder(attachment, attachment.context)
+      when Assignment; zip_assignment(attachment, attachment.context)
+      when Eportfolio; zip_eportfolio(attachment, attachment.context)
+      when Folder; zip_base_folder(attachment, attachment.context)
       end
     rescue => e
       ErrorReport.log_exception(:default, e, {

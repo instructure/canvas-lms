@@ -173,6 +173,24 @@ describe CoursesController do
       assigns[:context].should eql(@course)
       # assigns[:message_types].should_not be_nil
     end
+
+    it "should give a helpful error message for students that can't access yet" do
+      course_with_student_logged_in(:active_all => true)
+      @course.workflow_state = 'claimed'
+      @course.save!
+      get 'show', :id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_message].should_not be_nil
+
+      @course.workflow_state = 'available'
+      @course.save!
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.save!
+      get 'show', :id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_message].should_not be_nil
+    end
   end
   
   describe "POST 'unenroll'" do

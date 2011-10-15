@@ -22,7 +22,7 @@ module Api::V1::DiscussionTopics
 
       attachments = []
       if topic.attachment
-        attachments << attachment_json(topic.attachment, :context => @context)
+        attachments << attachment_json(topic.attachment)
       end
 
       url = nil

@@ -17,20 +17,19 @@
 #
 
 module SIS
-  class UserImporter
-    def initialize(batch_id, root_account, logger)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-    end
+  class UserImporter < BaseImporter
 
     def process(updates_every, messages)
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       User.skip_updating_account_associations do
-        yield importer
-        while importer.any_left_to_process?
-          importer.process_batch
+        User.process_as_sis(@sis_options) do
+          Pseudonym.process_as_sis(@sis_options) do
+            yield importer
+            while importer.any_left_to_process?
+              importer.process_batch
+            end
+          end
         end
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
@@ -104,11 +103,11 @@ module SIS
               end
 
               user = pseudo.user
-              user.name = user.sis_name = "#{first_name} #{last_name}" if user.sis_name && user.sis_name == user.name
+              user.name = "#{first_name} #{last_name}" unless user.stuck_sis_fields.include?(:name)
 
             else
               user = User.new
-              user.name = user.sis_name = "#{first_name} #{last_name}"
+              user.name = "#{first_name} #{last_name}"
             end
 
             if status =~ /active/i
@@ -120,7 +119,7 @@ module SIS
             end
 
             pseudo ||= Pseudonym.new
-            pseudo.unique_id = login_id
+            pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
             pseudo.sis_source_id = login_id
             pseudo.sis_user_id = user_id
             pseudo.account = @root_account

@@ -57,42 +57,6 @@ class ActiveRecord::Base
     res
   end
   
-  def self.find_cached(key, opts = nil, &block)
-    attrs = Rails.cache.read(key)
-    if !attrs || attrs.empty? || attrs.is_a?(String) || attrs[:assigned_cache_key] != key
-      obj = block.call rescue nil
-      attrs = obj && obj.is_a?(self) ? obj.attributes : nil
-      attrs[:assigned_cache_key] = key if attrs
-      Rails.cache.write(key, attrs, opts) if attrs
-    end
-    return nil if !attrs || attrs.empty?
-    obj = self.new
-    attrs = attrs.dup if attrs.frozen?
-    attrs.delete(:assigned_cache_key)
-    obj.instance_variable_set("@attributes", attrs)
-    obj.instance_variable_set("@new_record", false)
-    obj
-  end
-  
-  def self.find_all_cached(key, opts = nil, &block)
-    attrs_list = Rails.cache.read(key)
-    if !attrs_list || attrs_list.empty? || !attrs_list.is_a?(Array) || attrs_list.any?{|attr| attr[:assigned_cache_key] != key }
-      list = block.call.to_a rescue nil
-      attrs_list = list.map{|obj| obj && obj.is_a?(self) ? obj.attributes : nil }.compact
-      attrs_list.each{|attrs| attrs[:assigned_cache_key] = key }
-      Rails.cache.write(key, attrs_list, opts)
-    end
-    return [] if !attrs_list || attrs_list.empty?
-    attrs_list.map do |attrs|
-      obj = self.new
-      attrs = attrs.dup if attrs.frozen?
-      attrs.delete(:assigned_cache_key)
-      obj.instance_variable_set("@attributes", attrs)
-      obj.instance_variable_set("@new_record", false)
-      obj
-    end
-  end
-  
   def asset_string
     @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
   end
@@ -374,21 +338,6 @@ ActiveRecord::ConnectionAdapters::TableDefinition.class_eval do
     column_without_foreign_key_check(name, type, options)
   end
   alias_method_chain :column, :foreign_key_check
-end
-
-# patch adapted from https://rails.lighthouseapp.com/projects/8994/tickets/6535-find_or_create_by-on-an-association-always-creates-new-records
-ActiveRecord::Associations::AssociationCollection.class_eval do
-  def method_missing_with_splat_fix(method, *args, &block)
-    if method.to_s =~ /^find_or_create_by_(.*)$/
-      rest = $1
-      find_args = pull_finder_args_from(::ActiveRecord::DynamicFinderMatch.match(method).attribute_names, *args)
-      return send("find_by_#{rest}", *find_args) ||
-             method_missing("create_by_#{rest}", *args, &block)
-    else
-      method_missing_without_splat_fix(method, *args, &block)
-    end
-  end
-  alias_method_chain :method_missing, :splat_fix
 end
 
 # See https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/66-true-false-conditions-broken-for-sqlite#ticket-66-9

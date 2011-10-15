@@ -171,6 +171,26 @@ describe Assignment do
     @a.submissions.first.versions.length.should eql(3)
   end
 
+  it "should default to unmuted" do
+    assignment_model
+    @assignment.muted?.should eql false
+  end
+
+  it "should be mutable" do
+    assignment_model
+    @assignment.respond_to?(:mute!).should eql true
+    @assignment.mute!
+    @assignment.muted?.should eql true
+  end
+
+  it "should be unmutable" do
+    assignment_model
+    @assignment.respond_to?(:unmute!).should eql true
+    @assignment.mute!
+    @assignment.unmute!
+    @assignment.muted?.should eql false
+  end
+
   describe "infer_due_at" do
     it "should set to all_day" do
       assignment_model(:due_at => "Sep 3 2008 12:00am")
@@ -444,6 +464,14 @@ describe Assignment do
       @assignment.messages_sent.should be_include("Assignment Graded")
       @sub1.messages_sent.should be_empty
     end
+
+    it "should not fire off assignment graded notification on first publish if muted" do
+      setup_unpublished_assignment_with_students
+      @assignment.mute!
+      @assignment.publish!
+      @assignment.should be_muted
+      @assignment.messages_sent.should_not be_include("Assignment Graded")
+    end
     
     it "should fire off submission graded notifications if already published" do
       setup_unpublished_assignment_with_students
@@ -456,6 +484,17 @@ describe Assignment do
       @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
       @sub2.messages_sent.should_not be_include("Submission Graded")
       @sub2.messages_sent.should be_include("Submission Grade Changed")
+    end
+
+    it "should not fire off submission graded notifications if already published but muted" do
+      setup_unpublished_assignment_with_students
+      @assignment.publish!
+      @assignment.mute!
+      @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+      @sub2.messages_sent.should_not be_include("Submission Graded")
+      @sub2.update_attributes(:graded_at => Time.now - 60*60)
+      @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
+      @sub2.messages_sent.should_not be_include("Submission Grade Changed")
     end
     
     it "should not fire off assignment graded notification if started as published" do
@@ -521,7 +560,7 @@ describe Assignment do
       @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
       @sub2.messages_sent.should be_empty
     end
-    
+
     it" should fire off submission graded notifications on second publish" do
       setup_unpublished_assignment_with_students
       @assignment.publish!
@@ -543,7 +582,7 @@ describe Assignment do
       @assignment.updated_submissions.sort_by(&:id).last.messages_sent.should be_include("Submission Grade Changed")
     end
   end
-  
+
   context "to_json" do
     it "should include permissions if specified" do
       assignment_model
@@ -596,6 +635,11 @@ describe Assignment do
       hash["permissions"]["read"].should eql(true)
     end
 
+    it "should include group_category" do
+      assignment_model(:group_category => "Something")
+      hash = ActiveSupport::JSON.decode(@assignment.to_json)
+      hash["assignment"]["group_category"].should == "Something"
+    end
   end
   
   context "ical" do
@@ -863,6 +907,18 @@ describe Assignment do
         @sub2.messages_sent['Submission Graded'].should be_nil
         @sub2.messages_sent['Submission Grade Changed'].should_not be_nil
       end
+
+      it "should not notify students when their grade is changed if muted" do
+        setup_unpublished_assignment_with_students
+        @assignment.publish!
+        @assignment.mute!
+        @assignment.should be_muted
+        @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+        @sub2.update_attributes(:graded_at => Time.now - 60*60)
+        @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
+        @sub2.messages_sent.should be_empty
+      end
+
       it "should not notify students of grade changes if unpublished" do
         setup_unpublished_assignment_with_students
         @assignment.publish!
@@ -881,6 +937,14 @@ describe Assignment do
         @assignment.set_default_grade(:default_grade => 10)
         @assignment.messages_sent.should_not be_nil
         @assignment.messages_sent['Assignment Graded'].should_not be_nil
+      end
+
+      it "should not notify affected students on a mass-grade change if muted" do
+        setup_unpublished_assignment_with_students
+        @assignment.publish!
+        @assignment.mute!
+        @assignment.set_default_grade(:default_grade => 10)
+        @assignment.messages_sent.should be_empty
       end
       
       it "should notify affected students of a grade change when the assignment is republished" do
@@ -957,6 +1021,16 @@ describe Assignment do
         @a.description = "something different"
         @a.save
         @a.messages_sent.should_not be_include('Assignment Changed')
+      end
+
+      it "should not create a message when a muted assignment changes" do
+        assignment_model
+        @a.mute!
+        Notification.create :name => "Assignment Changed"
+        @a.context.offer!
+        @a.description = "something different"
+        @a.save
+        @a.messages_sent.should be_empty
       end
       
       # it "should NOT create a message when the content changes to an empty string" do
@@ -1148,11 +1222,72 @@ describe Assignment do
       a1.locked_for?(@user).should be_true
     end
   end
+
+  context "group_students" do
+    it "should return [nil, [student]] unless the assignment has a group_category" do
+      @assignment = assignment_model
+      @student = user_model
+      @assignment.group_students(@student).should == [nil, [@student]]
+    end
+
+    it "should return [nil, [student]] if the context doesn't have any active groups in the same category" do
+      @assignment = assignment_model(:group_category => "Fake Category")
+      @student = user_model
+      @assignment.group_students(@student).should == [nil, [@student]]
+    end
+
+    it "should return [nil, [student]] if the student isn't in any of the candidate groups" do
+      @assignment = assignment_model(:group_category => "Category")
+      @group = @course.groups.create(:name => "Group", :group_category => @assignment.group_category)
+      @student = user_model
+      @assignment.group_students(@student).should == [nil, [@student]]
+    end
+
+    it "should return [group, [students from group]] if the student is in one of the candidate groups" do
+      @assignment = assignment_model(:group_category => "Category")
+      @course.enroll_student(@student1 = user_model)
+      @course.enroll_student(@student2 = user_model)
+      @course.enroll_student(@student3 = user_model)
+      @group1 = @course.groups.create(:name => "Group 1", :group_category => @assignment.group_category)
+      @group1.add_user(@student1)
+      @group1.add_user(@student2)
+      @group2 = @course.groups.create(:name => "Group 2", :group_category => @assignment.group_category)
+      @group2.add_user(@student3)
+
+      # have to reload because the enrolled students above don't show up in
+      # Course#students until the course has been reloaded
+      result = @assignment.reload.group_students(@student1)
+      result.first.should == @group1
+      result.last.map{ |u| u.id }.sort.should == [@student1, @student2].map{ |u| u.id }.sort
+    end
+  end
+
+  it "should maintain the deprecated group_category attribute" do
+    assignment = assignment_model
+    assignment.read_attribute(:group_category).should be_nil
+    assignment.group_category = assignment.context.group_categories.create(:name => "my category")
+    assignment.save
+    assignment.reload
+    assignment.read_attribute(:group_category).should eql("my category")
+    assignment.group_category = nil
+    assignment.save
+    assignment.reload
+    assignment.read_attribute(:group_category).should be_nil
+  end
+
+  it "should provide has_group_category?" do
+    assignment = assignment_model
+    assignment.has_group_category?.should be_false
+    assignment.group_category = assignment.context.group_categories.create(:name => "my category")
+    assignment.has_group_category?.should be_true
+    assignment.group_category = nil
+    assignment.has_group_category?.should be_false
+  end
 end
 
 def setup_assignment_with_group
   assignment_model(:group_category => "Study Groups")
-  @group = @a.context.groups.create!(:name => "Study Group 1", :category => "Study Groups")
+  @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
   @u1 = @a.context.enroll_user(User.create(:name => "user 1")).user
   @u2 = @a.context.enroll_user(User.create(:name => "user 2")).user
   @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user

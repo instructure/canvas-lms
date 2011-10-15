@@ -36,5 +36,25 @@ describe "/profile/profile" do
     render "profile/profile"
     response.should_not be_nil
   end
+
+  it "should not show the delete link for SIS pseudonyms" do
+    course_with_student
+    view_context
+
+    assigns[:user] = @user
+    assigns[:email_channels] = []
+    assigns[:other_channels] = []
+    assigns[:sms_channels] = []
+    assigns[:notification_categories] = Notification.dashboard_categories
+    assigns[:policies] = @user.notification_policies
+    default_pseudonym = assigns[:default_pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaa", :password_confirmation => "asdfaa")
+    sis_pseudonym = @user.pseudonyms.create!(:unique_id => 'sis_unique@example.com') { |p| p.sis_source_id = 'sis_unique@example.com'; p.sis_user_id = 'sis_id' }
+    assigns[:pseudonyms] = @user.pseudonyms
+    assigns[:password_pseudonyms] = []
+    render "profile/profile"
+    page = Nokogiri('<document>' + response.body + '</document>')
+    page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style'].should == ''
+    page.css("#pseudonym_#{sis_pseudonym.id} .delete_pseudonym_link").first['style'].should == 'display: none;'
+  end
 end
 

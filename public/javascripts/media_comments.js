@@ -618,7 +618,7 @@ I18n.scoped('media_comments', function(I18n) {
         width: 470,
         height: 300
       }).dialog('open');
-      $.ajaxJSON('/dashboard/comment_session', 'GET', {}, function(data) {
+      $.ajaxJSON('/api/v1/services/kaltura_session', 'POST', {}, function(data) {
         $div.data('ks', data.ks);
         $div.data('uid', data.uid);
       }, function(data) {

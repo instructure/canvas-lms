@@ -80,7 +80,8 @@ describe DiscussionTopicsController, :type => :integration do
   end
   
   it "should work with groups" do
-    group = Group.create!(:name=>"group1", :category=>"watup", :context => @course)
+    group_category = @course.group_categories.create(:name => 'watup')
+    group = Group.create!(:name=>"group1", :group_category=>group_category, :context => @course)
     gtopic = group.discussion_topics.create!(:title => "Group Topic 1", :message => "<p>content here</p>")
 
     att = Attachment.create!(:filename => 'content.txt', :display_name => "content.txt", :uploaded_data => StringIO.new('attachment content'), :folder => Folder.unfiled_folder(group), :context => group)
@@ -108,7 +109,7 @@ describe DiscussionTopicsController, :type => :integration do
                           "message"=>"<p>content here</p>",
                           "attachments"=>
                                   [{"content-type"=>"unknown/unknown",
-                                    "url"=>"http://www.example.com/groups/#{group.id}/files/#{att.id}/download",
+                                    "url"=>"http://www.example.com/files/#{att.id}/download?verifier=#{att.uuid}",
                                     "filename"=>"content.txt",
                                     "display_name"=>"content.txt"}],
                           "posted_at"=>gtopic.posted_at.as_json,
@@ -117,7 +118,8 @@ describe DiscussionTopicsController, :type => :integration do
   end
 
   it "should paginate and return proper pagination headers for groups" do
-    group = Group.create!(:name=>"group1", :category=>"watup", :context => @course)
+    group_category = @course.group_categories.create(:name => "watup")
+    group = Group.create!(:name=>"group1", :group_category=>group_category, :context => @course)
     7.times { |i| group.discussion_topics.create!(:title => i.to_s, :message => i.to_s) }
     group.discussion_topics.count.should == 7
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json?per_page=3",

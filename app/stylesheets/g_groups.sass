@@ -1,20 +1,26 @@
-li.group 
-  &.teacher_group
-    .name
-      padding-left: 20px
-      background: url(/images/assignment.png) no-repeat center left
-  .name
-    padding-left: 20px
-    background: url(/images/group.png) no-repeat center left
-  .link
-    font-size: 0.8em
-    padding-left: 5px
-  .members
-    margin-left: 30px
-    font-size: 0.6em
-    line-height: 0.6em
-    margin-bottom: 10px
-    margin-top: -3px
+.group_list
+  list-style: none
+  .group
+    .group_name
+      clear: left
+      position: relative
+      border-top: 1px dotted #aaa
+      padding-top: 5px
+      margin: 1em
+      .management
+        float: left
+        position: absolute
+        right: 0
+      .name
+        font-size: 1.5em
+        padding-left: 20px
+        background: url(/images/group.png) no-repeat center left
+    &.teacher_group
+      .name
+        background: url(/images/assignment.png) no-repeat center left
+    .group_info
+      margin-top: -3px
+      padding-left: 3em
 
 .left_side
   a.assign_students_link

@@ -1,9 +1,8 @@
-test:
-  domain: "localhost:3000"
-
 development:
   domain: "localhost:3000"
 
 production:
   domain: "canvas.example.com"
   # files_domain: "canvasfiles.example.com"
+
+# this config file is ignored in the test environment

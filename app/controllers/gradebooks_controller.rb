@@ -194,8 +194,13 @@ class GradebooksController < ApplicationController
       # which means less AR -> JSON serialization overhead which means less data transfer over the wire and faster request.
       # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
       render :json => @context.assignments.active.gradeable.scoped(
-        :select => ["id", "title", "due_at", "unlock_at", "lock_at", "points_possible", "min_score", "max_score", "mastery_score", "grading_type", "submission_types", "assignment_group_id", "grading_scheme_id", "grading_standard_id", "group_category", "grade_group_students_individually"].join(", ")
-      ) + groups_as_assignments
+        :select => ["id", "title", "due_at", "unlock_at", "lock_at",
+                    "points_possible", "min_score", "max_score",
+                    "mastery_score", "grading_type", "submission_types",
+                    "assignment_group_id", "grading_scheme_id",
+                    "grading_standard_id", "grade_group_students_individually",
+                    "(select name from group_categories where
+                       id=assignments.group_category_id) AS group_category"].join(", ")) + groups_as_assignments
     elsif params[:students]
       # you need to specify specifically which student fields you want returned to the gradebook via json here
       render :json => @context.students_visible_to(@current_user).to_json(:only => ["id", "name", "sortable_name", "short_name"])
@@ -313,7 +318,7 @@ class GradebooksController < ApplicationController
           log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
           render :action => "speed_grader"
         }
-        format.json { render :json => @assignment.speed_grader_json }
+        format.json { render :json => @assignment.speed_grader_json(@current_user) }
       end
     end
   end

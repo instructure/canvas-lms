@@ -17,7 +17,7 @@
 #
 
 class ContextController < ApplicationController
-  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :object_snippet, :discussion_replies]
+  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
@@ -54,7 +54,25 @@ class ContextController < ApplicationController
       render :text => t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
-  
+
+   def media_object_thumbnail
+     mo = MediaObject.by_media_id(params[:id]).first
+     width = params[:width]
+     height = params[:height]
+     type = (params[:type].presence || 2).to_i
+     config = Kaltura::ClientV3.config
+     if config
+       redirect_to Kaltura::ClientV3.new.thumbnail_url(mo.media_id,
+                                                       :width => width,
+                                                       :height => height,
+                                                       :type => type,
+                                                       :protocol => (request.ssl? ? "https" : "http")),
+                   :status => 301
+     else
+       render :text => t(:media_objects_not_configured, "Media Objects not configured")
+     end
+   end
+
   def kaltura_notifications
     request_params = request.request_parameters.to_a.sort_by{|k, v| k }.select{|k, v| k != 'sig' }
     logger.info('=== KALTURA NOTIFICATON ===')
@@ -284,7 +302,6 @@ class ContextController < ApplicationController
       end
       @secondary_users ||= {}
       @groups = @context.groups.active rescue []
-      @categories = @groups.map{|g| g.category}.uniq
     end
   end
   

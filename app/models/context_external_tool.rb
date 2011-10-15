@@ -2,7 +2,7 @@ class ContextExternalTool < ActiveRecord::Base
   include Workflow
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
-  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, :name, :description, :custom_fields
+  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, :name, :description, :custom_fields, :custom_fields_string
   validates_presence_of :name
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
@@ -36,11 +36,23 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
   
-  def custom_fields=(hash)
-    settings[:custom_fields] ||= {}
-    hash.each do |key, val|
-      settings[:custom_fields][key] = val if key.match(/\Acustom_/)
+  def custom_fields_string
+    (settings[:custom_fields] || {}).map{|key, val|
+      "#{key}=#{val}"
+    }.join("\n")
+  end
+  
+  def custom_fields_string=(str)
+    hash = {}
+    str.split(/\n/).each do |line|
+      key, val = line.split(/=/)
+      hash[key] = val if key.present? && val.present?
     end
+    settings[:custom_fields] = hash
+  end
+  
+  def custom_fields=(hash)
+    settings[:custom_fields] = hash if hash.is_a?(Hash)
   end
   
   def shared_secret=(val)
@@ -169,6 +181,8 @@ class ContextExternalTool < ActiveRecord::Base
   
   def self.serialization_excludes; [:shared_secret,:settings]; end
   
+  def self.serialization_methods; [:custom_fields_string]; end
+  
   def self.process_migration(data, migration)
     tools = data['external_tools'] ? data['external_tools']: []
     to_import = migration.to_import 'external_tools'
@@ -176,6 +190,18 @@ class ContextExternalTool < ActiveRecord::Base
       if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
         item = import_from_migration(tool, migration.context)
         migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
+      end
+    end
+  end
+  
+  def set_custom_fields(hash)
+    fields = settings[:custom_fields]
+    (fields || {}).each do |key, val|
+      key = key.gsub(/[^\w]/, '_').downcase
+      if key.match(/^custom_/)
+        hash[key] = val
+      else
+        hash["custom_#{key}"] = val
       end
     end
   end

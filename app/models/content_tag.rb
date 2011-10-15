@@ -34,7 +34,7 @@ class ContentTag < ActiveRecord::Base
   after_save :touch_context_module
   after_save :touch_context_if_learning_outcome
 
-  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url
+  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab
   
 
   set_policy do

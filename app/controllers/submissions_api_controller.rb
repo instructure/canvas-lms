@@ -21,8 +21,12 @@
 # API for accessing and updating submissions for an assignment. The submission
 # id in these URLs is the id of the student in the course, there is no separate
 # submission id exposed in these APIs.
+#
+# All submission actions can be performed with either the course id, or the
+# course section id. SIS ids can be used, prefixed by "sis_course_id:" or
+# "sis_section_id:" as described in the API documentation on SIS IDs.
 class SubmissionsApiController < ApplicationController
-  before_filter :require_context
+  before_filter :get_course_from_section, :require_context
 
   # @API
   #
@@ -33,7 +37,7 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submissions = @assignment.submissions.all(
-        :conditions => { :user_id => @context.student_ids })
+        :conditions => { :user_id => (@section || @context).student_ids })
 
       includes = Array(params[:include])
 
@@ -78,21 +82,32 @@ class SubmissionsApiController < ApplicationController
 
       includes = Array(params[:include])
 
-      assignment_ids = @context.assignments.active.all(:select => :id).map(&:id)
+      assignment_scope = @context.assignments.active
       requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
-      assignment_ids &= requested_assignment_ids if requested_assignment_ids.present?
+      if requested_assignment_ids.present?
+        assignment_scope = assignment_scope.scoped(:conditions => { 'assignments.id' => requested_assignment_ids })
+      end
+      assignments = assignment_scope.all
+      assignments_hash = {}
+      assignments.each { |a| assignments_hash[a.id] = a }
 
-      Api.assignment_ids_for_students_api = assignment_ids
-      scope = @context.student_enrollments.scoped(
-        :include => { :user => :submissions_for_given_assignments },
+      # sadly hackish -- see User.submissions_for_given_assignments
+      Api.assignment_ids_for_students_api = assignments.map(&:id)
+      sql_includes = { :user => [] }
+      sql_includes[:user] << :submissions_for_given_assignments unless assignments.empty?
+      scope = (@section || @context).student_enrollments.scoped(
+        :include => sql_includes,
         :conditions => { 'users.id' => student_ids })
 
       result = scope.map do |enrollment|
         student = enrollment.user
         hash = { :user_id => student.id, :submissions => [] }
         student.submissions_for_given_assignments.each do |submission|
+          # we've already got all the assignments loaded, so bypass AR loading
+          # here and just give the submission its assignment
+          submission.assignment = assignments_hash[submission.assignment_id]
           hash[:submissions] << submission_json(submission, submission.assignment, includes)
-        end
+        end unless assignments.empty?
         if includes.include?('total_scores') && params[:grouped].present?
           hash.merge!(
             :computed_final_score => enrollment.computed_final_score,
@@ -116,8 +131,8 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    params[:id] = map_user_ids([params[:id]]).first
-    @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
+    @user = get_user_considering_section(params[:id])
+    @submission = @assignment.submissions.find_or_initialize_by_user_id(@user.id) or raise ActiveRecord::RecordNotFound
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
       render :json => submission_json(@submission, @assignment, includes).to_json
@@ -180,7 +195,7 @@ class SubmissionsApiController < ApplicationController
   def update
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @user = api_find(@context.students_visible_to(@current_user), params[:id])
+      @user = get_user_considering_section(params[:id])
 
       submission = {}
       if params[:submission].is_a?(Hash)
@@ -245,11 +260,10 @@ class SubmissionsApiController < ApplicationController
           :include_root => false,
           :only => %w(author_id author_name created_at comment))
         if sc.media_comment?
-          sc_hash['media_comment'] = media_comment_json(sc.media_comment_id,
-                                                        sc.media_comment_type)
+          sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a, :assignment => assignment, :url_params => {:comment_id => sc.id, :id => submission.user_id})
+          attachment_json(a)
         end unless sc.attachments.blank?
         sc_hash
       end
@@ -265,11 +279,23 @@ class SubmissionsApiController < ApplicationController
   end
 
   SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission).freeze
+  SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
 
   def submission_attempt_json(attempt, assignment, version_idx = nil)
     json_fields = SUBMISSION_JSON_FIELDS
     if params[:response_fields]
       json_fields = json_fields & params[:response_fields]
+    end
+    if params[:exclude_response_fields]
+      json_fields -= params[:exclude_response_fields]
+    end
+
+    other_fields = SUBMISSION_OTHER_FIELDS
+    if params[:response_fields]
+      other_fields = other_fields & params[:response_fields]
+    end
+    if params[:exclude_response_fields]
+      other_fields -= params[:exclude_response_fields]
     end
 
     hash = attempt.as_json(
@@ -281,22 +307,31 @@ class SubmissionsApiController < ApplicationController
       'version' => version_idx)
 
     unless attempt.media_comment_id.blank?
-      hash['media_comment'] = media_comment_json(attempt.media_comment_id,
-                                                 attempt.media_comment_type)
+      hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
     end
-    attachments = attempt.versioned_attachments.dup
-    attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
-    hash['attachments'] = attachments.map do |attachment|
-      attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
-    end.compact unless attachments.blank?
+    
+    if attempt.turnitin_data && attempt.grants_right?(@current_user, :view_turnitin_report)
+      turnitin_hash = attempt.turnitin_data.dup
+      turnitin_hash.delete(:last_processed_attempt)
+      hash['turnitin_data'] = turnitin_hash
+    end
+    
+    if other_fields.include?('attachments')
+      attachments = attempt.versioned_attachments.dup
+      attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
+      hash['attachments'] = attachments.map do |attachment|
+        attachment_json(attachment)
+      end.compact unless attachments.blank?
+    end
 
     # include the discussion topic entries
-    if assignment.submission_types =~ /discussion_topic/ &&
+    if other_fields.include?('discussion_entries') &&
+           assignment.submission_types =~ /discussion_topic/ &&
            assignment.discussion_topic
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
-      if assignment.group_category
+      if assignment.has_group_category?
         entries = assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
@@ -308,7 +343,7 @@ class SubmissionsApiController < ApplicationController
         )
         attachments = (entry.attachments.dup + [entry.attachment]).compact
         ehash['attachments'] = attachments.map do |attachment|
-          attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
+          attachment_json(attachment)
         end.compact unless attachments.blank?
         ehash
       end
@@ -317,18 +352,22 @@ class SubmissionsApiController < ApplicationController
     hash
   end
 
-  # a media comment looks just like an attachment to the API
-  def media_comment_json(media_comment_id, media_comment_type)
-    {
-      'content-type' => "#{media_comment_type}/mp4",
-      'url' => course_media_download_url(:entryId => media_comment_id,
-                                         :type => "mp4",
-                                         :redirect => "1"),
-    }
-  end
-
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User).compact
+    Api.map_ids(user_ids, User).compact unless user_ids.blank?
   end
 
+  def get_course_from_section
+    if params[:section_id]
+      @section = api_find(CourseSection, params.delete(:section_id))
+      params[:course_id] = @section.course_id
+    end
+  end
+
+  def get_user_considering_section(user_id)
+    scope = @context.students_visible_to(@current_user)
+    if @section
+      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => @section.id })
+    end
+    api_find(scope, user_id)
+  end
 end

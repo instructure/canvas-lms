@@ -17,7 +17,7 @@ $('#form').disableWhileLoading(promise, {
 I18n.scoped('instructure', function(I18n) {
   $.fn.disableWhileLoading = function(deferred, options) {
     return this.each(function() {
-      var opts = $.extend(true, { opacity: 0.5, buttons: ['button[type="submit"]'] }, options),
+      var opts = $.extend(true, {}, $.fn.disableWhileLoading.defaults, options),
           $this            = $(this),
           dataKey          = 'disabled_' + $.guid++,
           $disabledArea    = $this.add($this.next('.ui-dialog-buttonpane')),
@@ -33,9 +33,12 @@ I18n.scoped('instructure', function(I18n) {
         if ($.isArray(opts.buttons)){ selector = text, text = null }
         $disabledArea.find(selector).text(function(i, currentText) {
           $(this).data(dataKey, currentText);
-          // if nothing was passed in as the text value or if they pass an array for opts.buttons,
-          // just use a default loading... text.
-          return text || I18n.t('loading', 'Loading...');
+          return text || 
+                 $(this).data('textWhileLoading') || 
+                 ( $(this).is('.ui-button-text') && $(this).closest('.ui-button').data('textWhileLoading') ) || 
+                 // if nothing was passed in as the text value or if they pass an array for opts.buttons,
+                 // just use a default loading... text.
+                 I18n.t('loading', 'Loading...');
         });
       });
     
@@ -49,5 +52,9 @@ I18n.scoped('instructure', function(I18n) {
       });
     
     });
+  };
+  $.fn.disableWhileLoading.defaults = { 
+    opacity: 0.5, 
+    buttons: ['button[type="submit"], .ui-dialog-buttonpane .ui-button .ui-button-text'] 
   };
 });

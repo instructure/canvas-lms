@@ -95,6 +95,7 @@ $(document).ready(function() {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
         'item[id]': $("#external_urls_select .tools .tool.selected").data('id'),
+        'item[new_tab]': $("#external_tool_create_new_tab").attr('checked') ? '1' : '0',
         'item[indent]': $("#content_tag_indent").val()
       }
       item_data['item[url]'] = $("#external_tool_create_url").val();

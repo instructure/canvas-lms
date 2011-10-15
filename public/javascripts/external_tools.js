@@ -8,6 +8,7 @@ $(document).ready(function() {
       url: "",
       description: "",
       name: "",
+      custom_fields_string: "",
       privacy: "anonymous",
       consumer_key: "",
       shared_secret: ""
@@ -16,7 +17,7 @@ $(document).ready(function() {
       autoOpen: false,
       title: I18n.t('titles.edit_external_tool', "Edit External Tool"),
       width: 600,
-      height: 400
+      height: 420
     }).dialog('open');
     $dialog.find(".shared_secret_note").hide();
     $dialog.find("form")
@@ -57,7 +58,7 @@ $(document).ready(function() {
   $("#external_tools").delegate('.edit_tool_link', 'click', function(event) {
     event.preventDefault();
     var $tool = $(this).parents(".external_tool");
-    var data = $tool.getTemplateData({textValues: ['name', 'description', 'domain', 'url', 'consumer_key'], dataValues: ['id', 'workflow_state']});
+    var data = $tool.getTemplateData({textValues: ['name', 'description', 'domain', 'url', 'consumer_key', 'custom_fields_string'], dataValues: ['id', 'workflow_state']});
     
     data.privacy_level = data.workflow_state;
     $("#external_tool_match_by").val(data.url ? 'url' : 'domain').change();
@@ -70,7 +71,7 @@ $(document).ready(function() {
       autoOpen: false,
       title: I18n.t('titles.edit_external_tool', "Edit External Tool"),
       width: 600,
-      height: 400
+      height: 420
     }).dialog('open');
   }).delegate('.delete_tool_link', 'click', function(event) {
     event.preventDefault();

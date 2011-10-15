@@ -27,13 +27,24 @@
 class ActiveRecord::Base
   def self.skip_callback(callback, &block)
     method = instance_method(callback)
-    remove_method(callback)
+    begin
+      remove_method(callback)
+      should_redefine_original_callback = true
+    rescue NameError => e
+      raise e unless "#{e}" =~ /method `#{Regexp.escape callback.to_s}' not defined in #{Regexp.escape self.name}/
+      should_redefine_original_callback = false
+    end
     define_method(callback){ true }
     begin
       yield
     ensure
       remove_method(callback)
-      define_method(callback, method)
+      define_method(callback, method) if should_redefine_original_callback
     end
+  end
+
+  def self.skip_callbacks(*callbacks, &block)
+    return block.call if callbacks.size == 0
+    skip_callback(callbacks[0]) { skip_callbacks(*callbacks[1..-1], &block) }
   end
 end

@@ -308,6 +308,9 @@ jQuery(function($){
       $("#assignment_group_category").val("");
     }
   }).change();
+  $("#assignment_turnitin_enabled").change(function() {
+    $("#assignment_turnitin_settings").showIf($(this).attr('checked'));
+  }).change();
   $("#assignment_peer_reviews").change(function() {
     $("#assignment_peer_reviews_options").showIf($(this).attr('checked'));
     if(!$(this).attr('checked')) {
@@ -319,11 +322,11 @@ jQuery(function($){
     var $select = $(this);
     if($(this).val() == "new" && addGroupCategory) {
       addGroupCategory(function(data) {
-        var category = $(this).data('category_name') || "Category";
+        var group_category = data[0].group_category;
         var $option = $(document.createElement('option'));
-        $option.text(category).val(category);//.toLowerCase().replace(/\s/g, "_"));
+        $option.text(group_category.name).val(group_category.id);
         $select.find("option:last").before($option);
-        $select.val(category.toLowerCase().replace(/\s/g, "_"));
+        $select.val(group_category.id);
       });
     }
   });

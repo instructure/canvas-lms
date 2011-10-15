@@ -35,6 +35,7 @@ h2 {
   border-bottom: 1px #aaa solid;
   padding: 0 0 3px;
   font-size: 1.4em;
+  margin-top: 30px;
 }
 
 #sidebar {
@@ -101,6 +102,19 @@ h3 .defined-in {
 }
 
 .method_details h4 {
+}
+
+table.sis_csv {
+	border: 2px solid gray;
+	border-collapse: collapse;
+}
+table.sis_csv th, table.sis_csv td {
+    padding: 4px;
+    border: 1px inset gray;
+    border-spacing: 1px;
+}
+table.sis_csv th {
+    background-color: #DDD;
 }
 
 /* Footer */

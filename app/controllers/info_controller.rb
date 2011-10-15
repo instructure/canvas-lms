@@ -35,9 +35,9 @@ class InfoController < ApplicationController
     url = Rails.cache.fetch(['avatar_img', params[:user_id]].cache_key, :expires_in => 30.minutes) do
       user = User.find_by_id(params[:user_id]) if params[:user_id].present?
       if user && service_enabled?(:avatars)
-        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars])
+        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback])
       end
-      url ||= '/images/no_pic.gif'
+      url ||= params[:fallback] || '/images/no_pic.gif'
     end
     redirect_to url
   end

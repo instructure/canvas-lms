@@ -204,6 +204,17 @@ describe PseudonymsController do
       assert_status(400)
       @pseudonym.should be_active
     end
+
+    it "should not destroy if it's SIS and the user doesn't have permission" do
+      user_with_pseudonym(:active_all => true)
+      user_session(@user, @pseudonym)
+      @pseudonym.sis_source_id = 'user'
+      @pseudonym.sis_user_id = 'bob'
+      @pseudonym.save!
+      delete 'destroy', :user_id => @user.id, :id => @pseudonym.id
+      assert_status(400)
+      @pseudonym.should be_active
+    end
     
     it "should destroy if for the current user with more than one pseudonym" do
       user_with_pseudonym(:active_all => true)
@@ -221,10 +232,11 @@ describe PseudonymsController do
       user_session(@user, @pseudonym)
       @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       @p2.sis_source_id = 'test'
+      @p2.sis_user_id = 'another_one@test.com'
       @p2.save!
       @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
       delete 'destroy', :user_id => @user.id, :id => @p2.id
-      assert_status(500)
+      assert_status(401)
       @pseudonym.should be_active
       @p2.should be_active
     end
@@ -236,6 +248,7 @@ describe PseudonymsController do
       user_session(@user, @pseudonym)
       @p2 = @user.pseudonyms.build(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       @p2.sis_source_id = 'test'
+      @p2.sis_user_id = 'another_one@test.com'
       @p2.save!
       @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
       delete 'destroy', :user_id => @user.id, :id => @p2.id

@@ -83,7 +83,7 @@ class DiscussionEntry < ActiveRecord::Base
   
   on_create_send_to_streams do
     if self.parent_id == 0
-      recent_entries = DiscussionEntry.active.find(:all, :select => ['user_id'], :conditions => ['discussion_entries.discussion_topic_id=? AND discussion_entries.created_at > ?', self.discussion_topic_id, 2.weeks.ago])
+      recent_entries = DiscussionEntry.active.find(:all, :select => 'user_id', :conditions => ['discussion_entries.discussion_topic_id=? AND discussion_entries.created_at > ?', self.discussion_topic_id, 2.weeks.ago])
       # If the topic has been going for more than two weeks and it suddenly
       # got "popular" again, move it back up in user streams
       if !self.discussion_topic.for_assignment? && self.created_at && self.created_at > self.discussion_topic.created_at + 2.weeks && recent_entries.select{|e| e.created_at && e.created_at > 24.hours.ago }.length > 10
@@ -225,7 +225,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
   
   named_scope :for_user, lambda{|user|
-    {:conditions => ['discussion_entries.user_id = ?', (user.is_a?(User) ? user.id : user)], :order => ['discussion_entries.created_at']}
+    {:conditions => ['discussion_entries.user_id = ?', (user.is_a?(User) ? user.id : user)], :order => 'discussion_entries.created_at'}
   }
   named_scope :after, lambda{|date|
     {:conditions => ['created_at > ?', date] }

@@ -19,7 +19,7 @@ body
       margin: 0
       border: 0 none
       background-color: transparent
-      +box-shadow(none)
+      box-shadow: none
     #content
       padding-top: 0
       
@@ -35,7 +35,7 @@ body
 #main
   position: relative
   z-index: 10
-  background-color = !main_background_color  
+  background-color: $main_background_color  
   border-left: 1px solid #ddd
   border-top: 0px solid #ddd
   border-bottom: 1px solid #ccc
@@ -52,15 +52,15 @@ body.padless-content #content,#content.padless
   
 body.with-left-side
   #footer
-    margin-left = !left_side_width
+    margin-left: $left_side_width
   #wrapper
     margin-left: 0
   #left-side
     display: block
   #main
-    margin-left = !left_side_width
+    margin-left: $left_side_width
 body.with-right-side.with-left-side
-  min-width: $right_side_width + !left_side_width + !min_main_width
+  min-width: $right_side_width + $left_side_width + $min_main_width
 body
   &.with-right-side
     #right-side-wrapper
@@ -86,7 +86,7 @@ body
 #breadcrumbs
   border-bottom: 1px solid #ccc
   background-color: #F9F9F9
-  +box-shadow(#F2F2F2, 0px, 0px, 36px)
+  box-shadow: #F2F2F2 0 0 36px
   ul
     +reset-list
     +clearfix

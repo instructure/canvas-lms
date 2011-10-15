@@ -259,14 +259,19 @@ describe FilesController do
       old_file.display_name = 'holla'
       old_file.save
       old_file.destroy
-      
+
+      get 'show', :course_id => @course.id, :id => old_file.id
+      response.should be_redirect
+      flash[:notice].should match(/has been deleted/)
+      URI.parse(response['Location']).path.should == "/courses/#{@course.id}/files"
+
       new_file = course_file
       new_file.display_name = 'holla'
       new_file.save
-      
+
       get 'show', :course_id => @course.id, :id => old_file.id
-      response.should be_redirect
-      response.redirected_to['id'].should == new_file.id
+      response.should be_success
+      assigns(:attachment).should == new_file
     end
 
   end

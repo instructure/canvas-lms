@@ -90,6 +90,25 @@ describe GradebooksController do
     end
   end
 
+  describe "GET 'show'" do
+    describe "gradebook_init_json" do
+      it "should include group_category in rendered json for assignments" do
+        course_with_teacher_logged_in(:active_all => true)
+        group_category1 = @course.group_categories.create(:name => 'Category 1')
+        group_category2 = @course.group_categories.create(:name => 'Category 2')
+        assignment1 = @course.assignments.create(:title => "Assignment 1", :group_category => group_category1)
+        assignment2 = @course.assignments.create(:title => "Assignment 2", :group_category => group_category2)
+        get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'json'
+        response.should be_success
+        data = JSON.parse(response.body) rescue nil
+        data.should_not be_nil
+        data.size.should == 3 # 2 assignments + a total
+        data.first(2).sort_by{ |a| a['assignment']['title'] }.map{ |a| a['assignment']['group_category'] }.
+          should == [assignment1, assignment2].map{ |a| a.group_category.name }
+      end
+    end
+  end
+
   describe "POST 'update_submission'" do
     
     it "should have a route for update_submission" do

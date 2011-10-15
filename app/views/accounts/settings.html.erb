@@ -156,46 +156,52 @@
 
         <fieldset>
           <legend><%= t(:features_title, "Features") %></legend>
-          <% if current_user_is_site_admin? %>
-            <% f.fields_for :settings do |settings| %>
-              <div>
-                <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
-                <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>
-              </div>
-              <% if @account.root_account? && !@account.site_admin?%>
+          <% f.fields_for :settings do |settings| %>
+            <% if @account.root_account? %>
+              <% if current_user_is_site_admin? %>
                 <div>
-                  <%= f.check_box :enable_user_notes, :checked => @account.enable_user_notes %>
-                  <%= f.label :enable_user_notes, :en => "Faculty Journal" %>
+                  <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
+                  <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>
                 </div>
+                <% unless @account.site_admin? %>
+                  <div>
+                    <%= f.check_box :enable_user_notes, :checked => @account.enable_user_notes %>
+                    <%= f.label :enable_user_notes, :en => "Faculty Journal" %>
+                  </div>
+                  <div>
+                    <%= settings.check_box :enable_eportfolios, :checked => @account.settings[:enable_eportfolios] != false %>
+                    <%= settings.label :enable_eportfolios, :en => "ePortfolios" %>
+                  </div>
+                  <div>
+                    <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
+                    <%= f.label :allow_sis_import, :en => "SIS imports" %>
+                  </div>
+                  <div>
+                    <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
+                    <%= settings.label :enable_alerts, :en => "Alerts" %>
+                  </div>
+                <% end %>
                 <div>
-                  <%= settings.check_box :enable_eportfolios, :checked => @account.settings[:enable_eportfolios] != false %>
-                  <%= settings.label :enable_eportfolios, :en => "ePortfolios" %>
-                </div>
-                <div>
-                  <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
-                  <%= f.label :allow_sis_import, :en => "SIS imports" %>
-                </div>
-                <div>
-                  <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
-                  <%= settings.label :enable_alerts, :en => "Alerts" %>
+                  <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
+                  <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
                 </div>
               <% end %>
               <div>
-                <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
-                <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
+                <%= settings.check_box :users_can_edit_name, :checked => @account.settings[:users_can_edit_name] != false %>
+                <%= settings.label :users_can_edit_name, :en => "User's can edit display name" %>
               </div>
             <% end %>
+            <% unless @account.site_admin? %>
+              <div>
+                <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
+                <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
+              </div>
+              <div>
+                <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
+                <label for="turnitin"><%= t 'labels.turnitin', 'Turnitin' %></label>
+              </div>
+             <% end %>
           <% end %>
-          <% unless @account.site_admin? %>
-            <div>
-              <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
-              <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
-            </div>
-            <div>
-              <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
-              <label for="turnitin"><%= t 'labels.turnitin', 'Turnitin' %></label>
-            </div>
-           <% end %>
         </fieldset>
 
         <fieldset id="account_settings_global_includes_settings" style="<%= hidden unless @account.settings[:global_includes] %>">

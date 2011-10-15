@@ -1,5 +1,5 @@
 <% 
-  jammit_js :speed_grader
+  jammit_js :jquery_ui_menu, :speed_grader
   jammit_css :speed_grader
   @show_left_side = false 
   @can_edit_anything = !@context.completed?
@@ -21,8 +21,9 @@
       </div>
     </div>
     <div class="right">
+      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class="label"><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
-      <% if Setting.get_cached("show_feedback_link", "false") == "true" %>| <a href="#" id="feedback_link"><%= t('links.feedback', "Feedback") %></a><% end %>
+      <% if Setting.get_cached("show_feedback_link", "false") == "true" %>| <a href="#" id="feedback_link"><%= t('links.help', "Help") %></a><% end %>
       <div>
         <span id="x_of_x_graded"><%= t(:portion_graded, "%{x} / %{y} Graded", :x => raw('<span>0</span>'), :y => raw("<span>#{@assignment.context.students.length}</span>")) %></span>
         <span id='average_score_wrapper' style='display:none; padding-left: 10px;'><%= before_label(:average, "Avg") %> <span id='average_score'>0.0</span></span>
@@ -172,7 +173,7 @@
                 <div id="media_media_recording" style="display: none;">
                   <div class="media_recording"></div>
                 </div>
-                <% if @assignment.group_category %>
+                <% if @assignment.has_group_category? %>
                   <div id="group_comment_wrapper">
                     <input type="checkbox" name="group_comment" id="submission_group_comment"/>
                     <label for="submission_group_comment"><%= t('labels.group_comment', "Send Comment to the Whole Group") %></label>
@@ -243,6 +244,7 @@
     <button type="submit" class="button submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
   </p>
 </form>
+<%= render :partial => "shared/mute_dialog" %>
 <ul id="section-menu" class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open" style="display:none;" role="listbox" aria-activedescendant="section-menu-link">
   <li role="presentation" class="ui-selectmenu-item">
     <a href="#" tabindex="-1" role="option" aria-selected="true" id="section-menu-link">

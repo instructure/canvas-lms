@@ -1,13 +1,13 @@
 <% 
 # TODO: I am assuming that any new submission or grading will touch the course (or the user) so that will make this cache work, 
 # if not we need to cache smarter. -RS
+# BTW if you add a new thing here, it probably needs adding to the /users/self/todo API
 cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do 
  show_context = !contexts || contexts.length > 1
  max_to_show = 16
  if @current_user && [
     @current_user.assignments_needing_submitting(:contexts => contexts, :limit => max_to_show), 
     @current_user.assignments_needing_grading(:contexts => contexts)[0,max_to_show], 
-    (@assessments_needing_completing || []) 
   ].any?{ |set| set.length > 0} %>
   <h2><%= t('headings.to_do', %{To Do}) %></h2>
   <% cnt = 0 %>
@@ -36,7 +36,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
             <b><%= t 'headings.grade', 'Grade %{assignment}', :assignment => assignment.title %></b>
             <em><%= t 'need_grading_count', { :one => '1 needs grading', :other => '%{count} need grading' }, :count => assignment.needs_grading_count %></em>
           </a>
-          <a class='disable_item_link grading' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>" href="<%= dashboard_ignore_item_url(assignment.asset_string, 'grading') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
+          <a class='disable_item_link grading' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>" href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'grading') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
         </li>
       <% end %>
     <% end %>
@@ -61,24 +61,9 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
             <b><%= assignment.submission_action_string %> <%= assignment.title %></b>
             <em><%= t 'due_at', 'Due %{date}', :date => datetime_string(assignment.due_at) %></em>
           </a>
-          <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="<%= dashboard_ignore_item_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
+          <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
         </li>
       <% end %>
-    <% end %>
-    <% (@assessments_needing_completing || []).each do |a| %>
-      <% cnt += 1 %>
-      <% if cnt <= 15 %>
-        <li style="<%= hidden if cnt > 5 %>">
-          <a class='item icon-clock' href="<%= context_url(a.submission.assignment.context_id, :context_assignment_submission_url, a.submission.assignment_id, a.submission.user_id) %>">
-            <%= t 'links.review_assignment', '*Review %{assignment}* For **%{user}**', :assignment => a.submission.assignment.title, :user => (a.user.try_rescue(:name) || "Unknown User"), :wrapper => { '*' => '<b>\1</b>', '**' => '<em>\1</em>' } %>
-          </a>
-        </li>
-      <% end %>
-    <% end %>
-    <% if cnt > 5 %>
-      <li>
-        <a href="#" class="more_link"><%= t 'links.show_more', '%{count} more...', :count => [10, cnt - 5].min %></a>
-      </li>
     <% end %>
   </ul>
   <% end %>

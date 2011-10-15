@@ -6,7 +6,7 @@ $cell_height: 33px
 .slick-sort-indicator
   position: absolute
   bottom: 4px
-  left: 4px
+  left: 0px
 #gradebook_grid
   .slick-cell
     border: 0
@@ -66,7 +66,7 @@ $cell_height: 33px
     color: #2f2a34
     text-shadow: #fff 0 0 1px
 
-  .assignment-name
+  a.assignment-name
     font-weight: normal
     color: #1b7ecf
     text-shadow: #fff 0 0 1px
@@ -82,6 +82,25 @@ $cell_height: 33px
     font-size: 10px
     +opacity(0.5)
     color: #2f2a34
+    margin:
+      left: 10px
+      right: 14px
+
+  .gradebook-header-drop
+    background: url('/images/jqueryui/gradebook-header-drop.png') no-repeat top left
+    width: 14px
+    height: 14px
+    position: absolute
+    bottom: 3px
+    right: 3px
+    text-indent: 999px
+    +opacity(0)
+    &:hover, &.ui-menu-trigger-menu-is-open
+      background-position: bottom left
+      +opacity(1)
+  &:hover .gradebook-header-drop
+    +opacity(1)
+    
 
 
 #sort_rows_dialog
@@ -197,10 +216,10 @@ $cell_height: 33px
     width: 17px
     height: 17px
 
-  .gradebook-cell.with-comments &
+  .slick-cell.with-comments &
     visibility: visible
-  .gradebook-cell.focus &,
-  .gradebook-cell.hover &
+  .slick-cell.focus &,
+  .slick-cell.hover &
     visibility: visible
     background-position: 100% -41px
     width: 25px

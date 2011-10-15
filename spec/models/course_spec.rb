@@ -86,13 +86,16 @@ describe Course do
     @course.assignments.create!
     @course.wiki.wiki_page.save!
     @course.sis_source_id = 'sis_id'
+    @course.stuck_sis_fields = [].to_set
     @course.save!
     @course.course_sections.should_not be_empty
     @course.students.should == [@student]
+    @course.stuck_sis_fields.should == [].to_set
 
     @new_course = @course.reset_content
 
     @course.reload
+    @course.stuck_sis_fields.should == [].to_set
     @course.course_sections.should be_empty
     @course.students.should be_empty
     @course.sis_source_id.should be_nil
@@ -105,10 +108,59 @@ describe Course do
     @new_course.assignments.should be_empty
     @new_course.sis_source_id.should == 'sis_id'
     @new_course.syllabus_body.should be_blank
+    @new_course.stuck_sis_fields.should == [].to_set
 
     @course.uuid.should_not == @new_course.uuid
     @course.wiki_id.should_not == @new_course.wiki_id
     @course.replacement_course_id.should == @new_course.id
+  end
+
+  it "should preserve sticky fields when resetting content" do
+    course_with_student
+    @course.sis_source_id = 'sis_id'
+    @course.course_code = "cid"
+    @course.save!
+    @course.stuck_sis_fields = [].to_set
+    @course.name = "course_name"
+    @course.stuck_sis_fields.should == [:name].to_set
+    @course.save!
+    @course.stuck_sis_fields.should == [:name].to_set
+
+    @new_course = @course.reset_content
+
+    @course.reload
+    @course.stuck_sis_fields.should == [:name].to_set
+    @course.sis_source_id.should be_nil
+
+    @new_course.reload
+    @new_course.sis_source_id.should == 'sis_id'
+    @new_course.stuck_sis_fields.should == [:name].to_set
+
+    @course.uuid.should_not == @new_course.uuid
+    @course.replacement_course_id.should == @new_course.id
+  end
+
+  it "group_categories should not include deleted categories" do
+    course = course_model
+    course.group_categories.count.should == 0
+    category1 = course.group_categories.create(:name => 'category 1')
+    category2 = course.group_categories.create(:name => 'category 2')
+    course.group_categories.count.should == 2
+    category1.destroy
+    course.reload
+    course.group_categories.count.should == 1
+    course.group_categories.to_a.should == [category2]
+  end
+
+  it "all_group_categories should include deleted categories" do
+    course = course_model
+    course.all_group_categories.count.should == 0
+    category1 = course.group_categories.create(:name => 'category 1')
+    category2 = course.group_categories.create(:name => 'category 2')
+    course.all_group_categories.count.should == 2
+    category1.destroy
+    course.reload
+    course.all_group_categories.count.should == 2
   end
 end
 
@@ -247,6 +299,30 @@ describe Course, "gradebook_to_csv" do
     rows[2][-2].should == "100"
   end
   
+  it "should order assignments by due date" do
+    course_with_student(:active_all => true)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 1", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 1.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 2.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 3", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 3.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 5", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 4.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 4", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 5.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 6", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 7.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 7", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 6.days)
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+
+    csv = @course.gradebook_to_csv
+    csv.should_not be_nil
+    rows = FasterCSV.parse(csv)
+    rows.length.should equal(3)
+    assignments = []
+    rows[0].each do |column|
+      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Some Assignment/
+    end
+    assignments.should == ["Some Assignment 1", "Some Assignment 2", "Some Assignment 3", "Some Assignment 5", "Some Assignment 4", "Some Assignment 7", "Some Assignment 6"]
+  end
+
   it "should generate csv with final grade if enabled" do
     course_with_student(:active_all => true)
     @course.grading_standard_id = 0
@@ -623,7 +699,7 @@ describe Course, "backup" do
       html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
       html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
     end
-    
+
     it "should bring over linked files if not already brought over" do
       course_model
       attachment_model
@@ -631,6 +707,30 @@ describe Course, "backup" do
       @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
       html = @old_topic.message
       html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
+      @old_course = @course
+      @new_course = course_model
+      html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
+      @old_attachment.reload
+      @old_attachment.cloned_item_id.should_not be_nil
+      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
+      @new_attachment.should_not be_nil
+      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
+    end
+
+    it "should bring over linked files that have been replaced" do
+      course_model
+      attachment_model
+      @orig_attachment = @attachment
+
+      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
+      html = @old_topic.message
+      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
+
+      @orig_attachment.destroy
+      attachment_model
+      @old_attachment = @attachment
+      @old_attachment.handle_duplicates(:overwrite)
+
       @old_course = @course
       @new_course = course_model
       html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
@@ -682,6 +782,33 @@ describe Course, "backup" do
     end
   end
   
+  it "should not cross learning outcomes with learning outcome groups in the association" do
+    # set up two courses with two outcomes
+    course = course_model
+    default_group = LearningOutcomeGroup.default_for(course)
+    outcome = course.created_learning_outcomes.create!
+    default_group.add_item(outcome)
+
+    other_course = course_model
+    other_default_group = LearningOutcomeGroup.default_for(other_course)
+    other_outcome = other_course.created_learning_outcomes.create!
+    other_default_group.add_item(other_outcome)
+
+    # add another group to the first course, which "coincidentally" has the
+    # same id as the second course's outcome
+    other_group = course.learning_outcome_groups.build
+    other_group.id = other_outcome.id
+    other_group.save!
+    default_group.add_item(other_group)
+
+    # reload and check
+    course.reload
+    other_course.reload
+    course.learning_outcomes.should be_include(outcome)
+    course.learning_outcomes.should_not be_include(other_outcome)
+    other_course.learning_outcomes.should be_include(other_outcome)
+  end
+
   it "should copy learning outcomes into the new course" do
     old_course = course_model
     lo = old_course.learning_outcomes.new
@@ -1113,5 +1240,63 @@ describe Course, "inherited_assessment_question_banks" do
     banks.find_by_id(bank.id).should eql bank
     banks.find_by_id(account_bank.id).should eql account_bank
     banks.find_by_id(root_bank.id).should eql root_bank
+  end
+end
+
+describe Course, "section_visibility" do
+  before do
+    @course = course(:active_course => true)
+    @course.default_section
+    @other_section = @course.course_sections.create
+
+    @teacher = User.create
+    @course.enroll_teacher(@teacher)
+
+    @ta = User.create
+    @course.enroll_user(@ta, "TaEnrollment", :limit_priveleges_to_course_section => true)
+
+    @student1 = User.create
+    @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
+
+    @student2 = User.create
+    @course.enroll_user(@student2, "StudentEnrollment", :section => @other_section, :enrollment_state => 'active')
+
+    @observer = User.create
+    @course.enroll_user(@observer, "ObserverEnrollment")
+  end
+
+  context "full" do
+    it "should return students from all sections" do
+      @course.students_visible_to(@teacher).sort_by(&:id).should eql [@student1, @student2]
+      @course.students_visible_to(@student1).sort_by(&:id).should eql [@student1, @student2]
+    end
+
+    it "should return all sections if a teacher" do
+      @course.sections_visible_to(@teacher).sort_by(&:id).should eql [@course.default_section, @other_section]
+    end
+
+    it "should return user's sections if a student" do
+      @course.sections_visible_to(@student1).should eql [@course.default_section]
+    end
+  end
+
+  context "sections" do
+    it "should return students from user's sections" do
+      @course.students_visible_to(@ta).should eql [@student1]
+    end
+
+    it "should return user's sections" do
+      @course.sections_visible_to(@ta).should eql [@course.default_section]
+    end
+  end
+
+  context "restricted" do
+    it "should return no students" do
+      @course.students_visible_to(@observer).should eql []
+    end
+
+    it "should return no sections" do
+      @course.sections_visible_to(@observer).should eql []
+    end
   end
 end

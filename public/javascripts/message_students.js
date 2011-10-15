@@ -16,7 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 I18n.scoped("message_students", function(I18n) {
-(function() {
   var $message_students_dialog = $("#message_students_dialog");
   var currentSettings = {};
   window.messageStudents = function(settings) {
@@ -59,7 +58,7 @@ I18n.scoped("message_students", function(I18n) {
     $message_students_dialog.find("select").change();
     $message_students_dialog.dialog('close').dialog({
       width: 600,
-      height: 400
+      modal: true
     }).dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
   };
   $(document).ready(function() {
@@ -127,5 +126,4 @@ I18n.scoped("message_students", function(I18n) {
       }
     });
   });
-})();
 });

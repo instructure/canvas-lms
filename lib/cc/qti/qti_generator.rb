@@ -128,7 +128,7 @@ module CC
                         "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
         ) do |q_node|
           q_node.title quiz.title
-          q_node.description @html_exporter.html_content(quiz.description || '', @course, @manifest.exporter.user)
+          q_node.description @html_exporter.html_content(quiz.description || '')
           q_node.lock_at ims_datetime(quiz.lock_at) if quiz.lock_at
           q_node.unlock_at ims_datetime(quiz.unlock_at) if quiz.unlock_at
           q_node.due_at ims_datetime(quiz.due_at) if quiz.due_at

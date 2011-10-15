@@ -24,7 +24,7 @@ describe UsersController, :type => :integration do
   end
 
   it "should check for auth" do
-    get("/api/v1/users/activity_stream")
+    get("/api/v1/users/self/activity_stream")
     response.status.should == '401 Unauthorized'
     JSON.parse(response.body).should == { 'status' => 'unauthorized' }
 
@@ -110,7 +110,6 @@ describe UsersController, :type => :integration do
       'id' => StreamItem.last.id,
       'conversation_id' => @conversation.id,
       'type' => 'Conversation',
-      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'title' => nil,
@@ -132,7 +131,6 @@ describe UsersController, :type => :integration do
       'title' => "value for subject",
       'message' => 'value for body',
       'type' => 'Message',
-      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
@@ -157,7 +155,6 @@ describe UsersController, :type => :integration do
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
-      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
@@ -179,6 +176,8 @@ describe UsersController, :type => :integration do
         'user_name' => 'User',
         'user_id' => @user.id,
       },],
+
+      'context_type' => 'Course',
       'course_id' => @course.id,
     }]
   end
@@ -199,7 +198,6 @@ describe UsersController, :type => :integration do
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
-      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
@@ -221,6 +219,8 @@ describe UsersController, :type => :integration do
         'user_name' => 'User',
         'user_id' => @user.id,
       },],
+
+      'context_type' => 'Course',
       'course_id' => @course.id,
     }]
   end
@@ -239,7 +239,6 @@ describe UsersController, :type => :integration do
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
-      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
@@ -250,7 +249,8 @@ describe UsersController, :type => :integration do
         'id' => @assignment.id,
         'points_possible' => 14.2,
       },
-      
+
+      'context_type' => 'Course',
       'course_id' => @course.id,
     }]
   end
@@ -277,7 +277,6 @@ describe UsersController, :type => :integration do
       'title' => "hey",
       'message' => nil,
       'type' => 'Collaboration',
-      'context_type' => nil,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
     }]
@@ -298,7 +297,6 @@ describe UsersController, :type => :integration do
         'web_conference_id' => @conference.id,
         'title' => "myconf",
         'type' => 'WebConference',
-        'context_type' => nil,
         'message' => 'mydesc',
         'created_at' => StreamItem.last.created_at.as_json,
         'updated_at' => StreamItem.last.updated_at.as_json,

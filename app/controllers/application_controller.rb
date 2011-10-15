@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes_and_active_tab
 
-  add_crumb(lambda { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
+  add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
 
   protected
 
@@ -181,7 +181,7 @@ class ApplicationController < ActionController::Base
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html { 
         store_location if request.get?
-        return if !@current_user && initiate_delegated_login
+        return if !@current_user && initiate_delegated_login(request.env['canvas.account_domain'])
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
@@ -379,6 +379,11 @@ class ApplicationController < ActionController::Base
     @submissions_hash = {}
     @submissions.each{|s|
       @submissions_hash[s.assignment_id] = s
+      assignment = @assignments.select { |a| a.id == s.assignment_id }[0]
+      if assignment && assignment.muted?
+        submission = @submissions_hash[s.assignment_id]
+        submission.published_score = submission.published_grade = submission.graded_at = submission.grade = submission.score = nil
+      end
     }
     @ungraded_assignments = @assignments.select{|a| 
       a.grants_right?(@current_user, session, :grade) && 
@@ -809,6 +814,7 @@ class ApplicationController < ActionController::Base
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
       @tool = ContextExternalTool.find_external_tool(tag.url, context)
+      @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -998,7 +1004,7 @@ class ApplicationController < ActionController::Base
   end
 
   def verified_file_download_url(attachment, *opts)
-    file_download_url(attachment, :verifier => attachment.uuid, *opts)
+    file_download_url(attachment, { :verifier => attachment.uuid }, *opts)
   end
   helper_method :verified_file_download_url
 

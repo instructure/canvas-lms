@@ -8,7 +8,7 @@
             :wrapper => "<a href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
     </p>
     <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
-    <% if @assignment.group_category %>
+    <% if @assignment.has_group_category? %>
       <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
     <% end %>
     <% @entries.each do |entry| %>
@@ -79,7 +79,7 @@
             <% @submission.attachments.each do |attachment| %>
               <li>
                 <div class="ui-listview-text ui-listview-right">
-                  <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
+                  <% if can_do(@submission, @current_user, :view_turnitin_report) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
                     <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
                   <% end %>
                   <span><%= number_to_human_size(attachment.size) %></span>

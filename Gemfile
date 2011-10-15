@@ -1,18 +1,17 @@
 source :rubygems
 
-gem 'rails',          '2.3.11'
+gem 'rails',          '2.3.14'
 gem 'authlogic',      '2.1.3'
 gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
-gem 'barista',        '1.0.0'
 gem 'builder',        '2.1.2'
 gem 'closure-compiler','1.0.0'
-gem 'compass',        '0.10.5'
+gem 'compass',        '0.11.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.7.0'
 gem 'fastercsv',      '1.5.3'
 gem 'hairtrigger',    '0.1.11'
-gem 'haml',           '3.0.22'
+gem 'haml',           '3.1.2'
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
 gem 'hpricot',        '0.8.2'
@@ -32,7 +31,7 @@ gem 'netaddr',        '1.5.0'
 gem 'nokogiri',       '1.4.1'
 gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
-gem 'rake',           '0.8.7'
+gem 'rake',           '< 0.10'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount',      '1.6.8'
 gem 'require_relative', '1.0.1'
@@ -63,24 +62,31 @@ end
 
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
+  gem 'parallel_tests', '0.6.4'
   gem 'rcov',         '0.9.9'
-  gem 'rspec',        '1.3.1'
-  gem 'rspec-rails',  '1.3.3'
-  gem 'selenium-webdriver', '2.5.0'
-  gem 'webrat',       '0.7.2'
+  gem 'rspec',        '1.3.2'
+  gem 'rspec-rails',  '1.3.4'
+  gem 'selenium-webdriver', '2.7.0'
+  gem 'webrat',       '0.7.3'
   gem 'yard',         '0.7.2'
+  gem 'jasmine',      '1.1.0'
 end
 
 group :development do
+  gem 'barista',        '1.2.1'
+  gem 'coffee-script-source',  '1.1.2' #pinned just so everyone's compiled output matches
   gem 'ruby-debug',   '0.10.4'
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
+  gem 'guard'
+  gem 'guard-coffeescript'
 end
 
 group :redis do
   gem 'redis-store', '1.0.0.rc1'
 end
+
 
 # The closure-compiler gem has an undocumented
 # gem dependency on windows with ruby < 1.9.  I'm

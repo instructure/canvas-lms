@@ -1,0 +1,19 @@
+require File.expand_path(File.dirname(__FILE__) + '/common')
+
+describe "miscellaneous selenium tests" do
+  it_should_behave_like "in-process server selenium tests"
+  
+  it "should handle $.attr('disabled', true/false) by toggling class too" do
+    get('/logout')
+    driver.execute_script("return $('button').attr('disabled', true).hasClass('disabled')").should be_true
+  end
+  it "should handle $.prop('disabled', true/false) by toggling class too" do
+    get('/logout')
+    driver.execute_script("return $('button').prop('disabled', true).hasClass('disabled')").should be_true
+  end
+  it "should handle $.attr('method', post|delete|put|get) by adding a hidden input" do
+    get('/logout')
+    driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase.should  eql("post")
+    driver.execute_script("return $('form input[name=_method]').val()").should eql("delete")
+  end
+end

@@ -34,8 +34,7 @@
     <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
   <% end %>
   <%= include_stylesheets(*jammit_css_bundles) unless jammit_css_bundles.empty?  %>
-  <!--[if lte IE 8]> <%= javascript_include_tag "html5.js" %> <![endif]-->
-  <!--[if lte IE 7]> <%= include_javascripts :ie7 %> <![endif]-->
+  <!--[if lte IE 8]> <%= javascript_include_tag "vendor/html5.js" %> <![endif]-->
   <%= yield :stylesheets %>
   <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] && !@domain_root_account.settings[:global_stylesheet].try(:strip).empty?  %>
     <link href="<%= @domain_root_account.settings[:global_stylesheet] %>" media="all" rel="stylesheet" type="text/css" />
@@ -61,7 +60,13 @@
   </script>
 </head>
 <body class="<%= (@body_classes << @active_tab).uniq.join(" ") %>">
-  <% unless @body_class_no_headers %>
+  <% if @body_class_no_headers %>
+    <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
+      <%- cache([@current_user || 'nobody', 'identity-type-15m'], :expires_in => 15.minutes) do -%>
+      <div id="identity_feedback" style="display: none" class="feedback <%= @current_user.try(:highest_role) %>"></div>
+      <%- end -%>
+    <% end %>
+  <% else %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
     <a id="header-logo" href="<%= root_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> 
@@ -80,67 +85,10 @@
     <ul role="navigation" id="menu">
       <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
       <li class="menu-item">
-        <%# if any of these have anything in them, then we should show a dropdown on the 'home' menu item  %>
-        <%- if [ @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]),
-                @current_user.accounts,
-                @current_user.cached_current_group_memberships,
-                @current_user.enrollments.ended ].any?{ |e| e.respond_to?(:count) && e.count > 0 }  -%>
-        <a href="<%= dashboard_path %>" class="menu-item-title">
-          <%= @current_user.cached_current_group_memberships.empty? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
-          <span class="menu-item-title-icon"></span></a>
-        <div class="menu-item-drop">
-          <table cellspacing="0">
-            <tr>
-              <% 
-                max_to_show = 8 # Need to keep this low for users with limited screen real estate
-                coalesced_enrollments = []
-                course_name_counts = {}
-                found_completed = false
-                @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).each do |e|
-                  next if e.state_based_on_date == :inactive
-                  if e.state_based_on_date == :completed
-                    found_completed = true
-                    next
-                  end
-                  coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] } if !e.course
-                  existing_enrollment_info = coalesced_enrollments.find { |en|
-                    # coalesce together enrollments for the same course and the same state
-                    !e.course.nil? && en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
-                  }
-                  if existing_enrollment_info
-                    existing_enrollment_info[:types] << e.readable_type
-                    existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || [999,999, 999], [e.rank_sortable, e.state_sortable, 0 - e.id]].min
-                  else
-                    coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
-                    course_name_counts[e.course.name] ||= 0
-                    course_name_counts[e.course.name] += 1
-                  end
-                end
-                coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
-                [
-                  [coalesced_enrollments, "shared/menu_enrollment", t('menu.my_courses', "My Courses"), courses_path],
-                  [@current_user.cached_current_group_memberships, "shared/menu_group_membership", t('menu.current_groups', "Current Groups"), groups_path],
-                  [@current_user.accounts, "shared/menu_account", t('menu.managed_accounts', "Managed Accounts"), accounts_path]
-                ].each do |triple| %>
-              <%= render(:partial => "shared/menu_section", :locals => { 
-                           :collection => triple.first[0,max_to_show],
-                           :partial => triple[1],
-                           :collection_size => triple.first.length,
-                           :max_to_show => max_to_show,
-                           :more_link_for_over_max => triple[3],
-                           :title => triple[2],
-                           :course_name_counts => course_name_counts }) %>
-              <% end %>
-            </tr>
-          </table>
-          <% unless @current_user.enrollments.ended.empty? && !found_completed %>
-            <div class="menu-item-drop-padded">
-              <%= link_to h(t('menu.all_enrollments', 'See All Enrollments')) + raw(' &raquo;'), courses_path, :class => "menu-item-drop-float-right" %>
-            </div>
-          <% end %>
-        </div>
-        <%- else #there is nothing inside the home menu, so dont show it as a drop-down -%>
-        <a href="<%= dashboard_path %>" class="menu-item-no-drop"><%= t 'links.home', 'Home' %></a>
+        <%- if show_home_menu? -%>
+          <%= render(:partial => 'shared/home_menu') %>
+        <%- else  -%>
+          <a href="<%= dashboard_path %>" class="menu-item-no-drop"><%= t 'links.home', 'Home' %></a>
         <%- end -%>
       </li>
       <%- end -%>
@@ -309,9 +257,8 @@
   <%= render :partial => "shared/global_dialogs" %>
 <% end %>
 
-<script>
-  var INST = <%= raw(inst_env.to_json) %>;
-</script>
+<script> window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>'); </script>
+<script> var INST = <%= raw(inst_env.to_json) %>; </script>
 
 <%= include_javascripts :common %>
 <script>

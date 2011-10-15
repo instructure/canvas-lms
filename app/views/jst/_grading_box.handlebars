@@ -1,0 +1,26 @@
+{{#if assignment_grading_type_is_points}}
+  <input name="default_grade" type="number" value="{{ submission.grade }}" class="grading_value grading_box" id="student_grading_{{assignment.id}} %>" style="text-align: center; width: 50px;"/>
+{{/if}}
+{{#if assignment_grading_type_is_percent}}
+  <span name="default_grade" class="grading_box" id="student_grading_{{assignment.id}}">
+    <input type="number" value="{{ submission.grade }}" class="grading_value" style="text-align: center; width: 50px;"/>
+    <span style="display: none;">%</span>
+  </span>
+{{/if}}
+{{#if assignment_grading_type_is_letter_grade}}
+  <input name="default_grade" type="text" value="{{ submission.score }}" class="grading_value grading_box score_value" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
+{{/if}}
+{{#if assignment_grading_type_is_pass_fail}}
+  <select name="default_grade" class="grading_value grading_box pass_fail" id="student_grading_<%= assignment.id %>">
+    <option value="">---</option>
+    <option value="complete">{{#t "#gradebooks.grades.complete"}}Complete{{/t}}</option>
+    <option value="incomplete">{{#t "#gradebooks.grades.incomplete"}}Incomplete{{/t}}</option>
+  </select>
+{{/if}}
+{{#if showPointsPossible}}
+  <span style="font-size: 0.9em;" >
+    {{#t "out_of_points_possible"}}
+      out of {{assignment.points_possible}}
+    {{/t}}
+  </span>
+{{/if}}

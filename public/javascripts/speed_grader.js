@@ -84,14 +84,29 @@ I18n.scoped('gradebook', function(I18n) {
       $assignment_submission_url = $("#assignment_submission_url"),
       $rubric_full = $("#rubric_full"),
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
+      $mute_link = $('#mute_link'),
       $selectmenu = null,
       broswerableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
       resizeTimeOut = null,
       iframes = {},
       snapshotCache = {},
-      sectionToShow;
-      
+      sectionToShow,
+      header,
+      utils;
+
+  utils = {
+    getParam: function(name){
+      var pathRegex = new RegExp(name + '\/([^\/]+)'),
+          searchRegex = new RegExp(name + '=([^&]+)'),
+          match;
+
+      match = (window.location.pathname.match(pathRegex) || window.location.search.match(searchRegex));
+      if (!match) return false;
+      return match[1];
+    }
+  };
+
   function mergeStudentsAndSubmission(){
     jsonData.studentsWithSubmissions = jsonData.context.students;
     $.each(jsonData.studentsWithSubmissions, function(i, student){
@@ -262,34 +277,146 @@ I18n.scoped('gradebook', function(I18n) {
       });
     }
   }
-  
-  function initHeader(){
-    $gradebook_header.find(".prev").click(function(e){
-      e.preventDefault();
-      EG.prev();
-    });
-    $gradebook_header.find(".next").click(function(e){
-      e.preventDefault();
-      EG.next();
-    });
 
-    $("#settings_form").submit(function(){
+  header = {
+    elements: {
+      mute: {
+        icon: $('#mute_link .ui-icon'),
+        label: $('#mute_link .label'),
+        link: $('#mute_link'),
+        modal: $('#mute_dialog')
+      },
+      nav: $gradebook_header.find('.prev, .next'),
+      spinner: new Spinner({
+        length: 2,
+        radius: 3,
+        trail: 25,
+        width: 1
+      }),
+      settings: {
+        form: $('#settings_form'),
+        link: $('#settings_link')
+      }
+    },
+    courseId: utils.getParam('courses'),
+    assignmentId: utils.getParam('assignment_id'),
+    init: function(){
+      this.muted = this.elements.mute.link.data('muted');
+      this.addEvents();
+      this.createModals();
+      this.addSpinner();
+      return this;
+    },
+    addEvents: function(){
+      this.elements.nav.click($.proxy(this.toAssignment, this));
+      this.elements.mute.link.click($.proxy(this.onMuteClick, this));
+      this.elements.settings.form.submit($.proxy(this.submitForm, this));
+      this.elements.settings.link.click($.proxy(this.showSettingsModal, this));
+    },
+    addSpinner: function(){
+      this.elements.mute.link.append(this.elements.spinner.el);
+    },
+    createModals: function(){
+      var cancelLabel = I18n.t('cancel_button', 'Cancel'),
+          muteLabel   = I18n.t('mute_assignment', 'Mute Assignment'),
+          buttons     = {};
+      var buttons = {};
+      buttons[muteLabel] = $.proxy(function(){
+        this.toggleMute();
+        this.elements.mute.modal.dialog('close');
+      }, this);
+      buttons[cancelLabel] = $.proxy(function(){ this.elements.mute.modal.dialog('close'); }, this);
+      this.elements.settings.form.dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        width: 400
+      });
+      this.elements.mute.modal.dialog({
+        autoOpen: false,
+        buttons: buttons,
+        modal: true,
+        resizable: false,
+        title: this.elements.mute.modal.data('title'),
+        width: 400
+      });
+    },
+
+    toAssignment: function(e){
+      e.preventDefault();
+      EG[e.target.getAttribute('class')]();
+    },
+
+    submitForm: function(e){
       $.store.userSet('eg_sort_by', $('#eg_sort_by').val());
       $.store.userSet('eg_hide_student_names', $("#hide_student_names").attr('checked').toString());
-      $(this).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
+      $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
       window.location.reload();
       return false;
-    });
-    $("#settings_link").click(function(e){
-      $("#settings_form").dialog('close').dialog({
+    },
+
+    showSettingsModal: function(e){
+      this.elements.settings.form.dialog('close').dialog({
         modal: true,
         resizeable: false,
         width: 400
-      })
-      .dialog('open');
-    });
-  }
-  
+      }).dialog('open');
+    },
+
+    onMuteClick: function(e){
+      e.preventDefault();
+      this.muted ? this.toggleMute() : this.elements.mute.modal.dialog('open');
+    },
+
+    muteUrl: function(){
+      return '/courses/' + this.courseId + '/assignments/' + this.assignmentId + '/mute';
+    },
+
+    spinMute: function(){
+      this.elements.spinner.spin();
+      $(this.elements.spinner.el)
+        .css({ left: 9, top: 6})
+        .appendTo(this.elements.mute.link);
+    },
+
+    toggleMute: function(){
+      this.muted = !this.muted;
+      var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment');
+          action = this.muted ? 'mute' : 'unmute',
+          actions = {
+        /* Mute action */
+        mute: function(){
+          this.elements.mute.icon.css('visibility', 'hidden');
+          this.spinMute();
+          $.ajaxJSON(this.muteUrl(), 'put', { status: true }, $.proxy(function(res){
+            this.elements.spinner.stop();
+            this.elements.mute.label.html(label);
+            this.elements.mute.icon
+              .removeClass('ui-icon-volume-off')
+              .addClass('ui-icon-volume-on')
+              .css('visibility', 'visible');
+          }, this));
+        },
+
+        /* Unmute action */
+        unmute: function(){
+          this.elements.mute.icon.css('visibility', 'hidden');
+          this.spinMute();
+          $.ajaxJSON(this.muteUrl(), 'put', { status: false }, $.proxy(function(res){
+            this.elements.spinner.stop();
+            this.elements.mute.label.html(label);
+            this.elements.mute.icon
+              .removeClass('ui-icon-volume-on')
+              .addClass('ui-icon-volume-off')
+              .css('visibility', 'visible');
+          }, this));
+        }
+      };
+
+      actions[action].apply(this);
+    }
+  };
+
   function initCommentBox(){
     //initialize the auto height resizing on the textarea
     $('#add_a_comment textarea').elastic({
@@ -673,7 +800,7 @@ I18n.scoped('gradebook', function(I18n) {
       initRubricStuff();
       initCommentBox();
       EG.initComments();
-      initHeader();
+      header.init();
       initKeyCodes();
 
       $window.bind('hashchange', EG.handleFragementChange);

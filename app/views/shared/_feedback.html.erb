@@ -14,7 +14,7 @@
         <span class="subtext"><%= t('canvas_help_sub', 'Find answers to common questions') %></span>
       </a>
     </li>
-    <% @domain_root_account.custom_feedback_links.each do |link| %>
+    <% @domain_root_account && @domain_root_account.custom_feedback_links.each do |link| %>
       <li class="<%= link[:classes] %>" target="_blank">
         <a href="<%= link[:url] %>">
           <span class="text"><%= link[:text] %></span>

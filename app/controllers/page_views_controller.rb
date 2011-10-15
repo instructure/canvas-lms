@@ -27,7 +27,7 @@ class PageViewsController < ApplicationController
   # @API
   # Return the user's page view history in json format, similar to the
   # available CSV download. Pagination is used as described in API basics
-  # section.
+  # section. Page views are returned in descending order, newest to oldest.
   #
   # @response_field interaction_seconds The number of seconds the user actively interacted with the page. This is a best guess, using heuristics such as browser input events.
   # @response_field url The full canvas URL of the page view.
@@ -38,7 +38,7 @@ class PageViewsController < ApplicationController
   def index
     @user = api_find(User, params[:user_id])
     if authorized_action(@user, @current_user, :view_statistics)
-      @page_views = Api.paginate(@user.page_views, self, :order => 'created_at DESC')
+      @page_views = Api.paginate(@user.page_views, self, api_v1_user_page_views_path(:user => @user), :order => 'created_at DESC')
       respond_to do |format|
         format.html do
           if params[:html_xhr]

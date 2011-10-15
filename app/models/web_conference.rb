@@ -89,15 +89,18 @@ class WebConference < ActiveRecord::Base
 
   def cast_setting(value, type)
     case type
-      when :boolean: ['1', 'on', 'true'].include?(value.to_s)
+      when :boolean
+        ['1', 'on', 'true'].include?(value.to_s)
       else value
     end
   end
 
   def friendly_setting(value)
     case value
-      when true: t('#web_conference.settings.boolean.true', "On")
-      when false: t('#web_conference.settings.boolean.false', "Off")
+      when true
+        t('#web_conference.settings.boolean.true', "On")
+      when false
+        t('#web_conference.settings.boolean.false', "Off")
       else value.to_s
     end
   end

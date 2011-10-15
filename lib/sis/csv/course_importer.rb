@@ -29,7 +29,7 @@ module SIS
       def process(csv)
         course_ids = {}
         messages = []
-        @sis.counts[:courses] += SIS::CourseImporter.new(@batch.try(:id), @root_account, logger).process(messages) do |importer|
+        @sis.counts[:courses] += SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv) do |row|
             update_progress
 

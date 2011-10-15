@@ -120,8 +120,57 @@ describe Submission do
         @submission.grade_it!
         @submission.messages_sent.should be_include('Submission Graded')
       end
+
+      it "should not create a message when a muted assignment has been graded and published" do
+        Notification.create(:name => 'Submission Graded')
+        submission_spec_model
+        @cc = @user.communication_channels.create(:path => "somewhere")
+        @assignment.mute!
+        @submission.reload
+        @submission.assignment.should eql(@assignment)
+        @submission.assignment.state.should eql(:published)
+        @submission.grade_it!
+        @submission.messages_sent.should_not be_include "Submission Graded"
+      end
+
+      it "should create a hidden stream_item_instance when muted, graded, and published" do
+        Notification.create :name => "Submission Graded"
+        submission_spec_model
+        @cc = @user.communication_channels.create :path => "somewhere"
+        @assignment.mute!
+        lambda {
+          @submission = @assignment.grade_student(@user, :grade => 10)[0]
+        }.should change StreamItemInstance, :count
+        @user.stream_item_instances.last.should be_hidden
+      end
     end
-    
+
+    it "should create a stream_item_instance when graded and published" do
+      Notification.create :name => "Submission Graded"
+      submission_spec_model
+      @cc = @user.communication_channels.create :path => "somewhere"
+      lambda {
+        @assignment.grade_student(@user, :grade => 10)
+      }.should change StreamItemInstance, :count
+    end
+
+    it "should create a stream_item_instance when graded, and then made it visible when unmuted" do
+      Notification.create :name => "Submission Graded"
+      submission_spec_model
+      @cc = @user.communication_channels.create :path => "somewhere"
+      @assignment.mute!
+      lambda {
+        @assignment.grade_student(@user, :grade => 10)
+      }.should change StreamItemInstance, :count
+
+      @assignment.unmute!
+      item_asset_strings    = @assignment.submissions.map { |s| "submission_#{s.id}" }
+      stream_item_ids       = StreamItem.all(:select => :id, :conditions => { :item_asset_string => item_asset_strings })
+      stream_item_instances = StreamItemInstance.all(:conditions => { :stream_item_id => stream_item_ids })
+      stream_item_instances.each { |sii| sii.should_not be_hidden }
+    end
+
+        
     context "Submission Grade Changed" do
       it "should have a 'Submission Grade Changed' policy" do
         submission_spec_model
@@ -156,6 +205,23 @@ describe Submission do
         @submission.should eql(s)
         @submission.messages_sent.should_not be_include('Submission Grade Changed')
         @submission.messages_sent.should be_include('Submission Graded')
+      end
+
+      it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
+        Notification.create(:name => 'Submission Grade Changed')
+        @assignment.mute!
+        @assignment.stub!(:score_to_grade).and_return(10.0)
+        @assignment.stub!(:due_at).and_return(Time.now  - 100)
+        submission_spec_model
+
+        @cc = @user.communication_channels.create(:path => "somewhere")
+        s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
+        s.graded_at = Time.parse("Jan 1 2000")
+        s.save
+        @submission = @assignment.grade_student(@user, :grade => 9)[0]
+        @submission.should eql(s)
+        @submission.messages_sent.should_not be_include('Submission Grade Changed')
+
       end
       
       it "should NOT create a message when the score is changed and the submission was recently graded" do

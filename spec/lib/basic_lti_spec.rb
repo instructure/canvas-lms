@@ -109,7 +109,7 @@ describe BasicLTI do
       hash['context_id'].should == @course.opaque_identifier(:asset_string)
       hash['context_title'].should == @course.name
       hash['context_label'].should == @course.course_code
-      hash['launch_presentation_local'].should == 'en-US'
+      hash['launch_presentation_locale'].should == I18n.default_locale.to_s
       hash['launch_presentation_document_target'].should == 'iframe'
       hash['launch_presentation_width'].should == '600'
       hash['launch_presentation_height'].should == '400'
@@ -138,10 +138,14 @@ describe BasicLTI do
     
     it "should include custom fields" do
       course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john'}, :name => 'tool')
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123}, :name => 'tool')
       hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.yahoo.com')
+      hash.keys.select{|k| k.match(/^custom_/) }.sort.should == ['custom___taa____', 'custom_bob', 'custom_fred', 'custom_john']
       hash['custom_bob'].should eql('bob')
       hash['custom_fred'].should eql('fred')
+      hash['custom_john'].should eql('john')
+      hash['custom___taa____'].should eql('123')
+      hash['@$TAA$#$#'].should be_nil
       hash['john'].should be_nil
     end
     

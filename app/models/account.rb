@@ -29,8 +29,9 @@ class Account < ActiveRecord::Base
   authenticates_many :pseudonym_sessions
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
+  has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
+  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
-  has_many :account_groups, :as => :context, :class_name => 'Group', :foreign_key => 'account_id', :conditions => ['groups.context_type = ? and groups.context_id = #{id}', 'Account']
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
@@ -50,7 +51,6 @@ class Account < ActiveRecord::Base
   has_many :associated_courses, :through => :course_account_associations, :source => :course, :select => 'DISTINCT courses.*'
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
   has_many :attachments, :as => :context, :dependent => :destroy
-  has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted'], :order => 'attachments.display_name'
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
@@ -99,6 +99,9 @@ class Account < ActiveRecord::Base
 
   validates_locale :default_locale, :allow_nil => true
 
+  include StickySisFields
+  are_sis_sticky :name
+
   def default_locale(recurse = false)
     read_attribute(:default_locale) ||
     (recurse && parent_account ? parent_account.default_locale(true) : nil)
@@ -132,6 +135,7 @@ class Account < ActiveRecord::Base
   add_setting :equella_teaser
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
+  add_setting :users_can_edit_name, :boolean => true, :root_only => true
   
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -309,7 +313,7 @@ class Account < ActiveRecord::Base
   end
   
   def self.account_lookup_cache_key(id)
-    ['_account_lookup', id].cache_key
+    ['_account_lookup2', id].cache_key
   end
   
   def find_user_by_unique_id(unique_id)
@@ -386,6 +390,11 @@ class Account < ActiveRecord::Base
     res.compact
   end
   
+  def account_chain_ids(opts={})
+    account_chain(opts).map(&:id)
+  end
+  memoize :account_chain_ids
+  
   def all_page_views
     PageView.of_account(self)
   end
@@ -400,8 +409,8 @@ class Account < ActiveRecord::Base
       :group => "date(created_at)", 
       :order => "date(created_at)",
       :conditions => {
-        :account_id, self_and_all_sub_accounts,
-        :created_at, (dates.first)..(dates.last)
+        :account_id => self_and_all_sub_accounts,
+        :created_at => (dates.first)..(dates.last)
       }
     )
   end
@@ -419,8 +428,8 @@ class Account < ActiveRecord::Base
       :group => group,
       :order => group,
       :conditions => {
-        :account_id, self_and_all_sub_accounts,
-        :created_at, (dates.first)..(dates.last)
+        :account_id => self_and_all_sub_accounts,
+        :created_at => (dates.first)..(dates.last)
       }
     )
   end
@@ -454,11 +463,11 @@ class Account < ActiveRecord::Base
   
   def most_popular_courses(options={})
     conditions = {
-      :account_id, self_and_all_sub_accounts
+      :account_id => self_and_all_sub_accounts
     }
     if options[:dates]
       conditions.merge!({
-        :created_at, (options[:dates].first)..(options[:dates].last)
+        :created_at => (options[:dates].first)..(options[:dates].last)
       })
     end
     PageView.scoped(
@@ -921,10 +930,12 @@ class Account < ActiveRecord::Base
         :description => "",
         :expose_to_ui => true
       },
+      # TODO: move avatars to :settings hash, it makes more sense there
       :avatars => {
         :name => "User Avatars",
         :description => "",
-        :default => false
+        :default => false,
+        :expose_to_ui => true
       }
     }.freeze
   end

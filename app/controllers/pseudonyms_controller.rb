@@ -346,6 +346,8 @@ class PseudonymsController < ApplicationController
     if @user.pseudonyms.active.length < 2
       @pseudonym.errors.add_to_base(t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors.to_json, :status => :bad_request
+    elsif @pseudonym.sis_user_id && !@pseudonym.account.grants_right?(@current_user, session, :manage_sis)
+      return render_unauthorized_action(@pseudonym)
     elsif @pseudonym.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       render :json => @pseudonym.to_json
     else

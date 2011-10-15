@@ -106,7 +106,7 @@ module CC
           
           item_node.presentation do |pres_node|
             pres_node.material do |mat_node|
-              html = @html_exporter.html_content("<div>#{question['question_text']}</div>" || '', @course, @manifest.exporter.user)
+              html = @html_exporter.html_content("<div>#{question['question_text']}</div>" || '')
               mat_node.mattext html, :texttype=>'text/html'
             end
             presentation_options(pres_node, question)

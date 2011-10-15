@@ -24,7 +24,8 @@ describe "/groups/_category" do
     course_with_student
     view_context
     assigns[:groups] = []
-    render :partial => "groups/category", :object => "Good Students"
+    category = @course.group_categories.create(:name => "Good Students")
+    render :partial => "groups/category", :object => category
     response.should_not be_nil
   end
 end

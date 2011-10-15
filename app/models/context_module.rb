@@ -274,6 +274,7 @@ class ContextModule < ActiveRecord::Base
       added_item.attributes = {
         :content => tool,
         :url => params[:url], 
+        :new_tab => params[:new_tab],
         :tag_type => 'context_module', 
         :title => title, 
         :indent => params[:indent], 

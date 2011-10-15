@@ -28,7 +28,7 @@ module SIS
       # course_id,user_id,role,section_id,status
       def process(csv)
         messages = []
-        @sis.counts[:enrollments] += SIS::EnrollmentImporter.new(@batch.try(:id), @root_account, logger).process(messages, @sis.updates_every) do |importer|
+        @sis.counts[:enrollments] += SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages, @sis.updates_every) do |importer|
           csv_rows(csv) do |row|
             update_progress
 

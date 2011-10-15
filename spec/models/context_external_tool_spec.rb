@@ -108,6 +108,25 @@ describe ContextExternalTool do
     end
   end
   
+  describe "custom fields" do
+    it "should parse custom_fields_string from a text field" do
+      tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.custom_fields_string=("a=1\nbT^@!#n_40=123\n\nc=")
+      tool.settings[:custom_fields].should_not be_nil
+      tool.settings[:custom_fields].keys.length.should == 2
+      tool.settings[:custom_fields]['a'].should == '1'
+      tool.settings[:custom_fields]['bT^@!#n_40'].should == '123'
+      tool.settings[:custom_fields]['c'].should == nil
+    end
+    
+    it "should return custom_fields_string as a text-formatted field" do
+      tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'a' => '123', 'b' => '456'})
+      tool.custom_fields_string.should == "a=123\nb=456"
+    end
+    
+    
+  end
+  
   describe "all_tools_for" do
     it "should retrieve all tools in alphabetical order" do
       @tools = []

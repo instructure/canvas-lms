@@ -217,6 +217,16 @@ describe "security" do
       assigns['real_current_user'].id.should == @admin.id
     end
 
+    it "should not allow as_user_id for normal requests" do
+      user_session(@admin, @admin.pseudonyms.first)
+
+      get "/?as_user_id=#{@student.id}"
+      assert_response 200
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @admin.id
+      assigns['real_current_user'].should be_nil
+    end
+
     it "should not allow non-admins to become other people" do
       user_session(@student, @student.pseudonyms.first)
 

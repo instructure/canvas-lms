@@ -236,6 +236,9 @@ I18n.scoped('gradebook', function(I18n) {
       if($("#grades_summary.editable").length === 0 || $(this).find("#grade_entry").length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
         return;
       }
+      if (!$(this).find('.grade').data('originalValue')){
+        $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
+      }
       $(this).find(".grade").empty().append($("#grade_entry"));
       $(this).find(".score_value").hide();
       var val = $(this).parents(".student_assignment").find(".score").text();
@@ -296,7 +299,7 @@ I18n.scoped('gradebook', function(I18n) {
         $assignment.find(".revert_score_link").remove();
       }
       if(val === 0) { val = "0.0"; }
-      $assignment.find(".grade").text(val || "-");
+      $assignment.find(".grade").html(val || $assignment.find('.grade').data('originalValue'));
       updateStudentGrades();
     });
     $("#grade_entry").blur(function() {

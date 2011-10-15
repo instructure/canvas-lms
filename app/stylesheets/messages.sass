@@ -481,9 +481,8 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       display: none
     .actions
       position: absolute
-      right: 17px
+      right: 9999px
       top: 5px
-      display: none
       > a
         display: block
         background: transparent url(/images/messages/actions-dd-sprite.png) 0 0 no-repeat
@@ -495,8 +494,11 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       background-position: 0 -22px
     .actions.selected
       display: block
+      right: 17px
       a, a:hover
         background-position: 0 -44px
+    .actions:focus
+      right: 17px
     .count
       display: none
       color: #fff
@@ -560,6 +562,7 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       cursor: pointer
       .actions
         display: block
+        right: 17px
       .date
         visibility: hidden
     > li.labeled
@@ -780,26 +783,29 @@ li.purple .label_icon, .purple.label_icon
         width: 16px
         height: 16px
         margin: 7px
-        background: transparent url(/images/messages/checkbox-sprite.png) no-repeat 0 0
-    a.toggle:hover i
-      background-position: 0 -16px
     img.avatar
       width: 32px
       height: 32px
       float: left
       margin-right: 6px
       background: transparent url(/images/messages/avatar-sprites.png) 0 0 no-repeat
-    b, span
-      display: block
+    span.name, span.details
       white-space: nowrap
       overflow: hidden
+      display: block
     b
       color: #000
       text-shadow: none
-    span
+    span.details, span.context_name
       color: #2571bd
       font-weight: bold
       font-size: 0.8em
+    span.details
+      display: block
+    span.context_name
+      padding-left: 6px
+  li.toggleable a.toggle i
+    background: transparent url(/images/messages/checkbox-sprite.png) no-repeat 0 0
   li.context img.avatar, li.context.active.expanded img.avatar
     background-position: 0 -64px
   li.user.active img.avatar
@@ -825,13 +831,14 @@ li.purple .label_icon, .purple.label_icon
       background-position: 0 -32px
     img.context.avatar
       background-position: 0 -96px
-  li.on .toggle i
+  li.toggleable.on a.toggle i
     background-position: 0 -32px
-  li.on.active .toggle i
+  li.toggleable.on.active a.toggle i
     background-position: 0 -80px
-  li.on.active .toggle:hover i
+  li.toggleable.on.active a.toggle:hover i
     background-position: 0 -64px
   li.expanded, li.active.expanded
+    padding-left: 11px
     cursor: default
     a.expand
       i
@@ -839,7 +846,7 @@ li.purple .label_icon, .purple.label_icon
     a.toggle
       display: none
     img.avatar
-      margin: 0 14px 0 6px
+      margin: 0 14px 0 0
   li.active.expanded
     a.expand:hover
       cursor: pointer

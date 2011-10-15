@@ -17,12 +17,7 @@
 #
 
 module SIS
-  class GroupMembershipImporter
-    def initialize(batch_id, root_account, logger)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-    end
+  class GroupMembershipImporter < BaseImporter
 
     def process
       start = Time.now
