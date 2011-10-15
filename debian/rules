@@ -13,4 +13,4 @@
 	dh $@
 
 override_dh_auto_build:
-	$GEM_HOME/bin/bundle exec rake canvas:compile_assets
+	$(GEM_HOME)/bin/bundle exec rake canvas:compile_assets
