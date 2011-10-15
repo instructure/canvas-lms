@@ -24,6 +24,7 @@ fi
 exec su $(stat -c %U "$APPROOT/config/environment.rb") -c "/usr/bin/env \
 PATH=\"$PATH\" \
 HOME=\"$HOME\" \
+GEM_HOME=\"$GEM_HOME\" \
 RAILS_ENV=production \
 script/console"
 

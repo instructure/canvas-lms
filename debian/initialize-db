@@ -31,12 +31,13 @@ fi
 exec su $(stat -c %U "$APPROOT/config/environment.rb") -c "/usr/bin/env \
 PATH=\"$PATH\" \
 HOME=\"$HOME\" \
+GEM_HOME=\"$GEM_HOME\" \
 RAILS_ENV=production \
 CANVAS_LMS_ADMIN_EMAIL=\"$(get_config canvas-lms/admin-email)\" \
 CANVAS_LMS_ADMIN_PASSWORD=\"$(get_config canvas-lms/admin-password)\" \
 CANVAS_LMS_STATS_COLLECTION=\"$(get_config canvas-lms/collect-stats)\" \
 CANVAS_LMS_ACCOUNT_NAME=\"$(get_config canvas-lms/default-account-name)\" \
 /usr/bin/env \
-rake db:initial_setup"
+$GEM_HOME/bin/bundle exec rake db:initial_setup"
 
 exit 1

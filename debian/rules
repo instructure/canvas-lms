@@ -10,7 +10,7 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@ 
+	dh $@
 
 override_dh_auto_build:
-	rake canvas:compile_assets
+	$GEM_HOME/bin/bundle exec rake canvas:compile_assets
