@@ -79,4 +79,38 @@ describe IncomingMessageProcessor do
     DiscussionTopic.incoming_replies[0][:text].should == 'This is plain text'
     DiscussionTopic.incoming_replies[0][:html].should == '<h1>This is HTML</h1>'
   end
+
+  it "should process emails from mailman" do
+    Dir.mktmpdir do |tmpdir|
+      newdir = tmpdir + "/new"
+      Dir.mkdir(newdir)
+      
+      addr, domain = HostUrl.outgoing_email_address.split(/@/)
+      to_address = "#{addr}+#{@message.reply_to_secure_id}-#{@message.id}@#{domain}"
+      mail = Mail.new do
+        from 'test@example.com'
+        to to_address
+        subject 'subject of test message'
+        body 'body of test message'
+      end
+      
+      Mailman.config.maildir = nil
+      Mailman.config.ignore_stdin = false
+      Mailman.config.poll_interval = 0
+      Mailman.config.pop3 = nil
+      
+      # If we try to use maildir with mailman, it will just poll the maildir forever.
+      # Using stdin is the safest, but we have to do this little dance for it to work.
+      read, write = IO.pipe
+      saved_stdin = STDIN.dup
+      write.puts mail.to_s
+      write.close
+      STDIN.reopen(read)
+      IncomingMessageProcessor.process
+      STDIN.reopen(saved_stdin)
+      
+      DiscussionTopic.incoming_replies.length.should == 1
+      DiscussionTopic.incoming_replies[0][:text].should == 'body of test message'
+    end
+  end
 end
