@@ -60,4 +60,40 @@ describe CoursesController, :type => :integration do
     json = JSON.parse(response.body)
     json['errors'].should == "Invalid access token"
   end
+
+  it "should allow as_user_id" do
+    account_admin_user(:account => Account.site_admin)
+    user_with_pseudonym(:user => @user)
+
+    json = api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@student.id}",
+             :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => @student.id.to_param)
+    assigns['current_user'].should == @student
+    assigns['real_current_user'].should == @user
+    json.should == {
+      'id' => @student.id,
+      'name' => 'User',
+      'sortable_name' => 'user',
+      'short_name' => 'User',
+      'primary_email' => nil,
+      'login_id' => nil,
+      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+    }
+
+    # as_user_id is ignored if it's not allowed
+    @user = @student
+    user_with_pseudonym(:user => @user, :username => "nobody2@example.com")
+    raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
+             :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
+    assigns['current_user'].should == @student
+    assigns['real_current_user'].should be_nil
+    json.should == {
+      'id' => @student.id,
+      'name' => 'User',
+      'sortable_name' => 'user',
+      'short_name' => 'User',
+      'primary_email' => nil,
+      'login_id' => nil,
+      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+    }
+  end
 end

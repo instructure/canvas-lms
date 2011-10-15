@@ -21,7 +21,7 @@ class Pool
       GC.copy_on_write_friendly = true
     end
 
-    OptionParser.new do |opts|
+    op = OptionParser.new do |opts|
       opts.banner = "Usage #{$0} <command> <options>"
       opts.separator %{\nWhere <command> is one of:
   start      start the jobs daemon
@@ -35,7 +35,8 @@ class Pool
       opts.on("-c", "--config", "Use alternate config file (default #{options[:config_file]})") { |c| options[:config_file] = c }
       opts.on("-p", "--pid", "Use alternate folder for PID files (default #{options[:pid_folder]})") { |p| options[:pid_folder] = p }
       opts.on_tail("-h", "--help", "Show this message") { puts opts; exit }
-    end.parse!(@args)
+    end
+    op.parse!(@args)
 
     command = @args.shift
     case command
@@ -53,6 +54,8 @@ class Pool
       sleep(0.5) while status(false)
       daemonize
       start
+    when nil
+      puts op
     else
       raise("Unknown command: #{command.inspect}")
     end

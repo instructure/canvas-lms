@@ -253,7 +253,10 @@ class UsersController < ApplicationController
   #     'id': 1234,
   #     'title': 'Stream Item Subject',
   #     'message': 'This is the body text of the activity stream item. It is plain-text, and can be multiple paragraphs.',
-  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...'
+  #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...',
+  #     'context_type': 'course', // course|group
+  #     'course_id': 1,
+  #     'group_id': null,
   #   }
   #
   # In addition, each item type has its own set of attributes available.
@@ -352,10 +355,57 @@ class UsersController < ApplicationController
       end
     end
   end
-  
+
+  include Api::V1::TodoItem
+  # @API
+  # Returns the current user's list of todo items, as seen on the user dashboard.
+  #
+  # There is a limit to the number of items returned.
+  #
+  # The `ignore` and `ignore_permanently` URLs can be used to update the user's
+  # preferences on what items will be displayed.
+  # Performing a DELETE request against the `ignore` URL will hide that item
+  # from future todo item requests, until the item changes.
+  # Performing a DELETE request against the `ignore_permanently` URL will hide
+  # that item forever.
+  #
+  # @example_response
+  #   [
+  #     {
+  #       'type': 'grading',        // an assignment that needs grading
+  #       'assignment': { .. assignment object .. },
+  #       'ignore': '.. url ..',
+  #       'ignore_permanently': '.. url ..',
+  #       'needs_grading_count': 3, // number of submissions that need grading
+  #       'context_type': 'course', // course|group
+  #       'course_id': 1,
+  #       'group_id': null,
+  #     },
+  #     {
+  #       'type' => 'submitting',   // an assignment that needs submitting soon
+  #       'assignment' => { .. assignment object .. },
+  #       'ignore' => '.. url ..',
+  #       'ignore_permanently' => '.. url ..',
+  #       'context_type': 'course',
+  #       'course_id': 1,
+  #     }
+  #   ]
+  def todo_items
+    unless @current_user
+      return render_unauthorized_action
+    end
+
+    grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, 'grading') }
+    submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, 'submitting') }
+    render :json => (grading + submitting)
+  end
+
   def ignore_item
+    unless %w[grading submitting].include?(params[:purpose])
+      return render(:json => { :ignored => false }, :status => 400)
+    end
     @current_user.ignore_item!(params[:asset_string], params[:purpose], params[:permanent] == '1')
-    render :json => @current_user.to_json
+    render :json => { :ignored => true }
   end
 
   def ignore_stream_item
@@ -426,20 +476,16 @@ class UsersController < ApplicationController
     @user = params[:id] ? User.find(params[:id]) : @current_user
     if current_user_is_site_admin? || authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? profile_path : user_path(@user) )
-      @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC'
-      
-      # TODO this is ugly
-      @enrollments = []
-      @enrollments = @user.enrollments.select{|e| !e.deleted? && e.course && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
-      @group_memberships = @user.group_memberships
-      @pending_enrollments = if @context.is_a?(Account)
-                               @user.enrollments
-                             else
-                               @enrollments
-                             end.select{|e| e.invited? }
-      pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid]
-      @pending_enrollments.unshift(pending_enrollment) unless !pending_enrollment || @pending_enrollments.include?(pending_enrollment)
-      
+      @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50
+
+      # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
+      # maybe should just look at the first enrollment and check if it's cached to decide if we should include
+      # them here
+      @enrollments = @user.enrollments.scoped(:conditions => "workflow_state<>'deleted'", :include => [{:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section]).select{|e| e.course && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
+      # pre-populate the reverse association
+      @enrollments.each { |e| e.user = @user }
+      @group_memberships = @user.group_memberships.scoped(:include => :group)
+
       respond_to do |format|
         format.html
       end
@@ -560,25 +606,7 @@ class UsersController < ApplicationController
       end
     end
   end
-  
-  def kaltura_session
-    @user = @current_user
-    if !@current_user
-      render :json => {:errors => {:base => t('must_be_logged_in', "You must be logged in to use Kaltura")}, :logged_in => false}.to_json
-    end
-    client = Kaltura::ClientV3.new
-    uid = "#{@user.id}_#{@domain_root_account.id}"
-    res = client.startSession(Kaltura::SessionType::USER, uid)
-    raise "Kaltura session failed to generate" if res.match(/START_SESSION_ERROR/)
-    render :json => {
-      :ks => res,
-      :subp_id => Kaltura::ClientV3.config['subpartner_id'],
-      :partner_id => Kaltura::ClientV3.config['partner_id'],
-      :uid => uid,
-      :serverTime => Time.now.to_i
-    }.to_json
-  end
-  
+
   def media_download
     url = Rails.cache.fetch(['media_download_url', params[:entryId], params[:type]].cache_key, :expires_in => 30.minutes) do
       client = Kaltura::ClientV3.new

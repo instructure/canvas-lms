@@ -49,6 +49,43 @@ class Attachment < ActiveRecord::Base
   
   attr_accessor :podcast_associated_asset
 
+  # this mixin can be added to a has_many :attachments association, and it'll
+  # handle finding replaced attachments. In other words, if an attachment fond
+  # by id is deleted but an active attachment in the same context has the same
+  # path, it'll return that attachment.
+  module FindInContextAssociation
+    def find(*a, &b)
+      return super if a.first.is_a?(Symbol)
+      find_with_possibly_replaced(super)
+    end
+
+    def method_missing(method, *a, &b)
+      return super unless method.to_s =~ /^find(?:_all)?_by_id$/
+      find_with_possibly_replaced(super)
+    end
+
+    def find_with_possibly_replaced(a_or_as)
+      if a_or_as.is_a?(Attachment)
+        find_attachment_possibly_replaced(a_or_as)
+      elsif a_or_as.is_a?(Array)
+        a_or_as.map { |a| find_attachment_possibly_replaced(a) }
+      end
+    end
+
+    def find_attachment_possibly_replaced(att)
+      # if they found a deleted attachment by id, but there's an available
+      # attachment in the same context and the same full path, we return that
+      # instead, to emulate replacing a file without having to update every
+      # by-id reference in every user content field.
+      if att.deleted?
+        new_att = Folder.find_attachment_in_context_with_path(proxy_owner, att.full_display_path)
+        new_att || att
+      else
+        att
+      end
+    end
+  end
+
   def touch_context_if_appropriate
     touch_context unless context_type == 'ConversationMessage'
   end
@@ -60,7 +97,7 @@ class Attachment < ActiveRecord::Base
   # it to scribd from that point does not make the user wait since that 
   # does happen asynchronously and the data goes directly from s3 to scribd.
   def after_attachment_saved
-    send_later :submit_to_scribd! unless Attachment.skip_scribd_submits? || !ScribdAPI.enabled?
+    send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 }) unless Attachment.skip_scribd_submits? || !ScribdAPI.enabled?
     if respond_to?(:process_attachment_with_processing) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
       temp_file = temp_path || create_temp_file
       self.class.attachment_options[:thumbnails].each { |suffix, size| send_later_if_production(:create_thumbnail_size, suffix) }
@@ -303,13 +340,13 @@ class Attachment < ActiveRecord::Base
     end
     self.context = self.folder.context if self.folder && (!self.context || (self.context.respond_to?(:is_a_context? ) && self.context.is_a_context?))
 
-    if !self.scribd_mime_type_id
+    if !self.scribd_mime_type_id && !['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml'].include?(self.content_type)
       @@mime_ids ||= {}
-      @@mime_ids[self.after_extension] ||= self.after_extension && ScribdMimeType.find_by_extension(self.after_extension).try(:id)
-      self.scribd_mime_type_id = @@mime_ids[self.after_extension]
+      @@mime_ids[self.content_type] ||= self.content_type && ScribdMimeType.find_by_name(self.content_type).try(:id)
+      self.scribd_mime_type_id = @@mime_ids[self.content_type]
       if !self.scribd_mime_type_id
-        @@mime_ids[self.content_type] ||= self.content_type && ScribdMimeType.find_by_name(self.content_type).try(:id)
-        self.scribd_mime_type_id = @@mime_ids[self.content_type]
+        @@mime_ids[self.after_extension] ||= self.after_extension && ScribdMimeType.find_by_extension(self.after_extension).try(:id)
+        self.scribd_mime_type_id = @@mime_ids[self.after_extension]
       end
     end
 
@@ -602,9 +639,9 @@ class Attachment < ActiveRecord::Base
       self.thumbnail.cached_s3_url
     elsif self.media_object && self.media_object.media_id
       Kaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
-                                          options[:width] | 140,
-                                          options[:height] || 100,
-                                          options[:video_seconds] || 5)
+                                          :width => options[:width] || 140,
+                                          :height => options[:height] || 100,
+                                          :vid_sec => options[:video_seconds] || 5)
     else
       # "still need to handle things that are not images with thumbnails, scribd_docs, or kaltura docs"
     end

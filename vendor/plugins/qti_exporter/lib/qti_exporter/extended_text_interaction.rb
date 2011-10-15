@@ -1,6 +1,6 @@
 module Qti
 class ExtendedTextInteraction < AssessmentItemConverter
-  import Canvas::Migration::XMLHelper
+  include Canvas::Migration::XMLHelper
   
   def initialize(opts)
     super(opts)

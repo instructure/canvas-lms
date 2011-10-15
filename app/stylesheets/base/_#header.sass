@@ -62,7 +62,7 @@
   margin-right: 22px
   margin-bottom: 4px /*make room for the drop shadow*/
   padding: 1px 11px
-  +box-shadow(rgba(0,0,0, 0.2), 2px, 2px, 4px)
+  box-shadow: rgba(0,0,0, 0.2) 2px 2px 4px
   background-color: $identity_background_color
   
   
@@ -109,7 +109,7 @@
   +reset-list
   color: black
   padding-top: 3px
-  margin-left = !left_side_width
+  margin-left: $left_side_width
 .menu-item
   display: block
   float: left
@@ -133,9 +133,9 @@
     padding-right: 27px
   &.hover
     .menu-item-title
-      border-top-color = !menu_border_color
-      border-left-color = !menu_border_color
-      border-right-color = !menu_border_color 
+      border-top-color: $menu_border_color
+      border-left-color: $menu_border_color
+      border-right-color: $menu_border_color 
       background-color: $menu_background_color
       
     .menu-item-drop
@@ -143,9 +143,9 @@
       left: 0
 
   .menu-item-drop
-    border = "1px solid" !menu_border_color
-    +linear-gradient(color-stops($menu_background_color, $menu_background_color_bottom))
-    +box-shadow(rgba(0, 0, 0, 0.25), 7px, 7px, 9px)
+    border: 1px solid $menu_border_color
+    +vertical-gradiant($menu_background_color, $menu_background_color_bottom)
+    box-shadow: rgba(0, 0, 0, 0.25) 7px 7px 9px
     background:
       color: $menu_background_color
       repeat: repeat-x

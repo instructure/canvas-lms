@@ -359,8 +359,17 @@ class AccountsController < ApplicationController
             if params[:batch_mode_term_id].present?
               batch.batch_mode_term = @account.enrollment_terms.active.find(params[:batch_mode_term_id])
             end
-            batch.save!
           end
+
+          batch.options ||= {}
+          if params[:override_sis_stickiness].to_i > 0
+            batch.options[:override_sis_stickiness] = true
+            [:add_sis_stickiness, :clear_sis_stickiness].each do |option|
+              batch.options[option] = true if params[option].to_i > 0
+            end
+          end
+
+          batch.save!
 
           @account.current_sis_batch_id = batch.id
           @account.save
@@ -419,7 +428,7 @@ class AccountsController < ApplicationController
     # servers need to be able to access it without being authenticated.
     # It is used to disclose our SAML configuration settings.
     if @domain_root_account.account_authorization_config and @domain_root_account.account_authorization_config.auth_type == 'saml'
-      settings = @domain_root_account.account_authorization_config.saml_settings
+      settings = @domain_root_account.account_authorization_config.saml_settings(request.env['canvas.account_domain'])
       render :xml => Onelogin::Saml::MetaData.create(settings)
     else
       render :xml => ""

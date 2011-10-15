@@ -20,22 +20,18 @@ require "set"
 require "skip_callback"
 
 module SIS
-  class EnrollmentImporter
-
-    def initialize(batch_id, root_account, logger)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-    end
+  class EnrollmentImporter < BaseImporter
 
     def process(messages, updates_every)
       start = Time.now
       i = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
         User.skip_updating_account_associations do
-          yield i
-          while i.any_left_to_process?
-            i.process_batch
+          Enrollment.process_as_sis(@sis_options) do
+            yield i
+            while i.any_left_to_process?
+              i.process_batch
+            end
           end
         end
       end
@@ -193,8 +189,10 @@ module SIS
               enrollment.workflow_state = 'inactive'
             end
 
-            enrollment.start_at = start_date
-            enrollment.end_at = end_date
+            if (enrollment.stuck_sis_fields & [:start_at, :end_at]).empty?
+              enrollment.start_at = start_date
+              enrollment.end_at = end_date
+            end
 
             @courses_to_touch_ids.add(enrollment.course)
             if enrollment.should_update_user_account_association?

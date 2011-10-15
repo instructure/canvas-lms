@@ -13,7 +13,15 @@ I18n.locale = null;
 // Set the placeholder format. Accepts `{{placeholder}}` and `%{placeholder}`.
 I18n.PLACEHOLDER = /(?:\{\{|%\{)(.*?)(?:\}\}?)/gm;
 
-I18n.isValidNode = function(obj, node) { return (node in obj); }
+I18n.isValidNode = function(obj, node) { 
+  // handle names like "foo.bar.baz"
+  var nameParts = node.split('.');
+  for (var j=0; j < nameParts.length; j++) {
+    if (!(nameParts[j] in obj)) return false;
+    obj = obj[nameParts[j]];
+  }
+  return true; 
+};
 
 I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);
@@ -79,15 +87,25 @@ I18n.prepareOptions = function() {
 };
 
 I18n.interpolate = function(message, options) {
-  options = this.prepareOptions(options);
-  var matches = message.match(this.PLACEHOLDER) || [];
+  var placeholder, value, name, matches, needsEscaping = false;
 
-  var placeholder, value, name, needsEscaping;
+  options = this.prepareOptions(options);
+  if (options.wrapper) {
+    needsEscaping = true;
+    message = this.applyWrappers(message, options.wrapper);
+  }
+
+  matches = message.match(this.PLACEHOLDER) || [];
 
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
 
-    value = options[name];
+    // handle names like "foo.bar.baz"
+    var nameParts = name.split('.');
+    value = options;
+    for (var j=0; j < nameParts.length; j++) {
+      value = value[nameParts[j]];
+    }
 
     if (!this.isValidNode(options, name)) {
       value = "[missing " + placeholder + " value]";
@@ -105,9 +123,6 @@ I18n.interpolate = function(message, options) {
     message = message.replace(regex, value);
   }
 
-  if (options.wrapper) {
-    message = this.applyWrappers(needsEscaping ? $.raw(message) : message, options.wrapper)
-  }
   return message;
 };
 

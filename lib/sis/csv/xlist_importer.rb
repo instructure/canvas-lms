@@ -29,7 +29,7 @@ module SIS
       # possible columns:
       # xlist_course_id, section_id, status
       def process(csv)
-        @sis.counts[:xlists] += SIS::XlistImporter.new(@batch.try(:id), @root_account, logger).process do |importer|
+        @sis.counts[:xlists] += SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv) do |row|
             update_progress
 

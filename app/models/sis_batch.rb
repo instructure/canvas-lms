@@ -21,6 +21,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :account
   has_many :sis_batch_log_entries, :order => :created_at
   serialize :data
+  serialize :options
   serialize :processing_errors, Array
   serialize :processing_warnings, Array
   belongs_to :attachment
@@ -75,6 +76,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def process
+    self.options ||= {}
     if self.workflow_state == 'created'
       self.workflow_state = :importing
       self.progress = 0
@@ -111,7 +113,7 @@ class SisBatch < ActiveRecord::Base
   def process_instructure_csv_zip
     require 'sis'
     download_zip
-    importer = SIS::CSV::Import.process(self.account, :files => [ @data_file.path ], :batch => self)
+    importer = SIS::CSV::Import.process(self.account, :files => [ @data_file.path ], :batch => self, :override_sis_stickiness => options[:override_sis_stickiness], :add_sis_stickiness => options[:add_sis_stickiness], :clear_sis_stickiness => options[:clear_sis_stickiness])
     finish importer.finished
   end
 

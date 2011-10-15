@@ -17,6 +17,8 @@
 #
 
 module Api::V1::StreamItem
+  include Api::V1::Context
+
   def stream_item_json(stream_item)
     data = stream_item.data
     {}.tap do |hash|
@@ -28,14 +30,7 @@ module Api::V1::StreamItem
       hash['title'] = data.title
       hash['message'] = data.body
       hash['type'] = data.type
-      hash['context_type'] = data.context_type
-      # include context information, if a context exists
-      case stream_item.context_code
-      when %r{^course_(\d+)$}
-        hash['course_id'] = $1.to_i
-      when %r{^group_(\d+)$}
-        hash['group_id'] = $1.to_i
-      end
+      hash.merge!(context_data(data))
 
       case data.type
       when 'DiscussionTopic', 'Announcement'

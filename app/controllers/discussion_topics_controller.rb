@@ -22,7 +22,7 @@
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
   
-  add_crumb(lambda { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
+  add_crumb(proc { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
   before_filter { |c| c.active_tab = "discussions" }  
   
   include Api::V1::DiscussionTopics
@@ -138,13 +138,12 @@ class DiscussionTopicsController < ApplicationController
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @topic.context_module_action(@current_user, :read) if !@locked
       if @topic.for_group_assignment?
+        @groups = @topic.assignment.group_category.groups.active.select{|g| g.grants_right?(@current_user, session, :read) }
         if params[:combined]
-          @groups = @context.groups.active.find_all_by_category(@topic.assignment.group_category).select{|g| g.grants_right?(@current_user, session, :read) }
           @topic_agglomerated = true
           @topics = @topic.child_topics.select{|t| @groups.include?(t.context) }
           @entries = @topics.map{|t| t.discussion_entries.active.find(:all, :conditions => ['parent_id = ?', 0])}.flatten.sort_by{|e| e.created_at}
         else
-          @groups = @context.groups.active.find_all_by_category(@topic.assignment.group_category).select{|g| g.grants_right?(@current_user, session, :read) }
           @topics = @topic.child_topics.to_a
           @topics = @topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
           @group_entry = @topic.discussion_entries.build(:message => render_to_string(:partial => 'group_assignment_discussion_entry'))

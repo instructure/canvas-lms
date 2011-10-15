@@ -67,9 +67,6 @@
         editable: false
       });
     };
-    SubmissionCell.imageForCell = function(image_id) {
-      return $(image_id)[0].outerHTML;
-    };
     SubmissionCell.prototype.cellWrapper = function(innerContents, options) {
       var opts, specialClasses, tooltipText;
       if (options == null) {

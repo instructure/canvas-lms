@@ -57,6 +57,14 @@ module SIS
           yield row
         end
       end
+
+      def importer_opts
+        { :batch_id => @batch.try(:id),
+          :logger => @sis.logger,
+          :override_sis_stickiness => @sis.override_sis_stickiness,
+          :add_sis_stickiness => @sis.add_sis_stickiness,
+          :clear_sis_stickiness => @sis.clear_sis_stickiness }
+      end
     end
   end
 end

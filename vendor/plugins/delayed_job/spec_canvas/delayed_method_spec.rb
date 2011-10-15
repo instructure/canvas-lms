@@ -134,4 +134,34 @@ describe 'random ruby objects' do
     end
   end
 
+  describe "send_later_unless_in_job" do
+    module UnlessInJob
+      @runs = 0
+      def self.runs; @runs; end
+
+      def self.run
+        @runs += 1
+      end
+
+      def self.run_later
+        self.send_later_unless_in_job :run
+      end
+    end
+
+    before do
+      UnlessInJob.class_eval { @runs = 0 }
+    end
+
+    it "should perform immediately if in job" do
+      job = UnlessInJob.send_later :run_later
+      job.invoke_job
+      UnlessInJob.runs.should == 1
+    end
+
+    it "should queue up for later if not in job" do
+      UnlessInJob.run_later
+      UnlessInJob.runs.should == 0
+    end
+  end
+
 end

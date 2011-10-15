@@ -95,7 +95,7 @@ class FilesController < ApplicationController
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url))
     @contexts = [@context]
     if !@context.is_a?(User) || (@context == @current_user && params[:show_all_contexts])
-      get_all_pertinent_contexts
+      get_all_pertinent_contexts(true)
     end
     @too_many_contexts = @contexts.length > 15
     @contexts = @contexts[0,15]
@@ -173,13 +173,6 @@ class FilesController < ApplicationController
     @context = UserProfile.new(@context) if (@context == @current_user) && @current_user
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
-      # before telling them it's deleted, try to find another active attachment with the same full path
-      if new_attachment = Folder.find_attachment_in_context_with_path(@context, @attachment.full_display_path)
-        original_params[:id] = new_attachment.id
-        redirect_to original_params
-        return
-      end
-      
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
       if params[:preview] && @attachment.mime_class == 'image'
         redirect_to '/images/blank.png'

@@ -83,7 +83,7 @@ module Crummy
           content_tag(:ul, nil, nil, false) do 
             crumbs.collect do |crumb|
               content_tag(:li, crumb_to_html(crumb), crumb[2])
-            end
+            end.join
           end
         end
       end

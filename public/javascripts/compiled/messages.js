@@ -1,5 +1,5 @@
 (function() {
-  var $conversation_list, $conversations, $form, $last_label, $message_list, $messages, $selected_conversation, MessageInbox, TokenInput, TokenSelector;
+  var $conversation_list, $conversations, $form, $last_label, $message_list, $messages, $selected_conversation, MessageInbox, TokenInput, TokenSelector, page;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -13,6 +13,7 @@
   $form = [];
   $selected_conversation = null;
   $last_label = null;
+  page = {};
   MessageInbox = {};
   TokenInput = (function() {
     function TokenInput(node, options) {
@@ -252,7 +253,7 @@
     };
     TokenSelector.prototype.new_list = function() {
       var $list;
-      $list = $('<div><ul class="heading"></ul><ul></ul></div>');
+      $list = $('<div class="list"><ul class="heading"></ul><ul></ul></div>');
       $list.find('ul').mousemove(__bind(function(e) {
         var $li;
         if (this.ui_locked) {
@@ -286,14 +287,21 @@
             }
           } else if (this.selection_toggleable() && $(e.target).closest('a.toggle').length) {
             this.toggle_selection();
-          } else if (!this.selection.hasClass('expanded')) {
-            this.toggle_selection(true);
-            this.clear();
-            this.close();
+          } else {
+            if (this.selection_expanded()) {
+              this.collapse();
+            } else if (this.selection_expandable()) {
+              this.expand_selection();
+            } else {
+              this.toggle_selection(true);
+              this.clear();
+              this.close();
+            }
           }
         }
         return this.input.focus();
       }, this));
+      $list.body = $list.find('ul').last();
       return $list;
     };
     TokenSelector.prototype.capture_keydown = function(e) {
@@ -319,7 +327,7 @@
         case 'Tab':
         case 'U+0009':
         case 9:
-          if (this.selection && !this.selection.hasClass('expanded')) {
+          if (this.selection && (this.selection_toggleable() || !this.selection_expandable())) {
             this.toggle_selection(true);
           }
           this.clear();
@@ -330,7 +338,13 @@
           break;
         case 'Enter':
         case 13:
-          if (this.selection && !this.selection.hasClass('expanded')) {
+          if (this.selection_expanded()) {
+            this.collapse();
+            return true;
+          } else if (this.selection_expandable() && !this.selection_toggleable()) {
+            this.expand_selection();
+            return true;
+          } else if (this.selection) {
             this.toggle_selection(true);
             this.clear();
           }
@@ -426,7 +440,7 @@
           this.last_applied_query = this_query;
           this.last_search = post_data.search;
           this.clear_loading();
-          this.render_list(this.query_cache[this_query], options);
+          this.render_list(this.query_cache[this_query], options, post_data);
           return;
         }
         this.set_loading();
@@ -438,7 +452,7 @@
             this.last_applied_query = this_query;
             this.last_search = post_data.search;
             if (this.menu.is(":visible")) {
-              return this.render_list(data, options);
+              return this.render_list(data, options, post_data);
             }
           } else {
             return this.ui_locked = false;
@@ -491,9 +505,12 @@
       var _ref, _ref2;
       return (_ref = (_ref2 = this.selection) != null ? _ref2.hasClass('expandable') : void 0) != null ? _ref : false;
     };
-    TokenSelector.prototype.selection_toggleable = function() {
-      var _ref, _ref2;
-      return (_ref = (_ref2 = this.selection) != null ? _ref2.hasClass('toggleable') : void 0) != null ? _ref : false;
+    TokenSelector.prototype.selection_toggleable = function($node) {
+      var _ref;
+      if ($node == null) {
+        $node = this.selection;
+      }
+      return ((_ref = $node != null ? $node.hasClass('toggleable') : void 0) != null ? _ref : false) && !this.selection_expanded();
     };
     TokenSelector.prototype.expand_selection = function() {
       if (!(this.selection_expandable() && !this.selection_expanded())) {
@@ -524,32 +541,92 @@
         return this.ui_locked = false;
       }, this));
     };
-    TokenSelector.prototype.toggle_selection = function(state) {
-      var id;
-      if (!((state != null) || this.selection_toggleable())) {
+    TokenSelector.prototype.toggle_selection = function(state, $node, toggle_only) {
+      var id, _ref;
+      if ($node == null) {
+        $node = this.selection;
+      }
+      if (toggle_only == null) {
+        toggle_only = false;
+      }
+      if (!((state != null) || this.selection_toggleable($node))) {
         return false;
       }
-      id = this.selection.data('id');
+      id = $node.data('id');
       if (state == null) {
-        state = !this.input.has_token({
+        state = !$node.hasClass('on');
+      }
+      if (state) {
+        if (this.selection_toggleable($node) && !toggle_only) {
+          $node.addClass('on');
+        }
+        this.input.add_token({
+          value: id,
+          text: (_ref = $node.data('text')) != null ? _ref : $node.text(),
+          no_clear: true,
+          data: $node.data('user_data')
+        });
+      } else {
+        if (!toggle_only) {
+          $node.removeClass('on');
+        }
+        this.input.remove_token({
           value: id
         });
       }
-      if (state) {
-        if (this.selection_toggleable()) {
-          this.selection.addClass('on');
+      if (!toggle_only) {
+        return this.update_select_all($node);
+      }
+    };
+    TokenSelector.prototype.update_select_all = function($node, offset) {
+      var $list, $nodes, $on_nodes, $parent_node, $select_all, select_all_toggled;
+      if (offset == null) {
+        offset = 0;
+      }
+      select_all_toggled = $node.data('user_data').select_all;
+      $list = offset ? this.stack[this.stack.length - offset][1] : this.list;
+      $select_all = $list.select_all;
+      if (!$select_all) {
+        return;
+      }
+      $nodes = $list.body.find('li.toggleable').not($select_all);
+      if (select_all_toggled) {
+        if ($select_all.hasClass('on')) {
+          $nodes.addClass('on').each(__bind(function(i, node) {
+            return this.toggle_selection(false, $(node), true);
+          }, this));
+        } else {
+          $nodes.removeClass('on').each(__bind(function(i, node) {
+            return this.toggle_selection(false, $(node), true);
+          }, this));
         }
-        return this.input.add_token({
-          value: id,
-          text: this.selection.find('b').text(),
-          no_clear: true,
-          data: this.selection.data('user_data')
-        });
       } else {
-        this.selection.removeClass('on');
-        return this.input.remove_token({
-          value: id
-        });
+        $on_nodes = $nodes.filter('.on');
+        if ($on_nodes.length < $nodes.length && $select_all.hasClass('on')) {
+          $select_all.removeClass('on');
+          this.toggle_selection(false, $select_all, true);
+          $on_nodes.each(__bind(function(i, node) {
+            return this.toggle_selection(true, $(node), true);
+          }, this));
+        } else if ($on_nodes.length === $nodes.length && !$select_all.hasClass('on')) {
+          $select_all.addClass('on');
+          this.toggle_selection(true, $select_all, true);
+          $on_nodes.each(__bind(function(i, node) {
+            return this.toggle_selection(false, $(node), true);
+          }, this));
+        }
+      }
+      if (offset < this.stack.length) {
+        offset++;
+        $parent_node = this.stack[this.stack.length - offset][0];
+        if (this.selection_toggleable($parent_node)) {
+          if ($select_all.hasClass('on')) {
+            $parent_node.addClass('on');
+          } else {
+            $parent_node.removeClass('on');
+          }
+          return this.update_select_all($parent_node, offset);
+        }
       }
     };
     TokenSelector.prototype.select = function($node, preserve_mode) {
@@ -616,10 +693,13 @@
     TokenSelector.prototype.clear_loading = function() {
       return this.list.find('li').first().loadingImage('remove');
     };
-    TokenSelector.prototype.render_list = function(data, options) {
-      var $body, $heading, $li, $list, $message, $uls, i, row, _len, _ref, _ref2;
+    TokenSelector.prototype.render_list = function(data, options, post_data) {
+      var $body, $heading, $li, $list, $message, $uls, i, parent, row, _base, _base2, _len, _ref, _ref2, _ref3;
       if (options == null) {
         options = {};
+      }
+      if (post_data == null) {
+        post_data = {};
       }
       this.open();
       if (options.expand) {
@@ -627,28 +707,43 @@
       } else {
         $list = this.list;
       }
+      $list.select_all = null;
       this.selection = null;
       $uls = $list.find('ul');
       $uls.html('');
       $heading = $uls.first();
       $body = $uls.last();
       if (data.length) {
+        parent = this.stack.length ? this.stack[this.stack.length - 1][0] : null;
+        if (!data.prepared) {
+          if (typeof (_base = this.options).preparer === "function") {
+            _base.preparer(post_data, data, parent);
+          }
+          data.prepared = true;
+        }
         for (i = 0, _len = data.length; i < _len; i++) {
           row = data[i];
           $li = $('<li />').addClass('selectable');
           this.populate_row($li, row, {
             level: this.stack.length,
             first: i === 0,
-            last: i === data.length - 1
+            last: i === data.length - 1,
+            parent: parent
           });
+          if (row.select_all) {
+            $list.select_all = $li;
+          }
           if ($li.hasClass('toggleable') && this.input.has_token($li.data('id'))) {
             $li.addClass('on');
           }
           $body.append($li);
         }
+        if (((_ref = $list.select_all) != null ? typeof _ref.hasClass === "function" ? _ref.hasClass('on') : void 0 : void 0) || this.stack.length && (typeof (_base2 = this.stack[this.stack.length - 1][0]).hasClass === "function" ? _base2.hasClass('on') : void 0)) {
+          $list.body.find('li.toggleable').addClass('on');
+        }
       } else {
         $message = $('<li class="message first last"></li>');
-        $message.text((_ref = (_ref2 = this.options.messages) != null ? _ref2.no_results : void 0) != null ? _ref : '');
+        $message.text((_ref2 = (_ref3 = this.options.messages) != null ? _ref3.no_results : void 0) != null ? _ref2 : '');
         $body.append($message);
       }
       if (this.list_expanded()) {
@@ -679,17 +774,15 @@
       }
     };
     TokenSelector.prototype.prepare_post = function(data) {
-      var post_data, _base, _ref;
+      var post_data, _base, _ref, _ref2;
       post_data = $.extend(data, {
         search: this.input.val()
-      });
+      }, (_ref = this.options.base_data) != null ? _ref : {});
       post_data.exclude = this.input.base_exclude.concat(this.stack.length ? [] : this.input.token_values());
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-            if ((_ref = post_data.per_page) != null) {
-        _ref;
-      } else {
+      if ((_ref2 = post_data.per_page) == null) {
         post_data.per_page = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
@@ -837,7 +930,7 @@
       $form.loadingImage();
       $c = $selected_conversation;
       completion = function(data) {
-        var i, j, message, submission, user, user_id, _i, _len, _ref, _ref2;
+        var i, j, message, submission, user, _i, _len, _ref, _ref2;
         if (!is_selected($c)) {
           return;
         }
@@ -849,7 +942,20 @@
             user.html_name = html_name_for_user(user);
           }
         }
-        $form.find('#user_note_info').showIf($c.hasClass('private') && (user_id = $c.find('.participant').first().data('id')) && (user = MessageInbox.user_cache[user_id]) && can_add_notes_for(user));
+        if (data['private'] && (user = ((function() {
+          var _j, _len2, _ref3, _results;
+          _ref3 = data.participants;
+          _results = [];
+          for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
+            user = _ref3[_j];
+            if (user.id !== MessageInbox.user_id) {
+              _results.push(user);
+            }
+          }
+          return _results;
+        })())[0] && can_add_notes_for(user))) {
+          $form.find('#user_note_info').show();
+        }
         inbox_resize();
         $messages.show();
         i = j = 0;
@@ -1054,9 +1160,8 @@
     };
     build_media_object = function(blank, data) {
       var $media_object;
-      $media_object = blank.clone(true).attr('id', 'media_object_' + data.id);
-      $media_object.data('id', data.id);
-      $media_object.find('span.title').html($.h(data.title));
+      $media_object = blank.clone(true).attr('id', 'media_comment_' + data.media_id);
+      $media_object.find('span.title').html($.h(data.display_name));
       $media_object.find('span.media_comment_id').html($.h(data.media_id));
       return $media_object;
     };
@@ -1066,10 +1171,7 @@
       $attachment.data('id', data.id);
       $attachment.find('span.title').html($.h(data.display_name));
       $link = $attachment.find('a');
-      $link.attr('href', $.replaceTags($link.attr('href'), {
-        id: data.id,
-        uuid: data.uuid
-      }));
+      $link.attr('href', data.url);
       $link.click(function(e) {
         return e.stopPropagation();
       });
@@ -1371,39 +1473,118 @@
     set_conversation_state = function($conversation, state) {
       return $conversation.removeClass('read unread archived').addClass(state);
     };
+    $('#conversations').delegate('.actions a', 'blur', function(e) {
+      return $(window).one('keyup', function(e) {
+        if (e.shiftKey) {
+          return close_menus();
+        }
+      });
+    });
     open_conversation_menu = function($node) {
-      var $container, $conversation, $groups, offset;
-      $node.parent().addClass('selected').closest('li').addClass('menu_active');
-      $container = $('#conversation_actions');
-      $container.addClass('selected');
-      $conversation = $node.closest('li');
-      $container.data('selected_conversation', $conversation);
-      $container.find('ul').removeClass('first last').hide();
-      $container.find('li').hide();
-      $('#action_mark_as_read').parent().showIf($conversation.hasClass('unread'));
-      $('#action_mark_as_unread').parent().showIf($conversation.hasClass('read'));
-      $container.find('.label_group').show().find('.label_icon').removeClass('checked');
-      $container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked');
-      if ($conversation.hasClass('private')) {
-        $('#action_subscribe, #action_unsubscribe').parent().hide();
+      var $container, $conversation, elements, offset;
+      elements = {
+        node: $node,
+        container: $('#conversation_actions'),
+        conversation: $node.closest('li'),
+        parent: $node.parent(),
+        lists: $('#conversation_actions ul'),
+        listElements: $('#conversation_actions li'),
+        focusable: $('a, input, select, textarea'),
+        actions: {
+          markAsRead: $('#action_mark_as_read').parent(),
+          markAsUnread: $('#action_mark_as_unread').parent(),
+          unsubscribe: $('#action_unsubscribe').parent(),
+          subscribe: $('#action_subscribe').parent(),
+          forward: $('#action_forward').parent(),
+          archive: $('#action_archive').parent(),
+          unarchive: $('#action_unarchive').parent(),
+          "delete": $('#action_delete').parent(),
+          deleteAll: $('#action_delete_all').parent()
+        },
+        labels: {
+          group: $('#conversation_actions .label_group'),
+          icon: $('#conversation_actions .label_icon')
+        }
+      };
+      page.activeActionMenu = elements.node;
+      elements.parent.addClass('selected');
+      elements.container.addClass('selected');
+      elements.conversation.addClass('menu_active');
+      $container = elements.container;
+      $conversation = elements.conversation;
+      elements.container.data('selected_conversation', elements.conversation);
+      elements.lists.removeClass('first last').hide();
+      elements.listElements.hide();
+      if (elements.conversation.hasClass('unread')) {
+        elements.actions.markAsRead.show();
+      }
+      if (elements.conversation.hasClass('read')) {
+        elements.actions.markAsUnread.show();
+      }
+      elements.labels.group.show();
+      elements.labels.icon.removeClass('checked');
+      elements.container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked');
+      if (elements.conversation.hasClass('private')) {
+        elements.actions.subscribe.hide();
+        elements.actions.unsubscribe.hide();
       } else {
-        $('#action_unsubscribe').parent().showIf(!$conversation.hasClass('unsubscribed'));
-        $('#action_subscribe').parent().showIf($conversation.hasClass('unsubscribed'));
+        if (!elements.conversation.hasClass('unsubscribed')) {
+          elements.actions.unsubscribe.show();
+        }
+        if (elements.conversation.hasClass('unsubscribed')) {
+          elements.actions.subscribe.show();
+        }
       }
-      $('#action_forward').parent().show();
-      $('#action_archive').parent().showIf(MessageInbox.scope !== 'archived');
-      $('#action_unarchive').parent().showIf(MessageInbox.scope === 'archived');
-      $('#action_delete').parent().show();
-      $('#action_delete_all').parent().show();
-      $container.find('li[style*="list-item"]').parent().show();
-      $groups = $container.find('ul[style*="block"]');
-      if ($groups.length) {
-        $($groups[0]).addClass('first');
-        $($groups[$groups.length - 1]).addClass('last');
+      elements.actions.forward.show();
+      elements.actions["delete"].show();
+      elements.actions.deleteAll.show();
+      if (MessageInbox.scope === 'archived') {
+        elements.actions.unarchive.show();
+      } else {
+        elements.actions.archive.show();
       }
-      offset = $node.offset();
-      $container.css('top', offset.top + ($node.height() * 0.9) - $container.offsetParent().offset().top);
-      return $container.css('left', offset.left + ($node.width() / 2) - $container.offsetParent().offset().left - ($container.width() / 2));
+      $(window).one('keydown', function(e) {
+        if (e.keyCode !== 9 || e.shiftKey) {
+          return;
+        }
+        return elements.focusable.one('focus.actions_menu', function(e) {
+          page.nextElement = $(e.target);
+          elements.focusable.unbind('.actions_menu');
+          elements.container.find('a:visible:first').focus();
+          elements.container.find('a:visible:first').bind('blur.actions_menu', e, function() {
+            return $(window).one('keyup', function(e) {
+              var actionMenuActive;
+              actionMenuActive = elements.container.find('a:focus').length;
+              if (!actionMenuActive) {
+                elements.container.find('a.visible').unbind('.actions_menu');
+                return page.activeActionMenu.focus();
+              }
+            });
+          });
+          return elements.container.find('a:visible:last').bind('blur.actions_menu', e, function() {
+            return $(window).one('keyup', function(e) {
+              var actionMenuActive;
+              actionMenuActive = elements.container.find('a:focus').length;
+              if (!actionMenuActive) {
+                elements.container.find('a.visible').unbind('.actions_menu');
+                page.nextElement.focus();
+                return close_menus();
+              }
+            });
+          });
+        });
+      });
+      elements.container.find('li[style*="list-item"]').parent().show();
+      elements.groups = elements.container.find('ul[style*="block"]');
+      if (elements.groups.length) {
+        elements.groups.first().addClass('first');
+        elements.groups.last().addClass('last');
+      }
+      offset = elements.node.offset();
+      return elements.container.css({
+        left: offset.left + (elements.node.width() / 2) - elements.container.offsetParent().offset().left - (elements.container.width() / 2),
+        top: offset.top + (elements.node.height() * 0.9) - elements.container.offsetParent().offset().top
+      });
     };
     close_menus = function() {
       $('#actions .menus > li, #conversation_actions, #conversations .actions').removeClass('selected');
@@ -1916,7 +2097,7 @@
       $('.recipients').tokenInput({
         placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group"),
         added: function(data, $token, new_token) {
-          var $details, _base, _name, _ref3;
+          var $details, current_data, _ref3;
           if (new_token && data.type) {
             $token.addClass(data.type);
             if (data.user_count != null) {
@@ -1931,7 +2112,8 @@
           if (!(data.id && ("" + data.id).match(/^(course|group)_/))) {
             data = $.extend({}, data);
             delete data.avatar_url;
-            return (_ref3 = (_base = MessageInbox.user_cache)[_name = data.id]) != null ? _ref3 : _base[_name] = data;
+            current_data = (_ref3 = MessageInbox.user_cache[data.id]) != null ? _ref3 : {};
+            return MessageInbox.user_cache[data.id] = $.extend(current_data, data);
           }
         },
         selector: {
@@ -1939,7 +2121,7 @@
             no_results: I18n.t('no_results', 'No results found')
           },
           populator: function($node, data, options) {
-            var $b, $img, $span;
+            var $b, $context_name, $img, $name, $span, context_name, text;
             if (options == null) {
               options = {};
             }
@@ -1948,26 +2130,61 @@
               $img.attr('src', data.avatar_url);
               $node.append($img);
             }
+            context_name = data.context_name ? data.context_name : '';
+            context_name = context_name.length < 40 ? context_name : context_name.substr(0, 40) + '...';
+            $context_name = data.context_name ? $('<span />', {
+              "class": 'context_name'
+            }).text("(" + context_name + ")") : '';
             $b = $('<b />');
             $b.text(data.name);
-            $span = $('<span />');
+            $name = $('<span />', {
+              "class": 'name'
+            });
+            $name.append($b, $context_name);
+            $span = $('<span />', {
+              "class": 'details'
+            });
             if (data.common_courses != null) {
-              $span.text(MessageInbox.context_list(data));
+              $span.text(MessageInbox.context_list({
+                courses: data.common_courses,
+                groups: data.common_groups
+              }));
             } else if (data.type && (data.user_count != null)) {
               $span.text(I18n.t('people_count', 'person', {
                 count: data.user_count
               }));
+            } else if (data.item_count != null) {
+              if (data.id.match(/_groups$/)) {
+                $span.text(I18n.t('groups_count', 'group', {
+                  count: data.item_count
+                }));
+              } else if (data.id.match(/_sections$/)) {
+                $span.text(I18n.t('sections_count', 'section', {
+                  count: data.item_count
+                }));
+              }
             }
-            $node.append($b, $span);
+            $node.append($name, $span);
             $node.attr('title', data.name);
+            text = data.name;
+            if (options.parent) {
+              if (data.select_all && data.no_expand) {
+                text = options.parent.data('text');
+              } else if ((data.id + '').match(/_\d+_/)) {
+                text = I18n.beforeLabel(options.parent.data('text')) + " " + text;
+              }
+            }
+            $node.data('text', text);
             $node.data('id', data.id);
             $node.data('user_data', data);
             $node.addClass(data.type ? data.type : 'user');
             if (options.level > 0) {
               $node.prepend('<a class="toggle"><i></i></a>');
-              $node.addClass('toggleable');
+              if (!data.item_count) {
+                $node.addClass('toggleable');
+              }
             }
-            if (data.type === 'context') {
+            if (data.type === 'context' && !data.no_expand) {
               $node.prepend('<a class="expand"><i></i></a>');
               return $node.addClass('expandable');
             }
@@ -1978,6 +2195,35 @@
             } else {
               return 5;
             }
+          },
+          preparer: function(post_data, data, parent) {
+            var context;
+            context = post_data.context;
+            if (!post_data.search && context && data.length > 1) {
+              if (context.match(/^(course|section)_\d+$/)) {
+                return data.unshift({
+                  id: "" + context + "_all",
+                  name: I18n.t('enrollments_everyone', "Everyone"),
+                  user_count: parent.data('user_data').user_count,
+                  type: 'context',
+                  avatar_url: parent.data('user_data').avatar_url,
+                  select_all: true
+                });
+              } else if (context.match(/^((course|section)_\d+_.*|group_\d+)$/) && !context.match(/^course_\d+_(groups|sections)$/)) {
+                return data.unshift({
+                  id: context,
+                  name: I18n.t('select_all', "Select All"),
+                  user_count: parent.data('user_data').user_count,
+                  type: 'context',
+                  avatar_url: parent.data('user_data').avatar_url,
+                  select_all: true,
+                  no_expand: true
+                });
+              }
+            }
+          },
+          base_data: {
+            synthetic_contexts: 1
           },
           browser: {
             data: {

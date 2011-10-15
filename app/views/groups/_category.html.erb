@@ -1,23 +1,39 @@
-<div id="<%= category ? category.unpack('H*') : "category_template" %>" class="group_category">
+<% category_name = category && category.name %>
+<% student_organized = category && category.student_organized? %>
+<% protected_category = category && category.protected? %>
+<div id="<%= "category_#{category ? category.id : "template"}" %>" data-category_id="<%= category && category.id %>" class="group_category <%= 'student_organized' if student_organized %>">
   <div class="category_header">
+    <div style="display: none;">
+      <span class="self_signup"><%= category && category.self_signup %></span>
+      <span class="heterogenous"><%= category && category.has_heterogenous_group? %></span>
+    </div>
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><%= image_tag "add.png" %></a>
-      <% if category != Group.student_organized_category %>
-        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_name => category || "{{ category_name }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
+      <% unless protected_category %>
+        <a href="<%= context_url(@context, :update_category_context_groups_url, :category_id => category ? category.id : "{{ category_id }}") %>" class="edit_category_link no-hover" title="<%= t 'buttons.edit_category', "Edit This Set of Groups" %>"><%= image_tag "edit.png" %></a>
+        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_id => category ? category.id : "{{ category_id }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><%= image_tag "delete.png" %></a>
       <% end %>
     </div>
-    <h3 class="category_name"><%= category %></h3>
+    <h3 class="category_name"><%= category_name %></h3>
     <div class="clear"></div>
     <div style="margin-left: 20px;">
       <div style="float: right;">
       <a href="#" class="expand_groups_link"><%= t 'actions.expand_all', "Expand All" %></a> |
       <a href="#" class="collapse_groups_link"><%= t 'actions.collapse_all', "Collapse All" %></a>
       </div>
+      <div style="margin-top: 0.5em; margin-bottom: 0.5em;">
       <span class="group_count"></span>
       <span style="color: #888;"> &nbsp; &nbsp; <%= t 'instructions.group_assignment', "drag students to assign to groups" %></span>
-      <% if category == Group.student_organized_category %>
+      </div>
+      <% if student_organized %>
         <div style="color: #444;"><%= image_tag "warning.png" %> <%= t 'warnings.studend_groups', "These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments." %></div>
       <% end %>
+      <div style="color: #444;<%= hidden unless category && category.self_signup? %>" class="self_signup_text">
+        <%= t 'self_signup_blurb', "Self sign-up is enabled for these groups." %>
+        <span class="restricted_self_signup_text" style="<%= hidden unless category && category.restricted_self_signup? %>"><%= t 'restricted_self_signup_blurb', "All students in a group are required to be in the same section." %></span>
+        <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
+                    :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
+      </div>
     </div>
   </div>
   <div class="right_side">
@@ -36,12 +52,12 @@
           <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="delete_group_link no-hover"><%= image_tag "delete.png" %></a>
         </div>
         <h3 style="display: none;" class="group_name"><a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" target="_blank" class="name"><%= t :group_name, "Name" %></a></h3>
-        <% if category == Group.student_organized_category %>
+        <% if student_organized %>
           <h3 class="name blank_name"><%= t :group_category_all, "Everyone" %></h3>
         <% else %>
           <h3 class="name blank_name"><%= t :group_category_unassigned, "Unassigned" %></h3>
         <% end %>
-        <% unless @context.is_a?(Account) || category == Group.student_organized_category %>
+        <% unless @context.is_a?(Account) || protected_category %>
           <a href="#" class="assign_students_link no-hover" title="<%= t :random_distribution_explanation, "Distribute Unassigned Students Equally Among Groups" %>"><%= t :randomly_distribute_students, "randomly assign students" %></a>
         <% end %>
         <div style="display: none;">
@@ -59,7 +75,7 @@
     </div>
   </div>
   <div class="left_side">
-  <% @groups.select{|g| g.category == category}.each do |group| %>
+  <% @groups.select{|g| g.group_category == category}.each do |group| %>
     <div class="group" id="group_<%= group.id %>">
       <div class="inner-wrapper">
         <div class="group_user_count">
@@ -78,7 +94,7 @@
           <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" target="_blank"><%= group.name %></a>
         </h3>
         <div style="display: none;">
-          <span class="category_name"><%= category || nbsp %></span>
+          <span class="category_name"><%= category_name || nbsp %></span>
           <span class="max_membership"><%= (group.max_membership || nbsp) rescue nbsp %></span>
           <span class="group_id"><%= group ? group.id : nbsp %></span>
         </div>

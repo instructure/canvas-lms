@@ -98,19 +98,15 @@ module Turnitin
       res.css("userid")[0].content rescue nil
     end
     
-    def createAssignment(assignment)
+    def createOrUpdateAssignment(assignment)
+      return true if assignment.turnitin_settings[:current]
+
       course = assignment.context
       today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
-      # s_paper_check       - 1/0, check student paper repository (is this the CURRENT student's repo, or all other students on the same paper???)
-      # internet_check      - 1/0, check internet repo
-      # journal_check       - 1/0, check journals, periodicals, publications
+      settings = assignment.turnitin_settings.dup
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution
-      # exclude_biblio      - 1/0, exclude bibliographic material
-      # exclude_quoted      - 1/0, exclude quoted material
-      # exclude_type        - 0=none, 1=by_word_count, 2=by_percentage
-      # exclude_value       - goes with exclude_type, either num or pct based on type
-      res = sendRequest(:create_assignment, '2',
+      res = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge({
         :user => course,
         :course => course,
         :assignment => assignment,
@@ -121,8 +117,17 @@ module Turnitin
         :s_view_report => "1", 
         :late_accept_flag => '1',
         :post => true
-      )
-      res.css("assignmentid")[0].content rescue nil
+      }))
+      begin
+        ret = res.css("assignmentid")[0].content
+        assignment.turnitin_settings = assignment.turnitin_settings
+        assignment.turnitin_settings[:current] = true
+        assignment.turnitin_settings[:created] = true
+        assignment.save
+        ret
+      rescue
+        nil
+      end
     end
     
     def submitPaper(submission)

@@ -19,7 +19,7 @@
 class AssignmentsController < ApplicationController
   include GoogleDocs
   before_filter :require_context
-  add_crumb(lambda { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
   
   def index
@@ -201,7 +201,21 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
+  def toggle_mute
+    return nil unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    method = if params[:status] == "true" then :mute! else :unmute! end
+
+    respond_to do |format|
+      if @assignment && @assignment.send(method)
+        format.json { render :json => @assignment.to_json }
+      else
+        format.json { render :json => @assignment.to_json, :status => :bad_request }
+      end
+    end
+  end
+
   def new
     if !params[:model_key]
       args = request.query_parameters

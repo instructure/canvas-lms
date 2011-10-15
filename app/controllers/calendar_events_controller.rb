@@ -19,7 +19,7 @@
 class CalendarEventsController < ApplicationController
   before_filter :require_context
   
-  add_crumb(lambda { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
+  add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
   
   
   def show

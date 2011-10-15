@@ -28,6 +28,7 @@ describe "users/_logins.html.erb" do
       @pseudo = @user.pseudonyms.first
       @pseudo.sis_user_id = "why_is_this_one_user_id_lame"
       @pseudo.save
+      @pseudo2 = @user.pseudonyms.create!(:unique_id => 'someone@somewhere.com') { |p| p.sis_user_id = 'more' }
       assigns[:context] = @account
       assigns[:context_account] = @account
       assigns[:account] = @account
@@ -52,6 +53,8 @@ describe "users/_logins.html.erb" do
       render
       response.should have_tag("span#sis_source_id_#{@pseudo.id}", @pseudo.sis_source_id)
       response.should have_tag("div.can_edit_sis_user_id", 'true')
+      page = Nokogiri('<document>' + response.body + '</document>')
+      page.css(".login .delete_pseudonym_link").first['style'].should == ''
     end
 
     it "should not show to non-sis admin" do
@@ -61,6 +64,8 @@ describe "users/_logins.html.erb" do
       render
       response.should have_tag("span#sis_source_id_#{@pseudo.id}", @pseudo.sis_source_id)
       response.should have_tag("div.can_edit_sis_user_id", 'false')
+      page = Nokogiri('<document>' + response.body + '</document>')
+      page.css(".login .delete_pseudonym_link").first['style'].should == 'display: none;'
     end
   end
 end

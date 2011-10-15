@@ -1,9 +1,13 @@
+<% section = student && student.section_for_course(@context) %>
 <li class="student user_<%= student ? student.id : "blank" %>" title="<%= t :drag_drop_instructions, "Click and Drag to move student to another group" %>">
-  <span class="name"><%= student.last_name_first rescue "" %></span>
+  <div class="name"><%= student.last_name_first rescue "" %></div>
+  <div class="section_code"><%= section ? section.section_code : "" %></div>
   <div style="display: none;" class="data">
     <% student && @memberships.select{|m| m.user_id == student.id}.each do |membership| %>
-      <span class="<%= membership.group.category.underscore.gsub(" ", "_") %>_group_id"><%= membership.group_id || nbsp %></span>
+      <% next unless category = membership.group && membership.group.group_category %>
+      <span class="category_<%= category.id %>_group_id"><%= membership.group.id %></span>
     <% end %>
     <span class="user_id"><%= student ? student.id : nbsp %></span>
+    <span class="section_id"><%= section ? section.id : "" %></span>
   </div>
 </li>

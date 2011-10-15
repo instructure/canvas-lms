@@ -38,7 +38,7 @@
       text-decoration: underline; } }
 
   #breadcrumbs {
-    @include box-shadow(white, 0, 0, 0);
+    box-shadow: 0 0 0 white;
     ul {
       li {
         padding-left: 10px;

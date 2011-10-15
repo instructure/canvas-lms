@@ -56,6 +56,55 @@ describe AccountsController do
       batch.batch_mode.should be_true
       batch.batch_mode_term.should == @account.enrollment_terms.first
     end
+
+    it "should set sis stickiness options if given" do
+      account_with_admin_logged_in
+      @account.update_attribute(:allow_sis_import, true)
+
+      post 'sis_import_submit', :account_id => @account.id,
+          :import_type => 'instructure_csv_zip'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.options.should == {}
+      batch.destroy
+
+      post 'sis_import_submit', :account_id => @account.id,
+          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.options.should == { :override_sis_stickiness => true }
+      batch.destroy
+
+      post 'sis_import_submit', :account_id => @account.id,
+          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1',
+          :add_sis_stickiness => '1'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.options.should == { :override_sis_stickiness => true, :add_sis_stickiness => true }
+      batch.destroy
+
+      post 'sis_import_submit', :account_id => @account.id,
+          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1',
+          :clear_sis_stickiness => '1'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.options.should == { :override_sis_stickiness => true, :clear_sis_stickiness => true }
+      batch.destroy
+
+      post 'sis_import_submit', :account_id => @account.id,
+          :import_type => 'instructure_csv_zip', :clear_sis_stickiness => '1'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.options.should == {}
+      batch.destroy
+
+      post 'sis_import_submit', :account_id => @account.id,
+          :import_type => 'instructure_csv_zip', :add_sis_stickiness => '1'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.options.should == {}
+      batch.destroy
+    end
   end
 
   describe "managing admins" do

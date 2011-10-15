@@ -36,18 +36,112 @@ describe SubmissionsApiController, :type => :integration do
     sub
   end
 
-  it "should 404 if there is no submission" do
+  it "should not 404 if there is no submission" do
     student = user(:active_all => true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
-    raw_api_call(:get,
+    json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
-    response.status.should match /404/
+    json.should == {
+      "assignment_id" => @assignment.id,
+      "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}?preview=1",
+      "user_id"=>student.id,
+      "grade"=>nil,
+      "body"=>nil,
+      "submitted_at"=>nil,
+      "submission_history"=>[],
+      "attempt"=>nil,
+      "url"=>nil,
+      "submission_type"=>nil,
+      "submission_comments"=>[],
+      "grade_matches_current_submission"=>nil,
+      "score"=>nil
+    }
+  end
+
+  describe "using section ids" do
+    before do
+      @student1 = user(:active_all => true)
+      course_with_teacher(:active_all => true)
+      @default_section = @course.default_section
+      @section = factory_with_protected_attributes(@course.course_sections, :sis_source_id => 'my-section-sis-id', :name => 'section2')
+      @course.enroll_user(@student1, 'StudentEnrollment', :section => @section).accept!
+    end
+
+    it "should list submissions" do
+      quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+      quiz.did_edit!
+      quiz.offer!
+      a1 = quiz.assignment
+      sub = a1.find_or_create_submission(@student1)
+      sub.submission_type = 'online_quiz'
+      sub.workflow_state = 'submitted'
+      sub.save!
+
+      json = api_call(:get,
+            "/api/v1/sections/#{@default_section.id}/assignments/#{a1.id}/submissions.json",
+            { :controller => 'submissions_api', :action => 'index',
+              :format => 'json', :section_id => @default_section.id.to_s,
+              :assignment_id => a1.id.to_s },
+            { :include => %w(submission_history submission_comments rubric_assessment) })
+      json.size.should == 0
+
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{a1.id}/submissions.json",
+            { :controller => 'submissions_api', :action => 'index',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+              :assignment_id => a1.id.to_s },
+            { :include => %w(submission_history submission_comments rubric_assessment) })
+      json.size.should == 1
+      json.first['user_id'].should == @student1.id
+
+      json = api_call(:get,
+            "/api/v1/sections/#{@default_section.id}/students/submissions",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :section_id => @default_section.id.to_s },
+              :student_ids => [@student1.id])
+      json.size.should == 0
+
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
+              :student_ids => [@student1.id])
+      json.size.should == 1
+    end
+
+    it "should post to submissions" do
+      a1 = @course.assignments.create!({:title => 'assignment1', :grading_type => 'percent', :points_possible => 10})
+
+      raw_api_call(:put,
+                      "/api/v1/sections/#{@default_section.id}/assignments/#{a1.id}/submissions/#{@student1.id}",
+      { :controller => 'submissions_api', :action => 'update',
+        :format => 'json', :section_id => @default_section.id.to_s,
+        :assignment_id => a1.id.to_s, :id => @student1.id.to_s },
+        { :submission => { :posted_grade => '75%' } })
+      response.status.should == "404 Not Found"
+
+      json = api_call(:put,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{a1.id}/submissions/#{@student1.id}",
+      { :controller => 'submissions_api', :action => 'update',
+        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+        :assignment_id => a1.id.to_s, :id => @student1.id.to_s },
+        { :submission => { :posted_grade => '75%' } })
+
+      Submission.count.should == 1
+      @submission = Submission.first
+
+      json['score'].should == 7.5
+      json['grade'].should == '75%'
+    end
+
+    it "should return submissions for a section" do
+    end
   end
 
   it "should return student discussion entries for discussion_topic assignments" do
@@ -63,6 +157,63 @@ describe SubmissionsApiController, :type => :integration do
     se2 = @topic.discussion_entries.create!(:message => 'student 1', :user => @student)
     @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
     e1 = @topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s })
+
+    json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
+      [{
+        'message' => 'sub 1',
+        'user_id' => @student.id,
+        'created_at' => se1.created_at.as_json,
+        'updated_at' => se1.updated_at.as_json,
+      },
+      {
+        'message' => 'student 1',
+        'user_id' => @student.id,
+        'created_at' => se2.created_at.as_json,
+        'updated_at' => se2.updated_at.as_json,
+      }].sort_by { |h| h['user_id'] }
+
+    # don't include discussion entries if response_fields limits the response
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s },
+          { :response_fields => SubmissionsApiController::SUBMISSION_JSON_FIELDS })
+    json['discussion_entries'].should be_nil
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s },
+          { :exclude_response_fields => %w(discussion_entries) })
+    json['discussion_entries'].should be_nil
+  end
+
+  it "should return student discussion entries from child topics for discussion_topic group assignments" do
+    @student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(@student).accept!
+    group_category = @course.group_categories.create(:name => "Category")
+    @group = @course.groups.create(:name => "Group", :group_category => group_category)
+    @group.add_user(@student)
+    @context = @course
+    @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model, :group_category => @group.group_category})
+    @topic.refresh_subtopics # since the DJ won't happen in time
+    @child_topic = @group.discussion_topics.find_by_root_topic_id(@topic.id)
+
+    e1 = @child_topic.discussion_entries.create!(:message => 'main entry', :user => @user)
+    se1 = @child_topic.discussion_entries.create!(:message => 'sub 1', :user => @student, :parent_entry => e1)
+    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+    se2 = @child_topic.discussion_entries.create!(:message => 'student 1', :user => @student)
+    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+    e1 = @child_topic.discussion_entries.create!(:message => 'another entry', :user => @user)
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
@@ -121,6 +272,7 @@ describe SubmissionsApiController, :type => :integration do
 
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     sub1 = submit_homework(a1, student1)
+    media_object(:media_id => "3232", :media_type => "audio")
     a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
     comment = sub1.submission_comments.first
 
@@ -145,8 +297,11 @@ describe SubmissionsApiController, :type => :integration do
         "submission_comments"=>
          [{"comment"=>"Well here's the thing...",
            "media_comment" => {
+             "media_id"=>"3232",
+             "media_type"=>"audio",
              "content-type" => "audio/mp4",
-             "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "display_name" => nil
            },
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
@@ -165,6 +320,49 @@ describe SubmissionsApiController, :type => :integration do
     JSON.parse(response.body).should == { 'status' => 'unauthorized' }
   end
 
+  it "should allow retrieving attachments without a session" do
+    student1 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => student1)] }
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s },
+          { :include => %w(submission_history submission_comments rubric_assessment) })
+    url = json[0]['attachments'][0]['url']
+    get_via_redirect(url)
+    response.should be_success
+    response['content-type'].should == 'image/png'
+  end
+
+  it "should allow retrieving media comments without a session" do
+    student1 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    media_object(:media_id => "54321", :context => student1, :user => student1)
+    mock_kaltura = mock(Kaltura::ClientV3)
+    Kaltura::ClientV3.stub(:new).and_return(mock_kaltura)
+    mock_kaltura.should_receive :startSession
+    mock_kaltura.should_receive(:flavorAssetGetByEntryId).and_return([{:fileExt => 'mp4', :id => 'fake'}])
+    mock_kaltura.should_receive(:flavorAssetGetDownloadUrl).and_return("https://kaltura.example.com/some/url")
+    submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
+    stub_kaltura
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s },
+          { :include => %w(submission_history submission_comments rubric_assessment) })
+    url = json[0]['media_comment']['url']
+    get(url)
+    response.should be_redirect
+    response['Location'].should match(%r{https://kaltura.example.com/some/url})
+  end
+
   it "should return all submissions for an assignment" do
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
@@ -180,11 +378,13 @@ describe SubmissionsApiController, :type => :integration do
     a1.create_rubric_association(:rubric => rubric, :purpose => 'grading', :use_for_grading => true)
 
     submit_homework(a1, student1)
+    media_object(:media_id => "54321", :context => student1, :user => student1)
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:context => student1, :folder => nil)] }
 
     sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s| s.attachment = attachment_model(:context => s, :filename => 'snapshot.png', :content_type => 'image/png'); s.attachments = [attachment_model(:context => a1, :filename => 'ss2.png', :content_type => 'image/png')] }
 
+    media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
     a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
     sub1.reload
     sub1.submission_comments.size.should == 1
@@ -210,7 +410,7 @@ describe SubmissionsApiController, :type => :integration do
         "attachments" =>
          [
            { "content-type" => "application/loser",
-             "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
+             "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?verifier=#{sub1.attachments.first.uuid}",
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser" },
          ],
@@ -229,8 +429,11 @@ describe SubmissionsApiController, :type => :integration do
           {"grade"=>nil,
             "assignment_id" => a1.id,
            "media_comment" =>
-            { "content-type" => "video/mp4",
-              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+            { "media_type"=>"video",
+              "media_id"=>"54321",
+              "content-type" => "video/mp4",
+              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+              "display_name" => nil },
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T02:00:00Z",
            "attempt"=>2,
@@ -243,12 +446,14 @@ describe SubmissionsApiController, :type => :integration do
           {"grade"=>"A-",
             "assignment_id" => a1.id,
            "media_comment" =>
-            { "content-type" => "video/mp4",
-              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+            { "media_type"=>"video",
+              "media_id"=>"54321","content-type" => "video/mp4",
+              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+              "display_name" => nil },
            "attachments" =>
             [
               { "content-type" => "application/loser",
-                "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
+                "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?verifier=#{sub1.attachments.first.uuid}",
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser" },
             ],
@@ -268,15 +473,21 @@ describe SubmissionsApiController, :type => :integration do
         "submission_comments"=>
          [{"comment"=>"Well here's the thing...",
            "media_comment" => {
+             "media_type"=>"audio",
+             "media_id"=>"3232",
              "content-type" => "audio/mp4",
-             "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "display_name" => nil
            },
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
            "author_id"=>student1.id}],
         "media_comment" =>
-         { "content-type" => "video/mp4",
-           "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+         { "media_type"=>"video",
+           "media_id"=>"54321",
+           "content-type" => "video/mp4",
+           "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+           "display_name" => nil },
         "score"=>13.5},
        {"grade"=>"F",
         "assignment_id" => a1.id,
@@ -300,11 +511,11 @@ describe SubmissionsApiController, :type => :integration do
              {"content-type" => "image/png",
               "display_name" => "ss2.png",
               "filename" => "ss2.png",
-              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachments.first.id}",},
+              "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?verifier=#{sub2.attachments.first.uuid}",},
              {"content-type" => "image/png",
               "display_name" => "snapshot.png",
               "filename" => "snapshot.png",
-              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",},
+              "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?verifier=#{sub2.attachment.uuid}",},
             ],
            "score"=>9}],
         "attempt"=>1,
@@ -316,11 +527,11 @@ describe SubmissionsApiController, :type => :integration do
           {"content-type" => "image/png",
            "display_name" => "ss2.png",
            "filename" => "ss2.png",
-           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachments.first.id}",},
+           "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?verifier=#{sub2.attachments.first.uuid}",},
           {"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",},
+           "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?verifier=#{sub2.attachment.uuid}",},
          ],
         "submission_comments"=>[],
         "score"=>9,
@@ -328,6 +539,96 @@ describe SubmissionsApiController, :type => :integration do
          {"crit2"=>{"comments"=>"Hmm", "points"=>2},
           "crit1"=>{"comments"=>nil, "points"=>7}}}]
     json.sort_by { |h| h['user_id'] }.should == res.sort_by { |h| h['user_id'] }
+  end
+
+  it "should return nothing if no assignments in the course" do
+    student1 = user(:active_all => true)
+    student2 = user_with_pseudonym(:active_all => true)
+    student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
+    student2.pseudonym.update_attribute(:sis_source_id, 'my-login-id')
+
+    course_with_teacher(:active_all => true)
+
+    @course.enroll_student(student1).accept!
+    @course.enroll_student(student2).accept!
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, student2.to_param], :grouped => 1 })
+    json.sort_by { |h| h['user_id'] }.should == [
+      {
+        'user_id' => student1.id,
+        'submissions' => [],
+      },
+      {
+        'user_id' => student2.id,
+        'submissions' => [],
+      },
+    ]
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, student2.to_param] })
+    json.should == []
+  end
+
+  it "should return turnitin data if present" do
+    student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1.turnitin_settings = {:originality_report_visibility => 'after_grading'}
+    a1.save!
+    submission = submit_homework(a1, student)
+    sample_turnitin_data = {
+      :last_processed_attempt=>1,
+      "attachment_504177"=> {
+        :web_overlap=>73,
+        :publication_overlap=>0,
+        :error=>true,
+        :student_overlap=>100,
+        :state=>"failure",
+        :similarity_score=>100,
+        :object_id=>"123345"
+      }
+    }
+    submission.turnitin_data = sample_turnitin_data
+    submission.save!
+    
+    # as teacher
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+    json.should have_key 'turnitin_data'
+    sample_turnitin_data.delete :last_processed_attempt
+    json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
+    
+    # as student before graded
+    @user = student
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+    json.should_not have_key 'turnitin_data'
+    
+    # as student after grading
+    a1.grade_student(student, {:grade => 11})
+    @user = student
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+    json.should have_key 'turnitin_data'
+    json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
+    
   end
 
   it "should return all submissions for a student" do
@@ -713,6 +1014,7 @@ describe SubmissionsApiController, :type => :integration do
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    media_object(:media_id => "1234", :media_type => 'audio')
 
     json = api_call(:put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
@@ -727,7 +1029,7 @@ describe SubmissionsApiController, :type => :integration do
     json['submission_comments'].size.should == 1
     comment = json['submission_comments'].first
     comment['comment'].should == 'This is a media comment.'
-    comment['media_comment']['url'].should == "http://www.example.com/courses/#{@course.id}/media_download?entryId=1234&redirect=1&type=mp4"
+    comment['media_comment']['url'].should == "http://www.example.com/users/#{@user.id}/media_download?entryId=1234&redirect=1&type=mp4"
     comment['media_comment']["content-type"].should == "audio/mp4"
   end
 

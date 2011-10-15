@@ -17,11 +17,13 @@
 #
 
 def eportfolio_model(opts={})
-  @eportfolio = Eportfolio.create(:user => user_model)
+  user = opts[:user] ? opts[:user] : user_model
+  @eportfolio = Eportfolio.create(:user => user)
   @eportfolio_category = @eportfolio.eportfolio_categories.create!(:name => "category")
   
   @eportfolio_entry = EportfolioEntry.new(:name => "page")
   @eportfolio_entry.eportfolio = @eportfolio
   @eportfolio_entry.eportfolio_category = @eportfolio_category
   @eportfolio_entry.save!
+  @eportfolio
 end

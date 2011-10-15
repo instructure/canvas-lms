@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #

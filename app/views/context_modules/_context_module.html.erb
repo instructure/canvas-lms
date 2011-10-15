@@ -45,7 +45,7 @@
       <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="collapse_module_link collapse-small"><%= t('links.hide_contents', %{Hide module contents}) %></a>
     </div>
     <div class="manage_module">
-      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" rel="nofollow" class="add_module_item_link add-small"><%= t('links.add_item', %{Add item to module}) %></a>
+      <a href="#" rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" class="add_module_item_link add-small"><%= t('links.add_item', %{Add item to module}) %></a>
       <a href="#" class="add_prerequisite_link edit-small" style="display: none;"><%= t('links.settings', %{Module Settings}) %></a>
     </div>
     <div class="progression_container">

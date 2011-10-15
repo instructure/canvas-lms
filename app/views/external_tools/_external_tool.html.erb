@@ -7,6 +7,7 @@
       <a href="#" class="delete_tool_link" title="<%= t :delete_tool, "Delete Tool" %>"><%= image_tag "delete.png" %></a>
     </div>
     <div class="clear"></div>
+    <div class="custom_fields_string" style="display: none;"><%= tool.try(:custom_fields_string) %></div>
   </div>
   <div class="content">
     <table class="formtable">

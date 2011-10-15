@@ -26,7 +26,7 @@
         <%= @assignment.quiz.survey? ? t('links.submission.view_survey', "View the Survey Submission") :
           t('links.submission.view_quiz', "View the Quiz Submission") %></a><br />
     <% end %>
-    <% if @current_user_submission.grade %>
+    <% if @current_user_submission.grade && !@assignment.muted? %>
       <br/>
       <%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", :grade => @current_user_submission.grade,
         :points_possible => @assignment.points_possible, :wrapper => '<span style="font-size: 0.8em;">\1</span>' %>

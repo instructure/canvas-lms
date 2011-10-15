@@ -15,7 +15,7 @@ else
                   @target.delete_at(i).tap do |t|
                     keys = ["id"] + t.changes.keys + (f.attribute_names - t.attribute_names)
                     f.attributes.except(*keys).each do |k,v|
-                      t.send("#{k}=", v)
+                      t.write_attribute(k, v)
                     end
                   end
                 else

@@ -55,6 +55,7 @@ describe 'Models' do
     (ignore_classes << Story) rescue nil
     (ignore_classes << CustomField) rescue nil
     (ignore_classes << CustomFieldValue) rescue nil
+    (ignore_classes << RemoveQuizDataIds::QuizQuestion) rescue nil
     (ignore_classes << Woozel) rescue nil
     ActiveRecord::Base.send(:subclasses).each do |subclass|
       subclass.should protect_attributes unless ignore_classes.include?(subclass)

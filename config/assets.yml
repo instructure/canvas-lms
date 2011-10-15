@@ -7,28 +7,75 @@ css_compressor_options:
 <% saved = _erbout; _erbout = '' %>
 javascripts:
   common:
-    - public/javascripts/firebugx.js
+    - public/javascripts/vendor/firebugx.js
     - public/javascripts/datejs_to_iso_string_patch.js
-    - public/javascripts/date.js
-    - public/javascripts/jquery-1.5.2.js
-    - public/javascripts/jquery-ui-1.8.js
+    - public/javascripts/vendor/date.js
+    - public/javascripts/vendor/handlebars.vm.js
+    - public/javascripts/vendor/jquery-1.6.4.js
+    # jquery ui modules and effects that we don't actually use are commented out to reduce payload
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.core.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.widget.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.mouse.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.position.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.draggable.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.droppable.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.resizable.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.selectable.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.sortable.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.accordion.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.autocomplete.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.button.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.dialog.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.slider.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.tabs.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.datepicker.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.progressbar.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.core.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.blind.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.bounce.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.clip.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.drop.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.explode.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.fold.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.highlight.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.pulsate.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.scale.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.shake.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.slide.js
+    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.effects.transfer.js
+    - public/javascripts/instructure-jquery.ui.draggable-patch.js
     - public/javascripts/i18n.js
-    - public/javascripts/jquery.ba-throttle-debounce.js
-    - public/javascripts/jquery.ba-tinypubsub.js
-    - public/javascripts/jquery.ba-hashchange.js
-    - public/javascripts/spin.js
-    - public/javascripts/jquery.spin.js
+    - public/javascripts/vendor/jquery.ba-throttle-debounce.js
+    - public/javascripts/vendor/jquery.ba-tinypubsub.js
+    - public/javascripts/vendor/jquery.ba-hashchange.js
+    - public/javascripts/vendor/spin.js
+    - public/javascripts/vendor/jquery.spin.js
+    - public/javascripts/compiled/Template.js
+    - public/javascripts/compiled/handlebars_helpers.js
     - public/javascripts/jquery.disableWhileLoading.js
     - public/javascripts/jquery.fancyplaceholder.js
-    - public/javascripts/jquery.autocomplete.js
+    - public/javascripts/vendor/jquery.autocomplete.js
     - public/javascripts/jquery.google-analytics.js
-    - public/javascripts/jquery.pageless.js
+    - public/javascripts/vendor/jquery.pageless.js
     - public/javascripts/jquery.inst_tree.js
-    - public/javascripts/jquery.store.js
-    - public/javascripts/jquery.scrollTo.js
-    - public/javascripts/scribd.view.js
-    - public/javascripts/swfobject/swfobject.js
+    - public/javascripts/vendor/jquery.store.js
+    - public/javascripts/vendor/jquery.scrollTo.js
+    - public/javascripts/vendor/scribd.view.js
+    - public/javascripts/vendor/swfobject/swfobject.js
     - public/javascripts/reminders.js
+    - public/javascripts/jquery.instructure_jquery_patches.js
+    - public/javascripts/jquery.instructure_misc_helpers.js
+    - public/javascripts/jquery.instructure_misc_plugins.js
+    - public/javascripts/jquery.instructure_date_and_time.js
+    - public/javascripts/jquery.instructure_forms.js
+    - public/javascripts/jquery.ajaxJSON.js
+    - public/javascripts/jquery.doc_previews.js
+    - public/javascripts/jquery.dropdownList.js
+    - public/javascripts/jquery.keycodes.js
+    - public/javascripts/jquery.loadingImg.js
+    - public/javascripts/jquery.rails_flash_notifications.js
+    - public/javascripts/jquery.scrollToVisible.js
+    - public/javascripts/jquery.templateData.js
     - public/javascripts/instructure_helper.js
     - public/javascripts/media_comments.js
     - public/javascripts/tinymce.editor_box.js
@@ -39,10 +86,13 @@ javascripts:
     - public/javascripts/compiled/license_help.js
     - public/javascripts/wiki_sidebar.js
     - public/javascripts/translations/_core_en.js
+  assignmentMuter:
+    - public/javascripts/compiled/AssignmentMuter.js
+    - public/javascripts/jst/mute_dialog.js
   speed_grader:
-    - public/javascripts/jquery.elastic.js
-    - public/javascripts/ui.selectmenu.js
-    - public/javascripts/jquery.getScrollbarWidth.js
+    - public/javascripts/vendor/jquery.elastic.js
+    - public/javascripts/vendor/ui.selectmenu.js
+    - public/javascripts/vendor/jquery.getScrollbarWidth.js
     - public/javascripts/jquery.shake.js
     - public/javascripts/rubric_assessment.js
     - public/javascripts/speed_grader.js
@@ -56,22 +106,22 @@ javascripts:
     - public/javascripts/account_settings.js
     - public/javascripts/external_tools.js
   graphael:
-    - public/javascripts/raphael.js
-    - public/javascripts/g.raphael/g.raphael.js
-    - public/javascripts/g.raphael/g.pie.js
-    - public/javascripts/g.raphael/g.bar.js
-    - public/javascripts/g.raphael/g.dot.js
-    - public/javascripts/g.raphael/g.line.js
+    - public/javascripts/vendor/raphael.js
+    - public/javascripts/vendor/g.raphael/g.raphael.js
+    - public/javascripts/vendor/g.raphael/g.pie.js
+    - public/javascripts/vendor/g.raphael/g.bar.js
+    - public/javascripts/vendor/g.raphael/g.dot.js
+    - public/javascripts/vendor/g.raphael/g.line.js
   gradebook_uploads:
-    - public/javascripts/underscore.js
-    - public/javascripts/jquery.template.js
-    - public/javascripts/jquery.getScrollbarWidth.js
-    - public/javascripts/slickgrid-googlecode/slick.editors.js
-    - public/javascripts/slickgrid-googlecode/slick.grid.js
-    - public/javascripts/slickgrid-googlecode/slick.globaleditorlock.js
+    - public/javascripts/vendor/underscore.js
+    - public/javascripts/vendor/jquery.template.js
+    - public/javascripts/vendor/jquery.getScrollbarWidth.js
+    - public/javascripts/vendor/slickgrid-googlecode/slick.editors.js
+    - public/javascripts/vendor/slickgrid-googlecode/slick.grid.js
+    - public/javascripts/vendor/slickgrid-googlecode/slick.globaleditorlock.js
     - public/javascripts/gradebook_uploads.js
   gradebook_history:
-    - public/javascripts/jquery.metadata.js 
+    - public/javascripts/vendor/jquery.metadata.js 
     - public/javascripts/gradebook-history.js
   jobs:
     - public/javascripts/compiled/jobs.js
@@ -89,9 +139,9 @@ javascripts:
     - public/javascripts/edit_rubric.js
     - public/javascripts/find_outcome.js
   slickgrid:
-    - public/javascripts/slickgrid-1.4.3/lib/jquery.event.drag-2.0.min.js
-    - public/javascripts/slickgrid-1.4.3/slick.grid.js
-    - public/javascripts/slickgrid-1.4.3/slick.editors.js
+    - public/javascripts/vendor/slickgrid-1.4.3/lib/jquery.event.drag-2.0.min.js
+    - public/javascripts/vendor/slickgrid-1.4.3/slick.grid.js
+    - public/javascripts/vendor/slickgrid-1.4.3/slick.editors.js
   syllabus:
     - public/javascripts/calendar_move.js
     - public/javascripts/syllabus.js
@@ -108,7 +158,7 @@ javascripts:
   context_modules:
     - public/javascripts/context_modules.js
   course_settings:
-    - public/javascripts/jquery.cookie.js
+    - public/javascripts/vendor/jquery.cookie.js
     - public/javascripts/user_lists.js
     - public/javascripts/course_settings.js
     - public/javascripts/external_tools.js
@@ -131,21 +181,36 @@ javascripts:
   datagrid:
     - public/javascripts/datagrid.js
   jquery_ui_menu:
-    - public/javascripts/jquery-1.6.2.js
-    - public/javascripts/jquery.ui.core-1.9.js
-    - public/javascripts/jquery.ui.position-1.9.js
-    - public/javascripts/jquery.ui.widget-1.9.js
-    - public/javascripts/jquery.ui.menu-1.9.js
-    - public/javascripts/jquery.ui.button-1.9.js
-    - public/javascripts/jquery.ui.popup-1.9.js
+    - public/javascripts/vendor/jquery.ui.core-1.9.js
+    - public/javascripts/vendor/jquery.ui.position-1.9.js
+    - public/javascripts/vendor/jquery.ui.widget-1.9.js
+    - public/javascripts/vendor/jquery.ui.menu-1.9.js
+    - public/javascripts/vendor/jquery.ui.button-1.9.js
+    - public/javascripts/vendor/jquery.ui.popup-1.9.js
     - public/javascripts/jquery.ui.menu.inputmenu.js
     - public/javascripts/compiled/jquery.kylemenu.js
-    - public/javascripts/jquery.ui.menu-1.9_unsetup.js
   gradebook2:
+    - public/javascripts/jst/_grading_box.js
+    - public/javascripts/jst/gradebook_uploads_form.js
+    - public/javascripts/jst/re_upload_submissions_form.js
+    - public/javascripts/message_students.js
     - public/javascripts/compiled/multi_grid.js
     - public/javascripts/compiled/grade_calculator.js
-    - public/javascripts/compiled/gradebook2.js
-    - public/javascripts/compiled/submission_cell.js
+    - public/javascripts/jst/SetDefaultGradeDialog.js
+    - public/javascripts/compiled/gradebook2/SetDefaultGradeDialog.js
+    - public/javascripts/jst/AssignmentGroupWeightsDialog.js
+    - public/javascripts/compiled/gradebook2/AssignmentGroupWeightsDialog.js
+    - public/javascripts/jst/AssignmentDetailsDialog.js
+    - public/javascripts/compiled/AssignmentDetailsDialog.js
+    - public/javascripts/jst/CurveGradesDialog.js
+    - public/javascripts/compiled/gradebook2/CurveGradesDialog.js
+    - public/javascripts/jst/gradebook2/GradebookHeaderMenu.js
+    - public/javascripts/compiled/gradebook2/GradebookHeaderMenu.js
+    - public/javascripts/jst/_submission_detail.js
+    - public/javascripts/jst/SubmissionDetailsDialog.js
+    - public/javascripts/compiled/SubmissionDetailsDialog.js
+    - public/javascripts/compiled/gradebook2/Gradebook.js
+    - public/javascripts/compiled/gradebook2/SubmissionCell.js
   gradebooks:
     - public/javascripts/gradebooks.js
     - public/javascripts/message_students.js
@@ -214,8 +279,8 @@ javascripts:
     - public/javascripts/manage_groups.js
   manage_avatars:
     - public/javascripts/manage_avatars.js
-  ie7:
-    - public/javascripts/json2.js
+  json2:
+    - public/javascripts/vendor/json2.js
   content_migration:
     - public/javascripts/content_migration.js
   link_enrollment:
@@ -227,14 +292,14 @@ javascripts:
   conferences:
     - public/javascripts/conferences.js
   teacher_activity_report:
-    - public/javascripts/jquery.tablesorter.min.js
+    - public/javascripts/vendor/jquery.tablesorter.min.js
     - public/javascripts/compiled/teacher_activity_report.js
   messages:
     - public/javascripts/compiled/messages.js
     - public/javascripts/compiled/slideshow.js
     - public/javascripts/compiled/conversations_intro.js
-    - public/javascripts/jquery.elastic.js
-    - public/javascripts/jquery.cookie.js
+    - public/javascripts/vendor/jquery.elastic.js
+    - public/javascripts/vendor/jquery.cookie.js
   alerts:
     - public/javascripts/alerts.js
 <% base_js = _erbout; _erbout = saved %>
@@ -268,6 +333,7 @@ stylesheets:
     - public/stylesheets/compiled/jquery-ui-menu.css
     - public/stylesheets/static/jquery.autocomplete.css
     - public/stylesheets/compiled/g_instructure.css
+    - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
     - public/stylesheets/compiled/g_util_fancy_links.css
     - public/stylesheets/compiled/g_util_buttons.css
@@ -317,7 +383,11 @@ stylesheets:
     - public/stylesheets/compiled/gradebooks.css
     - public/stylesheets/compiled/message_students.css
   gradebook2:
+    - public/stylesheets/compiled/message_students.css
+    - public/stylesheets/compiled/submissionDetailsDialog.css
+    - public/stylesheets/compiled/AssignmentDetailsDialog.css
     - public/stylesheets/compiled/gradebook2.css
+    - public/stylesheets/compiled/assignment_group_weights_dialog.css
   attendance:
     - public/stylesheets/compiled/attendance.css
   quizzes:
@@ -348,7 +418,7 @@ stylesheets:
   statistics:
     - public/stylesheets/compiled/statistics.css
   slickgrid:
-    - public/javascripts/slickgrid-1.4.3/slick.grid.css
+    - public/javascripts/vendor/slickgrid-1.4.3/slick.grid.css
   sub_accounts:
     - public/stylesheets/compiled/sub_accounts.css
   user_logins:

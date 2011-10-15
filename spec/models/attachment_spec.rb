@@ -37,22 +37,54 @@ describe Attachment do
       @attachment.display_name.should eql(@attachment.filename)
     end
     
-    it "should set the scribd_mime_type_id to the appropriate value" do
-      # scribdable_attachment_model
-      scribd_mime_type_model(:extension => 'pdf')
-      @course = course_model
-      @attachment = Attachment.new()
-      @attachment.context = @course
-      @attachment.filename = 'some_file.pdf'
-      @attachment.content_type = 'pdf'
-      ScribdMimeType.find_by_name(@attachment.content_type).should eql(@scribd_mime_type)
-      Attachment.clear_cached_mime_ids
-      @attachment.save!
-      
-      @attachment.scribd_mime_type.should_not be_nil
-      @attachment.content_type.should eql('pdf')
-      @attachment.scribd_mime_type.extension.should eql("pdf")
-      #@attachment.scribd_mime_type.should eql(@scribd_mime_type)
+    context "scribd_mime_type_id" do
+      it "should get set given extension" do
+        Attachment.clear_cached_mime_ids
+        scribd_mime_type_model(:extension => 'pdf')
+        @course = course_model
+
+        @attachment = @course.attachments.build(:filename => 'some_file.pdf')
+        @attachment.content_type = ''
+        @attachment.save!
+        @attachment.scribd_mime_type.should eql(@scribd_mime_type)
+      end
+
+      it "should get set given content_type" do
+        Attachment.clear_cached_mime_ids
+        scribd_mime_type_model(:name => 'application/pdf')
+        @course = course_model
+
+        @attachment = @course.attachments.build(:filename => 'some_file')
+        @attachment.content_type = 'application/pdf'
+        @attachment.save!
+        @attachment.scribd_mime_type.should eql(@scribd_mime_type)
+      end
+
+      it "should prefer using content_type over extension" do
+        Attachment.clear_cached_mime_ids
+        mime_type_pdf = scribd_mime_type_model(:name => 'application/pdf')
+        mime_type_doc = scribd_mime_type_model(:extension => 'doc')
+        @course = course_model
+
+        @attachment = @course.attachments.build(:filename => 'some_file.doc')
+        @attachment.content_type = 'application/pdf'
+        @attachment.save!
+        @attachment.scribd_mime_type.should eql(mime_type_pdf)
+      end
+
+      it "should not get set for html content despite extension" do
+        ['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml'].each do |content_type|
+          # make sure mime type exists so we'd otherwise have a chance to set it
+          mime_type_doc = scribd_mime_type_model(:extension => 'doc')
+          mime_type_html = scribd_mime_type_model(:name => content_type)
+
+          @course = course_model
+          @attachment = @course.attachments.build(:filename => 'some_file.doc')
+          @attachment.content_type = content_type
+          @attachment.save!
+          @attachment.scribd_mime_type.should be_nil
+        end
+      end
     end
     
     it "should create a ScribdAccount if one isn't present" do

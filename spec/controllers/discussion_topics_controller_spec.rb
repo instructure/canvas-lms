@@ -19,11 +19,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DiscussionTopicsController do
-  def course_topic
+  def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic")
     if @user
       @topic.user = @user
     end
+
+    if opts[:with_assignment]
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+      @topic.assignment.infer_due_at
+      @topic.assignment.saved_by = :discussion_topic
+    end
+
     @topic.save
     @topic
   end
@@ -90,6 +97,23 @@ describe DiscussionTopicsController do
       response.should be_success
       get 'index', :course_id => @course.id
       response.should be_success
+    end
+
+    it "should assign groups from the topic's assignment's category if the topic is for a group assignment" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic(:with_assignment => true)
+
+      # set up groups
+      group_category1 = @course.group_categories.create(:name => 'category 1')
+      group_category2 = @course.group_categories.create(:name => 'category 2')
+      @course.groups.create!(:group_category => group_category1)
+      @course.groups.create!(:group_category => group_category1)
+      @course.groups.create!(:group_category => group_category2)
+      @topic.assignment.group_category = group_category1
+      @topic.assignment.save!
+
+      get 'show', :course_id => @course.id, :id => @topic.id
+      assigns[:groups].size.should eql(2)
     end
   end
   

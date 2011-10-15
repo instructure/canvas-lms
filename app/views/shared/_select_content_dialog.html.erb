@@ -78,6 +78,12 @@
             <td><label for="external_tool_create_title"><%= before_label :page_name, "Page Name" %></label></td>
             <td><input type="text" name="title" id="external_tool_create_title" style="width: 120px;"/></td>
           </tr>
+          <tr>
+              <td colspan="2">
+              <input type="checkbox" name="new_tab" id="external_tool_create_new_tab"/>
+              <label for="external_tool_create_new_tab"><%= t :new_tab, "Load this tool in a new tab" %></label>
+            </td>
+          </tr>
         </table>
       </div>
       <div id="wiki_pages_select" class="module_item_option" style="margin: 5px 20px;">
