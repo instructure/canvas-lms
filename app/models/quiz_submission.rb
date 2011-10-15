@@ -596,7 +596,9 @@ class QuizSubmission < ActiveRecord::Base
         user_answer["answer_for_#{variable}".to_sym] = answer[:text] rescue nil
         user_answer["answer_id_for_#{variable}".to_sym] = answer[:id] rescue nil
       end
-      user_answer[:points] = (answer_tally / variables.length.to_f) * q[:points_possible].to_f
+      if !variables.empty?
+        user_answer[:points] = (answer_tally / variables.length.to_f) * q[:points_possible].to_f
+      end
       user_answer[:correct] = true if answer_tally == variables.length.to_i
       user_answer[:correct] = "partial" if answer_tally > 0 && answer_tally < variables.length.to_i
     else
