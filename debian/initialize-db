@@ -38,6 +38,6 @@ CANVAS_LMS_ADMIN_PASSWORD=\"$(get_config canvas-lms/admin-password)\" \
 CANVAS_LMS_STATS_COLLECTION=\"$(get_config canvas-lms/collect-stats)\" \
 CANVAS_LMS_ACCOUNT_NAME=\"$(get_config canvas-lms/default-account-name)\" \
 /usr/bin/env \
-$GEM_HOME/bin/bundle exec rake db:initial_setup"
+bundle exec rake db:initial_setup"
 
 exit 1
