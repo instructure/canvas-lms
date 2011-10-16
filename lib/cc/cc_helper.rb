@@ -140,7 +140,7 @@ module CCHelper
       end
       @rewriter.set_handler('files') do |match|
         obj = match.obj_class.find_by_id(match.obj_id)
-        break(match.url) unless obj && @rewriter.user_can_view_content?(obj)
+        next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
         folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
         # for files, turn it into a relative link by path, rather than by file id
         # we retain the file query string parameters

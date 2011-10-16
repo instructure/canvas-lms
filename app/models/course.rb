@@ -1450,9 +1450,9 @@ class Course < ActiveRecord::Base
 
     rewriter.set_default_handler do |match|
       new_url = match.url
-      break(new_url) if supported_types && !supported_types.include?(match.type)
+      next(new_url) if supported_types && !supported_types.include?(match.type)
       new_id = @merge_mappings["#{match.obj_class.name.underscore}_#{match.obj_id}"]
-      break(new_url) unless rewriter.user_can_view_content? { match.obj_class.find_by_id(match.obj_id) }
+      next(new_url) unless rewriter.user_can_view_content? { match.obj_class.find_by_id(match.obj_id) }
       if !new_id && to_context != from_context
         new_obj = self.find_or_create_for_new_context(match.obj_class, to_context, from_context, match.obj_id)
         new_id = new_obj.id if new_obj
