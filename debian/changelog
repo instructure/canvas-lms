@@ -1,3 +1,14 @@
+canvas-lms (1.1-70) professional; urgency=low
+
+  * Package ref: 3a00ce77beb5b6cc549c4359d99b01ad5a9fc23e
+  *
+  * [+0662714] fix scoring fimb question with no answers; fixes #5963
+  * [+298da7e] fix localjumperror in new html rewriter refactor; fixes #5964
+  * [+a73c2c6] handle case where term of course might be deleted; fixes #5965
+  * [+3a00ce7] fix invalid sql during role override lookup; fixes #5966
+
+ -- JT Olds <jt@instructure.com>  Sun, 16 Oct 2011 00:16:03 -0600
+
 canvas-lms (1.1-69) professional; urgency=low
 
   * Package ref: ef152a33edfda7bfd3bdf73c1da34d6bf0ba7493
