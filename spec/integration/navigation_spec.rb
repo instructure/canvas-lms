@@ -44,6 +44,19 @@ describe "navigation" do
     list[0].text.should_not match /Term/ # "
   end
 
+  it "should not fail on courses where the term no longer exists" do
+    @account = Account.default
+    user_with_pseudonym
+    course_with_teacher
+    
+    EnrollmentTerm.delete(@course.enrollment_term.id)
+    
+    user_session(@user, @pseudonym)
+    
+    get "/"
+    response.should be_success
+  end
+
   it "should not show enrollments with identical created_at and updated_at dates (bad SIS data)" do
     @account = Account.default
     user_with_pseudonym
