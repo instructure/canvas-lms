@@ -936,7 +936,7 @@ class Assignment < ActiveRecord::Base
           :workflow_state => "submitted",
           :group => group
         })
-        homework.submitted_at = Time.now
+        homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
 
         homework.with_versioning(:explicit => true) do
           group ? homework.save_without_broadcast : homework.save!
