@@ -220,6 +220,16 @@ describe CoursesController, :type => :integration do
     json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
   end
 
+  it "should not return deleted sections" do
+    section1 = @course2.default_section
+    section2 = @course2.course_sections.create!(:name => 'Section B')
+    section2.destroy
+    section2.save!
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
+            { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
+    json.size.should == 1
+  end
+
   it "should allow specifying course sis id" do
     first_user = @user
     new_user = User.create!(:name => 'Zombo')
