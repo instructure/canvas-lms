@@ -76,10 +76,10 @@ $(document).ready(function() {
     $("#course_id").val("").change();
   });
   $("#course_autocomplete_id_lookup").autocomplete({
-    serviceUrl: $("#course_autocomplete_url").attr('href'),
-    onSelect: function(value, data){
+    source: $("#course_autocomplete_url").attr('href'),
+    select: function(event, ui){
       $("#course_id").val("");
-      $("#crosslist_course_form").triggerHandler('id_entered', data.course);
+      $("#crosslist_course_form").triggerHandler('id_entered', ui.item);
     }
   });
   $("#course_id").keycodes('return', function(event) {

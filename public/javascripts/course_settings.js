@@ -265,17 +265,14 @@ I18n.scoped('course_settings', function(I18n) {
       }
     });
     $(".edit_course_link").click(function(event) {
-      var $course_account_id_lookup = $("#course_account_id_lookup");
       event.preventDefault();
       $("#course_form").addClass('editing').find(":text:first").focus().select();
-      if($course_account_id_lookup.length && !$course_account_id_lookup.data('autocomplete')) {
-        $course_account_id_lookup.data('autocomplete', $course_account_id_lookup.autocomplete({
-          serviceUrl: $("#course_account_id_url").attr('href'),
-          onSelect: function(value, data){
-            $("#course_account_id").val(data.id);
-          }
-        }));
-      }
+      $("#course_account_id_lookup").autocomplete({
+        source: $("#course_account_id_url").attr('href'),
+        select: function(event, ui){
+          $("#course_account_id").val(ui.item.id);
+        }
+      });
       $hashtag_form.showIf($course_hashtag.text().length > 0);
       $course_hashtag.triggerHandler('blur');
     });

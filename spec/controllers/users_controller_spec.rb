@@ -56,11 +56,11 @@ describe UsersController do
     course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
     course2 = @course
 
-    get 'manageable_courses', :user_id => @teacher.id, :query => "MyCourse"
+    get 'manageable_courses', :user_id => @teacher.id, :term => "MyCourse"
     response.should be_success
 
     courses = ActiveSupport::JSON.decode(response.body)
-    courses['data'].map { |c| c['course']['id'] }.should == [course2.id]
+    courses.map { |c| c['id'] }.should == [course2.id]
   end
 
 end
