@@ -83,9 +83,9 @@ class AssessmentQuestionBank < ActiveRecord::Base
     user && self.assessment_question_bank_users.map(&:user_id).include?(user.id)
   end
   
-  def select_for_submission(count)
+  def select_for_submission(count, exclude_ids=[])
     ids = AssessmentQuestion.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
-    ids = ids.sort_by{rand}[0...count].map{|i|i['id']}
+    ids = (ids.map{|i|i['id'].to_i} - exclude_ids).sort_by{rand}[0...count]
     ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids)
   end
   
