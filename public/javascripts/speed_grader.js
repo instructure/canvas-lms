@@ -803,7 +803,7 @@ I18n.scoped('gradebook', function(I18n) {
       header.init();
       initKeyCodes();
 
-      $window.bind('hashchange', EG.handleFragementChange);
+      $window.bind('hashchange', EG.handleFragmentChange);
       $('#eg_sort_by').val($.store.userGet('eg_sort_by'));
       $('#submit_same_score').click(function(e) {
         EG.handleGradeSubmit();
@@ -823,7 +823,7 @@ I18n.scoped('gradebook', function(I18n) {
         $("#speed_grader_loading").hide();
         $("#gradebook_header, #full_width_container").show();
         initDropdown();
-        EG.handleFragementChange();
+        EG.handleFragmentChange();
       }
     },
 
@@ -865,7 +865,7 @@ I18n.scoped('gradebook', function(I18n) {
       this.resizeFullHeight();
     },
 
-    handleFragementChange: function(){
+    handleFragmentChange: function(){
       var hash;
       try {
         hash = JSON.parse(decodeURIComponent(document.location.hash.substr(1))); //get rid of the first charicter "#" of the hash
@@ -873,11 +873,17 @@ I18n.scoped('gradebook', function(I18n) {
         hash = {};
       }
 
-      //if there is not a valid student_id in the location.hash then force it to be the first student in the class.
+      //if there is not a valid student_id in the location.hash then force it to be the first student in the class with an assignment to grade.
       if (typeof(hash.student_id) != "number" ||
           !$.grep(jsonData.studentsWithSubmissions, function(s){
             return hash.student_id == s.id;}).length) {
         hash.student_id = jsonData.studentsWithSubmissions[0].id;
+        for (var i = 0, max = jsonData.studentsWithSubmissions.length; i < max; i++){
+          if (typeof jsonData.studentsWithSubmissions[i].submission !== 'undefined' && jsonData.studentsWithSubmissions[i].submission.workflow_state !== 'graded'){
+            hash.student_id = jsonData.studentsWithSubmissions[i].id;
+            break;
+          }
+        }
       }
 
       EG.goToStudent(hash.student_id);
