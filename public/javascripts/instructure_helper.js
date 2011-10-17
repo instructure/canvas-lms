@@ -58,7 +58,7 @@ I18n.scoped('instructure', function(I18n) {
   if (document.body.style.WebkitTransitionProperty !== undefined || document.body.style.MozTransitionProperty !== undefined || document.body.style.OTransitionProperty !== undefined) {
 
     // if you can't add the class .use-css-transitions-for-show-hide to your element, you need to add it to this
-    var selectorForThingsToUseCssTransitions = '.use-css-transitions-for-show-hide, .ui-widget-overlay',
+    var selectorForThingsToUseCssTransitions = '.use-css-transitions-for-show-hide',
         secondsToUseForCssTransition = 0.5,
         eventsToBindTo = 'transitionend oTransitionEnd webkitTransitionEnd';
     $('<style>' +
