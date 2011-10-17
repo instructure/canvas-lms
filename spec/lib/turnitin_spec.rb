@@ -72,5 +72,17 @@ describe Turnitin::Client do
     @attachment.should_receive(:open).and_return(:my_stub)
     api.should_receive(:sendRequest).with(:submit_paper, '2', hash_including(:pdata => :my_stub))
     @submission.submit_to_turnitin
+    @assignment.reload.turnitin_settings.should eql({
+      :originality_report_visibility => 'after_grading',
+      :s_paper_check => '0',
+      :internet_check => '0',
+      :journal_check => '0',
+      :exclude_biblio => '0',
+      :exclude_quoted => '0',
+      :exclude_type => '1',
+      :exclude_value => '5',
+      :created => true,
+      :current => true
+    })
   end
 end

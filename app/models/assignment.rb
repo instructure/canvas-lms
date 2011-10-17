@@ -164,6 +164,7 @@ class Assignment < ActiveRecord::Base
 
   def turnitin_settings=(settings)
     unless settings.nil?
+      settings = settings.dup
       settings.delete_if { |key, value| !default_turnitin_settings.has_key?(key.to_sym) }
       settings[:created] = turnitin_settings[:created] if turnitin_settings[:created]
   
