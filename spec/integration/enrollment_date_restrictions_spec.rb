@@ -33,8 +33,6 @@ describe "enrollment_date_restrictions" do
     e2.state.should == :active
     e2.state_based_on_date.should == :inactive
 
-    Enrollment.update_all(["created_at = ?", 1.minute.ago]) # need to make created_at and updated_at different
-
     user_session(@student, @pseudonym)
 
     get "/"
@@ -67,8 +65,6 @@ describe "enrollment_date_restrictions" do
     e2 = student_in_course(:user => @student, :active_all => 1)
     @group2 = @course2.groups.create(:name => "Group 1")
     @group2.add_user(@student)
-
-    Enrollment.update_all(["created_at = ?", 1.minute.ago]) # need to make created_at and updated_at different
 
     user_session(@student, @pseudonym)
 
