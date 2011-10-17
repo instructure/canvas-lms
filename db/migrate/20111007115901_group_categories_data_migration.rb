@@ -17,24 +17,25 @@ class GroupCategoriesDataMigration < ActiveRecord::Migration
     @cache[context][name] ||= uncached_group_category_id_for(context, name)
   end
 
-  def self.update_groups_for_record(record)
+  def self.update_records_for_record(record)
     return unless record.context.present? and record.group_category_name.present?
-    groups = Group.scoped(:conditions => ['context_id=? AND context_type=? AND category=?',
+    category_column = (record.class == Group ? 'category' : 'group_category')
+    records = record.class.scoped(:conditions => ["context_id=? AND context_type=? AND #{category_column}=? AND group_category_id IS NULL",
       record.context_id,
       record.context_type,
       record.group_category_name])
-    groups.update_all({:group_category_id => group_category_id_for(record)})
+    records.update_all({:group_category_id => group_category_id_for(record)})
   end
 
   def self.up
     Group.find(:all, :select => "DISTINCT context_id, context_type, category",
-      :conditions => ['context_id IS NOT NULL AND category IS NOT NULL']).each do |record|
-      update_groups_for_record(record)
+      :conditions => ['context_id IS NOT NULL AND category IS NOT NULL AND group_category_id IS NULL']).each do |record|
+      update_records_for_record(record)
     end
 
     Assignment.find(:all, :select => "DISTINCT context_id, context_type, group_category",
-      :conditions => ['context_id IS NOT NULL AND group_category IS NOT NULL']).each do |record|
-      update_groups_for_record(record)
+      :conditions => ['context_id IS NOT NULL AND group_category IS NOT NULL AND group_category_id IS NULL']).each do |record|
+      update_records_for_record(record)
     end
 
     # groups.category and assignments.group_category are now deprecated, but
