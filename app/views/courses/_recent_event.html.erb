@@ -5,42 +5,17 @@
   submission = submissions.detect{|s| s.assignment_id == recent_event.id} if recent_event.is_a?(Assignment)
   
   cache(['recent_event_render', submission || 'no_submission', recent_event || 'blank_event', Time.zone.utc_offset, recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades), recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do 
-    context = recent_event.context
-    if recent_event.is_a?(Assignment)
-      url = context_url(context, :context_assignment_url, :id => recent_event.id)
-    else
-      url = calendar_url_for(nil, {
-        :query => {:month => recent_event.start_at.month, :year => recent_event.start_at.year},
-        :anchor => "calendar_event_" + recent_event.id.to_s
-      })
-    end
-    icon_data = [nil, "calendar"]
-    if recent_event.is_a?(Assignment)
-      icon_data = [nil, 'icon-grading-gray']
-      if can_do(context, @current_user, :participate_as_student)
-        icon_data = submission && submission.submitted_or_graded? ? [submission.readable_state, 'icon-grading'] : [t('not_submitted', 'not submitted'), "icon-grading-gray"]
-        icon_data[0] = nil if !recent_event.expects_submission?
-      elsif can_do(context, @current_user, :manage_grades)
-        if recent_event.has_submitted_submissions?
-          icon_data = [t('no_submissions', 'no submissions'), "icon-grading-gray"]
-        elsif !@current_user.assignments_needing_grading(:contexts => @contexts).include?(recent_event)
-          icon_data = [t('all_graded', 'all graded'), 'icon-grading']
-        else
-          icon_data = [t('needs_grading', 'needs grading'), "icon-grading-gray"]
-        end
-      end
-    end
-    icon_explanation, icon_class = *icon_data
+    set_icon_data(:context => @context, :contexts => @contexts, :current_user => @current_user, :recent_event => recent_event, :submission => submission)
   %>
 <li style="<%= hidden if is_hidden %>" class="event">
-  <a class="<%= icon_class %> tooltip" href="<%= url %>">
+  <a class="<%= @icon_class %> tooltip" href="<%= recent_event_url(recent_event) %>">
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
         <% if recent_event.is_a?(Assignment) %>
           <span style="display: block;">due: <%= datetime_string(recent_event.due_at) %></span>
-          <% if icon_explanation %>
-            <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
+          <% if @icon_explanation %>
+            <span style="display: block; font-style: italic;"><%= @icon_explanation %></span>
           <% end %>
           <% if recent_event.points_possible %>
             <span style="display: block;"><%= t 'submission_score', %{%{score} *out of %{points_possible}*},
@@ -52,7 +27,7 @@
           <span style="display: block;"><%= datetime_string(recent_event.start_at, :event, recent_event.end_at) %></span>
         <% end %>
         <% if show_context %>
-          <span style="display: block; font-size: 0.8em;"><%= context.short_name %></span>
+          <span style="display: block; font-size: 0.8em;"><%= @context.short_name %></span>
         <% end %>
       </span>
     </span>
