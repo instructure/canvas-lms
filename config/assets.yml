@@ -241,6 +241,7 @@ javascripts:
   question_bank:
     - public/javascripts/question_bank.js
     - public/javascripts/find_outcome.js
+    - public/javascripts/jst/quiz/move_question.js
   take_quiz:
     - public/javascripts/quiz_timing.js
     - public/javascripts/take_quiz.js
