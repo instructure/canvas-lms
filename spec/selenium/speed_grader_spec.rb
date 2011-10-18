@@ -223,4 +223,27 @@ describe "speedgrader selenium tests" do
     find_with_jquery('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
   end
 
+  it "should be able to change sorting and hide student names" do
+    student_submission
+    
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+    
+    driver.find_element(:id, "settings_link").click
+    driver.find_element(:css, 'select#eg_sort_by option[value="submitted_at"]').click
+    driver.find_element(:id, 'hide_student_names').click
+    expect_new_page_load {
+      driver.find_element(:css, '#settings_form .submit_button').click
+    }
+    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    
+    # make sure it works a second time too
+    driver.find_element(:id, "settings_link").click
+    driver.find_element(:css, 'select#eg_sort_by option[value="alphabetically"]').click
+    expect_new_page_load {
+      driver.find_element(:css, '#settings_form .submit_button').click
+    }
+    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+  end
+
 end
