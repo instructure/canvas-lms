@@ -108,14 +108,15 @@ describe "Users API", :type => :integration do
   end
 
   it "should return page view history" do
+    page_view_model(:user => @student, :created_at => 1.day.ago)
     page_view_model(:user => @student)
-    page_view_model(:user => @student)
-    page_view_model(:user => @student)
+    page_view_model(:user => @student, :created_at => 1.day.from_now)
     Setting.set('api_max_per_page', '2')
     json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?per_page=1000",
                        { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :per_page => '1000' })
     json.size.should == 2
     json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
+    json[0]['created_at'].should be > json[1]['created_at']
     json = api_call(:get, "/api/v1/users/sis_user_id:sis-user-id/page_views?page=2",
                        { :controller => "page_views", :action => "index", :user_id => 'sis_user_id:sis-user-id', :format => 'json', :page => '2' })
     json.size.should == 1

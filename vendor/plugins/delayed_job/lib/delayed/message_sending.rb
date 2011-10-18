@@ -33,6 +33,15 @@ module Delayed
                           *args)
     end
 
+    def send_later_unless_in_job(method, *args)
+      if Delayed::Job.in_delayed_job?
+        send(method, *args)
+      else
+        send_later(method, *args)
+      end
+      nil # can't rely on the type of return value, so return nothing
+    end
+
     module ClassMethods
       def handle_asynchronously(method, enqueue_args = {})
         aliased_method, punctuation = method.to_s.sub(/([?!=])$/, ''), $1

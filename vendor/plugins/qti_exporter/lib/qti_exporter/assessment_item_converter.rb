@@ -135,8 +135,7 @@ class AssessmentItemConverter
           when 'Essay'
             @question[:question_type] = 'essay_question'
         end
-      end
-      if type =  get_node_att(meta, 'instructureField[name=question_type]', 'value')
+      elsif type =  get_node_att(meta, 'instructureField[name=question_type]', 'value')
         @migration_type = type
         QUESTION_TYPE_MAPPING.each do |k,v|
           @migration_type = v if k === @migration_type

@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
   include Context
 
   attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
-  attr_accessor :original_id
+  attr_accessor :original_id, :menu_data
   
   before_save :infer_defaults
   serialize :preferences
@@ -61,7 +61,6 @@ class User < ActiveRecord::Base
   has_one :pseudonym, :conditions => ['pseudonyms.workflow_state != ?', 'deleted'], :order => 'position'
   has_many :tags, :class_name => 'ContentTag', :as => 'context', :order => 'LOWER(title)', :dependent => :destroy
   has_many :attachments, :as => 'context', :dependent => :destroy
-  has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted']
   has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
@@ -107,6 +106,10 @@ class User < ActiveRecord::Base
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
+
+  include StickySisFields
+  are_sis_sticky :name
+
   def conversations
     all_conversations.visible # i.e. exclude any where the user has deleted all the messages
   end
@@ -184,7 +187,7 @@ class User < ActiveRecord::Base
     conditions = {}
     if options[:dates]
       conditions.merge!({
-        :created_at, (options[:dates].first)..(options[:dates].last)
+        :created_at => (options[:dates].first)..(options[:dates].last)
       })
     end
     page_views_as_hash = {}
@@ -473,7 +476,7 @@ class User < ActiveRecord::Base
   end
   
   def self.user_lookup_cache_key(id)
-    ['_user_lookup', id].cache_key
+    ['_user_lookup2', id].cache_key
   end
   
   def self.invalidate_cache(id)
@@ -523,7 +526,7 @@ class User < ActiveRecord::Base
   
   def self.cached_name(id)
     key = user_lookup_cache_key(id)
-    user = find_cached(key) do
+    user = Rails.cache.fetch(key) do
       User.find_by_id(id)
     end
     user && user.name
@@ -916,7 +919,7 @@ class User < ActiveRecord::Base
           url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
           data = JSON.parse(Net::HTTP.get(url)) rescue nil
           if data
-            self.avatar_image_url = data['profile_image_url'] || self.avatar_image_url
+            self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
             self.avatar_image_updated_at = Time.now
           end
         end
@@ -940,6 +943,13 @@ class User < ActiveRecord::Base
   def avatar_image=(val)
     return false if avatar_state == :locked
     val ||= {}
+
+    # clear out the old avatar first, in case of failure to get new avatar
+    self.avatar_image_url = nil
+    self.avatar_image_source = 'no_pic'
+    self.avatar_image_updated_at = Time.now
+    self.avatar_state = 'approved'
+
     if val['type'] == 'facebook'
       # TODO: support this
     elsif val['type'] == 'gravatar'
@@ -954,7 +964,7 @@ class User < ActiveRecord::Base
         data = JSON.parse(Net::HTTP.get(url)) rescue nil
         if data
           self.avatar_image_source = 'twitter'
-          self.avatar_image_url = data['profile_image_url'] || self.avatar_image_url
+          self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
           self.avatar_image_updated_at = Time.now
           self.avatar_state = 'submitted'
         end
@@ -975,11 +985,6 @@ class User < ActiveRecord::Base
       self.avatar_image_source = 'attachment'
       self.avatar_image_updated_at = Time.now
       self.avatar_state = 'submitted'
-    else
-      self.avatar_image_url = nil
-      self.avatar_image_source = 'no_pic'
-      self.avatar_image_updated_at = Time.now
-      self.avatar_state = 'approved'
     end
   end
   
@@ -1023,36 +1028,41 @@ class User < ActiveRecord::Base
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
   
-  def lti_role_types
-    memberships = current_enrollments.uniq + account_users.uniq
+  def lti_role_types(context=nil)
+    memberships = []
+    if context.is_a?(Course)
+      memberships += current_enrollments.find_all_by_course_id(context.id).uniq
+    end
+    if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
+      memberships += account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
+    end
     memberships.map{|membership|
       case membership
       when StudentEnrollment
-        'Student'
+        'Learner'
       when TeacherEnrollment
         'Instructor'
       when TaEnrollment
         'Instructor'
       when ObserverEnrollment
-        'Observer'
+        'urn:lti:instrole:ims/lis/Observer'
       when AccountUser
-        'AccountAdmin'
+        'urn:lti:instrole:ims/lis/Administrator'
       else
-        'Observer'
+        'urn:lti:instrole:ims/lis/Observer'
       end
     }.uniq
   end
   
-  def avatar_url(size=nil, avatar_setting=nil, fallback=nil)
+  def avatar_url(size=nil, avatar_setting=nil, fallback='/images/no_pic.gif')
     size ||= 50
     avatar_setting ||= 'enabled'
     if avatar_setting == 'enabled' || (avatar_setting == 'enabled_pending' && avatar_approved?) || (avatar_setting == 'sis_only')
       @avatar_url ||= self.avatar_image_url 
     end
-    @avatar_url ||= '/images/no_pic.gif' if self.avatar_image_source == 'no_pic'
+    @avatar_url ||= fallback if self.avatar_image_source == 'no_pic'
     @avatar_url ||= gravatar_url(size, fallback) if avatar_setting == 'enabled'
-    @avatar_url ||= '/images/no_pic.gif'
-    @avatar_url
+    @avatar_url ||= fallback
   end
   
   named_scope :with_avatar_state, lambda{|state|
@@ -1319,6 +1329,24 @@ class User < ActiveRecord::Base
   end
   memoize :account
   
+  def courses_with_primary_enrollment
+    Rails.cache.fetch([self, 'courses_with_primary_enrollment'].cache_key) do
+      postgres = (connection.adapter_name =~ /postgresql/i)
+      prefix = postgres ? "DISTINCT ON (courses.id)" : nil
+      result = courses.find(:all,
+                            :select => "#{prefix} courses.*, enrollments.type AS primary_enrollment, #{Enrollment::ENROLLMENT_RANK_SQL} AS primary_enrollment_rank",
+                            :order => "courses.id, #{Enrollment::ENROLLMENT_RANK_SQL}")
+      unless postgres
+        result = result.inject([]) { |ary, course|
+          ary << course unless ary.last && ary.last.id == course.id
+          ary
+        }
+      end
+      result.sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
+    end
+  end
+  memoize :courses_with_primary_enrollment
+
    # activesupport/lib/active_support/memoizable.rb from rails and
    # http://github.com/seamusabshere/cacheable/blob/master/lib/cacheable.rb from the cacheable gem
    # to get a head start
@@ -1380,11 +1408,12 @@ class User < ActiveRecord::Base
     submissions = []
     submissions += self.submissions.after(opts[:fallback_start_at]).for_context_codes(context_codes).find(
       :all, 
-      :conditions => "submissions.score IS NOT NULL AND assignments.workflow_state != 'deleted'",
+      :conditions => ["submissions.score IS NOT NULL AND assignments.workflow_state != ? AND assignments.muted = ?", 'deleted', false],
       :include => [:assignment, :user, :submission_comments],
       :order => 'submissions.created_at DESC',
       :limit => opts[:limit]
     )
+
     # THIS IS SLOW, it takes ~230ms for mike
     submissions += Submission.for_context_codes(context_codes).find(
       :all,
@@ -1402,7 +1431,8 @@ class User < ActiveRecord::Base
                 INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
                 SQL
       :order => 'last_updated_at_from_db DESC',
-      :limit => opts[:limit]
+      :limit => opts[:limit],
+      :conditions => { "assignments.muted" => false }
     )
     
     submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil)  || t.created_at}.reverse
@@ -1613,11 +1643,12 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch([self, 'enrollment_visibility'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.hour) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
       user_counts = {}
+      section_user_counts = {}
       (courses + concluded_courses).each do |course|
         section_visibilities = course.section_visibilities_for(self)
         conditions = nil
@@ -1634,20 +1665,30 @@ class User < ActiveRecord::Base
             end
             conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
-        user_counts[course.id] = course.enrollments.scoped(:conditions => self.class.reflections[:current_and_invited_enrollments].options[:conditions]).scoped(:conditions => conditions).size +
-                                 course.enrollments.scoped(:conditions => self.class.reflections[:concluded_enrollments].options[:conditions]).scoped(:conditions => conditions).size
+        base_conditions = self.class.reflections[:current_and_invited_enrollments].options[:conditions] + " OR " +  self.class.reflections[:concluded_enrollments].options[:conditions]
+        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).count("DISTINCT user_id")
+
+        sections = course.sections_visible_to(self)
+        if sections.size > 1
+          sections.each{ |section| section_user_counts[section.id] = 0 }
+          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} GROUP BY course_section_id").each do |row|
+            section_user_counts[row["course_section_id"].to_i] = row["user_count"].to_i
+          end
+        end
       end
       {:full_course_ids => full_course_ids,
        :section_id_hash => section_id_hash,
        :restricted_course_hash => restricted_course_hash,
-       :user_counts => user_counts
+       :user_counts => user_counts,
+       :section_user_counts => section_user_counts
       }
     end
   end
+  memoize :enrollment_visibility
 
   def messageable_groups
     group_visibility = group_membership_visibility
-    Group.find_all_by_id(visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 } + [0])
+    Group.scoped(:conditions => {:id => visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 } + [0]})
   end
 
   def visible_group_ids
@@ -1657,6 +1698,7 @@ class User < ActiveRecord::Base
       }.map(&:id)
     end
   end
+  memoize :visible_group_ids
 
   def group_membership_visibility
     Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.hour) do
@@ -1688,9 +1730,11 @@ class User < ActiveRecord::Base
       }
     end
   end
+  memoize :group_membership_visibility
 
   MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
+  MESSAGEABLE_USER_CONTEXT_REGEX = /\A(course|section|group)_(\d+)(_([a-z]+))?\z/
   def messageable_users(options = {})
     course_hash = enrollment_visibility
     full_course_ids = course_hash[:full_course_ids]
@@ -1702,47 +1746,56 @@ class User < ActiveRecord::Base
 
     account_ids = []
 
+    limited_id = {}
+    enrollment_type_sql = nil
+
     if options[:context]
-      limited_course_ids = []
-      limited_group_ids = []
-      Array(options[:context]).each do |context|
-        if context =~ /\Acourse_(\d+)\z/
-          limited_course_ids << $1.to_i
-        elsif context =~ /\Agroup_(\d+)\z/
-          limited_group_ids << $1.to_i
+      if options[:context].sub(/_all\z/, '') =~ MESSAGEABLE_USER_CONTEXT_REGEX
+        type = $1
+        limited_id[type] = $2.to_i
+        enrollment_type = $4
+        if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
+          enrollment_type_sql = " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
         end
       end
-      full_course_ids &= limited_course_ids
-      course_section_ids = course_hash[:section_id_hash].values_at(*limited_course_ids).flatten.compact
-      group_section_ids = group_hash[:section_id_hash].values_at(*limited_group_ids).flatten.compact
-      restricted_course_hash.delete_if{|course_id, ids| !limited_course_ids.include?(course_id)}
-      full_group_ids &= limited_group_ids
+      full_course_ids &= [limited_id['course']]
+      full_group_ids &= [limited_id['group']]
+      restricted_course_hash.delete_if{ |course_id, ids| course_id != limited_id['course']}
+      if limited_id['section'] && section = CourseSection.find_by_id(limited_id['section'])
+        course_section_ids = course_hash[:full_course_ids].include?(section.course_id) ?
+          [limited_id['section']] :
+          (course_hash[:section_id_hash][section.course_id] || []) & [limited_id['section']]
+      else
+        course_section_ids = course_hash[:section_id_hash].values_at(limited_id['course']).flatten.compact
+        group_section_ids = group_hash[:section_id_hash].values_at(limited_id['group']).flatten.compact
+      end
     else
       course_section_ids = course_hash[:section_id_hash].values.flatten
-      # if we're not searching with context(s) in mind, include any users we
+      # if we're not searching with a context in mind, include any users we
       # have admin access to know about
       account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
       account_ids &= options[:account_ids] if options[:account_ids]
     end
 
-    # if :ids is present but empty (different than just not present), don't
+    # if :ids is specified but empty (different than just not specified), don't
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
-    user_condition_sql = "TRUE"
-    user_condition_sql << " AND users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
-    user_condition_sql << " AND users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
+    user_conditions = []
+    user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
+    user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
       parts.each do |part|
-        user_condition_sql << " AND (#{wildcard('users.name', 'users.short_name', part)})"
+        user_conditions << "(#{wildcard('users.name', 'users.short_name', part)})"
       end
     end
+    user_condition_sql = user_conditions.present? ? "AND " + user_conditions.join(" AND ") : ""
     user_sql = []
 
     course_sql = []
     course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
     course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
-    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id IN (#{limited_group_ids.join(',')})) )" if group_section_ids.present?
+    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id = #{limited_id['group']}) )" if limited_id['group'] && group_section_ids.present?
     course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
     user_sql << <<-SQL if course_sql.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
@@ -1751,7 +1804,8 @@ class User < ActiveRecord::Base
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
-        AND #{user_condition_sql}
+        #{enrollment_type_sql}
+        #{user_condition_sql}
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
     SQL
 
@@ -1760,7 +1814,7 @@ class User < ActiveRecord::Base
       FROM users, group_memberships
       WHERE group_id IN (#{full_group_ids.join(',')}) AND users.id = user_id
         AND group_memberships.workflow_state = 'accepted'
-        AND #{user_condition_sql}
+        #{user_condition_sql}
     SQL
 
     # if this is an account admin who doesn't have any courses/groups in common
@@ -1779,7 +1833,7 @@ class User < ActiveRecord::Base
       FROM users, user_account_associations
       WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
         AND user_account_associations.user_id = users.id
-        AND #{user_condition_sql}
+        #{user_condition_sql}
     SQL
 
     if options[:ids]
@@ -1790,15 +1844,15 @@ class User < ActiveRecord::Base
         user_sql << <<-SQL
           SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users, conversation_participants
-          WHERE #{user_condition_sql}
-            AND conversation_participants.user_id = users.id
+          WHERE conversation_participants.user_id = users.id
             AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
+            #{user_condition_sql}
         SQL
       elsif options[:no_check_context]
         user_sql << <<-SQL
           SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users
-          WHERE #{user_condition_sql}
+          #{user_condition_sql.sub(/\AAND/, "WHERE")}
         SQL
       end
     end
@@ -1849,4 +1903,75 @@ class User < ActiveRecord::Base
   # there's better solutions in AR 3.
   # See also e.g., http://makandra.com/notes/983-dynamic-conditions-for-belongs_to-has_many-and-has_one-associations
   has_many :submissions_for_given_assignments, :include => [:assignment, :submission_comments], :conditions => 'submissions.assignment_id IN (#{Api.assignment_ids_for_students_api.join(",")})', :class_name => 'Submission'
+
+  def set_menu_data(enrollment_uuid)
+    max_to_show = 8
+
+    coalesced_enrollments = []
+    course_name_counts = {}
+    has_completed_enrollment = false
+    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid)
+    cached_enrollments.each do |e|
+
+      next if e.state_based_on_date == :inactive
+
+      if e.state_based_on_date == :completed
+        has_completed_enrollment = true
+        next
+      end
+
+      if !e.course
+        coalesced_enrollments << {
+          :enrollment => e,
+          :sortable => [e.rank_sortable, e.state_sortable, e.long_name],
+          :types => [ e.readable_type ]
+        }
+      end
+
+      existing_enrollment_info = coalesced_enrollments.find { |en|
+        # coalesce together enrollments for the same course and the same state
+        !e.course.nil? && en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
+      }
+
+      if existing_enrollment_info
+        existing_enrollment_info[:types] << e.readable_type
+        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || [999,999, 999], [e.rank_sortable, e.state_sortable, 0 - e.id]].min
+      else
+        coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
+        course_name_counts[e.course.name] ||= 0
+        course_name_counts[e.course.name] += 1
+      end
+    end
+    coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
+
+    active_enrollments = coalesced_enrollments.map{ |e| e[:enrollment] }
+    cached_group_memberships = self.cached_current_group_memberships
+    coalesced_group_memberships = cached_group_memberships.
+      select{ |gm| gm.active_given_enrollments?(active_enrollments) }.
+      sort_by{ |gm| gm.group.name }
+
+    @menu_data = {
+      :enrollments => coalesced_enrollments,
+      :enrollments_count => cached_enrollments.length,
+      :course_name_counts => course_name_counts,
+      :has_completed_enrollment => has_completed_enrollment,
+      :group_memberships => coalesced_group_memberships,
+      :group_memberships_count => cached_group_memberships.length,
+      :accounts => self.accounts,
+      :accounts_count => self.accounts.length,
+    }
+  end
+
+  def has_ended_enrollments?
+    self.enrollments.ended.length || self.menu_data[:has_completed_enrollment]
+  end
+
+  def user_can_edit_name?
+    associated_root_accounts.any? { |a| a.settings[:users_can_edit_name] != false } || associated_root_accounts.empty?
+  end
+
+  def section_for_course(course)
+    enrollment = course.student_enrollments.active.for_user(self).first
+    enrollment && enrollment.course_section
+  end
 end

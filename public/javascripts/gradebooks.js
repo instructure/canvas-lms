@@ -152,28 +152,6 @@ I18n.scoped('gradebook', function(I18n) {
           return "th_assignment_"+assignment_id+" th_student_"+student_id;
         }
       });
-    },
-    publishGradesToSis: function() {
-      if(sisPublishStatus == 'published') {
-        if(!confirm(I18n.t('confirms.republish_to_sis', "Are you sure you want to republish these grades to the student information system?")))
-          return;
-      } else {
-        if(!confirm(I18n.t('confirms.publish_to_sis', "Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized.")))
-          return;
-      }
-      sisPublishStatus = "publishing";
-      var successful_statuses = { "published": 1, "publishing": 1, "pending": 1 };
-      var error = function(data, xhr, status, error) {
-        sisPublishStatus = "unknown";
-        $.flashError(I18n.t('errors.publishing_failed', "Something went wrong when trying to publish grades to the student information system. Please try again later."));
-      };
-      $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
-        if(!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
-          error(null, null, I18n.t('errors.invalid_publishing_response', "Invalid SIS publish status"), null);
-          return;
-        }
-        sisPublishStatus = data["sis_publish_status"];
-      }, error);
     }
   };
   
@@ -369,12 +347,13 @@ I18n.scoped('gradebook', function(I18n) {
         $default_grade_form.dialog('close');
       });
       $("#gradebook_full_content,.datagrid").delegate('.assignment_dropdown', 'click', function(event) {
-        var $obj = $(this),
+        var $obj                 = $(this),
+            $parent              = $obj.parent(),
             extendedGradebookURL = $obj.parents(".assignment_name").find(".grade_assignment_link").attr('href'),
-            $td = $obj.parents(".assignment_name"),
-            $cell = $(this).parents(".cell"),
-            options = {},
-            columnData = objectData($td);
+            $td                  = $obj.parents(".assignment_name"),
+            $cell                = $(this).parents(".cell"),
+            options              = {},
+            columnData           = objectData($td);
 
         var addOption = function(icon, text, func) {
           var label = '<span class="ui-icon ui-icon-' + icon + '">&nbsp;</span> ' + text;
@@ -430,13 +409,96 @@ I18n.scoped('gradebook', function(I18n) {
           addOption('newwin', I18n.t('speed_grader', 'SpeedGrader'), function() {
             window.location.href = extendedGradebookURL;
           });
+
+          var muteLink = {
+            elements: {
+              assignments: {},
+              modal: $('#mute_dialog'),
+              rows: $('#datagrid_top .row, #datagrid_data .row')
+            },
+
+            init: function(){
+              this.isMuted = $parent.data('muted');
+              this.label = this.isMuted ?
+                I18n.t('unmute_assignment', 'Unmute Assignment') :
+                I18n.t('mute_assignment', 'Mute Assignment');
+            },
+
+            onClick: function(e){
+              this.url = $parent.attr('href') + '/mute';
+              this.isMuted ? this.updateStatus() : this.showDialog();
+            },
+
+            showDialog: function(){
+              var cancelLabel = I18n.t('cancel_button', 'Cancel'),
+                  muteLabel   = I18n.t('mute_assignment', 'Mute Assignment'),
+                  buttons     = {};
+              buttons[muteLabel]   = $.proxy(function(){
+                this.updateStatus();
+                this.elements.modal.dialog('close');
+              }, this);
+              buttons[cancelLabel] = $.proxy(function(){ this.elements.modal.dialog('close'); }, this);
+              this.elements.modal.dialog({
+                autoOpen: false,
+                buttons: buttons,
+                modal: true,
+                resizable: false,
+                title: this.elements.modal.data('title'),
+                width: 400
+              });
+
+              this.elements.modal.dialog('open');
+            },
+
+            updateStatus: function(){
+              $.ajaxJSON(this.url, 'put', { status : !this.isMuted }, $.proxy(this.onUpdate, this));
+            },
+
+            onUpdate: function(data){
+              var key = 'assignment_' + data.assignment.id,
+                  assignment;
+
+              $parent.data('muted', !this.isMuted);
+              if (typeof this.elements.assignments[key] === 'undefined'){
+                this.elements.assignments[key] = {};
+                this.elements.assignments[key].assignment = $('#' + key);
+                this.elements.assignments[key].cell = this.elements.assignments[key].assignment.parent();
+                this.elements.assignments[key].index = this.elements.assignments[key].cell.data('column');
+                this.elements.assignments[key].column = $('.content div[data-column=' + this.elements.assignments[key].index + ']');
+              }
+
+              assignment = this.elements.assignments[key];
+              this.isMuted ? this.unmuteAssignment(assignment) : this.muteAssignment(assignment);
+            },
+
+            muteAssignment: function(assignment){
+              var icon = $('<a />', { 'class': 'mute_icon', title: I18n.t('teacher_muted_title', 'Assignment is muted') }).
+                append($('<img />', { src: '/images/sound_mute.png', alt: '' }));
+
+              assignment.assignment
+                .find('a.assignment_link.assignment_title')
+                .after(icon);
+              assignment.column.width(assignment.column.width() + 20);
+              this.elements.rows.width(this.elements.rows.width() + 20);
+            },
+
+            unmuteAssignment: function(assignment){
+              assignment.assignment.find('.mute_icon').remove();
+              assignment.column.width(assignment.column.width() - 20);
+              this.elements.rows.width(this.elements.rows.width() - 20);
+            }
+          };
+
+          muteLink.init();
+          addOption('volume-on', muteLink.label, $.proxy(muteLink.onClick, muteLink));
+
           if(object_data.submissions) {
             if(!readOnlyGradebook) {
               addOption('mail-closed', I18n.t('message_students_who', 'Message Students Who...'), function() {
                 var data = objectData($td),
                     title = data.title,
                     $submissions = $("#datagrid_data .assignment_" + data.id);
-                
+
                 var students_hash = {};
                 $("#datagrid_left .student_header").each(function(i) {
                   var student = {};
@@ -1186,6 +1248,40 @@ I18n.scoped('gradebook', function(I18n) {
       $("#sort_columns_dialog").dialog('close');
     });
 
+    $('#content').delegate('.mute_icon', 'click.mute', function(e){
+      var $el = $(e.currentTarget),
+          $link = $el.siblings('a.assignment_link.assignment_title'),
+          cancelLabel = I18n.t('cancel_button', 'Cancel'),
+          unmuteLabel = I18n.t('unmute_button', 'Unmute Assignment'),
+          buttons     = {},
+          $modal      = $('#unmute_dialog'),
+          $rows       = $('#datagrid_data .row, #datagrid_top .row'),
+          url         = $link.attr('href') + '/mute';
+
+      buttons[unmuteLabel] = function(){
+        $modal.dialog('close');
+        $.ajaxJSON(url, 'put', { status : false }, function(data){
+          var key = 'assignment_' + data.assignment.id,
+              $assignment = $('#' + key),
+              $cell = $assignment.parent(),
+              index = $cell.data('column'),
+              $column = $('.content div[data-column=' + index + ']');
+          $assignment.find('a.assignment_link.assignment_options').data('muted', false);
+          $assignment.find('.mute_icon').remove();
+          $column.width($column.width() - 20);
+          $rows.width($rows.width() - 20);
+        });
+      };
+      buttons[cancelLabel] = function(){ $modal.dialog('close'); };
+
+      $modal.dialog({
+        buttons   : buttons,
+        modal     : true,
+        resizable : false,
+        title     : $modal.data('title'),
+        width     : 400
+      });
+    });
   });
     
 

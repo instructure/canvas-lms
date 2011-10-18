@@ -1,0 +1,20 @@
+<div id="mute_dialog" style="display: none; width: 400px;" data-title="<%= t("gradebook.mute_assignment", "Mute Assignment") %>">
+  <%=
+    mt(:mute_dialog, %{
+Are you sure you want to mute this assignment? While this assignment
+is muted, students will not receive new notifications about or be
+able to see:
+
+*  Grade change notifications
+*  Submission comments
+*  Curving assignments
+*  Score change notifications
+
+Students will be able to see that this assignment is muted.
+
+Once you have muted this assignment, you can begin sending
+notifications again by clicking the "Unmute Assignment" link.
+    })
+  %>
+</div>
+

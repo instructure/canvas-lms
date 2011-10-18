@@ -61,10 +61,10 @@ class IncomingMessageProcessor
     Mailman::Application.run do
       to regex do
         begin
-          process_single(message, params['captures'][0], params['captures'][1].to_i)
+          IncomingMessageProcessor.process_single(message, params['captures'][0], params['captures'][1].to_i)
         rescue => e
           ErrorReport.log_exception(:default, e, :from => message.from.try(:first),
-                                                 :to => message.to)
+                                                 :to => message.to.to_s)
         end
       end
       default do

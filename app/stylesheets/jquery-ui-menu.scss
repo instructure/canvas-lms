@@ -60,7 +60,7 @@ $kyle-menu-border-radius: 10px;
   position: absolute; // take it out of the "flow" so that it pops on top and doesnt push things down
   z-index: 9999;
   @include border-radius($kyle-menu-border-radius);
-  @include box-shadow(rgba(0,0,0,0.4), 0px, 2px, 4px, -1px);
+  box-shadow: rgba(0,0,0,.4) 0px 2px 4px -1px;
   &.ui-state-open{
     -webkit-animation-duration:.5s;
     -webkit-animation-name:kylemenu-bounce;

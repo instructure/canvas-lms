@@ -67,15 +67,10 @@ module AuthenticationMethods
     end
 
     if !@access_token
-      @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
-      key = @pseudonym_session.send(:session_credentials)[1] rescue nil
-      if key
-        @current_pseudonym = Pseudonym.find_cached(['_pseudonym_lookup', key].cache_key) do
-          @pseudonym_session && @pseudonym_session.record
-        end
-      elsif @policy_pseudonym_id
+      if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
       else
+        @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
         @current_pseudonym = @pseudonym_session && @pseudonym_session.record
       end
       if params[:login_success] == '1' && !@current_pseudonym
@@ -131,13 +126,12 @@ module AuthenticationMethods
       end
     end
 
-    if session[:become_user_id]
-      user = User.find_by_id(session[:become_user_id])
-      if user && user.grants_right?(@current_user, session, :become_user)
-        @real_current_user = @current_user
-        @current_user = user
-        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
-      end
+    as_user_id = api_request? && params[:as_user_id]
+    as_user_id ||= session[:become_user_id]
+    if as_user_id && (user = User.find_by_id(as_user_id)) && user.grants_right?(@current_user, session, :become_user)
+      @real_current_user = @current_user
+      @current_user = user
+      logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
     end
 
     @current_user
@@ -225,7 +219,7 @@ module AuthenticationMethods
     reset_session_saving_keys(:return_to, :oauth2)
   end
 
-  def initiate_delegated_login
+  def initiate_delegated_login(preferred_account_domain=nil)
     is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
     is_cas = @domain_root_account.cas_authentication? && is_delegated
     is_saml = @domain_root_account.saml_authentication? && is_delegated
@@ -233,7 +227,7 @@ module AuthenticationMethods
       initiate_cas_login
       return true
     elsif is_saml
-      initiate_saml_login
+      initiate_saml_login(preferred_account_domain)
       return true
     end
     false
@@ -251,9 +245,9 @@ module AuthenticationMethods
     end
   end
 
-  def initiate_saml_login
+  def initiate_saml_login(preferred_account_domain=nil)
     reset_session_for_login
-    settings = @domain_root_account.account_authorization_config.saml_settings
+    settings = @domain_root_account.account_authorization_config.saml_settings(preferred_account_domain)
     request = Onelogin::Saml::AuthRequest.create(settings)
     redirect_to(request)
   end

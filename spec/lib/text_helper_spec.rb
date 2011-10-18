@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -171,10 +172,12 @@ describe TextHelper do
     it "should split on multi-byte character boundaries" do
       str = "This\ntext\nhere\n获\nis\nutf-8"
       th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
-      th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获\ni..."
       th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
-      th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n获..."
-      th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n获\n..."
+      th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n..."
+      th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n..."
+      th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获..."
+      th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\n..."
+      th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\ni..."
       th.truncate_text(str, :max_length => 80).should == str
     end
   end

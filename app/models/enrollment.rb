@@ -35,6 +35,7 @@ class Enrollment < ActiveRecord::Base
   before_save :assign_uuid
   before_save :assert_section
   before_save :update_user_account_associations_if_necessary
+  before_save :audit_restricted_self_signup_groups_for_deleted_enrollments
 
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :invitation_email
 
@@ -64,7 +65,8 @@ class Enrollment < ActiveRecord::Base
     SQL
   end
 
-
+  include StickySisFields
+  are_sis_sticky :start_at, :end_at
 
   has_a_broadcast_policy
   
@@ -138,7 +140,7 @@ class Enrollment < ActiveRecord::Base
   def should_update_user_account_association?
     self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
   end
-  
+
   def update_user_account_associations_if_necessary
     if self.new_record?
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
@@ -148,6 +150,45 @@ class Enrollment < ActiveRecord::Base
     end
   end
   protected :update_user_account_associations_if_necessary
+  
+  def audit_restricted_self_signup_groups_for_deleted_enrollments
+    # did the student cease to be enrolled in a non-deleted state in a section?
+    had_section = self.course_section_id_was.present?
+    was_active = (self.workflow_state_was != 'deleted')
+    return unless had_section && was_active &&
+                  (self.course_section_id_changed? || self.workflow_state == 'deleted')
+
+    # what section the user is abandoning, and the section they're moving to
+    # (if it's in the same course and the enrollment's not deleted)
+    section = CourseSection.find(self.course_section_id_was)
+
+    # ok, consider groups the user is in from the abandoned section's course
+    self.user.groups.scoped(:include => :group_category, :conditions =>
+      ['context_type=? AND context_id=? AND group_category_id IS NOT NULL',
+       'Course', section.course_id]).each do |group|
+
+      # don't bother unless the group's category has section restrictions
+      next unless group.group_category.restricted_self_signup?
+
+      # skip if the user is the only user in the group. there's no one to have
+      # a conflicting section.
+      next if group.users.count == 1
+
+      # check if the group has the section the user is abandoning as a common
+      # section (from CourseSection#common_to_users? view, the enrollment is
+      # still there since it queries the db directly and we haven't saved yet);
+      # if not, dropping the section is not necessary
+      next unless section.common_to_users?(group.users)
+
+      # at this point, we know there's another user, and he's in the abandoned
+      # section, and a student *should* only be in one section, so there's no
+      # way for any other sections to be common between them. remove the
+      # leaving user from the group to keep the group happy
+      membership = group.group_memberships.find_by_user_id(self.user_id)
+      membership.destroy
+    end
+  end
+  protected :audit_restricted_self_signup_groups_for_deleted_enrollments
 
   def conclude
     self.workflow_state = "completed"
@@ -163,7 +204,7 @@ class Enrollment < ActiveRecord::Base
     }
     if options[:dates]
       conditions.merge!({
-        :created_at, (options[:dates].first)..(options[:dates].last)
+        :created_at => (options[:dates].first)..(options[:dates].last)
       })
     end
     page_views_as_hash = {}
@@ -474,6 +515,39 @@ class Enrollment < ActiveRecord::Base
     end
   end
   
+  # This is called to recompute the users' cached scores for a given course
+  # when:
+  # 
+  # * The user is merged with another user; the scores are recomputed for the
+  #   new user in each of his/her courses.
+  # 
+  # * An assignment's default grade is changed; all users in the assignment's
+  #   course have their scores for that course recomputed.
+  # 
+  # * A course is merged into another, a section is crosslisted/uncrosslisted,
+  #   or a section is otherwise moved between courses; scores are recomputed
+  #   for all users in the target course.
+  # 
+  # * A course's group_weighting_scheme is changed; scores are recomputed for
+  #   all users in the course.
+  # 
+  # * Assignments are reordered (since an assignment may change groups, which
+  #   may have weights); scores are recomputed for all users in the associated
+  #   course.
+  # 
+  # * An assignment's points_possible is changed; scores are recomputed for all
+  #   users in the associated course.
+  # 
+  # * An assignment group's rules or group_weight are changed; scores are
+  #   recomputed for all users in the associated course.
+  # 
+  # * A submission's score is changed; scores for the submission owner in the
+  #   associated course are recomputed.
+  #
+  # If some new feature comes up that affects calculation of a user's score,
+  # please add appropriate calls to this so that the cached values don't get
+  # stale! And once you've added the call, add the condition to the comment
+  # here for future enlightenment.
   def self.recompute_final_score(user_ids, course_id)
     GradeCalculator.recompute_final_score(user_ids, course_id)
   end

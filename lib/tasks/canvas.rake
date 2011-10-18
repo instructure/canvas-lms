@@ -112,10 +112,21 @@ namespace :canvas do
   
   desc "Compile javascript and css assets."
   task :compile_assets do
-    puts "--> Compiling static assets [compass -s compressed --force]"
-    output = `bundle exec compass -s compressed --force 2>&1`
+    puts "--> Compiling static assets [compass compile -e production --force]"
+    output = `bundle exec compass compile -e production --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
-    
+
+    puts "--> Pre-compiling all handlebars templates"
+    Rake::Task['jst:compile'].invoke
+    puts "--> Compiling all Coffeescript using barista"
+    require 'coffee-script'
+    require 'fileutils'
+    Dir[Rails.root+'app/coffeescripts/**/*.coffee'].each do |coffee|
+      destination = coffee.sub('app/coffeescripts', 'public/javascripts/compiled').sub(%r{\.coffee$}, '.js')
+      FileUtils.mkdir_p(File.dirname(destination))
+      File.open(destination, 'wb') { |out| out.write CoffeeScript.compile(File.open(coffee)) }
+    end
+
     puts "--> Generating js localization bundles"
     Rake::Task['i18n:generate_js'].invoke
 

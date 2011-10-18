@@ -136,6 +136,20 @@ describe DiscussionTopic do
   end
   
   context "sub-topics" do
+    it "should default subtopics_refreshed_at on save if a group assignment" do
+      course_with_student(:active_all => true)
+      group_category = @course.group_categories.create(:name => "category")
+      @group = @course.groups.create(:name => "group", :group_category => group_category)
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @topic.subtopics_refreshed_at.should be_nil
+
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group.group_category)
+      @topic.assignment.infer_due_at
+      @topic.assignment.saved_by = :discussion_topic
+      @topic.save
+      @topic.subtopics_refreshed_at.should_not be_nil
+    end
+
     it "should not allow students to edit sub-topics" do
       course_with_student(:active_all => true)
       @first_user = @user
@@ -151,6 +165,157 @@ describe DiscussionTopic do
       @sub_topic.save!
       @group_topic.grants_right?(@second_user, nil, :update).should eql(true)
       @sub_topic.grants_right?(@second_user, nil, :update).should eql(false)
+    end
+  end
+
+  context "refresh_subtopics" do
+    it "should be a no-op unless there's an assignment and it has a group_category" do
+      course_with_student(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @topic.refresh_subtopics.should be_nil
+      @topic.reload.child_topics.should be_empty
+
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+      @topic.assignment.saved_by = :discussion_topic
+      @topic.save
+      @topic.refresh_subtopics.should be_nil
+      @topic.reload.child_topics.should be_empty
+    end
+
+    it "should create a topic per active group in the category otherwise" do
+      course_with_student(:active_all => true)
+      group_category = @course.group_categories.create(:name => "category")
+      @group1 = @course.groups.create(:name => "group 1", :group_category => group_category)
+      @group2 = @course.groups.create(:name => "group 2", :group_category => group_category)
+
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
+      @assignment.infer_due_at
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+
+      subtopics = @topic.refresh_subtopics
+      subtopics.should_not be_nil
+      subtopics.size.should == 2
+      subtopics.each{ |t| t.root_topic.should == @topic }
+      @group1.reload.discussion_topics.should_not be_empty
+      @group2.reload.discussion_topics.should_not be_empty
+    end
+  end
+
+  context "root_topic?" do
+    it "should be false if the topic has a root topic" do
+      # subtopic has the assignment and group_category, but has a root topic
+      course_with_student(:active_all => true)
+      group_category = @course.group_categories.create(:name => "category")
+      @parent_topic = @course.discussion_topics.create(:title => "parent topic")
+      @subtopic = @parent_topic.child_topics.build(:title => "subtopic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :group_category => group_category)
+      @assignment.infer_due_at
+      @assignment.saved_by = :discussion_topic
+      @subtopic.assignment = @assignment
+      @subtopic.save
+
+      @subtopic.should_not be_root_topic
+    end
+
+    it "should be false unless the topic has an assignment" do
+      # topic has no root topic, but also has no assignment
+      course_with_student(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "subtopic")
+      @topic.should_not be_root_topic
+    end
+
+    it "should be false unless the topic's assignment has a group_category" do
+      # topic has no root topic and has an assignment, but the assignment has no group_category
+      course_with_student(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+      @assignment.infer_due_at
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+
+      @topic.should_not be_root_topic
+    end
+
+    it "should be true otherwise" do
+      # topic meets all criteria
+      course_with_student(:active_all => true)
+      group_category = @course.group_categories.create(:name => "category")
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => group_category)
+      @assignment.infer_due_at
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+
+      @topic.should be_root_topic
+    end
+  end
+
+  context "for_assignment?/for_group_assignment?" do
+    it "should not be for_assignment?/for_group_assignment? unless it has an assignment" do
+      course_with_student(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @topic.should_not be_for_assignment
+      @topic.should_not be_for_group_assignment
+
+      group_category = @course.group_categories.build(:name => "category")
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => group_category)
+      @topic.assignment.infer_due_at
+      @topic.assignment.saved_by = :discussion_topic
+      @topic.save
+      @topic.should be_for_assignment
+      @topic.should be_for_group_assignment
+    end
+
+    it "should not be for_group_assignment? unless the assignment has a group_category" do
+      course_with_student(:active_all => true)
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+      @assignment.infer_due_at
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+      @topic.should be_for_assignment
+      @topic.should_not be_for_group_assignment
+
+      @assignment.group_category = @course.group_categories.create(:name => "category")
+      @assignment.save
+      @topic.reload.should be_for_group_assignment
+    end
+  end
+
+  context "should_send_to_stream" do
+    it "should be true for non-assignment discussions" do
+      course_with_student(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @topic.should_send_to_stream.should be_true
+    end
+
+    it "should be true for non-group discussion assignments" do
+      course_with_student(:active_all => true)
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :due_at => 1.day.from_now)
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+      @topic.should_send_to_stream.should be_true
+    end
+
+    it "should be true for the parent topic only in group discussion assignments, not the subtopics" do
+      course_with_student(:active_all => true)
+      group_category = @course.group_categories.create(:name => "category")
+      @parent_topic = @course.discussion_topics.create(:title => "parent topic")
+      @subtopic = @parent_topic.child_topics.build(:title => "subtopic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :group_category => group_category, :due_at => 1.day.from_now)
+      @assignment.saved_by = :discussion_topic
+      @subtopic.assignment = @assignment
+      @subtopic.save
+      @parent_topic.should_send_to_stream.should be_true
+      @subtopic.should_send_to_stream.should be_false
     end
   end
 end

@@ -70,7 +70,7 @@ class ContentMigration < ActiveRecord::Base
     p.dispatch :migration_export_ready
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:exported)
+      record.changed_state(:exported) && !record.migration_settings[:skip_import_notification]
     }
     
     p.dispatch :migration_import_finished

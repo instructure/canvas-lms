@@ -28,7 +28,7 @@ module SIS
       # expected columns
       # section_id,course_id,name,status,start_date,end_date
       def process(csv)
-        @sis.counts[:sections] += SIS::SectionImporter.new(@batch.try(:id), @root_account, logger).process do |importer|
+        @sis.counts[:sections] += SIS::SectionImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv) do |row|
             update_progress
 

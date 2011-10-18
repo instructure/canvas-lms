@@ -22,7 +22,8 @@ require 'zip/zip'
 module SIS
   module CSV
     class Import
-      attr_accessor :root_account, :batch, :errors, :warnings, :finished, :counts, :updates_every
+      attr_accessor :root_account, :batch, :errors, :warnings, :finished, :counts, :updates_every,
+        :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness
 
       IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
 
@@ -47,6 +48,9 @@ module SIS
         @files = opts[:files] || []
         @batch = opts[:batch]
         @logger = opts[:logger]
+        @override_sis_stickiness = opts[:override_sis_stickiness]
+        @add_sis_stickiness = opts[:add_sis_stickiness]
+        @clear_sis_stickiness = opts[:clear_sis_stickiness]
         @counts = {}
         IMPORTERS.each { |importer| @counts[importer.to_s.pluralize.to_sym] = 0 }
 

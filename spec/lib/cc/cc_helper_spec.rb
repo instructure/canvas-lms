@@ -33,8 +33,8 @@ describe CC::CCHelper do
     end
 
     it "should translate media links using the original flavor" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new
-      translated = @exporter.html_content(<<-HTML, @course, @user)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      translated = @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
       @exporter.media_object_infos[@obj.id].should_not be_nil
@@ -42,8 +42,8 @@ describe CC::CCHelper do
     end
 
     it "should translate media links using an alternate flavor" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(:media_object_flavor => 'flash video')
-      translated = @exporter.html_content(<<-HTML, @course, @user)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
+      translated = @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
       @exporter.media_object_infos[@obj.id].should_not be_nil

@@ -132,7 +132,7 @@ class LearningOutcome < ActiveRecord::Base
       if @tied_context == context
         codes = "all"
       else
-        codes = @tied_context.all_courses.scoped({:select => [:id]}).map(&:asset_string)
+        codes = @tied_context.all_courses.scoped({:select => 'id'}).map(&:asset_string)
       end
     end
     self.learning_outcome_results.for_context_codes(codes).count

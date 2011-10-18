@@ -17,18 +17,14 @@
 #
 
 module SIS
-  class AbstractCourseImporter
-
-    def initialize(batch_id, root_account, logger)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-    end
+  class AbstractCourseImporter < BaseImporter
 
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
-      yield importer
+      AbstractCourse.process_as_sis(@sis_options) do
+        yield importer
+      end
       AbstractCourse.update_all({:sis_batch_id => @batch_id}, {:id => importer.abstract_courses_to_update_sis_batch_id}) if @batch_id && !importer.abstract_courses_to_update_sis_batch_id.empty?
       @logger.debug("AbstractCourses took #{Time.now - start} seconds")
       return importer.success_count
@@ -54,9 +50,9 @@ module SIS
         raise ImportError, "No long_name given for abstract course #{abstract_course_id}" if long_name.blank?
         raise ImportError, "Improper status \"#{status}\" for abstract course #{abstract_course_id}" unless status =~ /\Aactive|\Adeleted/i
 
-        term = @root_account.enrollment_terms.find_by_sis_source_id(term_id)
         course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, abstract_course_id)
         course ||= AbstractCourse.new
+        term = course.stuck_sis_fields.include?(:enrollment_term_id) ? nil : @root_account.enrollment_terms.find_by_sis_source_id(term_id)
         course.enrollment_term = term if term
         course.root_account = @root_account
 
@@ -68,12 +64,9 @@ module SIS
 
         # only update the name/short_name on new records, and ones that haven't been changed
         # since the last sis import
-        if course.new_record? || (course.sis_course_code && course.sis_course_code == course.short_name)
-          course.short_name = course.sis_course_code = short_name
-        end
-        if course.new_record? || (course.sis_name && course.sis_name == course.name)
-          course.name = course.sis_name = long_name
-        end
+        course.name = long_name if long_name.present? && (course.new_record? || (!course.stuck_sis_fields.include?(:name)))
+        course.short_name = short_name if short_name.present? && (course.new_record? || (!course.stuck_sis_fields.include?(:short_name)))
+
         course.sis_source_id = abstract_course_id
         if status =~ /active/i
           course.workflow_state = 'active'

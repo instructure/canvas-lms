@@ -40,6 +40,14 @@ module Delayed
             self.create(options)
           end
         end
+
+        def in_delayed_job?
+          !!Thread.current[:in_delayed_job]
+        end
+
+        def in_delayed_job=(val)
+          Thread.current[:in_delayed_job] = val
+        end
       end
 
       def failed?
@@ -84,7 +92,9 @@ module Delayed
 
       # Moved into its own method so that new_relic can trace it.
       def invoke_job
+        Delayed::Job.in_delayed_job = true
         payload_object.perform
+        Delayed::Job.in_delayed_job = false
       end
 
       # Unlock this job (note: not saved to DB)

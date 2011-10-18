@@ -57,7 +57,7 @@ module BasicLTI
     hash['resource_link_id'] = link_code
     hash['resource_link_title'] = tool.name
     hash['user_id'] = user.opaque_identifier(:asset_string)
-    hash['roles'] = user.lti_role_types.join(',') # AccountAdmin, Student, Faculty or Observer
+    hash['roles'] = user.lti_role_types(context).join(',') # AccountAdmin, Student, Faculty or Observer
     if tool.include_name?
       last, other = user.last_name_first.split(/,/, 2)
       hash['lis_person_name_given'] = other
@@ -74,7 +74,7 @@ module BasicLTI
     hash['context_id'] = context.opaque_identifier(:asset_string)
     hash['context_title'] = context.name
     hash['context_label'] = context.course_code rescue nil
-    hash['launch_presentation_local'] = 'en-US' # TODO: I18N
+    hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s
     hash['launch_presentation_document_target'] = 'iframe'
     hash['launch_presentation_width'] = 600
     hash['launch_presentation_height'] = 400
@@ -82,9 +82,7 @@ module BasicLTI
     hash['tool_consumer_instance_guid'] = "#{(context.root_account || context).opaque_identifier(:asset_string)}.#{HostUrl.context_host(context)}"
     hash['tool_consumer_instance_name'] = (context.root_account || context).name
     hash['tool_consumer_instance_contact_email'] = HostUrl.outgoing_email_address # TODO: find a better email address to use here
-    (tool.settings[:custom_fields] || {}).each do |key, val|
-      hash[key] = val if key.match(/\Acustom_/)
-    end
+    tool.set_custom_fields(hash)
     
     hash['oauth_callback'] = 'about:blank'
     generate_params(hash, url, tool.consumer_key, tool.shared_secret)

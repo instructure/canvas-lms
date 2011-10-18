@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.dirname(__FILE__) + '/../../qti_helper'
 
 describe "Converting Canvas QTI" do

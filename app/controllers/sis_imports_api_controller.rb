@@ -30,25 +30,41 @@ class SisImportsApiController < ApplicationController
 
   # @API
   #
-  # Import SIS data into Canvas. Must be on a root account with SIS imports enabled.
+  # Import SIS data into Canvas. Must be on a root account with SIS imports
+  # enabled.
   #
-  # For more information on the format that's expected here, please see our
-  # documentation at http://github.com/instructure/canvas-lms/raw/stable/public/resources/CanvasSISImport.pdf
-  #
-  # There are two ways to post SIS import data - either via a multipart/form-data
-  # form-field-style attachment, or via a non-multipart raw post request. For the
-  # latter to work, you must provide a suitable Content-Type header.
+  # For more information on the format that's expected here, please see the
+  # "SIS CSV" section in the API docs.
   #
   # @argument import_type Choose the data format for reading SIS data. With a
   #   standard Canvas install, this option can only be 'instructure_csv',
-  #   and if unprovided, will be assumed to be so. Can be part of the query string.
+  #   and if unprovided, will be assumed to be so. Can be part of the query
+  #   string.
   #
-  # @argument attachment Required for multipart/form-data style posts. Assumed to be SIS data from a file
-  #   upload form field named 'attachment'.
+  # @argument attachment There are two ways to post SIS import data - either
+  #   via a multipart/form-data form-field-style attachment, or via a
+  #   non-multipart raw post request.
+  #
+  #   'attachment' is required for multipart/form-data style posts. Assumed to
+  #   be SIS data from a file upload form field named 'attachment'.
   #
   #   Examples:
   #     curl -F attachment=@<filename> -u '<username>:<password>' \ 
   #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv'
+  #
+  #   If you decide to do a raw post, you can skip the 'attachment' argument,
+  #   but you will then be required to provide a suitable Content-Type header.
+  #   You are encouraged to also provide the 'extension' argument.
+  #
+  #   Examples:
+  #     curl -H 'Content-Type: application/octet-stream' --data-binary @<filename>.zip -u '<username>:<password>' \ 
+  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv&extension=zip'
+  #     curl -H 'Content-Type: application/zip' --data-binary @<filename>.zip -u '<username>:<password>' \ 
+  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv'
+  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv -u '<username>:<password>' \ 
+  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv'
+  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv -u '<username>:<password>' \ 
+  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
   #
   # @argument extension Recommended for raw post request style imports. This
   #   field will be used to distinguish between zip, xml, csv, and other file
@@ -62,15 +78,11 @@ class SisImportsApiController < ApplicationController
   # @argument batch_mode_term_id Limit deletions to only this term, if batch
   #   mode is enabled.
   #
-  #   Examples:
-  #     curl -H 'Content-Type: application/octet-stream' --data-binary @<filename>.zip -u '<username>:<password>' \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv&extension=zip'
-  #     curl -H 'Content-Type: application/zip' --data-binary @<filename>.zip -u '<username>:<password>' \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv'
-  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv -u '<username>:<password>' \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv'
-  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv -u '<username>:<password>' \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
+  # @argument override_sis_stickiness ["1"] Many fields on records in Canvas can be marked "sticky," which means that when something changes in the UI apart from the SIS, that field gets "stuck." In this way, by default, SIS imports do not override UI changes. If this field is present, however, it will tell the SIS import to ignore "stickiness" and override all fields.
+  #
+  # @argument add_sis_stickiness ["1"] This option, if present, will process all changes as if they were UI changes. This means that "stickiness" will be added to changed fields. This option is only processed if 'override_sis_stickiness' is also provided.
+  #
+  # @argument clear_sis_stickiness ["1"] This option, if present, will clear "stickiness" from all fields touched by this import. Requires that 'override_sis_stickiness' is also provided. If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will overrule the behavior of 'add_sis_stickiness'
   def create
     if authorized_action(@account, @current_user, :manage)
       params[:import_type] ||= 'instructure_csv'
@@ -108,14 +120,23 @@ class SisImportsApiController < ApplicationController
       end
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj)
 
-      if params[:batch_mode] == '1'
+      if params[:batch_mode].to_i > 0
         batch.batch_mode = true
         if params[:batch_mode_term_id].present?
           batch.batch_mode_term = api_find(@account.enrollment_terms.active,
                                            params[:batch_mode_term_id])
         end
-        batch.save!
       end
+
+      batch.options ||= {}
+      if params[:override_sis_stickiness].to_i > 0
+        batch.options[:override_sis_stickiness] = true
+        [:add_sis_stickiness, :clear_sis_stickiness].each do |option|
+          batch.options[option] = true if params[option].to_i > 0
+        end
+      end
+
+      batch.save!
 
       batch.process
       render :json => batch.api_json

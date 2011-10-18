@@ -5,6 +5,7 @@ $message_list = []
 $form = []
 $selected_conversation = null
 $last_label = null
+page = {}
 MessageInbox = {}
 
 class TokenInput
@@ -205,7 +206,7 @@ class TokenSelector
       true
 
   new_list: ->
-    $list = $('<div><ul class="heading"></ul><ul></ul></div>')
+    $list = $('<div class="list"><ul class="heading"></ul><ul></ul></div>')
     $list.find('ul')
       .mousemove (e) =>
         return if @ui_locked
@@ -230,11 +231,17 @@ class TokenSelector
               @expand_selection()
           else if @selection_toggleable() and $(e.target).closest('a.toggle').length
             @toggle_selection()
-          else if not @selection.hasClass('expanded')
-            @toggle_selection(on)
-            @clear()
-            @close()
+          else
+            if @selection_expanded()
+              @collapse()
+            else if @selection_expandable()
+              @expand_selection()
+            else
+              @toggle_selection(on)
+              @clear()
+              @close()
         @input.focus()
+    $list.body = $list.find('ul').last()
     $list
 
   capture_keydown: (e) ->
@@ -250,12 +257,19 @@ class TokenSelector
             @input.remove_last_token()
           return true
       when 'Tab', 'U+0009', 9
-        @toggle_selection(on) if @selection and not @selection.hasClass('expanded')
+        if @selection and (@selection_toggleable() or not @selection_expandable())
+          @toggle_selection(on)
         @clear()
         @close()
         return true if @selection
       when 'Enter', 13
-        if @selection and not @selection.hasClass('expanded')
+        if @selection_expanded()
+          @collapse()
+          return true
+        else if @selection_expandable() and not @selection_toggleable()
+          @expand_selection()
+          return true
+        else if @selection
           @toggle_selection(on)
           @clear()
         @close()
@@ -316,7 +330,7 @@ class TokenSelector
         @last_applied_query = this_query
         @last_search = post_data.search
         @clear_loading()
-        @render_list(@query_cache[this_query], options)
+        @render_list(@query_cache[this_query], options, post_data)
         return
 
       @set_loading()
@@ -327,7 +341,7 @@ class TokenSelector
           if JSON.stringify(@prepare_post(options.data ? {})) is this_query # i.e. only if it hasn't subsequently changed (and thus triggered another call)
             @last_applied_query = this_query
             @last_search = post_data.search
-            @render_list(data, options) if @menu.is(":visible")
+            @render_list(data, options, post_data) if @menu.is(":visible")
           else
             @ui_locked=false
         ,
@@ -368,8 +382,8 @@ class TokenSelector
   selection_expandable: ->
     @selection?.hasClass('expandable') ? false
 
-  selection_toggleable: ->
-    @selection?.hasClass('toggleable') ? false
+  selection_toggleable: ($node=@selection) ->
+    ($node?.hasClass('toggleable') ? false) and not @selection_expanded()
 
   expand_selection: ->
     return false unless @selection_expandable() and not @selection_expanded()
@@ -389,19 +403,57 @@ class TokenSelector
       @list = $list
       @select $selection
       @ui_locked = false
-      # TODO: if any in this list are now selected, we should requery so
-      # as to remove them
 
-  toggle_selection: (state) ->
-    return false unless state? or @selection_toggleable()
-    id = @selection.data('id')
-    state = !@input.has_token(value: id) unless state?
+  toggle_selection: (state, $node=@selection, toggle_only=false) ->
+    return false unless state? or @selection_toggleable($node)
+    id = $node.data('id')
+    state = !$node.hasClass('on') unless state?
     if state
-      @selection.addClass('on') if @selection_toggleable()
-      @input.add_token value: id, text: @selection.find('b').text(), no_clear: true, data: @selection.data('user_data')
+      $node.addClass('on') if @selection_toggleable($node) and not toggle_only
+      @input.add_token
+        value: id
+        text: $node.data('text') ? $node.text()
+        no_clear: true
+        data: $node.data('user_data')
     else
-      @selection.removeClass('on')
+      $node.removeClass('on') unless toggle_only
       @input.remove_token value: id
+    @update_select_all($node) unless toggle_only
+
+  update_select_all: ($node, offset=0) ->
+    select_all_toggled = $node.data('user_data').select_all
+    $list = if offset then @stack[@stack.length - offset][1] else @list
+    $select_all = $list.select_all
+    return unless $select_all
+    $nodes = $list.body.find('li.toggleable').not($select_all)
+    if select_all_toggled
+      if $select_all.hasClass('on')
+        $nodes.addClass('on').each (i, node) =>
+          @toggle_selection off, $(node), true
+      else
+        $nodes.removeClass('on').each (i, node) =>
+          @toggle_selection off, $(node), true
+    else
+      $on_nodes = $nodes.filter('.on')
+      if $on_nodes.length < $nodes.length and $select_all.hasClass('on')
+        $select_all.removeClass('on')
+        @toggle_selection off, $select_all, true
+        $on_nodes.each (i, node) =>
+          @toggle_selection on, $(node), true
+      else if $on_nodes.length == $nodes.length and not $select_all.hasClass('on')
+        $select_all.addClass('on')
+        @toggle_selection on, $select_all, true
+        $on_nodes.each (i, node) =>
+          @toggle_selection off, $(node), true
+    if offset < @stack.length
+      offset++
+      $parent_node = @stack[@stack.length - offset][0]
+      if @selection_toggleable($parent_node)
+        if $select_all.hasClass('on')
+          $parent_node.addClass('on')
+        else
+          $parent_node.removeClass('on')
+        @update_select_all($parent_node, offset)
 
   select: ($node, preserve_mode = false) ->
     return if $node?[0] is @selection?[0]
@@ -458,13 +510,14 @@ class TokenSelector
   clear_loading: ->
     @list.find('li').first().loadingImage('remove')
 
-  render_list: (data, options={}) ->
+  render_list: (data, options={}, post_data={}) ->
     @open()
 
     if options.expand
       $list = @new_list()
     else
       $list = @list
+    $list.select_all = null
 
     @selection = null
     $uls = $list.find('ul')
@@ -472,11 +525,18 @@ class TokenSelector
     $heading = $uls.first()
     $body = $uls.last()
     if data.length
+      parent = if @stack.length then @stack[@stack.length - 1][0] else null
+      unless data.prepared
+        @options.preparer?(post_data, data, parent)
+        data.prepared = true
+
       for row, i in data
         $li = $('<li />').addClass('selectable')
-        @populate_row($li, row, {level: @stack.length, first: (i is 0), last: (i is data.length - 1)})
+        @populate_row($li, row, level: @stack.length, first: (i is 0), last: (i is data.length - 1), parent: parent)
+        $list.select_all = $li if row.select_all
         $li.addClass('on') if $li.hasClass('toggleable') and @input.has_token($li.data('id'))
         $body.append($li)
+      $list.body.find('li.toggleable').addClass('on') if $list.select_all?.hasClass?('on') or @stack.length and @stack[@stack.length - 1][0].hasClass?('on')
     else
       $message = $('<li class="message first last"></li>')
       $message.text(@options.messages?.no_results ? '')
@@ -501,12 +561,11 @@ class TokenSelector
       @ui_locked = false
 
   prepare_post: (data) ->
-    post_data = $.extend(data, {search: @input.val()})
+    post_data = $.extend(data, {search: @input.val()}, @options.base_data ? {})
     post_data.exclude = @input.base_exclude.concat(if @stack.length then [] else @input.token_values())
     post_data.context = @stack[@stack.length - 1][0].data('id') if @list_expanded()
     post_data.per_page ?= @options.limiter?(level: @stack.length)
     post_data
-
 
 # depends on the scrollable ancestor being the first positioned
 # ancestor. if it's not, it won't work
@@ -613,12 +672,8 @@ I18n.scoped 'conversations', (I18n) ->
       for user in data.participants when !MessageInbox.user_cache[user.id]?.avatar_url
         MessageInbox.user_cache[user.id] = user
         user.html_name = html_name_for_user(user)
-      $form.find('#user_note_info').showIf(
-          $c.hasClass('private') and
-          (user_id = $c.find('.participant').first().data('id')) and
-          (user = MessageInbox.user_cache[user_id]) and
-          can_add_notes_for(user)
-        )
+      if data['private'] and user = (user for user in data.participants when user.id isnt MessageInbox.user_id)[0] and can_add_notes_for(user)
+        $form.find('#user_note_info').show()
       inbox_resize()
       $messages.show()
       i = j = 0
@@ -797,9 +852,8 @@ I18n.scoped 'conversations', (I18n) ->
     $message
 
   build_media_object = (blank, data) ->
-    $media_object = blank.clone(true).attr('id', 'media_object_' + data.id)
-    $media_object.data('id', data.id)
-    $media_object.find('span.title').html $.h(data.title)
+    $media_object = blank.clone(true).attr('id', 'media_comment_' + data.media_id)
+    $media_object.find('span.title').html $.h(data.display_name)
     $media_object.find('span.media_comment_id').html $.h(data.media_id)
     $media_object
 
@@ -808,7 +862,7 @@ I18n.scoped 'conversations', (I18n) ->
     $attachment.data('id', data.id)
     $attachment.find('span.title').html $.h(data.display_name)
     $link = $attachment.find('a')
-    $link.attr('href', $.replaceTags($link.attr('href'), id: data.id, uuid: data.uuid))
+    $link.attr('href', data.url)
     $link.click (e) ->
       e.stopPropagation()
     $attachment
@@ -1005,39 +1059,102 @@ I18n.scoped 'conversations', (I18n) ->
   set_conversation_state = ($conversation, state) ->
     $conversation.removeClass('read unread archived').addClass state
 
+  $('#conversations').delegate '.actions a', 'blur', (e) ->
+    $(window).one 'keyup', (e) ->
+      close_menus() if e.shiftKey #or $('#conversation_actions a:focus').length == 0
+
   open_conversation_menu = ($node) ->
-    $node.parent().addClass('selected').closest('li').addClass('menu_active')
-    $container = $('#conversation_actions')
-    $container.addClass('selected')
+    # get elements
+    elements =
+      node         : $node
+      container    : $('#conversation_actions')
+      conversation : $node.closest 'li'
+      parent       : $node.parent()
+      lists        : $('#conversation_actions ul')
+      listElements : $('#conversation_actions li')
+      focusable    : $('a, input, select, textarea')
+      actions      :
+        markAsRead   : $('#action_mark_as_read').parent()
+        markAsUnread : $('#action_mark_as_unread').parent()
+        unsubscribe  : $('#action_unsubscribe').parent()
+        subscribe    : $('#action_subscribe').parent()
+        forward      : $('#action_forward').parent()
+        archive      : $('#action_archive').parent()
+        unarchive    : $('#action_unarchive').parent()
+        delete       : $('#action_delete').parent()
+        deleteAll    : $('#action_delete_all').parent()
+      labels:
+        group: $('#conversation_actions .label_group')
+        icon: $('#conversation_actions .label_icon')
 
-    $conversation = $node.closest('li')
-    $container.data('selected_conversation', $conversation)
-    $container.find('ul').removeClass('first last').hide()
-    $container.find('li').hide()
-    $('#action_mark_as_read').parent().showIf $conversation.hasClass('unread')
-    $('#action_mark_as_unread').parent().showIf $conversation.hasClass('read')
-    $container.find('.label_group').show().find('.label_icon').removeClass('checked')
-    $container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked')
-    if $conversation.hasClass('private')
-      $('#action_subscribe, #action_unsubscribe').parent().hide()
+    page.activeActionMenu = elements.node
+
+    # add selected classes
+    elements.parent.addClass 'selected'
+    elements.container.addClass 'selected'
+    elements.conversation.addClass 'menu_active'
+
+    $container    = elements.container
+    $conversation = elements.conversation
+
+    # prep action container
+    elements.container.data 'selected_conversation', elements.conversation
+    elements.lists.removeClass('first last').hide()
+    elements.listElements.hide()
+
+    # show/hide relevant links
+    elements.actions.markAsRead.show() if elements.conversation.hasClass 'unread'
+    elements.actions.markAsUnread.show() if elements.conversation.hasClass 'read'
+
+    elements.labels.group.show()
+    elements.labels.icon.removeClass 'checked'
+    elements.container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked')
+
+    if elements.conversation.hasClass('private')
+      elements.actions.subscribe.hide()
+      elements.actions.unsubscribe.hide()
     else
-      $('#action_unsubscribe').parent().showIf !$conversation.hasClass('unsubscribed')
-      $('#action_subscribe').parent().showIf $conversation.hasClass('unsubscribed')
-    $('#action_forward').parent().show()
-    $('#action_archive').parent().showIf MessageInbox.scope != 'archived'
-    $('#action_unarchive').parent().showIf MessageInbox.scope == 'archived'
-    $('#action_delete').parent().show()
-    $('#action_delete_all').parent().show()
+      elements.actions.unsubscribe.show() unless elements.conversation.hasClass 'unsubscribed'
+      elements.actions.subscribe.show() if elements.conversation.hasClass 'unsubscribed'
 
-    $container.find('li[style*="list-item"]').parent().show()
-    $groups = $container.find('ul[style*="block"]')
-    if $groups.length
-      $($groups[0]).addClass 'first'
-      $($groups[$groups.length - 1]).addClass 'last'
+    elements.actions.forward.show()
+    elements.actions.delete.show()
+    elements.actions.deleteAll.show()
+    if MessageInbox.scope is 'archived' then elements.actions.unarchive.show() else elements.actions.archive.show()
 
-    offset = $node.offset()
-    $container.css('top', offset.top + ($node.height() * 0.9) - $container.offsetParent().offset().top)
-    $container.css('left', offset.left + ($node.width() / 2) - $container.offsetParent().offset().left - ($container.width() / 2))
+    $(window).one 'keydown', (e) ->
+      return if e.keyCode isnt 9 or e.shiftKey
+
+      elements.focusable.one 'focus.actions_menu', (e) ->
+        page.nextElement = $(e.target)
+        elements.focusable.unbind '.actions_menu'
+        elements.container.find('a:visible:first').focus()
+
+        elements.container.find('a:visible:first').bind 'blur.actions_menu', (e), ->
+          $(window).one 'keyup', (e) ->
+            actionMenuActive = elements.container.find('a:focus').length
+            unless actionMenuActive
+              elements.container.find('a.visible').unbind '.actions_menu'
+              page.activeActionMenu.focus()
+        elements.container.find('a:visible:last').bind 'blur.actions_menu', (e), ->
+          $(window).one 'keyup', (e) ->
+            actionMenuActive = elements.container.find('a:focus').length
+            unless actionMenuActive
+              elements.container.find('a.visible').unbind '.actions_menu'
+              page.nextElement.focus()
+              close_menus()
+
+    elements.container.find('li[style*="list-item"]').parent().show()
+    elements.groups = elements.container.find('ul[style*="block"]')
+    if elements.groups.length
+      elements.groups.first().addClass 'first'
+      elements.groups.last().addClass 'last'
+
+    offset = elements.node.offset()
+    elements.container.css {
+      left: (offset.left + (elements.node.width() / 2) - elements.container.offsetParent().offset().left - (elements.container.width() / 2)),
+      top : (offset.top + (elements.node.height() * 0.9) - elements.container.offsetParent().offset().top)
+    }
 
   close_menus = () ->
     $('#actions .menus > li, #conversation_actions, #conversations .actions').removeClass('selected')
@@ -1435,7 +1552,8 @@ I18n.scoped 'conversations', (I18n) ->
         unless data.id and "#{data.id}".match(/^(course|group)_/)
           data = $.extend({}, data)
           delete data.avatar_url # since it's the wrong size and possibly a blank image
-          MessageInbox.user_cache[data.id] ?= data
+          current_data = MessageInbox.user_cache[data.id] ? {}
+          MessageInbox.user_cache[data.id] = $.extend(current_data, data)
       selector:
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
@@ -1443,26 +1561,67 @@ I18n.scoped 'conversations', (I18n) ->
             $img = $('<img class="avatar" />')
             $img.attr('src', data.avatar_url)
             $node.append($img)
+          context_name  = if data.context_name then data.context_name else ''
+          context_name  = if context_name.length < 40 then context_name else context_name.substr(0, 40) + '...'
+          $context_name = if data.context_name then $('<span />', class: 'context_name').text("(#{context_name})") else ''
           $b = $('<b />')
           $b.text(data.name)
-          $span = $('<span />')
+          $name = $('<span />', class: 'name')
+          $name.append($b, $context_name)
+          $span = $('<span />', class: 'details')
           if data.common_courses?
-            $span.text(MessageInbox.context_list(data))
+            $span.text(MessageInbox.context_list(courses: data.common_courses, groups: data.common_groups))
           else if data.type and data.user_count?
             $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
-          $node.append($b, $span)
+          else if data.item_count?
+            if data.id.match(/_groups$/)
+              $span.text(I18n.t('groups_count', 'group', {count: data.item_count}))
+            else if data.id.match(/_sections$/)
+              $span.text(I18n.t('sections_count', 'section', {count: data.item_count}))
+          $node.append($name, $span)
           $node.attr('title', data.name)
+          text = data.name
+          if options.parent
+            if data.select_all and data.no_expand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"
+              text = options.parent.data('text')
+            else if (data.id + '').match(/_\d+_/) # e.g. course_123_teachers -> "Spanish 101: Teachers"
+              text = I18n.beforeLabel(options.parent.data('text')) + " " + text
+          $node.data('text', text)
           $node.data('id', data.id)
           $node.data('user_data', data)
           $node.addClass(if data.type then data.type else 'user')
           if options.level > 0
             $node.prepend('<a class="toggle"><i></i></a>')
-            $node.addClass('toggleable')
-          if data.type == 'context'
+            $node.addClass('toggleable') unless data.item_count # can't toggle synthetic contexts, e.g. "Student Groups"
+          if data.type == 'context' and not data.no_expand
             $node.prepend('<a class="expand"><i></i></a>')
             $node.addClass('expandable')
         limiter: (options) ->
           if options.level > 0 then -1 else 5
+        preparer: (post_data, data, parent) ->
+          context = post_data.context
+          if not post_data.search and context and data.length > 1
+            if context.match(/^(course|section)_\d+$/)
+              # i.e. we are listing synthetic contexts under a course or section
+              data.unshift
+                id: "#{context}_all"
+                name: I18n.t('enrollments_everyone', "Everyone")
+                user_count: parent.data('user_data').user_count
+                type: 'context'
+                avatar_url: parent.data('user_data').avatar_url
+                select_all: true
+            else if context.match(/^((course|section)_\d+_.*|group_\d+)$/) and not context.match(/^course_\d+_(groups|sections)$/)
+              # i.e. we are listing all users in a group or synthetic context
+              data.unshift
+                id: context
+                name: I18n.t('select_all', "Select All")
+                user_count: parent.data('user_data').user_count
+                type: 'context'
+                avatar_url: parent.data('user_data').avatar_url
+                select_all: true
+                no_expand: true # just a magic select-all checkbox, you can't drill into it
+        base_data:
+          synthetic_contexts: 1
         browser:
           data:
             per_page: -1

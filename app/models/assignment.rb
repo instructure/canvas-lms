@@ -23,19 +23,18 @@ class Assignment < ActiveRecord::Base
   include TextHelper
   include HasContentTags
   include CopyAuthorizedLinks
+  include Mutable
   
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
-    :assignment_group, :unlock_at, :lock_at, :group_category,
+    :assignment_group, :unlock_at, :lock_at, :group_category, :group_category_id,
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-    :notify_of_update, :time_zone_edited, :turnitin_enabled,
+    :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :set_custom_field_values, :context, :position, :allowed_extensions
   attr_accessor :original_id
   
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
-  has_many :terse_submissions, :class_name => 'Submission'
-  has_many :verbose_submissions, :class_name => 'Submission', :include => [:submission_comments, :versions, :attachments, :rubric_assessment]
   has_many :attachments, :as => :context, :dependent => :destroy
   has_one :quiz
   belongs_to :assignment_group
@@ -48,6 +47,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   belongs_to :grading_standard
+  belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
 
   validates_presence_of :context_id
@@ -71,6 +71,7 @@ class Assignment < ActiveRecord::Base
     self.title = val
   end
 
+  serialize :turnitin_settings, Hash
   # file extensions allowed for online_upload submission
   serialize :allowed_extensions, Array
 
@@ -90,7 +91,8 @@ class Assignment < ActiveRecord::Base
                 :infer_grading_type, 
                 :process_if_quiz,
                 :default_values,
-                :update_submissions_if_details_changed
+                :update_submissions_if_details_changed,
+                :maintain_group_category_attribute
   
   after_save    :update_grades_if_details_changed,
                 :generate_reminders_if_changed,
@@ -155,7 +157,48 @@ class Assignment < ActiveRecord::Base
     end
     true
   end
+
+  def turnitin_settings
+    read_attribute(:turnitin_settings) || default_turnitin_settings
+  end
+
+  def turnitin_settings=(settings)
+    unless settings.nil?
+      settings = settings.dup
+      settings.delete_if { |key, value| !default_turnitin_settings.has_key?(key.to_sym) }
+      settings[:created] = turnitin_settings[:created] if turnitin_settings[:created]
   
+      settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date'].include?(settings[:originality_report_visibility])
+  
+      [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
+        settings[key] = '0' unless settings[key] == '1'
+      end
+  
+      exclude_value = settings[:exclude_value].to_i
+      settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
+      settings[:exclude_value] = case settings[:exclude_type]
+        when '0': ''
+        when '1': [exclude_value, 1].max.to_s
+        when '2': (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+      end
+    end
+
+    write_attribute :turnitin_settings, settings
+  end
+
+  def default_turnitin_settings
+    {
+      :originality_report_visibility => 'immediate',
+      :s_paper_check => '1',
+      :internet_check => '1',
+      :journal_check => '1',
+      :exclude_biblio => '1',
+      :exclude_quoted => '1',
+      :exclude_type => '0',
+      :exclude_value => ''
+    }
+  end
+
   def default_values
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
@@ -297,6 +340,7 @@ class Assignment < ActiveRecord::Base
     p.to { participants }
     p.whenever { |record| 
       !self.suppress_broadcast and
+      !record.muted? and
       record.created_at < Time.now - (30*60) and
       record.context.state == :available and [:available, :published].include?(record.state) and
       record.prior_version and (record.points_possible != record.prior_version.points_possible || @assignment_changed)
@@ -313,18 +357,26 @@ class Assignment < ActiveRecord::Base
     p.to { @students_whose_grade_just_changed }
     p.whenever {|record|
       !self.suppress_broadcast and
+      !record.muted? and
       @notify_affected_students_of_grading_change and 
       record.context.state == :available and
       @students_whose_grade_just_changed and !@students_whose_grade_just_changed.empty?
     }
-      
     
     p.dispatch :assignment_graded
     p.to { participants }
     p.whenever {|record|
       !self.suppress_broadcast and
+      !record.muted? and
       @notify_all_students_of_grading and
       record.context.state == :available
+    }
+
+    p.dispatch :assignment_unmuted
+    p.to { participants }
+    p.whenever { |record|
+      !self.suppress_broadcast and
+      record.recently_unmuted
     }
 
   end
@@ -722,8 +774,8 @@ class Assignment < ActiveRecord::Base
   def group_students(student)
     group = nil
     students = [student]
-    if self.group_category
-      group = self.context.groups.active.for_category(self.group_category).to_a.find{|g| g.users.include?(student)}
+    if self.has_group_category?
+      group = self.group_category.groups.active.to_a.find{|g| g.users.include?(student)}
       students = (group.users & self.context.students) if group && !self.grade_group_students_individually
     end
     [group, students]
@@ -902,50 +954,51 @@ class Assignment < ActiveRecord::Base
     self.submissions_downloads && self.submissions_downloads > 0
   end
   
-  def submissions
-    if @speed_grader
-      self.verbose_submissions
-    else
-      self.terse_submissions
+  def as_json(options=nil)
+    json = super(options)
+    if json && json['assignment']
+      # remove anything coming automatically from deprecated db column
+      json['assignment'].delete('group_category')
+      if self.group_category
+        # put back version from association 
+        json['assignment']['group_category'] = self.group_category.name
+      elsif self.read_attribute('group_category').present?
+        # or failing that, version from query
+        json['assignment']['group_category'] = self.read_attribute('group_category')
+      end
     end
+    json
   end
 
-  def speed_grader_json(as_json=false)
-    @speed_grader = true
+  def speed_grader_json(user)
     Attachment.skip_thumbnails = true
-    res = self.send(as_json ? "as_json" : "to_json", 
+    res = as_json( 
       :include => {
-        :context => {
-          :only => :id,
-          :include => {
-            :students => {
-              :only => nil
-            },
-            :enrollments  => {
-              :only => [:user_id, :course_section_id]
-            },
-            :active_course_sections => {
-              :only => [:id, :name]
-            }
-          }
-        },
-        :submissions => {
-          :include => {
-            :submission_comments => {},
-            :attachments => {:except => :thumbnail_url},
-            :rubric_assessment => {}
-          },
-          :methods => [:scribdable?, :scribd_doc, :submission_history]
-        },
-        :rubric_association => {
-          :except => {}
-        }
+        :context => { :only => :id },
+        :rubric_association => { :except => {} }
       },
       :include_root => false
     )
-    @speed_grader = false
-    Attachment.skip_thumbnails = nil
+    visible_students = context.students_visible_to(user)
+    res[:context][:students] = visible_students.
+      map{|u| u.as_json(:include_root => false)}
+    res[:context][:active_course_sections] = context.sections_visible_to(user).
+      map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
+    res[:context][:enrollments] = context.enrollments_visible_to(user).
+      map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
+    res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
+      s.as_json(:include_root => false,
+        :include => {
+          :submission_comments => {},
+          :attachments => {:except => :thumbnail_url},
+          :rubric_assessment => {},
+        },
+        :methods => [:scribdable?, :scribd_doc, :submission_history]
+      )
+    }
     res
+  ensure
+    Attachment.skip_thumbnails = nil
   end
 
   def visible_rubric_assessments_for(user)
@@ -977,11 +1030,22 @@ class Assignment < ActiveRecord::Base
     [comments.compact, @ignored_files]
   end
   
-  def group_category
-    attr = read_attribute(:group_category)
-    attr && attr != "" ? attr : nil
+  def group_category_name
+    self.read_attribute(:group_category)
   end
-  
+
+  def maintain_group_category_attribute
+    # keep this field up to date even though it's not used (group_category_name
+    # exists solely for the migration that introduces the GroupCategory model).
+    # this way group_category_name is correct if someone mistakenly uses it
+    # (modulo category renaming in the GroupCategory model).
+    self.write_attribute(:group_category, self.group_category && self.group_category.name)
+  end
+
+  def has_group_category?
+    self.group_category_id.present?
+  end
+
   def assign_peer_review(reviewer, reviewee)
     reviewer_submission = self.find_or_create_submission(reviewer)
     reviewee_submission = self.find_or_create_submission(reviewee)
@@ -1138,7 +1202,7 @@ class Assignment < ActiveRecord::Base
   # This should only be used in the course drop down to show assignments recently graded.
   named_scope :need_submitting_info, lambda{|user_id, limit, ignored_ids|
     ignored_ids ||= []
-          {:select => 'id, title, points_possible, due_at, context_id, context_type, submission_types,' +
+          {:select => 'id, title, points_possible, due_at, context_id, context_type, submission_types, description, ' +
           '(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name',
           :conditions =>["(SELECT COUNT(id) FROM submissions
               WHERE assignment_id = assignments.id
@@ -1153,7 +1217,7 @@ class Assignment < ActiveRecord::Base
   named_scope :need_grading_info, lambda{|limit, ignore_ids|
     ignore_ids ||= []
     {
-      :select => 'assignments.id, title, points_possible, due_at, context_id, context_type, submission_types, ' +
+      :select => 'assignments.id, title, points_possible, due_at, context_id, context_type, submission_types, description, ' +
                  '(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count',
       :conditions => "needs_grading_count > 0 #{ignore_ids.empty? ? "" : "AND id NOT IN (#{ignore_ids.join(',')})"}",
       :limit => limit,
@@ -1289,7 +1353,7 @@ class Assignment < ActiveRecord::Base
       dup.send("#{key}=", val)
     end
 
-    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.group_category && !self.group_category.empty?
+    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.has_group_category?
     context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
     
     dup.context = context

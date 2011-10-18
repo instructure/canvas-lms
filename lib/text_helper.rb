@@ -1,3 +1,5 @@
+# encoding: UTF-8
+#
 # By Henrik Nyh <http://henrik.nyh.se> 2008-01-30.
 # Free to modify and redistribute with credit.
 
@@ -123,8 +125,10 @@ module TextHelper
     ellipsis = options[:ellipsis] || I18n.t('lib.text_helper.ellipsis', '...')
     ellipsis_length = ellipsis.length
     actual_length = max_length - ellipsis_length
-
-    truncated = (text || "")[/.{0,#{actual_length}}/mu]
+    
+    # First truncate the text down to the bytes max, then lop off any invalid
+    # unicode characters at the end.
+    truncated = (text || "")[0,actual_length][/.{0,#{actual_length}}/mu]
     if truncated.length < text.length
       truncated + ellipsis
     else
@@ -150,7 +154,7 @@ module TextHelper
     (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time
   end
 
-  def date_string(start_date, style=:normal)
+  def self.date_string(start_date, style=:normal)
     return nil unless start_date
     start_date = start_date.in_time_zone.to_date rescue start_date.to_date
     today = Time.zone.now.to_date
@@ -165,6 +169,9 @@ module TextHelper
       return I18n.l(start_date, :format => :short) if start_date.year == today.year || style == :short
     end
     return I18n.l(start_date, :format => :medium)
+  end
+  def date_string(*args)
+    TextHelper.date_string(*args)
   end
 
   def time_string(start_time, end_time=nil)

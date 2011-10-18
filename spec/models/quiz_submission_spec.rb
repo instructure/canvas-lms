@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -252,6 +253,15 @@ describe QuizSubmission do
       })
       user_answer[:correct].should be_false
       user_answer[:points].should == 0
+    end
+    
+    it "should not fail if fimb question doesn't have any answers" do
+      course_with_student(:active_all => true)
+      # @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
+      q = {:position=>1, :name=>"Question 1", :correct_comments=>"", :question_type=>"fill_in_multiple_blanks_question", :assessment_question_id=>7903, :incorrect_comments=>"", :neutral_comments=>"", :id=>1, :points_possible=>50, :question_name=>"Question 1", :answers=>[], :question_text=>"<p><span>Ayo my quality [answer1].</p>"}
+      lambda {
+        QuizSubmission.score_question(q, { "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "bleh" })
+      }.should_not raise_error
     end
   end
 end

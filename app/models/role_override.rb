@@ -664,7 +664,7 @@ class RoleOverride < ActiveRecord::Base
       end
       case_string = ""
       account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
-      overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => "CASE #{case_string} ELSE 9999 END DESC")
+      overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => (case_string.empty? ? nil : "CASE #{case_string} ELSE 9999 END DESC"))
     end
     
     @@role_override_chain[permissionless_key] = overrides

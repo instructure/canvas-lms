@@ -304,9 +304,9 @@ $(document).ready(function() {
     var $checkbox = $("#copy_all_topics");
     var include_secondaries = $(this).hasClass('include');
     if(include_secondaries) {
-      $checkbox.parent().next("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $checkbox.attr('checked')).each(function() { $(this).triggerHandler('change', true); });
+      $checkbox.parent().next("ul").find(":checkbox:not(.secondary_checkbox)").prop('checked', $checkbox.prop('checked')).each(function() { $(this).triggerHandler('change', true); });
     } else {
-      $checkbox.parent().next("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $checkbox.attr('checked'));
+      $checkbox.parent().next("ul").find(":checkbox:not(.secondary_checkbox)").prop('checked', $checkbox.prop('checked'));
     }
     $("#copy_entries_dialog").dialog('close');
   });
@@ -322,12 +322,12 @@ $(document).ready(function() {
           width: 370
         }).dialog('open');
       } else {
-        $(this).parent().next("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $(this).attr('checked')).each(function() { $(this).triggerHandler('change'); });
+        $(this).parent().next("ul").find(":checkbox:not(.secondary_checkbox)").prop('checked', $(this).prop('checked')).each(function() { $(this).triggerHandler('change'); });
         $('#copy_everything').attr('checked', false);
       }
     } else if($(this).hasClass('copy_everything')) {
-      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.skip_on_everything):not(.shift_dates_checkbox)").attr('checked', $(this).attr('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
-      $("#copy_all_topics").attr('checked', $(this).attr('checked')).triggerHandler('change');
+      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.skip_on_everything):not(.shift_dates_checkbox)").prop('checked', $(this).prop('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
+      $("#copy_all_topics").prop('checked', $(this).prop('checked')).triggerHandler('change');
     } else {
       $(this).parent().find(":checkbox.secondary_checkbox" + (force_secondaries ? '' : ':not(.skip)')).attr('checked', $(this).attr('checked'));
       if($(this).hasClass('secondary_checkbox') && $(this).attr('checked')) {

@@ -25,6 +25,7 @@ describe "Services API", :type => :integration do
     Kaltura::ClientV3.stub!(:config).and_return({
       'domain' => 'kaltura.fake.local',
       'resource_domain' => 'cdn.kaltura.fake.local',
+      'rtmp_domain' => 'rtmp-kaltura.fake.local',
       'partner_id' => '420',
     })
   end
@@ -42,6 +43,7 @@ describe "Services API", :type => :integration do
       'enabled' => true,
       'domain' => 'kaltura.fake.local',
       'resource_domain' => 'cdn.kaltura.fake.local',
+      'rtmp_domain' => 'rtmp-kaltura.fake.local',
       'partner_id' => '420',
     }
   end
@@ -52,6 +54,21 @@ describe "Services API", :type => :integration do
               :controller => "services_api", :action => "show_kaltura_config", :format => "json")
     json.should == {
       'enabled' => false,
+    }
+  end
+
+  it "should return a new kaltura session" do
+    stub_kaltura
+    kal = mock(Kaltura::ClientV3)
+    kal.should_receive(:startSession).and_return "new_session_id_here"
+    Kaltura::ClientV3.stub!(:new).and_return(kal)
+    json = api_call(:post, "/api/v1/services/kaltura_session",
+                    :controller => "services_api", :action => "start_kaltura_session", :format => "json")
+    json.delete_if { |k,v| %w(serverTime).include?(k) }.should == {
+      'ks' => "new_session_id_here",
+      'subp_id' => '10000',
+      'partner_id' => '100',
+      'uid' => "#{@user.id}_#{Account.default.id}",
     }
   end
 end

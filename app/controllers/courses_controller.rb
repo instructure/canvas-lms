@@ -44,6 +44,16 @@ class CoursesController < ApplicationController
   #   When syllabus_body is given the user-generated html for the course 
   #   syllabus is returned.
   #
+  # @argument include[] ["total_scores"] Optional information to include with each Course.
+  #   When total_scores is given, any enrollments with type 'student' will also
+  #   include the fields 'calculated_current_score', 'calculated_final_score',
+  #   and 'calculated_final_grade'. calculated_current_score is the student's
+  #   score in the course, ignoring ungraded assignments. calculated_final_score
+  #   is the student's score in the course including ungraded assignments with
+  #   a score of 0. calculated_final_grade is the letter grade equivalent of
+  #   calculated_final_score (if available). This argument is ignored if the
+  #   course is configured to hide final grades.
+  #
   # @response_field id The unique identifier for the course.
   # @response_field name The name of the course.
   # @response_field course_code The course code.
@@ -56,7 +66,7 @@ class CoursesController < ApplicationController
   #   include[]=needs_grading_count
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student'}], 'calendar': { 'ics': '..url..' } },
+  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student', 'computed_current_score': 84.8, 'computed_final_score': 62.9, 'computed_final_grade': 'D-'}], 'calendar': { 'ics': '..url..' } },
   #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'enrollments': [{'type': 'teacher'}], 'calendar': { 'ics': '..url..' } } ]
   def index
     respond_to do |format|
@@ -155,6 +165,7 @@ class CoursesController < ApplicationController
   #
   # @response_field id The unique identifier for the course section.
   # @response_field name The name of the section.
+  # @response_field sis_section_id The sis id of the section.
   #
   # @example_response
   #   ?include[]=students
@@ -163,11 +174,13 @@ class CoursesController < ApplicationController
   #   {
   #     "id": 1,
   #     "name": "Section A",
+  #     "sis_section_id": null,
   #     "students": [...]
   #   },
   #   {
   #     "id": 2,
   #     "name": "Section B",
+  #     "sis_section_id": "section-b",
   #     "students": [...]
   #   }
   # ]
@@ -223,11 +236,26 @@ class CoursesController < ApplicationController
   # @API
   # Returns the current user's course-specific activity stream.
   #
-  # For full documentation, see the API documentation for the user activity stream.
+  # For full documentation, see the API documentation for the user activity
+  # stream, in the user api.
   def activity_stream
     get_context
     if authorized_action(@context, @current_user, :read)
       render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+    end
+  end
+
+  include Api::V1::TodoItem
+  # @API
+  # Returns the current user's course-specific todo items.
+  #
+  # For full documentation, see the API documentation for the user todo items, in the user api.
+  def todo_items
+    get_context
+    if authorized_action(@context, @current_user, :read)
+      grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, 'grading') }
+      submitting = @current_user.assignments_needing_submitting(:contexts => [@context]).map { |a| todo_item_json(a, 'submitting') }
+      render :json => (grading + submitting)
     end
   end
 
@@ -317,7 +345,6 @@ class CoursesController < ApplicationController
       @students = @context.participating_students.find(:all, :order => 'sortable_name')
       @teachers = @context.admins.find(:all, :order => 'sortable_name')
       @groups = @context.groups.active
-      @categories = @groups.map{|g| g.category}.uniq
     end
   end
   
@@ -585,6 +612,10 @@ class CoursesController < ApplicationController
     if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
       return redirect_to course_settings_path(@context.id)
     end
+
+    start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment && @context_enrollment.state_based_on_date == :inactive
+    @unauthorized_message = t('unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context_enrollment && @context.claimed?
+    @unauthorized_message = t('unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now
     if authorized_action(@context, @current_user, :read)
       
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
@@ -606,7 +637,7 @@ class CoursesController < ApplicationController
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
         @modules = @context.context_modules.active
-        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
+        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
@@ -942,16 +973,15 @@ class CoursesController < ApplicationController
   end
 
   def publish_to_sis
-    get_context
-    return unless authorized_action(@context, @current_user, :manage_grades)
-    @context.publish_final_grades(@current_user)
-    render :json => {:sis_publish_status => @context.grade_publishing_status}.to_json
+    sis_publish_status(true)
   end
 
-  def sis_publish_status
+  def sis_publish_status(publish_grades=false)
     get_context
     return unless authorized_action(@context, @current_user, :manage_grades)
-    render :json => {:sis_publish_status => @context.grade_publishing_status}
+    @context.publish_final_grades(@current_user) if publish_grades
+    render :json => {:sis_publish_messages => @context.grade_publishing_messages,
+                     :sis_publish_status => @context.grade_publishing_status}
   end
 
   def reset_content
@@ -960,4 +990,5 @@ class CoursesController < ApplicationController
     @new_course = @context.reset_content
     redirect_to course_settings_path(@new_course.id)
   end
+
 end

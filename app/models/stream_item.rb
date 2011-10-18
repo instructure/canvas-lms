@@ -208,11 +208,16 @@ class StreamItem < ActiveRecord::Base
     object = get_parent_for_stream(object)
     res = StreamItem.generate_or_update(object)
 
+    # set the hidden flag if an assignment and muted
+    hidden = object.is_a?(Submission) && object.assignment.muted? ? true : false
+
     # Then insert a StreamItemInstance for each user in user_ids
     instance_ids = []
     StreamItemInstance.transaction do
       user_ids.each do |user_id|
-        i = res.stream_item_instances.create(:user_id => user_id)
+        i = res.stream_item_instances.build(:user_id => user_id)
+        i.hidden = object.class == Submission && object.assignment.muted? ? true : false
+        i.save
         instance_ids << i.id
       end
     end

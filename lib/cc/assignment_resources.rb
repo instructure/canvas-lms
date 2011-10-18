@@ -43,7 +43,7 @@ module CC
       # That way at least the content of the assignment will
       # appear when someone non-canvas imports the package
       File.open(path, 'w') do |file|
-        file << @html_exporter.html_page(assignment.description || '', "Assignment: " + assignment.title, @course, @manifest.exporter.user)
+        file << @html_exporter.html_page(assignment.description || '', "Assignment: " + assignment.title)
       end
 
       assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')

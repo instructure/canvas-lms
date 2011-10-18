@@ -148,6 +148,7 @@ ActionController::Routing::Routes.draw do |map|
       assignment.delete_peer_review "peer_reviews/:id", :controller => 'assignments', :action => 'delete_peer_review', :conditions => {:method => :delete}
       assignment.remind_peer_review "peer_reviews/:id", :controller => 'assignments', :action => 'remind_peer_review', :conditions => {:method => :post}
       assignment.assign_peer_review "peer_reviews/users/:reviewer_id", :controller => 'assignments', :action => 'assign_peer_review', :conditions => {:method => :post}
+      assignment.mute "mute", :controller => "assignments", :action => "toggle_mute", :conditions => {:method => :put}
     end
     course.resources :grading_standards, :only => %w(index create update destroy)
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
@@ -173,7 +174,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
-    course.resources :groups, :collection => {:create_category => :post, :delete_category => :delete}
+    course.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
     course.resources :wiki_pages, :as => 'wiki' do |wiki_page|
       wiki_page.latest_version_number 'revisions/latest', :controller => 'wiki_page_revisions', :action => 'latest_version_number'
       wiki_page.resources :wiki_page_revisions, :as => "revisions"
@@ -269,6 +270,8 @@ ActionController::Routing::Routes.draw do |map|
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
   map.media_object_redirect 'media_objects/:id/redirect', :controller => 'context', :action => 'media_object_redirect'
+  map.media_object_thumbnail 'media_objects/:id/thumbnail', :controller => 'context', :action => 'media_object_thumbnail'
+
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
   map.external_content_cancel 'external_content/cancel/:service', :controller => 'external_content', :action => 'cancel'
   
@@ -441,7 +444,7 @@ ActionController::Routing::Routes.draw do |map|
     end
     account.media_download 'media_download', :controller => 'users', :action => 'media_download'
     account.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
-    account.resources :groups, :collection => {:create_category => :post, :delete_category => :delete}
+    account.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
     account.resources :outcomes
     account.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
     account.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
@@ -510,6 +513,7 @@ ActionController::Routing::Routes.draw do |map|
     user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
+    user.media_download 'media_download', :controller => 'users', :action => 'media_download'
   end
   map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
@@ -548,8 +552,8 @@ ActionController::Routing::Routes.draw do |map|
     dashboard.eportfolios "eportfolios", :controller => "eportfolios", :action => "user_index"
     dashboard.grades "grades", :controller => "users", :action => "grades"
     dashboard.resources :rubrics, :as => :assessments
-    dashboard.comment_session "comment_session", :controller => "users", :action => "kaltura_session"
-    dashboard.ignore_item 'ignore_item/:asset_string/:purpose', :controller => 'users', :action => 'ignore_item', :conditions => {:method => :delete}
+    # comment_session can be removed once the iOS apps are no longer using it
+    dashboard.comment_session "comment_session", :controller => "services_api", :action => "start_kaltura_session"
     dashboard.ignore_stream_item 'ignore_stream_item/:id', :controller => 'users', :action => 'ignore_stream_item', :conditions => {:method => :delete}
   end
   map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
@@ -646,8 +650,8 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
-      courses.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
+      courses.get 'courses/:course_id/todo', :action => :todo_items
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -659,8 +663,16 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :submissions_api) do |submissions|
       submissions.get 'courses/:course_id/assignments/:assignment_id/submissions', :action => :index, :path_name => 'course_assignment_submissions'
+      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions', :action => :index, :path_name => 'section_assignment_submissions'
+
+      submissions.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
+      submissions.get 'sections/:section_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'section_student_submissions'
+
       submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show
+      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :show
+
       submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'course_assignment_submission'
+      submissions.put 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'section_assignment_submission'
     end
 
     api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
@@ -676,17 +688,20 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :users) do |users|
-      users.get 'users/self/activity_stream', :action => 'activity_stream'
-      users.get 'users/activity_stream', :action => 'activity_stream' # deprecated
+      users.get 'users/self/activity_stream', :action => :activity_stream
+      users.get 'users/activity_stream', :action => :activity_stream # deprecated
+
+      users.get 'users/self/todo', :action => :todo_items
+      users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
     end
 
     api.with_options(:controller => :accounts) do |accounts|
-      accounts.get 'accounts', :action => :index, :path_name => 'accounts'
+      accounts.get 'accounts', :action => :index, :path_name => :accounts
       accounts.get 'accounts/:id', :action => :show
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
     end
 
-    api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index
+    api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
     api.get 'users/:user_id/profile', :controller => :profile, :action => :show
 
     api.with_options(:controller => :conversations) do |conversations|
@@ -701,14 +716,17 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
     end
-    
+
     api.with_options(:controller => :services_api) do |services|
       services.get 'services/kaltura', :action => :show_kaltura_config
+      services.post 'services/kaltura_session', :action => :start_kaltura_session
     end
   end
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
+
+  map.resources :equation_images, :only => :show
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want

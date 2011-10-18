@@ -25,10 +25,12 @@ require 'webrat'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
-ALL_MODELS = Dir.glob(File.expand_path(File.dirname(__FILE__) + '/../app/models') + '/*.rb').map{|x| 
-  model = File.basename(x, '.rb').split('_').map(&:capitalize).join
-  eval(model) rescue nil
-}.find_all{|x| x.respond_to? :delete_all and x.count >= 0 rescue false}
+ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
+      Dir["#{RAILS_ROOT}/app/models/*", "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"].collect { |file|
+        model = File.basename(file, ".*").camelize.constantize
+        next unless model < ActiveRecord::Base
+        model
+      }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -49,6 +51,17 @@ end
 # wipe out the test db, in case some non-transactional tests crapped out before
 # cleaning up after themselves
 ALL_MODELS.each { |m| truncate_table(m) }
+
+
+# Make AR not puke if MySQL auto-commits the transaction
+class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
+  def outside_transaction?
+    # MySQL ignores creation of savepoints outside of a transaction; so if we can create one
+    # and then can't release it because it doesn't exist, we're not in a transaction
+    execute('SAVEPOINT outside_transaction')
+    !!execute('RELEASE SAVEPOINT outside_transaction') rescue true
+  end
+end
 
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
@@ -216,7 +229,11 @@ Spec::Runner.configure do |config|
   end
 
   def outcome_with_rubric(opts={})
-    @outcome = @course.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
+    @outcome_group ||= LearningOutcomeGroup.default_for(@course)
+    @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
+    @outcome_group.add_item(@outcome)
+    @outcome_group.save! 
+
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
       {
@@ -239,10 +256,37 @@ Spec::Runner.configure do |config|
           }
         ],
         :learning_outcome_id => @outcome.id
+      },
+      {
+        :points => 5,
+        :description => "no outcome row",
+        :long_description => 'non outcome criterion',
+        :id => 2,
+        :ratings => [
+          {
+            :points => 5,
+            :description => "Amazing",
+            :criterion_id => 2,
+            :id => 4
+          },
+          {
+            :points => 3,
+            :description => "not too bad",
+            :criterion_id => 2,
+            :id => 5
+          },
+          {
+            :points => 0,
+            :description => "no bueno",
+            :criterion_id => 2,
+            :id => 6
+          }
+        ]
       }
     ]
     @rubric.instance_variable_set('@outcomes_changed', true)
     @rubric.save!
+    @rubric.update_outcome_tags
   end
 
   def eportfolio(opts={})
@@ -263,6 +307,15 @@ Spec::Runner.configure do |config|
     @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload
+  end
+
+  def media_object(opts={})
+    mo = MediaObject.new
+    mo.media_id = opts[:media_id] || "1234"
+    mo.media_type = opts[:media_type] || "video"
+    mo.context = opts[:context] || @user || @course
+    mo.user = opts[:user] || @user
+    mo.save!
   end
 
   def assert_status(status=500)
@@ -306,23 +359,27 @@ Spec::Runner.configure do |config|
     update_with_protected_attributes!(ar_instance, attrs) rescue false
   end
 
-  def process_csv_data(*lines)
+  def process_csv_data(*lines_or_opts)
     account_model unless @account
   
+    lines = lines_or_opts.reject{|thing| thing.is_a? Hash}
+    opts = lines_or_opts.select{|thing| thing.is_a? Hash}.inject({:allow_printing => false}, :merge)
+
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
     tmp.close!
     File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
+    opts[:files] = [path]
     
-    importer = SIS::CSV::Import.process(@account, :files => [ path ], :allow_printing=>false)
+    importer = SIS::CSV::Import.process(@account, opts)
     
     File.unlink path
     
     importer
   end
   
-  def process_csv_data_cleanly(*lines)
-    importer = process_csv_data(*lines)
+  def process_csv_data_cleanly(*lines_or_opts)
+    importer = process_csv_data(*lines_or_opts)
     importer.errors.should == []
     importer.warnings.should == []
   end
@@ -365,6 +422,21 @@ Spec::Runner.configure do |config|
       server.close
     end
     return server, server_thread, post_lines
+  end
+ 
+  def stub_kaltura
+    # trick kaltura into being activated
+    Kaltura::ClientV3.stub!(:config).and_return({
+          'domain' => 'kaltura.example.com',
+          'resource_domain' => 'kaltura.example.com',
+          'partner_id' => '100',
+          'subpartner_id' => '10000',
+          'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+          'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+          'player_ui_conf' => '1',
+          'kcw_ui_conf' => '1',
+          'upload_ui_conf' => '1'
+    })
   end
 
 end

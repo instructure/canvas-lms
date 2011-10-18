@@ -77,13 +77,13 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
   end
 
-  def saml_settings
+  def saml_settings(preferred_account_domain=nil)
     return nil unless self.auth_type == 'saml'
     app_config = Setting.from_config('saml')
     raise "This Canvas instance isn't configured for SAML" unless app_config
 
     unless @saml_settings
-      domain = HostUrl.context_host(self.account)
+      domain = HostUrl.context_host(self.account, preferred_account_domain)
       @saml_settings = Onelogin::Saml::Settings.new
 
       @saml_settings.issuer = self.entity_id || app_config[:entity_id]

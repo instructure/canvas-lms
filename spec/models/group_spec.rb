@@ -40,11 +40,25 @@ describe Group do
   
   it "should find all peer groups" do
     context = course_model
-    group1 = Group.create!(:name=>"group1", :category=>"worldCup", :context => context)
-    group2 = Group.create!(:name=>"group2", :category=>"worldCup", :context => context)
+    group_category = context.group_categories.create(:name => "worldCup")
+    other_category = context.group_categories.create(:name => "other category")
+    group1 = Group.create!(:name=>"group1", :group_category => group_category, :context => context)
+    group2 = Group.create!(:name=>"group2", :group_category => group_category, :context => context)
+    group3 = Group.create!(:name=>"group3", :group_category => group_category, :context => context)
+    group4 = Group.create!(:name=>"group4", :group_category => other_category, :context => context)
+    group1.peer_groups.length.should == 2
     group1.peer_groups.should be_include(group2)
+    group1.peer_groups.should be_include(group3)
     group1.peer_groups.should_not be_include(group1)
-    group1.peer_groups.length.should == 1
+    group1.peer_groups.should_not be_include(group4)
+  end
+  
+  it "should not find peer groups for student organized groups" do
+    context = course_model
+    group_category = GroupCategory.student_organized_for(context)
+    group1 = Group.create!(:name=>"group1", :group_category=>group_category, :context => context)
+    group2 = Group.create!(:name=>"group2", :group_category=>group_category, :context => context)
+    group1.peer_groups.should be_empty
   end
   
   context "atom" do
@@ -81,8 +95,9 @@ describe Group do
     
     it "adding a user should remove that user from peer groups" do
       context = course_model
-      group1 = Group.create!(:name=>"group1", :category=>"worldCup", :context => context)
-      group2 = Group.create!(:name=>"group2", :category=>"worldCup", :context => context)
+      group_category = context.group_categories.create!(:name => "worldCup")
+      group1 = Group.create!(:name=>"group1", :group_category=>group_category, :context => context)
+      group2 = Group.create!(:name=>"group2", :group_category=>group_category, :context => context)
       user_model
       pseudonym_model(:user_id => @user.id)
       group1.add_user(@user)
@@ -155,6 +170,190 @@ describe Group do
       group.save!
       group.account.should == new_sub_acct
       group.root_account.should == new_root_acct
+    end
+  end
+
+  context "auto_accept?" do
+    it "should be false unless join level is 'parent_context_auto_join'" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group_category = GroupCategory.student_organized_for(@course)
+      group = @course.groups.create(:group_category => group_category)
+      group.auto_accept?(student).should be_false
+    end
+
+    it "should be false unless the group is student organized" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group_category = @course.group_categories.create(:name => "random category")
+      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      group.auto_accept?(student).should be_false
+    end
+
+    it "should be true otherwise" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group_category = GroupCategory.student_organized_for(@course)
+      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      group.auto_accept?(student).should be_true
+    end
+  end
+
+  context "allow_join_request?" do
+    it "should be false unless join level is 'parent_context_auto_join' or 'parent_context_request'" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group_category = GroupCategory.student_organized_for(@course)
+      group = @course.groups.create(:group_category => group_category)
+      group.allow_join_request?(student).should be_false
+    end
+
+    it "should be false unless the group is student organized" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group_category = @course.group_categories.create(:name => "random category")
+      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      group.allow_join_request?(student).should be_false
+    end
+
+    it "should be true otherwise" do
+      course_with_teacher
+      student = user_model
+      @course.enroll_student(student)
+      @course.reload
+
+      group_category = GroupCategory.student_organized_for(@course)
+
+      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      group.allow_join_request?(student).should be_true
+
+      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
+      group.allow_join_request?(student).should be_true
+    end
+  end
+
+  it "should default group_category to student organized category on save" do
+    course_with_teacher
+    group = @course.groups.create
+    group.group_category.should == GroupCategory.student_organized_for(@course)
+
+    group_category = @course.group_categories.create(:name => "random category")
+    group = @course.groups.create(:group_category => group_category)
+    group.group_category.should == group_category
+  end
+
+  context "import_from_migration" do
+    it "should respect group_category from the hash" do
+      course_with_teacher
+      group = @course.groups.build
+      @course.imported_migration_items = []
+      Group.import_from_migration({:group_category => "random category"}, @course, group)
+      group.group_category.name.should == "random category"
+    end
+
+    it "should default group_category to imported if not in the hash" do
+      course_with_teacher
+      group = @course.groups.build
+      @course.imported_migration_items = []
+      Group.import_from_migration({}, @course, group)
+      group.group_category.should == GroupCategory.imported_for(@course)
+    end
+  end
+
+  it "as_json should include group_category" do
+    group_category = GroupCategory.create(:name => "Something")
+    group = Group.create(:group_category => group_category)
+    hash = ActiveSupport::JSON.decode(group.to_json)
+    hash["group"]["group_category"].should == "Something"
+  end
+
+  it "should maintain the deprecated category attribute" do
+    course = course_model
+    group = course.groups.create
+    default_category = GroupCategory.student_organized_for(course)
+    group.read_attribute(:category).should eql(default_category.name)
+    group.group_category = group.context.group_categories.create(:name => "my category")
+    group.save
+    group.reload
+    group.read_attribute(:category).should eql("my category")
+    group.group_category = nil
+    group.save
+    group.reload
+    group.read_attribute(:category).should eql(default_category.name)
+  end
+
+  context "has_common_section?" do
+    it "should be false for accounts" do
+      account = Account.default
+      group = account.groups.create
+      group.should_not have_common_section
+    end
+
+    it "should not be true if two members don't share a section" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      section2 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.add_user(user2)
+      group.should_not have_common_section
+    end
+
+    it "should be true if all members group have a section in common" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.add_user(user2)
+      group.should have_common_section
+    end
+  end
+
+  context "has_common_section_with_user?" do
+    it "should be false for accounts" do
+      account = Account.default
+      group = account.groups.create
+      group.should_not have_common_section_with_user(user_model)
+    end
+
+    it "should not be true if the new member does't share a section with an existing member" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      section2 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.should_not have_common_section_with_user(user2)
+    end
+
+    it "should be true if all members group have a section in common with the new user" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      group.should have_common_section_with_user(user2)
     end
   end
 end

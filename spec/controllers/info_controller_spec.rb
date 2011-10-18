@@ -20,12 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe InfoController do
 
-  #Delete these examples and add some real ones
-  it "should use InfoController" do
-    controller.should be_an_instance_of(InfoController)
-  end
-
-
   describe "POST 'record_error'" do
     it "should be successful" do
       post 'record_error'
@@ -39,10 +33,32 @@ describe InfoController do
       course_with_student_logged_in(:active_all => true)
       post 'record_error', "feedback_type"=>"teacher", "comments"=>"OHAI", "subject"=>"help me.", "course_id"=>@course.id, "error"=>{"comments"=>"OHAI", "subject"=>"help me.", "backtrace"=>"Posted as a _PROBLEM_", "email"=>""}, "email"=>""
       assert_recorded_error("Thanks for your feedback!  Your teacher has been notified.")
-  end
+    end
     
   end
   
+  describe "GET 'avatar_image_url'" do
+    it "should redirect to no_pic if no avatar is set" do
+      course_with_student_logged_in(:active_all => true)
+      get 'avatar_image_url', :user_id  => @user.id
+      response.should redirect_to '/images/no_pic.gif'
+    end
+    it "should handle passing a fallback" do
+      course_with_student_logged_in(:active_all => true)
+      get 'avatar_image_url', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
+      response.should redirect_to '/my/custom/fallback/url.png'
+    end
+    it "should handle passing a fallback when avatars are enabled" do
+      course_with_student_logged_in(:active_all => true)
+      @account = Account.default
+      @account.enable_service(:avatars)
+      @account.save!
+      @account.service_enabled?(:avatars).should be_true
+      get 'avatar_image_url', :user_id  => @user.id, :fallback => "https://test.domain/my/custom/fallback/url.png"
+      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=https%3A%2F%2Ftest.domain%2Fmy%2Fcustom%2Ffallback%2Furl.png"
+    end
+  end
+
   def assert_recorded_error(msg = "Thanks for your help!  We'll get right on this")
     flash[:notice].should eql(msg)
     response.should be_redirect

@@ -36,6 +36,13 @@ TEXT
       </td>
     </tr>
     <tr>
+      <td><%= f.blabel :rtmp_domain, :en => "RTMP Domain" %></td>
+      <td>
+        <%= f.text_field :rtmp_domain %>
+        <div class="hint"><%= t('hints.rtmp_domain', 'For hosted accounts, use "www.kaltura.com"') %></div>
+      </td>
+    </tr>
+    <tr>
       <td colspan="2" class="sub">
         <h3><%= t('headers.account_settings', "Account Settings") %></h3>
         <p><%= t(:account_settings, 'These values can be found in the Kaltura Management Console under "Settings -> Integration Settings"') %></p>

@@ -35,12 +35,25 @@ describe "navigation" do
     get "/"
     page = Nokogiri::HTML(response.body)
     list = page.css(".menu-item-drop-column-list li")
-    list[0].text.should match /Summer Term/m # course 3, Summer Term
-    list[1].text.should match /Spring Term/m # course 3, Spring Term
+
+    # order of tests assumes alphabetical order of list
+    list[4].text.should match /Summer Term/m # course 3, Summer Term
+    list[3].text.should match /Spring Term/m # course 3, Spring Term
     list[2].text.should_not match /Term/ # don't show term cause it doesn't have a name collision
-    list[3].text.should_not match /Term/ # don't show term cause it's the default term
-    list[4].text.should_not match /Term/ # "
+    list[1].text.should_not match /Term/ # don't show term cause it's the default term
+    list[0].text.should_not match /Term/ # "
+  end
+
+  it "should not fail on courses where the term no longer exists" do
+    @account = Account.default
+    user_with_pseudonym
+    course_with_teacher
+    
+    EnrollmentTerm.delete(@course.enrollment_term.id)
+    
+    user_session(@user, @pseudonym)
+    
+    get "/"
+    response.should be_success
   end
 end
-
-

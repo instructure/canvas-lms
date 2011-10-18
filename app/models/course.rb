@@ -92,12 +92,14 @@ class Course < ActiveRecord::Base
   has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment') and enrollments.workflow_state = 'active'"
 
   has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content
-  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
+  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.content_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'LearningOutcome', 'deleted']
   has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
   has_many :learning_outcome_groups, :as => :context
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
   has_many :users, :through => :enrollments, :source => :user
+  has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
+  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
   has_many :active_groups, :as => :context, :class_name => 'Group', :conditions => ['groups.workflow_state != ?', 'deleted']
   has_many :assignment_groups, :as => :context, :dependent => :destroy, :order => 'assignment_groups.position, assignment_groups.name'
@@ -110,8 +112,7 @@ class Course < ActiveRecord::Base
   has_many :discussion_entries, :through => :discussion_topics, :include => [:discussion_topic, :user], :dependent => :destroy
   has_many :announcements, :as => :context, :class_name => 'Announcement', :dependent => :destroy
   has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :order => 'created_at DESC'
-  has_many :attachments, :as => :context, :dependent => :destroy
-  has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted'], :order => 'attachments.display_name'
+  has_many :attachments, :as => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
   has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.title, assignments.position'
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
@@ -167,6 +168,9 @@ class Course < ActiveRecord::Base
   
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
   
+  include StickySisFields
+  are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id
+
   has_a_broadcast_policy
   
   def self.skip_updating_account_associations(&block)
@@ -942,6 +946,11 @@ class Course < ActiveRecord::Base
     self.account.account_chain
   end
   
+  def account_chain_ids
+    account_chain.map(&:id)
+  end
+  memoize :account_chain_ids
+  
   def institution_name
     return self.root_account.name if self.root_account_id != Account.default.id
     return (self.account || self.root_account).name
@@ -977,19 +986,68 @@ class Course < ActiveRecord::Base
   end
 
   def grade_publishing_messages
-    student_enrollments.count(:all, :group => :grade_publishing_message, :conditions => "grade_publishing_message IS NOT NULL AND grade_publishing_message != ''")
+    messages = {}
+    student_enrollments.count(:all, :group => [:grade_publishing_message, :grade_publishing_status]).each do |key, count|
+      status = key.last
+      status = "unpublished" if status.blank?
+      message = key.first
+      case status
+      when 'error'
+        if message.present?
+          message = t('grade_publishing_status.error_with_message', "Error: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.error', "Error")
+        end
+      when 'unpublished'
+        if message.present?
+          message = t('grade_publishing_status.unpublished_with_message', "Unpublished: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.unpublished', "Unpublished")
+        end
+      when 'pending'
+        if message.present?
+          message = t('grade_publishing_status.pending_with_message', "Pending: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.pending', "Pending")
+        end
+      when 'publishing'
+        if message.present?
+          message = t('grade_publishing_status.publishing_with_message', "Publishing: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.publishing', "Publishing")
+        end
+      when 'published'
+        if message.present?
+          message = t('grade_publishing_status.published_with_message', "Published: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.published', "Published")
+        end
+      when 'unpublishable'
+        if message.present?
+          message = t('grade_publishing_status.unpublishable_with_message', "Unpublishable: %{message}", :message => message)
+        else
+          message = t('grade_publishing_status.unpublishable', "Unpublishable")
+        end
+      else
+        if message.present?
+          message = t('grade_publishing_status.unknown_with_message', "Unknown status, %{status}: %{message}", :message => message, :status => status)
+        else
+          message = t('grade_publishing_status.unknown', "Unknown status, %{status}", :status => status)
+        end
+      end
+      messages[message] ||= 0
+      messages[message] += count
+    end
+    messages
   end
 
   def grade_publishing_status
+    # this will return the overall course grade publishing status
     statuses = {}
-    student_enrollments.find(:all, :select => "DISTINCT grade_publishing_status, 0 AS user_id").each do |enrollment|
-        status = enrollment.grade_publishing_status
-        status ||= "unpublished"
-        statuses[status] = true
+    student_enrollments.count(:all, :group => [:grade_publishing_status]).each do |key, count|
+      statuses[key || "unpublished"] = true
     end
     return "unpublished" unless statuses.size > 0
-    # to fake a course-level grade publishing status, we look at all possible
-    # enrollments, and return statuses if we find any, in this order.
     ["error", "unpublished", "pending", "publishing", "published", "unpublishable"].each do |status|
       return status if statuses.has_key?(status)
     end
@@ -1089,7 +1147,11 @@ class Course < ActiveRecord::Base
 
   def gradebook_to_csv(options = {})
     assignments = self.assignments.active.gradeable
-    assignments = [assignments.find(options[:assignment_id])] if options[:assignment_id]
+    if options[:assignment_id]
+      assignments = [assignments.find(options[:assignment_id])]
+    else
+      assignments = assignments.find(:all, :order => 'due_at, title')
+    end
     single = assignments.length == 1
     student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
     submissions = self.submissions.inject({}) { |h, sub|
@@ -1366,8 +1428,9 @@ class Course < ActiveRecord::Base
     association_name = obj_class.table_name
     old_item = old_context.send(association_name).find_by_id(old_id)
     res = new_context.send(association_name).first(:conditions => { :cloned_item_id => old_item.cloned_item_id}, :order => 'id desc') if old_item
-    if !res
-      old_item = old_context.send(association_name).active.find_by_id(old_id)
+    if !res && old_item
+      # make sure it's active by re-finding it with the active scope ... active
+      old_item = old_context.send(association_name).active.find_by_id(old_item.id)
       res = old_item.clone_for(new_context) if old_item
       res.save if res
     end
@@ -1375,68 +1438,47 @@ class Course < ActiveRecord::Base
   end
   
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
-    return html unless from_context
+    return html unless html.present? && to_context
+
+    from_name = from_context.class.name.tableize
+    to_name = to_context.class.name.tableize
+
     @merge_mappings ||= {}
+    rewriter = UserContent::HtmlRewriter.new(from_context, user_to_check_for_permission)
     limit_migrations_to_listed_types = !!supported_types
-    from_name = "courses"
-    from_name = "users" if from_context.is_a?(User)
-    from_name = "groups" if from_context.is_a?(Group)
-    to_name = "courses"
-    to_name = "users" if to_context.is_a?(User)
-    to_name = "groups" if to_context.is_a?(Group)
-    regex = Regexp.new("/#{from_name}/#{from_context.id}/([^\\s]*)")
-    html ||= ""
-    html = html.gsub(regex) do |relative_url|
-      sub_spot = $1
-      matched = false
-      is_sub_item = false
-      {'assignments' => Assignment,
-        'calendar_events' => CalendarEvent,
-        'discussion_topics' => DiscussionTopic,
-        'collaborations' => Collaboration,
-        'files' => Attachment,
-        'conferences' => WebConference,
-        'quizzes' => Quiz,
-        'groups' => Group,
-        'modules' => ContextModule
-      }.each do |type, obj_class|
-        sub_regex = Regexp.new("#{type}/(\\d+)[^\\s]*$")
-        is_sub_item ||= sub_spot.match(sub_regex)
-        next if matched || (supported_types && !supported_types.include?(type))
-        if item = sub_spot.match(sub_regex)
-          matched = sub_spot.match(sub_regex)
-          new_id = @merge_mappings["#{obj_class.to_s.underscore}_#{item[1]}"]
-          allow_migrate_content = true
-          if user_to_check_for_permission
-            allow_migrate_content = from_context.grants_right?(user_to_check_for_permission, nil, :manage_content)
-            if !allow_migrate_content
-              obj = obj_class.find(item[1]) rescue nil
-              allow_migrate_content = true if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user_to_check_for_permission, nil, :read)
-              allow_migrate_content = false if obj && obj.respond_to?(:locked_for?) && obj.locked_for?(user_to_check_for_permission)
-            end
-          end
-          if !new_id && allow_migrate_content && to_context != from_context
-            new_obj = self.find_or_create_for_new_context(obj_class, to_context, from_context, item[1])
-            new_id ||= new_obj.id if new_obj
-          end
-          if !limit_migrations_to_listed_types || new_id
-            relative_url = relative_url.gsub("#{type}/#{item[1]}", new_id ? "#{type}/#{new_id}" : "#{type}")
-          end
-        end
+    rewriter.allowed_types = %w(assignments calendar_events discussion_topics collaborations files conferences quizzes groups modules)
+
+    rewriter.set_default_handler do |match|
+      new_url = match.url
+      next(new_url) if supported_types && !supported_types.include?(match.type)
+      new_id = @merge_mappings["#{match.obj_class.name.underscore}_#{match.obj_id}"]
+      next(new_url) unless rewriter.user_can_view_content? { match.obj_class.find_by_id(match.obj_id) }
+      if !new_id && to_context != from_context
+        new_obj = self.find_or_create_for_new_context(match.obj_class, to_context, from_context, match.obj_id)
+        new_id = new_obj.id if new_obj
       end
-      if is_sub_item && !matched
-        relative_url
-      else
-        relative_url = relative_url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
+      if !limit_migrations_to_listed_types || new_id
+        new_url = new_url.gsub("#{match.type}/#{match.obj_id}", new_id ? "#{match.type}/#{new_id}" : "#{match.type}")
       end
+      new_url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
     end
+
+    rewriter.set_unknown_handler do |match|
+      match.url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
+    end
+
+    html = rewriter.translate_content(html)
+
     if !limit_migrations_to_listed_types
+      # for things like calendar urls, swap out the old context id with the new one
       regex = Regexp.new("include_contexts=[^\\s&]*#{from_context.asset_string}")
       html = html.gsub(regex) do |match|
         match.gsub("#{from_context.asset_string}", "#{to_context.asset_string}")
       end
+      # swap out the old host with the new host
       html = html.gsub(HostUrl.context_host(from_context), HostUrl.context_host(to_context))
     end
+
     html
   end
   
@@ -2037,7 +2079,7 @@ class Course < ActiveRecord::Base
     }
     if options[:dates]
       conditions.merge!({
-        :created_at, (options[:dates].first)..(options[:dates].last)
+        :created_at => (options[:dates].first)..(options[:dates].last)
       })
     end
     PageView.count(
@@ -2052,6 +2094,7 @@ class Course < ActiveRecord::Base
       Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id } }
     end
   end
+  memoize :section_visibilities_for
 
   def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
     !visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
@@ -2075,6 +2118,22 @@ class Course < ActiveRecord::Base
       when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
       else scope.scoped({:conditions => "FALSE"})
     end
+  end
+
+  def sections_visible_to(user, sections = active_course_sections)
+    visibilities = section_visibilities_for(user)
+    section_ids = visibilities.map{ |s| s[:course_section_id] }
+    case enrollment_visibility_level_for(user, visibilities)
+      when :full
+        if visibilities.all?{ |v| ['StudentEnrollment', 'ObserverEnrollment'].include? v[:type] }
+          return sections.find_all_by_id(section_ids)
+        else
+          return sections
+        end
+      when :sections
+        return sections.find_all_by_id(section_ids)
+    end
+    []
   end
 
   def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))
@@ -2349,7 +2408,7 @@ class Course < ActiveRecord::Base
     Course.transaction do
       new_course = Course.new
       self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration].include?(k.to_sym) }.each do |key, val|
-        new_course.send("#{key}=", val)
+        new_course.write_attribute(key, val)
       end
       # The order here is important; we have to set our sis id to nil and save first
       # so that the new course can be saved, then we need the new course saved to
@@ -2358,7 +2417,7 @@ class Course < ActiveRecord::Base
       # deleted before they got moved
       self.uuid = self.sis_source_id = self.sis_batch_id = nil;
       self.save!
-      new_course.save!
+      Course.process_as_sis { new_course.save! }
       self.course_sections.update_all(:course_id => new_course.id)
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
@@ -2372,7 +2431,7 @@ class Course < ActiveRecord::Base
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!
-      new_course
+      Course.find(new_course.id)
     end
   end
 end

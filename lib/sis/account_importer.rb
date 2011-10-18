@@ -19,19 +19,15 @@
 require "skip_callback"
 
 module SIS
-  class AccountImporter
-
-    def initialize(batch_id, root_account, logger)
-      @batch_id = batch_id
-      @root_account = root_account
-      @logger = logger
-    end
+  class AccountImporter < BaseImporter
 
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
       Account.skip_callback(:update_account_associations_if_changed) do
-        yield importer
+        Account.process_as_sis(@sis_options) do
+          yield importer
+        end
       end
       @logger.debug("Accounts took #{Time.now - start} seconds")
       return importer.success_count
@@ -75,9 +71,7 @@ module SIS
         account.parent_account_id = parent ? parent.id : @root_account.id
 
         # only update the name on new records, and ones that haven't been changed since the last sis import
-        if name.present? && (account.new_record? || (account.sis_name && account.sis_name == account.name))
-          account.name = account.sis_name = name
-        end
+        account.name = name if name.present? && (account.new_record? || (!account.stuck_sis_fields.include?(:name)))
 
         account.sis_source_id = account_id
         account.sis_batch_id = @batch_id if @batch_id

@@ -22,6 +22,7 @@ end
 
 def valid_rubric_attributes
   {
+    :title => "test rubric",
     :data => [{
       :description => "Some criterion",
       :points => 10,

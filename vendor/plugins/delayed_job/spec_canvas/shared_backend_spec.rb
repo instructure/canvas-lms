@@ -410,4 +410,17 @@ shared_examples_for 'a backend' do
       proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
     end
   end
+
+  module InDelayedJobTest
+    def self.check_in_job
+      Delayed::Job.in_delayed_job?.should == true
+    end
+  end
+
+  it "should set in_delayed_job?" do
+    job = InDelayedJobTest.send_later(:check_in_job)
+    Delayed::Job.in_delayed_job?.should == false
+    job.invoke_job
+    Delayed::Job.in_delayed_job?.should == false
+  end
 end

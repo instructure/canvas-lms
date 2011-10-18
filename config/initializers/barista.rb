@@ -1,4 +1,13 @@
 # Configure barista.
+# If you change this config, keep in mind that the canvas:compile_assets rake
+# task bypasses Barista and compiles the coffeescript with the coffee-script
+# gem directly, because Barista requires loading up a full canvas/rails
+# environment, which is not compatible with our current deploy process.
+#
+# So if you make changes to this file, check out lib/tasks/canvas.rake as well.
+#
+# This isn't ideal.
+if defined?(Barista)
 Barista.configure do |c|
   c.add_preamble = false
   
@@ -47,4 +56,5 @@ Barista.configure do |c|
   # e.g. vendoring CoffeeScript in your application:
   # c.js_path = Rails.root.join('public', 'javascripts', 'coffee-script.js')
   
+end
 end

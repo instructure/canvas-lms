@@ -243,6 +243,7 @@ I18n.scoped('context_modules', function(I18n) {
         data.id = data.id || 'new'
         data.type = data.type || data['item[type]'] || $.underscore(data.content_type);
         data.title = data.title || data['item[title]'];
+        data.new_tab = data.new_tab ? '1' : '0';
         if(data.id != 'new') {
           $("#context_module_item_" + data.id).remove();
         }
@@ -930,9 +931,10 @@ I18n.scoped('context_modules', function(I18n) {
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
       var $item = $(this).parents(".context_module_item");
-      var data = $item.getTemplateData({textValues: ['title', 'url', 'indent']});
+      var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab']});
       data.indent = modules.currentIndent($item);
       $("#edit_item_form").find(".external_url").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
+      $("#edit_item_form").find(".external_tool").showIf($item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
       $("#edit_item_form").dialog('close').dialog({
@@ -1007,7 +1009,7 @@ I18n.scoped('context_modules', function(I18n) {
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
           $module.find(".context_module_items").sortable('refresh');
-          var url = $module.find(".add_module_item_link").attr('href');
+          var url = $module.find(".add_module_item_link").attr('rel');
           $item.loadingImage({image_size: 'small'});
           $.ajaxJSON(url, 'POST', item_data, function(data) {
             $item.loadingImage('remove');
@@ -1128,6 +1130,7 @@ I18n.scoped('context_modules', function(I18n) {
         }
       });
       modules.refreshModuleList();
+      modules.refreshed = true;
     }, 1000);
   }
 });

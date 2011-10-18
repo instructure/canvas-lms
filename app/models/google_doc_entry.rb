@@ -17,7 +17,7 @@
 #
 
 class GoogleDocEntry
-  attr_accessor :document_id, :folder, :entry
+  attr_reader :document_id, :folder, :entry
   def initialize(entry)
     @entry = entry
     if entry.is_a?(String)
@@ -35,19 +35,29 @@ class GoogleDocEntry
   def edit_url
     "http://docs.google.com/feeds/documents/private/full/#{@document_id}"
   end
-  
+
+  def content_type
+    @entry.content && @entry.content.type
+  end
+
   def extension
-    case @document_id
-    when /\Aspreadsheet/ then "xls"
-    when /\Apresentation/ then "ppt"
-    when /\Adocument/ then "doc"
-    else
-      case @entry.content.type
-      # TODO more of these
-      when 'application/pdf' then 'pdf'
-      else nil
+    if @extension.nil?
+      # first, try and chose and extension by content-types we can scribd
+      if content_type.present? && mimetype = ScribdMimeType.find_by_name(content_type)
+        @extension = mimetype.extension
       end
+      # second, look at the document id itself for any clues
+      if @document_id.present?
+        @extension ||= case @document_id
+          when /\Aspreadsheet/ then "xls"
+          when /\Apresentation/ then "ppt"
+          when /\Adocument/ then "doc"
+          end
+      end
+      # finally, just declare it unknown
+      @extension ||= "unknown"
     end
+    @extension == "unknown" ? nil : @extension
   end
 
   def display_name

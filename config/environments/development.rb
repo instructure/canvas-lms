@@ -27,14 +27,14 @@ config.to_prepare do
   Canvas.dynamic_finder_type_cast_error = :raise
 end
 
-# eval <env>-local.rb if it exists
-Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
-
 # initialize cache store
 # this needs to happen in each environment config file, rather than a
 # config/initializer/* file, to allow Rails' full initialization of the cache
 # to take place, including middleware inserts and such.
 config.cache_store = Canvas.cache_store_config
+
+# eval <env>-local.rb if it exists
+Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
 # allow debugging only in development environment by default
 require "ruby-debug"

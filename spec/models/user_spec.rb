@@ -278,6 +278,50 @@ describe User do
     user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 0}, {3 => 1}].sort(&sort_account_associations)
   end
 
+  def create_course_with_student_and_assignment
+    @course = course_model
+    @course.offer!
+    @student = user_model
+    @course.enroll_student @student
+    @assignment = @course.assignments.create :title => "Test Assignment", :points_possible => 10
+  end
+
+  it "should not include recent feedback for muted assignments" do
+    create_course_with_student_and_assignment
+    @assignment.mute!
+    @assignment.grade_student @student, :grade => 9
+    @user.recent_feedback.should be_empty
+  end
+
+  it "should include recent feedback for unmuted assignments" do
+    create_course_with_student_and_assignment
+    @assignment.grade_student @user, :grade => 9
+    @user.recent_feedback(:contexts => [@course]).should_not be_empty
+  end
+
+  it "should return appropriate courses with primary enrollment" do
+    user
+    @course1 = course(:course_name => "course", :active_course => true)
+    @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+
+    @course2 = course(:course_name => "other course", :active_course => true)
+    @course2.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+
+    @course3 = course(:course_name => "yet another course", :active_course => true)
+    @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+    @course3.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+
+    @course4 = course(:course_name => "not yet active")
+    @course4.enroll_user(@user, 'StudentEnrollment')
+
+    # only three, in the right order (type, then name), and with the top type per course
+    @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
+      [@course2.id, 'TeacherEnrollment'],
+      [@course3.id, 'TeacherEnrollment'],
+      [@course1.id, 'StudentEnrollment']
+    ]
+  end
+
   context "move_to_user" do
     it "should delete the old user" do
       @user1 = user_model
@@ -409,6 +453,7 @@ describe User do
 
     def set_up_course_with_users
       @course = course_model
+      @this_section_teacher = @teacher
       @course.offer!
 
       @this_section_user = user_model
@@ -417,6 +462,33 @@ describe User do
       @other_section_user = user_model
       @other_section = @course.course_sections.create
       @course.enroll_user(@other_section_user, 'StudentEnrollment', :enrollment_state => 'active', :section => @other_section)
+      @other_section_teacher = user_model
+      @course.enroll_user(@other_section_teacher, 'TeacherEnrollment', :enrollment_state => 'active', :section => @other_section)
+
+      @group = @course.groups.create
+      @group.users = [@this_section_user]
+
+      @unrelated_user = user_model
+    end
+
+    it "should only return users from the specified context and type" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+        should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
+
+      @student.messageable_users(:context => "course_#{@course.id}_students").map(&:id).sort.
+        should eql [@student, @this_section_user, @other_section_user].map(&:id).sort
+
+      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.
+        should eql [@this_section_user].map(&:id).sort
+
+      @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id).sort.
+        should eql [@other_section_user, @other_section_teacher].map(&:id).sort
+
+      @student.messageable_users(:context => "section_#{@other_section.id}_teachers").map(&:id).sort.
+        should eql [@other_section_teacher].map(&:id).sort
     end
 
     it "should not include users from other sections if visibility is limited to sections" do
@@ -429,6 +501,21 @@ describe User do
       messageable_users = @student.messageable_users(:context => "course_#{@course.id}").map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
+
+      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users.should be_empty
+    end
+
+    it "should only include users from the specified section" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      messageable_users = @student.messageable_users(:context => "section_#{@course.default_section.id}").map(&:id)
+      messageable_users.should include @this_section_user.id
+      messageable_users.should_not include @other_section_user.id
+
+      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users.should_not include @this_section_user.id
+      messageable_users.should include @other_section_user.id
     end
 
     it "should include users from all sections if visibility is not limited to sections" do
@@ -443,9 +530,6 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @group = @course.groups.create
-      @group.users = [@this_section_user]
-
       @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
       # student can see it too, even though he's not in the group (since he can view the roster)
       @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
@@ -455,8 +539,7 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
 
-      @group = @course.groups.create
-      @group.users = [@this_section_user, @other_section_user]
+      @group.users << @other_section_user
 
       @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
       @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
@@ -526,9 +609,49 @@ describe User do
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      @admin.messageable_users(:context => ["course_#{course1.id}"], :ids => [@student.id]).should be_empty
-      @admin.messageable_users(:context => ["course_#{course2.id}"], :ids => [@student.id]).should_not be_empty
-      @student.messageable_users(:context => ["course_#{course2.id}"], :ids => [@admin.id]).should_not be_empty
+      @admin.messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
+      @admin.messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
+      @student.messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
+    end
+  end
+  
+  context "lti_role_types" do
+    it "should return the correct role types" do
+      course_model
+      @course.offer
+      teacher = user_model
+      student = user_model
+      nobody = user_model
+      admin = user_model
+      @course.root_account.add_user(admin)
+      @course.enroll_teacher(teacher).accept
+      @course.enroll_student(student).accept
+      teacher.lti_role_types(@course).should == ['Instructor']
+      student.lti_role_types(@course).should == ['Learner']
+      nobody.lti_role_types(@course).should == []
+      admin.lti_role_types(@course).should == ['urn:lti:instrole:ims/lis/Administrator']
+    end
+    
+    it "should return multiple role types if applicable" do
+      course_model
+      @course.offer
+      teacher = user_model
+      @course.root_account.add_user(teacher)
+      @course.enroll_teacher(teacher).accept
+      @course.enroll_student(teacher).accept
+      teacher.lti_role_types(@course).sort.should == ['Instructor','Learner','urn:lti:instrole:ims/lis/Administrator'].sort
+    end
+    
+    it "should not return role types from other contexts" do
+      @course1 = course_model
+      @course2 = course_model
+      @course.offer
+      teacher = user_model
+      student = user_model
+      @course1.enroll_teacher(teacher).accept
+      @course1.enroll_student(student).accept
+      teacher.lti_role_types(@course2).should == []
+      student.lti_role_types(@course2).should == []
     end
   end
   
@@ -544,6 +667,13 @@ describe User do
       User.with_avatar_state('submitted').count.should == 1
       User.with_avatar_state('any').count.should == 1
     end
+
+    it "should clear avatar state when assigning by service that no longer exists" do
+      user_model
+      @user.avatar_image_url = 'http://www.example.com'
+      @user.avatar_image = { 'type' => 'twitter' }
+      @user.avatar_image_url.should be_nil
+    end
   end
 
   it "should assert_by_email users into the correct account" do
@@ -551,5 +681,10 @@ describe User do
     data = User.assert_by_email('test@example.com', @account)
     data[:new].should be_true
     data[:user].account.should == @account
+  end
+
+  it "should find section for course" do
+    course_with_student
+    @student.section_for_course(@course).should == @course.default_section
   end
 end

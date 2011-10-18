@@ -137,7 +137,7 @@ class ProfileController < ApplicationController
       data = JSON.parse(Net::HTTP.get(url)) rescue nil
       if data
         @pics << {
-          :url => data['profile_image_url'],
+          :url => data['profile_image_url_https'],
           :type => 'twitter',
           :alt => 'twitter pic'
         }
@@ -177,6 +177,10 @@ class ProfileController < ApplicationController
   def update
     @user = @current_user
     respond_to do |format|
+      unless @user.user_can_edit_name?
+        params[:user].delete(:name)
+        params[:user].delete(:short_name)
+      end
       if @user.update_attributes(params[:user])
         pseudonymed = false
         if params[:default_email_id].present?

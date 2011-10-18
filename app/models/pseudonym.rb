@@ -28,7 +28,6 @@ class Pseudonym < ActiveRecord::Base
   has_many :group_memberships
   has_many :groups, :through => :group_memberships
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
-  validates_length_of :sis_update_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :unique_id, :maximum => maximum_string_length
   before_validation :validate_unique_id
   before_destroy :retire_channels
@@ -42,13 +41,17 @@ class Pseudonym < ActiveRecord::Base
   has_a_broadcast_policy
   
   attr_accessor :path, :path_type
-  
+
+  include StickySisFields
+  are_sis_sticky :unique_id
+
   acts_as_authentic do |config|
-    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]+\z/}
+    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]*\z/}
     config.login_field :unique_id
     config.validations_scope = :account_id
     config.perishable_token_valid_for = 30.minutes
     config.validates_length_of_password_field_options = { :minimum => 6, :if => :require_password? }
+    config.validates_length_of_login_field_options = {:within => 1..100}
   end
 
   def require_password?

@@ -6,6 +6,7 @@
       var minimumAssignmentColumWidth;
       minimumAssignmentColumWidth = 10;
       function Gradebook(options) {
+        var promise;
         this.options = options;
         this.initHeader = __bind(this.initHeader, this);
         this.hoverMinimizedCell = __bind(this.hoverMinimizedCell, this);
@@ -19,7 +20,11 @@
         this.groupTotalFormatter = __bind(this.groupTotalFormatter, this);
         this.staticCellFormatter = __bind(this.staticCellFormatter, this);
         this.cellFormatter = __bind(this.cellFormatter, this);
+        this.updateSubmissionsFromExternal = __bind(this.updateSubmissionsFromExternal, this);
+        this.updateSubmission = __bind(this.updateSubmission, this);
         this.gotSubmissionsChunk = __bind(this.gotSubmissionsChunk, this);
+        this.getSubmissionsChunks = __bind(this.getSubmissionsChunks, this);
+        this.buildRows = __bind(this.buildRows, this);
         this.rowFilter = __bind(this.rowFilter, this);
         this.gotStudents = __bind(this.gotStudents, this);
         this.gotAssignmentGroups = __bind(this.gotAssignmentGroups, this);
@@ -33,22 +38,34 @@
         this.sectionToShow = Number($.store.userGet("grading_show_only_section" + this.options.context_id)) || void 0;
         this.show_attendance = $.store.userGet("show_attendance_" + this.options.context_code) === 'true';
         this.include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_" + this.options.context_code) === 'true';
-        $.when($.ajaxJSON(this.options.assignment_groups_url, "GET", {}, this.gotAssignmentGroups), $.ajaxJSON(this.options.sections_and_students_url, "GET", this.sectionToShow && {
+        $.subscribe('assignment_group_weights_changed', this.buildRows);
+        $.subscribe('submissions_updated', this.updateSubmissionsFromExternal);
+        promise = $.when($.ajaxJSON(this.options.assignment_groups_url, "GET", {}, this.gotAssignmentGroups), $.ajaxJSON(this.options.sections_and_students_url, "GET", this.sectionToShow && {
           sections: [this.sectionToShow]
         })).then(__bind(function(assignmentGroupsArgs, studentsArgs) {
           this.gotStudents.apply(this, studentsArgs);
           return this.initHeader();
         }, this));
+        this.spinner = new Spinner();
+        $(this.spinner.spin().el).css({
+          opacity: 0.5,
+          top: '50%',
+          left: '50%'
+        }).addClass('use-css-transitions-for-show-hide').appendTo('#main');
       }
-      Gradebook.prototype.gotAssignmentGroups = function(assignment_groups) {
+      Gradebook.prototype.gotAssignmentGroups = function(assignmentGroups) {
         var assignment, group, _i, _len, _results;
-        this.assignment_groups = {};
+        this.assignmentGroups = {};
         this.assignments = {};
+        new AssignmentGroupWeightsDialog({
+          context: this.options,
+          assignmentGroups: assignmentGroups
+        });
         _results = [];
-        for (_i = 0, _len = assignment_groups.length; _i < _len; _i++) {
-          group = assignment_groups[_i];
+        for (_i = 0, _len = assignmentGroups.length; _i < _len; _i++) {
+          group = assignmentGroups[_i];
           $.htmlEscapeValues(group);
-          this.assignment_groups[group.id] = group;
+          this.assignmentGroups[group.id] = group;
           _results.push((function() {
             var _j, _len2, _ref, _results2;
             _ref = group.assignments;
@@ -157,6 +174,7 @@
         while (true) {
           students = this.rows.slice(this.chunk_start, this.chunk_start + this.options.chunk_size);
           if (!students.length) {
+            this.allSubmissionsLoaded = true;
             break;
           }
           params = {
@@ -191,17 +209,31 @@
         for (_i = 0, _len = student_submissions.length; _i < _len; _i++) {
           data = student_submissions[_i];
           student = this.students[data.user_id];
-          student.submissionsAsArray = [];
           _ref = data.submissions;
           for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
             submission = _ref[_j];
-            if (submission.submitted_at) {
-              submission.submitted_at = $.parseFromISO(submission.submitted_at);
-            }
-            student["assignment_" + submission.assignment_id] = submission;
-            student.submissionsAsArray.push(submission);
+            this.updateSubmission(submission);
           }
           student.loaded = true;
+          this.multiGrid.removeRow(student.row);
+          this.calculateStudentGrade(student);
+        }
+        return this.multiGrid.render();
+      };
+      Gradebook.prototype.updateSubmission = function(submission) {
+        var student;
+        student = this.students[submission.user_id];
+        if (submission.submitted_at) {
+          submission.submitted_at = $.parseFromISO(submission.submitted_at);
+        }
+        return student["assignment_" + submission.assignment_id] = submission;
+      };
+      Gradebook.prototype.updateSubmissionsFromExternal = function(submissions) {
+        debugger;        var student, submission, _i, _len;
+        for (_i = 0, _len = submissions.length; _i < _len; _i++) {
+          submission = submissions[_i];
+          student = this.students[submission.user_id];
+          this.updateSubmission(submission);
           this.multiGrid.removeRow(student.row);
           this.calculateStudentGrade(student);
         }
@@ -249,9 +281,20 @@
         return res;
       };
       Gradebook.prototype.calculateStudentGrade = function(student) {
-        var group, result, _i, _len, _ref;
+        var group, key, result, submissionsAsArray, value, _i, _len, _ref;
         if (student.loaded) {
-          result = INST.GradeCalculator.calculate(student.submissionsAsArray, this.assignment_groups, 'percent');
+          submissionsAsArray = (function() {
+            var _results;
+            _results = [];
+            for (key in student) {
+              value = student[key];
+              if (key.match(/^assignment_/)) {
+                _results.push(value);
+              }
+            }
+            return _results;
+          })();
+          result = INST.GradeCalculator.calculate(submissionsAsArray, this.assignmentGroups, this.options.group_weighting_scheme);
           _ref = result.group_sums;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             group = _ref[_i];
@@ -274,11 +317,13 @@
         return this.$grid.find('.hovered-column').removeClass('hovered-column');
       };
       Gradebook.prototype.showCommentDialog = function() {
-        $('<div>TODO: show comments and stuff</div>').dialog();
+        $('<div>TODO: show comments and stuff</div>').dialog({
+          modal: true
+        });
         return false;
       };
       Gradebook.prototype.fixColumnReordering = function() {
-        var $headers, fixupStopCallback, makeOnlyAssignmentsSortable, onlyAssignmentColsSelector, originalItemsSelector, originalStopFn;
+        var $headers, fixupStopCallback, initHeaderDropMenus, makeOnlyAssignmentsSortable, onlyAssignmentColsSelector, originalItemsSelector, originalStopFn;
         $headers = $('#gradebook_grid').find('.slick-header-columns');
         originalItemsSelector = $headers.sortable('option', 'items');
         onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"])';
@@ -288,6 +333,16 @@
           $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers));
           return $notAssignments.data('sortable-item', null);
         })();
+        (initHeaderDropMenus = __bind(function() {
+          return $headers.find('.gradebook-header-drop').click(__bind(function(event) {
+            var $link;
+            $link = $(event.target);
+            if (!$link.data('gradebookHeaderMenu')) {
+              new GradebookHeaderMenu(this.assignments[$link.data('assignmentId')], $link, this);
+              return false;
+            }
+          }, this));
+        }, this))();
         originalStopFn = $headers.sortable('option', 'stop');
         return (fixupStopCallback = function() {
           return $headers.sortable('option', 'stop', function(event, ui) {
@@ -295,6 +350,7 @@
             $headers.sortable('option', 'items', originalItemsSelector);
             returnVal = originalStopFn.apply(this, arguments);
             makeOnlyAssignmentsSortable();
+            initHeaderDropMenus();
             fixupStopCallback();
             return returnVal;
           });
@@ -378,6 +434,8 @@
         var grid, tooltipTexts;
         this.fixColumnReordering();
         tooltipTexts = {};
+        $(this.spinner.el).remove();
+        $('#gradebook_wrapper').show();
         this.$grid = grid = $('#gradebook_grid').fillWindowWithMe({
           alsoResize: '#gradebook_students_grid',
           onResize: __bind(function() {
@@ -416,8 +474,8 @@
       Gradebook.prototype.initHeader = function() {
         var $courseSectionTemplate, $sectionToShowMenu, $settingsMenu, allSectionsText, i, section, _ref;
         if (this.sections_enabled) {
-          $courseSectionTemplate = jQUI19('#course_section_template').removeAttr('id').detach();
-          $sectionToShowMenu = jQUI19('#section_to_show').next();
+          $courseSectionTemplate = $('#course_section_template').removeAttr('id').detach();
+          $sectionToShowMenu = $('#section_to_show').next();
           allSectionsText = $('#section_being_shown').text();
           if (this.sectionToShow) {
             $('#section_being_shown').text(this.sections[this.sectionToShow].name);
@@ -430,7 +488,7 @@
               value: section.id
             }).prop('checked', section.id === this.sectionToShow);
           }
-          jQUI19('#section_to_show').show().kyleMenu({
+          $('#section_to_show').show().kyleMenu({
             buttonOpts: {
               icons: {
                 primary: "ui-icon-sections",
@@ -445,7 +503,7 @@
             return this.buildRows();
           }, this));
         }
-        $settingsMenu = jQUI19('#gradebook_settings').next();
+        $settingsMenu = $('#gradebook_settings').next();
         $.each(['show_attendance', 'include_ungraded_assignments'], __bind(function(i, setting) {
           return $settingsMenu.find("#" + setting).prop('checked', this[setting]).change(__bind(function(event) {
             this[setting] = $(event.target).is(':checked');
@@ -453,7 +511,7 @@
             return this.buildRows();
           }, this));
         }, this));
-        jQUI19('#gradebook_settings').show().kyleMenu({
+        $('#gradebook_settings').show().kyleMenu({
           buttonOpts: {
             icons: {
               primary: "ui-icon-cog",
@@ -462,24 +520,26 @@
           }
         });
         return $settingsMenu.find('.gradebook_upload_link').click(function(event) {
-          var dialogData;
+          var $upload_modal;
           event.preventDefault();
-          dialogData = {
-            bgiframe: true,
-            autoOpen: false,
-            modal: true,
-            width: 410,
-            resizable: false,
-            buttons: {}
-          };
-          dialogData['buttons'][I18n.t('buttons.upload_data', 'Upload Data')] = function() {
-            return $(this).submit();
-          };
-          return $("#upload_modal").dialog(dialogData).dialog('open');
+          $upload_modal = $("#upload_modal");
+          if (!$upload_modal.data('dialog')) {
+            $upload_modal.dialog({
+              bgiframe: true,
+              autoOpen: false,
+              modal: true,
+              width: 720,
+              resizable: false
+            }).fixDialogButtons().delegate('#gradebook-upload-help-trigger', 'click', function() {
+              $(this).hide();
+              return $('#gradebook-upload-help').show();
+            });
+          }
+          return $upload_modal.dialog('open');
         });
       };
       Gradebook.prototype.initGrid = function() {
-        var $widthTester, assignment, columnDef, fieldName, grids, group, html, id, minWidth, options, outOfFormatter, sortRowsBy, testWidth, _ref, _ref2;
+        var $widthTester, assignment, columnDef, fieldName, grids, group, href, html, id, minWidth, options, outOfFormatter, sortRowsBy, testWidth, _ref, _ref2;
         $widthTester = $('<span style="padding:10px" />').appendTo('#content');
         testWidth = function(text, minWidth) {
           return Math.max($widthTester.text(text).outerWidth(), minWidth);
@@ -506,14 +566,15 @@
         _ref = this.assignments;
         for (id in _ref) {
           assignment = _ref[id];
-          html = "<div class='assignment-name'>" + assignment.name + "</div>";
+          href = $.replaceOneTag(this.options.assignment_url, 'id', assignment.id);
+          html = "<a class='assignment-name' href='" + href + "'>" + assignment.name + "</a>                <a class='gradebook-header-drop' data-assignment-id='" + assignment.id + "' href='#' role='button'>" + (I18n.t('assignment_options', 'Assignment Options')) + "</a>";
           if (assignment.points_possible != null) {
             html += "<div class='assignment-points-possible'>" + (I18n.t('points_out_of', "out of %{points_possible}", {
               points_possible: assignment.points_possible
             })) + "</div>";
           }
           outOfFormatter = assignment && assignment.grading_type === 'points' && (assignment.points_possible != null) && SubmissionCell.out_of;
-          minWidth = outOfFormatter ? 70 : 50;
+          minWidth = outOfFormatter ? 70 : 90;
           fieldName = "assignment_" + id;
           columnDef = {
             id: fieldName,
@@ -543,7 +604,7 @@
           }
           this.columns.push(columnDef);
         }
-        _ref2 = this.assignment_groups;
+        _ref2 = this.assignmentGroups;
         for (id in _ref2) {
           group = _ref2[id];
           html = "" + group.name;
