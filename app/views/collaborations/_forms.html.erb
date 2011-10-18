@@ -21,19 +21,16 @@
   </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @google_docs %>">
     <td colspan="2" style="padding: 5px 20px 10px">
       <%= image_tag "google_docs_icon.png", :style => "float: right; margin-left: 15px;" %>
-      <%= t 'descriptions.google_docs', "Google Docs are a great place to collaborate
-      on a group project.  It's like Microsoft Word, but lets you work together with others
-      on the same file without having to email it around.  You'll need a Google account
-      in order to participate in any Google Docs collaborations." %>
+      <%= mt 'descriptions.google_docs', "Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  \n  \n**Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations." %>
     </td>
   </tr><tr id="etherpad_description" style="display: none;" class="collaboration_type">
     <td colspan="2" style="padding: 5px 20px 10px">
       <%= image_tag "ether_pad.png", :style => "float: right; margin-left: 15px; margin-top: 5px;" %>
-      <%= t 'descriptions.etherpad', %{EtherPad is a site that lets you quickly set
+      <%= t 'descriptions.etherpad', %{EtherPad is an open source project that lets you quickly set
       up shared documents.  It's fast enough that you can see what others are typing as they're
-      typing it -- although "pads" aren't protected by a password so anyone that knows about them
-      can edit them.  EtherPad might be better suited than Google Docs for things like taking
-      notes because it's so fast.} %>
+      typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them
+      can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or
+      allowing people without Google accounts to participate.} %>
     </td>
   </tr><tr class="collaborate_data">
     <td style="white-space: nowrap">
