@@ -60,7 +60,7 @@ HEREDOC
       <div style="margin-bottom: 5px;" class="description">
         <%= collaboration.description %>
       </div>
-      <%= t :collaborators_count, { :one => "*1 Collaboration* on %{service}", :other => "*%{count} Collaborations* on %{service}" },
+      <%= t :collaborators_count, { :one => "*1 Collaborator* on %{service}", :other => "*%{count} Collaborators* on %{service}" },
             :count => (collaboration.users + [collaboration.user]).compact.uniq.length,
             :service => collaboration.service_name,
             :wrapper => '<a href="#" class="toggle_collaborators_link">\1</a>' %>
