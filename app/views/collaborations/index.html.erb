@@ -49,7 +49,7 @@ HEREDOC
 <div id="collaborations">
 <% @collaborations.each do |collaboration| %>
   <% if can_do(collaboration, @current_user, :read) %>
-    <div class="collaboration <%= collaboration.style_class %>">
+    <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>">
       <% if can_do(collaboration, @current_user, :delete) %>
       <div class="links">
         <a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>

@@ -17,6 +17,17 @@
  */
 
 I18n.scoped('collaborations', function(I18n) {
+
+  function removeCollaborationDiv(div) {
+    if($("#collaborations .collaboration:visible").length <= 1) {
+      $("#no_collaborations_message").slideDown();
+      $(".add_collaboration_link").click();
+    }
+    div.slideUp(function() {
+      div.remove();
+    });
+  }
+
 $(document).ready(function() {
   $("#add_collaboration_form").submit(function(event) {
     var data = $(this).getFormData();
@@ -38,6 +49,7 @@ $(document).ready(function() {
   });
   $(".add_collaboration_link").click(function(event) {
     event.preventDefault();
+    if($(this).is(":hidden")) return;
     $(this).hide();
     $("#add_collaboration_form").slideToggle(function() {
       $("html,body").scrollTo($(this));
@@ -58,10 +70,8 @@ $(document).ready(function() {
         url = $collaboration.find(".delete_collaboration_link").attr('href');
     $collaboration.dim();
     $("#delete_collaboration_dialog").dialog('close');
-    $.ajaxJSON(url, 'DELETE', function(data) {
-      $collaboration.slideUp(function() {
-        $(this).remove();
-      });
+    $.ajaxJSON(url, 'DELETE', data, function(data) {
+      removeCollaborationDiv($collaboration);
     }, function(data) {
     });
   });
@@ -80,12 +90,7 @@ $(document).ready(function() {
         message: "Are you sure you want to delete this collaboration?",
         url: $(this).attr('href'),
         success: function(data) {
-          if($("#collaborations .collaboration:visible").length <= 1) {
-            $("#no_collaborations_message").slideDown();
-          }
-          $(this).slideUp(function() {
-            $(this).remove();
-          });
+          removeCollaborationDiv($(this));
         }
       });
     }
@@ -153,5 +158,7 @@ $(document).ready(function() {
       $(this).attr('checked', checked);
     });
   });
+  if($("#collaborations .collaboration:visible").length < 1)
+      $(".add_collaboration_link").click();
 });
 });
