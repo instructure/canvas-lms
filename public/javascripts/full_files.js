@@ -82,11 +82,11 @@ var fileStructureData = [];
           if(!folder || folder.mime_class != 'folder') { return; }
           $(this).addClass('file_drag');
           $("#drag_n_drop_panel").css('top', $files_content.scrollTop());
-        }, false).bind('dragleave dragout', function(event) {
+        }).bind('dragleave dragout', function(event) {
           if(!$(this).closest(".drag_panel").length) {
             $(this).removeClass('file_drag');
           }
-        }, false).bind('drop', function(event) {
+        }).bind('drop', function(event) {
           var dt = event.originalEvent.dataTransfer;
           if (dt) {
             var folder = files.currentItemData();
@@ -215,7 +215,7 @@ var fileStructureData = [];
             }
             return false; 
           }
-        }, false);
+        });
       }
     },
     preflight: function(folder_id, folder_context_string, filenames, on_choose, on_success, on_cancel) {
