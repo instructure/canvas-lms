@@ -132,6 +132,13 @@ Spec::Runner.configure do |config|
     @user
   end
 
+  def site_admin_user(opts={})
+    user(opts)
+    @admin = @user
+    Account.site_admin.add_user(@user, opts[:membership_type] || 'AccountAdmin')
+    @user
+  end
+
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]

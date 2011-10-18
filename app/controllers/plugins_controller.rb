@@ -25,6 +25,7 @@ class PluginsController < ApplicationController
   
   def show
     if find_plugin_setting
+      @plugin_setting.disabled = true if @plugin_setting.new_record?
       @settings = @plugin.settings
     else
       flash[:notice] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])

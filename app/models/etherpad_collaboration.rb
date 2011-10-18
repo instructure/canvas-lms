@@ -17,15 +17,15 @@
 #
 
 class EtherpadCollaboration < Collaboration
-  
+
   def service_name
     "EtherPad"
   end
-  
+
   def style_class
     'etherpad'
   end
-  
+
   # Etherpad embed query parameters
   # This information may be useful, but is kind of hard to find anymore
   # fullScreen=1 (or 0)           uses full window width
@@ -33,19 +33,16 @@ class EtherpadCollaboration < Collaboration
   # slider=0                      hides the slider in slider view
   # displayName=name              sets the user's name for the pad
   # /ep/pad/view/PAD_ID/latest  read-only view (still reveals pad id)
-  
+
   def initialize_document
     self.url = "http://#{EtherpadCollaboration.config[:domain]}/i-#{self.uuid}"
   end
-  
+
   def user_can_access_document_type?(user)
     true
   end
-  
+
   def self.config
-    # Return existing value, even if nil, as long as it's defined
-    return @config if defined?(@config)
-    @config ||= Canvas::Plugin.find(:etherpad).try(:settings)
-    @config ||= (YAML.load_file(RAILS_ROOT + "/config/etherpad.yml")[RAILS_ENV] rescue nil)
+    Canvas::Plugin.find(:etherpad).try(:settings) || (YAML.load_file(RAILS_ROOT + "/config/etherpad.yml")[RAILS_ENV] rescue nil)
   end
 end
