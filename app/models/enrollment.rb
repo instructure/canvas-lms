@@ -37,7 +37,7 @@ class Enrollment < ActiveRecord::Base
   before_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :invitation_email
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section
 
   trigger.after(:insert).where("NEW.workflow_state = 'active'") do
     <<-SQL

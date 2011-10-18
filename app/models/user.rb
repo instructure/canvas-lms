@@ -668,15 +668,11 @@ class User < ActiveRecord::Base
     Pseudonym.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
     max_position = (new_user.communication_channels.last.position || 0) rescue 0
     updates = []
-    enrollment_emails = []
     self.communication_channels.each do |cc|
       max_position += 1
       updates << "WHEN id=#{cc.id} THEN #{max_position}"
-      enrollment_emails << cc.path if cc.path && cc.path_type == 'email'
     end
     CommunicationChannel.connection.execute("UPDATE communication_channels SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.communication_channels.map(&:id).join(',')})") unless self.communication_channels.empty?
-    e_conn = Enrollment.connection
-    e_conn.execute("UPDATE enrollments SET user_id=#{new_user.id} WHERE user_id=#{self.id} AND invitation_email IN (#{enrollment_emails.map{|email| e_conn.quote(email)}.join(',')})") unless enrollment_emails.empty?
     [
       [:quiz_id, :quiz_submissions], 
       [:assignment_id, :submissions]
@@ -769,8 +765,6 @@ class User < ActiveRecord::Base
     self.available_courses.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
   memoize :courses_with_grades
-  
-  attr_accessor :invitation_email
   
   set_policy do
     given { |user| user == self }

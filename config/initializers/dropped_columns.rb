@@ -23,6 +23,7 @@ class ActiveRecord::Base
     'role_overrides' => %w(context_code),
     'enrollment_terms' => %w(sis_data),
     'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id),
+    'enrollments' => %w(invitation_email),
   }.freeze
 
   def self.columns_with_remove_dropped_columns
