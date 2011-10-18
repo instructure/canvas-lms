@@ -20,7 +20,6 @@ I18n.scoped 'gradebook2', (I18n) ->
         $.ajaxJSON( @options.sections_and_students_url, "GET", @sectionToShow && {sections: [@sectionToShow]})
       ).then (assignmentGroupsArgs, studentsArgs) =>
         @gotStudents.apply(this, studentsArgs)
-        @initHeader()
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
         opacity: 0.5
@@ -31,8 +30,8 @@ I18n.scoped 'gradebook2', (I18n) ->
     gotAssignmentGroups: (assignmentGroups) =>
       @assignmentGroups = {}
       @assignments       = {}
-      
-      # purposely passing the @options and assignmentGroups by reference so it can update 
+
+      # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
@@ -40,6 +39,7 @@ I18n.scoped 'gradebook2', (I18n) ->
         @assignmentGroups[group.id] = group
         for assignment in group.assignments
           $.htmlEscapeValues(assignment)
+          assignment.assignment_group = group
           assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
           @assignments[assignment.id] = assignment
 
@@ -68,9 +68,47 @@ I18n.scoped 'gradebook2', (I18n) ->
       @initGrid()
       @buildRows()
       @getSubmissionsChunks()
+      @initHeader()
+
+    arrangeColumnsBy: (newThingToArrangeBy) =>
+      if newThingToArrangeBy and newThingToArrangeBy != @_sortColumnsBy
+        @$columnArrangementTogglers.each ->
+          $(this).closest('li').showIf $(this).data('arrangeColumnsBy') isnt newThingToArrangeBy
+        @_sortColumnsBy = newThingToArrangeBy
+        $.store[ if newThingToArrangeBy is 'due_date' then 'userSet' else 'userRemove']("sort_grade_colums_by_#{@options.context_id}", newThingToArrangeBy)
+        columns = @gradeGrid.getColumns()
+        columns.sort @columnSortFn
+        @gradeGrid.setColumns(columns)
+        @buildRows()
+      @_sortColumnsBy ||= $.store.userGet("sort_grade_colums_by_#{@options.context_id}") || 'assignment_group'
+
+    columnSortFn: (a,b) =>
+      return -1 if b.type is 'total_grade'
+      return  1 if a.type is 'total_grade'
+      return -1 if b.type is 'assignment_group' and a.type isnt 'assignment_group'
+      return  1 if a.type is 'assignment_group' and b.type isnt 'assignment_group'
+      if a.type is 'assignment_group' and b.type is 'assignment_group'
+        return a.object.position - b.object.position
+      else if a.type is 'assignment' and b.type is 'assignment'
+        if @arrangeColumnsBy() is 'assignment_group'
+          diffOfAssignmentGroupPosition = a.object.assignment_group.position - b.object.assignment_group.position
+          diffOfAssignmentPosition = a.object.position - b.object.position
+
+          # order first by assignment_group position and then by assignment position
+          # will work when there are less than 1000000 assignments in an assignment_group
+          return (diffOfAssignmentGroupPosition * 1000000) + diffOfAssignmentPosition
+        else
+          aDate = a.object.due_at?.timestamp or Number.MAX_VALUE
+          bDate = b.object.due_at?.timestamp or Number.MAX_VALUE
+          if aDate is bDate
+            return 0 if a.object.name is b.object.name
+            return (if a.object.name > b.object.name then 1 else -1)
+          return aDate - bDate
+      throw "unhandled column sort condition"
 
     rowFilter: (student) =>
       !@sectionToShow || (student.section.id == @sectionToShow)
+
     # filter, sort, and build the dataset for slickgrid to read from, then force
     # a full redraw
     buildRows: =>
@@ -126,7 +164,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
       student["assignment_#{submission.assignment_id}"] = submission
 
-    # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api 
+    # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
     # because there is no *bulk* submissions#update endpoint in the api.
     # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
     # where each student has an array of submissions.  This one just expects an array of submissions,
@@ -307,7 +345,7 @@ I18n.scoped 'gradebook2', (I18n) ->
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
-      
+
       $('#gradebook_grid .slick-resizable-handle').live 'drag', (e,dd) =>
         @$grid.find('.slick-header-column').each (i, elem) =>
           $columnHeader = $(elem)
@@ -348,7 +386,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       #     console.log(event, documentation, arguments)
       # set up row sorting options
 
-    initHeader: () =>
+    initHeader: =>
       if @sections_enabled
         $courseSectionTemplate = $('#course_section_template').removeAttr('id').detach()
         $sectionToShowMenu = $('#section_to_show').next()
@@ -378,6 +416,12 @@ I18n.scoped 'gradebook2', (I18n) ->
           $.store.userSet "#{setting}_#{@options.context_code}", (''+@[setting])
           @buildRows()
 
+      @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
+        event.preventDefault()
+        thingToArrangeBy = $(event.currentTarget).data('arrangeColumnsBy')
+        @arrangeColumnsBy(thingToArrangeBy)
+      @arrangeColumnsBy('assignment_group')
+
       $('#gradebook_settings').show().kyleMenu
         buttonOpts: {icons: {primary: "ui-icon-cog", secondary: "ui-icon-droparrow"}}
 
@@ -397,12 +441,12 @@ I18n.scoped 'gradebook2', (I18n) ->
               width: 720
               resizable: false
             .fixDialogButtons()
-            .delegate '#gradebook-upload-help-trigger', 'click', -> 
+            .delegate '#gradebook-upload-help-trigger', 'click', ->
               $(this).hide()
               $('#gradebook-upload-help').show()
         $upload_modal.dialog('open')
 
-    initGrid: () ->
+    initGrid: =>
       #this is used to figure out how wide to make each column
       $widthTester = $('<span style="padding:10px" />').appendTo('#content')
       testWidth = (text, minWidth) -> Math.max($widthTester.text(text).outerWidth(), minWidth)
@@ -451,6 +495,7 @@ I18n.scoped 'gradebook2', (I18n) ->
           width: testWidth(assignment.name, minWidth),
           sortable: true
           toolTip: true
+          type: 'assignment'
 
         if ''+assignment.submission_types is "not_graded"
           columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded'
@@ -479,6 +524,7 @@ I18n.scoped 'gradebook2', (I18n) ->
           width: testWidth(group.name, 35)
           cssClass: "meta-cell assignment-group-cell",
           sortable: true
+          type: 'assignment_group'
 
       @columns.push
         id: "total_grade"
@@ -490,6 +536,7 @@ I18n.scoped 'gradebook2', (I18n) ->
         width: testWidth("Total", 50)
         cssClass: "total-cell",
         sortable: true
+        type: 'total_grade'
 
       $widthTester.remove()
 
