@@ -346,7 +346,7 @@ var I18n = I18n || {};
     @section_tabs ||= begin
       if @context 
         Rails.cache.fetch([@context, @current_user, "section_tabs", I18n.locale].cache_key) do
-          if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user)).empty?
+          if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session)).empty?
             html = []
             html << '<nav role="navigation"><ul id="section-tabs">'
             tabs = tabs.select do |tab|
