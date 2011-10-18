@@ -776,7 +776,7 @@ class Assignment < ActiveRecord::Base
     students = [student]
     if self.has_group_category?
       group = self.group_category.groups.active.to_a.find{|g| g.users.include?(student)}
-      students = (group.users & self.context.students) if group && !self.grade_group_students_individually
+      students = (group.users & self.context.students) if group
     end
     [group, students]
   end
