@@ -416,6 +416,10 @@ I18n.scoped 'gradebook2', (I18n) ->
           $.store.userSet "#{setting}_#{@options.context_code}", (''+@[setting])
           @buildRows()
 
+      # don't show the "show attendance" link in the dropdown if there's no attendance assignments
+      unless ($.detect @gradeGrid.getColumns(), -> this.object?.submission_types == "attendance")
+        $settingsMenu.find('#show_attendance').hide()
+
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()
         thingToArrangeBy = $(event.currentTarget).data('arrangeColumnsBy')

@@ -570,6 +570,12 @@
             return this.buildRows();
           }, this));
         }, this));
+        if (!($.detect(this.gradeGrid.getColumns(), function() {
+          var _ref2;
+          return ((_ref2 = this.object) != null ? _ref2.submission_types : void 0) === "attendance";
+        }))) {
+          $settingsMenu.find('#show_attendance').hide();
+        }
         this.$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind('click', __bind(function(event) {
           var thingToArrangeBy;
           event.preventDefault();
