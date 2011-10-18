@@ -16,6 +16,9 @@ describe "jquery.instructure_misc_plugins", ->
     expect($("#checkbox1").showIf(-> false)).toEqual($("#checkbox1"))
     expect($("#checkbox1").showIf(true)).toEqual($("#checkbox1"))
     expect($("#checkbox1").showIf(false)).toEqual($("#checkbox1"))
+    $('*').showIf ->
+      expect(this.nodeType).toBeDefined()
+      expect(this.constructor).not.toBe(jQuery)
 
   it 'disableIf', ->
     loadFixtures "jquery.instructure_misc_plugins.html"

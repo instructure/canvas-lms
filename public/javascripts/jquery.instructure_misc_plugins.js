@@ -197,9 +197,11 @@ I18n.scoped('instructure', function(I18n) {
   // had much success with it.
   $.fn.showIf = function(bool) {
     if ($.isFunction(bool)) {
-      bool = bool.call(this);
+      return this.each(function(index) {
+        $(this).showIf(bool.call(this));
+      });
     }
-    if(bool) {
+    if (bool) {
       this.show();
     } else {
       this.hide();
