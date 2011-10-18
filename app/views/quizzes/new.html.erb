@@ -282,7 +282,7 @@ $(document).ready(function() {
   <a style="float: right; font-size: 0.8em; cursor: pointer;" href="#" class="toggle_description_views_link"><%= t('links.switch_views', "Switch Views") %></a>
   <textarea style="display: block; width: 100%; margin: 0px auto; height: 125px;" id="quiz_description"><%= @quiz.description %></textarea>
 </div>
-<div style="margin-bottom: 5px;">
+<div style="display: none; margin-bottom: 5px;" id="show_question_details_wrap">
   <input type="checkbox" id="show_question_details"/><label for="show_question_details"> <%= t('labels.show_question_details', "Show Question Details") %></label>
 </div>
 <div id="questions" class="question_editing brief">
