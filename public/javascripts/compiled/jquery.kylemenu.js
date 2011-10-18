@@ -19,16 +19,18 @@
       position: {
         my: 'center top',
         at: 'center bottom',
-        offset: '0 10px'
+        offset: '0 10px',
+        within: '#main',
+        collision: 'fit'
       },
       open: function(event) {
-        var $trigger, actualOffset, caratOffset, differenceInWidth, triggerWidth;
+        var $trigger, actualOffset, caratOffset, differenceInOffset, triggerWidth;
         $(this).find(".ui-menu-carat").remove();
         $trigger = $(this).popup("option", "trigger");
         triggerWidth = $trigger.width();
-        differenceInWidth = $(this).width() - triggerWidth;
+        differenceInOffset = $trigger.offset().left - $(this).offset().left;
         actualOffset = event.pageX - $trigger.offset().left;
-        caratOffset = Math.min(Math.max(20, actualOffset), triggerWidth - 20) + differenceInWidth / 2;
+        caratOffset = Math.min(Math.max(20, actualOffset), triggerWidth - 20) + differenceInOffset;
         $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this);
         return $(this).css('-webkit-transform-origin-x', caratOffset + 'px').addClass('ui-state-open');
       },

@@ -12,18 +12,18 @@ $.fn.kyleMenu = (options) ->
 
 $.fn.kyleMenu.defaults =
   popupOpts:
-    position: { my: 'center top', at: 'center bottom', offset: '0 10px' },
+    position: { my: 'center top', at: 'center bottom', offset: '0 10px', within: '#main', collision: 'fit' },
     open: (event) ->
       # handle sticking the carat right below where you clicked on the button
       $(this).find(".ui-menu-carat").remove()
       $trigger = $(this).popup("option", "trigger")
       triggerWidth = $trigger.width()
-      differenceInWidth = $(this).width() - triggerWidth
+      differenceInOffset = $trigger.offset().left - $(this).offset().left
       actualOffset = event.pageX - $trigger.offset().left
       caratOffset = Math.min(
         Math.max(20, actualOffset),
         triggerWidth - 20
-      ) + differenceInWidth/2
+      ) + differenceInOffset
       $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this)
 
       # this, along with the webkit animation makes it bounce into place.
