@@ -66,11 +66,13 @@ class RespondusAPIPort
       domain_root_account.pseudonyms :
       Pseudonym
     pseudonym = scope.find_by_unique_id(userName) || raise(BadAuthError)
-    if pseudonym.account.try(:delegated_authentication?)
+    if pseudonym.valid_arbitrary_credentials?(password)
+      @user = pseudonym.user
+    elsif pseudonym.account.try(:delegated_authentication?)
       raise(NeedDelegatedAuthError)
+    else
+      raise(BadAuthError)
     end
-    raise(BadAuthError) unless pseudonym.valid_arbitrary_credentials?(password)
-    @user = pseudonym.user
   end
 
   # See the wrapping code at the bottom of this class.

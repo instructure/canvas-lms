@@ -118,6 +118,14 @@ Implemented for: Canvas LMS}
                                               ['clearState', ''])
       status.should == "Success"
     end
+
+    it "should continue to allow canvas login for delegated domains, for now" do
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'asdfasdf',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Success"
+    end
   end
 
   it "should reject a session created for a different user" do
