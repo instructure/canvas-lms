@@ -169,7 +169,17 @@ class SubmissionsController < ApplicationController
         params[:submission][:attachments] << @attachment
       end
       params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
-      @submission = @assignment.submit_homework(@current_user, params[:submission])
+      begin
+        @submission = @assignment.submit_homework(@current_user, params[:submission])
+      rescue ActiveRecord::RecordInvalid => e
+        respond_to do |format|
+          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
+          format.html { redirect_to course_assignment_url(@context, @assignment) }
+          format.xml  { render :xml => e.record.errors.to_xml }
+          format.json { render :json => e.record.errors.to_json, :status => :bad_request }
+        end
+        return
+      end
       respond_to do |format|
         if @submission.save
           log_asset_access(@assignment, "assignments", @assignment_group, 'submit')

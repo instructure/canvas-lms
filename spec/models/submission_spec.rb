@@ -265,6 +265,20 @@ describe Submission do
       s.errors.length.should == 1
       s.errors.first.to_s.should match(/not a valid URL/)
     end
+
+    it "should reject empty urls" do
+      s = Submission.create(@valid_attributes.merge :url => '')
+      s.new_record?.should be_true
+      s.errors.length.should == 1
+      s.errors.first.to_s.should match(/not a valid URL/)
+    end
+
+    it "should strip leading/trailing whitespace" do
+      s = Submission.create(@valid_attributes.merge :url => ' http://www.google.com ')
+      s.new_record?.should be_false
+      s.errors.should be_empty
+      s.url.should == 'http://www.google.com'
+    end
   end
 end
 

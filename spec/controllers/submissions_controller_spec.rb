@@ -82,6 +82,24 @@ describe SubmissionsController do
       assigns[:submission].attachments.map{|a| a.display_name}.should be_include("doc.doc")
       assigns[:submission].attachments.map{|a| a.display_name}.should be_include("xls.xls")
     end
+
+    it "should fail but not raise when the submission is invalid" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url")
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => ""} # blank url not allowed
+      response.should be_redirect
+      flash[:error].should_not be_nil
+      assigns[:submission].should be_nil
+    end
+
+    it "should strip leading/trailing whitespace off url submissions" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url")
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => " http://www.google.com "}
+      response.should be_redirect
+      assigns[:submission].should_not be_nil
+      assigns[:submission].url.should eql("http://www.google.com")
+    end
   end
   
   describe "PUT update" do
