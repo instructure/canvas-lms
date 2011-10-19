@@ -178,7 +178,7 @@ class Submission < ActiveRecord::Base
       (assignment.cached_context_grants_right?(user, session, :manage_grades) ||
         case assignment.turnitin_settings[:originality_report_visibility]
           when 'immediate': true
-          when 'after_grading': graded?
+          when 'after_grading': current_submission_graded?
           when 'after_due_date': assignment.due_at && assignment.due_at < Time.now.utc
         end
       )
@@ -258,7 +258,7 @@ class Submission < ActiveRecord::Base
       self.send_later(:check_turnitin_status, asset_string)
       if self.grants_right?(user, nil, :grade)
         turnitin.submissionReportUrl(self, asset_string)
-      elsif self.current_submission_graded?
+      elsif self.grants_right?(user, nil, :view_turnitin_report)
         turnitin.submissionStudentReportUrl(self, asset_string)
       end
     else
