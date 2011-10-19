@@ -332,6 +332,9 @@ I18n.scoped('gradebook', function(I18n) {
         resizable: false,
         width: 400
       });
+      // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
+      // button. So here we'll manually re-enable it.
+      this.elements.settings.form.find(".submit_button").removeAttr('disabled')
       this.elements.mute.modal.dialog({
         autoOpen: false,
         buttons: buttons,
@@ -349,7 +352,7 @@ I18n.scoped('gradebook', function(I18n) {
 
     submitForm: function(e){
       $.store.userSet('eg_sort_by', $('#eg_sort_by').val());
-      $.store.userSet('eg_hide_student_names', $("#hide_student_names").attr('checked').toString());
+      $.store.userSet('eg_hide_student_names', $("#hide_student_names").prop('checked').toString());
       $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
       window.location.reload();
       return false;
