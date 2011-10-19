@@ -1283,6 +1283,63 @@ describe Assignment do
     assignment.group_category = nil
     assignment.has_group_category?.should be_false
   end
+
+  context "turnitin settings" do
+    it "should sanitize bad data" do
+      assignment = assignment_model
+      assignment.turnitin_settings = {
+        :originality_report_visibility => 'invalid',
+        :s_paper_check => '2',
+        :internet_check => '2',
+        :journal_check => '2',
+        :exclude_biblio => '2',
+        :exclude_quoted => '2',
+        :exclude_type => '3',
+        :exclude_value => 'asdf',
+        :bogus => 'haha'
+      }
+      assignment.turnitin_settings.should eql({
+        :originality_report_visibility => 'immediate',
+        :s_paper_check => '0',
+        :internet_check => '0',
+        :journal_check => '0',
+        :exclude_biblio => '0',
+        :exclude_quoted => '0',
+        :exclude_type => '0',
+        :exclude_value => ''
+      })
+    end
+
+    it "should persist :created across changes" do
+      assignment = assignment_model
+      assignment.turnitin_settings = assignment.default_turnitin_settings
+      assignment.save
+      assignment.turnitin_settings[:created] = true
+      assignment.save
+      assignment.reload
+      assignment.turnitin_settings[:created].should be_true
+
+      assignment.turnitin_settings = assignment.default_turnitin_settings.merge(:s_paper_check => '0')
+      assignment.save
+      assignment.reload
+      assignment.turnitin_settings[:created].should be_true
+    end
+
+    it "should clear out :current" do
+      assignment = assignment_model
+      assignment.turnitin_settings = assignment.default_turnitin_settings
+      assignment.save
+      assignment.turnitin_settings[:current] = true
+      assignment.save
+      assignment.reload
+      assignment.turnitin_settings[:current].should be_true
+
+      assignment.turnitin_settings = assignment.default_turnitin_settings.merge(:s_paper_check => '0')
+      assignment.save
+      assignment.reload
+      assignment.turnitin_settings[:current].should be_nil
+    end
+  end
 end
 
 def setup_assignment_with_group
