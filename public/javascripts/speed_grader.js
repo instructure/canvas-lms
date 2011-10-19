@@ -870,7 +870,7 @@ I18n.scoped('gradebook', function(I18n) {
 
     refreshFullRubric: function() {
       if (!jsonData.rubric_association) { return; }
-      if ($rubric_full.filter(":visible").length == 0) { return; }
+      if (!$rubric_full.filter(":visible").length) { return; }
 
       rubricAssessment.populateRubric($rubric_full.find(".rubric"), getSelectedAssessment() );
       $("#grading").height($rubric_full.height());
