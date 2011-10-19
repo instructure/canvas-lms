@@ -12,7 +12,7 @@ describe "speedgrader selenium tests" do
 
   before(:each) do
     stub_kaltura
-    
+
     course_with_teacher_logged_in
     outcome_with_rubric
     @assignment = @course.assignments.create(:name => 'assignment with rubric')
@@ -66,9 +66,9 @@ describe "speedgrader selenium tests" do
 
   it "should display submission late notice message" do
     @assignment.due_at = Time.now - 2.days
-    @assignment.save! 
+    @assignment.save!
     student_submission
-    
+
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     keep_trying_until{ driver.find_element(:id, 'speedgrader_iframe') }
 
@@ -119,11 +119,11 @@ describe "speedgrader selenium tests" do
     second_message = 'second student message'
     discussion_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
     entry = discussion_topic.discussion_entries.
-      create!(:user => student, :message => first_message) 
+      create!(:user => student, :message => first_message)
     entry.update_topic
     entry.context_module_action
     entry_2 = discussion_topic.discussion_entries.
-      create!(:user => student_2, :message => second_message) 
+      create!(:user => student_2, :message => second_message)
     entry_2.update_topic
     entry_2.context_module_action
 
@@ -185,13 +185,13 @@ describe "speedgrader selenium tests" do
     wait_for_animations
 
     #check media comment
-    keep_trying_until{ 
+    keep_trying_until{
       driver.execute_script("$('#add_a_comment .media_comment_link').click();")
       driver.find_element(:id, "audio_record_option").should be_displayed
     }
     driver.find_element(:id, "video_record_option").should be_displayed
     find_with_jquery('.ui-icon-closethick:visible').click
-    driver.find_element(:id, "audio_record_option").should_not be_displayed 
+    driver.find_element(:id, "audio_record_option").should_not be_displayed
 
     #check for file upload comment
     driver.find_element(:css, '#add_attachment img').click
@@ -225,10 +225,10 @@ describe "speedgrader selenium tests" do
 
   it "should be able to change sorting and hide student names" do
     student_submission
-    
+
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
-    
+
     driver.find_element(:id, "settings_link").click
     driver.find_element(:css, 'select#eg_sort_by option[value="submitted_at"]').click
     driver.find_element(:id, 'hide_student_names').click
@@ -236,7 +236,7 @@ describe "speedgrader selenium tests" do
       driver.find_element(:css, '#settings_form .submit_button').click
     }
     driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
-    
+
     # make sure it works a second time too
     driver.find_element(:id, "settings_link").click
     driver.find_element(:css, 'select#eg_sort_by option[value="alphabetically"]').click
@@ -244,6 +244,44 @@ describe "speedgrader selenium tests" do
       driver.find_element(:css, '#settings_form .submit_button').click
     }
     driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+  end
+
+  it "should leave the full rubric open when switching submissions" do
+    student_submission :username => "student1@example.com"
+    student_submission :username => "student2@example.com"
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_animations
+
+    driver.find_element(:css, '.toggle_full_rubric').click
+    wait_for_animations
+    rubric = driver.find_element(:id, 'rubric_full')
+    rubric.should be_displayed
+    first_criterion = rubric.find_element(:id, 'criterion_1')
+    first_criterion.find_element(:css, '.ratings .edge_rating').click
+    second_criterion = rubric.find_element(:id, 'criterion_2')
+    second_criterion.find_element(:css, '.ratings .edge_rating').click
+    rubric.find_element(:css, '.rubric_total').should include_text('8')
+    driver.find_element(:css, '#rubric_full .save_rubric_button').click
+    wait_for_ajaximations
+    driver.find_element(:css, '.toggle_full_rubric').click
+    wait_for_animations
+
+    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
+    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
+
+    driver.find_element(:css, '#gradebook_header .next').click
+    wait_for_ajaximations
+
+    driver.find_element(:id, 'rubric_full').should be_displayed
+    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == ""
+    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == ""
+
+    driver.find_element(:css, '#gradebook_header .prev').click
+    wait_for_ajaximations
+
+    driver.find_element(:id, 'rubric_full').should be_displayed
+    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
+    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
   end
 
 end

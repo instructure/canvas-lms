@@ -859,12 +859,21 @@ I18n.scoped('gradebook', function(I18n) {
       if ($rubric_full.filter(":visible").length || force === "close") {
         $("#grading").height("auto").children().show();
         $rubric_full.fadeOut();
+        this.resizeFullHeight();
       }
       else {
         $rubric_full.fadeIn();
-        rubricAssessment.populateRubric($rubric_full.find(".rubric"), getSelectedAssessment() );
-        $("#grading").height($rubric_full.height()).children().hide();
+        $("#grading").children().hide();
+        this.refreshFullRubric();
       }
+    },
+
+    refreshFullRubric: function() {
+      if (!jsonData.rubric_association) { return; }
+      if ($rubric_full.filter(":visible").length == 0) { return; }
+
+      rubricAssessment.populateRubric($rubric_full.find(".rubric"), getSelectedAssessment() );
+      $("#grading").height($rubric_full.height());
       this.resizeFullHeight();
     },
 
@@ -922,11 +931,11 @@ I18n.scoped('gradebook', function(I18n) {
   	  }));
 
   	  this.showGrade();
-  	  this.toggleFullRubric("close");
   	  this.showDiscussion();
   	  this.showRubric();
   	  this.updateStatsInHeader();
       this.showSubmissionDetails();
+      this.refreshFullRubric();
     },
 
     handleSubmissionSelectionChange: function(){
