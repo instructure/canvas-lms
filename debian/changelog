@@ -1,3 +1,18 @@
+canvas-lms (1.1-71) professional; urgency=low
+
+  * Package ref: a8551fa3db264f9eaf66817726a53e90962dfe99
+  *
+  * [+c229624] don't do css3 transitions for .ui-widget-overlay
+  * [+1d851ff] fix for existing turnitin assignments, closes #5977
+  * [+9de2607] fix group_category migration
+  * [+d6d148d] cleanup migration to go with 70c18ac
+  * [+4ef3955] Fixes #5978 - Missing Courses in Menu
+  * [+ddc2227] fix turnitin_settings :created not sticking
+  * [+cdf11de] still allow password auth in respondus api for delegated auth accounts
+  * [+a8551fa] fix changing sort options in speedgrader; fixes #6002
+
+ -- JT Olds <jt@instructure.com>  Wed, 19 Oct 2011 12:23:24 -0600
+
 canvas-lms (1.1-70) professional; urgency=low
 
   * Package ref: 3a00ce77beb5b6cc549c4359d99b01ad5a9fc23e
