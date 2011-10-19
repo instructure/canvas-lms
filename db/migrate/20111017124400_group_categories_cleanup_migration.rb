@@ -1,4 +1,8 @@
-class GroupCategoriesDataMigration < ActiveRecord::Migration
+# an older version of 20111007115901_group_categories_data_migration.rb was
+# broken and did not update assignments correctly. the current version is
+# fixed, but if you ran the broken one, this will clean it up. if you ran the
+# fixed one, this migration is a no-op.
+class GroupCategoriesCleanupMigration < ActiveRecord::Migration
   def self.uncached_group_category_id_for(context, name)
     if !context.is_a?(Account) && name == "Student Groups"
       GroupCategory.student_organized_for(context).id
@@ -28,22 +32,12 @@ class GroupCategoriesDataMigration < ActiveRecord::Migration
   end
 
   def self.up
-    Group.find(:all, :select => "DISTINCT context_id, context_type, category",
-      :conditions => ['context_id IS NOT NULL AND category IS NOT NULL AND group_category_id IS NULL']).each do |record|
-      update_records_for_record(record)
-    end
-
     Assignment.find(:all, :select => "DISTINCT context_id, context_type, group_category",
       :conditions => ['context_id IS NOT NULL AND group_category IS NOT NULL AND group_category_id IS NULL']).each do |record|
       update_records_for_record(record)
     end
-
-    # groups.category and assignments.group_category are now deprecated, but
-    # should be maintained alongside *.group_category_id in the models
   end
 
   def self.down
-    # no data migration, since groups.category and assignments.group_category
-    # are maintained along with *.group_category_id, even though deprecated.
   end
 end

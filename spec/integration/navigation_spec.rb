@@ -56,23 +56,4 @@ describe "navigation" do
     get "/"
     response.should be_success
   end
-
-  it "should not show enrollments with identical created_at and updated_at dates (bad SIS data)" do
-    @account = Account.default
-    user_with_pseudonym
-
-    course_with_teacher(:course_name => "Course 1", :user => @user)
-    @enrollment = course_with_teacher(:course_name => "Course 2", :user => @user)
-
-    Enrollment.update_all(["updated_at = ?", @enrollment.created_at], :id => @enrollment.id)
-
-    user_session(@user, @pseudonym)
-
-    get "/"
-    page = Nokogiri::HTML(response.body)
-    list = page.css(".menu-item-drop-column-list li")
-    list.length.should == 2
-  end
 end
-
-

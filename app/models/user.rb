@@ -1913,9 +1913,6 @@ class User < ActiveRecord::Base
     cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid)
     cached_enrollments.each do |e|
 
-      # SIS "garbage" data, user auto-enrolled but has never done anything with it
-      next if e.updated_at == e.created_at
-
       next if e.state_based_on_date == :inactive
 
       if e.state_based_on_date == :completed
