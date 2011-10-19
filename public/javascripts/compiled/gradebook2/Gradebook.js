@@ -527,7 +527,8 @@
           if (!$upload_modal) {
             locals = {
               download_gradebook_csv_url: "" + this.options.context_url + "/gradebook.csv",
-              action: "" + this.options.context_url + "/gradebook_uploads"
+              action: "" + this.options.context_url + "/gradebook_uploads",
+              authenticityToken: $("#ajax_authenticity_token").text()
             };
             $upload_modal = $(Template('gradebook_uploads_form', locals)).dialog({
               bgiframe: true,
