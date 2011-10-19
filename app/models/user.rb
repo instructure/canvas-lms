@@ -108,7 +108,7 @@ class User < ActiveRecord::Base
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
 
   include StickySisFields
-  are_sis_sticky :name
+  are_sis_sticky :name, :title, :given_name, :surname, :suffix
 
   def conversations
     all_conversations.visible # i.e. exclude any where the user has deleted all the messages
@@ -435,13 +435,12 @@ class User < ActiveRecord::Base
   def self.find_by_email(email)
     CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
   end
-    
-  def <=>(other)
-    self.name <=> other.name
-  end
 
   def last_name_first
-    User.last_name_first(self.name)
+    _title, _given, _surname, _suffix = title, given_name, surname, suffix
+    _title, _given, _surname, _suffix = User.name_parts(read_attribute(:name)) if !_title && !_given && !_surname && !_suffix
+    _given = [_title, _given, _suffix].compact.join(' ')
+    _surname ? "#{_surname}, #{_given}" : _given
   end
   
   def last_name_first_or_unnamed
@@ -451,28 +450,68 @@ class User < ActiveRecord::Base
   end
   
   def first_name
-    (self.name || "").split(/\s/)[0]
+    return given_name if given_name
+    User.name_parts(read_attribute(:name))[1] || ''
   end
   
   def last_name
-    (self.name || "").split(/\s/)[1..-1].join(" ")
+    return surname if surname
+    User.name_parts(read_attribute(:name))[2] || ''
   end
-  
-  def self.last_name_first(name)
-    name_groups = []
-    if name
-      comma_separated = name.split(",")
-      comma_separated.each do |clump|
-        names = clump.split
-        if name.match(/\s/)
-          names = clump.split.map{|c| c.split(".").join(". ").split }.flatten
-        end
-        name = names.pop
-        name += ", " + names.join(" ") if !names.empty?
-        name_groups << name
-      end
+
+  # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
+  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
+  TITLES = /^(Mrs?\.?|Ms\.?|Miss|Dr\.?|Doctor)$/
+
+  def self.name_parts(name)
+    return [nil, nil, nil, nil] unless name
+    surname, given, suffix = name.strip.split(/\s*,\s*/, 3)
+
+    # Doe, John, Sr.
+    # Otherwise change Ho, Chi, Min to Ho, Chi Min
+    if suffix && !(suffix =~ SUFFIXES)
+      given = "#{given} #{suffix}"
+      suffix = nil
     end
-    name_groups.join ", "
+
+    if given
+      # John Doe, Sr.
+      if !suffix && given =~ SUFFIXES
+        suffix = given
+        given = surname
+        surname = nil
+      end
+    else
+      # John Doe
+      given = name.strip
+      surname = nil
+    end
+
+    given_parts = given.split
+    # John Doe Sr.
+    if !suffix && given_parts.length > 1 && given_parts.last =~ SUFFIXES
+      suffix = given_parts.pop
+    end
+    # Dr. John Doe
+    if given_parts.length > 1 && given_parts.first =~ TITLES
+      title = given_parts.shift
+    end
+    surname = given_parts.pop if !surname && given_parts.length > 1
+
+    [ title, given_parts.empty? ? nil : given_parts.join(' '), surname, suffix ]
+  end
+
+  def name
+    return (read_attribute(:name) || '') if !title && !given_name && !surname && !suffix
+    [title, given_name, surname, suffix].compact.join(' ')
+  end
+
+  def name=(name)
+    # name != self.name prevents "John St. Clair" blowing away [nil, "John", "St. Clair", nil]
+    if name != self.name
+      self.title, self.given_name, self.surname, self.suffix = User.name_parts(name)
+      write_attribute(:name, name)
+    end
   end
   
   def self.user_lookup_cache_key(id)
@@ -487,8 +526,8 @@ class User < ActiveRecord::Base
     
   def infer_defaults
     self.name = nil if self.name == "User"
-    self.name ||= self.email || t(:default_user_name, "User")
-    self.short_name = nil if self.short_name == ""
+    self.name = self.email || t(:default_user_name, "User") if self.name.blank?
+    [:short_name, :title, :given_name, :surname, :suffix].each { |attr| write_attribute(attr, nil) if read_attribute(attr) == '' }
     self.short_name ||= self.name
     self.sortable_name = self.last_name_first.downcase
     self.reminder_time_for_due_dates ||= 48.hours.to_i
@@ -1847,7 +1886,7 @@ class User < ActiveRecord::Base
   end
   memoize :group_membership_visibility
 
-  MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
+  MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'title', 'given_name', 'surname', 'suffix', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
   MESSAGEABLE_USER_CONTEXT_REGEX = /\A(course|section|group)_(\d+)(_([a-z]+))?\z/
   def messageable_users(options = {})

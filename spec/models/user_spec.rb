@@ -803,4 +803,112 @@ describe User do
     course_with_student
     @student.section_for_course(@course).should == @course.default_section
   end
+
+  context "names" do
+    it "should infer name parts" do
+      User.name_parts('Cody Cutrer').should == [nil, 'Cody', 'Cutrer', nil]
+      User.name_parts('  Cody  Cutrer   ').should == [nil, 'Cody', 'Cutrer', nil]
+      User.name_parts('Cutrer, Cody').should == [nil, 'Cody', 'Cutrer', nil]
+      User.name_parts('Cutrer, Cody Houston').should == [nil, 'Cody Houston', 'Cutrer', nil]
+      User.name_parts('St. Clair, John').should == [nil, 'John', 'St. Clair', nil]
+      # sorry, can't figure this out
+      User.name_parts('John St. Clair').should == [nil, 'John St.', 'Clair', nil]
+      User.name_parts('Jefferson Thomas Cutrer IV').should == [nil, 'Jefferson Thomas', 'Cutrer', 'IV']
+      User.name_parts('Jefferson Thomas Cutrer, IV').should == [nil, 'Jefferson Thomas', 'Cutrer', 'IV']
+      User.name_parts('Cutrer, Jefferson, IV').should == [nil, 'Jefferson', 'Cutrer', 'IV']
+      User.name_parts('Cutrer, Jefferson IV').should == [nil, 'Jefferson', 'Cutrer', 'IV']
+      User.name_parts(nil).should == [nil, nil, nil, nil]
+      User.name_parts('Bob').should == [nil, 'Bob', nil, nil]
+      User.name_parts('Doctor').should == [nil, 'Doctor', nil, nil]
+      # sorry, have to choose one or the other
+      User.name_parts('Doctor John').should == ['Doctor', 'John', nil, nil]
+      User.name_parts('Doctor Kevorkian').should == ['Doctor', 'Kevorkian', nil, nil]
+      User.name_parts('Ho, Chi, Min').should == [nil, 'Chi Min', 'Ho', nil]
+      # sorry, don't understand cultures that put the surname first
+      # (maybe pass in the user's locale when parsing?)
+      User.name_parts('Ho Chi Min').should == [nil, 'Ho Chi', 'Min', nil]
+      User.name_parts('Mr. Cody Cutrer').should == ['Mr.', 'Cody', 'Cutrer', nil]
+      User.name_parts('').should == [nil, nil, nil, nil]
+      User.name_parts('John Doe').should == [nil, 'John', 'Doe', nil]
+      User.name_parts('Junior').should == [nil, 'Junior', nil, nil]
+    end
+
+    it "should return properly formatted names" do
+      u = User.new
+      u.name.should == ''
+      u.first_name.should == ''
+      u.last_name.should == ''
+      u.last_name_first.should == ''
+
+      u.given_name = 'Cody'
+      u.name.should == 'Cody'
+      u.first_name.should == 'Cody'
+      u.last_name.should == ''
+      u.last_name_first.should == 'Cody'
+
+      u.surname = 'Cutrer'
+      u.name.should == 'Cody Cutrer'
+      u.first_name.should == 'Cody'
+      u.last_name.should == 'Cutrer'
+      u.last_name_first.should == 'Cutrer, Cody'
+
+      u.title = 'Mr.'
+      u.name.should == 'Mr. Cody Cutrer'
+      u.first_name.should == 'Cody'
+      u.last_name.should == 'Cutrer'
+      u.last_name_first.should == 'Cutrer, Mr. Cody'
+
+      u.suffix = 'Esquire'
+      u.name.should == 'Mr. Cody Cutrer Esquire'
+      u.first_name.should == 'Cody'
+      u.last_name.should == 'Cutrer'
+      u.last_name_first.should == 'Cutrer, Mr. Cody Esquire'
+    end
+
+    # name attribute is set, but others are not
+    # name is returned raw, other fields are returned as parsed by name_parts
+    it "should return properly formatted names (backcompat)" do
+      u = User.new
+      u.write_attribute(:name, '')
+      u.name.should == ''
+      u.first_name.should == ''
+      u.last_name.should == ''
+      u.last_name_first.should == ''
+
+      u.write_attribute(:name, 'Cody')
+      u.name.should == 'Cody'
+      u.first_name.should == 'Cody'
+      u.last_name.should == ''
+      u.last_name_first.should == 'Cody'
+
+      u.write_attribute(:name, 'Cody Cutrer')
+      u.name.should == 'Cody Cutrer'
+      u.first_name.should == 'Cody'
+      u.last_name.should == 'Cutrer'
+      u.last_name_first.should == 'Cutrer, Cody'
+
+      u.write_attribute(:name, 'Cutrer, Cody')
+      u.name.should == 'Cutrer, Cody'
+      u.first_name.should == 'Cody'
+      u.last_name.should == 'Cutrer'
+      u.last_name_first.should == 'Cutrer, Cody'
+
+      u.write_attribute(:name, 'Mr. Jefferson Thomas Cutrer IV')
+      u.name.should == 'Mr. Jefferson Thomas Cutrer IV'
+      u.first_name.should == 'Jefferson Thomas'
+      u.last_name.should == 'Cutrer'
+      u.last_name_first.should == 'Cutrer, Mr. Jefferson Thomas IV'
+    end
+
+    it "should not blow away name details when assigning the same name via backcompat method" do
+      u = User.new
+      u.name = "St. Clair, John"
+      u.name.should == "John St. Clair"
+      u.last_name_first.should == 'St. Clair, John'
+      u.name = "John St. Clair"
+      u.last_name_first.should == 'St. Clair, John'
+      # The original assignment is still preserved
+      u.read_attribute(:name).should == 'St. Clair, John'
+    end
+  end
 end

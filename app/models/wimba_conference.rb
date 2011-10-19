@@ -118,17 +118,16 @@ class WimbaConference < WebConference
   end
 
   def touch_user(user)
-    names = user.last_name_first.split(/, /, 2)
     send_request('modifyUser', {
       'target' => wimba_id(user.uuid),
       'password_type' => 'A',
-      'first_name' => names[1],
-      'last_name' => names[0]}) ||
+      'first_name' => user.first_name,
+      'last_name' => user.last_name}) ||
     send_request('createUser', {
       'target' => wimba_id(user.uuid),
       'password_type' => 'A',
-      'first_name' => names[1],
-      'last_name' => names[0]})
+      'first_name' => user.first_name,
+      'last_name' => user.last_name})
   end
 
   def add_user_to_conference(user, role=:participant)

@@ -103,11 +103,16 @@ module SIS
               end
 
               user = pseudo.user
-              user.name = "#{first_name} #{last_name}" unless user.stuck_sis_fields.include?(:name)
-
+              if ([:name, :title, :given_name, :surname, :suffix] & user.stuck_sis_fields.to_a).empty?
+                # clears out name, title, and suffix
+                user.name = nil
+                user.given_name = first_name.blank? ? nil : first_name
+                user.surname = last_name.blank? ? nil : last_name
+              end
             else
               user = User.new
-              user.name = "#{first_name} #{last_name}"
+              user.given_name = first_name.blank? ? nil : first_name
+              user.surname = last_name.blank? ? nil : last_name
             end
 
             if status =~ /active/i
