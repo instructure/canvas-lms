@@ -81,6 +81,8 @@ describe SubAccountsController do
       # 150 sub_accounts; these sub_accounts won't be visible
       sub_account_5 = root_account.sub_accounts.create!
       (1..150).each { sub_account_5.sub_accounts.create! }
+      # give one of them a course (which previously triggered a bug)
+      Course.create!(:account => sub_account_5.sub_accounts.last)
 
       get 'index', :account_id => root_account.id
 
