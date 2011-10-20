@@ -91,6 +91,22 @@ describe FilesController do
       assigns[:quota].should_not be_nil
       response.should be_success
     end
+
+    it "should assign variables for group quota" do
+      course_with_teacher_logged_in(:active_all => true)
+      group_model(:context => @course)
+      get 'quota', :group_id => @group.id
+      assigns[:quota].should_not be_nil
+      response.should be_success
+    end
+
+    it "should allow changing group quota" do
+      course_with_teacher_logged_in(:active_all => true)
+      group_model(:context => @course, :storage_quota => 500.megabytes)
+      get 'quota', :group_id => @group.id
+      assigns[:quota].should == 500.megabytes
+      response.should be_success
+    end
   end
   
   describe "GET 'index'" do
