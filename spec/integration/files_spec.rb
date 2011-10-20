@@ -41,6 +41,81 @@ describe FilesController do
     end
   end
 
+  context "should support User as a context" do
+    before(:each) do
+      user_with_pseudonym
+      login_as
+      @me = @user
+      @att = @me.attachments.create(:uploaded_data => stub_png_data('my-pic.png'))
+    end
+
+    it "with safefiles" do
+      HostUrl.stub!(:file_host).and_return('files-test.host')
+      get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
+      response.should be_redirect
+      uri = URI.parse response['Location']
+      qs = Rack::Utils.parse_nested_query(uri.query)
+      uri.host.should == 'files-test.host'
+      # redirects to a relative url, since relative files are available in user context
+      uri.path.should == "/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/my-pic.png"
+      @me.valid_access_verifier?(qs['ts'], qs['sf_verifier']).should be_true
+      location = response['Location']
+      reset!
+
+      get location
+      response.should be_success
+      response.content_type.should == 'image/png'
+      # ensure that the user wasn't logged in by the normal means
+      controller.instance_variable_get(:@current_user).should be_nil
+    end
+
+    it "without safefiles" do
+      HostUrl.stub!(:file_host).and_return('test.host')
+      get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
+      response.should be_success
+      response.content_type.should == 'image/png'
+      response['Pragma'].should be_nil
+      response['Cache-Control'].should_not match(/no-cache/)
+    end
+
+    context "with inlineable html files" do
+      before do
+        @att = @me.attachments.create(:uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
+      end
+
+      it "with safefiles" do
+        HostUrl.stub!(:file_host).and_return('files-test.host')
+        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
+        response.should be_redirect
+        uri = URI.parse response['Location']
+        qs = Rack::Utils.parse_nested_query(uri.query)
+        uri.host.should == 'test.host'
+        uri.path.should == "/users/#{@me.id}/files/#{@att.id}"
+        location = response['Location']
+
+        get location
+        # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
+        response.should be_success
+        response.content_type.should == 'text/html'
+        doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+        doc.at_css('iframe#file_content')['src'].should =~ %r{^http://files-test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
+      end
+
+      it "without safefiles" do
+        HostUrl.stub!(:file_host).and_return('test.host')
+        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
+        response.should be_redirect
+        location = response['Location']
+        URI.parse(location).path.should == "/users/#{@me.id}/files/#{@att.id}"
+        get location
+        response.content_type.should == 'text/html'
+        doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+        doc.at_css('iframe#file_content')['src'].should =~ %r{^http://test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
+      end
+
+    end
+  end
+
   it "should use relative urls for safefiles in course context" do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     login_as
