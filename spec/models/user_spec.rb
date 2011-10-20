@@ -452,7 +452,7 @@ describe User do
     end
 
     def set_up_course_with_users
-      @course = course_model
+      @course = course_model(:name => 'the course')
       @this_section_teacher = @teacher
       @course.offer!
 
@@ -465,7 +465,7 @@ describe User do
       @other_section_teacher = user_model
       @course.enroll_user(@other_section_teacher, 'TeacherEnrollment', :enrollment_state => 'active', :section => @other_section)
 
-      @group = @course.groups.create
+      @group = @course.groups.create(:name => 'the group')
       @group.users = [@this_section_user]
 
       @unrelated_user = user_model
@@ -612,6 +612,21 @@ describe User do
       @admin.messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
       @admin.messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
       @student.messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
+    end
+
+    it "should return names with shared contexts" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      @group.users << @student
+
+      @student.shared_contexts(@this_section_user).should eql ['the course', 'the group']
+      @student.short_name_with_shared_contexts(@this_section_user).should eql "#{@this_section_user.short_name} (the course and the group)"
+
+      @student.shared_contexts(@other_section_user).should eql ['the course']
+      @student.short_name_with_shared_contexts(@other_section_user).should eql "#{@other_section_user.short_name} (the course)"
+
+      @student.shared_contexts(@unrelated_user).should eql []
+      @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
     end
   end
   

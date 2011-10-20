@@ -1888,6 +1888,23 @@ class User < ActiveRecord::Base
     end
   end
 
+  def short_name_with_shared_contexts(user)
+    if (contexts = shared_contexts(user)).present?
+      "#{short_name} (#{contexts[0, 2].to_sentence})"
+    else
+      short_name
+    end
+  end
+
+  def shared_contexts(user)
+    contexts = []
+    if info = messageable_users(:ids => [user.id]).first
+      contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
+      contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
+    end
+    contexts.map(&:name).sort_by{|c|c.downcase}
+  end
+
   def mark_all_conversations_as_read!
     conversations.unread.update_all(:workflow_state => 'read')
     User.update_all 'unread_conversations_count = 0', :id => id
