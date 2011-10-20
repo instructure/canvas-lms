@@ -666,13 +666,52 @@ class User < ActiveRecord::Base
       updates << "WHEN id=#{p.id} THEN #{max_position}"
     end
     Pseudonym.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
+
     max_position = (new_user.communication_channels.last.position || 0) rescue 0
-    updates = []
+    position_updates = []
+    to_retire_ids = []
     self.communication_channels.each do |cc|
       max_position += 1
-      updates << "WHEN id=#{cc.id} THEN #{max_position}"
+      position_updates << "WHEN id=#{cc.id} THEN #{max_position}"
+      source_cc = cc
+      # have to find conflicting CCs, and make sure we don't have conflicts
+      # To avoid the case where a user has duplicate CCs and one of them is retired, don't look for retired ccs
+      # it's okay to do that even if the only matching CC is a retired CC, because it would end up on the no-op
+      # case below anyway.
+      # Behavior is undefined if a user has both an active and an unconfirmed CC; it's not allowed with current
+      # validations, but could be there due to older code that didn't enforce the uniqueness.  The results would
+      # simply be that they'll continue to have duplicate unretired CCs
+      target_cc = new_user.communication_channels.detect { |cc| cc.path.downcase == source_cc.path.downcase && cc.path_type == source_cc.path_type && !cc.retired? }
+      next unless target_cc
+
+      # we prefer keeping the "most" active one, preferring the target user if they're equal
+      # the comments inline show all the different cases, with the source cc on the left,
+      # target cc on the right.  The * indicates the CC that will be retired in order
+      # to resolve the conflict
+      if target_cc.active?
+        # retired, active
+        # unconfirmed*, active
+        # active*, active
+        to_retire = source_cc
+      elsif source_cc.active?
+        # active, unconfirmed*
+        # active, retired
+        to_retire = target_cc
+      elsif target_cc.unconfirmed?
+        # unconfirmed*, unconfirmed
+        # retired, unconfirmed
+        to_retire = source_cc
+      end
+      #elsif
+        # unconfirmed, retired
+        # retired, retired
+      #end
+
+      to_retire_ids << to_retire.id if to_retire && !to_retire.retired?
     end
-    CommunicationChannel.connection.execute("UPDATE communication_channels SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.communication_channels.map(&:id).join(',')})") unless self.communication_channels.empty?
+    CommunicationChannel.update_all("user_id=#{new_user.id}, position=CASE #{position_updates.join(" ")} ELSE NULL END", :id => self.communication_channels.map(&:id)) unless self.communication_channels.empty?
+    CommunicationChannel.update_all({:workflow_state => 'retired'}, :id => to_retire_ids) unless to_retire_ids.empty?
+
     [
       [:quiz_id, :quiz_submissions], 
       [:assignment_id, :submissions]
