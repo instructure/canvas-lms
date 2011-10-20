@@ -56,6 +56,54 @@ describe GroupMembership do
     membership.should_not be_valid
     membership.errors[:user_id].should_not be_nil
   end
+
+  context 'active_given_enrollments?' do
+    it 'should be false if the membership is pending (requested)' do
+      course(:active_all => true)
+      group = @course.groups.create
+      student = user_model
+      enrollment = @course.enroll_student(student)
+      membership = group.add_user(student)
+      membership.workflow_state = 'requested'
+      membership.active_given_enrollments?([enrollment]).should be_false
+    end
+
+    it 'should be false if the membership is terminated (deleted)' do
+      course(:active_all => true)
+      group = @course.groups.create
+      student = user_model
+      enrollment = @course.enroll_student(student)
+      membership = group.add_user(student)
+      membership.workflow_state = 'deleted'
+      membership.active_given_enrollments?([enrollment]).should be_false
+    end
+
+    it 'should be false given a course group without an enrollment in the list' do
+      course(:active_all => true)
+      group = @course.groups.create
+      student = user_model
+      enrollment = @course.enroll_student(student)
+      membership = group.add_user(student)
+      membership.active_given_enrollments?([]).should be_false
+    end
+
+    it 'should be true for other course groups' do
+      course(:active_all => true)
+      group = @course.groups.create
+      student = user_model
+      enrollment = @course.enroll_student(student)
+      membership = group.add_user(student)
+      membership.active_given_enrollments?([enrollment]).should be_true
+    end
+
+    it 'should be true for account groups regardless of enrollments' do
+      account = Account.default
+      group = account.groups.create
+      student = user_model
+      membership = group.add_user(student)
+      membership.active_given_enrollments?([]).should be_true
+    end
+  end
 end
 
 def group_membership_model(opts={})
