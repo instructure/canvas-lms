@@ -331,6 +331,10 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def quota
+    self.storage_quota || Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
+  end
+
   TAB_HOME = 0
   TAB_PAGES = 1
   TAB_PEOPLE = 2
