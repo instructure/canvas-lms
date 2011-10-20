@@ -193,9 +193,10 @@ I18n.scoped('instructure', function(I18n) {
           $body.toggleClass('with-sidebar-pinned-to-bottom');
         }
       }
-      onScroll();
-      $window.scroll(onScroll);
-      setInterval(onScroll, 1000);
+      var throttledOnScroll = $.throttle(50, onScroll);
+      throttledOnScroll();
+      $window.scroll(throttledOnScroll);
+      setInterval(throttledOnScroll, 1000);
       scrollSideBarIsBound = true;
     }
   };
