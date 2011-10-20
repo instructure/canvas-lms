@@ -27,7 +27,7 @@ class AssessmentQuestion < ActiveRecord::Base
   simply_versioned :automatic => false
   acts_as_list :scope => :assessment_question_bank_id
   before_save :infer_defaults
-  after_save :translate_links_if_changed
+  before_save :translate_links_if_changed
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
 
   ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question", 
@@ -57,42 +57,52 @@ class AssessmentQuestion < ActiveRecord::Base
   end
   
   def translate_links_if_changed
-    send_later :translate_links if self.question_data_changed? && !@skip_translate_links
+    translate_links(false) if self.question_data_changed? && !@skip_translate_links
+    true
   end
   
-  def translate_links(hash=nil, file_substitutions={})
-    root = false
-    if !hash
-      root = true
-      hash = self.question_data || {}
+  def self.translate_links(ids)
+    ids.each do |aqid|
+      if aq = AssessmentQuestion.find(aqid)
+        aq.translate_links
+      end
     end
-    links = Regexp.new("/#{context_type.downcase.pluralize}/#{context_id}/files/(\\d+)/(download|preview)") rescue nil
-    hash.each do |key, value|
-      if value.is_a?(Hash)
-        hash[key] = translate_links(value, file_substitutions)
-      elsif value.is_a?(String) && links
-        hash[key] = value.gsub(links) do |match|
-          if !file_substitutions[$1]
-            file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
-            new_file = file.clone_for(self) rescue nil
-            new_file.save if new_file
-            file_substitutions[$1] = new_file
-          end
-          if file_substitutions[$1]
-            "/assessment_questions/#{self.id}/files/#{file_substitutions[$1].id}/#{file_substitutions[$1].uuid}"
-          else
-            match
+  end
+  
+  def translate_links(should_save = true)
+    # we can't translate links unless this question has a context (through a bank)
+    return unless assessment_question_bank && assessment_question_bank.context
+    
+    regex = Regexp.new("/#{context_type.downcase.pluralize}/#{context_id}/files/(\\d+)/(download|preview)")
+    file_substitutions = {}
+    
+    translate_in_hash = lambda do |hash|
+      hash.each do |key, value|
+        if value.is_a?(Hash)
+          hash[key] = translate_in_hash.call(value)
+        elsif value.is_a?(String)
+          hash[key] = value.gsub(regex) do |match|
+            if !file_substitutions[$1]
+              file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
+              new_file = file.clone_for(self) rescue nil
+              new_file.save if new_file
+              file_substitutions[$1] = new_file
+            end
+            if file_substitutions[$1]
+              "/files/#{file_substitutions[$1].id}/download?verifier=#{file_substitutions[$1].uuid}"
+            else
+              match
+            end
           end
         end
       end
+      hash
     end
-    if root
-      @skip_translate_links = true
-      self.question_data = hash
-      self.save
-      @skip_translate_links = false
-    end
-    hash
+    
+    hash = translate_in_hash.call(self.question_data)
+    self.question_data = hash
+    
+    self.save! if should_save
   end
   
   def data
@@ -121,6 +131,9 @@ class AssessmentQuestion < ActiveRecord::Base
   def question_data=(data)
     if data.is_a?(String)
       data = ActiveSupport::JSON.decode(data) rescue nil
+    else
+      # have to dup it so that the dirty flag gets set
+      data = data.try(:dup)
     end
     write_attribute(:question_data, data)
   end

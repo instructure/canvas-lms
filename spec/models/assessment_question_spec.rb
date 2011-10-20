@@ -24,4 +24,29 @@ describe AssessmentQuestion do
     assessment_question_model
   end
   
+  it "should translate links to be readable w/ verifier" do
+    course
+    @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+
+    data = {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]}
+    @question = @bank.assessment_questions.create!(:question_data => data)
+
+    @attachment1 = attachment_with_context(@course)
+    @attachment2 = attachment_with_context(@course)
+
+    data['question_text'] = "This url should be translated: <img src='/courses/#{@course.id}/files/#{@attachment1.id}/download'> and so should this one: <img src='/courses/#{@course.id}/files/#{@attachment2.id}/download'>"
+    @question.question_data = data
+    @question.save
+
+    @attachment1.reload
+    @attachment2.reload
+    @question.reload
+
+    @attachment1.cloned_item.attachments.length.should == 2
+    @attachment2.cloned_item.attachments.length.should == 2
+    @clone1 = @attachment1.cloned_item.attachments.last
+    @clone2 = @attachment2.cloned_item.attachments.last
+
+    @question.question_data['question_text'].should match %r{'/files/#{@clone1.id}/download\?verifier=#{@clone1.uuid}'.*'/files/#{@clone2.id}/download\?verifier=#{@clone2.uuid}'}
+  end
 end
