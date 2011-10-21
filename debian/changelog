@@ -1,3 +1,17 @@
+canvas-lms (1.1-72) professional; urgency=low
+
+  * Package ref: bd91b250898ec9c7103de771fc1a30ad1efae12d
+  *
+  * [+30a401f] fix sub-accounts error page; fixes #6019
+  * [+475424b] check correct permission for turnitin links, fixes #6024
+  * [+19a3248] incorrect jsonification of forwarded messages, fixes #6037
+  * [+f3a61ec] allow changing group quotas, closes #6039
+  * [+42f4f1e] make sure links in assessment questions are correctly translated, fixes #6012
+  * [+d74ebf7] fix /assessment_question/XXX/files/YYY file download urls
+  * [+bd91b25] fix assessment question link translation; refs #6012
+
+ -- JT Olds <jt@instructure.com>  Fri, 21 Oct 2011 15:30:37 -0600
+
 canvas-lms (1.1-71) professional; urgency=low
 
   * Package ref: a8551fa3db264f9eaf66817726a53e90962dfe99
