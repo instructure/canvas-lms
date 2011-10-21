@@ -882,11 +882,15 @@ class ApplicationController < ActionController::Base
     opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
     opts[:verifier] = verifier if verifier.present?
 
-    if @context
+    if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
+      # if the context is one that supports relative paths (which requires extra
+      # routes and stuff), then we'll build an actual named_context_url with the
+      # params for show_relative
       res += named_context_url(@context, :context_file_url, attachment)
       res += '/' + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
       res += '?' + opts.to_query
     else
+      # otherwise, just redirect to /files/:id
       res += file_download_url(attachment, opts.merge(:only_path => true))
     end
 
