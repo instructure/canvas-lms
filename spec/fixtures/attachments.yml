@@ -2,7 +2,6 @@
 --- 
 attachments_001: 
   context_id: "1"
-  enrollment_id: 
   content_type: pdf
   size: "100"
   updated_at: 2009-04-30 23:55:53
@@ -21,7 +20,6 @@ attachments_001:
   workflow_state: pending_upload
 attachments_002: 
   context_id: "1"
-  enrollment_id: 
   content_type: txt
   size: "100"
   updated_at: 2009-04-30 23:55:53
