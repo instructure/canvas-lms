@@ -558,4 +558,12 @@ var I18n = I18n || {};
     ].any?{ |e| e.respond_to?(:count) && e.count > 0 }
   end
 
+  def cache_if(cond, *args)
+    if cond
+      cache(*args) { yield }
+    else
+      yield
+    end
+  end
+
 end

@@ -386,10 +386,16 @@ Spec::Runner.configure do |config|
 
   def enable_cache
     old_cache = RAILS_CACHE
-    silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
+    new_cache = ActiveSupport::Cache::MemoryStore.new
+    ActionController::Base.cache_store = new_cache
+    silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
+    old_perform_caching = ActionController::Base.perform_caching
+    ActionController::Base.perform_caching = true
     yield
   ensure
     silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+    ActionController::Base.cache_store = old_cache
+    ActionController::Base.perform_caching = old_perform_caching
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
