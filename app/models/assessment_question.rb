@@ -57,42 +57,62 @@ class AssessmentQuestion < ActiveRecord::Base
   end
   
   def translate_links_if_changed
-    send_later :translate_links if self.question_data_changed? && !@skip_translate_links
+    # this has to be in an after_save, because translate_links may create attachments
+    # with this question as the context, and if this question does not exist yet,
+    # creating that attachment will fail.
+    translate_links if self.question_data_changed? && !@skip_translate_links
   end
   
-  def translate_links(hash=nil, file_substitutions={})
-    root = false
-    if !hash
-      root = true
-      hash = self.question_data || {}
+  def self.translate_links(ids)
+    ids.each do |aqid|
+      if aq = AssessmentQuestion.find(aqid)
+        aq.translate_links
+      end
     end
-    links = Regexp.new("/#{context_type.downcase.pluralize}/#{context_id}/files/(\\d+)/(download|preview)") rescue nil
-    hash.each do |key, value|
-      if value.is_a?(Hash)
-        hash[key] = translate_links(value, file_substitutions)
-      elsif value.is_a?(String) && links
-        hash[key] = value.gsub(links) do |match|
-          if !file_substitutions[$1]
-            file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
-            new_file = file.clone_for(self) rescue nil
-            new_file.save if new_file
-            file_substitutions[$1] = new_file
-          end
-          if file_substitutions[$1]
-            "/assessment_questions/#{self.id}/files/#{file_substitutions[$1].id}/#{file_substitutions[$1].uuid}"
-          else
-            match
+  end
+  
+  def translate_links
+    # we can't translate links unless this question has a context (through a bank)
+    return unless assessment_question_bank && assessment_question_bank.context
+    
+    regex = Regexp.new("/#{context_type.downcase.pluralize}/#{context_id}/files/(\\d+)/(download|preview)")
+    file_substitutions = {}
+    
+    translate_in_hash = lambda do |hash|
+      hash.each do |key, value|
+        if value.is_a?(Hash)
+          hash[key] = translate_in_hash.call(value)
+        elsif value.is_a?(String)
+          hash[key] = value.gsub(regex) do |match|
+            if !file_substitutions[$1]
+              file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
+              begin
+                new_file = file.clone_for(self)
+              rescue => e
+                new_file = nil
+                er = ErrorReport.log_exception(:file_clone_during_translate_links, e)
+                logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: #{er.id}")
+              end
+              new_file.save if new_file
+              file_substitutions[$1] = new_file
+            end
+            if file_substitutions[$1]
+              "/assessment_questions/#{self.id}/files/#{file_substitutions[$1].id}/download?verifier=#{file_substitutions[$1].uuid}"
+            else
+              match
+            end
           end
         end
       end
+      hash
     end
-    if root
-      @skip_translate_links = true
-      self.question_data = hash
-      self.save
-      @skip_translate_links = false
-    end
-    hash
+    
+    hash = translate_in_hash.call(self.question_data)
+    self.question_data = hash
+    
+    @skip_translate_links = true
+    self.save!
+    @skip_translate_links = false
   end
   
   def data
@@ -121,7 +141,12 @@ class AssessmentQuestion < ActiveRecord::Base
   def question_data=(data)
     if data.is_a?(String)
       data = ActiveSupport::JSON.decode(data) rescue nil
+    else
+      # we may be modifying this data (translate_links), and only want to work on a copy
+      data = data.try(:dup)
     end
+    # force AR to think this attribute has changed
+    self.question_data_will_change!
     write_attribute(:question_data, data)
   end
   

@@ -63,7 +63,45 @@ describe FilesController do
     # ensure that the user wasn't logged in by the normal means
     controller.instance_variable_get(:@current_user).should be_nil
   end
-  
+
+  context "should support AssessmentQuestion as a context" do
+    before do
+      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      login_as
+      @aq = assessment_question_model
+      @att = @aq.attachments.create!(:uploaded_data => stub_png_data)
+    end
+
+    it "with safefiles" do
+      HostUrl.stub!(:file_host).and_return('files-test.host')
+      get "http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}"
+      response.should be_redirect
+      uri = URI.parse response['Location']
+      qs = Rack::Utils.parse_nested_query(uri.query)
+      uri.host.should == 'files-test.host'
+      uri.path.should == "/files/#{@att.id}/download"
+      @user.valid_access_verifier?(qs['ts'], qs['sf_verifier']).should be_true
+      qs['verifier'].should == @att.uuid
+      location = response['Location']
+      reset!
+
+      get location
+      response.should be_success
+      response.content_type.should == 'image/png'
+      # ensure that the user wasn't logged in by the normal means
+      controller.instance_variable_get(:@current_user).should be_nil
+    end
+
+    it "without safefiles" do
+      HostUrl.stub!(:file_host).and_return('test.host')
+      get "http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}"
+      response.should be_success
+      response.content_type.should == 'image/png'
+      response['Pragma'].should be_nil
+      response['Cache-Control'].should_not match(/no-cache/)
+    end
+  end
+
   it "should allow access to non-logged-in user agent if it has the right :verifier (lets google docs preview submissions in speedGrader)" do
     submission_model
     @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')

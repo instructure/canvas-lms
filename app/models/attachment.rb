@@ -86,6 +86,13 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  RELATIVE_CONTEXT_TYPES = %w(Course Group User Account)
+  # returns true if the context is a type that supports relative file paths
+  def self.relative_context?(context_class)
+    RELATIVE_CONTEXT_TYPES.include?(context_class.to_s)
+  end
+
+
   def touch_context_if_appropriate
     touch_context unless context_type == 'ConversationMessage'
   end
