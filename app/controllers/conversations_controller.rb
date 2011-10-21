@@ -782,6 +782,7 @@ class ConversationsController < ApplicationController
       message = message.as_json
       message['media_comment'] = media_comment_json(message['media_comment']) if message['media_comment']
       message['attachments'] = message['attachments'].map{ |attachment| attachment_json(attachment) }
+      message['forwarded_messages'] = jsonify_messages(message['forwarded_messages'])
       message
     }
   end

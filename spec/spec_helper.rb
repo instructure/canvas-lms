@@ -439,4 +439,15 @@ Spec::Runner.configure do |config|
     })
   end
 
+  def attachment_obj_with_context(obj, opts={})
+    @attachment = factory_with_protected_attributes(Attachment, valid_attachment_attributes.merge(opts))
+    @attachment.context = obj
+    @attachment
+  end
+
+  def attachment_with_context(obj, opts={})
+    attachment_obj_with_context(obj, opts)
+    @attachment.save!
+    @attachment
+  end
 end

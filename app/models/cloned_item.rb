@@ -18,8 +18,8 @@
 
 class ClonedItem < ActiveRecord::Base
   belongs_to :original_item, :polymorphic => true
-  has_many :attachments
-  has_many :discussion_topics
-  has_many :wiki_pages
+  has_many :attachments, :order => 'id asc'
+  has_many :discussion_topics, :order => 'id asc'
+  has_many :wiki_pages, :order => 'id asc'
   attr_accessible :original_item
 end
