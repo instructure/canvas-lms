@@ -73,6 +73,16 @@ describe SubmissionList do
         end
       end
     end
+
+    it "should only keep one diff per grader per day" do
+      SubmissionList.days(@course).each do |day|
+        day.graders.each do |grader|
+          grader.assignments.each do |assignment|
+            assignment.submissions.length.should eql assignment.submissions.map(&:student_name).uniq.length
+          end
+        end
+      end
+    end
     
     it "should be able to loop on assignments" do
       available_keys = [:submission_count, :name, :submissions, :assignment_id]
@@ -207,10 +217,13 @@ def interesting_submission_data(opts={})
   opts[:submission] ||= {}
   
   @grader = user_model({:name => 'some_grader'}.merge(opts[:grader]))
+  @grader2 = user_model({:name => 'another_grader'}.merge(opts[:grader]))
   @student = factory_with_protected_attributes(User, {:name => "some student", :workflow_state => "registered"}.merge(opts[:user]))
   @course = factory_with_protected_attributes(Course, {:name => "some course", :workflow_state => "available"}.merge(opts[:course]))
-  e = @course.enroll_teacher(@grader)
-  e.accept
+  [@grader, @grader2].each do |grader|
+    e = @course.enroll_teacher(grader)
+    e.accept
+  end
   @course.enroll_student(@student)
   @assignment = @course.assignments.new({
     :title => "some assignment", 
@@ -220,7 +233,7 @@ def interesting_submission_data(opts={})
   @assignment.save!
   @assignment.grade_student(@student, {:grade => 1.5, :grader => @grader}.merge(opts[:submission]))
   @assignment.grade_student(@student, {:grade => 3, :grader => @grader}.merge(opts[:submission]))
-  @assignment.grade_student(@student, {:grade => 5, :grader => @grader}.merge(opts[:submission]))
+  @assignment.grade_student(@student, {:grade => 5, :grader => @grader2}.merge(opts[:submission]))
   @student = user_model(:name => 'another student')
   @course.enroll_student(@student)
   @assignment.reload
