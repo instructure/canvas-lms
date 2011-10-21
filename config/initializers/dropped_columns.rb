@@ -18,6 +18,7 @@
 
 class ActiveRecord::Base
   DROPPED_COLUMNS = {
+    'attachments' => %w(enrollment_id),
     'courses' => %w(section hidden_tabs),
     'users' => %w(type),
     'role_overrides' => %w(context_code),
