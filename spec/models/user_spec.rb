@@ -446,6 +446,7 @@ describe User do
       @enrollment1 = @course.enroll_user(@user1)
       @enrollment2 = @course.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => 'active')
       @enrollment3 = StudentEnrollment.create!(:course => @course, :course_section => @course.course_sections.create!, :user => @user1)
+      @enrollment4 = @course.enroll_teacher(@user1)
 
       @user1.move_to_user(@user2)
       @enrollment1.reload
@@ -456,6 +457,9 @@ describe User do
       @enrollment2.user.should == @user2
       @enrollment3.reload
       @enrollment3.should be_invited
+      @enrollment4.reload
+      @enrollment4.user.should == @user2
+      @enrollment4.should be_invited
 
       @user1.reload
       @user1.enrollments.should be_empty

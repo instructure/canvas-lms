@@ -715,7 +715,8 @@ class User < ActiveRecord::Base
     to_delete_ids = []
     self.enrollments.each do |enrollment|
       source_enrollment = enrollment
-      target_enrollment = new_user.enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && !enrollment.deleted? }
+      # non-deleted enrollments should be unique per [course_section, type]
+      target_enrollment = new_user.enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && enrollment.type == source_enrollment.type && !['deleted', 'inactive', 'rejected'].include?(enrollment.workflow_state) }
       next unless target_enrollment
 
       # we prefer keeping the "most" active one, preferring the target user if they're equal
