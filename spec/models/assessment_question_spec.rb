@@ -23,7 +23,21 @@ describe AssessmentQuestion do
   it "should create a new instance given valid attributes" do
     assessment_question_model
   end
-  
+
+  it "should translate links to be readable when creating the assessment question" do
+    course
+    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+
+    @attachment = attachment_with_context(@course)
+    data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+    @question = @bank.assessment_questions.create!(:question_data => data)
+
+    @attachment.reload.cloned_item.attachments.length.should == 2
+    @clone = @attachment.cloned_item.attachments.last
+
+    @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
+  end
+
   it "should translate links to be readable w/ verifier" do
     course
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
@@ -47,6 +61,6 @@ describe AssessmentQuestion do
     @clone1 = @attachment1.cloned_item.attachments.last
     @clone2 = @attachment2.cloned_item.attachments.last
 
-    @question.question_data['question_text'].should match %r{'/files/#{@clone1.id}/download\?verifier=#{@clone1.uuid}'.*'/files/#{@clone2.id}/download\?verifier=#{@clone2.uuid}'}
+    @question.question_data['question_text'].should match %r{'/assessment_questions/#{@question.id}/files/#{@clone1.id}/download\?verifier=#{@clone1.uuid}'.*'/assessment_questions/#{@question.id}/files/#{@clone2.id}/download\?verifier=#{@clone2.uuid}'}
   end
 end
