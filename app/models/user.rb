@@ -712,6 +712,87 @@ class User < ActiveRecord::Base
     CommunicationChannel.update_all("user_id=#{new_user.id}, position=CASE #{position_updates.join(" ")} ELSE NULL END", :id => self.communication_channels.map(&:id)) unless self.communication_channels.empty?
     CommunicationChannel.update_all({:workflow_state => 'retired'}, :id => to_retire_ids) unless to_retire_ids.empty?
 
+    to_delete_ids = []
+    self.enrollments.each do |enrollment|
+      source_enrollment = enrollment
+      target_enrollment = new_user.enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && !enrollment.deleted? }
+      next unless target_enrollment
+
+      # we prefer keeping the "most" active one, preferring the target user if they're equal
+      # the comments inline show all the different cases, with the source enrollment on the left,
+      # target enrollment on the right.  The * indicates the enrollment that will be deleted in order
+      # to resolve the conflict.
+      if target_enrollment.active?
+        # deleted, active
+        # inactive, active
+        # rejected, active
+        # invited*, active
+        # creation_pending*, active
+        # active*, active
+        # completed*, active
+        to_delete = source_enrollment
+      elsif source_enrollment.active?
+        # active, deleted
+        # active, inactive
+        # active, rejected
+        # active, invited*
+        # active, creation_pending*
+        # active, completed*
+        to_delete = target_enrollment
+      elsif target_enrollment.completed?
+        # deleted, completed
+        # inactive, completed
+        # rejected, completed
+        # invited*, completed
+        # creation_pending*, completed
+        # completed*, completed
+        to_delete = source_enrollment
+      elsif source_enrollment.completed?
+        # completed, deleted
+        # completed, inactive
+        # completed, rejected
+        # completed, invited*
+        # completed, creation_pending*
+        to_delete = target_enrollment
+      elsif target_enrollment.invited?
+        # deleted, invited
+        # inactive, invited
+        # rejected, invited
+        # creation_pending*, invited
+        # invited*, invited
+        to_delete = source_enrollment
+      elsif source_enrollment.invited?
+        # invited, deleted
+        # invited, inactive
+        # invited, rejected
+        # invited, creation_pending*
+        to_delete = target_enrollment
+      elsif target_enrollment.creation_pending?
+        # deleted, creation_pending
+        # inactive, creation_pending
+        # rejected, creation_pending
+        # creation_pending*, creation_pending
+        to_delete = source_enrollment
+      end
+      #elsif
+        # creation_pending, deleted
+        # creation_pending, inactive
+        # creation_pending, rejected
+        # deleted, rejected
+        # inactive, rejected
+        # rejected, rejected
+        # rejected, deleted
+        # rejected, inactive
+        # deleted, inactive
+        # inactive, inactive
+        # inactive, deleted
+        # deleted, deleted
+      #end
+
+      to_delete_ids << to_delete.id if to_delete && !['deleted', 'inactive', 'rejected'].include?(to_delete.workflow_state)
+    end
+    Enrollment.update_all({:workflow_state => 'deleted'}, :id => to_delete_ids) unless to_delete_ids.empty?
+
     [
       [:quiz_id, :quiz_submissions], 
       [:assignment_id, :submissions]

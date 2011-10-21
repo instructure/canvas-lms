@@ -438,6 +438,28 @@ describe User do
     #  ]
     #  @user1.communication_channels.should be_empty
     #end
+
+    it "should move and uniquify enrollments" do
+      @user1 = user_model
+      @user2 = user_model
+      course(:active_all => 1)
+      @enrollment1 = @course.enroll_user(@user1)
+      @enrollment2 = @course.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => 'active')
+      @enrollment3 = StudentEnrollment.create!(:course => @course, :course_section => @course.course_sections.create!, :user => @user1)
+
+      @user1.move_to_user(@user2)
+      @enrollment1.reload
+      @enrollment1.user.should == @user2
+      @enrollment1.should be_deleted
+      @enrollment2.reload
+      @enrollment2.should be_active
+      @enrollment2.user.should == @user2
+      @enrollment3.reload
+      @enrollment3.should be_invited
+
+      @user1.reload
+      @user1.enrollments.should be_empty
+    end
   end
 
   context "permissions" do
