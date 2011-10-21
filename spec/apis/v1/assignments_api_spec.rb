@@ -139,6 +139,7 @@ describe AssignmentsApiController, :type => :integration do
             :format => 'json', :course_id => @course.id.to_s },
           { :assignment => { 'name' => 'some assignment',
               'position' => '1', 'points_possible' => '12',
+              'due_at' => '2011-01-01',
               'grading_type' => 'points', 'set_custom_field_values' => { 'test_custom' => { 'value' => '1' } } } })
 
     json.should == {
@@ -150,7 +151,7 @@ describe AssignmentsApiController, :type => :integration do
       'points_possible' => 12,
       'grading_type' => 'points',
       'needs_grading_count' => 0,
-      'due_at' => nil,
+      'due_at' => '2011-01-01T23:59:00Z',
       'submission_types' => [
         'none',
       ],
