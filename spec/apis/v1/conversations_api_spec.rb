@@ -298,6 +298,7 @@ describe ConversationsController, :type => :integration do
 
       it "should create a conversation with forwarded messages" do
         forwarded_message = conversation(@me, :sender => @bob).messages.first
+        attachment = forwarded_message.attachments.create(:uploaded_data => stub_png_data)
 
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -335,7 +336,7 @@ describe ConversationsController, :type => :integration do
                 "id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "attachments" => [],
                 "forwarded_messages" => [
                   {
-                    "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []
+                    "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [{'filename' => 'test my file? hai!&.png', 'url' => "http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png'}]
                   }
                 ]
               }

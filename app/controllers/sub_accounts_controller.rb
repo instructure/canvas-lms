@@ -25,9 +25,10 @@ class SubAccountsController < ApplicationController
     sub_accounts = account.sub_accounts.active(:limit => 101, :order => :name) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100
-      sub_accounts = account_data[:sub_account_ids] = []
+      account_data[:sub_account_ids] = []
       account_data[:sub_account_count] = 0
       @accounts[:accounts_to_get_sub_account_count] << account.id
+      return
     else
       account_data[:sub_account_ids] = sub_account_ids
       account_data[:sub_account_count] = sub_accounts.length

@@ -2,6 +2,7 @@ module Delayed
   HIGH_PRIORITY = 0
   NORMAL_PRIORITY = 10
   LOW_PRIORITY = 20
+  LOWER_PRIORITY = 50
 end
 
 Delayed::Job.default_priority = Delayed::NORMAL_PRIORITY

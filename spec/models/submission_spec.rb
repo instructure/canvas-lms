@@ -259,6 +259,86 @@ describe Submission do
       s.errors.first.to_s.should match(/not a valid URL/)
     end
   end
+
+  context "turnitin" do
+    before do
+      @assignment.turnitin_enabled = true
+      @assignment.turnitin_settings = @assignment.turnitin_settings
+      @assignment.save!
+      submission_spec_model
+      @submission.turnitin_data = {
+        "submission_#{@submission.id}" => {
+          :web_overlap => 92,
+          :error => true,
+          :publication_overlap => 0,
+          :state => "failure",
+          :object_id => "123456789",
+          :student_overlap => 90,
+          :similarity_score => 92
+        }
+      }
+      @submission.save!
+
+      api = Turnitin::Client.new('test_account', 'sekret')
+      Turnitin::Client.should_receive(:new).at_least(:once).and_return(api)
+      api.should_receive(:sendRequest).with(:generate_report, 1, hash_including(:oid => "123456789")).at_least(:once).and_return('http://foo.bar')
+    end
+
+    it "should let teachers view the turnitin report" do
+      @teacher = User.create
+      @context.enroll_teacher(@teacher)
+      @submission.should be_grants_right(@teacher, nil, :view_turnitin_report)
+      @submission.turnitin_report_url("submission_#{@submission.id}", @teacher).should_not be_nil
+    end
+
+    it "should let students view the turnitin report after grading" do
+      @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
+      @assignment.save!
+      @submission.reload
+
+      @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
+      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+
+      @submission.score = 1
+      @submission.grade_it!
+
+      @submission.should be_grants_right(@user, nil, :view_turnitin_report)
+      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+    end
+
+    it "should let students view the turnitin report immediately if the visibility setting allows it" do
+      @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
+      @assignment.save
+      @submission.reload
+
+      @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
+      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+
+      @assignment.turnitin_settings[:originality_report_visibility] = 'immediate'
+      @assignment.save
+      @submission.reload
+
+      @submission.should be_grants_right(@user, nil, :view_turnitin_report)
+      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+    end
+
+    it "should let students view the turnitin report after the due date if the visibility setting allows it" do
+      @assignment.turnitin_settings[:originality_report_visibility] = 'after_due_date'
+      @assignment.due_at = Time.now + 1.day
+      @assignment.save
+      @submission.reload
+
+      @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
+      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+
+      @assignment.due_at = Time.now - 1.day
+      @assignment.save
+      @submission.reload
+
+      @submission.should be_grants_right(@user, nil, :view_turnitin_report)
+      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+    end
+  end
 end
 
 def submission_spec_model(opts={})

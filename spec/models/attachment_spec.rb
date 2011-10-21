@@ -567,18 +567,6 @@ def processing_model
   @attachment.submit_to_scribd!
 end
 
-def attachment_obj_with_context(obj, opts={})
-  @attachment = factory_with_protected_attributes(Attachment, valid_attachment_attributes.merge(opts))
-  @attachment.context = obj
-  @attachment
-end
-
-def attachment_with_context(obj, opts={})
-  attachment_obj_with_context(obj, opts)
-  @attachment.save!
-  @attachment
-end
-
 # Makes sure we have a value in scribd_mime_types and that the attachment model points to that.
 def scribdable_attachment_model
   scribd_mime_type_model(:extension => 'pdf')
