@@ -34,8 +34,8 @@
         %>
         <% if @context.default_view == 'wiki' %>
           <%= mt :default_wiki_page_is_course_home_page_warning, <<-EOT, :link => context_url(@context, :context_url)
-          Right now this is also set as the default course page, so visitors to your
-          course will see this page first.  You can change that from [the course home page](%{link}).
+Right now this is also set as the default course page, so visitors to your
+course will see this page first.  You can change that from [the course home page](%{link}).
           EOT
           %>
         <% end %>

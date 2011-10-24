@@ -19,10 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe I18nExtraction::RubyExtractor do
-  def extract(source, scope = 'asdf.', scope_results = true)
+  def extract(source, scope = 'asdf.', scope_results = true, in_html_view = false)
     sexps = RubyParser.new.parse(source)
     extractor = I18nExtraction::RubyExtractor.new
     extractor.scope = scope
+    extractor.in_html_view = in_html_view
     extractor.process(sexps)
     (scope_results ?
       scope.split(/\./).inject(extractor.translations) { |hash, s| hash[s] } :
@@ -54,7 +55,7 @@ describe I18nExtraction::RubyExtractor do
   context "default translations" do
     it "should allow strings" do
       extract("t 'foo', \"Foo\"").should == {'foo' => "Foo"}
-      extract("t 'foo2', <<-STR\nFoo\nSTR").should == {'foo2' => "Foo\n"}
+      extract("t 'foo2', <<-STR\nFoo\nSTR").should == {'foo2' => "Foo"}
       extract("t 'foo', 'F' + 'o' + 'o'").should == {'foo' => "Foo"}
     end
 
@@ -169,6 +170,17 @@ describe I18nExtraction::RubyExtractor do
 
     it "should not let you use a key as a scope" do
       lambda{ extract "t 'foo', 'foo'\nt 'foo.bar', 'bar'" }.should raise_error '"asdf.foo" used as both a scope and a key'
+    end
+  end
+
+  context "whitespace" do
+    it "should remove extraneous whitespace from view translate calls" do
+      extract("t 'foo', \"\\n Foo \\t foo!\\n\"", 'asdf.', true, true).should == {'foo' => "Foo foo!"}
+    end
+
+    it "should strip whitespace from all other calls" do
+      extract("t 'foo', \"\\n Foo \\t foo!\\n\"").should == {'foo' => "Foo \t foo!"}
+      extract("mt 'foo', \"\\n Foo \\t foo!\\n\"").should == {'foo' => "Foo \t foo!"}
     end
   end
 end

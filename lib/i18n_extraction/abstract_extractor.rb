@@ -10,6 +10,7 @@ module I18nExtraction
 
     def add_translation(full_key, default, remove_whitespace = false)
       default = default.gsub(/\s+/, ' ') if remove_whitespace
+      default = default.strip unless full_key =~ /separator/
       @total += 1
       scope = full_key.split('.')
       key = scope.pop
