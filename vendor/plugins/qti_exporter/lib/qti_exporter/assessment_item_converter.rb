@@ -58,7 +58,8 @@ class AssessmentItemConverter
       create_doc
       @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
       # The colons are replaced with dashes in the conversion from QTI 1.2
-      @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier').gsub(/:/, '-')
+      @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
+      @question[:migration_id] = @question[:migration_id].gsub(/:/, '-') if @question[:migration_id]
       if @opts[:alternate_ids]
         # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
         alt_id = get_node_att(@doc, 'assessmentItem', 'label')
