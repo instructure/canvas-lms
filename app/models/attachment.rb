@@ -111,9 +111,26 @@ class Attachment < ActiveRecord::Base
       send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 })
     end
 
+    send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/
     if respond_to?(:process_attachment_with_processing) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
       temp_file = temp_path || create_temp_file
       self.class.attachment_options[:thumbnails].each { |suffix, size| send_later_if_production(:create_thumbnail_size, suffix) }
+    end
+  end
+
+  def infer_encoding
+    return unless self.encoding.nil?
+    begin
+      Iconv.open('UTF-8', 'UTF-8') do |iconv|
+        self.open do |chunk|
+          iconv.iconv(chunk)
+        end
+        iconv.iconv(nil)
+      end
+      self.update_attribute(:encoding, 'UTF-8')
+    rescue Iconv::Failure
+      self.update_attribute(:encoding, '')
+      return
     end
   end
   
@@ -619,6 +636,10 @@ class Attachment < ActiveRecord::Base
     )
   end
 
+  def content_type_with_encoding
+    encoding.blank? ? content_type : "#{content_type}; charset=#{encoding}"
+  end
+
   # Returns an IO-like object containing the contents of the attachment file.
   # Any resources are guaranteed to be cleaned up when the object is garbage
   # collected (for instance, using the Tempfile class). Calling close on the
@@ -639,9 +660,21 @@ class Attachment < ActiveRecord::Base
   # If opts[:temp_folder] is given, and a local temporary file is created, this
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
-  def open(opts = {})
+  def open(opts = {}, &block)
     if Attachment.local_storage?
-      File.open(self.full_filename, 'rb')
+      if block
+        File.open(self.full_filename, 'rb') { |file|
+          chunk = file.read(4096)
+          while chunk
+            yield chunk
+            chunk = file.read(4096)
+          end
+        }
+      else
+        File.open(self.full_filename, 'rb')
+      end
+    elsif block
+      AWS::S3::S3Object.stream(self.full_filename, self.bucket_name, &block)
     else
       # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
       # natively support streaming the response, except when a block is given.
