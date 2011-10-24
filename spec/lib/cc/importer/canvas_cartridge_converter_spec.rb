@@ -142,6 +142,11 @@ describe "Canvas Cartridge importing" do
     tool1.consumer_key = 'haha'
     tool1.shared_secret = "don't share me"
     tool1.settings[:custom_fields] = {"key1" => "value1", "key2" => "value2"}
+    tool1.settings[:user_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
+    tool1.settings[:course_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra'}
+    tool1.settings[:account_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
+    tool1.settings[:resource_selection] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
+    tool1.settings[:editor_button] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra'}
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
     tool2.domain = 'example.com'
@@ -179,6 +184,33 @@ describe "Canvas Cartridge importing" do
     t1.domain.should == nil
     t1.consumer_key.should == 'fake'
     t1.shared_secret.should == 'fake'
+    [:user_navigation, :course_navigation, :account_navigation].each do |type|
+      t1.settings[type][:url].should == "http://www.example.com"
+      t1.settings[type][:text].should == "hello"
+      t1.settings[type][:labels][:en].should == 'hello'
+      t1.settings[type][:labels]['es'].should == 'hola'
+      if type == :course_navigation
+        t1.settings[type][:default].should == 'disabled'
+        t1.settings[type][:visibility].should == 'members'
+        t1.settings[type].keys.map(&:to_s).sort.should == ['default', 'labels', 'text', 'url', 'visibility']
+      else
+        t1.settings[type].keys.map(&:to_s).sort.should == ['labels', 'text', 'url']
+      end
+    end
+    [:resource_selection, :editor_button].each do |type|
+      t1.settings[type][:url].should == "http://www.example.com"
+      t1.settings[type][:text].should == "hello"
+      t1.settings[type][:labels][:en].should == 'hello'
+      t1.settings[type][:labels]['es'].should == 'hola'
+      t1.settings[type][:selection_width].should == 100
+      t1.settings[type][:selection_height].should == 50
+      if type == :editor_button
+        t1.settings[type][:icon_url].should == 'http://www.example.com'
+        t1.settings[type].keys.map(&:to_s).sort.should == ['icon_url', 'labels', 'selection_height', 'selection_width', 'text', 'url']
+      else
+        t1.settings[type].keys.map(&:to_s).sort.should == ['labels', 'selection_height', 'selection_width', 'text', 'url']
+      end
+    end
     t1.settings[:custom_fields].should == {"key1"=>"value1", "key2"=>"value2"}
     t1.settings[:vendor_extensions].should == [] 
     
@@ -190,7 +222,15 @@ describe "Canvas Cartridge importing" do
     t2.workflow_state.should == tool2.workflow_state
     t2.consumer_key.should == 'fake'
     t2.shared_secret.should == 'fake'
-    t2.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}]
+    t2.settings[:user_navigation].should be_nil
+    t2.settings[:course_navigation].should be_nil
+    t2.settings[:account_navigation].should be_nil
+    t2.settings[:resource_selection].should be_nil
+    t2.settings[:editor_button].should be_nil
+    t2.settings.keys.map(&:to_s).sort.should == ['custom_fields', 'vendor_extensions']
+    t2.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
+    t2.settings[:vendor_extensions][0][:platform].should == 'my.lms.com'
+    t2.settings[:vendor_extensions][0][:custom_fields].should == {"key"=>"value"}
     t2.settings[:custom_fields].should == {}
   end
   
