@@ -23,6 +23,8 @@ class PseudonymSession < Authlogic::Session::Base
   find_by_login_method :custom_find_by_unique_id
   remember_me_for 2.weeks
 
+  attr_accessor :remote_ip, :too_many_attempts
+
   # we need to know if the session came from http basic auth, so we override
   # authlogic's method here to add a flag that we can check
   def persist_by_http_auth
@@ -39,5 +41,34 @@ class PseudonymSession < Authlogic::Session::Base
   end
   def used_basic_auth?
     @valid_basic_auth
+  end
+
+  # Validate the session using password auth (either local or LDAP, but not
+  # SSO). If too many failed attempts have occured, the validation will fail.
+  # In this case, `too_many_attempts?` will be true, rather than
+  # `invalid_password?`.
+  #
+  # Note that for IP based max attempt tracking to occur, you'll need to set
+  # remote_ip on the PseudonymSession before calling save/valid?. Otherwise,
+  # only total # of failed attempts will be tracked.
+  def validate_by_password
+    super
+
+    # have to call super first, as that's what loads attempted_record
+    if !Canvas::Security.allow_login_attempt?(attempted_record, remote_ip)
+      self.too_many_attempts = true
+      errors.add(password_field, I18n.t('errors.max_attempts', 'Too many failed login attempts. Please try again later or contact your system administrator.'))
+      return
+    end
+
+    if invalid_password?
+      Canvas::Security.failed_login!(attempted_record, remote_ip)
+    else
+      Canvas::Security.successful_login!(attempted_record, remote_ip)
+    end
+  end
+
+  def too_many_attempts?
+    too_many_attempts == true
   end
 end

@@ -77,6 +77,29 @@ Implemented for: Canvas LMS}
     soap_response.first.should == "Invalid credentials"
   end
 
+  if Canvas.redis_enabled?
+    it "should limit the max failed login attempts" do
+      Setting.set('login_attempts_total', '2')
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'hax0r',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Invalid credentials"
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'hax0r',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Invalid credentials"
+      # now use the right credentials, but it'll still fail because max attempts
+      # was reached. unfortunately we can't return a more specific error message.
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'asdfasdf',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Invalid credentials"
+    end
+  end
+
   describe "delegated auth" do
     before do
       @account = account_with_cas

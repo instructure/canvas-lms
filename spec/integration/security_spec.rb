@@ -129,7 +129,55 @@ describe "security" do
     c2.should match(/; *secure/)
     ActionController::Base.session_options[:secure] = nil
   end
-  
+
+  if Canvas.redis_enabled?
+    describe "max login attempts" do
+      before do
+        Setting.set('login_attempts_total', '2')
+        Setting.set('login_attempts_per_ip', '1')
+        u = user_with_pseudonym :active_user => true,
+          :username => "nobody@example.com",
+          :password => "asdfasdf"
+        u.save!
+      end
+
+      def bad_login(ip)
+        post_via_redirect "/login",
+          { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "failboat" },
+          { "REMOTE_ADDR" => ip }
+      end
+
+      it "should be limited for the same ip" do
+        bad_login("5.5.5.5")
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.5")
+        response.body.should match(/Too many failed login attempts/)
+      end
+
+      it "should have a higher limit for other ips" do
+        bad_login("5.5.5.5")
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.6") # different IP, so allowed
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.7") # different IP, but too many total failures
+        response.body.should match(/Too many failed login attempts/)
+      end
+
+      it "should not block other users with the same ip" do
+        bad_login("5.5.5.5")
+        response.body.should match(/Incorrect username/)
+
+        # schools like to NAT hundreds of people to the same IP, so we don't
+        # ever block the IP address as a whole
+        user_with_pseudonym(:active_user => true, :username => "second@example.com", :password => "12341234").save!
+        post_via_redirect "/login",
+          { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
+          { "REMOTE_ADDR" => "5.5.5.5" }
+        path.should eql("/?login_success=1")
+      end
+    end
+  end
+
   it "should only allow user list username resolution if the current user has appropriate rights" do
     u = User.create!(:name => 'test user')
     u.pseudonyms.create!(:unique_id => "A1234567", :account => Account.default)

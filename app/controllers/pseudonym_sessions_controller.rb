@@ -96,8 +96,15 @@ class PseudonymSessionsController < ApplicationController
 
     # Try to use authlogic's built-in login approach first
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session])
+    @pseudonym_session.remote_ip = request.remote_ip
     found = @pseudonym_session.save
-    
+
+    if @pseudonym_session.too_many_attempts?
+      flash[:error] = t 'errors.max_attempts', "Too many failed login attempts. Please try again later or contact your system administrator."
+      redirect_to login_url
+      return
+    end
+
     # TODO: don't allow logins from other root accounts anymore
     # If authlogic fails and this account allows handles from other account,
     # try to log in with a handle from another account
@@ -111,7 +118,7 @@ class PseudonymSessionsController < ApplicationController
         found = true
       end
     end
-    
+
     @pseudonym = @pseudonym_session && @pseudonym_session.record
     # If the user's account has been deleted, feel free to share that information
     if @pseudonym && (!@pseudonym.user || @pseudonym.user.unavailable?)
@@ -119,11 +126,10 @@ class PseudonymSessionsController < ApplicationController
       redirect_to login_url
       return
     end
-    
+
     # Call for some cleanups that should be run when a user logs in
-    @pseudonym.login_assertions_for_user if found
-    @user = @pseudonym.user if found
-    
+    @user = @pseudonym.login_assertions_for_user if found
+
     # If the user is registered and logged in, redirect them to their dashboard page
     if found
       successful_login(@user, @pseudonym)
