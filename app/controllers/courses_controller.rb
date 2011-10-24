@@ -366,7 +366,7 @@ class CoursesController < ApplicationController
     return if check_enrollment
     if !@pending_enrollment
       redirect_to course_url(@context.id)
-      return
+      return true
     end
     if params[:reject]
       @pending_enrollment.reject!
@@ -382,7 +382,13 @@ class CoursesController < ApplicationController
         @pending_enrollment.accept!
         session[:accepted_enrollment_uuid] = @pending_enrollment.uuid
         flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
-        redirect_to course_url(@context.id)
+        if params[:action] != 'show'
+          redirect_to course_url(@context.id)
+        else
+          @context_enrollment = @pending_enrollment
+          @pending_enrollment = nil
+          return false
+        end
       elsif !@current_user && @pending_enrollment.user.registered?
         session[:return_to] = course_url(@context.id)
         flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
@@ -394,6 +400,7 @@ class CoursesController < ApplicationController
     else
       redirect_to course_url(@context.id)
     end
+    true
   end
   
   def claim_course
@@ -408,8 +415,14 @@ class CoursesController < ApplicationController
   protected :claim_course
   
   def check_enrollment
+    return false if @pending_enrollment
+
+    # Use the enrollment we already fetched, if possible
     enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
-    enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]])
+    # Overwrite with the session enrollment, if one exists, and it's different than the current user's
+    enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] && params[:invitation].blank?
+    # Look up the explicitly provided invitation
+    enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]]) unless params[:invitation].blank?
     if enrollment && enrollment.state_based_on_date == :inactive
       flash[:notice] = t('notices.enrollment_not_active', "Your membership in the course, %{course}, is not yet activated", :course => @context.name)
       redirect_to dashboard_url
@@ -425,15 +438,16 @@ class CoursesController < ApplicationController
       session[:session_affects_permissions] = true
       session[:enrollment_as_student] = true if e.is_a?(StudentEnrollment)
       session[:enrollment_uuid_course_id] = e.course_id
+      @pending_enrollment = enrollment
       if @context.root_account.allow_invitation_previews?
         flash[:notice] = t('notices.preview_course', "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
-        redirect_to course_enrollment_invitation_url(@context, :invitation => enrollment.uuid, :accept => 1)
-        return true
+        # directly call the next action; it's just going to redirect anyway, so no need to have
+        # an additional redirect to get to it
+        params[:accept] = 1
+        return enrollment_invitation
       end
-      @pending_enrollment = enrollment
     end
-    @pending_enrollment ||= @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid]
     if session[:accepted_enrollment_uuid] && (e = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid]))
       e.accept! if e.invited?
       flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)

@@ -50,7 +50,7 @@
           t 'details.register', "In order to finish signing you up, we'll need a few more pieces of information."
         end %></p>
       <%= (error_messages_for :object => [@user, @pseudonym], :header_message => nil).gsub("Unique", "Login") %>
-      <% form_for :pseudonym, :url => registration_confirmation_url(@communication_channel.confirmation_code), :html => {:id => "registration_confirmation_form"} do |form| %>
+      <% form_for :pseudonym, :url => registration_confirmation_url(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid)), :html => {:id => "registration_confirmation_form"} do |form| %>
       <input type="hidden" name="register" value="1"/>
       <table class="formtable">
         <tr>

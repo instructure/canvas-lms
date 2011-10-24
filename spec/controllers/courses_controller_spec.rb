@@ -191,13 +191,17 @@ describe CoursesController do
         @enrollment.should be_invited
       end
 
-      it "should auto-redirect to accept if previews are not allowed" do
+      it "should auto-accept if previews are not allowed" do
         # Currently, previews are only allowed for the default account
         @account = Account.create!
-        course_with_student(:active_course => 1, :account => @account)
+        course_with_student_logged_in(:active_course => 1, :account => @account)
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
-        response.should be_redirect
-        response.should redirect_to(course_enrollment_invitation_url(@course, :invitation => @enrollment.uuid, :accept => 1))
+        response.should be_success
+        response.should render_template('show')
+        assigns[:pending_enrollment].should be_nil
+        assigns[:context_enrollment].should == @enrollment
+        @enrollment.reload
+        @enrollment.should be_active
       end
 
       it "should ignore invitations that have been accepted" do
@@ -212,6 +216,30 @@ describe CoursesController do
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
         response.should be_success
         assigns[:pending_enrollment].should be_nil
+      end
+
+      it "should use the invitation enrollment, rather than the current enrollment" do
+        course_with_student_logged_in(:active_course => 1, :active_user => 1)
+        @student1 = @student
+        @enrollment1 = @enrollment
+        student_in_course
+        @enrollment.should be_invited
+
+        get 'show', :id => @course.id, :invitation => @enrollment.uuid
+        response.should be_success
+        assigns[:pending_enrollment].should == @enrollment
+        assigns[:current_user].should == @student1
+        session[:enrollment_uuid].should == @enrollment.uuid
+        @enrollment.reload
+        @enrollment.should be_invited
+
+        get 'show', :id => @course.id # invitation should be in the session now
+        response.should be_success
+        assigns[:pending_enrollment].should == @enrollment
+        assigns[:current_user].should == @student1
+        session[:enrollment_uuid].should == @enrollment.uuid
+        @enrollment.reload
+        @enrollment.should be_invited
       end
     end
   end
