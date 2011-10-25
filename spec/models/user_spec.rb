@@ -507,6 +507,12 @@ describe User do
       @admin2.grants_right?(@admin1, nil, :become_user).should be_false
     end
 
+    it "should not allow account admin to modify admin privileges of other account admins" do
+      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
+    end
+
     it "should grant become_user for users in multiple accounts to site admins but not account admins" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @account2 = Account.create!
