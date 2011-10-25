@@ -28,12 +28,12 @@ describe User do
   
   it "should get the first email from communication_channel" do
     @user = User.create
-    @cc1 = mock_model(CommunicationChannel)
-    @cc1.stub!(:path).and_return('cc1')
-    @cc2 = mock_model(CommunicationChannel)
-    @cc2.stub!(:path).and_return('cc2')
-    @user.stub!(:communication_channels).and_return([@cc1, @cc2])
-    @user.stub!(:communication_channel).and_return(@cc1)
+    @cc1 = mock('CommunicationChannel')
+    @cc1.stubs(:path).returns('cc1')
+    @cc2 = mock('CommunicationChannel')
+    @cc2.stubs(:path).returns('cc2')
+    @user.stubs(:communication_channels).returns([@cc1, @cc2])
+    @user.stubs(:communication_channel).returns(@cc1)
     @user.communication_channel.should eql(@cc1)
   end
   

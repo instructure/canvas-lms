@@ -22,6 +22,7 @@ require 'spec'
 # require 'spec/autorun'
 require 'spec/rails'
 require 'webrat'
+require 'mocha'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
@@ -71,6 +72,7 @@ Spec::Runner.configure do |config|
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
   config.global_fixtures = :plugin_settings
+  config.mock_with :mocha
 
   config.include Webrat::Matchers, :type => :views 
 
@@ -220,14 +222,15 @@ Spec::Runner.configure do |config|
   end
 
   def user_session(user, pseudonym=nil)
-    pseudonym ||= mock_model(Pseudonym, {:record => user})
-    pseudonym.stub!(:user_id).and_return(user.id)
-    pseudonym.stub!(:user).and_return(user)
-    pseudonym.stub!(:login_count).and_return(1)
-    session = mock_model(PseudonymSession)
-    session.stub!(:record).and_return(pseudonym)
-    session.stub!(:session_credentials).and_return(nil)
-    PseudonymSession.stub!(:find).and_return(session)
+    pseudonym ||= mock()
+    pseudonym.stubs(:record).returns(user)
+    pseudonym.stubs(:user_id).returns(user.id)
+    pseudonym.stubs(:user).returns(user)
+    pseudonym.stubs(:login_count).returns(1)
+    session = mock()
+    session.stubs(:record).returns(pseudonym)
+    session.stubs(:session_credentials).returns(nil)
+    PseudonymSession.stubs(:find).returns(session)
   end
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
@@ -442,7 +445,7 @@ Spec::Runner.configure do |config|
  
   def stub_kaltura
     # trick kaltura into being activated
-    Kaltura::ClientV3.stub!(:config).and_return({
+    Kaltura::ClientV3.stubs(:config).returns({
           'domain' => 'kaltura.example.com',
           'resource_domain' => 'kaltura.example.com',
           'partner_id' => '100',

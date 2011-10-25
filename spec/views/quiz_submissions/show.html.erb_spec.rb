@@ -23,13 +23,13 @@ describe "/quiz_submissions/show" do
   it "should render" do
     course_with_student
     view_context
-    @submission = mock_model(QuizSubmission)
-    @submission.stub!(:score).and_return(10)
-    @submission.stub!(:data).and_return([])
-    @quiz = mock_model(Quiz)
-    @quiz.stub!(:questions).and_return([])
-    @quiz.stub!(:points_possible).and_return(10)
-    @quiz.stub!(:stored_questions).and_return([])
+    @submission = mock('QuizSubmission')
+    @submission.stubs(:score).returns(10)
+    @submission.stubs(:data).returns([])
+    @quiz = mock('Quiz')
+    @quiz.stubs(:questions).returns([])
+    @quiz.stubs(:points_possible).returns(10)
+    @quiz.stubs(:stored_questions).returns([])
     assigns[:quiz] = @quiz
     assigns[:submission] = @submission
     

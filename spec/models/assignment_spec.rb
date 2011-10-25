@@ -59,7 +59,7 @@ describe Assignment do
     @submission = @assignment.submissions.first
     original_graded_at = @submission.graded_at
     new_time = Time.now + 1.hour
-    Time.stub!(:now).and_return(new_time)
+    Time.stubs(:now).returns(new_time)
     @assignment.grade_student(@user, :grade => 2)
     @submission.reload
     @submission.graded_at.should_not eql original_graded_at
@@ -1089,7 +1089,7 @@ describe Assignment do
         @a.context.offer!
         @c.enroll_student(@user)
 #        @students = [@user]
-#        @a.stub!(:participants).and_return(@students)
+#        @a.stubs(:participants).returns(@students)
 #        @a.participants.should be_include(@user)
         @a.previously_published = false
         @a.save

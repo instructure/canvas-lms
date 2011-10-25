@@ -25,12 +25,23 @@ describe SIS do
     Setting.set('sis_transaction_seconds', '1')
     # this is the fun bit where we get to stub User.new to insert a sleep into
     # the transaction loop.
-    User.stub!(:new) { sleep 1; User.allocate.tap { |u| u.send(:initialize) } }
+    class User
+      def _stub_sleep
+        sleep 1
+        true
+      end
+      before_save :_stub_sleep
+    end
+
     SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
       importer.add_user(*"U001,user1,active,User,One,user1@example.com".split(','))
       importer.add_user(*"U002,user2,active,User,Two,user2@example.com".split(','))
       importer.add_user(*"U003,user3,active,User,Three,user3@example.com".split(','))
     end
     Pseudonym.all.map(&:sis_user_id).sort.should == %w(U001 U002 U003)
+
+    class User
+      @before_save_callbacks.delete :_stub_sleep
+    end
   end
 end

@@ -313,14 +313,14 @@ describe "security" do
   end
 
   it "should not allow logins to safefiles domains" do
-    HostUrl.stub!(:is_file_host?).and_return(true)
-    HostUrl.stub!(:default_host).and_return('test.host')
+    HostUrl.stubs(:is_file_host?).returns(true)
+    HostUrl.stubs(:default_host).returns('test.host')
     get "http://files-test.host/login"
     response.should be_redirect
     uri = URI.parse response['Location']
     uri.host.should == 'test.host'
 
-    HostUrl.stub!(:is_file_host?).and_return(false)
+    HostUrl.stubs(:is_file_host?).returns(false)
     get "http://test.host/login"
     response.should be_success
   end

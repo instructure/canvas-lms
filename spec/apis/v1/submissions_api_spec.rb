@@ -344,11 +344,11 @@ describe SubmissionsApiController, :type => :integration do
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     media_object(:media_id => "54321", :context => student1, :user => student1)
-    mock_kaltura = mock(Kaltura::ClientV3)
-    Kaltura::ClientV3.stub(:new).and_return(mock_kaltura)
-    mock_kaltura.should_receive :startSession
-    mock_kaltura.should_receive(:flavorAssetGetByEntryId).and_return([{:fileExt => 'mp4', :id => 'fake'}])
-    mock_kaltura.should_receive(:flavorAssetGetDownloadUrl).and_return("https://kaltura.example.com/some/url")
+    mock_kaltura = mock('Kaltura::ClientV3')
+    Kaltura::ClientV3.stubs(:new).returns(mock_kaltura)
+    mock_kaltura.expects :startSession
+    mock_kaltura.expects(:flavorAssetGetByEntryId).returns([{:fileExt => 'mp4', :id => 'fake'}])
+    mock_kaltura.expects(:flavorAssetGetDownloadUrl).returns("https://kaltura.example.com/some/url")
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     stub_kaltura
     json = api_call(:get,

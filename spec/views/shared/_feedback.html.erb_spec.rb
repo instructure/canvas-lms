@@ -24,7 +24,7 @@ describe "/shared/_feedback" do
     course_with_student
     assigns[:current_user] = @user
     assigns[:domain_root_account] = @course.root_account
-    assigns[:domain_root_account].stub!(:custom_feedback_links).and_return([])
+    assigns[:domain_root_account].stubs(:custom_feedback_links).returns([])
     render :partial => "shared/feedback"
     response.should_not be_nil
     html = Nokogiri::HTML(response.body)
@@ -35,7 +35,7 @@ describe "/shared/_feedback" do
     course_with_student
     assigns[:current_user] = @user
     assigns[:domain_root_account] = @course.root_account
-    assigns[:domain_root_account].stub!(:custom_feedback_links).and_return([
+    assigns[:domain_root_account].stubs(:custom_feedback_links).returns([
       {
         :url => "http://www.google.com",
         :title => "Google",

@@ -231,12 +231,12 @@ Implemented for: Canvas LMS}
     status.should == "Success"
 
     mock_migration = ContentMigration.create!
-    mock_migration.should_receive(:export_content) do
-      mock_migration.workflow_state = 'imported'
-      mock_migration.migration_settings[:imported_assets] = ["quiz_xyz"]
+    def mock_migration.export_content
+      self.workflow_state = 'imported'
+      self.migration_settings[:imported_assets] = ["quiz_xyz"]
     end
-    ContentMigration.stub!(:new).and_return(mock_migration)
-    ContentMigration.stub!(:find).with(mock_migration.id).and_return(mock_migration)
+    ContentMigration.stubs(:new).returns(mock_migration)
+    ContentMigration.stubs(:find).with(mock_migration.id).returns(mock_migration)
 
     status, details, context, item_id = soap_request(
       'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
@@ -262,11 +262,11 @@ Implemented for: Canvas LMS}
       status.should == "Success"
 
       @mock_migration = ContentMigration.create!
-      @mock_migration.should_receive(:export_content) do
-        @mock_migration.workflow_state = 'importing'
+      def @mock_migration.export_content
+        self.workflow_state = 'importing'
       end
-      ContentMigration.stub!(:new).and_return(@mock_migration)
-      ContentMigration.stub!(:find).with(@mock_migration.id).and_return(@mock_migration)
+      ContentMigration.stubs(:new).returns(@mock_migration)
+      ContentMigration.stubs(:find).with(@mock_migration.id).returns(@mock_migration)
 
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,

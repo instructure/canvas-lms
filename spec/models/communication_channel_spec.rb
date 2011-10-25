@@ -20,9 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CommunicationChannel do
   before(:each) do
-    @pseudonym = mock_model(Pseudonym)
-    @pseudonym.stub!(:destroyed?).and_return(false)
-    Pseudonym.stub!(:find_by_user_id).and_return(@pseudonym)
+    @pseudonym = mock('Pseudonym')
+    @pseudonym.stubs(:destroyed?).returns(false)
+    Pseudonym.stubs(:find_by_user_id).returns(@pseudonym)
   end
 
   it "should create a new instance given valid attributes" do
@@ -176,7 +176,7 @@ describe CommunicationChannel do
   end
   
   it "should set a confirmation code unless one has been set" do
-    AutoHandle.should_receive(:generate).at_least(:once).and_return('abc123')
+    AutoHandle.expects(:generate).at_least(1).returns('abc123')
     communication_channel_model
     @cc.confirmation_code.should eql('abc123')
   end

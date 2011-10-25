@@ -408,8 +408,8 @@ describe FilesController do
     end
     
     it "should create file placeholder (in local mode)" do
-      Attachment.stub!(:s3_storage?).and_return(false)
-      Attachment.stub!(:local_storage?).and_return(true)
+      Attachment.stubs(:s3_storage?).returns(false)
+      Attachment.stubs(:local_storage?).returns(true)
       Attachment.local_storage?.should eql(true)
       Attachment.s3_storage?.should eql(false)
       course_with_teacher_logged_in(:active_all => true)
@@ -430,12 +430,12 @@ describe FilesController do
     end
     
     it "should create file placeholder (in s3 mode)" do
-      Attachment.stub!(:s3_storage?).and_return(true)
-      Attachment.stub!(:local_storage?).and_return(false)
-      conn = mock(AWS::S3::Connection)
-      AWS::S3::Base.stub!(:connection).and_return(conn)
-      conn.stub!(:access_key_id).and_return('stub_id')
-      conn.stub!(:secret_access_key).and_return('stub_key')
+      Attachment.stubs(:s3_storage?).returns(true)
+      Attachment.stubs(:local_storage?).returns(false)
+      conn = mock('AWS::S3::Connection')
+      AWS::S3::Base.stubs(:connection).returns(conn)
+      conn.stubs(:access_key_id).returns('stub_id')
+      conn.stubs(:secret_access_key).returns('stub_key')
 
       Attachment.s3_storage?.should eql(true)
       Attachment.local_storage?.should eql(false)
@@ -457,12 +457,12 @@ describe FilesController do
     end
     
     it "should not allow going over quota for file uploads" do
-      Attachment.stub!(:s3_storage?).and_return(true)
-      Attachment.stub!(:local_storage?).and_return(false)
-      conn = mock(AWS::S3::Connection)
-      AWS::S3::Base.stub!(:connection).and_return(conn)
-      conn.stub!(:access_key_id).and_return('stub_id')
-      conn.stub!(:secret_access_key).and_return('stub_key')
+      Attachment.stubs(:s3_storage?).returns(true)
+      Attachment.stubs(:local_storage?).returns(false)
+      conn = mock('AWS::S3::Connection')
+      AWS::S3::Base.stubs(:connection).returns(conn)
+      conn.stubs(:access_key_id).returns('stub_id')
+      conn.stubs(:secret_access_key).returns('stub_key')
 
       Attachment.s3_storage?.should eql(true)
       Attachment.local_storage?.should eql(false)
@@ -477,12 +477,12 @@ describe FilesController do
     end
     
     it "should allow going over quota for homework submissions" do
-      Attachment.stub!(:s3_storage?).and_return(true)
-      Attachment.stub!(:local_storage?).and_return(false)
-      conn = mock(AWS::S3::Connection)
-      AWS::S3::Base.stub!(:connection).and_return(conn)
-      conn.stub!(:access_key_id).and_return('stub_id')
-      conn.stub!(:secret_access_key).and_return('stub_key')
+      Attachment.stubs(:s3_storage?).returns(true)
+      Attachment.stubs(:local_storage?).returns(false)
+      conn = mock('AWS::S3::Connection')
+      AWS::S3::Base.stubs(:connection).returns(conn)
+      conn.stubs(:access_key_id).returns('stub_id')
+      conn.stubs(:secret_access_key).returns('stub_key')
 
       Attachment.s3_storage?.should eql(true)
       Attachment.local_storage?.should eql(false)

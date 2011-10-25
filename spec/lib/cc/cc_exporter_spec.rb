@@ -5,7 +5,7 @@ describe "Common Cartridge exporting" do
     course = course_model
     user = user_model
     message = "fail"
-    course.stub!(:wiki).and_raise(message)
+    course.stubs(:wiki).raises(message)
     content_export = ContentExport.new
     content_export.course = course
     content_export.user = user

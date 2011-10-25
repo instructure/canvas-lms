@@ -33,10 +33,10 @@ describe GettingStartedController do
 
     # it "should serve html, xml, and json data" do
       # format = mock("format")
-      # format.should_receive(:html).and_return('this text')
-      # format.should_receive(:xml).and_return('this text')
-      # format.should_receive(:json).and_return("this text")
-      # controller.should_receive(:respond_to).and_yield(format)
+      # format.expects(:html).returns('this text')
+      # format.expects(:xml).returns('this text')
+      # format.expects(:json).returns("this text")
+      # controller.expects(:respond_to).and_yield(format)
       # session[:course_creation_auth] = true
       # get 'name', :format => :html
     # end
@@ -71,10 +71,10 @@ describe GettingStartedController do
     
     # it "should serve html, xml, and json data" do
       # format = mock("format")
-      # format.should_receive(:html).and_return('this text')
-      # format.should_receive(:xml).and_return('this text')
-      # format.should_receive(:json).and_return('this text')
-      # controller.should_receive(:respond_to).and_yield(format)
+      # format.expects(:html).returns('this text')
+      # format.expects(:xml).returns('this text')
+      # format.expects(:json).returns('this text')
+      # controller.expects(:respond_to).and_yield(format)
       # session[:course_creation_auth] = true
       # get 'assignments', :format => :html
     # end
@@ -96,10 +96,10 @@ describe GettingStartedController do
   describe "GET 'students'" do
     # it "should serve html, xml, and json data" do
       # format = mock("format")
-      # format.should_receive(:html).and_return('this text')
-      # format.should_receive(:xml).and_return('this text')
-      # format.should_receive(:json).and_return('this text')
-      # controller.should_receive(:respond_to).and_yield(format)
+      # format.expects(:html).returns('this text')
+      # format.expects(:xml).returns('this text')
+      # format.expects(:json).returns('this text')
+      # controller.expects(:respond_to).and_yield(format)
       # session[:course_creation_auth] = true
       # get 'students', :format => :html
     # end

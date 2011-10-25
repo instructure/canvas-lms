@@ -31,17 +31,17 @@ describe Turnitin::Client do
     turnitin_assignment
     @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
     @submission.reload
-    @submission.context.should_receive(:turnitin_settings).at_least(:once).and_return([:my_settings])
+    @submission.context.expects(:turnitin_settings).at_least(1).returns([:my_settings])
     job = Delayed::Job.last(:conditions => { :tag => 'Submission#submit_to_turnitin'})
     job.should_not be_nil
 
     api = Turnitin::Client.new('test_account', 'sekret')
-    Turnitin::Client.should_receive(:new).with(:my_settings).and_return(api)
-    api.should_receive(:createOrUpdateAssignment).with(@assignment).and_return(true)
-    api.should_receive(:enrollStudent).with(@course, @user).and_return(true)
-    Attachment.stub!(:instantiate).and_return(@attachment)
-    @attachment.should_receive(:open).and_return(:my_stub)
-    api.should_receive(:sendRequest).with(:submit_paper, '2', hash_including(:pdata => :my_stub))
+    Turnitin::Client.expects(:new).with(:my_settings).returns(api)
+    api.expects(:createOrUpdateAssignment).with(@assignment).returns(true)
+    api.expects(:enrollStudent).with(@course, @user).returns(true)
+    Attachment.stubs(:instantiate).returns(@attachment)
+    @attachment.expects(:open).returns(:my_stub)
+    api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => :my_stub))
     @submission.submit_to_turnitin
   end
 
@@ -60,17 +60,17 @@ describe Turnitin::Client do
     @assignment.update_attributes(:turnitin_settings => settings)
     @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
     @submission.reload
-    @submission.context.should_receive(:turnitin_settings).at_least(:once).and_return([:my_settings])
+    @submission.context.expects(:turnitin_settings).at_least(1).returns([:my_settings])
     job = Delayed::Job.last(:conditions => { :tag => 'Submission#submit_to_turnitin'})
     job.should_not be_nil
 
     api = Turnitin::Client.new('test_account', 'sekret')
-    Turnitin::Client.should_receive(:new).with(:my_settings).and_return(api)
-    api.should_receive(:sendRequest).with(:create_assignment, '2', hash_including(settings)).and_return(Nokogiri('<assignmentid>12345</assignmentid>'))
-    api.should_receive(:enrollStudent).with(@course, @user).and_return(true)
-    Attachment.stub!(:instantiate).and_return(@attachment)
-    @attachment.should_receive(:open).and_return(:my_stub)
-    api.should_receive(:sendRequest).with(:submit_paper, '2', hash_including(:pdata => :my_stub))
+    Turnitin::Client.expects(:new).with(:my_settings).returns(api)
+    api.expects(:sendRequest).with(:create_assignment, '2', has_entries(settings)).returns(Nokogiri('<assignmentid>12345</assignmentid>'))
+    api.expects(:enrollStudent).with(@course, @user).returns(true)
+    Attachment.stubs(:instantiate).returns(@attachment)
+    @attachment.expects(:open).returns(:my_stub)
+    api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => :my_stub))
     @submission.submit_to_turnitin
     @assignment.reload.turnitin_settings.should eql({
       :originality_report_visibility => 'after_grading',

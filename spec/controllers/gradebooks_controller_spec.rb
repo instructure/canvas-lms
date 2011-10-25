@@ -26,7 +26,7 @@ describe GradebooksController do
 
   describe "GET 'index'" do
     before(:each) do
-      Course.should_receive(:find).and_return(['a course'])
+      Course.expects(:find).returns(['a course'])
     end
 
   end

@@ -203,15 +203,15 @@ describe Attachment do
   
   context "submit_to_scribd!" do
     before(:all) do
-      ScribdAPI.stub!(:set_user).and_return(true)
-      ScribdAPI.stub!(:upload).and_return(UUIDSingleton.instance.generate)
+      ScribdAPI.stubs(:set_user).returns(true)
+      ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
     end
     
     it "should upload scribdable attachments" do
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
-      ScribdAPI.should_receive(:upload).and_return(@doc_obj)
-      @doc_obj.stub!(:thumbnail).and_return("the url to the scribd doc thumbnail")
+      ScribdAPI.expects(:upload).returns(@doc_obj)
+      @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!.should be_true
       @attachment.scribd_doc.should eql(@doc_obj)
       @attachment.state.should eql(:processing)
@@ -220,15 +220,15 @@ describe Attachment do
     it "should bypass non-scridbable attachments" do
       attachment_model
       @attachment.should_not be_scribdable
-      ScribdAPI.should_not_receive(:set_user)
-      ScribdAPI.should_not_receive(:upload)
+      ScribdAPI.expects(:set_user).never
+      ScribdAPI.expects(:upload).never
       @attachment.submit_to_scribd!.should be_true
       @attachment.state.should eql(:processed)
     end
     
     it "should not mess with attachments outside the pending_upload state" do
-      ScribdAPI.should_not_receive(:set_user)
-      ScribdAPI.should_not_receive(:upload)
+      ScribdAPI.expects(:set_user).never
+      ScribdAPI.expects(:upload).never
       attachment_model(:workflow_state => 'processing')
       @attachment.submit_to_scribd!.should be_false
       attachment_model(:workflow_state => 'processed')
@@ -263,9 +263,9 @@ describe Attachment do
   
   context "conversion_status" do
     before(:each) do
-      ScribdAPI.stub!(:get_status).and_return(:status_from_scribd)
-      ScribdAPI.stub!(:set_user).and_return(true)
-      ScribdAPI.stub!(:upload).and_return(Scribd::Document.new)
+      ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
+      ScribdAPI.stubs(:set_user).returns(true)
+      ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
     end
 
     it "should have a default conversion_status of :not_submitted for attachments that haven't been submitted" do
@@ -274,21 +274,21 @@ describe Attachment do
     end
 
     it "should ask Scribd for the status" do
-      ScribdAPI.should_receive(:get_status).and_return(:status_from_scribd)
+      ScribdAPI.expects(:get_status).returns(:status_from_scribd)
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
-      ScribdAPI.should_receive(:upload).and_return(@doc_obj)
-      @doc_obj.stub!(:thumbnail).and_return("the url to the scribd doc thumbnail")
+      ScribdAPI.expects(:upload).returns(@doc_obj)
+      @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!
       @attachment.query_conversion_status!
     end
 
     it "should not ask Scribd for the status" do
-      ScribdAPI.should_not_receive(:get_status)
+      ScribdAPI.expects(:get_status).never
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
-      ScribdAPI.should_receive(:upload).and_return(@doc_obj)
-      @doc_obj.stub!(:thumbnail).and_return("the url to the scribd doc thumbnail")
+      ScribdAPI.expects(:upload).returns(@doc_obj)
+      @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!
       @attachment.conversion_status.should == "PROCESSING"
     end
@@ -297,23 +297,10 @@ describe Attachment do
   
   context "download_url" do
     before do
-      ScribdAPI.stub!(:set_user).and_return(true)
+      ScribdAPI.stubs(:set_user).returns(true)
       @doc = mock('Scribd Document', :download_url => 'some url')
-      Scribd::Document.stub!(:find).and_return(@doc)
+      Scribd::Document.stubs(:find).returns(@doc)
     end
-
-    # Not working, doesn't need to work for now.
-    # it "should get the URL from the Scribd service" do
-    #   processing_model
-    #   @attachment.download_url.should eql('some url')
-    # end
-    # 
-    # it "should not ask for the url more than once" do
-    #   processing_model
-    #   @attachment.download_url.should eql('some url')
-    #   ScribdAPI.should_not_receive(:set_user)
-    #   @attachment.download_url.should eql('some url')
-    # end
   end
   
   context "named scopes" do
@@ -565,31 +552,31 @@ describe Attachment do
 
     it "should include response-content-disposition" do
       attachment = attachment_with_context(@course, :display_name => 'foo')
-      attachment.stub(:authenticated_s3_url)
-      attachment.should_receive(:authenticated_s3_url).with(hash_including('response-content-disposition' => 'attachment; filename=foo'))
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename=foo'))
       attachment.cacheable_s3_url
     end
 
     it "should use the display_name, not filename, in the response-content-disposition" do
       attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
-      attachment.stub(:authenticated_s3_url)
-      attachment.should_receive(:authenticated_s3_url).with(hash_including('response-content-disposition' => 'attachment; filename=foo'))
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename=foo'))
       attachment.cacheable_s3_url
     end
 
     it "should http quote the filename in the response-content-disposition if necessary" do
       attachment = attachment_with_context(@course, :display_name => 'fo"o')
-      attachment.stub(:authenticated_s3_url)
-      attachment.should_receive(:authenticated_s3_url).with(hash_including('response-content-disposition' => 'attachment; filename="fo\\"o"'))
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename="fo\\"o"'))
       attachment.cacheable_s3_url
     end
   end
 end
 
 def processing_model
-  ScribdAPI.stub!(:get_status).and_return(:status_from_scribd)
-  ScribdAPI.stub!(:set_user).and_return(true)
-  ScribdAPI.stub!(:upload).and_return(Scribd::Document.new)
+  ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
+  ScribdAPI.stubs(:set_user).returns(true)
+  ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
   scribdable_attachment_model
   @attachment.submit_to_scribd!
 end

@@ -12,7 +12,7 @@ shared_examples_for "plugins selenium tests" do
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     settings.should be_nil
     
-    Twitter.stub(:config_check).and_return("Bad check")
+    Twitter.stub(:config_check).returns("Bad check")
     get "/plugins/twitter"
     
     driver.find_element(:css, "#settings_api_key").send_keys("asdf")
@@ -22,7 +22,7 @@ shared_examples_for "plugins selenium tests" do
     keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
-    Twitter.stub(:config_check).and_return(nil)
+    Twitter.stub(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
     
@@ -64,7 +64,7 @@ shared_examples_for "plugins selenium tests" do
     settings = Canvas::Plugin.find(:google_docs).try(:settings)
     settings.should be_nil
     
-    GoogleDocs.stub(:config_check).and_return("Bad check")
+    GoogleDocs.stub(:config_check).returns("Bad check")
     get "/plugins/google_docs"
     
     driver.find_element(:css, "#settings_api_key").send_keys("asdf")
@@ -74,7 +74,7 @@ shared_examples_for "plugins selenium tests" do
     keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
-    GoogleDocs.stub(:config_check).and_return(nil)
+    GoogleDocs.stub(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
 
@@ -91,7 +91,7 @@ shared_examples_for "plugins selenium tests" do
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
     settings.should be_nil
     
-    LinkedIn.stub(:config_check).and_return("Bad check")
+    LinkedIn.stub(:config_check).returns("Bad check")
     get "/plugins/linked_in"
     
     driver.find_element(:css, "#settings_api_key").send_keys("asdf")
@@ -101,7 +101,7 @@ shared_examples_for "plugins selenium tests" do
     keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
-    LinkedIn.stub(:config_check).and_return(nil)
+    LinkedIn.stub(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
     
@@ -118,7 +118,7 @@ shared_examples_for "plugins selenium tests" do
     settings = Canvas::Plugin.find(:scribd).try(:settings)
     settings.should be_nil
     
-    ScribdAPI.stub(:config_check).and_return("Bad check")
+    ScribdAPI.stub(:config_check).returns("Bad check")
     get "/plugins/scribd"
     
     driver.find_element(:css, "#settings_api_key").send_keys("asdf")
@@ -130,7 +130,7 @@ shared_examples_for "plugins selenium tests" do
     }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
-    ScribdAPI.stub(:config_check).and_return(nil)
+    ScribdAPI.stub(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
     
@@ -147,7 +147,7 @@ shared_examples_for "plugins selenium tests" do
     settings = Canvas::Plugin.find(:tinychat).try(:settings)
     settings.should be_nil
     
-    Tinychat.stub(:config_check).and_return("Bad check")
+    Tinychat.stub(:config_check).returns("Bad check")
     get "/plugins/tinychat"
     
     driver.find_element(:css, "#settings_api_key").send_keys("asdf")
@@ -157,7 +157,7 @@ shared_examples_for "plugins selenium tests" do
     keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
-    Tinychat.stub(:config_check).and_return(nil)
+    Tinychat.stub(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
     
