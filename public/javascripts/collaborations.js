@@ -151,10 +151,10 @@ $(document).ready(function() {
     $(".collaboration_authorization").hide();
     $("#collaborate_authorize_" + type).showIf($description.hasClass('unauthorized'));
   }).change();
-  $(".collaborate_data").find(".select_all_link,.deselect_all_link").click(function(event) {
+  $(".select_all_link,.deselect_all_link").click(function(event) {
     event.preventDefault();
     var checked = $(this).hasClass('select_all_link');
-    $("#collaborator_list :checkbox").each(function() {
+    $(this).parents("form").find(":checkbox").each(function() {
       $(this).attr('checked', checked);
     });
   });

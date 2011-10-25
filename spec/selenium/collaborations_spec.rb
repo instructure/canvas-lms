@@ -16,6 +16,10 @@ describe "collaborations" do
     end
   end
 
+  def test_checkbox(css_context, user, checked)
+    driver.execute_script("return $('#{css_context} ul.collaborator_list input#user_#{user.id}').is(':checked');").should == checked
+  end
+
   [["EtherPad", "etherpad"], ["Google Docs", "google_docs"]].each do |collab_title, collab_type|
 
     context collab_title do
@@ -182,6 +186,100 @@ describe "collaborations" do
         driver.find_element(:css, "form.collaboration_#{@collaboration.id} div.footer").text.should =~ /Collaborate With/
         driver.execute_script("$('.add_collaboration_link').click();")
         driver.find_element(:css, "form#add_collaboration_form div.collaborator_list").text.should =~ /Collaborate With/
+      end
+
+      it "should show collaborator selection menus if there are any collaborators" do
+        PluginSetting.create!(:name => collab_type, :settings => {})
+        course_with_teacher_logged_in
+        student_in_course :course => @course, :name => "test student 1"
+        @collaboration = Collaboration.typed_collaboration_instance(collab_title)
+        @collaboration.context = @course
+        @collaboration.attributes = {:title => "My Collab"}
+        @collaboration.save!
+        get "/courses/#{@course.id}/collaborations/"
+        wait_for_ajaximations
+        driver.find_element(:css, "div.collaboration_#{@collaboration.id} a.edit_collaboration_link").click
+        wait_for_ajaximations
+        driver.find_element(:css, "form.collaboration_#{@collaboration.id} div.footer").text.should =~ /Collaborate With/
+        driver.execute_script("$('.add_collaboration_link').click();")
+        driver.find_element(:css, "form#add_collaboration_form div.collaborator_list").text.should =~ /Collaborate With/
+      end
+
+      it "should distinguish checkbox lists when someone clicks (de)select all" do
+        PluginSetting.create!(:name => collab_type, :settings => {})
+        course_with_teacher_logged_in
+        @students = [student_in_course(:course => @course, :name => "test student 1"),
+                     student_in_course(:course => @course, :name => "test student 2"),
+                     student_in_course(:course => @course, :name => "test student 3"),
+                     student_in_course(:course => @course, :name => "test student 4")]
+        @collaboration1 = Collaboration.typed_collaboration_instance(collab_title)
+        @collaboration1.context = @course
+        @collaboration1.attributes = {:title => "My Collab 1"}
+        @collaboration1.save!
+        @collaboration2 = Collaboration.typed_collaboration_instance(collab_title)
+        @collaboration2.context = @course
+        @collaboration2.attributes = {:title => "My Collab 2"}
+        @collaboration2.save!
+        @collaboration3 = Collaboration.typed_collaboration_instance(collab_title)
+        @collaboration3.context = @course
+        @collaboration3.attributes = {:title => "My Collab 3"}
+        @collaboration3.save!
+        get "/courses/#{@course.id}/collaborations/"
+        wait_for_ajaximations
+        driver.find_element(:css, "div.collaboration_#{@collaboration1.id} a.edit_collaboration_link").click
+        driver.find_element(:css, "div.collaboration_#{@collaboration2.id} a.edit_collaboration_link").click
+        driver.find_element(:css, "div.collaboration_#{@collaboration3.id} a.edit_collaboration_link").click
+        driver.execute_script("$('.add_collaboration_link').click();")
+        wait_for_ajaximations
+
+        forms = ["form#add_collaboration_form",
+                 "form.collaboration_#{@collaboration1.id}",
+                 "form.collaboration_#{@collaboration2.id}",
+                 "form.collaboration_#{@collaboration3.id}"]
+        @students.each do |student|
+          forms.each do |form|
+            test_checkbox form, student, false
+          end
+        end
+
+        forms.each do |form|
+          driver.find_element(:css, "#{form} a.select_all_link").click
+          @students.each do |student|
+            forms.each do |other_form|
+              test_checkbox other_form, student, form == other_form
+            end
+          end
+          driver.find_element(:css, "#{form} a.deselect_all_link").click
+          @students.each do |student|
+            forms.each do |other_form|
+              test_checkbox other_form, student, false
+            end
+          end
+        end
+
+        forms.each do |form|
+          driver.find_element(:css, "#{form} a.select_all_link").click
+        end
+        @students.each do |student|
+          forms.each do |form|
+            test_checkbox form, student, true
+          end
+        end
+
+        forms.each do |form|
+          driver.find_element(:css, "#{form} a.deselect_all_link").click
+          @students.each do |student|
+            forms.each do |other_form|
+              test_checkbox other_form, student, form != other_form
+            end
+          end
+          driver.find_element(:css, "#{form} a.select_all_link").click
+          @students.each do |student|
+            forms.each do |other_form|
+              test_checkbox other_form, student, true
+            end
+          end
+        end
       end
 
     end

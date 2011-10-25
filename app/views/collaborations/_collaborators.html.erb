@@ -5,7 +5,7 @@
     <a href="#" class="select_all_link"><%= t '#links.select_all', "Select All" %></a> |
     <a href="#" class="deselect_all_link"><%= t '#links.deselect_all', "Deselect All" %></a>
   </div>
-  <ul id="collaborator_list">
+  <ul class="collaborator_list">
     <% possible_collaborators.each do |user| %>
       <li class="collaborator collaborator_<%= user.id %>">
         <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
