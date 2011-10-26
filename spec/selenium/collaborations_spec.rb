@@ -149,6 +149,41 @@ describe "collaborations" do
         assert_wizard_visibility true
       end
 
+      it "should not show collaborator selection menus if there aren't any collaborators" do
+        PluginSetting.create!(:name => collab_type, :settings => {})
+        course_with_teacher_logged_in
+        @collaboration = Collaboration.typed_collaboration_instance(collab_title)
+        @collaboration.context = @course
+        @collaboration.attributes = {:title => "My Collab"}
+        @collaboration.save!
+        get "/courses/#{@course.id}/collaborations/"
+        wait_for_ajaximations
+        driver.find_element(:css, "div.collaboration_#{@collaboration.id} a.edit_collaboration_link").click
+        wait_for_ajaximations
+        driver.find_element(:css, "form.collaboration_#{@collaboration.id} div.footer").text.should_not =~ /Collaborate With/
+        driver.execute_script("$('.add_collaboration_link').click();")
+        driver.find_element(:css, "form#add_collaboration_form div.collaborator_list").text.should_not =~ /Collaborate With/
+      end
+
+      it "should show collaborator selection menus if there are any collaborators" do
+        PluginSetting.create!(:name => collab_type, :settings => {})
+        course_with_teacher_logged_in
+        student_in_course :course => @course
+        @student.name = "test student 1"
+        @student.save!
+        @collaboration = Collaboration.typed_collaboration_instance(collab_title)
+        @collaboration.context = @course
+        @collaboration.attributes = {:title => "My Collab"}
+        @collaboration.save!
+        get "/courses/#{@course.id}/collaborations/"
+        wait_for_ajaximations
+        driver.find_element(:css, "div.collaboration_#{@collaboration.id} a.edit_collaboration_link").click
+        wait_for_ajaximations
+        driver.find_element(:css, "form.collaboration_#{@collaboration.id} div.footer").text.should =~ /Collaborate With/
+        driver.execute_script("$('.add_collaboration_link').click();")
+        driver.find_element(:css, "form#add_collaboration_form div.collaborator_list").text.should =~ /Collaborate With/
+      end
+
     end
   end
 
