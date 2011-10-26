@@ -496,7 +496,7 @@ class CoursesController < ApplicationController
   
   def self_unenrollment
     get_context
-    unless @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid
+    unless @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid && @context_enrollment.self_enrolled?
       redirect_to course_url(@context)
       return
     end

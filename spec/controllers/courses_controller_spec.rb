@@ -459,4 +459,35 @@ describe CoursesController do
       @enrollment.user.pseudonyms.should be_empty
     end
   end
+
+  describe "GET 'self_unenrollment'" do
+    it "should unenroll" do
+      course_with_student_logged_in(:active_all => true)
+      @enrollment.update_attribute(:self_enrolled, true)
+
+      get 'self_unenrollment', :course_id => @course.id, :self_unenrollment => @enrollment.uuid
+      response.should redirect_to(course_url(@course))
+      @enrollment.reload
+      @enrollment.should be_completed
+    end
+
+    it "should not unenroll for incorrect code" do
+      course_with_student_logged_in(:active_all => true)
+      @enrollment.update_attribute(:self_enrolled, true)
+
+      get 'self_unenrollment', :course_id => @course.id, :self_unenrollment => 'abc'
+      response.should redirect_to(course_url(@course))
+      @enrollment.reload
+      @enrollment.should be_active
+    end
+
+    it "should not unenroll a non-self-enrollment" do
+      course_with_student_logged_in(:active_all => true)
+
+      get 'self_unenrollment', :course_id => @course.id, :self_unenrollment => @enrollment.uuid
+      response.should redirect_to(course_url(@course))
+      @enrollment.reload
+      @enrollment.should be_active
+    end
+  end
 end
