@@ -59,9 +59,9 @@
         })
         .bind('keyup', hideOrShowLabels);
       
-      // because crhome is lame and forces a yello background on things it autofills
+      // because webkit is lame and forces a yello background on things it autofills
       // see: http://code.google.com/p/chromium/issues/detail?id=1334
-      if (INST.browser.chrome) {
+      if (window.devicePixelRatio) { //this is to detect if it is a webkit browser
         $input.attr('autocomplete', 'off');
       }
       
