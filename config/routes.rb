@@ -479,7 +479,6 @@ ActionController::Routing::Routes.draw do |map|
   map.registered "registered", :controller => "users", :action => "registered"
   map.services 'services', :controller => 'users', :action => 'services'
   map.bookmark_search 'search/bookmarks', :controller => 'users', :action => 'bookmark_search'
-  map.image_search 'search/images', :controller => 'users', :action => 'image_search'
   map.search_rubrics 'search/rubrics', :controller => "search", :action => "rubrics"
   map.resources :users do |user|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'

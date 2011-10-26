@@ -448,13 +448,7 @@ class UsersController < ApplicationController
     res = @service.find_bookmarks(params[:q]) if @service
     render :json => res.to_json
   end
-  
-  def image_search
-    @service = ImageService.new(:service => "flickr")
-    res = @service.find_images(params[:q])
-    render :json => res.to_json
-  end
-  
+
   def show
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
