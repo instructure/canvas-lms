@@ -238,15 +238,49 @@ describe CommunicationChannelsController do
         post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1
         response.should be_redirect
         response.should redirect_to(course_url(@course))
-        # communication_channel is redefed to do a lookup
-        assigns[:pseudonym].communication_channel_id.should == @cc.id
         @user.reload
         @user.should be_registered
         @enrollment.reload
         @enrollment.should be_active
         @cc.reload
         @cc.should be_active
+        @user.pseudonyms.length.should == 1
+        @pseudonym = @user.pseudonyms.first
+        @pseudonym.should be_active
+        @pseudonym.unique_id.should == 'jt@instructure.com'
+        # communication_channel is redefed to do a lookup
+        @pseudonym.communication_channel_id.should == @cc.id
       end
+
+      it "should work for old creation_pending users that have a pseudonym" do
+        course(:active_all => 1)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_student(@user)
+        @user.should be_creation_pending
+        @enrollment.should be_invited
+        @pseudonym = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
+        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        response.should be_success
+        assigns[:pseudonym].should == @pseudonym
+
+        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1
+        response.should be_redirect
+        response.should redirect_to(course_url(@course))
+        @user.reload
+        @user.should be_registered
+        @enrollment.reload
+        @enrollment.should be_active
+        @cc.reload
+        @cc.should be_active
+        @user.pseudonyms.length.should == 1
+        @pseudonym.reload
+        @pseudonym.should be_active
+        # communication_channel is redefed to do a lookup
+        @pseudonym.communication_channel_id.should == @cc.id
+      end
+
 
       it "should force the user to provide a unique_id if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
