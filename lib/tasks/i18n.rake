@@ -285,7 +285,7 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
           if $?.exitstatus == 0
             if ret.include?(base_filename)
               `git checkout #{arg}`
-              if previous = YAML.load(File.read(arg)).flatten rescue nil
+              if previous = YAML.load(File.read(base_filename)).flatten rescue nil
                 last_export = {:type => :commit, :data => previous}
               else
                 $stderr.puts "Unable to load en.yml file"
@@ -318,7 +318,7 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
       current_branch = nil if current_branch.blank?
       
       puts "Extracting current en translations..."
-      `git checkout #{current_branch || 'master'}; git pull --rebase` if last_export[:type] == :commit || current_branch != prevgit[:branch]
+      `git checkout #{current_branch || 'master'}` if last_export[:type] == :commit || current_branch != prevgit[:branch]
       Rake::Task["i18n:generate"].invoke
 
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
