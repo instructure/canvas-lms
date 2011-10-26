@@ -73,8 +73,8 @@ class Course < ActiveRecord::Base
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted', 'inactive'], :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
-  has_many :students, :through => :student_enrollments, :source => :user, :order => :sortable_name
-  has_many :all_students, :through => :all_student_enrollments, :source => :user, :order => :sortable_name
+  has_many :students, :through => :student_enrollments, :source => :user, :order => User.sortable_name_order_by_clause
+  has_many :all_students, :through => :all_student_enrollments, :source => :user, :order => User.sortable_name_order_by_clause
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'StudentEnrollment' and enrollments.workflow_state = 'active'"
   has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user #, :conditions => "type = 'StudentEnrollment'"
   has_many :all_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
@@ -475,7 +475,7 @@ class Course < ActiveRecord::Base
                                                        FROM group_memberships gm
                                                       WHERE gm.user_id = u.id AND
                                                             gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-                            ORDER BY u.sortable_name ASC", self.id], :page => page, :per_page => per_page)
+                            ORDER BY #{User.sortable_name_order_by_clause('u')} ASC", self.id], :page => page, :per_page => per_page)
   end
   
   def admins_in_charge_of(user_id)
@@ -1082,7 +1082,7 @@ class Course < ActiveRecord::Base
     # actual grade publishing logic is here, but you probably want
     # 'publish_final_grades'
 
-    enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
+    enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
 
     begin
 
@@ -1150,7 +1150,7 @@ class Course < ActiveRecord::Base
       assignments = assignments.find(:all, :order => 'due_at, title')
     end
     single = assignments.length == 1
-    student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
+    student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
     submissions = self.submissions.inject({}) { |h, sub|
       h[[sub.user_id, sub.assignment_id]] = sub; h
     }

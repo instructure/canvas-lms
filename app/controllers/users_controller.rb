@@ -167,7 +167,7 @@ class UsersController < ApplicationController
       if @context && @context.is_a?(Account) && @query
         @users = @context.users_name_like(@query)
       elsif params[:enrollment_term_id].present? && @root_account == @context
-        @users = @context.fast_all_users.scoped(:joins => :courses, :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]], :group => 'users.id, users.name, users.sortable_name')
+        @users = @context.fast_all_users.scoped(:joins => :courses, :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]], :group => @context.connection.group_by('users.id', 'users.name', User.sortable_name_order_by_clause('users')))
       else
         @users = @context.fast_all_users
       end
@@ -561,7 +561,7 @@ class UsersController < ApplicationController
     if (!rename ? authorized_action(@user, @current_user, :manage) : authorized_action(@user, @current_user, :rename))
       if rename
         params[:default_pseudonym_id] = nil
-        managed_attributes = [:name, :short_name]
+        managed_attributes = [:name, :short_name, :sortable_name]
         managed_attributes << :time_zone if @user.grants_right?(@current_user, nil, :manage_user_details)
         params[:user] = params[:user].slice(*managed_attributes)
       end
@@ -899,7 +899,7 @@ class UsersController < ApplicationController
       end
     end
 
-    data.values.sort_by { |e| e[:enrollment].user.sortable_name }
+    data.values.sort_by { |e| e[:enrollment].user.sortable_name.downcase }
   end
 
 end

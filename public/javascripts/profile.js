@@ -77,6 +77,7 @@ $(function() {
         var templateData = {
           short_name: user.short_name,
           full_name: user.name,
+          sortable_name: user.sortable_name,
           time_zone: user.time_zone,
           locale: $("#user_locale option[value='" + user.locale + "']").text()
         };

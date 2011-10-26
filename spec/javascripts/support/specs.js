@@ -2,6 +2,7 @@ require([
   'specs/TemplateSpec',
   'specs/CustomListSpec',
   'specs/invokerSpec',
-  'specs/jQuery.instructureMiscPluginsSpec'
+  'specs/jQuery.instructureMiscPluginsSpec',
+  'specs/userNamePartsSpec'
 ]);
 

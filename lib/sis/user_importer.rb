@@ -104,10 +104,13 @@ module SIS
 
               user = pseudo.user
               user.name = "#{first_name} #{last_name}" unless user.stuck_sis_fields.include?(:name)
-
+              unless user.stuck_sis_fields.include?(:sortable_name)
+                user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
+              end
             else
               user = User.new
               user.name = "#{first_name} #{last_name}"
+              user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
             end
 
             # we just leave all users registered now

@@ -111,7 +111,7 @@ class SectionsController < ApplicationController
     @section = @context.course_sections.find(params[:id])
     if authorized_action(@section, @current_user, :read)
       add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
-      @enrollments = @section.enrollments.sort_by{|e| e.user.sortable_name }
+      @enrollments = @section.enrollments.sort_by{|e| e.user.sortable_name.downcase }
       @student_enrollments = @enrollments.select{|e| e.student? }
       @current_enrollments = @enrollments.select{|e| !e.completed? }
       @completed_enrollments = @enrollments.select{|e| e.completed? }

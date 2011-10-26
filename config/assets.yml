@@ -137,6 +137,8 @@ javascripts:
     - public/javascripts/compiled/jobs.js
   profile:
     - public/javascripts/profile.js
+    - public/javascripts/user_sortable_name.js
+    - public/javascripts/user_utils.js
   topics:
     - public/javascripts/topics.js
   topic:
@@ -284,6 +286,8 @@ javascripts:
     - public/javascripts/user_logins.js
   user_name:
     - public/javascripts/user_name.js
+    - public/javascripts/user_sortable_name.js
+    - public/javascripts/user_utils.js
   user:
     - public/javascripts/user.js
   manage_groups:
@@ -313,6 +317,9 @@ javascripts:
     - public/javascripts/vendor/jquery.cookie.js
   alerts:
     - public/javascripts/alerts.js
+  user_sortable_name:
+    - public/javascripts/user_sortable_name.js
+    - public/javascripts/user_utils.js
 <% base_js = _erbout; _erbout = saved %>
 
 <%=

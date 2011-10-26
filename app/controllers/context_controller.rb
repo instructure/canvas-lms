@@ -285,8 +285,8 @@ class ContextController < ApplicationController
       if @context.is_a?(Course)
         @enrollments_hash = {}
         @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
-        @students = @context.students_visible_to(@current_user).find(:all, :order => 'sortable_name').uniq
-        @teachers = @context.admins.find(:all, :order => 'sortable_name').uniq
+        @students = @context.students_visible_to(@current_user).find(:all, :order => User.sortable_name_order_by_clause).uniq
+        @teachers = @context.admins.find(:all, :order => User.sortable_name_order_by_clause).uniq
         user_ids = @students.map(&:id) + @teachers.map(&:id)
         if @context.visibility_limited_to_course_sections?(@current_user)
           user_ids = @students.map(&:id) + [@current_user.id]
@@ -294,10 +294,10 @@ class ContextController < ApplicationController
         @primary_users = {t('roster.students', 'Students') => @students}
         @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @teachers}
       elsif @context.is_a?(Group)
-        @users = @context.participating_users.find(:all, :order => 'sortable_name').uniq
+        @users = @context.participating_users.find(:all, :order => User.sortable_name_order_by_clause).uniq
         @primary_users = {t('roster.group_members', 'Group Members') => @users}
         if @context.context && @context.context.is_a?(Course)
-          @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
+          @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @context.context.admins.find(:all, :order => User.sortable_name_order_by_clause).uniq}
         end
       end
       @secondary_users ||= {}
@@ -308,7 +308,7 @@ class ContextController < ApplicationController
   def prior_users
     get_context
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
-      @prior_memberships = @context.enrollments.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name] }
+      @prior_memberships = @context.enrollments.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name.downcase] }
     end
   end
 

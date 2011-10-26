@@ -1,5 +1,6 @@
 <%
   jammit_css :login
+  jammit_js :user_sortable_name
   @headers = false
   @body_classes << "modal"
   content_for :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
@@ -63,7 +64,7 @@
         <tr>
           <td><%= blabel :user, :name, :en => "Full Name" %></td>
           <td>
-            <%= text_field :user, :name, :value => (@user.name == @user.email ? "" : @user.name) %>
+            <%= text_field :user, :name, :value => @user.name %>
             <div style="font-size: 0.8em;"><%= t 'tips.name', "Teachers will use this name for grading." %></div>
           </td>
         </tr><tr>
@@ -71,6 +72,12 @@
           <td>
             <%= text_field :user, :short_name, :value => params[:short_name] || (@user.short_name && !@user.short_name.blank? && @user.short_name) || @user.name %>
             <div style="font-size: 0.8em;"><%= t 'tips.short_name', "People will see this name in discussions, messages and comments." %></div>
+          </td>
+        </tr><tr>
+          <td><%= blabel :user, :sortable_name, :en => "Sortable Name" %></td>
+          <td>
+            <%= text_field :user, :sortable_name, :value => params[:sortable_name] || @user.sortable_name %>
+            <div style="font-size: 0.8em;"><%= t 'tips.sortable_name', "This name appears in sorted lists." %></div>
           </td>
         </tr><tr>
           <td><%= blabel :user, :time_zone, :en => "Time Zone" %></td>

@@ -72,7 +72,7 @@ describe CoursesController, :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'User',
-      'sortable_name' => 'user',
+      'sortable_name' => 'User',
       'short_name' => 'User',
       'primary_email' => nil,
       'login_id' => nil,
@@ -89,7 +89,7 @@ describe CoursesController, :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'User',
-      'sortable_name' => 'user',
+      'sortable_name' => 'User',
       'short_name' => 'User',
       'primary_email' => nil,
       'login_id' => nil,
@@ -110,7 +110,7 @@ describe CoursesController, :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'User',
-      'sortable_name' => 'user',
+      'sortable_name' => 'User',
       'short_name' => 'User',
       'primary_email' => nil,
       'login_id' => 'nobody_sis@example.com',

@@ -54,7 +54,7 @@ class GettingStartedController < ApplicationController
     @students = @context.detailed_enrollments.select{ |e|
       e.type == 'StudentEnrollment' && e.active?
     }.sort_by{ |e|
-      e.user.sortable_name rescue "a"
+      e.user.sortable_name.downcase
     }
     respond_to do |format|
       format.html

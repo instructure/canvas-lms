@@ -306,7 +306,7 @@ class Account < ActiveRecord::Base
                                                        FROM group_memberships gm
                                                       WHERE gm.user_id = u.id AND
                                                             gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-                            ORDER BY u.sortable_name ASC", self.id], :page => page, :per_page => per_page)
+                            ORDER BY #{User.sortable_name_order_by_clause('u')} ASC", self.id], :page => page, :per_page => per_page)
   end
 
   def courses_name_like(query="", opts={})

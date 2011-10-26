@@ -824,4 +824,57 @@ describe User do
     course_with_student
     @student.section_for_course(@course).should == @course.default_section
   end
+
+  describe "name_parts" do
+    it "should infer name parts" do
+      User.name_parts('Cody Cutrer').should == ['Cody', 'Cutrer', nil]
+      User.name_parts('  Cody  Cutrer   ').should == ['Cody', 'Cutrer', nil]
+      User.name_parts('Cutrer, Cody').should == ['Cody', 'Cutrer', nil]
+      User.name_parts('Cutrer, Cody Houston').should == ['Cody Houston', 'Cutrer', nil]
+      User.name_parts('St. Clair, John').should == ['John', 'St. Clair', nil]
+      # sorry, can't figure this out
+      User.name_parts('John St. Clair').should == ['John St.', 'Clair', nil]
+      User.name_parts('Jefferson Thomas Cutrer IV').should == ['Jefferson Thomas', 'Cutrer', 'IV']
+      User.name_parts('Jefferson Thomas Cutrer, IV').should == ['Jefferson Thomas', 'Cutrer', 'IV']
+      User.name_parts('Cutrer, Jefferson, IV').should == ['Jefferson', 'Cutrer', 'IV']
+      User.name_parts('Cutrer, Jefferson IV').should == ['Jefferson', 'Cutrer', 'IV']
+      User.name_parts(nil).should == [nil, nil, nil]
+      User.name_parts('Bob').should == ['Bob', nil, nil]
+      User.name_parts('Ho, Chi, Min').should == ['Chi Min', 'Ho', nil]
+      # sorry, don't understand cultures that put the surname first
+      # they should just manually specify their sort name
+      User.name_parts('Ho Chi Min').should == ['Ho Chi', 'Min', nil]
+      User.name_parts('').should == [nil, nil, nil]
+      User.name_parts('John Doe').should == ['John', 'Doe', nil]
+      User.name_parts('Junior').should == ['Junior', nil, nil]
+      User.name_parts('John St. Clair', 'St. Clair').should == ['John', 'St. Clair', nil]
+      User.name_parts('John St. Clair', 'Cutrer').should == ['John St.', 'Clair', nil]
+      User.name_parts('St. Clair', 'St. Clair').should == [nil, 'St. Clair', nil]
+      User.name_parts('St. Clair,').should == [nil, 'St. Clair', nil]
+    end
+
+    it "should keep the sortable_name up to date if all that changed is the name" do
+      u = User.new
+      u.name = 'Cody Cutrer'
+      u.save!
+      u.sortable_name.should == 'Cutrer, Cody'
+
+      u.name = 'Bracken Mosbacker'
+      u.save!
+      u.sortable_name.should == 'Mosbacker, Bracken'
+
+      u.name = 'John St. Clair'
+      u.sortable_name = 'St. Clair, John'
+      u.save!
+      u.sortable_name.should == 'St. Clair, John'
+
+      u.name = 'Matthew St. Clair'
+      u.save!
+      u.sortable_name.should == "St. Clair, Matthew"
+
+      u.name = 'St. Clair'
+      u.save!
+      u.sortable_name.should == "St. Clair,"
+    end
+  end
 end

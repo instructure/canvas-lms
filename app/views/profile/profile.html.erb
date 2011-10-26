@@ -36,6 +36,13 @@
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
     </td>
   </tr>
+  <tr>
+    <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
+    <td><span class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
+      <%= f.text_field :sortable_name, :class => "edit_data"  if editable_name %>
+      <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
+    </td>
+  </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
   <% if active_email_channels.length > 1 %>
     <tr>

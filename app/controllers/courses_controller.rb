@@ -342,8 +342,8 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
-      @students = @context.participating_students.find(:all, :order => 'sortable_name')
-      @teachers = @context.admins.find(:all, :order => 'sortable_name')
+      @students = @context.participating_students.find(:all, :order => User.sortable_name_order_by_clause)
+      @teachers = @context.admins.find(:all, :order => User.sortable_name_order_by_clause)
       @groups = @context.groups.active
     end
   end

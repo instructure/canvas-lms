@@ -17,9 +17,15 @@
 #
 
 class User < ActiveRecord::Base
+  # this has to be before include COntext to prevent a circular dependency in Course
+  def self.sortable_name_order_by_clause(table = nil)
+    col = table ? "#{table}.sortable_name" : 'sortable_name'
+    connection.adapter_name == 'PostgreSQL' ? "LOWER(#{col})" : col
+  end
+
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
+  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
   attr_accessor :original_id, :menu_data
   
   before_save :infer_defaults
@@ -109,9 +115,8 @@ class User < ActiveRecord::Base
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
 
-
   include StickySisFields
-  are_sis_sticky :name
+  are_sis_sticky :name, :sortable_name, :short_name
 
   def conversations
     all_conversations.visible # i.e. exclude any where the user has deleted all the messages
@@ -148,7 +153,7 @@ class User < ActiveRecord::Base
   
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
   
-  named_scope :order_by_sortable_name, :order => 'sortable_name ASC'
+  named_scope :order_by_sortable_name, :order => User.sortable_name_order_by_clause
   
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at| 
     ids_string = course_ids.join(",")
@@ -434,9 +439,10 @@ class User < ActiveRecord::Base
   def participants
     []
   end
-  
+
+  # compatibility only - this isn't really last_name_first
   def last_name_first
-    User.last_name_first(self.name)
+    self.sortable_name
   end
   
   def last_name_first_or_unnamed
@@ -444,32 +450,63 @@ class User < ActiveRecord::Base
     res = "No Name" if res.strip.empty?
     res
   end
-  
+
   def first_name
-    (self.name || "").split(/\s/)[0]
+    User.name_parts(self.sortable_name)[0] || ''
   end
-  
+
   def last_name
-    (self.name || "").split(/\s/)[1..-1].join(" ")
+    User.name_parts(self.sortable_name)[1] || ''
   end
-  
-  def self.last_name_first(name)
-    name_groups = []
-    if name
-      comma_separated = name.split(",")
-      comma_separated.each do |clump|
-        names = clump.split
-        if name.match(/\s/)
-          names = clump.split.map{|c| c.split(".").join(". ").split }.flatten
-        end
-        name = names.pop
-        name += ", " + names.join(" ") if !names.empty?
-        name_groups << name
-      end
+
+  # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
+  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
+
+  # see also user_sortable_name.js
+  def self.name_parts(name, prior_surname = nil)
+    return [nil, nil, nil] unless name
+    surname, given, suffix = name.strip.split(/\s*,\s*/, 3)
+
+    # Doe, John, Sr.
+    # Otherwise change Ho, Chi, Min to Ho, Chi Min
+    if suffix && !(suffix =~ SUFFIXES)
+      given = "#{given} #{suffix}"
+      suffix = nil
     end
-    name_groups.join ", "
+
+    if given
+      # John Doe, Sr.
+      if !suffix && given =~ SUFFIXES
+        suffix = given
+        given = surname
+        surname = nil
+      end
+    else
+      # John Doe
+      given = name.strip
+      surname = nil
+    end
+
+    given_parts = given.split
+    # John Doe Sr.
+    if !suffix && given_parts.length > 1 && given_parts.last =~ SUFFIXES
+      suffix = given_parts.pop
+    end
+    # Use prior information on the last name to try and reconstruct it
+    prior_surname_parts = nil
+    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..-1] == prior_surname_parts
+    # Last resort; last name is just the last word given
+    surname = given_parts.pop if !surname && given_parts.length > 1
+
+    [ given_parts.empty? ? nil : given_parts.join(' '), surname, suffix ]
   end
-  
+
+  def self.last_name_first(name, name_was = nil)
+    given, surname, suffix = name_parts(name, name_parts(name_was)[1])
+    given = [given, suffix].compact.join(' ')
+    surname ? "#{surname}, #{given}".strip : given
+  end
+
   def self.user_lookup_cache_key(id)
     ['_user_lookup2', id].cache_key
   end
@@ -485,7 +522,10 @@ class User < ActiveRecord::Base
     self.name ||= self.email || t(:default_user_name, "User")
     self.short_name = nil if self.short_name == ""
     self.short_name ||= self.name
-    self.sortable_name = self.last_name_first.downcase
+    self.sortable_name = nil if self.sortable_name == ""
+    # recalculate the sortable name if the name changed, but the sortable name didn't, and the sortable_name matches the old name
+    self.sortable_name = nil if !self.sortable_name_changed? && self.name_changed? && User.name_parts(self.sortable_name).compact.join(' ') == self.name_was
+    self.sortable_name = User.last_name_first(self.name, self.sortable_name_was) unless read_attribute(:sortable_name)
     self.reminder_time_for_due_dates ||= 48.hours.to_i
     self.reminder_time_for_grading ||= 0
     User.invalidate_cache(self.id) if self.id
@@ -494,7 +534,7 @@ class User < ActiveRecord::Base
   end
   
   def sortable_name
-    self.sortable_name = read_attribute(:sortable_name) || self.last_name_first.downcase
+    self.sortable_name = read_attribute(:sortable_name) || User.last_name_first(self.name)
   end
   
   def primary_pseudonym
