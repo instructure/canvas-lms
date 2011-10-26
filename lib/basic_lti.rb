@@ -59,8 +59,9 @@ module BasicLTI
     hash['user_id'] = user.opaque_identifier(:asset_string)
     hash['roles'] = user.lti_role_types(context).join(',') # AccountAdmin, Student, Faculty or Observer
     if tool.include_name?
-      hash['lis_person_name_given'] = user.first_name.present? ? user.first_name : nil
-      hash['lis_person_name_family'] = user.last_name.present? ? user.last_name : nil
+      last, other = user.last_name_first.split(/,/, 2)
+      hash['lis_person_name_given'] = other
+      hash['lis_person_name_family'] = last
       hash['lis_person_name_full'] = user.name
     end
     if tool.include_email?

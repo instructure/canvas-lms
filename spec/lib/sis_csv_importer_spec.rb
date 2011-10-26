@@ -975,18 +975,6 @@ describe SIS::CSV::Import do
       user.name.should eql("My Awesome Name")
     end
 
-    it "should preserve first name/last name split" do
-      process_csv_data_cleanly(
-        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
-        "user_1,user1,badpassword,John,St. Clair,user@example.com,active,"
-      )
-      user = Pseudonym.find_by_unique_id('user1').user
-      user.first_name.should == 'John'
-      user.last_name.should == 'St. Clair'
-      user.name.should == 'John St. Clair'
-      user.last_name_first.should == 'St. Clair, John'
-    end
-
     it "should set passwords and not overwrite current passwords" do
       process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",

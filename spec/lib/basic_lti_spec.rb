@@ -167,8 +167,8 @@ describe BasicLTI do
       @tool.include_name?.should eql(true)
       @tool.include_email?.should eql(false)
       hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.yahoo.com')
-      hash['lis_person_name_given'].should == 'User'
-      hash['lis_person_name_family'].should == nil
+      hash['lis_person_name_given'].should == nil
+      hash['lis_person_name_family'].should == 'User'
       hash['lis_person_name_full'].should == @user.name
       hash['lis_person_contact_email_primary'].should be_nil
     end
@@ -179,8 +179,8 @@ describe BasicLTI do
       @tool.include_name?.should eql(true)
       @tool.include_email?.should eql(true)
       hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.yahoo.com')
-      hash['lis_person_name_given'].should == 'User'
-      hash['lis_person_name_family'].should == nil
+      hash['lis_person_name_given'].should == nil
+      hash['lis_person_name_family'].should == 'User'
       hash['lis_person_name_full'].should == @user.name
       hash['lis_person_contact_email_primary'] = @user.email
     end

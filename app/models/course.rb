@@ -467,7 +467,7 @@ class Course < ActiveRecord::Base
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(["SELECT u.id, u.name, u.title, u.given_name, u.surname, u.suffix
+    User.paginate_by_sql(["SELECT u.id, u.name
                              FROM users u
                             INNER JOIN enrollments e ON e.user_id = u.id
                             WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'

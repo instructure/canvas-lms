@@ -298,7 +298,7 @@ class Account < ActiveRecord::Base
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(["SELECT u.id, u.name, u.title, u.given_name, u.surname, u.suffix
+    User.paginate_by_sql(["SELECT u.id, u.name 
                              FROM users u
                             INNER JOIN user_account_associations uaa on uaa.user_id = u.id
                             WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
