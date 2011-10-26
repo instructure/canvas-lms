@@ -636,7 +636,6 @@ class User < ActiveRecord::Base
   workflow do
     state :pre_registered do
       event :register, :transitions_to => :registered
-      event :merge, :transitions_to => :pending_merge
     end
     
     # Not listing this first so it is not the default.
@@ -650,23 +649,9 @@ class User < ActiveRecord::Base
       event :register, :transitions_to => :registered
     end
     
-    state :registered do
-      event :merge, :transitions_to => :pending_merge
-    end
-    
-    state :pending_merge do
-      event :complete_merge, :transitions_to => :merged
-    end
-    
+    state :registered
+
     state :deleted
-    
-    state :merged
-    state :processor
-    state :test_user
-  end
-  
-  def registered?
-    self.workflow_state == 'registered' || self.workflow_state == 'test_user'
   end
   
   def unavailable?
