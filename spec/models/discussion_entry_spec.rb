@@ -35,6 +35,21 @@ describe DiscussionEntry do
     sub_entry.save!
     sub_entry.parent_id.should eql(0)
   end
+
+  it "should be marked as deleted when parent is deleted" do
+    topic = course.discussion_topics.create!
+    entry = topic.discussion_entries.create!
+    
+    sub_entry = topic.discussion_entries.build
+    sub_entry.parent_id = entry.id
+    sub_entry.save!
+    
+    topic.discussion_entries.active.length.should == 2
+    entry.destroy
+    sub_entry.reload
+    sub_entry.should be_deleted
+    topic.discussion_entries.active.length.should == 0
+  end
   
   it "should only allow one level of nesting" do
     course
