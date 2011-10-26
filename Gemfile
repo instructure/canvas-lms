@@ -2,7 +2,10 @@ source :rubygems
 
 gem 'rails',          '2.3.14'
 gem 'authlogic',      '2.1.3'
-gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
+#gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
+# use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
+# is merged into mainline. gem built from https://github.com/lukfugl/aws-s3
+gem "aws-s3-instructure", "~> 0.6.2.1319643167",  :require => 'aws/s3'
 gem 'builder',        '2.1.2'
 gem 'closure-compiler','1.0.0'
 gem 'compass',        '0.11.5'

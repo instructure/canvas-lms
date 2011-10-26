@@ -557,6 +557,33 @@ describe Attachment do
       new_name.should match(%r{^/a/b/b[^.]+\.txt})
     end
   end
+
+  context "cacheable_s3_url" do
+    before(:each) do
+      course_model
+    end
+
+    it "should include response-content-disposition" do
+      attachment = attachment_with_context(@course, :display_name => 'foo')
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename=foo'))
+      attachment.cacheable_s3_url
+    end
+
+    it "should use the display_name, not filename, in the response-content-disposition" do
+      attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename=foo'))
+      attachment.cacheable_s3_url
+    end
+
+    it "should http quote the filename in the response-content-disposition if necessary" do
+      attachment = attachment_with_context(@course, :display_name => 'fo"o')
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename="fo\\"o"'))
+      attachment.cacheable_s3_url
+    end
+  end
 end
 
 def processing_model
