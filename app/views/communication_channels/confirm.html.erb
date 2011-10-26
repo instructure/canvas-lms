@@ -119,11 +119,12 @@
           <% query_params = { :enrollment => @enrollment.uuid } if @enrollment %>
           <li>
             <% if account_pseudonyms.length == 1 %>
-              <% pseudonyms = account_pseudonyms.first %>
+              <% account = account_pseudonyms.first.first %>
+              <% pseudonyms = account_pseudonyms.first.last %>
               <% sis_pseudonym = pseudonyms.detect { |p| p.sis_user_id } %>
               <% pseudonym = sis_pseudonym || pseudonyms.first %>
               <% display_name = sis_pseudonym ? "#{user.name} (#{sis_pseudonym.unique_id})" : user.name %>
-              <%= link_to display_name, login_url({ :host => HostUrl.context_host(accounts.first), :confirm => @communication_channel.confirmation_code, :unique_id => pseudonym.unique_id }.merge(query_params)) %>
+              <%= link_to display_name, login_url({ :host => HostUrl.context_host(account), :confirm => @communication_channel.confirmation_code, :unique_id => pseudonym.unique_id }.merge(query_params)) %>
             <% else %>
               <%= user.name %>
               <ul>

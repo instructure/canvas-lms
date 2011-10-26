@@ -12,7 +12,7 @@
     To continue the enrollment process, please provide us with your current
     email address.}, :course => content_tag('b', @context.name) %>
     <div style="margin-top: 20px;">
-      <% form_tag course_self_enrollment_path(@context, @context.self_enrollment_code), {:method => :get} do %>
+      <% form_tag course_self_enrollment_path(@context, @context.self_enrollment_code) do %>
         <label for="enrollment_email"><%= before_label('email', %{Email Address}) %></label>
         <input type="text" name="email" id="enrollment_email"/>
         <div class="button-container">

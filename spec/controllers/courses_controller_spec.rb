@@ -241,6 +241,20 @@ describe CoursesController do
         @enrollment.reload
         @enrollment.should be_invited
       end
+
+      it "should auto-redirect to registration page when it's a self-enrollment" do
+        course_with_student(:active_course => 1)
+        @user = User.new
+        @user.communication_channels.build(:path => "jt@instructure.com")
+        @user.workflow_state = 'creation_pending'
+        @user.save!
+        @enrollment = @course.enroll_student(@user)
+        @enrollment.update_attribute(:self_enrolled, true)
+        @enrollment.should be_invited
+
+        get 'show', :id => @course.id, :invitation => @enrollment.uuid
+        response.should redirect_to(registration_confirmation_url(@user.email_channel.confirmation_code, :enrollment => @enrollment.uuid))
+      end
     end
   end
   
@@ -367,11 +381,82 @@ describe CoursesController do
       @course.conclude_at.should be_nil
     end
   end
-  
-  # describe "GET 'public_feed'" do
-    # it "should return success" do
-      # course(:active_all => true)
-      # get 'public_feed', :feed_code => "
-    # end
-  # end
+
+  describe "GET 'self_enrollment'" do
+    before do
+      Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true)
+    end
+
+    it "should enroll the currently logged in user" do
+      course(:active_all => true)
+      @course.update_attribute(:self_enrollment, true)
+      user
+      user_session(@user)
+
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      response.should redirect_to(course_url(@course))
+      flash[:notice].should_not be_empty
+      @user.enrollments.length.should == 1
+      @enrollment = @user.enrollments.first
+      @enrollment.course.should == @course
+      @enrollment.workflow_state.should == 'active'
+      @enrollment.should be_self_enrolled
+    end
+
+    it "should not enroll for incorrect code" do
+      course(:active_all => true)
+      @course.update_attribute(:self_enrollment, true)
+      user
+      user_session(@user)
+
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => 'abc'
+      response.should redirect_to(course_url(@course))
+      @user.enrollments.length.should == 0
+    end
+
+    it "should not enroll if self_enrollment is disabled" do
+      course(:active_all => true)
+      user
+      user_session(@user)
+
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      response.should redirect_to(course_url(@course))
+      @user.enrollments.length.should == 0
+    end
+
+    it "should redirect to login without open registration" do
+      Account.default.update_attribute(:settings, :open_registration => false)
+      course(:active_all => true)
+      @course.update_attribute(:self_enrollment, true)
+
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      response.should redirect_to(login_url)
+    end
+
+    it "should render for non-logged-in user" do
+      course(:active_all => true)
+      @course.update_attribute(:self_enrollment, true)
+
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      response.should be_success
+      response.should render_template('open_enrollment')
+    end
+
+    it "should create a creation_pending user" do
+      course(:active_all => true)
+      @course.update_attribute(:self_enrollment, true)
+
+      post 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code, :email => 'bracken@instructure.com'
+      response.should be_success
+      response.should render_template('open_enrollment_confirmed')
+      @course.student_enrollments.length.should == 1
+      @enrollment = @course.student_enrollments.first
+      @enrollment.should be_self_enrolled
+      @enrollment.should be_invited
+      @enrollment.user.should be_creation_pending
+      @enrollment.user.email_channel.path.should == 'bracken@instructure.com'
+      @enrollment.user.email_channel.should be_unconfirmed
+      @enrollment.user.pseudonyms.should be_empty
+    end
+  end
 end

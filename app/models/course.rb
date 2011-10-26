@@ -1232,16 +1232,23 @@ class Course < ActiveRecord::Base
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     enrollment_state = 'invited' if enrollment_state == 'creation_pending' && (type == 'TeacherEnrollment' || type == 'TaEnrollment')
     e = self.enrollments.find_by_user_id_and_type(user.id, type) if user
-    e.update_attributes(:workflow_state => 'invited', :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section) if e && (e.completed? || e.rejected?)
-    e ||= self.send(type.underscore.pluralize).create(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section)
+    e.attributes = { :workflow_state => 'invited', :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section } if e && (e.completed? || e.rejected?)
+    e ||= self.send(type.underscore.pluralize).build(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section)
+    if e.changed?
+      if opts[:no_notify]
+        e.save_without_broadcasting
+      else
+        e.save
+      end
+    end
     e.user = user
     self.claim if self.created? && e && e.admin?
     user.try(:touch) unless opts[:skip_touch_user]
     e
  end
   
-  def enroll_student(user)
-    enroll_user(user, 'StudentEnrollment')
+  def enroll_student(user, opts={})
+    enroll_user(user, 'StudentEnrollment', opts)
   end
   
   def enroll_ta(user)

@@ -433,6 +433,10 @@ class CoursesController < ApplicationController
         enrollment.workflow_state = 'invited'
         enrollment.save_without_broadcasting
       end
+      if enrollment.self_enrolled?
+        redirect_to registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid)
+        return true
+      end
       e = enrollment
       session[:enrollment_uuid] = e.uuid
       session[:session_affects_permissions] = true
@@ -503,35 +507,37 @@ class CoursesController < ApplicationController
   def self_enrollment
     get_context
     unless @context.self_enrollment && params[:self_enrollment] && params[:self_enrollment] == @context.self_enrollment_code
-      redirect_to course_url(@context)
-      return
+      return redirect_to course_url(@context)
     end
-    if params[:email] || @current_user
-      params[:email] ||= @current_user.email
-      @user = User.find_by_email(params[:email])
-      if @user && @user.registered?
-        store_location
-        flash[:notice] = t('notices.user_exists', "That user already exists.  Please log in before accepting the enrollment.")
-        redirect_to login_url
-        return
-      end
-      email = (@current_user && @current_user.email) || params[:email]
-      @user = @current_user
-      @enrollments = EnrollmentsFromUserList.process(UserList.new(params[:email], @context.root_account), @context, :enrollment_type => 'StudentEnrollment', :limit => 1)
-      if @enrollments.length == 0
-        flash[:error] = t('errors.invalid_user', "Invalid user, please try again")
-        render :action => 'open_enrollment'
-        return
-      else
-        @enrollment = @enrollments.first
-      end
+    unless @current_user || @context.root_account.open_registration?
+      store_location
+      flash[:notice] = t('notices.login_required', "Please log in to join this course.")
+      return redirect_to login_url
+    end
+    if @current_user
+      @enrollment = @context.enroll_student(@current_user, :no_notify => true)
       @enrollment.self_enrolled = true
       @enrollment.accept
-      render :action => 'open_enrollment_confirmed'
-      # redirect_to course_url(@context, :invitation => @enrollment.uuid)
-    else
-      render :action => 'open_enrollment'
+      flash[:notice] = t('notices.enrolled', "You are now enrolled in this course.")
+      return redirect_to course_url(@context)
     end
+    if params[:email]
+      begin
+        address = TMail::Address::parse(params[:email])
+      rescue
+        flash[:error] = t('errors.invalid_email', "Invalid e-mail address, please try again.")
+        render :action => 'open_enrollment'
+        return
+      end
+      user = User.new(:name => address.name || address.address)
+      user.communication_channels.build(:path => address.address)
+      user.workflow_state = 'creation_pending'
+      user.save!
+      @enrollment = @context.enroll_student(user)
+      @enrollment.update_attribute(:self_enrolled, true)
+      return render :action => 'open_enrollment_confirmed'
+    end
+    render :action => 'open_enrollment'
   end
   
   def check_pending_teacher
