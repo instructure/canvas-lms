@@ -1,6 +1,6 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  define(['js!vendor/jquery-1.6.4.js!order', 'js!jquery.ajaxJSON.js!order', 'js!i18n.js!order', 'js!vendor/handlebars.vm.js!order', 'js!compiled/handlebars_helpers.js!order', 'js!compiled/Template.js!order', 'js!jst/courseList/wrapper.js!order', 'js!jst/courseList/content.js!order', 'js!compiled/util/objectCollection.js!order', 'js!compiled/widget/CustomList.js!order'], function() {
+  define(['js!vendor/jquery-1.6.4.js', 'js!jquery.ajaxJSON.js!order', 'js!i18n.js!order', 'js!vendor/handlebars.vm.js!order', 'js!compiled/handlebars_helpers.js!order', 'js!jst/courseList/wrapper.js!order', 'js!jst/courseList/content.js!order', 'compiled/widget/CustomList'], function(a, b, c, d, e, f, g, CustomList) {
     module('CustomList', {
       setup: function() {
         var index, items;
