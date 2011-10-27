@@ -283,29 +283,21 @@ describe UsersController, :type => :integration do
   end
 
   it "should format WebConference" do
-    WebConference.instance_eval do
-      def plugins
+    WebConference.stubs(:plugins).returns(
         [OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true, :enabled? => true),]
-      end
-    end
-    begin
-      @conference = BigBlueButtonConference.create!(:title => 'myconf', :user => @user, :description => 'mydesc', :conference_type => 'big_blue_button')
-      json = api_call(:get, "/api/v1/users/activity_stream.json",
-                      { :controller => "users", :action => "activity_stream", :format => 'json' })
-      json.should == [{
-        'id' => StreamItem.last.id,
-        'web_conference_id' => @conference.id,
-        'title' => "myconf",
-        'type' => 'WebConference',
-        'message' => 'mydesc',
-        'created_at' => StreamItem.last.created_at.as_json,
-        'updated_at' => StreamItem.last.updated_at.as_json,
-      }]
-    ensure
-      WebConference.instance_eval do
-        def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
-      end
-    end
+    )
+    @conference = BigBlueButtonConference.create!(:title => 'myconf', :user => @user, :description => 'mydesc', :conference_type => 'big_blue_button')
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == [{
+      'id' => StreamItem.last.id,
+      'web_conference_id' => @conference.id,
+      'title' => "myconf",
+      'type' => 'WebConference',
+      'message' => 'mydesc',
+      'created_at' => StreamItem.last.created_at.as_json,
+      'updated_at' => StreamItem.last.updated_at.as_json,
+    }]
   end
 
   it "should return the course-specific activity stream" do
