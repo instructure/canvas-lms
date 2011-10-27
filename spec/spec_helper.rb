@@ -81,25 +81,25 @@ Spec::Runner.configure do |config|
   end
 
   def account_with_cas(opts={})
-    account = opts[:account]
-    account ||= Account.create!
+    @account = opts[:account]
+    @account ||= Account.create!
     config = AccountAuthorizationConfig.new
     cas_url = opts[:cas_url] || "https://localhost/cas"
     config.auth_type = "cas"
     config.auth_base = cas_url
     config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
-    account.account_authorization_configs << config
-    account
+    @account.account_authorization_configs << config
+    @account
   end
 
   def account_with_saml(opts={})
-    account = opts[:account]
-    account ||= Account.create!
+    @account = opts[:account]
+    @account ||= Account.create!
     config = AccountAuthorizationConfig.new
     config.auth_type = "saml"
     config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
-    account.account_authorization_configs << config
-    account
+    @account.account_authorization_configs << config
+    @account
   end
 
   def course(opts={})

@@ -241,11 +241,11 @@ module AuthenticationMethods
     reset_session_for_login
     if @domain_root_account.account_authorization_config.log_in_url.present?
       session[:exit_frame] = true
-      redirect_to(@domain_root_account.account_authorization_config.log_in_url)
+      delegated_auth_redirect(@domain_root_account.account_authorization_config.log_in_url)
     else
       config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
       cas_client ||= CASClient::Client.new(config)
-      redirect_to(cas_client.add_service_to_login_url(login_url))
+      delegated_auth_redirect(cas_client.add_service_to_login_url(login_url))
     end
   end
 
@@ -253,6 +253,10 @@ module AuthenticationMethods
     reset_session_for_login
     settings = @domain_root_account.account_authorization_config.saml_settings(preferred_account_domain)
     request = Onelogin::Saml::AuthRequest.create(settings)
-    redirect_to(request)
+    delegated_auth_redirect(request)
+  end
+
+  def delegated_auth_redirect(uri)
+    redirect_to(uri)
   end
 end
