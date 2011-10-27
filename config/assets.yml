@@ -95,7 +95,7 @@ javascripts:
     - public/javascripts/jst/courseList/content.js
     - public/javascripts/compiled/widget/CustomList.js
     - public/javascripts/compiled/widget/courseList.js
-
+    - public/javascripts/compiled/main.js
   assignmentMuter:
     - public/javascripts/compiled/AssignmentMuter.js
     - public/javascripts/jst/mute_dialog.js

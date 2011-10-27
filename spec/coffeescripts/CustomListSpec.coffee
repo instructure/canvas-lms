@@ -1,18 +1,17 @@
 define [
-  'js!vendor/jquery-1.6.4.js!order'
+  # non-amd dependencies, once everything is a module you'll rarely require
+  # more than one thing in a spec
+  'js!vendor/jquery-1.6.4.js'
   'js!jquery.ajaxJSON.js!order'
-
   'js!i18n.js!order'
   'js!vendor/handlebars.vm.js!order'
   'js!compiled/handlebars_helpers.js!order'
-  'js!compiled/Template.js!order'
   'js!jst/courseList/wrapper.js!order'
   'js!jst/courseList/content.js!order'
 
-  'js!compiled/util/objectCollection.js!order'
-  'js!compiled/widget/CustomList.js!order'
-], ->
-
+  # module dependencies
+  'compiled/widget/CustomList'
+], (a, b, c, d, e, f, g, CustomList)->
 
   module 'CustomList',
     setup: ->

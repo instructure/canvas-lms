@@ -1,4 +1,4 @@
 curl = require = {
-  baseUrl: '/public/javascripts/compiled',
+  baseUrl: '/public/javascripts',
   apiName: 'require'
 };

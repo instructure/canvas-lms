@@ -3,6 +3,7 @@ require([
   'specs/CustomListSpec',
   'specs/invokerSpec',
   'specs/jQuery.instructureMiscPluginsSpec',
-  'specs/userNamePartsSpec'
+  'specs/userNamePartsSpec',
+  'specs/objectCollectionSpec'
 ]);
 
