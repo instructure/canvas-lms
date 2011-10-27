@@ -72,8 +72,9 @@ class PseudonymSessionsController < ApplicationController
             return
           else
             logger.warn "Received CAS login for unknown user: #{st.response.user}"
+            reset_session
             session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.response.user
-            redirect_to :action => :destroy
+            redirect_to(cas_client.logout_url(login_url :no_auto => true))
             return
           end
         else
@@ -88,6 +89,7 @@ class PseudonymSessionsController < ApplicationController
     elsif @is_saml && !params[:no_auto]
       initiate_saml_login(request.env['canvas.account_domain'])
     end
+    flash[:delegated_message] = session.delete :delegated_message
   end
 
   def create
