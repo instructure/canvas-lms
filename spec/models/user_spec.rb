@@ -881,4 +881,39 @@ describe User do
       u.sortable_name.should == "St. Clair,"
     end
   end
+
+  context "group_member_json" do
+    before :each do
+      @account = Account.default
+      @enrollment = course_with_student(:active_all => true)
+      @section = @enrollment.course_section
+      @student.sortable_name = 'Doe, John'
+      @student.short_name = 'Johnny'
+      @student.save
+    end
+
+    it "should include user_id, name, and display_name" do
+      @student.group_member_json(@account).should == {
+        :user_id => @student.id,
+        :name => 'Doe, John',
+        :display_name => 'Johnny'
+      }
+    end
+
+    it "should include course section (section_id and section_code) if appropriate" do
+      @student.group_member_json(@account).should == {
+        :user_id => @student.id,
+        :name => 'Doe, John',
+        :display_name => 'Johnny'
+      }
+
+      @student.group_member_json(@course).should == {
+        :user_id => @student.id,
+        :name => 'Doe, John',
+        :display_name => 'Johnny',
+        :section_id => @section.id,
+        :section_code => @section.section_code
+      }
+    end
+  end
 end

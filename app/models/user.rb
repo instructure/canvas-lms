@@ -2099,4 +2099,12 @@ class User < ActiveRecord::Base
     enrollment = course.student_enrollments.active.for_user(self).first
     enrollment && enrollment.course_section
   end
+
+  def group_member_json(context)
+    h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
+    if context && context.is_a?(Course) && (section = self.section_for_course(context))
+      h = h.merge(:section_id => section.id, :section_code => section.section_code)
+    end
+    h
+  end
 end

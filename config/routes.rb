@@ -256,6 +256,7 @@ ActionController::Routing::Routes.draw do |map|
     course.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
     course.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
     course.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
+    course.group_assign_unassigned_members 'group_assign_unassigned_members', :controller => 'groups', :action => 'assign_unassigned_members', :conditions => { :method => :post }
     course.user_notes 'user_notes', :controller => 'user_notes', :action => 'user_notes'
     course.switch_role 'switch_role/:role', :controller => 'courses', :action => 'switch_role'
     course.sis_publish_status 'details/sis_publish', :controller => 'courses', :action => 'sis_publish_status', :conditions => {:method => :get}

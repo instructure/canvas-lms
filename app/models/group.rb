@@ -318,13 +318,7 @@ class Group < ActiveRecord::Base
 
   def members_json_cached
     Rails.cache.fetch(['group_members_json', self].cache_key) do
-      self.users.map do |u|
-        h = { :user_id => u.id, :name => u.last_name_first, :display_name => u.short_name }
-        if self.context && self.context.is_a?(Course) && (section = u.section_for_course(self.context))
-          h = h.merge(:section_id => section.id, :section_code => section.section_code)
-        end
-        h
-      end
+      self.users.map{ |u| u.group_member_json(self.context) }
     end
   end
 

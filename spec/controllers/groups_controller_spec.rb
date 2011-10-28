@@ -188,6 +188,14 @@ describe GroupsController do
       assigns[:group_category].should_not be_nil
       assigns[:group_category].should be_restricted_self_signup
     end
+
+    it "should work when the context is an account and not enable_self_signup and split_groups" do
+      user = account_admin_user
+      user_session(user)
+      post 'create_category', :account_id => Account.default, :category => {:name => "Study Groups", :split_group_count => 1, :split_groups => '1'}
+      response.should be_success
+      assigns[:group_category].should_not be_nil
+    end
   end
   
   describe "PUT update_category" do
@@ -574,6 +582,135 @@ describe GroupsController do
       user_session(u2)
       get 'context_group_members', :group_id => group.id
       response.should_not be_success
+    end
+  end
+
+  context "POST 'assign_unassigned_members'" do
+    it "should require :manage_groups permission" do
+      course_with_teacher(:active_all => true)
+      student = @course.enroll_student(user_model).user
+      category = @course.group_categories.create(:name => "Group Category")
+
+      user_session(student)
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.status.should == '401 Unauthorized'
+    end
+
+    it "should require valid group :category_id" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id + 1
+      response.status.should == '404 Not Found'
+    end
+
+    it "should fail for student organized groups" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = GroupCategory.student_organized_for(@course)
+
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.status.should == '400 Bad Request'
+    end
+
+    it "should fail for restricted self signup groups" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.build(:name => "Group Category")
+      category.configure_self_signup(true, true)
+      category.save
+
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.status.should == '400 Bad Request'
+
+      category.configure_self_signup(true, false)
+      category.save
+
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.should be_success
+    end
+
+    it "should not assign users to inactive groups" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      group2.add_user(student1)
+      group1.destroy
+
+      # group1 now has fewer students, and would be favored if it weren't
+      # destroyed. make sure the unassigned student (student2) is assigned to
+      # group2 instead of group1
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.should be_success
+      data = JSON.parse(response.body) rescue nil
+      data.size.should == 1
+      data.first['id'].should == group2.id
+    end
+
+    it "should not assign users already in group in the category" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      group2.add_user(student1)
+
+      # student1 shouldn't get assigned, already being in a group
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.should be_success
+      data = JSON.parse(response.body) rescue nil
+      data.map{ |g| g['new_members'] }.flatten.map{ |u| u['user_id'] }.should_not be_include(student1.id)
+    end
+
+    it "should otherwise assign ungrouped users to groups in the category" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      group2.add_user(student1)
+
+      # student2 should get assigned, not being in a group
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.should be_success
+      data = JSON.parse(response.body) rescue nil
+      data.map{ |g| g['new_members'] }.flatten.map{ |u| u['user_id'] }.should be_include(student2.id)
+    end
+
+    it "should prefer groups with fewer users" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      student3 = @course.enroll_student(user_model).user
+      student4 = @course.enroll_student(user_model).user
+      student5 = @course.enroll_student(user_model).user
+      student6 = @course.enroll_student(user_model).user
+      group1.add_user(student1)
+      group1.add_user(student2)
+
+      # group2 should get three unassigned students while group1 gets one, to
+      # bring them both to three
+      post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
+      response.should be_success
+      data = JSON.parse(response.body) rescue nil
+      data.size.should == 2
+      data.map{ |g| g['id'] }.sort.should == [group1.id, group2.id].sort
+
+      student_ids = [student3.id, student4.id, student5.id, student6.id]
+
+      group1_assignments = data.find{ |g| g['id'] == group1.id }['new_members']
+      group1_assignments.size.should == 1
+      student_ids.delete(group1_assignments.first['user_id']).should_not be_nil
+
+      group2_assignments = data.find{ |g| g['id'] == group2.id }['new_members']
+      group2_assignments.size.should == 3
+      group2_assignments.map{ |u| u['user_id'] }.sort.should == student_ids.sort
     end
   end
 end

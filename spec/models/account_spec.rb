@@ -506,4 +506,43 @@ describe Account do
     config.save
     account.reload.login_handle_name.should == "LDAP Login"
   end
+
+  context "users_not_in_groups" do
+    before :each do
+      @account = Account.default
+      @user1 = account_admin_user(:account => @account)
+      @user2 = account_admin_user(:account => @account)
+      @user3 = account_admin_user(:account => @account)
+    end
+
+    it "should not include deleted users" do
+      @user1.destroy
+      @account.users_not_in_groups([]).size.should == 2
+    end
+
+    it "should not include users in one of the groups" do
+      group = @account.groups.create
+      group.add_user(@user1)
+      users = @account.users_not_in_groups([group])
+      users.size.should == 2
+      users.should_not be_include(@user1)
+    end
+
+    it "should include users otherwise" do
+      group = @account.groups.create
+      group.add_user(@user1)
+      users = @account.users_not_in_groups([group])
+      users.should be_include(@user2)
+      users.should be_include(@user3)
+    end
+  end
+
+  it "should order results of paginate_users_not_in_groups by user's sortable name" do
+    @account = Account.default
+    @user1 = account_admin_user(:account => @account); @user1.sortable_name = 'jonny'; @user1.save
+    @user2 = account_admin_user(:account => @account); @user2.sortable_name = 'bob'; @user2.save
+    @user3 = account_admin_user(:account => @account); @user3.sortable_name = 'richard'; @user3.save
+    users = @account.paginate_users_not_in_groups([], 1)
+    users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+  end
 end

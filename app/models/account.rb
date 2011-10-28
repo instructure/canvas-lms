@@ -296,17 +296,26 @@ class Account < ActiveRecord::Base
     @cached_fast_all_users ||= {}
     @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, users.name")
   end
+
+  def users_not_in_groups_sql(groups, opts={})
+    ["SELECT u.id, u.name
+        FROM users u
+       INNER JOIN user_account_associations uaa on uaa.user_id = u.id
+       WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
+             #{"AND NOT EXISTS (SELECT *
+                                  FROM group_memberships gm
+                                 WHERE gm.user_id = u.id AND
+                                       gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
+       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
+  end
+
+  def users_not_in_groups(groups)
+    User.find_by_sql(users_not_in_groups_sql(groups))
+  end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(["SELECT u.id, u.name 
-                             FROM users u
-                            INNER JOIN user_account_associations uaa on uaa.user_id = u.id
-                            WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
-                                  #{"AND NOT EXISTS (SELECT *
-                                                       FROM group_memberships gm
-                                                      WHERE gm.user_id = u.id AND
-                                                            gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-                            ORDER BY #{User.sortable_name_order_by_clause('u')} ASC", self.id], :page => page, :per_page => per_page)
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')} ASC"),
+                         :page => page, :per_page => per_page)
   end
 
   def courses_name_like(query="", opts={})

@@ -162,6 +162,51 @@ describe Course do
     course.reload
     course.all_group_categories.count.should == 2
   end
+
+  context "users_not_in_groups" do
+    before :each do
+      @course = course(:active_all => true)
+      @user1 = user_model
+      @user2 = user_model
+      @user3 = user_model
+      @enrollment1 = @course.enroll_user(@user1)
+      @enrollment2 = @course.enroll_user(@user2)
+      @enrollment3 = @course.enroll_user(@user3)
+    end
+
+    it "should not include users through deleted/rejected/completed enrollments" do
+      @enrollment1.destroy
+      @course.users_not_in_groups([]).size.should == 2
+    end
+
+    it "should not include users in one of the groups" do
+      group = @course.groups.create
+      group.add_user(@user1)
+      users = @course.users_not_in_groups([group])
+      users.size.should == 2
+      users.should_not be_include(@user1)
+    end
+
+    it "should include users otherwise" do
+      group = @course.groups.create
+      group.add_user(@user1)
+      users = @course.users_not_in_groups([group])
+      users.should be_include(@user2)
+      users.should be_include(@user3)
+    end
+  end
+
+  it "should order results of paginate_users_not_in_groups by user's sortable name" do
+    @course = course(:active_all => true)
+    @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save
+    @user2 = user_model; @user2.sortable_name = 'bob'; @user2.save
+    @user3 = user_model; @user3.sortable_name = 'richard'; @user3.save
+    @course.enroll_user(@user1)
+    @course.enroll_user(@user2)
+    @course.enroll_user(@user3)
+    users = @course.paginate_users_not_in_groups([], 1)
+    users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+  end
 end
 
 describe Course, "enroll" do
