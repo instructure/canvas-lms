@@ -26,9 +26,7 @@ describe "collaborations" do
 
       before(:each) do
         if collab_type == "google_docs"
-          controller = CollaborationsController.new
-          def controller.google_docs_verify_access_token; true; end
-          CollaborationsController.stub!(:new).and_return(controller)
+          CollaborationsController.any_instance.stubs(:google_docs_verify_access_token).returns(true)
         end
       end
 

@@ -196,11 +196,10 @@ shared_examples_for "all selenium tests" do
     if real_login
       login_as(pseudonym.unique_id, pseudonym.password)
     else
-      @pseudonym_session = mock(PseudonymSession)
-      @pseudonym_session.stubs(:session_credentials).returns([])
-      @pseudonym_session.stubs(:record).returns { pseudonym.reload }
-      @pseudonym_session.stubs(:used_basic_auth?).returns { false }
-      PseudonymSession.stubs(:find).returns(@pseudonym_session)
+      PseudonymSession.any_instance.stubs(:session_credentials).returns([])
+      PseudonymSession.any_instance.stubs(:record).returns(pseudonym.reload)
+      PseudonymSession.any_instance.stubs(:used_basic_auth?).returns(false)
+      # PseudonymSession.stubs(:find).returns(@pseudonym_session)
     end
   end
 
@@ -378,7 +377,7 @@ shared_examples_for "all selenium tests" do
           'kcw_ui_conf' => '1',
           'upload_ui_conf' => '1'
     })
-    kal = mock(Kaltura::ClientV3)
+    kal = mock('Kaltura::ClientV3')
     kal.stubs(:startSession).returns "new_session_id_here"
     Kaltura::ClientV3.stubs(:new).returns(kal)
   end
