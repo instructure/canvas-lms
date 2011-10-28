@@ -604,6 +604,82 @@ describe SIS::CSV::UserImporter do
     Pseudonym.find_by_unique_id('user5').should be_nil
   end
 
+  it 'should leave users around always' do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,deleted"
+    )
+    user1 = @account.pseudonyms.find_by_sis_user_id('user_1')
+    user2 = @account.pseudonyms.find_by_sis_user_id('user_2')
+    user1.workflow_state.should == 'active'
+    user2.workflow_state.should == 'deleted'
+    user1.user.workflow_state.should == 'registered'
+    user2.user.workflow_state.should == 'registered'
+  end
+
+  it 'should remove enrollments when a user is deleted' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active",
+      "test_2,TC 102,Test Course 102,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status,start_date,end_date",
+      "S001,test_1,Sec1,active,,",
+      "S002,test_2,Sec1,active,,"
+    )
+    # the enrollments
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,teacher,,active,,,",
+      ",user_1,student,S002,active,,,"
+    )
+    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted"
+    )
+    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_false
+    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_false
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_false
+    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_false
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,teacher,,active,,,",
+      ",user_1,student,S002,active,,,"
+    )
+    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_true
+    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_true
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted"
+    )
+    @account.courses.find_by_sis_source_id("test_1").teachers.map(&:name).include?("User Uno").should be_false
+    @account.courses.find_by_sis_source_id("test_2").students.map(&:name).include?("User Uno").should be_false
+  end
+
   context 'account associations' do
     before(:each) do
       process_csv_data_cleanly(
@@ -615,7 +691,7 @@ describe SIS::CSV::UserImporter do
       )
     end
 
-    it "should work" do
+    it "should work with users created as both active and deleted" do
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user1@example.com,active",
@@ -632,6 +708,111 @@ describe SIS::CSV::UserImporter do
       )
       user1.reload
       user1.user.user_account_associations.should be_empty
+    end
+
+    it 'should work when a user gets undeleted' do
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+      )
+      user = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
+
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,deleted"
+      )
+      user = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user.user.user_account_associations.should be_empty
+
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+      )
+      user = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
+    end
+
+    it 'should delete user enrollments for the current account when deleted, and update appropriate account associations' do
+      @account1 = @account
+      @account2 = account_model
+      @account = @account1
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active")
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount1,active",
+        "A002,A001,TestAccount1A,active")
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "C001,TC 101,Test Course 1,A002,,active,,")
+      process_csv_data_cleanly(
+        "section_id,course_id,name,status,start_date,end_date",
+        "S001,C001,Test Course 1,active,,")
+      @account.pseudonyms.find_by_sis_user_id('user_1').user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
+      process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "C001,user_1,teacher,,active,,,"
+      )
+      @pseudo1 = @account.pseudonyms.find_by_sis_user_id('user_1')
+      @pseudo1.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.find_by_sis_source_id('A002').id, Account.find_by_sis_source_id('A001').id].sort
+
+      @account = @account2
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active")
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A101,,TestAccount1,active",
+        "A102,A101,TestAccount1A,active")
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "C001,TC 101,Test Course 1,A102,,active,,")
+      process_csv_data_cleanly(
+        "section_id,course_id,name,status,start_date,end_date",
+        "S001,C001,Test Course 1,active,,")
+      @account.pseudonyms.find_by_sis_user_id('user_1').user.user_account_associations.map { |uaa| uaa.account_id }.should == [@account.id]
+      process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "C001,user_1,teacher,,active,,,"
+      )
+      @pseudo2 = @account.pseudonyms.find_by_sis_user_id('user_1')
+      @pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+
+      @pseudo1.user.move_to_user @pseudo2.user
+      @user = @account1.pseudonyms.find_by_sis_user_id('user_1').user
+      @account2.pseudonyms.find_by_sis_user_id('user_1').user.should == @user
+
+      @user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account1.id, @account2.id, Account.find_by_sis_source_id('A002').id, Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+
+      @account = @account1
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,deleted")
+      @account1.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+        pseudo.workflow_state.should == 'deleted'
+        pseudo.user.workflow_state.should == 'registered'
+      end
+      @account2.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
+        pseudo.workflow_state.should == 'active'
+        pseudo.user.workflow_state.should == 'registered'
+      end
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active")
+      @account1.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id, @account1.id].sort
+        pseudo.workflow_state.should == 'active'
+        pseudo.user.workflow_state.should == 'registered'
+      end
+      @account2.pseudonyms.find_by_sis_user_id('user_1').tap do |pseudo|
+        pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account2.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id, @account1.id].sort
+        pseudo.workflow_state.should == 'active'
+        pseudo.user.workflow_state.should == 'registered'
+      end
     end
   end
 

@@ -110,19 +110,39 @@ module SIS
               user.name = "#{first_name} #{last_name}"
             end
 
-            if status =~ /active/i
-              user.workflow_state = 'registered'
-            elsif status =~ /deleted/i
-              user.workflow_state = 'deleted'
-              user.enrollments.scoped(:conditions => {:root_account_id => @root_account.id }).update_all(:workflow_state => 'deleted')
-              @users_to_update_account_associations << user.id unless user.new_record?
+            # we just leave all users registered now
+            # since we've deleted users though, we need to do this to be
+            # backwards compatible with the data
+            user.workflow_state = 'registered'
+
+            should_add_account_associations = false
+            should_update_account_associations = false
+
+            status_is_active = !(status =~ /\Adeleted/i)
+
+            if !status_is_active && !user.new_record?
+              # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and
+              # delete the pseudonym.
+              if 0 < user.enrollments.scoped(:conditions => ["root_account_id = ? AND workflow_state <> ?", @root_account.id, 'deleted']).update_all(:workflow_state => 'deleted')
+                should_update_account_associations = true
+              end
             end
 
             pseudo ||= Pseudonym.new
             pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
             pseudo.sis_user_id = user_id
             pseudo.account = @root_account
-            pseudo.workflow_state = status =~ /active/i ? 'active' : 'deleted'
+            pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
+            if pseudo.new_record? && status_is_active
+              should_add_account_associations = true
+            elsif pseudo.workflow_state_changed?
+              if status_is_active
+                should_add_account_associations = true
+              else
+                should_update_account_associations = true
+              end
+            end
+
             # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
             # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
             if !password.blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(password))
@@ -137,9 +157,7 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user.creation_sis_batch_id = @batch_id if @batch_id
-                  new_record = user.new_record?
                   raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
-                  @users_to_add_account_associations << user.id if new_record && user.workflow_state != 'deleted'
                 elsif @batch_id
                   @users_to_set_sis_batch_ids << user.id
                 end
@@ -154,11 +172,14 @@ module SIS
               next
             end
 
+            @users_to_add_account_associations << user.id if should_add_account_associations
+            @users_to_update_account_associations << user.id if should_update_account_associations
+
             if email.present?
               conditions = [ "path=? AND path_type='email' AND ", email, user.id]
               # find all CCs for this user, and active conflicting CCs for all users
               # unless we're deleting this user, then only find CCs for this user
-              conditions.first << (status =~ /deleted/i ? 'user_id=?' : "(workflow_state='active' OR user_id=?)")
+              conditions.first << (status_is_active ? "(workflow_state='active' OR user_id=?)" : 'user_id=?')
 
               ccs = CommunicationChannel.find(:all, :conditions => conditions)
               sis_cc = ccs.find { |cc| cc.id == pseudo.sis_communication_channel_id } if pseudo.sis_communication_channel_id
@@ -174,7 +195,7 @@ module SIS
               cc.user_id = user.id
               cc.pseudonym_id = pseudo.id
               cc.path = email
-              cc.workflow_state = (status =~ /active/i) ? 'active' : 'retired'
+              cc.workflow_state = status_is_active ? 'active' : 'retired'
               newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
               cc.save_without_broadcasting if cc.changed?
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
