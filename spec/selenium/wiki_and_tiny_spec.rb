@@ -520,8 +520,9 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     # Until we can track that down, first we do a fake drag to make sure the rest of the resizing machinery
     # works.
     driver.action.drag_and_drop_by(resizer, 0, -1).perform
+    resizer_to = 1 - resizer.location.y
     # drag the resizer way up to the top of the screen (to make the wysiwyg the shortest it will go)
-    driver.action.drag_and_drop_by(resizer, 0, -1500).perform
+    driver.action.drag_and_drop_by(resizer, 0, resizer_to).perform
     keep_trying_until { driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200) }
     resizer.attribute('style').should be_blank
 
