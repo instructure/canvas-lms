@@ -78,6 +78,7 @@ javascripts:
     - public/javascripts/jquery.rails_flash_notifications.js
     - public/javascripts/jquery.scrollToVisible.js
     - public/javascripts/jquery.templateData.js
+    - public/javascripts/vendor/jquery.placeholder.js
     - public/javascripts/instructure_helper.js
     - public/javascripts/media_comments.js
     - public/javascripts/tinymce.editor_box.js
