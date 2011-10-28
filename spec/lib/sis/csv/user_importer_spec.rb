@@ -1,0 +1,638 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+
+def gen_ssha_password(password)
+  salt = ActiveSupport::SecureRandom.random_bytes(10)
+  "{SSHA}" + Base64.encode64(Digest::SHA1.digest(password+salt).unpack('H*').first+salt).gsub(/\s/, '')
+end
+
+describe SIS::CSV::UserImporter do
+
+  before { account_model }
+
+  it "should create new users and update names" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.account.should eql(@account)
+    user.name.should eql("User Uno")
+
+    user.pseudonyms.count.should eql(1)
+    pseudonym = user.pseudonyms.first
+    pseudonym.unique_id.should eql('user1')
+
+    user.communication_channels.count.should eql(1)
+    cc = user.communication_channels.first
+    cc.path.should eql("user@example.com")
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno 2,user@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.account.should eql(@account)
+    user.name.should eql("User Uno 2")
+
+    user.pseudonyms.count.should eql(1)
+    pseudonym = user.pseudonyms.first
+    pseudonym.unique_id.should eql('user1')
+
+    user.communication_channels.count.should eql(1)
+
+    user.name = "My Awesome Name"
+    user.save
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno 2,user@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.account.should eql(@account)
+    user.name.should eql("My Awesome Name")
+  end
+
+  it "should set passwords and not overwrite current passwords" do
+    process_csv_data_cleanly(
+      "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+      "user_1,user1,badpassword,User,Uno 2,user@example.com,active,",
+      "user_2,user2,,User,Uno 2,user2@example.com,active,#{gen_ssha_password("password")}"
+    )
+    user1 = CommunicationChannel.find_by_path('user@example.com').user
+    p = user1.pseudonyms.first
+    p.valid_arbitrary_credentials?('badpassword').should be_true
+
+    p.password = 'lessbadpassword'
+    p.password_confirmation = 'lessbadpassword'
+    p.save
+
+    user2 = CommunicationChannel.find_by_path('user2@example.com').user
+    p = user2.pseudonyms.first
+    p.valid_arbitrary_credentials?('password').should be_true
+
+    p.password = 'newpassword'
+    p.password_confirmation = 'newpassword'
+    p.save
+
+    p.valid_arbitrary_credentials?('password').should be_false
+    p.valid_arbitrary_credentials?('newpassword').should be_true
+
+    process_csv_data_cleanly(
+      "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+      "user_1,user1,badpassword2,User,Uno 2,user@example.com,active",
+      "user_2,user2,,User,Uno 2,user2@example.com,active,#{gen_ssha_password("changedpassword")}"
+    )
+
+    user1.reload
+    p = user1.pseudonyms.first
+    p.valid_arbitrary_credentials?('badpassword').should be_false
+    p.valid_arbitrary_credentials?('badpassword2').should be_false
+    p.valid_arbitrary_credentials?('lessbadpassword').should be_true
+
+    user2.reload
+    p = user2.pseudonyms.first
+    p.valid_arbitrary_credentials?('password').should be_false
+    p.valid_arbitrary_credentials?('changedpassword').should be_false
+    p.valid_arbitrary_credentials?('newpassword').should be_true
+    p.valid_ssha?('changedpassword').should be_true
+  end
+
+  it "should allow setting and resetting of passwords" do
+    CommunicationChannel.find_by_path("user1@example.com").should be_nil
+    CommunicationChannel.find_by_path("user2@example.com").should be_nil
+
+    process_csv_data_cleanly(
+      "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+      "user_1,user1,password1,User,Uno,user1@example.com,active,",
+      "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass1")}"
+    )
+
+    user1_persistence_token = nil
+    user2_persistence_token = nil
+    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+      user1_persistence_token = p.persistence_token
+      p.valid_arbitrary_credentials?('password1').should be_true
+      p.valid_arbitrary_credentials?('password2').should be_false
+      p.valid_arbitrary_credentials?('password3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_false
+    end
+
+    user2_sis_ssha = nil
+    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+      user2_persistence_token = p.persistence_token
+      user2_sis_ssha = p.sis_ssha
+      p.valid_arbitrary_credentials?('encpass1').should be_true
+      p.valid_arbitrary_credentials?('encpass2').should be_false
+      p.valid_arbitrary_credentials?('encpass3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_false
+    end
+
+    # passwords haven't changed, neither should persistence tokens
+    process_csv_data_cleanly(
+      "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+      "user_1,user1,password1,User,Uno,user1@example.com,active,",
+      "user_2,user2,,User,Dos,user2@example.com,active,#{user2_sis_ssha}"
+    )
+
+    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+      user1_persistence_token.should == p.persistence_token
+      p.valid_arbitrary_credentials?('password1').should be_true
+      p.valid_arbitrary_credentials?('password2').should be_false
+      p.valid_arbitrary_credentials?('password3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_false
+    end
+
+    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+      user2_persistence_token.should == p.persistence_token
+      p.valid_arbitrary_credentials?('encpass1').should be_true
+      p.valid_arbitrary_credentials?('encpass2').should be_false
+      p.valid_arbitrary_credentials?('encpass3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_false
+    end
+
+    # passwords change, persistence token should change
+    process_csv_data_cleanly(
+      "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+      "user_1,user1,password2,User,Uno,user1@example.com,active,",
+      "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass2")}"
+    )
+
+    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+      user1_persistence_token.should_not == p.persistence_token
+      p.valid_arbitrary_credentials?('password1').should be_false
+      p.valid_arbitrary_credentials?('password2').should be_true
+      p.valid_arbitrary_credentials?('password3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_false
+
+      p.password_confirmation = p.password = 'password4'
+      p.save
+      user1_persistence_token = p.persistence_token
+    end
+
+    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+      user2_persistence_token.should_not == p.persistence_token
+      p.valid_arbitrary_credentials?('encpass1').should be_false
+      p.valid_arbitrary_credentials?('encpass2').should be_true
+      p.valid_arbitrary_credentials?('encpass3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_false
+
+      p.password_confirmation = p.password = 'password4'
+      p.save
+      user2_persistence_token = p.persistence_token
+    end
+
+    # user set password, persistence token should not change
+    process_csv_data_cleanly(
+      "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+      "user_1,user1,password3,User,Uno,user1@example.com,active,",
+      "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass3")}"
+    )
+
+    CommunicationChannel.find_by_path('user1@example.com').user.pseudonyms.first.tap do |p|
+      user1_persistence_token.should == p.persistence_token
+      p.valid_arbitrary_credentials?('password1').should be_false
+      p.valid_arbitrary_credentials?('password2').should be_false
+      p.valid_arbitrary_credentials?('password3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_true
+    end
+
+    CommunicationChannel.find_by_path('user2@example.com').user.pseudonyms.first.tap do |p|
+      user2_persistence_token.should == p.persistence_token
+      p.valid_arbitrary_credentials?('encpass1').should be_false
+      p.valid_arbitrary_credentials?('encpass2').should be_false
+      p.valid_arbitrary_credentials?('encpass3').should be_false
+      p.valid_arbitrary_credentials?('password4').should be_true
+    end
+
+  end
+
+  it "should catch active-record-level errors, like invalid unique_id" do
+    before_user_count = User.count
+    before_pseudo_count = Pseudonym.count
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "U1,@,User,Uno,user@example.com,active"
+    )
+    CommunicationChannel.find_by_path('user@example.com').should be_nil
+
+    importer.errors.map(&:last).should == []
+    importer.warnings.map(&:last).should == ["Failed saving user. Internal error: unique_id is invalid"]
+    [User.count, Pseudonym.count].should == [before_user_count, before_pseudo_count]
+  end
+
+  it "should not allow a secondary user account with the same login id." do
+    p_count = Pseudonym.count
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.pseudonyms.count.should == 1
+    user.pseudonyms.find_by_unique_id('user1').sis_user_id.should == 'user_1'
+
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user1,User,Uno,user@example.com,active"
+    )
+    importer.errors.should == []
+    importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.pseudonyms.count.should == 1
+    user.pseudonyms.find_by_unique_id('user1').sis_user_id.should == 'user_1'
+    Pseudonym.count.should == (p_count + 1)
+  end
+
+  it "should not allow a secondary user account to change its login id to some other registered login id" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active"
+    )
+
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user1,User,Dos,user2@example.com,active",
+      "user_1,user3,User,Uno,user1@example.com,active"
+    )
+    importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
+    importer.errors.should == []
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user2"
+  end
+
+  it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active"
+    )
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user3,User,Uno,user1@example.com,active",
+      "user_2,user1,User,Dos,user2@example.com,active"
+    )
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user1"
+  end
+
+  it "should allow a user to update information" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user2,User,Uno-Dos,user1@example.com,active"
+    )
+
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.last_name.should == "Uno-Dos"
+  end
+
+  it "should allow a user to update emails specifically" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user2@example.com,active"
+    )
+
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
+  end
+
+  it "should add two users with different user_ids, login_ids, but the same email" do
+    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      "user_2,user2,User,Dos,user@example.com,active"
+    )
+    user1 = Pseudonym.find_by_unique_id('user1').user
+    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1.should_not == user2
+    user1.last_name.should == "Uno"
+    user2.last_name.should == "Dos"
+    user1.pseudonyms.count.should == 1
+    user2.pseudonyms.count.should == 1
+    user1.pseudonyms.first.communication_channel_id.should_not be_nil
+    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+
+    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+  end
+
+  it "should not have problems updating a user to a conflicting email" do
+    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active"
+    )
+    user1 = Pseudonym.find_by_unique_id('user1').user
+    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1.should_not == user2
+    user1.last_name.should == "Uno"
+    user2.last_name.should == "Dos"
+    user1.pseudonyms.count.should == 1
+    user2.pseudonyms.count.should == 1
+    user1.pseudonyms.first.communication_channel_id.should_not be_nil
+    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user1@example.com,active"
+    )
+    user2.reload
+    user2.communication_channels.length.should == 1
+    user2.email_channel.should be_active
+    user2.email.should == 'user1@example.com'
+
+    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+  end
+
+  it "should re-activate retired e-mails" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    user1 = Pseudonym.find_by_unique_id('user1').user
+    user1.email_channel.destroy
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    user1.reload
+    user1.email_channel.should be_active
+    user1.communication_channels.length.should == 1
+  end
+
+  it "should send merge opportunity notifications when reactivating an email" do
+    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user1@example.com,deleted"
+    )
+    user1 = Pseudonym.find_by_unique_id('user1').user
+    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1.should_not == user2
+    user1.last_name.should == "Uno"
+    user2.last_name.should == "Dos"
+    user1.pseudonyms.count.should == 1
+    user2.pseudonyms.count.should == 1
+    user1.pseudonyms.first.communication_channel_id.should_not be_nil
+    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+    user1.email_channel.should_not == user2.email_channel
+    Message.count.should == 0
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user1@example.com,active"
+    )
+    user2.reload
+
+    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+  end
+
+  it "should not send merge opportunity notifications if the conflicting cc is retired or unconfirmed" do
+    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    u1 = User.create! { |u| u.workflow_state = 'registered' }
+    cc1 = u1.communication_channels.create!(:path => 'user1@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired' }
+    u2 = User.create! { |u| u.workflow_state = 'registered'}
+    cc2 = u2.communication_channels.create!(:path => 'user1@example.com', :path_type => 'email')
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    user1 = Pseudonym.find_by_unique_id('user1').user
+    [u1, u2].should_not be_include(user1)
+    user1.communication_channels.length.should == 1
+    user1.email.should == 'user1@example.com'
+    [cc1, cc2].should_not be_include(user1.email_channel)
+    Message.find(:first, :conditions => { :communication_channel_id => user1.email_channel.id, :notification_id => notification.id }).should be_nil
+  end
+
+  it "should create everything in the deleted state when deleted initially" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,deleted"
+    )
+    p = Pseudonym.find_by_unique_id('user1')
+    p.should be_deleted
+    u = p.user
+    u.communication_channels.length.should == 1
+    u.email_channel.should be_retired
+  end
+
+  it "should not add a user with the same login id as another user" do
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user1,User,Dos,user2@example.com,active"
+    )
+    importer.errors.should == []
+    importer.warnings.map{|x| x[1]}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
+    Pseudonym.find_by_unique_id('user1').should_not be_nil
+    Pseudonym.find_by_unique_id('user2').should be_nil
+  end
+
+  it "should use an existing pseudonym if it wasn't imported from sis and has the same login id" do
+    u = User.create!
+    u.register!
+    p_count = Pseudonym.count
+    p = u.pseudonyms.create!(:unique_id => "user2", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
+    Pseudonym.find_by_unique_id('user1').should be_nil
+    Pseudonym.find_by_unique_id('user2').should_not be_nil
+    p.sis_user_id.should be_nil
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active"
+    )
+    p.reload
+    Pseudonym.find_by_unique_id('user1').should_not be_nil
+    Pseudonym.find_by_unique_id('user2').should_not be_nil
+    Pseudonym.count.should == (p_count + 2)
+    p.sis_user_id.should == "user_2"
+  end
+
+  it "should use an existing pseudonym if it wasn't imported from sis and has the same email address" do
+    u = User.create!
+    u.register!
+    p_count = Pseudonym.count
+    p = u.pseudonyms.create!(:unique_id => "user2@example.com", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
+    Pseudonym.find_by_unique_id('user1').should be_nil
+    Pseudonym.find_by_unique_id('user2').should be_nil
+    Pseudonym.find_by_unique_id('user2@example.com').should_not be_nil
+    p.sis_user_id.should be_nil
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active"
+    )
+    p.reload
+    Pseudonym.find_by_unique_id('user1').should_not be_nil
+    Pseudonym.find_by_unique_id('user2').should_not be_nil
+    Pseudonym.find_by_unique_id('user2@example.com').should be_nil
+    Pseudonym.count.should == (p_count + 2)
+    p.sis_user_id.should == "user_2"
+  end
+
+  it "should strip white space on fields" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1  ,user1   ,User   ,Uno   ,user@example.com   ,active  ",
+      "   user_2,   user2,   User,   Dos,   user2@example.com,  active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.should_not be_nil
+    p = user.pseudonyms.first
+    p.unique_id.should == "user1"
+    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user.should_not be_nil
+    p = user.pseudonyms.first
+    p.unique_id.should == "user2"
+  end
+
+  it "should use an existing communication channel" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    p = Pseudonym.find_by_unique_id('user1')
+    user1 = p.user
+    user1.last_name.should == "Uno"
+    user1.pseudonyms.count.should == 1
+    p.communication_channel_id.should_not be_nil
+    user1.communication_channels.count.should == 1
+    user1.communication_channels.first.path.should == 'user1@example.com'
+    p.sis_communication_channel_id.should == p.communication_channel_id
+    user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+
+    # change to user2@example.com; because user1@example.com was sis created, it should disappear
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user2@example.com,active"
+    )
+    p.reload
+    user1.reload
+    user1.pseudonyms.count.should == 1
+    user1.communication_channels.count.should == 2
+    user1.communication_channels.unretired.count.should == 1
+    p.communication_channel_id.should_not be_nil
+    user1.communication_channels.unretired.first.path.should == 'user2@example.com'
+    p.sis_communication_channel_id.should == p.communication_channel_id
+    p.communication_channel_id.should == user1.communication_channels.unretired.first.id
+  end
+
+  it "should work when a communication channel already exists, but there's no sis_communication_channel" do
+    importer = process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,,active"
+    )
+    p = Pseudonym.find_by_unique_id('user1')
+    user1 = p.user
+    user1.last_name.should == "Uno"
+    user1.pseudonyms.count.should == 1
+    p.communication_channel_id.should be_nil
+    user1.communication_channels.count.should == 0
+    p.sis_communication_channel_id.should be_nil
+    user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+
+    importer = process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user2@example.com,active"
+    )
+    p.reload
+    user1.reload
+    user1.pseudonyms.count.should == 1
+    user1.communication_channels.count.should == 1
+    user1.communication_channels.unretired.count.should == 1
+    p.communication_channel_id.should_not be_nil
+    user1.communication_channels.unretired.first.path.should == 'user2@example.com'
+    p.sis_communication_channel_id.should == p.communication_channel_id
+    p.communication_channel_id.should == user1.communication_channels.unretired.first.id
+  end
+
+  it "should handle stickiness" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,,active"
+    )
+    p = Pseudonym.find_by_unique_id('user1')
+    p.unique_id = 'user5'
+    p.save!
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user3,User,Uno,,active"
+    )
+    p.reload
+    p.unique_id.should == 'user5'
+    Pseudonym.find_by_unique_id('user1').should be_nil
+    Pseudonym.find_by_unique_id('user3').should be_nil
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user3,User,Uno,,active",
+      {:override_sis_stickiness => true}
+    )
+    p.reload
+    p.unique_id.should == 'user3'
+    Pseudonym.find_by_unique_id('user1').should be_nil
+    Pseudonym.find_by_unique_id('user5').should be_nil
+  end
+
+  context 'account associations' do
+    before(:each) do
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active",
+        "A002,A001,English,active",
+        "A003,A002,English Literature,active",
+        "A004,,Awesomeness,active"
+      )
+    end
+
+    it "should work" do
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,deleted"
+      )
+      user1 = @account.pseudonyms.find_by_sis_user_id('user_1')
+      user2 = @account.pseudonyms.find_by_sis_user_id('user_2')
+      user1.user.user_account_associations.map { |uaa| [uaa.account_id, uaa.depth] }.should == [[@account.id, 0]]
+      user2.user.user_account_associations.should be_empty
+
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,deleted"
+      )
+      user1.reload
+      user1.user.user_account_associations.should be_empty
+    end
+  end
+
+end

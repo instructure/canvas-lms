@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe SIS do
+describe SIS::UserImporter do
   it "should split into transactions based on time elapsed" do
     account_model
     messages = []
