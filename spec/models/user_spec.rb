@@ -458,6 +458,34 @@ describe User do
       @user1.reload
       @user1.enrollments.should be_empty
     end
+
+    it "should update account associations" do
+      @account1 = account_model
+      @account2 = account_model
+      @pseudo1 = (@user1 = user_with_pseudonym :account => @account1).pseudonym
+      @pseudo2 = (@user2 = user_with_pseudonym :account => @account2).pseudonym
+      @subsubaccount1 = (@subaccount1 = @account1.sub_accounts.create!).sub_accounts.create!
+      @subsubaccount2 = (@subaccount2 = @account2.sub_accounts.create!).sub_accounts.create!
+      course_with_student(:account => @subsubaccount1, :user => @user1)
+      course_with_student(:account => @subsubaccount2, :user => @user2)
+
+      @user1.associated_accounts.map(&:id).sort.should == [@account1, @subaccount1, @subsubaccount1].map(&:id).sort
+      @user2.associated_accounts.map(&:id).sort.should == [@account2, @subaccount2, @subsubaccount2].map(&:id).sort
+
+      @pseudo1.user.should == @user1
+      @pseudo2.user.should == @user2
+
+      @user1.move_to_user @user2
+
+      @pseudo1, @pseudo2 = [@pseudo1, @pseudo2].map{|p| Pseudonym.find(p.id)}
+      @user1, @user2 = [@user1, @user2].map{|u| User.find(u.id)}
+
+      @pseudo1.user.should == @pseudo2.user
+      @pseudo1.user.should == @user2
+
+      @user1.associated_accounts.map(&:id).sort.should == []
+      @user2.associated_accounts.map(&:id).sort.should == [@account1, @account2, @subaccount1, @subaccount2, @subsubaccount1, @subsubaccount2].map(&:id).sort
+    end
   end
 
   context "permissions" do

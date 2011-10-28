@@ -815,6 +815,8 @@ class User < ActiveRecord::Base
     end
     self.reload
     Enrollment.send_later(:recompute_final_scores, new_user.id)
+    new_user.update_account_associations
+    self.user_account_associations.delete_all
     self.destroy
   end
   
