@@ -138,6 +138,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     t(:default_login_handle_name, "Email")
   end
   
+  def self.default_delegated_login_handle_name
+    t(:default_delegated_login_handle_name, "Login")
+  end
+  
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
 
   def test_ldap_connection

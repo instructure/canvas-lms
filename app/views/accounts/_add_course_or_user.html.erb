@@ -41,11 +41,11 @@
           <div style="font-size: 0.8em; color: #888;"><%= t(:sortable_name_help, "This name appears in sorted lists.") %></div>
         </td>
       </tr>
-      <% if @root_account.login_handle_name_is_customized? %>
-      <tr>
-        <td><%= blabel :pseudonym, :path, :en => "Email" %></td>
-        <td><%= text_field :pseudonym, :path %></td>
-      </tr>
+      <% if @root_account.login_handle_name_is_customized? || @root_account.delegated_authentication? %>
+        <tr>
+          <td><%= blabel :pseudonym, :path, :en => "Email" %></td>
+          <td><%= text_field :pseudonym, :path %></td>
+        </tr>
       <% end %>
       <tr>
         <td><%= blabel :pseudonym, :unique_id, @root_account.login_handle_name %></td>

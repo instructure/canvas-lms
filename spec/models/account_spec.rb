@@ -487,4 +487,23 @@ describe Account do
     account.reload
     account.all_group_categories.count.should == 2
   end
+  
+  it "should return correct values for login_handle_name based on authorization_config" do
+    account = Account.default
+    account.login_handle_name.should == "Email"
+    
+    config = account.account_authorization_configs.create(:auth_type => 'cas')
+    account.login_handle_name.should == "Login"
+    
+    config.auth_type = 'saml'
+    config.save
+    account.reload.login_handle_name.should == "Login"
+    
+    config.auth_type = 'ldap'
+    config.save
+    account.reload.login_handle_name.should == "Email"
+    config.login_handle_name = "LDAP Login"
+    config.save
+    account.reload.login_handle_name.should == "LDAP Login"
+  end
 end

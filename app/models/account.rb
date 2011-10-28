@@ -531,7 +531,8 @@ class Account < ActiveRecord::Base
   
   def login_handle_name
     login_handle_name_is_customized? ? self.account_authorization_config.login_handle_name :
-        AccountAuthorizationConfig.default_login_handle_name
+        (self.delegated_authentication? ? AccountAuthorizationConfig.default_delegated_login_handle_name :
+            AccountAuthorizationConfig.default_login_handle_name)
   end
   
   def self_and_all_sub_accounts
