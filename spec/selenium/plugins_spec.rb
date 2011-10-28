@@ -5,6 +5,7 @@ describe "plugins ui" do
 
   it 'should have plugins default to disabled when no plugin_setting exits' do
     site_admin_logged_in
+    truncate_table PluginSetting
 
     get '/plugins/etherpad'
     driver.execute_script("return $('#plugin_setting_disabled').is(':checked');").should be_true
