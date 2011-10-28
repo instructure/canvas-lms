@@ -93,6 +93,17 @@ class PseudonymSessionsController < ApplicationController
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
       initiate_saml_login(request.env['canvas.account_domain'])
+    else
+      if request.user_agent.to_s =~ /ipod|iphone/i
+        @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
+        @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
+        @shared_js_vars = {
+          :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil),
+          :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
+          :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
+        }
+        render :template => 'pseudonym_sessions/mobile_login', :layout => false
+      end
     end
     flash[:delegated_message] = session.delete :delegated_message
   end
