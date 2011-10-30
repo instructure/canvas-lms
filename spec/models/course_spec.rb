@@ -352,24 +352,29 @@ describe Course, "gradebook_to_csv" do
   end
 
   it "should include sis ids if enabled" do
-    user_with_pseudonym(:active_all => true)
     course(:active_all => true)
-    student_in_course(:user => @user)
-    @user.pseudonym.sis_user_id = "SISUSERID"
-    @user.pseudonym.sis_source_id = "SISLOGINID"
-    @user.pseudonym.save!
+    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+    student_in_course(:user => @user1)
+    @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
+    student_in_course(:user => @user2)
+    @user3 = user(:active_all => true, :name => 'JT')
+    student_in_course(:user => @user3)
+    @user1.pseudonym.sis_user_id = "SISUSERID"
+    @user1.pseudonym.save!
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@user, :grade => "10")
+    @assignment.grade_student(@user1, :grade => "10")
+    @assignment.grade_student(@user2, :grade => "9")
+    @assignment.grade_student(@user3, :grade => "9")
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
     @course.recompute_student_scores
-    @user.reload
     @course.reload
 
     csv = @course.gradebook_to_csv(:include_sis_id => true)
     csv.should_not be_nil
     rows = FasterCSV.parse(csv)
-    rows.length.should equal(3)
+    rows.length.should == 5
+    rows[0][1].should == 'ID'
     rows[0][2].should == 'SIS User ID'
     rows[0][3].should == 'SIS Login ID'
     rows[0][4].should == 'Section'
@@ -377,8 +382,15 @@ describe Course, "gradebook_to_csv" do
     rows[1][3].should == ''
     rows[1][4].should == ''
     rows[1][-1].should == '(read only)'
+    rows[2][1].should == @user1.id.to_s
     rows[2][2].should == 'SISUSERID'
-    rows[2][3].should == 'SISLOGINID'
+    rows[2][3].should == @user1.pseudonym.unique_id
+    rows[3][1].should == @user2.id.to_s
+    rows[3][2].should be_nil
+    rows[3][3].should == @user2.pseudonym.unique_id
+    rows[4][1].should == @user3.id.to_s
+    rows[4][2].should be_nil
+    rows[4][3].should be_nil
   end
 end
 
@@ -1008,21 +1020,18 @@ describe Course, 'grade_publishing' do
     Pseudonym.find_by_sis_user_id("S5").tap do |p|
       stud5 = p
       p.sis_user_id = nil
-      p.sis_source_id = nil
       p.save
     end
     
     Pseudonym.find_by_sis_user_id("S6").tap do |p|
       stud6 = p
       p.sis_user_id = nil
-      p.sis_source_id = nil
       p.save
     end
     
     getsection("S4").tap do |s|
       sec4 = s
       sec4id = s.sis_source_id
-      s.sis_source_id = nil
       s.save
     end
     
@@ -1051,7 +1060,7 @@ describe Course, 'grade_publishing' do
         "#{teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").id},S3,#{getenroll("S3", "S2").id},active,\"\",80\n" +
         "#{teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").id},S4,#{getenroll("S4", "S1").id},active,\"\",0\n" + 
         "#{teacher.id},T1,#{getsection("S3").id},S3,#{stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,\"\",85\n" + 
-        "#{teacher.id},T1,#{sec4.id},,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,\"\",90\n"]
+        "#{teacher.id},T1,#{sec4.id},S4,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,\"\",90\n"]
     @course.grading_standard_id = 0
     @course.save
     server, server_thread, post_lines = start_test_http_server
@@ -1070,7 +1079,7 @@ describe Course, 'grade_publishing' do
         "#{teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").id},S3,#{getenroll("S3", "S2").id},active,B-,80\n" +
         "#{teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").id},S4,#{getenroll("S4", "S1").id},active,F,0\n" + 
         "#{teacher.id},T1,#{getsection("S3").id},S3,#{stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,B,85\n" + 
-        "#{teacher.id},T1,#{sec4.id},,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,A-,90\n"]
+        "#{teacher.id},T1,#{sec4.id},S4,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,A-,90\n"]
   end
   
 end

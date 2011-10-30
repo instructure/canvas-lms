@@ -3,6 +3,49 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "discussions selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  it "should load both topics and images via pageless without conflict" do
+    course_with_teacher_logged_in
+    
+    # create some topics. 11 is enough to trigger pageless with default value
+    # of 10 per page
+    11.times do |i|
+      @course.discussion_topics.create!(:title => "Topic #{i}")
+    end
+
+    # create some images
+    2.times do |i| 
+      @attachment = @course.attachments.build
+      @attachment.filename = "image#{i}.png"
+      @attachment.file_state = 'available'
+      @attachment.content_type = 'image/png'
+      @attachment.save!
+    end
+
+    get "/courses/#{@course.id}/discussion_topics"
+    start_topics = driver.find_elements(:css, "#topic_list .topic").length
+    start_images = driver.find_elements(:css, ".image_list .img_holder").length
+
+    # go to Images tab to trigger pageless for .image_list
+    keep_trying_until {
+      driver.find_element(:css, '.add_topic_link').click()
+      driver.find_elements(:css, '#editor_tabs .ui-tabs-nav li a').last.should be_displayed
+    }
+    driver.find_elements(:css, '#editor_tabs .ui-tabs-nav li a').last.click
+
+    # scroll window to trigger pageless for #topic_list
+    driver.execute_script('window.scrollTo(0, 100000)')
+
+    # wait till done
+    wait_for_ajax_requests
+    wait_for_ajaximations
+
+    # check all topics were loaded (11 we created, plus the blank template)
+    driver.find_elements(:css, "#topic_list .topic").length.should == 12
+
+    # check images were loaded
+    driver.find_elements(:css, ".image_list .img_holder").length.should == 2
+  end
+
   it "should not record a javascript error when creating the first topic" do
     course_with_teacher_logged_in
 

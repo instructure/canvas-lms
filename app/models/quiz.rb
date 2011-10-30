@@ -430,12 +430,13 @@ class Quiz < ActiveRecord::Base
     end
     
     non_shuffled_questions = ["true_false_question", "matching_question"]
+    exclude_ids = @submission_questions.map{ |q| q[:assessment_question_id] }.compact
     @submission_questions.each do |q|
       if q[:pick_count] #QuizGroup
         if q[:assessment_question_bank_id]
           bank = AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id]) if q[:assessment_question_bank_id].present?
           if bank
-            questions = bank.select_for_submission(q[:pick_count])
+            questions = bank.select_for_submission(q[:pick_count], exclude_ids)
             questions = questions.map{|aq| aq.data}
             questions.each do |question|
               if question[:answers]

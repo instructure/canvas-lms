@@ -27,7 +27,7 @@
       <li id="course_section_template"><a href="#"><label class="section_name" for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" /></a></li>
     </ul>
     <button id="gradebook_settings">&nbsp;</button>
-    <ul style="display: none; width: 210px;">
+    <ul style="display: none;">
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
       <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
@@ -35,6 +35,8 @@
       <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url, :fragment => "tab-grade-publishing") %>"><%= t('publish_to_sis', 'Publish grades to SIS') %></a></li>
       <% end %>
       <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('set_group_weights', 'Set Group Weights') %></a></li>
+      <li><a data-arrange-columns-by="due_date" href="#"><label><%= t('arrange_columns_by_due_date', 'Arrange columns by due date') %><input type="radio" name="arrange-columns-by" /></label></a></li>
+      <li><a data-arrange-columns-by="assignment_group" href="#"><label><%= t('arrange_columns_by_group', 'Arrange columns by assignment group') %><input type="radio" name="arrange-columns-by" /></label></a></li>
       <li><a href="#"><label><%= t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
       <li><a href="#"><label><%= t('include_ungraded', 'Include Ungraded Assignments') %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
     </ul>
@@ -58,6 +60,6 @@
       :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
       :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading'),
     }.to_json.html_safe %>;
-    new Gradebook(<%= options.to_json.html_safe %>);
+    var gradebook = new Gradebook(<%= options.to_json.html_safe %>);
   </script>
 <% end %>

@@ -53,7 +53,7 @@ $(function(){
           <td colspan="2">
             <input type="hidden" name="new_teacher" value="1"/>
             <span class="field-with-fancyplaceholder"><%= label :user, :name, t('your_name', "Your name") %><%= text_field :user, :name, :class => "text" %></span>
-            <span class="field-with-fancyplaceholder"><%= form.label :unique_id, t('email_address', "Email address") %><%= form.text_field :unique_id, :class => "text", :value => !@pseudonym || @pseudonym.deleted? ? (@pseudonym.deleted_unique_id rescue nil) : @pseudonym.unique_id %></span>
+            <span class="field-with-fancyplaceholder"><%= form.label :unique_id, t('email_address', "Email address") %><%= form.text_field :unique_id, :class => "text", :value => @pseudonym.try(:unique_id) %></span>
           </td>
         </tr>
         <% Canvas::Plugin.all_for_tag('registration_form').each do |plugin| %>

@@ -13,7 +13,7 @@
       <div class="load_tab">
         <%= t :new_tab, "This tool needs to be loaded in a new browser window" %>
         <div style="margin: 10px 0;">
-          <button class="button" type="submit" data-expired_message="<%= t :new_tab_expired, "The session for this tool has expired. Please reload the page to access the tool again" %>"><%= t :load_tool_new_tab_button, "Load %{tool} in a new tab", :tool => @tool.name %></button>
+          <button class="button" type="submit" data-expired_message="<%= t :new_tab_expired, "The session for this tool has expired. Please reload the page to access the tool again" %>"><%= t :load_tool_new_tab_button, "Load %{tool} in a new window", :tool => @tool.name %></button>
         </div>
       </div>
       <div class="tab_loaded" style="display: none;">

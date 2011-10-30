@@ -293,8 +293,11 @@ I18n.scoped('gradebook', function(I18n) {
           .find(".score_holder").append($("#revert_score_template").clone(true).attr('id', '').show())
           .find(".grade").addClass('changed');
       } else {
+        var tooltip = $assignment.data('muted') ?
+          I18n.t('student_mute_notification', 'Instructor is working on grades') :
+          I18n.t('click_to_change', 'Click to test a different score');
         $assignment.find(".assignment_score").attr('title', I18n.t('click_to_change', 'Click to test a different score'))
-          .find(".score_teaser").text(I18n.t('click_to_change', "Click to test a different score")).end()
+          .find(".score_teaser").text(tooltip).end()
           .find(".grade").removeClass('changed');
         $assignment.find(".revert_score_link").remove();
       }
@@ -310,12 +313,15 @@ I18n.scoped('gradebook', function(I18n) {
     $("#grades_summary").delegate('.revert_score_link', 'click', function(event, skipEval) {
       event.preventDefault();
       event.stopPropagation();
-      var val = $(this).parents(".student_assignment").find(".original_score").text();
-      var $assignment = $(this).parents(".student_assignment");
+      var $assignment = $(this).parents(".student_assignment"),
+          val         = $assignment.find(".original_score").text(),
+          tooltip     = $assignment.data('muted') ?
+            I18n.t('student_mute_notification', 'Instructor is working on grades') :
+            I18n.t('click_to_change', 'Click to test a different score');
       $assignment.find(".score").text(val);
-      $assignment.find(".grade").text(val || "-");
+      $assignment.data('muted') ? $assignment.find('.grade').html('<img alt="Muted" class="muted_icon" src="/images/sound_mute.png?1318436336">') : $assignment.find(".grade").text(val || "-");
       $assignment.find(".assignment_score").attr('title', I18n.t('click_to_change', 'Click to test a different score'))
-        .find(".score_teaser").text(I18n.t('click_to_change', "Click to test a different score")).end()
+        .find(".score_teaser").text(tooltip).end()
         .find(".grade").removeClass('changed');
       $assignment.find(".revert_score_link").remove();
       $assignment.find(".score_value").text(val);

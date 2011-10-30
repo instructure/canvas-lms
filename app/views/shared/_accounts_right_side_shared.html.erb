@@ -3,7 +3,7 @@
   <div class="rs-margin-lr">
     <% form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :method => :get} do |f| -%>
       <fieldset class="textfield-inline-with-button">
-        <input id="user_name" type="search" name="user[name]" size=30 value="<%= @query %>" autocomplete="off" />
+        <input id="user_name" name="user[name]" value="<%= @query %>" />
         <button class='button small-button'><%= t 'buttons.go', "Go" %></button>
       </fieldset>
     <% end -%>
@@ -13,23 +13,13 @@
     <script type="text/javascript">
       jQuery(function(){
         $("#new_user").find("#user_name").autocomplete({
-          minChars: 4,
-          deferRequestBy: 150, //miliseconds
-          serviceUrl: $("#new_user")[0].action + ".json",
-          onSelect: function(value, data){
-            window.location = $("#new_user")[0].action + "/" + data
-          <% if @account.user_count < 500 %>
-          },
-          lookup: <%= raw({
-            :suggestions =>  @account.fast_all_users.map{ |u| u.last_name_first || ""},
-            :data        => @account.fast_all_users.map.map(&:id)
-          }.to_json) %>
-          <% else %>
+          minLength: 4,
+          delay: 150, //miliseconds
+          source: $("#new_user")[0].action + ".json",
+          select: function(event, ui){
+            window.location = $("#new_user")[0].action + "/" + ui.item.id;
           }
-          <% end %>
         });
-        // get rid of this lookup part and it will use ajax queries to that serviceUrl above.  I just figured this would be faster
-        // and since we dont have that many users per institution we can afford to send it in a pageload.
       });
     </script>
   <% end %>

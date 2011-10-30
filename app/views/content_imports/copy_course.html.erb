@@ -384,11 +384,11 @@ $(document).ready(function() {
   }).change();
   if($("#course_autocomplete_id_lookup:visible").length > 0) {
     $("#course_autocomplete_id_lookup").autocomplete({
-      serviceUrl: $("#course_autocomplete_url").attr('href'),
-      onSelect: function(value, data){
+      source: $("#course_autocomplete_url").attr('href'),
+      select: function(event, ui){
         $("#course_autocomplete_name_holder").show();
-        $("#course_autocomplete_name").text(value);
-        $("#course_autocomplete_id").val(data.course.id);
+        $("#course_autocomplete_name").text(ui.item.label);
+        $("#course_autocomplete_id").val(ui.item.id);
         $("#copy_from_course").val("none");
       }
     });

@@ -210,9 +210,15 @@ class Submission < ActiveRecord::Base
 
   validates_each(:url, :allow_nil => true) do |record, attr, value|
     begin
+      value = value.strip
+      raise ArgumentError if value.empty?
       uri = URI.parse(value)
-      raise(ArgumentError) if uri.scheme && !%w(http https).include?(uri.scheme)
-      record.url = "http://#{value}" unless uri.scheme
+      unless uri.scheme
+        value = "http://#{value}"
+        uri = URI.parse(value)
+      end
+      raise ArgumentError unless %w(http https).include?(uri.scheme)
+      record.url = value
     rescue URI::InvalidURIError, ArgumentError
       record.errors.add attr, 'is not a valid URL'
     end

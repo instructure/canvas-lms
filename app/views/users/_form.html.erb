@@ -4,7 +4,7 @@
     <td><%= text_field :user, :name %></td>
   </tr><tr>
     <td><%= form.blabel :unique_id, :en => "Email Address" %></td>
-    <td><%= form.text_field :unique_id, :value => !@pseudonym || @pseudonym.deleted? ? (@pseudonym.deleted_unique_id rescue nil) : @pseudonym.unique_id %></td>
+    <td><%= form.text_field :unique_id, :value => @pseudonym.try(:unique_id) %></td>
   </tr><tr>
     <td><%= form.blabel :school_name, :en => "School/Institution" %></td>
     <td><%= text_field :user, :school_name %></td>

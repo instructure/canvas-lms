@@ -82,11 +82,11 @@ var fileStructureData = [];
           if(!folder || folder.mime_class != 'folder') { return; }
           $(this).addClass('file_drag');
           $("#drag_n_drop_panel").css('top', $files_content.scrollTop());
-        }, false).bind('dragleave dragout', function(event) {
+        }).bind('dragleave dragout', function(event) {
           if(!$(this).closest(".drag_panel").length) {
             $(this).removeClass('file_drag');
           }
-        }, false).bind('drop', function(event) {
+        }).bind('drop', function(event) {
           var dt = event.originalEvent.dataTransfer;
           if (dt) {
             var folder = files.currentItemData();
@@ -215,7 +215,7 @@ var fileStructureData = [];
             }
             return false; 
           }
-        }, false);
+        });
       }
     },
     preflight: function(folder_id, folder_context_string, filenames, on_choose, on_success, on_cancel) {
@@ -1483,7 +1483,7 @@ var fileStructureData = [];
                           '<p>', I18n.t('descriptions.collaborations',
                           'Collaborations are a way for you to use web-based tools like ' +
                           'Google Docs and EtherPad ' +
-                          'to work collaboratively on tasks like group papers or note-taking.  This is a special folder that shows you any collaborations you have created' +
+                          'to work collaboratively on tasks like group papers or note-taking.  This is a special folder that shows you any collaborations you have created ' +
                           'so you have an easy place to keep track of and create those collaborations'),
                           '</p>',
                           '<p>', I18n.t('descriptions.collaborations2', 'To find out more about a particular type of collaboration, click &quot;New collaboration&quot;' +

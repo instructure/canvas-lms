@@ -17,9 +17,6 @@
                 <%= before_label('sis_id', 'SIS ID') %> <span id="sis_user_id_<%= pseudonym.id %>" class="sis_user_id"><%= pseudonym.sis_user_id %></span> 
               </div>
               <div style="display:none" class="can_edit_sis_user_id"><%= can_do(pseudonym.account, @current_user, :manage_sis) %></div>
-              <div style="font-size: 0.8em; padding-left: 20px;">
-                <%= before_label('sis_login_id', 'SIS Login ID') %> <span id="sis_source_id_<%= pseudonym.id %>" class="sis_source_id"><%= pseudonym.sis_source_id %></span> 
-              </div>
             <% end %>
           </th>
           <td class='account'>

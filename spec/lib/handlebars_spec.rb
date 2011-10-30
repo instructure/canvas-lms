@@ -40,6 +40,15 @@ describe Handlebars do
       }.should raise_error
     end
 
+    it "should fix up the scope" do
+      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', '_test').
+        should eql('{{{t "foo" "hello" scope="test"}}}')
+      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/test').
+        should eql('{{{t "foo" "hello" scope="test.test"}}}')
+      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/_this_is_a_test').
+        should eql('{{{t "foo" "hello" scope="test.this_is_a_test"}}}')
+    end
+
   end
 
 end

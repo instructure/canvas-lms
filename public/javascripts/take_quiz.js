@@ -142,8 +142,9 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
     });
     setTimeout(function() {
       $("#question_list .list_question").each(function() {
-        if($(this).find(".jump_to_question_link").text() == "Spacer") {
-          $(this).remove();
+        var $this = $(this);
+        if($this.find(".jump_to_question_link").text() == "Spacer") {
+          $this.remove();
         }
       });
     }, 1000);
@@ -170,9 +171,9 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
         $(this).editorBox();
       });
     }, 2000);
-    setInterval(quizSubmission.updateTime, 200);
+    setInterval(quizSubmission.updateTime, 400);
+    var current_user_id = $("#identity .user_id").text() || "none";
     setInterval(function() {
-      var current_user_id = $("#identity .user_id").text() || "none";
       $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
       }, function() {
         ajaxErrorFlash(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}), request);
@@ -181,7 +182,15 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
     setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
   });
   quizSubmission = (function() {
-    var timeMod = 0;
+    var timeMod = 0,
+        started_at =  $(".started_at"),
+        end_at = $(".end_at"),
+        startedAtText = started_at.text(),
+        endAtText = end_at.text(),
+        endAtParsed = endAtText && new Date(endAtText),
+        $countdown_seconds = $(".countdown_seconds"),
+        $time_running_time_remaining = $(".time_running,.time_remaining");
+
     return {
       referenceDate: null,
       countDown: null,
@@ -193,8 +202,8 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
       contentBoxCounter: 0,
       lastSubmissionUpdate: new Date(),
       currentlyBackingUp: false,
-      started_at: $(".started_at"),
-      end_at: $(".end_at"),
+      started_at: started_at,
+      end_at: end_at,
       time_limit: parseInt($(".time_limit").text(), 10) || null,
       updateSubmission: function(repeat) {
         if(quizSubmission.submitting && !repeat) { return; }
@@ -234,18 +243,17 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
       },
       updateTime: function() {
         var now = new Date();
-        var end_at = quizSubmission.time_limit ? quizSubmission.end_at.text() : null;
+        var end_at = quizSubmission.time_limit ? endAtText : null;
         timeMod = (timeMod + 1) % 120;
         if(timeMod == 0 && !end_at && !quizSubmission.twelveHourDeadline) {
           quizSubmission.referenceDate = null;
-          var end = Date.parse(quizSubmission.end_at.text());
-          var now = new Date();
+          var end = endAtParsed;
           if(!quizSubmission.time_limit && (end - now) < 43200000) {
-            end_at = quizSubmission.end_at.text();
+            end_at = endAtText;
           }
         }
         if(!quizSubmission.referenceDate) {
-          $.extend(quizSubmission, timing.setReferenceDate(quizSubmission.started_at.text(), end_at, now));
+          $.extend(quizSubmission, timing.setReferenceDate(startedAtText, end_at, now));
         }
         if(quizSubmission.countDown) {
           var diff = quizSubmission.countDown.getTime() - now.getTime() - quizSubmission.clientServerDiff;
@@ -253,7 +261,7 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
             diff = 0;
           }
           var d = new Date(diff);
-          $(".countdown_seconds").text(d.getUTCSeconds());
+          $countdown_seconds.text(d.getUTCSeconds());
           if(diff <= 0 && !quizSubmission.submitting) {
             quizSubmission.submitting = true;
             $("#submit_quiz_form").submit();
@@ -314,7 +322,7 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
         if(hr) { times.push(I18n.t('hours_count', "Hour", {'count': hr})); }
         if(true || min) { times.push(I18n.t('minutes_count', "Minute", {'count': min})); }
         if(true || sec) { times.push(I18n.t('seconds_count', "Second", {'count': sec})); }
-        $(".time_running,.time_remaining").text(times.join(", "));
+        $time_running_time_remaining.text(times.join(", "));
       }
     };
   })();

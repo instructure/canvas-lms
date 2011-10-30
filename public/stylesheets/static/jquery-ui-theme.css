@@ -328,10 +328,13 @@
 
 ----------------------------------*/
 .ui-autocomplete { position: absolute; cursor: default; background: #FFFFFF; border: 0px none !important; padding: 0px !important; -moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px; -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }	
-.ui-autocomplete-loading { background: white url('/images/jqueryui/ui-anim_basic_16x16.gif') right center no-repeat; }
+.ui-autocomplete-loading { background: white url('/images/ajax-reload-animated.gif') right center no-repeat; }
+.ui-autocomplete .ui-state-hover {font-weight: normal; }
 
-/* workarounds */
-* html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
+/* set a default 1px transparent border less specific so that when it gets the class .ui-state-hover it has a border color but does not move around */
+.ui-autocomplete a {border: 1px solid transparent;}
+
+.ui-autocomplete.ui-menu .ui-menu-item a { padding-top: 3px;  padding-bottom: 3px;}
 
 /* Menu
 ----------------------------------*/

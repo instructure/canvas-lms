@@ -103,7 +103,6 @@ class FilesController < ApplicationController
       return
     end
     return unless tab_enabled?(@context.class::TAB_FILES)
-    @context = UserProfile.new(@context) if @context == @current_user
     log_asset_access("files:#{@context.asset_string}", "files", 'other') if @context
     respond_to do |format|
       if @contexts.empty?
@@ -162,15 +161,18 @@ class FilesController < ApplicationController
     original_params = params.dup
     params[:id] ||= params[:file_id]
     get_context
+    # note that the /files/XXX URL implicitly uses the current user as the
+    # context, even though it doesn't search for the file using
+    # @current_user.attachments.find , since it might not actually be a user
+    # attachment.
+    # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
       @attachment = @context.attachments.find(params[:id])
     else
       @attachment = Attachment.find(params[:id])
-      @context = nil
-      @skip_crumb = true
+      @skip_crumb = true unless @context
     end
     params[:download] ||= params[:preview]
-    @context = UserProfile.new(@context) if (@context == @current_user) && @current_user
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name

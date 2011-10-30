@@ -52,7 +52,7 @@ $(document).ready(function() {
       }
       $login.fillTemplateData({
         data: data.pseudonym,
-        hrefValues: ['account_id']
+        hrefValues: ['id', 'account_id']
       });
       if($.inArray(data.pseudonym.account_id.toString(), passwordable_account_ids) != -1) {
         $login.find(".links").addClass('passwordable');

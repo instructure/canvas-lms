@@ -122,7 +122,7 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  ALLOWED_FIELDS = %w(name position points_possible grading_type)
+  ALLOWED_FIELDS = %w(name position points_possible grading_type due_at)
 
   # @API
   # Create a new assignment for this course. The assignment is created in the
@@ -134,14 +134,18 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[points_possible] [Float] The maximum points possible on
   #   the assignment.
   # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"points"] The strategy used for grading the assignment. The assignment is ungraded if this field is omitted.
+  # @argument assignment[due_at] [Timestamp] The day/time the assignment is due. Accepts
+  #   times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   def create
     assignment_params = {}
     if params[:assignment].is_a?(Hash)
       assignment_params = params[:assignment].slice(*ALLOWED_FIELDS)
+      assignment_params["time_zone_edited"] = Time.zone.name if assignment_params["due_at"]
     end
     # TODO: allow rubric creation
 
     @assignment = @context.active_assignments.build(assignment_params)
+    @assignment.infer_due_at
 
     if authorized_action(@assignment, @current_user, :create)
       if custom_vals = params[:assignment][:set_custom_field_values]

@@ -31,6 +31,20 @@ describe Pseudonym do
     @pseudonym.unique_id = 'c'
     @pseudonym.save!
   end
+
+  it "should not allow active duplicates" do
+    p1 = Pseudonym.create!(:unique_id => 'cody@instructure.com')
+    p2 = Pseudonym.create(:unique_id => 'cody@instructure.com')
+    # Failed; p1 is still active
+    p2.should be_new_record
+    p2.workflow_state = 'deleted'
+    p2.save!
+    # Duplicates okay in the deleted state
+    p1.workflow_state = 'deleted'
+    p1.save!
+    # Should allow creating a new active one if the others are deleted
+    Pseudonym.create!(:unique_id => 'cody@instructure.com')
+  end
   
   it "should associate to another user" do
     user_model
@@ -76,7 +90,7 @@ describe Pseudonym do
   
   it "should not allow deleting system-generated pseudonyms by default" do
     user_with_pseudonym(:active_all => true)
-    @pseudonym.sis_source_id = 'something_cool'
+    @pseudonym.sis_user_id = 'something_cool'
     @pseudonym.save!
     @pseudonym.account.account_authorization_configs.create!(:auth_type => 'ldap')
     lambda{ @pseudonym.destroy}.should raise_error("Cannot delete system-generated pseudonyms")
@@ -85,7 +99,7 @@ describe Pseudonym do
   
   it "should not allow deleting system-generated pseudonyms by default" do
     user_with_pseudonym(:active_all => true)
-    @pseudonym.sis_source_id = 'something_cool'
+    @pseudonym.sis_user_id = 'something_cool'
     @pseudonym.save!
     @pseudonym.destroy(true).should eql(true)
     @pseudonym.should be_deleted
@@ -172,36 +186,14 @@ describe Pseudonym do
     end
   end
   
-
-  # it "should fire off registration message when created with a path for an unregistered user" do
-  #   u = User.create!(:name => "some user")
-  #   Notification.create(:name => "Confirm Registration", :category => "Registration")
-  #   p = u.pseudonyms.create!(:unique_id => "fred@example.com", :password => "password", :password_confirmation => "password", :path => "fred@example.com")
-  #   c = p.communication_channels.first
-  #   c.messages_sent.should be_include("Confirm Registration")
-  #   c.messages_sent["Confirm Registration"].length.should eql(1)
-  #   c.messages_sent["Confirm Registration"][0].to.should eql("fred@example.com")
-  # end
-  # 
-  # it "should fire off confirmation message when created with a path for a registered user" do
-  #   u = User.create!(:name => "some user", :workflow_state => "registered")
-  #   Notification.create!(:name => "Confirm Email Communication Channel", :category => "Registration")
-  #   p = u.pseudonyms.create!(:unique_id => "fred@example.com", :password => "password", :password_confirmation => "password", :path => "fred@example.com")
-  #   c = p.communication_channels.first
-  #   c.messages_sent.should be_include("Confirm Email Communication Channel")
-  #   c.messages_sent["Confirm Email Communication Channel"].length.should eql(1)
-  #   c.messages_sent["Confirm Email Communication Channel"][0].to.should eql("fred@example.com")
-  # end
-  # 
-  # it "should fire off confirmation message when created with a path for a registered user" do
-  #   Pseudonym.find(:all).each {|x| x.destroy}
-  #   u = User.create!(:name => "some user", :workflow_state => "registered")
-  #   Notification.create!(:name => "Confirm Email Communication Channel", :category => "Not Registration")
-  #   p = u.pseudonyms.create!(:unique_id => "fred@example.com", :password => "password", :password_confirmation => "password", :path => "fred@example.com")
-  #   c = p.communication_channels.first
-  #   c.messages_sent.should be_include("Confirm Email Communication Channel")
-  #   c.messages_sent["Confirm Email Communication Channel"].length.should eql(1)
-  #   c.messages_sent["Confirm Email Communication Channel"][0].to.should eql("dashboard")
-  # end
+  it "should determine if the password is managed" do
+    p = Pseudonym.create!(:unique_id => 'jt@instructure.com')
+    p.sis_user_id = 'jt'
+    p.should_not be_managed_password
+    p.account.account_authorization_configs.create!(:auth_type => 'ldap')
+    p.should be_managed_password
+    p.sis_user_id = nil
+    p.should_not be_managed_password
+  end
 end
 

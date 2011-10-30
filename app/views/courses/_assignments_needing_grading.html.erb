@@ -16,7 +16,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
       <% cnt += 1 %>
       <% if cnt <= 15 %>
         <li style="<%= hidden if cnt > 5 %>">
-          <a class="item icon-grading-gray tooltip" href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>">
+        <a class="item icon-grading-gray tooltip" href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>">
             <% if assignment.due_at || assignment.points_possible || show_context %>
               <span class="tooltip_wrap">
                 <span class='tooltip-carat'></span>

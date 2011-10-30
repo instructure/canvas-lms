@@ -170,7 +170,7 @@ class UsersController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account || @account
       @users = []
-      @query = (params[:user] && params[:user][:name]) || params[:query]
+      @query = (params[:user] && params[:user][:name]) || params[:term]
       if @context && @context.is_a?(Account) && @query
         @users = @context.users_name_like(@query)
       elsif params[:enrollment_term_id].present? && @root_account == @context
@@ -180,7 +180,7 @@ class UsersController < ApplicationController
       end
       @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
       respond_to do |format|
-        if @users.length == 1 && params[:query]
+        if @users.length == 1 && params[:term]
           format.html {
             redirect_to(named_context_url(@context, :context_user_url, @users.first))
           }
@@ -194,11 +194,7 @@ class UsersController < ApplicationController
         format.json  {
           cancel_cache_buster
           expires_in 30.minutes 
-          render :json => {
-            :query =>  @query,
-            :suggestions =>  @users.map( &:name),
-            :data => @users.map(&:id)
-          }.to_json
+          render :json => @users.map{ |u| {:label => u.name, :id => u.id} }
         }
       end
     end
@@ -340,17 +336,13 @@ class UsersController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :manage)
       @courses = []
-      @query = (params[:course] && params[:course][:name]) || params[:query]
+      @query = (params[:course] && params[:course][:name]) || params[:term]
       @courses = @context.manageable_courses_name_like(@query) if @context && @query
       respond_to do |format|
         format.json  {
           cancel_cache_buster
           expires_in 30.minutes 
-          render :json => {
-            :query =>  @query,
-            :suggestions =>  @courses.map(&:name),
-            :data => @courses
-          }
+          render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
         }
       end
     end

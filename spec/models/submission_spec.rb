@@ -62,6 +62,25 @@ describe Submission do
     @submission.should be_respond_to(:versions)
   end
 
+  it "should not save new versions by default" do
+    submission_spec_model
+    lambda {
+      @submission.save!
+    }.should_not change(@submission.versions, :count)
+  end
+
+  context "Discussion Topic" do
+    it "should use its created_at date for its submitted_at value" do
+      submission_spec_model(:submission_type => "discussion_topic")
+      @assignment.submit_homework(@user, :submission_type => "discussion_topic")
+      new_time = Time.now + 30.minutes
+      Time.stub!(:now).and_return(new_time)
+      @assignment.submit_homework(@user, :submission_type => "discussion_topic")
+      @submission.reload
+      @submission.submitted_at.to_s(:db).should eql @submission.created_at.to_s(:db)
+    end
+  end
+
   context "broadcast policy" do
     it "should have a broadcast policy" do
       submission_spec_model
@@ -73,7 +92,7 @@ describe Submission do
       submission_spec_model
       @submission.broadcast_policy_list.size.should eql(6)
     end
-        
+
     context "Assignment Submitted Late" do
       it "should have a 'Assignment Submitted Late' policy" do
         submission_spec_model
@@ -257,6 +276,20 @@ describe Submission do
       s.new_record?.should be_true
       s.errors.length.should == 1
       s.errors.first.to_s.should match(/not a valid URL/)
+    end
+
+    it "should reject empty urls" do
+      s = Submission.create(@valid_attributes.merge :url => '')
+      s.new_record?.should be_true
+      s.errors.length.should == 1
+      s.errors.first.to_s.should match(/not a valid URL/)
+    end
+
+    it "should strip leading/trailing whitespace" do
+      s = Submission.create(@valid_attributes.merge :url => ' http://www.google.com ')
+      s.new_record?.should be_false
+      s.errors.should be_empty
+      s.url.should == 'http://www.google.com'
     end
   end
 

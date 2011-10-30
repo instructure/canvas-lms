@@ -28,7 +28,6 @@ describe CoursesController, :type => :integration do
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
-    @user.pseudonym.update_attribute(:sis_source_id, 'login-id')
   end
 
   it "should return course list" do
@@ -164,13 +163,12 @@ describe CoursesController, :type => :integration do
     new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
     @course2.enroll_student(new_user).accept!
     new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
-    new_user.pseudonym.update_attribute(:sis_source_id, 'login-2')
 
     @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
-    json.map { |u| u['sis_login_id'] }.sort.should == ['login-id', 'login-2'].sort
+    json.map { |u| u['sis_login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
     json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
   end
   
@@ -179,17 +177,15 @@ describe CoursesController, :type => :integration do
     first_student = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
     @course1.enroll_student(first_student).accept!
     first_student.pseudonym.update_attribute(:sis_user_id, 'user2')
-    first_student.pseudonym.update_attribute(:sis_source_id, 'login-2')
     second_student = user_with_pseudonym(:name => 'second student', :username => 'nobody3@example.com')
     @course1.enroll_student(second_student).accept!
     second_student.pseudonym.update_attribute(:sis_user_id, 'user3')
-    second_student.pseudonym.update_attribute(:sis_source_id, 'login-3')
-    
+
     @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course1.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course1.to_param, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.sort.should == ['user2', 'user3'].sort
-    json.map { |u| u['sis_login_id'] }.sort.should == ['login-2', 'login-3'].sort
+    json.map { |u| u['sis_login_id'] }.sort.should == ['nobody2@example.com', 'nobody3@example.com'].sort
     json.map { |u| u['login_id'] }.sort.should == ['nobody2@example.com', 'nobody3@example.com'].sort
   end
 
@@ -199,13 +195,12 @@ describe CoursesController, :type => :integration do
     new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
     @course2.enroll_student(new_user).accept!
     new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
-    new_user.pseudonym.update_attribute(:sis_source_id, 'login-2')
 
     @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
-    json.map { |u| u['sis_login_id'] }.sort.should == ['login-id', 'login-2'].sort
+    json.map { |u| u['sis_login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
     json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
   end
 
@@ -223,6 +218,16 @@ describe CoursesController, :type => :integration do
     json.find { |s| s['name'] == section2.name }['sis_section_id'].should == 'sis-section'
     json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
     json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
+  end
+
+  it "should not return deleted sections" do
+    section1 = @course2.default_section
+    section2 = @course2.course_sections.create!(:name => 'Section B')
+    section2.destroy
+    section2.save!
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
+            { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
+    json.size.should == 1
   end
 
   it "should allow specifying course sis id" do
