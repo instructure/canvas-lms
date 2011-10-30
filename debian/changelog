@@ -1,3 +1,84 @@
+canvas-lms (1.1-73) professional; urgency=low
+
+  * Package ref: 02fcbf1747804f8f2d1adf9db3dc3f57fcc2c1db
+  *
+  * [-c926711] temporarily remove fsevent/inotify gems
+  * [+2181cef] don't set perspective 2x
+  * [+29cacb1] fix a couple kaltura related selenium specs
+  * [+1ccd161] typo in group collaborations text
+  * [+966f196] drop Pseudonym#deleted_unique_id closes #5896
+  * [+1fe1b1a] csv lib compat in ruby 1.9.x
+  * [+0730f8c] revert to syck yaml engine in ruby 1.9, for delayed jobs
+  * [+909a634] show mute icon when refreshing gradebook page. fixes #5101
+  * [+f56f249] display previous grade on grade history. fixes #5240.
+  * [+ef8c086] make verbiage match on 'new window' text and button for BLTI
+  * [+d2a5328] drop Pseudonym#sis_source_id closes #5897
+  * [+7768105] fix replacing hours/minutes when editing date picker fields; fixes #5903
+  * [+38dd777] Add barista gem to test group
+  * [+a0109ba] Fixes #4545 - Store flash version in localStorage
+  * [+20722f2] fix grade_passback_sel for Pseudonym#sis_source_id being gone
+  * [+a59142e] Fixes #4545 - Store flash version in localStorage
+  * [+a2b972f] partially revert "force domain.yml config in test env"
+  * [+e218898] fix mute messaging on student grade page.
+  * [+328186c] allow multiple simultaneous pagelesses
+  * [+6d7b1ae] Fix selenium/discussion_spec error on hudson build
+  * [+08a054f] remove errant apostrophe
+  * [+82f33e9] fix <select> scroll issue in chrome (win), fixes #5257
+  * [+4d9e9b6] fix up i18n scope for handlebars partials
+  * [+8c1916d] more es translations
+  * [+ef5ed4b] add option to sort users in speedgrader by submission. fixes #932
+  * [+f6029c1] Fixes #5090 - Misleading Quiz Availability
+  * [+84bac17] don't return deleted sections in api, fixes 5920
+  * [+f006299] show all questions in move question list. fixes #3594
+  * [+93db186] use official jQueryUI autocomplete plugin
+  * [+3412df6] remove confusing "published assignments" section; fixes #5951
+  * [+fed13f8] move test from misc_spec to jquery_spec, where it belongs
+  * [+aa96b02] delete compiled js file if you delete a handlebars fie
+  * [+f850c51] fix #6014 deleting a pseudonym you just added
+  * [+da0b7db] pass session along to tabs_available from application_helper fixes #5571
+  * [+9964762] drag-drop fix for new jquery and missing prop
+  * [+1fd1eba] better styling of right side of submission details page
+  * [+2fa3451] fix #5789 gradebook2 dropdown cut off on the left
+  * [+7fb1208] don't ref link to create new collab if it doesn't exist
+  * [+57bd536] fix "Reminder to Assess" links, closes #4652
+  * [+aa77cef] don't repeat questions when picking from banks, fixes #4212
+  * [+1825523] add authenticity token to grade book csv upload form
+  * [+3a150e7] remove student from group(s) when dropped from course, fixes #4982
+  * [+5554bc0] conditional tooltips for grading progress. fixes #5791
+  * [+c8a36ad] share submissions on grade ind. group assignments. fixes #4197
+  * [+8ab78d4] fix submission validation, url and general
+  * [+02ce5c9] fixes typo on people page and #5679 TA's/TAs
+  * [+ab315a2] inside a function passed to showIf 'this' should be the DOM node
+  * [+43dc01f] Fixes #5793 - Show question details issues
+  * [+c81c22d] leave grading rubric open in speedgrader when switching submissions.
+  * [+cbd31f7] quiz result style tweak, fixes #5051
+  * [+f089518] use first discussion topic post for late deadline. fixes #5828.
+  * [+f91365b] enable arranging columns by due date or by assignment group
+  * [+b95a6a1] hide "show attendance" if there's not any attendance
+  * [+7a52347] include account groups in menu regardless of enrollments
+  * [+c87ad64] prevent random selenium/conversations_spec failures
+  * [+9fefc7a] add sis_user_id option to as_user_id param in API.
+  * [+68c88d0] include shared contexts in notifications, closes #5496
+  * [+121bf06] change identity header cache key when masquerading. fixes #5995
+  * [+d32bc2a] don't use == in javascript
+  * [+2df7fce] drop unused Enrollments#invitation_email
+  * [+eaf7df0] drop completely unused attachments.enrollment_id
+  * [+2163004] remove duplicate ccs when merging users refs #5833
+  * [+84deec9] comment out not-yet-applicable-spec refs #5833
+  * [+43a1866] uniquify enrollments when merging users refs #5833
+  * [+4067177] remove relation and fixture data for attachments.enrollment
+  * [+51dc49b] can set due_at in assignments api. fixes #5805.
+  * [+add7e1e] display inline files in user context
+  * [+2b72c47] fix overly zealous uniquifying of enrollments refs #5833
+  * [+51f6535] don't cache the identity menu when masquerading
+  * [+215e828] speed up scrolling on quiz taking page.
+  * [+71957bf] remote rb-fsevent/inotify
+  * [+aca2554] don't fail when converting qti item without identifier
+  * [+18293fb] get quiz group name when importing
+  * [+02fcbf1] add method for plugins to easily inject into the delegated auth workflow
+
+ -- JT Olds <jt@instructure.com>  Sun, 30 Oct 2011 10:32:21 -0600
+
 canvas-lms (1.1-72) professional; urgency=low
 
   * Package ref: bd91b250898ec9c7103de771fc1a30ad1efae12d
