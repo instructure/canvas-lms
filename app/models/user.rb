@@ -666,17 +666,134 @@ class User < ActiveRecord::Base
       updates << "WHEN id=#{p.id} THEN #{max_position}"
     end
     Pseudonym.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
+
     max_position = (new_user.communication_channels.last.position || 0) rescue 0
-    updates = []
-    enrollment_emails = []
+    position_updates = []
+    to_retire_ids = []
     self.communication_channels.each do |cc|
       max_position += 1
-      updates << "WHEN id=#{cc.id} THEN #{max_position}"
-      enrollment_emails << cc.path if cc.path && cc.path_type == 'email'
+      position_updates << "WHEN id=#{cc.id} THEN #{max_position}"
+      source_cc = cc
+      # have to find conflicting CCs, and make sure we don't have conflicts
+      # To avoid the case where a user has duplicate CCs and one of them is retired, don't look for retired ccs
+      # it's okay to do that even if the only matching CC is a retired CC, because it would end up on the no-op
+      # case below anyway.
+      # Behavior is undefined if a user has both an active and an unconfirmed CC; it's not allowed with current
+      # validations, but could be there due to older code that didn't enforce the uniqueness.  The results would
+      # simply be that they'll continue to have duplicate unretired CCs
+      target_cc = new_user.communication_channels.detect { |cc| cc.path.downcase == source_cc.path.downcase && cc.path_type == source_cc.path_type && !cc.retired? }
+      next unless target_cc
+
+      # we prefer keeping the "most" active one, preferring the target user if they're equal
+      # the comments inline show all the different cases, with the source cc on the left,
+      # target cc on the right.  The * indicates the CC that will be retired in order
+      # to resolve the conflict
+      if target_cc.active?
+        # retired, active
+        # unconfirmed*, active
+        # active*, active
+        to_retire = source_cc
+      elsif source_cc.active?
+        # active, unconfirmed*
+        # active, retired
+        to_retire = target_cc
+      elsif target_cc.unconfirmed?
+        # unconfirmed*, unconfirmed
+        # retired, unconfirmed
+        to_retire = source_cc
+      end
+      #elsif
+        # unconfirmed, retired
+        # retired, retired
+      #end
+
+      to_retire_ids << to_retire.id if to_retire && !to_retire.retired?
     end
-    CommunicationChannel.connection.execute("UPDATE communication_channels SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.communication_channels.map(&:id).join(',')})") unless self.communication_channels.empty?
-    e_conn = Enrollment.connection
-    e_conn.execute("UPDATE enrollments SET user_id=#{new_user.id} WHERE user_id=#{self.id} AND invitation_email IN (#{enrollment_emails.map{|email| e_conn.quote(email)}.join(',')})") unless enrollment_emails.empty?
+    CommunicationChannel.update_all("user_id=#{new_user.id}, position=CASE #{position_updates.join(" ")} ELSE NULL END", :id => self.communication_channels.map(&:id)) unless self.communication_channels.empty?
+    CommunicationChannel.update_all({:workflow_state => 'retired'}, :id => to_retire_ids) unless to_retire_ids.empty?
+
+    to_delete_ids = []
+    self.enrollments.each do |enrollment|
+      source_enrollment = enrollment
+      # non-deleted enrollments should be unique per [course_section, type]
+      target_enrollment = new_user.enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && enrollment.type == source_enrollment.type && !['deleted', 'inactive', 'rejected'].include?(enrollment.workflow_state) }
+      next unless target_enrollment
+
+      # we prefer keeping the "most" active one, preferring the target user if they're equal
+      # the comments inline show all the different cases, with the source enrollment on the left,
+      # target enrollment on the right.  The * indicates the enrollment that will be deleted in order
+      # to resolve the conflict.
+      if target_enrollment.active?
+        # deleted, active
+        # inactive, active
+        # rejected, active
+        # invited*, active
+        # creation_pending*, active
+        # active*, active
+        # completed*, active
+        to_delete = source_enrollment
+      elsif source_enrollment.active?
+        # active, deleted
+        # active, inactive
+        # active, rejected
+        # active, invited*
+        # active, creation_pending*
+        # active, completed*
+        to_delete = target_enrollment
+      elsif target_enrollment.completed?
+        # deleted, completed
+        # inactive, completed
+        # rejected, completed
+        # invited*, completed
+        # creation_pending*, completed
+        # completed*, completed
+        to_delete = source_enrollment
+      elsif source_enrollment.completed?
+        # completed, deleted
+        # completed, inactive
+        # completed, rejected
+        # completed, invited*
+        # completed, creation_pending*
+        to_delete = target_enrollment
+      elsif target_enrollment.invited?
+        # deleted, invited
+        # inactive, invited
+        # rejected, invited
+        # creation_pending*, invited
+        # invited*, invited
+        to_delete = source_enrollment
+      elsif source_enrollment.invited?
+        # invited, deleted
+        # invited, inactive
+        # invited, rejected
+        # invited, creation_pending*
+        to_delete = target_enrollment
+      elsif target_enrollment.creation_pending?
+        # deleted, creation_pending
+        # inactive, creation_pending
+        # rejected, creation_pending
+        # creation_pending*, creation_pending
+        to_delete = source_enrollment
+      end
+      #elsif
+        # creation_pending, deleted
+        # creation_pending, inactive
+        # creation_pending, rejected
+        # deleted, rejected
+        # inactive, rejected
+        # rejected, rejected
+        # rejected, deleted
+        # rejected, inactive
+        # deleted, inactive
+        # inactive, inactive
+        # inactive, deleted
+        # deleted, deleted
+      #end
+
+      to_delete_ids << to_delete.id if to_delete && !['deleted', 'inactive', 'rejected'].include?(to_delete.workflow_state)
+    end
+    Enrollment.update_all({:workflow_state => 'deleted'}, :id => to_delete_ids) unless to_delete_ids.empty?
+
     [
       [:quiz_id, :quiz_submissions], 
       [:assignment_id, :submissions]
@@ -769,8 +886,6 @@ class User < ActiveRecord::Base
     self.available_courses.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
   memoize :courses_with_grades
-  
-  attr_accessor :invitation_email
   
   set_policy do
     given { |user| user == self }
@@ -1886,6 +2001,23 @@ class User < ActiveRecord::Base
         hash
       }
     end
+  end
+
+  def short_name_with_shared_contexts(user)
+    if (contexts = shared_contexts(user)).present?
+      "#{short_name} (#{contexts[0, 2].to_sentence})"
+    else
+      short_name
+    end
+  end
+
+  def shared_contexts(user)
+    contexts = []
+    if info = messageable_users(:ids => [user.id]).first
+      contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
+      contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
+    end
+    contexts.map(&:name).sort_by{|c|c.downcase}
   end
 
   def mark_all_conversations_as_read!

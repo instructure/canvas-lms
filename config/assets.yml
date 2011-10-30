@@ -23,7 +23,7 @@ javascripts:
     - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.selectable.js
     - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.sortable.js
     - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.accordion.js
-    # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.autocomplete.js
+    - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.autocomplete.js
     - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.button.js
     - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.dialog.js
     # - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.slider.js
@@ -54,7 +54,6 @@ javascripts:
     - public/javascripts/compiled/handlebars_helpers.js
     - public/javascripts/jquery.disableWhileLoading.js
     - public/javascripts/jquery.fancyplaceholder.js
-    - public/javascripts/vendor/jquery.autocomplete.js
     - public/javascripts/jquery.google-analytics.js
     - public/javascripts/vendor/jquery.pageless.js
     - public/javascripts/jquery.inst_tree.js
@@ -121,7 +120,6 @@ javascripts:
     - public/javascripts/vendor/slickgrid-googlecode/slick.globaleditorlock.js
     - public/javascripts/gradebook_uploads.js
   gradebook_history:
-    - public/javascripts/vendor/jquery.metadata.js 
     - public/javascripts/gradebook-history.js
   jobs:
     - public/javascripts/compiled/jobs.js
@@ -242,6 +240,7 @@ javascripts:
   question_bank:
     - public/javascripts/question_bank.js
     - public/javascripts/find_outcome.js
+    - public/javascripts/jst/quiz/move_question.js
   take_quiz:
     - public/javascripts/quiz_timing.js
     - public/javascripts/take_quiz.js
@@ -331,7 +330,6 @@ stylesheets:
     - public/stylesheets/static/jquery-ui-theme.css
     - public/stylesheets/compiled/jquery-ui-button.css
     - public/stylesheets/compiled/jquery-ui-menu.css
-    - public/stylesheets/static/jquery.autocomplete.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css

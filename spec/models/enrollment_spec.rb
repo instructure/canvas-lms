@@ -742,8 +742,8 @@ describe Enrollment do
     end
   end
   
-  context "audit_restricted_self_signup_groups_for_deleted_enrollments" do
-    it "should ungroup the user when a deleted enrollment causes conflict" do
+  context "audit_groups_for_deleted_enrollments" do
+    it "should ungroup the user when the enrollment is deleted" do
       # set up course with two users in one section
       course_with_teacher(:active_all => true)
       user1 = user_model
@@ -752,27 +752,19 @@ describe Enrollment do
       section1.enroll_user(user1, 'StudentEnrollment')
       section1.enroll_user(user2, 'StudentEnrollment')
 
-      # set up a group category in that course with restricted self sign-up and
-      # put both users in one of its groups
-      category = @course.group_categories.build
-      category.configure_self_signup(true, true)
-      category.save
-      group = category.groups.create(:context => @course)
+      # set up a group without a group category and put both users in it
+      group = @course.groups.create
       group.add_user(user1)
       group.add_user(user2)
-      category.should_not have_heterogenous_group
 
       # remove user2 from the section (effectively unenrolled from the course)
       user2.enrollments.first.destroy
       group.reload
-      category.reload
 
-      # he should be removed from the group, letting the group and the category
-      # happily continue satisfying the self sign-up restriction.
+      # he should be removed from the group
       group.users.size.should == 1
       group.users.should_not be_include(user2)
       group.should have_common_section
-      category.should_not have_heterogenous_group
     end
 
     it "should ungroup the user when a changed enrollment causes conflict" do
@@ -828,14 +820,41 @@ describe Enrollment do
       group.add_user(user1)
       group.add_user(user2)
 
-      # remove user2 from the section (effectively unenrolled from the course)
-      user2.enrollments.first.destroy
+      # move a user to a new section
+      section2 = @course.course_sections.create
+      enrollment = user2.enrollments.first
+      enrollment.course_section = section2
+      enrollment.save
       group.reload
       category.reload
 
       # he should still be in the group
       group.users.size.should == 2
       group.users.should be_include(user2)
+    end
+
+    it "should ungroup the user even when there's not another user in the group if the enrollment is deleted" do
+      # set up course with only one user in one section
+      course_with_teacher(:active_all => true)
+      user1 = user_model
+      section1 = @course.course_sections.create
+      section1.enroll_user(user1, 'StudentEnrollment')
+
+      # set up a group category in that course with restricted self sign-up and
+      # put the user in one of its groups
+      category = @course.group_categories.build
+      category.configure_self_signup(true, false)
+      category.save
+      group = category.groups.create(:context => @course)
+      group.add_user(user1)
+
+      # remove the user from the section (effectively unenrolled from the course)
+      user1.enrollments.first.destroy
+      group.reload
+      category.reload
+
+      # he should not be in the group
+      group.users.size.should == 0
     end
 
     it "should not ungroup the user when there's not another user in the group" do
@@ -853,8 +872,11 @@ describe Enrollment do
       group = category.groups.create(:context => @course)
       group.add_user(user1)
 
-      # remove the user from the section (effectively unenrolled from the course)
-      user1.enrollments.first.destroy
+      # move a user to a new section
+      section2 = @course.course_sections.create
+      enrollment = user1.enrollments.first
+      enrollment.course_section = section2
+      enrollment.save
       group.reload
       category.reload
 

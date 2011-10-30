@@ -489,6 +489,25 @@ describe Quiz do
     it "should get the correct points possible" do
       @quiz.current_points_possible.should == 15
     end
+
+    it "should omit top level questions when selecting from a question bank" do
+      questions = @bank.assessment_questions
+      # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
+      linked_question = @quiz.quiz_questions.build(:question_data => questions[0].question_data)
+      linked_question.assessment_question_id = questions[0].id
+      linked_question.save!
+      @quiz.generate_quiz_data
+      @quiz.save!
+      @quiz.reload
+  
+      submission = @quiz.generate_submission(@user)
+      submission.quiz_data.length.should == 3
+      texts = submission.quiz_data.map{|q|q[:question_text]}
+      texts.member?('gq1').should be_true
+      texts.member?('gq2').should be_true
+      texts.member?('qq1').should be_true
+    end
+
   end
   
   

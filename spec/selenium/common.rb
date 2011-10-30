@@ -199,6 +199,7 @@ shared_examples_for "all selenium tests" do
       @pseudonym_session = mock(PseudonymSession)
       @pseudonym_session.stub!(:session_credentials).and_return([])
       @pseudonym_session.stub!(:record).and_return { pseudonym.reload }
+      @pseudonym_session.stub!(:used_basic_auth?).and_return { false }
       PseudonymSession.stub!(:find).and_return(@pseudonym_session)
     end
   end
@@ -372,6 +373,9 @@ shared_examples_for "all selenium tests" do
           'kcw_ui_conf' => '1',
           'upload_ui_conf' => '1'
     })
+    kal = mock(Kaltura::ClientV3)
+    kal.stub!(:startSession).and_return "new_session_id_here"
+    Kaltura::ClientV3.stub!(:new).and_return(kal)
   end
 
   def get(link)

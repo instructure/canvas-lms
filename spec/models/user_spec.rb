@@ -254,7 +254,7 @@ describe User do
     user = User.create!
     user.register!
     p1 = user.pseudonyms.new :unique_id => "id1", :account => account1
-    p1.sis_source_id = 'sis_id1'
+    p1.sis_user_id = 'sis_id1'
     p1.save!
     user.pseudonyms.create! :unique_id => "id2", :account => account2
     lambda { p1.destroy }.should raise_error /Cannot delete system-generated pseudonyms/
@@ -363,6 +363,107 @@ describe User do
       @user1.submissions.map(&:id).should be_include(s1.id)
       @user1.submissions.map(&:id).should be_include(s3.id)
     end
+
+    #it "should move ccs to the new user (but only if they don't already exist)" do
+    #  @user1 = user_model
+    #  @user2 = user_model
+    #  # unconfirmed => active conflict
+    #  @user1.communication_channels.create!(:path => 'a@instructure.com')
+    #  @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  # active => unconfirmed conflict
+    #  @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  @user2.communication_channels.create!(:path => 'B@instructure.com')
+    #  # active => active conflict
+    #  @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  # unconfirmed => unconfirmed conflict
+    #  @user1.communication_channels.create!(:path => 'd@instructure.com')
+    #  @user2.communication_channels.create!(:path => 'D@instructure.com')
+    #  # retired => unconfirmed conflict
+    #  @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    #  @user2.communication_channels.create!(:path => 'E@instructure.com')
+    #  # unconfirmed => retired conflict
+    #  @user1.communication_channels.create!(:path => 'f@instructure.com')
+    #  @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    #  # retired => active conflict
+    #  @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    #  @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  # active => retired conflict
+    #  @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    #  # retired => retired conflict
+    #  @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    #  @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    #  # <nothing> => active
+    #  @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  # active => <nothing>
+    #  @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+    #  # <nothing> => unconfirmed
+    #  @user2.communication_channels.create!(:path => 'l@instructure.com')
+    #  # unconfirmed => <nothing>
+    #  @user1.communication_channels.create!(:path => 'm@instructure.com')
+    #  # <nothing> => retired
+    #  @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    #  # retired => <nothing>
+    #  @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+
+    #  @user1.move_to_user(@user2)
+    #  @user1.reload
+    #  @user2.reload
+    #  @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+    #      ['A@instructure.com', 'active'],
+    #      ['B@instructure.com', 'retired'],
+    #      ['C@instructure.com', 'active'],
+    #      ['D@instructure.com', 'unconfirmed'],
+    #      ['E@instructure.com', 'unconfirmed'],
+    #      ['F@instructure.com', 'retired'],
+    #      ['G@instructure.com', 'active'],
+    #      ['H@instructure.com', 'retired'],
+    #      ['I@instructure.com', 'retired'],
+    #      ['a@instructure.com', 'retired'],
+    #      ['b@instructure.com', 'active'],
+    #      ['c@instructure.com', 'retired'],
+    #      ['d@instructure.com', 'retired'],
+    #      ['e@instructure.com', 'retired'],
+    #      ['f@instructure.com', 'unconfirmed'],
+    #      ['g@instructure.com', 'retired'],
+    #      ['h@instructure.com', 'active'],
+    #      ['i@instructure.com', 'retired'],
+    #      ['j@instructure.com', 'active'],
+    #      ['k@instructure.com', 'active'],
+    #      ['l@instructure.com', 'unconfirmed'],
+    #      ['m@instructure.com', 'unconfirmed'],
+    #      ['n@instructure.com', 'retired'],
+    #      ['o@instructure.com', 'retired']
+    #  ]
+    #  @user1.communication_channels.should be_empty
+    #end
+
+    it "should move and uniquify enrollments" do
+      @user1 = user_model
+      @user2 = user_model
+      course(:active_all => 1)
+      @enrollment1 = @course.enroll_user(@user1)
+      @enrollment2 = @course.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => 'active')
+      @enrollment3 = StudentEnrollment.create!(:course => @course, :course_section => @course.course_sections.create!, :user => @user1)
+      @enrollment4 = @course.enroll_teacher(@user1)
+
+      @user1.move_to_user(@user2)
+      @enrollment1.reload
+      @enrollment1.user.should == @user2
+      @enrollment1.should be_deleted
+      @enrollment2.reload
+      @enrollment2.should be_active
+      @enrollment2.user.should == @user2
+      @enrollment3.reload
+      @enrollment3.should be_invited
+      @enrollment4.reload
+      @enrollment4.user.should == @user2
+      @enrollment4.should be_invited
+
+      @user1.reload
+      @user1.enrollments.should be_empty
+    end
   end
 
   context "permissions" do
@@ -452,7 +553,7 @@ describe User do
     end
 
     def set_up_course_with_users
-      @course = course_model
+      @course = course_model(:name => 'the course')
       @this_section_teacher = @teacher
       @course.offer!
 
@@ -465,7 +566,7 @@ describe User do
       @other_section_teacher = user_model
       @course.enroll_user(@other_section_teacher, 'TeacherEnrollment', :enrollment_state => 'active', :section => @other_section)
 
-      @group = @course.groups.create
+      @group = @course.groups.create(:name => 'the group')
       @group.users = [@this_section_user]
 
       @unrelated_user = user_model
@@ -612,6 +713,21 @@ describe User do
       @admin.messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
       @admin.messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
       @student.messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
+    end
+
+    it "should return names with shared contexts" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      @group.users << @student
+
+      @student.shared_contexts(@this_section_user).should eql ['the course', 'the group']
+      @student.short_name_with_shared_contexts(@this_section_user).should eql "#{@this_section_user.short_name} (the course and the group)"
+
+      @student.shared_contexts(@other_section_user).should eql ['the course']
+      @student.short_name_with_shared_contexts(@other_section_user).should eql "#{@other_section_user.short_name} (the course)"
+
+      @student.shared_contexts(@unrelated_user).should eql []
+      @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
     end
   end
   

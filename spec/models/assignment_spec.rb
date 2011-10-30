@@ -1100,7 +1100,17 @@ describe Assignment do
       subs.map(&:submission_type).uniq.should eql(['online_text_entry'])
       subs.map(&:body).uniq.should eql(['Some text for you'])
     end
-    
+    it "should submit the homework for all students in the group if grading them individually" do
+      setup_assignment_with_group
+      @a.update_attribute(:grade_group_students_individually, true)
+      res = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Test submission")
+      @a.reload
+      submissions = @a.submissions
+      submissions.length.should eql 2
+      submissions.map(&:group_id).uniq.should eql [@group.id]
+      submissions.map(&:submission_type).uniq.should eql ["online_text_entry"]
+      submissions.map(&:body).uniq.should eql ["Test submission"]
+    end
     it "should update submission for all students in the same group" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :grade => "10")
@@ -1110,7 +1120,6 @@ describe Assignment do
       res.map{|s| s.user}.should be_include(@u1)
       res.map{|s| s.user}.should be_include(@u2)
     end
-    
     it "should add a submission comment for only the specified user by default" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :comment => "woot")
@@ -1122,8 +1131,7 @@ describe Assignment do
     end
     it "should update submission for only the individual student if set thay way" do
       setup_assignment_with_group
-      @a.grade_group_students_individually = true
-      @a.save!
+      @a.update_attribute(:grade_group_students_individually, true)
       res = @a.grade_student(@u1, :grade => "10")
       res.should_not be_nil
       res.should_not be_empty

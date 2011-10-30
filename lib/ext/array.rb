@@ -17,7 +17,6 @@
 #
 
 class Array
-  require "fastercsv"
   def to_csv(options = {})
     if all? { |e| e.respond_to?(:to_row) }
       header_row = first.export_columns(options[:format]).to_csv

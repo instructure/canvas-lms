@@ -39,7 +39,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'Student',
       'primary_email' => 'pvuser@example.com',
       'sis_user_id' => 'sis-user-id',
-      'sis_login_id' => nil,
+      'sis_login_id' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
       'avatar_url' => "http://www.example.com/images/users/#{@student.id}",
     }

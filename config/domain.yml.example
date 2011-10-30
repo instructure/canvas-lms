@@ -5,4 +5,5 @@ production:
   domain: "canvas.example.com"
   # files_domain: "canvasfiles.example.com"
 
-# this config file is ignored in the test environment
+# don't set a domain for the test environment, this is handled automatically by
+# the specs

@@ -9,7 +9,6 @@ gem 'compass',        '0.11.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.7.0'
-gem 'fastercsv',      '1.5.3'
 gem 'hairtrigger',    '0.1.11'
 gem 'haml',           '3.1.2'
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
@@ -61,6 +60,7 @@ group :sqlite do
 end
 
 group :test do
+  gem 'barista',        '1.2.1'
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel_tests', '0.6.4'
   gem 'rcov',         '0.9.9'
@@ -99,6 +99,10 @@ if WINDOWS
   if !ONE_NINE
     gem 'win32-open3',  '0.3.2'
   end
+end
+
+if !ONE_NINE
+  gem 'fastercsv', '1.5.3'
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from

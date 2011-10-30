@@ -69,17 +69,33 @@ describe GradebookImporter do
       @u2 = @user
 
       user_with_pseudonym(:active_all => true, :username => "something_that_has_not_been_taken")
-      @user.pseudonym.sis_source_id = "SISLOGINID"
       student_in_course(:user => @user)
       @user.pseudonym.save!
       @u3 = @user
+
+      user_with_pseudonym(:active_all => true, :username => "inactive_login")
+      @user.pseudonym.destroy
+      student_in_course(:user => @user)
+      @user.pseudonym.save!
+      @user.reload
+      @u4 = @user
+
+      user_with_pseudonym(:active_all => true, :username => "inactive_login")
+      @user.pseudonym.destroy
+      @user.pseudonyms.create!(:unique_id => 'active_login', :account => Account.default)
+      student_in_course(:user => @user)
+      @user.pseudonym.save!
+      @user.reload
+      @u5 = @user
 
       uploaded_csv = FasterCSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
         csv << ["    Points Possible", "", "","", ""]
         csv << [@u1.name , "", "", "", "", 99]
         csv << ["" , "", @u2.pseudonym.sis_user_id, "", "", 99]
-        csv << ["" , "", "", @u3.pseudonym.sis_source_id, "", 99]
+        csv << ["" , "", "", @u3.pseudonym.unique_id, "", 99]
+        csv << ["", "", "", 'inactive_login', "", 99]
+        csv << ["", "", "", 'active_login', "", 99]
         csv << ["" , "", "bogusSISid", "", "", 99]
       end
 
@@ -96,8 +112,15 @@ describe GradebookImporter do
       hash['students'][2]['id'].should == @u3.id
       hash['students'][2]['original_id'].should == @u3.id
 
-      hash['students'][3]['id'].should <  0
+      # Looking up by login, but there are no active pseudonyms for u4
+      hash['students'][3]['id'].should < 0
       hash['students'][3]['original_id'].should be_nil
+
+      hash['students'][4]['id'].should == @u5.id
+      hash['students'][4]['original_id'].should == @u5.id
+
+      hash['students'][5]['id'].should <  0
+      hash['students'][5]['original_id'].should be_nil
 
     end
   end

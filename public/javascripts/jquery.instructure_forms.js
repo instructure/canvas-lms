@@ -439,7 +439,7 @@ I18n.scoped('instructure', function(I18n) {
     
     for(var idx in params) {
       paramsList.push([idx, params[idx]]);
-      if (params[idx].fake_file) {
+      if (params[idx] && params[idx].fake_file) {
         hasFakeFile = true;
       }
     }

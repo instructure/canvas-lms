@@ -41,20 +41,20 @@ class SubAccountsController < ApplicationController
 
   before_filter :require_context, :require_account_management
   def index
-    if (params[:account] && params[:account][:name]) || request.format == :json
+    @query = params[:account] && params[:account][:name] || params[:term]
+    if @query
       @accounts = []
       if @context && @context.is_a?(Account)
-        @accounts = @context.all_accounts.active.name_like(params[:account][:name]).limit(100)
+        @accounts = @context.all_accounts.active.name_like(@query).limit(100)
       end
       respond_to do |format|
         format.html {
           redirect_to @accounts.first if @accounts.length == 1
         }
-        format.json  { render :json => {
-            :query =>  params[:account][:name],
-            :suggestions =>  @accounts.map(& :name),
-            :data => @accounts.map{ |c| {:url => account_url(c), :id => c.id}  }
-          }.to_json
+        format.json {
+          render :json => @accounts.map { |a|
+            {:label => a.name, :url => account_url(a), :id => a.id}
+          }
           return
         }
       end

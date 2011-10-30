@@ -36,10 +36,7 @@
                 </thead>
                 <tbody>
                   <% assignment.submissions.each_with_index do |submission, i| %>
-                  <tr class='<%= i.even? ? "even" : "odd" %> <%= raw({
-                    :assignment_id =>  submission.assignment_id,
-                    :user_id => submission.user_id,
-                    }.to_json) %>'>
+                  <tr class="<%= i.even? ? "even" : "odd" %>" data-assignment-id="<%= submission.assignment_id %>" data-user-id="<%= submission.user_id %>">
                     <th scope="row"><%= submission.student_name %></th>
                     <td>
                       <a href="#" class="ui-corner-all revert-grade-link" >

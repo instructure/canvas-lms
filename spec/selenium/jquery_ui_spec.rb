@@ -25,6 +25,27 @@ describe "jquery ui selenium tests" do
     driver.find_element(:css, ".ui-widget-overlay").should be_displayed
   end
   
+  context "calendar widget" do
+    it "should let you replace content by selecting and typing instead of appending" do
+      get "/courses/#{@course.id}/assignments"
+      
+      driver.find_element(:css, "a.add_assignment_link").click
+      wait_for_animations
+      driver.find_element(:css, ".ui-datepicker-trigger").click
+      wait_for_animations
+      driver.find_element(:css, ".ui-datepicker-time-hour").send_keys("12")
+      driver.find_element(:css, ".ui-datepicker-time-minute").send_keys("00")
+      driver.find_element(:css, ".ui-datepicker-ok").click
+      
+      driver.find_element(:css, ".ui-datepicker-trigger").click
+      wait_for_animations
+      
+      driver.execute_script("$('#ui-datepicker-time-hour').select();")
+      driver.find_element(:id, "ui-datepicker-time-hour").send_keys('5')
+      driver.find_element(:id, "ui-datepicker-time-hour").attribute('value').should == "5"
+    end
+  end
+  
   context "dialog titles" do
 
     # jquery ui doesn't escape dialog titles by default (even when inferred from

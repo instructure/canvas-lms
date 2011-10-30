@@ -31,20 +31,7 @@ I18n.scoped('instructure', function(I18n) {
     this.length && func.call(this, this);
     return this;
   };
-  
-  $.fn.zIndex = function() {
-    var $obj = this;
-    while($obj.length > 0 && $obj.closest("html").length > 0) {
-      var zIndex = parseInt($obj.css('zIndex'), 10);
-      if(zIndex && !isNaN(zIndex)) {
-        return zIndex;
-      } else {
-        $obj = $obj.parent();
-      }
-    }
-    return 1;
-  };
-  
+
   // Returns the width of the browser's scroll bars.
   $.fn.scrollbarWidth = function() {
       var $div = $('<div style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"><div style="height:100px;"></div>').appendTo(this),
@@ -210,9 +197,11 @@ I18n.scoped('instructure', function(I18n) {
   // had much success with it.
   $.fn.showIf = function(bool) {
     if ($.isFunction(bool)) {
-      bool = bool.call(this);
+      return this.each(function(index) {
+        $(this).showIf(bool.call(this));
+      });
     }
-    if(bool) {
+    if (bool) {
       this.show();
     } else {
       this.hide();

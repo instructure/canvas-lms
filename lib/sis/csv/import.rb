@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'faster_csv'
 require 'zip/zip'
 
 module SIS

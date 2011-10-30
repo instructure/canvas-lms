@@ -28,7 +28,7 @@
       <div class="rs-margin-lr rs-margin-bottom">
         <% form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :method => :get} do |f| -%>
           <fieldset class="textfield-inline-with-button">
-            <input id="course_name" type="search" name="course[name]" size=30 value="<%= @query %>" autocomplete="off" />
+            <input id="course_name" name="course[name]" value="<%= @query %>" />
             <button class='button small-button'><%= t(:go_button, "Go") %></button>
           </fieldset>
         <%- end -%>

@@ -292,12 +292,12 @@ class ContextController < ApplicationController
           user_ids = @students.map(&:id) + [@current_user.id]
         end
         @primary_users = {t('roster.students', 'Students') => @students}
-        @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @teachers}
+        @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @teachers}
       elsif @context.is_a?(Group)
         @users = @context.participating_users.find(:all, :order => 'sortable_name').uniq
         @primary_users = {t('roster.group_members', 'Group Members') => @users}
         if @context.context && @context.context.is_a?(Course)
-          @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
+          @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
         end
       end
       @secondary_users ||= {}

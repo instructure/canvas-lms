@@ -22,9 +22,26 @@ var wikiSidebar;
 // to not pollute the global namespace, but it could use more.
 var quiz = {};
 var maxCombinations;
+
 I18n.scoped('quizzes', function(I18n) {
+
   quiz = {
     uniqueLocalIDStore: {},
+
+    // Should cache any elements used throughout the object here
+    init: function () {
+      this.$questions = $('#questions');
+      this.$showDetailsWrap = $('#show_question_details_wrap').hide();
+
+      return this;
+    },
+
+    // Determines whether or to show the "show question details" link.
+    checkShowDetails: function() {
+      var hasQuestions = this.$questions.find('fieldset:not(.essay_question, .text_only_question)').length;
+      this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200);
+    },
+
     generateUniqueLocalID: function($obj) {
       var className = "object";
       if($obj.attr('class')) {
@@ -253,7 +270,12 @@ I18n.scoped('quizzes', function(I18n) {
       $question.find(".formulas_holder").css('display', 'none').find(".formulas_list").empty();
       $question.find('.question_points').text(question.points_possible);
       var details = quiz.answerTypeDetails(question.question_type);
-      var answer_type = details.answer_type, question_type = details.question_type, n_correct = details.n_correct;
+      var answer_type = details.answer_type,
+          question_type = details.question_type,
+          n_correct = details.n_correct;
+
+      $question.attr('class', 'question display_question').addClass(question_type || 'text_only_question');
+
       if(question.question_type == 'fill_in_multiple_blanks_question') {
         $question.find(".multiple_answer_sets_holder").css('display', '');
       } else if(question.question_type == 'multiple_dropdowns_question') {
@@ -393,7 +415,6 @@ I18n.scoped('quizzes', function(I18n) {
         }
       }
       $question.find(".blank_id_select").change();
-      $question.attr('class', 'question display_question').addClass(question_type);
       $question.fillTemplateData({
         question_type: question_type,
         answer_selection_type: answer_type
@@ -559,6 +580,7 @@ I18n.scoped('quizzes', function(I18n) {
       return result;
     },
     updateDisplayComments: function() {
+      this.checkShowDetails();
       $(".question_holder > .question > .question_comment").each(function() {
         var val = $.trim($(this).find(".question_comment_text").html());
         $(this).css('display', '').toggleClass('empty', !val);
@@ -874,7 +896,8 @@ I18n.scoped('quizzes', function(I18n) {
     }
   }
   $(document).ready(function() {
-    quiz.updateDisplayComments();
+    quiz.init().updateDisplayComments();
+
     var $quiz_options_form = $("#quiz_options_form");
     $.scrollSidebar();
     $(".datetime_field").datetime_field();

@@ -518,11 +518,10 @@ shared_examples_for "quiz selenium tests" do
     question.submit
     wait_for_ajax_requests
 
-    driver.find_element(:id, 'show_question_details').click
     quiz.reload
     question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is an essay question.')
   end
 
@@ -542,12 +541,63 @@ shared_examples_for "quiz selenium tests" do
     question.submit
     wait_for_ajax_requests
 
-    driver.find_element(:id, 'show_question_details').click
     quiz.reload
     question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
-    finished_question.should be_displayed
+    finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is a text question.')
+  end
+
+  it "should not show the display details for text questions" do
+    start_quiz_question
+    quiz = Quiz.last
+
+    question = find_with_jquery(".question:visible")
+    question.
+      find_element(:css, 'select.question_type').
+      find_element(:css, 'option[value="text_only_question"]').click
+    question.submit
+    wait_for_ajax_requests
+
+    quiz.reload
+
+    show_el = driver.find_element(:id, 'show_question_details')
+    show_el.should_not be_displayed
+  end
+
+  it "should not show the display details for essay questions" do
+    start_quiz_question
+    quiz = Quiz.last
+
+    question = find_with_jquery(".question:visible")
+    question.
+      find_element(:css, 'select.question_type').
+      find_element(:css, 'option[value="essay_question"]').click
+    question.submit
+    wait_for_ajax_requests
+
+    quiz.reload
+
+    show_el = driver.find_element(:id, 'show_question_details')
+    show_el.should_not be_displayed
+  end
+
+  it "should show the display details when questions other than text or essay questions exist" do
+    start_quiz_question
+    show_el = driver.find_element(:id, 'show_question_details')
+    quiz = Quiz.last
+    question = find_with_jquery(".question_form:visible")
+
+    show_el.should_not be_displayed
+
+    question.
+      find_element(:css, 'select.question_type').
+      find_element(:css, 'option[value="multiple_choice_question"]').click
+    question.submit
+    wait_for_ajax_requests
+    quiz.reload
+
+    show_el.should be_displayed
   end
 
   it "should calculate correct quiz question points total" do

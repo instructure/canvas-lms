@@ -75,7 +75,7 @@
       <% if (identity = yield :identity) %>
         <%= identity %>
       <% else %>
-        <%- cache([@current_user || 'nobody', 'identity-15m'], :expires_in => 15.minutes) do -%>
+        <%- cache_if(!@real_current_user, [@current_user || 'nobody', 'identity-15m'], :expires_in => 15.minutes) do -%>
           <%= render(:partial => 'shared/identity') %>
         <%- end -%>
       <% end %>

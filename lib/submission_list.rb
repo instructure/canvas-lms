@@ -127,7 +127,7 @@ class SubmissionList
     # puts "---------------------------------------------------------------------------------"
     # foo
   end
-  
+
   # A filtered list of hashes of all submission versions that change the
   # grade with all the meta data finally included. This list can be sorted
   # and displayed. 
@@ -252,7 +252,10 @@ class SubmissionList
         # grade for this submission has been changed.  That's because we know
         # that this submission must be the same as the prior submission. 
         # Set the prevous grade and the new grade and add this to the list.
+        # Remove the old submission so that it doesn't show up twice in the
+        # grade history.
         elsif prior_score != h[:score]
+          l.pop
           h[:previous_grade] = prior_grade
           h[:previous_graded_at] = prior_graded_at
           h[:previous_grader] = prior_grader
