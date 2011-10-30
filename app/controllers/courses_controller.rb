@@ -190,7 +190,7 @@ class CoursesController < ApplicationController
       includes = Array(params[:include])
       include_students = includes.include?('students')
 
-      result = @context.course_sections.map do |section|
+      result = @context.active_course_sections.map do |section|
         res = section.as_json(:include_root => false,
                               :only => %w(id name))
         res['sis_section_id'] = section.sis_source_id

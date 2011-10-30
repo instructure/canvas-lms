@@ -1,7 +1,7 @@
 <% key ||= nil %>
 <li>
   <% if key == :needing_grading %>
-      <a href="<%= speed_grader_course_gradebook_path( menu_assignment.context_id, :assignment_id => menu_assignment.id) %>">
+    <a href="<%= speed_grader_course_gradebook_path( menu_assignment.context_id, :assignment_id => menu_assignment.id) %>">
   <% else %>
       <a href="<%= course_assignment_path( menu_assignment.context_id, menu_assignment.id ) %>">
   <% end %>

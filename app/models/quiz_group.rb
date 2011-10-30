@@ -77,6 +77,8 @@ class QuizGroup < ActiveRecord::Base
     item.question_points = hash[:question_points]
     item.pick_count = hash[:pick_count]
     item.position = position
+    item.name = hash[:title] || t('question_group', "Question Group")
+    
     if hash[:question_bank_migration_id]
       if bank = context.assessment_question_banks.find_by_migration_id(hash[:question_bank_migration_id])
         item.assessment_question_bank_id = bank.id

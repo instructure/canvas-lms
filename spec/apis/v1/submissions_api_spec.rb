@@ -545,7 +545,6 @@ describe SubmissionsApiController, :type => :integration do
     student1 = user(:active_all => true)
     student2 = user_with_pseudonym(:active_all => true)
     student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
-    student2.pseudonym.update_attribute(:sis_source_id, 'my-login-id')
 
     course_with_teacher(:active_all => true)
 
@@ -635,7 +634,6 @@ describe SubmissionsApiController, :type => :integration do
     student1 = user(:active_all => true)
     student2 = user_with_pseudonym(:active_all => true)
     student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
-    student2.pseudonym.update_attribute(:sis_source_id, 'my-login-id')
 
     course_with_teacher(:active_all => true)
 
@@ -692,7 +690,7 @@ describe SubmissionsApiController, :type => :integration do
           "/api/v1/courses/#{@course.id}/students/submissions.json",
           { :controller => 'submissions_api', :action => 'for_students',
             :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, 'sis_login_id:my-login-id'],
+          { :student_ids => [student1.to_param, "sis_login_id:#{student2.pseudonym.unique_id}"],
             :assignment_ids => [a1.to_param] })
 
     json.size.should == 2

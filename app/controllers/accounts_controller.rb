@@ -391,7 +391,7 @@ class AccountsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       load_course_right_side
       @courses = []
-      @query = (params[:course] && params[:course][:name]) || params[:query]
+      @query = (params[:course] && params[:course][:name]) || params[:term]
       if @context && @context.is_a?(Account) && @query
         @courses = @context.courses_name_like(@query, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
       end
@@ -403,11 +403,7 @@ class AccountsController < ApplicationController
         format.json  { 
           cancel_cache_buster
           expires_in 30.minutes 
-          render :json => {
-            :query =>  @query,
-            :suggestions =>  @courses.map(& :name),
-            :data => @courses.map(&:id)
-          }
+          render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
         }
       end
     end

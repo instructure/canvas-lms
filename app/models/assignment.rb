@@ -776,7 +776,7 @@ class Assignment < ActiveRecord::Base
     students = [student]
     if self.has_group_category?
       group = self.group_category.groups.active.to_a.find{|g| g.users.include?(student)}
-      students = (group.users & self.context.students) if group && !self.grade_group_students_individually
+      students = (group.users & self.context.students) if group
     end
     [group, students]
   end
@@ -811,6 +811,7 @@ class Assignment < ActiveRecord::Base
       submission_updated = false
       submission = self.find_or_create_submission(student) #submissions.find_or_create_by_user_id(student.id) #(:first, :conditions => {:assignment_id => self.id, :user_id => student.id})
       if student == original_student || !grade_group_students_individually
+        previously_graded = submission.grade.present?
         submission.attributes = opts
         submission.assignment_id = self.id
         submission.user_id = student.id
@@ -832,7 +833,7 @@ class Assignment < ActiveRecord::Base
         submission_updated = true if submission.changed?
         submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
         submission.group = group
-        submission.save!
+        previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
         tags.each do |tag|
           tag.create_outcome_result(student, self, submission)
         end
@@ -922,30 +923,35 @@ class Assignment < ActiveRecord::Base
     comment = opts.delete :comment
     group, students = group_students(original_student)
     homeworks = []
+    primary_homework = nil
     ts = Time.now.to_s
-    students.each do |student|
-      homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
-      homework.grade_matches_current_submission = homework.score ? false : true
-      homework.attributes = opts.merge({
-        :attachment => nil,
-        :processed => false,
-        :process_attempts => 0,
-        :workflow_state => "submitted",
-        :group => group
-      })
-      homework.submitted_at = Time.now
+    transaction do
+      students.each do |student|
+        homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
+        homework.grade_matches_current_submission = homework.score ? false : true
+        homework.attributes = opts.merge({
+          :attachment => nil,
+          :processed => false,
+          :process_attempts => 0,
+          :workflow_state => "submitted",
+          :group => group
+        })
+        homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
 
-      homework.with_versioning(:explicit => true) do
-        group ? homework.save_without_broadcast : homework.save
+        homework.with_versioning(:explicit => true) do
+          group ? homework.save_without_broadcast : homework.save!
+        end
+        homeworks << homework
+        primary_homework = homework if student == original_student
       end
-      context_module_action(student, :submitted)
-      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment
-      homeworks << homework
     end
-    homeworks[0].broadcast_group_submission if group && !homeworks.empty? 
+    primary_homework.broadcast_group_submission if group
+    homeworks.each do |homework|
+      context_module_action(homework.student, :submitted)
+      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment
+    end
     touch_context
-    return homeworks[0] if homeworks.length == 1
-    homeworks.find{|h| h.user_id == original_student.id}
+    return primary_homework
   end
   
   

@@ -21,7 +21,6 @@ class Attachment < ActiveRecord::Base
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data
   include HasContentTags
   
-  belongs_to :enrollment
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   belongs_to :folder

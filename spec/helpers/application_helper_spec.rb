@@ -107,4 +107,20 @@ describe ApplicationHelper do
       tomorrow_at_midnight.should > now
     end
   end
+
+  describe "cache_if" do
+    it "should cache the fragment if the condition is true" do
+      enable_cache do
+        cache_if(true, "t1", :expires_in => 15.minutes, :no_locale => true) { output_buffer.concat "blargh" }
+        @controller.read_fragment("t1").should == "blargh"
+      end
+    end
+
+    it "should not cache if the condition is false" do
+      enable_cache do
+        cache_if(false, "t1", :expires_in => 15.minutes, :no_locale => true) { output_buffer.concat "blargh" }
+        @controller.read_fragment("t1").should be_nil
+      end
+    end
+  end
 end

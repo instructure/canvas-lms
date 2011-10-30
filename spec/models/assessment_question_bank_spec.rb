@@ -39,6 +39,11 @@ describe AssessmentQuestionBank do
     @bank.select_for_submission(5).length.should == 4
   end
 
+  it "should exclude specified questions" do
+    questions = @bank.assessment_questions
+    @bank.select_for_submission(4, [questions.first.id, questions.last.id]).sort_by(&:id).should eql questions[1, 2]
+  end
+
   it "should allow user read access through question bank users" do
     user
     @bank.assessment_question_bank_users.create!(:user => user)

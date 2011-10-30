@@ -48,14 +48,6 @@
       </div>
     <% end %>
     <%= render :partial => 'assignments_needing_grading', :locals => {:contexts => [@context]} %>
-    <% if can_do(@context, @current_user, :manage_grades) && @assignments_needing_publishing && !@assignments_needing_publishing.empty? %>
-      <h2><%= t('headings.unpublished_assignments', %{Unpublished Assignments}) %></h2>
-      <ul class="unstyled_list" title="<%= t('titles.publish_assignments', %{You should publish assignments you're done grading.That way students can consider their grades are official.}) %>" style="margin-left: 10px; margin-bottom: 20px;">
-        <% @assignments_needing_publishing.each do |assignment| %>
-          <li><a href="<%= context_url(@context, :context_assignment_url, assignment.id) %>"><%= assignment.title %></a></li>
-        <% end %>
-      </ul>
-    <% end %>
     <%= render :partial => "group_list", :object => @user_groups %>
     <%= nbsp unless @current_user %>
   </div>

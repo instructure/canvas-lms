@@ -84,7 +84,6 @@ class EnrollmentsFromUserList
           u.workflow_state = @new_user_state
           new_user = true
         end
-        user.invitation_email = email
         user.assert_name(entry[:name])
         
         # there isn't a pseudonym by this unique_id, or else we wouldn't have got here.

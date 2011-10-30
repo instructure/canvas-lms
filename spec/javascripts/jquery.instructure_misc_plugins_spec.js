@@ -25,7 +25,11 @@
         return false;
       })).toEqual($("#checkbox1"));
       expect($("#checkbox1").showIf(true)).toEqual($("#checkbox1"));
-      return expect($("#checkbox1").showIf(false)).toEqual($("#checkbox1"));
+      expect($("#checkbox1").showIf(false)).toEqual($("#checkbox1"));
+      return $('*').showIf(function() {
+        expect(this.nodeType).toBeDefined();
+        return expect(this.constructor).not.toBe(jQuery);
+      });
     });
     return it('disableIf', function() {
       loadFixtures("jquery.instructure_misc_plugins.html");

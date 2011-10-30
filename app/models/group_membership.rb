@@ -119,6 +119,7 @@ class GroupMembership < ActiveRecord::Base
   # provided enrollments
   def active_given_enrollments?(enrollments)
     state != :requested && state != :deleted && 
-    enrollments.any?{ |e| e.user == self.user && e.course == self.group.context }
+    (!self.group.context.is_a?(Course) ||
+     enrollments.any?{ |e| e.user == self.user && e.course == self.group.context })
   end
 end

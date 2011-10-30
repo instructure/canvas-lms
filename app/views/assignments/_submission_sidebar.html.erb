@@ -45,15 +45,15 @@
         <% end %>
       </ul>
     <% end %>
-    <div style="font-size: 0.8em; padding-top: 10px; max-height: 300px; overflow: auto;"><b><%= t 'titles.comments', "Comments:" %> </b>
+    <div style="font-size: 11px; padding-top: 10px; max-height: 300px; overflow: auto;"><b><%= t 'titles.comments', "Comments:" %> </b>
       <%= t('messages.no_comments', "No Comments") if @current_user_submission.submission_comments.empty? %>
       <% @current_user_submission.submission_comments.each do |comment| %>
         <div style="margin-left: 10px;">
           <%= comment.comment %>
-          <div class="comment_attachments" style="text-align: right; margin-right: 10px;">
+          <div class="comment_attachments">
             <% comment.attachments.each do |attachment| %>
               <div class="comment_attachment">
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link"><%= image_tag "file.png", :style => "height: 12px;" %> <%= t 'links.download_attachment', "Download %{attachment_display_name}", :attachment_display_name => attachment.display_name %></a>
+                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
               </div>
             <% end %>
           </div>

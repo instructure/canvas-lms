@@ -28,10 +28,10 @@ module Api::V1::User
       if user_json_is_admin? && pseudonym = user.pseudonym
         # the sis fields on pseudonym are poorly named -- sis_user_id is
         # the id in the SIS import data, where on every other table
-        # that's called sis_source_id. But on pseudonym, sis_source_id is
-        # the login id from the SIS import data.
+        # that's called sis_source_id.
         json.merge! :sis_user_id => pseudonym.sis_user_id,
-                    :sis_login_id => pseudonym.sis_source_id,
+            # TODO: don't send sis_login_id; it's garbage data
+                    :sis_login_id => pseudonym.sis_user_id ? pseudonym.unique_id : nil,
                     :login_id => pseudonym.unique_id
       end
     end

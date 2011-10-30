@@ -20,31 +20,30 @@ HEREDOC
 <h2><%= t 'titles.current', "Current Collaborations" %></h2>
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content) %>
-    <%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
+    <p><%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
 **What do we mean by collaborations?**  We're talking about web-based tools that most
 likely your students are already familiar with.  Students can use resources like
 [Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
 to work collaboratively on tasks like group papers or note-taking.  This page gives them
 (and you) an easy place to keep track of those collaborations, and also to set them
 up without having to swap emails.
-
-To find out more about a particular type of collaboration, click "Start a New Collaboration"
-and then choose that type in the dropdown list.
 HEREDOC
-        %>
+        %></p>
   <% else %>
-    <%= mt :description_student, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
+    <p><%= mt :description_student, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
 **What do we mean by collaborations?**  We're talking about web-based tools for
 working together on a shared document.  You can use resources like
 [Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
 to work collaboratively on tasks like group papers or note-taking.  This page is
 an easy place to keep track of those collaborations, and also to set them
 up without having to swap emails.
-
-To find out more about a particular type of collaboration, click "Start a New Collaboration"
-and then choose that type in the dropdown list.
 HEREDOC
-        %>
+        %></p>
+  <% end %>
+  <% if can_do(@context, @current_user, :create_collaborations) %>
+    <p>
+      <%= t :how_to_start_a_new_collaboration, 'To find out more about a particular type of collaboration, click "Start a New Collaboration" and then choose that type in the dropdown list.' %>
+    </p>
   <% end %>
 </div>
 <div id="collaborations">

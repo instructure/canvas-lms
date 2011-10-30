@@ -12,6 +12,7 @@
       function Gradebook(options) {
         var promise;
         this.options = options;
+        this.initGrid = __bind(this.initGrid, this);
         this.initHeader = __bind(this.initHeader, this);
         this.hoverMinimizedCell = __bind(this.hoverMinimizedCell, this);
         this.unminimizeColumn = __bind(this.unminimizeColumn, this);
@@ -29,6 +30,8 @@
         this.getSubmissionsChunks = __bind(this.getSubmissionsChunks, this);
         this.buildRows = __bind(this.buildRows, this);
         this.rowFilter = __bind(this.rowFilter, this);
+        this.columnSortFn = __bind(this.columnSortFn, this);
+        this.arrangeColumnsBy = __bind(this.arrangeColumnsBy, this);
         this.gotStudents = __bind(this.gotStudents, this);
         this.gotAssignmentGroups = __bind(this.gotAssignmentGroups, this);
         this.chunk_start = 0;
@@ -47,8 +50,7 @@
         promise = $.when($.ajaxJSON(this.options.assignment_groups_url, "GET", {}, this.gotAssignmentGroups), $.ajaxJSON(this.options.sections_and_students_url, "GET", this.sectionToShow && {
           sections: [this.sectionToShow]
         })).then(__bind(function(assignmentGroupsArgs, studentsArgs) {
-          this.gotStudents.apply(this, studentsArgs);
-          return this.initHeader();
+          return this.gotStudents.apply(this, studentsArgs);
         }, this));
         this.spinner = new Spinner();
         $(this.spinner.spin().el).css({
@@ -77,6 +79,7 @@
             for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
               assignment = _ref[_j];
               $.htmlEscapeValues(assignment);
+              assignment.assignment_group = group;
               if (assignment.due_at) {
                 assignment.due_at = $.parseFromISO(assignment.due_at);
               }
@@ -126,7 +129,62 @@
         }
         this.initGrid();
         this.buildRows();
-        return this.getSubmissionsChunks();
+        this.getSubmissionsChunks();
+        return this.initHeader();
+      };
+      Gradebook.prototype.arrangeColumnsBy = function(newThingToArrangeBy) {
+        var columns;
+        if (newThingToArrangeBy && newThingToArrangeBy !== this._sortColumnsBy) {
+          this.$columnArrangementTogglers.each(function() {
+            return $(this).closest('li').showIf($(this).data('arrangeColumnsBy') !== newThingToArrangeBy);
+          });
+          this._sortColumnsBy = newThingToArrangeBy;
+          $.store[newThingToArrangeBy === 'due_date' ? 'userSet' : 'userRemove']("sort_grade_colums_by_" + this.options.context_id, newThingToArrangeBy);
+          columns = this.gradeGrid.getColumns();
+          columns.sort(this.columnSortFn);
+          this.gradeGrid.setColumns(columns);
+          this.buildRows();
+        }
+        return this._sortColumnsBy || (this._sortColumnsBy = $.store.userGet("sort_grade_colums_by_" + this.options.context_id) || 'assignment_group');
+      };
+      Gradebook.prototype.columnSortFn = function(a, b) {
+        var aDate, bDate, diffOfAssignmentGroupPosition, diffOfAssignmentPosition, _ref, _ref2;
+        if (b.type === 'total_grade') {
+          return -1;
+        }
+        if (a.type === 'total_grade') {
+          return 1;
+        }
+        if (b.type === 'assignment_group' && a.type !== 'assignment_group') {
+          return -1;
+        }
+        if (a.type === 'assignment_group' && b.type !== 'assignment_group') {
+          return 1;
+        }
+        if (a.type === 'assignment_group' && b.type === 'assignment_group') {
+          return a.object.position - b.object.position;
+        } else if (a.type === 'assignment' && b.type === 'assignment') {
+          if (this.arrangeColumnsBy() === 'assignment_group') {
+            diffOfAssignmentGroupPosition = a.object.assignment_group.position - b.object.assignment_group.position;
+            diffOfAssignmentPosition = a.object.position - b.object.position;
+            return (diffOfAssignmentGroupPosition * 1000000) + diffOfAssignmentPosition;
+          } else {
+            aDate = ((_ref = a.object.due_at) != null ? _ref.timestamp : void 0) || Number.MAX_VALUE;
+            bDate = ((_ref2 = b.object.due_at) != null ? _ref2.timestamp : void 0) || Number.MAX_VALUE;
+            if (aDate === bDate) {
+              if (a.object.name === b.object.name) {
+                return 0;
+              }
+              if (a.object.name > b.object.name) {
+                return 1;
+              } else {
+                return -1;
+              }
+            }
+            return aDate - bDate;
+          }
+        }
+        throw "unhandled column sort condition";
       };
       Gradebook.prototype.rowFilter = function(student) {
         return !this.sectionToShow || (student.section.id === this.sectionToShow);
@@ -512,6 +570,19 @@
             return this.buildRows();
           }, this));
         }, this));
+        if (!($.detect(this.gradeGrid.getColumns(), function() {
+          var _ref2;
+          return ((_ref2 = this.object) != null ? _ref2.submission_types : void 0) === "attendance";
+        }))) {
+          $settingsMenu.find('#show_attendance').hide();
+        }
+        this.$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind('click', __bind(function(event) {
+          var thingToArrangeBy;
+          event.preventDefault();
+          thingToArrangeBy = $(event.currentTarget).data('arrangeColumnsBy');
+          return this.arrangeColumnsBy(thingToArrangeBy);
+        }, this));
+        this.arrangeColumnsBy('assignment_group');
         $('#gradebook_settings').show().kyleMenu({
           buttonOpts: {
             icons: {
@@ -527,7 +598,8 @@
           if (!$upload_modal) {
             locals = {
               download_gradebook_csv_url: "" + this.options.context_url + "/gradebook.csv",
-              action: "" + this.options.context_url + "/gradebook_uploads"
+              action: "" + this.options.context_url + "/gradebook_uploads",
+              authenticityToken: $("#ajax_authenticity_token").text()
             };
             $upload_modal = $(Template('gradebook_uploads_form', locals)).dialog({
               bgiframe: true,
@@ -592,7 +664,8 @@
             maxWidth: 200,
             width: testWidth(assignment.name, minWidth),
             sortable: true,
-            toolTip: true
+            toolTip: true,
+            type: 'assignment'
           };
           if ('' + assignment.submission_types === "not_graded") {
             columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded';
@@ -631,7 +704,8 @@
             maxWidth: 200,
             width: testWidth(group.name, 35),
             cssClass: "meta-cell assignment-group-cell",
-            sortable: true
+            sortable: true,
+            type: 'assignment_group'
           });
         }
         this.columns.push({
@@ -643,7 +717,8 @@
           maxWidth: 100,
           width: testWidth("Total", 50),
           cssClass: "total-cell",
-          sortable: true
+          sortable: true,
+          type: 'total_grade'
         });
         $widthTester.remove();
         options = $.extend({

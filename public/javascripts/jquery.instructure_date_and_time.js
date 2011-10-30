@@ -176,9 +176,6 @@ I18n.scoped('instructure', function(I18n) {
     return (date && date.toString('h:mmtt').toLowerCase()) || "";
   };
   $.friendlyDatetime = function(datetime, perspective) {
-    if (perspective == null) {
-      perspective = 'past';
-    }
     var today = Date.today();
     if (Date.equals(datetime.clone().clearTime(), today)) {
       return I18n.l('#time.formats.tiny', datetime);
@@ -283,21 +280,18 @@ I18n.scoped('instructure', function(I18n) {
         var cur = $.datepicker._curInst;
         if(cur) {
           var val = $(this).val();
-          $(this).val(val);
           cur.input.data('time-hour', val);
         }
       }).delegate(".ui-datepicker-time-minute", 'change keypress focus blur', function(event) {
         var cur = $.datepicker._curInst;
         if(cur) {
           var val = $(this).val();
-          $(this).val(val);
           cur.input.data('time-minute', val);
         }
       }).delegate(".ui-datepicker-time-ampm", 'change keypress focus blur', function(event) {
         var cur = $.datepicker._curInst;
         if(cur) {
           var val = $(this).val();
-          $(this).val(val);
           cur.input.data('time-ampm', val);
         }
       });

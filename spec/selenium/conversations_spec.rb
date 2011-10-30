@@ -56,7 +56,7 @@ shared_examples_for "conversations selenium tests" do
     end
 
     expect {
-      find_with_jquery("#create_message_form button[type='submit']").click
+      driver.find_element(:id, "create_message_form").submit
       wait_for_ajaximations
     }.to change(ConversationMessage, :count).by(1)
 

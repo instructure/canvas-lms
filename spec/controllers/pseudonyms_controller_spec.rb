@@ -208,7 +208,6 @@ describe PseudonymsController do
     it "should not destroy if it's SIS and the user doesn't have permission" do
       user_with_pseudonym(:active_all => true)
       user_session(@user, @pseudonym)
-      @pseudonym.sis_source_id = 'user'
       @pseudonym.sis_user_id = 'bob'
       @pseudonym.save!
       delete 'destroy', :user_id => @user.id, :id => @pseudonym.id
@@ -231,7 +230,6 @@ describe PseudonymsController do
       user_with_pseudonym(:active_all => true)
       user_session(@user, @pseudonym)
       @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
-      @p2.sis_source_id = 'test'
       @p2.sis_user_id = 'another_one@test.com'
       @p2.save!
       @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
@@ -247,7 +245,6 @@ describe PseudonymsController do
       Account.site_admin.add_user(@user)
       user_session(@user, @pseudonym)
       @p2 = @user.pseudonyms.build(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
-      @p2.sis_source_id = 'test'
       @p2.sis_user_id = 'another_one@test.com'
       @p2.save!
       @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
