@@ -356,6 +356,26 @@ describe SIS::CSV::UserImporter do
     Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
   end
 
+  it "should not notify about merge opportunities for users that have no means of logging in" do
+    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted",
+      "user_2,user2,User,Dos,user@example.com,active"
+    )
+    user1 = Pseudonym.find_by_unique_id('user1').user
+    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1.should_not == user2
+    user1.last_name.should == "Uno"
+    user2.last_name.should == "Dos"
+    user1.pseudonyms.count.should == 1
+    user2.pseudonyms.count.should == 1
+    user1.pseudonyms.first.communication_channel_id.should_not be_nil
+    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+
+    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
+  end
+
   it "should not have problems updating a user to a conflicting email" do
     notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
     process_csv_data_cleanly(

@@ -204,7 +204,7 @@ module SIS
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
               if newly_active
-                other_ccs = ccs.reject { |cc_but_i_cant_call_it_cc_because_ruby_is_jacked_up_in_my_opinion| cc_but_i_cant_call_it_cc_because_ruby_is_jacked_up_in_my_opinion.user_id == user.id }
+                other_ccs = ccs.reject { |other_cc| other_cc.user_id == user.id || other_cc.user.nil? || other_cc.user.pseudonyms.active.count == 0 }
                 unless other_ccs.empty?
                   cc.send_merge_notification!
                 end

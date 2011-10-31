@@ -171,10 +171,28 @@ describe UsersController do
 
         u = User.create! { |u| u.workflow_state = 'registered' }
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+        u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
         p = Pseudonym.find_by_unique_id('jacob@instructure.com')
         Message.find(:first, :conditions => { :communication_channel_id => p.user.email_channel.id, :notification_id => notification.id }).should_not be_nil
+      end
+
+      it "should not notify the user if the merge opportunity can't log in'" do
+        notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+
+        account = Account.create!
+        user_with_pseudonym(:account => account)
+        account.add_user(@user)
+        user_session(@user, @pseudonym)
+        @admin = @user
+
+        u = User.create! { |u| u.workflow_state = 'registered' }
+        u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+        post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }
+        response.should be_success
+        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+        Message.find(:first, :conditions => { :communication_channel_id => p.user.email_channel.id, :notification_id => notification.id }).should be_nil
       end
     end
   end
