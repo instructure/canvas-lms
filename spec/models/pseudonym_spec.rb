@@ -46,6 +46,15 @@ describe Pseudonym do
     Pseudonym.create!(:unique_id => 'cody@instructure.com')
   end
   
+  it "should find the correct pseudonym for logins" do
+    p1 = Pseudonym.create!(:unique_id => 'Cody@instructure.com')
+    p2 = Pseudonym.create!(:unique_id => 'codY@instructure.com') { |p| p.workflow_state = 'deleted' }
+    Pseudonym.custom_find_by_unique_id('cody@instructure.com').should == p1
+    account = Account.create!
+    p3 = Pseudonym.create!(:unique_id => 'cOdy@instructure.com', :account => account)
+    Pseudonym.custom_find_by_unique_id('cody@instructure.com', :all).sort.should == [p1, p3]
+  end
+
   it "should associate to another user" do
     user_model
     pseudonym_model
