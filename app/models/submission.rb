@@ -363,8 +363,10 @@ class Submission < ActiveRecord::Base
       self.score = self.assignment.min_score if self.assignment.min_score && self.score && self.score < self.assignment.min_score 
     end
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
+    self.quiz_submission.reload if self.quiz_submission
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
+    self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission && !self.quiz_submission.complete?
     if self.graded? && self.graded_at_changed? && self.assignment.available?
       self.changed_since_publish = true
     end

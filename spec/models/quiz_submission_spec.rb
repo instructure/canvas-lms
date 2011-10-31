@@ -110,6 +110,81 @@ describe QuizSubmission do
     s.kept_score.should eql(6.0)
   end
 
+  describe "with an essay question" do
+    before(:each) do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
+        {
+          "text_after_answers"            => "",
+          "question_#{@questions[0].id}"  => "<p>Lorem ipsum answer.</p>",
+          "context_id"                    => "#{@course.id}",
+          "context_type"                  => "Course",
+          "user_id"                       => "#{@user.id}",
+          "quiz_id"                       => "#{@quiz.id}",
+          "course_id"                     => "#{@course.id}",
+          "question_text"                 => "Lorem ipsum question",
+        }
+      end
+    end
+
+    it "should leave a submission in pending_review state if there are essay questions" do
+      @quiz_submission.submission.workflow_state.should eql 'pending_review'
+    end
+
+    it "should mark a submission as complete once an essay question has been graded" do
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1'
+      })
+      @quiz_submission.submission.workflow_state.should eql 'graded'
+    end
+  end
+
+  describe "with multiple essay questions" do
+    before(:each) do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}},
+                                   {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
+        {
+          "text_after_answers"            => "",
+          "question_#{@questions[0].id}"  => "<p>Lorem ipsum answer 1.</p>",
+          "question_#{@questions[1].id}"  => "<p>Lorem ipsum answer 2.</p>",
+          "context_id"                    => "#{@course.id}",
+          "context_type"                  => "Course",
+          "user_id"                       => "#{@user.id}",
+          "quiz_id"                       => "#{@quiz.id}",
+          "course_id"                     => "#{@course.id}",
+          "question_text"                 => "Lorem ipsum question",
+        }
+      end
+    end
+
+    it "should not mark a submission complete if there are essay questions without grades" do
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1',
+        "question_score_#{@questions[1].id}" => "--"
+      })
+      @quiz_submission.submission.workflow_state.should eql 'pending_review'
+    end
+
+    it "should mark a submission complete if all essay questions have been graded" do
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1',
+        "question_score_#{@questions[1].id}" => "0"
+      })
+      @quiz_submission.submission.workflow_state.should eql 'graded'
+    end
+  end
+
   it "should update associated submission" do
     c = factory_with_protected_attributes(Course, :workflow_state => "active")
     a = c.assignments.new(:title => "some assignment")

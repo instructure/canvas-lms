@@ -263,6 +263,24 @@ Spec::Runner.configure do |config|
     path.should eql("/?login_success=1")
   end
 
+  # The block should return the submission_data. A block is used so
+  # that we have access to the @questions variable that is created
+  # in this method
+  def quiz_with_graded_submission(questions, &block)
+    course_with_student(:active_all => true)
+    @assignment = @course.assignments.create(:title => "Test Assignment")
+    @assignment.workflow_state = "available"
+    @assignment.submission_types = "online_quiz"
+    @assignment.save
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+    @quiz.generate_quiz_data
+    @quiz_submission = @quiz.generate_submission(@user)
+    @quiz_submission.mark_completed
+    @quiz_submission.submission_data = yield if block_given?
+    @quiz_submission.grade_submission
+  end
+
   def outcome_with_rubric(opts={})
     @outcome_group ||= LearningOutcomeGroup.default_for(@course)
     @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
