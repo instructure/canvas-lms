@@ -188,7 +188,7 @@ Spec::Runner.configure do |config|
   end
 
   def course_with_teacher(opts={})
-    course(opts)
+    @course = opts[:course] || course(opts)
     @user = opts[:user] || user(opts)
     @teacher = @user
     @enrollment = @course.enroll_teacher(@user)
