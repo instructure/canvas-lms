@@ -45,6 +45,7 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]  
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments
+  has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments
   has_many :all_courses, :source => :course, :through => :enrollments  
   has_many :group_memberships, :include => :group, :dependent => :destroy
@@ -113,7 +114,7 @@ class User < ActiveRecord::Base
   has_many :stream_items, :through => :stream_item_instances
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
   has_many :favorites
-  has_many :favorite_courses, :source => :course, :through => :current_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
+  has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
@@ -1455,21 +1456,12 @@ class User < ActiveRecord::Base
   end
   memoize :account
   
-  def courses_with_primary_enrollment(association = :courses)
+  def courses_with_primary_enrollment(association = :current_and_invited_courses)
     Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
-      postgres = (connection.adapter_name =~ /postgresql/i)
-      prefix = postgres ? "DISTINCT ON (courses.id)" : nil
-      result = send(association).find(:all,
-        :select => "#{prefix} courses.*, enrollments.type AS primary_enrollment, #{Enrollment::ENROLLMENT_RANK_SQL} AS primary_enrollment_rank",
-        :order => "courses.id, #{Enrollment::ENROLLMENT_RANK_SQL}"
-      )
-      unless postgres
-        result = result.inject([]) { |ary, course|
-          ary << course unless ary.last && ary.last.id == course.id
-          ary
-        }
-      end
-      result.sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
+      send(association).distinct_on(["courses.id"],
+        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment::TYPE_RANK_SQL} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+        :order => "courses.id, #{Enrollment::TYPE_RANK_SQL}, #{Enrollment::STATE_RANK_SQL}"
+      ).sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
     end
   end
   memoize :courses_with_primary_enrollment
@@ -1938,7 +1930,7 @@ class User < ActiveRecord::Base
       WHERE
         user_id = users.id AND courses.id = course_id
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]})
-      ORDER BY #{Enrollment::ENROLLMENT_RANK_SQL}
+      ORDER BY #{Enrollment::TYPE_RANK_SQL}
       LIMIT 1
     SQL
     user_sql << <<-SQL if account_ids.present?

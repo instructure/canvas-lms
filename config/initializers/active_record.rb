@@ -265,6 +265,38 @@ class ActiveRecord::Base
     end
     result
   end
+
+  def self.rank_sql(ary, col)
+    ary.each_with_index.inject('CASE '){ |string, (values, i)|
+      string << "WHEN #{col} IN (" << Array(values).map{ |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
+    } << "ELSE #{ary.size} END"
+  end
+
+  def self.rank_hash(ary)
+    ary.each_with_index.inject(Hash.new(ary.size + 1)){ |hash, (values, i)|
+      Array(values).each{ |value| hash[value] = i + 1 }
+      hash
+    }
+  end
+
+  def self.distinct_on(columns, options)
+    native = (connection.adapter_name == 'PostgreSQL')
+    options[:select] = "DISTINCT ON (#{Array(columns).join(', ')}) " + (options[:select] || '*') if native
+    raise "can't use limit with distinct on" if options[:limit] # while it's possible, it would be gross for non-native, so we don't allow it
+    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{columns.map{ |c| Regexp.escape(c) }.join(' (asc|desc)?,')}/i
+
+    result = find(:all, options)
+
+    if !native
+      columns = columns.map{ |c| c.to_s.sub(/.*\./, '') }
+      result = result.inject([]) { |ary, row|
+        ary << row unless ary.last && columns.all?{ |c| ary.last[c] == row[c] }
+        ary
+      }
+    end
+
+    result
+  end
 end
 
 class ActiveRecord::Serialization::Serializer

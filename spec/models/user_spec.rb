@@ -308,8 +308,12 @@ describe User do
     @course4 = course(:course_name => "not yet active")
     @course4.enroll_user(@user, 'StudentEnrollment')
 
-    # only three, in the right order (type, then name), and with the top type per course
+    @course5 = course(:course_name => "invited")
+    @course5.enroll_user(@user, 'TeacherEnrollment')
+
+    # only four, in the right order (type, then name), and with the top type per course
     @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
+      [@course5.id, 'TeacherEnrollment'],
       [@course2.id, 'TeacherEnrollment'],
       [@course3.id, 'TeacherEnrollment'],
       [@course1.id, 'StudentEnrollment']

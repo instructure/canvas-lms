@@ -520,7 +520,10 @@ var I18n = I18n || {};
 
     mapped = courses.map do |course|
       term = course.enrollment_term.name if (name_counts[course.short_name] > 1 && !course.enrollment_term.default_term?)
-      subtitle = Enrollment.readable_type(course.primary_enrollment)
+      subtitle = (course.primary_enrollment_state == 'invited' ?
+                  before_label('#shared.menu_enrollment.labels.invited_as', 'Invited as') :
+                  before_label('#shared.menu_enrollment.labels.enrolled_as', "Enrolled as")
+                 ) + " " + Enrollment.readable_type(course.primary_enrollment)
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
