@@ -30,21 +30,19 @@ module BasicLTI
         end
       end
     end
-    request = consumer.send(:create_http_request, :post, path, params)
     options = {
-                :request_uri      => request.send(:oauth_full_request_uri, consumer.http),
-                :consumer         => consumer,
-                :token            => nil,
                 :scheme           => 'body',
-                :signature_method => 'HMAC-SHA1',
                 :timestamp        => @timestamp,
                 :nonce            => @nonce
               }
-    options[:uri] = options[:request_uri]
-    request.oauth!(consumer.http, consumer, nil, options)
+    request = consumer.create_signed_request(:post, path, nil, options, params)
+
+    # the request is made by a html form in the user's browser, so we
+    # want to revert the escapage and return the hash of post parameters ready
+    # for embedding in a html view
     hash = {}
     request.body.split(/&/).each do |param|
-      key, val = param.split(/=/).map{|v| URI.unescape(v) }
+      key, val = param.split(/=/).map{|v| CGI.unescape(v) }
       hash[key] = val
     end
     hash

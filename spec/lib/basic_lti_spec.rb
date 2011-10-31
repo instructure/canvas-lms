@@ -58,8 +58,9 @@ describe BasicLTI do
         :tool_consumer_instance_guid        => 'lmsng.school.edu',
         :tool_consumer_instance_description => 'University of School (LMSng)',
         :basiclti_submit                    => 'Launch Endpoint with BasicLTI Data'
-      }, 'http://dr-chuck.com/ims/php-simple/tool.php?a=1&b=2', '12345', 'secret')
-      res['oauth_signature'].should eql('eCJ7qILcordyJC2/Unhchp6RAcs=')
+      }, 'http://dr-chuck.com/ims/php-simple/tool.php?a=1&b=2&c=3%20%26a', '12345', 'secret')
+      res['oauth_signature'].should eql('uF7LooyefQN5aocx7UlYQ4tQM5k=')
+      res['c'].should == "3 &a"
     end
     
     it "should generate a correct signature with a non-standard port" do

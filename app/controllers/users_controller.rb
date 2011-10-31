@@ -31,36 +31,6 @@ class UsersController < ApplicationController
   before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade]
   before_filter :require_open_registration, :only => [:new, :create]
   
-  def oauth
-    if !feature_and_service_enabled?(params[:service])
-      if params[:service]
-        flash[:error] = t('named_service_not_enabled', "The service \"%{name_of_service}\" has not been enabled", :name_of_service => params[:service])
-      else
-        flash[:error] = t('service_not_enabled', "That service has not been enabled")
-      end
-      return
-    end
-    if params[:service] == "google_docs"
-      session[:google_docs_authorization_return_to] = params[:return_to] || dashboard_url(:only_path => false)
-      redirect_to google_docs_request_token_url(session[:google_docs_authorization_return_to])
-    elsif params[:service] == "twitter"
-      session[:twitter_authorization_return_to] = params[:return_to] || dashboard_url(:only_path => false)
-      redirect_to twitter_request_token_url(session[:twitter_authorization_return_to])
-    elsif params[:service] == "linked_in"
-      session[:linked_in_authorization_return_to] = params[:return_to] || dashboard_url(:only_path => false)
-      redirect_to linked_in_request_token_url(session[:linked_in_authorization_return_to])
-    elsif params[:service] == "facebook"
-      oauth_request = OauthRequest.create(
-        :service => 'facebook',
-        :secret => AutoHandle.generate("fb", 10),
-        :return_url => params[:return_to],
-        :user => @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-      redirect_to Facebook.authorize_url(oauth_request)
-    end
-  end
-  
   def grades
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
@@ -104,6 +74,30 @@ class UsersController < ApplicationController
       end
     end
   end
+
+  def oauth
+    if !feature_and_service_enabled?(params[:service])
+      flash[:error] = t('service_not_enabled', "That service has not been enabled")
+      return redirect_to(profile_url)
+    end
+    return_to_url = params[:return_to] || profile_url
+    if params[:service] == "google_docs"
+      redirect_to google_docs_request_token_url(return_to_url)
+    elsif params[:service] == "twitter"
+      redirect_to twitter_request_token_url(return_to_url)
+    elsif params[:service] == "linked_in"
+      redirect_to linked_in_request_token_url(return_to_url)
+    elsif params[:service] == "facebook"
+      oauth_request = OauthRequest.create(
+        :service => 'facebook',
+        :secret => AutoHandle.generate("fb", 10),
+        :return_url => return_to_url,
+        :user => @current_user,
+        :original_host_with_port => request.host_with_port
+      )
+      redirect_to Facebook.authorize_url(oauth_request)
+    end
+  end
   
   def oauth_success
     oauth_request = nil
@@ -127,34 +121,29 @@ class UsersController < ApplicationController
         else
           flash[:error] = t('facebook_fail', "Facebook authorization failed.")
         end
-        return_to(oauth_request.return_url, profile_url)
       elsif params[:service] == "google_docs"
         begin
-          google_docs_get_access_token(oauth_request)
-          doc_list = google_doc_list
+          google_docs_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
           flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
         end
-        return_to(session[:google_docs_authorization_return_to], profile_url)
       elsif params[:service] == "linked_in"
         begin
-          linked_in_get_access_token(oauth_request)
+          linked_in_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
           flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
         end
-        return_to(session[:linked_in_authorization_return_to], profile_url)
       else
         begin
-          token = twitter_get_access_token(oauth_request)
-          favorites = twitter_list(token)
+          token = twitter_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
-        return_to(session[:twitter_authorization_return_to], profile_url)
       end
+      return_to(oauth_request.return_url, profile_url)
     end
   end
 

@@ -31,7 +31,7 @@ gem 'mime-types',     '1.16',   :require => 'mime/types'
 gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
 gem 'nokogiri',       '1.4.1'
-gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
+gem 'oauth',          '0.4.5'
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'rake',           '< 0.10'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
