@@ -20,7 +20,7 @@
           end
           %>
       </p>
-      <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :merge => 'self') %>" class="button"><%= t('buttons.merge', "Merge") %></a>
+      <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :merge => 'self') %>" class="button"><%= t('buttons.merge', "Merge") %></a>
       <div style="clear: both;"></div>
     <% end %>
     <% if @communication_channel.user.registered?  %>
