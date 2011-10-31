@@ -47,7 +47,7 @@ module BasicLTI
     end
     hash
   end
-  
+
   def self.generate(url, tool, user, context, link_code, return_url)
     hash = {}
     hash['lti_message_type'] = 'basic-lti-launch-request'
@@ -83,5 +83,16 @@ module BasicLTI
     
     hash['oauth_callback'] = 'about:blank'
     generate_params(hash, url, tool.consumer_key, tool.shared_secret)
+  end
+
+  def self.verify(tool, rack_request)
+    require 'oauth'
+    require 'oauth/consumer'
+
+    consumer = OAuth::Consumer.new(tool.consumer_key, tool.shared_secret, {
+      :site => "#{uri.scheme}://#{host}",
+      :signature_method => "HMAC-SHA1"
+    })
+    request = consumer.send(:create_http_request, :post, rack_request.path, params)
   end
 end

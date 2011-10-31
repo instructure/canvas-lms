@@ -749,7 +749,7 @@ class ApplicationController < ActionController::Base
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
-  API_REQUEST_REGEX = /\A\/api\//
+  API_REQUEST_REGEX = %r{\A/api/v\d}
 
   def api_request?
     @api_request ||= !!request.path.match(API_REQUEST_REGEX)

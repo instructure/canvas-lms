@@ -70,13 +70,13 @@ describe DiscussionTopicsController, :type => :integration do
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :per_page => '3'})
 
     json.length.should == 3
-    response.headers['Link'].should eql(%{</api/v1/courses/#{@course.id}/discussion_topics.json?page=2&per_page=3>; rel="next",</api/v1/courses/#{@course.id}/discussion_topics.json?page=1&per_page=3>; rel="first",</api/v1/courses/#{@course.id}/discussion_topics.json?page=3&per_page=3>; rel="last"})
+    response.headers['Link'].should eql(%{</api/v1/courses/#{@course.id}/discussion_topics?page=2&per_page=3>; rel="next",</api/v1/courses/#{@course.id}/discussion_topics?page=1&per_page=3>; rel="first",</api/v1/courses/#{@course.id}/discussion_topics?page=3&per_page=3>; rel="last"})
 
       # get the last page
-    json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?page=3&per_page=3",
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics?page=3&per_page=3",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :page => '3', :per_page => '3'})
     json.length.should == 1
-    response.headers['Link'].should eql(%{</api/v1/courses/#{@course.id}/discussion_topics.json?page=2&per_page=3>; rel="prev",</api/v1/courses/#{@course.id}/discussion_topics.json?page=1&per_page=3>; rel="first",</api/v1/courses/#{@course.id}/discussion_topics.json?page=3&per_page=3>; rel="last"})
+    response.headers['Link'].should eql(%{</api/v1/courses/#{@course.id}/discussion_topics?page=2&per_page=3>; rel="prev",</api/v1/courses/#{@course.id}/discussion_topics?page=1&per_page=3>; rel="first",</api/v1/courses/#{@course.id}/discussion_topics?page=3&per_page=3>; rel="last"})
   end
   
   it "should work with groups" do
@@ -126,13 +126,13 @@ describe DiscussionTopicsController, :type => :integration do
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s, :per_page => '3'})
 
     json.length.should == 3
-    response.headers['Link'].should eql(%{</api/v1/groups/#{group.id}/discussion_topics.json?page=2&per_page=3>; rel="next",</api/v1/groups/#{group.id}/discussion_topics.json?page=1&per_page=3>; rel="first",</api/v1/groups/#{group.id}/discussion_topics.json?page=3&per_page=3>; rel="last"})
+    response.headers['Link'].should eql(%{</api/v1/groups/#{group.id}/discussion_topics?page=2&per_page=3>; rel="next",</api/v1/groups/#{group.id}/discussion_topics?page=1&per_page=3>; rel="first",</api/v1/groups/#{group.id}/discussion_topics?page=3&per_page=3>; rel="last"})
 
       # get the last page
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json?page=3&per_page=3",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s, :page => '3', :per_page => '3'})
     json.length.should == 1
-    response.headers['Link'].should eql(%{</api/v1/groups/#{group.id}/discussion_topics.json?page=2&per_page=3>; rel="prev",</api/v1/groups/#{group.id}/discussion_topics.json?page=1&per_page=3>; rel="first",</api/v1/groups/#{group.id}/discussion_topics.json?page=3&per_page=3>; rel="last"})
+    response.headers['Link'].should eql(%{</api/v1/groups/#{group.id}/discussion_topics?page=2&per_page=3>; rel="prev",</api/v1/groups/#{group.id}/discussion_topics?page=1&per_page=3>; rel="first",</api/v1/groups/#{group.id}/discussion_topics?page=3&per_page=3>; rel="last"})
   end
 
 end
