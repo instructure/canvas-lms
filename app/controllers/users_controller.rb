@@ -499,6 +499,8 @@ class UsersController < ApplicationController
     @user.name ||= params[:pseudonym][:unique_id]
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
+    # pre-populate the reverse association
+    @pseudonym.user = @user
     @pseudonym.attributes = params[:pseudonym]
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'

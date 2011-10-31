@@ -87,6 +87,7 @@ describe UsersController do
         p.user.communication_channels.length.should == 1
         p.user.communication_channels.first.should be_unconfirmed
         p.user.communication_channels.first.path.should == 'jacob@instructure.com'
+        p.user.associated_accounts.should == [Account.default]
       end
 
       it "should complain about conflicting unique_ids" do
