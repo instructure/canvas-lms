@@ -27,6 +27,9 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
   });
 
   $(function() {
+    // prevent mousewheel from changing answers on dropdowns see #6143
+    $('select').bind('mousewheel', false);
+
     $.scrollSidebar();
 
     if($("#preview_mode_link").length == 0) {

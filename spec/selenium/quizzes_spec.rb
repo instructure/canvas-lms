@@ -891,6 +891,34 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:id, 'quiz_title').text.should == q.title
   end
 
+  it "should prevent mousewheel events on select elements when taking a quiz" do
+    course_with_teacher_logged_in
+    @context = @course
+    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    q = quiz_model
+    b = bank.assessment_questions.create!
+    quest2 = q.quiz_questions.create!(:assessment_question => b)
+    quest2.write_attribute(:question_data, { :neutral_comments=>"", :question_text=>"<p>My hair is [x] and my wife's is [y].</p>", :points_possible=>1, :question_type=>"multiple_dropdowns_question", :answers=>[{:comments=>"", :weight=>100, :blank_id=>"x", :text=>"brown", :id=>2624}, {:comments=>"", :weight=>0, :blank_id=>"x", :text=>"black", :id=>3085}, {:comments=>"", :weight=>100, :blank_id=>"y", :text=>"brown", :id=>5780}, {:comments=>"", :weight=>0, :blank_id=>"y", :text=>"red", :id=>8840}], :correct_comments=>"", :name=>"Question", :question_name=>"Question", :incorrect_comments=>"", :assessment_question_id=>nil})
+
+    q.generate_quiz_data
+    q.save!
+    get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
+    driver.find_element(:css, '.publish_quiz_button')
+    get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+
+    wait_for_ajax_requests
+
+    driver.execute_script <<-EOF
+      window.mousewheelprevented = false;
+      jQuery('select').bind('mousewheel', function(event) {
+        mousewheelprevented = event.isDefaultPrevented();
+      }).trigger('mousewheel');
+    EOF
+
+    is_prevented = driver.execute_script('return window.mousewheelprevented')
+    is_prevented.should be_true
+  end
+
   it "should display quiz statistics" do
     course_with_teacher_logged_in
     quiz_with_submission
@@ -899,8 +927,6 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:link, I18n.t("links.quiz_statistics", "Quiz Statistics")).click
 
     driver.find_element(:css, '#content .question_name').should include_text("Question 1")
-
-
   end
 end
 
