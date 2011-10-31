@@ -141,14 +141,6 @@ class Enrollment < ActiveRecord::Base
     READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
   end
 
-  ENROLLMENT_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
-  ENROLLMENT_RANK_SQL = ENROLLMENT_RANK.size.times.inject('CASE '){|s, i| s << "WHEN type = '#{ENROLLMENT_RANK[i]}' THEN #{i} "} << 'END'
-  def self.highest_enrollment_type(type, type2)
-    res = ENROLLMENT_RANK.find{|t| t == type || t == type2}
-    res ||= type || type2
-    res
-  end
-  
   def should_update_user_account_association?
     self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
   end
@@ -291,41 +283,22 @@ class Enrollment < ActiveRecord::Base
     @long_name
   end
   
+  TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
+  TYPE_RANK_SQL = rank_sql(TYPE_RANK, 'enrollments.type')
+  TYPE_RANK_HASH = rank_hash(TYPE_RANK)
+
   def rank_sortable(student_first=false)
     type = self.class.to_s
-    case type
-    when 'StudentEnrollment'
-      student_first ? 0 : 4
-    when 'TeacherEnrollment'
-      1
-    when 'TaEnrollment'
-      2
-    when 'ObserverEnrollment'
-      5
-    when 'DesignerEnrollment'
-      3
-    else
-      6
-    end
+    return 0 if type == 'StudentEnrollment' && student_first
+    TYPE_RANK_HASH[type]
   end
-  
+
+  STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
+  STATE_RANK_SQL = rank_sql(STATE_RANK, 'enrollments.workflow_state')
+  STATE_RANK_HASH = rank_hash(STATE_RANK)
+
   def state_sortable
-    case state
-    when :invited
-      1
-    when :creation_pending
-      1
-    when :active
-      0
-    when :deleted
-      5
-    when :rejected
-      4
-    when :completed
-      2
-    else
-      6
-    end
+    STATE_RANK_HASH[state.to_s]
   end
   
   def accept!
