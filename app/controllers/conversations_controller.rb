@@ -490,7 +490,7 @@ class ConversationsController < ApplicationController
   #   "bob smith"). If multiple terms are given (separated via whitespace),
   #   only results matching all terms will be returned.
   # @argument context Limit the search to a particular course/group (e.g.
-  # "course_3" or "group_4").
+  #   "course_3" or "group_4").
   # @argument exclude Array of ids to exclude from the search. These may be
   #   user ids or course/group ids prefixed with "course_" or "group_"
   #   respectively, e.g. [1, 2, "course_3"].
