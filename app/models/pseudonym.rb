@@ -105,11 +105,11 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
   
-  def self.custom_find_by_unique_id(unique_id)
+  def self.custom_find_by_unique_id(unique_id, which = :first)
     if connection.adapter_name.downcase == 'mysql'
-      find_by_unique_id(unique_id)
+      find(which, :conditions => { :unique_id => unique_id, :workflow_state => 'active'})
     else
-      first(:conditions => ["LOWER(#{quoted_table_name}.unique_id) = ?", unique_id.mb_chars.downcase])
+      find(which, :conditions => ["LOWER(#{quoted_table_name}.unique_id)=? AND workflow_state='active'", unique_id.mb_chars.downcase])
     end
   end
   

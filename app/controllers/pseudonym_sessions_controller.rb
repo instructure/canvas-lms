@@ -57,7 +57,7 @@ class PseudonymSessionsController < ApplicationController
         end
         if st.is_valid?
           @pseudonym = nil
-          @pseudonym = @domain_root_account.pseudonyms.active.custom_find_by_unique_id(st.response.user)
+          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(st.response.user)
           if @pseudonym
             # Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
@@ -102,7 +102,7 @@ class PseudonymSessionsController < ApplicationController
     # If authlogic fails and this account allows handles from other account,
     # try to log in with a handle from another account
     if !found && !@domain_root_account.require_account_pseudonym? && params[:pseudonym_session]
-      valid_alternative = Pseudonym.find_all_by_unique_id_and_workflow_state(params[:pseudonym_session][:unique_id], 'active').find{|p|
+      valid_alternative = Pseudonym.custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).find{|p|
         (p.valid_password?(params[:pseudonym_session][:password]) && p.account.password_authentication?) rescue false
       }
       if valid_alternative
@@ -214,7 +214,7 @@ class PseudonymSessionsController < ApplicationController
       if response.is_valid?
         if response.success_status?
           @pseudonym = nil
-          @pseudonym = @domain_root_account.pseudonyms.active.custom_find_by_unique_id(response.name_id)
+          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(response.name_id)
 
           if @pseudonym
             # We have to reset the session again here -- it's possible to do a
