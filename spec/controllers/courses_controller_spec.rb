@@ -255,6 +255,28 @@ describe CoursesController do
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
         response.should redirect_to(registration_confirmation_url(@user.email_channel.confirmation_code, :enrollment => @enrollment.uuid))
       end
+
+      it "should not use the session enrollment if it's for the wrong course" do
+        course_with_student(:active_course => 1)
+        @enrollment1 = @enrollment
+        @course1 = @course
+        course(:active_course => 1)
+        student_in_course(:user => @user)
+        @enrollment2 = @enrollment
+        @course2 = @course
+        user_session(@user)
+
+        get 'show', :id => @course1.id
+        response.should be_success
+        assigns[:pending_enrollment].should == @enrollment1
+        session[:enrollment_uuid].should == @enrollment1.uuid
+
+        controller.instance_variable_set(:@pending_enrollment, nil)
+        get 'show', :id => @course2.id
+        response.should be_success
+        assigns[:pending_enrollment].should == @enrollment2
+        session[:enrollment_uuid].should == @enrollment2.uuid
+      end
     end
   end
   
