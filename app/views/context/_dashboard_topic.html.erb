@@ -24,7 +24,7 @@
     <div class="message_short user_content"><%= truncate_html(user_content(topic.try_rescue(:message)) || nbsp, :max_length => 250, :link => link_to(t('read_more', "more"), "#{context_prefix(context_code)}/discussion_topics/#{topic ? topic.id : '{{ id }}'}", :class => "read_more_link")) %></div>
     <% end %>
     <div class="message user_content" style="<%= hidden if topic && topic.message && topic.message.length > 250 %>"><%= user_content(topic.try_rescue(:message)) || nbsp %></div>
-    <% if topic && !topic.root_discussion_entries.empty? %>
+    <% if topic && topic.root_discussion_entries.present? %>
       <div class="original_post_date">
         <%= t :post_date, "posted *%{post_date}*", :post_date => datetime_string(topic.try_rescue(:created_at)) || nbsp, :wrapper => '<span class="post_date time_ago_date">\1</span>' %>
       </div>
