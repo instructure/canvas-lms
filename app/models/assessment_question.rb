@@ -509,7 +509,7 @@ class AssessmentQuestion < ActiveRecord::Base
       hash[field] = ImportedHtmlConverter.convert(hash[field], context, true) if hash[field].present?
     end
     hash[:answers].each do |answer|
-      [:html, :comments_html].each do |field|
+      [:html, :comments_html, :left_html].each do |field|
         answer[field] = ImportedHtmlConverter.convert(answer[field], context, true) if answer[field].present?
       end
     end if hash[:answers]
