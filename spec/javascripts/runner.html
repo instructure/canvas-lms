@@ -25,6 +25,7 @@
   </style>
 </head>
 <body>
+  <button id="kill">Remove Fixtures</button>
   <h1 id="qunit-header">QUnit Test Suite</h1>
   <h2 id="qunit-banner"></h2>
   <div id="qunit-testrunner-toolbar"></div>
@@ -52,6 +53,11 @@
   <script src="../../public/javascripts/vendor/curl.js"></script>
   <script>
     require(['specs']);
+    $(function () {
+      $('#kill').click(function () {
+        $('#fixtures').empty();
+      });
+    });
   </script>
 
 </body>

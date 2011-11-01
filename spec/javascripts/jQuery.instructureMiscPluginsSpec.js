@@ -1,5 +1,5 @@
 (function() {
-  define(['js!vendor/jquery-1.6.4.js', 'js!jquery.instructure_misc_plugins.js!order'], function() {
+  define(['js!vendor/jquery-1.6.4.js', 'js!I18n.js', 'js!jquery.instructure_misc_plugins.js!order'], function() {
     module('instructure misc plugins');
     test('showIf', function() {
       var el;
