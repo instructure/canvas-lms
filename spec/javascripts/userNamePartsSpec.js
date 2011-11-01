@@ -19,9 +19,15 @@ define(['js!user_utils.js'], function() {
     deepEqual(userUtils.nameParts(''), [null, null, null]);
     deepEqual(userUtils.nameParts('John Doe'), ['John', 'Doe', null]);
     deepEqual(userUtils.nameParts('Junior'), ['Junior', null, null]);
+  });
+
+  test("should use prior_surname", function (){
     deepEqual(userUtils.nameParts('John St. Clair', 'St. Clair'), ['John', 'St. Clair', null])
     deepEqual(userUtils.nameParts('John St. Clair', 'Cutrer'), ['John St.', 'Clair', null])
     deepEqual(userUtils.nameParts('St. Clair', 'St. Clair'), [null, 'St. Clair', null])
+  });
+
+  test("should infer surname with no given name", function() {
     deepEqual(userUtils.nameParts('St. Clair,'), [null, 'St. Clair', null])
   });
 });
