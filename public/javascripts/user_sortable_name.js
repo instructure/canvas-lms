@@ -9,12 +9,12 @@ $(function () {
     var name = $name.attr('value');
     var sortable_name = $sortable_name.attr('value');
     var sortable_name_parts = userUtils.nameParts(sortable_name);
-    if (sortable_name.trim() === '' || userUtils.firstNameFirst(sortable_name_parts) === prior_name.trim()) {
+    if (jQuery.trim(sortable_name) === '' || userUtils.firstNameFirst(sortable_name_parts) === jQuery.trim(prior_name)) {
       var parts = userUtils.nameParts(name, sortable_name_parts[1]);
       $sortable_name.attr('value', userUtils.lastNameFirst(parts));
     }
     var short_name = $short_name.attr('value');
-    if (short_name.trim() === '' || short_name === prior_name) {
+    if (jQuery.trim(short_name) === '' || short_name === prior_name) {
       $short_name.attr('value', name);
     }
     prior_name = $(this).attr('value');

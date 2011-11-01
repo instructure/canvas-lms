@@ -3,10 +3,12 @@ var userUtils = {
   nameParts: function(name, prior_surname) {
     var SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
     var surname, given, suffix, given_parts, prior_surname_parts, name_parts;
-    if (!name || name.trim() === '') {
+    if (!name || jQuery.trim(name) === '') {
       return [null, null, null];
     }
-    name_parts = name.trim().split(/\s*,\s*/);
+    name_parts = jQuery.map(name.split(','), function(str) {
+      return jQuery.trim(str);
+    });
     surname = name_parts[0];
     given = name_parts[1];
     suffix = name_parts.slice(2).join(', ');
@@ -19,7 +21,7 @@ var userUtils = {
       suffix = null;
     }
 
-    if (given != null) {
+    if (typeof given === 'string') {
       // John Doe, Sr.
       if (!suffix && SUFFIXES.test(given)) {
         suffix = given;
@@ -28,7 +30,7 @@ var userUtils = {
       }
     } else {
       // John Doe
-      given = name.trim();
+      given = jQuery.trim(name);
       surname = null;
     }
 
@@ -47,7 +49,7 @@ var userUtils = {
         (prior_surname_parts = prior_surname.split(/\s+/)) &&
         given_parts.length >= prior_surname_parts.length &&
         given_parts.slice(given_parts.length - prior_surname_parts.length).join(' ') === prior_surname_parts.join(' ')) {
-      surname = given_parts.splice(given_parts.length - prior_surname_parts.length).join(' ')
+      surname = given_parts.splice(given_parts.length - prior_surname_parts.length, prior_surname_parts.length).join(' ')
     }
     // Last resort; last name is just the last word given
     if (!surname && given_parts.length > 1) {
@@ -57,10 +59,11 @@ var userUtils = {
     return [ given_parts.length === 0 ? null : given_parts.join(' '), surname, suffix ];
   },
   lastNameFirst: function(parts) {
-    var given = [parts[0], parts[2]].join(' ').trim();
-    return (parts[1] ? parts[1] + ', ' + given : given).trim();
+    var given = jQuery.trim([parts[0], parts[2]].join(' '));
+    return jQuery.trim((parts[1] ? parts[1] + ', ' + given : given));
   },
   firstNameFirst: function(parts) {
-    return parts.join(' ').replace(/\s+/, ' ').trim();
+    return jQuery.trim(parts.join(' ').replace(/\s+/, ' '));
   }
 };
+
