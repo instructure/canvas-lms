@@ -51,10 +51,12 @@ class CommunicationChannelsController < ApplicationController
     @course = @enrollment && @enrollment.course
     @headers = false
     @root_account = @course.root_account if @course
-    @root_account ||= @domain_root_account
     if cc
       @communication_channel = cc
       @user = cc.user
+      @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
+      @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
+      @root_account ||= @domain_root_account
 
       # load merge opportunities
       other_ccs = CommunicationChannel.find(:all, :conditions => ["path=? AND path_type=? AND user_id<>? AND workflow_state='active'", cc.path, cc.path_type, @user.id])
