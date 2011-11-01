@@ -193,7 +193,7 @@ class Enrollment < ActiveRecord::Base
       # we have just deleted the user's enrollment in the group's course.
       # remove the leaving user from the group to keep the group happy
       membership = group.group_memberships.find_by_user_id(self.user_id)
-      membership.destroy
+      membership.destroy if membership
     end
   end
   protected :audit_groups_for_deleted_enrollments
