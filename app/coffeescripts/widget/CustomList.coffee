@@ -1,4 +1,4 @@
-### 
+###
 js!requires:
   - vendor/jquery-1.6.4.js
   - compiled/Template.js
@@ -20,6 +20,7 @@ define 'compiled/widget/CustomList', [
       url: '/favorites'
       appendTarget: 'body',
       resetCount: 12
+      onToggle: false
 
     constructor: (selector, items, options) ->
       @options          = jQuery.extend {}, @options, options
@@ -32,21 +33,23 @@ define 'compiled/widget/CustomList', [
       @ghost            = jQuery('<ul/>').addClass('customListGhost')
       @requests         = { add: {}, remove: {} }
       @doc              = jQuery document.body
-      @isOpen           = false
 
       @attach()
       @setItems items
+      @open() if @options.autoOpen
 
     open: ->
       @wrapper.appendTo(@appendTarget).show()
       setTimeout => # css3 animation
         @element.addClass('customListEditing')
+        @options.onToggle?(on)
       , 1
 
     close: ->
       @wrapper.hide 0, =>
         @teardown()
       @element.removeClass('customListEditing');
+      @options.onToggle?(off)
       @resetList() if @pinned.length is 0
 
     attach: ->
@@ -139,7 +142,7 @@ define 'compiled/widget/CustomList', [
         args.unshift(item.id)
         @addError.apply(this, args)
 
-      data = 
+      data =
         favorite:
           context_type: @options.model,
           context_id: item.id

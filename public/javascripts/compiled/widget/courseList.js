@@ -6,14 +6,30 @@
     return {
       init: function() {
         return jQuery(function() {
-          var menu;
-          menu = jQuery('#menu_enrollments');
-          if (menu.length === 0) {
+          var $menu, $menuDrop, loadCourses;
+          $menu = jQuery('#menu_enrollments');
+          $menuDrop = $menu.closest('.menu-item-drop');
+          if ($menu.length === 0) {
             return;
           }
-          return jQuery.getJSON('/all_menu_courses', function(enrollments) {
-            return window.courseList = new CustomList('#menu_enrollments', enrollments, {
-              appendTarget: '#menu_enrollments'
+          return jQuery.subscribe('menu/hovered', loadCourses = function(elem) {
+            var autoOpen;
+            if (!$(elem).find($menu).find('.customListOpen').length) {
+              return;
+            }
+            jQuery.unsubscribe('menu/hovered', loadCourses);
+            autoOpen = false;
+            $menu.delegate('.customListOpen', 'click', function() {
+              return autoOpen = true;
+            });
+            return jQuery.getJSON('/all_menu_courses', function(enrollments) {
+              return window.courseList = new CustomList('#menu_enrollments', enrollments, {
+                appendTarget: '#menu_enrollments',
+                autoOpen: autoOpen,
+                onToggle: function(state) {
+                  return $menuDrop.toggleClass('menuCustomListEditing', state);
+                }
+              });
             });
           });
         });
