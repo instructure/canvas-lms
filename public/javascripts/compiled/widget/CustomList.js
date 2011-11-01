@@ -1,5 +1,5 @@
 (function() {
-  /* 
+  /*
   js!requires:
     - vendor/jquery-1.6.4.js
     - compiled/Template.js
@@ -17,7 +17,8 @@
         content: 'courseList/content',
         url: '/favorites',
         appendTarget: 'body',
-        resetCount: 12
+        resetCount: 12,
+        onToggle: false
       };
       function CustomList(selector, items, options) {
         this.options = jQuery.extend({}, this.options, options);
@@ -33,21 +34,29 @@
           remove: {}
         };
         this.doc = jQuery(document.body);
-        this.isOpen = false;
         this.attach();
         this.setItems(items);
+        if (this.options.autoOpen) {
+          this.open();
+        }
       }
       CustomList.prototype.open = function() {
         this.wrapper.appendTo(this.appendTarget).show();
         return setTimeout(__bind(function() {
-          return this.element.addClass('customListEditing');
+          var _base;
+          this.element.addClass('customListEditing');
+          return typeof (_base = this.options).onToggle === "function" ? _base.onToggle(true) : void 0;
         }, this), 1);
       };
       CustomList.prototype.close = function() {
+        var _base;
         this.wrapper.hide(0, __bind(function() {
           return this.teardown();
         }, this));
         this.element.removeClass('customListEditing');
+        if (typeof (_base = this.options).onToggle === "function") {
+          _base.onToggle(false);
+        }
         if (this.pinned.length === 0) {
           return this.resetList();
         }
