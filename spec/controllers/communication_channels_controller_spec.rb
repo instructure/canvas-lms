@@ -201,7 +201,7 @@ describe CommunicationChannelsController do
         @pseudonym.account.should == @account
       end
 
-      it "should give an error when trying to register on the wrong domain" do
+      it "should figure out the correct domain when registering" do
         @account = Account.create!
         user_with_pseudonym(:account => @account, :password => :autogenerate)
         @pseudonym.account.should == @account
@@ -209,8 +209,10 @@ describe CommunicationChannelsController do
 
         # @domain_root_account == Account.default
         post 'confirm', :nonce => @cc.confirmation_code
-        response.should_not be_success
-        response.should render_template('confirm_failed')
+        response.should be_success
+        response.should render_template('confirm')
+        assigns[:pseudonym].should == @pseudonym
+        assigns[:root_account].should == @account
       end
 
       it "should not finalize registration for invalid parameters" do
@@ -248,6 +250,39 @@ describe CommunicationChannelsController do
         @pseudonym = @user.pseudonyms.first
         @pseudonym.should be_active
         @pseudonym.unique_id.should == 'jt@instructure.com'
+        # communication_channel is redefed to do a lookup
+        @pseudonym.communication_channel_id.should == @cc.id
+      end
+
+      it "should register creation_pending user in the correct account" do
+        @account = Account.create!
+        course(:active_all => 1, :account => @account)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_student(@user)
+        @user.should be_creation_pending
+        @enrollment.should be_invited
+        get 'confirm', :nonce => @cc.confirmation_code
+        response.should be_success
+        assigns[:pseudonym].should be_new_record
+        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
+        assigns[:pseudonym].account.should == @account
+        assigns[:root_account].should == @account
+
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1
+        response.should be_redirect
+        @user.reload
+        @user.should be_registered
+        @enrollment.reload
+        @enrollment.should be_invited
+        @cc.reload
+        @cc.should be_active
+        @user.pseudonyms.length.should == 1
+        @pseudonym = @user.pseudonyms.first
+        @pseudonym.should be_active
+        @pseudonym.unique_id.should == 'jt@instructure.com'
+        @pseudonym.account.should == @account
         # communication_channel is redefed to do a lookup
         @pseudonym.communication_channel_id.should == @cc.id
       end
