@@ -1,3 +1,11 @@
+canvas-lms (1.1-74) professional; urgency=low
+
+  * Package ref: 7270ef38bb8716dc5dc3bdcfcde2da8d33936c93
+  *
+  * [+7270ef3] only search for active pseudonyms when logging in fixes #6128
+
+ -- JT Olds <jt@instructure.com>  Tue, 01 Nov 2011 01:12:31 -0600
+
 canvas-lms (1.1-73) professional; urgency=low
 
   * Package ref: 02fcbf1747804f8f2d1adf9db3dc3f57fcc2c1db
