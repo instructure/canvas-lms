@@ -133,17 +133,19 @@ shared_examples_for "dashboard selenium tests" do
   end
 
   it "should display scheduled web conference in stream" do
+    PluginSetting.create!(:name => "dim_dim", :settings => {"domain" => "dimdim.instructure.com"})
+
     course_with_student_logged_in
-     @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "DimDim", :duration => 60})
-     @conference.user = @user
-     @conference.save!
-     @conference.add_initiator(@user)
-     @conference.add_invitee(@user)
-     @conference.save!
+    @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "DimDim", :duration => 60})
+    @conference.user = @user
+    @conference.save!
+    @conference.add_initiator(@user)
+    @conference.add_invitee(@user)
+    @conference.save!
 
-      get "/"
+    get "/"
 
-      driver.find_element(:css, '#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
+    driver.find_element(:css, '#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
   end
 
   it "should display calendar events in the coming up list" do
