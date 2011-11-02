@@ -519,8 +519,8 @@ class Assignment < ActiveRecord::Base
       0.0
     else
       # try to treat it as a letter grade
-      if grading_scheme
-        (points_possible * GradingStandard.grade_to_score(grading_scheme, grade)).round / 100.0
+      if grading_scheme && standard_based_score = GradingStandard.grade_to_score(grading_scheme, grade)
+        (points_possible * standard_based_score).round / 100.0
       else
         nil
       end

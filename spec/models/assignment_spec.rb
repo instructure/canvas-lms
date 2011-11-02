@@ -174,6 +174,12 @@ describe Assignment do
     s2[0].state.should eql(:graded)
   end
   
+  describe  "interpret_grade" do
+    it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
+      Assignment.interpret_grade("", 20, GradingStandard.default_grading_standard).should be_nil
+    end
+  end
+
   it "should create a new version for each submission" do
     setup_assignment_without_submission
     @a.submit_homework(@user)
