@@ -31,7 +31,8 @@ class Assignment < ActiveRecord::Base
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
-    :set_custom_field_values, :context, :position, :allowed_extensions
+    :set_custom_field_values, :context, :position, :allowed_extensions,
+    :context_external_tool
   attr_accessor :original_id
   
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
@@ -49,6 +50,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
+  belongs_to :context_external_tool
 
   validates_presence_of :context_id
   validates_presence_of :context_type
@@ -651,7 +653,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def submittable_type?
-    submission_types && self.submission_types != "" && self.submission_types != "none" && self.submission_types != 'not_graded' && self.submission_types != "online_quiz" && self.submission_types != 'discussion_topic' && self.submission_types != 'attendance'
+    submission_types && self.submission_types != "" && self.submission_types != "none" && self.submission_types != 'not_graded' && self.submission_types != "online_quiz" && self.submission_types != 'discussion_topic' && self.submission_types != 'attendance' && self.submission_types != "external_tool"
   end
   
   def graded_count
@@ -1461,6 +1463,8 @@ class Assignment < ActiveRecord::Base
       item.submission_types = "online_upload"
     elsif ['online_quiz'].include?(hash[:submission_format])
       item.submission_types = "online_quiz"
+    elsif ['external_tool'].include?(hash[:submission_format])
+      item.submission_types = "external_tool"
     end
     if item.submission_types == "online_quiz"
       item.saved_by = :quiz

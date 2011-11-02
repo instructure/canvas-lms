@@ -726,8 +726,8 @@ ActionController::Routing::Routes.draw do |map|
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
 
-  ApiRouteSet.route(map, "/api/lti") do |lti|
-    lti.post "tools/:tool_id/courses/:course_id/assignments/:assignment_id/submissions/:id", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
+  ApiRouteSet.route(map, "/api/lti/v1") do |lti|
+    lti.post "courses/:course_id/assignments/:assignment_id/submissions/:id", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
   end
 
   map.resources :equation_images, :only => :show
