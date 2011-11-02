@@ -43,7 +43,8 @@
     }
     #f1_container {
       position: relative;
-      margin: 100px auto;
+      margin: 0 auto;
+      padding: 100px 0;
       width: 300px;
       height: 170px;
       z-index: 1;
@@ -159,7 +160,9 @@
     var $forgot_password_form = document.querySelector('#forgot_password_form');
     $forgot_password_form.addEventListener('submit', function(event){
       var $button      = $forgot_password_form.querySelector('.request-password-button'),
-          originalText = $button.textContent;
+          originalText = $button.textContent,
+          uniqueId     = $forgot_password_form.querySelector('input[name="pseudonym_session[unique_id_forgot]"]').value.trim();
+      if (!uniqueId) return false;
       $button.disabled = true;
       $button.textContent = $button.getAttribute('data-text-while-loading')
       event.preventDefault();
@@ -169,7 +172,7 @@
         data: 'authenticity_token=' +
               encodeURIComponent($forgot_password_form.querySelector('input[name=authenticity_token]').value) +
               '&pseudonym_session%5Bunique_id_forgot%5D=' +
-              encodeURIComponent($forgot_password_form.querySelector('input[name="pseudonym_session[unique_id_forgot]"]').value),
+              encodeURIComponent(uniqueId),
         success: function(response){
           alert(SHARED_JS_VARS.RESET_SENT);
         },
