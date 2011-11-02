@@ -73,9 +73,13 @@ class ApiRouteSet
     route(:delete, path, opts)
   end
 
+  def mapper_prefix
+    ""
+  end
+
   def mapper_method(opts)
     if opts[:path_name]
-      path_name = "api_v1_#{opts.delete(:path_name)}"
+      path_name = "#{mapper_prefix}#{opts.delete(:path_name)}"
     else
       path_name = :connect
     end
@@ -97,6 +101,10 @@ class ApiRouteSet
 
     def self.prefix
       "/api/v1"
+    end
+
+    def mapper_prefix
+      "api_v1_"
     end
 
     def route(method, path, opts)

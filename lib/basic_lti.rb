@@ -49,50 +49,59 @@ module BasicLTI
   end
 
   def self.generate(url, tool, user, context, link_code, return_url)
-    hash = {}
-    hash['lti_message_type'] = 'basic-lti-launch-request'
-    hash['lti_version'] = 'LTI-1p0'
-    hash['resource_link_id'] = link_code
-    hash['resource_link_title'] = tool.name
-    hash['user_id'] = user.opaque_identifier(:asset_string)
-    hash['roles'] = user.lti_role_types(context).join(',') # AccountAdmin, Student, Faculty or Observer
-    if tool.include_name?
-      hash['lis_person_name_given'] = user.first_name
-      hash['lis_person_name_family'] = user.last_name
-      hash['lis_person_name_full'] = user.name
-    end
-    if tool.include_email?
-      hash['lis_person_contact_email_primary'] = user.email
-    end
-    if tool.public?
-      hash['custom_canvas_user_id'] = user.id
-      hash['custom_canvas_course_id'] = context.id
-    end
-    hash['context_id'] = context.opaque_identifier(:asset_string)
-    hash['context_title'] = context.name
-    hash['context_label'] = context.course_code rescue nil
-    hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s
-    hash['launch_presentation_document_target'] = 'iframe'
-    hash['launch_presentation_width'] = 600
-    hash['launch_presentation_height'] = 400
-    hash['launch_presentation_return_url'] = return_url
-    hash['tool_consumer_instance_guid'] = "#{(context.root_account || context).opaque_identifier(:asset_string)}.#{HostUrl.context_host(context)}"
-    hash['tool_consumer_instance_name'] = (context.root_account || context).name
-    hash['tool_consumer_instance_contact_email'] = HostUrl.outgoing_email_address # TODO: find a better email address to use here
-    tool.set_custom_fields(hash)
-    
-    hash['oauth_callback'] = 'about:blank'
-    generate_params(hash, url, tool.consumer_key, tool.shared_secret)
+    ToolLaunch.new(url, tool, user, context, link_code, return_url).generate
   end
 
-  def self.verify(tool, rack_request)
-    require 'oauth'
-    require 'oauth/consumer'
+  class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_url, :hash)
 
-    consumer = OAuth::Consumer.new(tool.consumer_key, tool.shared_secret, {
-      :site => "#{uri.scheme}://#{host}",
-      :signature_method => "HMAC-SHA1"
-    })
-    request = consumer.send(:create_http_request, :post, rack_request.path, params)
+    def initialize(*a)
+      super
+      self.hash = {}
+    end
+
+    def for_assignment!(assignment, outcome_service_url)
+      hash['lis_result_sourcedid'] = BasicLTI::BasicOutcomes.result_source_id(tool, context, assignment, user)
+      hash['lis_outcome_service_url'] = outcome_service_url
+      if tool.public?
+        hash['custom_canvas_assignment_id'] = assignment.id
+      end
+    end
+
+    def generate
+      hash['lti_message_type'] = 'basic-lti-launch-request'
+      hash['lti_version'] = 'LTI-1p0'
+      hash['resource_link_id'] = link_code
+      hash['resource_link_title'] = tool.name
+      hash['user_id'] = user.opaque_identifier(:asset_string)
+      hash['roles'] = user.lti_role_types(context).join(',') # AccountAdmin, Student, Faculty or Observer
+      if tool.include_name?
+        hash['lis_person_name_given'] = user.first_name
+        hash['lis_person_name_family'] = user.last_name
+        hash['lis_person_name_full'] = user.name
+      end
+      if tool.include_email?
+        hash['lis_person_contact_email_primary'] = user.email
+      end
+      if tool.public?
+        hash['custom_canvas_user_id'] = user.id
+        hash['custom_canvas_course_id'] = context.id
+      end
+      hash['context_id'] = context.opaque_identifier(:asset_string)
+      hash['context_title'] = context.name
+      hash['context_label'] = context.course_code rescue nil
+      hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s
+      hash['launch_presentation_document_target'] = 'iframe'
+      hash['launch_presentation_width'] = 600
+      hash['launch_presentation_height'] = 400
+      hash['launch_presentation_return_url'] = return_url
+      hash['tool_consumer_instance_guid'] = "#{(context.root_account || context).opaque_identifier(:asset_string)}.#{HostUrl.context_host(context)}"
+      hash['tool_consumer_instance_name'] = (context.root_account || context).name
+      hash['tool_consumer_instance_contact_email'] = HostUrl.outgoing_email_address # TODO: find a better email address to use here
+      tool.set_custom_fields(hash)
+
+      hash['oauth_callback'] = 'about:blank'
+      BasicLTI.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
+    end
+
   end
 end

@@ -186,4 +186,15 @@ describe BasicLTI do
       hash['lis_person_contact_email_primary'] = @user.email
     end
   end
+
+  it "should include assignment outcome service params" do
+    course_with_teacher(:active_all => true)
+    @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
+    launch = BasicLTI::ToolLaunch.new("http://www.yahoo.com", @tool, @user, @course, '123456', 'http://www.yahoo.com')
+    assignment_model(:submission_types => "external_tool", :course => @course)
+    launch.for_assignment!(@assignment, "/my/test/url")
+    hash = launch.generate
+    hash['lis_result_sourcedid'].should == BasicLTI::BasicOutcomes.result_source_id(@tool, @course, @assignment, @user)
+    hash['lis_outcome_service_url'].should == "/my/test/url"
+  end
 end

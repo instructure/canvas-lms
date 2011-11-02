@@ -24,13 +24,14 @@ class LtiApiController < ApplicationController
     require_context
 
     # load the external tool to grab the key and secret
-    @assignment = @context.assignments.find(params[:assignment_id], :include => :context_external_tool)
+    @assignment = @context.assignments.find(params[:assignment_id])
     @user = @context.students.find(params[:id])
+    tag = @assignment.external_tool_tag
+    @tool = ContextExternalTool.find_external_tool(tag.url, @context) if tag
 
     # verify the request oauth signature
     verified = begin
-      shared_secret = @assignment.context_external_tool.try(:shared_secret)
-      shared_secret && OAuth::Signature.verify(request, :consumer_secret => shared_secret)
+      @tool && OAuth::Signature.verify(request, :consumer_secret => @tool.shared_secret)
     rescue OAuth::Signature::UnknownSignatureMethod,
            OAuth::Unauthorized
       false
@@ -46,7 +47,7 @@ class LtiApiController < ApplicationController
 
     xml = Nokogiri::XML.parse(request.body)
 
-    lti_response = BasicLTI::BasicOutcomes.process_request(@context, @assignment, @user, xml)
+    lti_response = BasicLTI::BasicOutcomes.process_request(@tool, @context, @assignment, @user, xml)
     render :text => lti_response.to_xml, :content_type => 'application/xml'
   end
 end

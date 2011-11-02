@@ -820,6 +820,11 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
+        @launch = BasicLTI::ToolLaunch.new(@tag.url, @tool, @current_user, @context, @tag.opaque_identifier(:asset_string), named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true), @tag.context)
+        if @tag.context.is_a?(Assignment) && @context.students.include?(@current_user)
+          @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@context, @tag.context, @current_user))
+        end
+        @tool_settings = @launch.generate
         render :template => 'external_tools/tool_show'
       end
     else

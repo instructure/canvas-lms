@@ -23,8 +23,11 @@ describe LtiApiController, :type => :integration do
     course_with_student(:active_all => true)
     @student = @user
     @course.enroll_teacher(user_with_pseudonym(:active_all => true))
-    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool')
-    assignment_model(:course => @course, :context_external_tool => @tool, :name => 'tool assignment', :submission_types => 'external_tool', :points_possible => 20, :grading_type => 'points')
+    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
+    assignment_model(:course => @course, :name => 'tool assignment', :submission_types => 'external_tool', :points_possible => 20, :grading_type => 'points')
+    tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
+    tag.content_type = 'ContextExternalTool'
+    tag.save!
   end
 
   def make_call(opts = {})
@@ -99,62 +102,74 @@ describe LtiApiController, :type => :integration do
     Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content.should == 'success'
   end
 
-  it "should allow updating the submission score" do
-    @assignment.submissions.find_by_user_id(@student.id).should be_nil
-    make_call('body' => replace_result('0.6'))
-    check_success
+  describe "replaceResult" do
+    it "should allow updating the submission score" do
+      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      make_call('body' => replace_result('0.6'))
+      check_success
 
-    xml = Nokogiri::XML.parse(response.body)
-    xml.at_css('imsx_codeMajor').content.should == 'success'
-    xml.at_css('imsx_messageRefIdentifier').content.should == '999999123'
-    xml.at_css('imsx_operationRefIdentifier').content.should == 'replaceResult'
-    submission = @assignment.submissions.find_by_user_id(@student.id)
-    submission.should be_present
-    submission.score.should == 12
-  end
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'success'
+      xml.at_css('imsx_messageRefIdentifier').content.should == '999999123'
+      xml.at_css('imsx_operationRefIdentifier').content.should == 'replaceResult'
+      xml.at_css('imsx_POXBody *:first').name.should == 'replaceResultResponse'
+      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission.should be_present
+      submission.score.should == 12
+    end
 
-  it "should reject out of bound scores" do
-    @assignment.submissions.find_by_user_id(@student.id).should be_nil
-    make_call('body' => replace_result('-1'))
-    check_failure('failure')
-    make_call('body' => replace_result('1.1'))
-    check_failure('failure')
+    it "should reject out of bound scores" do
+      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      make_call('body' => replace_result('-1'))
+      check_failure('failure')
+      make_call('body' => replace_result('1.1'))
+      check_failure('failure')
 
-    make_call('body' => replace_result('0.0'))
-    check_success
-    submission = @assignment.submissions.find_by_user_id(@student.id)
-    submission.should be_present
-    submission.score.should == 0
+      make_call('body' => replace_result('0.0'))
+      check_success
+      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission.should be_present
+      submission.score.should == 0
 
-    make_call('body' => replace_result('1.0'))
-    check_success
-    submission = @assignment.submissions.find_by_user_id(@student.id)
-    submission.should be_present
-    submission.score.should == 20
-  end
+      make_call('body' => replace_result('1.0'))
+      check_success
+      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission.should be_present
+      submission.score.should == 20
+    end
 
-  it "should reject non-numeric scores" do
-    @assignment.submissions.find_by_user_id(@student.id).should be_nil
-    make_call('body' => replace_result("OHAI SCORES"))
-    check_failure('failure')
+    it "should reject non-numeric scores" do
+      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      make_call('body' => replace_result("OHAI SCORES"))
+      check_failure('failure')
+    end
   end
 
   it "should reject if the assignment doesn't use this tool" do
-    tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool')
-    @assignment.update_attribute(:context_external_tool, tool)
+    tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
+    @assignment.external_tool_tag.destroy!
+    @assignment.external_tool_tag = nil
+    tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+    tag.content_type = 'ContextExternalTool'
+    tag.save!
     make_call('body' => replace_result('0.5'))
     response.status.should == "401 Unauthorized"
   end
 
   it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
-    tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool')
-    @assignment.update_attribute(:context_external_tool, tool)
+    tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
+    @assignment.external_tool_tag.destroy!
+    @assignment.external_tool_tag = nil
+    tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+    tag.content_type = 'ContextExternalTool'
+    tag.save!
     make_call('body' => replace_result('0.5'))
     check_failure
   end
 
   it "should reject if the assignment is no longer a tool assignment" do
-    @assignment.update_attributes(:context_external_tool => nil, :submission_types => 'online_upload')
+    @assignment.update_attributes(:submission_types => 'online_upload')
+    @assignment.external_tool_tag.destroy!
     make_call('body' => replace_result('0.5'))
     response.status.should == "401 Unauthorized"
   end

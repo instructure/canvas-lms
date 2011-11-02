@@ -31,10 +31,9 @@ class Assignment < ActiveRecord::Base
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
-    :set_custom_field_values, :context, :position, :allowed_extensions,
-    :context_external_tool
+    :set_custom_field_values, :context, :position, :allowed_extensions
   attr_accessor :original_id
-  
+
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
   has_one :quiz
@@ -50,7 +49,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
-  belongs_to :context_external_tool
+  has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
 
   validates_presence_of :context_id
   validates_presence_of :context_type

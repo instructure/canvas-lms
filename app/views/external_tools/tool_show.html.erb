@@ -1,11 +1,10 @@
 <% content_for :page_title do %><%= @tag.title %><% end %>
-<% add_crumb @tag.context_module.name, context_url(@context, :context_context_modules_url) %>
+<% add_crumb(@tag.context_module.name, context_url(@context, :context_context_modules_url)) if @tag.context_module %>
 <% add_crumb @tag.title %>
 
 <% jammit_js :tool_inline %>
-<% settings = BasicLTI.generate(@tag.url, @tool, @current_user, @context, @tag.opaque_identifier(:asset_string), context_url(@context, :context_external_tool_finished_url, @tool.id, :only_path => false)) %>
 <form action="<%= @tag.url %>" method="POST" target="<%= @target || 'tool_content' %>" id="tool_form" class="<%= 'new_tab' if @tag.new_tab %>">
-  <% settings.each do |key, value| %>
+  <% @tool_settings.each do |key, value| %>
     <%= hidden_field_tag key, value %>
   <% end %>
   <% if @tag.new_tab %>
