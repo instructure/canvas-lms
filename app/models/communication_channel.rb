@@ -147,29 +147,16 @@ class CommunicationChannel < ActiveRecord::Base
     end
   }
   
-  named_scope :email, lambda{
-    {:conditions => ['path_type = ?', 'email']}
-  }
-  
-  named_scope :active_email_paths, lambda {|paths|
-    {
-      :conditions => {:path_type => 'email', :path => paths, :workflow_state => 'active'},
-      :include => :user
-    }
-  }
-  
-  named_scope :unretired, lambda {
-    {:conditions => ['communication_channels.workflow_state != ?', 'retired'] }
-  }
-  
+  named_scope :email, :conditions => { :path_type => 'email' }
+  named_scope :active, :conditions => { :workflow_state => 'active' }
+  named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']
+
   named_scope :for_notification_frequency, lambda {|notification, frequency|
     { :include => [:notification_policies], :conditions => ['notification_policies.notification_id = ? and notification_policies.frequency = ?', notification.id, frequency] }
   }
   
-  named_scope :include_policies, lambda {
-    {:include => :notification_policies }
-  }
-  
+  named_scope :include_policies, :include => :notification_policies
+
   named_scope :in_state, lambda { |state| { :conditions => ["communication_channels.workflow_state = ?", state.to_s]}}
   named_scope :of_type, lambda {|type| { :conditions => ['communication_channels.path_type = ?', type] } }
   

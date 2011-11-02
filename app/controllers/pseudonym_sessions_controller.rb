@@ -30,7 +30,12 @@ class PseudonymSessionsController < ApplicationController
       @needs_cookies = true
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
-    @unique_id = params[:unique_id]
+
+    if params[:pseudonym]
+      pseudonym = Pseudonym.find_by_id(params[:pseudonym])
+      @unique_id = pseudonym.unique_id
+      session[:expected_user] = pseudonym.user_id
+    end
 
     session[:confirm] = params[:confirm]
     session[:enrollment] = params[:enrollment]
@@ -314,10 +319,7 @@ class PseudonymSessionsController < ApplicationController
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
       elsif session[:confirm]
-        format.html { redirect_to(registration_confirmation_path(session.delete(:confirm), :enrollment => session.delete(:enrollment), :login_success => 1))}
-      elsif session[:enrollment]
-        @enrollment = Enrollment.find_by_uuid_and_workflow_state(session.delete(:enrollment), 'invited')
-        format.html { redirect_to(course_url(@enrollment.course, :invitation => @enrollment.uuid, :login_success => 1))}
+        format.html { redirect_to(registration_confirmation_path(session.delete(:confirm), :enrollment => session.delete(:enrollment), :login_success => 1, :confirm => (user.id == session.delete(:expected_user) ? 1 : nil))) }
       else
         # the URL to redirect back to is stored in the session, so it's
         # assumed that if that URL is found rather than using the default,
