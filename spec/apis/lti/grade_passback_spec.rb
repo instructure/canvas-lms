@@ -43,7 +43,7 @@ describe LtiApiController, :type => :integration do
   it "should respond 'unsupported' for any unknown xml body" do
     body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox"></imsx_POXEnvelopeRequest>}
     make_call('body' => body)
-    check_unsupported
+    check_failure
   end
 
   it "should require a content-type of application/xml" do
@@ -86,17 +86,23 @@ describe LtiApiController, :type => :integration do
     }
   end
 
-  def check_unsupported
+  def check_failure(failure_type = 'unsupported')
     response.should be_success
-    Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content.should == 'unsupported'
+    response.content_type.should == 'application/xml'
+    Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content.should == failure_type
     @assignment.submissions.find_by_user_id(@student.id).should be_nil
+  end
+
+  def check_success
+    response.should be_success
+    response.content_type.should == 'application/xml'
+    Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content.should == 'success'
   end
 
   it "should allow updating the submission score" do
     @assignment.submissions.find_by_user_id(@student.id).should be_nil
     make_call('body' => replace_result('0.6'))
-    response.should be_success
-    response.content_type.should == 'application/xml'
+    check_success
 
     xml = Nokogiri::XML.parse(response.body)
     xml.at_css('imsx_codeMajor').content.should == 'success'
@@ -107,22 +113,30 @@ describe LtiApiController, :type => :integration do
     submission.score.should == 12
   end
 
-  it "should reject scores < 0.0, but allow 0.0" do
+  it "should reject out of bound scores" do
     @assignment.submissions.find_by_user_id(@student.id).should be_nil
     make_call('body' => replace_result('-1'))
-    check_unsupported
+    check_failure('failure')
+    make_call('body' => replace_result('1.1'))
+    check_failure('failure')
 
     make_call('body' => replace_result('0.0'))
-    response.should be_success
+    check_success
     submission = @assignment.submissions.find_by_user_id(@student.id)
     submission.should be_present
     submission.score.should == 0
+
+    make_call('body' => replace_result('1.0'))
+    check_success
+    submission = @assignment.submissions.find_by_user_id(@student.id)
+    submission.should be_present
+    submission.score.should == 20
   end
 
   it "should reject non-numeric scores" do
     @assignment.submissions.find_by_user_id(@student.id).should be_nil
     make_call('body' => replace_result("OHAI SCORES"))
-    check_unsupported
+    check_failure('failure')
   end
 
   it "should reject if the assignment doesn't use this tool" do
@@ -136,7 +150,7 @@ describe LtiApiController, :type => :integration do
     tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool')
     @assignment.update_attribute(:context_external_tool, tool)
     make_call('body' => replace_result('0.5'))
-    check_unsupported
+    check_failure
   end
 
   it "should reject if the assignment is no longer a tool assignment" do
@@ -147,7 +161,7 @@ describe LtiApiController, :type => :integration do
 
   it "should verify the sourcedid is correct for this tool launch" do
     make_call('body' => replace_result('0.6', 'BAD SOURCE ID'))
-    check_unsupported
+    check_failure
   end
 
   it "should not allow the same nonce to be used more than once" do

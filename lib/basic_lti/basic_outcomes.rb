@@ -31,11 +31,12 @@ module BasicLTI::BasicOutcomes
     when 'replaceResult'
       text_value = xml.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
       new_value = Float(text_value) rescue false
-      if new_value && new_value >= 0.0
-        # the spec says to reject > 1.0 as well, but canvas allows grades >
-        # 100% to allow for extra credit, so we're going to let those through
+      if new_value && (0.0 .. 1.0).include?(new_value)
         submission_hash = { :grade => "#{new_value * 100}%" }
         submission = assignment.grade_student(user, submission_hash).first
+        return true
+      else
+        res.code_major = 'failure'
         return true
       end
     end
