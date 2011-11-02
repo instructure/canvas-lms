@@ -35,7 +35,7 @@ class ContentTag < ActiveRecord::Base
   after_save :touch_context_if_learning_outcome
 
   attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab
-  
+    
 
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
@@ -145,6 +145,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def update_asset_name!
+    return if !self.sync_title_to_asset_title?
     correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
     correct_context ||= self.context && self.content.is_a?(WikiPage) && self.content.wiki && self.content.wiki.wiki_namespaces.length == 1 && self.content.wiki.wiki_namespaces.map(&:context_code).include?(self.context_code)
     if correct_context
@@ -178,7 +179,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def self.update_for(asset)
-    tags = ContentTag.find(:all, :conditions => ['content_id = ? AND content_type = ?', asset.id, asset.class.to_s], :select => 'id, tag_type, context_module_id')
+    tags = ContentTag.find(:all, :conditions => ['content_id = ? AND content_type = ?', asset.id, asset.class.to_s], :select => 'id, tag_type, content_type, context_module_id')
     tag_ids = tags.select{|t| t.sync_title_to_asset_title? }.map(&:id)
     module_ids = tags.select{|t| t.context_module_id }.map(&:context_module_id)
     attr_hash = {:updated_at => Time.now.utc}
@@ -191,7 +192,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def sync_title_to_asset_title?
-    self.tag_type != "learning_outcome_association"
+    self.tag_type != "learning_outcome_association" && self.content_type != 'ContextExternalTool'
   end
   
   def context_module_action(user, action, points=nil)
