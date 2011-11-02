@@ -7,51 +7,110 @@
 %>
 
 <div id="modal-box-top"></div>
-<div id='modal-box-arbitrary-size'>
-  <div style="margin: 20px 10px 0">
-    <h2><%= t 'titles.welcome_aboard', "Welcome aboard!" %></h2>
-    <% if @current_user && @current_user != @communication_channel.user %>
-      <h4><%= t 'titles.merge_self', "Merge With Your Current User" %></h4>
-      <p><%= if @course
-            t('details.merge_self_course', "The invitation for %{course} is for %{user1}, but you are currently logged in as %{user2}. You can combine these two accounts together and accept the invitation by clicking 'Merge'.",
-             :course => @course.name, :user1 => @communication_channel.user.name, :user2 => @current_user.name)
-          else
-            t('details.merge_self', "The e-mail address %{email} is currently associated with %{user1}, but you are currently logged in as %{user2}. You can merge these two accounts together by clicking 'Merge'.",
-              :email => @communication_channel.path, :user1 => @communication_channel.user.name, :user2 => @current_user.name)
-          end
-          %>
-      </p>
-      <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :merge => 'self') %>" class="button"><%= t('buttons.merge', "Merge") %></a>
-      <div style="clear: both;"></div>
-    <% end %>
-    <% if @communication_channel.user.registered?  %>
-      <% # if the user is registered, it's safe to assume that @current_user == @communication_channel.user, because the only way to get to #confirm with an enrollment is a redirect from CoursesController#enrollment_invitation that makes sure you are logged in, then send sends you to confirm with a cc for the enrollment's user %>
-      <% if @communication_channel.unconfirmed? %>
-        <h4><%= t 'titles.confirm', "Confirm E-mail Address" %></h4>
-        <p><%= t('details.confirm', "Confirm %{email} belongs to %{user} by clicking 'Confirm'.", :email => @communication_channel.path, :user => @communication_channel.user.name) %>
-          <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :confirm => 1) %>" class="button"><%= t 'buttons.confirm', "Confirm" %></a>
-        </p>
-        <div style="clear: both;"></div>
-      <% elsif @enrollment.try(:invited?) %>
-        <h4><%= t 'titles.transfer_enrollment', "Transfer Enrollment" %></h4>
-        <p><%= t('details.transfer', "Alternatively, you can simply accept the invitation as %{user} by clicking 'Transfer Enrollment'.", :user => @current_user.name) %></p>
-        <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="button"><%= t('buttons.transfer_enrollment', "Transfer Enrollment") %></a>
-        <h4><%= t 'titles.accept_enrollment', "Accept Enrollment" %></h4>
-        <p><%= t('details.accept_logout', "In order to accept this enrollment for %{user}, you will need to log out and log in as that user.", :user => @enrollment.user.name) %></p>
-        <a href="<%= login_url(:enrollment => @enrollment.uuid, :re_login => 1) %>" class="button"><%= t('buttons.relogin', "Re-login") %></a>
-        <div style="clear: both;"></div>
-      <% end %>
-    <% end %>
+<div id="modal-box-arbitrary-size">
+  <h2><%= t 'titles.welcome_aboard', "Welcome aboard!" %></h2>
+  <% if @current_user && @current_user != @user && @user.registered? && @enrollment %>
+    <p><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
+    <div class="button_box">
+      <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="button" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
+      <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym => @user.pseudonym.try(:id)) %>" class="button" id="login"><%=  t 'buttons.login_as', "Login as %{invited_user}", :invited_user => @user.name %></a>
+    </div>
+  <% elsif !@merge_opportunities.empty? %>
+    <% js_block do %>
+      <script>
+        $(function() {
+          var $registration_form = $('#registration_confirmation_form');
+          var $disambiguation_box = $('.disambiguation_box');
+          $('.button#back').click(function(event) {
+            $disambiguation_box.slideDown();
+            $registration_form.slideUp();
+            event.preventDefault();
+          });
+          $('.button#register').click(function(event) {
+            $disambiguation_box.slideUp();
+            $registration_form.slideDown();
+            event.preventDefault();
+          });
 
-    <% if @pseudonym %>
-      <h4><%= t 'titles.register', "Register New Account" %></h4>
-      <p><%= if @course
+          var $merge_link = $('.button#merge');
+          $('input:radio[name="pseudonym_select"]').change(function() {
+            $merge_link.attr('href', $('input:radio[name="pseudonym_select"]:checked').attr('value'));
+          });
+        });
+      </script>
+    <% end %>
+    <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
+      <% if @merge_opportunities.length == 1 && (@user.registered? || !@current_user || @current_user.communication_channels.active.email.find_by_path(@communication_channel.path)) %>
+        <p><% if @enrollment %>
+          <%= mt 'details.account_exists_course', "The invitation for %{course} was sent to **%{email}**. An account already exists for this email address. Would you like to use this account?", :course => @course.name, :email => @communication_channel.path %>
+        <% elsif @user.registered? %>
+          <%= mt 'details.merge_one', "Would you like to combine **%{current_user}** and **%{other_user}**?", :current_user => friendly_name(@user, @merge_opportunities), :other_user => friendly_name(@merge_opportunities.first.last.find { |p| p.account == @root_account } || @merge_opportunities.first.last.first, @merge_opportunities) %>
+        <% else %>
+          <%= mt 'details.account_exists', "An account already exists for **%{email}**. Would you like to use this account?", :email => @communication_channel.path %>
+        <% end %></p>
+        <% if !@current_user && @merge_opportunities.first.last.length > 1 %>
+          <p><strong><%=  t 'details.choose_login', "Select where you would like to login at." %></strong></p>
+          <ul>
+            <% @merge_opportunities.first.last.each_with_index do |pseudonym, i| %>
+              <li><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonym) %>"<%= ' checked="checked"' if i == 0 %>>&nbsp;<%= pseudonym.account.name %> (<%= pseudonym.unique_id %>)</li>
+            <% end %>
+          </ul>
+        <% end %>
+        <div class="button_box">
+          <% if @pseudonym %><a href="#" class="button" id="register"><%= t 'buttons.new_account', 'New Account' %></a><% end %>
+          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="button not_external" id="merge"><%= @user.registered? ? t('buttons.merge', "Combine") : t('buttons.use_this_account', "Use This Account") %></a>
+        </div>
+      <% elsif @merge_opportunities.length == 1 && @current_user %>
+        <p><% if @enrollment %>
+          <%= mt 'details.logged_in_other_user_course', "The invitation for %{course} was sent to **%{email}**, but you are currently logged in as **%{user}**.", :course => @course.name, :email => @communication_channel.path, :user => (@current_pseudonym && @current_pseudonym.user == @current_user ? @current_pseudonym : @current_user.pseudonym).unique_id %>
+        <% else %>
+          <%= mt 'details.logged_in_other_user', "**%{email}** is a new account, but you are currently logged in as **%{user}**.", :email => @communication_channel.path, :user => (@current_pseudonym && @current_pseudonym.user == @current_user ? @current_pseudonym : @current_user.pseudonym).unique_id %>
+        <% end %></p>
+        <p><strong><%=  t 'details.add_email', "Would you like to add this email address to your current account?" %></strong></p>
+        <div class="button_box">
+          <a href="#" class="button" id="register"><%= t 'buttons.new_account', 'New Account' %></a>
+          <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="button" id='merge'><%=  t 'buttons.add_email_address', "Add Email Address" %></a>
+        </div>
+      <% else %>
+        <p><% if @enrollment %>
+          <%= mt 'details.multiple_accounts_course', "The invitation for %{course} was sent to **%{email}**. There are %{count} accounts with this email address.", :course => @course.name, :email => @communication_channel.path, :count => @merge_opportunities.length %>
+          <p><strong><%= t 'details.choose_account', "Select the account you would like to use." %></strong></p>
+        <% elsif @user.registered? %>
+          <%= mt 'details.merge_multiple', "Select the account you would like to combine with **%{current_user}**.", :current_user => friendly_name(@user, @merge_opportunities) %>
+        <% else %>
+          <%= mt 'details.multiple_accounts', "There are %{count} accounts with the email address **%{email}**.", :email => @communication_channel.path, :count => @merge_opportunities.length %>         <p><strong><%= t 'details.choose_account', "Select the account you would like to use." %></strong></p>
+        <% end %></p>
+        <ul>
+          <% @merge_opportunities.each_with_index do |(user, pseudonyms), i| %>
+            <% if pseudonyms.length == 1 || user == @current_user %>
+              <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonyms.first) %>"<%= ' checked="checked"' if i == 0 %> /></span><%= friendly_name(pseudonyms.first, @merge_opportunities) %></li>
+            <% else %>
+              <li><span class="radio_spacer"></span><%= user.name %>
+                <ul>
+                  <% pseudonyms.each_with_index do |pseudonym, j| %>
+                    <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonym) %>"<%= ' checked="checked"' if i == 0 && j == 0 %> /></span><%= pseudonym.account.name %> (<%= pseudonym.unique_id %>)</li>
+                  <% end %>
+                </ul>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+        <div class="button_box">
+          <% if @pseudonym %><a href="#" class="button" id="register"><%= t 'buttons.new_account', 'New Account' %></a><% end %>
+          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="button not_external" id="merge"><%= @user.registered? ? t('buttons.merge', "Combine") : t('buttons.use_this_account', "Use This Account") %></a>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @pseudonym %>
+      <% form_for :pseudonym, :url => registration_confirmation_url(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid)), :html => {:id => "registration_confirmation_form", :style => (!@merge_opportunities.empty? && !params[:register]) ? hidden : '' } do |form| %>
+      <p><%= if @enrollment
           mt 'details.register_with_course', "In order to finish signing you up for the course **%{course}**, we'll need a few more pieces of information.", :course => @course.name
-        elsif @pseudonym
+        else
           t 'details.register', "In order to finish signing you up, we'll need a few more pieces of information."
         end %></p>
       <%= (error_messages_for :object => [@user, @pseudonym], :header_message => nil).gsub("Unique", "Login") %>
-      <% form_for :pseudonym, :url => registration_confirmation_url(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid)), :html => {:id => "registration_confirmation_form"} do |form| %>
       <input type="hidden" name="register" value="1"/>
       <table class="formtable">
         <tr>
@@ -81,7 +140,7 @@
           </td>
         </tr><tr>
           <td><%= blabel :user, :time_zone, :en => "Time Zone" %></td>
-          <td><%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@root_account.default_time_zone) || "Mountain Time (US & Canada)"), :value => @user.time_zone %></td>
+          <td><%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@pseudonym.account.default_time_zone) || "Mountain Time (US & Canada)"), :value => @user.time_zone %></td>
         </tr><tr>
           <td><%= form.blabel :password, :en => "Password" %></td>
           <td><%= form.password_field :password %></td>
@@ -89,7 +148,7 @@
           <td><%= form.blabel :password_confirmation, :en => "Confirm Password"%></td>
           <td><%= form.password_field :password_confirmation %></td>
         </tr>
-        <% if @root_account == Account.default %>
+        <% if @pseudonym.account == Account.default %>
           <tr>
             <td colspan="2">
               <%= check_box :user, :subscribe_to_emails, :checked => true %>
@@ -98,57 +157,15 @@
           </tr>
         <% end %>
       </table>
-      <button style="margin-top:-43px" type="submit" class="button"><%= t 'buttons.register', "Register" %></button>
-      <% end %>
-    <% end %>
-
-    <% unless @merge_opportunities.empty? %>
-      <h4><%= @course ? t('titles.merge_opportunities_course', "Accept With Another Account") : t('titles.merge_opportunities', "Merge With Another Account") %></h4>
-      <p><%= if @course
-            t('details.merge_others_course', { :one => "The invitation for %{course} is for %{user}, but another account exists with the same e-mail address. You can accept the invitation using that account by clicking it below.",
-                    :other => "The invitation for %{course} is for %{user}, but other accounts exist with the same e-mail address. You can accept the invitation with another account by clicking it below." },
-             :course => @course.name, :user => @communication_channel.user.name, :count => @merge_opportunities.length)
-          else
-              t('details.merge_others', { :one => "The email address %{email} belongs to %{user}, but another account exists with the same e-mail address. You can merge the two accounts together by clicking it below.",
-                      :other => "The email address %{email} belongs to %{user}, but other accounts exist with the same e-mail address. You can merge %{user} with another account by clicking one below." },
-               :email => @communication_channel.path, :user => @communication_channel.user.name, :count => @merge_opportunities.length)
-          end
-          %>
-      </p>
-      <ul>
-        <% @merge_opportunities.each do |user| %>
-          <% account_pseudonyms = user.pseudonyms.inject({}) do |result, p|
-              next(result) unless p.active?
-              (result[p.account] ||= []) << p
-              result
-             end %>
-          <% query_params = {} %>
-          <% query_params = { :enrollment => @enrollment.uuid } if @enrollment %>
-          <li>
-            <% if account_pseudonyms.length == 1 %>
-              <% account = account_pseudonyms.first.first %>
-              <% pseudonyms = account_pseudonyms.first.last %>
-              <% sis_pseudonym = pseudonyms.detect { |p| p.sis_user_id } %>
-              <% pseudonym = sis_pseudonym || pseudonyms.first %>
-              <% display_name = sis_pseudonym ? "#{user.name} (#{sis_pseudonym.unique_id})" : user.name %>
-              <%= link_to display_name, login_url({ :host => HostUrl.context_host(account), :confirm => @communication_channel.confirmation_code, :unique_id => pseudonym.unique_id }.merge(query_params)) %>
-            <% else %>
-              <%= user.name %>
-              <ul>
-                <% account_pseudonyms.each do |account, pseudonyms| %>
-                  <% sis_pseudonym = pseudonyms.detect { |p| p.sis_user_id } %>
-                  <% pseudonym = sis_pseudonym || pseudonyms.first %>
-                  <% url = link_to(account.name, login_url({ :host => HostUrl.context_host(account), :confirm => @communication_channel.confirmation_code, :unique_id => pseudonym.unique_id }.merge(query_params))) %>
-                  <li><%= sis_pseudonym ? t(:merge_login_link_with_id, 'Login at %{institution} (%{username})', :institution => url, :username => sis_pseudonym.unique_id) :
-                    t(:merge_login_link, 'Login at %{institution}', :institution => url) %></li>
-                <% end %>
-              </ul>
-            <% end %>
-          </li>
+      <div class='button_box'>
+        <% unless @merge_opportunities.empty? %>
+          <a href="#" class="button" id="back"><%= t 'buttons.back', "Back" %></a>
         <% end %>
-      </ul>
+        <button type="submit" class="button"><%= t 'buttons.register', "Register" %></button>
+      </div>
     <% end %>
-  </div>
+  <% end %>
+
 </div>
 <div id="modal-box-bottom"></div>
 

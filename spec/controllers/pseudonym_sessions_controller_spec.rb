@@ -43,6 +43,25 @@ describe PseudonymSessionsController do
     assigns[:pseudonym_session].should_not be_nil
   end
 
+  context "merging" do
+    it "should pre-fill the unique_id if in params" do
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+      get 'new', :pseudonym => @pseudonym.id
+      response.should render_template('new')
+      assigns[:unique_id].should == 'jt@instructure.com'
+      session[:expected_user].should == @user.id
+    end
+
+    it "should redirect back to merge users" do
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+      @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
+      session[:confirm] = @cc.confirmation_code
+      session[:expected_user] = @user.id
+      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty' }
+      response.should redirect_to(registration_confirmation_url(@cc.confirmation_code, :login_success => 1, :enrollment => nil, :confirm => 1))
+    end
+  end
+
   context "saml" do
     it "should scope logins to the correct domain root account" do
       Setting.set_config("saml", {})

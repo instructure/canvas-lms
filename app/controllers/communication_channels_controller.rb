@@ -47,46 +47,81 @@ class CommunicationChannelsController < ApplicationController
   def confirm
     nonce = params[:nonce]
     cc = CommunicationChannel.unretired.find_by_confirmation_code(nonce)
-    @enrollment = Enrollment.find_by_uuid_and_workflow_state(params[:enrollment], 'invited') if params[:enrollment]
-    @course = @enrollment && @enrollment.course
     @headers = false
-    @root_account = @course.root_account if @course
     if cc
       @communication_channel = cc
       @user = cc.user
+      @enrollment = @user.enrollments.find_by_uuid_and_workflow_state(params[:enrollment], 'invited') if params[:enrollment]
+      @course = @enrollment && @enrollment.course
+      @root_account = @course.root_account if @course
       @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
       @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
+      unless @root_account
+        account = @user.account_users.first.try(:account)
+        @root_account = account.try(:root_account) || account
+      end
       @root_account ||= @domain_root_account
 
-      # load merge opportunities
-      other_ccs = CommunicationChannel.find(:all, :conditions => ["path=? AND path_type=? AND user_id<>? AND workflow_state='active'", cc.path, cc.path_type, @user.id])
-      CommunicationChannel.send(:preload_associations, other_ccs, :user)
-      @merge_opportunities = other_ccs.map(&:user).uniq
-      @merge_opportunities.reject! { |u| u == @current_user }
-      User.send(:preload_associations, @merge_opportunities, { :pseudonyms => :account })
-      @merge_opportunities.reject! { |u| u.pseudonyms.all? { |p| p.deleted? } }
+      # logged in as an unconfirmed user?! someone's masquerading; just pretend we're not logged in at all
+      if @current_user == @user && !@user.registered?
+        @current_user = nil
+      end
 
-      if @current_user && params[:merge] == 'self'
+      if @user.registered? && cc.unconfirmed?
+        unless @current_user == @user
+          session[:return_to] = request.url
+          flash[:notice] = t 'notices.login_to_confirm', "Please log in to confirm your e-mail address"
+          return redirect_to login_url(:re_login => @current_user ? 1 : nil)
+        end
+
+        cc.confirm
+        flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
+        return respond_to do |format|
+          format.html { redirect_back_or_default(profile_url) }
+          format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
+        end
+      end
+
+      # load merge opportunities
+      other_ccs = CommunicationChannel.find(:all, :conditions => ["path=? AND path_type=? AND id<>? AND workflow_state='active'", cc.path, cc.path_type, cc.id], :include => :user)
+      merge_users = (other_ccs.map(&:user)).uniq
+      merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
+      User.send(:preload_associations, merge_users, { :pseudonyms => :account })
+      merge_users.reject! { |u| u != @current_user && u.pseudonyms.all? { |p| p.deleted? } }
+      @merge_opportunities = []
+      merge_users.each do |user|
+        account_to_pseudonyms_hash = {}
+        user.pseudonyms.each do |p|
+          next unless p.active?
+          # populate reverse association
+          p.user = user
+          (account_to_pseudonyms_hash[p.account] ||= []) << p
+        end
+        @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
+          pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort { |a, b| a.position <=> b.position }.first
+        end]
+        @merge_opportunities.last.last.sort! { |a, b| a.account.name <=> b.account.name }
+      end
+      @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, a.first.name] <=> [b.first == @current_user ? 0 : 1, b.first.name] }
+
+      if @current_user && params[:confirm] && @merge_opportunities.find { |opp| opp.first == @current_user }
         cc.confirm
         @enrollment.accept if @enrollment
-        @user.move_to_user(@current_user)
-      elsif @current_user && @enrollment && params[:transfer_enrollment]
-        cc.active? || cc.confirm
-        @enrollment.user = @current_user
-        # accept will save it
-        @enrollment.accept
-      elsif @user.registered?
-        unless @current_user
-          session[:return_to] = request.url
-          return redirect_to login_url
+        @user.move_to_user(@current_user) if @user != @current_user
+      elsif @current_user && @current_user != @user && @enrollment && @user.registered?
+        if params[:transfer_enrollment]
+          cc.active? || cc.confirm
+          @enrollment.user = @current_user
+          # accept will save it
+          @enrollment.accept
+        else
+          # render
+          return
         end
-        # Present merge opportunities to a registered user
-        return if (!@merge_opportunities.empty? || @current_user != @user) && !params[:confirm]
-
-        # Auto-confirm a CC that has been added to a registered account, and no merge opportunities
-        # OR the user clicked "confirm" on confirmation page
-        failed = true unless cc.active? || cc.confirm
-        @enrollment.accept if !failed && @enrollment
+      elsif @user.registered?
+        # render
+        return unless @merge_opportunities.empty?
+        failed = true
       elsif cc.active?
         # !user.registered? && cc.active? ?!?
         # This state really isn't supported; just error out
@@ -101,11 +136,11 @@ class CommunicationChannelsController < ApplicationController
         # up with something new
         @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.find_by_unique_id(@pseudonym.unique_id)
 
-        # Have to either have a pseudonym to register with, or be registered, or be looking at merge opportunities
-        return render :action => 'confirm_failed', :status => :bad_request unless @user.registered? || @pseudonym || !@merge_opportunities.empty? || (@current_user && @current_user != @user)
+        # Have to either have a pseudonym to register with, or be looking at merge opportunities
+        return render :action => 'confirm_failed', :status => :bad_request if !@pseudonym && @merge_opportunities.empty?
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
-        if params[:register]
+        if @pseudonym && params[:register]
           @user.name = params[:user].try(:[], :name) || @user.name
           @user.name = @pseudonym.unique_id if !@user.name || @user.name.empty?
           @user.time_zone = params[:user].try(:[], :time_zone) || @user.time_zone
