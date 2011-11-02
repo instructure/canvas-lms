@@ -198,7 +198,7 @@ shared_examples_for "all selenium tests" do
       login_as(pseudonym.unique_id, pseudonym.password)
     else
       PseudonymSession.any_instance.stubs(:session_credentials).returns([])
-      PseudonymSession.any_instance.stubs(:record).returns(pseudonym.reload)
+      PseudonymSession.any_instance.stubs(:record).returns { pseudonym.reload }
       PseudonymSession.any_instance.stubs(:used_basic_auth?).returns(false)
       # PseudonymSession.stubs(:find).returns(@pseudonym_session)
     end
