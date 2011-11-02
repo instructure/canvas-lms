@@ -129,6 +129,7 @@ module SeleniumTestsHelperMethods
     
     domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
     domain_conf = YAML.load_file(domain_conf_path)
+    domain_conf[Rails.env] ||= {}
     old_domain = domain_conf[Rails.env]["domain"]
     domain_conf[Rails.env]["domain"] = $app_host_and_port
     File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
@@ -205,7 +206,7 @@ shared_examples_for "all selenium tests" do
 
   def user_logged_in(opts={})
     user_with_pseudonym({:active_user => true}.merge(opts))
-    create_session(@pseudonym, opts[:real_login])
+    create_session(@pseudonym, opts[:real_login] || $in_proc_webserver_shutdown.nil?)
   end
 
   def course_with_teacher_logged_in(opts={})
