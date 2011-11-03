@@ -25,7 +25,7 @@ I18n.scoped("learning_outcomes", function(I18n) {
       if(!$outcome || $outcome.length === 0) {
         $outcome = $("#outcome_blank").clone(true).removeAttr('id');
         $("#outcomes .outcome_group:first").append($outcome.show());
-        $("#outcomes .outcome_group:first").sortable('refresh');
+        $("#outcomes .outcome_group:first .child_outcomes").sortable('refresh');
       }
       outcome.asset_string = $.underscore("learning_outcome_" + outcome.id);
       $outcome.find("textarea.description").val(outcome.description);
@@ -49,43 +49,43 @@ I18n.scoped("learning_outcomes", function(I18n) {
         $outcome.find(".mastery_points").text(outcome.data.rubric_criterion.mastery_points);
         $outcome.find(".points_possible").text(outcome.data.rubric_criterion.points_possible);
       }
-      if(outcome.permissions) {
-        $outcome.find(".edit_outcome_link").showIf(outcome.permissions.update && for_context);
-        var for_context = (outcome.context_code == $("#find_outcome_dialog .context_code").text());
-        $outcome.find(".really_delete_outcome_link").showIf(for_context);
-        $outcome.find(".remove_outcome_link").showIf(!for_context);
-      }
-      return $outcome;
-    },
-    sizeRatings: function() {
-    },
-    hideEditOutcome: function() {
-      // remove .prev('.outcome') if id is 'outcome_new'
-      $("#edit_outcome_form textarea").editorBox('destroy');
-      var $outcome = $("#outcomes #edit_outcome_form").prev(".learning_outcome");
-      $("body").append($("#edit_outcome_form").hide());
-      if($outcome.attr('id') == 'outcome_new') {
-        $outcome.remove();
-      } else {
-        $outcome.show();
-      }
-    },
-    editOutcome: function($outcome, $group) {
-      // set id to "outcome_new"
-      if($outcome && $outcome.length > 0 && !$outcome.hasClass('loaded')) {
-        $outcome.find(".show_details_link").triggerHandler('click', function() {
-          outcomes.editOutcome($outcome, $group);
-        });
-        return;
-      }
-      outcomes.hideEditOutcome();
-      if(!$outcome || $outcome.length === 0) {
+        if(outcome.permissions) {
+          $outcome.find(".edit_outcome_link").showIf(outcome.permissions.update && for_context);
+          var for_context = (outcome.context_code == $("#find_outcome_dialog .context_code").text());
+          $outcome.find(".really_delete_outcome_link").showIf(for_context);
+          $outcome.find(".remove_outcome_link").showIf(!for_context);
+        }
+        return $outcome;
+      },
+      sizeRatings: function() {
+      },
+      hideEditOutcome: function() {
+        // remove .prev('.outcome') if id is 'outcome_new'
+        $("#edit_outcome_form textarea").editorBox('destroy');
+        var $outcome = $("#outcomes #edit_outcome_form").prev(".learning_outcome");
+        $("body").append($("#edit_outcome_form").hide());
+        if($outcome.attr('id') == 'outcome_new') {
+          $outcome.remove();
+        } else {
+          $outcome.show();
+        }
+      },
+      editOutcome: function($outcome, $group) {
+        // set id to "outcome_new"
+        if($outcome && $outcome.length > 0 && !$outcome.hasClass('loaded')) {
+          $outcome.find(".show_details_link").triggerHandler('click', function() {
+            outcomes.editOutcome($outcome, $group);
+          });
+          return;
+        }
+        outcomes.hideEditOutcome();
+        if(!$outcome || $outcome.length === 0) {
         $outcome = $("#outcome_blank").clone(true).attr('id', 'outcome_new');
         if(!$group || $group.length == 0) {
           $group = $("#outcomes .outcome_group:first");
         }
-        $group.append($outcome.show());
-        $group.sortable('refresh');
+        $('#outcomes .child_outcomes:first').append($outcome.show());
+        $group.find('.child_outcomes').sortable('refresh');
       }
       var $form = $("#edit_outcome_form");
       $form.attr('action', $outcome.find(".edit_outcome_link").attr('href'));
@@ -95,8 +95,8 @@ I18n.scoped("learning_outcomes", function(I18n) {
         $form.attr('method', 'POST');
       }
       var data = $outcome.getTemplateData({textValues: ['short_description', 'description', 'mastery_points']});
-
-      // the OR here is because of a wierdness in chrome where .val() is an
+      
+      // the OR here is because of a wierdness in chrome where .val() is an 
       // empty string but .html() is the actual imputed html that we want
       data.description = $outcome.find("textarea.description").val() || $outcome.find("textarea.description").html();
       $form.fillFormData(data, {object_name: 'learning_outcome'});
@@ -136,9 +136,9 @@ I18n.scoped("learning_outcomes", function(I18n) {
       if(!$group || $group.length === 0) {
         $group = $("#group_blank").clone(true).removeAttr('id');
         $("#outcomes .outcome_group:first").append($group.show());
-        $("#outcomes .outcome_group:first").sortable('refresh');
-        $group.sortable(outcomes.sortableOptions);
-        $(".outcome_group").sortable('option', 'connectWith', '.outcome_group');
+        $("#outcomes .outcome_group:first .child_outcomes").sortable('refresh');
+        $group.find('.child_outcomes').sortable(outcomes.sortableOptions);
+        $(".outcome_group .child_outcomes").sortable('option', 'connectWith', '.child_outcomes');
       }
       group.asset_string = $.underscore("learning_outcome_group_" + group.id);
       $group.find("textarea.description").val(group.description);
@@ -166,10 +166,10 @@ I18n.scoped("learning_outcomes", function(I18n) {
       outcomes.hideEditOutcomeGroup();
       if(!$group || $group.length === 0) {
         $group = $("#group_blank").clone(true).attr('id', 'group_new');
-        $("#outcomes .outcome_group:first").append($group.show());
-        $("#outcomes .outcome_group:first").sortable('refresh');
-        $group.sortable(outcomes.sortableOptions);
-        $(".outcome_group").sortable('option', 'connectWith', '.outcome_group');
+        $("#outcomes .child_outcomes:first").append($group.show());
+        $("#outcomes .outcome_group:first .child_outcomes").sortable('refresh');
+        $group.find('.child_outcomes').sortable(outcomes.sortableOptions);
+        $(".outcome_group .child_outcomes").sortable('option', 'connectWith', '.child_outcomes');
       }
       var $form = $("#edit_outcome_group_form");
       $form.attr('action', $group.find(".edit_group_link").attr('href'));
@@ -198,29 +198,25 @@ I18n.scoped("learning_outcomes", function(I18n) {
       });
     },
     sortableOptions: {
-      handle: '.reorder_link',
-      connectWith: '.outcome_group',
-      items: '.learning_outcome,.outcome_group',
       axis: 'y',
+      connectWith: '#outcomes .child_outcomes',
+      containment: '#outcomes',
+      handle: '.reorder_link',
       update: function(event, ui) {
-        var $group = $(ui.item).parent().closest(".outcome_group");
-        var id = $group.children(".header").getTemplateData({textValues: ['asset_string', 'id']}).id;
-        var assets = [];
-        var data = {}
-        $group.children(".learning_outcome,.outcome_group").each(function() {
-          var asset_string = $(this).children(".header").getTemplateData({textValues: ['asset_string']}).asset_string;
-          assets.push(asset_string);
-        });
-        for(var idx = 0; idx < assets.length; idx++) {
-          data['ordering[' + assets[idx] + ']'] = idx;
+        var $group = $(ui.item).parent().closest('.outcome_group'),
+            id     = $group.children('.header').getTemplateData({ textValues: [ 'asset_string', 'id' ] }).id,
+            data   = {},
+            url    = $.replaceTags($("#outcome_links .reorder_items_url").attr('href'), 'id', id),
+            assets = $group.find('.child_outcomes').children('.learning_outcome, .outcome_group').map(function(i, el){
+              return $(el).children('.header').getTemplateData({ textValues: [ 'asset_string', 'id' ] }).asset_string;
+            });
+        for (var _i = 0, _max = assets.length; _i < _max; _i++){
+          data['ordering[' + assets[_i] + ']'] = _i;
         }
-        var url = $.replaceTags($("#outcome_links .reorder_items_url").attr('href'), 'id', id);
-        $.ajaxJSON(url, 'POST', data, function(data) {
-        }, function(data) {
-        });
+        $.ajaxJSON(url, 'POST', data);
       }
     }
-  }
+  };
   $(document).ready(function() {
     $("#outcome_information_link").click(function(event) {
       event.preventDefault();
@@ -255,9 +251,7 @@ I18n.scoped("learning_outcomes", function(I18n) {
         $outcome.removeClass('expanded');
       }
     });
-    $(".outcome_group:visible").each(function() {
-      $(this).sortable(outcomes.sortableOptions);
-    });
+    $('#outcomes .child_outcomes').sortable(outcomes.sortableOptions);
     $(".delete_group_link").click(function(event) {
       event.preventDefault();
       outcomes.deleteOutcomeGroup($(this).closest(".outcome_group"));
