@@ -285,11 +285,11 @@ describe LtiApiController, :type => :integration do
     check_failure
   end
 
-  it "should not allow the same nonce to be used more than once" do
-    make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-    response.status.should == "415 Unsupported Media Type"
-    make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-    pending("start tracking nonces") do
+  if Canvas.redis_enabled?
+    it "should not allow the same nonce to be used more than once" do
+      make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+      response.status.should == "415 Unsupported Media Type"
+      make_call('nonce' => 'not_so_random', 'content-type' => 'none')
       response.status.should == "401 Unauthorized"
       response.body.should match(/nonce/i)
     end
@@ -297,10 +297,8 @@ describe LtiApiController, :type => :integration do
 
   it "should block timestamps more than 90 minutes old" do
     # the 90 minutes value is suggested by the LTI spec
-    make_call('timestamp' => 2.hours.ago.to_i, 'content-type' => 'none')
-    pending("start verifying timestamps") do
-      response.status.should == "401 Unauthorized"
-      response.body.should match(/expired/i)
-    end
+    make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
+    response.status.should == "401 Unauthorized"
+    response.body.should match(/expired/i)
   end
 end

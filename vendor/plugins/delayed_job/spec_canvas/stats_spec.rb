@@ -4,7 +4,6 @@ if Canvas.redis_enabled?
 describe Delayed::Stats do
   before do
     Setting.set('delayed_jobs_store_stats', 'redis')
-    Canvas.redis.flushdb()
   end
 
   it "should store stats for jobs" do

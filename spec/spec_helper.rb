@@ -81,6 +81,24 @@ Spec::Runner.configure do |config|
     Setting.reset_cache!
   end
 
+  # flush redis before the first spec, and before each spec that comes after
+  # one that used redis
+  class << Canvas
+    attr_accessor :redis_used
+    def redis_with_track_usage(*a, &b)
+      self.redis_used = true
+      redis_without_track_usage(*a, &b)
+    end
+    alias_method_chain :redis, :track_usage
+    Canvas.redis_used = true
+  end
+  config.before :each do
+    if Canvas.redis_enabled? && Canvas.redis_used
+      Canvas.redis.flushdb
+    end
+    Canvas.redis_used = false
+  end
+
   def use_remote_services; ENV['ACTUALLY_TALK_TO_REMOTE_SERVICES'].to_i > 0; end
 
   def account_with_cas(opts={})

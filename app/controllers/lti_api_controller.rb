@@ -20,6 +20,8 @@ require 'oauth/request_proxy/action_controller_request'
 
 class LtiApiController < ApplicationController
 
+  class Unauthorized < Exception; end
+
   def grade_passback
     require_context
 
@@ -29,16 +31,27 @@ class LtiApiController < ApplicationController
     tag = @assignment.external_tool_tag
     @tool = ContextExternalTool.find_external_tool(tag.url, @context) if tag
 
+    raise(Unauthorized, "LTI tool not found") unless @tool
+
     # verify the request oauth signature
-    verified = begin
-      @tool && OAuth::Signature.verify(request, :consumer_secret => @tool.shared_secret)
+    begin
+      @signature = OAuth::Signature.build(request, :consumer_secret => @tool.shared_secret)
+      @signature.verify() or raise OAuth::Unauthorized
     rescue OAuth::Signature::UnknownSignatureMethod,
            OAuth::Unauthorized
-      false
+      raise Unauthorized, "Invalid authorization header"
     end
 
-    unless verified
-      return render :text => 'Invalid Authorization Header', :status => 401
+    timestamp = Time.zone.at(@signature.request.timestamp.to_i)
+    # 90 minutes is suggested by the LTI spec
+    allowed_delta = Setting.get_cached('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
+    if timestamp < allowed_delta.ago || timestamp > allowed_delta.from_now
+      raise Unauthorized, "Timestamp too old, request has expired"
+    end
+
+    nonce = @signature.request.nonce
+    unless Canvas::Redis.lock("nonce:#{@tool.asset_string}:#{nonce}", allowed_delta)
+      raise Unauthorized, "Duplicate nonce detected"
     end
 
     if request.content_type != "application/xml"
@@ -49,5 +62,8 @@ class LtiApiController < ApplicationController
 
     lti_response = BasicLTI::BasicOutcomes.process_request(@tool, @context, @assignment, @user, xml)
     render :text => lti_response.to_xml, :content_type => 'application/xml'
+
+  rescue Unauthorized => e
+    render :text => e.to_s, :content_type => 'application/xml', :status => 401
   end
 end
