@@ -644,7 +644,7 @@ ActionController::Routing::Routes.draw do |map|
 
   ### API routes ###
 
-  ApiRouteSet::V1.route(map, "/api/v1") do |api|
+  ApiRouteSet::V1.route(map) do |api|
     api.with_options(:controller => :courses) do |courses|
       courses.get 'courses', :action => :index
       courses.get 'courses/:id', :action => :show

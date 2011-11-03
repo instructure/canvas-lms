@@ -34,12 +34,16 @@ class ApiRouteSet
   end
   attr_accessor :mapper
 
-  def self.route(mapper, prefix)
+  def self.route(mapper, prefix = self.prefix)
     route_set = self.new(prefix)
     route_set.mapper = mapper
     yield route_set
   ensure
     route_set.mapper = nil
+  end
+
+  def self.prefix
+    raise ArgumentError, "prefix required"
   end
 
   def self.routes_for(prefix)
@@ -90,6 +94,10 @@ class ApiRouteSet
     # which allows any string.
     ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}
     ID_PARAM = %r{^:(id|[\w_]+_id)$}
+
+    def self.prefix
+      "/api/v1"
+    end
 
     def route(method, path, opts)
       opts ||= {}
