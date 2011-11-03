@@ -113,6 +113,30 @@ describe LtiApiController, :type => :integration do
     }
   end
 
+  def delete_result(sourceid = nil)
+    sourceid ||= BasicLTI::BasicOutcomes.result_source_id(@tool, @course, @assignment, @student)
+    body = %{
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <deleteResultRequest>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>#{sourceid}</sourcedId>
+        </sourcedGUID>
+      </resultRecord>
+    </deleteResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+    }
+  end
+
   def check_failure(failure_type = 'unsupported')
     response.should be_success
     response.content_type.should == 'application/xml'
@@ -197,6 +221,33 @@ describe LtiApiController, :type => :integration do
       xml.at_css('imsx_POXBody *:first').name.should == 'readResultResponse'
       xml.at_css('imsx_POXBody > readResultResponse > result > resultScore > language').content.should == 'en'
       xml.at_css('imsx_POXBody > readResultResponse > result > resultScore > textString').content.should == '0.4'
+    end
+  end
+
+  describe "deleteResult" do
+    it "should succeed but do nothing when the submission isn't graded" do
+      make_call('body' => delete_result)
+      check_success
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'success'
+      xml.at_css('imsx_messageRefIdentifier').content.should == '999999123'
+      xml.at_css('imsx_operationRefIdentifier').content.should == 'deleteResult'
+      xml.at_css('imsx_POXBody *:first').name.should == 'deleteResultResponse'
+    end
+
+    it "should delete the existing score for the submission (by creating a new version)" do
+      @assignment.grade_student(@student, :grade => "40%")
+
+      make_call('body' => delete_result)
+      check_success
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'success'
+      xml.at_css('imsx_messageRefIdentifier').content.should == '999999123'
+      xml.at_css('imsx_operationRefIdentifier').content.should == 'deleteResult'
+      xml.at_css('imsx_POXBody *:first').name.should == 'deleteResultResponse'
+
+      @assignment.submission_for_student(@student).should_not be_graded
+      @assignment.submission_for_student(@student).score.should be_nil
     end
   end
 

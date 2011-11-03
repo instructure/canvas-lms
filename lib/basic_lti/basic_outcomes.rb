@@ -49,6 +49,12 @@ module BasicLTI::BasicOutcomes
     end
   end
 
+  def self.handle_deleteResult(tool, course, assignment, user, xml, res)
+    assignment.grade_student(user, :grade => nil)
+    res.body = "<deleteResultResponse />"
+    true
+  end
+
   def self.handle_readResult(tool, course, assignment, user, xml, res)
     submission = assignment.submission_for_student(user)
     if submission.graded?
@@ -65,6 +71,7 @@ module BasicLTI::BasicOutcomes
         </result>
       </readResultResponse>
     }
+    true
   end
 
   class LtiResponse
