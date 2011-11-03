@@ -95,7 +95,7 @@ function program1(depth0,data) {
 
   buffer += "<div id=\"assignment-details-dialog\" title=\"";
   stack1 = "Grade statistics for: %{assignment.name}";
-  stack2 = "grade_statistics_for_assignment";
+  stack2 = "grading_statistics_for_assignment";
   stack3 = {};
   stack4 = "AssignmentDetailsDialog";
   stack3['scope'] = stack4;
@@ -193,4 +193,4 @@ function program1(depth0,data) {
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</td>\n    </tr>\n  </table>\n</div>";
-  return buffer;}); }()
+  return buffer;}); }();

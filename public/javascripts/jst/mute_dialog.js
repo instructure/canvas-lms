@@ -4,7 +4,7 @@ templates['mute_dialog'] = template(function (Handlebars,depth0,helpers,partials
   var buffer = "", stack1, stack2, stack3, stack4, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0;
 
 
-  buffer += "<div style=\"display: none; width: 400px;\" title=\"";
+  buffer += "<div title=\"";
   stack1 = "Mute Assignment";
   stack2 = "mute_assignment";
   stack3 = {};
@@ -109,4 +109,4 @@ templates['mute_dialog'] = template(function (Handlebars,depth0,helpers,partials
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n  </p>\n</div>";
-  return buffer;}); }()
+  return buffer;}); }();

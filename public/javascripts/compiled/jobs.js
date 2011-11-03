@@ -211,7 +211,7 @@
           _results = [];
           for (var _i = 0, _ref = this.data.length; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
           return _results;
-        }).apply(this, arguments));
+        }).apply(this));
         return this.grid.onSelectedRowsChanged();
       };
       Jobs.prototype.onSelected = function(action) {

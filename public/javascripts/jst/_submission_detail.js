@@ -46,7 +46,7 @@ function program2(depth0,data) {
   stack1 = "Go to submission URL";
   stack2 = "go_to_submission_url";
   stack3 = {};
-  stack4 = "_submission_detail";
+  stack4 = "submission_detail";
   stack3['scope'] = stack4;
   stack4 = helpers['t'] || depth0['t'];
   tmp1 = {};
@@ -69,7 +69,7 @@ function program4(depth0,data) {
   stack1 = "Submitted files:";
   stack2 = "submitted_files";
   stack3 = {};
-  stack4 = "_submission_detail";
+  stack4 = "submission_detail";
   stack3['scope'] = stack4;
   stack4 = helpers['t'] || depth0['t'];
   tmp1 = {};
@@ -132,7 +132,7 @@ function program6(depth0,data) {
   stack1 = "Turnitin similarity score -- more information";
   stack2 = "titles.turnitin_score";
   stack3 = {};
-  stack4 = "_submission_detail";
+  stack4 = "submission_detail";
   stack3['scope'] = stack4;
   stack4 = helpers['t'] || depth0['t'];
   tmp1 = {};
@@ -156,7 +156,7 @@ function program8(depth0,data) {
   stack1 = "Online Text Entry, *see details in the SpeedGrader*.";
   stack2 = "online_text_entry_see_details_in_the_speedgrader.";
   stack3 = {};
-  stack4 = "_submission_detail";
+  stack4 = "submission_detail";
   stack3['scope'] = stack4;
   stack4 = "<a href=\"%{speedGraderUrl}\">$1</a>";
   stack3['w0'] = stack4;
@@ -177,7 +177,7 @@ function program10(depth0,data) {
   stack1 = "No submission";
   stack2 = "no_submission";
   stack3 = {};
-  stack4 = "_submission_detail";
+  stack4 = "submission_detail";
   stack3['scope'] = stack4;
   stack4 = helpers['t'] || depth0['t'];
   tmp1 = {};
@@ -201,4 +201,4 @@ function program10(depth0,data) {
   buffer += "\n</div>\n";
   return buffer;}); 
 Handlebars.registerPartial('submission_detail', templates['_submission_detail']);
-}()
+}();

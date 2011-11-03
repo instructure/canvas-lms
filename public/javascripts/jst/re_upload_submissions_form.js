@@ -57,4 +57,4 @@ templates['re_upload_submissions_form'] = template(function (Handlebars,depth0,h
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n</form>\n";
-  return buffer;}); }()
+  return buffer;}); }();

@@ -57,4 +57,4 @@ templates['AssignmentGroupWeightsDialog'] = template(function (Handlebars,depth0
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n</div>\n";
-  return buffer;}); }()
+  return buffer;}); }();

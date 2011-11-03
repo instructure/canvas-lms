@@ -56,9 +56,9 @@ function program7(depth0,data) {
   var buffer = "", stack1, stack2, stack3, stack4;
   buffer += "\n  <select name=\"default_grade\" class=\"grading_value grading_box pass_fail\" id=\"student_grading_<%= assignment.id %>\">\n    <option value=\"\">---</option>\n    <option value=\"complete\">";
   stack1 = "Complete";
-  stack2 = "#gradebooks.grades.complete";
+  stack2 = "gradebooks.grades.complete";
   stack3 = {};
-  stack4 = "_grading_box";
+  stack4 = "grading_box";
   stack3['scope'] = stack4;
   stack4 = helpers['t'] || depth0['t'];
   tmp1 = {};
@@ -69,9 +69,9 @@ function program7(depth0,data) {
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</option>\n    <option value=\"incomplete\">";
   stack1 = "Incomplete";
-  stack2 = "#gradebooks.grades.incomplete";
+  stack2 = "gradebooks.grades.incomplete";
   stack3 = {};
-  stack4 = "_grading_box";
+  stack4 = "grading_box";
   stack3['scope'] = stack4;
   stack4 = helpers['t'] || depth0['t'];
   tmp1 = {};
@@ -90,7 +90,7 @@ function program9(depth0,data) {
   stack1 = "out of %{assignment.points_possible}";
   stack2 = "out_of_points_possible";
   stack3 = {};
-  stack4 = "_grading_box";
+  stack4 = "grading_box";
   stack3['scope'] = stack4;
   stack4 = helpers['t'] || depth0['t'];
   tmp1 = {};
@@ -149,4 +149,4 @@ function program9(depth0,data) {
   buffer += "\n";
   return buffer;}); 
 Handlebars.registerPartial('grading_box', templates['_grading_box']);
-}()
+}();
