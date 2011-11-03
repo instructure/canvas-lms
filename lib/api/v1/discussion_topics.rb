@@ -45,11 +45,44 @@ module Api::V1::DiscussionTopics
     end
   end
 
+  def discussion_entry_api_json(entries)
+    entries.map do |entry|
+      json = entry.as_json(:only => %w(id message user_id created_at workflow_state),
+                           :methods => [:user_name, :discussion_subentry_count],
+                           :permissions => {:user => @current_user, :session => session})
+      if entry.parent_id.zero?
+        replies = entry.unordered_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
+        unless replies.empty?
+          json['discussion_entry'][:recent_replies] = discussion_entry_api_json(replies.first(10))
+          json['discussion_entry'][:has_more_replies] = replies.size > 10
+        end
+        json['discussion_entry'][:attachment] = attachment_json(entry.attachment) if entry.attachment
+      end
+      json
+    end
+  end
+
   def topic_pagination_path
     if @context.is_a? Course
       api_v1_course_discussion_topics_path(@context)
     else
       api_v1_group_discussion_topics_path(@context)
+    end
+  end
+
+  def entry_pagination_path(topic)
+    if @context.is_a? Course
+      api_v1_course_discussion_entries_path(@context)
+    else
+      api_v1_group_discussion_entries_path(@context)
+    end
+  end
+
+  def reply_pagination_path(entry)
+    if @context.is_a? Course
+      api_v1_course_discussion_replies_path(@context)
+    else
+      api_v1_group_discussion_replies_path(@context)
     end
   end
 end
