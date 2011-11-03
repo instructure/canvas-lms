@@ -19,7 +19,6 @@ module BasicLTI::BasicOutcomes
   protected
 
   def self.handle_request(tool, course, assignment, user, xml, res)
-
     # verify the lis_result_sourcedid param, which will be a canvas-signed
     # tuple of (course, assignment, user) to ensure that only this launch of
     # the tool is attempting to modify this data.
@@ -28,22 +27,44 @@ module BasicLTI::BasicOutcomes
       return false
     end
 
-    case res.operation_ref_identifier
-    when 'replaceResult'
-      text_value = xml.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
-      new_value = Float(text_value) rescue false
-      if new_value && (0.0 .. 1.0).include?(new_value)
-        submission_hash = { :grade => "#{new_value * 100}%" }
-        submission = assignment.grade_student(user, submission_hash).first
-        res.body = "<replaceResultResponse />"
-        return true
-      else
-        res.code_major = 'failure'
-        return true
-      end
+    op = res.operation_ref_identifier
+    if self.respond_to?("handle_#{op}")
+      return self.send("handle_#{op}", tool, course, assignment, user, xml, res)
     end
 
     false
+  end
+
+  def self.handle_replaceResult(tool, course, assignment, user, xml, res)
+    text_value = xml.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
+    new_value = Float(text_value) rescue false
+    if new_value && (0.0 .. 1.0).include?(new_value)
+      submission_hash = { :grade => "#{new_value * 100}%" }
+      submission = assignment.grade_student(user, submission_hash).first
+      res.body = "<replaceResultResponse />"
+      return true
+    else
+      res.code_major = 'failure'
+      return true
+    end
+  end
+
+  def self.handle_readResult(tool, course, assignment, user, xml, res)
+    submission = assignment.submission_for_student(user)
+    if submission.graded?
+      raw_score = assignment.score_to_grade_percent(submission.score)
+      score = raw_score / 100.0
+    end
+    res.body = %{
+      <readResultResponse>
+        <result>
+          <resultScore>
+            <language>en</language>
+            <textString>#{score}</textString>
+          </resultScore>
+        </result>
+      </readResultResponse>
+    }
   end
 
   class LtiResponse

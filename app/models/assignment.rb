@@ -483,12 +483,16 @@ class Assignment < ActiveRecord::Base
   def infer_grading_type
     self.grading_type ||= "points"
   end
-  
+
+  def score_to_grade_percent(score=0.0)
+    result = score.to_f / self.points_possible
+    result = (result * 1000.0).round / 10.0
+  end
+
   def score_to_grade(score=0.0)
     result = score.to_f
     if self.grading_type == "percent"
-      result = score.to_f / self.points_possible
-      result = (result * 1000.0).round / 10.0
+      result = score_to_grade_percent(score)
       result = "#{result}%"
     elsif self.grading_type == "pass_fail"
       result = score.to_f == self.points_possible ? "complete" : "incomplete"
@@ -788,7 +792,11 @@ class Assignment < ActiveRecord::Base
       self.context_module_action(user, action, points)
     end
   end
-  
+
+  def submission_for_student(user)
+    self.submissions.find_or_initialize_by_user_id(user.id)
+  end
+
   def grade_student(original_student, opts={})
     raise "Student is required" unless original_student
     raise "Student must be enrolled in the course as a student to be graded" unless original_student && self.context.students.include?(original_student)

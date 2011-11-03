@@ -89,6 +89,30 @@ describe LtiApiController, :type => :integration do
     }
   end
 
+  def read_result(sourceid = nil)
+    sourceid ||= BasicLTI::BasicOutcomes.result_source_id(@tool, @course, @assignment, @student)
+    body = %{
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <readResultRequest>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>#{sourceid}</sourcedId>
+        </sourcedGUID>
+      </resultRecord>
+    </readResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+    }
+  end
+
   def check_failure(failure_type = 'unsupported')
     response.should be_success
     response.content_type.should == 'application/xml'
@@ -115,6 +139,7 @@ describe LtiApiController, :type => :integration do
       xml.at_css('imsx_POXBody *:first').name.should == 'replaceResultResponse'
       submission = @assignment.submissions.find_by_user_id(@student.id)
       submission.should be_present
+      submission.should be_graded
       submission.score.should == 12
     end
 
@@ -142,6 +167,36 @@ describe LtiApiController, :type => :integration do
       @assignment.submissions.find_by_user_id(@student.id).should be_nil
       make_call('body' => replace_result("OHAI SCORES"))
       check_failure('failure')
+    end
+  end
+
+  describe "readResult" do
+    it "should return an empty string when no grade exists" do
+      make_call('body' => read_result)
+      check_success
+
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'success'
+      xml.at_css('imsx_messageRefIdentifier').content.should == '999999123'
+      xml.at_css('imsx_operationRefIdentifier').content.should == 'readResult'
+      xml.at_css('imsx_POXBody *:first').name.should == 'readResultResponse'
+      xml.at_css('imsx_POXBody > readResultResponse > result > resultScore > language').content.should == 'en'
+      xml.at_css('imsx_POXBody > readResultResponse > result > resultScore > textString').content.should == ''
+    end
+
+    it "should return the score if the assignment is scored" do
+      @assignment.grade_student(@student, :grade => "40%")
+
+      make_call('body' => read_result)
+      check_success
+
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'success'
+      xml.at_css('imsx_messageRefIdentifier').content.should == '999999123'
+      xml.at_css('imsx_operationRefIdentifier').content.should == 'readResult'
+      xml.at_css('imsx_POXBody *:first').name.should == 'readResultResponse'
+      xml.at_css('imsx_POXBody > readResultResponse > result > resultScore > language').content.should == 'en'
+      xml.at_css('imsx_POXBody > readResultResponse > result > resultScore > textString').content.should == '0.4'
     end
   end
 
