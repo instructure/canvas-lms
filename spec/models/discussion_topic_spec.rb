@@ -318,4 +318,31 @@ describe DiscussionTopic do
       @subtopic.should_send_to_stream.should be_false
     end
   end
+  
+  context "posting first to view" do
+    before(:each) do
+      course_with_student(:active_all => true)
+      @observer = user(:active_all => true)
+      course_with_teacher(:course => @course, :active_all => true)
+      @context = @course
+      discussion_topic_model
+      @topic.require_initial_post = true
+      @topic.save
+    end
+    
+    it "should allow admins to see posts without posting" do
+      @topic.user_can_see_posts?(@teacher).should == true
+    end
+    
+    it "shouldn't allow student (and observer) who hasn't posted to see" do
+      @topic.user_can_see_posts?(@student).should == false
+    end
+    
+    it "should allow student (and observer) who has posted to see" do 
+      @topic.reply_from(:user => @student, :text => 'hai')
+      @topic.user_can_see_posts?(@student).should == true
+    end
+    
+  end
+  
 end

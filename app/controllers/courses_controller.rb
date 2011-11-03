@@ -241,7 +241,7 @@ class CoursesController < ApplicationController
   def activity_stream
     get_context
     if authorized_action(@context, @current_user, :read)
-      render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+      render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i, @current_user.id) }
     end
   end
 

@@ -245,6 +245,8 @@ class UsersController < ApplicationController
   #     'type': 'DiscussionTopic',
   #     'discussion_topic_id': 1234,
   #     'total_root_discussion_entries': 5,
+  #     'require_initial_post' => true,
+  #     'user_has_posted' => true,
   #     'root_discussion_entries': {
   #       ...
   #     }
@@ -257,6 +259,8 @@ class UsersController < ApplicationController
   #     'type': 'Announcement',
   #     'announcement_id': 1234,
   #     'total_root_discussion_entries': 5,
+  #     'require_initial_post' => true,
+  #     'user_has_posted' => null,
   #     'root_discussion_entries': {
   #       ...
   #     }
@@ -308,7 +312,7 @@ class UsersController < ApplicationController
   #   }
   def activity_stream
     if @current_user
-      render :json => @current_user.stream_items.map { |i| stream_item_json(i) }
+      render :json => @current_user.stream_items.map { |i| stream_item_json(i, @current_user.id) }
     else
       render_unauthorized_action
     end

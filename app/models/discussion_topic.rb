@@ -242,6 +242,22 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
   
+  def require_initial_post?
+    self.require_initial_post || (self.root_topic && self.root_topic.require_initial_post)
+  end
+  
+  def user_ids_who_have_posted_and_admins
+    ids = DiscussionEntry.active.scoped(:select => "distinct user_id").find_all_by_discussion_topic_id(self.id).map(&:user_id)
+    ids += self.context.admin_enrollments.scoped(:select => 'user_id').map(&:user_id) if self.context.respond_to?(:admin_enrollments)
+    ids
+  end
+  memoize :user_ids_who_have_posted_and_admins
+  
+  def user_can_see_posts?(user, session=nil)
+    return false unless user
+    !self.require_initial_post || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id) 
+  end
+  
   def reply_from(opts)
     user = opts[:user]
     message = opts[:text].strip
