@@ -114,6 +114,8 @@ class CommunicationChannelsController < ApplicationController
           @enrollment.user = @current_user
           # accept will save it
           @enrollment.accept
+          @user.touch
+          @current_user.touch
         else
           # render
           return
