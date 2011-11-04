@@ -35,9 +35,15 @@ describe "communication_channels/confirm.html.erb" do
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
       registration_form.should_not be_nil
-      registration_form['style'].should be_blank
-      # no "back", "use this account", "new account", etc. buttons
-      page.css('a.button').should be_empty
+      if @enrollment
+        registration_form['style'].should match /display:\s*none/
+        page.css('#register.button').first.should_not be_nil
+        page.css('#back.button').first.should be_nil
+      else
+        registration_form['style'].should be_blank
+        # no "back", "use this account", "new account", etc. buttons
+        page.css('a.button').should be_empty
+      end
     end
 
     it "should follow the simple path for not logged in" do

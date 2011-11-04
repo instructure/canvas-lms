@@ -104,12 +104,12 @@ class CommunicationChannelsController < ApplicationController
       end
       @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, a.first.name] <=> [b.first == @current_user ? 0 : 1, b.first.name] }
 
-      if @current_user && params[:confirm] && @merge_opportunities.find { |opp| opp.first == @current_user }
+      if @current_user && params[:confirm].present? && @merge_opportunities.find { |opp| opp.first == @current_user }
         cc.confirm
         @enrollment.accept if @enrollment
         @user.move_to_user(@current_user) if @user != @current_user
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
-        if params[:transfer_enrollment]
+        if params[:transfer_enrollment].present?
           cc.active? || cc.confirm
           @enrollment.user = @current_user
           # accept will save it
