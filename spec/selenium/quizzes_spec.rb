@@ -917,6 +917,12 @@ shared_examples_for "quiz selenium tests" do
 
     is_prevented = driver.execute_script('return window.mousewheelprevented')
     is_prevented.should be_true
+
+    #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+    driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
+    confirm_dialog = driver.switch_to.alert
+    confirm_dialog.accept
+    wait_for_dom_ready
   end
 
   it "should display quiz statistics" do
