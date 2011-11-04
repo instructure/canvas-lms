@@ -4,12 +4,9 @@ require 'lib/i18n_extraction/handlebars_extractor'
 # Precompiles handlebars templates into JavaScript function strings
 class Handlebars
 
-  @@header = '!function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};'
-  @@footer = '}();'
-
   class << self
 
-    # Recursively compiles a source directory of .handlebars templates into a 
+    # Recursively compiles a source directory of .handlebars templates into a
     # destination directory. Immitates the node.js bin script at
     # https://github.com/wycats/handlebars.js/blob/master/bin/handlebars
     #
@@ -50,7 +47,14 @@ class Handlebars
         partial_registration = "\nHandlebars.registerPartial('#{partial_path}', templates['#{id}']);\n"
       end
       template = context.call "Handlebars.precompile", prepare_i18n(source, id)
-      "#{@@header}\ntemplates['#{id}'] = template(#{template}); #{partial_registration}#{@@footer}"
+
+      <<-JS
+!define('jst/#{id}', ['compiled/handlebars_helpers'], function (Handlebars) {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+  templates['#{id}'] = template(#{template});#{partial_registration}
+  return templates['#{id}'];
+});
+JS
     end
 
     def prepare_i18n(source, scope)

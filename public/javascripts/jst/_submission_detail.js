@@ -1,5 +1,6 @@
-!function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-templates['_submission_detail'] = template(function (Handlebars,depth0,helpers,partials,data) {
+!define('jst/_submission_detail', ['compiled/handlebars_helpers'], function (Handlebars) {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+  templates['_submission_detail'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
   var buffer = "", stack1, stack2, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
 
@@ -199,6 +200,8 @@ function program10(depth0,data) {
   stack1 = stack2.call(depth0, stack1, tmp1);
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>\n";
-  return buffer;}); 
+  return buffer;});
 Handlebars.registerPartial('submission_detail', templates['_submission_detail']);
-}();
+
+  return templates['_submission_detail'];
+});

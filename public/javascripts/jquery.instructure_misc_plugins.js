@@ -16,16 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('instructure', function(I18n) {
-  
-  // this function is to prevent you from doing all kinds of expesive operations on a 
+define('jquery.instructure_misc_plugins', ['i18n'], function(I18n){
+
+  I18n = I18n.scoped('instructure');
+
+  // this function is to prevent you from doing all kinds of expesive operations on a
   // jquery object that doesn't actually have any elements in it
   // it is similar and inspired by http://www.slideshare.net/paul.irish/perfcompression (slide #42)
   // to use it do something like:
   // $("a .bunch #of .nodes").ifExists(function(orignalQuery){
   //   //  'this' points to the original jquery object (in this case, $("a .bunch #of .nodes") );
   //   // orignalQuery is the same as 'this';
-  //   this.slideUp().dialog().show(); 
+  //   this.slideUp().dialog().show();
   // });
   $.fn.ifExists = function(func){
     this.length && func.call(this, this);
@@ -271,16 +273,16 @@ I18n.scoped('instructure', function(I18n) {
       $("html,body").scrollToVisible($indicator);
     }
   };
-  
+
   $.fn.hasScrollbar = function(){
     return this.length && (this[0].clientHeight < this[0].scrollHeight);
   };
-  
+
   $.fn.log = function (msg) {
     console.log("%s: %o", msg, this);
     return this;
   };
-  
+
   $.fn.chevronCrumbs = function(options) {
     return this.each(function() {
       $(this).show()
@@ -291,7 +293,7 @@ I18n.scoped('instructure', function(I18n) {
           .filter(".active").prev().addClass("before-active");
     });
   };
-  
+
   // this is used if you want to fill the browser window with something inside #content but you want to also leave the footer and header on the page.
   $.fn.fillWindowWithMe = function(options){
     var opts               = $.extend({minHeight: 400}, options),
@@ -304,11 +306,11 @@ I18n.scoped('instructure', function(I18n) {
 
     function fillWindowWithThisElement(){
       $toResize.height(0);
-      var spaceLeftForThis = $window.height() 
+      var spaceLeftForThis = $window.height()
                              - ($wrapper_container.offset().top + $wrapper_container.height())
                              + ($main.height() - $not_right_side.height()),
           newHeight = Math.max(400, spaceLeftForThis);
-                               
+
       $toResize.height(newHeight);
       if ($.isFunction(opts.onResize)) {
         opts.onResize.call($this, newHeight);
@@ -378,7 +380,7 @@ I18n.scoped('instructure', function(I18n) {
     return this;
 
   };
-  
+
   $.fn.fixDialogButtons = function() {
     return this.each(function() {
       var $dialog = $(this);
@@ -396,6 +398,6 @@ I18n.scoped('instructure', function(I18n) {
       });
     });
   }
-  
 
+  return $;
 });

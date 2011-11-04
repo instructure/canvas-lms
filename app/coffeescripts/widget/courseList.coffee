@@ -2,7 +2,11 @@
 requires:
   - js!vendor/jquery-1.6.4.js
 ###
-define 'compiled/widget/courseList', ['compiled/widget/CustomList'], (CustomList) ->
+define 'compiled/widget/courseList', [
+  'compiled/widget/CustomList'
+  'jst/courseList/wrapper'
+  'jst/courseList/content'
+], (CustomList, wrapper, content) ->
 
   init: ->
     jQuery ->
@@ -20,7 +24,9 @@ define 'compiled/widget/courseList', ['compiled/widget/CustomList'], (CustomList
           autoOpen = true
 
         jQuery.getJSON '/all_menu_courses', (enrollments) ->
-          window.courseList = new CustomList '#menu_enrollments', enrollments,
+          courseList = new CustomList '#menu_enrollments', enrollments,
             appendTarget: '#menu_enrollments'
             autoOpen: autoOpen
+            wrapper: wrapper
+            content: content
             onToggle: (state) -> $menuDrop.toggleClass 'menuCustomListEditing', state
