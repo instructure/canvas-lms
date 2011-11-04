@@ -31,7 +31,7 @@ describe LtiApiController, :type => :integration do
   end
 
   def make_call(opts = {})
-    opts['path'] ||= "/api/lti/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+    opts['path'] ||= "/api/lti/v1/tools/#{@tool.id}/grade_passback"
     opts['key'] ||= @tool.consumer_key
     opts['secret'] ||= @tool.shared_secret
     opts['content-type'] ||= 'application/xml'
@@ -60,7 +60,7 @@ describe LtiApiController, :type => :integration do
   end
 
   def replace_result(score, sourceid = nil)
-    sourceid ||= BasicLTI::BasicOutcomes.result_source_id(@tool, @course, @assignment, @student)
+    sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
     body = %{
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
@@ -90,7 +90,7 @@ describe LtiApiController, :type => :integration do
   end
 
   def read_result(sourceid = nil)
-    sourceid ||= BasicLTI::BasicOutcomes.result_source_id(@tool, @course, @assignment, @student)
+    sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
     body = %{
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
@@ -114,7 +114,7 @@ describe LtiApiController, :type => :integration do
   end
 
   def delete_result(sourceid = nil)
-    sourceid ||= BasicLTI::BasicOutcomes.result_source_id(@tool, @course, @assignment, @student)
+    sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
     body = %{
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
@@ -259,7 +259,7 @@ describe LtiApiController, :type => :integration do
     tag.content_type = 'ContextExternalTool'
     tag.save!
     make_call('body' => replace_result('0.5'))
-    response.status.should == "401 Unauthorized"
+    check_failure
   end
 
   it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
@@ -277,7 +277,7 @@ describe LtiApiController, :type => :integration do
     @assignment.update_attributes(:submission_types => 'online_upload')
     @assignment.external_tool_tag.destroy!
     make_call('body' => replace_result('0.5'))
-    response.status.should == "401 Unauthorized"
+    check_failure
   end
 
   it "should verify the sourcedid is correct for this tool launch" do

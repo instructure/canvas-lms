@@ -194,7 +194,7 @@ describe BasicLTI do
     assignment_model(:submission_types => "external_tool", :course => @course)
     launch.for_assignment!(@assignment, "/my/test/url")
     hash = launch.generate
-    hash['lis_result_sourcedid'].should == BasicLTI::BasicOutcomes.result_source_id(@tool, @course, @assignment, @user)
+    hash['lis_result_sourcedid'].should == BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @user)
     hash['lis_outcome_service_url'].should == "/my/test/url"
   end
 end

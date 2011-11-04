@@ -19,39 +19,29 @@
 require 'oauth/request_proxy/action_controller_request'
 
 class LtiApiController < ApplicationController
-
-  class Unauthorized < Exception; end
-
   def grade_passback
-    require_context
-
     # load the external tool to grab the key and secret
-    @assignment = @context.assignments.find(params[:assignment_id])
-    @user = @context.students.find(params[:id])
-    tag = @assignment.external_tool_tag
-    @tool = ContextExternalTool.find_external_tool(tag.url, @context) if tag
+    @tool = ContextExternalTool.find(params[:tool_id])
 
-    raise(Unauthorized, "LTI tool not found") unless @tool
-
-    # verify the request oauth signature
+    # verify the request oauth signature, timestamp and nonce
     begin
       @signature = OAuth::Signature.build(request, :consumer_secret => @tool.shared_secret)
       @signature.verify() or raise OAuth::Unauthorized
     rescue OAuth::Signature::UnknownSignatureMethod,
            OAuth::Unauthorized
-      raise Unauthorized, "Invalid authorization header"
+      raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header"
     end
 
     timestamp = Time.zone.at(@signature.request.timestamp.to_i)
     # 90 minutes is suggested by the LTI spec
     allowed_delta = Setting.get_cached('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
     if timestamp < allowed_delta.ago || timestamp > allowed_delta.from_now
-      raise Unauthorized, "Timestamp too old, request has expired"
+      raise BasicLTI::BasicOutcomes::Unauthorized, "Timestamp too old or too far in the future, request has expired"
     end
 
     nonce = @signature.request.nonce
     unless Canvas::Redis.lock("nonce:#{@tool.asset_string}:#{nonce}", allowed_delta)
-      raise Unauthorized, "Duplicate nonce detected"
+      raise BasicLTI::BasicOutcomes::Unauthorized, "Duplicate nonce detected"
     end
 
     if request.content_type != "application/xml"
@@ -60,10 +50,10 @@ class LtiApiController < ApplicationController
 
     xml = Nokogiri::XML.parse(request.body)
 
-    lti_response = BasicLTI::BasicOutcomes.process_request(@tool, @context, @assignment, @user, xml)
+    lti_response = BasicLTI::BasicOutcomes.process_request(@tool, xml)
     render :text => lti_response.to_xml, :content_type => 'application/xml'
 
-  rescue Unauthorized => e
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
     render :text => e.to_s, :content_type => 'application/xml', :status => 401
   end
 end

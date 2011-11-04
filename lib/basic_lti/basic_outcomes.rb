@@ -1,16 +1,38 @@
 module BasicLTI::BasicOutcomes
+  class Unauthorized < Exception; end
+
   # this is the lis_result_sourcedid field in the launch, and the
   # sourcedGUID/sourcedId in BLTI basic outcome requests.
   # it's a secure signature of the (tool, course, assignment, user). Combined with
   # the pre-determined shared secret that the tool signs requests with, this
   # ensures that only this launch of the tool can modify the score.
-  def self.result_source_id(tool, course, assignment, user)
-    Canvas::Security.hmac_sha1("#{tool.id}-#{course.id}-#{assignment.id}-#{user.id}")
+  def self.encode_source_id(tool, course, assignment, user)
+    payload = [tool.id, course.id, assignment.id, user.id].join('-')
+    "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
   end
 
-  def self.process_request(tool, course, assignment, user, xml)
+  SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
+
+  def self.decode_source_id(sourceid)
+    md = sourceid.match(SOURCE_ID_REGEX)
+    return false unless md
+    new_encoding = [md[1], md[2], md[3], md[4]].join('-')
+    return false unless Canvas::Security.hmac_sha1(new_encoding) == md[5]
+    tool = ContextExternalTool.find(md[1])
+    course = Course.find(md[2])
+    assignment = course.assignments.active.find(md[3])
+    user = course.students.active.find(md[4])
+    tag = assignment.external_tool_tag
+    if !tag || tool != ContextExternalTool.find_external_tool(tag.url, course)
+      return false # assignment settings have changed, this tool is no longer active
+    end
+    return course, assignment, user
+  end
+
+  def self.process_request(tool, xml)
     res = LtiResponse.new(xml)
-    unless self.handle_request(tool, course, assignment, user, xml, res)
+
+    unless self.handle_request(tool, xml, res)
       res.code_major = 'unsupported'
     end
     return res
@@ -18,12 +40,14 @@ module BasicLTI::BasicOutcomes
 
   protected
 
-  def self.handle_request(tool, course, assignment, user, xml, res)
+  def self.handle_request(tool, xml, res)
     # verify the lis_result_sourcedid param, which will be a canvas-signed
     # tuple of (course, assignment, user) to ensure that only this launch of
     # the tool is attempting to modify this data.
     source_id = xml.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
-    unless source_id && source_id == BasicLTI::BasicOutcomes.result_source_id(tool, course, assignment, user)
+    course, assignment, user = self.decode_source_id(source_id) if source_id
+
+    unless course && assignment && user
       return false
     end
 
