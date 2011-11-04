@@ -143,16 +143,8 @@ class CommunicationChannelsController < ApplicationController
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
-          @user.name = params[:user].try(:[], :name) || @user.name
-          @user.name = @pseudonym.unique_id if !@user.name || @user.name.empty?
-          @user.time_zone = params[:user].try(:[], :time_zone) || @user.time_zone
-          @user.short_name = params[:user].try(:[], :short_name) || @user.short_name
-          @user.subscribe_to_emails = params[:user].try(:[], :subscribe_to_emails) || @user.subscribe_to_emails
-          @pseudonym.unique_id = params[:pseudonym].try(:[], :unique_id) || @pseudonym.unique_id
-          if params[:pseudonym].try(:[], :password)
-            @pseudonym.password = params[:pseudonym][:password]
-            @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-          end
+          @user.attributes = params[:user]
+          @pseudonym.attributes = params[:pseudonym]
           @pseudonym.communication_channel = cc
 
           # trick pseudonym into validating the e-mail address

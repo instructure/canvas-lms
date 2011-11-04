@@ -122,9 +122,9 @@
       <input type="hidden" name="register" value="1"/>
       <table class="formtable">
         <tr>
-          <td><%= blabel :pseudonym, :unique_id, :en => "Email Address" %></td>
+          <td><%= form.blabel :unique_id, :en => "Email Address" %></td>
           <td>
-            <%= text_field :pseudonym, :unique_id, :value => @pseudonym.unique_id %>
+            <%= form.text_field :unique_id %>
             <div style="font-size: 0.8em;"><%= t 'tips.login', "This is the email address you will use to login." %></div>
           </td>
         </tr>
@@ -137,13 +137,13 @@
         </tr><tr>
           <td><%= blabel :user, :short_name, :en => "Short Name" %></td>
           <td>
-            <%= text_field :user, :short_name, :value => params[:short_name] || (@user.short_name && !@user.short_name.blank? && @user.short_name) || @user.name %>
+            <%= text_field :user, :short_name, :value => @user.short_name %>
             <div style="font-size: 0.8em;"><%= t 'tips.short_name', "People will see this name in discussions, messages and comments." %></div>
           </td>
         </tr><tr>
           <td><%= blabel :user, :sortable_name, :en => "Sortable Name" %></td>
           <td>
-            <%= text_field :user, :sortable_name, :value => params[:sortable_name] || @user.sortable_name %>
+            <%= text_field :user, :sortable_name, :value => @user.sortable_name %>
             <div style="font-size: 0.8em;"><%= t 'tips.sortable_name', "This name appears in sorted lists." %></div>
           </td>
         </tr><tr>
@@ -151,10 +151,10 @@
           <td><%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@pseudonym.account.default_time_zone) || "Mountain Time (US & Canada)"), :value => @user.time_zone %></td>
         </tr><tr>
           <td><%= form.blabel :password, :en => "Password" %></td>
-          <td><%= form.password_field :password %></td>
+          <td><%= form.password_field :password, :value => '' %></td>
         </tr><tr>
           <td><%= form.blabel :password_confirmation, :en => "Confirm Password"%></td>
-          <td><%= form.password_field :password_confirmation %></td>
+          <td><%= form.password_field :password_confirmation, :value => '' %></td>
         </tr>
         <% if @pseudonym.account == Account.default %>
           <tr>
