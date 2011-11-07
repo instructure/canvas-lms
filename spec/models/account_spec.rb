@@ -585,4 +585,15 @@ describe Account do
       tab[:args].should == [@account.id, tool.id]
     end
   end
+
+  describe "fast_all_users" do
+    it "should preserve sortable_name" do
+      user_with_pseudonym(:active_all => 1)
+      @user.update_attributes(:name => "John St. Clair", :sortable_name => "St. Clair, John")
+      @johnstclair = @user
+      user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com', :name => 'JT Olds')
+      @jtolds = @user
+      Account.default.fast_all_users.should == [@jtolds, @johnstclair]
+    end
+  end
 end
