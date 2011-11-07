@@ -149,7 +149,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def update_grades_if_details_changed
-    if @points_possible_was != self.points_possible
+    if @points_possible_was != self.points_possible || @grades_affected
       begin
         self.context.recompute_student_scores
       rescue
@@ -430,6 +430,7 @@ class Assignment < ActiveRecord::Base
     self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
     self.quiz.destroy if self.quiz && !self.quiz.deleted?
     ContentTag.delete_for(self)
+    @grades_affected = true
     self.save
   end
   
@@ -439,6 +440,7 @@ class Assignment < ActiveRecord::Base
   
   def restore(from=nil)
     self.workflow_state = 'published'
+    @grades_affected = true
     self.save
     self.discussion_topic.restore if self.discussion_topic && from != :discussion_topic
     self.quiz.restore if self.quiz && from != :quiz
