@@ -516,6 +516,8 @@ class Enrollment < ActiveRecord::Base
   # * A submission's score is changed; scores for the submission owner in the
   #   associated course are recomputed.
   #
+  # * An assignment is deleted/undeleted
+  #
   # If some new feature comes up that affects calculation of a user's score,
   # please add appropriate calls to this so that the cached values don't get
   # stale! And once you've added the call, add the condition to the comment
