@@ -33,10 +33,11 @@ class ContentTag < ActiveRecord::Base
   after_save :enforce_unique_in_modules
   after_save :touch_context_module
   after_save :touch_context_if_learning_outcome
+  include CustomValidations
+  validates_as_url :url
 
   attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab
     
-
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
     can :delete

@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe ContentTag do
   
@@ -158,5 +159,11 @@ describe ContentTag do
     @tag.title.should == 'some assignment (renamed)'
     @assignment.reload
     @assignment.title.should == 'some assignment (renamed)'
+  end
+
+  it_should_behave_like "url validation tests"
+  it "should check url validity" do
+    quiz = course.quizzes.create!
+    test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
   end
 end
