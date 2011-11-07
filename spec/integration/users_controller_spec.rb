@@ -80,5 +80,19 @@ describe UsersController do
       response.body.should match(/coursename2/)
     end
   end
+
+  describe "#index" do
+    it "should render" do
+      user_with_pseudonym(:active_all => 1)
+      @johnstclair = @user.update_attributes(:name => 'John St. Clair', :sortable_name => 'St. Clair, John')
+      user_with_pseudonym(:active_all => 1, :username => 'jtolds@instructure.com', :name => 'JT Olds')
+      @jtolds = @user
+      Account.default.add_user(@user)
+      user_session(@user, @pseudonym)
+      get account_users_url(Account.default)
+      response.should be_success
+      response.body.should match /Olds, JT.*St\. Clair, John/m
+    end
+  end
 end
 
