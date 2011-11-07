@@ -32,70 +32,19 @@ module BasicLTI::BasicOutcomes
   def self.process_request(tool, xml)
     res = LtiResponse.new(xml)
 
-    unless self.handle_request(tool, xml, res)
+    unless res.handle_request(tool)
       res.code_major = 'unsupported'
     end
     return res
   end
 
-  protected
+  def self.process_legacy_request(tool, params)
+    res = LtiResponse::Legacy.new(params)
 
-  def self.handle_request(tool, xml, res)
-    # verify the lis_result_sourcedid param, which will be a canvas-signed
-    # tuple of (course, assignment, user) to ensure that only this launch of
-    # the tool is attempting to modify this data.
-    source_id = xml.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
-    course, assignment, user = self.decode_source_id(source_id) if source_id
-
-    unless course && assignment && user
-      return false
+    unless res.handle_request(tool)
+      res.code_major = 'unsupported'
     end
-
-    op = res.operation_ref_identifier
-    if self.respond_to?("handle_#{op}")
-      return self.send("handle_#{op}", tool, course, assignment, user, xml, res)
-    end
-
-    false
-  end
-
-  def self.handle_replaceResult(tool, course, assignment, user, xml, res)
-    text_value = xml.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
-    new_value = Float(text_value) rescue false
-    if new_value && (0.0 .. 1.0).include?(new_value)
-      submission_hash = { :grade => "#{new_value * 100}%" }
-      submission = assignment.grade_student(user, submission_hash).first
-      res.body = "<replaceResultResponse />"
-      return true
-    else
-      res.code_major = 'failure'
-      return true
-    end
-  end
-
-  def self.handle_deleteResult(tool, course, assignment, user, xml, res)
-    assignment.grade_student(user, :grade => nil)
-    res.body = "<deleteResultResponse />"
-    true
-  end
-
-  def self.handle_readResult(tool, course, assignment, user, xml, res)
-    submission = assignment.submission_for_student(user)
-    if submission.graded?
-      raw_score = assignment.score_to_grade_percent(submission.score)
-      score = raw_score / 100.0
-    end
-    res.body = %{
-      <readResultResponse>
-        <result>
-          <resultScore>
-            <language>en</language>
-            <textString>#{score}</textString>
-          </resultScore>
-        </result>
-      </readResultResponse>
-    }
-    true
+    return res
   end
 
   class LtiResponse
@@ -107,6 +56,10 @@ module BasicLTI::BasicOutcomes
       self.severity = 'status'
     end
 
+    def sourcedid
+      @lti_request.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
+    end
+
     def message_ref_identifier
       @lti_request.at_css('imsx_POXHeader imsx_messageIdentifier').try(:content)
     end
@@ -114,6 +67,10 @@ module BasicLTI::BasicOutcomes
     def operation_ref_identifier
       tag = @lti_request.at_css('imsx_POXBody *:first').try(:name)
       tag && tag.sub(%r{Request$}, '')
+    end
+
+    def result_score
+      @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
     end
 
     def to_xml
@@ -150,6 +107,132 @@ module BasicLTI::BasicOutcomes
       XML
       @envelope.encoding = 'UTF-8'
       @envelope
+    end
+
+    def handle_request(tool)
+      # verify the lis_result_sourcedid param, which will be a canvas-signed
+      # tuple of (course, assignment, user) to ensure that only this launch of
+      # the tool is attempting to modify this data.
+      source_id = self.sourcedid
+      course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(source_id) if source_id
+
+      unless course && assignment && user
+        return false
+      end
+
+      op = self.operation_ref_identifier
+      if self.respond_to?("handle_#{op}")
+        return self.send("handle_#{op}", tool, course, assignment, user)
+      end
+
+      false
+    end
+
+    protected
+
+    def handle_replaceResult(tool, course, assignment, user)
+      text_value = self.result_score
+      new_value = Float(text_value) rescue false
+      if new_value && (0.0 .. 1.0).include?(new_value)
+        submission_hash = { :grade => "#{new_value * 100}%" }
+        @submission = assignment.grade_student(user, submission_hash).first
+        self.body = "<replaceResultResponse />"
+        return true
+      else
+        self.code_major = 'failure'
+        return true
+      end
+    end
+
+    def handle_deleteResult(tool, course, assignment, user)
+      assignment.grade_student(user, :grade => nil)
+      self.body = "<deleteResultResponse />"
+      true
+    end
+
+    def handle_readResult(tool, course, assignment, user)
+      @submission = assignment.submission_for_student(user)
+      self.body = %{
+        <readResultResponse>
+          <result>
+            <resultScore>
+              <language>en</language>
+              <textString>#{submission_score}</textString>
+            </resultScore>
+          </result>
+        </readResultResponse>
+      }
+      true
+    end
+
+    def submission_score
+      if @submission.try(:graded?)
+        raw_score = @submission.assignment.score_to_grade_percent(@submission.score)
+        raw_score / 100.0
+      end
+    end
+
+    class Legacy < LtiResponse
+      def initialize(params)
+        super(nil)
+        @params = params
+      end
+
+      def sourcedid
+        @params[:sourcedid]
+      end
+
+      def result_score
+        @params[:result_resultscore_textstring]
+      end
+
+      def operation_ref_identifier
+        case @params[:lti_message_type].try(:downcase)
+        when 'basic-lis-updateresult'
+          'replaceResult'
+        when 'basic-lis-readresult'
+          'readResult'
+        when 'basic-lis-deleteresult'
+          'deleteResult'
+        end
+      end
+
+      def to_xml
+        xml = LtiResponse::Legacy.envelope.dup
+        xml.at_css('message_response > statusinfo > codemajor').content = code_major.capitalize
+        if score = submission_score
+          xml.at_css('message_response > result > sourcedid').content = sourcedid
+          xml.at_css('message_response > result > resultscore > textstring').content = score
+        else
+          xml.at_css('message_response > result').remove
+        end
+        xml.to_s
+      end
+
+      def self.envelope
+        return @envelope if @envelope
+        @envelope = Nokogiri::XML.parse <<-XML
+        <message_response>
+          <lti_message_type></lti_message_type>
+          <statusinfo>
+            <codemajor></codemajor>
+            <severity>Status</severity>
+            <codeminor>fullsuccess</codeminor>
+          </statusinfo>
+          <result>
+            <sourcedid></sourcedid>
+            <resultscore>
+              <resultvaluesourcedid>decimal</resultvaluesourdedid>
+              <textstring></textstring>
+              <language>en-US</language>
+            </resultscore>
+          </result>
+        </message_response>
+        XML
+        @envelope.encoding = 'UTF-8'
+        @envelope
+      end
+
     end
   end
 end

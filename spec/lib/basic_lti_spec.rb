@@ -192,9 +192,10 @@ describe BasicLTI do
     @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
     launch = BasicLTI::ToolLaunch.new(:url => "http://www.yahoo.com", :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
     assignment_model(:submission_types => "external_tool", :course => @course)
-    launch.for_assignment!(@assignment, "/my/test/url")
+    launch.for_assignment!(@assignment, "/my/test/url", "/my/other/test/url")
     hash = launch.generate
     hash['lis_result_sourcedid'].should == BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @user)
     hash['lis_outcome_service_url'].should == "/my/test/url"
+    hash['ext_ims_lis_basic_outcome_url'].should == "/my/other/test/url"
   end
 end

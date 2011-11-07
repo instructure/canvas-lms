@@ -826,7 +826,7 @@ class ApplicationController < ActionController::Base
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
         if @tag.context.is_a?(Assignment) && @context.students.include?(@current_user)
-          @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool))
+          @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         end
         @tool_settings = @launch.generate
         render :template => 'external_tools/tool_show'

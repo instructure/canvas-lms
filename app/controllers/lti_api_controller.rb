@@ -19,7 +19,41 @@
 require 'oauth/request_proxy/action_controller_request'
 
 class LtiApiController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+
+  # this API endpoint passes all the existing tests for the LTI v1.1 outcome service specification
   def grade_passback
+    verify_oauth
+
+    if request.content_type != "application/xml"
+      return render :text => '', :status => 415
+    end
+
+    xml = Nokogiri::XML.parse(request.body)
+
+    lti_response = BasicLTI::BasicOutcomes.process_request(@tool, xml)
+    render :text => lti_response.to_xml, :content_type => 'application/xml'
+
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
+    render :text => e.to_s, :status => 401
+  end
+
+  # this similar API implements the older work-in-process BLTI 0.0.4 outcome
+  # service extension spec, for clients who have not yet upgraded to the new
+  # specification
+  def legacy_grade_passback
+    verify_oauth
+
+    lti_response = BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
+    render :text => lti_response.to_xml, :content_type => 'application/xml'
+
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
+    render :text => e.to_s, :status => 401
+  end
+
+  protected
+
+  def verify_oauth
     # load the external tool to grab the key and secret
     @tool = ContextExternalTool.find(params[:tool_id])
 
@@ -43,17 +77,5 @@ class LtiApiController < ApplicationController
     unless Canvas::Redis.lock("nonce:#{@tool.asset_string}:#{nonce}", allowed_delta)
       raise BasicLTI::BasicOutcomes::Unauthorized, "Duplicate nonce detected"
     end
-
-    if request.content_type != "application/xml"
-      return render :text => '', :status => 415
-    end
-
-    xml = Nokogiri::XML.parse(request.body)
-
-    lti_response = BasicLTI::BasicOutcomes.process_request(@tool, xml)
-    render :text => lti_response.to_xml, :content_type => 'application/xml'
-
-  rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    render :text => e.to_s, :content_type => 'application/xml', :status => 401
   end
 end

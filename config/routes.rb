@@ -741,6 +741,7 @@ ActionController::Routing::Routes.draw do |map|
 
   ApiRouteSet.route(map, "/api/lti/v1") do |lti|
     lti.post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
+    lti.post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
   end
 
   map.resources :equation_images, :only => :show

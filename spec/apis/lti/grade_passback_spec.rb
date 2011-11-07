@@ -301,4 +301,188 @@ describe LtiApiController, :type => :integration do
     response.status.should == "401 Unauthorized"
     response.body.should match(/expired/i)
   end
+
+  describe "blti extensions 0.0.4" do
+    def make_call(opts = {})
+      opts['path'] ||= "/api/lti/v1/tools/#{@tool.id}/ext_grade_passback"
+      opts['key'] ||= @tool.consumer_key
+      opts['secret'] ||= @tool.shared_secret
+      consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
+      req = consumer.create_signed_request(:post, opts['path'], nil, { :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'] }, opts['body'])
+      post "https://www.example.com#{req.path}",
+        req.body,
+        { 'content-type' => 'application/x-www-form-urlencoded', "Authorization" => req['Authorization'] }
+    end
+
+    it "should require the correct shared secret" do
+      make_call('secret' => 'bad secret is bad')
+      response.status.should == "401 Unauthorized"
+    end
+
+    def sourceid
+      BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
+    end
+
+    def update_result(score, sourcedid = nil)
+      sourcedid ||= sourceid
+      body = {
+        'lti_message_type' => 'basic-lis-updateresult',
+        'sourcedid' => sourcedid,
+        'result_resultscore_textstring' => score.to_s,
+      }
+    end
+
+    def read_result(sourcedid = nil)
+      sourcedid ||= sourceid
+      body = {
+        'lti_message_type' => 'basic-lis-readresult',
+        'sourcedid' => sourcedid,
+      }
+    end
+
+    def delete_result(sourcedid = nil)
+      sourcedid ||= sourceid
+      body = {
+        'lti_message_type' => 'basic-lis-deleteresult',
+        'sourcedid' => sourcedid,
+      }
+    end
+
+    def check_success
+      response.should be_success
+      response.content_type.should == 'application/xml'
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('message_response > statusinfo > codemajor').content.should == 'Success'
+      xml.at_css('message_response > statusinfo > codeminor').content.should == 'fullsuccess'
+      xml
+    end
+
+    def check_failure(failure_type = 'Unsupported')
+      response.should be_success
+      response.content_type.should == 'application/xml'
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('message_response > statusinfo > codemajor').content.should == failure_type
+      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      xml
+    end
+
+    describe "basic-lis-updateresult" do
+      it "should allow updating the submission score" do
+        @assignment.submissions.find_by_user_id(@student.id).should be_nil
+        make_call('body' => update_result('0.6'))
+        xml = check_success
+
+        xml.at_css('message_response > result > sourcedid').content.should == sourceid
+        xml.at_css('message_response > result > resultscore > resultvaluesourcedid').content.should == 'decimal'
+        xml.at_css('message_response > result > resultscore > textstring').content.should == '0.6'
+        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission.should be_present
+        submission.should be_graded
+        submission.score.should == 12
+      end
+
+      it "should reject out of bound scores" do
+        @assignment.submissions.find_by_user_id(@student.id).should be_nil
+        make_call('body' => update_result('-1'))
+        check_failure('Failure')
+        make_call('body' => update_result('1.1'))
+        check_failure('Failure')
+
+        make_call('body' => update_result('0.0'))
+        check_success
+        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission.should be_present
+        submission.score.should == 0
+
+        make_call('body' => update_result('1.0'))
+        check_success
+        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission.should be_present
+        submission.score.should == 20
+      end
+
+      it "should reject non-numeric scores" do
+        @assignment.submissions.find_by_user_id(@student.id).should be_nil
+        make_call('body' => update_result("OHAI SCORES"))
+        check_failure('Failure')
+      end
+    end
+
+    describe "basic-lis-readresult" do
+      it "should return xml without result when no grade exists" do
+        make_call('body' => read_result)
+        xml = check_success
+        xml.at_css('message_response result').should be_nil
+      end
+
+      it "should return the score if the assignment is scored" do
+        @assignment.grade_student(@student, :grade => "40%")
+
+        make_call('body' => read_result)
+        xml = check_success
+        xml.at_css('message_response > result > sourcedid').content.should == sourceid
+        xml.at_css('message_response > result > resultscore > textstring').content.should == '0.4'
+      end
+    end
+
+    describe "basic-lis-deleteresult" do
+      it "should succeed but do nothing when the submission isn't graded" do
+        make_call('body' => delete_result)
+        xml = check_success
+        xml.at_css('message_response result').should be_nil
+      end
+
+      it "should delete the existing score for the submission (by creating a new version)" do
+        @assignment.grade_student(@student, :grade => "40%")
+
+        make_call('body' => delete_result)
+        xml = check_success
+        xml.at_css('message_response result').should be_nil
+
+        @assignment.submission_for_student(@student).should_not be_graded
+        @assignment.submission_for_student(@student).score.should be_nil
+      end
+    end
+
+    it "should reject if the assignment doesn't use this tool" do
+      tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
+      @assignment.external_tool_tag.destroy!
+      @assignment.external_tool_tag = nil
+      tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+      tag.content_type = 'ContextExternalTool'
+      tag.save!
+      make_call('body' => update_result('0.5'))
+      check_failure
+    end
+
+    it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
+      tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
+      @assignment.external_tool_tag.destroy!
+      @assignment.external_tool_tag = nil
+      tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+      tag.content_type = 'ContextExternalTool'
+      tag.save!
+      make_call('body' => update_result('0.5'))
+      check_failure
+    end
+
+    it "should reject if the assignment is no longer a tool assignment" do
+      @assignment.update_attributes(:submission_types => 'online_upload')
+      @assignment.external_tool_tag.destroy!
+      make_call('body' => update_result('0.5'))
+      check_failure
+    end
+
+    it "should verify the sourcedid is correct for this tool launch" do
+      make_call('body' => update_result('0.6', 'BAD SOURCE ID'))
+      check_failure
+    end
+
+    it "should not require an authenticity token" do
+      enable_forgery_protection do
+        make_call('body' => read_result)
+        check_success
+      end
+    end
+  end
 end
