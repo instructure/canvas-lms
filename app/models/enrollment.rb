@@ -36,6 +36,7 @@ class Enrollment < ActiveRecord::Base
   before_save :assert_section
   before_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
+  after_save :clear_email_caches
 
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section
 
@@ -197,6 +198,12 @@ class Enrollment < ActiveRecord::Base
     end
   end
   protected :audit_groups_for_deleted_enrollments
+
+  def clear_email_caches
+    if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
+      self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+    end
+  end
 
   def conclude
     self.workflow_state = "completed"
@@ -588,16 +595,23 @@ class Enrollment < ActiveRecord::Base
       :select => 'user_id, course_id, users.name AS user_name'
     }
   }
-  named_scope :accepted, lambda{
-    {:conditions => ['enrollments.workflow_state != ?', 'invited'] }
+  named_scope :invited, :conditions => { :workflow_state => 'invited' }
+  named_scope :accepted, :conditions => ['enrollments.workflow_state != ?', 'invited']
+  named_scope :active_or_pending, :conditions => {:workflow_state => ['invited', 'creation_pending', 'active']}
+  named_scope :currently_online, :joins => :pseudonyms, :conditions => ['pseudonyms.last_request_at > ?', 5.minutes.ago]
+  # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
+  named_scope :for_email, lambda { |email|
+    {
+      :joins => { :user => :communication_channels },
+      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND path=?", email]
+    }
   }
-  named_scope :active_or_pending, lambda{
-    {:conditions => {:workflow_state => ['invited', 'creation_pending', 'active']}}
-  }
-  named_scope :currently_online, lambda{
-    {:joins => :pseudonyms, :conditions => ['pseudonyms.last_request_at > ?', 5.minutes.ago] }
-  }
-  
+  def self.cached_temporary_invitations(email)
+    Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
+      Enrollment.invited.for_email(email).to_a
+    end
+  end
+
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist

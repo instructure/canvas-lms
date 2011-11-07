@@ -942,4 +942,34 @@ describe User do
       }
     end
   end
+
+  describe "menu_courses" do
+    it "should include temporary invitations" do
+      user_with_pseudonym(:active_all => 1)
+      @user1 = @user
+      user
+      @user2 = @user
+      @user2.update_attribute(:workflow_state, 'creation_pending')
+      @user2.communication_channels.create!(:path => @cc.path)
+      course(:active_all => 1)
+      @course.enroll_user(@user2)
+
+      @user1.menu_courses.should == [@course]
+    end
+  end
+
+  describe "cached_current_enrollments" do
+    it "should include temporary invitations" do
+      user_with_pseudonym(:active_all => 1)
+      @user1 = @user
+      user
+      @user2 = @user
+      @user2.update_attribute(:workflow_state, 'creation_pending')
+      @user2.communication_channels.create!(:path => @cc.path)
+      course(:active_all => 1)
+      @enrollment = @course.enroll_user(@user2)
+
+      @user1.cached_current_enrollments.should == [@enrollment]
+    end
+  end
 end

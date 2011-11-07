@@ -75,6 +75,7 @@ class CommunicationChannelsController < ApplicationController
         end
 
         cc.confirm
+        @user.touch
         flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         return respond_to do |format|
           format.html { redirect_back_or_default(profile_url) }
@@ -217,6 +218,7 @@ class CommunicationChannelsController < ApplicationController
   def destroy
     @cc = @current_user.communication_channels.find_by_id(params[:id]) if params[:id]
     if !@cc || @cc.destroy
+      @current_user.touch
       render :json => @cc.to_json
     else
       render :json => @cc.errors.to_json, :status => :bad_request

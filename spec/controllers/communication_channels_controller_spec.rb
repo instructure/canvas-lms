@@ -449,6 +449,27 @@ describe CommunicationChannelsController do
         @enrollment.user.should == @user
       end
     end
+
+    it "should uncache user's cc's when confirming a CC" do
+      user_with_pseudonym(:active_user => true)
+      user_session(@user, @pseudonym)
+      puts @user.updated_at
+      puts @user.cache_key
+      User.record_timestamps = false
+      begin
+        @user.update_attribute(:updated_at, 1.second.ago)
+        enable_cache do
+          @user.cached_active_emails.should == []
+          @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+          @user.cached_active_emails.should == []
+          get 'confirm', :nonce => @cc.confirmation_code
+          @user.reload
+          @user.cached_active_emails.should == ['jt@instructure.com']
+        end
+      ensure
+        User.record_timestamps = true
+      end
+    end
   end
 
   it "should re-send communication channel invitation for an invited channel" do
@@ -472,5 +493,27 @@ describe CommunicationChannelsController do
     assigns[:user].should eql(@user)
     assigns[:enrollment].should eql(@enrollment)
     assigns[:enrollment].messages_sent.should_not be_nil
+  end
+
+  it "should uncache user's cc's when retiring a CC" do
+    user_with_pseudonym(:active_user => true)
+    user_session(@user, @pseudonym)
+    User.record_timestamps = false
+    begin
+      @user.update_attribute(:updated_at, 10.seconds.ago)
+      enable_cache do
+        @user.cached_active_emails.should == []
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # still cached
+        @user.cached_active_emails.should == []
+        @user.update_attribute(:updated_at, 5.seconds.ago)
+        @user.cached_active_emails.should == ['jt@instructure.com']
+        delete 'destroy', :id => @cc.id
+        @user.reload
+        @user.cached_active_emails.should == []
+      end
+    ensure
+      User.record_timestamps = true
+    end
   end
 end

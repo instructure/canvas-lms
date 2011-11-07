@@ -17,7 +17,6 @@
 #
 
 class Course < ActiveRecord::Base
-  
 
   include Context
   include Workflow

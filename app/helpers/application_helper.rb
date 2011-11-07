@@ -534,7 +534,7 @@ var I18n = I18n || {};
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
-        :href => course_path(course),
+        :href => course_path(course, :invitation => course.read_attribute(:invitation)),
         :term => term || nil,
         :subtitle => subtitle,
         :id => course.id
@@ -587,7 +587,7 @@ var I18n = I18n || {};
   def show_home_menu?
     @current_user.set_menu_data(session[:enrollment_uuid])
     [
-      @current_user.menu_data[:enrollments],
+      @current_user.menu_courses(session[:enrollment_uuid]),
       @current_user.accounts,
       @current_user.cached_current_group_memberships,
       @current_user.enrollments.ended
