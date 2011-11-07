@@ -478,7 +478,7 @@ This identifier must not change for the group, and must be globally unique.</td>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
+<td>available</td>
 <td>available, closed, completed, deleted</td>
 </tr>
 </table>
@@ -517,7 +517,7 @@ groups_membership.csv
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
+<td>accepted</td>
 <td>accepted, deleted</td>
 </tr>
 </table>
