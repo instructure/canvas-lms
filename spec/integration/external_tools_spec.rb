@@ -29,6 +29,24 @@ describe "External Tools" do
       @tag.save!
     end
 
+    it "should generate valid LTI parameters" do
+      student_in_course(:course => @course, :active_all => true)
+      user_session(@user)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      response.should be_success
+      doc = Nokogiri::HTML.parse(response.body)
+      form = doc.at_css('form#tool_form')
+
+      form.at_css('input#launch_presentation_locale')['value'].should == 'en'
+      form.at_css('input#oauth_callback')['value'].should == 'about:blank'
+      form.at_css('input#oauth_signature_method')['value'].should == 'HMAC-SHA1'
+      form.at_css('input#launch_presentation_return_url')['value'].should == "http://www.example.com/courses/#{@course.id}/external_tools/#{@tool.id}/finished"
+      form.at_css('input#lti_message_type')['value'].should == "basic-lti-launch-request"
+      form.at_css('input#lti_version')['value'].should == "LTI-1p0"
+      form.at_css('input#oauth_version')['value'].should == "1.0"
+      form.at_css('input#roles')['value'].should == "Learner"
+    end
+
     it "should include outcome service params when viewing as student" do
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
