@@ -126,7 +126,7 @@
   <div id="f1_container">
     <div id="f1_card">
       <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face"} do |f| %>
-        <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= @unique_id %>" placeholder="<%= @login_handle_name %>">
+        <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
         <input type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
         <button type="submit"><%= t('login', 'Login') %></button>
         <button class="flip-to-back"><%= t('dont_know_password', "I don't know my password") %></button>

@@ -58,7 +58,7 @@ describe "communication_channels/confirm.html.erb" do
       page.css('#register.button').first.should_not be_nil
       merge_button = page.css('#merge.button').first
       merge_button.should_not be_nil
-      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym => @pseudonym.id)
+      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym_session => {:unique_id => @pseudonym.unique_id}, :expected_user_id => @pseudonym.user_id)
       page.css('#back.button').first.should_not be_nil
     end
 
@@ -112,7 +112,7 @@ describe "communication_channels/confirm.html.erb" do
       page.css('#register.button').first.should_not be_nil
       merge_button = page.css('#merge.button').first
       merge_button.should_not be_nil
-      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym => @pseudonym.id)
+      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym_session => {:unique_id => @pseudonym.unique_id}, :expected_user_id => @pseudonym.user_id)
       page.css('#back.button').first.should_not be_nil
     end
 
@@ -154,6 +154,7 @@ describe "communication_channels/confirm.html.erb" do
     it "should render transfer enrollment form" do
       assigns[:merge_opportunities] = []
       @user.register
+      @pseudonym1 = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
       user_with_pseudonym(:active_all => 1)
       assigns[:current_user] = @user
 
@@ -165,7 +166,7 @@ describe "communication_channels/confirm.html.erb" do
       transfer_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1)
       login_button = page.css('#login.button').first
       login_button.should_not be_nil
-      login_button['href'].should == login_url(:enrollment => @enrollment.uuid)
+      login_button['href'].should == login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => 'jt@instructure.com'}, :expected_user_id => @pseudonym1.user_id)
     end
 
     context "open registration" do
@@ -216,6 +217,7 @@ describe "communication_channels/confirm.html.erb" do
     it "should render to merge multiple users" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
+      @pseudonym1 = @pseudonym
       user_with_pseudonym(:active_all => 1, :username => 'georgedoe@example.com')
       @user2 = @user
       assigns[:merge_opportunities] = [[@user1, [@user1.pseudonym]], [@user2, [@user2.pseudonym]]]
@@ -227,7 +229,7 @@ describe "communication_channels/confirm.html.erb" do
       merge_button = page.css('#merge.button').first
       merge_button.should_not be_nil
       merge_button.text.should == 'Combine'
-      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :pseudonym => @user1.pseudonym.id)
+      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :pseudonym_session => {:unique_id => @pseudonym1.unique_id}, :expected_user_id => @pseudonym1.user_id)
     end
   end
 

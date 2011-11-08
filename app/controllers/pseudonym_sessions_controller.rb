@@ -21,7 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm]
+    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id]
       redirect_to dashboard_url
       return
     end
@@ -31,12 +31,7 @@ class PseudonymSessionsController < ApplicationController
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
 
-    if params[:pseudonym]
-      pseudonym = Pseudonym.find_by_id(params[:pseudonym])
-      @unique_id = pseudonym.unique_id
-      session[:expected_user] = pseudonym.user_id
-    end
-
+    session[:expected_user_id] = params[:expected_user_id]
     session[:confirm] = params[:confirm]
     session[:enrollment] = params[:enrollment]
 
@@ -318,7 +313,7 @@ class PseudonymSessionsController < ApplicationController
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
       elsif session[:confirm]
-        format.html { redirect_to(registration_confirmation_path(session.delete(:confirm), :enrollment => session.delete(:enrollment), :login_success => 1, :confirm => (user.id == session.delete(:expected_user) ? 1 : nil))) }
+        format.html { redirect_to(registration_confirmation_path(session.delete(:confirm), :enrollment => session.delete(:enrollment), :login_success => 1, :confirm => (user.id == session.delete(:expected_user_id) ? 1 : nil))) }
       else
         # the URL to redirect back to is stored in the session, so it's
         # assumed that if that URL is found rather than using the default,
