@@ -326,15 +326,27 @@ describe Course, "gradebook_to_csv" do
     rows[2][-2].should == "100"
   end
   
-  it "should order assignments by due date" do
+  it "should order assignments by due date, assignment_group, position, title" do
     course_with_student(:active_all => true)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 1", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 1.days)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 2.days)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 3", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 3.days)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 5", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 4.days)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 4", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 5.days)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 6", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 7.days)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 7", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 6.days)
+
+    @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by{|a| a.id}
+
+    now = Time.now
+
+    @assignment = @course.assignments.create!(:title => "Some Assignment 01", :points_possible => 10, :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 02", :points_possible => 10, :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 03", :points_possible => 10, :due_at => now + 1.days, :position => 2, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 05", :points_possible => 10, :due_at => now + 4.days, :position => 4, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 04", :points_possible => 10, :due_at => now + 5.days, :position => 5, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 06", :points_possible => 10, :due_at => now + 7.days, :position => 6, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 07", :points_possible => 10, :due_at => now + 6.days, :position => 7, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 08", :points_possible => 10, :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 09", :points_possible => 10, :due_at => now + 8.days, :position => 9, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 10", :points_possible => 10, :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 11", :points_possible => 10, :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 13", :points_possible => 10, :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 12", :points_possible => 10, :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 14", :points_possible => 10, :due_at => nil, :position => 14, :assignment_group => @assignment_group_1)
     @course.recompute_student_scores
     @user.reload
     @course.reload
@@ -347,7 +359,27 @@ describe Course, "gradebook_to_csv" do
     rows[0].each do |column|
       assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Some Assignment/
     end
-    assignments.should == ["Some Assignment 1", "Some Assignment 2", "Some Assignment 3", "Some Assignment 5", "Some Assignment 4", "Some Assignment 7", "Some Assignment 6"]
+    assignments.should == ["Some Assignment 14", "Some Assignment 02", "Some Assignment 03", "Some Assignment 01", "Some Assignment 05", "Some Assignment 04", "Some Assignment 07", "Some Assignment 06", "Some Assignment 09", "Some Assignment 08", "Some Assignment 10", "Some Assignment 11", "Some Assignment 12", "Some Assignment 13"]
+  end
+
+  it "should work for just one assignment" do
+    course_with_student(:active_all => true)
+    now = Time.now
+    @assignment = @course.assignments.create!(:title => "Some Assignment 1", :points_possible => 10, :assignment_group => @group, :due_at => now + 1.days, :position => 3)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group, :due_at => now + 1.days, :position => 1)
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+
+    csv = @course.gradebook_to_csv :assignment_id => @assignment
+    csv.should_not be_nil
+    rows = FasterCSV.parse(csv)
+    rows.length.should equal(3)
+    assignments = []
+    rows[0].each do |column|
+      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Some Assignment/
+    end
+    assignments.should == ["Some Assignment 2"]
   end
 
   it "should generate csv with final grade if enabled" do

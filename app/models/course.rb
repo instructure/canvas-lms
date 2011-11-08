@@ -1152,11 +1152,12 @@ class Course < ActiveRecord::Base
   end
 
   def gradebook_to_csv(options = {})
-    assignments = self.assignments.active.gradeable
     if options[:assignment_id]
-      assignments = [assignments.find(options[:assignment_id])]
+      assignments = [self.assignments.active.gradeable.find(options[:assignment_id])]
     else
-      assignments = assignments.find(:all, :order => 'due_at, title')
+      group_order = {}
+      self.assignment_groups.active.each_with_index{|group, idx| group_order[group.id] = idx}
+      assignments = self.assignments.active.gradeable.find(:all).sort_by{|a| [a.due_at ? 1 : 0, a.due_at || 0, group_order[a.assignment_group_id] || 0, a.position || 0, a.title || ""]}
     end
     single = assignments.length == 1
     student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
