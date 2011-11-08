@@ -493,7 +493,7 @@ describe "Canvas Cartridge importing" do
     
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
-    page_2.url.should == page.url
+    page_2.url.should match /\d{1,3}-#{page.title.to_url}/
     page_2.body.should == body_with_link % ([ @copy_to.id, attachment_import.id ] * 4)
   end
 
@@ -517,7 +517,6 @@ describe "Canvas Cartridge importing" do
     to_att.save
     path = to_att.full_display_path.gsub('course files/', '')
     @copy_to.attachment_path_id_lookup = {path => to_att.migration_id}
-    
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
       <a href=\"/courses/%s/file_contents/course%%20files/tbe_banner.jpg\">Some file</a>
@@ -543,9 +542,10 @@ describe "Canvas Cartridge importing" do
     WikiPage.import_from_migration(hash, @copy_to)
     
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
+    wiki_assignments_segment = page_2.body.match(/wiki\/\d+-assignments/)
     page_2.title.should == page.title
-    page_2.url.should == page.url
-    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png">/, 'png" />')
+    page_2.url.should match /^\d+-#{page.title.to_url}$/
+    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png">/, 'png" />').gsub(/wiki\/assignments/, wiki_assignments_segment[0])
   end
   
   it "should import migrate inline external tool URLs in wiki pages" do
@@ -565,7 +565,7 @@ describe "Canvas Cartridge importing" do
     
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
-    page_2.url.should == page.url
+    page_2.url.should match /^\d+-#{page.title.to_url}$/
     page_2.body.should match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
   end
   
