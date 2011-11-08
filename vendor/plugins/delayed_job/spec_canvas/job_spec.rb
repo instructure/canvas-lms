@@ -23,7 +23,7 @@ describe Delayed::Job do
   end
 
   it "should recover as well as possible from a failure failing a job" do
-    Delayed::Job::Failed.stub!(:create).and_return { raise "oh noes that was weird" }
+    Delayed::Job::Failed.stubs(:create).raises(RuntimeError)
     job = "test".send_later :reverse
     job_id = job.id
     proc { job.fail! }.should raise_error

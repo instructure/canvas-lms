@@ -1054,9 +1054,9 @@ namespace :db do
           # don't pass the password in the create call, because that way is extra
           # picky. the admin should know what they're doing, and we'd rather not
           # fail here.
-          pseudonym = user.pseudonyms.create!(:unique_id => email, :path => email,
+          pseudonym = user.pseudonyms.create!(:unique_id => email,
               :password => "validpassword", :password_confirmation => "validpassword")
-          user.communication_channels << pseudonym.communication_channel
+          user.communication_channels.create!(:path => email) { |cc| cc.workflow_state = 'active' }
         end
         # set the password later.
         pseudonym.password = pseudonym.password_confirmation = password

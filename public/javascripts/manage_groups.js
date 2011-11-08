@@ -613,17 +613,18 @@ I18n.scoped('groups', function(I18n){
     $("#add_category_form #category_enable_self_signup").change(function() {
       var self_signup = $(this).prop('checked')
       $("#add_category_form #category_restrict_self_signup").prop('disabled', !self_signup);
-      if (!self_signup && $("#add_category_form #category_restrict_self_signup").prop('checked')) {
+      $("#add_category_form #group_structure_standard_subcontainer").showIf(!self_signup);
+      $("#add_category_form #group_structure_self_signup_subcontainer").showIf(self_signup);
+      if (!self_signup) {
         $("#add_category_form #category_restrict_self_signup").prop('checked', false);
       }
-      $("#add_category_form #spread_students").showIf(!self_signup);
     });
     $("#edit_category_form #category_enable_self_signup").change(function() {
       var self_signup = $(this).prop('checked');
       var heterogenous = $(this).parents('.group_category').find('.heterogenous').text() == 'true';
       var disable_restrict = !self_signup || heterogenous;
       $("#edit_category_form #category_restrict_self_signup").prop('disabled', disable_restrict);
-      if (disable_restrict && $("#edit_category_form #category_restrict_self_signup").prop('checked')) {
+      if (disable_restrict) {
         $("#edit_category_form #category_restrict_self_signup").prop('checked', false);
       }
     });

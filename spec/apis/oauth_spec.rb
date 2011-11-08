@@ -166,12 +166,13 @@ describe "OAuth2", :type => :integration do
       Setting.set_config("saml", {})
       account = account_with_saml(:account => Account.default)
       flow do
-        Onelogin::Saml::Response.stub(:new).and_return {
-          r = mock(:response, :is_valid? => true, :success_status? => true, :name_id => 'test1@example.com', :name_qualifier => nil, :session_index => nil)
-          r.stub(:settings=)
-          r.stub(:logger=)
-          r
-        }
+        Onelogin::Saml::Response.any_instance.stubs(:settings=)
+        Onelogin::Saml::Response.any_instance.stubs(:logger=)
+        Onelogin::Saml::Response.any_instance.stubs(:is_valid?).returns(true)
+        Onelogin::Saml::Response.any_instance.stubs(:success_status?).returns(true)
+        Onelogin::Saml::Response.any_instance.stubs(:name_id).returns('test1@example.com')
+        Onelogin::Saml::Response.any_instance.stubs(:name_qualifier).returns(nil)
+        Onelogin::Saml::Response.any_instance.stubs(:session_index).returns(nil)
 
         get 'saml_consume', :SAMLResponse => "foo"
       end
@@ -182,10 +183,11 @@ describe "OAuth2", :type => :integration do
         account = account_with_cas(:account => Account.default)
 
         cas = CASClient::Client.new(:cas_base_url => account.account_authorization_config.auth_base)
-        cas.should_receive(:validate_service_ticket).and_return { |st|
-          st.response = CASClient::ValidationResponse.new("yes\n#{@user.pseudonyms.first.unique_id}\n")
-        }
-        CASClient::Client.stub(:new).and_return(cas)
+        cas.instance_variable_set(:@stub_user, @user)
+        def cas.validate_service_ticket(st)
+          st.response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
+        end
+        CASClient::Client.stubs(:new).returns(cas)
 
         get response['Location']
         response.should redirect_to(cas.add_service_to_login_url(login_url))

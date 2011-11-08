@@ -196,11 +196,10 @@ shared_examples_for "all selenium tests" do
     if real_login
       login_as(pseudonym.unique_id, pseudonym.password)
     else
-      @pseudonym_session = mock(PseudonymSession)
-      @pseudonym_session.stub!(:session_credentials).and_return([])
-      @pseudonym_session.stub!(:record).and_return { pseudonym.reload }
-      @pseudonym_session.stub!(:used_basic_auth?).and_return { false }
-      PseudonymSession.stub!(:find).and_return(@pseudonym_session)
+      PseudonymSession.any_instance.stubs(:session_credentials).returns([])
+      PseudonymSession.any_instance.stubs(:record).returns(pseudonym.reload)
+      PseudonymSession.any_instance.stubs(:used_basic_auth?).returns(false)
+      # PseudonymSession.stubs(:find).returns(@pseudonym_session)
     end
   end
 
@@ -227,6 +226,11 @@ shared_examples_for "all selenium tests" do
 
   def admin_logged_in(opts={})
     account_admin_user({:active_user => true}.merge(opts))
+    user_logged_in({:user => @user}.merge(opts))
+  end
+
+  def site_admin_logged_in(opts={})
+    site_admin_user({:active_user => true}.merge(opts))
     user_logged_in({:user => @user}.merge(opts))
   end
 
@@ -362,7 +366,7 @@ shared_examples_for "all selenium tests" do
 
   def stub_kaltura
     # trick kaltura into being activated
-    Kaltura::ClientV3.stub!(:config).and_return({
+    Kaltura::ClientV3.stubs(:config).returns({
           'domain' => 'www.instructuremedia.com',
           'resource_domain' => 'www.instructuremedia.com',
           'partner_id' => '100',
@@ -373,9 +377,9 @@ shared_examples_for "all selenium tests" do
           'kcw_ui_conf' => '1',
           'upload_ui_conf' => '1'
     })
-    kal = mock(Kaltura::ClientV3)
-    kal.stub!(:startSession).and_return "new_session_id_here"
-    Kaltura::ClientV3.stub!(:new).and_return(kal)
+    kal = mock('Kaltura::ClientV3')
+    kal.stubs(:startSession).returns "new_session_id_here"
+    Kaltura::ClientV3.stubs(:new).returns(kal)
   end
 
   def get(link)

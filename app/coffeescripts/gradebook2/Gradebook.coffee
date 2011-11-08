@@ -79,6 +79,7 @@ I18n.scoped 'gradebook2', (I18n) ->
         columns = @gradeGrid.getColumns()
         columns.sort @columnSortFn
         @gradeGrid.setColumns(columns)
+        @fixColumnReordering()
         @buildRows()
       @_sortColumnsBy ||= $.store.userGet("sort_grade_colums_by_#{@options.context_id}") || 'assignment_group'
 

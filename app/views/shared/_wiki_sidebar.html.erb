@@ -260,7 +260,6 @@
   <div style="display: none;">
     <a href="<%= services_path(:service_type => "BookmarkService") %>" class="bookmark_services_url">&nbsp;</a>
     <a href="<%= bookmark_search_path(:service_type => "{{ service_type }}", :q => "{{ query }}") %>" class="bookmark_search_url">&nbsp;</a>
-    <a href="<%= image_search_path(:service_type => "{{ service_type }}", :q => "{{ query }}") %>" class="image_search_url">&nbsp;</a>
     <span class="context_code"><%= @context.asset_string %></span>
     <div id="wiki_sidebar_select_folder_dialog">
       <%= t 'select_destination', 'Select a destination folder for these %{count} files:', :count => '<span class="file_count">&nbsp;</span>'.html_safe %>

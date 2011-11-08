@@ -1,5 +1,6 @@
 (function() {
-  this.Template = (function() {
+  var Template;
+  Template = (function() {
     function Template(name, locals) {
       this.name = name;
       this.locals = locals;
@@ -20,4 +21,8 @@
     };
     return Template;
   })();
+  this.Template = Template;
+  define('compiled/Template', function() {
+    return Template;
+  });
 }).call(this);

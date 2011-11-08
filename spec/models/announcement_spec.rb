@@ -41,17 +41,6 @@ describe Announcement do
       @a.broadcast_policy_list.first.dispatch.should eql('New Announcement')
     end
     
-    # it "should create a message for the announcement" do
-    #   @notification = mock_model(Notification)
-    #   @notification.should_receive(:create_message).and_return(true)
-    #   Notification.stub!(:find_by_name).and_return(@notification)
-    #   @user = User.create
-    #   @course = Course.create
-    #   @course.enroll_student(@user)
-    #   announcement_model(:context_id => @course.id, :context_type => @course.class)
-    #   # Need to fix the course context
-    # end
-    
     it "should sanitize message" do
       announcement_model
       @a.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"

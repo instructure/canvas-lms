@@ -20,9 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CommunicationChannel do
   before(:each) do
-    @pseudonym = mock_model(Pseudonym)
-    @pseudonym.stub!(:destroyed?).and_return(false)
-    Pseudonym.stub!(:find_by_user_id).and_return(@pseudonym)
+    @pseudonym = mock('Pseudonym')
+    @pseudonym.stubs(:destroyed?).returns(false)
+    Pseudonym.stubs(:find_by_user_id).returns(@pseudonym)
   end
 
   it "should create a new instance given valid attributes" do
@@ -176,7 +176,7 @@ describe CommunicationChannel do
   end
   
   it "should set a confirmation code unless one has been set" do
-    AutoHandle.should_receive(:generate).at_least(:once).and_return('abc123')
+    AutoHandle.expects(:generate).at_least(1).returns('abc123')
     communication_channel_model
     @cc.confirmation_code.should eql('abc123')
   end
@@ -230,9 +230,9 @@ describe CommunicationChannel do
     @u2 = User.create!
     @u1.should_not eql(@u2)
     @u1.id.should_not eql(@u2.id)
-    @cc1 = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(:user => @u1))
-    @cc2 = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(:user => @u1))
-    @cc3 = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(:user => @u2))
+    @cc1 = @u1.communication_channels.create!(:path => 'jt@instructure.com')
+    @cc2 = @u1.communication_channels.create!(:path => 'cody@instructure.com')
+    @cc3 = @u2.communication_channels.create!(:path => 'brianp@instructure.com')
     @cc1.user.should eql(@u1)
     @cc2.user.should eql(@u1)
     @cc3.user.should eql(@u2)

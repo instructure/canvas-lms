@@ -164,9 +164,9 @@ describe SubmissionsController do
 
       a = Attachment.last
       a.update_attribute('workflow_state', 'zipped')
-      a.stub!('full_filename').and_return(File.expand_path(__FILE__)) # just need a valid file
-      a.stub!('content_type').and_return('test/file')
-      Attachment.stub!(:instantiate).and_return(a)
+      a.stubs('full_filename').returns(File.expand_path(__FILE__)) # just need a valid file
+      a.stubs('content_type').returns('test/file')
+      Attachment.stubs(:instantiate).returns(a)
 
       get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }, 'HTTP_ACCEPT' => '*/*'
       response.should be_success

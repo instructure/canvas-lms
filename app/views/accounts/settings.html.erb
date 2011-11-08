@@ -180,6 +180,10 @@
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts" %>
                   </div>
+                  <div>
+                    <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
+                    <%= settings.label :open_registration, :en => "Open Registration" %>
+                  </div>
                 <% end %>
                 <div>
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
@@ -315,15 +319,15 @@
             <div style="font-size: 0.8em;"><%= t(:create_courses_description, "(Account Administrators can always create courses)") %></div>
             <% f.fields_for :settings do |settings| %>
               <div>
-                <%= settings.check_box :teachers_can_create_courses, :checked => @account.settings[:teachers_can_create_courses] != false %>
+                <%= settings.check_box :teachers_can_create_courses, :checked => @account.teachers_can_create_courses? %>
                 <%= settings.label :teachers_can_create_courses, :en => "Teachers" %>
               </div>
               <div>
-                <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.settings[:no_enrollments_can_create_courses] != false %>
+                <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.no_enrollments_can_create_courses? %>
                 <%= settings.label :no_enrollments_can_create_courses, :en => "Users with no enrollments" %>
               </div>
               <div>
-                <%= settings.check_box :students_can_create_courses, :checked => @account.settings[:students_can_create_courses] != false %>
+                <%= settings.check_box :students_can_create_courses, :checked => @account.students_can_create_courses? %>
                 <%= settings.label :students_can_create_courses, :en => "Students" %>
               </div>
             <% end %>
@@ -338,30 +342,32 @@
   <% end %>
   <div id="tab-users">
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
-    <ul class="admins_list">
-      <% @account_users.each do |account_user| %>
-        <li>
-          <a href="<%= user_url(account_user.user_id) %>" class="user_name"><%= account_user.user.name %></a>
-          <% if can_do(@context, @current_user, :manage_account_memberships) %>
-            <a href="<%= account_remove_account_user_url(@context.id, account_user.id) %>" class="remove_account_user_link no-hover" title="<%= t(:remove_admin_tooltip, "Remove this admin") %>"><%= image_tag "delete_circle.png" %></a>
-          <% end -%>
-          <span class="membership_type"><%= account_user.readable_type %></span>
-          <span class="email"><%= account_user.user.email %></span>
-        </li>
-      <% end %>
+    <ul class="admins_list user_list list admins">
+      <%= render :partial => 'account_user', :collection => @account_users %>
+      <%= render :partial => 'account_user', :object => nil %>
     </ul>
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
-      <h2><%= t(:add_admin_title, "Add a New Admin") %></h2>
-      <% form_for :account_user, :url => account_add_account_user_url(@account), :html => {:id => ""} do |f| %>
-        <%= f.blabel :admin_email, :en => "Email Address" %>
-        <input type="text" id="admin_email" name="admin[email]"/>
-        <%= f.blabel :admin_membership_type, :en => "Type" %>
-        <select name="admin[membership_type]" id="admin_membership_type">
-        <% @context.account_membership_types.each do |type| %>
-          <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
-        <% end %>
-        </select>
-        <button type="submit" class="button"><%= t(:add_admin_button, "Add Admin") %></button>
+      <% jammit_js :user_lists %>
+      <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_admins', %{Add Account Admins}) %></a>
+      <% form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
+        <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
+        <div style="margin-top: 5px;">
+          <div>
+            <%= label_tag :membership_type, :en => "Add More" %>
+            <select name="membership_type" id="admin_membership_type">
+            <% @context.account_membership_types.each do |type| %>
+              <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
+            <% end %>
+            </select>
+          </div>
+          <%= render :partial => 'shared/user_lists' %>
+        </div>
+        <div class="button-container">
+          <button type="button" class="button verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
+          <button type="submit" class="button add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
+          <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
+          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+        </div>
       <% end %>
     <% end %>
   </div>

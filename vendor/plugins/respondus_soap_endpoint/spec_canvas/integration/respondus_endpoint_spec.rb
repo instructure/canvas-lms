@@ -77,6 +77,29 @@ Implemented for: Canvas LMS}
     soap_response.first.should == "Invalid credentials"
   end
 
+  if Canvas.redis_enabled?
+    it "should limit the max failed login attempts" do
+      Setting.set('login_attempts_total', '2')
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'hax0r',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Invalid credentials"
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'hax0r',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Invalid credentials"
+      # now use the right credentials, but it'll still fail because max attempts
+      # was reached. unfortunately we can't return a more specific error message.
+      soap_response = soap_request('ValidateAuth',
+                                   'nobody@example.com', 'asdfasdf',
+                                   '',
+                                   ['Institution', ''])
+      soap_response.first.should == "Invalid credentials"
+    end
+  end
+
   describe "delegated auth" do
     before do
       @account = account_with_cas
@@ -208,12 +231,12 @@ Implemented for: Canvas LMS}
     status.should == "Success"
 
     mock_migration = ContentMigration.create!
-    mock_migration.should_receive(:export_content) do
-      mock_migration.workflow_state = 'imported'
-      mock_migration.migration_settings[:imported_assets] = ["quiz_xyz"]
+    def mock_migration.export_content
+      self.workflow_state = 'imported'
+      self.migration_settings[:imported_assets] = ["quiz_xyz"]
     end
-    ContentMigration.stub!(:new).and_return(mock_migration)
-    ContentMigration.stub!(:find).with(mock_migration.id).and_return(mock_migration)
+    ContentMigration.stubs(:new).returns(mock_migration)
+    ContentMigration.stubs(:find).with(mock_migration.id).returns(mock_migration)
 
     status, details, context, item_id = soap_request(
       'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
@@ -239,11 +262,11 @@ Implemented for: Canvas LMS}
       status.should == "Success"
 
       @mock_migration = ContentMigration.create!
-      @mock_migration.should_receive(:export_content) do
-        @mock_migration.workflow_state = 'importing'
+      def @mock_migration.export_content
+        self.workflow_state = 'importing'
       end
-      ContentMigration.stub!(:new).and_return(@mock_migration)
-      ContentMigration.stub!(:find).with(@mock_migration.id).and_return(@mock_migration)
+      ContentMigration.stubs(:new).returns(@mock_migration)
+      ContentMigration.stubs(:find).with(@mock_migration.id).returns(@mock_migration)
 
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,

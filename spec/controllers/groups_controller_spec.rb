@@ -106,7 +106,7 @@ describe GroupsController do
       e4 = @course.enroll_student(user_model)
       e5 = @course.enroll_student(user_model)
       e6 = @course.enroll_student(user_model)
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :group_count => 2, :split_groups => '1'}
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :split_group_count => 2, :split_groups => '1'}
       response.should be_success
       assigns[:group_category].should_not be_nil
       groups = assigns[:group_category].groups
@@ -118,7 +118,7 @@ describe GroupsController do
     it "should give the new groups the right group_category" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :group_count => 1, :split_groups => '1'}
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :split_group_count => 1, :split_groups => '1'}
       response.should be_success
       assigns[:group_category].should_not be_nil
       assigns[:group_category].groups[0].group_category.name.should == "Study Groups"
@@ -147,6 +147,46 @@ describe GroupsController do
       post 'create_category', :course_id => @course.id, :category => {:name => ''}
       response.should be_success
       assigns[:group_category].name.should == "Study Groups"
+    end
+    
+    it "should respect enable_self_signup" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1'}
+      response.should be_success
+      assigns[:group_category].should_not be_nil
+      assigns[:group_category].should be_self_signup
+      assigns[:group_category].should be_unrestricted_self_signup
+    end
+    
+    it "should use create_group_count when self-signup" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_group_count => '3'}
+      response.should be_success
+      assigns[:group_category].should_not be_nil
+      assigns[:group_category].groups.size.should == 3
+    end
+    
+    it "should not distribute students when self-signup" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course
+      student_in_course
+      student_in_course
+      student_in_course
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_category_count => '2'}
+      response.should be_success
+      assigns[:group_category].should_not be_nil
+      assigns[:group_category].groups.all?{ |g| g.users.should be_empty }
+    end
+    
+    it "should respect restrict_self_signup" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :restrict_self_signup => '1'}
+      response.should be_success
+      assigns[:group_category].should_not be_nil
+      assigns[:group_category].should be_restricted_self_signup
     end
   end
   

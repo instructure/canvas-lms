@@ -449,6 +449,16 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     check_image( driver.find_element(:css, '#wiki_body img') )
   end
 
+  def add_flickr_image(el)
+    el.find_element(:css, '.mce_instructure_embed').click
+    driver.find_element(:css, '.flickr_search_link').click
+    driver.find_element(:css, '#image_search_form > input').send_keys('angel')
+    driver.find_element(:id, 'image_search_form').submit
+    wait_for_ajax_requests
+    keep_trying_until{ driver.find_element(:css, '.image_link').should be_displayed }
+    driver.find_element(:css, '.image_link').click
+  end
+
   it "should add image from flickr" do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/wiki"
@@ -457,13 +467,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     driver.find_element(:css, '.wiki_switch_views_link').click
     clear_rce
     driver.find_element(:css, '.wiki_switch_views_link').click
-    driver.find_element(:css, '.mce_instructure_embed').click
-    driver.find_element(:css, '.flickr_search_link').click
-    driver.find_element(:css, '#image_search_form > input').send_keys('angel')
-    driver.find_element(:id, 'image_search_form').submit
-    wait_for_ajax_requests
-    keep_trying_until{ driver.find_element(:css, '.image_link').should be_displayed }
-    driver.find_element(:css, '.image_link').click
+    add_flickr_image(driver)
     in_frame "wiki_page_body_ifr" do
       driver.find_element(:css, '#tinymce img').should be_displayed
     end
@@ -474,6 +478,23 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     wait_for_ajax_requests
 
     check_image( driver.find_element(:css, '#wiki_body img') )
+  end
+
+  it "should put flickr images into the right editor" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/quizzes"
+    driver.find_element(:css, ".new-quiz-link").click
+    keep_trying_until { driver.find_element(:css, ".mce_instructure_embed").displayed? }
+    add_flickr_image(driver)
+    driver.find_element(:css, ".add_question_link").click
+    wait_for_animations
+    add_flickr_image(driver.find_element(:id, "question_content_0_parent"))
+    in_frame "quiz_description_ifr" do
+      driver.find_element(:id, "tinymce").find_elements(:css, "a").length.should == 1
+    end
+    in_frame "question_content_0_ifr" do
+      driver.find_element(:id, "tinymce").find_elements(:css, "a").length.should == 1
+    end
   end
 
   it "should display record video dialog" do

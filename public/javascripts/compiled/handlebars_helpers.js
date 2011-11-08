@@ -49,6 +49,22 @@
     },
     newlinesToBreak: function(string) {
       return new Handlebars.SafeString($.htmlEscape(string).replace(/\n/g, "<br />"));
+    },
+    eachWithIndex: function(context, options) {
+      var ctx, index, inverse, ret;
+      fn = options.fn;
+      inverse = options.inverse;
+      ret = '';
+      if (context && context.length > 0) {
+        for (index in context) {
+          ctx = context[index];
+          ctx._index = index;
+          ret += fn(ctx);
+        }
+      } else {
+        ret = inverse(this);
+      }
+      return ret;
     }
   };
   for (name in _ref) {

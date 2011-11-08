@@ -50,5 +50,18 @@ describe ActiveRecord::Base do
       User.columns.any? { |c| c.name == 'name' }.should be_false
       Group.columns.any? { |c| c.name == 'name' }.should be_true
     end
+
+    context "rank helpers" do
+      it "should generate appropriate rank sql" do
+        ActiveRecord::Base.rank_sql(['a', ['b', 'c'], ['d']], 'foo').
+          should eql "CASE WHEN foo IN ('a') THEN 0 WHEN foo IN ('b', 'c') THEN 1 WHEN foo IN ('d') THEN 2 ELSE 3 END"
+      end
+
+      it "should generate appropriate rank hashes" do
+        hash = ActiveRecord::Base.rank_hash(['a', ['b', 'c'], ['d']])
+        hash.should == {'a' => 1, 'b' => 2, 'c' => 2, 'd' => 3}
+        hash['e'].should eql 4
+      end
+    end
   end
 end

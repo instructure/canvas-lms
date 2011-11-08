@@ -28,12 +28,12 @@ describe User do
   
   it "should get the first email from communication_channel" do
     @user = User.create
-    @cc1 = mock_model(CommunicationChannel)
-    @cc1.stub!(:path).and_return('cc1')
-    @cc2 = mock_model(CommunicationChannel)
-    @cc2.stub!(:path).and_return('cc2')
-    @user.stub!(:communication_channels).and_return([@cc1, @cc2])
-    @user.stub!(:communication_channel).and_return(@cc1)
+    @cc1 = mock('CommunicationChannel')
+    @cc1.stubs(:path).returns('cc1')
+    @cc2 = mock('CommunicationChannel')
+    @cc2.stubs(:path).returns('cc2')
+    @user.stubs(:communication_channels).returns([@cc1, @cc2])
+    @user.stubs(:communication_channel).returns(@cc1)
     @user.communication_channel.should eql(@cc1)
   end
   
@@ -49,12 +49,6 @@ describe User do
     @user.name.should eql('bill')
     @user = User.find(@user)
     @user.name.should eql('bill')
-  end
-
-  it "should not find a user by non-email when searching by email" do
-    @user = User.create
-    @user.communication_channels.create!(:path => 'cody', :path_type => 'twitter')
-    User.find_by_email('cody').should be_nil
   end
 
   it "should update account associations when a course account changes" do
@@ -314,8 +308,12 @@ describe User do
     @course4 = course(:course_name => "not yet active")
     @course4.enroll_user(@user, 'StudentEnrollment')
 
-    # only three, in the right order (type, then name), and with the top type per course
+    @course5 = course(:course_name => "invited")
+    @course5.enroll_user(@user, 'TeacherEnrollment')
+
+    # only four, in the right order (type, then name), and with the top type per course
     @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
+      [@course5.id, 'TeacherEnrollment'],
       [@course2.id, 'TeacherEnrollment'],
       [@course3.id, 'TeacherEnrollment'],
       [@course1.id, 'StudentEnrollment']
@@ -364,80 +362,80 @@ describe User do
       @user1.submissions.map(&:id).should be_include(s3.id)
     end
 
-    #it "should move ccs to the new user (but only if they don't already exist)" do
-    #  @user1 = user_model
-    #  @user2 = user_model
-    #  # unconfirmed => active conflict
-    #  @user1.communication_channels.create!(:path => 'a@instructure.com')
-    #  @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  # active => unconfirmed conflict
-    #  @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  @user2.communication_channels.create!(:path => 'B@instructure.com')
-    #  # active => active conflict
-    #  @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  # unconfirmed => unconfirmed conflict
-    #  @user1.communication_channels.create!(:path => 'd@instructure.com')
-    #  @user2.communication_channels.create!(:path => 'D@instructure.com')
-    #  # retired => unconfirmed conflict
-    #  @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
-    #  @user2.communication_channels.create!(:path => 'E@instructure.com')
-    #  # unconfirmed => retired conflict
-    #  @user1.communication_channels.create!(:path => 'f@instructure.com')
-    #  @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
-    #  # retired => active conflict
-    #  @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
-    #  @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  # active => retired conflict
-    #  @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
-    #  # retired => retired conflict
-    #  @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
-    #  @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
-    #  # <nothing> => active
-    #  @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  # active => <nothing>
-    #  @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
-    #  # <nothing> => unconfirmed
-    #  @user2.communication_channels.create!(:path => 'l@instructure.com')
-    #  # unconfirmed => <nothing>
-    #  @user1.communication_channels.create!(:path => 'm@instructure.com')
-    #  # <nothing> => retired
-    #  @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
-    #  # retired => <nothing>
-    #  @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+    it "should move ccs to the new user (but only if they don't already exist)" do
+      @user1 = user_model
+      @user2 = user_model
+      # unconfirmed => active conflict
+      @user1.communication_channels.create!(:path => 'a@instructure.com')
+      @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+      # active => unconfirmed conflict
+      @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
+      @user2.communication_channels.create!(:path => 'B@instructure.com')
+      # active => active conflict
+      @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+      @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+      # unconfirmed => unconfirmed conflict
+      @user1.communication_channels.create!(:path => 'd@instructure.com')
+      @user2.communication_channels.create!(:path => 'D@instructure.com')
+      # retired => unconfirmed conflict
+      @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      @user2.communication_channels.create!(:path => 'E@instructure.com')
+      # unconfirmed => retired conflict
+      @user1.communication_channels.create!(:path => 'f@instructure.com')
+      @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      # retired => active conflict
+      @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+      # active => retired conflict
+      @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
+      @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      # retired => retired conflict
+      @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      # <nothing> => active
+      @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
+      # active => <nothing>
+      @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+      # <nothing> => unconfirmed
+      @user2.communication_channels.create!(:path => 'l@instructure.com')
+      # unconfirmed => <nothing>
+      @user1.communication_channels.create!(:path => 'm@instructure.com')
+      # <nothing> => retired
+      @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      # retired => <nothing>
+      @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
 
-    #  @user1.move_to_user(@user2)
-    #  @user1.reload
-    #  @user2.reload
-    #  @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
-    #      ['A@instructure.com', 'active'],
-    #      ['B@instructure.com', 'retired'],
-    #      ['C@instructure.com', 'active'],
-    #      ['D@instructure.com', 'unconfirmed'],
-    #      ['E@instructure.com', 'unconfirmed'],
-    #      ['F@instructure.com', 'retired'],
-    #      ['G@instructure.com', 'active'],
-    #      ['H@instructure.com', 'retired'],
-    #      ['I@instructure.com', 'retired'],
-    #      ['a@instructure.com', 'retired'],
-    #      ['b@instructure.com', 'active'],
-    #      ['c@instructure.com', 'retired'],
-    #      ['d@instructure.com', 'retired'],
-    #      ['e@instructure.com', 'retired'],
-    #      ['f@instructure.com', 'unconfirmed'],
-    #      ['g@instructure.com', 'retired'],
-    #      ['h@instructure.com', 'active'],
-    #      ['i@instructure.com', 'retired'],
-    #      ['j@instructure.com', 'active'],
-    #      ['k@instructure.com', 'active'],
-    #      ['l@instructure.com', 'unconfirmed'],
-    #      ['m@instructure.com', 'unconfirmed'],
-    #      ['n@instructure.com', 'retired'],
-    #      ['o@instructure.com', 'retired']
-    #  ]
-    #  @user1.communication_channels.should be_empty
-    #end
+      @user1.move_to_user(@user2)
+      @user1.reload
+      @user2.reload
+      @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+          ['A@instructure.com', 'active'],
+          ['B@instructure.com', 'retired'],
+          ['C@instructure.com', 'active'],
+          ['D@instructure.com', 'unconfirmed'],
+          ['E@instructure.com', 'unconfirmed'],
+          ['F@instructure.com', 'retired'],
+          ['G@instructure.com', 'active'],
+          ['H@instructure.com', 'retired'],
+          ['I@instructure.com', 'retired'],
+          ['a@instructure.com', 'retired'],
+          ['b@instructure.com', 'active'],
+          ['c@instructure.com', 'retired'],
+          ['d@instructure.com', 'retired'],
+          ['e@instructure.com', 'retired'],
+          ['f@instructure.com', 'unconfirmed'],
+          ['g@instructure.com', 'retired'],
+          ['h@instructure.com', 'active'],
+          ['i@instructure.com', 'retired'],
+          ['j@instructure.com', 'active'],
+          ['k@instructure.com', 'active'],
+          ['l@instructure.com', 'unconfirmed'],
+          ['m@instructure.com', 'unconfirmed'],
+          ['n@instructure.com', 'retired'],
+          ['o@instructure.com', 'retired']
+      ]
+      @user1.communication_channels.should be_empty
+    end
 
     it "should move and uniquify enrollments" do
       @user1 = user_model
@@ -463,6 +461,34 @@ describe User do
 
       @user1.reload
       @user1.enrollments.should be_empty
+    end
+
+    it "should update account associations" do
+      @account1 = account_model
+      @account2 = account_model
+      @pseudo1 = (@user1 = user_with_pseudonym :account => @account1).pseudonym
+      @pseudo2 = (@user2 = user_with_pseudonym :account => @account2).pseudonym
+      @subsubaccount1 = (@subaccount1 = @account1.sub_accounts.create!).sub_accounts.create!
+      @subsubaccount2 = (@subaccount2 = @account2.sub_accounts.create!).sub_accounts.create!
+      course_with_student(:account => @subsubaccount1, :user => @user1)
+      course_with_student(:account => @subsubaccount2, :user => @user2)
+
+      @user1.associated_accounts.map(&:id).sort.should == [@account1, @subaccount1, @subsubaccount1].map(&:id).sort
+      @user2.associated_accounts.map(&:id).sort.should == [@account2, @subaccount2, @subsubaccount2].map(&:id).sort
+
+      @pseudo1.user.should == @user1
+      @pseudo2.user.should == @user2
+
+      @user1.move_to_user @user2
+
+      @pseudo1, @pseudo2 = [@pseudo1, @pseudo2].map{|p| Pseudonym.find(p.id)}
+      @user1, @user2 = [@user1, @user2].map{|u| User.find(u.id)}
+
+      @pseudo1.user.should == @pseudo2.user
+      @pseudo1.user.should == @user2
+
+      @user1.associated_accounts.map(&:id).sort.should == []
+      @user2.associated_accounts.map(&:id).sort.should == [@account1, @account2, @subaccount1, @subaccount2, @subsubaccount1, @subsubaccount2].map(&:id).sort
     end
   end
 
@@ -511,6 +537,12 @@ describe User do
       Account.default.add_user(@admin2)
       @admin1.grants_right?(@admin2, nil, :become_user).should be_false
       @admin2.grants_right?(@admin1, nil, :become_user).should be_false
+    end
+
+    it "should not allow account admin to modify admin privileges of other account admins" do
+      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
     end
 
     it "should grant become_user for users in multiple accounts to site admins but not account admins" do
@@ -792,15 +824,61 @@ describe User do
     end
   end
 
-  it "should assert_by_email users into the correct account" do
-    account_model
-    data = User.assert_by_email('test@example.com', @account)
-    data[:new].should be_true
-    data[:user].account.should == @account
-  end
-
   it "should find section for course" do
     course_with_student
     @student.section_for_course(@course).should == @course.default_section
+  end
+
+  describe "name_parts" do
+    it "should infer name parts" do
+      User.name_parts('Cody Cutrer').should == ['Cody', 'Cutrer', nil]
+      User.name_parts('  Cody  Cutrer   ').should == ['Cody', 'Cutrer', nil]
+      User.name_parts('Cutrer, Cody').should == ['Cody', 'Cutrer', nil]
+      User.name_parts('Cutrer, Cody Houston').should == ['Cody Houston', 'Cutrer', nil]
+      User.name_parts('St. Clair, John').should == ['John', 'St. Clair', nil]
+      # sorry, can't figure this out
+      User.name_parts('John St. Clair').should == ['John St.', 'Clair', nil]
+      User.name_parts('Jefferson Thomas Cutrer IV').should == ['Jefferson Thomas', 'Cutrer', 'IV']
+      User.name_parts('Jefferson Thomas Cutrer, IV').should == ['Jefferson Thomas', 'Cutrer', 'IV']
+      User.name_parts('Cutrer, Jefferson, IV').should == ['Jefferson', 'Cutrer', 'IV']
+      User.name_parts('Cutrer, Jefferson IV').should == ['Jefferson', 'Cutrer', 'IV']
+      User.name_parts(nil).should == [nil, nil, nil]
+      User.name_parts('Bob').should == ['Bob', nil, nil]
+      User.name_parts('Ho, Chi, Min').should == ['Chi Min', 'Ho', nil]
+      # sorry, don't understand cultures that put the surname first
+      # they should just manually specify their sort name
+      User.name_parts('Ho Chi Min').should == ['Ho Chi', 'Min', nil]
+      User.name_parts('').should == [nil, nil, nil]
+      User.name_parts('John Doe').should == ['John', 'Doe', nil]
+      User.name_parts('Junior').should == ['Junior', nil, nil]
+      User.name_parts('John St. Clair', 'St. Clair').should == ['John', 'St. Clair', nil]
+      User.name_parts('John St. Clair', 'Cutrer').should == ['John St.', 'Clair', nil]
+      User.name_parts('St. Clair', 'St. Clair').should == [nil, 'St. Clair', nil]
+      User.name_parts('St. Clair,').should == [nil, 'St. Clair', nil]
+    end
+
+    it "should keep the sortable_name up to date if all that changed is the name" do
+      u = User.new
+      u.name = 'Cody Cutrer'
+      u.save!
+      u.sortable_name.should == 'Cutrer, Cody'
+
+      u.name = 'Bracken Mosbacker'
+      u.save!
+      u.sortable_name.should == 'Mosbacker, Bracken'
+
+      u.name = 'John St. Clair'
+      u.sortable_name = 'St. Clair, John'
+      u.save!
+      u.sortable_name.should == 'St. Clair, John'
+
+      u.name = 'Matthew St. Clair'
+      u.save!
+      u.sortable_name.should == "St. Clair, Matthew"
+
+      u.name = 'St. Clair'
+      u.save!
+      u.sortable_name.should == "St. Clair,"
+    end
   end
 end

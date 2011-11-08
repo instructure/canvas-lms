@@ -26,7 +26,7 @@ describe "/assignments/_syllabus_row" do
     a = @course.assignments.create!(:title => "asdf")
     e = @course.calendar_events.create!(:title => "asdf")
     render :partial => 'assignments/syllabus_row', :object => [a,e]
-    # template.should_receive(:syllabus_row).and_return([a, e])
+    # template.expects(:syllabus_row).returns([a, e])
     # render 'assignments/_syllabus_row'
     response.should have_tag('tr.date')
   end

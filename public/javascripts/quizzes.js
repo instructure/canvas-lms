@@ -642,11 +642,8 @@ I18n.scoped('quizzes', function(I18n) {
     },
     defaultAnswerData: {
       answer_type: "select_answer",
-      answer_text: I18n.t('default_answer_text', "Answer Text"),
       answer_comment: "",
       answer_weight: 0,
-      answer_match_left: I18n.t('default_match_left', "Matching left side"),
-      answer_match_right: I18n.t('default_match_right', "Matching right side"),
       numerical_answer_type: "exact_answer",
       answer_exact: "",
       answer_error_margin: "",
@@ -709,7 +706,7 @@ I18n.scoped('quizzes', function(I18n) {
     $answer.fillFormData({answer_text: answer.answer_text});
     $answer.fillTemplateData({data: answer, htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']});
     if(!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == I18n.t('answer_comments', "Answer comments")) {
-      $answer.find(".answer_comment_holder").hide();
+    $answer.find(".answer_comment_holder").hide();
     }
     if(answer.answer_weight == 100) {
       $answer.addClass('correct_answer');
@@ -728,6 +725,7 @@ I18n.scoped('quizzes', function(I18n) {
     answer.answer_weight = parseFloat(answer.answer_weight);
     if(isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
     quiz.updateFormAnswer($answer, answer, true);
+    $answer.find('input[placeholder]').placeholder();
     $answer.show();
     return $answer;
   }
@@ -1701,7 +1699,6 @@ I18n.scoped('quizzes', function(I18n) {
       var answer_type = null, question_type = null, answer_selection_type = "single_answer";
       if($question.hasClass('multiple_choice_question')) {
         var answers = [{
-          answer_text: I18n.t('default_answer_text', "Answer Text"),
           comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "select_answer";
@@ -1710,7 +1707,6 @@ I18n.scoped('quizzes', function(I18n) {
         return;
       } else if($question.hasClass('short_answer_question')) {
         var answers = [{
-          answer_text: I18n.t('default_answer_text', "Answer Text"),
           comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "short_answer";
@@ -1724,8 +1720,6 @@ I18n.scoped('quizzes', function(I18n) {
         question_type = "essay_question";
       } else if($question.hasClass('matching_question')) {
         var answers = [{
-          answer_match_left: I18n.t('default_answer_text', "Answer Text"),
-          answer_match_right: I18n.t('matching_text', "Matching Text"),
           comments: I18n.t('default_comments_on_wrong_match', "Response if the user misses this match")
         }];
         answer_type = "matching_answer";
@@ -1733,7 +1727,6 @@ I18n.scoped('quizzes', function(I18n) {
         answer_selection_type = "matching";
       } else if($question.hasClass('missing_word_question')) {
         var answers = [{
-          answer_text: I18n.t('default_answer_text', "Answer Text"),
           comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "short_answer";
@@ -1750,7 +1743,6 @@ I18n.scoped('quizzes', function(I18n) {
         answer_selection_type = "any_answer";
       } else if($question.hasClass('multiple_answers_question')) {
         var answers = [{
-          answer_text: I18n.t('default_answer_text', "Answer Text"),
           comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "select_answer";
@@ -1758,14 +1750,12 @@ I18n.scoped('quizzes', function(I18n) {
         answer_selection_type = "multiple_answers";
       } else if($question.hasClass('multiple_dropdowns_question')) {
         var answers = [{
-          answer_text: I18n.t('default_answer_text', "Answer Text"),
           comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "select_answer";
         question_type = "multiple_dropdowns_question";
       } else if($question.hasClass('fill_in_multiple_blanks_question')) {
         var answers = [{
-          answer_text: I18n.t('default_answer_text', "Answer Text"),
           comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "short_answer";
@@ -1966,13 +1956,6 @@ I18n.scoped('quizzes', function(I18n) {
       }
     }).delegate('input.float_value', 'change blur focus', function(event) {
       quiz.parseInput($(this), $(this).hasClass('long') ? 'float_long' : 'float');
-    });
-    $(".question_form textarea, .question_form :text, .answer textarea, .answer :text").focus(function(event) {
-      // chrome/safari mouseup event fires after focus, causing it to get
-      // deselected. (we don't want to disable mouseup, as that has other
-      // side effects)
-      var $me = $(this);
-      setTimeout(function() { $me.select(); });
     });
     $("#questions").delegate('.question_teaser_link', 'click', function(event) {
       event.preventDefault();

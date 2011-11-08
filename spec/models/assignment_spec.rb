@@ -53,6 +53,18 @@ describe Assignment do
     @submission.versions.length.should eql(1)
   end
 
+  it "should update a submission's graded_at when grading it" do
+    setup_assignment_with_homework
+    @assignment.grade_student(@user, :grade => 1)
+    @submission = @assignment.submissions.first
+    original_graded_at = @submission.graded_at
+    new_time = Time.now + 1.hour
+    Time.stubs(:now).returns(new_time)
+    @assignment.grade_student(@user, :grade => 2)
+    @submission.reload
+    @submission.graded_at.should_not eql original_graded_at
+  end
+
   it "should update needs_grading_count when submissions transition state" do
     setup_assignment_with_homework
     @assignment.needs_grading_count.should eql(1)
@@ -1077,7 +1089,7 @@ describe Assignment do
         @a.context.offer!
         @c.enroll_student(@user)
 #        @students = [@user]
-#        @a.stub!(:participants).and_return(@students)
+#        @a.stubs(:participants).returns(@students)
 #        @a.participants.should be_include(@user)
         @a.previously_published = false
         @a.save

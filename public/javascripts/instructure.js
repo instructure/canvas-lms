@@ -85,6 +85,7 @@ jQuery(function($) {
         $elem.addClass("hover");
       }
     }, 300);
+    $.publish('menu/hovered', $elem);
     return false;  
   }
   

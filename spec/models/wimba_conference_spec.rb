@@ -66,7 +66,7 @@ describe WimbaConference do
   before(:each) do
     user_model
     email = "email@email.com"
-    @user.stub!(:email).and_return(email)
+    @user.stubs(:email).returns(email)
   end
 
   context "wimba" do

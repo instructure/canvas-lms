@@ -3,6 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "course selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  before do
+    account = Account.default
+    account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
+    account.save!
+  end
+
   it "should not create two assignments when using more options in the wizard" do
     course_with_teacher_logged_in
 

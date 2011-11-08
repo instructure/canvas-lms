@@ -20,7 +20,7 @@ def attachment_model(opts={})
   attrs = valid_attachment_attributes(opts).merge(opts)
   attrs.delete(:filename) if attrs.key?(:uploaded_data)
   @attachment = factory_with_protected_attributes(Attachment, attrs, false)
-  @attachment.stub!(:downloadable?).and_return(true)
+  @attachment.stubs(:downloadable?).returns(true)
   @attachment.save!
   @attachment
 end
@@ -41,8 +41,8 @@ def stub_file_data(filename, data, content_type)
   $stub_file_counter ||= 0
   data ||= "ohai#{$stub_file_counter += 1}"
   sio = StringIO.new(data)
-  sio.stub!(:original_filename).and_return(filename)
-  sio.stub!(:content_type).and_return(content_type)
+  sio.stubs(:original_filename).returns(filename)
+  sio.stubs(:content_type).returns(content_type)
   sio
 end
 

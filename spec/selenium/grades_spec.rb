@@ -15,7 +15,7 @@ describe "grades selenium tests" do
     #add second student
     @student_2 = User.create!(:name => 'nobody2@example.com')
     @student_2.register!
-    pseudonym_2 = @student_2.pseudonyms.create!(:unique_id => 'nobody2@example.com', :path => 'nobody2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+    pseudonym_2 = @student_2.pseudonyms.create!(:unique_id => 'nobody2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
 
     e2 = @course.enroll_student(@student_2)
     e2.workflow_state = 'active'

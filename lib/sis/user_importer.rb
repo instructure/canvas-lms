@@ -104,25 +104,48 @@ module SIS
 
               user = pseudo.user
               user.name = "#{first_name} #{last_name}" unless user.stuck_sis_fields.include?(:name)
-
+              unless user.stuck_sis_fields.include?(:sortable_name)
+                user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
+              end
             else
               user = User.new
               user.name = "#{first_name} #{last_name}"
+              user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
             end
 
-            if status =~ /active/i
-              user.workflow_state = 'registered'
-            elsif status =~ /deleted/i
-              user.workflow_state = 'deleted'
-              user.enrollments.scoped(:conditions => {:root_account_id => @root_account.id }).update_all(:workflow_state => 'deleted')
-              @users_to_update_account_associations << user.id unless user.new_record?
+            # we just leave all users registered now
+            # since we've deleted users though, we need to do this to be
+            # backwards compatible with the data
+            user.workflow_state = 'registered'
+
+            should_add_account_associations = false
+            should_update_account_associations = false
+
+            status_is_active = !(status =~ /\Adeleted/i)
+
+            if !status_is_active && !user.new_record?
+              # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and
+              # delete the pseudonym.
+              if 0 < user.enrollments.scoped(:conditions => ["root_account_id = ? AND workflow_state <> ?", @root_account.id, 'deleted']).update_all(:workflow_state => 'deleted')
+                should_update_account_associations = true
+              end
             end
 
             pseudo ||= Pseudonym.new
             pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
             pseudo.sis_user_id = user_id
             pseudo.account = @root_account
-            pseudo.workflow_state = status =~ /active/i ? 'active' : 'deleted'
+            pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
+            if pseudo.new_record? && status_is_active
+              should_add_account_associations = true
+            elsif pseudo.workflow_state_changed?
+              if status_is_active
+                should_add_account_associations = true
+              else
+                should_update_account_associations = true
+              end
+            end
+
             # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
             # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
             if !password.blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(password))
@@ -137,9 +160,7 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user.creation_sis_batch_id = @batch_id if @batch_id
-                  new_record = user.new_record?
                   raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
-                  @users_to_add_account_associations << user.id if new_record && user.workflow_state != 'deleted'
                 elsif @batch_id
                   @users_to_set_sis_batch_ids << user.id
                 end
@@ -154,33 +175,38 @@ module SIS
               next
             end
 
+            @users_to_add_account_associations << user.id if should_add_account_associations
+            @users_to_update_account_associations << user.id if should_update_account_associations
+
             if email.present?
-              comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(email, 'active', 'email')
-              if !comm and status =~ /active/i
-                begin
-                  comm = pseudo.sis_communication_channel || CommunicationChannel.new
-                  if comm.new_record?
-                    comm.user_id = user.id
-                    comm.pseudonym_id = pseudo.id
-                    pseudo.sis_communication_channel = comm
-                  end
-                  comm.path = email
-                  comm.workflow_state = 'active'
-                  comm.do_delayed_jobs_immediately = true
-                  comm.save_without_broadcasting if comm.changed?
-                  pseudo.communication_channel_id = comm.id
-                rescue => e
-                  @messages << "Failed adding communication channel #{email} to user #{login_id}"
-                end
-              elsif status =~ /active/i
-                if comm.user_id != pseudo.user_id
-                  @messages << "E-mail address #{email} for user #{login_id} is already claimed; ignoring"
-                else
-                  pseudo.sis_communication_channel.destroy if pseudo.sis_communication_channel != comm and !pseudo.sis_communication_channel.nil?
-                  pseudo.sis_communication_channel = comm
-                  pseudo.communication_channel_id = comm.id
-                  comm.do_delayed_jobs_immediately = true
-                  comm.save_without_broadcasting if comm.changed?
+              conditions = [ "path=? AND path_type='email' AND ", email, user.id]
+              # find all CCs for this user, and active conflicting CCs for all users
+              # unless we're deleting this user, then only find CCs for this user
+              conditions.first << (status_is_active ? "(workflow_state='active' OR user_id=?)" : 'user_id=?')
+
+              ccs = CommunicationChannel.find(:all, :conditions => conditions)
+              sis_cc = ccs.find { |cc| cc.id == pseudo.sis_communication_channel_id } if pseudo.sis_communication_channel_id
+              # Have to explicitly load the old sis communication channel, in case it changed (should only happen if user_id got messed up)
+              sis_cc ||= pseudo.sis_communication_channel
+              other_cc = ccs.find { |cc| cc.path = email && cc.user_id == user.id && cc.id != sis_cc.try(:id) }
+              # Handle the case where the SIS CC changes to match an already existing CC
+              if sis_cc && other_cc
+                sis_cc.destroy
+                sis_cc = nil
+              end
+              cc = sis_cc || other_cc || CommunicationChannel.new
+              cc.user_id = user.id
+              cc.pseudonym_id = pseudo.id
+              cc.path = email
+              cc.workflow_state = status_is_active ? 'active' : 'retired'
+              newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
+              cc.save_without_broadcasting if cc.changed?
+              pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
+
+              if newly_active
+                other_ccs = ccs.reject { |other_cc| other_cc.user_id == user.id || other_cc.user.nil? || other_cc.user.pseudonyms.active.count == 0 }
+                unless other_ccs.empty?
+                  cc.send_merge_notification!
                 end
               end
             end

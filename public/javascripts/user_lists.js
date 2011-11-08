@@ -167,7 +167,7 @@ I18n.scoped('user_lists', function(I18n) {
         var $enrollment = $enrollment_blank
           .clone(true)
           .fillTemplateData({
-            textValues: ['name'],
+            textValues: ['name', 'membership_type', 'email'],
             id: 'enrollment_' + enrollment.id,
             hrefValues: ['id', 'user_id', 'pseudonym_id', 'communication_channel_id'],
             data: enrollment

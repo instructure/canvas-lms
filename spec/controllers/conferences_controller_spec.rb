@@ -19,6 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConferencesController do
+  before do
+    # these specs need an enabled web conference plugin
+    @plugin = PluginSetting.find_or_create_by_name('dim_dim')
+    @plugin.update_attribute(:settings, { :domain => 'www.example.com' })
+  end
+
   describe "GET 'index'" do
     it "should require authorization" do
       course_with_student(:active_all => true)

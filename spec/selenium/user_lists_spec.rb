@@ -3,9 +3,17 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "user lists Windows-Firefox-Tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  before (:each) do
+    account = Account.default
+    account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
+    account.save!
+  end
+
   def add_users_to_user_list(include_short_name = true)
-    @course.root_account.pseudonyms.create!(:unique_id => "A124123").assert_user{|u| u.name = "login_name user"}
-    
+    user = User.create!(:name => 'login_name user')
+    user.pseudonyms.create!(:unique_id => "A124123", :account => @course.root_account)
+    user.communication_channels.create!(:path => "A124123")
+
     user_list = <<eolist
 user1@example.com, "bob sagat" <bob@thesagatfamily.name>, A124123
 eolist
@@ -14,13 +22,13 @@ eolist
     driver.find_element(:css, "button.add_users_button").click
     wait_for_ajax_requests
     wait_for_animations
-    keep_trying_until {driver.find_element(:css, "#enrollment_#{Enrollment.last.id}").text.should == ("user, login_name" + (include_short_name ? "\nlogin_name user" : "")) }
+    keep_trying_until {driver.find_element(:css, "#enrollment_#{Enrollment.last.id}").text.should == ("user, login_name" + (include_short_name ? "\nlogin_name user" : "") + "\nA124123") }
     
     unique_ids = ["user1@example.com", "bob@thesagatfamily.name", "A124123"]
-    browser_text = ["user1@example.com\nuser1@example.com\nuser1@example.com", "sagat, bob\nbob sagat\nbob@thesagatfamily.name", "user, login_name\nlogin_name user"] if include_short_name
-    browser_text = ["user1@example.com\nuser1@example.com", "sagat, bob\nbob@thesagatfamily.name", "user, login_name"] unless include_short_name
+    browser_text = ["user1@example.com\nuser1@example.com\nuser1@example.com", "sagat, bob\nbob sagat\nbob@thesagatfamily.name", "user, login_name\nlogin_name user\nA124123"] if include_short_name
+    browser_text = ["user1@example.com\nuser1@example.com", "sagat, bob\nbob@thesagatfamily.name", "user, login_name\nA124123"] unless include_short_name
     Enrollment.all.last(3).each do |e|
-      e.user.pseudonyms.first.unique_id.should == unique_ids.shift
+      e.user.communication_channels.first.path.should == unique_ids.shift
       driver.find_element(:css, "#enrollment_#{e.id}").text.should == browser_text.shift
     end
   end

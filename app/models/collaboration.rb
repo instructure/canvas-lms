@@ -193,13 +193,10 @@ class Collaboration < ActiveRecord::Base
     nil
   end
   
-  
-  DEFAULT_COLLABORATION_TYPES = [
-    {'name' => 'Google Docs', 'type' => 'google_docs'},
-    {'name' => 'EtherPad', 'type' => 'etherpad'}
-  ]
   def self.collaboration_types
-    @collab_types ||= (YAML.load_file(RAILS_ROOT + "/config/collaborations.yml")[RAILS_ENV] rescue nil) || DEFAULT_COLLABORATION_TYPES
+    Canvas::Plugin.all_for_tag(:collaborations).find_all(&:enabled?).map do |x|
+      {'name' => x.name, 'type' => x.id}
+    end
   end
   
   def self.any_collaborations_configured?

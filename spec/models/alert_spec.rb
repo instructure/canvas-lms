@@ -97,16 +97,16 @@ describe Alert do
 
   context "basic evaluation" do
     it "should not trigger any alerts for unpublished courses" do
-      course = mock_model(Course)
-      course.stub!(:available?, false)
+      course = mock('Course')
+      course.stubs(:available?, false)
       Alert.evaluate_for_course(course)
       Alert.sent_alerts.should be_blank
     end
 
     it "should not trigger any alerts for courses with no alerts" do
-      course = mock_model(Course)
-      course.stub!(:available?, true)
-      course.stub!(:alerts, [].stub!(:all, []))
+      course = mock('Course')
+      course.stubs(:available?).returns(true)
+      course.stubs(:alerts).returns(stub(:all => []))
       Alert.evaluate_for_course(course)
       Alert.sent_alerts.should be_blank
     end
