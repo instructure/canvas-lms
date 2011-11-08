@@ -1,3 +1,86 @@
+canvas-lms (1.1-75) professional; urgency=low
+
+  * Package ref: 1ea4e1e63f05fe446f48d1f1a1a076470c9d09cb
+  *
+  * [-71957bf] remote rb-fsevent/inotify
+  * [+995110f] add distinct name part fields refs #5317
+  * [+c59c0f5] refactor user creation/invitations closes #5833
+  * [+b475040] display gradebook history properly. fixes #6051
+  * [+4a3ad93] fix drop down menus that broke in column re-arrangement
+  * [+b0b370a] fix initial creation of admins refs #5833
+  * [+8e3067e] added favorite courses option to main menu
+  * [+1a87aea] remove collaborations.yml dependency, refs #5796
+  * [+e0eafa8] use hard-coded table names for VALID_SIS_COLUMNS
+  * [+6d83261] fixing some collaboration description layout, refs #5796
+  * [+af34025] i18n key typo, refs #5796
+  * [+e7c9d7e] english string collaborator count typo, refs #5796
+  * [+3ab1f94] reword collaboration service descriptions, refs #5796
+  * [+1287bb0] strip whitespace from extracted strings
+  * [+8ad501a] limit failed login attempts
+  * [+ef33ff7] automatically start the new collaboration wizard when there aren't any
+  * [+ef4c897] fix the 'Started by' user link in collaborations, refs #5796
+  * [+3c66de6] don't show the collaborators selection form if there aren't any, refs #5796
+  * [+cbd95db] fix collaborator (de)select all links. refs #5796
+  * [+0180c28] fix some invitation acceptance bugs refs #5833
+  * [+3b2d4b3] include response-content-disposition in S3 download urls
+  * [+2595707] fix self enrollments refs #5833
+  * [+695ab7f] remove completely unused user workflow_states
+  * [+9be1995] support creation_pending users that were created prior to the big refactor
+  * [+92d3ad5] spec self unenrollment
+  * [+e5e1c51] use rspec mocks not mocha mocks
+  * [+730c63c] disable auto-complete on safari too since it forces yellow bg
+  * [+20a2376] switch to mocha mock framework for specs
+  * [+9197684] make take_quiz faster on domready
+  * [+f99abb4] Revert "add distinct name part fields refs #5317"
+  * [+3a7b9dc] fix up web conference related spec failures
+  * [+85fccf6] fixes  #6079 changes account admin role default permissions
+  * [+78e727f] update qti specs for new question bank behavior
+  * [+718f9f3] qunit + AMD javascript specs
+  * [+21be362] tweak group category creation UI
+  * [+05cb088] refactored embed image tinymce plugin, fixes #6056
+  * [+7c21ae7] fix i18n:export bug, don't always rebase
+  * [+c758b85] en.yml snapshot for es and jp translations
+  * [+b9981e4] fix more web conference related specs
+  * [+bd3dc5b] convert selenium specs to mocha mock framework
+  * [+8dd5ad8] make sure discussion subentry is deleted with parent
+  * [+ce09bc7] remove id param from menu_section partial
+  * [+0300755] migrate all quiz images in course copy, fixes #5611
+  * [+c754e8d] splitting apart sis unit tests
+  * [+287bfc4] plugins_spec should not expect there are no plugin settings
+  * [+7be2641] Author Name for "add new entry" was same for all users in a course
+  * [+b6fca29] make sure UsersController#create creates account assocations
+  * [+357b621] placeholders for quiz answers fixes #5438
+  * [+1da2b3f] base showing Create User on the correct permissions
+  * [+736ddf0] fix rendering of registration page for merges when there is no enrollment
+  * [+c4c79f5] grandfather in accounts with old not-secure-by-default settings
+  * [+9bd892d] update account associations on user merge. fixes #5574
+  * [+6403cdf] don't actually delete users, just pseudonyms. fixes #6117
+  * [+3f3f726] expose sortable name to user, fixes #5317
+  * [+f6e13d5] show login label on "add user" screen for cas/saml users; fixes #6120
+  * [+03d8d6d] remove cruft around unused image search library and model
+  * [+4e1f699] don't lose our enrollment when navigating between multiple courses with pending invitations
+  * [+2f1bb6e] remove rb-fsevent/rb-inotify from the gemfile
+  * [+deb3602] fix names on the access report, other tweaks; fixes #4682
+  * [+009253d] incorporated AMD into the main application
+  * [+3ffb35e] cache menu courses
+  * [+6b3f8a9] include invited enrollments in course dropdown, show state
+  * [+d06ac5f] only load course list when menu first opens
+  * [+4d893bb] don't send merge notifications to users that can't login
+  * [+81b894d] avoid establishing a connection during initialization
+  * [+f0933d0] fixes for IE8 incompatibility for userUtils
+  * [+c00ab67] fix rendering settings page for accounts with customized login handles
+  * [+f611d02] infer the correct account when registering a new pseudonym refs #5833
+  * [+2a21760] show merge link when applicable in profile refs #5833
+  * [+eaf52ec] fix enrollment notification e-mail running in delayed jobs refs #5833
+  * [+c10a04f] redesign merge/registration/confirmation page closes #6149
+  * [+be01869] only enable self-registration for the default account refs #5833
+  * [+f7225ab] touch the users when transferring enrollments or merging refs #5833
+  * [+6dadd0a] give new users a chance to login with an existing account refs #5833
+  * [+9f4c7f1] fix display of sortable name in users list refs #5317
+  * [+1ea4e1e] use mass assignment for user registration
+
+ -- JT Olds <jt@instructure.com>  Tue, 08 Nov 2011 13:48:10 -0700
+
 canvas-lms (1.1-74) professional; urgency=low
 
   * Package ref: 7270ef38bb8716dc5dc3bdcfcde2da8d33936c93
