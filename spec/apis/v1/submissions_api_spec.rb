@@ -838,6 +838,65 @@ describe SubmissionsApiController, :type => :integration do
     json['score'].should == 12.9
   end
 
+  it "should allow commenting by a student without trying to grade" do
+    course_with_teacher(:active_all => true)
+    student = user(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    # since student is the most recently created user, @user = student, so this
+    # call will happen as student
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => 'witty remark' } })
+
+    Submission.count.should == 1
+    @submission = Submission.first
+    @submission.submission_comments.size.should == 1
+    comment = @submission.submission_comments.first
+    comment.comment.should == 'witty remark'
+    comment.author.should == student
+  end
+
+  it "should not allow grading by a student" do
+    course_with_teacher(:active_all => true)
+    student = user(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    # since student is the most recently created user, @user = student, so this
+    # call will happen as student
+    raw_api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => 'witty remark' },
+            :submission => { :posted_grade => 'B' } })
+    response.status.should == '401 Unauthorized'
+  end
+
+  it "should not allow rubricking by a student" do
+    course_with_teacher(:active_all => true)
+    student = user(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    # since student is the most recently created user, @user = student, so this
+    # call will happen as student
+    raw_api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => 'witty remark' },
+            :rubric_assessment => { :criteria => { :points => 5 } } })
+    response.status.should == '401 Unauthorized'
+  end
+
   it "should not return submissions for no-longer-enrolled students" do
     student = user(:active_all => true)
     course_with_teacher(:active_all => true)

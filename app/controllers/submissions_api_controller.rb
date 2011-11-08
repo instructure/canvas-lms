@@ -142,7 +142,12 @@ class SubmissionsApiController < ApplicationController
 
   # @API
   #
-  # Update the grading for a student's assignment submission.
+  # Comment on and/or update the grading for a student's assignment submission.
+  # If any submission or rubric_assessment arguments are provided, the user
+  # must have permission to manage grades in the appropriate context (course or
+  # section).
+  #
+  # @argument comment[text_comment] Add a textual comment to the submission.
   #
   # @argument submission[posted_grade] Assign a score to the submission,
   #   updating both the "score" and "grade" fields on the submission record.
@@ -191,13 +196,19 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #
   #   rubric_assessment[crit1][points]=3&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][comments]=Well%20Done.
-  #
-  # @argument comment[text_comment] Add a textual comment to the submission.
   def update
-    if authorized_action(@context, @current_user, :manage_grades)
-      @assignment = @context.assignments.active.find(params[:assignment_id])
-      @user = get_user_considering_section(params[:id])
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @user = get_user_considering_section(params[:id])
 
+    authorized = false
+    if params[:submission] || params[:rubric_assessment]
+      authorized = authorized_action(@context, @current_user, :manage_grades)
+    else
+      @submission = @assignment.find_or_create_submission(@user)
+      authorized = authorized_action(@submission, @current_user, :comment)
+    end
+
+    if authorized
       submission = {}
       if params[:submission].is_a?(Hash)
         submission[:grade] = params[:submission].delete(:posted_grade)
@@ -205,7 +216,7 @@ class SubmissionsApiController < ApplicationController
       if submission[:grade]
         @submission = @assignment.grade_student(@user, submission).first
       else
-        @submission = @assignment.find_or_create_submission(@user)
+        @submission ||= @assignment.find_or_create_submission(@user)
       end
 
       assessment = params[:rubric_assessment]
