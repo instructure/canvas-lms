@@ -2116,12 +2116,15 @@ class Course < ActiveRecord::Base
   def students_visible_to(user, include_priors=false)
     enrollments_visible_to(user, include_priors, true)
   end
-  def enrollments_visible_to(user, include_priors=false, return_users=false)
+  def enrollments_visible_to(user, include_priors=false, return_users=false, limit_to_section_ids=nil)
     visibilities = section_visibilities_for(user)
     if return_users
       scope = include_priors ? self.all_students : self.students
     else
       scope = include_priors ? self.all_student_enrollments : self.student_enrollments
+    end
+    if limit_to_section_ids
+      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => limit_to_section_ids.to_a })
     end
     # See also Users#messageable_users (same logic used to get users across multiple courses)
     case enrollment_visibility_level_for(user, visibilities)

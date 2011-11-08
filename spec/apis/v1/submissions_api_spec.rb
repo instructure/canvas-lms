@@ -1170,4 +1170,88 @@ describe SubmissionsApiController, :type => :integration do
     @submission.user_id.should == student.id
   end
 
+  it "should not allow accessing other sections when limited" do
+    course_with_teacher(:active_all => true)
+    @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+    @teacher = @user
+    s1 = submission_model(:course => @course)
+    section2 = @course.course_sections.create(:name => "another section")
+    s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => section2, :assignment => @assignment)
+    @user = @teacher
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s })
+    json.map { |u| u['user_id'] }.should == [s1.user_id]
+
+    # try querying the other section directly
+    json = api_call(:get,
+          "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :section_id => section2.id.to_s,
+            :assignment_id => @assignment.id.to_s })
+    json.size.should == 0
+
+    raw_api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s })
+    response.status.should == "404 Not Found"
+
+    # try querying the other section directly
+    raw_api_call(:get,
+          "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :section_id => section2.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s })
+    response.status.should == "404 Not Found"
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.id.to_s },
+          { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 })
+    json.map { |u| u['user_id'] }.should == [s1.user_id]
+
+    # try querying the other section directly
+    json = api_call(:get,
+          "/api/v1/sections/#{section2.id}/students/submissions",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :section_id => section2.id.to_s },
+          { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 })
+    json.size.should == 0
+
+    # grade the s1 submission, succeeds because the section is the same
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s1.user_id}",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => s1.user_id.to_s },
+          { :submission => { :posted_grade => '10' } })
+    @submission = @assignment.submission_for_student(s1.user)
+    @submission.should be_present
+    @submission.grade.should == '10'
+
+    # grading s2 will fail because the teacher can't manipulate this student's section
+    raw_api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s },
+          { :submission => { :posted_grade => '10' } })
+    response.status.should == "404 Not Found"
+
+    # try querying the other section directly
+    raw_api_call(:put,
+          "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :section_id => section2.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s },
+          { :submission => { :posted_grade => '10' } })
+    response.status.should == "404 Not Found"
+  end
+
 end

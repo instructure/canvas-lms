@@ -155,6 +155,19 @@ describe GradebooksController do
       post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
       assert_unauthorized
     end
+
+    it "should not allow updating submissions in other sections when limited" do
+      course_with_teacher_logged_in(:active_all => true)
+      @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+      s1 = submission_model(:course => @course)
+      s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"), :assignment => @assignment)
+
+      post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => s1.user_id}
+      response.should be_redirect
+
+      # attempt to grade another section should throw not found
+      proc { post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => s2.user_id} }.should raise_error(ActiveRecord::RecordNotFound)
+    end
   end
   
   describe "GET 'speed_grader'" do

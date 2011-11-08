@@ -37,7 +37,7 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submissions = @assignment.submissions.all(
-        :conditions => { :user_id => (@section || @context).student_ids })
+        :conditions => { :user_id => visible_user_ids })
 
       includes = Array(params[:include])
 
@@ -77,8 +77,9 @@ class SubmissionsApiController < ApplicationController
   # ]
   def for_students
     if authorized_action(@context, @current_user, :manage_grades)
-      student_ids = map_user_ids(params[:student_ids])
-      raise ActiveRecord::RecordNotFound if student_ids.blank?
+      raise ActiveRecord::RecordNotFound if params[:student_ids].blank?
+      student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids
+      return render(:json => []) if student_ids.blank?
 
       includes = Array(params[:include])
 
@@ -369,5 +370,14 @@ class SubmissionsApiController < ApplicationController
       scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => @section.id })
     end
     api_find(scope, user_id)
+  end
+
+  def visible_user_ids
+    scope = if @section
+      @context.enrollments_visible_to(@current_user, false, false, [@section.id])
+    else
+      @context.enrollments_visible_to(@current_user)
+    end
+    scope.all(:select => :user_id).map(&:user_id)
   end
 end
