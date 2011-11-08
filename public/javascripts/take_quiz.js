@@ -16,9 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var lastAnswerSelected = null;
-var quizSubmission;
-I18n.scoped('quizzes.take_quiz', function(I18n) {
+require(['i18n'], function (I18n) {
+
+  I18n = I18n.scoped('quizzes.take_quiz');
+
+  var lastAnswerSelected = null;
+  var quizSubmission;
 
   $(document).mousedown(function(event) {
     lastAnswerSelected = $(event.target).parents(".answer")[0];
@@ -258,7 +261,8 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
         endAtText = end_at.text(),
         endAtParsed = endAtText && new Date(endAtText),
         $countdown_seconds = $(".countdown_seconds"),
-        $time_running_time_remaining = $(".time_running,.time_remaining");
+        $time_running_time_remaining = $(".time_running,.time_remaining"),
+        $last_saved = $('#last_saved_indicator');
 
     return {
       referenceDate: null,
@@ -285,7 +289,10 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
         $(".question_holder .question.marked").each(function() {
           data[$(this).attr('id') + "_marked"] = "1";
         });
+
+        $last_saved.text(I18n.t('saving', 'Saving...'));
         $.ajaxJSON($(".backup_quiz_submission_url").attr('href'), 'PUT', data, function(data) {
+          $last_saved.text(I18n.t('saved_at', 'Saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
           quizSubmission.currentlyBackingUp = false;
           if(repeat) {
             setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
@@ -308,8 +315,9 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
           if(repeat) {
             setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
           }
-        }, {timeout: 5000, skipDefaultError: true});
+        }, {timeout: 5000 });
       },
+
       updateTime: function() {
         var now = new Date();
         var end_at = quizSubmission.time_limit ? endAtText : null;
@@ -395,5 +403,5 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
       }
     };
   })();
-
 });
+

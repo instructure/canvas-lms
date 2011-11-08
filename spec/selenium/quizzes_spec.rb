@@ -891,6 +891,68 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:id, 'quiz_title').text.should == q.title
   end
 
+  it "should indicate when it was last saved" do
+    course_with_teacher_logged_in
+    @context = @course
+    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    q = quiz_model
+    a = AssessmentQuestion.create!
+    b = AssessmentQuestion.create!
+    bank.assessment_questions << a
+    bank.assessment_questions << b
+    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+    quest1 = q.quiz_questions.create!(:question_data => { :name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    quest2 = q.quiz_questions.create!(:question_data => { :name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+
+    q.generate_quiz_data
+    q.save!
+    get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
+    driver.find_element(:css, '.publish_quiz_button')
+
+    get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+    wait_for_dom_ready
+    wait_for_ajax_requests
+
+    # sleep because display is updated on timer, not ajax callback
+    sleep(1)
+    indicator = driver.find_element(:css, '#last_saved_indicator')
+
+    indicator.text.should == 'Not saved'
+    driver.find_element(:css, 'input[type=radio]').click
+
+    # too fast, this always fails
+    #indicator.text.should == 'Saving...'
+
+    wait_for_ajax_requests
+    indicator.text.should match(/^Saved at \d+:\d+(pm|am)$/)
+
+    #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+    driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
+    confirm_dialog = driver.switch_to.alert
+    confirm_dialog.accept
+    wait_for_dom_ready
+  end
+
+  it "should prevent mousewheel events on select elements when taking a quiz" do
+    course_with_teacher_logged_in
+    @context = @course
+    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    q = quiz_model
+    b = bank.assessment_questions.create!
+    quest2 = q.quiz_questions.create!(:assessment_question => b)
+    quest2.write_attribute(:question_data, { :neutral_comments=>"", :question_text=>"<p>My hair is [x] and my wife's is [y].</p>", :points_possible=>1, :question_type=>"multiple_dropdowns_question", :answers=>[{:comments=>"", :weight=>100, :blank_id=>"x", :text=>"brown", :id=>2624}, {:comments=>"", :weight=>0, :blank_id=>"x", :text=>"black", :id=>3085}, {:comments=>"", :weight=>100, :blank_id=>"y", :text=>"brown", :id=>5780}, {:comments=>"", :weight=>0, :blank_id=>"y", :text=>"red", :id=>8840}], :correct_comments=>"", :name=>"Question", :question_name=>"Question", :incorrect_comments=>"", :assessment_question_id=>nil})
+
+    q.generate_quiz_data
+    q.save!
+    get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
+    driver.find_element(:css, '.publish_quiz_button')
+    get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+
+    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
+    in_frame tiny_frame["id"] do
+      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
+    end
+
   it "should round numeric questions thes same when created and taking a quiz" do
     start_quiz_question
     quiz = Quiz.last
@@ -899,10 +961,6 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="numerical_question"]').click
 
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
-    end
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0].find_element(:name, 'answer_exact').send_keys('0.000675')
     driver.execute_script <<-JS
