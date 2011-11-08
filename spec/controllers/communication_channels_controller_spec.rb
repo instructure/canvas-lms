@@ -80,7 +80,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_user => 1)
         get 'confirm', :nonce => @cc.confirmation_code
         response.should be_redirect
-        response.should redirect_to(login_url)
+        response.should redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
 
       it "should require the correct user to confirm a cc" do
@@ -92,7 +92,7 @@ describe CommunicationChannelsController do
         user_session(@user1, @pseudonym1)
 
         get 'confirm', :nonce => @cc.confirmation_code
-        response.should redirect_to(login_url(:re_login => 1))
+        response.should redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
 
       it "should not confirm an already-confirmed CC" do

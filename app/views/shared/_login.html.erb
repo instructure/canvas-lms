@@ -83,7 +83,7 @@ $(document).ready(function() {
           <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>
           <input type="hidden" name="redirect_to_ssl" value="1"/>
           <div>
-            <span class=" field-with-fancyplaceholder"><%= f.label :unique_id, login_handle_name %><%= f.text_field :unique_id, :class => "text", :value => @unique_id %></span>
+            <span class=" field-with-fancyplaceholder"><%= f.label :unique_id, login_handle_name %><%= f.text_field :unique_id, :class => "text", :value => params[:pseudonym_session].try(:[], :unique_id) %></span>
             <span class=" field-with-fancyplaceholder"><%= f.label :password, :en => "Password" %><%= f.password_field :password, :class => "text" %></span>
           </div>
           <div>
