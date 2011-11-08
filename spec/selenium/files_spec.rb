@@ -69,6 +69,22 @@ shared_examples_for "files selenium tests" do
     }
     link.attribute('href').should match(%r"/courses/#{@course.id}/folders/\d+/download")
   end
+
+  it "should make folders in the menu droppable" do
+    course_with_teacher_logged_in
+    get "/dashboard/files"
+    wait_for_ajaximations
+
+    keep_trying_until {
+      driver.find_element(:css, ".add_folder_link").click
+      wait_for_animations
+      driver.find_element(:css, "#files_content .add_folder_form #folder_name").should be_displayed
+    }
+    driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
+    wait_for_ajax_requests
+    driver.find_element(:css, ".node.folder span").should have_class('ui-droppable')
+  end
+
 end
 
 describe "files without s3 and forked tests" do

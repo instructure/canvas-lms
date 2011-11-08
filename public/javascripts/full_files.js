@@ -1961,6 +1961,7 @@ I18n.scoped('files', function(I18n) {
           $parent.children("ul").append($folder.show());
           files.updateFolder($(this).data('root_context_string'), data);
           $(this).parents("li").remove();
+          $folder.find('span').droppable(files.droppable_options);
           files.refreshView(folder);
         },
         error: function(data) {
