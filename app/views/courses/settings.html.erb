@@ -7,7 +7,7 @@
   enrollment_hashes  = {} 
   ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment'].each do |type|
     enrollment_hashes[type] = {} 
-    list = @context.detailed_enrollments.select{|e| e.type == type && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue 'a' }
+    list = @context.detailed_enrollments.select{|e| e.type == type && e.active_or_pending?}.sort_by{|e| e.user.sortable_name.downcase rescue 'a' }
     if type == 'StudentEnrollment' && @context.visibility_limited_to_course_sections?(@current_user)
       user_ids = @context.students_visible_to(@current_user).map(&:id)
       list = list.select{|e| user_ids.include?(e.user_id) }
@@ -477,7 +477,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <% if students.empty? %>
               <li class="none"><%= t('no_students', %{No Students Enrolled}) %></li>
             <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['StudentEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
+              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['StudentEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
             <% end %>
             <%= render :partial => 'shared/enrollment', :object => nil, :locals => {:show_information_link => true} %>
           </ul>
@@ -486,7 +486,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <% if observers.empty? %>
               <li class="none"><%= t('no_observers', %{No Observers Enrolled}) %></li>
             <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['ObserverEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_information_link => true} %>
+              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['ObserverEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_information_link => true} %>
             <% end %>
           </ul>
         </td>
@@ -496,7 +496,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <% if teachers.empty? %>
               <li class="none"><%= t('no_teachers', %{No Teachers Assigned}) %></li>
             <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TeacherEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
+              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TeacherEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
             <% end %>
           </ul>
           <h3><%= t('headings.tas', %{TAs}) %> <span class="tally">(<span class="ta_count"><%= tas.length %></span>)</span></h3>
@@ -504,7 +504,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <% if tas.empty? %>
               <li class="none"><%= t('no_tas', %{No TAs Assigned}) %></li>
             <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TaEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
+              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TaEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
             <% end %>
           </ul>
         </td>

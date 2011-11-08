@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Enrollment do
   before(:each) do
-    @user = User.create! #mock_model(User)
-    @course = Course.create! #mock_model(Course)
+    @user = User.create!
+    @course = Course.create!
     @enrollment = Enrollment.new(valid_enrollment_attributes)
   end
 
@@ -32,8 +32,8 @@ describe Enrollment do
   it "should have an interesting state machine" do
     enrollment_model
     list = {}
-    list.stub!(:find_all_by_context_id_and_context_type).and_return([])
-    @user.stub!(:dashboard_messages).and_return(list)
+    list.stubs(:find_all_by_context_id_and_context_type).returns([])
+    @user.stubs(:dashboard_messages).returns(list)
     @enrollment.state.should eql(:invited)
     @enrollment.accept
     @enrollment.state.should eql(:active)
@@ -52,8 +52,8 @@ describe Enrollment do
   
   it "should find students" do
     @student_list = mock('student list')
-    @student_list.stub!(:map).and_return(['student list'])
-    Enrollment.should_receive(:find).and_return(@student_list)
+    @student_list.stubs(:map).returns(['student list'])
+    Enrollment.expects(:find).returns(@student_list)
     Enrollment.students.should eql(['student list'])
   end
   

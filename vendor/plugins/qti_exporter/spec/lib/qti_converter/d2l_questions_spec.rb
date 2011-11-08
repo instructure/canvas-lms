@@ -66,7 +66,7 @@ module D2LExpected
   MULTIPLE_CHOICE =
           {
                   :incorrect_comments=>"",
-                  :question_bank_name=>"QLIB_730739",
+                  :question_bank_name=>"02gilback",
                   :answers=>
                           [
                                   {:weight=>100,
@@ -86,7 +86,7 @@ module D2LExpected
                                    :migration_id=>"QUES_516156_630296_A2899445",
                                    :comments=>""}
                           ],
-                  :question_bank_id=>"QLIB_730739",
+                  :question_bank_id=>"SECT_3981973",
                   :points_possible=>1,
                   :migration_id=>"OBJ_1519236",
                   :question_text=>"The first letter of the Greek alphabet is?",
@@ -146,7 +146,7 @@ module D2LExpected
                      :access_code=>"insecure",
                      :assignment_migration_id=>'164842'}
   
-  LONG_ANSWER = {:question_bank_name=>"QLIB_730739",
+  LONG_ANSWER = {:question_bank_name=>"02gilback",
                  :points_possible=>1,
                  :answers=>[],
                  :question_text=>"Write an essay on writing essays",
@@ -155,12 +155,12 @@ module D2LExpected
                  :correct_comments=>"",
                  :question_type=>"essay_question",
                  :incorrect_comments=>"",
-                 :question_bank_id=>"QLIB_730739"}
+                 :question_bank_id=>"SECT_3981973"}
 
   SHORT_ANSWER = {:question_type=>"short_answer_question",
                   :incorrect_comments=>"",
-                  :question_bank_id=>"QLIB_730739",
-                  :question_bank_name=>"QLIB_730739",
+                  :question_bank_id=>"SECT_3981973",
+                  :question_bank_name=>"02gilback",
                   :points_possible=>1,
                   :answers=>[{:weight=>100, :text=>"Nydam", :comments=>""}],
                   :question_text=>"Who is winning the Tour of California today?",
@@ -171,8 +171,8 @@ module D2LExpected
   MULTI_SELECT = {:correct_comments=>"",
                   :question_type=>"multiple_answers_question",
                   :incorrect_comments=>"",
-                  :question_bank_id=>"QLIB_730739",
-                  :question_bank_name=>"QLIB_730739",
+                  :question_bank_id=>"SECT_3981973",
+                  :question_bank_name=>"02gilback",
                   :points_possible=>1,
                   :answers=>
                           [{:text=>"1", :weight=>0, :migration_id=>"QUES_968905_1181391_A4710353"},
@@ -188,8 +188,8 @@ module D2LExpected
                     :correct_comments=>"",
                     :question_type=>"short_answer_question",
                     :incorrect_comments=>"",
-                    :question_bank_id=>"QLIB_730739",
-                    :question_bank_name=>"QLIB_730739",
+                    :question_bank_id=>"SECT_3981973",
+                    :question_bank_name=>"02gilback",
                     :points_possible=>1,
                     :answers=>
                             [{:comments=>"", :text=>"answer 1", :weight=>100},
@@ -206,8 +206,8 @@ module D2LExpected
               :correct_comments=>"",
               :question_type=>"matching_question",
               :incorrect_comments=>"",
-              :question_bank_id=>"QLIB_730739",
-              :question_bank_name=>"QLIB_730739",
+              :question_bank_id=>"SECT_3981973",
+              :question_bank_name=>"02gilback",
               :points_possible=>1,
               :answers=>
                       [{:right=>"1",
@@ -218,12 +218,12 @@ module D2LExpected
                         :comments=>"", 
                         :text=>"b"}]}
 
-  ORDERING = {:question_bank_id=>"QLIB_730739",
+  ORDERING = {:question_bank_id=>"SECT_3981973",
               :answers=>[],
               :incorrect_comments=>"",
               :qti_error=>"There was an error exporting an assessment question - No question type used when trying to parse a qti question",
               :points_possible=>1,
-              :question_bank_name=>"QLIB_730739",
+              :question_bank_name=>"02gilback",
               :question_text=>"<p>the alphabet, heard of it?</p>",
               :question_name=>"ordering question",
               :migration_id=>"OBJ_3503048",
@@ -233,11 +233,11 @@ module D2LExpected
   MATH = {:answers=>[],
           :question_type=>"calculated_question",
           :formulas=>[],
-          :question_bank_id=>"QLIB_730739",
+          :question_bank_id=>"SECT_3981973",
           :incorrect_comments=>"",
           :imported_formula=>"2 * {x}   {y} - {z}",
           :points_possible=>1,
-          :question_bank_name=>"QLIB_730739",
+          :question_bank_name=>"02gilback",
           :question_text=>"<p>Solve the formula:</p>",
           :question_name=>"multi variable math",
           :migration_id=>"OBJ_3563546",
@@ -254,10 +254,10 @@ module D2LExpected
                   {:blank_id=>"QUES_979782_1194494_A4749144", :text=>"questions", :weight=>100}],
          :correct_comments=>"",
          :question_type=>"fill_in_multiple_blanks_question",
-         :question_bank_id=>"QLIB_730739",
+         :question_bank_id=>"SECT_3981973",
          :incorrect_comments=>"",
          :points_possible=>1,
-         :question_bank_name=>"QLIB_730739",
+         :question_bank_name=>"02gilback",
          :question_text=> "This a weird way to do [QUES_979782_1194494_A4749142] in the blank [QUES_979782_1194494_A4749144] ",
          :question_name=>""}
 end

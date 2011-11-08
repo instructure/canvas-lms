@@ -54,7 +54,7 @@ describe "cross listing" do
         "X1,S2,active",
         "C4,S3,active")
 
-      User.find_by_email('u1@example.com').cached_current_enrollments.map(&:course).map(&:sis_source_id).sort.should == ["C1", "X1", "C4"].sort
+      CommunicationChannel.find_by_path('u1@example.com').user.cached_current_enrollments.map(&:course).map(&:sis_source_id).sort.should == ["C1", "X1", "C4"].sort
     end
     
   end

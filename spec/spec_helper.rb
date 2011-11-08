@@ -22,6 +22,7 @@ require 'spec'
 # require 'spec/autorun'
 require 'spec/rails'
 require 'webrat'
+require 'mocha'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
@@ -71,6 +72,7 @@ Spec::Runner.configure do |config|
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
   config.global_fixtures = :plugin_settings
+  config.mock_with :mocha
 
   config.include Webrat::Matchers, :type => :views 
 
@@ -103,7 +105,7 @@ Spec::Runner.configure do |config|
   end
 
   def course(opts={})
-    @course = Course.create!(:name => opts[:course_name])
+    @course = Course.create!(:name => opts[:course_name], :account => opts[:account])
     @course.offer! if opts[:active_course] || opts[:active_all]
     if opts[:active_all]
       u = User.create!
@@ -132,6 +134,13 @@ Spec::Runner.configure do |config|
     @user
   end
 
+  def site_admin_user(opts={})
+    user(opts)
+    @admin = @user
+    Account.site_admin.add_user(@user, opts[:membership_type] || 'AccountAdmin')
+    @user
+  end
+
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
@@ -143,11 +152,14 @@ Spec::Runner.configure do |config|
     user = opts[:user] || @user
     username = opts[:username] || "nobody@example.com"
     password = opts[:password] || "asdfasdf"
-    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :path => username, :password => password, :password_confirmation => password)
-    @cc = @pseudonym.communication_channel
+    password = nil if password == :autogenerate
+    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
+    @cc = @pseudonym.communication_channel = user.communication_channels.create!(:path_type => 'email', :path => username) do |cc|
+      cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
+      cc.workflow_state = opts[:cc_state] if opts[:cc_state]
+    end
     @cc.should_not be_nil
     @cc.should_not be_new_record
-    user.communication_channels << @cc
     user
   end
 
@@ -210,14 +222,15 @@ Spec::Runner.configure do |config|
   end
 
   def user_session(user, pseudonym=nil)
-    pseudonym ||= mock_model(Pseudonym, {:record => user})
-    pseudonym.stub!(:user_id).and_return(user.id)
-    pseudonym.stub!(:user).and_return(user)
-    pseudonym.stub!(:login_count).and_return(1)
-    session = mock_model(PseudonymSession)
-    session.stub!(:record).and_return(pseudonym)
-    session.stub!(:session_credentials).and_return(nil)
-    PseudonymSession.stub!(:find).and_return(session)
+    pseudonym ||= mock()
+    pseudonym.stubs(:record).returns(user)
+    pseudonym.stubs(:user_id).returns(user.id)
+    pseudonym.stubs(:user).returns(user)
+    pseudonym.stubs(:login_count).returns(1)
+    session = mock()
+    session.stubs(:record).returns(pseudonym)
+    session.stubs(:session_credentials).returns(nil)
+    PseudonymSession.stubs(:find).returns(session)
   end
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
@@ -432,7 +445,7 @@ Spec::Runner.configure do |config|
  
   def stub_kaltura
     # trick kaltura into being activated
-    Kaltura::ClientV3.stub!(:config).and_return({
+    Kaltura::ClientV3.stubs(:config).returns({
           'domain' => 'kaltura.example.com',
           'resource_domain' => 'kaltura.example.com',
           'partner_id' => '100',

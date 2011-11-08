@@ -157,6 +157,7 @@ class DiscussionEntry < ActiveRecord::Base
   
   alias_method :destroy!, :destroy
   def destroy
+    discussion_subentries.each &:destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     save!

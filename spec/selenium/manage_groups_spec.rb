@@ -306,11 +306,11 @@ describe "manage_groups selenium tests" do
 
     # submit new category form
     driver.find_element(:css, ".add_category_link").click
-    driver.find_elements(:css, "#add_category_form input[type=text]").first.clear
-    driver.find_elements(:css, "#add_category_form input[type=text]").first.send_keys("New Category")
-    driver.find_element(:css, "#category_no_groups").click
+    driver.find_element(:css, "#add_category_form input[type=text]").clear
+    driver.find_element(:css, "#add_category_form input[type=text]").send_keys("New Category")
     driver.find_element(:css, "#category_split_groups").click
-    driver.find_elements(:css, "#add_category_form input[type=text]").second.send_keys("1")
+    driver.find_element(:css, "#category_split_group_count").clear
+    driver.find_element(:css, "#category_split_group_count").send_keys("1")
     driver.find_element(:css, "#add_category_form").submit
     wait_for_ajax_requests
     wait_for_ajaximations
@@ -322,6 +322,71 @@ describe "manage_groups selenium tests" do
 
     find_with_jquery("#sidebar_category_#{new_category.id}").should_not be_nil
     find_with_jquery("#sidebar_category_#{new_category.id} #sidebar_group_#{new_group.id}").should_not be_nil
+  end
+
+  it "should honor enable_self_signup when adding a category" do
+    course_with_teacher_logged_in
+    @course.enroll_student(john = user_model(:name => "John Doe"))
+
+    get "/courses/#{@course.id}/groups"
+
+    # submit new category form
+    driver.find_element(:css, ".add_category_link").click
+    driver.find_element(:css, "#add_category_form input[type=text]").clear
+    driver.find_element(:css, "#add_category_form input[type=text]").send_keys("New Category")
+    driver.find_element(:css, "#add_category_form #category_enable_self_signup").click
+    driver.find_element(:css, "#add_category_form").submit
+    wait_for_ajax_requests
+    wait_for_ajaximations
+
+    new_category = @course.group_categories.find_by_name('New Category')
+    new_category.should_not be_nil
+    new_category.should be_self_signup
+    new_category.should be_unrestricted_self_signup
+  end
+
+  it "should honor restrict_self_signup when adding a self signup category" do
+    course_with_teacher_logged_in
+    @course.enroll_student(john = user_model(:name => "John Doe"))
+
+    get "/courses/#{@course.id}/groups"
+
+    # submit new category form
+    driver.find_element(:css, ".add_category_link").click
+    driver.find_element(:css, "#add_category_form input[type=text]").clear
+    driver.find_element(:css, "#add_category_form input[type=text]").send_keys("New Category")
+    driver.find_element(:css, "#add_category_form #category_enable_self_signup").click
+    driver.find_element(:css, "#add_category_form #category_restrict_self_signup").click
+    driver.find_element(:css, "#add_category_form").submit
+    wait_for_ajax_requests
+    wait_for_ajaximations
+
+    new_category = @course.group_categories.find_by_name('New Category')
+    new_category.should_not be_nil
+    new_category.should be_self_signup
+    new_category.should be_restricted_self_signup
+  end
+
+  it "should honor create_group_count when adding a self signup category" do
+    course_with_teacher_logged_in
+    @course.enroll_student(john = user_model(:name => "John Doe"))
+
+    get "/courses/#{@course.id}/groups"
+
+    # submit new category form
+    driver.find_element(:css, ".add_category_link").click
+    driver.find_element(:css, "#add_category_form input[type=text]").clear
+    driver.find_element(:css, "#add_category_form input[type=text]").send_keys("New Category")
+    driver.find_element(:css, "#add_category_form #category_enable_self_signup").click
+    driver.find_element(:css, "#category_create_group_count").clear
+    driver.find_element(:css, "#category_create_group_count").send_keys("2")
+    driver.find_element(:css, "#add_category_form").submit
+    wait_for_ajax_requests
+    wait_for_ajaximations
+
+    new_category = @course.group_categories.find_by_name('New Category')
+    new_category.should_not be_nil
+    new_category.groups.size.should == 2
   end
 
   it "should preserve group to category association when editing a group" do

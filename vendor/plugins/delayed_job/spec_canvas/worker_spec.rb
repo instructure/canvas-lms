@@ -131,18 +131,18 @@ describe Delayed::Worker do
     
     context "and we want to destroy jobs" do
       it "should be destroyed if it failed more than Worker.max_attempts times" do
-        @job.should_receive(:destroy)
+        @job.expects(:destroy)
         Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
       end
       
       it "should not be destroyed if failed fewer than Worker.max_attempts times" do
-        @job.should_not_receive(:destroy)
+        @job.expects(:destroy).never
         (Delayed::Worker.max_attempts - 1).times { @worker.reschedule(@job) }
       end
 
       it "should be destroyed if failed more than Job#max_attempts times" do
         Delayed::Worker.max_attempts = 25
-        @job.should_receive(:destroy)
+        @job.expects(:destroy)
         @job.update_attribute(:max_attempts, 2)
         2.times { @worker.reschedule(@job) }
       end
@@ -176,7 +176,7 @@ describe Delayed::Worker do
           job.should == @job
           false
         end
-        @job.should_receive(:fail!)
+        @job.expects(:fail!)
         Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
       end
 
@@ -185,7 +185,7 @@ describe Delayed::Worker do
           job.should == @job
           true
         end
-        @job.should_receive(:destroy)
+        @job.expects(:destroy)
         Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
       end
     end

@@ -21,8 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe "Services API", :type => :integration do
   before do
     user_with_pseudonym(:active_all => true)
-    @kal = mock(Kaltura::ClientV3)
-    Kaltura::ClientV3.stub!(:config).and_return({
+    @kal = mock('Kaltura::ClientV3')
+    Kaltura::ClientV3.stubs(:config).returns({
       'domain' => 'kaltura.fake.local',
       'resource_domain' => 'cdn.kaltura.fake.local',
       'rtmp_domain' => 'rtmp-kaltura.fake.local',
@@ -49,7 +49,7 @@ describe "Services API", :type => :integration do
   end
   
   it "should degrade gracefully if kaltura is disabled or not configured" do
-    Kaltura::ClientV3.stub!(:config).and_return(nil)
+    Kaltura::ClientV3.stubs(:config).returns(nil)
     json = api_call(:get, "/api/v1/services/kaltura",
               :controller => "services_api", :action => "show_kaltura_config", :format => "json")
     json.should == {
@@ -59,9 +59,9 @@ describe "Services API", :type => :integration do
 
   it "should return a new kaltura session" do
     stub_kaltura
-    kal = mock(Kaltura::ClientV3)
-    kal.should_receive(:startSession).and_return "new_session_id_here"
-    Kaltura::ClientV3.stub!(:new).and_return(kal)
+    kal = mock('Kaltura::ClientV3')
+    kal.expects(:startSession).returns "new_session_id_here"
+    Kaltura::ClientV3.stubs(:new).returns(kal)
     json = api_call(:post, "/api/v1/services/kaltura_session",
                     :controller => "services_api", :action => "start_kaltura_session", :format => "json")
     json.delete_if { |k,v| %w(serverTime).include?(k) }.should == {

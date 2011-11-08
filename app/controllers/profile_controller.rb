@@ -180,6 +180,7 @@ class ProfileController < ApplicationController
       unless @user.user_can_edit_name?
         params[:user].delete(:name)
         params[:user].delete(:short_name)
+        params[:user].delete(:sortable_name)
       end
       if @user.update_attributes(params[:user])
         pseudonymed = false

@@ -75,15 +75,22 @@ class QuizQuestion < ActiveRecord::Base
   
   def self.migrate_question_hash(hash, params)
     if params[:old_context] && params[:new_context]
-      [:question_text, :text_after_answers].each do |key|
-        hash[key] = Course.migrate_content_links(hash[key], params[:old_context], params[:new_context]) if hash[key]
-      end
+      migrator = lambda { |value| Course.migrate_content_links(value, params[:old_context], params[:new_context]) }
     elsif params[:context] && params[:user]
-      [:question_text, :text_after_answers].each do |key|
-        hash[key] = Course.copy_authorized_content(hash[key], params[:context], params[:user]) if hash[key]
-      end
+      migrator = lambda { |value| Course.copy_authorized_content(value, params[:context], params[:user]) }
+    else
+      return hash
     end
-    
+
+    [:question_text, :correct_comments, :incorrect_comments, :neutral_comments, :text_after_answers].each do |key|
+      hash[key] = migrator.call(hash[key]) if hash[key]
+    end
+    hash[:answers].each do |answer|
+      [:html, :comments_html].each do |key|
+        answer[key] = migrator.call(answer[key]) if answer[key].present?
+      end
+    end if hash[:answers]
+
     hash
   end
   

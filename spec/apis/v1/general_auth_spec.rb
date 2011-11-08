@@ -72,7 +72,7 @@ describe CoursesController, :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'User',
-      'sortable_name' => 'user',
+      'sortable_name' => 'User',
       'short_name' => 'User',
       'primary_email' => nil,
       'login_id' => nil,
@@ -89,7 +89,7 @@ describe CoursesController, :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'User',
-      'sortable_name' => 'user',
+      'sortable_name' => 'User',
       'short_name' => 'User',
       'primary_email' => nil,
       'login_id' => nil,
@@ -100,7 +100,7 @@ describe CoursesController, :type => :integration do
   it "should allow sis_user_id as an as_user_id" do
     account_admin_user(:account => Account.site_admin)
     user_with_pseudonym(:user => @user)
-    @student.pseudonyms.create!(:account => Account.default, :unique_id => "nobody_sis@example.com", :path => "nobody_sis@example.com", :password => "secret", :password_confirmation => "secret")
+    @student.pseudonyms.create!(:account => Account.default, :unique_id => "nobody_sis@example.com", :password => "secret", :password_confirmation => "secret")
     @student.pseudonym.update_attribute(:sis_user_id, "1234")
 
     json = api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:#{@student.pseudonym.sis_user_id}",
@@ -110,9 +110,9 @@ describe CoursesController, :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'User',
-      'sortable_name' => 'user',
+      'sortable_name' => 'User',
       'short_name' => 'User',
-      'primary_email' => 'nobody_sis@example.com',
+      'primary_email' => nil,
       'login_id' => 'nobody_sis@example.com',
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
     }

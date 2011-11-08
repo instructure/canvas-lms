@@ -29,4 +29,18 @@ Handlebars.registerHelper name, fn for name, fn of {
   
   newlinesToBreak : (string) ->
     new Handlebars.SafeString $.htmlEscape(string).replace(/\n/g, "<br />")
+
+  eachWithIndex: (context, options) ->
+    fn = options.fn
+    inverse = options.inverse
+    ret = ''
+
+    if context and context.length > 0
+      for index, ctx of context
+        ctx._index = index
+        ret += fn ctx
+    else
+      ret = inverse this
+
+    ret
 }

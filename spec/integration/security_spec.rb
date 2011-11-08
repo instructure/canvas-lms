@@ -129,9 +129,58 @@ describe "security" do
     c2.should match(/; *secure/)
     ActionController::Base.session_options[:secure] = nil
   end
-  
+
+  if Canvas.redis_enabled?
+    describe "max login attempts" do
+      before do
+        Setting.set('login_attempts_total', '2')
+        Setting.set('login_attempts_per_ip', '1')
+        u = user_with_pseudonym :active_user => true,
+          :username => "nobody@example.com",
+          :password => "asdfasdf"
+        u.save!
+      end
+
+      def bad_login(ip)
+        post_via_redirect "/login",
+          { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "failboat" },
+          { "REMOTE_ADDR" => ip }
+      end
+
+      it "should be limited for the same ip" do
+        bad_login("5.5.5.5")
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.5")
+        response.body.should match(/Too many failed login attempts/)
+      end
+
+      it "should have a higher limit for other ips" do
+        bad_login("5.5.5.5")
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.6") # different IP, so allowed
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.7") # different IP, but too many total failures
+        response.body.should match(/Too many failed login attempts/)
+      end
+
+      it "should not block other users with the same ip" do
+        bad_login("5.5.5.5")
+        response.body.should match(/Incorrect username/)
+
+        # schools like to NAT hundreds of people to the same IP, so we don't
+        # ever block the IP address as a whole
+        user_with_pseudonym(:active_user => true, :username => "second@example.com", :password => "12341234").save!
+        post_via_redirect "/login",
+          { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
+          { "REMOTE_ADDR" => "5.5.5.5" }
+        path.should eql("/?login_success=1")
+      end
+    end
+  end
+
   it "should only allow user list username resolution if the current user has appropriate rights" do
-    Account.default.pseudonyms.create!(:unique_id => "A1234567").assert_user{|u| u.name = "test user"}
+    u = User.create!(:name => 'test user')
+    u.pseudonyms.create!(:unique_id => "A1234567", :account => Account.default)
     @course = Account.default.courses.create!
     @course.offer!
     @teacher = user :active_all => true
@@ -148,29 +197,15 @@ describe "security" do
 
     user_session(@student)
     post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
-    assert_response :success
-    ActiveSupport::JSON.decode(response.body).should == {
-      "duplicates" => [],
-      "errored_users" => [],
-      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
-    }
-    
+    response.should_not be_success
+
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
     assert_response :success
     ActiveSupport::JSON.decode(response.body).should == {
       "duplicates" => [],
-      "errored_users" => ["A345678"],
-      "users" => [{"login" => "A1234567", "name" => "test user"}]
-    }
-    
-    user_session(@student)
-    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
-    assert_response :success
-    ActiveSupport::JSON.decode(response.body).should == {
-      "duplicates" => [],
-      "errored_users" => [],
-      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
+      "errored_users" => [{"address" => "A345678", "details" => "not_found"}],
+      "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id.to_s }]
     }
   end
 
@@ -278,14 +313,14 @@ describe "security" do
   end
 
   it "should not allow logins to safefiles domains" do
-    HostUrl.stub!(:is_file_host?).and_return(true)
-    HostUrl.stub!(:default_host).and_return('test.host')
+    HostUrl.stubs(:is_file_host?).returns(true)
+    HostUrl.stubs(:default_host).returns('test.host')
     get "http://files-test.host/login"
     response.should be_redirect
     uri = URI.parse response['Location']
     uri.host.should == 'test.host'
 
-    HostUrl.stub!(:is_file_host?).and_return(false)
+    HostUrl.stubs(:is_file_host?).returns(false)
     get "http://test.host/login"
     response.should be_success
   end

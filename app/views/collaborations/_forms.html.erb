@@ -19,21 +19,18 @@
       </select>
     </td>
   </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @google_docs %>">
-    <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
-      <%= image_tag "google_docs_icon.png", :style => "float: left; margin-right: 5px;" %>
-      <%= t 'descriptions.google_docs', "Google Docs are a great place to collaborate
-      on a group project.  It's like Microsoft Word, but lets you work together with others
-      on the same file without having to email it around.  You'll need a Google account
-      in order to participate in any Google Docs collaborations." %>
+    <td colspan="2" style="padding: 5px 20px 10px">
+      <%= image_tag "google_docs_icon.png", :style => "float: right; margin-left: 15px;" %>
+      <%= mt 'descriptions.google_docs', "Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  \n  \n**Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations." %>
     </td>
   </tr><tr id="etherpad_description" style="display: none;" class="collaboration_type">
-    <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
-      <%= image_tag "ether_pad.png", :style => "float: left; margin-right: 5px; margin-top: 5px;" %>
-      <%= t 'descriptions.etherpad', %{EtherPad is a site that lets you quickly set
+    <td colspan="2" style="padding: 5px 20px 10px">
+      <%= image_tag "ether_pad.png", :style => "float: right; margin-left: 15px; margin-top: 5px;" %>
+      <%= t 'descriptions.etherpad', %{EtherPad is an open source project that lets you quickly set
       up shared documents.  It's fast enough that you can see what others are typing as they're
-      typing it -- although "pads" aren't protected by a password so anyone that knows about them
-      can edit them.  EtherPad might be better suited than Google Docs for things like taking
-      notes because it's so fast.} %>
+      typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them
+      can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or
+      allowing people without Google accounts to participate.} %>
     </td>
   </tr><tr class="collaborate_data">
     <td style="white-space: nowrap">
@@ -52,22 +49,8 @@
   </tr>
     <td colspan="2">
       <div class="collaborate_data">
-        <div>
-          <%= before_label :collaborate_with, "Collaborate With" %>
-          <div style="margin-left: 10px; font-size: 0.8em;">
-            <a href="#" class="select_all_link"><%= t '#links.select_all', "Select All" %></a> |
-            <a href="#" class="deselect_all_link"><%= t '#links.deselect_all', "Deselect All" %></a>
-          </div>
-          <ul id="collaborator_list">
-            <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
-              <% if user != @current_user %>
-                <li class="collaborator">
-                  <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
-                  <%= label :user, "#{user.id}".to_sym, context_user_name(@context, user, true) %>
-                </li>
-              <% end %>
-            <% end %>
-          </ul>
+        <div class="collaborator_list">
+          <%= render :partial => "collaborators" %>
         </div>
         <div class="button-container">
           <button type="submit" class="button button-default-action"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
@@ -88,7 +71,7 @@
 <% end %>
 <div id="delete_collaboration_dialog" style="display: none;">
   <%= image_tag "google_docs.png", :style => "float: left;" %>
-  <%= t 'messages.delete_google_doc_as_weel', "This collaboration is being stored as a Google Doc.  Did you want to delete it just
+  <%= t 'messages.delete_google_doc_as_well', "This collaboration is being stored as a Google Doc.  Did you want to delete it just
   from Canvas, or remove it from Google Docs as well?" %>
   <div style="margin-top: 15px;">
   <button type="button" class="button delete_button delete_document_button"><%= mt 'buttons.delete_from_canvas', "Just Delete  \nfrom Canvas" %></button>
@@ -104,21 +87,7 @@
   <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
   </div>
   <div class="footer">
-    <%= before_label :collaborate_with, "Collaborate With" %>
-    <div style="margin-left: 10px; font-size: 0.8em;">
-      <a href="#" class="select_all_link"><%= t '#links.select_all', "Select All" %></a> |
-      <a href="#" class="deselect_all_link"><%= t '#links.deselect_all', "Deselect All" %></a>
-    </div>
-    <ul id="collaborator_list">
-      <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
-        <% if user != @current_user %>
-          <li class="collaborator collaborator_<%= user.id %>">
-            <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
-            <%= label :user, "#{user.id}".to_sym, user.last_name_first %>
-          </li>
-        <% end %>
-      <% end %>
-    </ul>
+    <%= render :partial => "collaborators" %>
   </div>
   <div class="button-container">
     <button type="submit" class="button button-default-action"><%= t 'buttons.update', "Update Collaboration" %></button>

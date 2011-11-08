@@ -12,7 +12,7 @@ describe CoursesHelper do
 
     describe "an assignment with no submissions" do
       it "should return a no submission tooltip if there are no submissions" do
-        should_receive(:t).with('#courses.recent_event.no_submissions', 'no submissions').and_return('no submissions')
+        expects(:t).with('#courses.recent_event.no_submissions', 'no submissions').returns('no submissions')
         call_set_icon_data("no submissions", "icon-grading-gray")
       end
     end
@@ -30,20 +30,20 @@ describe CoursesHelper do
       end
 
       it "should return a needs grading tooltip if assignments have been submitted that aren't graded" do
-        should_receive(:t).with('#courses.recent_event.needs_grading', 'needs grading').and_return('needs grading')
+        expects(:t).with('#courses.recent_event.needs_grading', 'needs grading').returns('needs grading')
         @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry" })
         call_set_icon_data("needs grading", "icon-grading-gray")
       end
 
       it "should return a no new submissions tooltip if some assignments have been submitted and graded" do
-        should_receive(:t).with('#courses.recent_event.no_new_submissions', 'no new submissions').and_return('no new submissions')
+        expects(:t).with('#courses.recent_event.no_new_submissions', 'no new submissions').returns('no new submissions')
         @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry" })
         @assignment.grade_student(@student_one, :grade => 5)
         call_set_icon_data("no new submissions", "icon-grading-gray")
       end
 
       it "should return an all graded tooltip if all assignments are submitted and graded" do
-        should_receive(:t).with('#courses.recent_event.all_graded', 'all graded').and_return('all graded')
+        expects(:t).with('#courses.recent_event.all_graded', 'all graded').returns('all graded')
         [@student_one, @student_two].each do |student|
           @assignment.submit_homework(student, { :submission_type => "online_text_entry" })
           @assignment.grade_student(student, :grade => 5)

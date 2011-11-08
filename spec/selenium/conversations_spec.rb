@@ -335,7 +335,7 @@ shared_examples_for "conversations selenium tests" do
   context "media comments" do
     it "should add a media comment to the message form" do
       # don't have a good way to test kaltura here, so we just fake it up
-      Kaltura::ClientV3.should_receive(:config).at_least(:once).and_return({})
+      Kaltura::ClientV3.expects(:config).at_least(1).returns({})
       mo = MediaObject.new
       mo.media_id = '0_12345678'
       mo.media_type = 'audio'

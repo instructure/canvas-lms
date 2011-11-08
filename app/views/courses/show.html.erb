@@ -25,7 +25,7 @@
         <h2><%= image_tag "group.png", :style => "vertical-align: middle;" %> <%= t('headings.joining_a_course', %{Joining a Course}) %></h2>
         <%= t('details.joining_a_course', %{Once you join a course you will see it show up in your course list.  You'll be able to participate in graded portions of the course and communicate directly with the teachers and other students.  You'll also see conversations and events from this course show up in your stream and as notifications.}) %>
         <div class="button-container">
-          <a href="<%= course_self_enrollment_path(@context, @context.self_enrollment_code) %>#" class="button action"><%= image_tag "add.png" %> <span><%= t('links.join_course', %{Join this Course}) %></span></a>
+          <a href="<%= course_self_enrollment_path(@context, @context.self_enrollment_code) %>" class="button action"><%= image_tag "add.png" %> <span><%= t('links.join_course', %{Join this Course}) %></span></a>
           <a href="#" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
         </div>
       </div>

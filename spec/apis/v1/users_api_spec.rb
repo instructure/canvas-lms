@@ -35,7 +35,7 @@ describe "Users API", :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'Student',
-      'sortable_name' => 'student',
+      'sortable_name' => 'Student',
       'short_name' => 'Student',
       'primary_email' => 'pvuser@example.com',
       'sis_user_id' => 'sis-user-id',
@@ -72,7 +72,7 @@ describe "Users API", :type => :integration do
     json.should == {
       'id' => @admin.id,
       'name' => 'User',
-      'sortable_name' => 'user',
+      'sortable_name' => 'User',
       'short_name' => 'User',
       'primary_email' => 'nobody@example.com',
       'sis_user_id' => nil,
@@ -90,7 +90,7 @@ describe "Users API", :type => :integration do
     json.should == {
       'id' => @student.id,
       'name' => 'Student',
-      'sortable_name' => 'student',
+      'sortable_name' => 'Student',
       'short_name' => 'Student',
       'primary_email' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',

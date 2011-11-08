@@ -299,12 +299,11 @@ class RoleOverride < ActiveRecord::Base
         :label => lambda { t('permissions.manage_role_overrides', "Manage permissions") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
-        :available_to => %w(AccountAdmin AccountMembership)
+        :available_to => %w(AccountMembership)
       },
       :manage_account_memberships => {
         :label => lambda { t('permissions.manage_account_memberships', "Add/remove other admins for the account") },
         :available_to => [
-          'AccountAdmin',
           'AccountMembership'
         ],
         :true_for => [
@@ -315,7 +314,6 @@ class RoleOverride < ActiveRecord::Base
       :manage_account_settings => {
         :label => lambda { t('permissions.manage_account_settings', "Manage account-level settings") },
         :available_to => [
-          'AccountAdmin',
           'AccountMembership'
         ],
         :true_for => [

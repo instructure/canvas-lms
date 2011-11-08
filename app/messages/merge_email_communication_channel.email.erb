@@ -1,16 +1,13 @@
 <% define_content :link do %>
-  http://<%= HostUrl.default_host %>/communication_channels/<%= asset.id %>/merge/<%= asset.confirmation_code %>
+  http://<%= HostUrl.default_host %>/register/<%= asset.confirmation_code %>
 <% end %>
-
 
 <% define_content :subject do %>
-  <%= t('subject', 'Claim Email: Canvas') %>
+  <%= t('subject', 'New Canvas Account') %>
 <% end %>
 <% url = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>
-<%= t :body, <<-BODY, :email_address=> asset.path, :url => url, :user_name => asset.user.name, :user_id => asset.user_id
-Someone is requesting the use of this email address, %{email_address}, for their account at %{url}.  Right now this address is being used by %{user_name} (id: %{user_id}).
+<%= t :body, <<-BODY, :url => url
+An account has been created for you at %{url}, but you already have a Canvas account.  If you would like to merge them together, please visit the following url:
 BODY
 %>
-
-<%= t('reassign_link', 'If you would like to assign this email address to a different user, please visit the following url:') %>
 <%= content :link %>

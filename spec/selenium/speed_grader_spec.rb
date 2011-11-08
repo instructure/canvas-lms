@@ -25,7 +25,7 @@ describe "speedgrader selenium tests" do
     #create initial data for second student
     @student_2 = User.create!(:name => 'student 2')
     @student_2.register
-    @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :path => 'student2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+    @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
     @course.enroll_user(@student_2, "StudentEnrollment", :enrollment_state => 'active')
     @submission_2 = @assignment.submit_homework(@student_2, :body => 'second student submission text')
 

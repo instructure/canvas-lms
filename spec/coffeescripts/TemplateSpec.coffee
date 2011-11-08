@@ -1,17 +1,24 @@
-describe "Template", ->
+define [
+  'js!vendor/jquery-1.6.4.js!order'
+  'js!vendor/handlebars.vm.js!order'
+  'js!compiled/Template.js!order'
+  'js!specs/helpers/TemplateHelper.js!order'
+], ->
 
-  it 'should create an HTML string from a template', ->
+  module 'Template'
+  test 'should create an HTML string from a template', ->
     # templates names derived from path in app/views/jst/
     # here the file app/views/jst/test.handlebars becomes 'test'
     template = new Template 'test'
     html = template.toHTML(foo: 'bar')
-    expect(html).toEqual('bar')
+    equal html, 'bar'
 
-  it 'should create a collection of DOM elements', ->
+  test 'should create a collection of DOM elements', ->
     template = new Template 'test'
     element = template.toElement(foo: 'bar')
-    expect(element.html()).toEqual('bar')
+    equal element.html(), 'bar'
 
-  it 'should return the HTML string when called w/o new', ->
+  test 'should return the HTML string when called w/o new', ->
     html = Template('test', {foo: 'bar'})
-    expect(html).toEqual('bar')
+    equal html, 'bar'
+

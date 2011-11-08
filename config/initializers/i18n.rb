@@ -12,7 +12,10 @@ end
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
-    text_or_key = t('labels.' + text_or_key.to_s, default_value, *args) if default_value
+    if default_value
+      text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s =~ /\A#/
+      text_or_key = t(text_or_key, default_value, *args)
+    end
     t("#before_label_wrapper", "%{text}:", :text => text_or_key)
   end
 

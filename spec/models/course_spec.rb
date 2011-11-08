@@ -164,24 +164,6 @@ describe Course do
   end
 end
 
-describe Course, "account" do
-  before(:each) do
-    @account = mock_model(Account)
-    @account2 = mock_model(Account)
-    @course = Course.new
-  end
-  
-  it "should refer to the course's account" do
-    @course.account = @account
-    @course.account.should eql(@account)
-  end
-  
-  it "should be sortable" do
-    3.times {|x| Course.create(:name => x.to_s)}
-    lambda{Course.find(:all).sort}.should_not raise_error
-  end
-end
-
 describe Course, "enroll" do
   
   before(:each) do

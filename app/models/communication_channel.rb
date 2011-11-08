@@ -31,49 +31,19 @@ class CommunicationChannel < ActiveRecord::Base
   
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
-  before_validation :validate_unique_path
-  after_save :remove_other_paths
-  
+  validates_uniqueness_of :path, :case_sensitive => false, :scope => [:path_type, :user_id], :if => lambda { |cc| cc.user_id && !cc.retired? }
+
   acts_as_list :scope => :user_id
   
   has_a_broadcast_policy
   
   attr_reader :request_password
   attr_reader :send_confirmation
-  attr_accessor :do_delayed_jobs_immediately
-  
-  def remove_other_paths
-    if @state_was != 'active' && self.active? && self.path_type == 'email'
-      CommunicationChannel.delete_all(['path = ? AND path_type = ? AND id != ?', self.path, self.path_type, self.id])
-    end
-  end
-  
+
   def pseudonym
     self.user.pseudonyms.find_by_unique_id(self.path)
   end
 
-  def validate_unique_path
-    @state_was = self.workflow_state_was
-    if (self.new_record? || (self.workflow_state_was != 'active' && self.workflow_state == 'active')) && self.path_type == 'email' && self.path
-      ccs = CommunicationChannel.find_all_by_path_and_path_type_and_workflow_state(self.path, self.path_type, 'active')
-      if ccs.any?{|cc| cc != self }
-        case self.path_type
-          when 'email'
-            self.errors.add(:path, t('errors.duplicate_email', "The email address %{email} has already been activated for another account", :email => self.path))
-          when 'sms'
-            self.errors.add(:path, t('errors.duplicate_sms', "The SMS address %{email} has already been activated for another account", :email => self.path))
-          when 'facebook'
-            self.errors.add(:path, t('errors.duplicate_facebook', "The Facebook account %{email} has already been activated for another account", :email => self.path))
-          when 'twitter'
-            self.errors.add(:path, t('errors.duplicate_twitter', "The Twitter handle %{handle} has already been activated for another account", :handle => self.path))
-          else
-            self.errors.add(:path, t('errors.duplicate', "The address %{address} has already been activated for another account", :address => self.path))
-        end
-        return false
-      end
-    end
-  end
-  
   set_broadcast_policy do |p|
     p.dispatch :forgot_password
     p.to { self }
@@ -177,29 +147,16 @@ class CommunicationChannel < ActiveRecord::Base
     end
   }
   
-  named_scope :email, lambda{
-    {:conditions => ['path_type = ?', 'email']}
-  }
-  
-  named_scope :active_email_paths, lambda {|paths|
-    {
-      :conditions => {:path_type => 'email', :path => paths, :workflow_state => 'active'},
-      :include => :user
-    }
-  }
-  
-  named_scope :unretired, lambda {
-    {:conditions => ['communication_channels.workflow_state != ?', 'retired'] }
-  }
-  
+  named_scope :email, :conditions => { :path_type => 'email' }
+  named_scope :active, :conditions => { :workflow_state => 'active' }
+  named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']
+
   named_scope :for_notification_frequency, lambda {|notification, frequency|
     { :include => [:notification_policies], :conditions => ['notification_policies.notification_id = ? and notification_policies.frequency = ?', notification.id, frequency] }
   }
   
-  named_scope :include_policies, lambda {
-    {:include => :notification_policies }
-  }
-  
+  named_scope :include_policies, :include => :notification_policies
+
   named_scope :in_state, lambda { |state| { :conditions => ["communication_channels.workflow_state = ?", state.to_s]}}
   named_scope :of_type, lambda {|type| { :conditions => ['communication_channels.path_type = ?', type] } }
   
@@ -278,8 +235,6 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
   
-  
-  
   def consider_building_pseudonym
     if self.build_pseudonym_on_confirm && self.active?
       self.build_pseudonym_on_confirm = false
@@ -305,7 +260,6 @@ class CommunicationChannel < ActiveRecord::Base
   end
   
   workflow do
-    
     state :unconfirmed do
       event :confirm, :transitions_to => :active do
         self.set_confirmation_code(true)
@@ -322,13 +276,6 @@ class CommunicationChannel < ActiveRecord::Base
         self.bounce_count = 0
       end
     end
-    state :deleted
-  end
-  
-  def assert_user(params={}, &block)
-    self.user ||= User.create!({:name => self.path}.merge(params), &block)
-    self.save
-    self.user
   end
 
   # This is setup as a default in the database, but this overcomes misspellings.

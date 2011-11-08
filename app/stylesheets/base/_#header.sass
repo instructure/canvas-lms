@@ -184,24 +184,6 @@
         margin-top: 0
       &:first-child /* :first-child works in IE 7+ but not :last-child */
         border-left: none
-      .menu-item-drop-column-list
-        +reset-list
-        width: 270px
-        li
-          border-top: 1px dashed #ccc
-          &:hover
-            // do this instead of a specific bg color because the drop-down has a gradient, so it would look wierd with a color, 
-            // but this just makes any li a little darker than it normally would so it works with the gradient
-            background-image: url('/images/4_percent_opacity.png')
-            .name
-              color: darken($menu_link_color, 12%)
-          a
-            display: block
-            font-size: 15px
-            line-height: 19px
-            padding-top: 2px
-            text-decoration: none
-            color: $menu_link_color
     li
       font-size: 15px
       line-height: .9em
@@ -227,5 +209,89 @@
         font-size: 11px
       .name
         display: block
-          
+
+.menu-item-drop-column-list, .customListGhost
+  +reset-list
+  width: 270px
+  li
+    border-top: 1px dashed #ccc
+    &:hover, &.on
+      // do this instead of a specific bg color because the drop-down has a gradient, so it would look wierd with a color, 
+      // but this just makes any li a little darker than it normally would so it works with the gradient
+      background-image: url('/images/4_percent_opacity.png')
+      .name
+        color: darken($menu_link_color, 12%)
+    a
+      display: block
+      font-size: 15px
+      line-height: 19px
+      padding-top: 2px
+      text-decoration: none
+      color: $menu_link_color
+
+.menu-item-drop.menuCustomListEditing
+  min-width: 589px
+
+#menu_enrollments
+  .customListWrapper
+    background: #fff
+    padding: 10px
+    border: solid 1px #ccc
+    
+    position: absolute
+    left: 0
+    opacity: 0
+    top: 10px
+    bottom: 10px
+    width: 270px
+    box-shadow: rgba(0,0,0, 0.2) 2px 2px 4px
+    +transition(all 200ms ease)
+    +transform(scale(0.5))
+
+    .customListClose
+      float: right
+      display: block
+      width: 20px
+      height: 20px
+      cursor: pointer
+      text-decoration: none
+      background: url(/images/close-button.png) no-repeat top left
+
+    ul
+      position: absolute
+      top: 40px
+      bottom: 10px
+      left: 10px
+      right: 10px
+      overflow: auto
+
+      a
+        padding-left: 30px
+        background: url(/images/add-remove.png) no-repeat -8px 6px
+
+      .on a
+        background-position: -8px -40px
+
+  .customListOpen
+    color: darken($menu_link_color, 12%)
+    float: right
+
+.customListEditing ul
+  min-height: 400px
+
+.customListEditing .customListWrapper ul
+  min-height: 300px
+
+#menu_enrollments.customListEditing .customListWrapper
+  +transform(scale(1))
+  left: 295px
+  opacity: 1
+
+.menu-item-drop .customListOpen
+  line-height: 28px
+  cursor: pointer
+
+.customListGhost
+  position: absolute
+  z-index: 100
 

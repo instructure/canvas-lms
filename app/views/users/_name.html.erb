@@ -18,6 +18,10 @@
         <th><%= before_label('display_name', 'Display Name') %></th>
         <td class="short_name"><%=h @user.short_name %></td>
       </tr>
+      <tr>
+        <th><%= before_label('sortable_name', 'Sortable Name') %></th>
+        <td class="sortable_name"><%=h @user.sortable_name %></td>
+      </tr>
       <% if service_enabled?(:avatars) %>
         <tr>
           <th><%= before_label('profile_picture', 'Profile Picture') %></th>
@@ -75,6 +79,9 @@
       </tr><tr>
         <td><%= f.blabel :short_name, :en => "Display Name" %></td>
         <td><%= f.text_field :short_name %></td>
+      </tr><tr>
+        <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
+        <td><%= f.text_field :sortable_name %></td>
       </tr>
       <% if can_manage_admin_users %>
         <tr>

@@ -195,7 +195,7 @@ describe Notification do
     it "should not send messages after the user's limit" do
       notification_set
       Rails.cache.delete(['recent_messages_for', @user.id].cache_key)
-      User.stub!(:max_messages_per_day).and_return(1)
+      User.stubs(:max_messages_per_day).returns(1)
       User.max_messages_per_day.times do 
         messages = @notification.create_message(@assignment, @user)
         messages.select{|m| m.to != 'dashboard'}.should_not be_empty
@@ -209,7 +209,7 @@ describe Notification do
     it "should not send messages after the category limit" do
       notification_set
       Rails.cache.delete(['recent_messages_for', "#{@user.id}_#{@notification.category}"].cache_key)
-      @notification.stub!(:max_for_category).and_return(1)
+      @notification.stubs(:max_for_category).returns(1)
       @notification.max_for_category.times do
         messages = @notification.create_message(@assignment, @user)
         messages.select{|m| m.to != 'dashboard'}.should_not be_empty
@@ -347,6 +347,8 @@ end
 
 # The opts pertain to user only
 def create_user_with_cc(opts={})
+  user_model(opts)
+
   if @notification
     notification_policy_model(:notification_id => @notification.id)
     communication_channel_model
@@ -354,9 +356,7 @@ def create_user_with_cc(opts={})
   else
     communication_channel_model
   end
-  
-  user_model(opts)
-  @communication_channel.update_attribute(:user_id, @user.id)
+
   @user.reload
   @user
 end

@@ -17,4 +17,30 @@
 #
 
 module CommunicationChannelsHelper
+  def merge_or_login_link(pseudonym)
+    if @current_user && pseudonym.user_id == @current_user.id
+      registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
+    else
+      login_url(:host => HostUrl.context_host(pseudonym.account, @account_domain), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym => pseudonym.id)
+    end
+  end
+
+  def friendly_name(pseudonym, merge_opportunities)
+    if pseudonym.is_a?(User)
+      user = pseudonym
+      pseudonym = user.pseudonyms.active.find_by_account_id(@root_account.id) || user.pseudonym
+      return user.name unless pseudonym
+    end
+
+    if !(conflicting_users = merge_opportunities.select { |(user, pseudonyms)| user != pseudonym.user && user.name == pseudonym.user.name }).empty?
+      conflicting_pseudonyms = conflicting_users.map(&:last).flatten
+      if conflicting_pseudonyms.find { |p| p.account != pseudonym.account}
+        "#{pseudonym.user.name} (#{pseudonym.account.name} - #{pseudonym.unique_id})"
+      else
+        "#{pseudonym.user.name} (#{pseudonym.unique_id})"
+      end
+    else
+      pseudonym.user.name
+    end
+  end
 end

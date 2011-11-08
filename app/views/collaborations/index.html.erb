@@ -49,7 +49,7 @@ HEREDOC
 <div id="collaborations">
 <% @collaborations.each do |collaboration| %>
   <% if can_do(collaboration, @current_user, :read) %>
-    <div class="collaboration <%= collaboration.style_class %>">
+    <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>">
       <% if can_do(collaboration, @current_user, :delete) %>
       <div class="links">
         <a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
@@ -60,14 +60,14 @@ HEREDOC
       <div style="margin-bottom: 5px;" class="description">
         <%= collaboration.description %>
       </div>
-      <%= t :collaborators_count, { :one => "*1 Collaboration* on %{service}", :other => "*%{count} Collaborations* on %{service}" },
+      <%= t :collaborators_count, { :one => "*1 Collaborator* on %{service}", :other => "*%{count} Collaborators* on %{service}" },
             :count => (collaboration.users + [collaboration.user]).compact.uniq.length,
             :service => collaboration.service_name,
             :wrapper => '<a href="#" class="toggle_collaborators_link">\1</a>' %>
       <br/>
       <span style="font-size: 0.8em;"><%= t :started_by, "Started by *%{user}*, %{at}",
                                           :user => context_user_name(@context, collaboration.user),
-                                          :wrapper => '<a href="#{context_url(@context, :context_user_url, collaboration.user_id)}">\1</a>',
+                                          :wrapper => "<a href=\"#{context_url(@context, :context_user_url, collaboration.user_id)}\" class=\"collaborator_link\">\\1</a>",
                                           :at => datetime_string(collaboration.created_at) %></span>
       <ul class="collaborators">
         <li><b><%= context_user_name(@context, collaboration.user) %></b></li>

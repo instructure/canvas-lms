@@ -29,9 +29,8 @@ body.modal
     margin: 0 auto 0
     padding: 0px 20px 10px 20px
     position: relative
-  #modal-box-arbitrary-size    
+  #modal-box-arbitrary-size
     margin-top: -30px !important
-    padding-top: 0 !important
     height: auto !important
     background-image: url(/images/login-bg-middle-tall.jpg) !important
     #register_form
@@ -50,12 +49,21 @@ body.modal
     a
       color: inherit !important
       text-decoration: underline
-    
-    button.button
+    ul
+      list-style-type: none
+
+    .button
       float: right
       padding: 10px 24px
       margin-right: 7px
-    
+
+    .button_box
+      text-align: right
+      margin-right: 7px
+      width: 100%
+      .button
+        float: none
+
     input.text
       background: url(/images/login-input-bg.png) no-repeat
       border: 0 none
@@ -64,7 +72,11 @@ body.modal
       width: 204px
       color: #303030
       margin: 0 6px 6px 0
-  
+
+    .radio_spacer
+      width: 25px
+      display: inline-block
+
 #login_form
   margin: 200px auto 0
   width: 487px

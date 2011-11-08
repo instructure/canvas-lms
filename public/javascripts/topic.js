@@ -45,7 +45,7 @@ I18n.scoped('topics', function(I18n) {
       addOrUpdateEntry = I18n.t('add_new_entry', "Add New Entry");
 
       $entry.find(".user_name")
-        .text($(".current_user_name").text())
+        .text(CURRENT_USER_NAME_FOR_TOPICS)
         .attr('href', function(i, href){
           return $.replaceTags(href, 'user_id', $('#identity .user_id').text());
         });

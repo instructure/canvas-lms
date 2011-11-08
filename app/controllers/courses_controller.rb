@@ -342,8 +342,8 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
-      @students = @context.participating_students.find(:all, :order => 'sortable_name')
-      @teachers = @context.admins.find(:all, :order => 'sortable_name')
+      @students = @context.participating_students.find(:all, :order => User.sortable_name_order_by_clause)
+      @teachers = @context.admins.find(:all, :order => User.sortable_name_order_by_clause)
       @groups = @context.groups.active
     end
   end
@@ -366,7 +366,7 @@ class CoursesController < ApplicationController
     return if check_enrollment
     if !@pending_enrollment
       redirect_to course_url(@context.id)
-      return
+      return true
     end
     if params[:reject]
       @pending_enrollment.reject!
@@ -380,52 +380,27 @@ class CoursesController < ApplicationController
     elsif params[:accept]
       if @current_user && @pending_enrollment.user == @current_user
         @pending_enrollment.accept!
-        session[:accepted_enrollment_uuid] = @pending_enrollment.uuid #session[:enrollment_uuid]
+        session[:accepted_enrollment_uuid] = @pending_enrollment.uuid
         flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
-        redirect_to course_url(@context.id)
-      elsif !@current_user && @pending_enrollment.user.registered?
-        @pseudonym = @pending_enrollment.user.pseudonym rescue nil
-        if @domain_root_account.password_authentication? && @pseudonym
-          reset_session
-          @pseudonym_session = PseudonymSession.new(@pseudonym, true)
-          @pseudonym_session.save!
-          redirect_to request.url
-        else
-          session[:return_to] = course_url(@context.id)
-          flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
-          redirect_to login_url
-        end
-      elsif @current_user && @current_user.registered? && @current_user != @pending_enrollment.user
-        if params[:transfer_enrollment]
-          @pending_enrollment.user = @current_user
-          @pending_enrollment.accept!
-          flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
-          session[:return_to] = nil
+        if params[:action] != 'show'
           redirect_to course_url(@context.id)
         else
-          session[:return_to] = course_url(@context, :invitation => @pending_enrollment.uuid)
-          render :action => "transfer_enrollment"
+          @context_enrollment = @pending_enrollment
+          @pending_enrollment = nil
+          return false
         end
+      elsif !@current_user && @pending_enrollment.user.registered?
+        session[:return_to] = course_url(@context.id)
+        flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
+        redirect_to login_url
       else
-        user = @pending_enrollment.user
-        @pending_enrollment.user.assert_pseudonym_and_communication_channel
-        pseudonym = @pending_enrollment.user.pseudonym
-        pseudonym.assert_communication_channel if pseudonym
-        session[:enrollment_uuid] = @pending_enrollment.uuid
-        session[:session_affects_permissions] = true
-        session[:to_be_accepted_enrollment_uuid] = session[:enrollment_uuid]
-        if @current_user
-          redirect_to claim_pseudonym_url(:id => pseudonym.id, :nonce => pseudonym.confirmation_code)
-        else
-          # pseudonym.assert_communication_channel
-          cc = pseudonym.communication_channel || pseudonym.user.communication_channel
-          
-          redirect_to registration_confirmation_url(pseudonym.id, cc.confirmation_code, :enrollment => @pending_enrollment.uuid)
-        end
+        # defer to CommunicationChannelsController#confirm for the logic of merging users
+        redirect_to registration_confirmation_path(@pending_enrollment.user.email_channel.confirmation_code, :enrollment => @pending_enrollment.uuid)
       end
     else
       redirect_to course_url(@context.id)
     end
+    true
   end
   
   def claim_course
@@ -440,42 +415,43 @@ class CoursesController < ApplicationController
   protected :claim_course
   
   def check_enrollment
-    enrollment = @context.enrollments.find_by_uuid_and_workflow_state(params[:invitation], "invited")
-    enrollment ||= @context.enrollments.find_by_uuid_and_workflow_state(params[:invitation], "rejected")
-    if @context_enrollment && @context_enrollment.pending? && !enrollment
-      pending_enrollment = @context_enrollment 
-      params[:invitation] = pending_enrollment.uuid
-      enrollment = pending_enrollment
-    end
+    return false if @pending_enrollment
+
+    # Use the enrollment we already fetched, if possible
+    enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
+    # Overwrite with the session enrollment, if one exists, and it's different than the current user's
+    enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] && params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
+    # Look up the explicitly provided invitation
+    enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]]) unless params[:invitation].blank?
     if enrollment && enrollment.state_based_on_date == :inactive
       flash[:notice] = t('notices.enrollment_not_active', "Your membership in the course, %{course}, is not yet activated", :course => @context.name)
       redirect_to dashboard_url
       return true
     end
-    if params[:invitation] && enrollment
+    if enrollment
       if enrollment.rejected?
-        enrollment.workflow_state = 'active'
+        enrollment.workflow_state = 'invited'
         enrollment.save_without_broadcasting
+      end
+      if enrollment.self_enrolled?
+        redirect_to registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid)
+        return true
       end
       e = enrollment
       session[:enrollment_uuid] = e.uuid
       session[:session_affects_permissions] = true
       session[:enrollment_as_student] = true if e.is_a?(StudentEnrollment)
       session[:enrollment_uuid_course_id] = e.course_id
-      if (!@domain_root_account || @domain_root_account.allow_invitation_previews?)
+      @pending_enrollment = enrollment
+      if @context.root_account.allow_invitation_previews?
         flash[:notice] = t('notices.preview_course', "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
-        redirect_to course_enrollment_invitation_url(@context, :invitation => enrollment.uuid, :accept => 1)
-        return true
+        # directly call the next action; it's just going to redirect anyway, so no need to have
+        # an additional redirect to get to it
+        params[:accept] = 1
+        return enrollment_invitation
       end
     end
-    if session[:enrollment_uuid] && (e = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited"))
-      @pending_enrollment = e
-    end
-    if @current_user && @context.enrollments.find_by_user_id_and_workflow_state(@current_user.id, "invited")
-      @pending_enrollment = e
-    end
-    @finished_enrollment = @context.enrollments.find_by_uuid(params[:invitation]) if params[:invitation]
     if session[:accepted_enrollment_uuid] && (e = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid]))
       e.accept! if e.invited?
       flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
@@ -520,7 +496,7 @@ class CoursesController < ApplicationController
   
   def self_unenrollment
     get_context
-    unless @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid
+    unless @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid && @context_enrollment.self_enrolled?
       redirect_to course_url(@context)
       return
     end
@@ -531,35 +507,37 @@ class CoursesController < ApplicationController
   def self_enrollment
     get_context
     unless @context.self_enrollment && params[:self_enrollment] && params[:self_enrollment] == @context.self_enrollment_code
-      redirect_to course_url(@context)
-      return
+      return redirect_to course_url(@context)
     end
-    if params[:email] || @current_user
-      params[:email] ||= @current_user.email
-      @user = User.find_by_email(params[:email])
-      if @user && @user.registered?
-        store_location
-        flash[:notice] = t('notices.user_exists', "That user already exists.  Please log in before accepting the enrollment.")
-        redirect_to login_url
-        return
-      end
-      email = (@current_user && @current_user.email) || params[:email]
-      @user = @current_user
-      @enrollments = EnrollmentsFromUserList.process(UserList.new(params[:email], @context.root_account), @context, :enrollment_type => 'StudentEnrollment', :limit => 1)
-      if @enrollments.length == 0
-        flash[:error] = t('errors.invalid_user', "Invalid user, please try again")
-        render :action => 'open_enrollment'
-        return
-      else
-        @enrollment = @enrollments.first
-      end
+    unless @current_user || @context.root_account.open_registration?
+      store_location
+      flash[:notice] = t('notices.login_required', "Please log in to join this course.")
+      return redirect_to login_url
+    end
+    if @current_user
+      @enrollment = @context.enroll_student(@current_user, :no_notify => true)
       @enrollment.self_enrolled = true
       @enrollment.accept
-      render :action => 'open_enrollment_confirmed'
-      # redirect_to course_url(@context, :invitation => @enrollment.uuid)
-    else
-      render :action => 'open_enrollment'
+      flash[:notice] = t('notices.enrolled', "You are now enrolled in this course.")
+      return redirect_to course_url(@context)
     end
+    if params[:email]
+      begin
+        address = TMail::Address::parse(params[:email])
+      rescue
+        flash[:error] = t('errors.invalid_email', "Invalid e-mail address, please try again.")
+        render :action => 'open_enrollment'
+        return
+      end
+      user = User.new(:name => address.name || address.address)
+      user.communication_channels.build(:path => address.address)
+      user.workflow_state = 'creation_pending'
+      user.save!
+      @enrollment = @context.enroll_student(user)
+      @enrollment.update_attribute(:self_enrolled, true)
+      return render :action => 'open_enrollment_confirmed'
+    end
+    render :action => 'open_enrollment'
   end
   
   def check_pending_teacher
@@ -608,7 +586,6 @@ class CoursesController < ApplicationController
     check_pending_teacher
     check_unknown_user
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
-    @unauthorized_user = @finished_enrollment.user rescue nil
     if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
       return redirect_to course_settings_path(@context.id)
     end
@@ -617,7 +594,6 @@ class CoursesController < ApplicationController
     @unauthorized_message = t('unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context_enrollment && @context.claimed?
     @unauthorized_message = t('unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now
     if authorized_action(@context, @current_user, :read)
-      
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
         @assignments_needing_publishing = @context.assignments.active.need_publishing || []
       end

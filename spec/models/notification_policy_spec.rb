@@ -171,16 +171,16 @@ end
 describe NotificationPolicy, "communication_preference" do
   
   before(:each) do
-    @cc1 = mock_model(CommunicationChannel)
-    @cc2 = mock_model(CommunicationChannel)
-    @user = mock_model(User)
-    @user.stub!(:communication_channel).and_return(@cc1)
+    @cc1 = mock('CommunicationChannel')
+    @cc2 = mock('CommunicationChannel')
+    @user = mock('User')
+    @user.stubs(:communication_channel).returns(@cc1)
     notification_policy_model
-    @notification_policy.stub!(:user).and_return(@user)
+    @notification_policy.stubs(:user).returns(@user)
   end
   
   it "should use the channel defined, if one is given" do
-    @notification_policy.stub!(:communication_channel).and_return(@cc2)
+    @notification_policy.stubs(:communication_channel).returns(@cc2)
     @notification_policy.communication_preference.should eql(@cc2)
   end
 

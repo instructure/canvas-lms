@@ -143,6 +143,7 @@
           columns = this.gradeGrid.getColumns();
           columns.sort(this.columnSortFn);
           this.gradeGrid.setColumns(columns);
+          this.fixColumnReordering();
           this.buildRows();
         }
         return this._sortColumnsBy || (this._sortColumnsBy = $.store.userGet("sort_grade_colums_by_" + this.options.context_id) || 'assignment_group');

@@ -24,7 +24,7 @@ describe GroupMembership do
     group = group_model
     user = user_model
     @gm = group_membership_model(:group_id => group.id, :user_id => user.id, :save => false)
-    @gm.should_receive(:ensure_mutually_exclusive_membership)
+    @gm.expects(:ensure_mutually_exclusive_membership)
     @gm.save!
   end
   

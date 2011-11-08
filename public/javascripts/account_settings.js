@@ -112,6 +112,16 @@ $(document).ready(function() {
     });
   });
 
+  // Admins tab
+  $(".add_users_link").click(function(event) {
+      var $enroll_users_form = $("#enroll_users_form");
+      $(this).hide();
+      event.preventDefault();
+      $enroll_users_form.show();
+      $("html,body").scrollTo($enroll_users_form);
+      $enroll_users_form.find("textarea").focus().select();
+    });
+
   $(".open_report_description_link").click(function(event) {
     event.preventDefault();
     var title = $(this).parents(".title").find("span.title").text();

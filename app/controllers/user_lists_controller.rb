@@ -21,9 +21,13 @@ class UserListsController < ApplicationController
   before_filter :require_context
   
   # POST /courses/:course_id/user_lists.json
+  # POST /accounts/:account_id/user_lists.json
   def create
+    return unless authorized_action(@context, @current_user, @context.is_a?(Course) ? :manage_admin_users : :manage_account_memberships)
     respond_to do |format|
-      format.json { render :json => UserList.new(params[:user_list], @context.root_account, @context.grants_right?(@current_user, session, :manage_students)) }
+      format.json { render :json => UserList.new(params[:user_list],
+          @context.root_account || @context,
+          @context.is_a?(Account) && @context.grants_right?(@current_user, session, :manage_user_logins)) }
     end
   end
 end

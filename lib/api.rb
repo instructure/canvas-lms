@@ -52,15 +52,15 @@ module Api
   end
 
   VALID_SIS_COLUMNS = {
-    Course.table_name =>
+    'courses' =>
       { 'sis_course_id' => 'sis_source_id' },
-    EnrollmentTerm.table_name =>
+    'enrollment_terms' =>
       { 'sis_term_id' => 'sis_source_id' },
-    User.table_name =>
+    'users' =>
       { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id' },
-    Account.table_name =>
+    'accounts' =>
       { 'sis_account_id' => 'sis_source_id' },
-    CourseSection.table_name =>
+    'course_sections' =>
       { 'sis_section_id' => 'sis_source_id' },
   }
 

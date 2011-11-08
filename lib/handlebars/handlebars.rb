@@ -29,7 +29,8 @@ class Handlebars
     #   root_path - See `compile`
     #   compiled_path - See `compile`
     def compile_file(file, root_path, compiled_path)
-      id       = file.gsub(root_path+'/', '').gsub(/.handlebars$/, '')
+      require 'execjs'
+      id       = file.gsub(root_path + '/', '').gsub(/.handlebars$/, '')
       path     = "#{compiled_path}/#{id}.js"
       dir      = File.dirname(path)
       source   = File.read(file)
