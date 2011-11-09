@@ -47,7 +47,7 @@
         <% end %>
       <%= t('unauthorized_1', %{It appears that you don't have permission to access this page.  Please make sure you're authorized to view this content.}) %>
       <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
-        <%= t('unauthorized_2', %{If you think you should be able to view this page, please use the "Feedback" link to notify support of the problem.}) %>
+        <%= t('unauthorized_2', %{If you think you should be able to view this page, please use the "Help" link to notify support of the problem.}) %>
       <% end %>
       </p>
     <% end %>
