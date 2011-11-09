@@ -49,11 +49,13 @@ class Handlebars
       template = context.call "Handlebars.precompile", prepare_i18n(source, id)
 
       <<-JS
-!define('jst/#{id}', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['#{id}'] = template(#{template});#{partial_registration}
-  return templates['#{id}'];
-});
+  define('jst/#{id}', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['#{id}'];
+  });
+})();
 JS
     end
 
