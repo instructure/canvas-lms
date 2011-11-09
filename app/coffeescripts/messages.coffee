@@ -36,6 +36,13 @@ class TokenInput
           $token.remove()
           @change?(@token_values())
 
+    @tokens.maxTokenWidth = =>
+      (parseInt(@tokens.css('width').replace('px', '')) - 150) + 'px'
+    @tokens.resizeTokens = (tokens) =>
+      tokens.find('div.ellipsis').css('max-width', @tokens.maxTokenWidth())
+    $(window).resize =>
+      @tokens.resizeTokens(@tokens)
+
     # key capture input
     @input = $('<input />')
       .appendTo(@fake_input)
@@ -87,7 +94,8 @@ class TokenInput
       $token = $('<li />')
       text = data?.text ? @val()
       $token.attr('id', id)
-      $text = $('<div />')
+      $text = $('<div />').addClass('ellipsis')
+      $text.attr('title', text)
       $text.text(text)
       $token.append($text)
       $close = $('<a />')
@@ -97,6 +105,9 @@ class TokenInput
         .attr('name', @node_name + '[]')
         .val(val)
       )
+      # has to happen before append, so that its unlimited width doesn't make
+      # @tokens grow (which would then keep us from limiting it)
+      @tokens.resizeTokens($token)
       @tokens.append($token)
     @val('') unless data?.no_clear
     @placeholder.hide()

@@ -46,6 +46,15 @@
           }
         }
       }, this));
+      this.tokens.maxTokenWidth = __bind(function() {
+        return (parseInt(this.tokens.css('width').replace('px', '')) - 150) + 'px';
+      }, this);
+      this.tokens.resizeTokens = __bind(function(tokens) {
+        return tokens.find('div.ellipsis').css('max-width', this.tokens.maxTokenWidth());
+      }, this);
+      $(window).resize(__bind(function() {
+        return this.tokens.resizeTokens(this.tokens);
+      }, this));
       this.input = $('<input />').appendTo(this.fake_input).css('width', '20px').css('font-size', this.fake_input.css('font-size')).autoGrowInput({
         comfortZone: 20
       }).focus(__bind(function() {
@@ -96,12 +105,14 @@
         $token = $('<li />');
         text = (_ref2 = data != null ? data.text : void 0) != null ? _ref2 : this.val();
         $token.attr('id', id);
-        $text = $('<div />');
+        $text = $('<div />').addClass('ellipsis');
+        $text.attr('title', text);
         $text.text(text);
         $token.append($text);
         $close = $('<a />');
         $token.append($close);
         $token.append($('<input />').attr('type', 'hidden').attr('name', this.node_name + '[]').val(val));
+        this.tokens.resizeTokens($token);
         this.tokens.append($token);
       }
       if (!(data != null ? data.no_clear : void 0)) {
