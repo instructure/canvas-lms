@@ -47,16 +47,17 @@ module Api::V1::DiscussionTopics
 
   def discussion_entry_api_json(entries)
     entries.map do |entry|
-      json = entry.as_json(:only => %w(id message user_id created_at),
+      json = entry.as_json(:include_root => false,
+                           :only => %w(id message user_id created_at),
                            :methods => [:user_name, :discussion_subentry_count],
                            :permissions => {:user => @current_user, :session => session})
       if entry.parent_id.zero?
         replies = entry.unordered_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
         unless replies.empty?
-          json['discussion_entry'][:recent_replies] = discussion_entry_api_json(replies.first(10))
-          json['discussion_entry'][:has_more_replies] = replies.size > 10
+          json[:recent_replies] = discussion_entry_api_json(replies.first(10))
+          json[:has_more_replies] = replies.size > 10
         end
-        json['discussion_entry'][:attachment] = attachment_json(entry.attachment) if entry.attachment
+        json[:attachment] = attachment_json(entry.attachment) if entry.attachment
       end
       json
     end

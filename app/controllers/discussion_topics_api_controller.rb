@@ -101,7 +101,7 @@ class DiscussionTopicsApiController < ApplicationController
   #   there is at least one reply.
   #
   # @example_response
-  #   [ { "discussion_entry": {
+  #   [ {
   #       "id": 1019,
   #       "user_id": 7086,
   #       "user_name": "nobody@example.com",
@@ -114,8 +114,8 @@ class DiscussionTopicsApiController < ApplicationController
   #         "content-type": "unknown/unknown",
   #         "url": "http://www.example.com/files/681/download?verifier=JDG10Ruitv8o6LjGXWlxgOb5Sl3ElzVYm9cBKUT3",
   #         "filename": "content.txt",
-  #         "display_name": "content.txt" } } },
-  #     { "discussion_entry": {
+  #         "display_name": "content.txt" } },
+  #     {
   #       "id": 1016,
   #       "user_id": 7086,
   #       "user_name": "nobody@example.com",
@@ -125,7 +125,7 @@ class DiscussionTopicsApiController < ApplicationController
   #         "delete": true, "reply": true, "read": true,
   #         "attach": true, "create": true, "update": true },
   #       "recent_replies": [
-  #         { "discussion_entry": {
+  #         {
   #           "id": 1017,
   #           "user_id": 7086,
   #           "user_name": "nobody@example.com",
@@ -134,8 +134,8 @@ class DiscussionTopicsApiController < ApplicationController
   #           "permissions": {
   #             "delete": true, "reply": true, "read": true,
   #             "attach": true, "create": true, "update": true },
-  #         } } ],
-  #       "has_more_replies": false } } ]
+  #         } ],
+  #       "has_more_replies": false } ]
   def entries
     if authorized_action(@topic, @current_user, :read)
       @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_path(@topic))
@@ -194,7 +194,7 @@ class DiscussionTopicsApiController < ApplicationController
   #   for the reply.
   #
   # @example_response
-  #   [ { "discussion_entry": {
+  #   [ {
   #       "id": 1015,
   #       "user_id": 7084,
   #       "user_name": "nobody@example.com",
@@ -202,8 +202,8 @@ class DiscussionTopicsApiController < ApplicationController
   #       "created_at": "2011-11-03T21:27:44Z",
   #       "permissions": {
   #         "delete": true, "reply": true, "read": true,
-  #         "attach": true, "create": true, "update": true } } },
-  #     { "discussion_entry": {
+  #         "attach": true, "create": true, "update": true } },
+  #     {
   #       "id": 1014,
   #       "user_id": 7084,
   #       "user_name": "nobody@example.com",
@@ -211,7 +211,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "created_at": "2011-11-03T21:26:44Z",
   #       "permissions": {
   #         "delete": true, "reply": true, "read": true,
-  #         "attach": true, "create": true, "update": true } } } ]
+  #         "attach": true, "create": true, "update": true } } ]
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
     if authorized_action(@topic, @current_user, :read)

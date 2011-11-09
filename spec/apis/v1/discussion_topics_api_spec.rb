@@ -156,9 +156,9 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
         { :message => @message })
-      json['discussion_entry'].should_not be_nil
-      json['discussion_entry']['id'].should_not be_nil
-      @entry = DiscussionEntry.find_by_id(json['discussion_entry']['id'])
+      json.should_not be_nil
+      json['id'].should_not be_nil
+      @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.should_not be_nil
       @entry.discussion_topic.should == @topic
       @entry.user.should == @user
@@ -172,8 +172,8 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
         { :message => @message })
-      @entry = DiscussionEntry.find_by_id(json['discussion_entry']['id'])
-      json.should == { "discussion_entry" => {
+      @entry = DiscussionEntry.find_by_id(json['id'])
+      json.should == {
         "id" => @entry.id,
         "user_id" => @user.id,
         "user_name" => @user.name,
@@ -183,7 +183,7 @@ describe DiscussionTopicsController, :type => :integration do
           "delete" => true, "reply" => true, "read" => true,
           "attach" => true, "create" => true, "update" => true
         }
-      }}
+      }
     end
 
     it "should allow creating a reply to an existing top-level entry" do
@@ -193,7 +193,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
         { :message => @message })
-      @entry = DiscussionEntry.find_by_id(json['discussion_entry']['id'])
+      @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.parent_entry.should == top_entry
     end
 
@@ -217,7 +217,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
         { :message => @message, :attachment => data })
-      @entry = DiscussionEntry.find_by_id(json['discussion_entry']['id'])
+      @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should_not be_nil
     end
 
@@ -231,7 +231,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
         { :message => @message, :attachment => data })
-      @entry = DiscussionEntry.find_by_id(json['discussion_entry']['id'])
+      @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should be_nil
     end
 
@@ -244,8 +244,8 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
         { :message => @message, :attachment => data })
-      json['discussion_entry']['attachment'].should_not be_nil
-      json['discussion_entry']['attachment'].should_not be_empty
+      json['attachment'].should_not be_nil
+      json['attachment'].should_not be_empty
     end
   end
 
@@ -263,7 +263,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       json.size.should == 1
-      entry_json = json.first['discussion_entry']
+      entry_json = json.first
       entry_json['id'].should == @entry.id
     end
 
@@ -272,7 +272,7 @@ describe DiscussionTopicsController, :type => :integration do
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      entry_json = json.first['discussion_entry']
+      entry_json = json.first
       entry_json['attachment'].should_not be_nil
       entry_json['attachment']['url'].should == "http://www.example.com/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
     end
@@ -282,10 +282,10 @@ describe DiscussionTopicsController, :type => :integration do
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      entry_json = json.first['discussion_entry']
+      entry_json = json.first
       entry_json['recent_replies'].size.should == 1
       entry_json['has_more_replies'].should be_false
-      reply_json = entry_json['recent_replies'].first['discussion_entry']
+      reply_json = entry_json['recent_replies'].first
       reply_json['id'].should == @reply.id
     end
 
@@ -297,8 +297,8 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       json.size.should == 3
-      json.first['discussion_entry']['id'].should == @newer_entry.id
-      json.last['discussion_entry']['id'].should == @older_entry.id
+      json.first['id'].should == @newer_entry.id
+      json.last['id'].should == @older_entry.id
     end
 
     it "should sort replies included on top-level entries by descending created_at" do
@@ -309,10 +309,10 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       json.size.should == 1
-      reply_json = json.first['discussion_entry']['recent_replies']
+      reply_json = json.first['recent_replies']
       reply_json.size.should == 3
-      reply_json.first['discussion_entry']['id'].should == @newer_reply.id
-      reply_json.last['discussion_entry']['id'].should == @older_reply.id
+      reply_json.first['id'].should == @newer_reply.id
+      reply_json.last['id'].should == @older_reply.id
     end
 
     it "should paginate top-level entries" do
@@ -326,7 +326,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '3' })
       json.length.should == 3
-      json.map{ |e| e['discussion_entry']['id'] }.should == entries.last(3).reverse.map{ |e| e.id }
+      json.map{ |e| e['id'] }.should == entries.last(3).reverse.map{ |e| e.id }
       response.headers['Link'].should == [
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=2&per_page=3>; rel="next"},
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=1&per_page=3>; rel="first"},
@@ -339,7 +339,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :page => '3', :per_page => '3' })
       json.length.should == 2
-      json.map{ |e| e['discussion_entry']['id'] }.should == [entries.first, @entry].map{ |e| e.id }
+      json.map{ |e| e['id'] }.should == [entries.first, @entry].map{ |e| e.id }
       response.headers['Link'].should == [
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=2&per_page=3>; rel="prev"},
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=1&per_page=3>; rel="first"},
@@ -358,10 +358,10 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       json.length.should == 1
-      reply_json = json.first['discussion_entry']['recent_replies']
+      reply_json = json.first['recent_replies']
       reply_json.length.should == 10
-      reply_json.map{ |e| e['discussion_entry']['id'] }.should == replies.last(10).reverse.map{ |e| e.id }
-      json.first['discussion_entry']['has_more_replies'].should be_true
+      reply_json.map{ |e| e['id'] }.should == replies.last(10).reverse.map{ |e| e.id }
+      json.first['has_more_replies'].should be_true
     end
   end
 
@@ -378,7 +378,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
       json.size.should == 1
-      json.first['discussion_entry']['id'].should == @reply.id
+      json.first['id'].should == @reply.id
     end
 
     it "should sort replies by descending created_at" do
@@ -389,8 +389,8 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
       json.size.should == 3
-      json.first['discussion_entry']['id'].should == @newer_reply.id
-      json.last['discussion_entry']['id'].should == @older_reply.id
+      json.first['id'].should == @newer_reply.id
+      json.last['id'].should == @older_reply.id
     end
 
     it "should paginate replies" do
@@ -404,7 +404,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :per_page => '3' })
       json.length.should == 3
-      json.map{ |e| e['discussion_entry']['id'] }.should == replies.last(3).reverse.map{ |e| e.id }
+      json.map{ |e| e['id'] }.should == replies.last(3).reverse.map{ |e| e.id }
       response.headers['Link'].should == [
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=2&per_page=3>; rel="next"},
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=1&per_page=3>; rel="first"},
@@ -417,7 +417,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :page => '3', :per_page => '3' })
       json.length.should == 2
-      json.map{ |e| e['discussion_entry']['id'] }.should == [replies.first, @reply].map{ |e| e.id }
+      json.map{ |e| e['id'] }.should == [replies.first, @reply].map{ |e| e.id }
       response.headers['Link'].should == [
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=2&per_page=3>; rel="prev"},
         %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=1&per_page=3>; rel="first"},
