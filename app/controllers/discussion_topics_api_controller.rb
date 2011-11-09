@@ -55,7 +55,7 @@ class DiscussionTopicsApiController < ApplicationController
           @entry.attachment = @attachment
           @entry.save
         end
-        render :json => discussion_entry_api_json([@entry]).first, :status => :created
+        render :json => discussion_entry_api_json([@entry], @context).first, :status => :created
       end
     end
   end
@@ -139,7 +139,7 @@ class DiscussionTopicsApiController < ApplicationController
   def entries
     if authorized_action(@topic, @current_user, :read)
       @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_path(@topic))
-      render :json => discussion_entry_api_json(@entries)
+      render :json => discussion_entry_api_json(@entries, @context)
     end
   end
 
@@ -164,7 +164,7 @@ class DiscussionTopicsApiController < ApplicationController
     @entry = build_entry(@parent.discussion_subentries)
     if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
       if save_entry
-        render :json => discussion_entry_api_json([@entry]).first, :status => :created
+        render :json => discussion_entry_api_json([@entry], @context).first, :status => :created
       end
     end
   end
@@ -216,7 +216,7 @@ class DiscussionTopicsApiController < ApplicationController
     @parent = root_entries(@topic).find(params[:entry_id])
     if authorized_action(@topic, @current_user, :read)
       @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_path(@parent))
-      render :json => discussion_entry_api_json(@replies)
+      render :json => discussion_entry_api_json(@replies, @context)
     end
   end
 

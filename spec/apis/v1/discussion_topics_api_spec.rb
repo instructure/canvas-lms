@@ -59,6 +59,17 @@ describe DiscussionTopicsController, :type => :integration do
                   "topic_children"=>[sub.id]}
   end
 
+  it "should translate user content in topics" do
+    should_translate_user_content(@course) do |user_content|
+      @topic = create_topic(@course, :title => "Topic 1", :message => user_content)
+      json = api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics",
+        { :controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s })
+      json.size.should == 1
+      json.first['message']
+    end
+  end
+
   it "should paginate and return proper pagination headers for courses" do
     7.times { |i| @course.discussion_topics.create!(:title => i.to_s, :message => i.to_s) }
     @course.discussion_topics.count.should == 7
@@ -379,6 +390,18 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
       json.size.should == 1
       json.first['id'].should == @reply.id
+    end
+
+    it "should translate user content in replies" do
+      should_translate_user_content(@course) do |user_content|
+        @reply.update_attribute('message', user_content)
+        json = api_call(
+          :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
+          { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+            :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+        json.size.should == 1
+        json.first['message']
+      end
     end
 
     it "should sort replies by descending created_at" do

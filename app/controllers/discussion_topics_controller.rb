@@ -89,7 +89,7 @@ class DiscussionTopicsController < ApplicationController
         format.xml  { render :xml => @topics.to_xml }
         format.json do
           if api_request?
-            render :json => discussion_topic_api_json(@topics)
+            render :json => discussion_topic_api_json(@topics, @context)
           else
             render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count], :permissions => {:user => @current_user, :session => session })
           end

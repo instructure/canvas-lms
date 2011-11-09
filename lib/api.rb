@@ -173,6 +173,8 @@ module Api
   mattr_accessor :assignment_ids_for_students_api
 
   def api_user_content(html, context = @context, user = @current_user)
+    return html if html.blank?
+
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
       obj = match.obj_class.find_by_id(match.obj_id)
