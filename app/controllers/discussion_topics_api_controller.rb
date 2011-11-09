@@ -37,10 +37,10 @@ class DiscussionTopicsApiController < ApplicationController
   #   restrictions.
   #
   # Example:
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \
-  #        -u '<username>:<password>' \
-  #        -F 'api_key=<key>' \
-  #        -F 'message=<message>' \
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \ 
+  #        -u '<username>:<password>' \ 
+  #        -F 'api_key=<key>' \ 
+  #        -F 'message=<message>' \ 
   #        -F 'attachment=@<filename>'
   def add_entry
     @entry = build_entry(@topic.discussion_entries)
@@ -101,44 +101,41 @@ class DiscussionTopicsApiController < ApplicationController
   #   there is at least one reply.
   #
   # @example_response
-  #   [ { "discussion_entry" => {
-  #       "id" => 1019,
-  #       "user_id" => 7086,
-  #       "user_name" => "nobody@example.com",
-  #       "message" => "Newer entry",
-  #       "created_at" => "2011-11-03T21:33:29Z",
-  #       "workflow_state" => "active",
-  #       "permissions" => {
-  #         "delete" => true, "reply" => true, "read" => true,
-  #         "attach" => true, "create" => true, "update" => true },
-  #       "attachment" => {
-  #         "content-type" => "unknown/unknown",
-  #         "url" => "http://www.example.com/files/681/download?verifier=JDG10Ruitv8o6LjGXWlxgOb5Sl3ElzVYm9cBKUT3",
-  #         "filename" => "content.txt",
-  #         "display_name" => "content.txt" } } },
-  #     { "discussion_entry" => {
-  #       "id" => 1016,
-  #       "user_id" => 7086,
-  #       "user_name" => "nobody@example.com",
-  #       "message" => "first top-level entry",
-  #       "created_at" => "2011-11-03T21:32:29Z",
-  #       "workflow_state" => "active",
-  #       "permissions" => {
-  #         "delete" => true, "reply" => true, "read" => true,
-  #         "attach" => true, "create" => true, "update" => true },
-  #       "recent_replies" => [
-  #         { "discussion_entry" => {
-  #           "id" => 1017,
-  #           "user_id" => 7086,
-  #           "user_name" => "nobody@example.com",
-  #           "message" => "Reply message",
-  #           "created_at" => "2011-11-03T21:32:29Z",
-  #           "workflow_state" => "active",
-  #           "permissions" => {
-  #             "delete" => true, "reply" => true, "read" => true,
-  #             "attach" => true, "create" => true, "update" => true },
+  #   [ { "discussion_entry": {
+  #       "id": 1019,
+  #       "user_id": 7086,
+  #       "user_name": "nobody@example.com",
+  #       "message": "Newer entry",
+  #       "created_at": "2011-11-03T21:33:29Z",
+  #       "permissions": {
+  #         "delete": true, "reply": true, "read": true,
+  #         "attach": true, "create": true, "update": true },
+  #       "attachment": {
+  #         "content-type": "unknown/unknown",
+  #         "url": "http://www.example.com/files/681/download?verifier=JDG10Ruitv8o6LjGXWlxgOb5Sl3ElzVYm9cBKUT3",
+  #         "filename": "content.txt",
+  #         "display_name": "content.txt" } } },
+  #     { "discussion_entry": {
+  #       "id": 1016,
+  #       "user_id": 7086,
+  #       "user_name": "nobody@example.com",
+  #       "message": "first top-level entry",
+  #       "created_at": "2011-11-03T21:32:29Z",
+  #       "permissions": {
+  #         "delete": true, "reply": true, "read": true,
+  #         "attach": true, "create": true, "update": true },
+  #       "recent_replies": [
+  #         { "discussion_entry": {
+  #           "id": 1017,
+  #           "user_id": 7086,
+  #           "user_name": "nobody@example.com",
+  #           "message": "Reply message",
+  #           "created_at": "2011-11-03T21:32:29Z",
+  #           "permissions": {
+  #             "delete": true, "reply": true, "read": true,
+  #             "attach": true, "create": true, "update": true },
   #         } } ],
-  #       "has_more_replies" => false } } ]
+  #       "has_more_replies": false } } ]
   def entries
     if authorized_action(@topic, @current_user, :read)
       @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_path(@topic))
@@ -158,10 +155,10 @@ class DiscussionTopicsApiController < ApplicationController
   # @argument message The body of the entry.
   #
   # Example:
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \
-  #        -u '<username>:<password>' \
-  #        -F 'api_key=<key>' \
-  #        -F 'message=<message>' \
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \ 
+  #        -u '<username>:<password>' \ 
+  #        -F 'api_key=<key>' \ 
+  #        -F 'message=<message>'
   def add_reply
     @parent = root_entries(@topic).find(params[:entry_id])
     @entry = build_entry(@parent.discussion_subentries)
@@ -197,26 +194,24 @@ class DiscussionTopicsApiController < ApplicationController
   #   for the reply.
   #
   # @example_response
-  #   [ { "discussion_entry" => {
-  #       "id" => 1015,
-  #       "user_id" => 7084,
-  #       "user_name" => "nobody@example.com",
-  #       "message" => "Newer message",
-  #       "created_at" => "2011-11-03T21:27:44Z",
-  #       "workflow_state" => "active",
-  #       "permissions" => {
-  #         "delete" => true, "reply" => true, "read" => true,
-  #         "attach" => true, "create" => true, "update" => true } } },
-  #     { "discussion_entry" => {
-  #       "id" => 1014,
-  #       "user_id" => 7084,
-  #       "user_name" => "nobody@example.com",
-  #       "message" => "Older message",
-  #       "created_at" => "2011-11-03T21:26:44Z",
-  #       "workflow_state" => "active",
-  #       "permissions" => {
-  #         "delete" => true, "reply" => true, "read" => true,
-  #         "attach" => true, "create" => true, "update" => true } } } ]
+  #   [ { "discussion_entry": {
+  #       "id": 1015,
+  #       "user_id": 7084,
+  #       "user_name": "nobody@example.com",
+  #       "message": "Newer message",
+  #       "created_at": "2011-11-03T21:27:44Z",
+  #       "permissions": {
+  #         "delete": true, "reply": true, "read": true,
+  #         "attach": true, "create": true, "update": true } } },
+  #     { "discussion_entry": {
+  #       "id": 1014,
+  #       "user_id": 7084,
+  #       "user_name": "nobody@example.com",
+  #       "message": "Older message",
+  #       "created_at": "2011-11-03T21:26:44Z",
+  #       "permissions": {
+  #         "delete": true, "reply": true, "read": true,
+  #         "attach": true, "create": true, "update": true } } } ]
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
     if authorized_action(@topic, @current_user, :read)

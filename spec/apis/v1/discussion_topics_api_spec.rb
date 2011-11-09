@@ -179,7 +179,6 @@ describe DiscussionTopicsController, :type => :integration do
         "user_name" => @user.name,
         "message" => @message,
         "created_at" => @entry.created_at.utc.iso8601,
-        "workflow_state" => "active",
         "permissions" => {
           "delete" => true, "reply" => true, "read" => true,
           "attach" => true, "create" => true, "update" => true
