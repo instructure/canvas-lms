@@ -36,6 +36,17 @@ describe PseudonymSessionsController do
     end
   end
 
+  it "should render special iPhone/iPod layout if coming from one of those and it's the wrong password'" do
+    [
+      "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
+      "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"
+    ].each do |user_agent|
+      request.env['HTTP_USER_AGENT'] = user_agent
+      post 'create'
+      response.should render_template("pseudonym_sessions/mobile_login")
+    end
+  end
+
   it "should re-render if no user" do
     post 'create'
     response.status.should == '400 Bad Request'
