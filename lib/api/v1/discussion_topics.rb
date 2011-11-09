@@ -47,7 +47,7 @@ module Api::V1::DiscussionTopics
 
   def discussion_entry_api_json(entries)
     entries.map do |entry|
-      json = entry.as_json(:only => %w(id message user_id created_at workflow_state),
+      json = entry.as_json(:only => %w(id message user_id created_at),
                            :methods => [:user_name, :discussion_subentry_count],
                            :permissions => {:user => @current_user, :session => session})
       if entry.parent_id.zero?
