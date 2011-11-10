@@ -16,8 +16,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var grading_scheme, readOnlyGradebook, gradebook;
-I18n.scoped('gradebook', function(I18n) {
+require([
+  'INST' /* INST */,
+  'i18n!gradebook',
+  'jquery' /* $ */,
+  'datagrid',
+  'compiled/grade_calculator',
+  'str/htmlEscape',
+  'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
+  'jquery.dropdownList' /* dropdownList */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.uniq/, /\$\.size/, /\$\.store/ */,
+  'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImg, loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'message_students' /* messageStudents */,
+  'vendor/date' /* Date.parse */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'vendor/jquery.store' /* /\$\.store/ */,
+  'jqueryui/position' /* /\.position\(/ */,
+  'jqueryui/progressbar' /* /\.progressbar/ */
+], function(INST, I18n, $, datagrid, GradeCalculator, htmlEscape) {
+
+  var grading_scheme = window.grading_scheme;
+  var readOnlyGradebook = window.readOnlyGradebook;
+  var gradebook = window.gradebook;
+
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
       $assignment_details_dialog = $("#assignment_details_dialog"),
@@ -178,7 +205,7 @@ I18n.scoped('gradebook', function(I18n) {
               showTooltip(I18n.t('tooltips.submission_dropped', 'This submission is dropped for grading purposes'));
             } else if(datagrid.columns[grid.cell.column].hidden) {
               var name = objectData(datagrid.cells['0,' + grid.cell.column]).title;
-              showTooltip($.htmlEscape(name) + "<br/><span style='font-size: 0.9em;'>" + I18n.t('click_to_expand', "Click to expand") + "</span>", true)
+              showTooltip(htmlEscape(name) + "<br/><span style='font-size: 0.9em;'>" + I18n.t('click_to_expand', "Click to expand") + "</span>", true)
             }
           } else if(event && event.originalEvent && event.originalEvent.type && !event.originalEvent.type.match(/mouse/)) {
             grid.cell.find(".grade").focus().css('outline', 0);
@@ -619,7 +646,7 @@ I18n.scoped('gradebook', function(I18n) {
         });
         if($td.hasClass('group_total')) {
           var type = $td.find(".assignment_title").text();
-          addOption('carat-1-w', $.htmlEscape(I18n.t('hide_all_things', 'Hide All %{things}', {'things': type})), function() {
+          addOption('carat-1-w', htmlEscape(I18n.t('hide_all_things', 'Hide All %{things}', {'things': type})), function() {
             var check_id = objectData($td).assignment_group_id;
             $(".outer_assignment_name").each(function() {
               var assignment = objectData($(this));
@@ -1592,7 +1619,7 @@ I18n.scoped('gradebook', function(I18n) {
               $type.append($link);
             }
             $type.append($("#submission_" + submission.submission_type + "_image").clone().removeAttr('id'));
-            $type.append(" <a href='" + attachment_url + "'>" + $.htmlEscape(I18n.t('links.download_attachment', "Download %{attachment}", {'attachment': attachment.display_name})) + "</a><br/>");
+            $type.append(" <a href='" + attachment_url + "'>" + htmlEscape(I18n.t('links.download_attachment', "Download %{attachment}", {'attachment': attachment.display_name})) + "</a><br/>");
           }
         }
       } else if(submission.submission_type == "online_text_entry") {
@@ -2123,7 +2150,7 @@ I18n.scoped('gradebook', function(I18n) {
     }
     var letterGrade = "";
     if(grading_scheme) {
-      letterGrade = INST.GradeCalculator.letter_grade(grading_scheme, finalGrade);
+      letterGrade = GradeCalculator.letter_grade(grading_scheme, finalGrade);
     }
     $("#submission_" + student_id + "_final-grade")
       .css('visibility', '')

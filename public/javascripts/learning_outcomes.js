@@ -15,7 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-I18n.scoped("learning_outcomes", function(I18n) {
+
+require([
+  'i18n!learning_outcomes',
+  'jquery' /* $ */,
+  'find_outcome',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(I18n, $, find_outcome) {
+
   var outcomes = {
     ratingCounter: 0,
     updateOutcome: function(outcome, $outcome) {

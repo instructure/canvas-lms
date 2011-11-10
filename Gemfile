@@ -8,7 +8,6 @@ gem 'authlogic',      '2.1.3'
 gem "aws-s3-instructure", "~> 0.6.2.1319643167",  :require => 'aws/s3'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
-gem 'closure-compiler','1.0.0'
 gem 'compass',        '0.11.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
@@ -91,19 +90,7 @@ group :redis do
 end
 
 
-# The closure-compiler gem has an undocumented
-# gem dependency on windows with ruby < 1.9.  I'm
-# working to get this fixed in the gem itself, but
-# in the mean time this needs to be here to make
-# things work on windows.
-WINDOWS  = RUBY_PLATFORM.match(/(win|w)32$/)
 ONE_NINE = RUBY_VERSION >= "1.9"
-if WINDOWS
-  if !ONE_NINE
-    gem 'win32-open3',  '0.3.2'
-  end
-end
-
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end

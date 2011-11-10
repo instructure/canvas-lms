@@ -4,5 +4,5 @@
 <% end %>
 
 <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
-<% jammit_js :syllabus %>
+<% js_bundle :syllabus %>
 <%= render :partial => 'assignments/syllabus_content' %>

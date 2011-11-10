@@ -23,6 +23,10 @@
 </div>
 <% js_block do %>
 <script type="text/javascript">
+require([
+  'jquery' /* $ */
+], function($) {
+
   $(function(){
     $(".zip_from_webct_link").click(function(event) {
       event.preventDefault();
@@ -32,5 +36,6 @@
       .attr("href", "<%= qti_or_content_link %>")
       .text(<%= params[:return_to] ? t('#buttons.cancel', "Cancel").to_json.html_safe : t('buttons.skip', "Skip this Step").to_json.html_safe %>);
   });
+});
 </script>
 <% end %>

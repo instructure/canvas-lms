@@ -21,8 +21,13 @@
 </ul>
 <% js_block do %>
   <script type="text/javascript">
+  require([
+    'jquery' /* $ */,
+    'jquery.instructure_misc_plugins' /* chevronCrumbs */
+  ], function($) {
     $(function(){
       $("#import-steps").chevronCrumbs();
     });
+  });
   </script>
 <% end %>

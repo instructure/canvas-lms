@@ -44,7 +44,6 @@
         var inTable = false;
         var obj = e.target;
         while(obj.nodeName != 'TABLE' && obj.nodeName != 'BODY' && obj.parentNode) {
-          console.log(obj.nodeName);
           obj = obj.parentNode;
         }
         if(obj.nodeName == 'TABLE') {

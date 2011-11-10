@@ -37,8 +37,8 @@ describe "courses" do
       checklist_button = driver.find_element(:css, '#course_show_secondary .wizard_popup_link')
       if checklist_button.displayed?
         checklist_button.click
-        wait_for_animations
       end
+      wait_for_animations
       wizard_box = driver.find_element(:css, ".wizard_content")
       wizard_box.should be_displayed
       checklist_button.should_not be_displayed

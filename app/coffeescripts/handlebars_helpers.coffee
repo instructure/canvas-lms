@@ -1,13 +1,14 @@
-define 'compiled/handlebars_helpers', [
+define [
   'vendor/handlebars.vm'
-  'i18n'
-], (Handlebars, I18n) ->
+  'i18nObj'
+  'jquery'
+  'str/htmlEscape'
+  'jquery.instructure_date_and_time'
+  'jquery.instructure_misc_helpers'
+  'jquery.instructure_misc_plugins'
+], (Handlebars, I18n, $, htmlEscape) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
-    'debugger' : (optionalValue) ->
-      console.log('this', this, 'arguments', arguments)
-      debugger
-
     t : (key, defaultValue, options) ->
       wrappers = {}
       options = options?.hash ? {}
@@ -33,7 +34,7 @@ define 'compiled/handlebars_helpers', [
     mimeClass: (contentType) -> $.mimeClass(contentType)
 
     newlinesToBreak : (string) ->
-      new Handlebars.SafeString $.htmlEscape(string).replace(/\n/g, "<br />")
+      new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")
 
     # runs block if all arugments are === to each other
     # usage:

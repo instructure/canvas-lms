@@ -1,0 +1,2 @@
+require ['vendor/json2']
+

@@ -16,7 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('user_name', function(I18n) {
+require([
+  'i18n!user_name',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.templateData' /* fillTemplateData */
+], function(I18n, $) {
 $(document).ready(function() {
   $("#name_and_email").delegate('.edit_user_link', 'click', function(event) {
     event.preventDefault();

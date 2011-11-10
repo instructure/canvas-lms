@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
 require "timeout"
+require 'coffee-script'
 require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 include I18nUtilities
@@ -148,6 +149,56 @@ module SeleniumTestsHelperMethods
     return shutdown
   end
 
+  def exec_cs(script, *args)
+    driver.execute_script(CoffeeScript.compile(script), *args)
+  end
+
+  # a varable named `callback` is injected into your function for you, just call it to signal you are done.
+  def exec_async_cs(script, *args)
+    to_compile = "var callback = arguments[arguments.length - 1]; #{CoffeeScript.compile(script)}"
+    driver.execute_async_script(script, *args)
+  end
+
+  # usage
+  # require_exec 'compiled/util/foo', 'bar', <<-CS
+  #   foo('something')
+  #   # optionally I should be able to do
+  #   bar 'something else', ->
+  #     "stuff"
+  #     callback('i made it')
+  #
+  # CS
+  #
+  # simple usage
+  # require_exec 'i18n!messages', 'i18n.t("foobar")'
+  def require_exec(*args)
+    code = args.last
+    things_to_require = {}
+    args[0...-1].each do |file_path|
+      things_to_require[file_path] = file_path.split('/').last.split('!').first
+    end
+
+    # make sure the code you pass is at least as intented as it should be
+    code = code.gsub(/^/, '          ')
+    coffee_source = <<-CS
+      _callback = arguments[arguments.length - 1];
+      cancelCallback = false
+
+      callback = ->
+        _callback.apply(this, arguments)
+        cancelCallback = true
+
+      require #{things_to_require.keys.to_json}, (#{things_to_require.values.join(', ')}) ->
+        res = do ->
+#{code}
+        _callback(res) unless cancelCallback
+    CS
+    # make it `bare` because selenium already wraps it in a function and we need to get
+    # the arguments for our callback
+    js = CoffeeScript.compile(coffee_source, :bare => true)
+    driver.execute_async_script(js)
+  end
+
   def self.start_forked_webrick_server
     setup_host_and_port
 
@@ -267,22 +318,38 @@ shared_examples_for "all selenium tests" do
     wait_for_dom_ready
   end
 
-  def wait_for_dom_ready
-    keep_trying_until(120) { driver.execute_script("return $") != nil }
-    driver.execute_script <<-JS
-      window.seleniumDOMIsReady = false;
-      $(function(){
-        window.setTimeout(function(){
-          //by doing a setTimeout, we ensure that the execution of all js completes. then we run selenium.
-          window.seleniumDOMIsReady = true;
-        }, 1);
-      });
-    JS
+  def check_domready
     dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-    until (dom_is_ready) do
-      sleep 0.1
-      dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-    end
+    requirejs_resources_loaded = driver.execute_script "return require.resourcesDone"
+    dom_is_ready and requirejs_resources_loaded
+  end
+
+  ##
+  # waits for JavaScript to evaluate, occasionally when you click an element
+  # a bunch of JS needs to run, this basically puts the rest of your test later
+  # in the JS thread
+  def wait_for_js
+    driver.execute_script <<-JS
+      window.selenium_wait_for_js = false;
+      setTimeout(function() { window.selenium_wait_for_js = true; });
+    JS
+    keep_trying_until { driver.execute_script('return window.selenium_wait_for_js') == true }
+  end
+
+  def wait_for_dom_ready
+    driver.execute_async_script(<<-JS)
+     var callback = arguments[arguments.length - 1];
+     var pollForJqueryAndRequire = function(){
+        if (window.jQuery && window.require && window.require.resourcesDone) {
+          jQuery(function(){
+            setTimeout(callback, 1);
+          });
+        } else {
+          setTimeout(pollForJqueryAndRequire, 1);
+        }
+      }
+      pollForJqueryAndRequire();
+    JS
   end
 
   def wait_for_ajax_requests(wait_start = 0)

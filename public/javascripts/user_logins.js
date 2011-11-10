@@ -16,7 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('user_logins', function(I18n) {
+require([
+  'i18n!user_logins',
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */
+], function(I18n, $) {
 $(document).ready(function() {
   var $form = $("#edit_pseudonym_form");
   var passwordable_account_ids = $("#passwordable_account_ids").text().split(",");

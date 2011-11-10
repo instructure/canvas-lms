@@ -3,7 +3,7 @@
 # Returns an array with extra methods.  It uses direct property injection so our
 # prototypes are still clean, but we get a nice OO syntax for these kinds
 # of arrays.
-define 'compiled/util/objectCollection', ->
+define ->
   (array) ->
 
     array.indexOf = (needle) ->

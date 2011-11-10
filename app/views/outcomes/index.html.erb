@@ -1,6 +1,6 @@
 <%
   jammit_css :learning_outcomes
-  jammit_js :learning_outcomes
+  js_bundle :learning_outcomes
   js_block { %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% }
   content_for :page_title, t("#titles.learning_outcomes", "Learning Outcomes")
 %>

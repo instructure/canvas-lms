@@ -1,6 +1,6 @@
 <%
   jammit_css :quizzes
-  jammit_js :quizzes_bundle
+  js_bundle :quizzes_bundle
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
 <% content_for :right_side do %>
@@ -245,17 +245,25 @@
     <a href="#" class="add_question_link add"><%= t('links.add_new_question', "Add a New Question") %></a><br/>
   </div>
 <% end %>
-<% js_block :i18n_scope => 'quizzes.new' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */
+], function(I18n, $) {
+
 window.quizAssignmentId = "<%= @assignment ? @assignment.id : "" %>";
 $(document).ready(function() {
   $(".delete_quiz_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".quiz").confirmDelete({
-      message: I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?"),
+      message: <%= jt('confirms.delete_quiz', "Are you sure you want to delete this quiz?") %>,
       url: $(this).attr('href')
     });
   });
+});
 });
 </script>
 <% end %>

@@ -6,12 +6,17 @@
 </div>
 <script src="//www.google.com/jsapi" type="text/javascript"></script>
 <script type="text/javascript">
-  google.load('search', '1', {language : 'en'});
+google.load('search', '1', {language : 'en'});
+
+require([
+  'jquery' /* $ */
+], function($) {
   google.setOnLoadCallback(function() {
     var customSearchControl = new google.search.CustomSearchControl('014949904870326116447:l9dhnd4kuni');
     customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
     customSearchControl.draw('cse');
     $("#custom_search_results_dialog").data('searchControl', customSearchControl);
   }, true);
+});
 </script>
 

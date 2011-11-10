@@ -1,4 +1,12 @@
-I18n.scoped('find_outcome', function(I18n) {
+require([
+  'i18n!find_outcome',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* truncateText */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */
+], function(I18n, $) {
+
 var find_outcome = (function() {
   return {
     find: function(callback, options) {
@@ -100,4 +108,7 @@ $(document).ready(function() {
     }
   });
 });
+
+return find_outcome;
 });
+

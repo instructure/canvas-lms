@@ -1,9 +1,12 @@
-define 'compiled/calendar/EditAppointmentGroupDetails', [
-  'i18n'
+define [
+  'jquery'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editAppointmentGroup'
   'jst/calendar/genericSelect'
-], (I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
+  'jquery.ajaxJSON'
+  'jquery.disableWhileLoading'
+  'jquery.instructure_forms'
+], ($, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
 
   class EditAppointmentGroupDetails
     constructor: (selector, @apptGroup, @contextChangeCB, @closeCB) ->

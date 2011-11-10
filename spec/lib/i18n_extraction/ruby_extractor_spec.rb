@@ -69,6 +69,9 @@ describe I18nExtraction::RubyExtractor do
   context "placeholders" do
     it "should ensure all placeholders have corresponding options" do
       lambda{ extract "t 'foo', 'i have a %{foo}'" }.should raise_error(/interpolation value not provided for :foo/)
+      extract("t 'foo', 'i have a %{foo}', :foo => 'foo'").should == {'foo' => 'i have a %{foo}'}
+      lambda{ extract "jt 'foo', 'i have a %{foo}', '{}'" }.should raise_error(/interpolation value not provided for :foo/)
+      extract("jt 'foo', 'i have a %{foo}', '{foo: a_foo}'").should == {'foo' => 'i have a %{foo}'}
     end
   end
 

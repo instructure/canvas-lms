@@ -1,4 +1,18 @@
-I18n.scoped('section', function(I18n) {
+require([
+  'i18n!section',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData */,
+  'jqueryui/autocomplete' /* /\.autocomplete/ */
+], function(I18n, $) {
+
 $(document).ready(function() {
   var $edit_section_form = $("#edit_section_form"),
       $edit_section_link = $(".edit_section_link");

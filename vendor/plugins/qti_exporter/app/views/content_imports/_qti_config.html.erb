@@ -2,17 +2,19 @@
 
 <% js_block do %>
   <script>
-    $(function() {
+    require(['jquery', 'content_migration'], function($){
+      $(function() {
 
-      $("#plugin_qti_converter").bind("pluginShown", function(event, enableFileUpload) {
-        enableFileUpload();
-        $(".migration_part_selection").hide();
-      });
-      
-      $("#plugin_qti_converter").bind("pluginHidden", function(event) {
-        $(".migration_part_selection").show();
-      });
+        $("#plugin_qti_converter").bind("pluginShown", function(event, enableFileUpload) {
+          enableFileUpload();
+          $(".migration_part_selection").hide();
+        });
 
+        $("#plugin_qti_converter").bind("pluginHidden", function(event) {
+          $(".migration_part_selection").show();
+        });
+
+      });
     });
   </script>
 <% end %>

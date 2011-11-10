@@ -124,7 +124,7 @@
   <% end %>
 <% end %>
 
-<% jammit_js :topic %>
+<% js_bundle :topic %>
 <% js_block do %>
   <script>
     var messageCount = <%= @entries.length %>, totalMessageCount = <%= @topic.discussion_entries.active.length %>;
@@ -148,7 +148,7 @@
 <% if @locked %>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:locked_topic, "This topic is currently locked.") %>
 <% else %>
-  <% jammit_js :wiki, :topics %>
+  <% js_bundle :wiki, :topics %>
   <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
   <% js_block do %><script>var CURRENT_USER_NAME_FOR_TOPICS=<%= context_user_name(@context, @current_user).to_json.html_safe %>;</script><% end %>
   <div style="display: none;" id="topic_urls">

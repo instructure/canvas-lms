@@ -1,10 +1,30 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
-define 'compiled/Gradebook', [
-  'i18n'
+define [
+  'i18n!gradebook2'
+  'jquery'
+  'compiled/grade_calculator'
+  'vendor/spin'
+  'compiled/multi_grid'
+  'compiled/SubmissionDetailsDialog'
+  'compiled/gradebook2/AssignmentGroupWeightsDialog'
+  'compiled/gradebook2/SubmissionCell'
+  'compiled/gradebook2/GradebookHeaderMenu'
+  'str/htmlEscape'
+  'jst/gradebook_uploads_form'
   'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
-], (I18n, sectionToShowMenuTemplate, columnHeaderTemplate) ->
-  I18n = I18n.scoped 'gradebook2'
+  'jquery.ajaxJSON'
+  'jquery.instructure_date_and_time'
+  'jquery.instructure_jquery_patches'
+  'jquery.instructure_misc_helpers'
+  'jquery.instructure_misc_plugins'
+  'vendor/jquery.ba-tinypubsub'
+  'vendor/jquery.store'
+  'jqueryui/mouse'
+  'jqueryui/position'
+  'jqueryui/sortable'
+  'compiled/jquery.kylemenu'
+], (I18n, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate) ->
 
   class Gradebook
     minimumAssignmentColumWidth = 10
@@ -41,10 +61,10 @@ define 'compiled/Gradebook', [
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
-        $.htmlEscapeValues(group)
+        htmlEscape(group)
         @assignmentGroups[group.id] = group
         for assignment in group.assignments
-          $.htmlEscapeValues(assignment)
+          htmlEscape(assignment)
           assignment.assignment_group = group
           assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
           @assignments[assignment.id] = assignment
@@ -53,10 +73,10 @@ define 'compiled/Gradebook', [
       @sections = {}
       @rows = []
       for section in sections
-        $.htmlEscapeValues(section)
+        htmlEscape(section)
         @sections[section.id] = section
         for student in section.students
-          $.htmlEscapeValues(student)
+          htmlEscape(student)
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
           student.secondary_identifier = student.sis_login_id || student.login_id
@@ -422,7 +442,7 @@ define 'compiled/Gradebook', [
             download_gradebook_csv_url: "#{@options.context_url}/gradebook.csv"
             action: "#{@options.context_url}/gradebook_uploads"
             authenticityToken: $("#ajax_authenticity_token").text()
-          $upload_modal = $(Template('gradebook_uploads_form', locals))
+          $upload_modal = $(gradebook_uploads_form(locals))
             .dialog
               bgiframe: true
               autoOpen: false
@@ -594,3 +614,4 @@ define 'compiled/Gradebook', [
         # TODO: start editing automatically when a number or letter is typed
         false
       @onGridInit()
+

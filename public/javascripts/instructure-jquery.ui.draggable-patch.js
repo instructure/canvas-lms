@@ -1,4 +1,5 @@
-!function($){
+define(['jquery', 'jqueryui/draggable'], function ($) {
+
   var _mouseMove = $.ui.draggable.prototype._mouseMove;
   $.ui.draggable.prototype._mouseMove = function() {
     var ret = _mouseMove.apply(this, arguments);
@@ -7,4 +8,6 @@
     if (this.options.instructureHackToNotAutoSizeTop) this.helper[0].style.top = '';
     return ret;
   };
-}(jQuery);
+
+});
+

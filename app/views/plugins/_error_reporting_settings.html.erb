@@ -47,10 +47,16 @@
 <% end %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */
+], function($) {
+
 $(document).ready(function() {
   $(".select_action").change(function() {
     $(".sub_setting").hide().filter("." + $(this).val()).show();
   }).change();
+});
+
 });
 </script>
 <% end %>

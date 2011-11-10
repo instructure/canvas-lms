@@ -15,8 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!groups',
+  'jquery' /* $ */,
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashMessage, flashError */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/droppable' /* /\.droppable/ */,
+  'jqueryui/tabs' /* /\.tabs/ */
+], function(I18n, $) {
 
-I18n.scoped('groups', function(I18n){
   window.contextGroups = {
     autoLoadGroupThreshold: 15,
     
@@ -768,3 +783,4 @@ I18n.scoped('groups', function(I18n){
     $("#tabs_loading_wrapper").show();
   });
 });
+

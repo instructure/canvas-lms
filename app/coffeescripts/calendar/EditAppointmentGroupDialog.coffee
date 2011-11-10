@@ -1,10 +1,10 @@
-define 'compiled/calendar/EditAppointmentGroupDialog', [
-  'i18n'
+define [
+  'jquery'
+  'i18n!calendar'
   'compiled/calendar/EditAppointmentGroupDetails'
   'jst/calendar/editAppointmentGroup'
-], (I18n, EditAppointmentGroupDetails, editAppointmentGroupTemplate) ->
-
-  I18n = I18n.scoped 'calendar'
+  'jquery.instructure_jquery_patches'
+], ($, I18n, EditAppointmentGroupDetails, editAppointmentGroupTemplate) ->
 
   dialog = $('<div id="edit_event"><div class="wrapper"></div>').appendTo('body').dialog
     autoOpen: false

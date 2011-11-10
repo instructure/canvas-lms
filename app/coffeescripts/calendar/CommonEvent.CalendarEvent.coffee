@@ -1,10 +1,10 @@
-define 'compiled/calendar/CommonEvent.CalendarEvent', [
-  'i18n'
+define [
+  'i18n!calendar'
   'compiled/util/semanticDateRange'
   'compiled/calendar/CommonEvent'
+  'jquery.instructure_date_and_time'
+  'jquery.instructure_misc_helpers'
 ], (I18n, semanticDateRange, CommonEvent) ->
-
-  I18n = I18n.scoped 'calendar'
 
   deleteConfirmation = I18n.t('prompts.delete_event', "Are you sure you want to delete this event?")
 

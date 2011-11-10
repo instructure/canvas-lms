@@ -108,7 +108,7 @@
     <% end %>
   <% end %>
 <% end %>
-<% jammit_js :quiz_show %>
+<% js_bundle :quiz_show %>
 <% jammit_css :quizzes %>
 <a id="context_quzzes_url" style="display:none;" href="<%= context_url(@context, :context_quizzes_url) %>">&nbsp;<!-- needed by quiz_show.js --></a>
 <% if @quiz.for_assignment? && @quiz.assignment.context_module_tag && @quiz.assignment.context_module_tag.context_module %>

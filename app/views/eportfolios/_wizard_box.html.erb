@@ -1,5 +1,10 @@
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_misc_plugins' /* /\.indicate/ */
+], function($) {
+
 $(document).ready(function() {
   $(".sections_list_hover").mouseover(function() {
     $("#section_list .section:first").indicate();
@@ -41,6 +46,7 @@ $(document).ready(function() {
       $(".wizard_options .option.editing_mode").click();
     }
   });
+});
 });
 </script>
 <% end %>

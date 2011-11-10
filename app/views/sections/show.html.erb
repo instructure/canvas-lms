@@ -181,7 +181,7 @@ h3 .tally {
     </ul>
   <% end %>
 <% end %>
-<% jammit_js :section %>
+<% js_bundle :section %>
 
 <div style="display: none;">
   <% form_tag context_url(@context, :context_section_crosslist_url, @section.id), :id => "crosslist_course_form", :title => t('titles.crosslist_this_section', 'Cross-List this Section'), :method => :post do %>

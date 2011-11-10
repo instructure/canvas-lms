@@ -1,7 +1,7 @@
 <% 
   content_for :page_title, t(:page_title, "Statistics for %{account}", :account => @account.name)
   @active_tab = "statistics"
-  jammit_js :graphael
+  js_bundle :graphael
 %>
 
 <% content_for :right_side do %>
@@ -37,11 +37,19 @@
 <h3 class="h-margin-top"><%= t(:page_views_by_hour_title, "Page views by hour") %></h3>
 <div id='hourly_usage' style='width: 600px; height: 260px;'></div>
 
-<% js_block :i18n_scope => 'accounts.statistics_page_views' do %>
+<% js_block do %>
   <!--Load the GOOGLE AJAX API-->
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
   <script type="text/javascript">
+  google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
+  require([
+    'i18nObj' /* I18n.t */,
+    'jquery' /* $ */,
+    'jquery.instructure_date_and_time' /* date_field */
+  ], function(I18n, $) {
+
     $(document).ready(function() {
       $(".date_field").date_field();
     });
@@ -60,18 +68,18 @@
         r.g.axis(40, 230, 220, 0, 100, 5, 1, <%= raw ([' '] + [20, 40, 60, 80, 100].map{ |n| number_to_percentage(n, :precision => 0) }).to_json %>, '|');
         r.g.axis(40, 230, 500, 0, 23, 24, 0, <%= raw (0..24).map{|i| I18n.l(Time.now.to_date + i.hours, :format => :tiny_on_the_hour).strip }.to_json %>, '+');
       } else {
-        $("#hourly_usage").text(I18n.t('no_data', "No data found for report"));
+        $("#hourly_usage").text(<%= jt('no_data', "No data found for report") %>);
       }
     } catch(e) {
-      $("#hourly_usage").text(I18n.t('building_report_error', "Error building usage report: %{error}", {error: e.toString()}));
+      $("#hourly_usage").text(<%= jt('building_report_error', "Error building usage report: %{error}", '{error: e.toString()}') %>);
     }
   
     var pageViewData = <%= raw @account.page_view_data(@start_at, @end_at).to_json %>;
-    google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
     google.setOnLoadCallback(function(){
       var data = new google.visualization.DataTable();
-      data.addColumn('date', I18n.t('date_column', 'Date'));
-      data.addColumn('number', I18n.t('page_views_column', 'Page Views'));
+      data.addColumn('date', <%= jt('date_column', 'Date') %>);
+      data.addColumn('number', <%= jt('page_views_column', 'Page Views') %>);
       data.addColumn('string', 'title1');
       data.addColumn('string', 'text1');
   
@@ -91,5 +99,6 @@
       chart.draw(data, {displayAnnotations: false});
   
     });
+  });
   </script>
 <% end %>

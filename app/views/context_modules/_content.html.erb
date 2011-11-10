@@ -328,6 +328,14 @@ TEXT
 <% end %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'context_modules' /* prerequisites, updateProgressionState */,
+  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
+  'jquery.instructure_misc_plugins' /* .dim */,
+  'jquery.keycodes' /* keycodes */
+], function($, context_modules) {
+
 $(document).ready(function() {
   var foundExpanded = false;
   var collapsedModules = <%= raw @collapsed_modules.to_json %>;
@@ -355,6 +363,7 @@ $(document).ready(function() {
       $module.find(".expand_module_link:first").triggerHandler('click', true);
     }
   });
+});
 });
 </script>
 <% end %>

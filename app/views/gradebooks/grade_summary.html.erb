@@ -1,5 +1,5 @@
 <% 
-  jammit_js :grade_summary, :rubric_assessment
+  js_bundle :grade_summary, :rubric_assessment
   jammit_css :grade_summary 
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @student.name), @context.name)
   editable = @current_user == @student && !@no_calculations
@@ -19,7 +19,7 @@
         <%= before_label(:total, "Total") %> <%= raw(number_to_percentage(100, :precision => 0).sub(/100/, '<span class="grade"></span>')) %>
         <% if @context.grading_standard_enabled? %>
           <span class="final_letter_grade">
-            (<span class="grade">-</span>)
+            (<span class="grade" id="final_letter_grade_text">-</span>)
           </span>
         <% end %>
       </div>
@@ -73,6 +73,9 @@
   </div>
   <% js_block do %>
     <script>
+    require([
+      'jquery' /* $ */
+    ], function($) {
       $(document).ready(function() {
         $("#course_url").change(function() {
           if(location.href != $(this).val()) {
@@ -80,6 +83,7 @@
           }
         });
       });
+    });
     </script>
   <% end %>
 <% end %>

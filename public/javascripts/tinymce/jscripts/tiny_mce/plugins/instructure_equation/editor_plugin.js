@@ -15,14 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// tinymce doesn't like its plugins being async,
+// all dependencies must export to window
+
+/*
+require([
+  'jquery',
+  'jquery.instructure_jquery_patches',
+  'mathquill'
+], function($) {
+*/
+
 (function() {
   $("<link/>", {
      rel: "stylesheet",
      type: "text/css",
      href: location.protocol + "//" + location.host + "/stylesheets/static/mathquill.css"
   }).appendTo("head");
-  $.getScript("/javascripts/mathquill.js", function() {
-    // hidden span so that we pre-load Symbola long before the equation popup ever opens
+
+  require(['mathquill'], function() {
     $("<span class='mathquill-embedded-latex' style='position: absolute; z-index: -1; top: 0; left: 0; width: 0; height: 0; overflow: hidden;'>a</span>").appendTo("body").mathquill();
   });
 

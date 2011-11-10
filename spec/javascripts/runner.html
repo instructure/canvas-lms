@@ -37,8 +37,19 @@
   <script>
     var require = {
       urlArgs: "bust=" +  (new Date()).getTime(),
+
       baseUrl: '../../public/javascripts',
+
+      paths: {
+        jquery: 'vendor/jquery-1.6.4',
+        jqueryui: 'vendor/jqueryui'
+      },
+
       packages: [
+        {
+          name: 'jqueryui',
+          location: 'vendor/jqueryui'
+        },
         {
           name: 'specs',
           location: '../../spec/javascripts',
@@ -62,67 +73,11 @@
   </script>
   <script src="../../public/javascripts/vendor/require.js"></script>
   <script>
-    // TODO AMD get rid of this first require when we get requireJS working fully
-    // it is only here for all those cases where we put "also gonna
-    // require foo, bar, baz" in a comment right before our require calls.
-    // If you need any of this stuff for your actual spec though, you
-    // should require it there.
-    require([
-      'order!vendor/jquery-1.6.4',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.core',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.widget',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.mouse',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.position',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.draggable',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.droppable',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.resizable',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.selectable',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.sortable',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.accordion',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.autocomplete',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.button',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.dialog',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.tabs',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.datepicker',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.ui.progressbar',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.effects.core',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.effects.blind',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.effects.drop',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.effects.highlight',
-      'order!vendor/jquery-ui-1.8.16/ui/jquery.effects.slide',
-      'order!instructure-jquery.ui.draggable-patch',
-      'order!i18n',
-      'order!vendor/jquery.ba-throttle-debounce',
-      'order!vendor/jquery.ba-tinypubsub',
-      'order!vendor/jquery.ba-hashchange',
-      'order!vendor/spin',
-      'order!vendor/jquery.spin',
-      'order!jquery.disableWhileLoading',
-      'order!jquery.fancyplaceholder',
-      'order!jquery.google-analytics',
-      'order!vendor/jquery.pageless',
-      'order!jquery.inst_tree',
-      'order!vendor/jquery.store',
-      'order!vendor/jquery.scrollTo',
-      'order!jquery.instructure_jquery_patches',
-      'order!jquery.instructure_misc_helpers',
-      'order!jquery.instructure_misc_plugins',
-      'order!jquery.instructure_date_and_time',
-      'order!jquery.instructure_forms',
-      'order!jquery.ajaxJSON',
-      'order!jquery.doc_previews',
-      'order!jquery.dropdownList',
-      'order!jquery.keycodes',
-      'order!jquery.loadingImg',
-      'order!jquery.rails_flash_notifications',
-      'order!jquery.scrollToVisible',
-      'order!jquery.templateData',
-      'order!vendor/jquery.placeholder',
-      'order!instructure_helper',
-      'i18n',
-      'compiled/handlebars_helpers',
-    ], function(){
-      require(['specs']);
+    // don't run specs until they are all loaded
+    stop();
+    require(['specs'], function() {
+      // run specs once they've all loaded
+      start();
     });
   </script>
 

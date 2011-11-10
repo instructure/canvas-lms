@@ -1,7 +1,7 @@
 # copy/pasted from: 
 # http://matthaynes.net/blog/2008/08/07/javascript-colour-functions/
 
-define 'compiled/util/hsvToRgb', ->
+define ->
 
   # /** 
   # * Converts HSV to RGB value. 

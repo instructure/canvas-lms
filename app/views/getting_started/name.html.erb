@@ -17,6 +17,11 @@
 <% end %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_misc_plugins' /* showIf */
+], function($) {
+
 $(function(){
   $(".save_button, .next_step_button, #wizard-steps a").click(function(event) {
     // if we clicked the "next step" button or one of the step1,2,3,4 links on the top
@@ -29,6 +34,7 @@ $(function(){
     $(".public_options").showIf($(this).attr('checked'));
   }).change();
   $("#course_name").focus().select();
+});
 });
 </script>
 <% end %>

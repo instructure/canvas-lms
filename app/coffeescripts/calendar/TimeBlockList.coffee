@@ -1,8 +1,12 @@
-define 'compiled/calendar/TimeBlockList', [
+define [
+  'jquery'
   'compiled/calendar/TimeBlockListManager'
   'jst/calendar/timeBlockList'
   'jst/calendar/_timeBlock'
-], (TimeBlockListManager, timeBlockListTemplate, timeBlockTemplate) ->
+  'jquery.instructure_date_and_time'
+  'jquery.instructure_forms'
+  'vendor/date'
+], ($, TimeBlockListManager, timeBlockListTemplate, timeBlockTemplate) ->
 
   class
     # blocks is an array of [ Date, Date ] pairs, representing

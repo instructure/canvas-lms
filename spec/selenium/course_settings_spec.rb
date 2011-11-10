@@ -130,8 +130,8 @@ describe "course settings tests" do
       driver.find_element(:id, 'user_list_parsed').should include_text(user.name)
       driver.find_element(:css, '.add_users_button').click
       wait_for_ajax_requests
-      driver.find_element(:link, 'Sections').click
       refresh_page
+      driver.find_element(:link, 'Sections').click
       new_section = driver.find_elements(:css, 'ul#sections > .section')[1]
       new_section.find_element(:css, '.users_count').should include_text("1")
     end

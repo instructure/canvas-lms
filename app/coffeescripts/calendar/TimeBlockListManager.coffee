@@ -1,4 +1,4 @@
-define 'compiled/calendar/TimeBlockListManager', [], () ->
+define ['jquery'], ($) ->
 
   class
     # takes an optional array of Date pairs

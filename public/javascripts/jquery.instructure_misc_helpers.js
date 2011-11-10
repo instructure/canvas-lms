@@ -15,9 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-if (!this.INST) this.INST = {};
-I18n.scoped('instructure', function(I18n) {
-  
+
+define([
+  'INST' /* INST */,
+  'i18n!instructure',
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSuggestion */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
+  'vendor/jquery.ba-throttle-debounce' /* throttle */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'vendor/jquery.store' /* /\$\.store/ */
+], function(INST, I18n, $, htmlEscape) {
+
   // Generate a unique integer id (unique within the entire window).
   // Useful for temporary DOM ids.
   // if you pass it a prefix (because all dom ids have to have a alphabetic prefix) it will 
@@ -116,24 +127,6 @@ I18n.scoped('instructure', function(I18n) {
     }
     return r;
   };
-  
-  var $dummyElement = $('<div/>');
-  $.htmlEscape = $.h = function(str) {
-    return str && str.htmlSafe ?
-      str.toString() :
-      $dummyElement.text(str).html();
-  }
-
-  // escape all string values (not keys) in an object
-  $.htmlEscapeValues = function(obj) {
-    var k,v;
-    for (k in obj) {
-      v = obj[k];
-      if (typeof v === "string") {
-        obj[k] = $.htmlEscape(v);
-      }
-    }
-  }
 
   // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
   // note that raw returns a String object, so you may want to call toString
@@ -217,52 +210,6 @@ I18n.scoped('instructure', function(I18n) {
     return $.map(res.split(/\s/), function(word) { return (word[0] || "").toUpperCase() + word.substring(1); }).join(" ");
   };
 
-  // ported pluralizations from active_support/inflections.rb
-  // (except for cow -> kine, because nobody does that) 
-  var pluralize = {
-    skip: ['equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep', 'jeans'],
-    patterns: [
-      [/person$/i, 'people'],
-      [/man$/i, 'men'],
-      [/child$/i, 'children'],
-      [/sex$/i, 'sexes'],
-      [/move$/i, 'moves'],
-      [/(quiz)$/i, '$1zes'],
-      [/^(ox)$/i, '$1en'],
-      [/([m|l])ouse$/i, '$1ice'],
-      [/(matr|vert|ind)(?:ix|ex)$/i, '$1ices'],
-      [/(x|ch|ss|sh)$/i, '$1es'],
-      [/([^aeiouy]|qu)y$/i, '$1ies'],
-      [/(hive)$/i, '$1s'],
-      [/(?:([^f])fe|([lr])f)$/i, '$1$2ves'],
-      [/sis$/i, 'ses'],
-      [/([ti])um$/i, '$1a'],
-      [/(buffal|tomat)o$/i, '$1oes'],
-      [/(bu)s$/i, '$1ses'],
-      [/(alias|status)$/i, '$1es'],
-      [/(octop|vir)us$/i, '$1i'],
-      [/(ax|test)is$/i, '$1es'],
-      [/s$/i, 's']
-    ]
-  };
-  $.pluralize = function(string) {
-    string = string || '';
-    if ($.inArray(string, pluralize.skip) > 0) {
-      return string;
-    }
-    for (var i = 0; i < pluralize.patterns.length; i++) {
-      var pair = pluralize.patterns[i];
-      if (string.match(pair[0])) {
-        return string.replace(pair[0], pair[1])
-      }
-    }
-    return string + "s";
-  };
-  
-  $.pluralize_with_count = function(count, string) {
-    return "" + count + " " + (count == 1 ? string : $.pluralize(string));
-  }
-  
   $.parseUserAgentString = function(userAgent) {
     userAgent = (userAgent || "").toLowerCase();
     var data = {
@@ -342,7 +289,7 @@ I18n.scoped('instructure', function(I18n) {
                        "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
                        "<input type='text' class='query' style='width: 230px;'/>" +
                        "<button class='button search_button' type='submit'>" +
-                       $.h(I18n.t('buttons.search', "Search")) + "</button></form>");
+                       htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>");
       $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>");
       $dialog.find("form").submit(function(event) {
         event.preventDefault();
@@ -354,17 +301,17 @@ I18n.scoped('instructure', function(I18n) {
             $dialog.find("form").submit();
           }, 15000 - (now - lastLookup));
           $dialog.find(".results").empty()
-            .append($.h(I18n.t('status.diigo_search_throttling', "Diigo limits users to one search every ten seconds.  Please wait...")));
+            .append(htmlEscape(I18n.t('status.diigo_search_throttling', "Diigo limits users to one search every ten seconds.  Please wait...")));
           return;
         }
-        $dialog.find(".results").empty().append($.h(I18n.t('status.searching', "Searching...")));
+        $dialog.find(".results").empty().append(htmlEscape(I18n.t('status.searching', "Searching...")));
         lastLookup = new Date();
         var query = $dialog.find(".query").val();
         var url = $.replaceTags($dialog.data('reference_url'), 'query', query);
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $dialog.find(".results").empty();
           if( !data.length ) {
-            $dialog.find(".results").append($.h(I18n.t('no_results_found', "No Results Found")));
+            $dialog.find(".results").append(htmlEscape(I18n.t('no_results_found', "No Results Found")));
           }
           for(var idx in data) {
             data[idx].short_title = data[idx].title;
@@ -382,7 +329,7 @@ I18n.scoped('instructure', function(I18n) {
           }
         }, function() {
           $dialog.find(".results").empty()
-            .append($.h(I18n.t('errors.search_failed', "Search failed, please try again.")));
+            .append(htmlEscape(I18n.t('errors.search_failed', "Search failed, please try again.")));
         });
       });
       $dialog.delegate('.bookmark_link', 'click', function(event) {
@@ -421,9 +368,9 @@ I18n.scoped('instructure', function(I18n) {
                   .append("<form id='image_search_form' style='margin-bottom: 5px;'>" +
                             "<img src='/images/flickr_creative_commons_small_icon.png'/>&nbsp;&nbsp;" + 
                             "<input type='text' class='query' style='width: 250px;' title='" +
-                            $.h(I18n.t('tooltips.enter_search_terms', "enter search terms")) + "'/>" + 
+                            htmlEscape(I18n.t('tooltips.enter_search_terms', "enter search terms")) + "'/>" + 
                             "<button class='button' type='submit'>" +
-                            $.h(I18n.t('buttons.search', "Search")) + "</button></form>")
+                            htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>")
                   .append("<div class='results' style='max-height: 240px; overflow: auto;'/>");
       
       $dialog.find("form .query").formSuggestion();
@@ -458,7 +405,7 @@ I18n.scoped('instructure', function(I18n) {
               );
             }
           } else {
-            $dialog.find(".results").empty().append($.h(I18n.t('errors.search_failed', "Search failed, please try again.")));
+            $dialog.find(".results").empty().append(htmlEscape(I18n.t('errors.search_failed', "Search failed, please try again.")));
           }
         });
         var query = encodeURIComponent($dialog.find(".query").val());
@@ -544,10 +491,6 @@ I18n.scoped('instructure', function(I18n) {
       default:
         return array.slice(0, -1).join(options.words_connector) + options.last_word_connector + array[array.length - 1];
     }
-  }
-  
-  $.regexEscape = function(string) {
-    return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   }
 
   // return query string parameter

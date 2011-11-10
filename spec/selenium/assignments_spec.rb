@@ -52,7 +52,10 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      driver.find_element(:css, ".toggle_full_rubric").click
+      keep_trying_until do
+        driver.find_element(:css, ".toggle_full_rubric").click
+        true
+      end
       wait_for_animations
       driver.find_element(:css, '#criterion_1 .long_description_link').click
       keep_trying_until { driver.find_element(:id, 'rubric_long_description_dialog').should be_displayed }
@@ -67,7 +70,6 @@ describe "assignments" do
       @assignment = @course.assignments.create(:name => assignment_name, :due_at => due_date)
 
       get "/calendar"
-
       #click on assignment in calendar
       if due_date.month > current_date.month
         driver.find_element(:css, '#content .next_month_link').click
@@ -413,7 +415,10 @@ describe "assignments" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       wait_for_ajaximations
-      driver.find_element(:css, '.toggle_full_rubric').click
+      keep_trying_until do
+        driver.find_element(:css, '.toggle_full_rubric').click
+        true
+      end
       find_with_jquery('#rubric_holder .criterion:visible .rating').click
       driver.find_element(:css, '#rubric_holder .save_rubric_button').click
       wait_for_ajaximations
@@ -510,7 +515,7 @@ describe "assignments" do
         driver.find_element(:id, 'edit_assignment_form').submit
         wait_for_ajaximations
 
-        assignment = Assignment.first(:order => "id desc")
+        assignment = Assignment.last
         assignment.turnitin_settings.should eql(expected_settings)
       end
 
@@ -580,6 +585,7 @@ describe "assignments" do
         click_option(".assignment_submission_types", 'Discussion')
         expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
         edit_form = driver.find_element(:id, 'edit_assignment_form')
+        wait_for_tiny driver.find_element(:id, 'assignment_description')
         edit_form.should be_displayed
         replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
         edit_form.find_element(:id, 'assignment_peer_reviews').click
@@ -691,6 +697,7 @@ describe "assignments" do
       wait_for_animations
       click_option(".assignment_submission_types", 'Discussion')
       expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
+      wait_for_tiny driver.find_element(:id, 'assignment_description')
       edit_form = driver.find_element(:id, 'edit_assignment_form')
       edit_form.should be_displayed
       replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)

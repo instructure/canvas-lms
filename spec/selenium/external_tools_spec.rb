@@ -233,7 +233,6 @@ describe "editing external tools" do
     driver.find_element(:css, "#external_tool_create_title").attribute('value').should == "not bob"
 
     tools[0].click
-
     keep_trying_until { driver.find_elements(:css, "#resource_selection_dialog")[0].try(:displayed?) }
 
     in_frame('resource_selection_iframe') do

@@ -16,9 +16,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('calendars', function(I18n) {
-(function() {
-    window.calendar = {
+require([
+  'INST' /* INST */,
+  'i18n!calendars',
+  'jquery' /* $ */,
+  'calendar_move' /* calendarMonths */,
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, parseFromISO, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, hideErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.disabled/ */,
+  'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags, /\$\.store/ */,
+  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.rails_flash_notifications' /* flashMessage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/date' /* Date.parse */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'vendor/jquery.store' /* /\$\.store/ */,
+  'jqueryui/datepicker' /* /\.datepicker/ */,
+  'jqueryui/resizable' /* /\.resizable/ */,
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'jqueryui/tabs' /* /\.tabs/ */
+], function(INST, I18n, $, calendarMonths) {
+
+  window.calendar = {
     viewItem: function(context_string, item_id, item_type) {
     },
     showingUndatedEvents: false,
@@ -1648,5 +1670,4 @@ I18n.scoped('calendars', function(I18n) {
       }, 10);
     });
   });
-})(jQuery);
 });

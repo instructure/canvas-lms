@@ -225,8 +225,16 @@ tr.question td .number_answer.correct_answer {
   </ul>
 </div>
 
-<% js_block :i18n_scope => 'quizzes.statistics' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* scrollSidebar, /\$\.uniq/ */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $.scrollSidebar();
   $(".essay_answer").live('click', function(event) {
@@ -255,7 +263,7 @@ $(document).ready(function() {
         var cnt = $.grep(ids, function(i) { return i == id; }).length;
         var name = $("#submitted_users .user.user_" + id).text();
         if(cnt > 1) {
-          name = name + " (" + I18n.t('count_attempts', "attempt", {'count': cnt}) + ")";
+          name = name + " (" + <%= jt('count_attempts', "attempt", '{\'count\': cnt}') %> + ")";
         }
         if(name) {
           var $name = $dialog.find(".user.blank:first").clone(true).removeClass('blank');
@@ -267,7 +275,7 @@ $(document).ready(function() {
       }
       if(uncounted > 0) {
         var $name = $dialog.find(".user.blank:first").clone(true).removeClass('blank');
-        $name.fillTemplateData({data: {name: I18n.t('uncounted_submissions', {'one': '1 other submission', 'other': '%{count} other submissions'}, {'count': uncounted})}});
+        $name.fillTemplateData({data: {name: <%= jt('uncounted_submissions', {:one => '1 other submission', :other => '%{count} other submissions'}, '{\'count\': uncounted}') %>}});
         $name.addClass('uncounted');
         $dialog.find(".users").append($name.show());
       }
@@ -277,12 +285,13 @@ $(document).ready(function() {
       }});
       $dialog.dialog('close').dialog({
         autoOpen: false,
-        title: I18n.t('titles.submitted_users_for_quesiton', "Submitted Users for %{user}", {'user': question_name}),
+        title: <%= jt('titles.submitted_users_for_quesiton', "Submitted Users for %{user}", '{\'user\': question_name}') %>,
         width: 500,
         height: 300
       }).dialog('open');
     }
   });
+});
 });
 </script>
 <% end %>

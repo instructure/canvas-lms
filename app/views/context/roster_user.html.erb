@@ -72,7 +72,7 @@
   </div>
 <% end %>
 
-<% jammit_js :user_name %>
+<% js_bundle :user_name %>
 <% jammit_css :roster_user %>
 
 <h2><%= t 'headings.users_details', "%{user}'s Details", :user => @user.short_name %></h2>
@@ -166,6 +166,15 @@
 
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_misc_plugins' /* .dim, undim, confirmDelete */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashError */,
+  'link_enrollment' /* link_enrollment */
+], function($) {
+
 $(document).ready(function() {
   $(".show_user_services_checkbox").change(function() {
     $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, function(data) {
@@ -233,6 +242,7 @@ $(document).ready(function() {
     $(".more_user_information").slideDown();
     $(this).hide();
   });
+});
 });
 </script>
 <% end %>

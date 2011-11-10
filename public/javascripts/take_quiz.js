@@ -15,10 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-require(['i18n'], function(I18n) {
-
-  I18n = I18n.scoped('quizzes.take_quiz');
+require([
+  'i18n!quizzes.take_quiz',
+  'jquery' /* $ */,
+  'quiz_timing',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
+  'jquery.instructure_forms' /* getFormData, errorBox */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* scrollSidebar */,
+  'jquery.rails_flash_notifications' /* flashMessage */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(I18n, $, timing) {
 
   var lastAnswerSelected = null;
   var quizSubmission = (function() {

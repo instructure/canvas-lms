@@ -1,7 +1,10 @@
-var _gaq = _gaq || [];
+define([
+  'INST' /* INST */,
+  'jquery' /* $ */
+], function(INST, $) {
 
-(function($, INST) {
-  var asyncScriptInserted = false;
+  // requires INST global
+  var _gaq = window._gaq = window._gaq || [];
 
   /**
    * Enables Google Analytics tracking on the page from which it's called.
@@ -83,4 +86,11 @@ var _gaq = _gaq || [];
     });
   }
 
-})(jQuery, this.INST);
+  return {
+    trackPage: $.trackPage,
+    setTrackingVar: $.setTrackingVar,
+    trackEvent: $.trackEvent,
+    trackPageView: $.trackPageView
+  };
+
+});

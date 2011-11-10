@@ -1,12 +1,15 @@
-define 'compiled/calendar/sidebar', [
-  'i18n'
+define [
+  'jquery'
   'jst/calendar/contextList'
   'jst/calendar/undatedEvents'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/EventDataSource'
-], (I18n, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
-  I18n = I18n.scoped 'calendar'
+  'compiled/jquery.kylemenu'
+  'jquery.instructure_misc_helpers'
+  'vendor/jquery.ba-tinypubsub'
+  'vendor/jquery.store'
+], ($, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
 
   class VisibleContextManager
     constructor: (contexts, @$holder) ->

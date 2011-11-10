@@ -1,7 +1,7 @@
 <% 
   content_for :page_title, "Statistics for #{@account.name}"
   @active_tab = "statistics"
-  jammit_js :graphael
+  js_bundle :graphael
 %>
 
 <h2>Page views by course</h2>
@@ -12,9 +12,19 @@
 
 <% js_block do %>
 
+<script type="text/javascript" src="//www.google.com/jsapi"></script>
 <script type="text/javascript">
-var pageViewData = <%= raw @account.page_view_data.to_json %>;
-(function($){
+
+google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
+require([
+  'jquery' /* jQuery, $ */,
+  'vendor/graphael',
+  'jquery.instructure_misc_plugins' /* /\.log\(/ */
+], function($, Raphael) {
+  
+  window.pageViewData = <%= raw @account.page_view_data.to_json %>;
+
   $(function(){
     var r = Raphael("pageviews_by_course_chart", 700, 240);
     r.g.txtattr.font = "12px 'Fontin Sans', Fontin-Sans, sans-serif";
@@ -42,37 +52,31 @@ var pageViewData = <%= raw @account.page_view_data.to_json %>;
         }
     });
   });
-})(jQuery);
-</script>
-<% end %>
-<% js_block do %>
-  <!--Load the GOOGLE AJAX API-->
-  <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
-  <script type="text/javascript">
-    google.load('visualization', '1', {'packages':['annotatedtimeline']});
-    google.setOnLoadCallback(function(){
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Date');
-      data.addColumn('number', 'Page Views');
-      data.addColumn('string', 'title1');
-      data.addColumn('string', 'text1');
-      
-      var rows = []
-      $.each(pageViewData, function() {
-        var date = new Date();
-        date.setTime(this[0]);
-        rows.push(
-          //this ends up being [(a date), (the number of pageViews on that date), "an annotation tile, (if any)", ""]
-          [date, this[1], undefined, undefined]
-        )
-      });
-      
-      data.addRows(rows);
-
-      var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-      chart.draw(data, {displayAnnotations: false});
-      
+  google.setOnLoadCallback(function(){
+    var data = new google.visualization.DataTable();
+    data.addColumn('date', 'Date');
+    data.addColumn('number', 'Page Views');
+    data.addColumn('string', 'title1');
+    data.addColumn('string', 'text1');
+    
+    var rows = []
+    $.each(pageViewData, function() {
+      var date = new Date();
+      date.setTime(this[0]);
+      rows.push(
+        //this ends up being [(a date), (the number of pageViews on that date), "an annotation tile, (if any)", ""]
+        [date, this[1], undefined, undefined]
+      )
     });
-  </script>
+    
+    data.addRows(rows);
+
+    var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+    chart.draw(data, {displayAnnotations: false});
+    
+  });
+
+});
+</script>
 <% end %>

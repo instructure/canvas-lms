@@ -19,7 +19,7 @@
 // handles shake event in browsers that support the devicemotion event (eg: iOS)
 // inspired by: https://github.com/shokai/js-iphone-shake-event
 
-(function($) {
+define(['jquery'], function($) {
 
 $.fn.shake = function(callback, options) {
   if ('ondevicemotion' in window) {
@@ -46,4 +46,4 @@ $.fn.shake = function(callback, options) {
   return this;
 };
 
-})(jQuery);
+});

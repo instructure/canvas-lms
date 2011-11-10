@@ -1,6 +1,7 @@
 define [
-  'jquery.instructure_misc_plugins'
+  'jquery'
   'helpers/loadFixture'
+  'jquery.instructure_misc_plugins'
 ], (jQuery, loadFixture) ->
 
   module 'instructure misc plugins'
@@ -8,7 +9,6 @@ define [
   test 'showIf', ->
     fixture = loadFixture "jQuery.instructureMiscPlugins"
     el = jQuery '#checkbox1'
-
     el.showIf(-> true)
     equal(el.is(":visible"), true, 'should show if callback returns true')
 

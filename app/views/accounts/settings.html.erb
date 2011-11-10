@@ -1,7 +1,7 @@
 <%
   @active_tab = "settings"
   add_crumb t(:settings_crumb, "Settings")
-  jammit_js :account_settings
+  js_bundle :account_settings
   jammit_css :account_settings, :reports
   content_for :page_title, t(:page_title, "Account Settings")
 %>
@@ -403,7 +403,7 @@
       <%= render :partial => 'account_user', :object => nil %>
     </ul>
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
-      <% jammit_js :user_lists %>
+      <% js_bundle :user_lists %>
       <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_admins', %{Add Account Admins}) %></a>
       <% form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>

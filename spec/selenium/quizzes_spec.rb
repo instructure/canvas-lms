@@ -73,10 +73,11 @@ describe "quizzes" do
 
     get "/courses/#{@course.id}/quizzes/new"
 
+    wait_for_tiny driver.find_element(:id, 'quiz_description')
     driver.find_element(:css, ".add_question .add_question_link").click
-    driver.find_element(:css, '.form_answers').should be_displayed
-    driver.find_element(:css, ".question_form .cancel_link").click
-    driver.find_element(:css, '.form_answers').should_not be_displayed
+    driver.find_elements(:css, ".question_holder .question_form").length.should == 1
+    driver.find_element(:css, ".question_holder .question_form .cancel_link").click
+    driver.find_elements(:css, ".question_holder .question_form").length.should == 0
   end
 
   it "should edit a quiz" do

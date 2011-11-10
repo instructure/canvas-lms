@@ -13,9 +13,10 @@
  *
  * Date: Sat Nov 19 18:21:10 2011 -0800
  *
+ * AMD by instructure
  */
  
-(function($, undefined) {
+define(['jquery'], function($, undefined) {
 
 
 var defaults = {
@@ -5215,4 +5216,4 @@ function HorizontalPositionCache(getElement) {
 	
 }
 
-})(jQuery);
+});

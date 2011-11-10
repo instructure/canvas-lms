@@ -16,7 +16,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('files', function(I18n) {
+require([
+  'INST' /* INST */,
+  'i18n!files',
+  'jquery' /* jQuery, $ */,
+  'str/htmlEscape',
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.doc_previews' /* loadDocPreview */,
+  'jquery.inst_tree' /* instTree */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData, fillFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.scrollToVisible' /* scrollToVisible */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'media_comments' /* mediaComment */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/droppable' /* /\.droppable/ */,
+  'jqueryui/progressbar' /* /\.progressbar/ */,
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'vendor/scribd.view' /* scribd */
+], function(INST, I18n, $, htmlEscape) {
+
   var files = {};
   var fileStructureData = [];
   (function() {
@@ -130,7 +155,7 @@ I18n.scoped('files', function(I18n) {
                   error: function(data) { }
                 });
                 var $dialog = $("<div/>");
-                $dialog.append("Extracting <b>" + $.htmlEscape(file.name) + "</b><br/>to " + $.htmlEscape(folder.name) + "...");
+                $dialog.append("Extracting <b>" + htmlEscape(file.name) + "</b><br/>to " + htmlEscape(folder.name) + "...");
                 $dialog.append("<div class='progress'/>");
                 var $progress = $dialog.find(".progress");
                 $progress.css('margin', '10px');
@@ -231,7 +256,7 @@ I18n.scoped('files', function(I18n) {
               I18n.t('prompts.duplicate_filenames', "Files with the following names already exist in this folder. Do you want to replace them, or rename the new files with unique names?"));
             var duplicatesHtml = '';
             for (idx in data.duplicates) {
-              duplicatesHtml += "<span class='duplicate_filename'>" + $.htmlEscape(data.duplicates[idx]) + "</span>";
+              duplicatesHtml += "<span class='duplicate_filename'>" + htmlEscape(data.duplicates[idx]) + "</span>";
             }
             $dialog.find(".duplicate_filenames").html(duplicatesHtml);
             $dialog.dialog('close').dialog({
@@ -525,7 +550,7 @@ I18n.scoped('files', function(I18n) {
           $(ui.helper).find(".header .sub_header").text("move to " + droppable.name);
           if(draggable && droppable && draggable.context_string != droppable.context_string) {
             $(ui.helper).addClass('copy_drag');
-            $(ui.helper).find(".header .sub_header").html("<strong>copy</strong> to " + $.htmlEscape(droppable.name));
+            $(ui.helper).find(".header .sub_header").html("<strong>copy</strong> to " + htmlEscape(droppable.name));
           }
         },
         out: function(event, ui) {
@@ -2505,3 +2530,4 @@ I18n.scoped('files', function(I18n) {
     file_details: {}
   };
 });
+

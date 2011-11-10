@@ -15,7 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-I18n.scoped("learning_outcome", function(I18n) {
+
+require([
+  'INST' /* INST */,
+  'i18n!learning_outcome',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* /\$\.underscore/, /\$\.titleize/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/jquery.pageless' /* pageless */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(INST, I18n, $) {
+
   $(document).ready(function() {
     $('#outcome_results').pageless({
       totalPages: parseInt($("#outcome_results_total_pages").text(), 10) || 1,

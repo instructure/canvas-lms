@@ -44,6 +44,11 @@
 <% end %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */
+], function($) {
+
 $(document).ready(function() {
   $("#messages").delegate('.delete_link', 'click', function(event) {
     event.preventDefault();
@@ -58,6 +63,7 @@ $(document).ready(function() {
       }
     });
   });
+});
 });
 </script>
 <% end %>

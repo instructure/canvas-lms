@@ -15,10 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// tinymce doesn't like its plugins being async,
+// all dependencies must export to window
+
+/*
+require([
+  'jquery',
+  'jquery.instructure_jquery_patches'
+], function($) {
+*/
+
 (function() {
-	tinymce.create('tinymce.plugins.InstructureEquella', {
-		init : function(ed, url) {
-			ed.addCommand('instructureEquella', function() {
+  tinymce.create('tinymce.plugins.InstructureEquella', {
+    init : function(ed, url) {
+      ed.addCommand('instructureEquella', function() {
         var $box = $("#equella_dialog");
         var url = $("#equella_endpoint_url").attr('href');
         var action = $.trim($("#equella_action").text() || "") || "selectOrAdd";
@@ -90,26 +101,26 @@
         $box.data('editor', ed);
         $box.dialog('close').dialog('open');
         $box.find("iframe").attr('src', full_url);
-			});
-			ed.addButton('instructure_equella', {
-				title: 'Insert Equella Links',
-				cmd: 'instructureEquella',
-				image: url + '/button.gif'
-			});
-		},
+      });
+      ed.addButton('instructure_equella', {
+        title: 'Insert Equella Links',
+        cmd: 'instructureEquella',
+        image: url + '/button.gif'
+      });
+    },
 
-		getInfo : function() {
-			return {
-				longname : 'InstructureEquella',
-				author : 'Brian Whitmer',
-				authorurl : 'http://www.instructure.com',
-				infourl : 'http://www.instructure.com',
-				version : tinymce.majorVersion + "." + tinymce.minorVersion
-			};
-		}
-	});
-	
-	// Register plugin
-	tinymce.PluginManager.add('instructure_equella', tinymce.plugins.InstructureEquella);
+    getInfo : function() {
+      return {
+        longname : 'InstructureEquella',
+        author : 'Brian Whitmer',
+        authorurl : 'http://www.instructure.com',
+        infourl : 'http://www.instructure.com',
+        version : tinymce.majorVersion + "." + tinymce.minorVersion
+      };
+    }
+  });
+
+  // Register plugin
+  tinymce.PluginManager.add('instructure_equella', tinymce.plugins.InstructureEquella);
 })();
 

@@ -43,6 +43,10 @@ DETAILS
 <% end %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */
+], function($) {
+
 $(document).ready(function() {
   $(".add_eportfolio_link").click(function(event) {
     event.preventDefault();
@@ -55,6 +59,7 @@ $(document).ready(function() {
     $("#add_eportfolio_form").slideToggle();
     $("#whats_an_eportfolio").slideToggle();
   });
+});
 });
 </script>
 <% end %>

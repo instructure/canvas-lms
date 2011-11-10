@@ -15,8 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-I18n.scoped('collaborations', function(I18n) {
+require([
+  'i18n!collaborations',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* fillFormData, getFormData, errorBox */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
+  'jquery.templateData' /* getTemplateData */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(I18n, $) {
 
   function removeCollaborationDiv(div) {
     if($("#collaborations .collaboration:visible").length <= 1) {
@@ -162,3 +170,4 @@ I18n.scoped('collaborations', function(I18n) {
       $(".add_collaboration_link").click();
   });
 });
+

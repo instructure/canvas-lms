@@ -15,7 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-I18n.scoped("question_banks", function(I18n) {
+
+require([
+  'i18n!question_banks',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $(".add_bank_link").click(function(event) {
     event.preventDefault();

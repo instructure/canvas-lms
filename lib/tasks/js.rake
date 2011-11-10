@@ -28,6 +28,12 @@ namespace :js do
   task :generate do
     require 'coffee-script'
     require 'fileutils'
+
+    # clear out all the files in case there are any old compiled versions of
+    # files that don't map to any source file anymore
+    FileUtils.rm_rf('public/javascripts/compiled')
+    FileUtils.rm_rf('public/javascripts/jst')
+
     puts "--> Pre-compiling all handlebars templates"
     Rake::Task['jst:compile'].invoke
     puts "--> Compiling all Coffeescript"
@@ -37,6 +43,11 @@ namespace :js do
     Dir[Rails.root+'app/coffeescripts/**/*.coffee'].each do |file|
       compile_coffescript file
     end
+  end
+
+  desc "optimize and build js for production"
+  task :build do
+    exec("node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js")
   end
 
 end

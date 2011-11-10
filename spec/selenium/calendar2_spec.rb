@@ -218,7 +218,7 @@ describe "calendar2" do
       select = driver.find_element(:css, '#edit_assignment_form .assignment_group')
       select = Selenium::WebDriver::Support::Select.new(select)
       select.first_selected_option.attribute(:value).to_i.should == group1.id
-      driver.find_element(:css, 'div.ui-dialog a.ui-dialog-titlebar-close').click
+      close_visible_dialog
 
       event2.click
       driver.find_element(:css, '.popover-links-holder .edit_event_link').click

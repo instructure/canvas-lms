@@ -46,26 +46,36 @@ class Handlebars
         partial_path = id.sub(filename, partial_name)
         partial_registration = "\nHandlebars.registerPartial('#{partial_path}', templates['#{id}']);\n"
       end
-      template = context.call "Handlebars.precompile", prepare_i18n(source, id)
+      prepared = prepare_i18n(source, id)
+      template = context.call "Handlebars.precompile", prepared[:content]
+      dependencies = ['compiled/handlebars_helpers']
+      dependencies << "i18n!#{normalize(id)}" if prepared[:keys].size > 0
 
       <<-JS
-!(function(){
+define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{dependencies.to_json}, function (Handlebars) {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-  templates['#{id}'] = template(#{template});#{partial_registration}
-  define('#{plugin ? plugin + "/" : ""}jst/#{id}', ['compiled/handlebars_helpers'], function (Handlebars) {
-    return templates['#{id}'];
-  });
-})();
+  templates['#{id}'] = template(#{template});
+  #{partial_registration}
+  return templates['#{id}'];
+});
 JS
+    end
+
+    def normalize(id)
+      # String#underscore may not be available
+      id.sub(/^_/, '').gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase.gsub(/\/_?/, '.')
     end
 
     def prepare_i18n(source, scope)
       @extractor ||= I18nExtraction::HandlebarsExtractor.new
       scope = scope.sub(/\A_/, '').gsub(/\/_?/, '.')
-      @extractor.scan(source, :method => :gsub) do |data|
+      keys = []
+      content = @extractor.scan(source, :method => :gsub) do |data|
         wrappers = data[:wrappers].map{ |value, delimiter| " w#{delimiter.size-1}=#{value.inspect}" }.join
+        keys << data[:key]
         "{{{t #{data[:key].inspect} #{data[:value].inspect} scope=#{scope.inspect}#{wrappers}#{data[:options]}}}}"
       end
+      {:content => content, :keys => keys}
     end
 
     protected
@@ -82,3 +92,4 @@ JS
     end
   end
 end
+

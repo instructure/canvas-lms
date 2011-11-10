@@ -16,7 +16,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('user_lists', function(I18n) {
+require([
+  'INST' /* INST */,
+  'i18n!user_lists',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* getFormData */,
+  'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.loadingImg' /* loadingImg, loadingImage */,
+  'jquery.rails_flash_notifications' /* flashMessage, flashError */,
+  'jquery.scrollToVisible' /* scrollToVisible */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(INST, I18n, $) {
 
   var $user_lists_processed_person_template = $("#user_lists_processed_person_template").removeAttr('id').detach(),
       $user_list_no_valid_users = $("#user_list_no_valid_users"),

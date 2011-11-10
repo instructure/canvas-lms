@@ -5,7 +5,7 @@
   account ||= managed_accounts.first
   root_account = account.root_account if account
 %>
-<% jammit_js :user_name %>
+<% js_bundle :user_name %>
   <fieldset id="name_and_email">
     <legend><%= t('titles.name_and_email', 'Name and Email') %></legend>
     <table class="profile_table details user_details">

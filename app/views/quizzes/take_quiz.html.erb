@@ -49,7 +49,7 @@
 <%= datetime_string(@submission.started_at) %>
 
 <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
-<% jammit_js :take_quiz %>
+<% js_bundle :take_quiz %>
 <div id="questions" class="assessing">
 <%
   form_params = { :controller => :quiz_submissions, :action => :create, :quiz_id => @quiz.id, :user_id => (@current_user && @current_user.id) }

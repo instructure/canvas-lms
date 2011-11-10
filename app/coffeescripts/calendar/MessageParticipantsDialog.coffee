@@ -1,10 +1,8 @@
 define 'compiled/calendar/MessageParticipantsDialog', [
-  'i18n'
+  'i18n!calendar'
   'jst/calendar/messageParticipants'
   'jst/calendar/recipientList'
 ], (I18n, messageParticipantsTemplate, recipientListTemplate) ->
-
-  I18n = I18n.scoped 'calendar'
 
   class
     constructor: (@group, @dataSource) ->

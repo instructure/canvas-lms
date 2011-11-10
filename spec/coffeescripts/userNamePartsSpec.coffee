@@ -1,5 +1,5 @@
-define [ 'user_utils' ], ->
-  
+define [ 'user_utils' ], (userUtils) ->
+
   module "UserNameParts"
   test "should infer name parts", ->
     deepEqual userUtils.nameParts("Cody Cutrer"), [ "Cody", "Cutrer", null ]

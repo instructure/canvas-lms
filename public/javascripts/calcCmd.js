@@ -1,5 +1,10 @@
-var calcCmd = {};
-I18n.scoped('calculator.commands', function(I18n){
+define([
+  'i18n!calculator.command',
+  'jquery' /* $ */
+], function(I18n, $) {
+
+  var calcCmd = {};
+
   (function() {
     var methods = {};
     var predefinedVariables = {};
@@ -487,4 +492,6 @@ I18n.scoped('calculator.commands', function(I18n){
     f('round', I18n.t('round.name', 'round'), function(x) { return Math.round(x); }, I18n.t('round.description', "Returns the given value rounded to the nearest whole number"), "round(x)");
     f('e', I18n.t('e.name', 'e'), function(x) { return Math.exp(x || 1); }, I18n.t('e.description', "Returns the value for e"), "e()");
   })();
+
+  return calcCmd;
 });

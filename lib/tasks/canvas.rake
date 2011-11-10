@@ -2,23 +2,24 @@ def check_syntax(files)
   quick = ENV["quick"] && ENV["quick"] == "true"
 
   files_not_to_lint = %w{
-    public/javascripts/date.js
-    public/javascripts/jquery-1.4.js
-    public/javascripts/jquery.ba-hashchange.js
-    public/javascripts/jquery-ui-1.8.js
-    public/javascripts/jquery.ba-throttle-debounce.js
-    public/javascripts/scribd.view.js
-    public/javascripts/swfobject/swfobject.js
-    public/javascripts/ui.selectmenu.js
-    public/javascripts/raphael.js
-    public/javascripts/g.raphael/g.raphael.js
-    public/javascripts/g.raphael/g.pie.js
-    public/javascripts/g.raphael/g.bar.js
-    public/javascripts/g.raphael/g.dot.js
-    public/javascripts/g.raphael/g.line.js
-    public/javascripts/underscore.js
-    public/flash/uploadify/jquery.uploadify.v2.1.0.js
-    public/javascripts/json2.js
+    ./public/javascripts/date.js
+    ./public/javascripts/jquery-1.4.js
+    ./public/javascripts/jquery.ba-hashchange.js
+    ./public/javascripts/jquery-ui-1.8.js
+    ./public/javascripts/jquery.ba-throttle-debounce.js
+    ./public/javascripts/scribd.view.js
+    ./public/javascripts/swfobject/swfobject.js
+    ./public/javascripts/ui.selectmenu.js
+    ./public/javascripts/raphael.js
+    ./public/javascripts/g.raphael/g.raphael.js
+    ./public/javascripts/g.raphael/g.pie.js
+    ./public/javascripts/g.raphael/g.bar.js
+    ./public/javascripts/g.raphael/g.dot.js
+    ./public/javascripts/g.raphael/g.line.js
+    ./public/javascripts/underscore.js
+    ./public/flash/uploadify/jquery.uploadify.v2.1.0.js
+    ./public/javascripts/json2.js
+    ./public/javascripts/mathquill.js
   }
   show_stoppers = []
   Array(files).each do |js_file|
@@ -101,12 +102,11 @@ namespace :canvas do
 
     desc "Checks all js files for sytax errors."
     task :all do
-      bundles = YAML.load(ERB.new(File.read('config/assets.yml')).result)['javascripts']
-      bundles.each do |bundle_name, bundle_files|
-        puts "------------------------------------------------------------"
-        puts "checking bundle: " + bundle_name
-        check_syntax(bundle_files)
-      end
+      #bundles = YAML.load(ERB.new(File.read('config/assets.yml')).result)['javascripts']
+      files = (Dir.glob('./public/javascripts/*.js')).
+        reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
+
+      check_syntax(files)
     end
   end
 
@@ -116,14 +116,17 @@ namespace :canvas do
     output = `bundle exec compass compile -e production --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
 
+    puts "--> Compiling static assets [jammit]"
+    output = `bundle exec jammit 2>&1`
+    raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
+
     Rake::Task['js:generate'].invoke
 
     puts "--> Generating js localization bundles"
     Rake::Task['i18n:generate_js'].invoke
 
-    puts "--> Compiling static assets [jammit]"
-    output = `bundle exec jammit 2>&1`
-    raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
+    puts "--> Optimizing JavaScript [r.js]"
+    Rake::Task['js:build'].invoke
 
     puts "--> Generating documentation [yardoc]"
     Rake::Task['doc:api'].invoke

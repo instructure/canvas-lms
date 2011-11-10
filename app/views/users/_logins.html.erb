@@ -1,5 +1,5 @@
   <% jammit_css :user_logins %>
-  <% jammit_js :user_logins %>
+  <% js_bundle :user_logins %>
   <% 
     can_only_select_current_account_which_is_passwordable = !can_do(Account.site_admin, @current_user, :manage_user_logins) && @domain_root_account && @domain_root_account.settings && @domain_root_account.settings[:admins_can_change_passwords] 
   %>

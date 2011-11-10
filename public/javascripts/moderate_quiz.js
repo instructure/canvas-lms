@@ -16,10 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var moderation;
+require([
+  'i18n!quizzes.moderate',
+  'jquery' /* $ */,
+  'quiz_timing',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* fillFormData, getFormData */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* showIf */,
+  'jquery.rails_flash_notifications' /* flashMessage */,
+  'jquery.templateData' /* fillTemplateData */,
+  'vendor/date' /* Date.parse */
+], function(I18n, $, timing) {
 
-I18n.scoped('quizzes.moderate', function(I18n) {
-  moderation = {
+  window.moderation = {
     updateTimes: function() {
       var now = new Date();
       moderation.studentsCurrentlyTakingQuiz = !!$("#students .student.in_progress");

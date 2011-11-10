@@ -1,7 +1,8 @@
 /***
  * A singleton for controlling access to the editing functionality for multiple components capable of editing the same data.
  */
-var GlobalEditorLock = new function()
+define(function() {
+window.GlobalEditorLock = new function()
 {
     var currentEditor = null;
     
@@ -51,4 +52,5 @@ var GlobalEditorLock = new function()
             currentEditor.cancelCurrentEdit();
     }
 };
-
+return window.GlobalEditorLock;
+});

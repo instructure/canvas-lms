@@ -1,4 +1,13 @@
-I18n.scoped('link_enrollment', function (I18n) {
+define([
+  'i18n!link_enrollment',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* showIf */,
+  'jquery.templateData' /* fillTemplateData */
+], function(I18n, $) {
+
   window.link_enrollment = (function() {
     return {
       choose: function(user_name, enrollment_id, current_user_id, callback) {

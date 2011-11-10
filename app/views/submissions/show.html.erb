@@ -1,5 +1,12 @@
 <%
-  jammit_js :rubric_assessment
+  js_bundle :rubric_assessment
+  js_env({
+    :RUBRIC_ASSESSMENT => {
+      :assessment_user_id => @submission.user_id,
+      :assessor_id => @current_user ? @current_user.id : "null",
+      :assessment_type => can_do(@submission, @current_user, :grade) ? "grading" : "peer_review"
+    }
+  })
   content_for :page_title, join_title(@assignment.title, @submission.user.name)
   add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
   add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
@@ -13,8 +20,24 @@
     }
   </style>
 <% end %>
-<% js_block :i18n_scope => 'submissions.show' do %>
-  <script>
+
+
+<% js_block do %>
+<script>
+require([
+  'INST' /* INST */,
+  'i18nObj',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
+  'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
+  'jquery.loadingImg' /* loadingImg, loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'media_comments' /* mediaComment, mediaCommentThumbnail */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(INST, I18n, $) {
+
   $("#content").addClass('padless');
   var fileIndex = 1;
   var submissionLoaded = function(data) {
@@ -34,7 +57,7 @@
         var $comment = $("#comment_blank").clone(true).removeAttr('id');
         comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
         if(comment.anonymous) {
-          comment.author_name = I18n.t("anonymous", "Anonymous");
+          comment.author_name = <%= jt("anonymous", "Anonymous") %>;
         }
         $comment.fillTemplateData({
           data: comment,
@@ -127,7 +150,7 @@
           formData['submission[comment]'] = $(".grading_comment").val();
         }
         if(!formData['submission[comment]'] && $("#add_comment_form input[type='file']").length > 0) {
-          formData['submission[comment]'] = formData['submission[comment]'] || I18n.t("see_attached_files", "See attached files");
+          formData['submission[comment]'] = formData['submission[comment]'] || <%= jt("see_attached_files", "See attached files") %>;
         }
       }
       if(!formData['submission[comment]'] && !formData['submission[grade]'] && !formData['submission[media_comment_id]']) {
@@ -209,8 +232,8 @@
         }
       }
       rubricAssessment.populateRubric($("#rubric_holder .rubric"), found);
-      var current_user = (!found || found.assessor_id == rubricAssessment.assessor_id);
-      $("#rubric_holder .rubric").toggleClass('assessing', current_user && rubricAssessment.assessor_id != rubricAssessment.assessment_user_id);
+      var current_user = (!found || found.assessor_id == ENV.RUBRIC_ASSESSMENT.assessor_id);
+      $("#rubric_holder .rubric").toggleClass('assessing', current_user && ENV.RUBRIC_ASSESSMENT.assessor_id != ENV.RUBRIC_ASSESSMENT.assessment_user_id);
       $("#rubric_holder .save_rubric_button").showIf(current_user);
     }).change();
     $(".media_comment_link").click(function(event) {
@@ -275,7 +298,8 @@
       $.ajaxJSON(url, 'GET', {}, submissionLoaded);
     }, 500);
   };
-  </script>
+});
+</script>
 <% end %>
   <div style="padding: 0px 20px 3px;" class="submission_details">
     <div style="float: right;">
@@ -474,9 +498,6 @@
 <% js_block do %>
 <script>
 var rubricAssessments = <%= raw @visible_rubric_assessments.to_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) %>;
-rubricAssessment.assessment_user_id = <%= @submission.user_id %>;
-rubricAssessment.assessor_id = <%= @current_user ? @current_user.id : "null" %>;
-rubricAssessment.assessment_type = '<%= can_do(@submission, @current_user, :grade) ? "grading" : "peer_review" %>';
 //rubricAssessment.populateRubric($("#rubric_holder"), rubricAssessments.rubric_assessment);
 </script>
 <% end %>

@@ -15,11 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+define([
+  'i18n!rubric_assessment',
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* fillFormData */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
+  'jquery.instructure_misc_helpers' /* truncateText */,
+  'jquery.instructure_misc_plugins' /* showIf */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(I18n, $) {
 
-var rubricAssessment;
-I18n.scoped('rubric_assessment', function(I18n) {
-rubricAssessment = {
-  
+// TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
+window.rubricAssessment = {
   init: function(){
     var $rubric_criterion_comments_dialog = $("#rubric_criterion_comments_dialog");
 
@@ -165,8 +173,8 @@ rubricAssessment = {
   assessmentData: function($rubric) {
     $rubric = rubricAssessment.findRubric($rubric);
     var data = {};
-    data['rubric_assessment[user_id]'] = rubricAssessment.assessment_user_id || $rubric.find(".user_id").text();
-    data['rubric_assessment[assessment_type]'] = rubricAssessment.assessment_type || $rubric.find(".assessment_type").text();
+    data['rubric_assessment[user_id]'] = ENV.RUBRIC_ASSESSMENT.assessment_user_id || $rubric.find(".user_id").text();
+    data['rubric_assessment[assessment_type]'] = ENV.RUBRIC_ASSESSMENT.assessment_type || $rubric.find(".assessment_type").text();
     $rubric.find(".criterion:not(.blank)").each(function() {
       var id = $(this).attr('id');
       var pre = "rubric_assessment[" + id + "]";
@@ -217,8 +225,8 @@ rubricAssessment = {
   populateRubric: function($rubric, data) {
     $rubric = rubricAssessment.findRubric($rubric);
     var id = $rubric.attr('id').substring(7);
-    $rubric.find(".user_id").text(rubricAssessment.assessment_user_id || data.user_id).end()
-      .find(".assessment_type").text(rubricAssessment.assessment_type || data.assessment_type);
+    $rubric.find(".user_id").text(ENV.RUBRIC_ASSESSMENT.assessment_user_id || data.user_id).end()
+      .find(".assessment_type").text(ENV.RUBRIC_ASSESSMENT.assessment_type || data.assessment_type);
     
     $rubric.find(".criterion_description").removeClass('completed').removeClass('original_completed').end()
       .find(".rating").removeClass('selected').removeClass('original_selected').end()
@@ -294,8 +302,8 @@ rubricAssessment = {
     }
   }
 };
-});
-// actually initialize it on dom ready.
-$(function() {
-  rubricAssessment.init();
+
+$(rubricAssessment.init);
+
+return rubricAssessment;
 });

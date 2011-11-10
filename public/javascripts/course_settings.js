@@ -15,8 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-I18n.scoped('course_settings', function(I18n) {
+require([
+  'i18n!course_settings',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* scrollSidebar */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashError */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'link_enrollment' /* link_enrollment */,
+  'vendor/jquery.ba-tinypubsub' /* /\.publish/ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/autocomplete' /* /\.autocomplete/ */,
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'jqueryui/tabs' /* /\.tabs/ */
+], function(I18n, $) {
 
   var GradePublishing = {
     status: null,

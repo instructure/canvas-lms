@@ -15,8 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!site_admin',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */
+], function(I18n, $) {
 
-I18n.scoped('site_admin', function(I18n) {
   $(document).ready(function() {
     $(".over_time_link").live('click', function(event) {
       event.preventDefault();

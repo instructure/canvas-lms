@@ -22,7 +22,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
     #make sure each view uses the proper format
     driver.find_element(:css, '.wiki_switch_views_link').click
-    driver.execute_script("return $('#wiki_page_body').val()").should include '<p><em><strong>'
+    driver.execute_script("return $('#wiki_page_body').val()").should include '<em><strong>'
     driver.find_element(:css, '.wiki_switch_views_link').click
     in_frame "wiki_page_body_ifr" do
       driver.find_element(:id, 'tinymce').should_not include_text('<p>')
@@ -33,7 +33,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
 
-    driver.page_source.should match(/<p><em><strong>This is my text\./)
+    driver.page_source.should match(/<em><strong>This is my text\./)
   end
 
   it "should add a quiz to the rce" do

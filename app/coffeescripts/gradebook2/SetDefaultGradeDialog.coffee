@@ -1,15 +1,30 @@
-I18n.scoped 'gradebook2', (I18n) ->
-  class @SetDefaultGradeDialog
+define [
+  'i18n!gradebook2'
+  'jquery'
+  'jst/SetDefaultGradeDialog'
+  'jquery.disableWhileLoading'
+  'jquery.instructure_forms'
+  'jquery.instructure_jquery_patches'
+  'jquery.instructure_misc_plugins'
+  'vendor/jquery.ba-tinypubsub'
+
+  # this is a partial needed by the 'SetDefaultGradeDialog' template
+  # since you cant declare a dependency in a handlebars file, we need to do it here
+  'jst/_grading_box'
+
+], (I18n, $, setDefaultGradeDialogTemplate) ->
+
+  class SetDefaultGradeDialog
     constructor: (@assignment, @gradebook) ->
       @initDialog()
-    
+
     initDialog: =>
-      templateLocals = 
+      templateLocals =
         assignment: @assignment
         showPointsPossible: @assignment.points_possible || @assignment.points_possible == '0'
         url: "/courses/#{@gradebook.options.context_id}/gradebook/update_submission"
       templateLocals["assignment_grading_type_is_#{@assignment.grading_type}"] = true
-      @$dialog = $(Template('SetDefaultGradeDialog', templateLocals))
+      @$dialog = $(setDefaultGradeDialogTemplate(templateLocals))
       @$dialog.dialog(
         resizable: false
         width: 350
