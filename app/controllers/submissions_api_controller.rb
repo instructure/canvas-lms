@@ -28,11 +28,26 @@
 class SubmissionsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
 
+  include Api::V1::Submission
+
   # @API
   #
   # Get all existing submissions for an assignment.
   #
-  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
+  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"|"assignment"] Associations to include with the group.
+  #
+  # Fields include:
+  # assignment_id:: The unique identifier for the assignment.
+  # user_id:: The id of the user who submitted the assignment.
+  # submitted_at:: The timestamp when the assignment was submitted, if an actual submission has been made.
+  # score:: The raw score for the assignment submission.
+  # attempt:: If multiple submissions have been made, this is the attempt number.
+  # body:: The content of the submission, if it was submitted directly in a text field.
+  # grade:: The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).
+  # grade_matches_current_submission:: A boolean flag which is false if the student has re-submitted since the submission was last graded.
+  # preview_url:: Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
+  # submitted_at:: Timestamp when the submission was made.
+  # url:: If the submission was made as a URL.
   def index
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -41,7 +56,7 @@ class SubmissionsApiController < ApplicationController
 
       includes = Array(params[:include])
 
-      result = @submissions.map { |s| submission_json(s, @assignment, includes) }
+      result = @submissions.map { |s| submission_json(s, @assignment, @context, includes) }
 
       render :json => result.to_json
     end
@@ -54,7 +69,7 @@ class SubmissionsApiController < ApplicationController
   # @argument student_ids[] List of student ids to return submissions for. At least one is required.
   # @argument assignment_ids[] List of assignments to return submissions for. If none are given, submissions for all assignments are returned.
   # @argument grouped If this argument is present, the response will be grouped by student, rather than a flat array of submissions.
-  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"|"total_scores"] Associations to include with the group. `total_scores` requires the `grouped` argument.
+  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"] Associations to include with the group. `total_scores` requires the `grouped` argument.
   #
   # @example_response
   #
@@ -106,7 +121,7 @@ class SubmissionsApiController < ApplicationController
           # we've already got all the assignments loaded, so bypass AR loading
           # here and just give the submission its assignment
           submission.assignment = assignments_hash[submission.assignment_id]
-          hash[:submissions] << submission_json(submission, submission.assignment, includes)
+          hash[:submissions] << submission_json(submission, submission.assignment, @context, includes)
         end unless assignments.empty?
         if includes.include?('total_scores') && params[:grouped].present?
           hash.merge!(
@@ -135,7 +150,7 @@ class SubmissionsApiController < ApplicationController
     @submission = @assignment.submissions.find_or_initialize_by_user_id(@user.id) or raise ActiveRecord::RecordNotFound
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
-      render :json => submission_json(@submission, @assignment, includes).to_json
+      render :json => submission_json(@submission, @assignment, @context, includes).to_json
     end
   end
 
@@ -236,120 +251,8 @@ class SubmissionsApiController < ApplicationController
       # fix this at some point.
       @submission.reload
 
-      render :json => submission_json(@submission, @assignment, %w(submission_comments)).to_json
+      render :json => submission_json(@submission, @assignment, @context, %w(submission_comments)).to_json
     end
-  end
-
-  protected
-
-  # We might want to make a Helper that holds all these methods to convert AR
-  # objects to the API json formatting.
-  def submission_json(submission, assignment, includes = [])
-    hash = submission_attempt_json(submission, assignment)
-
-    if includes.include?("submission_history")
-      hash['submission_history'] = []
-      submission.submission_history.each_with_index do |ver, idx|
-        hash['submission_history'] << submission_attempt_json(ver, assignment, idx)
-      end
-    end
-
-    if includes.include?("submission_comments")
-      hash['submission_comments'] = submission.submission_comments.map do |sc|
-        sc_hash = sc.as_json(
-          :include_root => false,
-          :only => %w(author_id author_name created_at comment))
-        if sc.media_comment?
-          sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
-        end
-        sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a)
-        end unless sc.attachments.blank?
-        sc_hash
-      end
-    end
-
-    if includes.include?("rubric_assessment") && submission.rubric_assessment
-      ra = submission.rubric_assessment.data
-      hash['rubric_assessment'] = {}
-      ra.each { |rating| hash['rubric_assessment'][rating[:criterion_id]] = rating.slice(:points, :comments) }
-    end
-
-    hash
-  end
-
-  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission).freeze
-  SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
-
-  def submission_attempt_json(attempt, assignment, version_idx = nil)
-    json_fields = SUBMISSION_JSON_FIELDS
-    if params[:response_fields]
-      json_fields = json_fields & params[:response_fields]
-    end
-    if params[:exclude_response_fields]
-      json_fields -= params[:exclude_response_fields]
-    end
-
-    other_fields = SUBMISSION_OTHER_FIELDS
-    if params[:response_fields]
-      other_fields = other_fields & params[:response_fields]
-    end
-    if params[:exclude_response_fields]
-      other_fields -= params[:exclude_response_fields]
-    end
-
-    hash = attempt.as_json(
-      :include_root => false,
-      :only => json_fields)
-
-    hash['preview_url'] = course_assignment_submission_url(
-      @context, assignment, attempt[:user_id], 'preview' => '1',
-      'version' => version_idx)
-
-    unless attempt.media_comment_id.blank?
-      hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
-    end
-    
-    if attempt.turnitin_data && attempt.grants_right?(@current_user, :view_turnitin_report)
-      turnitin_hash = attempt.turnitin_data.dup
-      turnitin_hash.delete(:last_processed_attempt)
-      hash['turnitin_data'] = turnitin_hash
-    end
-    
-    if other_fields.include?('attachments')
-      attachments = attempt.versioned_attachments.dup
-      attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
-      hash['attachments'] = attachments.map do |attachment|
-        attachment_json(attachment)
-      end.compact unless attachments.blank?
-    end
-
-    # include the discussion topic entries
-    if other_fields.include?('discussion_entries') &&
-           assignment.submission_types =~ /discussion_topic/ &&
-           assignment.discussion_topic
-      # group assignments will have a child topic for each group.
-      # it's also possible the student posted in the main topic, as well as the
-      # individual group one. so we search far and wide for all student entries.
-      if assignment.has_group_category?
-        entries = assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
-      else
-        entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
-      end
-      hash['discussion_entries'] = entries.map do |entry|
-        ehash = entry.as_json(
-          :include_root => false,
-          :only => %w(message user_id created_at updated_at)
-        )
-        attachments = (entry.attachments.dup + [entry.attachment]).compact
-        ehash['attachments'] = attachments.map do |attachment|
-          attachment_json(attachment)
-        end.compact unless attachments.blank?
-        ehash
-      end
-    end
-
-    hash
   end
 
   def map_user_ids(user_ids)
