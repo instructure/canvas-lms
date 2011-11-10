@@ -1,3 +1,5 @@
+require 'skip_callback'
+
 class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
   def self.up
     # entries from graded topics where the poster is enrolled as a student in
