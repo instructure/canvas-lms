@@ -891,6 +891,46 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:id, 'quiz_title').text.should == q.title
   end
 
+  it "should round numeric questions thes same when created and taking a quiz" do
+    start_quiz_question
+    quiz = Quiz.last
+    question = find_with_jquery(".question:visible")
+    question.
+      find_element(:css, 'select.question_type').
+      find_element(:css, 'option[value="numerical_question"]').click
+
+    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
+    in_frame tiny_frame["id"] do
+      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
+    end
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers[0].find_element(:name, 'answer_exact').send_keys('0.000675')
+    driver.execute_script <<-JS
+      $('input[name=answer_exact]').trigger('change');
+    JS
+    answers[0].find_element(:name, 'answer_error_margin').send_keys('0')
+    question.submit
+    wait_for_ajax_requests
+
+    driver.find_element(:css, '.publish_quiz_button').click
+    wait_for_ajax_requests
+    wait_for_dom_ready
+
+    driver.find_element(:link, 'Take the Quiz').click
+    wait_for_dom_ready
+
+    input = driver.find_element(:css, 'input[type=text]')
+    input.click
+    input.send_keys('0.000675')
+    driver.execute_script <<-JS
+      $('input[type=text]').trigger('change');
+    JS
+    driver.find_element(:css, '.submit_button').click
+    wait_for_dom_ready
+    driver.find_element(:css, '.score_value').text.strip.should == '1'
+  end
+
+
   context "select element behavior" do
     before do
       course_with_teacher_logged_in
@@ -929,7 +969,7 @@ shared_examples_for "quiz selenium tests" do
       is_prevented = driver.execute_script('return window.mousewheelprevented')
       is_prevented.should be_true
     end
-  
+
     # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
     it "should not unhover a question so long as one of its selects has focus" do
       container = driver.find_element(:css, '.question')

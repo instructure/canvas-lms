@@ -150,7 +150,11 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
         },
         'change blur': function() {
           var val = parseFloat($(this).val());
-          if(isNaN(val)) { val = ""; }
+          if (isNaN(val)){
+            val = "";
+          } else {
+            val = val.toFixed(4);
+          }
           $(this).val(val);
         }
       })
