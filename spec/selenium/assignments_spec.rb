@@ -310,7 +310,52 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
 
   end
+  
+  it "should not adjust assignment points possible for grading rubric" do
+    course_with_teacher_logged_in
+    assignment_name = 'first test assignment'
+    @group = @course.assignment_groups.create!(:name => "default")
+    @assignment = @course.assignments.create(
+      :name => assignment_name,
+      :assignment_group => @group,
+      :points_possible => 2
+      )
 
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+
+    driver.find_element(:css, '.add_rubric_link').click
+    driver.find_element(:id, 'grading_rubric').click
+    driver.find_element(:id, 'edit_rubric_form').submit
+    find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
+    wait_for_ajaximations
+    driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+  end
+  
+  it "should adjust assignment points possible for grading rubric" do
+    course_with_teacher_logged_in
+    assignment_name = 'first test assignment'
+    @group = @course.assignment_groups.create!(:name => "default")
+    @assignment = @course.assignments.create(
+      :name => assignment_name,
+      :assignment_group => @group,
+      :points_possible => 2
+      )
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+
+    driver.find_element(:css, '.add_rubric_link').click
+    driver.find_element(:id, 'grading_rubric').click
+    driver.find_element(:id, 'edit_rubric_form').submit
+    find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Change")').click
+    wait_for_ajaximations
+    
+    driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '5'
+  end
+  
   context "turnitin" do
     before do
       course_with_teacher_logged_in
