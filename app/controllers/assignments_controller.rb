@@ -322,6 +322,8 @@ class AssignmentsController < ApplicationController
           params[:assignment][:submission_types] = "attendance"
         elsif params[:assignment_type] == "discussion_topic"
           params[:assignment][:submission_types] = "discussion_topic"
+        elsif params[:assignment_type] == "external_tool"
+          params[:assignment][:submission_types] = "external_tool"
         end
       end
       respond_to do |format|

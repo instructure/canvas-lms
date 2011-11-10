@@ -115,12 +115,7 @@
             <% end %>
           <% end %>
         </div>
-        <% if can_do(@topic.assignment, @current_user, :grade) || can_do(@topic.assignment.context, @current_user, :manage_assignments) %>
-          <a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment_id, :return_to => request.url) %>" class="button button-sidebar button-sidebar-wide"><%= image_tag "edit.png" %> <%= t :edit_assignment_settings, "Edit Assignment Settings" %></a>
-          <% if !@topic.assignment.submissions.having_submission.empty? %>
-            <a target="_blank" class="button button-sidebar button-sidebar-wide" href="<%= context_url(@topic.assignment.context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment_id) %>"><%= image_tag "grading_icon.png" %> <%= t :speed_grader, "Speed Grader" %></a>
-          <% end %>
-        <% end %>
+        <%= render :partial => 'assignments/external_grader_sidebar', :locals => { :assignment => @topic.assignment } %>
         <% if can_do(@topic.assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
           <a href="#" rel="<%= context_url(@assignment.context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> <%= t :show_assignment_rubric, "Show Assignment Rubric" %></a>
         <% end %>

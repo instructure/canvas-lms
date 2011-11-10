@@ -31,7 +31,8 @@ class Assignment < ActiveRecord::Base
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
-    :set_custom_field_values, :context, :position, :allowed_extensions
+    :set_custom_field_values, :context, :position, :allowed_extensions,
+    :external_tool_tag_attributes
   attr_accessor :original_id
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
@@ -49,7 +50,28 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
+
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
+  after_save :save_external_tool_tag
+
+  def external_tool_tag_attributes=(attrs)
+    attrs.delete(:id)
+    @tmp_tag = self.external_tool_tag || self.build_external_tool_tag
+    @tmp_tag.attributes = attrs
+    @tmp_tag.content_type = 'ContextExternalTool'
+  end
+
+  def save_external_tool_tag
+    if @tmp_tag
+      @tmp_tag.context = self
+      @tmp_tag.save!
+    end
+    true
+  end
+
+  def external_tool?
+    self.submission_types == 'external_tool'
+  end
 
   validates_presence_of :context_id
   validates_presence_of :context_type
@@ -1553,7 +1575,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def expects_submission?
-    submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper"
+    submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper" && submission_types != 'external_tool'
   end
   
   def <=>(compairable)

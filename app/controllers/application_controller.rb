@@ -813,7 +813,12 @@ class ApplicationController < ActionController::Base
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
-      @resource_title = @tag.title
+      if @tag.context.is_a?(Assignment)
+        @assignment = @tag.context
+        @resource_title = @assignment.title
+      else
+        @resource_title = @tag.title
+      end
       @resource_url = @tag.url
       @opaque_id = @tag.opaque_identifier(:asset_string)
       @tool = ContextExternalTool.find_external_tool(tag.url, context)
@@ -825,7 +830,7 @@ class ApplicationController < ActionController::Base
       else
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
-        if @tag.context.is_a?(Assignment) && @context.students.include?(@current_user)
+        if @assignment && @context.students.include?(@current_user)
           @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         end
         @tool_settings = @launch.generate
