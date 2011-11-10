@@ -493,6 +493,9 @@ class UsersController < ApplicationController
     notify = :self_registration unless @context.grants_right?(@current_user, session, :manage_user_logins)
     email = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
 
+    sis_user_id = params[:pseudonym].delete(:sis_user_id)
+    sis_user_id = nil unless @context.grants_right?(@current_user, session, :manage_sis)
+
     @user = @pseudonym && @pseudonym.user
     @user ||= User.new
     @user.attributes = params[:user]
@@ -502,6 +505,8 @@ class UsersController < ApplicationController
     # pre-populate the reverse association
     @pseudonym.user = @user
     @pseudonym.attributes = params[:pseudonym]
+    @pseudonym.sis_user_id = sis_user_id
+
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'
     @cc = @user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
