@@ -129,6 +129,14 @@
         <% end %>
       </ul>
     <% end %>
+    <% if @copy_context.context_external_tools.active.length > 0 %>
+      <h3><%= check_box :copy, :all_external_tools, :class => "copy_all", :checked => true %><%= label :copy, :all_external_toold, t('labels.external_tools', "External Tools for %{course}", :course => @copy_context.name) %></h3>
+      <ul class="unstyled_list asset_list">
+        <% @copy_context.context_external_tools.active.each do |tool| %>
+          <li><%= check_box :copy, tool.asset_string.to_sym %><%= label :copy, tool.asset_string.to_sym, tool.name %></li>
+        <% end %>
+      </ul>
+    <% end %>
     <div style="margin-top: 20px;">
       <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, :en => "Adjust events and due dates" %></h3>
       <div style="display: none; margin-left: 50px;" class="shift_dates_settings">
