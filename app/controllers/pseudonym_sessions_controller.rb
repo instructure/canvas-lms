@@ -124,11 +124,8 @@ class PseudonymSessionsController < ApplicationController
       return
     end
 
-    # TODO: don't allow logins from other root accounts anymore
-    # If authlogic fails and this account allows handles from other account,
-    # try to log in with a handle from another account
-    if !found && !@domain_root_account.require_account_pseudonym? && params[:pseudonym_session]
-      valid_alternative = Pseudonym.custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).find{|p|
+    if !found && params[:pseudonym_session]
+      valid_alternative = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).find{|p|
         (p.valid_password?(params[:pseudonym_session][:password]) && p.account.password_authentication?) rescue false
       }
       if valid_alternative

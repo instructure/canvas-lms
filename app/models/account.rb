@@ -668,10 +668,6 @@ class Account < ActiveRecord::Base
     !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?)
   end
   
-  def require_account_pseudonym?
-    false
-  end
-  
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd
@@ -679,10 +675,6 @@ class Account < ActiveRecord::Base
   # invitation.
   def allow_invitation_previews?
     self == Account.default
-  end
-  
-  def pseudonym_session_scope
-    self.require_account_pseudonym? ? self.pseudonym_sessions : PseudonymSession
   end
   
   def find_courses(string)

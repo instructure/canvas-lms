@@ -163,12 +163,11 @@ class Pseudonym < ActiveRecord::Base
   def authentication_type
     :email_login
   end
-  
+
   def works_for_account?(account)
-    return false unless account
-    self.account_id == account.id || (!account.require_account_pseudonym? && self.account.password_authentication?)
+    true
   end
-  
+
   def save_without_updating_passwords_on_related_pseudonyms
     @dont_update_passwords_on_related_pseudonyms = true
     self.save
@@ -377,9 +376,9 @@ class Pseudonym < ActiveRecord::Base
   named_scope :account_unique_ids, lambda{|account, *unique_ids|
     {:conditions => {:account_id => account.id, :unique_id => unique_ids}, :order => :unique_id}
   }
-  named_scope :active, lambda{
-    {:conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted'] }
-  }
+  named_scope :active, :conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted']
+  # returns pseudonyms not from account, but that can be used by account
+  named_scope :trusted_by, lambda { |account| {:conditions => ['account_id<>?', account.id]} }
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 end
