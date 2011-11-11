@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'quiz_question_link_migrator'
+
 class QuizQuestion < ActiveRecord::Base
   attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version, :quiz_group, :quiz
   attr_readonly :quiz_id
@@ -133,5 +135,18 @@ class QuizQuestion < ActiveRecord::Base
     id = self.connection.insert(query)
     hash[:quiz_question_id] = id
     hash
+  end
+
+  def migrate_file_links
+    QuizQuestionLinkMigrator.migrate_file_links_in_question(self)
+  end
+
+  def self.batch_migrate_file_links(ids)
+    questions = QuizQuestion.find(:all, :include => [:quiz, :assessment_question], :conditions => ['id in (?)', ids])
+    questions.each do |question|
+      if question.migrate_file_links
+        question.save
+      end
+    end
   end
 end
