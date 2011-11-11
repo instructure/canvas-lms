@@ -62,8 +62,9 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
             groups.group_category_id=#{assignment.group_category_id}
           LIMIT 1
         SQL
+        group_id = group && group.id
 
-        homework = Submission.build(
+        homework = Submission.new(
           :assignment_id => assignment.id,
           :user_id => entry.user_id,
           :group_id => group_id,
