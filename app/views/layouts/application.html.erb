@@ -60,13 +60,6 @@
   </script>
 </head>
 <body class="<%= (@body_classes << @active_tab).uniq.join(" ") %>">
-  <% if @body_class_no_headers %>
-    <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
-      <%- cache([@current_user || 'nobody', 'identity-type-15m'], :expires_in => 15.minutes) do -%>
-      <div id="identity_feedback" style="display: none" class="feedback <%= @current_user.try(:highest_role) %>"></div>
-      <%- end -%>
-    <% end %>
-  <% else %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
     <a id="header-logo" href="<%= root_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> 
@@ -147,8 +140,6 @@
     </ul>
     <% end %>
   </div>
-
-  <% end  #unless no-headers %>
   <div id="instructure_ajax_error_box">
     <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link"><%= t('links.close', 'Close') %></a></div>
     <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;"></iframe>
@@ -198,20 +189,12 @@
         <% if Setting.get_cached("show_opensource_linkback", "false") == "true" %>
           <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>      
         <% end %>
-        <% if url = ((@domain_root_account && @domain_root_account.settings[:support_url]) || (Account.default && Account.default.settings[:support_url])) %>
-          <%= link_to(t('links.support', "Support"), url) %>
-        <% end %>
-        <%  if @headers == false && Setting.get_cached("show_feedback_link", "false") == "true" %>
-          <a href="#" id="feedback_link"><%= t('links.help', 'Help') %></a> 
-        <% end %>
+        <%= help_link %>
         <%= render :partial => 'shared/footer_links' %>
       </span>
     </footer>
   </div>
 </div>
-
-<%= render :partial => 'shared/feedback' if Setting.get_cached('show_feedback_link', 'false') == 'true' %>
-
 
 <% if wizard %>
   <div id="wizard_spacer_box"></div>
@@ -257,10 +240,14 @@
   <%= render :partial => "shared/global_dialogs" %>
 <% end %>
 
-<script> window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>'); </script>
-<script> var INST = <%= raw(inst_env.to_json) %>; </script>
+<script>
+  window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>');
+  var INST = <%= raw(inst_env.to_json) %>;
+  var ENV = <%= raw env.to_json %>;
+</script>
 
 <%= include_javascripts :common %>
+
 <script>
   I18n.locale = <%= @locale %>;
 </script>

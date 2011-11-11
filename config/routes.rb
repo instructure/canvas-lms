@@ -41,6 +41,7 @@ ActionController::Routing::Routes.draw do |map|
   map.oauth_success "oauth_success", :controller => "users", :action => "oauth_success"
 
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
+  map.help_links 'help_links', :controller => 'info', :action => 'help_links'
 
   question_bank_resources = lambda do |bank|
     bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'

@@ -5,6 +5,7 @@ require([
   'specs/jQuery.instructureMiscPluginsSpec',
   'specs/userNamePartsSpec',
   'specs/objectCollectionSpec',
+  'specs/helpDialogSpec',
   'specs/util/BackoffPollerSpec',
   'specs/jQuery.instructureJqueryPatches',
   'specs/ENVSpec'

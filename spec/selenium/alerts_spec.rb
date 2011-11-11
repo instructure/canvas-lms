@@ -159,14 +159,13 @@ describe "Alerts" do
 
   it "should validate the form" do
     get "/accounts/#{@context.id}/settings"
-
     driver.find_element(:css, '#tab-alerts-link').click
     driver.find_element(:css, '.add_alert_link').click
     alert = driver.find_element(:css, '.alert.new')
     alert.find_element(:css, 'input[name="repetition"][value="value"]').click
+    sleep 2 #need to wait for javascript to process
+    find_with_jquery('.alert.new .submit_button').click
     keep_trying_until do
-      find_with_jquery('.alert.new .submit_button').click
-      sleep 2 #need to wait for javascript to process
       wait_for_animations
       find_all_with_jquery('.error_box').length == 4
     end

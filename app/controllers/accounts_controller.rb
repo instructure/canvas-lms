@@ -80,6 +80,18 @@ class AccountsController < ApplicationController
   def update
     if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
+
+        custom_help_links = params[:account].delete :custom_help_links
+        if custom_help_links
+          @account.settings[:custom_help_links] = custom_help_links.sort.map do |index_with_hash|
+            hash = index_with_hash[1]
+            hash.assert_valid_keys ["text", "subtext", "url", "available_to"]
+            hash
+          end
+        elsif @account.settings[:custom_help_links].present?
+          @account.settings.delete :custom_help_links
+        end
+
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
         global_includes = !!params[:account][:settings].try(:delete, :global_includes)

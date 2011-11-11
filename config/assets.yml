@@ -84,9 +84,11 @@ javascripts:
     - public/javascripts/instructure.js
     - public/javascripts/ajax_errors.js
     - public/javascripts/page_views.js
-    - public/javascripts/feedback.js
     - public/javascripts/compiled/license_help.js
     - public/javascripts/wiki_sidebar.js
+    - public/javascripts/INST.js
+    - public/javascripts/jst/helpDialog.js
+    - public/javascripts/compiled/helpDialog.js
     - public/javascripts/translations/_core_en.js
     # CustomMenu
     - public/javascripts/compiled/util/objectCollection.js
@@ -376,6 +378,7 @@ stylesheets:
     - public/stylesheets/compiled/g_wiki_sidebar.css
     - public/stylesheets/compiled/g_syllabus.css
     - public/stylesheets/compiled/g_mini_calendar.css
+    - public/stylesheets/compiled/helpDialog.css
     - public/stylesheets/compiled/print.css
   profile:
     - public/stylesheets/compiled/profile.css

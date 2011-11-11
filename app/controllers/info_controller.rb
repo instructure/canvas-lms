@@ -19,7 +19,7 @@
 class InfoController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => :record_error
   skip_before_filter :load_account, :only => :health_check
-  skip_before_filter :load_user, :only => :health_check
+  skip_before_filter :load_user, :only => [:health_check, :help_links]
   
   def message_redirect
     m = Message.find_by_id(params[:id])
@@ -29,7 +29,11 @@ class InfoController < ApplicationController
       redirect_to "http://#{HostUrl.default_host}/"
     end
   end
-  
+
+  def help_links
+    render :json => @domain_root_account && @domain_root_account.help_links
+  end
+
   def avatar_image_url
     cancel_cache_buster
     url = Rails.cache.fetch(Cacher.avatar_cache_key(params[:user_id])) do
@@ -42,31 +46,8 @@ class InfoController < ApplicationController
     redirect_to url
   end
 
-  def record_error_for_teacher
-    @admins = @course.admins
-    if !@admins.empty?
-      backtrace = params[:error][:backtrace] rescue nil
-      comments = params[:error][:comments] rescue nil
-      comments = t(:no_comments, "No comments") unless comments.present?
-      body = t(:feedback_subject, "Student Feedback on %{course}", :course => @course.name)
-      body += "\n" + backtrace if backtrace.present?
-      body += "\n" + comments
-      @message = @current_user.initiate_conversation(@admins.map(&:id)).add_message(comments)
-      respond_to do |format|
-        flash[:notice] = t('notices.feedback_sent', "Thanks for your feedback!  Your teacher has been notified.")
-        format.html { redirect_to root_url }
-        format.json { render :json => {:logged => true, :id => @message.id, :teacher_message => true}.to_json }
-      end
-      return true
-    end
-  end
-  protected :record_error_for_teacher
-  
   def record_error
     error = params[:error] || {}
-    if @current_user && params[:feedback_type] == 'teacher' && params[:course_id].present? && @course = @current_user.courses.find_by_id(params[:course_id])
-      return if record_error_for_teacher
-    end
     error[:user_agent] = request.headers['User-Agent']
     begin
       report_id = error.delete(:id)

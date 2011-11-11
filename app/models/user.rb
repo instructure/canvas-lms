@@ -1772,6 +1772,15 @@ class User < ActiveRecord::Base
   end
   memoize :highest_role
 
+  def roles
+    res = ['user']
+    res << 'student' if self.cached_current_enrollments.any?(&:student?)
+    res << 'teacher' if self.cached_current_enrollments.any?(&:admin?)
+    res << 'admin' unless self.accounts.empty?
+    res
+  end
+  memoize :roles
+
   def eportfolios_enabled?
     accounts = associated_root_accounts.reject(&:site_admin?)
     accounts.size == 0 || accounts.any?{ |a| a.settings[:enable_eportfolios] != false }
@@ -1896,7 +1905,11 @@ class User < ActiveRecord::Base
         limited_id[type] = $2.to_i
         enrollment_type = $4
         if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
-          enrollment_type_sql = " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
+          if enrollment_type == 'admins'
+            enrollment_type_sql = " AND enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
+          else
+            enrollment_type_sql = " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
+          end
         end
       end
       full_course_ids &= [limited_id['course']]

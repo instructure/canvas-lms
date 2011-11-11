@@ -472,6 +472,14 @@ var I18n = I18n || {};
     end
   end
 
+  def env
+    {
+      :current_user_id => @current_user.try(:id),
+      :current_user_roles => @current_user.try(:roles),
+      :context_asset_string => @context.try(:asset_string)
+    }
+  end
+
   def nbsp
     raw("&nbsp;")
   end
@@ -621,6 +629,17 @@ var I18n = I18n || {};
       cache(*args) { yield }
     else
       yield
+    end
+  end
+
+  def help_link
+    url = ((@domain_root_account && @domain_root_account.settings[:support_url]) || (Account.default && Account.default.settings[:support_url]))
+    show_feedback_link = Setting.get_cached("show_feedback_link", "false") == "true"
+    css_classes = []
+    css_classes << "support_url" if url
+    css_classes << "help_dialog_trigger" if show_feedback_link
+    if url || show_feedback_link
+      link_to t('#links.help', "Help"), url || '#', :class => css_classes.join(" ")
     end
   end
 
