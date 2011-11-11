@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'quiz_question_link_migrator'
+
 class Quiz < ActiveRecord::Base
   include Workflow
   include HasContentTags
@@ -1208,4 +1210,17 @@ class Quiz < ActiveRecord::Base
   named_scope :not_for_assignment, lambda{
     {:conditions => ['quizzes.assignment_id IS NULL'] }
   }
+
+  def migrate_file_links
+    QuizQuestionLinkMigrator.migrate_file_links_in_quiz(self)
+  end
+
+  def self.batch_migrate_file_links(ids)
+    quizzes = Quiz.find(:all, :conditions => ['id in (?)', ids])
+    quizzes.each do |quiz|
+      if quiz.migrate_file_links
+        quiz.save
+      end
+    end
+  end
 end
