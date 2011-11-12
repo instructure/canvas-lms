@@ -3,10 +3,10 @@ require File.dirname(__FILE__) + '/cc_spec_helper'
 describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
     before do
-      @kaltura = mock(Kaltura::ClientV3)
-      Kaltura::ClientV3.stub(:new).and_return(@kaltura)
-      @kaltura.stub(:startSession)
-      @kaltura.stub(:flavorAssetGetByEntryId).with('abcde').and_return([
+      @kaltura = mock('Kaltura::ClientV3')
+      Kaltura::ClientV3.stubs(:new).returns(@kaltura)
+      @kaltura.stubs(:startSession)
+      @kaltura.stubs(:flavorAssetGetByEntryId).with('abcde').returns([
       {
         :isOriginal => 1,
         :containerFormat => 'mp4',
@@ -27,7 +27,7 @@ describe CC::CCHelper do
         :size => 5,
       },
       ])
-      @kaltura.stub(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId('abcde').first)
+      @kaltura.stubs(:flavorAssetGetOriginalAsset).returns(@kaltura.flavorAssetGetByEntryId('abcde').first)
       course_with_teacher
       @obj = @course.media_objects.create!(:media_id => 'abcde')
     end

@@ -30,20 +30,20 @@ describe BookmarkService do
   context "post_bookmark" do
     before do
       # For safety, that we don't mess with external services at all.
-      @bookmark_service.stub!(:delicious_post_bookmark).and_return(true)
-      @bookmark_service.stub!(:diigo_post_bookmark).and_return(true)
+      @bookmark_service.stubs(:delicious_post_bookmark).returns(true)
+      @bookmark_service.stubs(:diigo_post_bookmark).returns(true)
     end
     
     it "should be able to post a bookmark for diigo" do
       @bookmark_service.service.should eql('diigo')
       
-      @bookmark_service.should_receive(:diigo_post_bookmark).with(
+      @bookmark_service.expects(:diigo_post_bookmark).with(
         @bookmark_service, 
         'google.com', 
         'some title', 
         'some comments', 
         ['some', 'tags']
-      ).and_return(true)
+      ).returns(true)
       
       @bookmark_service.post_bookmark(
         :title => 'some title', 
@@ -58,13 +58,13 @@ describe BookmarkService do
 
       @bookmark_service.service.should eql('delicious')
       
-      @bookmark_service.should_receive(:delicious_post_bookmark).with(
+      @bookmark_service.expects(:delicious_post_bookmark).with(
         @bookmark_service, 
         'google.com', 
         'some title', 
         'some comments', 
         ['some', 'tags']
-      ).and_return(true)
+      ).returns(true)
       
       @bookmark_service.post_bookmark(
         :title => 'some title', 

@@ -92,7 +92,6 @@ class Worker
 
     if job
       configure_for_job(job) do
-        ensure_db_connection
         perform(job)
 
         @job_count += 1
@@ -200,16 +199,6 @@ class Worker
   ensure
     ENV['TMPDIR'] = previous_tmpdir if @make_tmpdir
     Thread.current[:context] = nil
-  end
-
-  def ensure_db_connection
-    begin
-      ActiveRecord::Base.connection.execute("select 1")
-    rescue ActiveRecord::StatementInvalid
-      ActiveRecord::Base.connection.reconnect!
-      # if this fails again, it'll raise the error up
-      ActiveRecord::Base.connection.execute("select 1")
-    end
   end
 
 end

@@ -19,19 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "navigation" do
-  it "should show enrollment terms when someone has multiple courses with the same name" do
+  before do
     @account = Account.default
-    user_with_pseudonym
-    course_with_teacher(:course_name => "Course 1", :user => @user)
-    course_with_teacher(:course_name => "Course 1", :user => @user)
-    term1 = @account.enrollment_terms.create!(:name => "Spring Term")
-    course_with_teacher(:course_name => "Course 2", :user => @user); @course.enrollment_term = term1; @course.save!
-    course_with_teacher(:course_name => "Course 3", :user => @user); @course.enrollment_term = term1; @course.save!
-    term2 = @account.enrollment_terms.create!(:name => "Summer Term")
-    course_with_teacher(:course_name => "Course 3", :user => @user); @course.enrollment_term = term2; @course.save!
-    
+    @user = user_with_pseudonym
     user_session(@user, @pseudonym)
-    
+  end
+
+  it "should show enrollment terms when someone has multiple courses with the same name" do
+    course_with_teacher(:course_name => "Course 1", :user => @user, :active_all => true)
+    course_with_teacher(:course_name => "Course 1", :user => @user, :active_all => true)
+    term1 = @account.enrollment_terms.create!(:name => "Spring Term")
+    course_with_teacher(:course_name => "Course 2", :user => @user, :active_all => true); @course.enrollment_term = term1; @course.save!
+    course_with_teacher(:course_name => "Course 3", :user => @user, :active_all => true); @course.enrollment_term = term1; @course.save!
+    term2 = @account.enrollment_terms.create!(:name => "Summer Term")
+    course_with_teacher(:course_name => "Course 3", :user => @user, :active_all => true); @course.enrollment_term = term2; @course.save!
+
     get "/"
     page = Nokogiri::HTML(response.body)
     list = page.css(".menu-item-drop-column-list li")
@@ -45,15 +47,27 @@ describe "navigation" do
   end
 
   it "should not fail on courses where the term no longer exists" do
-    @account = Account.default
-    user_with_pseudonym
-    course_with_teacher
-    
-    EnrollmentTerm.delete(@course.enrollment_term.id)
-    
-    user_session(@user, @pseudonym)
-    
     get "/"
-    response.should be_success
+    page = Nokogiri::HTML(response.body)
+    list = page.css(".menu-item-drop")
   end
+
+  it "should not show the 'customize' button with <= 12 enrollments" do
+    12.times do |int|
+      course_with_teacher :course_name => "Course #{int}", :user => @user, :active_all => true
+    end
+    get '/'
+    page = Nokogiri::HTML(response.body)
+    page.css('.customListOpen').should be_empty
+  end
+
+  it "should show the 'customize' button with > 12 enrollments" do
+    13.times do |int|
+      course_with_teacher :course_name => "Course #{int}", :user => @user, :active_all => true
+    end
+    get '/'
+    page = Nokogiri::HTML(response.body)
+    page.css('.customListOpen').should_not be_empty
+  end
+
 end

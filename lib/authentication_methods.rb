@@ -214,13 +214,13 @@ module AuthenticationMethods
   def reset_session_saving_keys(*keys)
     # can't use slice, because session has a different ctor than a normal hash
     saved = {}
-    keys.each { |k| saved[k] = session[k] }
+    keys.each { |k| saved[k] = session[k] if session[k] }
     reset_session
-    session.merge!(saved)
+    saved.each_pair { |k, v| session[k] = v }
   end
 
   def reset_session_for_login
-    reset_session_saving_keys(:return_to, :oauth2)
+    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id)
   end
 
   def initiate_delegated_login(preferred_account_domain=nil)

@@ -30,26 +30,9 @@
   <% end %>
 <% end %>
 <div>
-<% if session[:conflict_channel] %>
-  <div class="reminder">
-    <h2><%= t('titles.confirm_email', 'Confirm Email') %></h2>
-    <div class="body">
-      <%= mt('email_conflict', "Does the email address, **%{email}**, belong to you?  Right now it belongs to another user. If you're sure it belongs to you, then you should claim it as part of your account.", :email => session[:conflict_channel].path) %>
-      <div class="button-container button-container-right-aligned">
-        <% form_for session[:conflict_channel], :url => try_merge_communication_channels_path, :html => {:style => "float: left;", :method => :post} do |f| %>
-          <input type="hidden" name="path" value="<%= session[:conflict_channel].path %>"/>
-          <button type="submit" name="accept" class="button positive button-default"><%= t('buttons.claim_email', 'Claim This Address') %></button>
-        <% end %>
-        <% form_for User, :url => dashboard_ignore_channel_path(:path => session[:conflict_channel].path), :html => {:style => "float: left;", :method => :post} do |f| %>
-          <button type="submit" name="reject" class="button"><%= t('ignore_email', 'Ignore This Address') %></button>
-        <% end %>
-        <div class="clear"></div>
-      </div>
-    </div>
-  </div>
-<% end %>
 <% if @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).empty? %>
   <%= render :partial => 'ie7_upgrade' %>
+  <%= render :partial => 'users/account_notification', :collection => @account_notifications %>
   <div class="communication_message dashboard_notification">
     <div class="header">
       <div class="header_title">

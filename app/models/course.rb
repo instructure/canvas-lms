@@ -73,8 +73,8 @@ class Course < ActiveRecord::Base
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted', 'inactive'], :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
-  has_many :students, :through => :student_enrollments, :source => :user, :order => :sortable_name
-  has_many :all_students, :through => :all_student_enrollments, :source => :user, :order => :sortable_name
+  has_many :students, :through => :student_enrollments, :source => :user, :order => User.sortable_name_order_by_clause
+  has_many :all_students, :through => :all_student_enrollments, :source => :user, :order => User.sortable_name_order_by_clause
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'StudentEnrollment' and enrollments.workflow_state = 'active'"
   has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user #, :conditions => "type = 'StudentEnrollment'"
   has_many :all_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
@@ -475,7 +475,7 @@ class Course < ActiveRecord::Base
                                                        FROM group_memberships gm
                                                       WHERE gm.user_id = u.id AND
                                                             gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-                            ORDER BY u.sortable_name ASC", self.id], :page => page, :per_page => per_page)
+                            ORDER BY #{User.sortable_name_order_by_clause('u')} ASC", self.id], :page => page, :per_page => per_page)
   end
   
   def admins_in_charge_of(user_id)
@@ -817,12 +817,9 @@ class Course < ActiveRecord::Base
       can permission
     end
     
-    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && hash[:enrollment_state] == "invited" }
+    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered") }
     can :read
-    
-    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered" }
-    can :read
-    
+
     given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
     can :read
     
@@ -1085,7 +1082,7 @@ class Course < ActiveRecord::Base
     # actual grade publishing logic is here, but you probably want
     # 'publish_final_grades'
 
-    enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
+    enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
 
     begin
 
@@ -1153,7 +1150,7 @@ class Course < ActiveRecord::Base
       assignments = assignments.find(:all, :order => 'due_at, title')
     end
     single = assignments.length == 1
-    student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
+    student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
     submissions = self.submissions.inject({}) { |h, sub|
       h[[sub.user_id, sub.assignment_id]] = sub; h
     }
@@ -1235,16 +1232,23 @@ class Course < ActiveRecord::Base
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     enrollment_state = 'invited' if enrollment_state == 'creation_pending' && (type == 'TeacherEnrollment' || type == 'TaEnrollment')
     e = self.enrollments.find_by_user_id_and_type(user.id, type) if user
-    e.update_attributes(:workflow_state => 'invited', :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section) if e && (e.completed? || e.rejected?)
-    e ||= self.send(type.underscore.pluralize).create(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section)
+    e.attributes = { :workflow_state => 'invited', :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section } if e && (e.completed? || e.rejected?)
+    e ||= self.send(type.underscore.pluralize).build(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section)
+    if e.changed?
+      if opts[:no_notify]
+        e.save_without_broadcasting
+      else
+        e.save
+      end
+    end
     e.user = user
     self.claim if self.created? && e && e.admin?
     user.try(:touch) unless opts[:skip_touch_user]
     e
  end
   
-  def enroll_student(user)
-    enroll_user(user, 'StudentEnrollment')
+  def enroll_student(user, opts={})
+    enroll_user(user, 'StudentEnrollment', opts)
   end
   
   def enroll_ta(user)

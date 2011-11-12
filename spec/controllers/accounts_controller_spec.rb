@@ -111,10 +111,10 @@ describe AccountsController do
     it "should allow adding a new account admin" do
       account_with_admin_logged_in
 
-      post 'add_account_user', :account_id => @account.id, :admin => { :membership_type => 'AccountAdmin', :email => 'testadmin@example.com' }
-      response.should be_redirect
+      post 'add_account_user', :account_id => @account.id, :membership_type => 'AccountAdmin', :user_list => 'testadmin@example.com'
+      response.should be_success
 
-      new_admin = User.find_by_email('testadmin@example.com')
+      new_admin = CommunicationChannel.find_by_path('testadmin@example.com').user
       new_admin.should_not be_nil
       @account.reload
       @account.account_users.map(&:user).should be_include(new_admin)

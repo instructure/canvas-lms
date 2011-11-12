@@ -736,7 +736,14 @@ class Attachment < ActiveRecord::Base
   def cacheable_s3_url
     cached = cached_s3_url && s3_url_cached_at && s3_url_cached_at >= (Time.now - 24.hours.to_i)
     if !cached
-      self.cached_s3_url = authenticated_s3_url(:expires_in => 144.hours)
+      # response-content-disposition will be url encoded in the depths of
+      # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
+      # quote the filename string, though.
+      raw_filename = self.display_name
+      quoted_filename = raw_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
+      quoted_filename = "\"#{quoted_filename}\"" unless quoted_filename == raw_filename
+      self.cached_s3_url = authenticated_s3_url(:expires_in => 144.hours,
+        'response-content-disposition' => "attachment; filename=#{quoted_filename}")
       self.s3_url_cached_at = Time.now
       save
     end

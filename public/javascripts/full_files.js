@@ -2174,7 +2174,7 @@ var fileUpload = {
     };
     var $file = fileUpload.initFile(fileWrapper);
     $file.data('folder', files.currentItemData());
-    $file.find(".status").text("Queued ");
+    $file.find(".status").text("Queued");
     fileUpload.queuedAjaxUploads.push(fileWrapper);
     fileUpload.updateUploadCount();
     fileUpload.uploadAjaxFiles();
@@ -2189,7 +2189,7 @@ var fileUpload = {
     } else {
       fileUpload.currentlyUploading = true;
       var $file = fileUpload.initFile(file);
-      $file.find(".status").text("Uploading ");
+      $file.find(".status").text("Uploading");
       $file.find(".progress_bar").progressbar('value', 10);
       var folder = $file.data('folder');
       var fileData = file.file;
@@ -2275,7 +2275,7 @@ var fileUpload = {
   fileQueued: function(file) {
     var $file = fileUpload.initFile(file);
     $file.data('folder', files.currentItemData());
-    $file.find(".status").text(I18n.t('messages.queue', "Queued "));
+    $file.find(".status").text(I18n.t('messages.queue', "Queued"));
     fileUpload.updateSwfUploadCount(this.getStats().files_queued);
   },
   fileQueueError: function(file, error, message) {
@@ -2322,7 +2322,7 @@ var fileUpload = {
     file.id = id;
     var $file = fileUpload.initFile(file);
     $file.data('folder', files.currentItemData());
-    $file.find(".status").text(I18n.t('messages.queued', "Queued "));
+    $file.find(".status").text(I18n.t('messages.queued', "Queued"));
     fileUpload.swfFiles.push(file);
     var folder = $file.data('folder');
     var post_params = {
@@ -2350,7 +2350,7 @@ var fileUpload = {
     }, function(data) {
       $("#file_swf").uploadifyCancel(id);
       $file.find(".cancel_upload_link").hide().end()
-        .find(".status").text("Upload Failed ");
+        .find(".status").text("Upload Failed");
     });
   },
   swfUploadNext: function() {
@@ -2371,7 +2371,7 @@ var fileUpload = {
     $file.addClass('done');
     if(!$file.hasClass('errored') && !$file.hasClass('error_cancelled')) {
       $file.find(".cancel_upload_link").hide().end()
-        .find(".status").text("Cancelled ");
+        .find(".status").text("Cancelled");
       fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
     } 
     fileUpload.swfUploadNext();
@@ -2391,7 +2391,7 @@ var fileUpload = {
     $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
     fileUpload.showStatus();
     $file.find(".cancel_upload_link").hide().end()
-      .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info} ", {error_info: error.info}));
+      .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info}", {error_info: error.info}));
     $file.addClass('done').addClass('errored');
     fileUpload.swfUploadNext();
     return false;
@@ -2403,12 +2403,12 @@ var fileUpload = {
     if(file.upload_params) $("#file_swf").uploadifySettings('scriptData', file.upload_params);
     fileUpload.swfQueuedAndPendingFiles = $.grep(fileUpload.swfQueuedAndPendingFiles, function(f) { return f.id != file.id; });
     $file.find(".progress_bar").progressbar('value', 1);
-    $file.find(".status").text(I18n.t('messages.uploading', "Uploading "));
+    $file.find(".status").text(I18n.t('messages.uploading', "Uploading"));
   },
   swfFileProgress: function(event, id, file, data) { // onProgress
     file.id = id;
     var $file = fileUpload.initFile(file);
-    $file.find(".status").text(I18n.t('messages.uploading_with_speed', "Uploading (%{speed}KB/s) ", {speed: parseInt(data.speed, 10)}));
+    $file.find(".status").text(I18n.t('messages.uploading_with_speed', "Uploading (%{speed}KB/s)", {speed: parseInt(data.speed, 10)}));
     $file.find(".cancel_upload_link").showIf(data.percentage < 100);
     $file.find(".progress_bar").progressbar('value', data.percentage);
   },
@@ -2417,7 +2417,7 @@ var fileUpload = {
     var $file = fileUpload.initFile(file);
     if(response.indexOf("<PostResponse>") >= 0) {
       // we just got back XML stuff from S3. do the s3 success url
-      $file.find(".status").text(I18n.t('messages.finalizing', "Finalizing "));
+      $file.find(".status").text(I18n.t('messages.finalizing', "Finalizing"));
       var errored = function() {
         fileUpload.swfFileError({}, file.id, file, {type: "server", info: I18n.t('errors.unexpected_response', "didn't get back expected response")});
       };
@@ -2434,7 +2434,7 @@ var fileUpload = {
       return;
     }
     fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
-    $file.find(".status").text(I18n.t('messages.upload_complete', "Done uploading "));
+    $file.find(".status").text(I18n.t('messages.upload_complete', "Done uploading"));
     $file.find(".cancel_upload_link").remove();
     $file.find(".progress_bar").progressbar('value', 100);
     $file.addClass('done');
@@ -2462,7 +2462,7 @@ var fileUpload = {
         fileUpload.swfFileError(event, id, file, {type: "JS", info: e.toString()}, false);
       }
     } else {
-      $file.find(".status").text(I18n.t('warnings.file_uploaded_without_response', "File may have uploaded, but the server failed to respond.  Reload the page to confirm. "));
+      $file.find(".status").text(I18n.t('warnings.file_uploaded_without_response', "File may have uploaded, but the server failed to respond.  Reload the page to confirm."));
     }
     fileUpload.swfUploadNext();
   },

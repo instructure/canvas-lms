@@ -234,7 +234,7 @@ class SubmissionList
         # Also don't add it to the list.  Just pass the list to the next
         # iteration of the block. 
         next(l) unless h[:score]
-        
+
         # If the submission is different (not null for the first one, or just
         # different than the last one), set the previous_grade to nil (this is
         # the first version that changes a grade), set the new_grade to this
@@ -255,7 +255,7 @@ class SubmissionList
         # Remove the old submission so that it doesn't show up twice in the
         # grade history.
         elsif prior_score != h[:score]
-          l.pop
+          l.pop if prior_graded_at.to_date == h[:graded_at].to_date && prior_grader == h[:grader]
           h[:previous_grade] = prior_grade
           h[:previous_graded_at] = prior_graded_at
           h[:previous_grader] = prior_grader

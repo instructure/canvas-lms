@@ -118,8 +118,8 @@ describe DelayedMessage do
     user = user_with_pseudonym(:account => account)
     user.pseudonym.update_attribute(:account, account)
     user.pseudonym.account.should == account
-    HostUrl.should_receive(:context_host).with(user.pseudonym.account).at_least(:once).and_return("dm.dummy.test.host")
-    HostUrl.should_receive(:default_host).any_number_of_times.and_return("test.host")
+    HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
+    HostUrl.stubs(:default_host).returns("test.host")
     dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
     DelayedMessage.summarize([dm])
     message = Message.last

@@ -127,16 +127,20 @@ class Enrollment < ActiveRecord::Base
   named_scope :ended,
               :joins => :course, 
               :conditions => "courses.workflow_state = 'aborted' or courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
-              
 
-  ENROLLMENT_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
-  ENROLLMENT_RANK_SQL = ENROLLMENT_RANK.size.times.inject('CASE '){|s, i| s << "WHEN type = '#{ENROLLMENT_RANK[i]}' THEN #{i} "} << 'END'
-  def self.highest_enrollment_type(type, type2)
-    res = ENROLLMENT_RANK.find{|t| t == type || t == type2}
-    res ||= type || type2
-    res
+
+  READABLE_TYPES = {
+    'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
+    'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
+    'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
+    'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
+    'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
+  }
+
+  def self.readable_type(type)
+    READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
   end
-  
+
   def should_update_user_account_association?
     self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
   end
@@ -189,7 +193,7 @@ class Enrollment < ActiveRecord::Base
       # we have just deleted the user's enrollment in the group's course.
       # remove the leaving user from the group to keep the group happy
       membership = group.group_memberships.find_by_user_id(self.user_id)
-      membership.destroy if membership
+      membership.destroy
     end
   end
   protected :audit_groups_for_deleted_enrollments
@@ -279,41 +283,22 @@ class Enrollment < ActiveRecord::Base
     @long_name
   end
   
+  TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
+  TYPE_RANK_SQL = rank_sql(TYPE_RANK, 'enrollments.type')
+  TYPE_RANK_HASH = rank_hash(TYPE_RANK)
+
   def rank_sortable(student_first=false)
     type = self.class.to_s
-    case type
-    when 'StudentEnrollment'
-      student_first ? 0 : 4
-    when 'TeacherEnrollment'
-      1
-    when 'TaEnrollment'
-      2
-    when 'ObserverEnrollment'
-      5
-    when 'DesignerEnrollment'
-      3
-    else
-      6
-    end
+    return 0 if type == 'StudentEnrollment' && student_first
+    TYPE_RANK_HASH[type]
   end
-  
+
+  STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
+  STATE_RANK_SQL = rank_sql(STATE_RANK, 'enrollments.workflow_state')
+  STATE_RANK_HASH = rank_hash(STATE_RANK)
+
   def state_sortable
-    case state
-    when :invited
-      1
-    when :creation_pending
-      1
-    when :active
-      0
-    when :deleted
-      5
-    when :rejected
-      4
-    when :completed
-      2
-    else
-      6
-    end
+    STATE_RANK_HASH[state.to_s]
   end
   
   def accept!
@@ -467,24 +452,7 @@ class Enrollment < ActiveRecord::Base
       false
     end
   end
-  
-  def self.readable_type(type)
-    case type
-    when 'TeacherEnrollment'
-      t('#enrollment.roles.teacher', "Teacher")
-    when 'StudentEnrollment'
-      t('#enrollment.roles.student', "Student")
-    when 'TaEnrollment'
-      t('#enrollment.roles.ta', "TA")
-    when 'ObserverEnrollment'
-      t('#enrollment.roles.observer', "Observer")
-    when 'DesignerEnrollment'
-      t('#enrollment.roles.designer', "Designer")
-    else
-      t('#enrollment.roles.student', "Student")
-    end
-  end
-  
+    
   def self.workflow_readable_type(state)
     case state.to_s
       when 'active'

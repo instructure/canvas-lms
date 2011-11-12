@@ -86,6 +86,41 @@ describe "account authentication configs" do
     Account.default.account_authorization_configs.length.should == 0
   end
   
+  it "should show Login and Email fields in add user dialog for delegated auth accounts" do
+    course_with_admin_logged_in
+
+    get "/accounts/#{Account.default.id}/users"
+    driver.find_element(:css, ".add_user_link").click
+    dialog = driver.find_element(:id, "add_user_dialog")
+    dialog.find_elements(:id, "pseudonym_path").length.should == 0
+    dialog.find_element(:id, "pseudonym_unique_id").should be_displayed
+
+    Account.default.account_authorization_configs.create(:auth_type => 'cas')
+    get "/accounts/#{Account.default.id}/users"
+    driver.find_element(:css, ".add_user_link").click
+    dialog = driver.find_element(:id, "add_user_dialog")
+    dialog.find_element(:id, "pseudonym_path").should be_displayed
+    dialog.find_element(:id, "pseudonym_unique_id").should be_displayed
+  end
+  
+  it "should be able to set login labels for delegated auth accounts" do
+    course_with_admin_logged_in
+
+    get "/accounts/#{Account.default.id}/account_authorization_configs"
+    driver.find_element(:id, 'add_auth_select').
+      find_element(:css, 'option[value="cas"]').click
+    driver.find_element(:id, "account_authorization_config_0_login_handle_name").should be_displayed
+    
+    driver.find_element(:id, "account_authorization_config_0_auth_base").send_keys("cas.example.com")
+    driver.find_element(:id, "account_authorization_config_0_login_handle_name").send_keys("CAS Username")
+    expect_new_page_load { driver.find_element(:css, '#cas_div button[type="submit"]').click }
+    
+    get "/accounts/#{Account.default.id}/users"
+    driver.find_element(:css, ".add_user_link").click
+    dialog = driver.find_element(:id, "add_user_dialog")
+    dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:"
+  end
+  
   it "should be able to update term dates" do
     course_with_admin_logged_in
     

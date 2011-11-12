@@ -1,0 +1,269 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= t "log_in_to_canvas", "Log In To Canvas" %></title>
+  <meta name="HandheldFriendly" content="True">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <style>
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #353534 url("/images/mobile_login/mobile-login-bg.jpg");
+      font-size: 114%;
+      -webkit-background-size: cover;
+      -webkit-perspective: 800;
+      font-family: Helvetica;
+    }
+    header {
+      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #727273), color-stop(50%, #393939), color-stop(51%, #0d0d0f), color-stop(100%, #0f0f10));
+      text-align: center;
+      font-size: 23px;
+      color: #fff;
+      padding: .4em 1em;
+      border-bottom: 1px solid #2D3642;
+      text-shadow: 0px 1px 1px rgba(0,0,0, 0.5);
+      font-weight: bold;
+
+    }
+    .face {
+      background: #1a1b1a;
+      border-radius: 1em;
+      color: white;
+    }
+    #f1_container {
+      position: relative;
+      margin: 0 auto;
+      padding: 100px 0;
+      width: 300px;
+      height: 170px;
+      z-index: 1;
+    }
+    .face.back {
+      display: none;
+    }
+
+    #f1_card {
+      width: 100%;
+      height: 100%;
+      -webkit-transform-style: preserve-3d;
+      -webkit-transition: all 0.5s linear;
+    }
+    #f1_container.flipped #f1_card {
+      -webkit-transform: rotateY(180deg);
+    }
+    .face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      padding: 10px 0;
+    }
+    .face.back {
+      display: block;
+      -webkit-transform: rotateY(180deg);
+      -webkit-box-sizing: border-box;
+    }
+
+    input, button {
+      display: block;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 15px;
+      text-shadow: 1px 1px 3px rgba(255,255,255, 0.5);
+      font-family: Helvetica;
+      background-color: #e1e1e1;
+      width: 240px;
+      margin: 6px 15px;
+      font-size: 20px;
+    }
+    label {
+      padding: 5px 15px;
+      display: block;
+      font-size: 15px;
+    }
+    button {
+      text-align: center;
+      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #7ac0f8), color-stop(100%, #2e96e2));
+      -webkit-box-shadow: black 0px 0px 2px 0px;
+      border: 2px solid black;
+      text-shadow: 0px 1px 1px rgba(255,255,255,0.4);
+      color: #36629b;
+      width: 272px;
+      margin: 20px 13px;
+
+    }
+    .request-password-button{
+      margin-top: 3px;
+    }
+    .flip-to-back, .flip-to-front {
+      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #262626), color-stop(100%, #404141));
+      color: #c2c2c2;
+      margin-top: 30px;
+      font-size: 15px;
+      border-width: 1px;
+      text-shadow: 0px 1px 1px rgba(0,0,0,0.4);
+    }
+    input::-webkit-input-placeholder {
+      color: #898989;
+    }
+
+  </style>
+</head>
+
+<body>
+  <header><%= t :login, "Login" %></header>
+  <div id="f1_container">
+    <div id="f1_card">
+      <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face"} do |f| %>
+        <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
+        <input type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
+        <button type="submit"><%= t('login', 'Login') %></button>
+        <button class="flip-to-back"><%= t('dont_know_password', "I don't know my password") %></button>
+      <% end %>
+      <% form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
+        <label for="pseudonym_session_unique_id_forgot"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
+        <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
+        <button type="submit" data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %></button>
+        <button class="flip-to-front"><%= t('back_to_login', "Back to Login") %></button>
+      <% end %>
+    </div>
+  </div>
+  <%= render "shared/login_trailer" %>
+<script>
+  var SHARED_JS_VARS = <%= @shared_js_vars.to_json.html_safe %>;
+  var eventToBindTo = ('ontouchstart' in window) ? 'touchstart' : 'click';
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var $front_back_container = document.querySelector('#f1_container');
+
+    document.querySelector('.flip-to-back').addEventListener(eventToBindTo, function(event){
+      event.preventDefault();
+      addClass($front_back_container, 'flipped');
+    });
+
+    document.querySelector('.flip-to-front').addEventListener(eventToBindTo, function(event){
+      event.preventDefault();
+      removeClass($front_back_container, 'flipped');
+    });
+
+    var $forgot_password_form = document.querySelector('#forgot_password_form');
+    $forgot_password_form.addEventListener('submit', function(event){
+      var $button      = $forgot_password_form.querySelector('.request-password-button'),
+          originalText = $button.textContent,
+          uniqueId     = $forgot_password_form.querySelector('input[name="pseudonym_session[unique_id_forgot]"]').value.trim();
+      if (!uniqueId) return false;
+      $button.disabled = true;
+      $button.textContent = $button.getAttribute('data-text-while-loading')
+      event.preventDefault();
+      ajax({
+        type: "POST",
+        url: "/forgot_password",
+        data: 'authenticity_token=' +
+              encodeURIComponent($forgot_password_form.querySelector('input[name=authenticity_token]').value) +
+              '&pseudonym_session%5Bunique_id_forgot%5D=' +
+              encodeURIComponent(uniqueId),
+        success: function(response){
+          alert(SHARED_JS_VARS.RESET_SENT);
+        },
+        error: function(){
+          alert(SHARED_JS_VARS.RESET_ERROR);
+        },
+        complete: function(){
+          $button.textContent = originalText;
+        }
+      });
+    });
+  });
+
+  function addClass(element, name){
+    removeClass(element, name);
+    element.className += ' ' + name;
+  }
+
+  function removeClass(element, name){
+    regex = new RegExp('(^|\\s)' + name + '(\\s|$)');
+    element.className = element.className.replace(regex, '')
+  }
+
+  function ajax(options){
+    var xhr = new window.XMLHttpRequest();
+    options.headers = options.headers || {}
+    options.headers['X-Requested-With'] = 'XMLHttpRequest'
+    if (options.data && !options.contentType) options.contentType = 'application/x-www-form-urlencoded';
+    if (options.contentType) options.headers['Content-Type'] = options.contentType;
+
+    xhr.onreadystatechange = function(){
+      if (xhr.readyState == 4) {
+        var error = false;
+        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 0) {
+          options.success && options.success.call(options.context, xhr.responseText, 'success', xhr);
+        } else {
+          error = true;
+          options.error && options.error.call(options.context, xhr, 'error');
+        }
+        options.complete && options.complete.call(options.context, xhr, error ? 'error' : 'success');
+      }
+    };
+
+    xhr.open(options.type, options.url, true);
+    for (name in options.headers) xhr.setRequestHeader(name, options.headers[name]);
+    xhr.send(options.data);
+    return xhr;
+  }
+
+  // https://gist.github.com/1183357
+  //scroll to top, hide address bar on mobile devices - 1 for android, 0 for the rest
+  (function( win ){
+    var doc = win.document;
+
+    // If there's a hash, or addEventListener is undefined, stop here
+    if( !location.hash || !win.addEventListener ){
+
+      //scroll to 1
+      window.scrollTo( 0, 1 );
+      var scrollTop = 1,
+        getScrollTop = function(){
+          return "scrollTop" in doc.body ? doc.body.scrollTop : 1;
+        },
+
+        //reset to 0 on bodyready, if needed
+        bodycheck = setInterval(function(){
+          if( doc.body ){
+            clearInterval( bodycheck );
+            scrollTop = getScrollTop();
+            win.scrollTo( 0, scrollTop === 1 ? 0 : 1 );
+          }
+        }, 15 );
+
+      win.addEventListener( "load", function(){
+        setTimeout(function(){
+          //at load, if user hasn't scrolled more than 20 or so...
+          if( getScrollTop() < 20 ){
+            //reset to hide addr bar at onload
+            win.scrollTo( 0, scrollTop === 1 ? 0 : 1 );
+          }
+        }, 0);
+      }, false );
+    }
+
+  })( this );
+
+  // GOOGLE ANALYTICS
+  var _gaq=[["_setAccount",SHARED_JS_VARS.GOOGLE_ANALYTICS_KEY],["_trackPageview"]];
+  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+  g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
+  s.parentNode.insertBefore(g,s)}(document,"script"));
+</script>
+</body>
+</html>

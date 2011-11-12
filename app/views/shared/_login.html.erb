@@ -77,13 +77,13 @@ $(document).ready(function() {
         </div>
     <% else %>
         <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form"} do |f| %>
-          <%= link_to "Click to register",  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account && @domain_root_account.settings[:open_registration] %>
+          <%= link_to "Click to register",  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account == Account.default && @domain_root_account.open_registration? && @domain_root_account.no_enrollments_can_create_courses? %>
           <h2 class="ui-helper-hidden-accessible"><%= t('login', 'Login') %></h2>
           <% login_inner_dialog = yield :login_inner_dialog %>
           <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>
           <input type="hidden" name="redirect_to_ssl" value="1"/>
           <div>
-            <span class=" field-with-fancyplaceholder"><%= f.label :unique_id, login_handle_name %><%= f.text_field :unique_id, :class => "text", :value => (@unauthorized_user.email rescue '') %></span>
+            <span class=" field-with-fancyplaceholder"><%= f.label :unique_id, login_handle_name %><%= f.text_field :unique_id, :class => "text", :value => params[:pseudonym_session].try(:[], :unique_id) %></span>
             <span class=" field-with-fancyplaceholder"><%= f.label :password, :en => "Password" %><%= f.password_field :password, :class => "text" %></span>
           </div>
           <div>

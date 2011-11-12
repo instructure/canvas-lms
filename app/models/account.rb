@@ -117,6 +117,13 @@ class Account < ActiveRecord::Base
   # me if I'm overarchitecting...
   def self.add_setting(setting, opts=nil)
     self.account_settings_options[setting.to_sym] = opts || {}
+    if (opts && opts[:boolean] && opts.has_key?(:default))
+      if opts[:default]
+        self.class_eval "def #{setting}?; settings[:#{setting}] != false; end"
+      else
+        self.class_eval "def #{setting}?; !!settings[:#{setting}]; end"
+      end
+    end
   end
   
   # these settings either are or could be easily added to
@@ -125,9 +132,9 @@ class Account < ActiveRecord::Base
   add_setting :global_stylesheet, :condition => :global_includes, :root_only => true
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
-  add_setting :teachers_can_create_courses, :boolean => true, :root_only => true
-  add_setting :students_can_create_courses, :boolean => true, :root_only => true
-  add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true
+  add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
+  add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
+  add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true
   add_setting :self_enrollment
@@ -136,6 +143,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
+  add_setting :open_registration, :boolean => true, :root_only => true, :default => false
   
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -286,7 +294,7 @@ class Account < ActiveRecord::Base
   
   def fast_all_users(limit=nil)
     @cached_fast_all_users ||= {}
-    @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, users.name")
+    @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, users.name, users.sortable_name")
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
@@ -298,7 +306,7 @@ class Account < ActiveRecord::Base
                                                        FROM group_memberships gm
                                                       WHERE gm.user_id = u.id AND
                                                             gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-                            ORDER BY u.sortable_name ASC", self.id], :page => page, :per_page => per_page)
+                            ORDER BY #{User.sortable_name_order_by_clause('u')} ASC", self.id], :page => page, :per_page => per_page)
   end
 
   def courses_name_like(query="", opts={})
@@ -523,7 +531,8 @@ class Account < ActiveRecord::Base
   
   def login_handle_name
     login_handle_name_is_customized? ? self.account_authorization_config.login_handle_name :
-        AccountAuthorizationConfig.default_login_handle_name
+        (self.delegated_authentication? ? AccountAuthorizationConfig.default_delegated_login_handle_name :
+            AccountAuthorizationConfig.default_login_handle_name)
   end
   
   def self_and_all_sub_accounts
@@ -561,15 +570,15 @@ class Account < ActiveRecord::Base
       result = false
       site_admin = self.site_admin?
 
-      if !site_admin && user && root_account.settings[:teachers_can_create_courses] != false
+      if !site_admin && user && root_account.teachers_can_create_courses?
         count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
         result = true if count > 0
       end
-      if !site_admin && user && !result && root_account.settings[:students_can_create_courses] != false
+      if !site_admin && user && !result && root_account.students_can_create_courses?
         count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('StudentEnrollment', 'ObserverEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
         result = true if count > 0
       end
-      if !site_admin && user && !result && root_account.settings[:no_enrollments_can_create_courses] != false
+      if !site_admin && user && !result && root_account.no_enrollments_can_create_courses?
         count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.workflow_state != 'deleted' AND root_account_id = #{root_account.id}").count
         result = true if count == 0
       end
@@ -604,31 +613,6 @@ class Account < ActiveRecord::Base
     return @default_enrollment_term if @default_enrollment_term
     unless self.root_account_id
       @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
-    end
-  end
-  
-  def add_admin(args)
-    email = args[:email]
-    membership_type = args[:membership_type] || 'AccountAdmin'
-    user = User.find_by_email(email)
-    data = {}
-    if !user
-      data = User.assert_by_email(email, self.root_account || self)
-      user = data[:user]
-    end
-    if user
-      account_user = self.account_users.find_by_user_id(user.id)
-      account_user ||= self.account_users.build(:user => user)
-      account_user.membership_type = membership_type
-      account_user.save
-      if data[:new]
-        account_user.account_user_registration!
-      else
-        account_user.account_user_notification!
-      end
-      account_user
-    else
-      nil
     end
   end
   

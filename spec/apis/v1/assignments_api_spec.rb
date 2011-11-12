@@ -73,6 +73,7 @@ describe AssignmentsApiController, :type => :integration do
         {
           'id' => @assignment.id,
           'name' => 'some assignment',
+          'course_id' => @course.id,
           'description' => nil,
           'position' => 1,
           'points_possible' => 12,
@@ -145,6 +146,7 @@ describe AssignmentsApiController, :type => :integration do
     json.should == {
       'id' => Assignment.first.id,
       'name' => 'some assignment',
+      'course_id' => @course.id,
       'description' => nil,
       'muted' => false,
       'position' => 1,
@@ -184,6 +186,7 @@ describe AssignmentsApiController, :type => :integration do
     json.should == {
       'id' => @assignment.id,
       'name' => 'some assignment again',
+      'course_id' => @course.id,
       'description' => nil,
       'muted' => false,
       'position' => 1,

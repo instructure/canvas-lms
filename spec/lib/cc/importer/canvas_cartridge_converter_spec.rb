@@ -13,9 +13,9 @@ describe "Canvas Cartridge importing" do
     manifest = CC::Manifest.new(exporter)
     @resource = CC::Resource.new(manifest, nil)
     @migration = Object.new
-    @migration.stub!(:to_import).and_return(nil)
-    @migration.stub!(:context).and_return(@copy_to)
-    @migration.stub!(:add_warning).and_return('')
+    @migration.stubs(:to_import).returns(nil)
+    @migration.stubs(:context).returns(@copy_to)
+    @migration.stubs(:add_warning).returns('')
   end
 
   it "should import course settings" do

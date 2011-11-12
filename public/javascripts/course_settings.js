@@ -345,7 +345,7 @@ I18n.scoped('course_settings', function(I18n) {
     $(".add_users_link").click(function(event) {
       $(this).hide();
       event.preventDefault();
-      $("#enroll_users_form").show();
+      $enroll_users_form.show();
       $("html,body").scrollTo($enroll_users_form);
       $enroll_users_form.find("textarea").focus().select();
     });

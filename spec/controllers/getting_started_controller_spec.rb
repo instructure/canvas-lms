@@ -19,6 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GettingStartedController do
+  before do
+    account = Account.default
+    account.settings = {:teachers_can_create_courses => true, :no_enrollments_can_create_courses => true}
+    account.save!
+  end
 
   it "should use GettingStartedController" do
     controller.should be_an_instance_of(GettingStartedController)
@@ -28,10 +33,10 @@ describe GettingStartedController do
 
     # it "should serve html, xml, and json data" do
       # format = mock("format")
-      # format.should_receive(:html).and_return('this text')
-      # format.should_receive(:xml).and_return('this text')
-      # format.should_receive(:json).and_return("this text")
-      # controller.should_receive(:respond_to).and_yield(format)
+      # format.expects(:html).returns('this text')
+      # format.expects(:xml).returns('this text')
+      # format.expects(:json).returns("this text")
+      # controller.expects(:respond_to).and_yield(format)
       # session[:course_creation_auth] = true
       # get 'name', :format => :html
     # end
@@ -66,10 +71,10 @@ describe GettingStartedController do
     
     # it "should serve html, xml, and json data" do
       # format = mock("format")
-      # format.should_receive(:html).and_return('this text')
-      # format.should_receive(:xml).and_return('this text')
-      # format.should_receive(:json).and_return('this text')
-      # controller.should_receive(:respond_to).and_yield(format)
+      # format.expects(:html).returns('this text')
+      # format.expects(:xml).returns('this text')
+      # format.expects(:json).returns('this text')
+      # controller.expects(:respond_to).and_yield(format)
       # session[:course_creation_auth] = true
       # get 'assignments', :format => :html
     # end
@@ -91,10 +96,10 @@ describe GettingStartedController do
   describe "GET 'students'" do
     # it "should serve html, xml, and json data" do
       # format = mock("format")
-      # format.should_receive(:html).and_return('this text')
-      # format.should_receive(:xml).and_return('this text')
-      # format.should_receive(:json).and_return('this text')
-      # controller.should_receive(:respond_to).and_yield(format)
+      # format.expects(:html).returns('this text')
+      # format.expects(:xml).returns('this text')
+      # format.expects(:json).returns('this text')
+      # controller.expects(:respond_to).and_yield(format)
       # session[:course_creation_auth] = true
       # get 'students', :format => :html
     # end

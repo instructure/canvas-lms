@@ -335,7 +335,7 @@ shared_examples_for "conversations selenium tests" do
   context "media comments" do
     it "should add a media comment to the message form" do
       # don't have a good way to test kaltura here, so we just fake it up
-      Kaltura::ClientV3.should_receive(:config).at_least(:once).and_return({})
+      Kaltura::ClientV3.expects(:config).at_least(1).returns({})
       mo = MediaObject.new
       mo.media_id = '0_12345678'
       mo.media_type = 'audio'
@@ -493,6 +493,44 @@ shared_examples_for "conversations selenium tests" do
       checkbox.click
       submit_message_form
       @the_student.user_notes.size.should eql(1)
+    end
+  end
+
+  context "submissions" do
+    it "should list submission comments in the conversation" do
+      @me = @user
+      @bob = student_in_course(:name => "bob", :active_all => true).user
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission2 = submission_model(:course => @course, :user => @bob)
+      submission1.add_comment(:comment => "hey bob", :author => @me)
+      submission1.add_comment(:comment => "wut up teacher", :author => @bob)
+      submission2.add_comment(:comment => "my name is bob", :author => @bob)
+      submission2.assignment.grade_student(@bob, { :grade => 0.9 })
+      conversation(@bob)
+      get "/conversations"
+      elements = nil
+      keep_trying_until {
+        elements = find_all_with_jquery("#conversations > ul > li:visible")
+        elements.size == 1
+      }
+      elements.first.click
+      wait_for_ajaximations
+      subs = driver.find_elements(:css, "div#messages .submission")
+      subs.size.should == 2
+      subs[0].find_element(:css, '.score').text.should == '0.9 / 1.5'
+      subs[1].find_element(:css, '.score').text.should == 'no score'
+
+      coms = subs[0].find_elements(:css, '.comment')
+      coms.size.should == 1
+      coms.first.find_element(:css, '.audience').text.should == 'bob'
+      coms.first.find_element(:css, 'p').text.should == 'my name is bob'
+
+      coms = subs[1].find_elements(:css, '.comment')
+      coms.size.should == 2
+      coms.first.find_element(:css, '.audience').text.should == 'bob'
+      coms.first.find_element(:css, 'p').text.should == 'wut up teacher'
+      coms.last.find_element(:css, '.audience').text.should == 'nobody@example.com'
+      coms.last.find_element(:css, 'p').text.should == 'hey bob'
     end
   end
 end

@@ -21,6 +21,7 @@
 # API for creating, accessing and updating user conversations.
 class ConversationsController < ApplicationController
   include ConversationsHelper
+  include Api::V1::Submission
 
   before_filter :require_user
   before_filter :set_avatar_size
@@ -193,17 +194,9 @@ class ConversationsController < ApplicationController
   #   attachments:: Array of attachments for this message. Fields include: display_name, content-type, filename, url
   # @response_field submissions Array of assignment submissions having
   #   comments relevant to this conversation. These should be interleaved with
-  #   the messages when displaying to the user. Fields include:
-  #   id:: The unique identifier for the submission.
-  #   course_id:: The unique identifier for the course.
-  #   assignment_id:: The unique identifier for the assignment.
-  #   author_id:: The id of the user who submitted the assignment (could be current user, or a student if the current user is a teacher)
-  #   created_at:: The timestamp when the submission was created
-  #   updated_at:: The timestamp of the last update to this submission
-  #   title:: Title of the assignment
-  #   score:: Score for the assignment submission
-  #   comment_count:: Total number of comments on this submission
-  #   recent_comments:: Array of recent comments. Fields include: id, author_id, created_at, body
+  #   the messages when displaying to the user. See the Submissions API
+  #   documentation for details on the fields included. This response includes
+  #   the submission_comments and assignment associations.
   #
   # @example_response
   #   {
@@ -263,28 +256,8 @@ class ConversationsController < ApplicationController
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread?
     submissions = []
     if @conversation.one_on_one?
-      submissions = Submission.for_conversation_participant(@conversation).with_comments.map do |submission|
-        assignment = submission.assignment
-        recent_comments = submission.submission_comments.last(10).reverse
-        {
-          :id => submission.id,
-          :course_id => assignment.context_id,
-          :assignment_id => assignment.id,
-          :author_id => submission.user_id,
-          :created_at => submission.submitted_at,
-          :updated_at => recent_comments.first.created_at,
-          :title => assignment.title,
-          :score => submission.score && assignment.points_possible ? "#{submission.score} / #{assignment.points_possible}" : submission.score,
-          :comment_count => submission.submission_comments_count,
-          :recent_comments => recent_comments.map{ |comment| {
-            :id => comment.id,
-            :author_id => comment.author_id,
-            :created_at => comment.created_at,
-            :body => comment.comment
-          }}
-        }
-      end
-      submissions = submissions.sort_by{ |s| s[:updated_at] }.reverse
+      submissions = Submission.for_conversation_participant(@conversation).with_comments
+      submissions = submissions.sort_by{ |s| s.submission_comments.last.created_at }.reverse
     end
     render :json => jsonify_conversation(@conversation,
                                          :include_context_info => true,
@@ -490,7 +463,7 @@ class ConversationsController < ApplicationController
   #   "bob smith"). If multiple terms are given (separated via whitespace),
   #   only results matching all terms will be returned.
   # @argument context Limit the search to a particular course/group (e.g.
-  # "course_3" or "group_4").
+  #   "course_3" or "group_4").
   # @argument exclude Array of ids to exclude from the search. These may be
   #   user ids or course/group ids prefixed with "course_" or "group_"
   #   respectively, e.g. [1, 2, "course_3"].
@@ -769,7 +742,7 @@ class ConversationsController < ApplicationController
     result = conversation.as_json(options)
     audience = conversation.participants.reject{ |u| u.id == conversation.user_id }
     result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
-    result[:submissions] = options[:submissions] if options[:submissions]
+    result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, nil, ['assignment', 'submission_comments']) } if options[:submissions]
     result[:audience] = audience.map(&:id)
     result[:audience_contexts] = contexts_for(audience)
     result[:avatar_url] = avatar_url_for(conversation)

@@ -12,7 +12,7 @@ describe FilesController do
     end
 
     it "with safefiles" do
-      HostUrl.stub!(:file_host).and_return('files-test.host')
+      HostUrl.stubs(:file_host).returns('files-test.host')
       get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
       response.should be_redirect
       uri = URI.parse response['Location']
@@ -32,7 +32,7 @@ describe FilesController do
     end
 
     it "without safefiles" do
-      HostUrl.stub!(:file_host).and_return('test.host')
+      HostUrl.stubs(:file_host).returns('test.host')
       get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
       response.should be_success
       response.content_type.should == 'image/png'
@@ -50,7 +50,7 @@ describe FilesController do
     end
 
     it "with safefiles" do
-      HostUrl.stub!(:file_host).and_return('files-test.host')
+      HostUrl.stubs(:file_host).returns('files-test.host')
       get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
       response.should be_redirect
       uri = URI.parse response['Location']
@@ -70,7 +70,7 @@ describe FilesController do
     end
 
     it "without safefiles" do
-      HostUrl.stub!(:file_host).and_return('test.host')
+      HostUrl.stubs(:file_host).returns('test.host')
       get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
       response.should be_success
       response.content_type.should == 'image/png'
@@ -84,7 +84,7 @@ describe FilesController do
       end
 
       it "with safefiles" do
-        HostUrl.stub!(:file_host).and_return('files-test.host')
+        HostUrl.stubs(:file_host).returns('files-test.host')
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
         response.should be_redirect
         uri = URI.parse response['Location']
@@ -102,7 +102,7 @@ describe FilesController do
       end
 
       it "without safefiles" do
-        HostUrl.stub!(:file_host).and_return('test.host')
+        HostUrl.stubs(:file_host).returns('test.host')
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
         response.should be_redirect
         location = response['Location']
@@ -120,7 +120,7 @@ describe FilesController do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
-    HostUrl.stub!(:file_host).and_return('files-test.host')
+    HostUrl.stubs(:file_host).returns('files-test.host')
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", :inline => '1'
     response.should be_redirect
     uri = URI.parse response['Location']
@@ -148,7 +148,7 @@ describe FilesController do
     end
 
     it "with safefiles" do
-      HostUrl.stub!(:file_host).and_return('files-test.host')
+      HostUrl.stubs(:file_host).returns('files-test.host')
       get "http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}"
       response.should be_redirect
       uri = URI.parse response['Location']
@@ -168,7 +168,7 @@ describe FilesController do
     end
 
     it "without safefiles" do
-      HostUrl.stub!(:file_host).and_return('test.host')
+      HostUrl.stubs(:file_host).returns('test.host')
       get "http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}"
       response.should be_success
       response.content_type.should == 'image/png'
@@ -181,7 +181,7 @@ describe FilesController do
     submission_model
     @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
     @submission.save!
-    HostUrl.stub!(:file_host).and_return('files-test.host')
+    HostUrl.stubs(:file_host).returns('files-test.host')
     get "http://test.host/users/#{@submission.user.id}/files/#{@submission.attachment.id}/download", :verifier => @submission.attachment.uuid
     
     response.should be_redirect

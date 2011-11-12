@@ -90,7 +90,7 @@ describe ApplicationHelper do
   end
 
   it "show_user_create_course_button should work" do
-    Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
+    Account.default.update_attribute(:settings, { :teachers_can_create_courses => true, :students_can_create_courses => true })
     @domain_root_account = Account.default
     show_user_create_course_button(nil).should be_false
     user

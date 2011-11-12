@@ -833,6 +833,7 @@ class Assignment < ActiveRecord::Base
         submission_updated = true if submission.changed?
         submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
         submission.group = group
+        submission.graded_at = Time.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
         tags.each do |tag|
           tag.create_outcome_result(student, self, submission)

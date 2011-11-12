@@ -52,15 +52,15 @@ module Api
   end
 
   VALID_SIS_COLUMNS = {
-    Course.table_name =>
+    'courses' =>
       { 'sis_course_id' => 'sis_source_id' },
-    EnrollmentTerm.table_name =>
+    'enrollment_terms' =>
       { 'sis_term_id' => 'sis_source_id' },
-    User.table_name =>
+    'users' =>
       { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id' },
-    Account.table_name =>
+    'accounts' =>
       { 'sis_account_id' => 'sis_source_id' },
-    CourseSection.table_name =>
+    'course_sections' =>
       { 'sis_section_id' => 'sis_source_id' },
   }
 
@@ -166,6 +166,8 @@ module Api
   mattr_accessor :assignment_ids_for_students_api
 
   def api_user_content(html, context = @context, user = @current_user)
+    return html if html.blank?
+
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
       obj = match.obj_class.find_by_id(match.obj_id)

@@ -69,12 +69,12 @@ shared_examples_for "dashboard selenium tests" do
     get "/"
 
     #verify assignment is in to do list
-    driver.find_element(:css, '.to-do-list > li').should include_text(I18n.t('headings.grade','Grade '+assignment.title))
+    driver.find_element(:css, '.to-do-list > li').should include_text('Grade ' + assignment.title)
 
     #verify assignment is in drop down
-    assignment_menu = driver.find_element(:link, I18n.t('menu.assignments','Assignments')).find_element(:xpath, '..')
+    assignment_menu = driver.find_element(:link, 'Assignments').find_element(:xpath, '..')
     driver.action.move_to(assignment_menu).perform
-    assignment_menu.should include_text(I18n.t('menu.assignments_needing_grading', "Needing Grading"))
+    assignment_menu.should include_text("Needing Grading")
     assignment_menu.should include_text(assignment.title)
   end
 
@@ -90,14 +90,14 @@ shared_examples_for "dashboard selenium tests" do
     get "/"
 
     #verify assignment changed notice is in messages
-    driver.find_element(:css, '#topic_list .topic_message').should include_text(I18n.t('assignment_due_date_changed','Assignment Due Date Changed'))
+    driver.find_element(:css, '#topic_list .topic_message').should include_text('Assignment Due Date Changed')
     #verify assignment is in to do list
     driver.find_element(:css, '.to-do-list > li').should include_text("#{assignment.submission_action_string} #{assignment.title}")
 
     #verify assignment is in drop down
-    assignment_menu = driver.find_element(:link, I18n.t('menu.assignments','Assignments')).find_element(:xpath, '..')
+    assignment_menu = driver.find_element(:link, 'Assignments').find_element(:xpath, '..')
     driver.action.move_to(assignment_menu).perform
-    assignment_menu.should include_text(I18n.t('menu.assignments_needing_submitting', "To Turn In"))
+    assignment_menu.should include_text("To Turn In")
     assignment_menu.should include_text(assignment.title)
   end
 
@@ -108,10 +108,10 @@ shared_examples_for "dashboard selenium tests" do
 
     get "/"
 
-    course_menu = driver.find_element(:link, I18n.t('links.courses','Courses')).find_element(:xpath, '..')
+    course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
 
     driver.action.move_to(course_menu).perform
-    course_menu.should include_text(I18n.t('#menu.my_courses','My Courses'))
+    course_menu.should include_text('My Courses')
     course_menu.should include_text(@course.name)
   end
 
@@ -125,11 +125,49 @@ shared_examples_for "dashboard selenium tests" do
 
     get "/"
 
-    course_menu = driver.find_element(:link, I18n.t('links.courses_and_groups','Courses & Groups')).find_element(:xpath, '..')
+    course_menu = driver.find_element(:link, 'Courses & Groups').find_element(:xpath, '..')
 
     driver.action.move_to(course_menu).perform
-    course_menu.should include_text(I18n.t('#menu.current_groups','Current Groups'))
+    course_menu.should include_text('Current Groups')
     course_menu.should include_text(group.name)
+  end
+
+  it "should not allow customization of the course menu if there are insufficient courses" do
+    course_with_teacher_logged_in
+
+    get "/"
+
+    course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+    driver.action.move_to(course_menu).perform
+    course_menu.should include_text('My Courses')
+    course_menu.should_not include_text('Customize')
+  end
+
+  it "should allow customization of the course menu if there are sufficient courses" do
+    course_with_teacher_logged_in
+    20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+
+    get "/"
+
+    course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+    driver.action.move_to(course_menu).perform
+    course_menu.should include_text('My Courses')
+    course_menu.should include_text('Customize')
+  end
+
+  it "should allow customization of the course menu even before the course ajax request comes back" do
+    course_with_teacher_logged_in
+    20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+
+    get "/"
+
+    course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+    driver.action.move_to(course_menu).perform
+    course_menu.should include_text('My Courses')
+    course_menu.find_element(:css, '.customListOpen').click
+    keep_trying_until {
+      course_menu.find_element(:css, '.customListWrapper').should be_displayed
+    }
   end
 
   it "should display scheduled web conference in stream" do

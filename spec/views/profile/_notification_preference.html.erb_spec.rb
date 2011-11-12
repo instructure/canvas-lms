@@ -23,7 +23,6 @@ describe "/profile/_notification_preference" do
   it "should render" do
     course_with_student
     view_context
-    cc = @user.communication_channels.create!
     assigns[:user] = @user
     n = Notification.create!
     cc = @user.communication_channels.create!

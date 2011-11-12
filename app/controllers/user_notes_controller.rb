@@ -41,7 +41,7 @@ class UserNotesController < ApplicationController
         @is_course = true
       end
       count = @users.count
-      @users = @users.scoped(:select=> "name, users.id, last_user_note", :order=>"last_user_note ASC, sortable_name ASC", :include=>:courses)
+      @users = @users.scoped(:select=> "name, users.id, last_user_note", :order=>"last_user_note ASC, #{User.sortable_name_order_by_clause} ASC", :include=>:courses)
       @users = @users.paginate(:page => params[:page], :per_page => 20, :total_entries=>count)
     end
   end

@@ -1,7 +1,7 @@
 # A client-side templating wrapper.  Templates are compiled with the rake task
 # `$ rake jst:compile` or automatically using the guard gem `$ guard`.
 # Don't call the templating object directly (like Handlebars), use this class.
-class @Template
+class Template
 
   # If called w/o `new`, it will return the HTML string immediately.
   # i.e. `Template(test, {foo: 'bar'})` => '<div>bar</div>'
@@ -44,3 +44,11 @@ class @Template
   toElement: (locals) ->
     html = @toHTML locals
     jQuery('<div/>').html(html)
+
+# export to window until we convert new stuff to modules
+@Template = Template
+
+# register as module (will eventually put this at the head of the file)
+define 'compiled/Template', ->
+  Template
+

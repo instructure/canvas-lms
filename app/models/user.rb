@@ -17,9 +17,15 @@
 #
 
 class User < ActiveRecord::Base
+  # this has to be before include COntext to prevent a circular dependency in Course
+  def self.sortable_name_order_by_clause(table = nil)
+    col = table ? "#{table}.sortable_name" : 'sortable_name'
+    connection_pool.spec.config[:adapter] == 'postgresql' ? "LOWER(#{col})" : col
+  end
+
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
+  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
   attr_accessor :original_id, :menu_data
   
   before_save :infer_defaults
@@ -39,6 +45,7 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]  
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments
+  has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments
   has_many :all_courses, :source => :course, :through => :enrollments  
   has_many :group_memberships, :include => :group, :dependent => :destroy
@@ -106,9 +113,11 @@ class User < ActiveRecord::Base
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
+  has_many :favorites
+  has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
 
   include StickySisFields
-  are_sis_sticky :name
+  are_sis_sticky :name, :sortable_name, :short_name
 
   def conversations
     all_conversations.visible # i.e. exclude any where the user has deleted all the messages
@@ -145,7 +154,7 @@ class User < ActiveRecord::Base
   
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
   
-  named_scope :order_by_sortable_name, :order => 'sortable_name ASC'
+  named_scope :order_by_sortable_name, :order => User.sortable_name_order_by_clause
   
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at| 
     ids_string = course_ids.join(",")
@@ -431,17 +440,10 @@ class User < ActiveRecord::Base
   def participants
     []
   end
-  
-  def self.find_by_email(email)
-    CommunicationChannel.find_by_path_and_path_type(email, 'email').try(:user)
-  end
-    
-  def <=>(other)
-    self.name <=> other.name
-  end
 
+  # compatibility only - this isn't really last_name_first
   def last_name_first
-    User.last_name_first(self.name)
+    self.sortable_name
   end
   
   def last_name_first_or_unnamed
@@ -449,32 +451,63 @@ class User < ActiveRecord::Base
     res = "No Name" if res.strip.empty?
     res
   end
-  
+
   def first_name
-    (self.name || "").split(/\s/)[0]
+    User.name_parts(self.sortable_name)[0] || ''
   end
-  
+
   def last_name
-    (self.name || "").split(/\s/)[1..-1].join(" ")
+    User.name_parts(self.sortable_name)[1] || ''
   end
-  
-  def self.last_name_first(name)
-    name_groups = []
-    if name
-      comma_separated = name.split(",")
-      comma_separated.each do |clump|
-        names = clump.split
-        if name.match(/\s/)
-          names = clump.split.map{|c| c.split(".").join(". ").split }.flatten
-        end
-        name = names.pop
-        name += ", " + names.join(" ") if !names.empty?
-        name_groups << name
-      end
+
+  # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
+  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
+
+  # see also user_sortable_name.js
+  def self.name_parts(name, prior_surname = nil)
+    return [nil, nil, nil] unless name
+    surname, given, suffix = name.strip.split(/\s*,\s*/, 3)
+
+    # Doe, John, Sr.
+    # Otherwise change Ho, Chi, Min to Ho, Chi Min
+    if suffix && !(suffix =~ SUFFIXES)
+      given = "#{given} #{suffix}"
+      suffix = nil
     end
-    name_groups.join ", "
+
+    if given
+      # John Doe, Sr.
+      if !suffix && given =~ SUFFIXES
+        suffix = given
+        given = surname
+        surname = nil
+      end
+    else
+      # John Doe
+      given = name.strip
+      surname = nil
+    end
+
+    given_parts = given.split
+    # John Doe Sr.
+    if !suffix && given_parts.length > 1 && given_parts.last =~ SUFFIXES
+      suffix = given_parts.pop
+    end
+    # Use prior information on the last name to try and reconstruct it
+    prior_surname_parts = nil
+    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..-1] == prior_surname_parts
+    # Last resort; last name is just the last word given
+    surname = given_parts.pop if !surname && given_parts.length > 1
+
+    [ given_parts.empty? ? nil : given_parts.join(' '), surname, suffix ]
   end
-  
+
+  def self.last_name_first(name, name_was = nil)
+    given, surname, suffix = name_parts(name, name_parts(name_was)[1])
+    given = [given, suffix].compact.join(' ')
+    surname ? "#{surname}, #{given}".strip : given
+  end
+
   def self.user_lookup_cache_key(id)
     ['_user_lookup2', id].cache_key
   end
@@ -490,7 +523,10 @@ class User < ActiveRecord::Base
     self.name ||= self.email || t(:default_user_name, "User")
     self.short_name = nil if self.short_name == ""
     self.short_name ||= self.name
-    self.sortable_name = self.last_name_first.downcase
+    self.sortable_name = nil if self.sortable_name == ""
+    # recalculate the sortable name if the name changed, but the sortable name didn't, and the sortable_name matches the old name
+    self.sortable_name = nil if !self.sortable_name_changed? && self.name_changed? && User.name_parts(self.sortable_name).compact.join(' ') == self.name_was
+    self.sortable_name = User.last_name_first(self.name, self.sortable_name_was) unless read_attribute(:sortable_name)
     self.reminder_time_for_due_dates ||= 48.hours.to_i
     self.reminder_time_for_grading ||= 0
     User.invalidate_cache(self.id) if self.id
@@ -499,7 +535,7 @@ class User < ActiveRecord::Base
   end
   
   def sortable_name
-    self.sortable_name = read_attribute(:sortable_name) || self.last_name_first.downcase
+    self.sortable_name = read_attribute(:sortable_name) || User.last_name_first(self.name)
   end
   
   def primary_pseudonym
@@ -598,7 +634,6 @@ class User < ActiveRecord::Base
   workflow do
     state :pre_registered do
       event :register, :transitions_to => :registered
-      event :merge, :transitions_to => :pending_merge
     end
     
     # Not listing this first so it is not the default.
@@ -612,23 +647,9 @@ class User < ActiveRecord::Base
       event :register, :transitions_to => :registered
     end
     
-    state :registered do
-      event :merge, :transitions_to => :pending_merge
-    end
-    
-    state :pending_merge do
-      event :complete_merge, :transitions_to => :merged
-    end
-    
+    state :registered
+
     state :deleted
-    
-    state :merged
-    state :processor
-    state :test_user
-  end
-  
-  def registered?
-    self.workflow_state == 'registered' || self.workflow_state == 'test_user'
   end
   
   def unavailable?
@@ -835,6 +856,9 @@ class User < ActiveRecord::Base
     end
     self.reload
     Enrollment.send_later(:recompute_final_scores, new_user.id)
+    new_user.update_account_associations
+    new_user.touch
+    self.user_account_associations.delete_all
     self.destroy
   end
   
@@ -1364,18 +1388,7 @@ class User < ActiveRecord::Base
     res[:folders] = res[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
     res
   end
-  
-  def assert_pseudonym_and_communication_channel
-    if !self.communication_channel && !self.pseudonym
-      raise "User must have at least one pseudonym or communication channel"
-    elsif self.communication_channel && !self.pseudonym
-      self.reload
-    elsif self.pseudonym && !self.communication_channel
-      self.pseudonym.assert_communication_channel
-      self.reload
-    end
-  end
-  
+
   def generate_reminders_if_changed
     send_later(:generate_reminders!) if @reminder_times_changed
   end
@@ -1444,20 +1457,12 @@ class User < ActiveRecord::Base
   end
   memoize :account
   
-  def courses_with_primary_enrollment
-    Rails.cache.fetch([self, 'courses_with_primary_enrollment'].cache_key) do
-      postgres = (connection.adapter_name =~ /postgresql/i)
-      prefix = postgres ? "DISTINCT ON (courses.id)" : nil
-      result = courses.find(:all,
-                            :select => "#{prefix} courses.*, enrollments.type AS primary_enrollment, #{Enrollment::ENROLLMENT_RANK_SQL} AS primary_enrollment_rank",
-                            :order => "courses.id, #{Enrollment::ENROLLMENT_RANK_SQL}")
-      unless postgres
-        result = result.inject([]) { |ary, course|
-          ary << course unless ary.last && ary.last.id == course.id
-          ary
-        }
-      end
-      result.sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
+  def courses_with_primary_enrollment(association = :current_and_invited_courses)
+    Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
+      send(association).distinct_on(["courses.id"],
+        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment::TYPE_RANK_SQL} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+        :order => "courses.id, #{Enrollment::TYPE_RANK_SQL}, #{Enrollment::STATE_RANK_SQL}"
+      ).sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
     end
   end
   memoize :courses_with_primary_enrollment
@@ -1696,20 +1701,6 @@ class User < ActiveRecord::Base
     self.learning_outcome_results.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
   end
   
-  def self.assert_by_email(email, account)
-    p = Pseudonym.find_by_unique_id(email)
-    cc = CommunicationChannel.find_by_path_and_path_type(email, 'email')
-    user = p.try(:user)
-    user ||= cc.try(:user)
-    res = {:email => email}
-    res[:new] = !user
-    user ||= User.create!(:name => email)
-    user.pseudonyms.create!(:unique_id => email, :path => email, :account => account) unless p
-    user.communication_channels.create!(:path => email).confirm unless cc
-    res[:user] = user
-    res
-  end
-  
   def profile_pics_folder
     folder = self.active_folders.find_by_name(Folder::PROFILE_PICS_FOLDER_NAME)
     unless folder
@@ -1940,7 +1931,7 @@ class User < ActiveRecord::Base
       WHERE
         user_id = users.id AND courses.id = course_id
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]})
-      ORDER BY #{Enrollment::ENROLLMENT_RANK_SQL}
+      ORDER BY #{Enrollment::TYPE_RANK_SQL}
       LIMIT 1
     SQL
     user_sql << <<-SQL if account_ids.present?
@@ -2037,11 +2028,12 @@ class User < ActiveRecord::Base
   has_many :submissions_for_given_assignments, :include => [:assignment, :submission_comments], :conditions => 'submissions.assignment_id IN (#{Api.assignment_ids_for_students_api.join(",")})', :class_name => 'Submission'
 
   def set_menu_data(enrollment_uuid)
-    max_to_show = 8
-
+    return @menu_data if @menu_data
     coalesced_enrollments = []
     course_name_counts = {}
     has_completed_enrollment = false
+    favorite_courses = self.favorite_courses
+
     cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid)
     cached_enrollments.each do |e|
 
@@ -2094,8 +2086,10 @@ class User < ActiveRecord::Base
     }
   end
 
-  def has_ended_enrollments?
-    self.enrollments.ended.length || self.menu_data[:has_completed_enrollment]
+  def menu_courses
+    favorites = self.courses_with_primary_enrollment(:favorite_courses)
+    return favorites if favorites.length > 0
+    self.courses_with_primary_enrollment[0..11]
   end
 
   def user_can_edit_name?

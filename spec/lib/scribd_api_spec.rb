@@ -25,10 +25,9 @@ describe ScribdAPI do
   end
 
   before do
-    Scribd::API.instance.stub!(:key=).and_return(true)
-    Scribd::API.instance.stub!(:secret=).and_return(true)
-    Scribd::User.stub!(:login).and_return(true)
-    ScribdAPI.stub!(:upload).and_return { |a,b| ScribdAPI.instance.upload(a,b) }
+    Scribd::API.instance.stubs(:key=).returns(true)
+    Scribd::API.instance.stubs(:secret=).returns(true)
+    Scribd::User.stubs(:login).returns(true)
   end
   
   it "should offer the same instance every time" do
@@ -37,7 +36,7 @@ describe ScribdAPI do
   end
   
   it "should pass unknown calls down to the instance" do
-    instance.stub!(:blah).and_return('found me')
+    instance.stubs(:blah).returns('found me')
     ScribdAPI.blah.should eql('found me')
   end
   
@@ -46,20 +45,20 @@ describe ScribdAPI do
   end
   
   it "should get the conversion status" do
-    @doc = mock(:scribd_document)
-    @doc.should_receive(:conversion_status).and_return(:status)
-    Scribd::API.should_not_receive(:set_user)
+    @doc = mock('scribd_document')
+    @doc.expects(:conversion_status).returns(:status)
+    Scribd::API.expects(:set_user).never
     instance.get_status(@doc).should eql(:status)
   end
   
   it "should be able to upload a file" do
-    Scribd::Document.should_receive(:upload).and_return('dispatched')
+    Scribd::Document.expects(:upload).returns('dispatched')
     ScribdAPI.upload('filename.txt', 'txt')
   end
   
   it "should only upload if the file actually exists" do
-    Scribd::API.should_not_receive(:upload)
-    ErrorReport.should_receive(:log_error).and_return(true)
+    Scribd::API.expects(:upload).never
+    ErrorReport.expects(:log_error).returns(true)
     ScribdAPI.upload('not_a_file')
   end
 end

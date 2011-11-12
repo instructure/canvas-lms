@@ -48,7 +48,7 @@ describe CutyCapt do
       CutyCapt.verify_url("http://169.254.169.254/blah").should be_false
       CutyCapt.verify_url("http://4.4.4.4/blah").should be_true
       
-      Resolv.stub!(:getaddresses).and_return([ "8.8.8.8", "10.0.1.1" ])
+      Resolv.stubs(:getaddresses).returns([ "8.8.8.8", "10.0.1.1" ])
       CutyCapt.verify_url("http://workingexample.com/blah").should be_false
     end
   end

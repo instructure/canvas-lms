@@ -7,10 +7,13 @@ css_compressor_options:
 <% saved = _erbout; _erbout = '' %>
 javascripts:
   common:
+    - public/javascripts/curlConfig.js
+    - public/javascripts/vendor/curl.js
     - public/javascripts/vendor/firebugx.js
     - public/javascripts/datejs_to_iso_string_patch.js
     - public/javascripts/vendor/date.js
     - public/javascripts/vendor/handlebars.vm.js
+    - public/javascripts/compiled/Template.js
     - public/javascripts/vendor/jquery-1.6.4.js
     # jquery ui modules and effects that we don't actually use are commented out to reduce payload
     - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.core.js
@@ -75,6 +78,7 @@ javascripts:
     - public/javascripts/jquery.rails_flash_notifications.js
     - public/javascripts/jquery.scrollToVisible.js
     - public/javascripts/jquery.templateData.js
+    - public/javascripts/vendor/jquery.placeholder.js
     - public/javascripts/instructure_helper.js
     - public/javascripts/media_comments.js
     - public/javascripts/tinymce.editor_box.js
@@ -85,9 +89,17 @@ javascripts:
     - public/javascripts/compiled/license_help.js
     - public/javascripts/wiki_sidebar.js
     - public/javascripts/translations/_core_en.js
+    # CustomMenu
+    - public/javascripts/compiled/util/objectCollection.js
+    - public/javascripts/jst/courseList/wrapper.js
+    - public/javascripts/jst/courseList/content.js
+    - public/javascripts/compiled/widget/CustomList.js
+    - public/javascripts/compiled/widget/courseList.js
+    - public/javascripts/compiled/main.js
   assignmentMuter:
     - public/javascripts/compiled/AssignmentMuter.js
     - public/javascripts/jst/mute_dialog.js
+
   speed_grader:
     - public/javascripts/vendor/jquery.elastic.js
     - public/javascripts/vendor/ui.selectmenu.js
@@ -125,6 +137,8 @@ javascripts:
     - public/javascripts/compiled/jobs.js
   profile:
     - public/javascripts/profile.js
+    - public/javascripts/user_sortable_name.js
+    - public/javascripts/user_utils.js
   topics:
     - public/javascripts/topics.js
   topic:
@@ -272,6 +286,8 @@ javascripts:
     - public/javascripts/user_logins.js
   user_name:
     - public/javascripts/user_name.js
+    - public/javascripts/user_sortable_name.js
+    - public/javascripts/user_utils.js
   user:
     - public/javascripts/user.js
   manage_groups:
@@ -301,6 +317,9 @@ javascripts:
     - public/javascripts/vendor/jquery.cookie.js
   alerts:
     - public/javascripts/alerts.js
+  user_sortable_name:
+    - public/javascripts/user_sortable_name.js
+    - public/javascripts/user_utils.js
 <% base_js = _erbout; _erbout = saved %>
 
 <%=

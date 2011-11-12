@@ -20,8 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CollaborationsController do
   before(:all) do
-    EtherpadCollaboration.instance_variable_set('@config', {'domain' => 'typewith.me', 'name' => 'EtherPad'})
+    plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
+    plugin_setting.save!
   end
+  after(:all) { PluginSetting.all.map(&:destroy) }
+
   describe "GET 'index'" do
     it "should require authorization" do
       course_with_student(:active_all => true)

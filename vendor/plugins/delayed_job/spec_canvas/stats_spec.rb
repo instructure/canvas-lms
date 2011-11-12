@@ -10,8 +10,8 @@ describe Delayed::Stats do
   it "should store stats for jobs" do
     job = "ohai".send_later(:reverse)
     job.lock_exclusively!(60, 'stub worker').should be_true
-    worker = mock(Delayed::Worker)
-    worker.stub(:name).and_return("stub worker")
+    worker = mock('Delayed::Worker')
+    worker.stubs(:name).returns("stub worker")
     Delayed::Stats.job_complete(job, worker)
     Canvas.redis.hget("job:id:#{job.id}", "worker").should == 'stub worker'
     Canvas.redis.hget("job:id:#{job.id}", "id").should == job.id.to_s
@@ -20,8 +20,8 @@ describe Delayed::Stats do
   it "should completely clean up after stats" do
     job = "ohai".send_later(:reverse)
     job.lock_exclusively!(60, 'stub worker').should be_true
-    worker = mock(Delayed::Worker)
-    worker.stub(:name).and_return("stub worker")
+    worker = mock('Delayed::Worker')
+    worker.stubs(:name).returns("stub worker")
 
     Canvas.redis.keys("job:*").should be_empty
     Delayed::Stats.job_complete(job, worker)

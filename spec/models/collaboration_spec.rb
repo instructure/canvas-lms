@@ -21,24 +21,29 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Collaboration do
   
   context "collaboration_class" do
-    it "should list default collaboration types" do
-      Collaboration.instance_variable_set('@collab_types', Collaboration::DEFAULT_COLLABORATION_TYPES)
-      Collaboration.collaboration_types.should eql(Collaboration::DEFAULT_COLLABORATION_TYPES)
-      Collaboration.instance_variable_set('@collab_types', {})
-      Collaboration.collaboration_types.should eql({})
+    it "should by default not have any collaborations" do
+      Collaboration.any_collaborations_configured?.should be_false
+      Collaboration.collaboration_types.should == []
     end
     it "should allow google docs collaborations" do
-      Collaboration.instance_variable_set('@collab_types', Collaboration::DEFAULT_COLLABORATION_TYPES)
-      GoogleDocs.instance_variable_set('@config', {})
+      Collaboration.collaboration_class('GoogleDocs').should eql(nil)
+      plugin_setting = PluginSetting.new(:name => "google_docs", :settings => {})
+      plugin_setting.save!
       Collaboration.collaboration_class('GoogleDocs').should eql(GoogleDocsCollaboration)
+      plugin_setting.disabled = true
+      plugin_setting.save!
+      Collaboration.collaboration_class('GoogleDocs').should eql(nil)
     end
     it "should allow etherpad collaborations" do
-      Collaboration.instance_variable_set('@collab_types', Collaboration::DEFAULT_COLLABORATION_TYPES)
-      EtherpadCollaboration.instance_variable_set('@config', {})
+      Collaboration.collaboration_class('Etherpad').should eql(nil)
+      plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
+      plugin_setting.save!
       Collaboration.collaboration_class('Etherpad').should eql(EtherpadCollaboration)
+      plugin_setting.disabled = true
+      plugin_setting.save!
+      Collaboration.collaboration_class('Etherpad').should eql(nil)
     end
     it "should not allow invalid collaborations" do
-      Collaboration.instance_variable_set('@collab_types', Collaboration::DEFAULT_COLLABORATION_TYPES)
       Collaboration.collaboration_class('Bacon').should eql(nil)
     end
   end

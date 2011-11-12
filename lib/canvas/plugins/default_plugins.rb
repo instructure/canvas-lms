@@ -42,7 +42,7 @@ Canvas::Plugin.register('scribd', nil, {
   :settings_partial => 'plugins/scribd_settings',
   :validator => 'ScribdValidator'
 })
-Canvas::Plugin.register('etherpad', nil, {
+Canvas::Plugin.register('etherpad', :collaborations, {
   :name => lambda{ t :name, 'EtherPad' },
   :description => lambda{ t :description, 'EtherPad document sharing' },
   :website => 'http://www.etherpad.org',
@@ -52,7 +52,7 @@ Canvas::Plugin.register('etherpad', nil, {
   :settings_partial => 'plugins/etherpad_settings',
   :validator => 'EtherpadValidator'
 })
-Canvas::Plugin.register('google_docs', nil, {
+Canvas::Plugin.register('google_docs', :collaborations, {
   :name => lambda{ t :name, 'Google Docs' },
   :description => lambda{ t :description, 'Google Docs document sharing' },
   :website => 'http://docs.google.com',

@@ -24,6 +24,7 @@ class DiscussionEntry < ActiveRecord::Base
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
   has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
+  has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   belongs_to :discussion_topic
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   belongs_to :user
@@ -157,6 +158,7 @@ class DiscussionEntry < ActiveRecord::Base
   
   alias_method :destroy!, :destroy
   def destroy
+    discussion_subentries.each &:destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     save!
@@ -227,12 +229,21 @@ class DiscussionEntry < ActiveRecord::Base
   named_scope :for_user, lambda{|user|
     {:conditions => ['discussion_entries.user_id = ?', (user.is_a?(User) ? user.id : user)], :order => 'discussion_entries.created_at'}
   }
+  named_scope :for_users, lambda{|users|
+    user_ids = users.map{ |u| u.is_a?(User) ? u.id : u }
+    {:conditions => ['discussion_entries.user_id IN (?)', user_ids]}
+  }
   named_scope :after, lambda{|date|
     {:conditions => ['created_at > ?', date] }
   }
   named_scope :include_subentries, lambda{
     {:include => discussion_subentries}
   }
+  named_scope :top_level_for_topics, lambda {|topics|
+    topic_ids = topics.map{ |t| t.is_a?(DiscussionTopic) ? t.id : t }
+    {:conditions => ['discussion_entries.parent_id = ? AND discussion_entries.discussion_topic_id IN (?)', 0, topic_ids]}
+  }
+  named_scope :newest_first, :order => 'discussion_entries.created_at DESC'
 
   def to_atom(opts={})
     Atom::Entry.new do |entry|

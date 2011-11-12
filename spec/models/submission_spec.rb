@@ -39,9 +39,9 @@ describe Submission do
   end
   
   it "should offer the context, if one is available" do
-    @course = mock_model(Course)
-    @assignment = mock_model(Assignment)
-    @assignment.should_receive(:context).and_return(@course)
+    @course = Course.new
+    @assignment = Assignment.new(:context => @course)
+    @assignment.expects(:context).returns(@course)
     
     @submission = Submission.new
     lambda{@submission.context}.should_not raise_error
@@ -74,7 +74,7 @@ describe Submission do
       submission_spec_model(:submission_type => "discussion_topic")
       @assignment.submit_homework(@user, :submission_type => "discussion_topic")
       new_time = Time.now + 30.minutes
-      Time.stub!(:now).and_return(new_time)
+      Time.stubs(:now).returns(new_time)
       @assignment.submit_homework(@user, :submission_type => "discussion_topic")
       @submission.reload
       @submission.submitted_at.to_s(:db).should eql @submission.created_at.to_s(:db)
@@ -105,13 +105,13 @@ describe Submission do
         s = User.create(:name => "late student")
         @context.enroll_teacher(t)
         @context.enroll_student(s)
-#        @context.stub!(:teachers).and_return([@user])
+#        @context.stubs(:teachers).returns([@user])
         @assignment.workflow_state = "published"
         @assignment.update_attributes(:due_at => Time.now - 1000)
-#        @assignment.stub!(:due_at).and_return(Time.now - 100)
+#        @assignment.stubs(:due_at).returns(Time.now - 100)
         submission_spec_model(:user => s)
         
-#        @submission.stub!(:validate_enrollment).and_return(true)
+#        @submission.stubs(:validate_enrollment).returns(true)
 #        @submission.save
         @submission.messages_sent.should be_include('Assignment Submitted Late')
       end
@@ -130,12 +130,6 @@ describe Submission do
         @submission.reload
         @submission.assignment.should eql(@assignment)
         @submission.assignment.state.should eql(:published)
-#        @assignment.stub!(:state).and_return(:published)
-#        @cc = mock_model(CommunicationChannel)
-#        @cc.stub!(:path).and_return('somewhere@example.com')
-#        @cc.stub!(:user).and_return(@user)
-#        @user.stub!(:communication_channel).and_return(@cc)
-#        @submission.stub!(:student).and_return(@user)
         @submission.grade_it!
         @submission.messages_sent.should be_include('Submission Graded')
       end
@@ -198,8 +192,8 @@ describe Submission do
       
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stub!(:score_to_grade).and_return(10.0)
-        @assignment.stub!(:due_at).and_return(Time.now  - 100)
+        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -214,8 +208,8 @@ describe Submission do
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
         Notification.create(:name => 'Submission Graded')
-        @assignment.stub!(:score_to_grade).and_return(10.0)
-        @assignment.stub!(:due_at).and_return(Time.now  - 100)
+        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -229,8 +223,8 @@ describe Submission do
       it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.mute!
-        @assignment.stub!(:score_to_grade).and_return(10.0)
-        @assignment.stub!(:due_at).and_return(Time.now  - 100)
+        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -245,8 +239,8 @@ describe Submission do
       
       it "should NOT create a message when the score is changed and the submission was recently graded" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stub!(:score_to_grade).and_return(10.0)
-        @assignment.stub!(:due_at).and_return(Time.now  - 100)
+        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -313,8 +307,8 @@ describe Submission do
       @submission.save!
 
       api = Turnitin::Client.new('test_account', 'sekret')
-      Turnitin::Client.should_receive(:new).at_least(:once).and_return(api)
-      api.should_receive(:sendRequest).with(:generate_report, 1, hash_including(:oid => "123456789")).at_least(:once).and_return('http://foo.bar')
+      Turnitin::Client.expects(:new).at_least(1).returns(api)
+      api.expects(:sendRequest).with(:generate_report, 1, has_entries(:oid => "123456789")).at_least(1).returns('http://foo.bar')
     end
 
     it "should let teachers view the turnitin report" do

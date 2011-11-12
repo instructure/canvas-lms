@@ -600,6 +600,31 @@ describe ConversationsController, :type => :integration do
       })
     end
 
+    it "should return submission and comments with the conversation in api format" do
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission2 = submission_model(:course => @course, :user => @bob)
+      conversation = conversation(@bob)
+      submission1.add_comment(:comment => "hey bob", :author => @me)
+      submission1.add_comment(:comment => "wut up teacher", :author => @bob)
+      submission2.add_comment(:comment => "my name is bob", :author => @bob)
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+              { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
+      json['submissions'].size.should == 2
+      jsub = json['submissions'][1]
+      jsub['assignment'].should be_present # includes & ['assignment']
+      jcom = jsub['submission_comments']
+      jcom.should be_present # includes & ['submission_comments']
+      jcom.size.should == 2
+      jcom[0]['author_id'].should == @me.id
+      jcom[1]['author_id'].should == @bob.id
+
+      jsub = json['submissions'][0]
+      jcom = jsub['submission_comments']
+      jcom.size.should == 1
+      jcom[0]['author_id'].should == @bob.id
+    end
+
     it "should add a message to the conversation" do
       conversation = conversation(@bob)
 

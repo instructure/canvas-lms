@@ -7,6 +7,31 @@ class RespondusAPIPort
 
   OAUTH_TOKEN_USERNAME = 'oauth_access_token'
 
+  def request
+    # we want an actual rails request because it has logic to determine the
+    # remote_ip through proxies and such
+    @request ||= ActionController::Request.new(rack_env)
+  end
+
+  # sweet little authlogic adapter so we can play nice with authlogic
+  class AuthlogicAdapter < Authlogic::ControllerAdapters::AbstractAdapter
+    def authenticate_with_http_basic
+      false
+    end
+
+    def params
+      {}
+    end
+
+    def cookies
+      {}
+    end
+
+    def cookie_domain
+      "respondus (n/a)"
+    end
+  end
+
   protected
 
   class BadAuthError < Exception; end
@@ -62,13 +87,16 @@ class RespondusAPIPort
       return load_user_with_oauth(password, domain_root_account)
     end
 
-    scope = domain_root_account.require_account_pseudonym? ?
-      domain_root_account.pseudonyms :
-      Pseudonym
-    pseudonym = scope.find_by_unique_id(userName) || raise(BadAuthError)
-    if pseudonym.valid_arbitrary_credentials?(password)
-      @user = pseudonym.user
-    elsif pseudonym.account.try(:delegated_authentication?)
+    ip = rack_env['REMOTE_ADDR']
+
+    Authlogic::Session::Base.controller = AuthlogicAdapter.new(self)
+    pseudonym_session = domain_root_account.pseudonym_session_scope.new(:unique_id => userName, :password => password)
+    pseudonym_session.remote_ip = request.remote_ip
+    # don't actually want to create a session, so call `valid?` rather than `save`
+    if pseudonym_session.valid?
+      pseudonym = pseudonym_session.attempted_record
+      @user = pseudonym.login_assertions_for_user
+    elsif pseudonym_session.attempted_record.try(:account).try(:delegated_authentication?)
       raise(NeedDelegatedAuthError)
     else
       raise(BadAuthError)

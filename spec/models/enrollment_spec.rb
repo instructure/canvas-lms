@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Enrollment do
   before(:each) do
-    @user = User.create! #mock_model(User)
-    @course = Course.create! #mock_model(Course)
+    @user = User.create!
+    @course = Course.create!
     @enrollment = Enrollment.new(valid_enrollment_attributes)
   end
 
@@ -32,8 +32,8 @@ describe Enrollment do
   it "should have an interesting state machine" do
     enrollment_model
     list = {}
-    list.stub!(:find_all_by_context_id_and_context_type).and_return([])
-    @user.stub!(:dashboard_messages).and_return(list)
+    list.stubs(:find_all_by_context_id_and_context_type).returns([])
+    @user.stubs(:dashboard_messages).returns(list)
     @enrollment.state.should eql(:invited)
     @enrollment.accept
     @enrollment.state.should eql(:active)
@@ -52,8 +52,8 @@ describe Enrollment do
   
   it "should find students" do
     @student_list = mock('student list')
-    @student_list.stub!(:map).and_return(['student list'])
-    Enrollment.should_receive(:find).and_return(@student_list)
+    @student_list.stubs(:map).returns(['student list'])
+    Enrollment.expects(:find).returns(@student_list)
     Enrollment.students.should eql(['student list'])
   end
   
@@ -883,30 +883,6 @@ describe Enrollment do
       # he should still be in the group
       group.users.size.should == 1
       group.users.should be_include(user1)
-    end
-    
-    it "should ignore previously deleted memberships" do
-      # set up course with a user in one section
-      course_with_teacher(:active_all => true)
-      user = user_model
-      section1 = @course.course_sections.create
-      enrollment = section1.enroll_user(user, 'StudentEnrollment')
-
-      # set up a group without a group category and put the user in it
-      group = @course.groups.create
-      group.add_user(user)
-      
-      # mark the membership as deleted
-      membership = group.group_memberships.find_by_user_id(user.id)
-      membership.workflow_state = 'deleted'
-      membership.save!
-      
-      # delete the enrollment to trigger audit_groups_for_deleted_enrollments processing
-      lambda {enrollment.destroy}.should_not raise_error
-
-      # she should still be removed from the group
-      group.users.size.should == 0
-      group.users.should_not be_include(user)
     end
   end
 end

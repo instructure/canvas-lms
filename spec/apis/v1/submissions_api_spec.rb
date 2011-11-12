@@ -344,11 +344,11 @@ describe SubmissionsApiController, :type => :integration do
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     media_object(:media_id => "54321", :context => student1, :user => student1)
-    mock_kaltura = mock(Kaltura::ClientV3)
-    Kaltura::ClientV3.stub(:new).and_return(mock_kaltura)
-    mock_kaltura.should_receive :startSession
-    mock_kaltura.should_receive(:flavorAssetGetByEntryId).and_return([{:fileExt => 'mp4', :id => 'fake'}])
-    mock_kaltura.should_receive(:flavorAssetGetDownloadUrl).and_return("https://kaltura.example.com/some/url")
+    mock_kaltura = mock('Kaltura::ClientV3')
+    Kaltura::ClientV3.stubs(:new).returns(mock_kaltura)
+    mock_kaltura.expects :startSession
+    mock_kaltura.expects(:flavorAssetGetByEntryId).returns([{:fileExt => 'mp4', :id => 'fake'}])
+    mock_kaltura.expects(:flavorAssetGetDownloadUrl).returns("https://kaltura.example.com/some/url")
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     stub_kaltura
     json = api_call(:get,
@@ -810,6 +810,65 @@ describe SubmissionsApiController, :type => :integration do
 
     json['grade'].should == 'B'
     json['score'].should == 12.9
+  end
+
+  it "should allow commenting by a student without trying to grade" do
+    course_with_teacher(:active_all => true)
+    student = user(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    # since student is the most recently created user, @user = student, so this
+    # call will happen as student
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => 'witty remark' } })
+
+    Submission.count.should == 1
+    @submission = Submission.first
+    @submission.submission_comments.size.should == 1
+    comment = @submission.submission_comments.first
+    comment.comment.should == 'witty remark'
+    comment.author.should == student
+  end
+
+  it "should not allow grading by a student" do
+    course_with_teacher(:active_all => true)
+    student = user(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    # since student is the most recently created user, @user = student, so this
+    # call will happen as student
+    raw_api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => 'witty remark' },
+            :submission => { :posted_grade => 'B' } })
+    response.status.should == '401 Unauthorized'
+  end
+
+  it "should not allow rubricking by a student" do
+    course_with_teacher(:active_all => true)
+    student = user(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    # since student is the most recently created user, @user = student, so this
+    # call will happen as student
+    raw_api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => 'witty remark' },
+            :rubric_assessment => { :criteria => { :points => 5 } } })
+    response.status.should == '401 Unauthorized'
   end
 
   it "should not return submissions for no-longer-enrolled students" do
