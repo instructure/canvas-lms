@@ -21,7 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm]
+    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id]
       redirect_to dashboard_url
       return
     end
@@ -31,12 +31,7 @@ class PseudonymSessionsController < ApplicationController
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
 
-    if params[:pseudonym]
-      pseudonym = Pseudonym.find_by_id(params[:pseudonym])
-      @unique_id = pseudonym.unique_id
-      session[:expected_user] = pseudonym.user_id
-    end
-
+    session[:expected_user_id] = params[:expected_user_id]
     session[:confirm] = params[:confirm]
     session[:enrollment] = params[:enrollment]
 
@@ -93,8 +88,25 @@ class PseudonymSessionsController < ApplicationController
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
       initiate_saml_login(request.env['canvas.account_domain'])
+    else
+      flash[:delegated_message] = session.delete :delegated_message
+      maybe_render_mobile_login
     end
-    flash[:delegated_message] = session.delete :delegated_message
+  end
+
+  def maybe_render_mobile_login(status = nil)
+    if request.user_agent.to_s =~ /ipod|iphone/i
+      @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
+      @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
+      @shared_js_vars = {
+        :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil),
+        :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
+        :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
+      }
+      render :template => 'pseudonym_sessions/mobile_login', :layout => false, :status => status
+    else
+      render :action => 'new', :status => status
+    end
   end
 
   def create
@@ -147,7 +159,7 @@ class PseudonymSessionsController < ApplicationController
         @errored = true
         @pre_registered = @user if @user && !@user.registered?
         @headers = false
-        format.html { render :action => "new", :status => :bad_request }
+        format.html { maybe_render_mobile_login :bad_request }
         format.xml  { render :xml => @pseudonym_session.errors.to_xml }
         format.json { render :json => @pseudonym_session.errors.to_json, :status => :bad_request }
       end
@@ -308,7 +320,7 @@ class PseudonymSessionsController < ApplicationController
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
       elsif session[:confirm]
-        format.html { redirect_to(registration_confirmation_path(session.delete(:confirm), :enrollment => session.delete(:enrollment), :login_success => 1, :confirm => (user.id == session.delete(:expected_user) ? 1 : nil))) }
+        format.html { redirect_to(registration_confirmation_path(session.delete(:confirm), :enrollment => session.delete(:enrollment), :login_success => 1, :confirm => (user.id == session.delete(:expected_user_id) ? 1 : nil))) }
       else
         # the URL to redirect back to is stored in the session, so it's
         # assumed that if that URL is found rather than using the default,

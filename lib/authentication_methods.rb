@@ -220,7 +220,7 @@ module AuthenticationMethods
   end
 
   def reset_session_for_login
-    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user)
+    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id)
   end
 
   def initiate_delegated_login(preferred_account_domain=nil)

@@ -1,11 +1,9 @@
 <% content_for :page_title, join_title(t('titles.chat', "Chat"), @context.name) %>
 
-<div style="height: 600px; width: 800px; margin: 0 auto;">
-  <div id="client"></div> 
-</div>
-<% js_block do %>
-<script> 
-var tinychat = { room: "inst<%= Digest::MD5.hexdigest(@context.asset_string) %>", nick: "<%= @current_user.short_name.gsub(/[^\w]+/, "_").sub(/\A_/, '').sub(/_\z/, '') rescue "user" %>", colorbk: "0xffffff", oper: "none", owner: "none", change: "none", join: "auto", api: "none", key: "<%= Tinychat.config['api_key'] %>"};
-</script> 
-<script src="http://tinychat.com/js/embed.js"></script> 
-<% end %>
+<script>
+  var tinychat = { room: "inst<%= Digest::MD5.hexdigest(@context.asset_string) %>", nick: "<%= @current_user.short_name.gsub(/[^\w]+/, "_").sub(/\A_/, '').sub(/_\z/, '') rescue "user" %>", colorbk: "0xffffff", oper: "none", owner: "none", change: "none", join: "auto", api: "none", key: "<%= Tinychat.config['api_key'] %>"};
+</script>
+<!-- this has to be here (and not in a js_block) because it does a document.write to put it's iframe in -->
+<script src="http://tinychat.com/js/embed.js"></script>
+
+<div id="client"></div>

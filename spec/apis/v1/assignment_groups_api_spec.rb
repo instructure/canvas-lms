@@ -95,6 +95,7 @@ describe AssignmentGroupsController, :type => :integration do
         'assignments' => [
           {
             'id' => a3.id,
+            'course_id' => @course.id,
             'due_at' => nil,
             'muted' => false,
             'name' => 'test3',
@@ -126,6 +127,7 @@ describe AssignmentGroupsController, :type => :integration do
           },
           {
             'id' => a4.id,
+            'course_id' => @course.id,
             'due_at' => nil,
             'muted' => false,
             'name' => 'test4',
@@ -149,6 +151,7 @@ describe AssignmentGroupsController, :type => :integration do
         'assignments' => [
           {
             'id' => a1.id,
+            'course_id' => @course.id,
             'due_at' => nil,
             'muted' => false,
             'name' => 'test1',
@@ -163,6 +166,7 @@ describe AssignmentGroupsController, :type => :integration do
           },
           {
             'id' => a2.id,
+            'course_id' => @course.id,
             'due_at' => nil,
             'muted' => false,
             'name' => 'test2',

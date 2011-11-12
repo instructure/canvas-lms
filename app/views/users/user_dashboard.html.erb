@@ -32,6 +32,7 @@
 <div>
 <% if @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).empty? %>
   <%= render :partial => 'ie7_upgrade' %>
+  <%= render :partial => 'users/account_notification', :collection => @account_notifications %>
   <div class="communication_message dashboard_notification">
     <div class="header">
       <div class="header_title">

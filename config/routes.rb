@@ -682,6 +682,17 @@ ActionController::Routing::Routes.draw do |map|
       topics.get 'groups/:group_id/discussion_topics', :action => :index, :path_name => 'group_discussion_topics'
     end
 
+    api.with_options(:controller => :discussion_topics_api) do |topics|
+      topics.post 'courses/:course_id/discussion_topics/:topic_id/entries', :action => :add_entry, :path_name => 'course_discussion_add_entry'
+      topics.post 'groups/:group_id/discussion_topics/:topic_id/entries', :action => :add_entry, :path_name => 'group_discussion_add_entry'
+      topics.get 'courses/:course_id/discussion_topics/:topic_id/entries', :action => :entries, :path_name => 'course_discussion_entries'
+      topics.get 'groups/:group_id/discussion_topics/:topic_id/entries', :action => :entries, :path_name => 'group_discussion_entries'
+      topics.post 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :add_reply, :path_name => 'course_discussion_add_reply'
+      topics.post 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :add_reply, :path_name => 'group_discussion_add_reply'
+      topics.get 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'course_discussion_replies'
+      topics.get 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'group_discussion_replies'
+    end
+
     api.with_options(:controller => :sis_imports_api) do |sis|
       sis.post 'accounts/:account_id/sis_imports', :action => :create
       sis.get 'accounts/:account_id/sis_imports/:id', :action => :show

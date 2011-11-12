@@ -65,4 +65,25 @@ def api_json_response(objects, opts = nil)
   JSON.parse(objects.to_json(opts.merge(:include_root => false)))
 end
 
-
+# passes the cb a piece of user content html text. the block should return the
+# response from the api for that field, which will be verified for correctness.
+def should_translate_user_content(course)
+  attachment = attachment_model(:context => course)
+  content = %{
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
+      Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
+    </p>
+  }
+  html = yield content
+  doc = Nokogiri::HTML::DocumentFragment.parse(html)
+  img = doc.at_css('img')
+  img.should be_present
+  img['src'].should == "http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}"
+  video = doc.at_css('video')
+  video.should be_present
+  video['poster'].should match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
+  video['src'].should match(%r{http://www.example.com/courses/#{course.id}/media_download})
+    video['src'].should match(%r{entryId=qwerty})
+end

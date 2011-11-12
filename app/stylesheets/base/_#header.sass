@@ -215,7 +215,7 @@
   width: 270px
   li
     border-top: 1px dashed #ccc
-    &:hover, &.on
+    &:hover
       // do this instead of a specific bg color because the drop-down has a gradient, so it would look wierd with a color, 
       // but this just makes any li a little darker than it normally would so it works with the gradient
       background-image: url('/images/4_percent_opacity.png')
@@ -233,6 +233,11 @@
   min-width: 589px
 
 #menu_enrollments
+  li:hover
+    background-image: none
+    .subtitle
+      color: #bcbcbc
+
   .customListWrapper
     background: #fff
     padding: 10px
@@ -267,10 +272,13 @@
 
       a
         padding-left: 30px
-        background: url(/images/add-remove.png) no-repeat -8px 6px
+        background: url(/images/checkboxes-customlist.png) no-repeat -8px 6px
+
+        &:hover
+          background-position: -8px -88px
 
       .on a
-        background-position: -8px -40px
+        background-position: -8px -41px
 
   .customListOpen
     color: darken($menu_link_color, 12%)

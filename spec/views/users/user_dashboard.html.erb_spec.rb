@@ -34,5 +34,19 @@ describe "/users/user_dashboard" do
     render "users/user_dashboard"
     response.should_not be_nil
   end
-end
 
+  it "should show announcements to users with no enrollments" do
+    user
+    view_context
+    assigns[:courses] = []
+    assigns[:enrollments] = []
+    assigns[:group_memberships] = []
+    assigns[:topics] = []
+    assigns[:message_types] = {}
+    assigns[:recent_events] = []
+    assigns[:upcoming_events] = []
+    assigns[:account_notifications] = [AccountNotification.new(:subject => "My Global Announcement")]
+    render "users/user_dashboard"
+    response.body.should match /My Global Announcement/
+  end
+end
