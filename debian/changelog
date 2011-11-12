@@ -1,3 +1,24 @@
+canvas-lms (1.1-76) professional; urgency=low
+
+  * Package ref: d877fb232d07ea59dc9e227c1beb38b625baf783
+  *
+  * [+87916f5] add mobile login screen for ipod/iphone. closes #5817
+  * [+7664c98] fix bottom padding on iphone/ipod login screen.
+  * [+03b53e9] pre-fill the correct unique_id when confirming cc's refs #5833
+  * [+f17a53f] render the mobile login screen for failed logins as well
+  * [+6456a08] switched custom course list graphic to checkboxes
+  * [+25913e9] show account announcements to users without enrollments fixes #6288
+  * [+1ca6e4d] fix tinychat
+  * [+e520f04] finish discussion topics API
+  * [+3a9bef7] fix discussion API documentation
+  * [+001a858] don't wrap discussion entry api responses in json root element
+  * [+bb9e2e7] translate user content in discussion topics api
+  * [+96bd512] fix conversation api doc
+  * [+89a6464] use defined submission json format in conversations api
+  * [+d877fb2] allow students to comment via API; fixes #6083
+
+ -- JT Olds <jt@instructure.com>  Sat, 12 Nov 2011 10:08:22 -0700
+
 canvas-lms (1.1-75) professional; urgency=low
 
   * Package ref: 1ea4e1e63f05fe446f48d1f1a1a076470c9d09cb
