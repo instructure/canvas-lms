@@ -21,6 +21,7 @@ module Api::V1::Assignment
   # no includes supported right now
   hash = assignment.as_json(:include_root => false, :only => %w(id grading_type points_possible position due_at))
 
+  hash['course_id'] = assignment.context_id
   hash['name'] = assignment.title
   hash['description'] = api_user_content(assignment.description, @context || assignment.context)
 

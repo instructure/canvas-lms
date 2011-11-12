@@ -71,7 +71,7 @@ class CommunicationChannelsController < ApplicationController
         unless @current_user == @user
           session[:return_to] = request.url
           flash[:notice] = t 'notices.login_to_confirm', "Please log in to confirm your e-mail address"
-          return redirect_to login_url(:re_login => @current_user ? 1 : nil)
+          return redirect_to login_url(:pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id)
         end
 
         cc.confirm

@@ -17,7 +17,7 @@
 #
 
 module Api::V1::DiscussionTopics
-  def discussion_topic_api_json(topics)
+  def discussion_topic_api_json(topics, context)
     topics.map do |topic|
 
       attachments = []
@@ -34,14 +34,34 @@ module Api::V1::DiscussionTopics
       children = topic.child_topics.scoped(:select => 'id').map(&:id)
 
       topic.as_json(:include_root => false,
-                    :only => %w(id title assignment_id delayed_post_at last_reply_at message posted_at require_initial_post root_topic_id),
+                    :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at require_initial_post root_topic_id),
                     :methods => [:user_name, :discussion_subentry_count],
                     :permissions => {:user => @current_user, :session => session}
       ).tap do |json|
+        json[:message] = api_user_content(topic.message, context)
         json.merge! :podcast_url => url,
                     :topic_children => children,
                     :attachments => attachments
       end
+    end
+  end
+
+  def discussion_entry_api_json(entries, context)
+    entries.map do |entry|
+      json = entry.as_json(:include_root => false,
+                           :only => %w(id user_id created_at),
+                           :methods => [:user_name, :discussion_subentry_count],
+                           :permissions => {:user => @current_user, :session => session})
+      json[:message] = api_user_content(entry.message, context)
+      if entry.parent_id.zero?
+        replies = entry.unordered_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
+        unless replies.empty?
+          json[:recent_replies] = discussion_entry_api_json(replies.first(10), context)
+          json[:has_more_replies] = replies.size > 10
+        end
+        json[:attachment] = attachment_json(entry.attachment) if entry.attachment
+      end
+      json
     end
   end
 
@@ -50,6 +70,22 @@ module Api::V1::DiscussionTopics
       api_v1_course_discussion_topics_path(@context)
     else
       api_v1_group_discussion_topics_path(@context)
+    end
+  end
+
+  def entry_pagination_path(topic)
+    if @context.is_a? Course
+      api_v1_course_discussion_entries_path(@context)
+    else
+      api_v1_group_discussion_entries_path(@context)
+    end
+  end
+
+  def reply_pagination_path(entry)
+    if @context.is_a? Course
+      api_v1_course_discussion_replies_path(@context)
+    else
+      api_v1_group_discussion_replies_path(@context)
     end
   end
 end

@@ -20,6 +20,33 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe PseudonymSessionsController do
 
+  it "should render normal layout if not iphone/ipod" do
+    get 'new'
+    response.should render_template("pseudonym_sessions/new.html.erb")
+  end
+
+  it "should render special iPhone/iPod layout if coming from one of those" do
+    [
+      "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
+      "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"
+    ].each do |user_agent|
+      request.env['HTTP_USER_AGENT'] = user_agent
+      get 'new'
+      response.should render_template("pseudonym_sessions/mobile_login")
+    end
+  end
+
+  it "should render special iPhone/iPod layout if coming from one of those and it's the wrong password'" do
+    [
+      "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
+      "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"
+    ].each do |user_agent|
+      request.env['HTTP_USER_AGENT'] = user_agent
+      post 'create'
+      response.should render_template("pseudonym_sessions/mobile_login")
+    end
+  end
+
   it "should re-render if no user" do
     post 'create'
     response.status.should == '400 Bad Request'
@@ -44,19 +71,11 @@ describe PseudonymSessionsController do
   end
 
   context "merging" do
-    it "should pre-fill the unique_id if in params" do
-      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
-      get 'new', :pseudonym => @pseudonym.id
-      response.should render_template('new')
-      assigns[:unique_id].should == 'jt@instructure.com'
-      session[:expected_user].should == @user.id
-    end
-
     it "should redirect back to merge users" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
       session[:confirm] = @cc.confirmation_code
-      session[:expected_user] = @user.id
+      session[:expected_user_id] = @user.id
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty' }
       response.should redirect_to(registration_confirmation_url(@cc.confirmation_code, :login_success => 1, :enrollment => nil, :confirm => 1))
     end

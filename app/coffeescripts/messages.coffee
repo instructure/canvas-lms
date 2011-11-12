@@ -867,34 +867,44 @@ I18n.scoped 'conversations', (I18n) ->
       e.stopPropagation()
     $attachment
 
+  submission_id = (data) ->
+    "submission_#{data.assignment_id}_#{data.user_id}"
+
   build_submission = (data) ->
-    $submission = $("#submission_blank").clone(true).attr('id', 'submission_' + data.id)
-    $submission.data('id', data.id)
+    $submission = $("#submission_blank").clone(true).attr('id', submission_id(data))
+    $submission.data('id', submission_id(data))
     $ul = $submission.find('ul')
     $header = $ul.find('li.header')
-    href = $.replaceTags($header.find('a').attr('href'), course_id: data.course_id, assignment_id: data.assignment_id, id: data.author_id)
+    href = $.replaceTags($header.find('a').attr('href'), course_id: data.assignment.course_id, assignment_id: data.assignment_id, id: data.user_id)
     $header.find('a').attr('href', href)
-    user = MessageInbox.user_cache[data.author_id]
+    user = MessageInbox.user_cache[data.user_id]
     user.html_name ?= html_name_for_user(user) if user
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
-    $header.find('.title').html $.h(data.title)
-    if data.created_at
-      $header.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
+    $header.find('.title').html $.h(data.assignment.name)
+    if data.submitted_at
+      $header.find('span.date').text $.parseFromISO(data.submitted_at).datetime_formatted
     $header.find('.audience').html user?.html_name || $.h(user_name)
-    score = data.score ? I18n.t('not_scored', 'no score')
+    if data.score && data.assignment.points_possible
+      score = "#{data.score} / #{data.assignment.points_possible}"
+    else
+      score = data.score ? I18n.t('not_scored', 'no score')
     $header.find('.score').html(score)
     $comment_blank = $ul.find('.comment').detach()
     index = 0
     initially_shown = 4
-    for comment in data.recent_comments
+    for comment in data.submission_comments.reverse()
+      break if index >= 10
       index++
       comment = build_submission_comment($comment_blank, comment)
       comment.hide() if index > initially_shown
       $ul.append comment
     $more_link = $ul.find('.more').detach()
-    if data.recent_comments.length > initially_shown
+    # the submission response isn't yet paginating/limiting the number of
+    # comments returned, but we don't want to display more than 10 here, so we
+    # artificially limit it.
+    if index > initially_shown
       $inline_more = $more_link.clone(true)
-      $inline_more.find('.hidden').text(data.comment_count - initially_shown)
+      $inline_more.find('.hidden').text(index - initially_shown)
       $inline_more.attr('title', $.h(I18n.t('titles.expand_inline', "Show more comments")))
       $inline_more.click ->
         submission = $(this).closest('.submission')
@@ -904,17 +914,16 @@ I18n.scoped 'conversations', (I18n) ->
         inbox_resize()
         return false
       $ul.append $inline_more
-    if data.comment_count > data.recent_comments.length
+    if data.submission_comments.length > index
       $more_link.find('a').attr('href', href).attr('target', '_blank')
-      $more_link.find('.hidden').text(data.comment_count - data.recent_comments.length)
+      $more_link.find('.hidden').text(data.submission_comments.length - index)
       $more_link.attr('title', $.h(I18n.t('titles.view_submission', "Open submission in new window.")))
-      $more_link.hide() if data.recent_comments.length > initially_shown
+      $more_link.hide() if data.submission_comments.length > initially_shown
       $ul.append $more_link
     $submission
 
   build_submission_comment = (blank, data) ->
-    $comment = blank.clone(true).attr('id', 'submission_comment_' + data.id)
-    $comment.data('id', data.id)
+    $comment = blank.clone(true)
     user = MessageInbox.user_cache[data.author_id]
     if avatar = user?.avatar_url
       $comment.prepend $('<img />').attr('src', avatar).addClass('avatar')
@@ -922,7 +931,7 @@ I18n.scoped 'conversations', (I18n) ->
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
     $comment.find('.audience').html user?.html_name || $.h(user_name)
     $comment.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
-    $comment.find('p').html $.h(data.body).replace(/\n/g, '<br />')
+    $comment.find('p').html $.h(data.comment).replace(/\n/g, '<br />')
     $comment
 
   inbox_action_url_for = ($action, $conversation) ->
