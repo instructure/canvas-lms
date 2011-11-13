@@ -532,6 +532,48 @@ shared_examples_for "conversations selenium tests" do
       coms.last.find_element(:css, '.audience').text.should == 'nobody@example.com'
       coms.last.find_element(:css, 'p').text.should == 'hey bob'
     end
+
+    def get_messages
+      get "/conversations"
+      elements = nil
+      keep_trying_until {
+        elements = find_all_with_jquery("#conversations > ul > li:visible")
+        elements.size == 1
+      }
+      elements.first.click
+      wait_for_ajaximations
+      msgs = driver.find_elements(:css, "div#messages ul.messages > li")
+    end
+
+    it "should interleave submissions with messages based on comment time" do
+      @me = @user
+      @bob = student_in_course(:name => "bob", :active_all => true).user
+      @conversation = conversation(@bob).conversation
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission1.add_comment(:comment => "hey bob", :author => @me).update_attribute(:created_at, 10.minutes.ago)
+      @conversation.conversation_messages.first.update_attribute(:created_at, 9.minutes.ago)
+
+      # message comes first, then submission, due to creation times
+      msgs = get_messages
+      msgs.size.should == 2
+      msgs[0].should have_class('message')
+      msgs[1].should have_class('submission')
+
+      # now new submission comment bumps it up
+      submission1.add_comment(:comment => "hey teach", :author => @bob).update_attribute(:created_at, 8.minutes.ago)
+      msgs = get_messages
+      msgs.size.should == 2
+      msgs[0].should have_class('submission')
+      msgs[1].should have_class('message')
+
+      # new message appears on top, submission now in the middle
+      @conversation.add_message(@bob, 'ohai there').update_attribute(:created_at, 7.minutes.ago)
+      msgs = get_messages
+      msgs.size.should == 3
+      msgs[0].should have_class('message')
+      msgs[1].should have_class('submission')
+      msgs[2].should have_class('message')
+    end
   end
 end
 
