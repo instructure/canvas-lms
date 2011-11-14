@@ -80,6 +80,7 @@ Spec::Runner.configure do |config|
     Time.zone = 'UTC'
     Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
+    HostUrl.reset_cache!
   end
 
   # flush redis before the first spec, and before each spec that comes after
