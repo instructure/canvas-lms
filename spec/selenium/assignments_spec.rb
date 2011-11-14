@@ -296,7 +296,7 @@ describe "assignment selenium tests" do
       driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t2.url
       driver.find_element(:css, 'form.new_assignment').submit
 
-      wait_for_dom_ready
+      wait_for_ajax_requests
       a = @course.assignments(true).last
       a.should be_present
       a.submission_types.should == 'external_tool'
@@ -320,7 +320,7 @@ describe "assignment selenium tests" do
       driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t1.url
       driver.find_element(:css, 'form.edit_assignment').submit
 
-      wait_for_dom_ready
+      wait_for_ajax_requests
       a.reload
       a.submission_types.should == 'external_tool'
       a.external_tool_tag.should be_present
