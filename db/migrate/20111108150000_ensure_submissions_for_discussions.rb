@@ -64,15 +64,16 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
         SQL
         group_id = group && group.id
 
-        homework = Submission.new(
-          :assignment_id => assignment.id,
-          :user_id => entry.user_id,
-          :group_id => group_id,
-          :submission_type => 'discussion_topic',
+        homework = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment.id, entry.user_id)
+        homework.grade_matches_current_submission = homework.score ? false : true
+        homework.attributes = {
           :attachment => nil,
           :processed => false,
           :process_attempts => 0,
-          :workflow_state => "submitted")
+          :workflow_state => "submitted",
+          :group_id => group_id,
+          :submission_type => 'discussion_topic'
+        }
 
         # don't broadcast due to these fixes, period.
         homework.with_versioning(:explicit => true) do
