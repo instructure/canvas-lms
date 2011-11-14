@@ -18,12 +18,14 @@
 #
 
 class UserList
+  # open_registration is true, false, or nil. if nil, it defaults to root_account.open_registration?
   def initialize(string, root_account = nil, open_registration = nil)
     @addresses = []
     @errors = []
     @duplicate_addresses = []
     @root_account = root_account || Account.default
-    @open_registration = open_registration || @root_account.open_registration?
+    @open_registration = open_registration
+    @open_registration = @root_account.open_registration? if @open_registration.nil?
     parse_list(string)
     resolve
   end
