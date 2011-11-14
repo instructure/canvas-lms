@@ -4,7 +4,7 @@
 <% end %>
 <% add_crumb(@resource_title) unless @assignment %>
 
-<% if @assignment.description.present? %>
+<% if @assignment && @assignment.description.present? %>
   <div class="description user_content" style="margin: 20px">
     <%= user_content(@assignment.description) %>
   </div>
@@ -35,7 +35,7 @@
   <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
 <% end %>
 <% if @tag %>
-  <% if @tag.context.is_a?(Assignment) && can_do(@tag.context, @current_user, :grade) || can_do(@tag.context.context, @current_user, :manage_assignments) %>
+  <% if @tag.context.is_a?(Assignment) && (can_do(@tag.context, @current_user, :grade) || can_do(@tag.context.context, @current_user, :manage_assignments)) %>
     <% content_for :right_side do %>
       <div class="rs-margin-all">
         <%= render :partial => 'assignments/external_grader_sidebar', :locals => { :assignment => @tag.context } %>
