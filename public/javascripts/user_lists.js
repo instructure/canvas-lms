@@ -46,8 +46,7 @@ I18n.scoped('user_lists', function(I18n) {
         .click(function(e){
           e.preventDefault();
           UL.showProcessing();
-          var params = {user_list: $("#user_list_textarea_container textarea").val() };
-          $.ajaxJSON(user_lists_path, 'POST', params, UL.showResults);
+          $.ajaxJSON(user_lists_path, 'POST', $form.getFormData(), UL.showResults);
         })
       .end()
       .submit(function(event) {

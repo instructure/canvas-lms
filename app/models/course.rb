@@ -2497,4 +2497,8 @@ class Course < ActiveRecord::Base
       Course.find(new_course.id)
     end
   end
+
+  def open_registration_for?(user, session = nil)
+    root_account.open_registration_for?(user, session)
+  end
 end
