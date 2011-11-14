@@ -1653,11 +1653,11 @@ I18n.scoped 'conversations', (I18n) ->
     token_input.fake_input.css('width', '100%')
     token_input.change = (tokens) ->
       if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
-        $form.find('#group_conversation').attr('checked', true) if !$form.find('#group_conversation_info').is(':visible')
+        $form.find('#group_conversation').attr('checked', false) if !$form.find('#group_conversation_info').is(':visible')
         $form.find('#group_conversation_info').show()
         $form.find('#user_note_info').hide()
       else
-        $form.find('#group_conversation').attr('checked', true)
+        $form.find('#group_conversation').attr('checked', false)
         $form.find('#group_conversation_info').hide()
         $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) and can_add_notes_for(user))
       inbox_resize()

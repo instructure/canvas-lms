@@ -324,7 +324,11 @@ shared_examples_for "all selenium tests" do
   end
 
   def is_checked(selector)
-    return driver.execute_script('return $("'+selector+'").is(":checked")')
+    if selector.is_a?(String)
+      return driver.execute_script('return $("'+selector+'").is(":checked")')
+    else
+      return selector.attribute(:checked) == 'checked'
+    end
   end
 
   def set_value(input, value)
