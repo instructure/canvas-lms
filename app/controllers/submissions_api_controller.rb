@@ -268,7 +268,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User).compact unless user_ids.blank?
+    Api.map_ids(user_ids, User, @domain_root_account)
   end
 
   def get_course_from_section

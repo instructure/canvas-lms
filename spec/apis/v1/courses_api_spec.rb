@@ -140,8 +140,8 @@ describe CoursesController, :type => :integration do
 
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
-    json.should == api_json_response([first_user, new_user],
-        :only => USER_API_FIELDS)
+    json.sort_by{|x| x["id"]}.should == api_json_response([first_user, new_user],
+        :only => USER_API_FIELDS).sort_by{|x| x["id"]}
   end
 
   it "should not include user sis id or login id for non-admins" do
@@ -238,8 +238,8 @@ describe CoursesController, :type => :integration do
 
     json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
             { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
-    json.should == api_json_response([first_user, new_user],
-        :only => USER_API_FIELDS)
+    json.sort_by{|x| x["id"]}.should == api_json_response([first_user, new_user],
+        :only => USER_API_FIELDS).sort_by{|x| x["id"]}
 
     json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
             { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })

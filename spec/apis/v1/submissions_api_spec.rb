@@ -1313,4 +1313,55 @@ describe SubmissionsApiController, :type => :integration do
     response.status.should == "404 Not Found"
   end
 
+  context 'map_user_ids' do
+    before do
+      @controller = SubmissionsApiController.new
+      @controller.instance_variable_set :@domain_root_account, Account.default
+    end
+
+    it 'should map an empty list' do
+      @controller.map_user_ids([]).should == []
+    end
+
+    it 'should map a list of AR ids' do
+      @controller.map_user_ids([1, 2, '3', '4']).sort.should == [1, 2, 3, 4]
+    end
+
+    it "should bail on ids it can't figure out" do
+      @controller.map_user_ids(["nonexistentcolumn:5"]).should == []
+    end
+
+    it "should filter out sis ids that don't exist, but not filter out AR ids" do
+      @controller.map_user_ids(["sis_user_id:1", "2"]).should == [2]
+    end
+
+    it "should find sis ids that exist" do
+      user_with_pseudonym
+      @pseudonym.sis_user_id = "sisuser1"
+      @pseudonym.save!
+      @user1 = @user
+      user_with_pseudonym :username => "sisuser2@example.com"
+      @user2 = @user
+      user_with_pseudonym :username => "sisuser3@example.com"
+      @user3 = @user
+      @controller.map_user_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
+        "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4",
+        "5123"]).sort.should == [
+        @user1.id, @user2.id, @user3.id, 5123].sort
+    end
+
+    it "should not find sis ids in other accounts" do
+      account1 = account_model
+      account2 = account_model
+      @controller.instance_variable_set :@domain_root_account, account1
+      user1 = user_with_pseudonym :username => "sisuser1@example.com", :account => account1
+      user2 = user_with_pseudonym :username => "sisuser2@example.com", :account => account2
+      user3 = user_with_pseudonym :username => "sisuser3@example.com", :account => account1
+      user4 = user_with_pseudonym :username => "sisuser3@example.com", :account => account2
+      user5 = user :account => account1
+      user6 = user :account => account2
+      @controller.map_user_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id]).sort.should == [user1.id, user3.id, user5.id, user6.id].sort
+    end
+  end
+
 end
