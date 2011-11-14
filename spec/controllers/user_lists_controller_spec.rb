@@ -1,0 +1,40 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe UserListsController do
+  it "should not fail for permission to add students" do
+    course
+    account_admin_user_with_role_changes(:membership_type => 'myadmin', :role_changes => { :manage_students => true })
+    user_session(@user)
+
+    post 'create', :course_id => @course.id, :user_list => ''
+    response.should be_success
+  end
+
+  it "should allow bypassing the effects of open registration" do
+    course
+    user
+    Account.default.add_user(@user)
+    user_session(@user)
+
+    UserList.any_instance.expects(:initialize).with('', Account.default, false)
+    post 'create', :course_id => @course.id, :user_list => '', :only_search_existing_users => true
+  end
+end
