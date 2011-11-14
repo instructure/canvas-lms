@@ -2258,12 +2258,12 @@
         var user, _ref3;
         if (tokens.length > 1 || ((_ref3 = tokens[0]) != null ? _ref3.match(/^(course|group)_/) : void 0)) {
           if (!$form.find('#group_conversation_info').is(':visible')) {
-            $form.find('#group_conversation').attr('checked', true);
+            $form.find('#group_conversation').attr('checked', false);
           }
           $form.find('#group_conversation_info').show();
           $form.find('#user_note_info').hide();
         } else {
-          $form.find('#group_conversation').attr('checked', true);
+          $form.find('#group_conversation').attr('checked', false);
           $form.find('#group_conversation_info').hide();
           $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) && can_add_notes_for(user));
         }
