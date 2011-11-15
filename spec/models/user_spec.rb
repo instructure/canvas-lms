@@ -983,17 +983,17 @@ describe User do
 
     it "should return an active pseudonym" do
       user_with_pseudonym(:active_all => 1)
-      @user.pseudonym_for_account(Account.default).should == @pseudonym
+      @user.find_pseudonym_for_account(Account.default).should == @pseudonym
     end
 
     it "should return a trusted pseudonym" do
       user_with_pseudonym(:active_all => 1, :account => @account2)
-      @user.pseudonym_for_account(Account.default).should == @pseudonym
+      @user.find_pseudonym_for_account(Account.default).should == @pseudonym
     end
 
     it "should return nil if none work" do
       user_with_pseudonym(:active_all => 1)
-      @user.pseudonym_for_account(@account2).should == nil
+      @user.find_pseudonym_for_account(@account2).should == nil
     end
 
     it "should create a copy of an existing pseudonym" do
@@ -1003,7 +1003,7 @@ describe User do
 
       # from unrelated account
       user_with_pseudonym(:active_all => 1, :account => @account2, :username => 'unrelated@example.com', :password => 'abcdef')
-      new_pseudonym = @user.pseudonym_for_account(@account1, true)
+      new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
       new_pseudonym.should_not be_nil
       new_pseudonym.should be_new_record
       new_pseudonym.unique_id.should == 'unrelated@example.com'
@@ -1011,20 +1011,20 @@ describe User do
       # from default account
       @user.pseudonyms.create!(:unique_id => 'default@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.create!(:account => @account3, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
-      new_pseudonym = @user.pseudonym_for_account(@account1, true)
+      new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
       new_pseudonym.should_not be_nil
       new_pseudonym.should be_new_record
       new_pseudonym.unique_id.should == 'default@example.com'
 
       # from site admin account
       @user.pseudonyms.create!(:account => Account.site_admin, :unique_id => 'siteadmin@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
-      new_pseudonym = @user.pseudonym_for_account(@account1, true)
+      new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
       new_pseudonym.should_not be_nil
       new_pseudonym.should be_new_record
       new_pseudonym.unique_id.should == 'siteadmin@example.com'
 
       # from preferred account
-      new_pseudonym = @user.pseudonym_for_account(@account1, @account3)
+      new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
       new_pseudonym.should_not be_nil
       new_pseudonym.should be_new_record
       new_pseudonym.unique_id.should == 'preferred@example.com'
@@ -1033,7 +1033,7 @@ describe User do
       @account1.pseudonyms.create!(:unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.detect { |p| p.account == Account.site_admin }.update_attribute(:password_auto_generated, true)
       Account.default.account_authorization_configs.create!(:auth_type => 'cas')
-      new_pseudonym = @user.pseudonym_for_account(@account1, @account3)
+      new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
       new_pseudonym.should_not be_nil
       new_pseudonym.should be_new_record
       new_pseudonym.unique_id.should == 'unrelated@example.com'
@@ -1045,25 +1045,25 @@ describe User do
       @account1 = Account.create!
       # no pseudonyms
       user
-      @user.pseudonym_for_account(@account1, true).should be_nil
+      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
 
       # auto-generated password
       @account2 = Account.create!
       @user.pseudonyms.create!(:account => @account2, :unique_id => 'bracken@instructure.com')
-      @user.pseudonym_for_account(@account1, true).should be_nil
+      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
 
       # delegated auth
       @account3 = Account.create!
       @account3.account_authorization_configs.create!(:auth_type => 'cas')
       @account3.should be_delegated_authentication
       @user.pseudonyms.create!(:account => @account3, :unique_id => 'jacob@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
-      @user.pseudonym_for_account(@account1, true).should be_nil
+      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
 
       # conflict
       @user2 = User.create! { |u| u.workflow_state = 'registered' }
       @user2.pseudonyms.create!(:account => @account1, :unique_id => 'jt@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :password => 'ghijkl', :password_confirmation => 'ghijkl')
-      @user.pseudonym_for_account(@account1, true).should be_nil
+      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
     end
   end
 end

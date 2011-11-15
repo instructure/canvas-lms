@@ -2126,19 +2126,22 @@ class User < ActiveRecord::Base
     h
   end
 
+  def find_pseudonym_for_account(account)
+    self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account) }
+  end
+
   # account = the account that you want a pseudonym for
-  # preferred_template_account = true-ish to create a pseudonym for the specified account if one doesn't exist (and it's possible)
-  #   pass in an actual account if you have a preference for which account the new pseudonym gets copied from
+  # preferred_template_account = pass in an actual account if you have a preference for which account the new pseudonym gets copied from
   # this may not be able to find a suitable pseudonym to copy, so would still return nil
   # if a pseudonym is created, it is *not* saved, and *not* added to the pseudonyms collection
-  def pseudonym_for_account(account, preferred_template_account = nil)
-    pseudonym = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account) }
-    if !pseudonym && preferred_template_account
+  def find_or_initialize_pseudonym_for_account(account, preferred_template_account = nil)
+    pseudonym = find_pseudonym_for_account(account)
+    if !pseudonym
       # list of copyable pseudonyms
       active_pseudonyms = self.pseudonyms.select { |p| p.active? && !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
-      templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account.is_a?(Account)
+      templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
       templates.concat active_pseudonyms.select { |p| p.account_id == Account.site_admin.id }
       templates.concat active_pseudonyms.select { |p| p.account_id == Account.default.id }
       templates.concat active_pseudonyms
