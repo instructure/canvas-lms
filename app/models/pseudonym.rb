@@ -211,7 +211,9 @@ class Pseudonym < ActiveRecord::Base
     raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
-    self.save
+    result = self.save
+    self.user.try(:update_account_associations) if result
+    result
   end
   
   def never_logged_in?
