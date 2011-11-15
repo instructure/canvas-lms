@@ -333,15 +333,6 @@ class Account < ActiveRecord::Base
     ['_account_lookup2', id].cache_key
   end
   
-  def find_user_by_unique_id(unique_id)
-    self.pseudonyms.find_by_unique_id(unique_id_or_email).user rescue nil
-  end
-  
-  def clear_cache_keys!
-    Rails.cache.delete(self.id)
-    true
-  end
-  
   def self.invalidate_cache(id)
     Rails.cache.delete(account_lookup_cache_key(id)) if id
   rescue 
