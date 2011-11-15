@@ -1023,7 +1023,8 @@ namespace :db do
 
     def create_admin(email, password)
       begin
-        pseudonym = Pseudonym.find_by_unique_id(email)
+        pseudonym = Account.site_admin.pseudonyms.active.find_by_unique_id(email)
+        pseudonym ||= Account.default.pseudonyms.active.find_by_unique_id(email)
         user = pseudonym ? pseudonym.user : User.create!
         user.register! unless user.registered?
         unless pseudonym
@@ -1031,7 +1032,7 @@ namespace :db do
           # picky. the admin should know what they're doing, and we'd rather not
           # fail here.
           pseudonym = user.pseudonyms.create!(:unique_id => email,
-              :password => "validpassword", :password_confirmation => "validpassword")
+              :password => "validpassword", :password_confirmation => "validpassword", :account => Account.site_admin)
           user.communication_channels.create!(:path => email) { |cc| cc.workflow_state = 'active' }
         end
         # set the password later.
