@@ -16,9 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define('jquery.instructure_misc_plugins', ['i18n'], function(I18n){
-
-  I18n = I18n.scoped('instructure');
+I18n.scoped('instructure', function(I18n){
 
   // this function is to prevent you from doing all kinds of expesive operations on a
   // jquery object that doesn't actually have any elements in it
@@ -399,5 +397,6 @@ define('jquery.instructure_misc_plugins', ['i18n'], function(I18n){
     });
   }
 
-  return $;
+  define('jquery.instructure_misc_plugins', ['i18n'], function(){ return $ });
 });
+
