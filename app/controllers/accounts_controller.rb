@@ -382,7 +382,7 @@ class AccountsController < ApplicationController
   
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list], @context, @context.grants_right?(@current_user, session, :manage_user_logins))
+      list = UserList.new(params[:user_list], @context, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
       users = list.users
       account_users = users.map do |user|
         account_user = @context.add_user(user, params[:membership_type])

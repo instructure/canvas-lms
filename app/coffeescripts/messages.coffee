@@ -680,7 +680,7 @@ I18n.scoped 'conversations', (I18n) ->
       message = data.messages[0]
       submission = data.submissions[0]
       while message || submission
-        if message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.updated_at).datetime)
+        if message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.submission_comments[submission.submission_comments.length - 1]?.created_at).datetime)
           # there's another message, and the next submission (if any) is not newer than it
           $message_list.append build_message(message)
           message = data.messages[++i]
@@ -892,7 +892,8 @@ I18n.scoped 'conversations', (I18n) ->
     $comment_blank = $ul.find('.comment').detach()
     index = 0
     initially_shown = 4
-    for comment in data.submission_comments.reverse()
+    for idx in [data.submission_comments.length - 1 .. 0] by -1
+      comment = data.submission_comments[idx]
       break if index >= 10
       index++
       comment = build_submission_comment($comment_blank, comment)

@@ -280,6 +280,16 @@ describe UserList do
       cc.path.should == 'jt@instructure.com'
       cc.should_not == @cc
     end
+
+    it "should not create new users for users found by email" do
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
+      @pseudonym.update_attribute(:unique_id, 'jt')
+      ul = UserList.new 'jt@instructure.com', Account.default, false
+      ul.addresses.length.should == 1
+      ul.addresses.first[:user_id].should == @user.id.to_s
+      ul.addresses.first[:type].should == :email
+      ul.users.should == [@user]
+    end
   end
 end
 

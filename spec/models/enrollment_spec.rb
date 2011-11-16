@@ -884,5 +884,29 @@ describe Enrollment do
       group.users.size.should == 1
       group.users.should be_include(user1)
     end
+    
+    it "should ignore previously deleted memberships" do
+      # set up course with a user in one section
+      course_with_teacher(:active_all => true)
+      user = user_model
+      section1 = @course.course_sections.create
+      enrollment = section1.enroll_user(user, 'StudentEnrollment')
+
+      # set up a group without a group category and put the user in it
+      group = @course.groups.create
+      group.add_user(user)
+      
+      # mark the membership as deleted
+      membership = group.group_memberships.find_by_user_id(user.id)
+      membership.workflow_state = 'deleted'
+      membership.save!
+      
+      # delete the enrollment to trigger audit_groups_for_deleted_enrollments processing
+      lambda {enrollment.destroy}.should_not raise_error
+
+      # she should still be removed from the group
+      group.users.size.should == 0
+      group.users.should_not be_include(user)
+    end
   end
 end
