@@ -1032,6 +1032,12 @@ class Account < ActiveRecord::Base
     (self.root_account || self).sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
   end
 
+  def open_registration_for?(user, session = nil)
+    root_account = self.root_account || self
+    return true if root_account.open_registration?
+    root_account.grants_right?(user, session, :manage_user_logins)
+  end
+
   named_scope :sis_sub_accounts, lambda{|account, *sub_account_source_ids|
     {:conditions => {:root_account_id => account.id, :sis_source_id => sub_account_source_ids}, :order => :sis_source_id}
   }

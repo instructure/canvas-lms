@@ -930,7 +930,7 @@
       $form.loadingImage();
       $c = $selected_conversation;
       completion = function(data) {
-        var i, j, message, submission, user, _i, _len, _ref, _ref2;
+        var i, j, message, submission, user, _i, _len, _ref, _ref2, _ref3;
         if (!is_selected($c)) {
           return;
         }
@@ -962,7 +962,7 @@
         message = data.messages[0];
         submission = data.submissions[0];
         while (message || submission) {
-          if (message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.updated_at).datetime)) {
+          if (message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO((_ref3 = submission.submission_comments[submission.submission_comments.length - 1]) != null ? _ref3.created_at : void 0).datetime)) {
             $message_list.append(build_message(message));
             message = data.messages[++i];
           } else {
@@ -1181,7 +1181,7 @@
       return "submission_" + data.assignment_id + "_" + data.user_id;
     };
     build_submission = function(data) {
-      var $comment_blank, $header, $inline_more, $more_link, $submission, $ul, comment, href, index, initially_shown, score, user, user_name, _i, _len, _ref, _ref2, _ref3, _ref4;
+      var $comment_blank, $header, $inline_more, $more_link, $submission, $ul, comment, href, idx, index, initially_shown, score, user, user_name, _ref, _ref2, _ref3, _ref4;
       $submission = $("#submission_blank").clone(true).attr('id', submission_id(data));
       $submission.data('id', submission_id(data));
       $ul = $submission.find('ul');
@@ -1213,9 +1213,8 @@
       $comment_blank = $ul.find('.comment').detach();
       index = 0;
       initially_shown = 4;
-      _ref4 = data.submission_comments.reverse();
-      for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
-        comment = _ref4[_i];
+      for (idx = _ref4 = data.submission_comments.length - 1; idx >= 0; idx += -1) {
+        comment = data.submission_comments[idx];
         if (index >= 10) {
           break;
         }

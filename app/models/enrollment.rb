@@ -193,7 +193,7 @@ class Enrollment < ActiveRecord::Base
       # we have just deleted the user's enrollment in the group's course.
       # remove the leaving user from the group to keep the group happy
       membership = group.group_memberships.find_by_user_id(self.user_id)
-      membership.destroy
+      membership.destroy if membership
     end
   end
   protected :audit_groups_for_deleted_enrollments
@@ -515,6 +515,8 @@ class Enrollment < ActiveRecord::Base
   # 
   # * A submission's score is changed; scores for the submission owner in the
   #   associated course are recomputed.
+  #
+  # * An assignment is deleted/undeleted
   #
   # If some new feature comes up that affects calculation of a user's score,
   # please add appropriate calls to this so that the cached values don't get
