@@ -23,11 +23,11 @@ describe "Accounts API", :type => :integration do
     user_with_pseudonym(:active_all => true)
     @a1 = account_model(:name => 'root')
     @a1.add_user(@user)
-    @a2 = account_model(:name => 'subby', :parent_account => @a1, :sis_source_id => 'sis1')
+    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1')
     @a2.add_user(@user)
     @a3 = account_model(:name => 'no-access')
     # even if we have access to it implicitly, it's not listed
-    @a4 = account_model(:name => 'implicit-access', :parent_account => @a1)
+    @a4 = account_model(:name => 'implicit-access', :parent_account => @a1, :root_account => @a1)
   end
 
   it "should return the account list" do
@@ -67,7 +67,7 @@ describe "Accounts API", :type => :integration do
 
   it "should find accounts by sis in only this root account" do
     Account.default.add_user(@user)
-    other_sub = account_model(:name => 'other_sub', :parent_account => Account.default, :sis_source_id => 'sis1')
+    other_sub = account_model(:name => 'other_sub', :parent_account => Account.default, :root_account => Account.default, :sis_source_id => 'sis1')
     other_sub.add_user(@user)
 
     # this is scoped to Account.default

@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "accounts/settings.html.erb" do
   describe "sis_source_id edit box" do
     before do
-      @account = Account.default
+      @account = Account.default.sub_accounts.create!
       @account.sis_source_id = "so_special_sis_id"
       @account.save
       

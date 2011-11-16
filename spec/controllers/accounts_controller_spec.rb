@@ -141,4 +141,21 @@ describe AccountsController do
 
     assigns[:associated_courses_count].should == 1
   end
+
+  describe "update" do
+    it "should allow admins to set the sis_source_id on sub accounts" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      post 'update', :id => @account.id, :account => { :sis_source_id => 'abc' }
+      @account.reload
+      @account.sis_source_id.should == 'abc'
+    end
+
+    it "should not allow setting the sis_source_id on root accounts" do
+      account_with_admin_logged_in
+      post 'update', :id => @account.id, :account => { :sis_source_id => 'abc' }
+      @account.reload
+      @account.sis_source_id.should be_nil
+    end
+  end
 end

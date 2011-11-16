@@ -597,6 +597,12 @@ describe Account do
     end
   end
 
+  it "should not allow setting an sis id for a root account" do
+    @account = Account.create!
+    @account.sis_source_id = 'abc'
+    @account.save.should be_false
+  end
+
   describe "open_registration_for?" do
     it "should be true for anyone if open registration is turned on" do
       account = Account.default

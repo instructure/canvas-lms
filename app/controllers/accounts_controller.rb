@@ -98,7 +98,7 @@ class AccountsController < ApplicationController
           end
         end
         if sis_id = params[:account].delete(:sis_source_id)
-          if sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
+          if !@account.root_account? && sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
               @account.sis_source_id = nil
             else
