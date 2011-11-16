@@ -252,11 +252,6 @@ class Pseudonym < ActiveRecord::Base
     user.email
   end
   
-  def account_name
-    return "Instructure" if self.account == Account.default
-    self.account.name rescue "Canvas"
-  end
-  
   def chat
     user.chat if user
   end
