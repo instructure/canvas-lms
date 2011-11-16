@@ -41,19 +41,19 @@ class UserList
   end
 
   def users
-    non_emails = @addresses.select { |a| a[:type] != :email }
-    non_email_users = User.find_all_by_id(non_emails.map { |a| a[:user_id] }) unless non_emails.empty?
-    non_email_users ||= []
+    existing = @addresses.select { |a| a[:user_id] }
+    existing_users = User.find_all_by_id(existing.map { |a| a[:user_id] }) unless existing.empty?
+    existing_users ||= []
 
-    emails = @addresses.select { |a| a[:type] == :email }
-    email_users = emails.map do |a|
+    non_existing = @addresses.select { |a| !a[:user_id] }
+    non_existing_users = non_existing.map do |a|
       user = User.new(:name => a[:name] || a[:address])
       user.communication_channels.build(:path => a[:address], :path_type => 'email')
       user.workflow_state = 'creation_pending'
       user.save!
       user
     end
-    email_users + non_email_users
+    existing_users + non_existing_users
   end
 
   private
