@@ -675,5 +675,23 @@ describe Account do
       Account.default.fast_all_users.should == [@jtolds, @johnstclair]
     end
   end
->>>>>>> e9eec02... fix display of sortable name in users list refs #5317
+
+  describe "open_registration_for?" do
+    it "should be true for anyone if open registration is turned on" do
+      account = Account.default
+      account.settings = { :open_registration => true }
+      account.open_registration_for?(nil).should be_true
+      account.open_registration_for?(user).should be_true
+    end
+
+    it "should be true for account admins" do
+      account = Account.default
+      account.open_registration_for?(nil).should be_false
+      account.open_registration_for?(user).should be_false
+      user
+      account.add_user(@user)
+      account.open_registration_for?(@user).should be_true
+    end
+  end
+>>>>>>> 9b9fd33... fix permission check for TAs refs #5833
 end

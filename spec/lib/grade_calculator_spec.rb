@@ -285,6 +285,34 @@ describe GradeCalculator do
       @user.enrollments.first.computed_final_score.should eql(90.0)
     end
     
+    it "should recalculate all cached grades when an assignment is deleted/restored" do
+      course_with_student
+      @group = @course.assignment_groups.create!(:name => "some group")
+      @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 5)
+      @assignment.context = @course
+      @assignment.save!
+      @assignment2 = @group.assignments.build(:title => "yet another", :points_possible => 5)
+      @assignment2.context = @course
+      @assignment2.save!
+      @submission = @assignment.grade_student(@user, :grade => "2")
+      @submission2 = @assignment2.grade_student(@user, :grade => "4")
+      @course.save!
+      @user.reload
+      
+      @user.enrollments.first.computed_current_score.should eql(60.0)
+      @user.enrollments.first.computed_final_score.should eql(60.0)
+      
+      @assignment2.destroy
+      @user.reload
+      @user.enrollments.first.computed_current_score.should eql(40.0) # only the 2/5 should be there
+      @user.enrollments.first.computed_final_score.should eql(40.0)
+      
+      @assignment2.restore
+      @user.reload
+      @user.enrollments.first.computed_current_score.should eql(60.0)
+      @user.enrollments.first.computed_final_score.should eql(60.0)
+    end
+    
   end
   
 end
