@@ -1,3 +1,17 @@
+canvas-lms (1.1-77) professional; urgency=low
+
+  * Package ref: e7a28fdd2d2b0e2d08c7a94e4cda09d6aad6272d
+  *
+  * [+69f3198] fix interleaving of submission comments into conversations
+  * [+51299d6] add index on favorites.user_id
+  * [+7dfed00] recalculate cached grades when an assignment is deleted/undeleted
+  * [+0d62d79] don't try to delete an already deleted group membership
+  * [+617ead7] fix permission check for TAs refs #5833
+  * [+c888127] open registration is settable by account admins refs #5833
+  * [+e7a28fd] don't create temp users for closed registration refs #5833
+
+ -- JT Olds <jt@instructure.com>  Wed, 16 Nov 2011 15:16:24 -0700
+
 canvas-lms (1.1-76) professional; urgency=low
 
   * Package ref: d877fb232d07ea59dc9e227c1beb38b625baf783
