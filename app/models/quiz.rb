@@ -176,6 +176,12 @@ class Quiz < ActiveRecord::Base
     @assignment_id_set = true
     write_attribute(:assignment_id, val)
   end
+
+  def due_at=(val)
+    val = val.in_time_zone.end_of_day if val.is_a?(Date)
+    super(val)
+    infer_times if (val.is_a?(String) && !val.match(/:/))
+  end
   
   def assignment?
     self.quiz_type == 'assignment'

@@ -33,6 +33,30 @@ describe Quiz do
     q.assignment.due_at.should == Time.parse("Sep 3 2008 11:59pm UTC")
   end
 
+  it "should set the due time to 11:59pm if only given a date" do
+    params = { :quiz => { :title => "Test Quiz", :due_at => Date.today.to_s } }
+    q = @course.quizzes.create!(params[:quiz])
+    q.due_at.hour.should eql 23
+    q.due_at.min.should eql 59
+  end
+
+  it "should not set the due time to 11:59pm if passed a time of midnight" do
+    params = { :quiz => { :title => "Test Quiz", :due_at => "Jan 1 2011 12:00am" } }
+    q = @course.quizzes.create!(params[:quiz])
+    q.due_at.hour.should eql 0
+    q.due_at.min.should eql 0
+  end
+
+  it "should convert a date object to a time and set the time to 11:59pm" do
+    Time.zone = 'Alaska'
+    params = { :quiz => { :title => 'Test Quiz', :due_at => Date.today } }
+    quiz = @course.quizzes.create!(params[:quiz])
+    quiz.due_at.should be_an_instance_of ActiveSupport::TimeWithZone
+    quiz.due_at.zone.should eql 'AKST'
+    quiz.due_at.hour.should eql 23
+    quiz.due_at.min.should eql 59
+  end
+
   it "should initialize with default settings" do
     q = @course.quizzes.create!(:title => "new quiz")
     q.shuffle_answers.should eql(false)
