@@ -180,16 +180,16 @@
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts" %>
                   </div>
-                  <div>
-                    <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
-                    <%= settings.label :open_registration, :en => "Open Registration" %>
-                  </div>
                 <% end %>
                 <div>
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
                   <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
                 </div>
               <% end %>
+              <div>
+                <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
+                <%= settings.label :open_registration, :en => "Open Registration" %>
+              </div>
               <div>
                 <%= settings.check_box :users_can_edit_name, :checked => @account.settings[:users_can_edit_name] != false %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit display name" %>
