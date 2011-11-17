@@ -77,7 +77,7 @@ class Submission < ActiveRecord::Base
           SELECT DISTINCT s.id AS submission_id FROM submissions AS s
           INNER JOIN assignments AS a ON a.id = s.assignment_id
           INNER JOIN courses AS c ON c.id = a.context_id AND a.context_type = 'Course'
-            AND c.workflow_state NOT IN ('aborted', 'deleted')
+            AND c.workflow_state <> 'deleted'
           INNER JOIN enrollments AS e ON e.course_id = c.id AND e.user_id = #{p.user_id}
             AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment')
           INNER JOIN submission_comments AS sc ON sc.submission_id = s.id

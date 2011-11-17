@@ -965,4 +965,22 @@ describe Enrollment do
       Enrollment.cached_temporary_invitations('jt@instructure.com').should == []
     end
   end
+
+  context "named scopes" do
+    describe "ended" do
+      it "should work" do
+        course(:active_all => 1)
+        user
+        Enrollment.ended.should == []
+        @enrollment = Enrollment.create!(:user => @user, :course => @course)
+        Enrollment.ended.should == []
+        @enrollment.update_attribute(:workflow_state, 'active')
+        Enrollment.ended.should == []
+        @enrollment.update_attribute(:workflow_state, 'completed')
+        Enrollment.ended.should == [@enrollment]
+        @enrollment.update_attribute(:workflow_state, 'rejected')
+        Enrollment.ended.should == [@enrollment]
+      end
+    end
+  end
 end

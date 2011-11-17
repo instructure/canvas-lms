@@ -1447,7 +1447,7 @@ describe Course, "manageable_by_user" do
     Course.manageable_by_user(user.id).should be_empty
   end
 
-  it "should not include aborted or deleted courses the user was enrolled in" do
+  it "should not include deleted courses the user was enrolled in" do
     course = Course.create
     user = user_with_pseudonym
     course.enroll_teacher(user)

@@ -433,7 +433,7 @@ class Course < ActiveRecord::Base
        UNION SELECT courses.id AS course_id, e.user_id FROM courses
          INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment')
-         WHERE courses.workflow_state NOT IN ('aborted', 'deleted')) as course_users
+         WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id"
     }
   }
@@ -699,22 +699,18 @@ class Course < ActiveRecord::Base
     state :created do
       event :claim, :transitions_to => :claimed
       event :offer, :transitions_to => :available
-      event :abort_it, :transitions_to => :aborted
       event :complete, :transitions_to => :completed
     end
     
     state :claimed do
       event :offer, :transitions_to => :available
-      event :abort_it, :transitions_to => :aborted
       event :complete, :transitions_to => :completed
     end
     
     state :available do
-      event :abort_it, :transitions_to => :aborted
       event :complete, :transitions_to => :completed
     end
 
-    state :aborted
     state :completed do
       event :unconclude, :transitions_to => :available
     end

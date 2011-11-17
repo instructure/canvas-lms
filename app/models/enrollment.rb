@@ -135,7 +135,7 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :ended,
               :joins => :course,
-              :conditions => "courses.workflow_state = 'aborted' or courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
+              :conditions => "courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
 
 
   READABLE_TYPES = {
