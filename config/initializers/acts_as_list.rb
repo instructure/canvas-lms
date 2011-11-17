@@ -22,6 +22,8 @@ module ActiveRecord
           done_ids = {}
           cnt = 1
           ids.each do |id|
+            id = id.to_i
+            next unless id > 0
             updates << "WHEN id=#{id} THEN #{cnt}"
             done_ids[id.to_i] = true
             cnt += 1
