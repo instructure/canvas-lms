@@ -43,6 +43,25 @@ class PseudonymSession < Authlogic::Session::Base
     @valid_basic_auth
   end
 
+  # modifications to authlogic's cookie persistence (used for the "remember me" token)
+  # much of the theory here is based on this blog post:
+  # http://fishbowl.pastiche.org/2004/01/19/persistent_login_cookie_best_practice/
+  #
+  # also, authlogic doesn't support httponly (or secure-only) for the "remember me"
+  # cookie yet, so we add that support here. there's an open pull request still
+  # pending:
+  # https://github.com/binarylogic/authlogic/issues/issue/210
+  def save_cookie
+    return unless remember_me?
+    controller.cookies[cookie_key] = {
+      :value => "#{record.persistence_token}::#{record.send(record.class.primary_key)}",
+      :expires => remember_me_until,
+      :domain => controller.cookie_domain,
+      :httponly => true,
+      :secure => ActionController::Base.session_options[:secure],
+    }
+  end
+
   # Validate the session using password auth (either local or LDAP, but not
   # SSO). If too many failed attempts have occured, the validation will fail.
   # In this case, `too_many_attempts?` will be true, rather than
