@@ -16,11 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Courses
 class ContentImportsController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t 'crumbs.content_imports', "Content Imports" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
+  
+  include Api::V1::Course
   
   def intro
     authorized_action(@context, @current_user, [:manage_content, :manage_files, :manage_quizzes])
@@ -171,27 +174,82 @@ class ContentImportsController < ApplicationController
     end
   end
   
+  # @API
+  #
+  # Retrieve the status of a course copy
+  #
+  # @response_field id The unique identifier for the course copy.
+  #
+  # @response_field progress The progress of the copy as an integer. It is null before the copying starts, and 100 when finished.
+  #
+  # @response_field workflow_state The current status of the course copy. Possible values: "created", "started", "completed", "failed"
+  #
+  # @response_field status_url The relative url for the course copy status API endpoint.
+  #
+  # @example_response
+  #   {'status':'completed', 'workflow_state':100, 'id':257, 'created_at':'2011-11-17T16:50:06Z', 'status_url':'/api/v1/courses/9457/course_copy/257'}
   def copy_course_status
+    if api_request?
+      @context = api_find(Course, params[:course_id])
+    end
     if authorized_action(@context, @current_user, :manage_content)
       import = @context.course_imports.find(params[:id])
       respond_to do |format|
-        format.json { render :json => import.to_json }
+        format.json { render :json => copy_status_json(import, @context)}
       end
     end
   end
   
+  
+  # @API
+  #
+  # Copies content from one course into another. The default is to copy all course
+  # content. You can control specific types to copy by using either the 'except' option
+  # or the 'only' option.
+  #
+  # @argument source_course ID or SIS-ID of the course to copy the content from
+  #
+  # @argument except[] A list of the course content types to exclude, all areas not listed will be copied.
+  #
+  # @argument only[] A list of the course content types to copy, all areas not listed will not be copied.
+  #
+  # The possible items for 'except' and 'only' are: "course_settings", "assignments", "external_tools", 
+  # "files", "topics", "calendar_events", "quizzes", "wiki_pages", "modules", "outcomes"
+  #
+  # The response is the same as the course copy status endpoint
+  #
   def copy_course_content
+    if api_request?
+      @context = api_find(Course, params[:course_id])
+    end
+    
     if authorized_action(@context, @current_user, :manage_content)
-      @copy_context = Course.find(params[:copy][:course_id]) # permissions on this course are verified below
+      if api_request?
+        @copy_context = api_find(Course, params[:source_course])
+        copy_params = {:everything => false}
+        if params[:only] && params[:except]
+          render :json => {"errors"=>t('errors.no_only_and_except', 'You can not use "only" and "except" options at the same time.')}.to_json, :status => :bad_request
+          return
+        elsif params[:only]
+          params[:only].each {|o| copy_params["all_#{o}".to_sym] = true}
+        elsif params[:except]
+          Course::COPY_OPTIONS.each {|o| copy_params[o] = true}
+          params[:except].each {|o| copy_params["all_#{o}".to_sym] = false}
+        else
+          copy_params[:everything] = true
+        end
+      else
+        @copy_context = Course.find(params[:copy][:course_id])
+        copy_params = params[:copy]
+      end
+      
+      # make sure the user can copy from the source course
       return render_unauthorized_action unless @copy_context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
-      @import = CourseImport.create!(:import_type => "instructure_copy", :source => @copy_context, :course => @context, :parameters => params[:copy])
+      
+      @import = CourseImport.create!(:import_type => "instructure_copy", :source => @copy_context, :course => @context, :parameters => copy_params)
       @import.perform_later
       respond_to do |format|
-        format.json {
-          info = @import.as_json
-          info['course_import']['check_url'] = named_context_url(@context, :context_import_copy_status_url, :id => @import.id)
-          render :json => info.to_json
-        }
+        format.json { render :json => copy_status_json(@import, @context) }
       end
     end
   end

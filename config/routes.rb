@@ -654,6 +654,8 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
       courses.get 'courses/:course_id/todo', :action => :todo_items
+      courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
+      courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|

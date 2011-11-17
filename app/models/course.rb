@@ -1751,6 +1751,8 @@ class Course < ActiveRecord::Base
   end
   
   attr_accessor :merge_mappings
+  COPY_OPTIONS = [:all_course_settings, :all_assignments, :all_external_tools, :all_files, :all_topics, 
+                  :all_calendar_events, :all_quizzes, :all_wiki_pages, :all_modules, :all_outcomes]
   def merge_into_course(course, options, course_import = nil)
     @merge_mappings = {}
     @merge_results = []
@@ -1759,7 +1761,7 @@ class Course < ActiveRecord::Base
     added_items = []
     delete_placeholder = nil
     
-    if bool_res(options[:course_settings])
+    if bool_res(options[:course_settings]) || bool_res(options[:all_course_settings])
       #Copy the course settings too
       course.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
         self.send("#{attr}=", course.send(attr))

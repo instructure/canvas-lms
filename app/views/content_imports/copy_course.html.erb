@@ -275,14 +275,13 @@ $(document).ready(function() {
 
   var checkup = function(url) {
     $.ajaxJSON(url, 'GET', {}, function(data) {
-      var course_import = data.course_import;
-      if(course_import) {
-        $(".copy_progress").progressbar('option', 'value', course_import.progress);
+      if(data && data.workflow_state) {
+        $(".copy_progress").progressbar('option', 'value', data.progress);
       }
-      if(course_import && course_import.workflow_state == 'completed') {
-        location.href = location.href + "&import_id=" + course_import.id;
-      } else if(course_import && course_import.workflow_state == 'failed') {
-        var message = I18n.t('errors.failed', "Course Import failed with the following error:") + " \"import_" + course_import.id + "\"";
+      if(data && data.workflow_state == 'completed') {
+        location.href = location.href + "&import_id=" + data.id;
+      } else if(data && data.workflow_state == 'failed') {
+        var message = I18n.t('errors.failed', "Course Import failed with the following error:") + " \"import_" + data.id + "\"";
         $.flashError(message);
         $(".progress_bar_holder").after("<b>" + message + "</b>");
       } else {
@@ -304,7 +303,7 @@ $(document).ready(function() {
     },
     success: function(data) {
       setTimeout(function() {
-        checkup(data.course_import.check_url);
+        checkup(data.status_url);
       }, 5000);
     }
   })
