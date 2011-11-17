@@ -1,3 +1,11 @@
+canvas-lms (1.1-78) professional; urgency=low
+
+  * Package ref: 2183ac7e1006cbfb49a18780d1de767fd753bd45
+  *
+  * [+2183ac7] cast ids in acts_as_list update_order
+
+ -- JT Olds <jt@instructure.com>  Wed, 16 Nov 2011 23:05:24 -0700
+
 canvas-lms (1.1-77) professional; urgency=low
 
   * Package ref: e7a28fdd2d2b0e2d08c7a94e4cda09d6aad6272d
