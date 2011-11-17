@@ -156,6 +156,14 @@ describe NotificationPolicy do
     
   end
   
+  describe "setup_for" do
+    it "should not fail when params does not include a user, and the account doesn't allow scores in e-mails" do
+      params = {}
+      params[:root_account] = Account.default
+      params[:root_account].settings[:allow_sending_scores_in_emails] = false
+      NotificationPolicy.setup_for(user, params)
+    end
+  end
 end
 
 def policy_setup
