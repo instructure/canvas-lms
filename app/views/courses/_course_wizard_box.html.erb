@@ -88,7 +88,7 @@ $(document).ready(function() {
           </div>
         </li>
       <% end %>
-      <% if !@context.available? && can_do(@context, @current_user, :update) %>
+      <% if !@context.available? && can_do(@context, @current_user, :change_course_state) %>
       <li class="option publish_step">
         <a href="#" class="header"><%= t('links.publish', %{Publish Course}) %></a>
         <div class="details" style="display: none;">

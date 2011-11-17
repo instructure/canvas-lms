@@ -149,7 +149,7 @@ class CoursesController < ApplicationController
 
   def unconclude
     get_context
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :change_course_state)
       @context.unconclude
       flash[:notice] = t('notices.unconcluded', "Course un-concluded")
       redirect_to(named_context_url(@context, :context_url))
@@ -268,7 +268,7 @@ class CoursesController < ApplicationController
       @context.save
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
-      return unless authorized_action(@context, @current_user, :update)
+      return unless authorized_action(@context, @current_user, :change_course_state)
       @context.complete
       flash[:notice] = t('notices.concluded', "Course successfully concluded")
     end
@@ -906,7 +906,7 @@ class CoursesController < ApplicationController
           end
         end
       end
-      @course.process_event(params[:course].delete(:event)) if params[:course][:event]
+      @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
         if @course.update_attributes(params[:course])

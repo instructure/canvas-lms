@@ -35,7 +35,7 @@
       <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> <%= t('links.calendar', %{Course Calendar}) %></a>
     <% end %>
 
-    <% if can_do(@context, @current_user, :update) %>
+    <% if can_do(@context, @current_user, :change_course_state) %>
       <% if @context.completed? %>
         <% form_tag context_url(@context, :context_unconclude_url) do %>
           <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %><%= t('buttons.unconclude', %{Un-Conclude Course}) %></button>

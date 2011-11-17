@@ -518,6 +518,12 @@ describe "security" do
         :enabled => true)
     end
 
+    def remove_permission(permission, enrollment_type)
+      Account.default.role_overrides.create!(:permission => permission.to_s,
+              :enrollment_type => enrollment_type,
+              :enabled => false)
+    end
+
     describe "site admin" do
       it "role_overrides" do
         get "/accounts/#{Account.site_admin.id}/settings"
@@ -930,7 +936,6 @@ describe "security" do
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
         response.body.should match /Delete this Course/
-        response.body.should match /End this Course/
         html = Nokogiri::HTML(response.body)
         html.css('#course_account_id').should_not be_empty
         html.css('#course_enrollment_term_id').should_not be_empty
@@ -981,6 +986,36 @@ describe "security" do
 
         get "/courses/#{@course.id}/users/#{@student.id}/usage"
         response.should be_success
+      end
+
+      it 'manage_sections' do
+        course_with_teacher_logged_in(:active_all => 1)
+        remove_permission(:manage_sections, 'TeacherEnrollment')
+
+        get "/courses/#{@course.id}/settings"
+        response.should be_success
+        response.body.should_not match 'Add Section'
+
+        post "/courses/#{@course.id}/sections"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
+        response.should be_success
+
+        put "/courses/#{@course.id}/sections/#{@course.default_section.id}"
+        response.status.should == '401 Unauthorized'
+      end
+
+      it 'change_course_state' do
+        course_with_teacher_logged_in(:active_all => 1)
+        remove_permission(:change_course_state, 'TeacherEnrollment')
+
+        get "/courses/#{@course.id}/settings"
+        response.should be_success
+        response.body.should_not match 'End this Course'
+
+        delete "/courses/#{@course.id}", :event => 'conclude'
+        response.status.should == '401 Unauthorized'
       end
     end
   end
