@@ -2125,4 +2125,35 @@ class User < ActiveRecord::Base
     end
     h
   end
+
+  # account = the account that you want a pseudonym for
+  # preferred_template_account = true-ish to create a pseudonym for the specified account if one doesn't exist (and it's possible)
+  #   pass in an actual account if you have a preference for which account the new pseudonym gets copied from
+  # this may not be able to find a suitable pseudonym to copy, so would still return nil
+  # if a pseudonym is created, it is *not* saved, and *not* added to the pseudonyms collection
+  def pseudonym_for_account(account, preferred_template_account = nil)
+    pseudonym = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account) }
+    if !pseudonym && preferred_template_account
+      # list of copyable pseudonyms
+      active_pseudonyms = self.pseudonyms.select { |p| p.active? && !p.password_auto_generated? && !p.account.delegated_authentication? }
+      templates = []
+      # re-arrange in the order we prefer
+      templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account.is_a?(Account)
+      templates.concat active_pseudonyms.select { |p| p.account_id == Account.site_admin.id }
+      templates.concat active_pseudonyms.select { |p| p.account_id == Account.default.id }
+      templates.concat active_pseudonyms
+      templates.uniq!
+
+      template = templates.detect { |template| !account.pseudonyms.find_by_unique_id(template.unique_id) }
+      if template
+        # creating this not attached to the user's pseudonyms is intentional
+        pseudonym = account.pseudonyms.build
+        pseudonym.user = self
+        pseudonym.unique_id = template.unique_id
+        pseudonym.password_salt = template.password_salt
+        pseudonym.crypted_password = template.crypted_password
+      end
+    end
+    pseudonym
+  end
 end
