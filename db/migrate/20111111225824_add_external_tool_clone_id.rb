@@ -4,6 +4,6 @@ class AddExternalToolCloneId < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :context_external_tools, :cloned_item_id
+    remove_column :context_external_tools, :cloned_item_id
   end
 end
