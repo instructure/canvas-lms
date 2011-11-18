@@ -45,7 +45,7 @@ module Api::V1::User
         permissions_context = permissions_account = @domain_root_account
       else
         permissions_context = @context
-        permissions_account = @context.account
+        permissions_account = @context.is_a?(Account) ? @context : @context.account
       end
       @user_json_is_admin = !!(
         permissions_context.grants_right?(@current_user, :manage_students) ||
