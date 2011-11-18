@@ -706,6 +706,7 @@ ActionController::Routing::Routes.draw do |map|
 
       users.get 'users/self/todo', :action => :todo_items
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
+      users.post 'accounts/:account_id/users', :action => :create
     end
 
     api.with_options(:controller => :accounts) do |accounts|

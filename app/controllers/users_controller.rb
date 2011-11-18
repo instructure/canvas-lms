@@ -483,6 +483,18 @@ class UsersController < ApplicationController
     render :action => "new"
   end
 
+  include Api::V1::User
+  # @API
+  # Create and return a new user and pseudonym for an account.
+  #
+  # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
+  # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
+  # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
+  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed [here](http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone).
+  # @argument pseudonym[unique_id] User's login ID.
+  # @argument pseudonym[password] [Optional] User's password.
+  # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
+  # @argument pseudonym[:send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
   def create
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.find_by_unique_id_and_workflow_state(params[:pseudonym][:unique_id], 'active')
@@ -504,6 +516,8 @@ class UsersController < ApplicationController
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
     # pre-populate the reverse association
     @pseudonym.user = @user
+    # don't require password_confirmation on api calls
+    params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
     @pseudonym.attributes = params[:pseudonym]
     @pseudonym.sis_user_id = sis_user_id
 
@@ -537,7 +551,7 @@ class UsersController < ApplicationController
         flash[:user_id] = @user.id
         flash[:pseudonym_id] = @pseudonym.id
         format.html { redirect_to registered_url }
-        format.json { render :json => data }
+        format.json { api_request? ? render(:json => user_json(@user)) : render(:json => data) }
       end
     else
       respond_to do |format|
