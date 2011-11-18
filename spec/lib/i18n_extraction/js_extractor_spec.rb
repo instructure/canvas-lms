@@ -101,7 +101,10 @@ describe I18nExtraction::JsExtractor do
       SOURCE
 
       extract(<<-SOURCE, nil).should == {'asdf' => {'bar' => 'Bar'}}
-        require(['i18n'], function(I18n) {
+        define('bar',
+        ['foo',
+         'i18n'
+        ], function(Foo, I18n) {
           I18n = I18n.scoped('asdf');
           I18n.t('bar', 'Bar');
         });
