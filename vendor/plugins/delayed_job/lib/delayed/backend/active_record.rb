@@ -50,6 +50,19 @@ module Delayed
           end
         end
 
+        # postgresql needs this lock to be taken before the before_insert
+        # trigger starts, or we risk deadlock inside of the trigger when trying
+        # to raise the lock level
+        before_create :lock_strand_on_create
+        def lock_strand_on_create
+          if adapter_name.nil?
+            self.class.adapter_name = connection.adapter_name
+          end
+          if strand.present? && adapter_name == 'PostgreSQL'
+            connection.execute("LOCK delayed_jobs IN SHARE ROW EXCLUSIVE MODE")
+          end
+        end
+
         cattr_accessor :default_priority
         self.default_priority = 0
 
