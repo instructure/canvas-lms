@@ -1,3 +1,11 @@
+canvas-lms (1.1-79) professional; urgency=low
+
+  * Package ref: cafc7796b171e83f66ab8d2f35573439f1c0cdcb
+  *
+  * [+cafc779] fix strand job insert deadlock condition in postgresql
+
+ -- JT Olds <jt@instructure.com>  Fri, 18 Nov 2011 10:39:44 -0700
+
 canvas-lms (1.1-78) professional; urgency=low
 
   * Package ref: 2183ac7e1006cbfb49a18780d1de767fd753bd45
