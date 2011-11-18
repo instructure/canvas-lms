@@ -933,26 +933,6 @@ shared_examples_for "quiz selenium tests" do
     wait_for_dom_ready
   end
 
-  it "should prevent mousewheel events on select elements when taking a quiz" do
-    course_with_teacher_logged_in
-    @context = @course
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-    q = quiz_model
-    b = bank.assessment_questions.create!
-    quest2 = q.quiz_questions.create!(:assessment_question => b)
-    quest2.write_attribute(:question_data, { :neutral_comments=>"", :question_text=>"<p>My hair is [x] and my wife's is [y].</p>", :points_possible=>1, :question_type=>"multiple_dropdowns_question", :answers=>[{:comments=>"", :weight=>100, :blank_id=>"x", :text=>"brown", :id=>2624}, {:comments=>"", :weight=>0, :blank_id=>"x", :text=>"black", :id=>3085}, {:comments=>"", :weight=>100, :blank_id=>"y", :text=>"brown", :id=>5780}, {:comments=>"", :weight=>0, :blank_id=>"y", :text=>"red", :id=>8840}], :correct_comments=>"", :name=>"Question", :question_name=>"Question", :incorrect_comments=>"", :assessment_question_id=>nil})
-
-    q.generate_quiz_data
-    q.save!
-    get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
-    driver.find_element(:css, '.publish_quiz_button')
-    get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
-    end
-
   it "should round numeric questions thes same when created and taking a quiz" do
     start_quiz_question
     quiz = Quiz.last
@@ -960,6 +940,11 @@ shared_examples_for "quiz selenium tests" do
     question.
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="numerical_question"]').click
+
+    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
+    in_frame tiny_frame["id"] do
+      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
+    end
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0].find_element(:name, 'answer_exact').send_keys('0.000675')
@@ -1016,18 +1001,6 @@ shared_examples_for "quiz selenium tests" do
       wait_for_dom_ready
     end
 
-    it "should prevent mousewheel events on select elements when taking a quiz" do
-      driver.execute_script <<-EOF
-        window.mousewheelprevented = false;
-        jQuery('select').bind('mousewheel', function(event) {
-          mousewheelprevented = event.isDefaultPrevented();
-        }).trigger('mousewheel');
-      EOF
-  
-      is_prevented = driver.execute_script('return window.mousewheelprevented')
-      is_prevented.should be_true
-    end
-
     # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
     it "should not unhover a question so long as one of its selects has focus" do
       container = driver.find_element(:css, '.question')
@@ -1042,6 +1015,19 @@ shared_examples_for "quiz selenium tests" do
       driver.execute_script("$('.question select').blur()")
       container.attribute(:class).should_not match(/hover/)
     end
+
+    it "should cancel mousewheel events on select elements" do
+      driver.execute_script <<-EOF
+        window.mousewheelprevented = false;
+        jQuery('select').bind('mousewheel', function(event) {
+          mousewheelprevented = event.isDefaultPrevented();
+        }).trigger('mousewheel');
+      EOF
+
+      is_prevented = driver.execute_script('return window.mousewheelprevented')
+      is_prevented.should be_true
+    end
+
   end
 
   it "should display quiz statistics" do

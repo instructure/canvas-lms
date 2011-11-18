@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require(['i18n'], function (I18n) {
+require(['i18n'], function(I18n) {
 
   I18n = I18n.scoped('quizzes.take_quiz');
 
