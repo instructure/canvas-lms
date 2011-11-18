@@ -630,7 +630,14 @@ class ConversationsController < ApplicationController
 
     result = []
     if context_name.nil?
-      result = @contexts.values.map(&:values).flatten
+      result = if params[:search].blank?
+                 courses = @contexts[:courses].values
+                 group_ids = @current_user.current_groups.map(&:id)
+                 groups = @contexts[:groups].slice(*group_ids).values
+                 courses + groups
+               else
+                 @contexts.values.map(&:values).flatten
+               end
     elsif options[:synthetic_contexts]
       if context_name =~ /\Acourse_(\d+)(_(groups|sections))?\z/ && (course = @contexts[:courses][$1.to_i]) && course[:active]
         course = Course.find_by_id(course[:id])
