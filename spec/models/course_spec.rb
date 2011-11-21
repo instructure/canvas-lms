@@ -77,6 +77,26 @@ describe Course do
       @course.grants_right?(@admin1, nil, :delete).should be_true
       @course.grants_right?(@admin2, nil, :delete).should be_true
     end
+
+    it "should grant read_as_admin to date-completed teacher" do
+      course_with_teacher(:active_all => 1)
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.save!
+      @enrollment.state_based_on_date.should == :completed
+      @course.prior_enrollments.should == []
+      @course.grants_right?(@teacher, nil, :read_as_admin).should be_true
+    end
+
+    it "should grant read_grades to date-completed student" do
+      course_with_student(:active_all => 1)
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.save!
+      @enrollment.state_based_on_date.should == :completed
+      @course.prior_enrollments.should == []
+      @course.grants_right?(@student, nil, :read_grades).should be_true
+    end
   end
 
   it "should clear content when resetting" do
