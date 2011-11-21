@@ -553,7 +553,7 @@ I18n.scoped('instructure', function(I18n) {
         var $conversation = $message.parents(".communication_message");
 
         // fill out this message, display the new info, and remove the form
-        message_data = data.message;
+        message_data = data.messages[0];
         $message.fillTemplateData({
           data: {
             post_date: $.parseFromISO(message_data.created_at).datetime_formatted,
