@@ -1600,3 +1600,20 @@ describe Course, "section_visibility" do
     end
   end
 end
+
+describe Course, "enrollments" do
+  it "should update enrollments' root_account_id when necessary" do
+    a1 = Account.create!
+    a2 = Account.create!
+
+    course_with_student
+    @course.root_account = a1
+    @course.save!
+
+    @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
+
+    @course.root_account = a2
+    @course.save!
+    @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
+  end
+end

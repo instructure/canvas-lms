@@ -601,6 +601,11 @@ class Course < ActiveRecord::Base
     elsif self.deleted?
       Enrollment.update_all({:workflow_state => 'deleted'}, "course_id=#{self.id} AND workflow_state!='deleted'")
     end
+
+    if self.root_account_id_changed?
+      Enrollment.update_all({:root_account_id => self.root_account_id}, :course_id => self.id)
+    end
+
     case Enrollment.connection.adapter_name
     when 'MySQL'
       Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
