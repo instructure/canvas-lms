@@ -392,6 +392,54 @@ describe Quiz do
     q.quiz_submissions.first.submission.assignment.should == q.assignment
   end
 
+  context 'statistics' do
+    it 'should calculate mean/stddev as expected with no submissions' do
+      stats = @course.quizzes.new.statistics
+      stats[:submission_score_average].should be_nil
+      stats[:submission_score_high].should be_nil
+      stats[:submission_score_low].should be_nil
+      stats[:submission_score_stdev].should be_nil
+    end
+
+    it 'should calculate mean/stddev as expected with a few submissions' do
+      q = @course.quizzes.new
+      q.save!
+      @user1 = User.create! :name => "some_user 1"
+      @user2 = User.create! :name => "some_user 2"
+      @user3 = User.create! :name => "some_user 2"
+      student_in_course :course => @course, :user => @user1
+      student_in_course :course => @course, :user => @user2
+      student_in_course :course => @course, :user => @user3
+      sub = q.generate_submission(@user1)
+      sub.workflow_state = 'complete'
+      sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => -1 }]
+      sub.with_versioning(true, &:save!)
+      stats = q.statistics
+      stats[:submission_score_average].should == 15
+      stats[:submission_score_high].should == 15
+      stats[:submission_score_low].should == 15
+      stats[:submission_score_stdev].should == 0
+      sub = q.generate_submission(@user2)
+      sub.workflow_state = 'complete'
+      sub.submission_data = [{ :points => 17, :text => "", :correct => "undefined", :question_id => -1 }]
+      sub.with_versioning(true, &:save!)
+      stats = q.statistics
+      stats[:submission_score_average].should == 16
+      stats[:submission_score_high].should == 17
+      stats[:submission_score_low].should == 15
+      stats[:submission_score_stdev].should == 1
+      sub = q.generate_submission(@user3)
+      sub.workflow_state = 'complete'
+      sub.submission_data = [{ :points => 20, :text => "", :correct => "undefined", :question_id => -1 }]
+      sub.with_versioning(true, &:save!)
+      stats = q.statistics
+      stats[:submission_score_average].should be_close(17 + 1.0/3, 0.0000000001)
+      stats[:submission_score_high].should == 20
+      stats[:submission_score_low].should == 15
+      stats[:submission_score_stdev].should be_close(Math::sqrt(4 + 2.0/9), 0.0000000001)
+    end
+  end
+
   context "clone_for" do
     it "should clone for other contexts" do
       u = User.create!(:name => "some user")

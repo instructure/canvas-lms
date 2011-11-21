@@ -17,6 +17,14 @@
 #
 
 module QuizzesHelper
+  def render_score(score)
+    if score.nil?
+      '_'
+    else
+      score.to_f.round(2).to_s
+    end
+  end
+
   def answer_type(question)
     return OpenObject.new unless question
     @answer_types_lookup ||= {
