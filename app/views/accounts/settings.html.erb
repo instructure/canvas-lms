@@ -186,10 +186,12 @@
                   <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
                 </div>
               <% end %>
-              <div>
-                <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
-                <%= settings.label :open_registration, :en => "Open Registration" %>
-              </div>
+              <% unless @account.delegated_authentication? %>
+                <div>
+                  <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
+                  <%= settings.label :open_registration, :en => "Open Registration" %>
+                </div>
+              <% end %>
               <div>
                 <%= settings.check_box :users_can_edit_name, :checked => @account.settings[:users_can_edit_name] != false %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit display name" %>

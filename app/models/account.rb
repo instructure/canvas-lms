@@ -128,6 +128,7 @@ class Account < ActiveRecord::Base
   
   # these settings either are or could be easily added to
   # the account settings page
+  add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :global_javascript, :condition => :global_includes, :root_only => true
   add_setting :global_stylesheet, :condition => :global_includes, :root_only => true
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
@@ -143,14 +144,14 @@ class Account < ActiveRecord::Base
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
-  add_setting :open_registration, :boolean => true, :root_only => true, :default => false
-  
+  add_setting :open_registration, :boolean => true, :root_only => true, :default => false, :condition => :non_delegated_authentication
+
   def settings=(hash)
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
           opts = account_settings_options[key.to_sym]
-          if (opts[:root_only] && root_account_id) || (opts[:condition] && !settings[opts[:condition].to_sym])
+          if (opts[:root_only] && root_account_id) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
             settings.delete key.to_sym
           elsif opts[:boolean]
             settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
@@ -643,7 +644,11 @@ class Account < ActiveRecord::Base
   def delegated_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
   end
-  
+
+  def non_delegated_authentication?
+    !delegated_authentication?
+  end
+
   def forgot_password_external_url
     account_authorization_config.try(:change_password_url)
   end

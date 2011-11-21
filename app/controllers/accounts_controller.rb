@@ -82,6 +82,7 @@ class AccountsController < ApplicationController
       respond_to do |format|
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
+        global_includes = !!params[:account][:settings].try(:delete, :global_includes)
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
             @account.set_service_availability(key, value == '1')
@@ -93,7 +94,7 @@ class AccountsController < ApplicationController
           @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if params[:account][:settings]
             @account.settings[:admins_can_change_passwords] = !!params[:account][:settings][:admins_can_change_passwords]
-            @account.settings[:global_includes] = !!params[:account][:settings][:global_includes]
+            @account.settings[:global_includes] = global_includes
             @account.settings[:enable_eportfolios] = !!params[:account][:settings][:enable_eportfolios] unless @account.site_admin?
           end
         end

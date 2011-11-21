@@ -157,5 +157,22 @@ describe AccountsController do
       @account.reload
       @account.sis_source_id.should be_nil
     end
+
+    it "should not allow non-site-admins to update global_includes" do
+      account_with_admin_logged_in
+      post 'update', :id => @account.id, :account => { :settings => { :global_includes => true } }
+      @account.reload
+      @account.global_includes?.should be_false
+    end
+
+    it "should allow site_admin to update global_includes" do
+      user
+      user_session(@user)
+      @account = Account.create!
+      Account.site_admin.add_user(@user)
+      post 'update', :id => @account.id, :account => { :settings => { :global_includes => true } }
+      @account.reload
+      @account.global_includes?.should be_true
+    end
   end
 end

@@ -620,4 +620,27 @@ describe Account do
       account.open_registration_for?(@user).should be_true
     end
   end
+
+  context "settings" do
+    describe ":condition" do
+      it "should not allow setting things where condition is false" do
+        account = Account.default
+        account.stubs(:global_includes?).returns(false)
+        account.settings = { :global_javascript => 'bob' }
+        account.settings[:global_javascript].should be_nil
+        account.stubs(:global_includes?).returns(true)
+        account.settings = { :global_javascript => 'bob' }
+        account.settings[:global_javascript].should == 'bob'
+      end
+    end
+
+    describe "open_registration" do
+      it "should not allow it to be turned on if delegated auth is enabled" do
+        account = Account.default
+        account.account_authorization_configs.create!(:auth_type => 'cas')
+        account.settings = { :open_registration => true }
+        account.open_registration?.should be_false
+      end
+    end
+  end
 end
