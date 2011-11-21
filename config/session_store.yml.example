@@ -6,6 +6,10 @@ production:
   #
   # secure: true
   #
+  # change the time that "stay logged in" tokens are valid for, defaults to 1 month
+  #
+  # expire_remember_me_after: 2592000
+  #
   # for memcache, the list of servers will be read from config/memcache.yml (or
   # default to localhost:11211)
   #

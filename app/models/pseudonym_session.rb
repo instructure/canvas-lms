@@ -44,22 +44,47 @@ class PseudonymSession < Authlogic::Session::Base
   end
 
   # modifications to authlogic's cookie persistence (used for the "remember me" token)
-  # much of the theory here is based on this blog post:
-  # http://fishbowl.pastiche.org/2004/01/19/persistent_login_cookie_best_practice/
+  # see the SessionPersistenceToken class for details
   #
-  # also, authlogic doesn't support httponly (or secure-only) for the "remember me"
-  # cookie yet, so we add that support here. there's an open pull request still
-  # pending:
-  # https://github.com/binarylogic/authlogic/issues/issue/210
+  # also, the version of authlogic canvas is on doesn't support httponly (or
+  # secure-only) for the "remember me" cookie yet, so we add that support here.
   def save_cookie
     return unless remember_me?
+    token = SessionPersistenceToken.generate(record)
     controller.cookies[cookie_key] = {
-      :value => "#{record.persistence_token}::#{record.send(record.class.primary_key)}",
+      :value => token.pseudonym_credentials,
       :expires => remember_me_until,
       :domain => controller.cookie_domain,
       :httponly => true,
       :secure => ActionController::Base.session_options[:secure],
     }
+  end
+
+  def persist_by_cookie
+    cookie = controller.cookies[cookie_key]
+    if cookie
+      token = SessionPersistenceToken.find_by_pseudonym_credentials(cookie)
+      self.unauthorized_record = token.use! if token
+      is_valid = self.valid?
+      if is_valid
+        # this token has been used -- destroy it, and generate a new one
+        # remember_me is implicitly true when they login via the remember_me token
+        self.remember_me = true
+        self.save!
+      end
+      is_valid
+    else
+      false
+    end
+  end
+
+  # added behavior: destroy the server-side SessionPersistenceToken as well as the browser cookie
+  def destroy_cookie
+    cookie = controller.cookies.delete cookie_key, :domain => controller.cookie_domain
+    return true unless cookie
+    token = SessionPersistenceToken.find_by_pseudonym_credentials(cookie)
+    token.try(:destroy)
+    true
   end
 
   # Validate the session using password auth (either local or LDAP, but not
