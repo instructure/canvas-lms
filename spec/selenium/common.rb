@@ -34,7 +34,14 @@ $server_port = nil
 $app_host_and_port = nil
 
 at_exit do
-  $selenium_driver.try(:quit)
+  [1,2,3].each do
+    begin
+      $selenium_driver.try(:quit)
+      break
+    rescue Timeout::Error => te
+      puts "rescued timeout error from selenium_driver quit : #{te}"
+    end
+  end
 end
 
 module SeleniumTestsHelperMethods
@@ -55,11 +62,22 @@ module SeleniumTestsHelperMethods
         profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
         caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
       end
-      driver = Selenium::WebDriver.for(
-        :remote,
-        :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
-        :desired_capabilities => caps
-      )
+
+      driver = nil
+      [1,2,3].each do |times|
+        begin
+          driver = Selenium::WebDriver.for(
+            :remote,
+            :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
+            :desired_capabilities => caps
+          )
+          break
+        rescue Exception => e
+          puts "Error attempting to start remote webdriver: #{e}"
+          raise e if times == 3
+        end
+      end
+
     end
     driver.manage.timeouts.implicit_wait = 1
     driver
