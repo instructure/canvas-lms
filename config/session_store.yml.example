@@ -24,3 +24,7 @@ production:
   # redis_servers:
   #   - redis1:6379
   #   - redis2:6379
+
+test:
+  session_store: active_record_store
+  expire_after: 86400 # 1 day in seconds

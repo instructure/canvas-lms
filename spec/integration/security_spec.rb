@@ -88,6 +88,32 @@ describe "security" do
     end
   end
 
+  it "should always set the session id cookie to session expiration" do
+    # whether they select "stay logged in" or not, the actual session cookie
+    # should go away with the user agent session. the secondary
+    # pseudonym_credentials cookie will stick around and authenticate them
+    # again (there's separate specs for that).
+    u = user_with_pseudonym :active_user => true,
+                            :username => "nobody@example.com",
+                            :password => "asdfasdf"
+    u.save!
+    https!
+
+    post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+      "pseudonym_session[password]" => "asdfasdf"
+    assert_response 302
+    c = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+    c.should_not match(/expires=/)
+    reset!
+    https!
+    post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+      "pseudonym_session[password]" => "asdfasdf",
+      "pseudonym_session[remember_me]" => "1"
+    assert_response 302
+    c = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+    c.should_not match(/expires=/)
+  end
+
   it "should make both session-related cookies httponly" do
     u = user_with_pseudonym :active_user => true,
                             :username => "nobody@example.com",
