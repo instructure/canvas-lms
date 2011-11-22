@@ -121,6 +121,25 @@ describe PseudonymSessionsController do
 
       Setting.set_config("saml", nil)
     end
+
+    it "should redirect to RelayState relative urls" do
+      Setting.set_config("saml", {})
+      unique_id = 'foo@example.com'
+
+      account = account_with_saml
+      user = user_with_pseudonym({:active_all => true, :username => unique_id})
+      @pseudonym.account = account
+      @pseudonym.save!
+
+      controller.stubs(:saml_response).returns(
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil)
+      )
+
+      controller.request.env['canvas.domain_root_account'] = account
+      get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
+      response.should redirect_to(courses_url)
+      session[:name_id].should == unique_id
+    end
   end
 
   context "cas" do
