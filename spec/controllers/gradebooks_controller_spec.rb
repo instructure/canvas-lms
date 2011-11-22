@@ -44,6 +44,7 @@ describe GradebooksController do
       response.should render_template('grade_summary')
       get 'grade_summary', :course_id => @course.id, :id => @user.id
       response.should render_template('grade_summary')
+      assigns[:courses_with_grades].should_not be_nil
     end
 
     it "should not allow access for wrong user" do
@@ -68,6 +69,7 @@ describe GradebooksController do
       @user.reload
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should render_template('grade_summary')
+      assigns[:courses_with_grades].should be_nil
     end
 
     it "should allow concluded teachers to see a student grades pages" do
@@ -79,6 +81,7 @@ describe GradebooksController do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should be_success
       response.should render_template('grade_summary')
+      assigns[:courses_with_grades].should be_nil
     end
 
     it "should allow concluded students to see their grades pages" do
@@ -86,6 +89,51 @@ describe GradebooksController do
       @enrollment.conclude
       get 'grade_summary', :course_id => @course.id, :id => @user.id
       response.should render_template('grade_summary')
+    end
+    
+    it "give a student the option to switch between courses" do
+      teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
+      student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+      course1 = course_with_teacher(:user => teacher, :active_all => 1).course
+      student_in_course :user => student, :active_all => 1
+      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
+      student_in_course :user => student, :active_all => 1
+      user_session(student)
+      get 'grade_summary', :course_id => @course.id, :id => student.id
+      response.should be_success
+      assigns[:courses_with_grades].should_not be_nil
+      assigns[:courses_with_grades].length.should == 2
+    end
+    
+    it "should not give a teacher the option to switch between courses when viewing a student's grades" do
+      teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
+      student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+      course1 = course_with_teacher(:user => teacher, :active_all => 1).course
+      student_in_course :user => student, :active_all => 1
+      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
+      student_in_course :user => student, :active_all => 1
+      user_session(teacher)
+      get 'grade_summary', :course_id => @course.id, :id => student.id
+      response.should be_success
+      assigns[:courses_with_grades].should be_nil
+    end
+    
+    it "should not give a linked observer the option to switch between courses when viewing a student's grades" do
+      teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
+      student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+      observer = user_with_pseudonym(:username => 'parent@example.com', :active_all => 1)
+      course1 = course_with_teacher(:user => teacher, :active_all => 1).course
+      student_in_course :user => student, :active_all => 1
+      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
+      student_in_course :user => student, :active_all => 1
+      oe = course1.enroll_user(observer, 'ObserverEnrollment')
+      oe.associated_user = student
+      oe.save!
+      oe.accept
+      user_session(observer)
+      get 'grade_summary', :course_id => @course.id, :id => student.id
+      response.should be_success
+      assigns[:courses_with_grades].should be_nil
     end
   end
 

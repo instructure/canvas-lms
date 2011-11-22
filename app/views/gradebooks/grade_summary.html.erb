@@ -70,7 +70,7 @@
  <% end %>
 <% }) %>
 </h2>
-<% if @courses_with_grades.length > 1 %>
+<% if @courses_with_grades && @courses_with_grades.length > 1 %>
   <div style="margin-left: 10px;">
   <%= t(:for_course, "For the course,") %>
   <select id="course_url">
