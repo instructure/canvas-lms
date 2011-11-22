@@ -165,11 +165,11 @@ class PseudonymSessionsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     # the saml message has to survive a couple redirects and reset_session calls
     message = session[:delegated_message]
-    @pseudonym_session.destroy rescue true 
+    @pseudonym_session.destroy rescue true
 
     if @domain_root_account.saml_authentication? and session[:name_id]
       # logout at the saml identity provider
@@ -189,7 +189,7 @@ class PseudonymSessionsController < ApplicationController
       reset_session
       flash[:delegated_message] = message if message
     end
-    
+
     flash[:notice] = t 'notices.logged_out', "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
@@ -203,13 +203,13 @@ class PseudonymSessionsController < ApplicationController
       format.json { render :json => "OK".to_json, :status => :ok }
     end
   end
-  
+
   def clear_file_session
     session['file_access_user_id'] = nil
     session['file_access_expiration'] = nil
     render :text => "ok"
   end
-  
+
   def saml_consume
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
       settings = @domain_root_account.account_authorization_config.saml_settings(request.env['canvas.account_domain'])
@@ -234,6 +234,7 @@ class PseudonymSessionsController < ApplicationController
             session[:name_id] = response.name_id
             session[:name_qualifier] = response.name_qualifier
             session[:session_index] = response.session_index
+            session[:return_to] = params[:RelayState] if params[:RelayState] && params[:RelayState] =~ /\A\/(\z|[^\/])/
 
             successful_login(@user, @pseudonym)
           else
@@ -274,7 +275,7 @@ class PseudonymSessionsController < ApplicationController
       redirect_to login_url(:no_auto=>'true')
     end
   end
-  
+
   def saml_logout
     redirect_to :action => :destroy
   end
