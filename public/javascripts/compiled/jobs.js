@@ -211,7 +211,7 @@
           _results = [];
           for (var _i = 0, _ref = this.data.length; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
           return _results;
-        }).apply(this, arguments));
+        }).apply(this));
         return this.grid.onSelectedRowsChanged();
       };
       Jobs.prototype.onSelected = function(action) {
@@ -221,6 +221,10 @@
           q: this.query,
           update_action: action
         };
+        if (this.grid.getSelectedRows().length < 1) {
+          alert('No jobs are selected');
+          return;
+        }
         all_jobs = this.grid.getSelectedRows().length === this.data.length;
         if (all_jobs && action === 'destroy') {
           if (!confirm(I18n.t('confirm.delete_all', "Are you sure you want to delete *all* jobs of this type and matching this query?"))) {

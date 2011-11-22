@@ -346,7 +346,7 @@ var I18n = I18n || {};
     @section_tabs ||= begin
       if @context 
         Rails.cache.fetch([@context, @current_user, "section_tabs", I18n.locale].cache_key) do
-          if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session)).empty?
+          if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             html = []
             html << '<nav role="navigation"><ul id="section-tabs">'
             tabs = tabs.select do |tab|
@@ -361,8 +361,15 @@ var I18n = I18n || {};
               end
             end
             tabs.each do |tab|
-              path = tab[:no_args] ? send(tab[:href]) : send(tab[:href], @context)
-              html << "<li class='section #{"hidden" if tab[:hidden] || tab[:hidden_unused] }'>" + link_to(tab[:label], path, :class => tab[:css_class].to_css_class) + "</li>" if tab[:href]
+              path = nil
+              if tab[:args]
+                path = send(tab[:href], *tab[:args])
+              elsif tab[:no_args]
+                path = send(tab[:href])
+              else
+                path = send(tab[:href], @context)
+              end
+              html << "<li class='section #{"selected" if tab[:id] == @active_tab} #{"hidden" if tab[:hidden] || tab[:hidden_unused] }'>" + link_to(tab[:label], path, :class => tab[:css_class].to_css_class) + "</li>" if tab[:href]
             end
             html << "</ul></nav>"
             html.join("")
@@ -374,7 +381,7 @@ var I18n = I18n || {};
   end
   
   def sortable_tabs
-    tabs = @context.tabs_available(@current_user, :for_reordering => true)
+    tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
     tabs.select do |tab| 
       if (tab[:id] == @context.class::TAB_CHAT rescue false)
         feature_enabled?(:tinychat)

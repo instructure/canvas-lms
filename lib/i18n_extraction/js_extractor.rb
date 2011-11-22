@@ -46,8 +46,8 @@ module I18nExtraction
       <%\s*(end|\})\s*%>
     /mx
 
-    SCOPED_BLOCK_START = /I18n\.scoped/
-    SCOPED_BLOCK = /^([ \t]*)#{SCOPED_BLOCK_START}\(#{I18N_KEY},\s*function\s*\(I18n\)\s*\{(.*?)\n\1\}\)(;|$)/m
+    SCOPED_BLOCK_START = /((require|define)\([^\n]+I18n.*?I18n\s*=\s*|())I18n\.scoped/m
+    SCOPED_BLOCK = /^([ \t]*)#{SCOPED_BLOCK_START}\(#{I18N_KEY}(,\s*function\s*\(I18n\)\s*\{|\);)\s?\n((\1[^ ].*?\n)?( *\n|\1(  |\t)[^\n]+\n)+)/m
 
     I18N_ANY = /(I18n)/
 
@@ -88,12 +88,13 @@ module I18nExtraction
       matches = []
       source.scan(full_pattern){ |args| matches << [$&] + args }
       expected.each_index do |i|
+        expected_string = expected[i].first.strip
         unless matches[i]
-          raise "unable to \"parse\" #{expression_type} on line #{expected[i].last} (#{expected[i].first}...)"
+          raise "unable to \"parse\" #{expression_type} on line #{expected[i].last} (#{expected_string}...)"
         end
-        len = [expected[i].first.size, matches[i].first.size].min
-        if expected[i].first[0, len] != matches[i].first[0, len]
-          raise "unable to \"parse\" #{expression_type} on line #{expected[i].last} (#{expected[i].first[0, len]}...)"
+        matched_string = matches[i].first.strip
+        unless matched_string.include?(expected_string)
+          raise "unable to \"parse\" #{expression_type} on line #{expected[i].last} (#{expected_string}...)"
         end
         matches[i] << expected[i].last
         if block_given?
@@ -108,16 +109,19 @@ module I18nExtraction
     def process_js(source, options = {})
       line_offset = options[:line_offset] || 1
       scopes = find_matches(source, SCOPED_BLOCK_START, SCOPED_BLOCK, :start_prefix => /\s*/, :line_offset => line_offset, :expression => "I18n scope")
-      scopes.each do |(_, _, scope, scope_source, _, offset)|
-        process_block scope_source, scope.sub(/\A#/, ''), options.merge(:line_offset => offset)
+      scopes.each do |scope|
+        scope_name = scope[5]
+        scope_source = scope[7]
+        offset = scope.pop
+        process_block scope_source, scope_name.sub(/\A#/, ''), options.merge(:line_offset => offset)
       end
       # see if any other I18n calls happen outside of a scope
       chunks = source.split(/(#{SCOPED_BLOCK.to_s.gsub(/\\1/, '\\\\2')})/m) # captures subpatterns too, so we need to pick and choose what we want
       while chunk = chunks.shift
         if chunk =~ /^([ \t]*)#{SCOPED_BLOCK_START}/
-          chunks.slice!(0, 4)
+          chunks.slice!(0, 7).inspect
         else
-          find_matches chunk, I18N_ANY do |match|
+          find_matches chunk, /#{I18N_ANY}.*$/ do |match|
             raise "possibly unscoped I18n call on line #{line_offset + match.last} (hint: check your indentation)"
           end
         end
@@ -129,7 +133,7 @@ module I18nExtraction
       line_offset = options[:line_offset] || 1
       extract_from_erb(source, :line_offset => line_offset).each do |scope, block_source, offset|
         offset = line_offset + offset
-        find_matches block_source, /(#{SCOPED_BLOCK_START})/ do |match|
+        find_matches block_source, /#{SCOPED_BLOCK_START}.*/ do |match|
           raise "scoped blocks are no longer supported in js_blocks, use :i18n_scope instead (line #{offset + match.last})"
         end
         if scope && (scope = process_literal(scope))

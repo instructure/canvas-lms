@@ -168,6 +168,7 @@ a.load_members_link, .loading_members {
     <a href="<%= group_remove_user_url("{{ id }}") %>" class="remove_user_url">&nbsp;</a>
     <a href="<%= group_members_url("{{ id }}") %>" class="list_users_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_group_unassigned_members_url) %>" class="list_unassigned_users_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_group_assign_unassigned_members_url, :category_id => "{{ category_id }}") %>" class="assign_unassigned_users_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_groups_url) %>" class="add_group_url" %>&nbsp;</a>
   </div>
   

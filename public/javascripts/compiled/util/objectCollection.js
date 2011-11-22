@@ -1,18 +1,16 @@
 (function() {
   define('compiled/util/objectCollection', function() {
     return function(array) {
-      if (!array.indexOf) {
-        array.indexOf = function(needle) {
-          var index, item, _len, _results;
-          _results = [];
-          for (index = 0, _len = array.length; index < _len; index++) {
-            item = array[index];
-            _results.push(item === needle ? index : void 0);
+      array.indexOf = function(needle) {
+        var index, item, _len;
+        for (index = 0, _len = array.length; index < _len; index++) {
+          item = array[index];
+          if (item === needle) {
+            return index;
           }
-          return _results;
-        };
-        -1;
-      }
+        }
+      };
+      -1;
       array.findBy = function(prop, value) {
         var index, item, _len;
         for (index = 0, _len = array.length; index < _len; index++) {

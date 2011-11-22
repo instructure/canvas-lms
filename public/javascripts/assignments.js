@@ -596,7 +596,7 @@ I18n.scoped('assignments', function(I18n) {
     });
     $("#delete_assignments_dialog").delegate(".delete_button", 'click', function() {
       var $dialog = $("#delete_assignments_dialog");
-      group_id = $dialog.data('group_id');
+      var group_id = $dialog.data('group_id');
       $old_group = $("#group_" + group_id);
       var params = {};
       var formData = $dialog.getFormData();

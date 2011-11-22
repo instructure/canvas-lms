@@ -67,9 +67,9 @@ Rails::Initializer.run do |config|
   # config.active_record.schema_format = :sql
 
   # Activate observers that should always be running
-  # config.active_record.observers = :cacher, :garbage_collector
+  config.active_record.observers = :cacher
 
-  config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware )
+  config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware #{RAILS_ROOT}/app/observers )
 
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
   config.middleware.insert_before('ActionController::ParamsParser', 'PreventNonMultipartParse')

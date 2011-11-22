@@ -17,4 +17,12 @@
 #
 
 module DiscussionTopicsHelper
+  
+  # the delayed posting and not seeing reply options on a
+  # discussion don't make sense in a group setting because
+  # all the users are "admins" of the group so they can
+  # see the topics anyway.
+  def show_course_only_options?(context)
+    context.is_a? Course
+  end
 end

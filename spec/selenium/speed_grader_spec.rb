@@ -4,10 +4,7 @@ describe "speedgrader selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   def student_submission(options = {})
-    @student = user_with_pseudonym({:active_user => true, :username => 'student@example.com', :password => 'qwerty'}.merge(options))
-    @course.enroll_user(@student, "StudentEnrollment", {:enrollment_state => 'active'}.merge(options))
-    @submission = @assignment.submit_homework(@student, :body => 'first student submission text')
-    @submission.save!
+    submission_model(options.merge(:assignment => @assignment, :body => "first student submission text"))
   end
 
   before(:each) do

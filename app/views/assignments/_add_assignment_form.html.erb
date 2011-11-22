@@ -8,8 +8,9 @@
         <div style="padding-left: 20px; font-size: 0.8em; margin-top: 1px;">
           type: <select name="assignment[submission_types]" style="font-size: 0.8em;" class="assignment_submission_types">
             <option value="" class="current_submission_types"><%= t 'options.assignment', "Assignment" %></option>
-            <option value="online_quiz"><%= t 'options.quiz', "Quiz" %></option>
             <option value="discussion_topic"><%= t 'options.discussion', "Discussion" %></option>
+            <option value="online_quiz"><%= t 'options.quiz', "Quiz" %></option>
+            <option value="external_tool"><%= t 'options.external_tool', "External Tool" %></option>
             <% if feature_enabled?(:attendance) %>
               <option value="attendance"><%= t 'options.attendance', "Attendance" %></option>
             <% end %>

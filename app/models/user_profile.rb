@@ -34,6 +34,10 @@ class UserProfile
     @user.asset_string
   end
   
+  def opaque_identifier(*args)
+    @user.opaque_identifier(*args)
+  end
+  
   TAB_PROFILE = 0
   TAB_COMMUNICATION_PREFERENCES = 1
   TAB_FILES = 2
@@ -48,6 +52,17 @@ class UserProfile
         { :id => TAB_FILES, :label => I18n.t('#tabs.files', "Files"), :css_class => 'files', :href => :dashboard_files_path, :no_args => true }
       ]
       @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if @user.eportfolios_enabled?
+      if user && opts[:root_account]
+        opts[:root_account].context_external_tools.having_setting('user_navigation').each do |tool|
+          @tabs << {
+            :id => tool.asset_string,
+            :label => tool.label_for(:user_navigation, opts[:language]),
+            :css_class => tool.asset_string,
+            :href => :user_external_tool_path,
+            :args => [user.id, tool.id]
+          }
+        end
+      end
     end
     @tabs
   end

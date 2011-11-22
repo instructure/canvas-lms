@@ -71,10 +71,11 @@ I18n.scoped('instructure', function(I18n) {
             height: '400px'
           }, $this.data(), options);
           
-      function tellAppIViewedThisInline(){
+      function tellAppIViewedThisInline(serviceUsed){
         // if I have a url to ping back to the app that I viewed this file inline, ping it.
         if (opts.attachment_view_inline_ping_url) {
           $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, function() { }, function() { });
+          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts));
         }
       }
       
@@ -110,7 +111,7 @@ I18n.scoped('instructure', function(I18n) {
         // and http://groups.google.com/group/scribd-platform-developers/msg/46a4f12db73d02d8
         this.childNodes[0].keyboardShortcutDown = this.childNodes[0].keyboardShortcutUp = function(){};
 
-        tellAppIViewedThisInline();
+        tellAppIViewedThisInline('scribd');
       } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){ 
         // else if it's something google docs preview can handle and we can get a public url to this document.
         function loadGooglePreview(){
@@ -122,7 +123,7 @@ I18n.scoped('instructure', function(I18n) {
           $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
             .appendTo($this)
             .load(function(){
-              tellAppIViewedThisInline();
+              tellAppIViewedThisInline('google');
               if ($.isFunction(opts.ready)) {
                 opts.ready();
               }

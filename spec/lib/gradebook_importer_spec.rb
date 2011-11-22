@@ -121,7 +121,41 @@ describe GradebookImporter do
 
       hash['students'][5]['id'].should <  0
       hash['students'][5]['original_id'].should be_nil
+    end
+    
+    it "should allow ids that look like numbers" do
+      course_model
 
+      user_with_pseudonym(:active_all => true)
+      @user.pseudonym.sis_user_id = "0123456"
+      student_in_course(:user => @user)
+      @user.pseudonym.save!
+      @u0 = @user
+
+      # user with an sis-id that is a number
+      user_with_pseudonym(:active_all => true, :username => "octal_ud")
+      @user.pseudonym.destroy
+      @user.pseudonyms.create!(:unique_id => '0231163', :account => Account.default)
+      student_in_course(:user => @user)
+      @user.pseudonym.save!
+      @user.reload
+      @u1 = @user
+
+      uploaded_csv = FasterCSV.generate do |csv|
+        csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
+        csv << ["    Points Possible", "", "","", ""]
+        csv << ["" , "", "0123456", "", "", 99]
+        csv << ["" , "", "", "0231163", "", 99]
+      end
+
+      importer_with_rows(uploaded_csv)
+      hash = ActiveSupport::JSON.decode(@gi.to_json)
+
+      hash['students'][0]['id'].should == @u0.id
+      hash['students'][0]['original_id'].should == @u0.id
+
+      hash['students'][1]['id'].should == @u1.id
+      hash['students'][1]['original_id'].should == @u1.id
     end
   end
 

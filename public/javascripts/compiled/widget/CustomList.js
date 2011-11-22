@@ -6,15 +6,15 @@
     - jQuery.ajaxJSON
   */
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  define('compiled/widget/CustomList', ['compiled/util/objectCollection', 'compiled/Template'], function(objectCollection, Template) {
+  define('compiled/widget/CustomList', ['compiled/util/objectCollection', 'jst/courseList/wrapper', 'jst/courseList/content'], function(objectCollection, wrapper, content) {
     var CustomList;
     return CustomList = (function() {
       CustomList.prototype.options = {
         animationDuration: 200,
         model: 'Course',
         dataAttribute: 'id',
-        wrapper: 'courseList/wrapper',
-        content: 'courseList/content',
+        wrapper: wrapper,
+        content: content,
         url: '/favorites',
         appendTarget: 'body',
         resetCount: 12,
@@ -25,9 +25,9 @@
         this.appendTarget = jQuery(this.options.appendTarget);
         this.element = jQuery(selector);
         this.targetList = this.element.find('> ul');
-        this.wrapper = jQuery(Template(this.options.wrapper, {}));
+        this.wrapper = jQuery(this.options.wrapper({}));
         this.sourceList = this.wrapper.find('> ul');
-        this.contentTemplate = new Template(this.options.content);
+        this.contentTemplate = this.options.content;
         this.ghost = jQuery('<ul/>').addClass('customListGhost');
         this.requests = {
           add: {},
@@ -140,7 +140,7 @@
       CustomList.prototype.resetList = function() {
         var defaultItems, html;
         defaultItems = this.items.slice(0, this.options.resetCount);
-        html = this.contentTemplate.toHTML({
+        html = this.contentTemplate({
           items: defaultItems
         });
         this.targetList.empty().html(html);
@@ -213,7 +213,7 @@
         var html;
         this.items = objectCollection(items);
         this.items.sortBy('shortName');
-        html = this.contentTemplate.toHTML({
+        html = this.contentTemplate({
           items: this.items
         });
         this.sourceList.html(html);

@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe Submission do
   before(:each) do
@@ -38,6 +39,23 @@ describe Submission do
     Submission.create!(@valid_attributes)
   end
   
+  it_should_behave_like "url validation tests"
+  it "should check url validity" do
+    test_url_validation(Submission.create!(@valid_attributes))
+  end
+
+  it "should add http:// to the body for long urls, too" do
+    s = Submission.create!(@valid_attributes)
+    s.url.should == 'http://www.instructure.com'
+
+    long_url = ("a"*300 + ".com")
+    s.url = long_url
+    s.save!
+    s.url.should == "http://#{long_url}"
+    # make sure it adds the "http://" to the body for long urls, too
+    s.body.should == "http://#{long_url}"
+  end
+
   it "should offer the context, if one is available" do
     @course = Course.new
     @assignment = Assignment.new(:context => @course)
@@ -249,41 +267,6 @@ describe Submission do
         @submission.should eql(s)
         @submission.messages_sent.should_not be_include('Submission Grade Changed')
       end
-    end
-  end
-
-  context "URL submissions" do
-    it "should automatically add the 'http://' scheme if none given" do
-      s = Submission.create!(@valid_attributes)
-      s.url.should == 'http://www.instructure.com'
-
-      long_url = ("a"*300 + ".com")
-      s.url = long_url
-      s.save!
-      s.url.should == "http://#{long_url}"
-      # make sure it adds the "http://" to the body for long urls, too
-      s.body.should == "http://#{long_url}"
-    end
-
-    it "should reject invalid urls" do
-      s = Submission.create(@valid_attributes.merge :url => 'bad url')
-      s.new_record?.should be_true
-      s.errors.length.should == 1
-      s.errors.first.to_s.should match(/not a valid URL/)
-    end
-
-    it "should reject empty urls" do
-      s = Submission.create(@valid_attributes.merge :url => '')
-      s.new_record?.should be_true
-      s.errors.length.should == 1
-      s.errors.first.to_s.should match(/not a valid URL/)
-    end
-
-    it "should strip leading/trailing whitespace" do
-      s = Submission.create(@valid_attributes.merge :url => ' http://www.google.com ')
-      s.new_record?.should be_false
-      s.errors.should be_empty
-      s.url.should == 'http://www.google.com'
     end
   end
 

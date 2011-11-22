@@ -31,7 +31,7 @@ class StreamItem < ActiveRecord::Base
     res = data.is_a?(OpenObject) ? data : OpenObject.new
     res.assert_hash_data
     res.user_id ||= viewing_user_id
-    res
+    post_process(res, viewing_user_id)
   end
   
   def prepare_user(user)
@@ -127,6 +127,7 @@ class StreamItem < ActiveRecord::Base
     when DiscussionTopic
       object = object
       res = object.attributes
+      res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
       res['total_root_discussion_entries'] = object.root_discussion_entries.active.count
       res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,10].reverse.map do |entry|
         hash = entry.attributes
@@ -298,4 +299,21 @@ class StreamItem < ActiveRecord::Base
   named_scope :after, lambda {|start_at| 
     {:conditions => ['updated_at > ?', start_at], :order => 'updated_at DESC', :limit => 21 }
   }
+  
+  private
+  
+  def post_process(res, viewing_user_id)
+    case res.type
+    when 'DiscussionTopic','Announcement'
+      if res.require_initial_post
+        res.user_has_posted = true
+        if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id) 
+          res.root_discussion_entries = []
+          res.user_has_posted = false
+        end
+      end
+    end
+    
+    res
+  end
 end
