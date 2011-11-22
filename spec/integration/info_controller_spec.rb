@@ -17,20 +17,26 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'new_wiki_page.summary' do
-  it "should render" do
-    wiki_page_model
-    @object = @page
-    @object.reload
-    @object.wiki.should_not be_nil
-    @object.wiki_with_participants.should_not be_nil
-    @object.wiki_with_participants.wiki_namespaces.should_not be_empty
-    @object.wiki_with_participants.wiki_namespaces.first.context.participants.should be_include(@user)
-    @object.wiki.wiki_namespaces.should_not be_empty
-    @object.find_namespace_for_user(@user).should_not be_nil
-    @object.find_namespace_for_user(@user).context.should_not be_nil
-    generate_message(:new_wiki_page, :summary, @object, :user => @user)
+describe InfoController do
+  describe "#avatar_image_url" do
+    it "should clear the cache on avatar update" do
+      Account.default.tap { |a| a.enable_service(:avatars) }.save
+      enable_cache do
+        user
+        get "/images/users/#{@user.id}"
+        response.should be_redirect
+        response['Location'].should match(%r{gravatar})
+        response['Location'].should match(%r{no_pic})
+
+        @user.avatar_image = { 'type' => 'attachment', 'url' => '/images/thumbnails/blah' }
+        @user.save!
+
+        get "/images/users/#{@user.id}"
+        response.should be_redirect
+        response['Location'].should_not match(%r{gravatar})
+        response['Location'].should match(%r{/images/thumbnails/blah})
+      end
+    end
   end
 end

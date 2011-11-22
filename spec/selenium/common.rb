@@ -56,8 +56,8 @@ module SeleniumTestsHelperMethods
         caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
       end
       driver = Selenium::WebDriver.for(
-        :remote, 
-        :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub', 
+        :remote,
+        :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
         :desired_capabilities => caps
       )
     end
@@ -69,7 +69,7 @@ module SeleniumTestsHelperMethods
   def t(*a, &b)
     I18n.t(*a, &b)
   end
-  
+
   def app_host
     "http://#{$app_host_and_port}"
   end
@@ -80,7 +80,7 @@ module SeleniumTestsHelperMethods
       port = rand(65535 - 1024) + 1024
       next if tried_ports.include? port
       tried_ports << port
-      
+
       socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
       socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
       sockaddr = Socket.pack_sockaddr_in(port, '0.0.0.0')
@@ -90,20 +90,20 @@ module SeleniumTestsHelperMethods
         puts "found port #{port} after #{tried_ports.length} tries"
         $server_port = port
         $app_host_and_port = "#{SERVER_IP}:#{$server_port}"
-        
+
         return $server_port
       rescue Errno::EADDRINUSE => e
         # pass
       end
     end
-    
+
     raise "couldn't find an available port after #{tried_ports.length} tries! ports tried: #{tried_ports.join ", "}"
   end
 
 
   def self.start_in_process_webrick_server
     setup_host_and_port
-    
+
     HostUrl.default_host = $app_host_and_port
     HostUrl.file_host = $app_host_and_port
     server = SpecFriendlyWEBrickServer
@@ -123,12 +123,13 @@ module SeleniumTestsHelperMethods
     at_exit { shutdown.call }
     return shutdown
   end
-  
+
   def self.start_forked_webrick_server
     setup_host_and_port
-    
+
     domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
     domain_conf = YAML.load_file(domain_conf_path)
+    domain_conf[Rails.env] ||= {}
     old_domain = domain_conf[Rails.env]["domain"]
     domain_conf[Rails.env]["domain"] = $app_host_and_port
     File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
@@ -184,7 +185,7 @@ shared_examples_for "all selenium tests" do
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
-    
+
     driver.find_element(:css, '#pseudonym_session_unique_id').send_keys username
     password_element = driver.find_element(:css, '#pseudonym_session_password')
     password_element.send_keys(password)
@@ -197,7 +198,7 @@ shared_examples_for "all selenium tests" do
       login_as(pseudonym.unique_id, pseudonym.password)
     else
       PseudonymSession.any_instance.stubs(:session_credentials).returns([])
-      PseudonymSession.any_instance.stubs(:record).returns(pseudonym.reload)
+      PseudonymSession.any_instance.stubs(:record).returns { pseudonym.reload }
       PseudonymSession.any_instance.stubs(:used_basic_auth?).returns(false)
       # PseudonymSession.stubs(:find).returns(@pseudonym_session)
     end
@@ -205,7 +206,7 @@ shared_examples_for "all selenium tests" do
 
   def user_logged_in(opts={})
     user_with_pseudonym({:active_user => true}.merge(opts))
-    create_session(@pseudonym, opts[:real_login])
+    create_session(@pseudonym, opts[:real_login] || $in_proc_webserver_shutdown.nil?)
   end
 
   def course_with_teacher_logged_in(opts={})
@@ -244,11 +245,11 @@ shared_examples_for "all selenium tests" do
   def wait_for_dom_ready
     keep_trying_until(120) { driver.execute_script("return $") != nil }
     driver.execute_script <<-JS
-      window.seleniumDOMIsReady = false; 
-      $(function(){ 
+      window.seleniumDOMIsReady = false;
+      $(function(){
         window.setTimeout(function(){
           //by doing a setTimeout, we ensure that the execution of all js completes. then we run selenium.
-          window.seleniumDOMIsReady = true; 
+          window.seleniumDOMIsReady = true;
         }, 1);
       });
     JS
@@ -258,12 +259,12 @@ shared_examples_for "all selenium tests" do
       dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
     end
   end
-  
+
   def wait_for_ajax_requests
     return if driver.execute_script("return typeof($) == 'undefined' || typeof($.ajaxJSON) == 'undefined' || typeof($.ajaxJSON.inFlightRequests) == 'undefined'")
     keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlightRequests") == 0 }
   end
- 
+
   def wait_for_animations
     return if driver.execute_script("return typeof($) == 'undefined'")
     keep_trying_until { driver.execute_script("return $(':animated').length") == 0 }
@@ -290,15 +291,15 @@ shared_examples_for "all selenium tests" do
     raise "Unexpected #{val.inspect}" unless val
     val
   end
-  
+
   def find_with_jquery(selector)
     driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}')[0];")
   end
-  
+
   def find_all_with_jquery(selector)
     driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}').toArray();")
   end
-  
+
   # pass in an Element pointing to the textarea that is tinified.
   def wait_for_tiny(element)
     # TODO: Better to wait for an event from tiny?
@@ -314,7 +315,7 @@ shared_examples_for "all selenium tests" do
     }
     tiny_frame
   end
-  
+
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
     driver.switch_to.frame id
@@ -323,7 +324,20 @@ shared_examples_for "all selenium tests" do
   end
 
   def is_checked(selector)
-    return driver.execute_script('return $("'+selector+'").is(":checked")')
+    if selector.is_a?(String)
+      return driver.execute_script('return $("'+selector+'").is(":checked")')
+    else
+      return selector.attribute(:checked) == 'checked'
+    end
+  end
+
+  def set_value(input, value)
+    if input.tag_name == 'select'
+      input.find_element(:css, "option[value='#{value}']").click
+    else
+      replace_content(input, value)
+    end
+    driver.execute_script(input['onchange']) if input['onchange']
   end
 
   def find_option_value(selector_type, selector_css, option_text)
@@ -338,7 +352,7 @@ shared_examples_for "all selenium tests" do
       end
     end
     option_value
-  end 
+  end
 
   def element_exists(selector_type, selector)
     exists = false
@@ -391,7 +405,7 @@ shared_examples_for "all selenium tests" do
     driver.navigate.refresh
     wait_for_dom_ready
   end
-  
+
   def make_full_screen
     driver.execute_script <<-JS
       if (window.screen) {
@@ -399,6 +413,11 @@ shared_examples_for "all selenium tests" do
         window.resizeTo(window.screen.availWidth, window.screen.availHeight);
       }
     JS
+  end
+
+  def replace_content(el, value)
+    el.clear
+    el.send_keys(value)
   end
 
   def check_image(element)

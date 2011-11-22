@@ -18,22 +18,6 @@
 (function() {
   var lastLookup = null;
   
-  function calculateBorders(element) {
-    var borders = {};
-    element = $(element);    
-    $.each(['width', 'style', 'color'], function(i, widthStyleColor) {
-      borders[widthStyleColor] = {all: 'not-set'};
-      $.each(['top', 'right', 'bottom', 'left'], function(i, topRightBottomLeft){
-        var val = element.css('border-' + topRightBottomLeft + '-' + widthStyleColor);
-        borders[widthStyleColor][topRightBottomLeft] = val;
-        borders[widthStyleColor].all = borders[widthStyleColor].all === 'not-set' ? 
-          val :
-          (borders[widthStyleColor].all === val) && val;
-      });
-    });
-    return borders;
-  }
-  
   tinymce.create('tinymce.plugins.InstructureLinks', {
     init : function(ed, url) {
       var promptInteraction = {};
@@ -351,133 +335,10 @@
           } else {
             if($holder.hasClass('fullWidth')) { $holder.removeClass('fullWidth'); }
           }
-        }).end()
-        .find("table").each(function() {
-          var $table                 = $(this).removeClass('mceItemTable'),
-              $dummyTable            = $('<table><tr><td>&nbsp;</td></tr></table>').appendTo($table.parent('body'));
-          
-          // hanlde left, right, center alignment
-          var align = $table.attr('align');
-          if (align) {
-            if (align === 'center') {
-              $table.css({marginLeft: 'auto', marginRight: 'auto'});
-            } else if (align === 'left') {
-              $table.css('align', 'auto');
-            } else if (align === 'right') {
-              $table.css('marginLeft', 'auto');
-            }
-            $table.removeAttr('align');
-          }
-          
-          // convert html attributes to css styles
-          $.each({
-            'border': 'borderWidth',
-            'bordercolor': 'borderColor',
-            'bgcolor': 'backgroundColor',
-            'cellspacing': 'borderSpacing',
-            'cellpadding': '',
-            'width': 'width',
-            'height': 'height'
-          }, function(htmlAttr, cssAttr) {
-            var val = $table.attr(htmlAttr);
-            if (val) {
-              // if they set the width to 0 just get rid of it
-              $table.css(cssAttr, (htmlAttr === 'border' && val === '0') ? '': val).removeAttr(htmlAttr);
-            }
-          });
-          
-          // in our instructure_style.css stylesheet, we say that the default style for a table is
-          // border: 1px solid #888;  so if that is the case, I assume it is not a manually styled table
-          var tableBorders = calculateBorders($table); 
-          var dummyTableBorders = calculateBorders($table.hasClass('borderless') ? $dummyTable.addClass('borderless') : $dummyTable);
-          
-          // if there is a 0px border and no custom color or style, then clear the inline BorderWidth
-          if ( tableBorders.width.all === "0px" && 
-               dummyTableBorders.style.all == tableBorders.style.all && 
-               dummyTableBorders.color.all == tableBorders.color.all ) {
-            $table.css('borderWidth', '');
-            tableBorders = calculateBorders($table);
-          }
-          var borderless = JSON.stringify(tableBorders) == JSON.stringify(dummyTableBorders);
-          $table.add($dummyTable).toggleClass('borderless',  borderless);
-          if (borderless) {
-            $table.css({'borderStyle': '', 'borderColor': '', 'borderWidth' : ''});
-          } else if (tableBorders.style.all == 'solid') {
-            $table.css('borderStyle', '');
-          }
-          
-          if (arg == "contentJustSet" || true) {
-            // recalculate table borders just in case they changed.
-            tableBorders = calculateBorders($table); 
-            var dummyTdBorders = calculateBorders($dummyTable.find('td'));
-      
-            $table.find("td").each(function() {
-              var $td = $(this);
-
-              // transfer html attributes to css attributes
-              var align = $td.attr('align');
-              if (align != 'left') {
-                ed.dom.setStyle(this, 'textAlign', align);
-              }
-              $.each({
-                'valign': 'verticalAlign',
-                'border': 'borderWidth',
-                'bordercolor': 'borderColor',
-                'bgcolor': 'backgroundColor',
-                'width': 'width',
-                'height': 'height'
-              }, function(htmlAttr, cssAttr) {
-                var val = $td.attr(htmlAttr);
-                if (val) {
-                  ed.dom.setStyle($td[0], cssAttr, htmlAttr);
-                  $td.removeAttr(htmlAttr);
-                }
-              });
-
-              // Right now we're inferring td styling from table styling.  So if
-              // you set a table's border to "1px solid #000" then it will get
-              // set on all the td's as well.  This technically isn't the
-              // expected behavior, so someone may complain about this.
-              var tdBorders = calculateBorders($td);
-              // if the td's styles match the table's previous border styles 
-              // then get rid of all of the td's styles
-              var previous = $table.data('previousBorders');
-              if ( previous && 
-                   previous.width.all == tdBorders.width.all && 
-                   previous.color.all == tdBorders.color.all &&
-                   (previous.style.all == "solid" || previous.style.all == tdBorders.style.all) 
-                 ) {
-                $td.css({'borderStyle': '', 'borderColor': '', 'borderWidth' : ''});
-                tdBorders = calculateBorders($td);
-              }
-              
-              var manuallyStyled = JSON.stringify(dummyTdBorders) != JSON.stringify(tdBorders);
-              $td.toggleClass('manually_styled', manuallyStyled);
-              if (!borderless && !manuallyStyled) {
-                $.each({'width' : 'Width', 'style' : 'Style', 'color' : 'Color'}, function(lowercase, titlecase) {
-                  if (tdBorders[lowercase].all != tableBorders[lowercase].all) {
-                    ed.dom.setStyle($td[0], ('border' + titlecase), tableBorders[lowercase].all || "");
-                  }
-                });
-              }
-            });
-          }
-          $table.data('previousBorders', !borderless && tableBorders);
-          $dummyTable.remove();
         });
       }
       ed.onPreProcess.add(function(ed, o) {
         $(o.node).find("a.youtube_link_to_box").removeClass('youtube_link_to_box');
-        $(o.node).find("table").removeAttr('border')
-            .find("td").removeAttr('border').end()
-          .filter(".borderless").removeClass('borderless')
-          .css('borderWidth', 0)
-          .css('borderColor', '')
-          .css('borderStyle', '')
-          .find("td:not(.manually_styled)")
-            .css('borderWidth', 0)
-            .css('borderStyle', '')
-            .css('borderColor', '');
         $(o.node).find("img.iframe_placeholder").each(function() {
           var $holder = $(this);
           var $frame = $("<iframe/>");
@@ -500,11 +361,7 @@
         while(e.nodeName != 'A' && e.nodeName != 'BODY' && e.parentNode) {
           e = e.parentNode;
         }
-        if(e.nodeName == 'A') {
-          cm.setActive('instructure_links', true);
-        } else {
-          cm.setActive('instructure_links', false);
-        }
+        cm.setActive('instructure_links', e.nodeName == 'A');
       });
     },
 

@@ -35,7 +35,7 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
 
     #check quiz preview
-    driver.find_element(:link, I18n.t('links.preview_quiz', 'Preview the Quiz')).click
+    driver.find_element(:link, 'Preview the Quiz').click
     driver.find_element(:css ,'#content h2').text.should == 'new quiz'
 
   end
@@ -871,7 +871,7 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
     wait_for_dom_ready
 
-    driver.find_element(:link, I18n.t('links.take_the_quiz','Take the Quiz')).click
+    driver.find_element(:link, 'Take the Quiz').click
     wait_for_dom_ready
 
     #flag first question
@@ -891,16 +891,109 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:id, 'quiz_title').text.should == q.title
   end
 
+  it "should round numeric questions thes same when created and taking a quiz" do
+    start_quiz_question
+    quiz = Quiz.last
+    question = find_with_jquery(".question:visible")
+    question.
+      find_element(:css, 'select.question_type').
+      find_element(:css, 'option[value="numerical_question"]').click
+
+    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
+    in_frame tiny_frame["id"] do
+      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
+    end
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers[0].find_element(:name, 'answer_exact').send_keys('0.000675')
+    driver.execute_script <<-JS
+      $('input[name=answer_exact]').trigger('change');
+    JS
+    answers[0].find_element(:name, 'answer_error_margin').send_keys('0')
+    question.submit
+    wait_for_ajax_requests
+
+    driver.find_element(:css, '.publish_quiz_button').click
+    wait_for_ajax_requests
+    wait_for_dom_ready
+
+    driver.find_element(:link, 'Take the Quiz').click
+    wait_for_dom_ready
+
+    input = driver.find_element(:css, 'input[type=text]')
+    input.click
+    input.send_keys('0.000675')
+    driver.execute_script <<-JS
+      $('input[type=text]').trigger('change');
+    JS
+    driver.find_element(:css, '.submit_button').click
+    wait_for_dom_ready
+    driver.find_element(:css, '.score_value').text.strip.should == '1'
+  end
+
+
+  context "select element behavior" do
+    before do
+      course_with_teacher_logged_in
+      @context = @course
+      bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      q = quiz_model
+      b = bank.assessment_questions.create!
+      quest2 = q.quiz_questions.create!(:assessment_question => b)
+      quest2.write_attribute(:question_data, { :neutral_comments=>"", :question_text=>"<p>My hair is [x] and my wife's is [y].</p>", :points_possible=>1, :question_type=>"multiple_dropdowns_question", :answers=>[{:comments=>"", :weight=>100, :blank_id=>"x", :text=>"brown", :id=>2624}, {:comments=>"", :weight=>0, :blank_id=>"x", :text=>"black", :id=>3085}, {:comments=>"", :weight=>100, :blank_id=>"y", :text=>"brown", :id=>5780}, {:comments=>"", :weight=>0, :blank_id=>"y", :text=>"red", :id=>8840}], :correct_comments=>"", :name=>"Question", :question_name=>"Question", :incorrect_comments=>"", :assessment_question_id=>nil})
+  
+      q.generate_quiz_data
+      q.save!
+      get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
+      driver.find_element(:css, '.publish_quiz_button')
+      get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+  
+      wait_for_ajax_requests
+    end
+
+    after do
+      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+      driver.find_element(:link, 'Quizzes').click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      wait_for_dom_ready
+    end
+
+    it "should prevent mousewheel events on select elements when taking a quiz" do
+      driver.execute_script <<-EOF
+        window.mousewheelprevented = false;
+        jQuery('select').bind('mousewheel', function(event) {
+          mousewheelprevented = event.isDefaultPrevented();
+        }).trigger('mousewheel');
+      EOF
+  
+      is_prevented = driver.execute_script('return window.mousewheelprevented')
+      is_prevented.should be_true
+    end
+
+    # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
+    it "should not unhover a question so long as one of its selects has focus" do
+      container = driver.find_element(:css, '.question')
+      driver.execute_script("$('.question').mouseenter()")
+      container.attribute(:class).should match(/hover/)
+
+      container.find_element(:css, 'select').click
+
+      driver.execute_script("$('.question').mouseleave()")
+      container.attribute(:class).should match(/hover/)
+
+      driver.execute_script("$('.question select').blur()")
+      container.attribute(:class).should_not match(/hover/)
+    end
+  end
+
   it "should display quiz statistics" do
     course_with_teacher_logged_in
     quiz_with_submission
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-    driver.find_element(:link, I18n.t("links.quiz_statistics", "Quiz Statistics")).click
+    driver.find_element(:link, "Quiz Statistics").click
 
     driver.find_element(:css, '#content .question_name').should include_text("Question 1")
-
-
   end
 end
 

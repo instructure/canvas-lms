@@ -318,4 +318,114 @@ describe DiscussionTopic do
       @subtopic.should_send_to_stream.should be_false
     end
   end
+  
+  context "posting first to view" do
+    before(:each) do
+      course_with_student(:active_all => true)
+      @observer = user(:active_all => true)
+      course_with_teacher(:course => @course, :active_all => true)
+      @context = @course
+      discussion_topic_model
+      @topic.require_initial_post = true
+      @topic.save
+    end
+    
+    it "should allow admins to see posts without posting" do
+      @topic.user_can_see_posts?(@teacher).should == true
+    end
+    
+    it "shouldn't allow student (and observer) who hasn't posted to see" do
+      @topic.user_can_see_posts?(@student).should == false
+    end
+    
+    it "should allow student (and observer) who has posted to see" do 
+      @topic.reply_from(:user => @student, :text => 'hai')
+      @topic.user_can_see_posts?(@student).should == true
+    end
+    
+  end
+  
+  context "posters" do
+    before :each do
+      @teacher = course_with_teacher(:active_all => true).user
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+
+    it "should include the topic author" do
+      @topic.posters.should include(@teacher)
+    end
+
+    it "should include users that have posted entries" do
+      @student = student_in_course.user
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.posters.should include(@student)
+    end
+
+    it "should include users that have replies to entries" do
+      @entry = @topic.reply_from(:user => @teacher, :text => "entry")
+      @student = student_in_course.user
+      @entry.reply_from(:user => @student, :html => "reply")
+      @topic.posters.should include(@student)
+    end
+
+    it "should dedupe users" do
+      @entry = @topic.reply_from(:user => @teacher, :text => "entry")
+      @student = student_in_course.user
+      @entry.reply_from(:user => @student, :html => "reply 1")
+      @entry.reply_from(:user => @student, :html => "reply 2")
+      @topic.posters.should include(@teacher)
+      @topic.posters.should include(@student)
+      @topic.posters.size.should == 2
+    end
+  end
+
+  context "submissions when graded" do
+    before :each do
+      @teacher = course_with_teacher(:active_all => true).user
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+
+    it "should create submissions for existing entries when setting the assignment" do
+      @student = student_in_course.user
+      @topic.reply_from(:user => @student, :text => "entry")
+      @student.reload
+      @student.submissions.should be_empty
+
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.save
+      @student.reload
+      @student.submissions.size.should == 1
+      @student.submissions.first.submission_type.should == 'discussion_topic'
+    end
+
+    it "should not duplicate submissions for existing entries that already have submissions" do
+      @student = student_in_course.user
+      @topic.reload # to get the student in topic.assignment.context.students
+
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.save
+
+      @topic.reply_from(:user => @student, :text => "entry")
+      @student.reload
+      @student.submissions.size.should == 1
+      @existing_submission_id = @student.submissions.first.id
+
+      @topic.assignment = nil
+      @topic.save
+      @topic.reply_from(:user => @student, :text => "another entry")
+      @student.reload
+      @student.submissions.size.should == 1
+      @student.submissions.first.id.should == @existing_submission_id
+
+      @topic.assignment = @assignment
+      @topic.save
+      @student.reload
+      @student.submissions.size.should == 1
+      @student.submissions.first.id.should == @existing_submission_id
+    end
+  end
 end

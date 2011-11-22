@@ -120,7 +120,7 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_enabled?(id)
-    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :session => session, :include_hidden_unused => true).any?{|t| t[:id] == id }
+    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :session => session, :include_hidden_unused => true, :root_account => @domain_root_account).any?{|t| t[:id] == id }
       if @context.is_a?(Account)
         flash[:notice] = t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
       elsif @context.is_a?(Course)
@@ -749,7 +749,7 @@ class ApplicationController < ActionController::Base
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
-  API_REQUEST_REGEX = /\A\/api\//
+  API_REQUEST_REGEX = %r{\A/api/v\d}
 
   def api_request?
     @api_request ||= !!request.path.match(API_REQUEST_REGEX)
@@ -813,6 +813,14 @@ class ApplicationController < ActionController::Base
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
+      if @tag.context.is_a?(Assignment)
+        @assignment = @tag.context
+        @resource_title = @assignment.title
+      else
+        @resource_title = @tag.title
+      end
+      @resource_url = @tag.url
+      @opaque_id = @tag.opaque_identifier(:asset_string)
       @tool = ContextExternalTool.find_external_tool(tag.url, context)
       @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
@@ -820,6 +828,12 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
+        @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
+        @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
+        if @assignment && @context.students.include?(@current_user)
+          @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
+        end
+        @tool_settings = @launch.generate
         render :template => 'external_tools/tool_show'
       end
     else

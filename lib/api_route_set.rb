@@ -20,10 +20,12 @@
 # and lets us auto-discover the route for a given API method in the docs.
 class ApiRouteSet
   cattr_accessor :apis
+  attr_reader :prefix
   self.apis = []
 
-  def initialize
+  def initialize(prefix)
     ApiRouteSet.apis << self
+    @prefix = prefix
     # mapper.with_options(:path_prefix => @path_prefix,
     #                     :name_prefix => @name_prefix,
     #                     :requirements => { :id => ID_REGEX }) do |api|
@@ -32,12 +34,16 @@ class ApiRouteSet
   end
   attr_accessor :mapper
 
-  def self.route(mapper)
-    route_set = self.new
+  def self.route(mapper, prefix = self.prefix)
+    route_set = self.new(prefix)
     route_set.mapper = mapper
     yield route_set
   ensure
     route_set.mapper = nil
+  end
+
+  def self.prefix
+    raise ArgumentError, "prefix required"
   end
 
   def self.routes_for(prefix)
@@ -54,6 +60,36 @@ class ApiRouteSet
     self.class.routes_for(prefix).find_all { |r| r.matches_controller_and_action?(controller, action) }
   end
 
+  def get(path, opts = {})
+    route(:get, path, opts)
+  end
+  def put(path, opts = {})
+    route(:put, path, opts)
+  end
+  def post(path, opts = {})
+    route(:post, path, opts)
+  end
+  def delete(path, opts = {})
+    route(:delete, path, opts)
+  end
+
+  def mapper_prefix
+    ""
+  end
+
+  def mapper_method(opts)
+    if opts[:path_name]
+      path_name = "#{mapper_prefix}#{opts.delete(:path_name)}"
+    else
+      path_name = :connect
+    end
+  end
+
+  def route(method, path, opts)
+    opts ||= {}
+    mapper.__send__ mapper_method(opts), "#{prefix}/#{path}", opts.merge(:conditions => { :method => method })
+  end
+
   class V1 < ::ApiRouteSet
     # match a path component, including periods, but excluding the string ".json" for backwards compat
     # for api v2, we'll just drop the .json completely
@@ -63,33 +99,19 @@ class ApiRouteSet
     ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}
     ID_PARAM = %r{^:(id|[\w_]+_id)$}
 
-    def prefix
+    def self.prefix
       "/api/v1"
     end
 
-    def get(path, opts = {})
-      route(:get, path, opts)
-    end
-    def put(path, opts = {})
-      route(:put, path, opts)
-    end
-    def post(path, opts = {})
-      route(:post, path, opts)
-    end
-    def delete(path, opts = {})
-      route(:delete, path, opts)
+    def mapper_prefix
+      "api_v1_"
     end
 
     def route(method, path, opts)
       opts ||= {}
-      if opts[:path_name]
-        path_name = "api_v1_#{opts.delete(:path_name)}"
-      else
-        path_name = :connect
-      end
       path.split('/').each { |segment| opts[segment[1..-1].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
-      mapper.__send__ path_name, "/api/v1/#{path}", (opts || {}).merge(:conditions => { :method => method }, :format => 'json')
-      mapper.__send__ path_name, "/api/v1/#{path}.json", (opts || {}).merge(:conditions => { :method => method }, :format => 'json')
+      mapper.__send__ mapper_method(opts), "#{prefix}/#{path}", (opts || {}).merge(:conditions => { :method => method }, :format => 'json')
+      mapper.__send__ mapper_method(opts), "#{prefix}/#{path}.json", (opts || {}).merge(:conditions => { :method => method }, :format => 'json')
     end
   end
 end

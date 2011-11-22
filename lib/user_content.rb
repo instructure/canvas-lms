@@ -79,6 +79,7 @@ module UserContent
       'wiki' => WikiPage,
       'grades' => nil,
       'users' => nil,
+      'external_tools' => nil,
       'file_contents' => nil,
       'modules' => ContextModule,
     }

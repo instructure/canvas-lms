@@ -6,12 +6,10 @@
 define 'compiled/util/objectCollection', ->
   (array) ->
 
-    # The usual indexOf support if not present
-    unless array.indexOf
-      array.indexOf = (needle) ->
-        for item, index in array
-          index if item is needle
-      -1
+    array.indexOf = (needle) ->
+      for item, index in array
+        return index if item is needle
+    -1
 
     # Can find a specific element by a property ie:
     #   arr = arrayOfObjects([{id: 1}, {id: 2}])
