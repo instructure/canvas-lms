@@ -310,7 +310,7 @@
               </tr>
               <tr>
                 <td><%= f.blabel :turnitin_shared_secret, :en => "Turnitin Shared Secret" %></td>
-                <td><%= f.text_field :turnitin_shared_secret, :style => "width: 150px;", :class => "turnitin_account_settings" %></td>
+                <td><%= f.text_field :turnitin_shared_secret, :class => "turnitin_account_settings" %></td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
@@ -319,7 +319,7 @@
                 </td>
               </tr>
               <tr>
-                <td><%= f.blabel :turnitin_comments, :en => "Turnitin Submission Comments" %></td>
+                <td><%= f.blabel :turnitin_comments, :en => "Submission Comments" %></td>
                 <td>
                   <span style="font-size: 0.9em;"><%= t(:turnitin_comments_help, "these comments will be shown to students when submitting a Turnitin-enabled assignment") %></span>
                   <%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %>
