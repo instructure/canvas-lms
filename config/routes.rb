@@ -307,6 +307,8 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   map.resources :assessment_questions do |question|
+    question.map 'files/:id/download', :controller => 'files', :action => 'assessment_question_show', :download => '1'
+    question.map 'files/:id/preview', :controller => 'files', :action => 'assessment_question_show', :preview => '1'
     question.verified_file 'files/:id/:verifier', :controller => 'files', :action => 'assessment_question_show', :download => '1'
   end
   
