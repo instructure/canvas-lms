@@ -1,4 +1,4 @@
-!define('jst/_grading_box', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['_grading_box'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -151,5 +151,7 @@ function program9(depth0,data) {
   return buffer;});
 Handlebars.registerPartial('grading_box', templates['_grading_box']);
 
-  return templates['_grading_box'];
-});
+  define('jst/_grading_box', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['_grading_box'];
+  });
+})();
