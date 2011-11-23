@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting D2L QTI" do
   it "should convert multiple choice" do
     get_question_hash(d2l_question_dir, 'multiple_choice').should == D2LExpected::MULTIPLE_CHOICE
@@ -263,4 +263,5 @@ module D2LExpected
          :question_bank_name=>"02gilback",
          :question_text=> "This a weird way to do [QUES_979782_1194494_A4749142] in the blank [QUES_979782_1194494_A4749144] ",
          :question_name=>""}
+end
 end

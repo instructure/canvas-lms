@@ -3,7 +3,7 @@ require 'zip/zipfilesystem'
 
 if Qti.migration_executable
 
-describe 'QtiExporter' do
+describe Qti::Converter do
   before do
     course_with_teacher(:active_all => true)
   end
@@ -148,7 +148,7 @@ describe 'QtiExporter' do
     @migration = ContentMigration.new(:context => @course,
                                      :user => @user)
     @migration.update_migration_settings({
-      :migration_type => 'qti_exporter',
+      :migration_type => 'qti_converter',
     })
     @migration.save!
 

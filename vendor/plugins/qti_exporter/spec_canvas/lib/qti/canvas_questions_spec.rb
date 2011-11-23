@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting Canvas QTI" do
   it "should convert multiple choice" do
     manifest_node=get_manifest_node('multiple_choice')
@@ -361,4 +361,5 @@ module CanvasExpected
                          :weight=>100,
                          :text=>"answer_text"}],
                :migration_id=>"ic7e7f06a79092f0672f0ee014b709e27"}
+end
 end

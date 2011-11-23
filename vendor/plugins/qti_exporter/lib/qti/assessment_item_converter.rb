@@ -21,7 +21,7 @@ class AssessmentItemConverter
       @base_dir = opts[:base_dir]
       @identifier = @manifest_node['identifier']
       @href = File.join(@base_dir, @manifest_node['href'])
-      if title = @manifest_node.at_css('title langstring') || title = @manifest_node.at_css('xmlns|title xmlns|langstring', 'xmlns' => Qti::QtiExporter::IMS_MD)
+      if title = @manifest_node.at_css('title langstring') || title = @manifest_node.at_css('xmlns|title xmlns|langstring', 'xmlns' => Qti::Converter::IMS_MD)
         @title = title.text
       end
     else
@@ -247,10 +247,10 @@ class AssessmentItemConverter
   
   def self.get_interaction_type(manifest_node)
     manifest_node.at_css('interactionType') || 
-      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_1_URL) || 
-      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_0_URL) || 
-      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_1_ITEM_URL) || 
-      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_0_ITEM_URL)
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_URL) || 
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_0_URL) || 
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_ITEM_URL) || 
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_0_ITEM_URL)
   end
 
   def self.create_instructure_question(opts)

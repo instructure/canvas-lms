@@ -1,6 +1,6 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
 <p>
   <%= f.check_box :enabled, {}, 'true', 'false' %>
-  <%= f.label :enabled, :en => "Enabled (must enable QTI exporter as well)" %>
+  <%= f.label :enabled, :en => "Enabled (must enable QTI Converter as well)" %>
 </p>
 <% end %>

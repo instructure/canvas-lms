@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting Blackboard 8 qti" do
 
   it "should convert multiple choice" do
@@ -518,4 +518,5 @@ module BB8Expected
                                 :weight=>nil
                         }
   }
+end
 end

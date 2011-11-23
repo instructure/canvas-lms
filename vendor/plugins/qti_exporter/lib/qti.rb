@@ -1,16 +1,31 @@
+require 'nokogiri'
+require 'canvas/migration'
+require 'workers/qti_worker'
+require 'qti/qti_plugin_validator'
+
 module Qti
   PYTHON_MIGRATION_EXECUTABLE = 'migrate.py'
   EXPECTED_LOCATION = File.join(::RAILS_ROOT,'vendor', 'QTIMigrationTool', PYTHON_MIGRATION_EXECUTABLE) rescue nil
+  EXPECTED_LOCATION_ALT = File.join(::RAILS_ROOT,'vendor', 'qti_migration_tool', PYTHON_MIGRATION_EXECUTABLE) rescue nil
   @migration_executable = nil
 
   if File.exists?(EXPECTED_LOCATION)
     @migration_executable = EXPECTED_LOCATION
+  elsif File.exists?(EXPECTED_LOCATION_ALT)
+    @migration_executable = EXPECTED_LOCATION_ALT
   elsif `#{PYTHON_MIGRATION_EXECUTABLE} --version 2>&1` =~ /qti/i
     @migration_executable = PYTHON_MIGRATION_EXECUTABLE
   end
 
   def self.migration_executable
     @migration_executable
+  end
+  
+  def self.qti_enabled?
+    if plugin = Canvas::Plugin.find(:qti_converter)
+      return plugin.settings[:enabled].to_s == 'true'
+    end
+    false
   end
 
   # Does a JSON export of the courses

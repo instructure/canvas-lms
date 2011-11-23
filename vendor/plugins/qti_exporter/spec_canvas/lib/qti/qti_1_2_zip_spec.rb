@@ -1,12 +1,11 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "QTI 1.2 zip with id prepender value" do
    before(:all) do
-    require 'qti_exporter'
     archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti','plain_qti.zip')
     unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
     export_folder = File.join(File.dirname(archive_file_path), "qti_plain_qti")
-    @exporter = Qti::QtiExporter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path, :id_prepender=>'prepend_test')
+    @exporter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path, :id_prepender=>'prepend_test')
     @exporter.export
     @exporter.delete_unzipped_archive
     if File.exists?(export_folder)
@@ -24,8 +23,8 @@ describe "QTI 1.2 zip with id prepender value" do
 
   it "should have file paths" do
     @exporter.course[:overview_file_path].index("oi/overview.json").should_not be_nil
-    @exporter.course[:export_folder_path].index('spec/fixtures/qti/qti_plain_qti/oi').should_not be_nil
-    @exporter.course[:full_export_file_path].index('spec/fixtures/qti/qti_plain_qti/oi/course_export.json').should_not be_nil
+    @exporter.course[:export_folder_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi').should_not be_nil
+    @exporter.course[:full_export_file_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi/course_export.json').should_not be_nil
   end
 
 
@@ -50,3 +49,4 @@ QTI_EXPORT_ASSESSMENT = {
                   :quiz_type=>nil,
                   :quiz_name=>"Quiz",
                   :title=>"Quiz"}]}
+end

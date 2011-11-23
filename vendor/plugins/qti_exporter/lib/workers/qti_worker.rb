@@ -5,7 +5,7 @@ module Canvas::Migration
       def perform
         cm = ContentMigration.find_by_id migration_id
         begin
-          plugin = Canvas::Plugin.find(:qti_exporter)
+          plugin = Canvas::Plugin.find(:qti_converter)
           unless plugin && plugin.settings[:enabled]
             raise "Can't export QTI without the python converter tool installed."
           end
@@ -14,7 +14,7 @@ module Canvas::Migration
           settings[:user_id] = cm.user_id
           settings[:attachment_id] = cm.attachment.id rescue nil
 
-          exporter = Qti::QtiExporter.new(settings)
+          exporter = Qti::Converter.new(settings)
           assessments = exporter.export
           export_folder_path = assessments[:export_folder_path]
           overview_file_path = assessments[:overview_file_path]

@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting Blackboard 9 qti" do
 
   it "should convert matching questions" do
@@ -38,4 +38,5 @@ module BB9Expected
                        {:right=>"Luna", :text=>"Earth", :left=>"Earth", :comments=>""},
                        {:right=>"Ganymede", :text=>"Jupiter", :left=>"Jupiter", :comments=>""}],
               :question_name=>""}
+end
 end

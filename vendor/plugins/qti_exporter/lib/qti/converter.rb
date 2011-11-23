@@ -1,7 +1,7 @@
-require_dependency 'qti_exporter/respondus_settings'
+require_dependency 'qti/respondus_settings'
 
 module Qti
-class QtiExporter < Canvas::Migration::Migrator
+class Converter < Canvas::Migration::Migrator
 
   MANIFEST_FILE = "imsmanifest.xml"
   QTI_2_1_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p1'
@@ -24,7 +24,7 @@ class QtiExporter < Canvas::Migration::Migrator
   def export
     unzip_archive
 
-    if QtiExporter.is_qti_2(File.join(@unzipped_file_path, MANIFEST_FILE))
+    if Converter.is_qti_2(File.join(@unzipped_file_path, MANIFEST_FILE))
       @dest_dir_2_1 = @unzipped_file_path
       @converted = true
     else

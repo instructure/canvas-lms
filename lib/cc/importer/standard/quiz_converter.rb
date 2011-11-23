@@ -64,7 +64,7 @@ module CC::Importer::Standard
     def convert_questions(out_folder, resource_id)
       questions = nil
       begin
-        manifest_file = File.join(out_folder, Qti::QtiExporter::MANIFEST_FILE)
+        manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         questions = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
         prepend_id_to_questions(questions, resource_id)
       rescue
@@ -76,7 +76,7 @@ module CC::Importer::Standard
     def convert_assessment(out_folder, resource_id)
       quiz = nil
       begin
-        manifest_file = File.join(out_folder, Qti::QtiExporter::MANIFEST_FILE)
+        manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         quizzes = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
         prepend_id_to_assessments(quizzes, resource_id)
         if quiz = quizzes.first

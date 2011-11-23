@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting a cengage QTI" do
 
   it "should get the question bank name and id" do
@@ -18,4 +18,5 @@ describe "Converting a cengage QTI" do
     group[:question_bank_migration_id].should == 'res00013'
   end
 
+end
 end

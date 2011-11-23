@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting Angel CC QTI" do
   it "should convert multiple choice" do
     manifest_node=get_manifest_node('multiple_choice')
@@ -142,4 +142,5 @@ module AngelExpected
                            {:question_type=>"question_reference",
                                    :migration_id=>"ID_3f9f4eed-4698-4690-9f9d-851b31ce5eb0"}],
                   :points_possible=>"237.0"}
+end
 end

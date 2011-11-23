@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
+
 unless defined? BASE_FIXTURE_DIR
   BASE_FIXTURE_DIR = File.dirname(__FILE__) + '/fixtures/'
   CANVAS_FIXTURE_DIR = BASE_FIXTURE_DIR + 'canvas/'
@@ -11,7 +12,6 @@ unless defined? BASE_FIXTURE_DIR
   D2L_FIXTURE_DIR = BASE_FIXTURE_DIR + 'd2l/'
   HTML_SANITIZATION_FIXTURE_DIR = BASE_FIXTURE_DIR + 'html_sanitization/'
 end
-require 'qti_exporter'
 require 'pp'
 
 def get_question_hash(dir, name, delete_answer_ids=true, opts={})
@@ -28,48 +28,48 @@ end
 
 def get_manifest_node(question, opts={})
   manifest_node = {'identifier'=>nil, 'href'=>"#{question}.xml"}
-  manifest_node.stub!(:at_css).and_return(nil)
-  manifest_node.stub!(:at_css).with('instructureMetadata').and_return(manifest_node)
+  manifest_node.stubs(:at_css).returns(nil)
+  manifest_node.stubs(:at_css).with('instructureMetadata').returns(manifest_node)
 
   t = Object.new
-  t.stub!(:text).and_return(opts[:title])
-  manifest_node.stub!(:at_css).with('title langstring').and_return(t)
+  t.stubs(:text).returns(opts[:title])
+  manifest_node.stubs(:at_css).with('title langstring').returns(t)
 
   s = {}
-  s.stub!(:text).and_return('237.0')
+  s.stubs(:text).returns('237.0')
   s["value"] = '237.0'
-  manifest_node.stub!(:at_css).with('instructureField[name=max_score]').and_return(s)
+  manifest_node.stubs(:at_css).with('instructureField[name=max_score]').returns(s)
   
   it = nil
   if opts[:interaction_type]
     it = Object.new
-    it.stub!(:text).and_return(opts[:interaction_type])
+    it.stubs(:text).returns(opts[:interaction_type])
   end
-  manifest_node.stub!(:at_css).with(('interactionType')).and_return(it)
+  manifest_node.stubs(:at_css).with(('interactionType')).returns(it)
   
   bbqt = nil
   if opts[:bb_question_type]
     bbqt = {}
-    bbqt.stub!(:text).and_return(opts[:bb_question_type])
+    bbqt.stubs(:text).returns(opts[:bb_question_type])
     bbqt["value"] = opts[:bb_question_type]
   end
-  manifest_node.stub!(:at_css).with(('instructureMetadata instructureField[name=bb_question_type]')).and_return(bbqt)
+  manifest_node.stubs(:at_css).with(('instructureMetadata instructureField[name=bb_question_type]')).returns(bbqt)
 
   qt = nil
   if opts[:question_type]
     qt = {}
-    qt.stub!(:text).and_return(opts[:question_type])
+    qt.stubs(:text).returns(opts[:question_type])
     qt["value"] = opts[:question_type]
   end
-  manifest_node.stub!(:at_css).with(('instructureMetadata instructureField[name=question_type]')).and_return(qt)
+  manifest_node.stubs(:at_css).with(('instructureMetadata instructureField[name=question_type]')).returns(qt)
   
   bb8a = nil
   if opts[:quiz_type]
     bb8a = {}
-    bb8a.stub!(:text).and_return(opts[:quiz_type])
+    bb8a.stubs(:text).returns(opts[:quiz_type])
     bb8a["value"] = opts[:quiz_type]
   end
-  manifest_node.stub!(:at_css).with(('instructureField[name=bb8_assessment_type]')).and_return(bb8a)
+  manifest_node.stubs(:at_css).with(('instructureField[name=bb8_assessment_type]')).returns(bb8a)
   
   manifest_node
 end

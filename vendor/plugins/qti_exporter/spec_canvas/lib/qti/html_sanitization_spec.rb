@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "HTML Sanitization of" do
   describe "question text" do
     it "should sanitize qti v2p1 escaped html" do
@@ -97,5 +97,6 @@ describe "HTML Sanitization of" do
       ]
     end
   end
+end
 end
 

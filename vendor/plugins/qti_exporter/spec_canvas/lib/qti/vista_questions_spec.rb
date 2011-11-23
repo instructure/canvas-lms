@@ -1,13 +1,12 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting Blackboard Vista qti" do
 
   before(:all) do
-    require 'qti_exporter'
     archive_file_path = File.join(BASE_FIXTURE_DIR, 'bb_vista', 'vista_archive.zip')
     unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
     export_folder = File.join(File.dirname(archive_file_path), "qti_vista_archive")
-    @exporter = Qti::QtiExporter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path)
+    @exporter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path)
     @exporter.export
     @exporter.delete_unzipped_archive
     @assessment = @exporter.course[:assessments][:assessments].first
@@ -451,4 +450,5 @@ module VistaExpected
                       :points_possible=>1,
                       :question_bank_name=>"Export Test",
                       :question_name=>"Jumbled Sentence"}
+end
 end

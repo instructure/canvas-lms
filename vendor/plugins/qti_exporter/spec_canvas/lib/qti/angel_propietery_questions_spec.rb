@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting Angel QTI" do
 
   it "should convert multiple_choice" do
@@ -230,4 +230,5 @@ module AngelPropExpected
           :question_text=>"<div>The [l1] brown [l2] jumped over the lazy [l3] .</div>",
           :question_type=>"fill_in_multiple_blanks_question"}
 
+end
 end

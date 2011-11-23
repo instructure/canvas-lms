@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
-
+if Qti.migration_executable
 describe "Converting respondus QTI" do
   it "should convert multiple choice" do
     manifest_node=get_manifest_node('multiple_choice')
@@ -282,4 +282,5 @@ module RespondusExpected
                            {:migration_id=>"QUE_1061", :question_type=>"question_reference"}],
                   :title=>"neutral",
                   :quiz_name=>"neutral"}
+end
 end
