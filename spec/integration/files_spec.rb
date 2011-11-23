@@ -147,9 +147,9 @@ describe FilesController do
       @att = @aq.attachments.create!(:uploaded_data => stub_png_data)
     end
 
-    it "with safefiles" do
+    def do_with_safefiles_test(url)
       HostUrl.stubs(:file_host).returns('files-test.host')
-      get "http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}"
+      get url
       response.should be_redirect
       uri = URI.parse response['Location']
       qs = Rack::Utils.parse_nested_query(uri.query)
@@ -167,13 +167,33 @@ describe FilesController do
       controller.instance_variable_get(:@current_user).should be_nil
     end
 
-    it "without safefiles" do
+    context "with safefiles" do
+      it "with new url style" do
+        do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}")
+      end
+      
+      it "with old url style" do
+        do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/download?verifier=#{@att.uuid}")
+      end
+    end
+
+    def do_without_safefiles_test(url)
       HostUrl.stubs(:file_host).returns('test.host')
-      get "http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}"
+      get url
       response.should be_success
       response.content_type.should == 'image/png'
       response['Pragma'].should be_nil
       response['Cache-Control'].should_not match(/no-cache/)
+    end
+
+    context "without safefiles" do
+      it "with new url style" do
+        do_without_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}")
+      end
+      
+      it "with old url style" do
+        do_without_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/download?verifier=#{@att.uuid}")
+      end
     end
   end
 
