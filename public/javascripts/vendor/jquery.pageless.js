@@ -67,7 +67,6 @@
                    , params: {}
                    , url: location.href
                    , loaderImage: "/images/load.gif"
-                   , animate: true
                    }
       , container
       , $container;
@@ -120,26 +119,9 @@
     
     //
     var loading = function (bool) {
-      isLoading = bool;
-      if (!loader) { return; }
-      if (isLoading) {
-        if (loader.parents().first().is(':visible') && settings.animate) {
-          // visible parent, animate it
-          loader.fadeIn('normal');
-        } else {
-          // invisible parent, just show so it's visible when parent is shown
-          loader.show();
-        }
-      } else {
-        if (loader.parents().first().is(':visible') && settings.animate) {
-          // visible parent, animate it
-          loader.fadeOut('normal');
-        } else {
-          // invisible parent, just hide so it remains invisible when parent is
-          // shown
-          loader.hide();
-        }
-      }
+      (isLoading = bool)
+      ? (loader && loader.fadeIn('normal'))
+      : (loader && loader.fadeOut('normal'));
     };
     
     // distance to end of the container

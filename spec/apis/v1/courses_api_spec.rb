@@ -258,16 +258,6 @@ describe CoursesController, :type => :integration do
     json['sis_course_id'].should == sis_id
   end
 
-  it "should not find courses in other root accounts" do
-    acct = account_model(:name => 'root')
-    acct.add_user(@user)
-    course(:account => acct)
-    @course.update_attribute('sis_source_id', 'OTHER-SIS')
-    raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
-                 :controller => "courses", :action => "show", :id => "sis_course_id:OTHER-SIS", :format => "json")
-    response.status.should == "404 Not Found"
-  end
-
   it "should return the needs_grading_count for all assignments" do
     @group = @course1.assignment_groups.create!({:name => "some group"})
     @assignment = @course1.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)

@@ -1,12 +1,12 @@
 define [
-  'jquery.instructure_misc_plugins'
-  'helpers/loadFixture'
-], (jQuery, loadFixture) ->
+  'js!vendor/jquery-1.6.4.js',
+  'js!jquery.instructure_misc_plugins.js!order'
+], ->
 
   module 'instructure misc plugins'
 
   test 'showIf', ->
-    fixture = loadFixture "jQuery.instructureMiscPlugins"
+    loadFixture "jQuery.instructureMiscPlugins"
     el = jQuery '#checkbox1'
 
     el.showIf(-> true)
@@ -31,10 +31,10 @@ define [
       ok(this.nodeType)
       notEqual(this.constructor, jQuery)
 
-    fixture.remove()
+    removeFixture "jQuery.instructureMiscPlugins"
 
   test 'disableIf', ->
-    fixture = loadFixture "jQuery.instructureMiscPlugins"
+    loadFixture "jQuery.instructureMiscPlugins"
     el = jQuery '#checkbox1'
 
     el.disableIf(-> true)
@@ -56,4 +56,4 @@ define [
     equal(el.disableIf(true), el)
     equal(el.disableIf(false), el)
 
-    fixture.remove()
+    removeFixture "jQuery.instructureMiscPlugins"

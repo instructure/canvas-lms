@@ -7,17 +7,16 @@ js!requires:
 
 define 'compiled/widget/CustomList', [
   'compiled/util/objectCollection'
-  'jst/courseList/wrapper'
-  'jst/courseList/content'
-], (objectCollection, wrapper, content) ->
+  'compiled/Template'
+], (objectCollection, Template) ->
 
   class CustomList
     options:
       animationDuration: 200
       model: 'Course'
       dataAttribute: 'id'
-      wrapper: wrapper
-      content: content
+      wrapper: 'courseList/wrapper'
+      content: 'courseList/content'
       url: '/favorites'
       appendTarget: 'body',
       resetCount: 12
@@ -28,9 +27,9 @@ define 'compiled/widget/CustomList', [
       @appendTarget     = jQuery @options.appendTarget
       @element          = jQuery selector
       @targetList       = @element.find '> ul'
-      @wrapper          = jQuery @options.wrapper({})
+      @wrapper          = jQuery Template @options.wrapper, {}
       @sourceList       = @wrapper.find '> ul'
-      @contentTemplate  = @options.content
+      @contentTemplate  = new Template @options.content
       @ghost            = jQuery('<ul/>').addClass('customListGhost')
       @requests         = { add: {}, remove: {} }
       @doc              = jQuery document.body
@@ -124,7 +123,7 @@ define 'compiled/widget/CustomList', [
 
     resetList: ->
       defaultItems = @items.slice 0, @options.resetCount
-      html = @contentTemplate items: defaultItems
+      html = @contentTemplate.toHTML { items: defaultItems }
       @targetList.empty().html(html)
       @setPinned()
 
@@ -187,7 +186,7 @@ define 'compiled/widget/CustomList', [
     setItems: (items) ->
       @items  = objectCollection items
       @items.sortBy 'shortName'
-      html    = @contentTemplate items: @items
+      html    = @contentTemplate.toHTML items: @items
       @sourceList.html html
       @setPinned()
 

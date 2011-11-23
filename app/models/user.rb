@@ -1175,7 +1175,6 @@ class User < ActiveRecord::Base
     if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
       memberships += account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
     end
-    return ["urn:lti:sysrole:ims/lis/None"] if memberships.empty?
     memberships.map{|membership|
       case membership
       when StudentEnrollment
@@ -2100,13 +2099,5 @@ class User < ActiveRecord::Base
   def section_for_course(course)
     enrollment = course.student_enrollments.active.for_user(self).first
     enrollment && enrollment.course_section
-  end
-
-  def group_member_json(context)
-    h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
-    if context && context.is_a?(Course) && (section = self.section_for_course(context))
-      h = h.merge(:section_id => section.id, :section_code => section.section_code)
-    end
-    h
   end
 end

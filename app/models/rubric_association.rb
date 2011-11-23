@@ -21,7 +21,6 @@
 # with this idea, such as assignment submissions.
 # The other purpose of this class is just to make rubrics reusable.
 class RubricAssociation < ActiveRecord::Base
-  attr_accessor :skip_updating_points_possible
   attr_accessible :rubric, :association, :context, :use_for_grading, :title, :description, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
   belongs_to :rubric
   belongs_to :association, :polymorphic => true
@@ -152,7 +151,7 @@ class RubricAssociation < ActiveRecord::Base
   end
   
   def update_assignment_points
-    if self.use_for_grading && !self.skip_updating_points_possible && self.association && self.association.respond_to?(:points_possible=) && self.rubric && self.rubric.points_possible && self.association.points_possible != self.rubric.points_possible
+    if self.use_for_grading && self.association && self.association.respond_to?(:points_possible=) && self.rubric && self.rubric.points_possible && self.association.points_possible != self.rubric.points_possible
       self.association.update_attribute(:points_possible, self.rubric.points_possible) 
     end
   end
@@ -219,7 +218,6 @@ class RubricAssociation < ActiveRecord::Base
     association ||= rubric.associate_with(association_object, context, :use_for_grading => params[:use_for_grading] == "1", :purpose => params[:purpose], :update_if_existing => update_if_existing)
     association.rubric = rubric
     association.context = context
-    association.skip_updating_points_possible = params.delete :skip_updating_points_possible
     association.update_attributes(params)
     association.association = association_object
     # Invite any recipients from the get-go

@@ -1,6 +1,5 @@
-!define('jst/gradebook_uploads_form', ['compiled/handlebars_helpers'], function (Handlebars) {
-  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-  templates['gradebook_uploads_form'] = template(function (Handlebars,depth0,helpers,partials,data) {
+!function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['gradebook_uploads_form'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
   var buffer = "", stack1, stack2, stack3, stack4, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
 
@@ -174,6 +173,4 @@
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n</form>\n";
-  return buffer;});
-  return templates['gradebook_uploads_form'];
-});
+  return buffer;}); }();

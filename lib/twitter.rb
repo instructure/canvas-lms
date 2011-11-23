@@ -37,22 +37,17 @@ module Twitter
   def twitter_generate_token(token, secret)
     OAuth::AccessToken.new(twitter_consumer, token, secret)
   end
-
-  def twitter_get_service_user(access_token)
-    credentials = JSON.parse(access_token.get('/1/account/verify_credentials.json').body)
-    service_user_id = credentials["id"]
-    service_user_name = credentials["screen_name"]
-    return service_user_id, service_user_name
-  end
   
-  def twitter_get_access_token(oauth_request, oauth_verifier)
+  def twitter_get_access_token(oauth_request)
     consumer = twitter_consumer
-    request_token = session.delete(:oauth_twitter_request_token)
-    access_token = request_token.get_access_token(:oauth_verifier => oauth_verifier)
-    service_user_id, service_user_name = twitter_get_service_user(access_token)
+    request_token = OAuth::RequestToken.new(consumer, oauth_request.token, oauth_request.secret)
+    access_token = request_token.get_access_token
+    credentials = JSON.parse(access_token.get('/1/account/verify_credentials.json').body)
     session[:oauth_twitter_access_token_token] = access_token.token
     session[:oauth_twitter_access_token_secret] = access_token.secret
     if oauth_request.user
+      service_user_id = credentials["id"]
+      service_user_name = credentials["screen_name"]
       @twitter_service = UserService.register(
         :service => "twitter", 
         :access_token => access_token, 
@@ -69,8 +64,9 @@ module Twitter
   
   def twitter_request_token_url(return_to)
     consumer = twitter_consumer
-    request_token = consumer.get_request_token(:oauth_callback => oauth_success_url(:service => 'twitter'))
-    session[:oauth_twitter_request_token] = request_token
+    request_token = consumer.get_request_token
+    session[:oauth_twitter_token] = request_token.token
+    session[:oauth_twitter_secret] = request_token.secret
     OauthRequest.create(
       :service => 'twitter',
       :token => request_token.token,
@@ -130,6 +126,7 @@ module Twitter
     twitter_config = Twitter.config
     key ||= twitter_config['api_key']
     secret ||= twitter_config['secret_key']
+    req = request || nil rescue nil
     consumer = OAuth::Consumer.new(key, secret, {
       :site => "http://api.twitter.com",
       :request_token_path => "/oauth/request_token",

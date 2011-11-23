@@ -1,10 +1,10 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  define(['jquery.ajaxJSON', 'i18n', 'compiled/widget/CustomList', 'helpers/simulateClick', 'helpers/loadFixture'], function(_, I18n, CustomList, simulateClick, loadFixture) {
+  define(['js!vendor/jquery-1.6.4.js', 'js!jquery.ajaxJSON.js!order', 'js!i18n.js!order', 'js!vendor/handlebars.vm.js!order', 'js!compiled/handlebars_helpers.js!order', 'js!jst/courseList/wrapper.js!order', 'js!jst/courseList/content.js!order', 'compiled/widget/CustomList'], function(a, b, c, d, e, f, g, CustomList) {
     module('CustomList', {
       setup: function() {
         var index, items;
-        this.fixture = loadFixture('CustomList');
+        loadFixture('CustomList');
         items = window.items = [];
         for (index = 0; index <= 100; index++) {
           items.push({
@@ -15,15 +15,15 @@
             href: "/courses/" + index
           });
         }
-        this.list = new CustomList(this.fixture.find('#customList'), items, {
+        this.list = new CustomList('#customList', items, {
           url: 'fixtures/ok.json',
-          appendTarget: this.fixture.find('#customList')
+          appendTarget: '#customList'
         });
         this.list.open();
-        return this.lis = this.fixture.find('.customListItem');
+        return this.lis = jQuery('.customListItem');
       },
       teardown: function() {
-        return this.fixture.detach();
+        return removeFixture('CustomList');
       }
     });
     test('should open and close', function() {

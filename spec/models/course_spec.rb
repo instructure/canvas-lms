@@ -162,51 +162,6 @@ describe Course do
     course.reload
     course.all_group_categories.count.should == 2
   end
-
-  context "users_not_in_groups" do
-    before :each do
-      @course = course(:active_all => true)
-      @user1 = user_model
-      @user2 = user_model
-      @user3 = user_model
-      @enrollment1 = @course.enroll_user(@user1)
-      @enrollment2 = @course.enroll_user(@user2)
-      @enrollment3 = @course.enroll_user(@user3)
-    end
-
-    it "should not include users through deleted/rejected/completed enrollments" do
-      @enrollment1.destroy
-      @course.users_not_in_groups([]).size.should == 2
-    end
-
-    it "should not include users in one of the groups" do
-      group = @course.groups.create
-      group.add_user(@user1)
-      users = @course.users_not_in_groups([group])
-      users.size.should == 2
-      users.should_not be_include(@user1)
-    end
-
-    it "should include users otherwise" do
-      group = @course.groups.create
-      group.add_user(@user1)
-      users = @course.users_not_in_groups([group])
-      users.should be_include(@user2)
-      users.should be_include(@user3)
-    end
-  end
-
-  it "should order results of paginate_users_not_in_groups by user's sortable name" do
-    @course = course(:active_all => true)
-    @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save
-    @user2 = user_model; @user2.sortable_name = 'bob'; @user2.save
-    @user3 = user_model; @user3.sortable_name = 'richard'; @user3.save
-    @course.enroll_user(@user1)
-    @course.enroll_user(@user2)
-    @course.enroll_user(@user3)
-    users = @course.paginate_users_not_in_groups([], 1)
-    users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
-  end
 end
 
 describe Course, "enroll" do
@@ -326,27 +281,15 @@ describe Course, "gradebook_to_csv" do
     rows[2][-2].should == "100"
   end
   
-  it "should order assignments by due date, assignment_group, position, title" do
+  it "should order assignments by due date" do
     course_with_student(:active_all => true)
-
-    @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by{|a| a.id}
-
-    now = Time.now
-
-    @assignment = @course.assignments.create!(:title => "Some Assignment 01", :points_possible => 10, :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 02", :points_possible => 10, :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 03", :points_possible => 10, :due_at => now + 1.days, :position => 2, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 05", :points_possible => 10, :due_at => now + 4.days, :position => 4, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 04", :points_possible => 10, :due_at => now + 5.days, :position => 5, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 06", :points_possible => 10, :due_at => now + 7.days, :position => 6, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 07", :points_possible => 10, :due_at => now + 6.days, :position => 7, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 08", :points_possible => 10, :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 09", :points_possible => 10, :due_at => now + 8.days, :position => 9, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 10", :points_possible => 10, :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 11", :points_possible => 10, :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 13", :points_possible => 10, :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 12", :points_possible => 10, :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 14", :points_possible => 10, :due_at => nil, :position => 14, :assignment_group => @assignment_group_1)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 1", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 1.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 2.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 3", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 3.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 5", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 4.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 4", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 5.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 6", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 7.days)
+    @assignment = @course.assignments.create!(:title => "Some Assignment 7", :points_possible => 10, :assignment_group => @group, :due_at => Time.now + 6.days)
     @course.recompute_student_scores
     @user.reload
     @course.reload
@@ -359,27 +302,7 @@ describe Course, "gradebook_to_csv" do
     rows[0].each do |column|
       assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Some Assignment/
     end
-    assignments.should == ["Some Assignment 14", "Some Assignment 02", "Some Assignment 03", "Some Assignment 01", "Some Assignment 05", "Some Assignment 04", "Some Assignment 07", "Some Assignment 06", "Some Assignment 09", "Some Assignment 08", "Some Assignment 10", "Some Assignment 11", "Some Assignment 12", "Some Assignment 13"]
-  end
-
-  it "should work for just one assignment" do
-    course_with_student(:active_all => true)
-    now = Time.now
-    @assignment = @course.assignments.create!(:title => "Some Assignment 1", :points_possible => 10, :assignment_group => @group, :due_at => now + 1.days, :position => 3)
-    @assignment = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group, :due_at => now + 1.days, :position => 1)
-    @course.recompute_student_scores
-    @user.reload
-    @course.reload
-
-    csv = @course.gradebook_to_csv :assignment_id => @assignment
-    csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
-    rows.length.should equal(3)
-    assignments = []
-    rows[0].each do |column|
-      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Some Assignment/
-    end
-    assignments.should == ["Some Assignment 2"]
+    assignments.should == ["Some Assignment 1", "Some Assignment 2", "Some Assignment 3", "Some Assignment 5", "Some Assignment 4", "Some Assignment 7", "Some Assignment 6"]
   end
 
   it "should generate csv with final grade if enabled" do
@@ -1139,160 +1062,6 @@ describe Course, 'grade_publishing' do
         "#{teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").id},S4,#{getenroll("S4", "S1").id},active,F,0\n" + 
         "#{teacher.id},T1,#{getsection("S3").id},S3,#{stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,B,85\n" + 
         "#{teacher.id},T1,#{sec4.id},S4,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,A-,90\n"]
-  end
-  
-end
-
-describe Course, 'tabs_available' do
-  it "should not include external tools if not configured for course navigation" do
-    course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-    tool.save!
-    tool.has_course_navigation.should == false
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
-  end
-  
-  it "should include external tools if configured on the course" do
-    course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-    tool.save!
-    tool.has_course_navigation.should == true
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
-  end
-  
-  it "should include external tools if configured on the account" do
-    course_model
-    @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
-    @course.move_to_account(@account.root_account, @account)
-    tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-    tool.save!
-    tool.has_course_navigation.should == true
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
-  end
-  
-  it "should include external tools if configured on the root account" do
-    course_model
-    @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
-    @course.move_to_account(@account.root_account, @account)
-    tool = @account.root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-    tool.save!
-    tool.has_course_navigation.should == true
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
-  end
-  
-  it "should only include admin-only external tools for course admins" do
-    course_model
-    @course.offer
-    @course.is_public = true
-    @course.save!
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'admins'}
-    tool.save!
-    tool.has_course_navigation.should == true
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    @student = user_model
-    @student.register!
-    @course.enroll_student(@student).accept
-    tabs = @course.tabs_available(nil)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
-    tabs = @course.tabs_available(@student)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
-  end
-  
-  it "should not include member-only external tools for unauthenticated users" do
-    course_model
-    @course.offer
-    @course.is_public = true
-    @course.save!
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'members'}
-    tool.save!
-    tool.has_course_navigation.should == true
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    @student = user_model
-    @student.register!
-    @course.enroll_student(@student).accept
-    tabs = @course.tabs_available(nil)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
-    tabs = @course.tabs_available(@student)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    tab = tabs.detect{|t| t[:id] == tool.asset_string }
-    tab[:label].should == tool.settings[:course_navigation][:text]
-    tab[:href].should == :course_external_tool_path
-    tab[:args].should == [@course.id, tool.id]
-  end
-  
-  it "should allow reordering external tool position in course navigation" do
-    course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-    tool.save!
-    tool.has_course_navigation.should == true
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string})
-    @course.save!
-    tabs = @course.tabs_available(@teacher)
-    tabs[1][:id].should == tool.asset_string
-  end
-  
-  it "should not show external tools that are hidden in course navigation" do
-    course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-    tool.save!
-    tool.has_course_navigation.should == true
-    @teacher = user_model
-    @course.enroll_teacher(@teacher).accept
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    
-    @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string, :hidden => true})
-    @course.save!
-    @course = Course.find(@course.id)
-    tabs = @course.tabs_available(@teacher)
-    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
-    
-    tabs = @course.tabs_available(@teacher, :for_reordering => true)
-    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
   end
   
 end

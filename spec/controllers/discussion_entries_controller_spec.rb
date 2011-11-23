@@ -97,22 +97,6 @@ describe DiscussionEntriesController do
       assigns[:entry].attachment.should be_nil
       response.should be_redirect
     end
-
-    it "should create a submission if the topic has an assignment" do
-      course_with_student_logged_in(:active_all => true)
-      assignment_model(:course => @course)
-      course_topic
-      @topic.assignment = @assignment
-      @topic.save
-      @user.submissions.should be_empty
-
-      post 'create', :course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}
-      response.should be_redirect
-
-      @user.reload
-      @user.submissions.size.should == 1
-      @user.submissions.first.submission_type.should == 'discussion_topic'
-    end
   end
   
   describe "PUT 'update'" do

@@ -142,10 +142,6 @@ I18n.scoped 'jobs', (I18n) ->
         q: @query
         update_action: action
 
-      if @grid.getSelectedRows().length < 1
-        alert('No jobs are selected')
-        return
-
       all_jobs = @grid.getSelectedRows().length == @data.length
 
       if all_jobs && action == 'destroy'

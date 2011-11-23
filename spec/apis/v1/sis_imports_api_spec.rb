@@ -22,7 +22,7 @@ describe SisImportsApiController, :type => :integration do
   before do
     @user = user :active_all => true
     user_session @user
-    @account = Account.default
+    @account = Account.create!(:name => UUIDSingleton.instance.generate)
     @account.allow_sis_import = true
     @account.save
     @account.add_user(@user, 'AccountAdmin')

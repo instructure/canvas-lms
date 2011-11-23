@@ -38,15 +38,19 @@
         submission = $.detect(submissions, function() {
           return this.assignment_id === assignment.id;
         });
-        if (submission == null) {
+                if (submission != null) {
+          submission;
+        } else {
           submission = {
             score: null
           };
-        }
+        };
         submission.assignment_group_id = group.id;
-        if ((_ref2 = submission.points_possible) == null) {
+                if ((_ref2 = submission.points_possible) != null) {
+          _ref2;
+        } else {
           submission.points_possible = assignment.points_possible;
-        }
+        };
         data.submission = submission;
         sum.submissions.push(data);
         if (!(ignore_ungraded && (!(submission.score != null) || submission.score === ''))) {

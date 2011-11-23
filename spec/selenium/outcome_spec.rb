@@ -37,25 +37,6 @@ describe "learning outcome test" do
     find_all_with_jquery('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
   end
 
-  it "should allow dragging and dropping outside of the outcomes list without throwing an error" do
-    course_with_teacher_logged_in
-    @context = @course
-
-    get "/courses/#{@course.id}/outcomes"
-    %w{test_group_1 test_group_2}.each do |name|
-      driver.find_element(:css, '.add_outcome_group_link').click
-      driver.find_element(:id, 'learning_outcome_group_title').send_keys name
-      driver.find_element(:css, '#edit_outcome_group_form button.submit_button').click
-      wait_for_ajax_requests
-    end
-
-    draggable = driver.find_element(:css, '.outcome_group .reorder_link')
-    drag_to   = driver.find_element(:css, '#section-tabs')
-    driver.action.drag_and_drop(draggable, drag_to).perform
-
-    driver.execute_script('return INST.errorCount;').should eql 0
-  end
-
   it "should create a rubric" do
     course_with_teacher_logged_in
     @context = @course

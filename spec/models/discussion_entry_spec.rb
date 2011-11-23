@@ -141,43 +141,4 @@ describe DiscussionEntry do
       @sub_entry.grants_right?(@second_user, nil, :update).should eql(false)
     end
   end
-
-  context "update_topic" do
-    before :each do
-      course_with_student(:active_all => true)
-      @course.enroll_student(@user).accept
-      @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
-
-      # get rid of stupid milliseconds, since mysql won't preserve them
-      @original_updated_at = @topic.updated_at = Time.zone.at(1.minute.ago.to_i)
-      @original_last_reply_at = @topic.last_reply_at = Time.zone.at(2.minutes.ago.to_i)
-      @topic.save
-
-      @entry = @topic.discussion_entries.create!(:message => "entry", :user => @user)
-    end
-
-    it "should tickle updated_at on the associated discussion_topic" do
-      @entry.update_topic
-      @topic.reload
-      @topic.updated_at.should_not == @original_updated_at
-    end
-
-    it "should set last_reply_at on the associated discussion_topic given a newer entry" do
-      @new_last_reply_at = @entry.created_at = @original_last_reply_at + 5.minutes
-      @entry.save
-
-      @entry.update_topic
-      @topic.reload
-      @topic.last_reply_at.should == @new_last_reply_at
-    end
-
-    it "should leave last_reply_at on the associated discussion_topic alone given an older entry" do
-      @new_last_reply_at = @entry.created_at = @original_last_reply_at - 5.minutes
-      @entry.save
-
-      @entry.update_topic
-      @topic.reload
-      @topic.last_reply_at.should == @original_last_reply_at
-    end
-  end
 end

@@ -39,8 +39,6 @@ class Submission < ActiveRecord::Base
   serialize :turnitin_data, Hash
   validates_presence_of :assignment_id, :user_id
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  include CustomValidations
-  validates_as_url :url
   
   named_scope :with_comments, :include => [:submission_comments ]
   named_scope :after, lambda{|date|
@@ -207,6 +205,22 @@ class Submission < ActiveRecord::Base
       @full_url = read_attribute(:body)
     else
       @full_url = read_attribute(:url)
+    end
+  end
+
+  validates_each(:url, :allow_nil => true) do |record, attr, value|
+    begin
+      value = value.strip
+      raise ArgumentError if value.empty?
+      uri = URI.parse(value)
+      unless uri.scheme
+        value = "http://#{value}"
+        uri = URI.parse(value)
+      end
+      raise ArgumentError unless %w(http https).include?(uri.scheme)
+      record.url = value
+    rescue URI::InvalidURIError, ArgumentError
+      record.errors.add attr, 'is not a valid URL'
     end
   end
 

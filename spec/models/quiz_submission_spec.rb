@@ -255,38 +255,6 @@ describe QuizSubmission do
       user_answer[:points].should == 0
     end
     
-    it "should not escape user responses in fimb questions" do
-      course_with_student(:active_all => true)
-      q = {:neutral_comments=>"",
-       :position=>1,
-       :question_name=>"Question 1",
-       :correct_comments=>"",
-       :answers=>
-        [{:comments=>"",
-          :blank_id=>"answer1",
-          :weight=>100,
-          :text=>"control",
-          :id=>3950},
-         {:comments=>"",
-          :blank_id=>"answer1",
-          :weight=>100,
-          :text=>"controll",
-          :id=>9177}],
-       :points_possible=>50,
-       :question_type=>"fill_in_multiple_blanks_question",
-       :assessment_question_id=>7903,
-       :name=>"Question 1",
-       :question_text=>
-        "<p><span>Ayo my quality [answer1]</p>",
-       :id=>1,
-       :incorrect_comments=>""}
-
-       user_answer = QuizSubmission.score_question(q, {
-         "question_1_#{AssessmentQuestion.variable_id("answer1")}" => "<>&\""
-       })
-       user_answer[:answer_for_answer1].should == "<>&\""
-    end
-
     it "should not fail if fimb question doesn't have any answers" do
       course_with_student(:active_all => true)
       # @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)

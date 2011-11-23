@@ -17,7 +17,6 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe ContentTag do
   
@@ -87,83 +86,5 @@ describe ContentTag do
     tags = ContentTag.for_context(@course.account)
     tags.should_not be_empty
     tags.any?{ |t| t.id == tag.id }.should be_true
-  end
-  
-  it "should not rename the linked external tool if the tag is renamed" do
-    course
-    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({
-      :type => 'context_external_tool',
-      :title => 'Example',
-      :url => 'http://www.example.com',
-      :new_tab => '0'
-    })
-    @tag.update_asset_name!
-    @tool.reload
-    @tool.name.should == "new tool"
-    @tag.reload
-    @tag.title.should == "Example"
-  end
-    
-  it "should not rename the tag if the linked external tool is renamed" do
-    course
-    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({
-      :type => 'context_external_tool',
-      :title => 'Example',
-      :url => 'http://www.example.com',
-      :new_tab => '0'
-    })
-    ContentTag.update_for(@tool)
-    @tool.reload
-    @tool.name.should == "new tool"
-    @tag.reload
-    @tag.title.should == "Example"
-  end
-
-  it "should rename the linked assignment if the tag is renamed" do
-    course
-    @assignment = @course.assignments.create!(:title => "some assignment")
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({
-      :type => 'assignment',
-      :title => 'some assignment (renamed)',
-      :id => @assignment.id
-    })
-    @tag.update_asset_name!
-    @tag.reload
-    @tag.title.should == 'some assignment (renamed)'
-    @assignment.reload
-    @assignment.title.should == 'some assignment (renamed)'
-  end
-  
-  it "should rename the tag if the linked assignment is renamed" do
-    course
-    @assignment = @course.assignments.create!(:title => "some assignment")
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({
-      :type => 'assignment',
-      :title => 'some assignment',
-      :id => @assignment.id
-    })
-    @tag.reload
-    @tag.title.should == 'some assignment'
-    @assignment.reload
-    @assignment.title.should == 'some assignment'
-    @assignment.title = "some assignment (renamed)"
-    @assignment.save!
-    ContentTag.update_for(@assignment)
-    @tag.reload
-    @tag.title.should == 'some assignment (renamed)'
-    @assignment.reload
-    @assignment.title.should == 'some assignment (renamed)'
-  end
-
-  it_should_behave_like "url validation tests"
-  it "should check url validity" do
-    quiz = course.quizzes.create!
-    test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
   end
 end

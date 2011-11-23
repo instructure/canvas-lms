@@ -1,6 +1,5 @@
-!define('jst/courseList/wrapper', ['compiled/handlebars_helpers'], function (Handlebars) {
-  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-  templates['courseList/wrapper'] = template(function (Handlebars,depth0,helpers,partials,data) {
+!function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['courseList/wrapper'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
   var buffer = "", stack1, stack2, stack3, stack4, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0;
 
@@ -32,6 +31,4 @@
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n  <ul class=\"customListContent menu-item-drop-column-list\"></ul>\n</div>";
-  return buffer;});
-  return templates['courseList/wrapper'];
-});
+  return buffer;}); }();

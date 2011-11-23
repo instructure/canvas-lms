@@ -1,13 +1,21 @@
 define [
-  'jquery.ajaxJSON' #move to CustomList.coffee when ajaxJSON
-  'i18n'
+  # non-amd dependencies, once everything is a module you'll rarely require
+  # more than one thing in a spec
+  'js!vendor/jquery-1.6.4.js'
+  'js!jquery.ajaxJSON.js!order'
+  'js!i18n.js!order'
+  'js!vendor/handlebars.vm.js!order'
+  'js!compiled/handlebars_helpers.js!order'
+  'js!jst/courseList/wrapper.js!order'
+  'js!jst/courseList/content.js!order'
+
+  # module dependencies
   'compiled/widget/CustomList'
-  'helpers/simulateClick'
-  'helpers/loadFixture'
-], (_, I18n, CustomList, simulateClick, loadFixture)->
+], (a, b, c, d, e, f, g, CustomList)->
+
   module 'CustomList',
     setup: ->
-      @fixture = loadFixture 'CustomList'
+      loadFixture 'CustomList'
       items = window.items = []
       for index in [0..100]
         items.push
@@ -17,14 +25,14 @@ define [
           subtitle: "Enrolled as Teacher"
           href: "/courses/#{index}"
 
-      @list = new CustomList @fixture.find('#customList'), items,
+      @list = new CustomList '#customList', items,
         url: 'fixtures/ok.json'
-        appendTarget: @fixture.find('#customList')
+        appendTarget: '#customList'
       @list.open()
-      @lis = @fixture.find('.customListItem')
+      @lis = jQuery '.customListItem'
 
     teardown: ->
-      @fixture.detach()
+      removeFixture('CustomList')
 
   test 'should open and close', ->
     @list.close()

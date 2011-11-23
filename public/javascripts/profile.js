@@ -16,36 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require(['compiled/util/BackoffPoller', 'i18n'], function(BackoffPoller, I18n) {
-  I18n = I18n.scoped('profile');
+I18n.scoped('profile', function(I18n) {
 
+$(function() {
   var $profile_table = $(".profile_table"),
       $update_profile_form = $("#update_profile_form"),
-      $default_email_id = $("#default_email_id"),
-      profile_pics_url = $(".profile_pics_url").attr('href');
-
-  var thumbnailPoller = new BackoffPoller(profile_pics_url, function(data) {
-    var loadedImages = {},
-        $images = $('img.pending'),
-        image,
-        $image,
-        count = 0;
-    for (var i = 0, l = data.length; i < l; i++) {
-      image = data[i];
-      if (!image.pending) loadedImages[image.url] = true;
-    }
-    $images.each(function() {
-      $image = $(this);
-      if (loadedImages[$image.data('eventual_src')]) {
-        $image.removeClass('pending');
-        $image.attr('src', $image.data('eventual_src'));
-        count++;
-      }
-    });
-    if (count === $images.length) return 'stop';
-    if (count > 0) return 'reset';
-    return 'continue';
-  });
+      $default_email_id = $("#default_email_id");
   
   $(".edit_profile_link").click(function(event) {
     $profile_table.addClass('editing')
@@ -342,15 +318,14 @@ require(['compiled/util/BackoffPoller', 'i18n'], function(BackoffPoller, I18n) {
       var attachment = data.attachment;
       if ($span) {
         var $img = $span.find("img");
-        $img.data('eventual_src', '/images/thumbnails/' + attachment.id + '/' + attachment.uuid);
+        $img.removeClass('pending');
+        $img.attr('src', '/images/thumbnails/' + attachment.id + '/' + attachment.uuid);
         $img.attr('data-type', 'attachment');
         $img.attr('alt', attachment.display_name);
         $img[0].onerror = function() {
           $img.attr('src', '/images/dotted_pic.png');
         }
-        thumbnailPoller.start().then(function() {
-          $img.click();
-        });
+        $img.click();
       }
     },
     error: function(data, $span) {
@@ -399,23 +374,15 @@ require(['compiled/util/BackoffPoller', 'i18n'], function(BackoffPoller, I18n) {
     }
     if(!$dialog.hasClass('loaded')) {
       $dialog.find(".profile_pic_list h3").text(I18n.t('headers.loading_images', "Loading Images..."));
-      $.ajaxJSON(profile_pics_url, 'GET', {}, function(data) {
+      $.ajaxJSON($(".profile_pics_url").attr('href'), 'GET', {}, function(data) {
         if(data && data.length > 0) {
           $dialog.addClass('loaded')
           $dialog.find(".profile_pic_list h3").remove();
-          var pollThumbnails = false;
           for(var idx in data) {
             var image = data[idx];
             var $span = $("<span class='img'><img/></span>");
             $img = $span.find("img");
-            if (image.pending) {
-              $img.addClass('pending');
-              $img.attr('src', '/images/ajax-loader.gif');
-              $img.data('eventual_src', image.url);
-              pollThumbnails = true;
-            } else {
-              $img.attr('src', image.url);
-            }
+            $img.attr('src', image.url);
             $img.attr('alt', image.alt || image.type);
             $img.attr('title', image.alt || image.type);
             $img.attr('data-type', image.type);
@@ -424,7 +391,6 @@ require(['compiled/util/BackoffPoller', 'i18n'], function(BackoffPoller, I18n) {
             }
             $dialog.find(".profile_pic_list div").before($span);
           }
-          if (pollThumbnails) thumbnailPoller.start();
         } else {
           $dialog.find(".profile_pic_list h3").text(I18n.t('errors.loading_images_failed', "Loading Images Failed, please try again"));
         }
@@ -453,3 +419,5 @@ require(['compiled/util/BackoffPoller', 'i18n'], function(BackoffPoller, I18n) {
   };
   setTimeout(checkImage, 500);
 });
+
+})

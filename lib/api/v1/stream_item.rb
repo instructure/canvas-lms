@@ -19,8 +19,8 @@
 module Api::V1::StreamItem
   include Api::V1::Context
 
-  def stream_item_json(stream_item, viewing_user_id)
-    data = stream_item.stream_data(viewing_user_id)
+  def stream_item_json(stream_item)
+    data = stream_item.data
     {}.tap do |hash|
 
       # generic attributes common to all stream item types
@@ -41,8 +41,6 @@ module Api::V1::StreamItem
           hash['announcement_id'] = data.id
         end
         hash['total_root_discussion_entries'] = data.total_root_discussion_entries
-        hash['require_initial_post'] = data.require_initial_post
-        hash['user_has_posted'] = data.user_has_posted
         hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,3].map do |entry|
           {
             'user' => {

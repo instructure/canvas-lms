@@ -81,10 +81,7 @@ shared_examples_for "profile selenium tests" do
     dialog.find_element(:css, 'button[type="submit"]').click
     spans = dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img")
     spans.length.should == 3
-    new_image = spans.last.find_element(:css, 'img')
-    new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
     keep_trying_until { spans.last.attribute('class') =~ /selected/ }
-    new_image.attribute('src').should =~ %r{/images/thumbnails/}
     dialog.find_element(:css, 'button.select_button').click
     keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
     
@@ -104,6 +101,6 @@ shared_examples_for "profile selenium tests" do
 
 end
 
-describe "profile Windows-Firefox-Tests" do
+describe "course Windows-Firefox-Tests" do
   it_should_behave_like "profile selenium tests"
 end

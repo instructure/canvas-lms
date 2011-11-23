@@ -18,7 +18,7 @@
 
 var rubricEditing = {
   htmlBody: null,
-
+  
   updateCriteria: function($rubric) {
     $rubric.find(".criterion:not(.blank)").each(function(i) {
       $(this).attr('id', 'criterion_' + (i + 1));
@@ -174,7 +174,7 @@ var rubricEditing = {
     $criterion.find(".criterion_description").find(".container").show();
     rubricEditing.sizeRatings($criterion);
   },
-
+  
   originalSizeRatings: function() {
     var $visibleCriteria = $(".rubric:not(.rubric_summary) .criterion:visible");
     if ($visibleCriteria.length) {
@@ -189,13 +189,13 @@ var rubricEditing = {
                 $this.find(".criterion_description .container").height()
               );
           // the -10 here is the padding on the .container.
-          $ratingsContainers.css('height', (maxHeight - 10) + 'px');
+          $ratingsContainers.css('height', (maxHeight - 10) + 'px');        
         }
       });
-      rubricEditing.htmlBody.scrollTop(scrollTop);
+      rubricEditing.htmlBody.scrollTop(scrollTop); 
     }
   },
-
+  
   rubricData: function($rubric) {
     $rubric = $rubric.filter(":first");
     if(!$rubric.hasClass('editing')) {
@@ -352,9 +352,9 @@ $(document).ready(function() {
   var limitToOneRubric = true;
   var $rubric_dialog = $("#rubric_dialog"),
       $rubric_long_description_dialog = $("#rubric_long_description_dialog");
-
+  
   rubricEditing.htmlBody = $('html,body');
-
+      
   $("#rubrics")
   .delegate(".long_description_link", 'click', function(event) {
     event.preventDefault();
@@ -375,7 +375,7 @@ $(document).ready(function() {
         width: 400
       }).dialog('open')
       .find("textarea:visible:first").focus().select();
-
+    
   })
   .delegate(".find_rubric_link", 'click', function(event) {
     event.preventDefault();
@@ -418,15 +418,15 @@ $(document).ready(function() {
   })
   .delegate(".edit_rubric_link", 'click', function(event) {
     var $this = $(this);
-    if (
-      !$this.hasClass('copy_edit')  ||
+    if ( 
+      !$this.hasClass('copy_edit')  || 
       confirm(I18n.t('prompts.read_only_rubric', "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric.  Continue anyway?"))
     ) {
       rubricEditing.editRubric($this.parents(".rubric"), $this.attr('href')); //.hide().after($rubric.show());
     }
     return false;
   });
-
+  
   // cant use delegate because events bound to a .delegate wont get triggered when you do .triggerHandler('click') because it wont bubble up.
   $(".rubric .delete_rubric_link").bind('click', function(event, callback) {
     event.preventDefault();
@@ -434,7 +434,7 @@ $(document).ready(function() {
     if(callback && callback.confirmationMessage) {
       message = callback.confirmationMessage;
     }
-    $(this).parents(".rubric").confirmDelete({
+    $(this).parents(".rubric").confirmDelete({ 
       url: $(this).attr('href'),
       message: message,
       success: function() {
@@ -447,7 +447,7 @@ $(document).ready(function() {
       }
     });
   });
-
+  
   $rubric_long_description_dialog.find(".save_button").click(function() {
     var long_description = $rubric_long_description_dialog.find("textarea.long_description").val(),
         $criterion       = $rubric_long_description_dialog.data('current_criterion');
@@ -461,7 +461,7 @@ $(document).ready(function() {
   $rubric_long_description_dialog.find(".cancel_button").click(function() {
     $rubric_long_description_dialog.dialog('close');
   });
-
+  
   $(".add_rubric_link").click(function(event) {
     event.preventDefault();
     if($("#rubric_new").length > 0) { return; }
@@ -585,7 +585,7 @@ $(document).ready(function() {
       $rubric_dialog.loadingImage('remove');
     });
   });
-
+  
   $rubric_dialog.find(".cancel_find_rubric_link").click(function(event) {
     event.preventDefault();
     $rubric_dialog.dialog('close');
@@ -595,8 +595,6 @@ $(document).ready(function() {
     $(this).parents(".rubric_brief").find(".expand_data_link,.collapse_data_link").toggle().end()
       .find(".details").slideToggle();
   });
-  var forceSubmit = false,
-      skip_points_update = false;
   $("#edit_rubric_form").formSubmit({
     processData: function(data) {
       var $rubric = $(this).parents(".rubric");
@@ -605,40 +603,14 @@ $(document).ready(function() {
       if(data['rubric_association[use_for_grading]'] == '1') {
         var assignment_points = parseFloat($("#full_assignment .points_possible").text());
         var rubric_points = parseFloat(data.points_possible);
-        if(assignment_points && rubric_points != assignment_points && !forceSubmit) {
-          var assignment_title = $.trim($("#full_assignment .title").text());
-          var $confirm_dialog = $('<p />')
-            .text(I18n.t('prompts.update_assignment_points', "%{assignment_title} has %{assignment_points} points possible, " +
-                  "would you like to change it to have %{rubric_points} points possible to match this rubric?",
-                  {'assignment_points':assignment_points, 'assignment_title':assignment_title,'rubric_points':rubric_points} ))
-            .dialog({
-              buttons: {
-                "Change" : function(){
-                  forceSubmit = true;
-                  skip_points_update = false;
-                  $confirm_dialog.remove();
-                  $("#edit_rubric_form").submit();
-                },
-                "Leave different" : function(){
-                  forceSubmit = true;
-                  skip_points_update = true;
-                  $confirm_dialog.remove();
-                  $("#edit_rubric_form").submit();
-                }
-              },
-              width: 320,
-              resizable: false,
-              title: I18n.t('titles.update_assignment_points', "Change points possible to match rubric?"),
-              close: function(){
-                $confirm_dialog.remove();
-              }
-            });
-          return false;
+        if(assignment_points && rubric_points != assignment_points) {
+          var result = confirm(I18n.t('prompts.update_assignment_points', "The points total does not match the assignment's points.  Do you want to change the assignment's points to match the rubric score?"));
+          if(result) {
+          } else {
+            return false;
+          }
         }
       }
-      data.skip_updating_points_possible = skip_points_update;
-      skip_points_update = false;
-      forceSubmit = false;
       return data;
     },
     beforeSubmit: function(data) {
@@ -665,7 +637,7 @@ $(document).ready(function() {
         rubric.permissions.delete_association = data.rubric_association.permissions['delete'];
       }
       rubricEditing.updateRubric($rubric, rubric);
-      if(data.rubric_association && data.rubric_association.use_for_grading && !data.rubric_association.skip_updating_points_possible) {
+      if(data.rubric_association && data.rubric_association.use_for_grading) {
         $("#full_assignment .points_possible").text(rubric.points_possible);
         $("#full_assignment input.points_possible").val(rubric.points_possible);
       }
@@ -775,7 +747,7 @@ $(document).ready(function() {
     });
   }).delegate('.add_column', 'click', function(event) {
     var $this = $(this),
-        $rubric = $this.parents(".rubric");
+        $rubric = $this.parents(".rubric"); 
     if($rubric.hasClass('editing')){
       var $td = $this.clone(true).removeClass('edge_rating'),
           pts = parseFloat($this.find(".points").text()),
@@ -807,7 +779,7 @@ $(document).ready(function() {
       }
       rubricEditing.hideCriterionAdd($rubric);
       rubricEditing.updateCriterionPoints($criterion);
-      rubricEditing.sizeRatings($criterion);
+      rubricEditing.sizeRatings($criterion); 
     }
     return false;
   });

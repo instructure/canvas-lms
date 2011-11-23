@@ -1,11 +1,3 @@
-# In order to consume encrypted SAML assertions, you'll need to create
-# a public/private keypair:
-# 
-# openssl req -new -newkey rsa:1024 -days 730 -nodes -x509 -keyout samlkey.pem -out samlcert.pem
-# 
-# You will also need to have the xmlsec1 binary installed somewhere. Otherwise,
-# encrypted assertions will not be available in this Canvas' SAML integrations.
-
 production:
   entity_id: "http://www.your-domain.com/saml2"
   tech_contact_name: "Administrator"
@@ -15,10 +7,6 @@ development:
   entity_id: "http://www.your-domain.com/saml2"
   tech_contact_name: "Administrator"
   tech_contact_email: "info@your-domain.com"
-  encryption:
-    xmlsec_binary: /usr/local/bin/xmlsec1
-    private_key: /path/to/samlkey.pem
-    certificate: /path/to/samlcert.pem
      
 test:
   entity_id: "http://www.your-domain.com/saml2"

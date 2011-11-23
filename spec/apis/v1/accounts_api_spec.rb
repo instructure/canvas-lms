@@ -63,23 +63,18 @@ describe "Accounts API", :type => :integration do
         'parent_account_id' => nil,
         'sis_account_id' => nil,
       }
-  end
 
-  it "should find accounts by sis in only this root account" do
-    Account.default.add_user(@user)
-    other_sub = account_model(:name => 'other_sub', :parent_account => Account.default, :sis_source_id => 'sis1')
-    other_sub.add_user(@user)
-
-    # this is scoped to Account.default
+    # by sis id
     json = api_call(:get, "/api/v1/accounts/sis_account_id:sis1",
                     { :controller => 'accounts', :action => 'show', :id => "sis_account_id:sis1", :format => 'json' })
-    json['id'].should == other_sub.id
-
-    # we shouldn't find the account in the other root account by sis
-    other_sub.update_attribute(:sis_source_id, 'sis2')
-    raw_api_call(:get, "/api/v1/accounts/sis_account_id:sis1",
-                    { :controller => 'accounts', :action => 'show', :id => "sis_account_id:sis1", :format => 'json' })
-    response.status.should == "404 Not Found"
+    json.should ==
+      {
+        'id' => @a2.id,
+        'name' => 'subby',
+        'root_account_id' => @a1.id,
+        'parent_account_id' => @a1.id,
+        'sis_account_id' => 'sis1',
+      }
   end
 
   it "should return courses for an account" do

@@ -1,11 +1,10 @@
-!define('jst/mute_dialog', ['compiled/handlebars_helpers'], function (Handlebars) {
-  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-  templates['mute_dialog'] = template(function (Handlebars,depth0,helpers,partials,data) {
+!function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['mute_dialog'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
   var buffer = "", stack1, stack2, stack3, stack4, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0;
 
 
-  buffer += "<div title=\"";
+  buffer += "<div style=\"display: none; width: 400px;\" title=\"";
   stack1 = "Mute Assignment";
   stack2 = "mute_assignment";
   stack3 = {};
@@ -110,6 +109,4 @@
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n  </p>\n</div>";
-  return buffer;});
-  return templates['mute_dialog'];
-});
+  return buffer;}); }()

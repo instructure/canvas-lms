@@ -129,6 +129,23 @@ describe CoursesController do
       assert_unauthorized
     end
     
+    # No longer allowing session storage for permission definitions
+    # it "should allow access if the course uuid id known" do
+      # course
+      # get 'show', :id => @course.id, :verification => @course.uuid
+      # session[:claim_course_uuid].should eql(@course.uuid)
+      # assigns[:context].should eql(@course)
+      # response.should be_success
+    # end
+    
+    # it "should allow access if the course uuid is held in the session" do
+      # course
+      # session[:course_uuid] = @course.uuid
+      # get 'show', :id => @course.id
+      # assigns[:context].should eql(@course)
+      # response.should be_success
+    # end
+    
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       get 'show', :id => @course.id
@@ -153,71 +170,6 @@ describe CoursesController do
       get 'show', :id => @course.id
       response.status.should == '401 Unauthorized'
       assigns[:unauthorized_message].should_not be_nil
-    end
-    
-    context "show feedback for the current course only on course front page" do
-      before(:each) do
-        course_with_student_logged_in(:active_all => true)
-        @course1 = @course
-        course_with_teacher(:course => @course1)
-        
-        course_with_student_logged_in(:active_all => true, :user => @student)
-        @course2 = @course
-        course_with_teacher(:course => @course1, :user => @teacher)
-        
-        @a1 = @course1.assignments.new(:title => "some assignment course 1")
-        @a1.workflow_state = "published"
-        @a1.save
-        @s1 = @a1.submit_homework(@student)
-        @c1 = @s1.add_comment(:author => @teacher, :comment => "some comment1")
-        
-        @a2 = @course2.assignments.new(:title => "some assignment course 2")
-        @a2.workflow_state = "published"
-        @a2.save
-        @s2 = @a2.submit_homework(@student)
-        @c2 = @s2.add_comment(:author => @teacher, :comment => "some comment2")
-      end
-      
-      it "should work for module view" do 
-        @course1.default_view = "modules"
-        @course1.save
-        get 'show', :id => @course1.id
-        assigns(:recent_feedback).count.should == 1
-        assigns(:recent_feedback).first.assignment_id.should == @a1.id
-      end
-      
-      it "should work for assignments view" do 
-        @course1.default_view = "assignments"
-        @course1.save
-        get 'show', :id => @course1.id
-        assigns(:recent_feedback).count.should == 1
-        assigns(:recent_feedback).first.assignment_id.should == @a1.id
-      end
-      
-      it "should work for wiki view" do 
-        @course1.default_view = "wiki"
-        @course1.save
-        get 'show', :id => @course1.id
-        assigns(:recent_feedback).count.should == 1
-        assigns(:recent_feedback).first.assignment_id.should == @a1.id
-      end
-      
-      it "should work for syllabus view" do 
-        @course1.default_view = "syllabus"
-        @course1.save
-        get 'show', :id => @course1.id
-        assigns(:recent_feedback).count.should == 1
-        assigns(:recent_feedback).first.assignment_id.should == @a1.id
-      end
-      
-      it "should work for feed view" do 
-        @course1.default_view = "feed"
-        @course1.save
-        get 'show', :id => @course1.id
-        assigns(:recent_feedback).count.should == 1
-        assigns(:recent_feedback).first.assignment_id.should == @a1.id
-      end
-      
     end
 
     context "invitations" do

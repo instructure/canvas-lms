@@ -548,27 +548,6 @@ describe "Canvas Cartridge importing" do
     page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png">/, 'png" />')
   end
   
-  it "should import migrate inline external tool URLs in wiki pages" do
-    # make sure that the wiki page we're linking to in the test below exists
-    page = @copy_from.wiki.wiki_pages.create!(:title => "blti-link", :body => "<a href='/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape('http://www.example.com')}'>link</a>")
-    @copy_from.save!
-    
-    #export to html file
-    migration_id = CC::CCHelper.create_key(page)
-    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, migration_id)
-    #convert to json
-    doc = Nokogiri::HTML(exported_html)
-    hash = @converter.convert_wiki(doc, 'blti-link')
-    hash = hash.with_indifferent_access
-    #import into new course
-    WikiPage.import_from_migration(hash, @copy_to)
-    
-    page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
-    page_2.title.should == page.title
-    page_2.url.should == page.url
-    page_2.body.should match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
-  end
-  
   it "should import assignments" do 
     body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
 <div>

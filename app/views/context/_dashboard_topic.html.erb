@@ -24,7 +24,7 @@
     <div class="message_short user_content"><%= truncate_html(user_content(topic.try_rescue(:message)) || nbsp, :max_length => 250, :link => link_to(t('read_more', "more"), "#{context_prefix(context_code)}/discussion_topics/#{topic ? topic.id : '{{ id }}'}", :class => "read_more_link")) %></div>
     <% end %>
     <div class="message user_content" style="<%= hidden if topic && topic.message && topic.message.length > 250 %>"><%= user_content(topic.try_rescue(:message)) || nbsp %></div>
-    <% if topic && topic.root_discussion_entries.present? %>
+    <% if topic && !topic.root_discussion_entries.empty? %>
       <div class="original_post_date">
         <%= t :post_date, "posted *%{post_date}*", :post_date => datetime_string(topic.try_rescue(:created_at)) || nbsp, :wrapper => '<span class="post_date time_ago_date">\1</span>' %>
       </div>
@@ -54,35 +54,30 @@
     <div class="clear"></div>
     <div class="subcontent">
       <% entries = topic.try_rescue(:root_discussion_entries) || [] %>
-      <% if topic.require_initial_post && !topic.user_has_posted %>
-        <p class="initial_post_required"><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></p>
-      <% else %>
-        <% entry_count = topic.try_rescue(:total_root_discussion_entries) || entries.length %>
-        <% link_text = t('links.show_more_entries', { :one => "Show 1 More Entry", :other => "Show %{count} More Entries" }, :count => (entries.length - 2)) %>
-        <div class="communication_sub_message" style="<%= hidden unless entries.length > 3 %>">
-          <div class="content behavior_content">
-            <% if entry_count > 10 %>
-              <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="_show_sub_messages_link"><%= link_text %></a>
-            <% else %>
-              <a href="#" class="show_sub_messages_link"><%= link_text %></a>
-            <% end %>
-          </div>
+      <% entry_count = topic.try_rescue(:total_root_discussion_entries) || entries.length %>
+      <% link_text = t('links.show_more_entries', { :one => "Show 1 More Entry", :other => "Show %{count} More Entries" }, :count => (entries.length - 2)) %>
+      <div class="communication_sub_message" style="<%= hidden unless entries.length > 3 %>">
+        <div class="content behavior_content">
+          <% if entry_count > 10 %>
+            <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="_show_sub_messages_link"><%= link_text %></a>
+          <% else %>
+            <a href="#" class="show_sub_messages_link"><%= link_text %></a>
+          <% end %>
         </div>
-        <% entries.each_with_index do |entry, idx| %>
-          <%= render :partial => "context/dashboard_topic_entry", :object => entry, :locals => {:show_context => show_context, :context_code => context_code, :hide_entry => entries.length > 3 && idx < entries.length - 2} %>
-        <% end %>
+      </div>
+      <% entries.each_with_index do |entry, idx| %>
+        <%= render :partial => "context/dashboard_topic_entry", :object => entry, :locals => {:show_context => show_context, :context_code => context_code, :hide_entry => entries.length > 3 && idx < entries.length - 2} %>
       <% end %>
-      
       <% if !topic || can_do(topic, @current_user, :reply) %>
-        <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if entries.empty? %>">
-          <div class="content behavior_content">
-            <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="add_entry_link textarea"><%= t('links.add_comment', %{Add a Comment...}) %></a>
-            <div class="less_important">
-              <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>"><%= t('links.view_topic', %{View Entire Topic}) %></a>
-            </div>
+      <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if entries.empty? %>">
+        <div class="content behavior_content">
+          <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="add_entry_link textarea"><%= t('links.add_comment', %{Add a Comment...}) %></a>
+          <div class="less_important">
+            <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>"><%= t('links.view_topic', %{View Entire Topic}) %></a>
           </div>
         </div>
-        <%= render :partial => "context/dashboard_topic_entry", :object => nil, :locals => {:contextless => contextless, :context_code => context_code, :topic => topic} %>
+      </div>
+      <%= render :partial => "context/dashboard_topic_entry", :object => nil, :locals => {:contextless => contextless, :context_code => context_code, :topic => topic} %>
       <% end %>
     </div>
     <div class="clear"></div>
