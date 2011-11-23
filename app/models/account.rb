@@ -296,17 +296,26 @@ class Account < ActiveRecord::Base
     @cached_fast_all_users ||= {}
     @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, users.name, users.sortable_name")
   end
+
+  def users_not_in_groups_sql(groups, opts={})
+    ["SELECT u.id, u.name
+        FROM users u
+       INNER JOIN user_account_associations uaa on uaa.user_id = u.id
+       WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
+             #{"AND NOT EXISTS (SELECT *
+                                  FROM group_memberships gm
+                                 WHERE gm.user_id = u.id AND
+                                       gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
+       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
+  end
+
+  def users_not_in_groups(groups)
+    User.find_by_sql(users_not_in_groups_sql(groups))
+  end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(["SELECT u.id, u.name 
-                             FROM users u
-                            INNER JOIN user_account_associations uaa on uaa.user_id = u.id
-                            WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
-                                  #{"AND NOT EXISTS (SELECT *
-                                                       FROM group_memberships gm
-                                                      WHERE gm.user_id = u.id AND
-                                                            gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-                            ORDER BY #{User.sortable_name_order_by_clause('u')} ASC", self.id], :page => page, :per_page => per_page)
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')} ASC"),
+                         :page => page, :per_page => per_page)
   end
 
   def courses_name_like(query="", opts={})
@@ -837,6 +846,20 @@ class Account < ActiveRecord::Base
   TAB_GRADING_STANDARDS = 12
   TAB_QUESTION_BANKS = 13
 
+  def external_tool_tabs(opts)
+    tools = ContextExternalTool.find_all_for(self, :account_navigation)
+    tools.sort_by(&:id).map do |tool|
+     {
+        :id => tool.asset_string,
+        :label => tool.label_for(:account_navigation, opts[:language]),
+        :css_class => tool.asset_string,
+        :href => :account_external_tool_path,
+        :external => true,
+        :args => [self.id, tool.id]
+     }
+    end
+  end
+  
   def tabs_available(user=nil, opts={})
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
@@ -860,6 +883,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
       tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
     end
+    tabs += external_tool_tabs(opts)
     tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }
     tabs
   end

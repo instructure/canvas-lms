@@ -115,6 +115,66 @@ describe DiscussionTopicsController do
       get 'show', :course_id => @course.id, :id => @topic.id
       assigns[:groups].size.should eql(2)
     end
+    
+    context "posting first to view setting" do
+      before(:each) do
+        course_with_student(:active_all => true)
+        
+        @observer = user(:name => "Observer", :active_all => true)
+        e = @course.enroll_user(@observer, 'ObserverEnrollment')
+        e.associated_user = @student
+        e.save
+        @observer.reload
+        
+        course_with_teacher(:course => @course, :active_all => true)
+        @context = @course
+        discussion_topic_model
+        @topic.require_initial_post = true
+        @topic.save
+      end
+      
+      it "should allow admins to see posts without posting" do
+        @topic.reply_from(:user => @student, :text => 'hai')
+        user_session(@teacher)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        assigns[:initial_post_required].should be_nil
+        assigns[:entries].length.should == 1
+      end
+      
+      it "shouldn't allow student who hasn't posted to see" do
+        @topic.reply_from(:user => @teacher, :text => 'hai')
+        user_session(@student)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        assigns[:initial_post_required].should be_true
+        assigns[:entries].should be_empty
+      end
+      
+      it "shouldn't allow student's observer who hasn't posted to see" do
+        @topic.reply_from(:user => @teacher, :text => 'hai')
+        user_session(@observer)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        assigns[:initial_post_required].should be_true
+        assigns[:entries].should be_empty
+      end
+      
+      it "should allow student who has posted to see" do 
+        @topic.reply_from(:user => @student, :text => 'hai')
+        user_session(@student)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        assigns[:initial_post_required].should be_nil
+        assigns[:entries].length.should == 1
+      end
+      
+      it "should allow student's observer who has posted to see" do 
+        @topic.reply_from(:user => @student, :text => 'hai')
+        user_session(@observer)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        assigns[:initial_post_required].should be_nil
+        assigns[:entries].length.should == 1
+      end
+      
+    end
+    
   end
   
   describe "POST 'create'" do

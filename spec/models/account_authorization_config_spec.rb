@@ -34,6 +34,28 @@ describe AccountAuthorizationConfig do
     config.change_password_url.should be_nil
   end
   
+  context "SAML settings" do
+    it "should load encryption settings" do
+      file_that_exists = File.expand_path(__FILE__)
+      Setting.set_config('saml', {
+        :entity_id => 'http://www.example.com/saml2',
+        :tech_contact_name => 'Admin Dude',
+        :tech_contact_email => 'admindude@example.com',
+        :encryption => {
+          :xmlsec_binary => file_that_exists,
+          :private_key => file_that_exists,
+          :certificate => file_that_exists
+        }
+      })
+      
+      @account = Account.new
+      config = @account.account_authorization_configs.build(:auth_type => 'saml')
+      
+      s = config.saml_settings
+      s.encryption_configured?.should be_true
+    end
+  end
+  
   context "password" do
     it "should decrypt the password to the original value" do
       c = AccountAuthorizationConfig.new

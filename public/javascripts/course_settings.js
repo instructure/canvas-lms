@@ -194,9 +194,11 @@ I18n.scoped('course_settings', function(I18n) {
       function tab_id_from_el(el) {
         var tab_id_str = $(el).attr("id");
         if (tab_id_str) {
-          var comps = tab_id_str.split('_');
-          if (comps.length > 0) {
-            tab_id = parseInt(comps.pop(), 10);
+          var tab_id = tab_id_str.replace(/^nav_edit_tab_id_/, '');
+          if (tab_id.length > 0) {
+            if(!tab_id.match(/context/)) {
+              tab_id = parseInt(tab_id, 10);
+            }
             return tab_id;
           }
         }

@@ -264,6 +264,70 @@ describe "assignment selenium tests" do
     driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
   end
 
+  describe "external tool assignments" do
+    before do
+      course_with_teacher_logged_in
+      @t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool1", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
+      @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
+    end
+
+    it "should allow creating" do
+      get "/courses/#{@course.id}/assignments"
+
+      #create assignment
+      option_value = find_option_value(:css, '#right-side select.assignment_groups_select', 'Assignments')
+      driver.find_element(:css, '#right-side select.assignment_groups_select > option[value="'+option_value+'"]').click
+      driver.find_element(:css, '.add_assignment_link').click
+      driver.find_element(:id, 'assignment_title').send_keys('test1')
+      driver.find_element(:css, '.ui-datepicker-trigger').click
+      datepicker = datepicker_next
+      datepicker.find_element(:css, '.ui-datepicker-ok').click
+      driver.find_element(:id, 'assignment_points_possible').send_keys('5')
+      option_value = find_option_value(:css, '.assignment_submission_types', 'External Tool')
+      driver.find_element(:css, '.assignment_submission_types > option[value="'+option_value+'"]').click
+      driver.find_element(:css, '.more_options_link').click
+      keep_trying_until {
+        driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].click
+      }
+      driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
+      driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[1].click
+      driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
+      driver.find_element(:css, '#select_context_content_dialog .add_item_button').click
+      driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t2.url
+      driver.find_element(:css, 'form.new_assignment').submit
+
+      wait_for_dom_ready
+      a = @course.assignments(true).last
+      a.should be_present
+      a.submission_types.should == 'external_tool'
+      a.external_tool_tag.should be_present
+      a.external_tool_tag.url.should == @t2.url
+      a.external_tool_tag.new_tab.should be_false
+    end
+
+    it "should allow editing" do
+      a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
+      a.create_external_tool_tag(:url => @t1.url)
+      a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
+
+      get "/courses/#{@course.id}/assignments/#{a.id}/edit"
+      # don't display dialog on page load, since url isn't blank
+      driver.find_element(:css, '#context_external_tools_select').should_not be_displayed
+      driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').click
+      driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].click
+      driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
+      driver.find_element(:css, '#select_context_content_dialog .add_item_button').click
+      driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t1.url
+      driver.find_element(:css, 'form.edit_assignment').submit
+
+      wait_for_dom_ready
+      a.reload
+      a.submission_types.should == 'external_tool'
+      a.external_tool_tag.should be_present
+      a.external_tool_tag.url.should == @t1.url
+    end
+  end
+
   it "should add a new rubric to assignment" do
     course_with_teacher_logged_in
     assignment_name = 'first test assignment'
@@ -310,7 +374,52 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
 
   end
+  
+  it "should not adjust assignment points possible for grading rubric" do
+    course_with_teacher_logged_in
+    assignment_name = 'first test assignment'
+    @group = @course.assignment_groups.create!(:name => "default")
+    @assignment = @course.assignments.create(
+      :name => assignment_name,
+      :assignment_group => @group,
+      :points_possible => 2
+      )
 
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+
+    driver.find_element(:css, '.add_rubric_link').click
+    driver.find_element(:id, 'grading_rubric').click
+    driver.find_element(:id, 'edit_rubric_form').submit
+    find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
+    wait_for_ajaximations
+    driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+  end
+  
+  it "should adjust assignment points possible for grading rubric" do
+    course_with_teacher_logged_in
+    assignment_name = 'first test assignment'
+    @group = @course.assignment_groups.create!(:name => "default")
+    @assignment = @course.assignments.create(
+      :name => assignment_name,
+      :assignment_group => @group,
+      :points_possible => 2
+      )
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+
+    driver.find_element(:css, '.add_rubric_link').click
+    driver.find_element(:id, 'grading_rubric').click
+    driver.find_element(:id, 'edit_rubric_form').submit
+    find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Change")').click
+    wait_for_ajaximations
+    
+    driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
+    driver.find_element(:css, "#full_assignment .points_possible").text.should == '5'
+  end
+  
   context "turnitin" do
     before do
       course_with_teacher_logged_in

@@ -277,7 +277,8 @@ I18n.scoped('groups', function(I18n){
       // appropriate self signup text
       $category.find('.self_signup').text(category.self_signup || '');
       $category.find('.self_signup_text').showIf(category.self_signup);
-      $category.find('.restricted_self_signup_text').showIf(category.self_signup == 'restricted');
+      $category.find('.restricted_self_signup_text').showIf(category.self_signup === 'restricted');
+      $category.find('.assign_students_link').showIf(category.self_signup !== 'restricted');
     },
 
     addGroupToSidebar: function(group) {
@@ -552,6 +553,7 @@ I18n.scoped('groups', function(I18n){
         $category.data('category_id', group_category.id);
         $category.find('.self_signup_text').showIf(group_category.self_signup);
         $category.find('.restricted_self_signup_text').showIf(group_category.self_signup == 'restricted');
+        $category.find('.assign_students_link').showIf(group_category.self_signup !== 'restricted');
         
         var newIndex = $("#group_tabs").tabs('length');
         if ($("li.category").last().hasClass('student_organized')) {
@@ -658,32 +660,61 @@ I18n.scoped('groups', function(I18n){
     });
     $(".assign_students_link").click(function(event) {
       event.preventDefault();
-      var result = confirm(I18n.t('confirm.assign_students', "This will randomly assign all unassigned students evenly among the existing student groups"));
-      if(!result) {
-        return;
-      }
-      var $groups = $(this).parents(".group_category").find(".group:not(.group_blank)");
-      $groups.each(function() {
-        $(this).data('student_count', $(this).find(".student").length);
-      });
-      var students = []
-      $(this).parents(".group_category").find(".group_blank").find(".student").each(function() {
-        students.push($(this));
-      });
-      students.sort(function(a,b) { return Math.random() - 0.5; });
-      $.each(students, function() {
-        var min = -1;
-        var $lowest = null;
-        $groups.each(function() {
-          if(min == -1 || $(this).data('student_count') < min) {
-            min = $(this).data('student_count');
-            $lowest = $(this);
-          }
-        });
-        if($lowest) {
-          contextGroups.moveToGroup($(this), $lowest);
-          $lowest.data('student_count', $lowest.data('student_count') + 1);
+
+      // confirm before proceeding
+      var result = confirm(I18n.t('confirm.assign_students', "This will randomly assign all unassigned students as evenly as possible among the existing student groups"));
+      if (!result) { return; }
+
+      // indicate 'working' in visual state
+      var $category = $(this).parents(".group_category");
+      var $unassigned = $category.find(".group_blank");
+      $unassigned.find(".assign_students_link").hide();
+      $unassigned.find(".loading_members").text(I18n.t('status.assigning_students', "Assigning Students..."));
+      $unassigned.find(".loading_members").show();
+
+      // perform ajax request to do the assignment server side
+      var url = $("#manage_group_urls .assign_unassigned_users_url").attr('href');
+      url = $.replaceTags(url, "category_id", $category.data('category_id'));
+      $.ajaxJSON(url, "POST", null, function(data) {
+        if (!data.length) {
+          // reset visual state
+          $unassigned.find(".assign_students_link").show();
+          $unassigned.find(".loading_members").hide();
+          $(window).triggerHandler('resize');
+          $.flashError(I18n.t('notices.no_students_assigned', "Nothing to do."));
+          return;
         }
+        var user_template = $(".user_template");
+        for (var i = 0; i < data.length; i++) {
+          var group = data[i];
+          var $group = $category.find('#group_' + group.id);
+          for (var j = 0; j < group.new_members.length; j++) {
+            var user = group.new_members[j];
+            var user_class = 'user_id_' + user.user_id;
+
+            // remove existing user element, if any
+            $category.find('.' + user_class).remove();
+
+            // create new user element and place it in the right group
+            var $user = user_template.clone();
+            $user.removeClass('user_template');
+            $user.addClass(user_class);
+            $user.fillTemplateData({ data: user });
+            contextGroups.insertIntoGroup($user, $group);
+          }
+        }
+
+        // update visual state
+        contextGroups.updateCategoryCounts($category);
+        $unassigned.find(".assign_students_link").show();
+        $unassigned.find(".loading_members").hide();
+        $(window).triggerHandler('resize');
+        $.flashMessage(I18n.t('notices.students_assigned', "Students assigned to groups."));
+      }, function(data) {
+        // reset visual state
+        $unassigned.find(".assign_students_link").show();
+        $unassigned.find(".loading_members").hide();
+        $(window).triggerHandler('resize');
       });
     });
     $(".self_signup_help_link").click(function(event) {

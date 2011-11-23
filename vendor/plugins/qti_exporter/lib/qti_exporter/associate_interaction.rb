@@ -41,6 +41,8 @@ class AssociateInteraction < AssessmentItemConverter
   
   def ensure_correct_format
     @question[:answers].each do |answer|
+      answer[:left] = answer[:text] if answer[:text].present?
+      answer[:left_html] = answer[:html] if answer[:html].present?
       if answer[:match_id]
         if @question[:matches] && match = @question[:matches].find{|m|m[:match_id] == answer[:match_id]}
           answer[:right] = match[:text]
