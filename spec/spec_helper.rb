@@ -23,7 +23,6 @@ require 'spec'
 require 'spec/rails'
 require 'webrat'
 require 'mocha'
-require File.dirname(__FILE__) + '/mocha_extensions'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
@@ -72,6 +71,7 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+  config.global_fixtures = :plugin_settings
   config.mock_with :mocha
 
   config.include Webrat::Matchers, :type => :views 
@@ -81,26 +81,6 @@ Spec::Runner.configure do |config|
     Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
   end
-
-  # flush redis before the first spec, and before each spec that comes after
-  # one that used redis
-  class << Canvas
-    attr_accessor :redis_used
-    def redis_with_track_usage(*a, &b)
-      self.redis_used = true
-      redis_without_track_usage(*a, &b)
-    end
-    alias_method_chain :redis, :track_usage
-    Canvas.redis_used = true
-  end
-  config.before :each do
-    if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb
-    end
-    Canvas.redis_used = false
-  end
-
-  def use_remote_services; ENV['ACTUALLY_TALK_TO_REMOTE_SERVICES'].to_i > 0; end
 
   def account_with_cas(opts={})
     @account = opts[:account]
@@ -207,7 +187,7 @@ Spec::Runner.configure do |config|
   end
 
   def course_with_teacher(opts={})
-    @course = opts[:course] || course(opts)
+    course(opts)
     @user = opts[:user] || user(opts)
     @teacher = @user
     @enrollment = @course.enroll_teacher(@user)

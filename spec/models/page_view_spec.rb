@@ -32,6 +32,7 @@ describe PageView do
 
   if Canvas.redis_enabled?
     it "should store into redis through to the db in cache mode" do
+      Canvas.redis.flushdb()
       Setting.set('enable_page_views', 'cache')
       @page_view.store.should be_true
       PageView.count.should == 0

@@ -54,42 +54,5 @@ I18n.scoped('groups', function(I18n) {
         $(this).loadingImage('remove');
       }
     });
-    $(".toggle_members_link").click(function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      var $group = $(this).parents('li.group');
-      var $member_list = $group.find('ul.member_list');
-      if ($member_list.length) {
-        if ($member_list.is(":visible")) {
-          $member_list.hide();
-          $(this).prop('title', I18n.t('member_tooltip_show', 'View group roster'));
-        } else {
-          $member_list.show();
-          $(this).prop('title', I18n.t('member_tooltip_hide', 'Hide group roster'));
-        }
-        return;
-      }
-      $member_list = $('<ul/>').addClass('member_list');
-      var $loader = $('<li/>').addClass('loader').html(I18n.t('loading', 'loading group roster...'));
-      $member_list.append($loader);
-      $member_list.pageless({
-        container: $member_list,
-        currentPage: 0,
-        totalPages: 1,
-        url: $(this).prop('href') + '.json',
-        loader: $loader,
-        animate: false,
-        scrape: function(data, xhr) {
-          students = JSON.parse(data)
-          for (idx in students) {
-            $('<li/>').addClass('student').html(students[idx].display_name).insertBefore($loader);
-          }
-          return '';
-        }
-      });
-      $group.append($member_list);
-      $member_list.show();
-      $(this).prop('title', I18n.t('member_tooltip_hide', 'Hide group roster'));
-    });
   });
 });

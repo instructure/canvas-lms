@@ -24,15 +24,13 @@
       </div>
     </div>
     <div style="display: block; height: 10px;"></div>
-    <div class="child_outcomes">
-      <% if outcome_group %>
-          <% outcome_group.sorted_content.each do |item| %>
-            <% if item.is_a?(LearningOutcome) %>
-              <%= render :partial => "outcome", :object => item %>
-            <% elsif item.is_a?(LearningOutcomeGroup) %>
-              <%= render :partial => "outcome_group", :object => item %>
-            <% end %>
-          <% end %>
+    <% if outcome_group %>
+      <% outcome_group.sorted_content.each do |item| %>
+        <% if item.is_a?(LearningOutcome) %>
+          <%= render :partial => "outcome", :object => item %>
+        <% elsif item.is_a?(LearningOutcomeGroup) %>
+          <%= render :partial => "outcome_group", :object => item %>
+        <% end %>
       <% end %>
-    </div>
+    <% end %>
 </div>

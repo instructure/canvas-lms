@@ -24,7 +24,7 @@ module Api
       id = @current_user.id
     end
 
-    sis_column, sis_id, sis_find_params = Api.sis_find_params_for_collection(collection, id, nil, @domain_root_account)
+    sis_column, sis_id, sis_find_params = Api.sis_find_params_for_collection(collection, id)
     if sis_id
       collection.first(sis_find_params) || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with #{sis_column}=#{sis_id}")
     else
@@ -40,7 +40,7 @@ module Api
     result = []
     sis_find = {}
     ids.each do |id|
-      sis_column, sis_id, sis_find = Api.sis_find_params_for_collection(collection, id, sis_find, @domain_root_account)
+      sis_column, sis_id, sis_find = Api.sis_find_params_for_collection(collection, id, sis_find)
       unless sis_id
         result << id
       end
@@ -51,25 +51,20 @@ module Api
     result
   end
 
-  SIS_MAPPINGS = {
+  VALID_SIS_COLUMNS = {
     'courses' =>
-      { 'lookups' => { 'sis_course_id' => 'sis_source_id' },
-        'scope' => 'root_account_id' },
+      { 'sis_course_id' => 'sis_source_id' },
     'enrollment_terms' =>
-      { 'lookups' => { 'sis_term_id' => 'sis_source_id' },
-        'scope' => 'root_account_id' },
+      { 'sis_term_id' => 'sis_source_id' },
     'users' =>
-      { 'lookups' => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id' },
-        'scope' => 'pseudonyms.account_id' },
+      { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id' },
     'accounts' =>
-      { 'lookups' => { 'sis_account_id' => 'sis_source_id' },
-        'scope' => 'root_account_id' },
+      { 'sis_account_id' => 'sis_source_id' },
     'course_sections' =>
-      { 'lookups' => { 'sis_section_id' => 'sis_source_id' },
-        'scope' => 'root_account_id' },
-  }.freeze
+      { 'sis_section_id' => 'sis_source_id' },
+  }
 
-  def self.sis_find_params_for_collection(collection, id, sis_find_params = nil, sis_root_account = nil)
+  def self.sis_find_params_for_collection(collection, id, sis_find_params = nil)
     case id
     when Numeric
       return nil, nil, sis_find_params
@@ -85,17 +80,15 @@ module Api
         return nil, nil, sis_find_params
       end
 
-      sis_mapping = SIS_MAPPINGS[collection.table_name] or
+      valid_sis_columns = VALID_SIS_COLUMNS[collection.table_name] or
         raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
 
       sis_find_params ||= {}
 
-      if column = sis_mapping['lookups'][sis_column]
+      if column = valid_sis_columns[sis_column]
         sis_find_params[:conditions] ||= {}
         sis_find_params[:conditions][column] ||= []
         sis_find_params[:conditions][column] << sis_id
-        # scope to the current root account when finding by SIS ID
-        sis_find_params[:conditions][sis_mapping['scope']] = sis_root_account.id if sis_root_account
         # the "user" sis columns are actually on the pseudonym
         if collection.table_name == User.table_name
           sis_find_params[:include] ||= []

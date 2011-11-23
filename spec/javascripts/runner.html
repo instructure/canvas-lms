@@ -34,27 +34,22 @@
   <div id="fixtures"></div>
 
   <script src="support/qunit/qunit.js"></script>
+  <script src="../../public/javascripts/vendor/jquery-1.6.4.js"></script>
+  <script src="helpers/helpers.js"></script>
   <script>
-    var require = {
-      urlArgs: "bust=" +  (new Date()).getTime(),
+    var curl = {
       baseUrl: '../../public/javascripts',
-      packages: [
-        {
-          name: 'specs',
-          location: '../../spec/javascripts',
+      packages: {
+        specs: {
+          path: '../../spec/javascripts',
           main: 'support/specs',
           lib: './'
-        },
-        {
-          name: 'helpers',
-          location: '../../spec/javascripts/helpers',
-          main: 'helpers',
-          lib: './'
         }
-      ]
+      },
+      apiName: 'require'
     };
   </script>
-  <script src="../../public/javascripts/vendor/require.js"></script>
+  <script src="../../public/javascripts/vendor/curl.js"></script>
   <script>
     require(['specs']);
   </script>

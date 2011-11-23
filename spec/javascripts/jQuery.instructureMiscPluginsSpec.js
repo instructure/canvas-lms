@@ -1,9 +1,9 @@
 (function() {
-  define(['jquery.instructure_misc_plugins', 'helpers/loadFixture'], function(jQuery, loadFixture) {
+  define(['js!vendor/jquery-1.6.4.js', 'js!jquery.instructure_misc_plugins.js!order'], function() {
     module('instructure misc plugins');
     test('showIf', function() {
-      var el, fixture;
-      fixture = loadFixture("jQuery.instructureMiscPlugins");
+      var el;
+      loadFixture("jQuery.instructureMiscPlugins");
       el = jQuery('#checkbox1');
       el.showIf(function() {
         return true;
@@ -31,11 +31,11 @@
         ok(this.nodeType);
         return notEqual(this.constructor, jQuery);
       });
-      return fixture.remove();
+      return removeFixture("jQuery.instructureMiscPlugins");
     });
     return test('disableIf', function() {
-      var el, fixture;
-      fixture = loadFixture("jQuery.instructureMiscPlugins");
+      var el;
+      loadFixture("jQuery.instructureMiscPlugins");
       el = jQuery('#checkbox1');
       el.disableIf(function() {
         return true;
@@ -61,7 +61,7 @@
       }), el);
       equal(el.disableIf(true), el);
       equal(el.disableIf(false), el);
-      return fixture.remove();
+      return removeFixture("jQuery.instructureMiscPlugins");
     });
   });
 }).call(this);

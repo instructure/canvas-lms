@@ -123,20 +123,6 @@ describe "Users API", :type => :integration do
     json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
   end
 
-  it "shouldn't find users in other root accounts by sis id" do
-    acct = account_model(:name => 'other root')
-    acct.add_user(@user)
-    @me = @user
-    course_with_student(:account => acct, :active_all => true, :user => user_with_pseudonym(:name => 's2', :username => 'other@example.com'))
-    @other_user = @user
-    @other_user.pseudonym.update_attribute('sis_user_id', 'other-sis')
-    @other_user.pseudonym.update_attribute('account_id', acct.id)
-    @user = @me
-    raw_api_call(:get, "/api/v1/users/sis_user_id:other-sis/page_views",
-                       { :controller => "page_views", :action => "index", :user_id => 'sis_user_id:other-sis', :format => 'json' })
-    response.status.should == "404 Not Found"
-  end
-
   it "should allow id of 'self'" do
     page_view_model(:user => @admin)
     json = api_call(:get, "/api/v1/users/self/page_views?per_page=1000",

@@ -36,13 +36,6 @@ class TokenInput
           $token.remove()
           @change?(@token_values())
 
-    @tokens.maxTokenWidth = =>
-      (parseInt(@tokens.css('width').replace('px', '')) - 150) + 'px'
-    @tokens.resizeTokens = (tokens) =>
-      tokens.find('div.ellipsis').css('max-width', @tokens.maxTokenWidth())
-    $(window).resize =>
-      @tokens.resizeTokens(@tokens)
-
     # key capture input
     @input = $('<input />')
       .appendTo(@fake_input)
@@ -94,8 +87,7 @@ class TokenInput
       $token = $('<li />')
       text = data?.text ? @val()
       $token.attr('id', id)
-      $text = $('<div />').addClass('ellipsis')
-      $text.attr('title', text)
+      $text = $('<div />')
       $text.text(text)
       $token.append($text)
       $close = $('<a />')
@@ -105,9 +97,6 @@ class TokenInput
         .attr('name', @node_name + '[]')
         .val(val)
       )
-      # has to happen before append, so that its unlimited width doesn't make
-      # @tokens grow (which would then keep us from limiting it)
-      @tokens.resizeTokens($token)
       @tokens.append($token)
     @val('') unless data?.no_clear
     @placeholder.hide()
@@ -1653,11 +1642,11 @@ I18n.scoped 'conversations', (I18n) ->
     token_input.fake_input.css('width', '100%')
     token_input.change = (tokens) ->
       if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
-        $form.find('#group_conversation').attr('checked', false) if !$form.find('#group_conversation_info').is(':visible')
+        $form.find('#group_conversation').attr('checked', true) if !$form.find('#group_conversation_info').is(':visible')
         $form.find('#group_conversation_info').show()
         $form.find('#user_note_info').hide()
       else
-        $form.find('#group_conversation').attr('checked', false)
+        $form.find('#group_conversation').attr('checked', true)
         $form.find('#group_conversation_info').hide()
         $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) and can_add_notes_for(user))
       inbox_resize()

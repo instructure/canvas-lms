@@ -274,8 +274,15 @@ class WikiPage < ActiveRecord::Base
     context_roles = namespace.context.default_wiki_editing_roles rescue nil
     (self.editing_roles || context_roles || default_roles).split(",")
   end
-
+  
   set_broadcast_policy do |p|
+    p.dispatch :new_wiki_page
+    p.to { participants }
+    p.whenever { |record| 
+      record.active? && 
+      record.just_created
+    }
+    
     p.dispatch :updated_wiki_page
     p.to { participants }
     p.whenever { |record| 
@@ -287,8 +294,9 @@ class WikiPage < ActiveRecord::Base
           record.changed_state(:active)
         ))
     }
+    
   end
-
+  
   def context(user=nil)
     (@context_for_user ||= {})[user] ||= (find_namespace_for_user(user).context rescue nil)
   end

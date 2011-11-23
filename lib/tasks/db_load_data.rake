@@ -960,6 +960,30 @@ namespace :db do
       Your grade for <%= asset.assignment.title %>, <%= asset.assignment.context.name %> just changed.
     }
 
+    create_notification 'WikiPage', 'Course Content', 0,
+    '<%ns=asset.find_namespace_for_user(user) %>http://<%= HostUrl.context_host(ns.context) %>/<%= ns.context.class.to_s.downcase.pluralize %>/<%= ns.context_id %>/wiki/<%= ns.namespace + ":" if !ns.default? %><%= asset.url %>', %{
+      New Wiki Page
+      
+      New Wiki Page - <%= asset.title.titleize %>: <%= asset.find_namespace_for_user(user).context.name rescue "" %>
+      
+      <% namespace = asset.find_namespace_for_user(user) %>
+      A new page has been added to the wiki for <%= namespace.context.name %> that may make your life easier.  
+      
+      <%= asset.title.titleize %> 
+      
+      <%= strip_and_truncate(asset.body, :max_length => 200) %> 
+      
+      
+      You can review it here: 
+      <%= main_link %>
+    }, %{
+      New wiki page for <%= asset.find_namespace_for_user(user).context.name rescue "" %>:
+      
+      <%= asset.title.titleize %>
+      
+      <%= strip_and_truncate(asset.body, :max_length => 200) %>
+    }
+
     create_notification 'WikiPage', 'Course Content', 15*60,
     '<%ns=asset.find_namespace_for_user(user)%>http://<%= HostUrl.context_host(ns.context) %>/<%= ns.context.class.to_s.downcase.pluralize %>/<%= ns.context_id %>/wiki/<%= ns.namespace + ":" if !ns.default? %><%= asset.url %>', %{
       Updated Wiki Page

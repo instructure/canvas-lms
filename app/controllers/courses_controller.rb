@@ -241,7 +241,7 @@ class CoursesController < ApplicationController
   def activity_stream
     get_context
     if authorized_action(@context, @current_user, :read)
-      render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i, @current_user.id) }
+      render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
     end
   end
 
@@ -602,13 +602,13 @@ class CoursesController < ApplicationController
       
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
       
-      @contexts = [@context]
       case @course_home_view
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.wiki_page
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
+        @contexts = [@context]
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
@@ -623,6 +623,7 @@ class CoursesController < ApplicationController
         @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
       else
         @active_tab = "home"
+        @contexts = [@context]
         if @context.grants_right?(@current_user, session, :manage_groups)
           @contexts += @context.groups
         else

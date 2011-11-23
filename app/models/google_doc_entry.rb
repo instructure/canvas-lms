@@ -33,7 +33,7 @@ class GoogleDocEntry
   end
   
   def edit_url
-    "https://docs.google.com/feeds/documents/private/full/#{@document_id}"
+    "http://docs.google.com/feeds/documents/private/full/#{@document_id}"
   end
 
   def content_type

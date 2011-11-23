@@ -98,8 +98,6 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id) }
         elsif @assignment.submission_types == 'attendance' && !@editing
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
-        elsif @assignment.submission_types == 'external_tool' && !@editing
-          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
         else
           format.html { render :action => 'show' }
         end
@@ -322,8 +320,6 @@ class AssignmentsController < ApplicationController
           params[:assignment][:submission_types] = "attendance"
         elsif params[:assignment_type] == "discussion_topic"
           params[:assignment][:submission_types] = "discussion_topic"
-        elsif params[:assignment_type] == "external_tool"
-          params[:assignment][:submission_types] = "external_tool"
         end
       end
       respond_to do |format|

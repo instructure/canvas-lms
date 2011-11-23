@@ -31,10 +31,9 @@ class Assignment < ActiveRecord::Base
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
-    :set_custom_field_values, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes
+    :set_custom_field_values, :context, :position, :allowed_extensions
   attr_accessor :original_id
-
+  
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
   has_one :quiz
@@ -50,28 +49,6 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
-
-  has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
-  after_save :save_external_tool_tag
-
-  def external_tool_tag_attributes=(attrs)
-    attrs.delete(:id)
-    @tmp_tag = self.external_tool_tag || self.build_external_tool_tag
-    @tmp_tag.attributes = attrs
-    @tmp_tag.content_type = 'ContextExternalTool'
-  end
-
-  def save_external_tool_tag
-    if @tmp_tag
-      @tmp_tag.context = self
-      @tmp_tag.save!
-    end
-    true
-  end
-
-  def external_tool?
-    self.submission_types == 'external_tool'
-  end
 
   validates_presence_of :context_id
   validates_presence_of :context_type
@@ -474,10 +451,6 @@ class Assignment < ActiveRecord::Base
   
   def infer_state_from_course
     self.workflow_state = "published" if (self.context.publish_grades_immediately rescue false)
-    if self.assignment_group_id.nil?
-      self.context.require_assignment_group
-      self.assignment_group = self.context.assignment_groups.active.first
-    end
   end
   protected :infer_state_from_course
   
@@ -511,16 +484,12 @@ class Assignment < ActiveRecord::Base
   def infer_grading_type
     self.grading_type ||= "points"
   end
-
-  def score_to_grade_percent(score=0.0)
-    result = score.to_f / self.points_possible
-    result = (result * 1000.0).round / 10.0
-  end
-
+  
   def score_to_grade(score=0.0)
     result = score.to_f
     if self.grading_type == "percent"
-      result = score_to_grade_percent(score)
+      result = score.to_f / self.points_possible
+      result = (result * 1000.0).round / 10.0
       result = "#{result}%"
     elsif self.grading_type == "pass_fail"
       result = score.to_f == self.points_possible ? "complete" : "incomplete"
@@ -547,8 +516,8 @@ class Assignment < ActiveRecord::Base
       0.0
     else
       # try to treat it as a letter grade
-      if grading_scheme && standard_based_score = GradingStandard.grade_to_score(grading_scheme, grade)
-        (points_possible * standard_based_score).round / 100.0
+      if grading_scheme
+        (points_possible * GradingStandard.grade_to_score(grading_scheme, grade)).round / 100.0
       else
         nil
       end
@@ -627,8 +596,13 @@ class Assignment < ActiveRecord::Base
     cal.custom_property("METHOD","PUBLISH")
 
     event = Icalendar::Event.new
-    event.klass = "PUBLIC"
-    event.start = self.due_at.utc_datetime if self.due_at
+    event.klass =       "PUBLIC"
+    event.start =       DateTime.civil(
+                          self.due_at.utc.strftime("%Y").to_i, 
+                          self.due_at.utc.strftime("%m").to_i,
+                          self.due_at.utc.strftime("%d").to_i,
+                          self.due_at.utc.strftime("%H").to_i, 
+                          self.due_at.utc.strftime("%M").to_i) if self.due_at
     event.start.icalendar_tzid = 'UTC' if event.start
     event.end = event.start if event.start
     event.end.icalendar_tzid = 'UTC' if event.end
@@ -638,11 +612,10 @@ class Assignment < ActiveRecord::Base
       event.end = event.start
       event.end.ical_params = {"VALUE"=>["DATE"]}
     end
-    event.summary = self.title
+    event.summary =     self.title
     event.description = self.description
-    event.location = self.location
-    event.dtstamp = self.updated_at.utc_datetime if self.updated_at
-    event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
+    event.location =    self.location
+    event.dtstamp =     self.updated_at.to_datetime
     # This will change when there are other things that have calendars...
     # can't call calendar_url or calendar_url_for here, have to do it manually
     event.url           "http://#{HostUrl.context_host(self.context)}/calendar?include_contexts=#{self.context.asset_string}&month=#{self.due_at.strftime("%m") rescue ""}&year=#{self.due_at.strftime("%Y") rescue ""}#assignment_#{self.id.to_s}"
@@ -680,7 +653,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def submittable_type?
-    submission_types && self.submission_types != "" && self.submission_types != "none" && self.submission_types != 'not_graded' && self.submission_types != "online_quiz" && self.submission_types != 'discussion_topic' && self.submission_types != 'attendance' && self.submission_types != "external_tool"
+    submission_types && self.submission_types != "" && self.submission_types != "none" && self.submission_types != 'not_graded' && self.submission_types != "online_quiz" && self.submission_types != 'discussion_topic' && self.submission_types != 'attendance'
   end
   
   def graded_count
@@ -816,11 +789,7 @@ class Assignment < ActiveRecord::Base
       self.context_module_action(user, action, points)
     end
   end
-
-  def submission_for_student(user)
-    self.submissions.find_or_initialize_by_user_id(user.id)
-  end
-
+  
   def grade_student(original_student, opts={})
     raise "Student is required" unless original_student
     raise "Student must be enrolled in the course as a student to be graded" unless original_student && self.context.students.include?(original_student)
@@ -1494,8 +1463,6 @@ class Assignment < ActiveRecord::Base
       item.submission_types = "online_upload"
     elsif ['online_quiz'].include?(hash[:submission_format])
       item.submission_types = "online_quiz"
-    elsif ['external_tool'].include?(hash[:submission_format])
-      item.submission_types = "external_tool"
     end
     if item.submission_types == "online_quiz"
       item.saved_by = :quiz
@@ -1575,7 +1542,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def expects_submission?
-    submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper" && submission_types != 'external_tool'
+    submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper"
   end
   
   def <=>(compairable)

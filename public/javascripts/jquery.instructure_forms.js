@@ -845,7 +845,6 @@ I18n.scoped('instructure', function(I18n) {
     }
     if(hasErrors) {
       $form.formErrors(errors);
-      $.trackEvent("Form Errors", this.attr('id') || this.attr('class') || document.title, JSON.stringify(errors));
       return false;
     }
     return true;

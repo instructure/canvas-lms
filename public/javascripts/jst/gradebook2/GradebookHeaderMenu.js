@@ -1,6 +1,5 @@
-!define('jst/gradebook2/GradebookHeaderMenu', ['compiled/handlebars_helpers'], function (Handlebars) {
-  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-  templates['gradebook2/GradebookHeaderMenu'] = template(function (Handlebars,depth0,helpers,partials,data) {
+!function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['gradebook2/GradebookHeaderMenu'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
   var buffer = "", stack1, stack2, stack3, stack4, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
 
@@ -93,7 +92,7 @@
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</a></li>\n  <li><a data-action=\"reuploadSubmissions\" href=\"#\">";
   stack1 = "Re-Upload Submissions";
-  stack2 = "re_upload_submissions";
+  stack2 = "re-upload_submissions";
   stack3 = {};
   stack4 = "gradebook2.GradebookHeaderMenu";
   stack3['scope'] = stack4;
@@ -104,7 +103,5 @@
   else if(stack4=== undef) { stack1 = helperMissing.call(depth0, "t", stack2, stack1, tmp1); }
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</a></li>\n  <li><a data-action=\"toggleMuting\" href=\"#\"></a></li>\n</ul>\n";
-  return buffer;});
-  return templates['gradebook2/GradebookHeaderMenu'];
-});
+  buffer += "</a></li>\n</ul>\n";
+  return buffer;}); }()

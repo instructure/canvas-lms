@@ -47,7 +47,7 @@ users.csv
 <td>text</td>
 <td><em>required</em></td>
 <td>A unique identifier used to reference users in the enrollments table.
-This identifier must not change for the user, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+This identifier must not change for the user, and must be globally unique.</td>
 </tr>
 <tr>
 <td>login_id</td>
@@ -141,7 +141,7 @@ accounts.csv
 <td>text</td>
 <td>required</td>
 <td>A unique identifier used to reference accounts in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+This identifier must not change for the account, and must be globally unique.</td>
 </tr>
 <tr>
 <td>parent_account_id</td>
@@ -190,7 +190,7 @@ terms.csv
 <td>text</td>
 <td>required</td>
 <td>A unique identifier used to reference terms in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+This identifier must not change for the account, and must be globally unique.</td>
 </tr>
 <tr>
 <td>name</td>
@@ -244,7 +244,7 @@ courses.csv
 <td>text</td>
 <td>required</td>
 <td>A unique identifier used to reference courses in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+This identifier must not change for the account, and must be globally unique.</td>
 </tr>
 <tr>
 <td>short_name</td>
@@ -316,7 +316,7 @@ sections.csv
 <td>text</td>
 <td>required</td>
 <td>A unique identifier used to reference sections in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+This identifier must not change for the account, and must be globally unique.</td>
 </tr>
 <tr>
 <td>course_id</td>
@@ -478,7 +478,7 @@ This identifier must not change for the group, and must be globally unique.</td>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>available</td>
+<td>active</td>
 <td>available, closed, completed, deleted</td>
 </tr>
 </table>
@@ -517,7 +517,7 @@ groups_membership.csv
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>accepted</td>
+<td>active</td>
 <td>accepted, deleted</td>
 </tr>
 </table>

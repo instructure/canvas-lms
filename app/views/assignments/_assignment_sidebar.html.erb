@@ -16,9 +16,6 @@
 
   <div class="rs-margin-lr rs-margin-top">
     <% if can_do(@assignment, @current_user, :update_content) %>
-      <% if @assignment.external_tool? %>
-        <%= link_to(image_tag("back.png") + t('links.view_assignment', "View Assignment"), polymorphic_url([@context, @assignment]), :class => 'view_assignment_link button button-sidebar button-sidebar-wide') %>
-      <% end %>
       <a href="#" class="edit_full_assignment_link button button-sidebar button-sidebar-wide"><%= image_tag "edit.png" %> <%= t 'links.edit_assignment', "Edit Assignment" %></a>
     <% end %>
     <% if LearningOutcome.non_rubric_outcomes? && can_do(@context, @current_user, :manage_outcomes) && @context && @context.has_outcomes %>

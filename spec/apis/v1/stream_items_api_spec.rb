@@ -48,8 +48,6 @@ describe UsersController, :type => :integration do
   it "should format DiscussionTopic" do
     @context = @course
     discussion_topic_model
-    @topic.require_initial_post = true
-    @topic.save
     @topic.reply_from(:user => @user, :text => 'hai')
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
@@ -62,8 +60,6 @@ describe UsersController, :type => :integration do
       'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
-      'require_initial_post' => true,
-      'user_has_posted' => true,
 
       'total_root_discussion_entries' => 1,
       'root_discussion_entries' => [
@@ -74,40 +70,6 @@ describe UsersController, :type => :integration do
       ],
       'course_id' => @course.id,
     }]
-  end
-
-  it "should not return discussion entries if user has not posted" do
-    @context = @course
-    course_with_teacher(:course => @context, :active_all => true)
-    discussion_topic_model
-    @user = @student
-    @topic.require_initial_post = true
-    @topic.save
-    @topic.reply_from(:user => @teacher, :text => 'hai')
-    json = api_call(:get, "/api/v1/users/activity_stream.json",
-                    { :controller => "users", :action => "activity_stream", :format => 'json' })
-    json.first['require_initial_post'].should == true
-    json.first['user_has_posted'].should == false
-    json.first['root_discussion_entries'].should == []
-  end
-
-  it "should return discussion entries to admin without posting " do
-    @context = @course
-    course_with_teacher(:course => @context, :name => "Teach", :active_all => true)
-    discussion_topic_model
-    @topic.require_initial_post = true
-    @topic.save
-    @topic.reply_from(:user => @student, :text => 'hai')
-    json = api_call(:get, "/api/v1/users/activity_stream.json",
-                    { :controller => "users", :action => "activity_stream", :format => 'json' })
-    json.first['require_initial_post'].should == true
-    json.first['user_has_posted'].should == true
-    json.first['root_discussion_entries'].should == [
-            {
-              'user' => { 'user_id' => @student.id, 'user_name' => 'User' },
-              'message' => 'hai',
-            },
-          ]
   end
 
   it "should format Announcement" do
@@ -125,8 +87,6 @@ describe UsersController, :type => :integration do
       'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
-      'require_initial_post' => nil,
-      'user_has_posted' => nil,
 
       'total_root_discussion_entries' => 1,
       'root_discussion_entries' => [

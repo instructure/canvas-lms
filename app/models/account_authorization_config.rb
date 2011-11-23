@@ -93,36 +93,14 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       @saml_settings.name_identifier_format = self.identifier_format
       if ENV['RAILS_ENV'] == 'development'
         # if you set the domain to go to your local box in /etc/hosts you can test saml
-        @saml_settings.assertion_consumer_service_url = "http://#{domain}/saml_consume"
-        @saml_settings.sp_slo_url = "http://#{domain}/saml_logout"
+        @saml_settings.assertion_consumer_service_url = "http://#{domain}:3000/saml_consume"
+        @saml_settings.sp_slo_url = "http://#{domain}:3000/saml_logout"
       else
         @saml_settings.assertion_consumer_service_url = "https://#{domain}/saml_consume"
         @saml_settings.sp_slo_url = "https://#{domain}/saml_logout"
       end
       @saml_settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
       @saml_settings.tech_contact_email = app_config[:tech_contact_email]
-
-      encryption = app_config[:encryption]
-      if encryption.is_a?(Hash) && File.exists?(encryption[:xmlsec_binary])
-        resolve_path = lambda {|path|
-          if path.nil?
-            nil
-          elsif path[0,1] == '/'
-            path
-          else
-            File.join(Rails.root, 'config', path)
-          end
-        }
-
-        private_key_path = resolve_path.call(encryption[:private_key])
-        certificate_path = resolve_path.call(encryption[:certificate])
-
-        if File.exists?(private_key_path) && File.exists?(certificate_path)
-          @saml_settings.xmlsec1_path = encryption[:xmlsec_binary]
-          @saml_settings.xmlsec_certificate = certificate_path
-          @saml_settings.xmlsec_privatekey = private_key_path
-        end
-      end
     end
     
     @saml_settings

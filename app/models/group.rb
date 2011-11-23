@@ -303,9 +303,6 @@ class Group < ActiveRecord::Base
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
-    
-    given { |user, session| self.context && self.free_association?(user) }
-    can :read_roster
   end
 
   def file_structure_for(user)
@@ -318,7 +315,13 @@ class Group < ActiveRecord::Base
 
   def members_json_cached
     Rails.cache.fetch(['group_members_json', self].cache_key) do
-      self.users.map{ |u| u.group_member_json(self.context) }
+      self.users.map do |u|
+        h = { :user_id => u.id, :name => u.last_name_first }
+        if self.context && self.context.is_a?(Course) && (section = u.section_for_course(self.context))
+          h = h.merge(:section_id => section.id, :section_code => section.section_code)
+        end
+        h
+      end
     end
   end
 

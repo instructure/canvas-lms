@@ -3,10 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + "/common")
 describe "web conference selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
-    PluginSetting.create!(:name => "dim_dim", :settings =>
-        {"domain" => "dimdim.instructure.com"})
-  end
 
   it "should create a web conference" do
     course_with_teacher_logged_in

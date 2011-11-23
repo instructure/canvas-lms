@@ -31,7 +31,7 @@ gem 'mime-types',     '1.16',   :require => 'mime/types'
 gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
 gem 'nokogiri',       '1.4.1'
-gem 'oauth',          '0.4.5'
+gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'rake',           '< 0.10'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
@@ -40,7 +40,7 @@ gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.4'
+gem 'ruby-saml-mod',  '0.1.2'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '1.2.1'
@@ -70,7 +70,7 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.12.0'
+  gem 'selenium-webdriver', '2.7.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.7.2'
 end

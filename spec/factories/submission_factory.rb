@@ -17,13 +17,11 @@
 #
 
 def submission_model(opts={})
-  assignment = opts[:assignment] || assignment_model(:course => opts[:course])
-  @student = opts.delete(:user) || user_with_pseudonym({:active_user => true, :username => 'student@example.com', :password => 'qwerty'}.merge(opts))
-  @course.enroll_user(@student, "StudentEnrollment", {:enrollment_state => 'active'}.merge(opts))
-  assignment.reload # it caches the course pre-student enrollment
-  @submission = assignment.submit_homework(@student, (opts.presence || { :url => "http://www.instructure.com/" }))
-  @submission.save!
-  @submission
+  assignment_model
+  @student = opts.delete(:user) || User.create!(:name => "new student")
+  @enrollment = @course.enroll_student(@student)
+  @assignment.reload # it caches the course pre-student enrollment
+  @submission = @assignment.submit_homework(@student, (opts.presence || { :url => "http://www.instructure.com/" }))
 end
 
 def assignment_valid_attributes

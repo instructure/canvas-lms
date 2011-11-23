@@ -167,7 +167,6 @@ class ProfileController < ApplicationController
     @current_user.profile_pics_folder.active_file_attachments({:include => :thumbnail}).select{|a| a.content_type.match(/\Aimage\//) && a.thumbnail}.sort_by(&:id).reverse.each do |image|
       @pics << {
         :url => "/images/thumbnails/#{image.id}/#{image.uuid}",
-        :pending => image.thumbnail.nil?,
         :type => 'attachment',
         :alt => image.display_name
       }

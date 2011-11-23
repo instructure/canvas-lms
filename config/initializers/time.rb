@@ -14,15 +14,6 @@ if RUBY_VERSION < "1.9."
       strftime_without_1_9_parity(string)
     end
     alias_method_chain :strftime, :'1_9_parity'
-
-    def utc_datetime
-      timestamp = self.getutc
-      DateTime.civil(timestamp.strftime("%Y").to_i, 
-                     timestamp.strftime("%m").to_i,
-                     timestamp.strftime("%d").to_i,
-                     timestamp.strftime("%H").to_i, 
-                     timestamp.strftime("%M").to_i)
-    end
   end
 end
 
@@ -31,9 +22,5 @@ end
 class ActiveSupport::TimeWithZone
   def blank?
     false
-  end
-
-  def utc_datetime
-    self.comparable_time.utc_datetime
   end
 end

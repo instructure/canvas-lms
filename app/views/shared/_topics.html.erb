@@ -87,21 +87,19 @@
       <a href="#" class="more_options_link"><%= t('#links.more_options', %{more options}) %></a>
     </div>
     <div class="more_options_holder">
-      <% if show_course_only_options?(@context) %>
-        <div style="float: left;">
-          <%= check_box :discussion_topic, :delay_posting, :class => "delay_posting" %>
-          <%= label :discussion_topic, :delay_posting, :en => "Delay posting this message" %>
-        </div>
-        <div class="delay_posting_option" style="display: none; float: left;">
-          &nbsp;<%= t('delay_until', %{until}) %> 
-          <%= text_field :discussion_topic, :delayed_post_at, :style => "width: 100px;", :class => 'datetime_field delayed_post_at_value' %>
-        </div>
-        <div class="clear"></div>
-        <div>
-          <%= f.check_box :require_initial_post %>
-          <%= f.label :require_initial_post, :en => "Replies are not visible until after users post" %>
-        </div>
-      <% end %>
+      <div style="float: left;">
+        <%= check_box :discussion_topic, :delay_posting, :class => "delay_posting" %>
+        <%= label :discussion_topic, :delay_posting, :en => "Delay posting this message" %>
+      </div>
+      <div class="delay_posting_option" style="display: none; float: left;">
+        &nbsp;<%= t('delay_until', %{until}) %> 
+        <%= text_field :discussion_topic, :delayed_post_at, :style => "width: 100px;", :class => 'datetime_field delayed_post_at_value' %>
+      </div>
+      <div class="clear"></div>
+      <div>
+        <%= f.check_box :require_initial_post %>
+        <%= f.label :require_initial_post, :en => "Replies are not visible until after users post" %>
+      </div>
       <% if can_do(@context, @current_user, :moderate_forum) %>
         <div class="podcast_options">
           <%= f.check_box :podcast_enabled, :class => 'podcast_enabled_checkbox' %>

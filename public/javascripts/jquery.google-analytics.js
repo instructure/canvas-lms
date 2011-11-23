@@ -69,7 +69,7 @@ var _gaq = _gaq || [];
   };
 
   // this next part is the only part that is Instructure specific
-  if (INST && INST.googleAnalyticsAccount) {
+  if (INST.googleAnalyticsAccount) {
     $.trackPage(INST.googleAnalyticsAccount, {
       status_code: INST.http_status,
       error_id: INST.error_id,
@@ -77,4 +77,4 @@ var _gaq = _gaq || [];
     });
   }
 
-})(jQuery, this.INST);
+})(jQuery, INST);

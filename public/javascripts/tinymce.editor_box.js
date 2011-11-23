@@ -335,21 +335,6 @@
 // --------------------------------------------------------------------
 
 
-  function init() {
-    // ensure that blur/change/focus events fire for the active form element
-    // when we click into or out of tiny (they don't normally, since we are
-    // technically changing windows).
-    $(window).blur(function(e) {
-      if (document.activeElement && this == e.target) {
-        $(document.activeElement).filter(':input').blur().change();
-      }
-    }).focus(function(e) {
-      if (document.activeElement && this == e.target) {
-        $(document.activeElement).filter(':input').focus();
-      }
-    });
-  }
-
   var editorBoxIdCounter = 1;
   
   $.fn.editorBox = function(options, more_options) {
@@ -358,8 +343,6 @@
         $(this).editorBox(options, more_options);
       });
     }
-    if (editorBoxIdCounter === 1) init();
-
     var id = this.attr('id');
     if(typeof(options) == "string" && options != "create") {
       if(options == "get_code") {

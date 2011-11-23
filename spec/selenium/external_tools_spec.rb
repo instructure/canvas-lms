@@ -120,20 +120,7 @@ describe "editing external tools" do
     @tag.new_tab.should == false
     @tag.url.should == "http://www.example.com"
   end
-
-  it "should launch assignment external tools when viewing assignment" do
-    course_with_teacher_logged_in
-    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-    assignment_model(:course => @course, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
-    tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
-    tag.content_type = 'ContextExternalTool'
-    tag.save!
-    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-    driver.find_elements(:css, "#tool_content").length.should == 1
-    keep_trying_until { driver.find_element(:css, "#tool_content").displayed? }
-  end
-
+  
   it "should automatically load tools with defaul configuration" do
     course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})

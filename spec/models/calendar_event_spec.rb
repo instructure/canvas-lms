@@ -45,57 +45,19 @@ describe CalendarEvent do
     end
     
     it ".to_ics should return string data for events with times" do
-      Time.zone = 'UTC'
       calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
-      # force known value so we can check serialization
-      @event.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @event.to_ics
       res.should_not be_nil
       res.match(/DTSTART:20080903T115500Z/).should_not be_nil
       res.match(/DTEND:20080903T120000Z/).should_not be_nil
-      res.match(/DTSTAMP:20080903T120500Z/).should_not be_nil
-    end
-    
-    it ".to_ics should return string data for events with times in correct tz" do
-      Time.zone = 'Alaska' # -0800
-      calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
-      # force known value so we can check serialization
-      @event.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
-      res = @event.to_ics
-      res.should_not be_nil
-      res.match(/DTSTART:20080903T195500Z/).should_not be_nil
-      res.match(/DTEND:20080903T200000Z/).should_not be_nil
-      res.match(/DTSTAMP:20080903T200500Z/).should_not be_nil
     end
 
     it ".to_ics should return data for events with times" do
-      Time.zone = 'UTC'
       calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
-      # force known value so we can check serialization
-      @event.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @event.to_ics(false)
       res.should_not be_nil
-      res.start.icalendar_tzid.should == 'UTC'
-      res.start.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.end.icalendar_tzid.should == 'UTC'
-      res.end.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.dtstamp.icalendar_tzid.should == 'UTC'
-      res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-    end
-
-    it ".to_ics should return data for events with times in correct tz" do
-      Time.zone = 'Alaska' # -0800
-      calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
-      # force known value so we can check serialization
-      @event.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
-      res = @event.to_ics(false)
-      res.should_not be_nil
-      res.start.icalendar_tzid.should == 'UTC'
-      res.start.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.end.icalendar_tzid.should == 'UTC'
-      res.end.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      res.end.icalendar_tzid.should == 'UTC'
-      res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      res.start.strftime('%Y-%m-%dT%H:%M:00z').should == (ActiveSupport::TimeWithZone.new(Time.parse("Sep 3 2008 11:55am"), Time.zone).strftime('%Y-%m-%dT%H:%M:00z'))
+      res.end.strftime('%Y-%m-%dT%H:%M:00z').should == (ActiveSupport::TimeWithZone.new(Time.parse("Sep 3 2008 12:00pm"), Time.zone).strftime('%Y-%m-%dT%H:%M:00z'))
     end
     
     it ".to_ics should return string dates for all_day events" do
