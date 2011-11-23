@@ -286,8 +286,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_response(raw_response, settings)
-    response = Onelogin::Saml::Response.new(raw_response)
-    response.settings = settings
+    response = Onelogin::Saml::Response.new(raw_response, settings)
     response.logger = logger
     response
   end

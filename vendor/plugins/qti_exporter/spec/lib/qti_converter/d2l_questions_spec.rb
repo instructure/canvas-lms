@@ -212,11 +212,14 @@ module D2LExpected
               :answers=>
                       [{:right=>"1",
                         :html=>"<em><strong>A</strong></em>",
+                        :left_html=>"<em><strong>A</strong></em>",
                         :comments=>"",
-                        :text=>"A"},
+                        :text=>"A",
+                        :left=>"A"},
                        {:right=>"2", 
                         :comments=>"", 
-                        :text=>"b"}]}
+                        :text=>"b", 
+                        :left=>"b"}]}
 
   ORDERING = {:question_bank_id=>"SECT_3981973",
               :answers=>[],

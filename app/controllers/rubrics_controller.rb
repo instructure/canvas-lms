@@ -70,6 +70,8 @@ class RubricsController < ApplicationController
       @association_object ||= @association.association if @association
       params[:rubric_association][:association] = @association_object
       params[:rubric_association][:update_if_existing] = params[:action] == 'update'
+      skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
+      params[:rubric_association][:skip_updating_points_possible] = skip_points_update
       @rubric = @association.rubric if params[:id] && @association && (@association.rubric_id == params[:id].to_i || (@association.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))
       @rubric ||= @context.rubrics.find(params[:id]) if params[:id]
       @association = nil unless @association && @rubric && @association.rubric_id == @rubric.id
@@ -89,10 +91,10 @@ class RubricsController < ApplicationController
         @association = @rubric.update_with_association(@current_user, params[:rubric], @context, params[:rubric_association], @invitees)
         @rubric = @association.rubric if @association
       end
-      json_res = {
-        :rubric => ActiveSupport::JSON.decode(@rubric.to_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session})),
-        :rubric_association => ActiveSupport::JSON.decode(@association.to_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session}))
-      }
+      json_res = {}
+      json_res[:rubric] = @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}) if @rubric
+      json_res[:rubric_association] = @association.as_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session}) if @association
+      json_res[:rubric_association][:skip_updating_points_possible] = skip_points_update if json_res && json_res[:rubric_association]
       render :json => json_res.to_json
     end
   end

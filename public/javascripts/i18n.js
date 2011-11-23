@@ -1,3 +1,4 @@
+(function(){
 // Instantiate the object
 var I18n = I18n || {};
 
@@ -568,3 +569,10 @@ if (I18n.translations) {
 } else {
   I18n.translations = {en: {}};
 }
+
+if (typeof define === "function" && define.amd) {
+  define( "i18n", [], function(){ return I18n; } );
+}
+return this.I18n = I18n;
+
+})();

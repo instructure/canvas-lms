@@ -91,7 +91,7 @@ class AssessmentQuestion < ActiveRecord::Base
               rescue => e
                 new_file = nil
                 er = ErrorReport.log_exception(:file_clone_during_translate_links, e)
-                logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: #{er.id}")
+                logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{self.id} error_report: #{er.id}")
               end
               new_file.save if new_file
               file_substitutions[$1] = new_file
@@ -509,7 +509,7 @@ class AssessmentQuestion < ActiveRecord::Base
       hash[field] = ImportedHtmlConverter.convert(hash[field], context, true) if hash[field].present?
     end
     hash[:answers].each do |answer|
-      [:html, :comments_html].each do |field|
+      [:html, :comments_html, :left_html].each do |field|
         answer[field] = ImportedHtmlConverter.convert(answer[field], context, true) if answer[field].present?
       end
     end if hash[:answers]

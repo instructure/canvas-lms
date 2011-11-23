@@ -10,6 +10,7 @@
     assignment = @context.assignments.new
   end
   is_discussion_topic = !!(assignment && assignment.submission_types == "discussion_topic" && assignment.discussion_topic)
+  is_external_tool = !!(assignment.try(:submission_types) == "external_tool")
 %>
 <% js_block do %>
 <script type="text/javascript">
@@ -91,6 +92,9 @@
         <div class="quiz_content" style="display: none;">
           <%= before_label :quiz_summary, "Quiz Summary/Introduction" %>
         </div>
+        <div class="external_tool_content" style="display: none;">
+          <%= before_label :external_tool_introduction, "External Tool Instructions/Introduction" %>
+        </div>
         <div class="clear"></div>
         <div><%= f.text_area :description, :style => 'width: 100%;' %></div>
       </td>
@@ -104,6 +108,7 @@
             <option value="assignment" <%= "selected" if (assignment.submission_types != 'online_quiz' && assignment.submission_types != 'attendance' && assignment.submission_types != 'not_graded' rescue true) %>><%= t 'options.assignment', "Assignment" %></option>
             <option value="discussion_topic" <%= "selected" if (assignment.submission_types == 'discussion_topic' rescue false) %>><%= t 'options.discussion', "Discussion" %></option>
             <option value="quiz" <%= "selected" if (assignment.submission_types == 'online_quiz' rescue false) %>><%= t 'options.quiz', "Quiz" %></option>
+            <option value="external_tool" <%= "selected" if (assignment.submission_types == 'external_tool' rescue false) %>><%= t 'options.external_tool', "External Tool" %></option>
             <% if feature_enabled?(:attendance) %>
               <option value="attendance" <%= "selected" if (assignment.submission_types == 'attendance' rescue false) %>><%= t 'options.attendance', "Attendance" %></option>
             <% end %>
@@ -122,6 +127,20 @@
     </tr>
     <tr class="quiz_content">
       <td colspan="4" style="font-size: 0.8em; padding-left: 10px; padding-top: 0; font-style: italic;"><%= t 'descriptions.grades_from_quiz', "Grades for this assignment will be pulled from the quiz results" %></td>
+    </tr>
+    <tr class="external_tool_content">
+      <td colspan="4" style="font-size: 0.8em; padding-left: 10px; padding-top: 0; font-style: italic;"><%= t 'descriptions.grades_for_external_tool', "Grades for this assignment can be sent from the external tool, or entered manually." %></td>
+    </tr>
+    <tr class="external_tool_content">
+      <td style="width: 10%;"><%= f.blabel :external_tool_url, :en => "URL" %></td>
+      <%  f.object.external_tool_tag || f.object.build_external_tool_tag
+          f.fields_for :external_tool_tag do |tag_form| %>
+        <td colspan="3" id="external_tool_url">
+          <%= link_to(image_tag('edit.png', :alt => 'Edit URL'), '#', :id => 'edit_external_tool_url') %>
+          <%= tag_form.text_field(:url, :style => "width:95%", :readonly => true) %>
+          <%= tag_form.hidden_field(:new_tab) %>
+        </td>
+      <% end %>
     </tr>
       <tr>
         <td style="width: 10%;"><%= f.blabel :title, :en => "Title" %></td>
@@ -305,3 +324,4 @@
   <%= render :partial => "shared/add_assignment_group" %>
   <%= render :partial => "groups/add_group_category" %>
   <%= render :partial => "shared/turnitin_settings", :locals => {:assignment => assignment} %>
+  <%= render :partial => "shared/select_content_dialog", :locals => {:only => [:external_tools]} %>

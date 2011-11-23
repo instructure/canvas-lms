@@ -1,0 +1,3 @@
+require = {
+  baseUrl: '/public/javascripts'
+};

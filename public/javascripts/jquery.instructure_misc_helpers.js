@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+if (!this.INST) this.INST = {};
 I18n.scoped('instructure', function(I18n) {
   
   // Generate a unique integer id (unique within the entire window).

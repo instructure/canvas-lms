@@ -152,8 +152,15 @@ function insertTable() {
 	html += makeAttrib('data-mce-new', '1');
 
 	if (width && inst.settings.inline_styles) {
-		if (style)
-			style += '; ';
+		if (style) {
+			// INSTRUCTURE-workaround TinyMCE was adding a needless ';' at the end of the style
+			// so we were getting things like style="background-color: #d3da24; ;width: 4px;"
+			// this was choking up our sanitizer and it was stripping out everything.
+			// so, I ryan shaw, put this if in.
+			if ($.trim(style).charAt($.trim(style).length - 1) === ';') {
+				style += '; ';
+			}
+		}
 
 		// Force px
 		if (/^[0-9\.]+$/.test(width))

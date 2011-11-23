@@ -466,16 +466,25 @@ class Course < ActiveRecord::Base
     t('default_name', "My Course")
   end
   
+  def users_not_in_groups_sql(groups, opts={})
+    ["SELECT u.id, u.name
+        FROM users u
+       INNER JOIN enrollments e ON e.user_id = u.id
+       WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
+             #{"AND NOT EXISTS (SELECT *
+                                  FROM group_memberships gm
+                                 WHERE gm.user_id = u.id AND
+                                       gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
+       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
+  end
+
+  def users_not_in_groups(groups)
+    User.find_by_sql(users_not_in_groups_sql(groups))
+  end
+
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(["SELECT u.id, u.name
-                             FROM users u
-                            INNER JOIN enrollments e ON e.user_id = u.id
-                            WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
-                                  #{"AND NOT EXISTS (SELECT *
-                                                       FROM group_memberships gm
-                                                      WHERE gm.user_id = u.id AND
-                                                            gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-                            ORDER BY #{User.sortable_name_order_by_clause('u')} ASC", self.id], :page => page, :per_page => per_page)
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')} ASC"),
+                         :page => page, :per_page => per_page)
   end
   
   def admins_in_charge_of(user_id)
@@ -1143,11 +1152,12 @@ class Course < ActiveRecord::Base
   end
 
   def gradebook_to_csv(options = {})
-    assignments = self.assignments.active.gradeable
     if options[:assignment_id]
-      assignments = [assignments.find(options[:assignment_id])]
+      assignments = [self.assignments.active.gradeable.find(options[:assignment_id])]
     else
-      assignments = assignments.find(:all, :order => 'due_at, title')
+      group_order = {}
+      self.assignment_groups.active.each_with_index{|group, idx| group_order[group.id] = idx}
+      assignments = self.assignments.active.gradeable.find(:all).sort_by{|a| [a.due_at ? 1 : 0, a.due_at || 0, group_order[a.assignment_group_id] || 0, a.position || 0, a.title || ""]}
     end
     single = assignments.length == 1
     student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
@@ -2107,12 +2117,15 @@ class Course < ActiveRecord::Base
   def students_visible_to(user, include_priors=false)
     enrollments_visible_to(user, include_priors, true)
   end
-  def enrollments_visible_to(user, include_priors=false, return_users=false)
+  def enrollments_visible_to(user, include_priors=false, return_users=false, limit_to_section_ids=nil)
     visibilities = section_visibilities_for(user)
     if return_users
       scope = include_priors ? self.all_students : self.students
     else
       scope = include_priors ? self.all_student_enrollments : self.student_enrollments
+    end
+    if limit_to_section_ids
+      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => limit_to_section_ids.to_a })
     end
     # See also Users#messageable_users (same logic used to get users across multiple courses)
     case enrollment_visibility_level_for(user, visibilities)
@@ -2234,17 +2247,41 @@ class Course < ActiveRecord::Base
     ]
   end
   
+  def external_tool_tabs(opts)
+    tools = self.context_external_tools.having_setting('course_navigation')
+    account_ids = self.account_chain_ids
+    tools += ContextExternalTool.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
+    tools.sort_by(&:id).map do |tool|
+     {
+        :id => tool.asset_string,
+        :label => tool.label_for(:course_navigation, opts[:language]),
+        :css_class => tool.asset_string,
+        :href => :course_external_tool_path,
+        :visibility => tool.settings[:course_navigation][:visibility],
+        :external => true,
+        :hidden => tool.settings[:course_navigation][:default] == 'disabled',
+        :args => [self.id, tool.id]
+     }
+    end
+  end
+  
   def tabs_available(user=nil, opts={})
     # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
     tabs = self.tab_configuration.compact
     default_tabs = Course.default_tabs
+    settings_tab = default_tabs[-1]
+    external_tabs = external_tool_tabs(opts)
     tabs = tabs.map do |tab|
-      default_tab = default_tabs.find {|t| t[:id] == tab[:id] }
+      default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
       if default_tab
         tab[:label] = default_tab[:label]
         tab[:href] = default_tab[:href]
         tab[:css_class] = default_tab[:css_class]
+        tab[:args] = default_tab[:args]
+        tab[:visibility] = default_tab[:visibility]
+        tab[:external] = default_tab[:external]
         default_tabs.delete_if {|t| t[:id] == tab[:id] }
+        external_tabs.delete_if {|t| t[:id] == tab[:id] }
         tab
       else
         # Remove any tabs we don't know about in default_tabs (in case we removed them or something, like Groups)
@@ -2253,7 +2290,11 @@ class Course < ActiveRecord::Base
     end
     tabs.compact!
     tabs += default_tabs
-    
+    tabs += external_tabs
+    # Ensure that Settings is always at the bottom
+    tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
+    tabs << settings_tab
+
     tabs.each do |tab|
       tab[:hidden_unused] = true if tab[:id] == TAB_MODULES && !active_record_types[:modules]
       tab[:hidden_unused] = true if tab[:id] == TAB_FILES && !active_record_types[:files]
@@ -2276,16 +2317,21 @@ class Course < ActiveRecord::Base
         tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
         tabs.delete_if { |t| t[:id] == TAB_MODULES }
       end
+      unless self.grants_rights?(user, opts[:session], :participate_as_student, :manage_content).values.any?
+        tabs.delete_if{ |t| t[:visibility] == 'members' }
+      end
       unless self.grants_rights?(user, opts[:session], :read, :manage_content, :manage_assignments).values.any?
         tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
         tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
       end
+      tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :manage_content)
       if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
         tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
         tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
         tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
       end
+      tabs.delete_if { |t| t[:hidden] && t[:external] } 
       tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
       tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
       tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?

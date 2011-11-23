@@ -124,12 +124,12 @@ class DiscussionEntry < ActiveRecord::Base
     elsif !message || message.empty?
       raise "Message body cannot be blank"
     else
-      DiscussionEntry.create!({
-        :message => message,
-        :discussion_topic_id => self.discussion_topic_id,
-        :parent_id => self.parent_id == 0 ? self.id : self.parent_id,
-        :user_id => user.id
-      })
+      entry = DiscussionEntry.new(:message => message)
+      entry.discussion_topic_id = self.discussion_topic_id
+      entry.parent_id = self.parent_id == 0 ? self.id : self.parent_id
+      entry.user_id = user.id
+      entry.save!
+      entry
     end
   end
   
@@ -183,13 +183,11 @@ class DiscussionEntry < ActiveRecord::Base
   protected :infer_parent_id
   
   def update_topic
-    if self.discussion_topic    
-      DiscussionTopic.update_all({:last_reply_at => Time.now.utc, :updated_at => Time.now.utc}, {:id => self.discussion_topic_id})
-      if self.discussion_topic.for_assignment? && self.discussion_topic.assignment.context.students.include?(self.user)
-        submission ||= self.discussion_topic.assignment.submit_homework(self.user, :submission_type => 'discussion_topic')
-      end
+    if self.discussion_topic
+      last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].max
+      DiscussionTopic.update_all({:last_reply_at => last_reply_at, :updated_at => Time.now.utc}, {:id => self.discussion_topic_id})
     end
-   end
+  end
   
   set_policy do
     given { |user| self.user && self.user == user && !self.discussion_topic.locked? }

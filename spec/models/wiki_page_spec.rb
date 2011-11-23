@@ -19,18 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WikiPage do
-  
-  # it "should send page created notifications" do
-    # course_with_teacher(:active_all => true)
-    # Notification.create(:name => "New Wiki Page")
-    # p = @course.wiki.wiki_pages.create(:title => "some page")
-    # p.messages_sent.should_not be_nil
-    # p.messages_sent.should_not be_empty
-    # p.messages_sent["New Wiki Page"].should_not be_nil
-    # p.messages_sent["New Wiki Page"].should_not be_empty
-    # p.messages_sent["New Wiki Page"][0].user.should eql(@user)
-  # end
-  
   it "should send page updated notifications" do
     course_with_teacher(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")

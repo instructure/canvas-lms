@@ -776,7 +776,7 @@ describe User do
       @course.enroll_student(student).accept
       teacher.lti_role_types(@course).should == ['Instructor']
       student.lti_role_types(@course).should == ['Learner']
-      nobody.lti_role_types(@course).should == []
+      nobody.lti_role_types(@course).should == ['urn:lti:sysrole:ims/lis/None']
       admin.lti_role_types(@course).should == ['urn:lti:instrole:ims/lis/Administrator']
     end
     
@@ -798,8 +798,34 @@ describe User do
       student = user_model
       @course1.enroll_teacher(teacher).accept
       @course1.enroll_student(student).accept
-      teacher.lti_role_types(@course2).should == []
-      student.lti_role_types(@course2).should == []
+      teacher.lti_role_types(@course2).should == ['urn:lti:sysrole:ims/lis/None']
+      student.lti_role_types(@course2).should == ['urn:lti:sysrole:ims/lis/None']
+    end
+  end
+  
+  context "tabs_available" do
+    it "should not include unconfigured external tools" do
+      tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob')
+      tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.save!
+      tool.has_user_navigation.should == false
+      user_model
+      tabs = UserProfile.new(@user).tabs_available(@user, :root_account => Account.default)
+      tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    end
+    
+    it "should include configured external tools" do
+      tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob')
+      tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.save!
+      tool.has_user_navigation.should == true
+      user_model
+      tabs = UserProfile.new(@user).tabs_available(@user, :root_account => Account.default)
+      tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+      tab = tabs.detect{|t| t[:id] == tool.asset_string }
+      tab[:href].should == :user_external_tool_path
+      tab[:args].should == [@user.id, tool.id]
+      tab[:label].should == "Example URL"
     end
   end
   
@@ -879,6 +905,41 @@ describe User do
       u.name = 'St. Clair'
       u.save!
       u.sortable_name.should == "St. Clair,"
+    end
+  end
+
+  context "group_member_json" do
+    before :each do
+      @account = Account.default
+      @enrollment = course_with_student(:active_all => true)
+      @section = @enrollment.course_section
+      @student.sortable_name = 'Doe, John'
+      @student.short_name = 'Johnny'
+      @student.save
+    end
+
+    it "should include user_id, name, and display_name" do
+      @student.group_member_json(@account).should == {
+        :user_id => @student.id,
+        :name => 'Doe, John',
+        :display_name => 'Johnny'
+      }
+    end
+
+    it "should include course section (section_id and section_code) if appropriate" do
+      @student.group_member_json(@account).should == {
+        :user_id => @student.id,
+        :name => 'Doe, John',
+        :display_name => 'Johnny'
+      }
+
+      @student.group_member_json(@course).should == {
+        :user_id => @student.id,
+        :name => 'Doe, John',
+        :display_name => 'Johnny',
+        :section_id => @section.id,
+        :section_code => @section.section_code
+      }
     end
   end
 end
