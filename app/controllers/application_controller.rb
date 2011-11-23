@@ -1049,4 +1049,25 @@ class ApplicationController < ActionController::Base
     yield if block_given? && (@bank = bank)
     bank
   end
+
+  def render(options = nil, extra_options = {}, &block)
+    if options && options.key?(:json)
+      json = options.delete(:json)
+      json = ActiveSupport::JSON.encode(json) unless json.is_a?(String)
+      # prepend our CSRF protection to the JSON response, unless this is an API
+      # call that didn't use session auth.
+      if @pseudonym_session && !@pseudonym_session.used_basic_auth?
+        json = "while(1);#{json}"
+      end
+
+      # fix for IE not properly handling json responses to multipart file
+      # upload forms -- we'll respond with text instead.
+      if request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data} && params[:format].to_s != 'json'
+        options[:text] = json
+      else
+        options[:json] = json
+      end
+    end
+    super
+  end
 end

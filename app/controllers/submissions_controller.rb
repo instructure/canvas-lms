@@ -272,7 +272,7 @@ class SubmissionsController < ApplicationController
           format.html { render :action => "show", :id => @assignment.context.id }
           format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }
           format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
-          format.text { render_for_text({:errors => {:base => @error_message}}.to_json) }
+          format.text { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
         end
       end
     end

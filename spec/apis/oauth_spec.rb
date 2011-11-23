@@ -57,9 +57,14 @@ describe "OAuth2", :type => :integration do
 
     # don't need developer key when we have an actual application session
     post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+    response.should redirect_to("http://www.example.com/?login_success=1")
     get "/api/v1/courses.json", {}
     response.should be_success
-    JSON.parse(response.body).size.should == 1
+    # because this is a normal application session, the response is prepended
+    # with our anti-csrf measure
+    json = response.body
+    json.should match(%r{^while\(1\);})
+    JSON.parse(json.sub(%r{^while\(1\);}, '')).size.should == 1
     reset!
 
     post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }

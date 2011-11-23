@@ -38,13 +38,13 @@ describe FoldersController do
       file.save!
       
       get 'show', :course_id => @course.id, :id => @folder.id, :format => 'json'
-      json = JSON.parse(response.body)
+      json = json_parse
       json['files'].count.should eql(1)
       
       file.hidden = true
       file.save!
       get 'show', :course_id => @course.id, :id => @folder.id, :format => 'json'
-      json = JSON.parse(response.body)
+      json = json_parse
       json['files'].count.should eql(0)
     end
   end

@@ -47,9 +47,9 @@ class OutcomeGroupsController < ApplicationController
           outcome_hash = outcome_hash.with_indifferent_access
           outcome = group.learning_outcomes.create(params)
         end
-        render :text => group.to_json(:include => :learning_outcomes)
+        render :json => group.to_json(:include => :learning_outcomes)
       else
-        render :text => {:errors => {:base => t(:invalid_file, "Invalid outcome group file")}}, :status => :bad_request
+        render :json => {:errors => {:base => t(:invalid_file, "Invalid outcome group file")}}, :status => :bad_request
       end
     end
   end
