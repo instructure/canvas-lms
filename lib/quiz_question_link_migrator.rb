@@ -31,7 +31,8 @@ module QuizQuestionLinkMigrator
   def self.related_attachment_ids(file_id)
     # find the list of ids of copies of the file from the link
     attachment_ids = [file_id]
-    file = Attachment.find(file_id)
+    file = Attachment.find_by_id(file_id)
+    return attachment_ids unless file
     cloned_item_id = file.cloned_item_id
     if file.cloned_item_id
       copies = Attachment.find_all_by_cloned_item_id(file.cloned_item_id)
@@ -115,7 +116,8 @@ module QuizQuestionLinkMigrator
   def self.migrate_file_links_in_question_data(question_data, context={})
     return unless question_data
     changed = false
-    question = context[:question] || QuizQuestion.find(question_data[:id], :include => [:quiz, :assessment_question])
+    question = context[:question] || QuizQuestion.find_by_id(question_data[:id], :include => [:quiz, :assessment_question])
+    return unless question
     quiz = context[:quiz] || question.quiz
     for_each_interesting_field(question_data) do |field|
       changed = true if migrate_file_links_in_blob(field, question, quiz)
