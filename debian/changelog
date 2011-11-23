@@ -1,3 +1,11 @@
+canvas-lms (1.1-82) professional; urgency=low
+
+  * Package ref: 2ba924db45568cf8529b5a71ac3aaaf8509540b9
+  *
+  * [+2ba924d] don't die if a file or question is missing
+
+ -- JT Olds <jt@instructure.com>  Tue, 22 Nov 2011 21:40:45 -0700
+
 canvas-lms (1.1-81) professional; urgency=low
 
   * Package ref: 7e757f6334cb4f5facb2e7015dac1f038e031585
