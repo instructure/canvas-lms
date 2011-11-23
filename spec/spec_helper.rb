@@ -79,7 +79,7 @@ Spec::Runner.configure do |config|
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
   config.mock_with :mocha
 
-  config.include Webrat::Matchers, :type => :views 
+  config.include Webrat::Matchers, :type => :views
 
   config.before :each do
     Time.zone = 'UTC'
@@ -170,17 +170,25 @@ Spec::Runner.configure do |config|
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
+    @user.workflow_state = opts[:user_state] if opts[:user_state]
     @user
   end
 
   def user_with_pseudonym(opts={})
-    user(opts) unless opts[:user]
-    user = opts[:user] || @user
+    user = user_with_communication_channel(opts)
     username = opts[:username] || "nobody@example.com"
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
-    @cc = @pseudonym.communication_channel = user.communication_channels.create!(:path_type => 'email', :path => username) do |cc|
+    @pseudonym.communication_channel = @cc
+    user
+  end
+
+  def user_with_communication_channel(opts={})
+    user(opts) unless opts[:user]
+    user = opts[:user] || @user
+    username = opts[:username] || "nobody@example.com"
+    @cc = user.communication_channels.create!(:path_type => 'email', :path => username) do |cc|
       cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
       cc.workflow_state = opts[:cc_state] if opts[:cc_state]
     end
@@ -196,7 +204,7 @@ Spec::Runner.configure do |config|
 
   def course_with_student_logged_in(opts={})
     course_with_student(opts)
-    user_session(@user)    
+    user_session(@user)
   end
 
   def student_in_course(opts={})
@@ -290,7 +298,7 @@ Spec::Runner.configure do |config|
     @outcome_group ||= LearningOutcomeGroup.default_for(@course)
     @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
     @outcome_group.add_item(@outcome)
-    @outcome_group.save! 
+    @outcome_group.save!
 
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
@@ -390,13 +398,13 @@ Spec::Runner.configure do |config|
     response.should be_redirect
     flash[:notice].should eql("You must be logged in to access this page")
   end
-  
+
   def default_uploaded_data
     require 'action_controller'
     require 'action_controller/test_process.rb'
     ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/scribd_docs/doc.doc'), 'application/msword', true)
   end
-  
+
   def valid_gradebook_csv_content
     File.read(File.expand_path(File.join(File.dirname(__FILE__), %w(fixtures default_gradebook.csv))))
   end
@@ -419,7 +427,7 @@ Spec::Runner.configure do |config|
 
   def process_csv_data(*lines_or_opts)
     account_model unless @account
-  
+
     lines = lines_or_opts.reject{|thing| thing.is_a? Hash}
     opts = lines_or_opts.select{|thing| thing.is_a? Hash}.inject({:allow_printing => false}, :merge)
 
@@ -428,14 +436,14 @@ Spec::Runner.configure do |config|
     tmp.close!
     File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
     opts[:files] = [path]
-    
+
     importer = SIS::CSV::Import.process(@account, opts)
-    
+
     File.unlink path
-    
+
     importer
   end
-  
+
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
     importer.errors.should == []
@@ -487,7 +495,7 @@ Spec::Runner.configure do |config|
     end
     return server, server_thread, post_lines
   end
- 
+
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stubs(:config).returns({

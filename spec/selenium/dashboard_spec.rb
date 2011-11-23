@@ -148,42 +148,75 @@ shared_examples_for "dashboard selenium tests" do
     course_menu.should include_text(group.name)
   end
 
-  it "should not allow customization of the course menu if there are insufficient courses" do
-    course_with_teacher_logged_in
+  context "course menu customization" do
+    it "should not allow customization if there are insufficient courses" do
+      course_with_teacher_logged_in
 
-    get "/"
+      get "/"
 
-    course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
-    driver.action.move_to(course_menu).perform
-    course_menu.should include_text('My Courses')
-    course_menu.should_not include_text('Customize')
-  end
+      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+      driver.action.move_to(course_menu).perform
+      course_menu.should include_text('My Courses')
+      course_menu.should_not include_text('Customize')
+    end
 
-  it "should allow customization of the course menu if there are sufficient courses" do
-    course_with_teacher_logged_in
-    20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+    it "should allow customization if there are sufficient courses" do
+      course_with_teacher_logged_in
+      20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
 
-    get "/"
+      get "/"
 
-    course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
-    driver.action.move_to(course_menu).perform
-    course_menu.should include_text('My Courses')
-    course_menu.should include_text('Customize')
-  end
+      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+      driver.action.move_to(course_menu).perform
+      course_menu.should include_text('My Courses')
+      course_menu.should include_text('Customize')
+      course_menu.should include_text('View all courses')
+    end
 
-  it "should allow customization of the course menu even before the course ajax request comes back" do
-    course_with_teacher_logged_in
-    20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+    it "should allow customization if there are sufficient course invitations" do
+      course_with_teacher_logged_in(:active_cc => true)
+      20.times { course_with_teacher({:user => user_with_communication_channel(:user_state => :creation_pending), :active_course => true}) }
 
-    get "/"
+      get "/"
 
-    course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
-    driver.action.move_to(course_menu).perform
-    course_menu.should include_text('My Courses')
-    course_menu.find_element(:css, '.customListOpen').click
-    keep_trying_until {
-      course_menu.find_element(:css, '.customListWrapper').should be_displayed
-    }
+      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+      driver.action.move_to(course_menu).perform
+      course_menu.should include_text('My Courses')
+      course_menu.should include_text('Customize')
+      course_menu.should include_text('View all courses')
+    end
+
+    it "should allow customization if all courses are already favorited" do
+      course_with_teacher_logged_in
+      @user.favorites.create(:context => @course)
+      20.times {
+        course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true})
+        @user.favorites.create(:context => @course)
+      }
+
+      get "/"
+
+      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+      driver.action.move_to(course_menu).perform
+      course_menu.should include_text('My Courses')
+      course_menu.should include_text('Customize')
+    end
+
+    it "should allow customization even before the course ajax request comes back" do
+      course_with_teacher_logged_in
+      20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+
+      get "/"
+
+      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+      driver.action.move_to(course_menu).perform
+      course_menu.should include_text('My Courses')
+      course_menu.should include_text('View all courses')
+      course_menu.find_element(:css, '.customListOpen').click
+      keep_trying_until {
+        course_menu.find_element(:css, '.customListWrapper').should be_displayed
+      }
+    end
   end
 
   it "should display scheduled web conference in stream" do
