@@ -21,6 +21,16 @@ describe 'QtiExporter' do
     quiz.quiz_questions.each do |q|
       text = Nokogiri::HTML::DocumentFragment.parse(q.question_data['question_text'])
       text.css('img').first['src'].should == "/courses/#{@course.id}/files/#{attachment.id}/preview"
+
+      # verify that the associated assessment_question got links translated
+      aq = q.assessment_question
+      text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['question_text'])
+      text.css('img').first['src'].should =~ %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+
+      if aq.question_data['answers'][1]["comments_html"] =~ /\<img/
+        text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['answers'][1]["comments_html"])
+        text.css('img').first['src'].should =~ %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+      end
     end
     quiz.assignment.should be_nil
   end
