@@ -1,3 +1,85 @@
+canvas-lms (1.1-84) professional; urgency=low
+
+  * Package ref: 0939bfa83e577d994f522f5760b65eac70afd48e
+  *
+  * [+b0f4c0c] a GoogleDocEntry is not a model
+  * [+98e18ba] fixing google doc deletion. refs #5796
+  * [+752225f] don't create a dimdim plugin setting for every spec
+  * [+0161a87] update selenium-webdriver gem to 2.10.0
+  * [+b95617a] only show feedback for the current course in feedback sidebar
+  * [+4efba9a] update oauth lib to 0.4.5 and our usage to oauth 1.0a
+  * [+847175b] enable showing group rosters on student groups view
+  * [+a05c986] these specs depend on at least one enabled conferences type
+  * [+2729cf1] api docs reference invalid jquery path
+  * [+0260734] blur/change previous input when tiny gets focus, fixes #5764
+  * [+cf29385] IE8 was throwing an error on objectCollection.indexOf
+  * [+cf6a996] get forked-selenium specs working again
+  * [+7efd4c6] add LTI grade passback infrastructure, refs #5892
+  * [+28c9895] don't rename external tools when the tag is renamed
+  * [+25d77ac] add replaceResult support to LTI grade passback, refs #5892
+  * [+b66e8ba] respond 'failure' not 'unsupported' for bad values in replaceResult
+  * [+99a97ba] track user interaction events in google analytics
+  * [+f15c5cc] make sure matching questions are formatted correctly when imported
+  * [+1273176] added I18n js file to jquerypluginsspec
+  * [+a880d38] cancel mousewheel over select boxes fixes #6143
+  * [+a70c0f4] fix incompatible change in prefixing of api routes
+  * [+c1957aa] launch lti tool when viewing external_tool assignment
+  * [+b9b5409] add readResult support to LTI grade passback, refs #5892
+  * [+a67b9af] add deleteResult support to LTI grade passback, refs #5892
+  * [+20d6180] enforce nonce and timestamp in lti outcome requests
+  * [+7b3c47b] don't error when using grading_scheme and no score
+  * [+9e90401] disable 'randomly assign students' for restricted self-signup groups
+  * [+5c57abe] don't show discussion responses in stream when not allowed
+  * [+56dac94] recompiled js files
+  * [+81949b2] don't html escape user answers in fimb questions; fixes #5628
+  * [+25553b1] added additional steps to selenium/quizzes_spec mousewheel test
+  * [+6b83b92] basic lti navigation links
+  * [+506f7a8] fixing pseudonym session stub in selenium specs
+  * [+0478427] allow basic lti links from arbitrary content
+  * [+902bcec] extractor support for I18n as a module
+  * [+a3a25a2] lti return url needs to be absolute, refs #5892
+  * [+e987dc2] abort jobs onSelected if no jobs are selected
+  * [+0e72be8] change to a more generic lti outcome service url scheme
+  * [+22de180] implement blti extensions 0.0.4 outcome service, refs #5892
+  * [+c0b56aa] force dtstart in ics to utc
+  * [+ad8fcba] remove the new wiki page notification
+  * [+cfaa154] changes to allow using more things as AMD modules
+  * [+edad137] add support for SAML encrypted assertions; fixes #5299
+  * [+30bc3e9] fixes typos in sis documentation
+  * [+08f0b9c] fix quiz bug in windows chrome, closes #5257
+  * [+9158480] register handlebars templates even if not require()d
+  * [+f38f8e3] scope api sis finds to the domain root account, fixes #6246
+  * [+bad37ad] change Feedback to Help fixes #6262
+  * [+3783768] adding content tag url validation
+  * [+be5ec29] don't mess with table borders in tinyMCE
+  * [+5d5b443] ensure that assignments are associated with a group
+  * [+35d3f16] don't request thumbnail until it's ready, fixes #5800
+  * [+4c8c061] delete assignment group IE 8 - fixes #5988
+  * [+94fa0e1] new folders are droppable fixes #6001
+  * [+cfa114a] handle ids as strings on gradebook csv imports
+  * [+ee88bc9] prevent page error on dashboard, fixes #6121
+  * [+e0616ff] add sis id to add user dialog; fixes #6279
+  * [+5f3a790] log the id of the assessment question when link translation fails
+  * [+ed275b3] restrict submission actions to sections
+  * [+89d79c1] create submissions when a discussion gains an assignment
+  * [+14fd244] truncate recipient tokens to not screw up page flow
+  * [+6fadcdb] fix sorting on outcomes page. fixes #4670.
+  * [+28a62ef] give option to adjust assignment points possible based on rubric points possible
+  * [+777cd13] require skip_callbacks in migration that needs it
+  * [+bf4bde1] order the gradebook csv assignment columns by due_date, then position
+  * [+a654880] UI for creating external tool assignments
+  * [+8a6ace4] adds SIS id to descriptions fixes #6277
+  * [+227614a] upgrade selenium gem to 2.12.0
+  * [+0a626fb] round answers w/ the same precision fixes #5906
+  * [+c79b7f5] resolve view conflicts for blti module items
+  * [+23ebfa1] fix migration
+  * [+af3baff] update submissions with null submission type
+  * [+5cc775a] default 'group_conversations' off; fixes #6069
+  * [+ec20c5d] avatar image caching and invalidation, closes #5210
+  * [+9984668] make misc_plugins work until we have AMD fully
+
+ -- JT Olds <jt@instructure.com>  Wed, 23 Nov 2011 16:22:27 -0700
+
 canvas-lms (1.1-83) professional; urgency=low
 
   * Package ref: abe14d05f4ede956b7127e7b1d499b8886ab3d6d
