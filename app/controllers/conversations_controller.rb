@@ -786,11 +786,4 @@ class ConversationsController < ApplicationController
       hash
     }
   end
-
-  def render(options = {}, extra_options = {}, &block)
-    if options.keys == [:json] && request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data} && params[:format].to_s != 'json'
-      options[:text] = options.delete(:json).to_json
-    end
-    super
-  end
 end

@@ -383,7 +383,7 @@ describe "security" do
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
     assert_response :success
-    ActiveSupport::JSON.decode(response.body).should == {
+    json_parse.should == {
       "duplicates" => [],
       "errored_users" => [{"address" => "A345678", "details" => "not_found"}],
       "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id.to_s }]

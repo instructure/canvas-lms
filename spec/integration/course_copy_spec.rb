@@ -34,16 +34,16 @@ describe ContentImportsController, :type => :integration do
       
       post "/courses/#{@copy_to.id}/imports/copy", :copy => {:course_id => @copy_from.id, :all_assignments => 1}
       response.should be_success
-      data = JSON.parse(response.body)
+      data = json_parse
       dj = Delayed::Job.last
       
       api_call(:get, data['status_url'], { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
-      JSON.parse(response.body)['workflow_state'].should == 'created'
+      json_parse['workflow_state'].should == 'created'
       
       dj.invoke_job
       
       api_call(:get, data['status_url'], { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
-      JSON.parse(response.body)['workflow_state'].should == 'completed'
+      json_parse['workflow_state'].should == 'completed'
       
       @copy_to.reload
       @copy_to.assignments.count.should == 1

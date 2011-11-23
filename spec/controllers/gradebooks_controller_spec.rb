@@ -100,7 +100,7 @@ describe GradebooksController do
         assignment2 = @course.assignments.create(:title => "Assignment 2", :group_category => group_category2)
         get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'json'
         response.should be_success
-        data = JSON.parse(response.body) rescue nil
+        data = json_parse
         data.should_not be_nil
         data.size.should == 4 # 2 assignments + an assignment group + a total
         data.first(2).sort_by{ |a| a['assignment']['title'] }.map{ |a| a['assignment']['group_category'] }.

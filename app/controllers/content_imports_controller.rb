@@ -77,7 +77,7 @@ class ContentImportsController < ApplicationController
             render :json => upload_params
           else
             @migration.export_content
-            render :text => @migration.to_json
+            render :json => @migration.to_json
           end
         else
           render :json => @migration.errors, :status => :bad_request
@@ -126,7 +126,7 @@ class ContentImportsController < ApplicationController
           send_file_or_data(stream, :type => :json, :disposition => 'inline')
         else
           logger.error "There was no overview.json file for this content_migration."
-          render :text => {:success=>false}.to_json
+          render :json => {:success=>false}.to_json
         end
       end
     end
@@ -141,7 +141,7 @@ class ContentImportsController < ApplicationController
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save
         @content_migration.import_content
-        render :text => {:success => true}.to_json
+        render :json => {:success => true}.to_json
       else
         render :json => @content_migration.to_json
       end
@@ -282,9 +282,9 @@ class ContentImportsController < ApplicationController
       @attachment = @migration.attachment
       if block_given?
         if @attachment && yield
-          render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?])
+          render :json => @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?])
         else
-          render_for_text "", :status => :bad_request
+          render :text => "", :status => :bad_request
         end
       end
     end
