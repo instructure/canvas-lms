@@ -1,3 +1,11 @@
+canvas-lms (1.1-83) professional; urgency=low
+
+  * Package ref: abe14d05f4ede956b7127e7b1d499b8886ab3d6d
+  *
+  * [+abe14d0] add a route for the translated assessment question links
+
+ -- JT Olds <jt@instructure.com>  Wed, 23 Nov 2011 16:06:41 -0700
+
 canvas-lms (1.1-82) professional; urgency=low
 
   * Package ref: 2ba924db45568cf8529b5a71ac3aaaf8509540b9
