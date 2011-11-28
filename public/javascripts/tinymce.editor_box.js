@@ -363,9 +363,11 @@
   var editorBoxIdCounter = 1;
   
   $.fn.editorBox = function(options, more_options) {
+    var args = arguments;
     if(this.length > 1) {
       return this.each(function() {
-        $(this).editorBox(options, more_options);
+        var $this = $(this);
+        $this.editorBox.apply($this, args);
       });
     }
     if (editorBoxIdCounter === 1) init();
