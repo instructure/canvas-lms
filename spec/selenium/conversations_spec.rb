@@ -55,6 +55,9 @@ shared_examples_for "conversations selenium tests" do
       JS
     end
 
+    group_conversation_link = driver.find_element(:id, "group_conversation")
+    group_conversation_link.click if group_conversation_link.displayed?
+
     expect {
       driver.find_element(:id, "create_message_form").submit
       wait_for_ajaximations
@@ -568,7 +571,6 @@ shared_examples_for "conversations selenium tests" do
 
   context "group conversations" do
     before do
-      pending("tests in this context intermittently causes the build to fail on aws")
       @course.update_attribute(:name, "the course")
       @course.default_section.update_attribute(:name, "the section")
       @other_section = @course.course_sections.create(:name => "the other section")

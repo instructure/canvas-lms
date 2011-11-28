@@ -40,7 +40,7 @@ shared_examples_for "files selenium tests" do
         "authenticity_token" => authenticity_token,
         "no_redirect" => true}, { "Cookie" => @cookie })
     resp.code.should == "200"
-    data = ActiveSupport::JSON.decode(body)
+    data = json_parse(body)
     data["upload_url"] = data["proxied_upload_url"] || data["upload_url"]
     data["upload_url"] = "#{app_host}#{data["upload_url"]}" if data["upload_url"] =~ /^\//
     data["success_url"] = "#{app_host}#{data["success_url"]}" if data["success_url"] =~ /^\//

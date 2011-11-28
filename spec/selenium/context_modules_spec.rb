@@ -32,8 +32,7 @@ describe "context_modules selenium tests" do
     get "/courses/#{@course.id}/modules"
 
     keep_trying_until {
-      edit_link = driver.find_element(:css, '.edit_module_link')
-      driver.action.move_to(edit_link).click(edit_link).perform
+      hover_and_click('#context_modules .edit_module_link')
       wait_for_ajax_requests
       driver.find_element(:id, 'add_context_module_form').should be_displayed
     }

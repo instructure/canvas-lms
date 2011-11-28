@@ -50,18 +50,28 @@ shared_examples_for "profile selenium tests" do
 
     find_with_jquery("#{email_select_css} > option[value=\"#{option_value}\"]'").click
     #change notification setting for first notification
-    daily_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(4) > div')
+    daily_select = content_tbody.find_element(:css, 'tr:nth-child(5) > td:nth-child(3) > div')
     daily_select.click
     daily_select.find_element(:xpath, '..').should have_class('selected_pending')
     #change notification setting for second notification
-    never_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(3) > div')
+    never_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(5) > div')
     never_select.click
     never_select.find_element(:xpath, '..').should have_class('selected_pending')
     driver.find_element(:css, '#content .save_preferences_button').click
     wait_for_ajax_requests
     refresh_page
 
-    find_with_jquery(email_select_css + ' > option[selected]').text.should == second_email 
+    select_rows = [driver.find_element(:css, '#content > table > tbody > tr:nth-child(3)'),
+                   driver.find_element(:css, '#content > table > tbody > tr:nth-child(4)')]
+    select_rows.each do |row|
+      if row.find_element(:css, 'td:nth-child(3)').attribute('class').match(/selected/)
+        # the daily
+        row.find_element(:css, 'td > span > select > option:checked').text.should == @user.email
+      else
+        # the never
+        row.find_element(:css, 'td > span > select > option:checked').text.should == second_email
+      end
+    end
   end
 
   it "should successfully upload profile pictures" do

@@ -118,12 +118,9 @@ module SeleniumTestsHelperMethods
     raise "couldn't find an available port after #{tried_ports.length} tries! ports tried: #{tried_ports.join ", "}"
   end
 
-
   def self.start_in_process_webrick_server
     setup_host_and_port
 
-    HostUrl.default_host = $app_host_and_port
-    HostUrl.file_host = $app_host_and_port
     server = SpecFriendlyWEBrickServer
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
@@ -151,8 +148,6 @@ module SeleniumTestsHelperMethods
     old_domain = domain_conf[Rails.env]["domain"]
     domain_conf[Rails.env]["domain"] = $app_host_and_port
     File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-    HostUrl.default_host = $app_host_and_port
-    HostUrl.file_host = $app_host_and_port
     server_pid = fork do
       base = File.expand_path(File.dirname(__FILE__))
       STDOUT.reopen(File.open("/dev/null", "w"))
@@ -341,6 +336,16 @@ shared_examples_for "all selenium tests" do
     driver.switch_to.window saved_window_handle
   end
 
+  def type_in_tiny(tiny_controlling_element, text)
+    scr = "$(#{tiny_controlling_element.to_s.to_json}).editorBox('execute', 'mceInsertContent', false, #{text.to_s.to_json})"
+    driver.execute_script(scr)
+  end
+
+  def hover_and_click(element_jquery_finder)
+    find_with_jquery(element_jquery_finder.to_s).should be_present
+    driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
+  end
+
   def is_checked(selector)
     if selector.is_a?(String)
       return driver.execute_script('return $("'+selector+'").is(":checked")')
@@ -520,6 +525,10 @@ shared_examples_for "in-process server selenium tests" do
   it_should_behave_like "all selenium tests"
   prepend_before(:all) do
     $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
+  end
+  before do
+    HostUrl.default_host = $app_host_and_port
+    HostUrl.file_host = $app_host_and_port
   end
 end
 

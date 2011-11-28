@@ -7,6 +7,7 @@ describe "jquery selenium tests" do
   # jquery keeps breaking attr() ... see http://bugs.jquery.com/ticket/10278
   # should be fixed in 1.7 (or 1.6.5?)
   it "should return the correct value for attr" do
+    get('/logout')
     driver.execute_script("$(document.body).append('<input type=\"checkbox\" checked=\"checked\" id=\"checkbox_test\">')")
 
     checkbox = driver.find_element(:id, 'checkbox_test')

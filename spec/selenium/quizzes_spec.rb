@@ -842,8 +842,7 @@ shared_examples_for "quiz selenium tests" do
     wait_for_dom_ready
 
     #flag first question
-    flag = driver.find_element(:css, "#question_#{quest1.id} .flag_icon")
-    driver.action.move_to(flag).click(flag).perform
+    hover_and_click("#question_#{quest1.id} .flag_icon")
 
     #click second answer
     driver.find_element(:css, "#question_#{quest2.id} .answers .answer:first-child input").click
