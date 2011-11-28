@@ -1053,7 +1053,8 @@ describe User do
       new_pseudonym.unique_id.should == 'preferred@example.com'
 
       # from unrelated account, if other options are not viable
-      @account1.pseudonyms.create!(:unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
+      user2 = User.create!
+      @account1.pseudonyms.create!(:user => user2, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.detect { |p| p.account == Account.site_admin }.update_attribute(:password_auto_generated, true)
       Account.default.account_authorization_configs.create!(:auth_type => 'cas')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)

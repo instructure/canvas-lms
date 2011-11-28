@@ -529,6 +529,8 @@ class UsersController < ApplicationController
     @user ||= User.new
     @user.attributes = params[:user]
     @user.name ||= params[:pseudonym][:unique_id]
+    @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
+    @user.save!
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
     # pre-populate the reverse association
@@ -544,10 +546,8 @@ class UsersController < ApplicationController
     @cc ||= @user.communication_channels.build(:path => email)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
-    @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
     if @pseudonym.valid?
       @pseudonym.save_without_session_maintenance
-      @user.save!
       @cc.save!
       message_sent = false
       if notify == :self_registration
