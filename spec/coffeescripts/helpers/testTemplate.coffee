@@ -1,4 +1,4 @@
-!define('specs/helpers/testTemplate', ['compiled/handlebars_helpers'], function (Handlebars) {
+`!define('specs/helpers/testTemplate', ['compiled/handlebars_helpers'], function (Handlebars) {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['test_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -10,4 +10,4 @@
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "foo", { hash: {} }); }
   return escapeExpression(stack1);});
   return templates['test_template'];
-});
+});`
