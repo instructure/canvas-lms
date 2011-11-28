@@ -33,6 +33,7 @@ $(document).ready(function() {
     $dialog.find(".context_module_content").showIf(for_modules);
     $dialog.find(".holder_name").text(holder_name);
     $dialog.find(".add_item_button").text(select_button_text);
+    $dialog.find(".select_item_name").showIf(!options.no_name_input);
     if(allow_external_urls && !external_services) {
       var $services = $("#content_tag_services").empty();
       $.getUserServices('BookmarkService', function(data) {
@@ -59,6 +60,8 @@ $(document).ready(function() {
     }
     $("#select_context_content_dialog #external_urls_select :text").val("");
     $("#select_context_content_dialog #context_module_sub_headers_select :text").val("");
+    $('#add_module_item_select').change();
+    $("#select_context_content_dialog .module_item_select").change();
     $("#select_context_content_dialog").dialog('close').dialog({
       autoOpen: true,
       title: dialog_title,
@@ -73,8 +76,6 @@ $(document).ready(function() {
     $(this).parents(".module_item_option").find(".add_item_button").click();
   });
   $("#select_context_content_dialog .add_item_button").click(function() {
-    var module_id = $("#select_context_content_dialog").getTemplateData({textValues: ['context_module_id']}).context_module_id;
-    var item_type = $("#add_module_item_select").val();
     var submit = function(item_data) {
       $("#select_context_content_dialog").dialog('close');
       var submitted = $dialog.data('submitted_function');
@@ -82,6 +83,7 @@ $(document).ready(function() {
         submitted(item_data);
       }
     };
+    var item_type = $("#add_module_item_select").val();
     if(item_type == 'external_url') {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
@@ -195,13 +197,13 @@ $(document).ready(function() {
         });
       }
     }
-  }).change();
+  })
   $("#select_context_content_dialog .module_item_select").change(function() {
     if($(this).val() == "new") {
       $(this).parents(".module_item_option").find(".new").show().focus().select();
     } else {
       $(this).parents(".module_item_option").find(".new").hide();
     }
-  }).change();
+  })
 });
 });

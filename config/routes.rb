@@ -155,7 +155,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
-    course.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
+    course.resources :external_tools, :collection => {:retrieve => :get} do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     course.resources :submissions
@@ -256,6 +256,7 @@ ActionController::Routing::Routes.draw do |map|
     course.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
     course.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
     course.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
+    course.group_assign_unassigned_members 'group_assign_unassigned_members', :controller => 'groups', :action => 'assign_unassigned_members', :conditions => { :method => :post }
     course.user_notes 'user_notes', :controller => 'user_notes', :action => 'user_notes'
     course.switch_role 'switch_role/:role', :controller => 'courses', :action => 'switch_role'
     course.sis_publish_status 'details/sis_publish', :controller => 'courses', :action => 'sis_publish_status', :conditions => {:method => :get}
@@ -306,6 +307,8 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   map.resources :assessment_questions do |question|
+    question.map 'files/:id/download', :controller => 'files', :action => 'assessment_question_show', :download => '1'
+    question.map 'files/:id/preview', :controller => 'files', :action => 'assessment_question_show', :preview => '1'
     question.verified_file 'files/:id/:verifier', :controller => 'files', :action => 'assessment_question_show', :download => '1'
   end
   
@@ -412,7 +415,7 @@ ActionController::Routing::Routes.draw do |map|
     account.test_ldap_binds 'test_ldap_binds', :controller => 'account_authorization_configs', :action => 'test_ldap_bind'
     account.test_ldap_searches 'test_ldap_searches', :controller => 'account_authorization_configs', :action => 'test_ldap_search'
     account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
-    account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
+    account.resources :external_tools do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     account.resources :chats
@@ -498,6 +501,7 @@ ActionController::Routing::Routes.draw do |map|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
     user.resources :calendar_events
+    user.external_tool 'external_tools/:id', :controller => 'users', :action => 'external_tool'
     user.resources :notifications, :only => [:destroy, :update], :collection => {:clear => :post}
     user.resources :rubrics
     user.resources :rubric_associations do |association|
@@ -736,6 +740,11 @@ ActionController::Routing::Routes.draw do |map|
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
+
+  ApiRouteSet.route(map, "/api/lti/v1") do |lti|
+    lti.post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
+    lti.post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
+  end
 
   map.resources :equation_images, :only => :show
 

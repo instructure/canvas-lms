@@ -7,13 +7,12 @@ css_compressor_options:
 <% saved = _erbout; _erbout = '' %>
 javascripts:
   common:
-    - public/javascripts/curlConfig.js
-    - public/javascripts/vendor/curl.js
+    - public/javascripts/requireConfig.js
+    - public/javascripts/vendor/require.js
     - public/javascripts/vendor/firebugx.js
     - public/javascripts/datejs_to_iso_string_patch.js
     - public/javascripts/vendor/date.js
     - public/javascripts/vendor/handlebars.vm.js
-    - public/javascripts/compiled/Template.js
     - public/javascripts/vendor/jquery-1.6.4.js
     # jquery ui modules and effects that we don't actually use are commented out to reduce payload
     - public/javascripts/vendor/jquery-ui-1.8.16/ui/jquery.ui.core.js
@@ -136,6 +135,7 @@ javascripts:
   jobs:
     - public/javascripts/compiled/jobs.js
   profile:
+    - public/javascripts/compiled/util/BackoffPoller.js
     - public/javascripts/profile.js
     - public/javascripts/user_sortable_name.js
     - public/javascripts/user_utils.js

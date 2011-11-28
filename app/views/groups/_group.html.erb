@@ -37,10 +37,16 @@
   </div>
   <div class="group_info">
     <% items = [] %>
-    <%# 1 by default since when creating a group the creating user will be in
-        it, but will be the only user in it %>
-    <% items << t(:member, 'member', :count => group ? group.participating_users.length : 1) %>
-    <% items << group.group_category.name if group && !group.student_organized? %>
-    <%= items.join(", ") %>
+    <% if group && group.participating_users.length == 0 %>
+      <% items << h(t :no_members, 'No members') %>
+   <% else %>
+      <%# 1 by default since when creating a group the creating user will be in
+          it, but will be the only user in it %>
+      <% members_text = t :member, 'member', :count => group ? group.participating_users.length : 1 %>
+      <% members_tooltip = t :member_tooltip_show, 'View group roster' %>
+      <% items << link_to(h(members_text), group_members_url(group ? group.id : "{{ id }}"), :class => 'toggle_members_link', :title => h(members_tooltip)) %>
+    <% end %>
+    <% items << h(group.group_category.name) if group && !group.student_organized? %>
+    <%= items.join(", ").html_safe %>
   </div>
 </li>

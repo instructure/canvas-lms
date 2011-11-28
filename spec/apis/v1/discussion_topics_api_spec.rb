@@ -258,6 +258,44 @@ describe DiscussionTopicsController, :type => :integration do
       json['attachment'].should_not be_nil
       json['attachment'].should_not be_empty
     end
+
+    it "should create a submission from an entry on a graded topic" do
+      @topic.assignment = assignment_model(:course => @course)
+      @topic.save
+
+      student_in_course(:active_all => true)
+      @user.submissions.should be_empty
+
+      json = api_call(
+        :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
+        { :message => @message })
+
+      @user.reload
+      @user.submissions.size.should == 1
+      @user.submissions.first.submission_type.should == 'discussion_topic'
+    end
+
+    it "should create a submission from a reply on a graded topic" do
+      top_entry = create_entry(@topic, :message => 'top-level message')
+
+      @topic.assignment = assignment_model(:course => @course)
+      @topic.save
+
+      student_in_course(:active_all => true)
+      @user.submissions.should be_empty
+
+      json = api_call(
+        :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
+        { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
+        { :message => @message })
+
+      @user.reload
+      @user.submissions.size.should == 1
+      @user.submissions.first.submission_type.should == 'discussion_topic'
+    end
   end
 
   context "listing top-level discussion entries" do

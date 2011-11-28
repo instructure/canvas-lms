@@ -41,12 +41,11 @@ class GradebookImporter
   end
   
   FasterCSV::Converters[:nil] = lambda{|e| (e.nil? ? e : raise) rescue e}
-  FasterCSV::Converters[:nil_saving_numeric] = [:nil, :numeric]
   
   def parse!
     @student_columns = 3 # name, user id, section
     
-    csv = FasterCSV.new(self.contents, :converters => :nil_saving_numeric)
+    csv = FasterCSV.new(self.contents, :converters => :nil)
     header = csv.shift
     @assignments = process_header(header)
     

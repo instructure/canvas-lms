@@ -224,10 +224,10 @@ module VistaExpected
               :question_name=>"Matching",
               :question_text=>"Match these.<br>\n<br/>\n<br>\n<br/>\n<br>\n<br/>\n<br>\n<br/>\n<br>",
               :answers=>
-                      [{:right=>"right 1", :text=>"left 1", :comments=>""},
-                       {:right=>"right 2", :text=>"left 2", :comments=>""},
-                       {:right=>"right 3", :text=>"left 3", :comments=>""},
-                       {:right=>"right 4", :text=>"left 4", :comments=>""}],
+                      [{:right=>"right 1", :text=>"left 1", :left=>"left 1", :comments=>""},
+                       {:right=>"right 2", :text=>"left 2", :left=>"left 2", :comments=>""},
+                       {:right=>"right 3", :text=>"left 3", :left=>"left 3", :comments=>""},
+                       {:right=>"right 4", :text=>"left 4", :left=>"left 4", :comments=>""}],
               :incorrect_comments=>"",
               :question_type=>"matching_question",
               :matches=>

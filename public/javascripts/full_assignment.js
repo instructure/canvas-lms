@@ -88,6 +88,7 @@ jQuery(function($){
     event.preventDefault();
     $edit_assignment_form.find(".more_options_link").hide();
     $edit_assignment_form.find(".more_assignment_values").show();
+    $edit_assignment_form.find(".assignment_type").change();
   });
   $(".edit_full_assignment_link").click(function(event) {
     event.preventDefault();
@@ -97,12 +98,17 @@ jQuery(function($){
   $edit_assignment_form.find(".date_field").datetime_field();
   $edit_assignment_form.find(".assignment_type").change(function(event) {
     var val = $(this).val();
-    $edit_assignment_form.find(".assignment_content").showIf(val == "assignment" || val == "discussion_topic");
+    $edit_assignment_form.find(".assignment_content").showIf(val == "assignment" || val == "discussion_topic" || val == "external_tool");
     $edit_assignment_form.find(".submission_content").showIf(val == "assignment");
     $edit_assignment_form.find(".quiz_content").showIf(val == "quiz");
     $edit_assignment_form.find(".discussion_topic_content").showIf(val == "discussion_topic");
+    $edit_assignment_form.find(".external_tool_content").showIf(val == "external_tool");
     $edit_assignment_form.find(".not_graded_content").showIf(val == "not_graded");
     $edit_assignment_form.find(".more_assignment_values.assignment_content").showIf((val == "assignment" || val == "discussion_topic") && !$edit_assignment_form.find(".more_options_link:visible").length);
+    if (val == "external_tool" && $("#assignment_external_tool_tag_attributes_url").val() == "") {
+      // show the selector immediately
+      $("#edit_external_tool_url").click();
+    }
   }).triggerHandler('change');
   $edit_assignment_form.find(".points_possible").change(function(event) {
     var points = parseFloat($(this).val());
@@ -165,6 +171,12 @@ jQuery(function($){
             return I18n.t('messages.need_online_submission_type', "Please choose at least one type of online submission");
           }
         }
+      },
+      'external_tool_tag_attributes[url]': function(value, data) {
+        // no, this isn't real url validation
+        if (data.assignment_type == 'external_tool' && (value.length < 3 || value.indexOf(' ') >= 0)) {
+          return I18n.t('messages.need_url', "Please specify a valid URL");
+        }
       }
     },
     processData: function(data) {
@@ -197,6 +209,7 @@ jQuery(function($){
       if(data.assignment_type == 'quiz') { data['assignment[submission_types]'] = 'online_quiz'; }
       if(data.assignment_type == 'not_graded') { data['assignment[submission_types]'] = 'not_graded'; }
       if(data.assignment_type == 'discussion_topic') { data['assignment[submission_types]'] = 'discussion_topic'; }
+      if(data.assignment_type == 'external_tool') { data['assignment[submission_types]'] = 'external_tool'; }
       return data;
     }, beforeSubmit: function(data) {
       hideFullAssignmentForm();
@@ -289,6 +302,18 @@ jQuery(function($){
         width: 400
       }).dialog('open');
     }
+  });
+  $("#edit_external_tool_url, #assignment_external_tool_tag_attributes_url").click(function(event) {
+    event.preventDefault();
+    INST.selectContentDialog({
+      'select_button_text': I18n.t('buttons.select_url', 'Select'),
+      'no_name_input': true,
+      'submit': function(item_data) {
+        $('#assignment_external_tool_tag_attributes_url').val(item_data['item[url]']);
+        $('#assignment_external_tool_tag_attributes_new_tab').val(item_data['item[new_tab]']);
+      }
+    });
+    $("#external_tool_create_url").val($('#assignment_external_tool_tag_attributes_url').val());
   });
   $edit_assignment_form.find(":input").keycodes("esc", function(event) {
     event.preventDefault();

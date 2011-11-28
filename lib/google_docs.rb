@@ -39,18 +39,22 @@ module GoogleDocs
     @current_user ||= (self.respond_to?(:user) && self.user.is_a?(User) && self.user) || nil
   end
 
-  def google_docs_get_access_token(oauth_request)
-    consumer = google_consumer
-    request_token = OAuth::RequestToken.new(consumer, oauth_request.token, oauth_request.secret)
-    session[:oauth_gdocs_secret] = nil
-    access_token = request_token.get_access_token
+  def google_docs_get_service_user(access_token)
     doc = google_docs_create_doc("Temp Doc", true, access_token)
     google_docs_delete_doc(doc, access_token)
+    service_user_id = doc.entry.authors[0].email rescue nil
+    service_user_name = doc.entry.authors[0].email rescue nil
+    return service_user_id, service_user_name
+  end
+
+  def google_docs_get_access_token(oauth_request, oauth_verifier)
+    consumer = google_consumer
+    request_token = session.delete(:oauth_google_docs_request_token)
+    access_token = request_token.get_access_token(:oauth_verifier => oauth_verifier)
+    service_user_id, service_user_name = google_docs_get_service_user(access_token)
     session[:oauth_gdocs_access_token_token] = access_token.token
     session[:oauth_gdocs_access_token_secret] = access_token.secret
     if oauth_request.user
-      service_user_id = doc.entry.authors[0].email rescue nil
-      service_user_name = doc.entry.authors[0].email rescue nil
       UserService.register(
         :service => "google_docs",
         :access_token => access_token,
@@ -68,10 +72,9 @@ module GoogleDocs
 
   def google_docs_request_token_url(return_to)
     consumer = google_consumer
-    request_token = consumer.get_request_token({}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
-    session[:oauth_gdocs_token] = request_token.token
-    session[:oauth_gdocs_secret] = request_token.secret
     session[:oauth_gdocs_user_secret] = AutoHandle.generate(nil, 16)
+    request_token = consumer.get_request_token({ :oauth_callback => oauth_success_url(:service => 'google_docs')}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
+    session[:oauth_google_docs_request_token] = request_token
     OauthRequest.create(
       :service => 'google_docs',
       :token => request_token.token,
@@ -81,7 +84,7 @@ module GoogleDocs
       :user => @current_user,
       :original_host_with_port => request.host_with_port
     )
-    request_token.authorize_url + "&oauth_callback=#{oauth_success_url(:service => 'google_docs', :user => session[:oauth_gdocs_user_secret])}"
+    request_token.authorize_url
   end
 
   def google_docs_download(document_id)

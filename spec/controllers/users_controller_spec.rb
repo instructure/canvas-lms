@@ -152,11 +152,25 @@ describe UsersController do
         user_with_pseudonym(:account => account)
         account.add_user(@user)
         user_session(@user, @pseudonym)
-        post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
+        post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
         p = Pseudonym.find_by_unique_id('jacob@instructure.com')
         p.account_id.should == account.id
         p.should be_active
+        p.sis_user_id.should == 'testsisid'
+        p.user.should be_pre_registered
+      end
+
+      it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
+        account = Account.create!
+        admin = account_admin_user_with_role_changes(:account => account, :role_changes => {'manage_sis' => false})
+        user_session(admin)
+        post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
+        response.should be_success
+        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+        p.account_id.should == account.id
+        p.should be_active
+        p.sis_user_id.should be_nil
         p.user.should be_pre_registered
       end
 

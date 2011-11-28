@@ -23,7 +23,7 @@ describe I18nExtraction::JsExtractor do
     scope_results = scope && (options.has_key?(:scope_results) ? options.delete(:scope_results) : true)
 
     extractor = I18nExtraction::JsExtractor.new
-    source = "I18n.scoped('#{scope}', function(I18n) {\n#{source}\n});" if scope
+    source = "I18n.scoped('#{scope}', function(I18n) {\n#{source.gsub(/^/, '  ')}\n});" if scope
     extractor.process(source, options)
     (scope_results ?
       scope.split(/\./).inject(extractor.translations) { |hash, s| hash[s] } :
@@ -93,9 +93,32 @@ describe I18nExtraction::JsExtractor do
   end
 
   context "scoping" do
+    it "should correctly infer the scope" do
+      extract(<<-SOURCE, nil).should == {'asdf' => {'bar' => 'Bar'}}
+        I18n.scoped('asdf', function(I18n) {
+          I18n.t('bar', 'Bar');
+        });
+      SOURCE
+
+      extract(<<-SOURCE, nil).should == {'asdf' => {'bar' => 'Bar'}}
+        require(['i18n'], function(I18n) {
+          I18n = I18n.scoped('asdf');
+          I18n.t('bar', 'Bar');
+        });
+      SOURCE
+    end
+
     it "should require a scope for all I18n calls" do
       lambda{ extract(<<-SOURCE, nil) }.should raise_error /possibly unscoped I18n call on line 4/
         I18n.scoped('asdf', function(I18n) {
+          I18n.t('bar', 'Bar');
+        });
+        I18n.t('foo', 'Foo');
+      SOURCE
+
+      lambda{ extract(<<-SOURCE, nil) }.should raise_error /possibly unscoped I18n call on line 5/
+        require(['i18n'], function(I18n) {
+          I18n = I18n.scoped('asdf');
           I18n.t('bar', 'Bar');
         });
         I18n.t('foo', 'Foo');

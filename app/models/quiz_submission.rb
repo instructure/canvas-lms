@@ -585,7 +585,7 @@ class QuizSubmission < ActiveRecord::Base
       variables = q[:answers].map{|a| a[:blank_id] }.uniq
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
-        response = CGI::escapeHTML(params["question_#{q[:id]}_#{variable_id}"]) rescue nil
+        response = params["question_#{q[:id]}_#{variable_id}"]
         response ||= ""
         chosen_answer = q[:answers].detect{|answer| answer[:blank_id] == variable && (answer[:text] || "").strip.downcase == response.strip.downcase }
         chosen_answers[variable] = chosen_answer || {:text => response, :weight => 0}
