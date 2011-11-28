@@ -30,7 +30,7 @@ class ExternalContentController < ApplicationController
     elsif params[:service] == 'external_tool'
       params[:embed_type] = nil unless ['oembed', 'basic_lti', 'link', 'image', 'iframe'].include?(params[:embed_type])
       @retrieved_data = request.query_parameters
-      if @retrieved_data[:url]
+      if @retrieved_data[:url] && ['oembed', 'basic_lti'].include?(params[:embed_type])
         begin
           uri = URI.parse(@retrieved_data[:url])
           unless uri.scheme
