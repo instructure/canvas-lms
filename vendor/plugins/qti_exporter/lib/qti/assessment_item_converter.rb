@@ -16,6 +16,10 @@ class AssessmentItemConverter
     @doc = nil
     @flavor = opts[:flavor]
     @opts = opts
+    if @path_map = opts[:file_path_map]
+      @sorted_paths = opts[:sorted_file_paths]
+      @sorted_paths ||= @path_map.keys.sort_by { |v| v.length }
+    end
     
     if @manifest_node
       @base_dir = opts[:base_dir]
@@ -220,6 +224,25 @@ class AssessmentItemConverter
     # don't blow away the whole thing
     node.children.each do |child|
       Sanitize.clean_node!(child, Instructure::SanitizeField::SANITIZE)
+    end
+
+    # replace any file references with the migration id of the file
+    if @path_map
+      attrs = ['rel', 'href', 'src', 'data', 'value']
+      node.search("*").each do |subnode|
+        attrs.each do |attr|
+          if subnode[attr]
+            val = URI.unescape(subnode[attr])
+            val.gsub!(/\$[A-Z_]*\$/, '') # remove any path tokens like $TOKEN_EH$
+            # try to find the file by exact path match. If not found, try to find best match
+            mig_id = @path_map[val]
+            mig_id ||= @path_map[@sorted_paths.find{|k| k.end_with?(val)}]
+            if mig_id
+              subnode[attr] = "#{CC::CCHelper::OBJECT_TOKEN}/attachments/#{mig_id}"
+            end
+          end
+        end
+      end
     end
 
     if remove_extraneous_nodes

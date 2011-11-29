@@ -13,9 +13,10 @@ module Canvas::Migration
           settings[:content_migration_id] = migration_id
           settings[:user_id] = cm.user_id
           settings[:attachment_id] = cm.attachment.id rescue nil
+          settings[:content_migration] = cm
 
-          exporter = Qti::Converter.new(settings)
-          assessments = exporter.export
+          converter = Qti::Converter.new(settings)
+          assessments = converter.export
           export_folder_path = assessments[:export_folder_path]
           overview_file_path = assessments[:overview_file_path]
 
@@ -29,6 +30,9 @@ module Canvas::Migration
           end
 
           cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}.merge(cm.migration_settings[:migration_ids_to_import] || {})
+          if path = converter.course[:files_import_root_path]
+            cm.migration_settings[:files_import_root_path] = path
+          end
           cm.save
           cm.import_content
         rescue => e

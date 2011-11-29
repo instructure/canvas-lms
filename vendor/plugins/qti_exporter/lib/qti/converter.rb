@@ -16,9 +16,9 @@ class Converter < Canvas::Migration::Migrator
     super(settings, 'qti')
     @questions = {}
     @quizzes = {}
-    @files = {}
     @converted = false
     @dest_dir_2_1 = nil
+    @course[:hidden_folders] = [MigratorHelper::QUIZ_FILE_DIRECTORY]
   end
 
   def export
@@ -31,14 +31,17 @@ class Converter < Canvas::Migration::Migrator
       run_qti_converter
     end
 
-    @course[:assessment_questions] = convert_questions
+    convert_files
+    path_map = @course[:file_map].values.inject({}){|h, v| h[v[:path_name]] = v[:migration_id]; h }
+    @course[:assessment_questions] = convert_questions(:file_path_map => path_map)
     @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
-    @course[:file_map] = convert_files
+    @course[:files_import_root_path] = unique_quiz_dir
 
     if settings[:apply_respondus_settings_file]
       apply_respondus_settings
     end
 
+    @course['all_files_zip'] = package_course_files
     save_to_file
     delete_unzipped_archive
     @course
@@ -72,11 +75,11 @@ class Converter < Canvas::Migration::Migrator
     end
   end
 
-  def convert_questions
+  def convert_questions(opts={})
     raise "The QTI must be converted to 2.1 before converting to JSON" unless @converted
     begin
       manifest_file = File.join(@dest_dir_2_1, MANIFEST_FILE)
-      @questions[:assessment_questions] = Qti.convert_questions(manifest_file)
+      @questions[:assessment_questions] = Qti.convert_questions(manifest_file, opts)
     rescue => e
       message = "Error processing question QTI data: #{$!}: #{$!.backtrace.join("\n")}"
       add_error "qti_questions", message, @questions, e
@@ -102,22 +105,18 @@ class Converter < Canvas::Migration::Migrator
     begin
       manifest_file = File.join(@dest_dir_2_1, MANIFEST_FILE)
       Qti.convert_files(manifest_file).each do |attachment|
-        @files[attachment] = {
-          'migration_id' => "#{@quizzes[:assessments].first.try(:[], :migration_id)}_#{attachment}",
-          'path_name' => attachment,
+        mig_id = Digest::MD5.hexdigest(attachment)
+        @course[:file_map][mig_id] = {
+          :migration_id => mig_id,
+          :path_name => attachment,
         }
       end
     rescue => e
       message = "Error processing assessment QTI data: #{$!}: #{$!.backtrace.join("\n")}"
-      add_error "qti_assessments", message, @files, e
-      @files[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
+      add_error "qti_assessments", message, @course[:file_map], e
+      @course[:file_map][:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
     end
-    unless @files.empty?
-      # move the original archive to all_files.zip and it can be processed
-      # during the import to grab attachments
-      move_archive_to(File.join(@base_export_dir, Canvas::Migration::MigratorHelper::ALL_FILES_ZIP))
-    end
-    @files
+    @course[:file_map]
   end
 
   def apply_respondus_settings

@@ -28,6 +28,8 @@ module MigratorHelper
   
   COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :tab_configuration, :syllabus_body, :storage_quota]
   
+  QUIZ_FILE_DIRECTORY = "Quiz Files"
+  
   attr_reader :overview
 
   def self.get_utc_time_from_timestamp(timestamp)
@@ -67,9 +69,26 @@ module MigratorHelper
     error
   end
   
+  def unique_quiz_dir
+    if content_migration
+      if a = content_migration.attachment
+        key = "#{a.filename.gsub(/\..*/,'')}_#{content_migration.id}"
+      else
+        key = content_migration.id.to_s
+      end
+    else
+      key = "data_#{rand(10000)}" #should only happen in testing
+    end
+    "#{QUIZ_FILE_DIRECTORY}/#{key}"
+  end
+  
+  def content_migration
+    @settings[:content_migration]
+  end
+  
   def add_warning(user_message, exception_or_info='')
-    if @settings[:content_migration].respond_to?(:add_warning)
-      @settings[:content_migration].add_warning(user_message, exception_or_info)
+    if content_migration.respond_to?(:add_warning)
+      content_migration.add_warning(user_message, exception_or_info)
     end
   end
   
