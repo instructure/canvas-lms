@@ -42,6 +42,38 @@ module Delayed
       nil # can't rely on the type of return value, so return nothing
     end
 
+    def send_later_if_production(*args)
+      if Rails.env.production?
+        send_later(*args)
+      else
+        send(*args)
+      end
+    end
+
+    def send_later_if_production_enqueue_args(method, enqueue_args, *args)
+      if Rails.env.production?
+        send_later_enqueue_args(method, enqueue_args, *args)
+      else
+        send(method, *args)
+      end
+    end
+
+    def send_now_or_later(_when, *args)
+      if _when == :now
+        send(*args)
+      else
+        send_later(*args)
+      end
+    end
+
+    def send_now_or_later_if_production(_when, *args)
+      if _when == :now
+        send(*args)
+      else
+        send_later_if_production(*args)
+      end
+    end
+
     module ClassMethods
       def handle_asynchronously(method, enqueue_args = {})
         aliased_method, punctuation = method.to_s.sub(/([?!=])$/, ''), $1
