@@ -1,7 +1,7 @@
 <% jammit_js :select_content_dialog %>
 <% jammit_css :select_content_dialog %>
 <% only ||= nil # only is an optimization, so that tabs that aren't going to be used won't have their data loaded %>
-<% cache([@context, 'select_context_content_dialog']) do %>
+<% cache([@context, 'select_context_content_dialog', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div style="<%= hidden if only && only.size == 1 %>">
       <% ot :add_to_module, "Add %{item} to *module*", :item => capture { %>

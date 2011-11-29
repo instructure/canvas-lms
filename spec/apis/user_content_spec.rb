@@ -60,5 +60,31 @@ describe UserContent, :type => :integration do
     video['src'].should match(%r{http://www.example.com/courses/#{@course.id}/media_download})
     video['src'].should match(%r{entryId=qwerty})
   end
+
+  it "should not translate links in content not viewable by user" do
+    course_with_teacher(:active_all => true)
+    attachment_model
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
+    </p>
+    HTML
+
+    # put a student in the course. this will be the active user during the API
+    # call (necessary since the teacher has manage content rights and will thus
+    # ignore the lock). lock the attachment so the student can't view it.
+    student_in_course(:course => @course, :active_all => true)
+    @attachment.locked = true
+    @attachment.save
+
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+    { :controller => 'assignments_api', :action => 'show',
+      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc.at_css('img')['src'].should == "/courses/#{@course.id}/files/#{@attachment.id}/preview"
+  end
 end
 
