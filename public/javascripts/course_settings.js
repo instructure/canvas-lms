@@ -22,11 +22,9 @@ I18n.scoped('course_settings', function(I18n) {
     status: null,
     checkup: function() {
       $.ajaxJSON($("#publish_to_sis_form").attr('action'), 'GET', {}, function(data) {
-        if (!data.hasOwnProperty("sis_publish_status")) {
-          return;
-        }
-        GradePublishing.status = data.sis_publish_status;
-        GradePublishing.update(data.hasOwnProperty("sis_publish_messages") ? data.sis_publish_messages : {});
+        if (!data.hasOwnProperty("sis_publish_overall_status")) return;
+        GradePublishing.status = data.sis_publish_overall_status;
+        GradePublishing.update(data.hasOwnProperty("sis_publish_statuses") ? data.sis_publish_statuses : {});
       });
     },
     update: function(messages, requestInProgress) {
@@ -54,12 +52,12 @@ I18n.scoped('course_settings', function(I18n) {
       }
       $messages = $("#publish_grades_messages");
       $messages.empty();
-      $.each(messages, function(message, count) {
+      $.each(messages, function(message, users) {
         var $message = $("<span/>");
         $message.text(message);
         var $item = $("<li/>");
         $item.append($message);
-        $item.append(" - <b>" + count + "</b>");
+        $item.append(" - <b>" + users.length + "</b>");
         $messages.append($item);
       });
     },
@@ -84,12 +82,12 @@ I18n.scoped('course_settings', function(I18n) {
         GradePublishing.update({});
       };
       $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
-        if (!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
+        if (!data.hasOwnProperty("sis_publish_overall_status") || !successful_statuses.hasOwnProperty(data["sis_publish_overall_status"])) {
           error(null, null, I18n.t('errors.invalid_sis_status', "Invalid SIS publish status"), null);
           return;
         }
-        GradePublishing.status = data.sis_publish_status;
-        GradePublishing.update(data.hasOwnProperty("sis_publish_messages") ? data.sis_publish_messages : {});
+        GradePublishing.status = data.sis_publish_overall_status;
+        GradePublishing.update(data.hasOwnProperty("sis_publish_statuses") ? data.sis_publish_statuses : {});
       }, error);
     }
   }

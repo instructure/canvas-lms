@@ -52,5 +52,26 @@ describe "courses/settings.html.erb" do
       render
       response.should_not have_tag("input#course_sis_source_id")
     end
+
+    it "should show grade export when enabled" do
+      admin = account_admin_user(:account => @course.root_account)
+      @course.expects(:allows_grade_publishing_by).with(admin).returns(true)
+      view_context(@course, admin)
+      assigns[:current_user] = admin
+      render
+      response.body.should =~ /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
+      response.body.should =~ /<div id="tab-grade-publishing">/
+    end
+
+    it "should not show grade export when disabled" do
+      admin = account_admin_user(:account => @course.root_account)
+      @course.expects(:allows_grade_publishing_by).with(admin).returns(false)
+      view_context(@course, admin)
+      assigns[:current_user] = admin
+      render
+      response.body.should_not =~ /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
+      response.body.should_not =~ /<div id="tab-grade-publishing">/
+    end
+
   end
 end

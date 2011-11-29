@@ -911,6 +911,12 @@ class User < ActiveRecord::Base
   end
   memoize :courses_with_grades
   
+  def sis_pseudonym_for(context)
+    root_account = context.root_account || context
+    raise "could not resolve root account" unless root_account.is_a?(Account)
+    self.pseudonyms.active.find_by_account_id(root_account.id, :conditions => ["sis_user_id IS NOT NULL"])
+  end
+
   set_policy do
     given { |user| user == self }
     can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :become_user
