@@ -75,17 +75,39 @@ module Delayed
     end
 
     module ClassMethods
-      def handle_asynchronously(method, enqueue_args = {})
+      def add_send_later_methods(method, enqueue_args={}, default_async=false)
         aliased_method, punctuation = method.to_s.sub(/([?!=])$/, ''), $1
+
         with_method, without_method = "#{aliased_method}_with_send_later#{punctuation}", "#{aliased_method}_without_send_later#{punctuation}"
+
         define_method(with_method) do |*args|
           send_later_enqueue_args(without_method, enqueue_args, *args)
         end
-        alias_method_chain method, :send_later
+        alias_method without_method, method
+
+        if default_async
+          alias_method method, with_method
+          case
+            when public_method_defined?(without_method)
+              public method
+            when protected_method_defined?(without_method)
+              protected method
+            when private_method_defined?(without_method)
+              private method
+          end
+        end
+      end
+
+      def handle_asynchronously(method, enqueue_args={})
+        add_send_later_methods(method, enqueue_args, true)
       end
 
       def handle_asynchronously_with_queue(method, queue)
-        handle_asynchronously(method, :queue => queue)
+        add_send_later_methods(method, {:queue => queue}, true)
+      end
+
+      def handle_asynchronously_if_production(method, enqueue_args={})
+        add_send_later_methods(method, enqueue_args, Rails.env.production?)
       end
     end
   end
