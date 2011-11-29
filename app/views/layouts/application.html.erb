@@ -211,6 +211,9 @@
   </div>
 </div>
 
+<%= render :partial => 'shared/feedback' if Setting.get_cached('show_feedback_link', 'false') == 'true' %>
+
+
 <% if wizard %>
   <div id="wizard_spacer_box"></div>
   <div id="wizard_box" role="dialog">
