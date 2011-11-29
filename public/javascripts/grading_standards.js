@@ -58,7 +58,7 @@ I18n.scoped('grading_standards', function(I18n){
         $("#course_form .grading_scheme_set").text(I18n.t('grading_scheme_not_set', "Not Set"));
         $standard.addClass('editing');
         $standard.find(".update_grading_standard_url").attr('href', $("#update_grading_standard_url").attr('href'));
-        var data = JSON.parse($("#default_grading_standard_data").val());
+        var data = $.parseJSON($("#default_grading_standard_data").val());
         var standard = {title: "", id: null, data: data};
         $standard.fillTemplateData({
           data: standard,

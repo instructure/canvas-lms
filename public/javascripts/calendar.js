@@ -1153,7 +1153,7 @@ I18n.scoped('calendars', function(I18n) {
       date.setMonth(date.getMonth() + 1);
       var data = {};
       try {
-        data = JSON.parse($.decodeFromHex(location.hash.substring(1)));
+        data = $.parseJSON($.decodeFromHex(location.hash.substring(1)));
       } catch(e) { data = {}; }
       data.month = date.getMonth() + 1;
       data.year = date.getFullYear();
@@ -1165,7 +1165,7 @@ I18n.scoped('calendars', function(I18n) {
       date.setMonth(date.getMonth() - 1);
       var data = {};
       try {
-        data = JSON.parse($.decodeFromHex(location.hash.substring(1)));
+        data = $.parseJSON($.decodeFromHex(location.hash.substring(1)));
       } catch(e) { data = {}; }
       data.month = date.getMonth() + 1;
       data.year = date.getFullYear();
@@ -1584,7 +1584,7 @@ I18n.scoped('calendars', function(I18n) {
     $(document).fragmentChange(function(){
       var data = null;
       try {
-        data = JSON.parse($.decodeFromHex(document.location.hash.substring(1)));
+        data = $.parseJSON($.decodeFromHex(document.location.hash.substring(1)));
       } catch(e) { }
       if(data && data.month && parseInt(data.month, 10) && data.year && parseInt(data.year, 10)) {
         var text = $(".calendar_month .month_name").text() + " " + $(".calendar_month .year_number").text();
@@ -1631,7 +1631,7 @@ I18n.scoped('calendars', function(I18n) {
         if (data === 'dontUpdateFragment') { return true; }
         var data = null;
         try {
-          data = JSON.parse($.decodeFromHex(document.location.hash.substring(1)));
+          data = $.parseJSON($.decodeFromHex(document.location.hash.substring(1)));
         } catch(e) { }
         
         var ids = []

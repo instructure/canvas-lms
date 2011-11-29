@@ -492,7 +492,7 @@ I18n.scoped('topics', function(I18n) {
       if(fragment.match(/^#reply/)) {
         var params = null;
         try {
-          params = JSON.parse(fragment.substring(6));
+          params = $.parseJSON(fragment.substring(6));
         } catch(e) { }
         $("#sidebar .add_entry_link:visible:first").triggerHandler('click', params);
       }

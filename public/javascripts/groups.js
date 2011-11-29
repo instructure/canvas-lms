@@ -80,7 +80,7 @@ I18n.scoped('groups', function(I18n) {
         loader: $loader,
         animate: false,
         scrape: function(data, xhr) {
-          students = JSON.parse(data)
+          students = $.parseJSON(data)
           for (idx in students) {
             $('<li/>').addClass('student').html(students[idx].display_name).insertBefore($loader);
           }
