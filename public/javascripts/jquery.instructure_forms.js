@@ -230,7 +230,7 @@ I18n.scoped('instructure', function(I18n) {
               return;
             }
             text = $(doc).text();
-            var data = JSON.parse(text);
+            var data = $.parseJSON(text);
             if(options.success && $.isFunction(options.success) && data && !data.errors) {
               options.success.call($form, data, submitParam);
             }
@@ -379,7 +379,7 @@ I18n.scoped('instructure', function(I18n) {
         if(xhr.readyState == 4) {
           var json = null;
           try {
-            json = JSON.parse(xhr.responseText);
+            json = $.parseJSON(xhr.responseText);
           } catch(e) { }
           if($.httpSuccess(xhr)) {
             if(json && !json.errors) {
