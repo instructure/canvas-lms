@@ -1,3 +1,14 @@
+canvas-lms (1.1-85) professional; urgency=low
+
+  * Package ref: ffd4387ef88a89bd8aa5d8366435a713d10ec6d2
+  *
+  * [+cdb7ba0] fix permissions for date-completed users fixes #6431
+  * [+b67c543] don't break in a proc; fixes #6452
+  * [+4e99e28] include variable in cache key
+  * [+ffd4387] fix saving notification preferences with score notifications disabled
+
+ -- JT Olds <jt@instructure.com>  Tue, 29 Nov 2011 16:47:46 -0700
+
 canvas-lms (1.1-84) professional; urgency=low
 
   * Package ref: 0939bfa83e577d994f522f5760b65eac70afd48e
