@@ -882,6 +882,8 @@ I18n.scoped('gradebook', function(I18n) {
       try {
         hash = $.parseJSON(decodeURIComponent(document.location.hash.substr(1))); //get rid of the first charicter "#" of the hash
       } catch(e) {
+      }
+      if (!hash) {
         hash = {};
       }
 
