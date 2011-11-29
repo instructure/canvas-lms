@@ -282,7 +282,8 @@ class ContentImportsController < ApplicationController
       @attachment = @migration.attachment
       if block_given?
         if @attachment && yield
-          render :json => @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?])
+          render :json => @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?]),
+                 :as_text => true
         else
           render :text => "", :status => :bad_request
         end

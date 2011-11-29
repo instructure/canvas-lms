@@ -324,9 +324,11 @@ class AccountsController < ApplicationController
           @account.current_sis_batch_id = batch.id
           @account.save
           batch.process
-          render :json => batch.to_json(:include => :sis_batch_log_entries)
+          render :json => batch.to_json(:include => :sis_batch_log_entries),
+                 :as_text => true
         else
-          render :json => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json
+          render :json => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json,
+                 :as_text => true
         end
       end
     end

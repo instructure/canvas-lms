@@ -447,7 +447,8 @@ class FilesController < ApplicationController
       render :json => {
         :attachment => @attachment,
         :deleted_attachment_ids => deleted_attachments.map(&:id)
-      }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}, :include_root => false)
+      }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}, :include_root => false),
+             :as_text => true
     else
       render :text => ""
     end
@@ -511,8 +512,14 @@ class FilesController < ApplicationController
         if success
           @attachment.move_to_bottom
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
-          format.json { render :json => { :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false)}
-          format.text { render :json => { :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false)}
+          format.json do
+            render :json => { :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false),
+                   :as_text => true
+          end
+          format.text do
+            render :json => { :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false),
+                   :as_text => true
+          end
         else
           format.html { render :action => "new" }
           format.json { render :json => @attachment.errors.to_json }

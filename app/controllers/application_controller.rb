@@ -1060,9 +1060,9 @@ class ApplicationController < ActionController::Base
         json = "while(1);#{json}"
       end
 
-      # fix for IE not properly handling json responses to multipart file
-      # upload forms -- we'll respond with text instead.
-      if request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data} && params[:format].to_s != 'json'
+      # fix for some browsers not properly handling json responses to multipart
+      # file upload forms and s3 upload success redirects -- we'll respond with text instead.
+      if options[:as_text] || (request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data} && params[:format].to_s != 'json')
         options[:text] = json
       else
         options[:json] = json
