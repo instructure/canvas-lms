@@ -178,7 +178,7 @@ module Api
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
       obj = match.obj_class.find_by_id(match.obj_id)
-      break unless obj && rewriter.user_can_view_content?(obj)
+      next unless obj && rewriter.user_can_view_content?(obj)
       file_download_url(obj.id, :verifier => obj.uuid, :download => '1')
     end
     html = rewriter.translate_content(html)
