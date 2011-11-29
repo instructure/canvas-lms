@@ -1099,4 +1099,83 @@ describe User do
       u.email_channel.should == active
     end
   end
+
+  describe "sis_pseudonym_for" do
+    it "should return active pseudonyms only" do
+      course :active_all => true, :account => Account.default
+      u = User.create!
+      u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'deleted'; x.sis_user_id = "user2"; x.save!}
+      u.sis_pseudonym_for(@course).should be_nil
+      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user1"; x.save!}
+      u.sis_pseudonym_for(@course).should == @p
+    end
+
+    it "should return pseudonyms in the right account" do
+      course :active_all => true, :account => Account.default
+      other_account = account_model
+      u = User.create!
+      u.pseudonyms.new(:account => other_account, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user1"; x.save!}
+      u.sis_pseudonym_for(@course).should be_nil
+      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user2"; x.save!}
+      u.sis_pseudonym_for(@course).should == @p
+    end
+
+    it "should return pseudonyms with a sis id only" do
+      course :active_all => true, :account => Account.default
+      u = User.create!
+      u.pseudonyms.new(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.save!}
+      u.sis_pseudonym_for(@course).should be_nil
+      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user2"; x.save!}
+      u.sis_pseudonym_for(@course).should == @p
+    end
+
+    it "should find the right root account for a course" do
+      @account = account_model
+      course :active_all => true, :account => @account
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@course).should == 42
+    end
+
+    it "should find the right root account for a group" do
+      @account = account_model
+      course :active_all => true, :account => @account
+      @group = group :group_context => @course
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@group).should == 42
+    end
+
+    it "should find the right root account for a non-root-account" do
+      @root_account = account_model
+      @account = @root_account.sub_accounts.create!
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@root_account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@account).should == 42
+    end
+
+    it "should find the right root account for a root account" do
+      @account = account_model
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@account).should == 42
+    end
+
+    it "should bail if it can't find a root account" do
+      context = Course.new # some context that doesn't have an account
+      (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+    end
+  end
 end

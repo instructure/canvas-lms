@@ -1,10 +1,6 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan=2><%= f.check_box :enabled, {}, 'true', 'false' %>
-      <%= f.label :enabled, :en => "Enabled" %></td>
-    </tr>
-    <tr>
       <td><%= f.blabel :format_type, :en => "Output format type" %></td>
       <td><%= f.select :format_type, Course.valid_grade_export_types.keys.map{|k| [Course.valid_grade_export_types[k][:name], k]}, {} %>
     </tr>

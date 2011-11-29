@@ -38,10 +38,10 @@ describe SIS::CSV::GradePublishingResultsImporter do
 
   it 'should properly update the db' do
     course_with_student
-    @course.account = @account;
+    @course.account = @account
     @course.save!
 
-    @enrollment.grade_publishing_status = 'publishing';
+    @enrollment.grade_publishing_status = 'publishing'
     @enrollment.save!
 
     process_csv_data_cleanly(
@@ -54,20 +54,21 @@ describe SIS::CSV::GradePublishingResultsImporter do
 
   it 'should properly pass in messages' do
     course_with_student
-    @course.account = @account;
+    @course.account = @account
     @course.save!
 
-    @enrollment.grade_publishing_status = 'publishing';
+    @enrollment.grade_publishing_status = 'publishing'
     @enrollment.save!
 
-    @course.grade_publishing_status.should == 'publishing'
+    @course.reload.grade_publishing_statuses[1].should == "publishing"
 
     process_csv_data_cleanly(
       "enrollment_id,grade_publishing_status,message",
       "#{@enrollment.id},published,message1")
 
-    @course.grade_publishing_status.should == 'published'
-    @course.grade_publishing_messages.should == { "Published: message1" => 1 }
+    statuses = @course.reload.grade_publishing_statuses
+    statuses[1].should == "published"
+    statuses[0].should == { "Published: message1" => [@enrollment] }
 
     @enrollment.reload
     @enrollment.grade_publishing_status.should == 'published'
