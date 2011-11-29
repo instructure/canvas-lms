@@ -102,7 +102,7 @@
         scrape: function(data) {
             if(typeof(data) == 'string') {
               try {
-                data = JSON.parse(data);
+                data = $.parseJSON(data);
               } catch(e) {
                 data = [];
               }
