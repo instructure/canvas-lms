@@ -215,6 +215,7 @@ describe "speedgrader selenium tests" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_animations
 
+    keep_trying_until { find_all_with_jquery('#students_selectmenu option').size > 0 }
     find_all_with_jquery('#students_selectmenu option').size.should eql(1) # just the one student
     find_all_with_jquery('#section-menu ul li').size.should eql(1) # "Show all sections"
     find_with_jquery('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
@@ -232,7 +233,7 @@ describe "speedgrader selenium tests" do
     expect_new_page_load {
       driver.find_element(:css, '#settings_form .submit_button').click
     }
-    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
 
     # make sure it works a second time too
     driver.find_element(:id, "settings_link").click
@@ -240,7 +241,7 @@ describe "speedgrader selenium tests" do
     expect_new_page_load {
       driver.find_element(:css, '#settings_form .submit_button').click
     }
-    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
   end
 
   it "should leave the full rubric open when switching submissions" do
@@ -249,7 +250,7 @@ describe "speedgrader selenium tests" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_animations
 
-    driver.find_element(:css, '.toggle_full_rubric').click
+    keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').click }
     wait_for_animations
     rubric = driver.find_element(:id, 'rubric_full')
     rubric.should be_displayed
