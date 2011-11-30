@@ -14,6 +14,7 @@
         <th><%= before_label(:time, "Time") %></th>
         <td><%= time_ago_in_words(Time.now - ((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at)) %></td>
       </tr>
+      <% unless @quiz.assignment.present? && @quiz.assignment.muted? %>
       <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
         <th><%= before_label(:current_score, "Current Score") %></th>
         <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
@@ -26,6 +27,7 @@
                   :score => @submission.kept_score,
                   :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
       </tr>
+      <% end %>
     </table>
     </div>
   </div>
