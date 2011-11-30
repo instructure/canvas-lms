@@ -29,9 +29,12 @@ describe "help" do
     
     Setting.set('show_feedback_link', 'true')
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    feedback_link = driver.find_element(:css, '#feedback_link')
-    feedback_link.location_once_scrolled_into_view
-    feedback_link.should be_displayed
+    feedback_link = nil
+    keep_trying_until {
+      feedback_link = driver.find_element(:css, '#feedback_link')
+      feedback_link.location_once_scrolled_into_view
+      feedback_link.displayed?
+    }
     driver.find_element(:css, "#help_dialog").should_not be_displayed
     feedback_link.click
     wait_for_ajaximations
