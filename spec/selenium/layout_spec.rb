@@ -15,14 +15,21 @@ describe "layout selenium tests" do
     body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
 
     driver.find_element(:id, 'footer').location_once_scrolled_into_view
+    # We sleep here because the window scroll triggers a call to scrollSidebar that might
+    # be slightly throttled. We don't want to actually call scrollSidebar() ourselves
+    # because that's subverting part of the test. The throttle shouldn't be more than 50ms,
+    # so sleeping 100ms should be sufficient for it to fire.
+    sleep 0.1
     body.attribute(:class).should_not match /with-scrolling-right-side/
     body.attribute(:class).should match /with-sidebar-pinned-to-bottom/
 
     driver.find_element(:id, 'topic_list').location_once_scrolled_into_view
+    sleep 0.1
     body.attribute(:class).should match /with-scrolling-right-side/
     body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
 
     driver.find_element(:id, 'header').location_once_scrolled_into_view
+    sleep 0.1
     body.attribute(:class).should_not match /with-scrolling-right-side/
     body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
   end
