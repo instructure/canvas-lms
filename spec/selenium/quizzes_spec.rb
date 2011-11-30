@@ -89,7 +89,7 @@ shared_examples_for "quiz selenium tests" do
     get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
     wait_for_ajax_requests
 
-    driver.execute_script("$('.edit_question_link').hover().click();")#move_to occasionaly breaks in the hudson build
+    hover_and_click(".edit_question_link")
     wait_for_animations
     question = find_with_jquery(".question_form:visible")
     question.
@@ -876,6 +876,7 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:css, '.publish_quiz_button')
 
     get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+    driver.find_element(:link_text, 'Take the Quiz').click
     wait_for_dom_ready
     wait_for_ajax_requests
 
@@ -952,7 +953,8 @@ shared_examples_for "quiz selenium tests" do
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
       driver.find_element(:css, '.publish_quiz_button')
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-  
+      driver.find_element(:link, 'Take the Quiz').click
+
       wait_for_ajax_requests
     end
 
