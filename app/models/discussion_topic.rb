@@ -240,13 +240,13 @@ class DiscussionTopic < ActiveRecord::Base
   
   on_create_send_to_streams do
     if should_send_to_stream
-      self.participants
+      self.active_participants
     end
   end
   
   on_update_send_to_streams do
     if should_send_to_stream && (@delayed_just_posted || @content_changed || changed_state(:active, :post_delayed))
-      self.participants
+      self.active_participants
     end
   end
   
@@ -419,7 +419,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
-    p.to { participants - [user] }
+    p.to { active_participants - [user] }
     p.whenever { |record|
       record.context.available? and
       ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))
@@ -431,6 +431,14 @@ class DiscussionTopic < ActiveRecord::Base
   
   def participants
     ([self.user] + context.participants).uniq.select{|u| u}
+  end
+  
+  def active_participants
+    if !self.context.available? && self.context.respond_to?(:participating_admins)
+      self.context.participating_admins
+    else
+      self.participants
+    end
   end
   
   def posters
