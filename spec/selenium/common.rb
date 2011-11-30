@@ -55,6 +55,9 @@ module SeleniumTestsHelperMethods
       if SELENIUM_CONFIG[:firefox_profile].present? && browser == :firefox
         options[:profile] = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
       end
+      if path = SELENIUM_CONFIG[:paths].try(:[], browser)
+        Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
+      end
       driver = Selenium::WebDriver.for(browser, options)
     else
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
