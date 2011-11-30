@@ -38,8 +38,19 @@ hgroup, nav, section
 body
   line-height: 1.5
 
-/* NOTE: table border-collapse and border-spacing are purposely not being reset 
-   because TinyMCE relies on them not being there */
+/* NOTE: table border-spacing is purposely not being reset because TinyMCE relies on
+   it not being there. Once you set border-spacing: 0 in css,  there is no way to do
+   table.user_content {border-spacing:auto} (there is no 'auto' or 'default' value for
+   border-spacing) and you cannot override it with the cellspacing html attribute
+   (which is what tinyMCE uses). But we can, and do, reset border-collapse which makes
+   it so we dont have to add cellspacing=0 to all our tables.
+   see: http://stackoverflow.com/questions/339923/how-to-set-cellpadding-cellspacing-in-css */
+table
+  border-collapse: collapse
+.user_content,.mceContentBody
+  table
+    border-collapse: separate
+
 
 caption, th, td
   text-align: left
