@@ -108,7 +108,7 @@ shared_examples_for "dashboard selenium tests" do
     #verify assignment changed notice is in messages
     driver.find_element(:css, '#topic_list .topic_message').should include_text('Assignment Due Date Changed')
     #verify assignment is in to do list
-    driver.find_element(:css, '.to-do-list > li').should include_text("#{assignment.submission_action_string} #{assignment.title}")
+    driver.find_element(:css, '.to-do-list > li').should include_text(assignment.submission_action_string)
 
     #verify assignment is in drop down
     assignment_menu = driver.find_element(:link, 'Assignments').find_element(:xpath, '..')

@@ -1598,13 +1598,11 @@ class Assignment < ActiveRecord::Base
   def special_class; nil; end
 
   def submission_action_string
-    if self.submission_types == "online_quiz"
-      "Take"
+    if submission_types == "online_quiz"
+      t :submission_action_take_quiz, "Take %{title}", :title => title
     else
-      "Turn in"
+      t :submission_action_turn_in_assignment, "Turn in %{title}", :title => title
     end
-  rescue
-    "Turn in"
   end
 
   protected
