@@ -243,13 +243,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </tr><tr>
         <td style="width: 10%;"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry" %></span>
+          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => date_string(@context.start_at, :long) %></span>
           <span class="course_info start_at"><%= datetime_string(@context.start_at) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
         <td style="width: 10%;"><%= f.blabel :conclude_at, :en => "Ends" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry" %></span>
+          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => date_string(@context.conclude_at, :long) %></span>
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
