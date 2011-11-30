@@ -371,6 +371,7 @@ describe "assignment selenium tests" do
     wait_for_ajax_requests
     driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
     driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
+    wait_for_ajaximations
     driver.find_element(:css, '#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
 
   end
