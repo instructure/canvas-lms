@@ -61,6 +61,13 @@ describe "speedgrader selenium tests" do
 
   end
 
+  it "should not error if there are no submissions" do
+    student_in_course
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajax_requests
+    driver.execute_script("return INST.errorCount").should == 0
+  end
+
   it "should display submission late notice message" do
     @assignment.due_at = Time.now - 2.days
     @assignment.save!
