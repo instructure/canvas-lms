@@ -287,8 +287,9 @@ describe "assignment selenium tests" do
       driver.find_element(:css, '.assignment_submission_types > option[value="'+option_value+'"]').click
       driver.find_element(:css, '.more_options_link').click
       keep_trying_until {
-        driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].click
+        driver.find_elements(:css, '#context_external_tools_select td.tools .tool').length > 0
       }
+      driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].click
       driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
       driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[1].click
       driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
