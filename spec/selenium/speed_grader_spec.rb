@@ -68,6 +68,25 @@ describe "speedgrader selenium tests" do
     driver.execute_script("return INST.errorCount").should == 0
   end
 
+  it "should have a submission_history after a submitting a comment" do
+    # a student without a submission
+    @student_2 = User.create!(:name => 'student 2')
+    @student_2.register
+    @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+    @course.enroll_user(@student_2, "StudentEnrollment", :enrollment_state => 'active')
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajax_requests
+
+    #add comment
+    driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')
+    driver.find_element(:css, '#add_a_comment *[type="submit"]').click
+    keep_trying_until{ driver.find_element(:css, '#comments > .comment').displayed? }
+
+    # the ajax from that add comment form comes back without a submission_history, the js should mimic it.
+    driver.execute_script('return jsonData.studentsWithSubmissions[0].submission.submission_history.length').should == 1
+  end
+
   it "should display submission late notice message" do
     @assignment.due_at = Time.now - 2.days
     @assignment.save!
