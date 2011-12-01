@@ -277,8 +277,8 @@ shared_examples_for "all selenium tests" do
   end
 
   def wait_for_ajax_requests
-    return if driver.execute_script("return typeof($) == 'undefined' || typeof($.ajaxJSON) == 'undefined' || typeof($.ajaxJSON.inFlightRequests) == 'undefined'")
-    keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlightRequests") == 0 }
+    return if driver.execute_script("return typeof($) == 'undefined'")
+    keep_trying_until { driver.execute_script("return $.active") == 0 }
   end
 
   def wait_for_animations
