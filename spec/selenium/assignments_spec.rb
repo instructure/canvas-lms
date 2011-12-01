@@ -498,4 +498,27 @@ describe "assignment selenium tests" do
       assignment.turnitin_settings.should eql(expected_settings)
     end
   end
+
+  context "student view" do
+    it "should not show submission data when muted" do
+      course_with_student_logged_in
+
+      @assignment = @course.assignments.create!(:title => "hardest assignment ever", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@student)
+      @submission.submission_type = "online_url"
+      @submission.save!
+
+      @submission.add_comment :author => @teacher, :comment => "comment before muting"
+      @assignment.mute!
+      @assignment.update_submission(@student, :hidden => true, :comment => "comment after muting")
+
+      outcome_with_rubric
+      @rubric.associate_with @assignment, @course, :purpose => "grading"
+
+      get "/courses/#{@course.to_param}/assignments/#{@assignment.to_param}"
+
+      driver.find_element(:css, ".details").text.should =~ /comment before muting/
+      driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
+    end
+  end
 end
