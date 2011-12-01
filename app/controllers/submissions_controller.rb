@@ -50,6 +50,11 @@ class SubmissionsController < ApplicationController
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
     @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, session, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] }
+
+    unless @submission.grants_right?(@current_user, :read_grade)
+      @visible_rubric_assessments = []
+    end
+
     @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil
     if authorized_action(@submission, @current_user, :read)
       respond_to do |format|
@@ -97,7 +102,12 @@ class SubmissionsController < ApplicationController
           format.json { 
             @submission.limit_comments(@current_user, session)
             excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
-            render :json => @submission.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history]))
+            render :json => @submission.to_json(
+              Submission.json_serialization_full_parameters(
+                :exclude => excludes,
+                :except  => %w(quiz_submission submission_history)
+              ).merge(:permissions => {:user => @current_user, :session => session, :include_permissions => false})
+            )
           }
         end
       end
@@ -257,10 +267,10 @@ class SubmissionsController < ApplicationController
           excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
           comments_type = @context_enrollment.admin? ? :submission_comments : :visible_submission_comments
           format.json { 
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type)), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type).merge(:permissions => {:user => @current_user, :session => session, :include_permissions => false})), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
           format.text { 
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type)), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type).merge(:permissions => {:user => @current_user, :session => session, :include_permissions => false})), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
         else
           @error_message = t('errors_update_failed', "Update Failed")
