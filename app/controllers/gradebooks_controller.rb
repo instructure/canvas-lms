@@ -277,7 +277,6 @@ class GradebooksController < ApplicationController
         if @submissions && !@error_message#&& !@submission.errors || @submission.errors.empty?
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
-          format.xml  { head :created, :location => course_gradebook_url(@assignment.context) }
           format.json { 
             render :json => @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context)
           }
@@ -288,7 +287,6 @@ class GradebooksController < ApplicationController
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
           format.html { render :action => "show", :course_id => @assignment.context.id }
-          format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }
           format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
           format.text { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
         end

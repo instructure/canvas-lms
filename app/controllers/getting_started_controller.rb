@@ -45,7 +45,6 @@ class GettingStartedController < ApplicationController
     @assignments = @context.assignments.active.find(:all, :order => 'due_at, title')
     respond_to do |format|
       format.html
-      format.xml { render :xml => @assignments.to_xml, :status => :ok }
       format.json { render :json => @assignments.to_json, :status => :ok}
     end
   end
@@ -58,7 +57,6 @@ class GettingStartedController < ApplicationController
     }
     respond_to do |format|
       format.html
-      format.xml { render :xml => @students.to_xml, :status => :ok }
       format.json { render :json => @students.to_json(:methods => :email), :status => :ok}
     end
   end
@@ -85,7 +83,6 @@ class GettingStartedController < ApplicationController
     # Just needs course to set the name of the course.
     respond_to do |format|
       format.html
-      format.xml { render :xml => @context.to_xml, :status => :ok }
       format.json { render :json => @context.to_json, :status => :ok}
     end
   end

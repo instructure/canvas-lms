@@ -594,11 +594,9 @@ class UsersController < ApplicationController
         if @user.update_attributes(params[:user])
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
-          format.xml  { head :ok }
           format.json { render :json => @user.to_json(:methods => :default_pseudonym_id) }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @user.errors.to_xml }
         end
       end
     end
@@ -767,7 +765,6 @@ class UsersController < ApplicationController
         else
           format.html { redirect_to(users_url) }
         end
-        format.xml  { head :ok }
         format.json { render :json => @user.to_json }
       end
     end

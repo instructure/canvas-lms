@@ -185,7 +185,6 @@ class ApplicationController < ActionController::Base
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
-      format.xml { render :xml => { 'status' => 'unauthorized' }, :status => :unauthorized }
       format.json { render :json => { 'status' => 'unauthorized' }, :status => :unauthorized }
     end
     response.headers["Pragma"] = "no-cache"

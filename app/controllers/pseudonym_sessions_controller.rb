@@ -157,7 +157,6 @@ class PseudonymSessionsController < ApplicationController
         @pre_registered = @user if @user && !@user.registered?
         @headers = false
         format.html { maybe_render_mobile_login :bad_request }
-        format.xml  { render :xml => @pseudonym_session.errors.to_xml }
         format.json { render :json => @pseudonym_session.errors.to_json, :status => :bad_request }
       end
     end
@@ -196,7 +195,6 @@ class PseudonymSessionsController < ApplicationController
       else
         format.html { redirect_to login_url }
       end
-      format.xml { head :ok }
       format.json { render :json => "OK".to_json, :status => :ok }
     end
   end
