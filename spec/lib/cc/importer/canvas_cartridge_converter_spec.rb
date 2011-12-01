@@ -398,14 +398,14 @@ describe "Canvas Cartridge importing" do
     mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
     
     # attachments are migrated with just their filename as display_name, 
-    # but if a content tag has a different title the display_name should update
+    # if a content tag has a different title the display_name should not update
     att = Attachment.create!(:filename => 'boring.txt', :display_name => "Super exciting!", :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
     att.display_name.should == "Super exciting!"
     # create @copy_to attachment with normal display_name
     att_2 = Attachment.create!(:filename => 'boring.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
     att_2.migration_id = CC::CCHelper.create_key(att)
     att_2.save
-    mod4.add_item({:title => att.display_name, :type => "attachment", :id => att.id})
+    att_tag = mod4.add_item({:title => "A different title just because", :type => "attachment", :id => att.id})
     
     # create @copy_to module link with different name than attachment
     att_3 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
@@ -458,9 +458,9 @@ describe "Canvas Cartridge importing" do
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
     
     mod4_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod4))
-    mod4_2.content_tags.first.title.should == att.display_name
+    mod4_2.content_tags.first.title.should == att_tag.title
     att_2.reload
-    att_2.display_name.should == att.display_name
+    att_2.display_name.should == 'boring.txt'
     
     mod4_2.content_tags.count.should == 2
     tag = mod4_2.content_tags.last

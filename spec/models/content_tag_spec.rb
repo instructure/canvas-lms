@@ -160,6 +160,33 @@ describe ContentTag do
     @assignment.reload
     @assignment.title.should == 'some assignment (renamed)'
   end
+  
+  it "should not rename tag if linked attachment is renamed" do
+    course
+    att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
+
+    a_module = @course.context_modules.create!(:name => "module")
+    tag = a_module.add_item({ :type => 'attachment', :title => 'important title.txt', :id => att.id })
+    tag.update_asset_name!
+    
+    att.display_name = "no longer important.txt"
+    ContentTag.update_for(att)
+    tag.reload
+    tag.title.should == 'important title.txt'
+  end
+  
+  it "should not rename attachment if linked tag is renamed" do
+    course
+    att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
+
+    a_module = @course.context_modules.create!(:name => "module")
+    tag = a_module.add_item({ :type => 'attachment', :title => 'Differently Important Title', :id => att.id })
+    tag.update_asset_name!
+    
+    att.reload
+    att.filename.should == 'important title.txt'
+    att.display_name.should == 'important title.txt'
+  end
 
   it_should_behave_like "url validation tests"
   it "should check url validity" do
