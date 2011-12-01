@@ -511,15 +511,15 @@ TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
                        "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png') }
 def get_file(filename)
   data = TEST_FILE_UUIDS[filename]
-  if !SELENIUM_CONFIG[:host_and_port]
-    @file = Tempfile.new(filename.split(/(?=\.)/))
-    @file.write data
-    @file.close
-    fullpath = @file.path
-    filename = File.basename(@file.path)
-  else
-    @file = nil
-    fullpath = "C:\\testfiles\\#{filename}"
+  @file = Tempfile.new(filename.split(/(?=\.)/))
+  @file.write data
+  @file.close
+  fullpath = @file.path
+  filename = File.basename(@file.path)
+  if SELENIUM_CONFIG[:host_and_port]
+    driver.file_detector = proc do |args|
+      args.first if File.exist?(args.first.to_s)
+    end
   end
   [filename, fullpath, data, @file]
 end
