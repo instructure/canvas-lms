@@ -21,18 +21,12 @@ shared_examples_for "conversations selenium tests" do
 
     if opts[:add_recipient] && browser = find_with_jquery("#create_message_form .browser:visible")
       browser.click
-      keep_trying_until{
-        if elem = find_with_jquery('.selectable:visible')
-          elem.click
-        end
-        elem
-      }
-      keep_trying_until{
-        if elem = find_with_jquery('.toggleable:visible .toggle')
-          elem.click
-        end
-        elem
-      }
+      wait_for_ajaximations
+      find_with_jquery('.selectable:visible').click
+      wait_for_ajaximations
+      find_with_jquery('.toggleable:visible .toggle').click
+      wait_for_ajaximations
+      driver.find_elements(:css, '.token_input ul li').length.should > 0
       find_with_jquery("#create_message_form input:visible").send_keys("\t")
     end
 
@@ -593,11 +587,13 @@ shared_examples_for "conversations selenium tests" do
       level = 1
 
       @input.send_keys(name)
+      wait_for_ajaximations
       loop do
         keep_trying_until{ find_all_with_jquery('.autocomplete_menu:visible .list').size == level }
         driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").detect { |e|
           (e.find_element(:tag_name, :b).text rescue e.text) == name
         }.click
+        wait_for_ajaximations
 
         break if names.empty?
 
