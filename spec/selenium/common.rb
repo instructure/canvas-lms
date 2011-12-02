@@ -277,24 +277,77 @@ shared_examples_for "all selenium tests" do
     JS
     dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
     until (dom_is_ready) do
-      sleep 1
+      sleep 0.1
       dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
     end
   end
 
-  def wait_for_ajax_requests
-    return if driver.execute_script("return typeof($) == 'undefined'")
-    keep_trying_until { driver.execute_script("return $.active") == 0 }
+  def wait_for_ajax_requests(wait_start = 0)
+    driver.execute_async_script(<<-JS)
+      var callback = arguments[arguments.length - 1];
+      if (typeof($) == 'undefined') {
+        callback(-1);
+      } else {
+        var waitForAjaxStop = function(value) {
+          $(document).bind('ajaxStop.canvasTestAjaxWait', function() {
+            $(document).unbind('.canvasTestAjaxWait');
+            callback(value);
+          });
+        }
+        if ($.active == 0) {
+          // if there are no active requests, wait {wait_start}ms for one to start
+          var timeout = window.setTimeout(function() {
+            $(document).unbind('.canvasTestAjaxWait');
+            callback(0);
+          }, #{wait_start});
+          $(document).bind('ajaxStart.canvasTestAjaxWait', function() {
+            window.clearTimeout(timeout);
+            waitForAjaxStop(2);
+          });
+        } else {
+          waitForAjaxStop(1);
+        }
+      }
+    JS
   end
 
-  def wait_for_animations
-    return if driver.execute_script("return typeof($) == 'undefined'")
-    keep_trying_until { driver.execute_script("return $(':animated').length") == 0 }
+  def wait_for_animations(wait_start = 0)
+    driver.execute_async_script(<<-JS)
+      var callback = arguments[arguments.length - 1];
+      if (typeof($) == 'undefined') {
+        callback(-1);
+      } else {
+        var waitForAnimateStop = function(value) {
+          var _stop = $.fx.stop;
+          $.fx.stop = function() {
+            $.fx.stop = _stop;
+            _stop.apply(this, arguments);
+            callback(value);
+          }
+        }
+        if ($.timers.length == 0) {
+          var _tick = $.fx.tick;
+          // wait {wait_start}ms for an animation to start
+          var timeout = window.setTimeout(function() {
+            $.fx.tick = _tick;
+            callback(0);
+          }, #{wait_start});
+          $.fx.tick = function() {
+            window.clearTimeout(timeout);
+            $.fx.tick = _tick;
+            waitForAnimateStop(2);
+            _tick.apply(this, arguments);
+          }
+        } else {
+          waitForAnimateStop(1);
+        }
+      }
+    JS
   end
 
-  def wait_for_ajaximations
-    wait_for_ajax_requests
-    wait_for_animations
+  def wait_for_ajaximations(wait_start = 0)
+    wait_for_ajax_requests(wait_start)
+    wait_for_animations(wait_start)
   end
 
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
@@ -339,28 +392,28 @@ shared_examples_for "all selenium tests" do
   end
 
   def expect_fired_alert(&block)
-    driver.execute_script(<<-ENDSCRIPT)
+    driver.execute_script(<<-JS)
       window.canvasTestSavedAlert = window.alert;
       window.canvasTestAlertFired = false;
       window.alert = function() {
         window.canvasTestAlertFired = true;
         return true;
       }
-    ENDSCRIPT
+    JS
     
     yield
     
     keep_trying_until {
-      driver.execute_script(<<-ENDSCRIPT)
+      driver.execute_script(<<-JS)
         var value = window.canvasTestAlertFired;
         window.canvasTestAlertFired = false;
         return value;
-      ENDSCRIPT
+      JS
     }
     
-    driver.execute_script(<<-ENDSCRIPT)
+    driver.execute_script(<<-JS)
       window.alert = window.canvasTestSavedAlert;
-    ENDSCRIPT
+    JS
   end
 
   def in_frame(id, &block)
@@ -514,6 +567,7 @@ shared_examples_for "all selenium tests" do
 
   append_before(:each) do
     driver.manage.timeouts.implicit_wait = 1
+    driver.manage.timeouts.script_timeout = 5
   end
 
   append_before(:all) do

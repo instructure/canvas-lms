@@ -110,7 +110,7 @@ shared_examples_for "conversations selenium tests" do
       element = prev_elements.detect{ |e| e.last == name } or raise "menu item does not exist"
 
       element.first.click
-      wait_for_ajaximations
+      wait_for_ajaximations(150)
       keep_trying_until{
         find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
       }
@@ -587,7 +587,7 @@ shared_examples_for "conversations selenium tests" do
       level = 1
 
       @input.send_keys(name)
-      wait_for_ajaximations
+      wait_for_ajaximations(150)
       loop do
         keep_trying_until{ find_all_with_jquery('.autocomplete_menu:visible .list').size == level }
         driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").detect { |e|
