@@ -416,8 +416,8 @@ describe "security" do
     assert_response :success
     json_parse.should == {
       "duplicates" => [],
-      "errored_users" => [{"address" => "A345678", "details" => "not_found"}],
-      "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id.to_s }]
+      "errored_users" => [{"address" => "A345678", "details" => "not_found", "type" => "pseudonym"}],
+      "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id }]
     }
   end
 
