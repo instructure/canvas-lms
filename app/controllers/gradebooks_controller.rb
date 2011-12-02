@@ -27,7 +27,7 @@ class GradebooksController < ApplicationController
   def grade_summary
     # do this as the very first thing, if the current user is a teacher in the course and they are not trying to view another user's grades, redirect them to the gradebook
     if (@context.grants_right?(@current_user, nil, :manage_grades) || @context.grants_right?(@current_user, nil, :view_all_grades)) && !params[:id]
-      redirect_to named_context_url(@context, :context_gradebook_url)
+      redirect_to_appropriate_gradebook_version
       return
     end
 
@@ -344,6 +344,22 @@ class GradebooksController < ApplicationController
       format.atom { render :text => feed.to_xml }
     end
   end
+
+  def change_gradebook_version
+    if params[:reset]
+      @current_user.preferences.delete :use_gradebook2
+    else
+      @current_user.preferences[:use_gradebook2] = true
+    end
+    @current_user.save!
+    redirect_to_appropriate_gradebook_version
+  end
+
+  def redirect_to_appropriate_gradebook_version
+    gradebook_version_to_use = @current_user.preferences[:use_gradebook2] ? 'gradebook2' : 'gradebook'
+    redirect_to named_context_url(@context, "context_#{gradebook_version_to_use}_url")
+  end
+  protected :redirect_to_appropriate_gradebook_version
 
   def groups_as_assignments(groups=nil, options = {})
     groups ||= @context.assignment_groups.active

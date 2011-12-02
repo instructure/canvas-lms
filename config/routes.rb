@@ -94,6 +94,7 @@ ActionController::Routing::Routes.draw do |map|
     course.update_nav 'update_nav', :controller => 'courses', :action => 'update_nav'
     course.formatted_enroll_users 'enroll_users.:format', :controller => 'courses', :action => 'enroll_users'
     course.resource :gradebook, :collection => {
+      :change_gradebook_version => :get,
       :blank_submission => :get,
       :speed_grader => :get,
       :update_submission => :post,
