@@ -25,7 +25,7 @@ require File.expand_path(File.dirname(__FILE__) + '/server')
 include I18nUtilities
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
-SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
+SERVER_IP = SELENIUM_CONFIG[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 60
@@ -96,6 +96,12 @@ module SeleniumTestsHelperMethods
   end
 
   def self.setup_host_and_port(tries = 60)
+    if SELENIUM_CONFIG[:server_port]
+      $server_port = SELENIUM_CONFIG[:server_port]
+      $app_host_and_port = "#{SERVER_IP}:#{$server_port}"
+      return $server_port
+    end
+
     tried_ports = Set.new
     while tried_ports.length < 60
       port = rand(65535 - 1024) + 1024
