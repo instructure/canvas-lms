@@ -209,6 +209,16 @@ describe UserList do
       ul.duplicate_addresses.should == []
     end
 
+    it "should not think that multiple pseudonyms for the same user is multiple users" do
+      user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
+      @user.pseudonyms.create!(:unique_id => 'jt+2@instructure.com')
+      @user.communication_channels.create!(:path => 'jt+3@instructure.com') { |cc| cc.workflow_state = 'active' }
+      ul = UserList.new 'jt+3@instructure.com'
+      ul.addresses.should == [{:address => 'jt+3@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT'}]
+      ul.errors.should == []
+      ul.duplicate_addresses.should == []
+    end
+
     it "should detect duplicates, even from different CCs" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
       cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
@@ -292,6 +302,17 @@ describe UserList do
       ul = UserList.new 'jt@instructure.com'
       ul.addresses.should == []
       ul.errors.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :details => :non_unique}]
+    end
+
+    it "should find a user with multiple not-this-account pseudonyms" do
+      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({}))
+      account1 = Account.create!
+      account2 = Account.create!
+      user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
+      @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :account => account2)
+      ul = UserList.new 'jt@instructure.com'
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT'}]
+      ul.errors.should == []
     end
   end
 

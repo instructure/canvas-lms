@@ -130,7 +130,7 @@ class UserList
           # we already have the one from this-account, just go with it
           next if address[:account_id] == @root_account.id
           # neither is from this-account, flag an error
-          unless login[:account_id] == @root_account.id
+          if login[:account_id] != @root_account.id && login[:user_id] != address[:user_id]
             address[:type] = :pseudonym if address[:type] == :email
             address[:user_id] = false
             address[:details] = :non_unique
@@ -163,7 +163,7 @@ class UserList
         # ccs are not unique; just error out on duplicates
         # we're in a bit of a pickle if open registration is disabled, and there are conflicting
         # e-mails, but none of them are from a pseudonym
-        if address.has_key?(:user_id)
+        if address.has_key?(:user_id) && address[:user_id] != login[:user_id]
           address[:user_id] = false
           address[:details] = :non_unique
         else
