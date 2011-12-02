@@ -116,9 +116,6 @@ describe "OAuth2", :type => :integration do
         code = response['Location'].match(/code=([^\?&]+)/)[1]
         code.should be_present
 
-        get response['Location']
-        response.should be_success
-
         # make sure the user is now logged out, or the app also has full access to their session
         get '/'
         response.should be_redirect
@@ -157,6 +154,18 @@ describe "OAuth2", :type => :integration do
         @course.assignments.first.title.should == 'test assignment'
         @course.assignments.first.points_possible.should == 5.3
       end
+    end
+
+    it "should not prepend the csrf protection even if the post has a session" do
+      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+      post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+      code = ActiveSupport::SecureRandom.hex(64)
+      code_data = { 'user' => @user.id, 'client_id' => @client_id }
+      Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
+      post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
+      response.should be_success
+      json = JSON.parse(response.body)
+      json['access_token'].should == AccessToken.last.token
     end
 
     it "should execute for password/ldap login" do
@@ -198,7 +207,9 @@ describe "OAuth2", :type => :integration do
         response.should redirect_to(cas.add_service_to_login_url(login_url))
 
         get '/login', :ticket => 'ST-abcd'
-        session[:cas_login].should == true
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/auth\?code=})
+        session.should be_blank
       end
     end
 
