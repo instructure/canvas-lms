@@ -373,8 +373,8 @@ class UsersController < ApplicationController
       return render_unauthorized_action
     end
 
-    grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, 'grading') }
-    submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, 'submitting') }
+    grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, @current_user, session, 'grading') }
+    submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, @current_user, session, 'submitting') }
     render :json => (grading + submitting)
   end
 
@@ -553,7 +553,7 @@ class UsersController < ApplicationController
         flash[:user_id] = @user.id
         flash[:pseudonym_id] = @pseudonym.id
         format.html { redirect_to registered_url }
-        format.json { api_request? ? render(:json => user_json(@user)) : render(:json => data) }
+        format.json { api_request? ? render(:json => user_json(@user, @current_user, session)) : render(:json => data) }
       end
     else
       respond_to do |format|

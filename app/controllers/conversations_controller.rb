@@ -749,7 +749,7 @@ class ConversationsController < ApplicationController
     result = conversation.as_json(options)
     audience = conversation.participants.reject{ |u| u.id == conversation.user_id }
     result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
-    result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, nil, ['assignment', 'submission_comments']) } if options[:submissions]
+    result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
     result[:audience] = audience.map(&:id)
     result[:audience_contexts] = contexts_for(audience)
     result[:avatar_url] = avatar_url_for(conversation)
