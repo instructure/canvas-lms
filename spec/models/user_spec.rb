@@ -1066,4 +1066,14 @@ describe User do
       @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
     end
   end
+
+  describe "email_channel" do
+    it "should not return retired channels" do
+      u = User.new
+      retired = u.communication_channels.build(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      u.email_channel.should be_nil
+      active = u.communication_channels.build(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      u.email_channel.should == active
+    end
+  end
 end
