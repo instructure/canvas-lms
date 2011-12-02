@@ -174,18 +174,17 @@ class UserList
 
     # Search for matching SMS
     smses = @addresses.select { |a| a[:type] == :sms }
-    CommunicationChannel.connection.select_all("
-        SELECT communication_channels.path AS address, users.name AS name, communication_channels.user_id AS user_id
-        FROM communication_channels INNER JOIN users ON communication_channels.user_id = users.id
-        WHERE communication_channels.workflow_state='active'
-          AND communication_channels.path_type='sms'
-          AND (#{smses.map{|x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})
-        ").map(&:symbolize_keys).each do |sms|
+    sms_scope = @open_registration ? Pseudonym : Pseudonym.trusted_by_including_self(@root_account)
+    sms_scope.active.find(:all,
+        :select => 'path AS address, users.name AS name, communication_channels.user_id AS user_id',
+        :joins => { :user => :communication_channels },
+        :conditions => "communication_channels.workflow_state='active' AND (#{smses.map{|x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})"
+    ).map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
       address = sms.delete(:address)[/\d+/]
       addresses = @addresses.select { |a| a[:type] == :sms && a[:address].gsub(/[^\d]/, '') == address }
       addresses.each do |address|
         # ccs are not unique; just error out on duplicates
-        if address.has_key?(:user_id)
+        if address.has_key?(:user_id) && address[:user_id] != login[:user_id]
           address[:user_id] = false
           address[:details] = :non_unique
         else

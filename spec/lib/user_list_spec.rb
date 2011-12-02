@@ -314,6 +314,18 @@ describe UserList do
       ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT'}]
       ul.errors.should == []
     end
+
+    it "should not find a user from a different account by SMS" do
+      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({:conditions => {:account_id => Account.default.id}}))
+      account = Account.create!
+      user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
+      cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
+      cc.confirm!
+      ul = UserList.new '(801) 555-5555'
+      ul.addresses.should == []
+      ul.errors.should == [{:address => '(801) 555-5555', :type => :sms, :details => :not_found}]
+      ul.duplicate_addresses.should == []
+    end
   end
 
   context "user creation" do
