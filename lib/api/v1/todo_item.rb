@@ -20,10 +20,10 @@ module Api::V1::TodoItem
   include Api::V1::Assignment
   include Api::V1::Context
 
-  def todo_item_json(assignment, todo_type)
+  def todo_item_json(assignment, user, session, todo_type)
     context_data(assignment).merge({
       :type => todo_type,
-      :assignment => assignment_json(assignment),
+      :assignment => assignment_json(assignment, user, session),
       :ignore => api_v1_users_todo_ignore_url(assignment.asset_string, todo_type, :permanent => '0'),
       :ignore_permanently => api_v1_users_todo_ignore_url(assignment.asset_string, todo_type, :permanent => '1'),
     }).tap do |hash|

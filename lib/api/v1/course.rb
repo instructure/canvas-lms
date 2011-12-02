@@ -17,13 +17,14 @@
 #
 
 module Api::V1::Course
-  def course_json(course, includes, enrollments)
+  include Api::V1::Json
+
+  def course_json(course, user, session, includes, enrollments)
     include_grading = includes.include?('needs_grading_count')
     include_syllabus = includes.include?('syllabus_body')
     include_total_scores = includes.include?('total_scores') && !course.settings[:hide_final_grade]
 
-    hash = course.as_json(
-      :include_root => false, :only => %w(id name course_code))
+    hash = api_json(course, user, session, :only => %w(id name course_code))
     hash['sis_course_id'] = course.sis_source_id
     if enrollments
       hash['enrollments'] = enrollments.map do |e|
@@ -46,12 +47,11 @@ module Api::V1::Course
     end
     hash
   end
-  
-  def copy_status_json(import, course)
-    hash = import.as_json(:include_root => false, :only => %w(id progress created_at workflow_state))
+
+  def copy_status_json(import, course, user, session)
+    hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state))
     hash[:status_url] = api_v1_course_copy_status_path(course, import)
     hash
   end
-  
 end
 

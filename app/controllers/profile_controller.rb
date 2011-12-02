@@ -66,7 +66,7 @@ class ProfileController < ApplicationController
         render :action => "profile"
       end
       format.json do
-        hash = user_json(@user)
+        hash = user_json(@user, @current_user, session)
         hash[:primary_email] = @default_email_channel.try(:path)
         hash[:login_id] ||= @default_pseudonym.try(:unique_id)
         if service_enabled?(:avatars)

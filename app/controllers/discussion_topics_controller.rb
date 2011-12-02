@@ -38,7 +38,6 @@ class DiscussionTopicsController < ApplicationController
   # @response_field id The unique identifier for the discussion topic.
   # @response_field last_reply_at The datetime for when the last reply was in the topic
   # @response_field message The HTML content of the topic 
-  # @response_field permissions A hash of permissions for the current user. If a key is not present then the permission is false. 
   #   Example:
   #           {"delete"=>true,"reply"=>true,"read"=>true,"attach"=>true,"create"=>true,"update"=>true}
   # @response_field podcast_url If the topic is a podcast topic this is the feed url for the current user
@@ -62,7 +61,6 @@ class DiscussionTopicsController < ApplicationController
   #        "assignment_id":null,
   #        "delayed_post_at":null,
   #        "user_name":"User Name",
-  #        "permissions":{"reply":true,"read":true},
   #        "topic_children":[],
   #        "root_topic_id":null,
   #        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
@@ -88,7 +86,7 @@ class DiscussionTopicsController < ApplicationController
         format.html
         format.json do
           if api_request?
-            render :json => discussion_topic_api_json(@topics, @context)
+            render :json => discussion_topic_api_json(@topics, @context, @current_user, session)
           else
             render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count], :permissions => {:user => @current_user, :session => session })
           end

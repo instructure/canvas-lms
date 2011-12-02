@@ -36,7 +36,7 @@ class AccountsController < ApplicationController
         # that you implicitly have access to, or have a separate method
         # to get the sub-accounts of an account?
         @accounts = Api.paginate(@accounts, self, api_v1_accounts_path)
-        render :json => @accounts.map { |a| account_json(a, []) }
+        render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
       end
     end
   end
@@ -54,7 +54,7 @@ class AccountsController < ApplicationController
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
         build_course_stats
       end
-      format.json { render :json => account_json(@account, []) }
+      format.json { render :json => account_json(@account, @current_user, session, []) }
     end
   end
 
@@ -73,7 +73,7 @@ class AccountsController < ApplicationController
       @courses = @account.associated_courses.active
       @courses = @courses.with_enrollments if params[:hide_enrollmentless_courses]
       @courses = Api.paginate(@courses, self, api_v1_account_courses_path, :order => :id)
-      render :json => @courses.map { |c| course_json(c, [], nil) }
+      render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
     end
   end
 

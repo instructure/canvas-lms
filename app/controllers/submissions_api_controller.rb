@@ -56,7 +56,7 @@ class SubmissionsApiController < ApplicationController
 
       includes = Array(params[:include])
 
-      result = @submissions.map { |s| submission_json(s, @assignment, @context, includes) }
+      result = @submissions.map { |s| submission_json(s, @assignment, @current_user, session, @context, includes) }
 
       render :json => result.to_json
     end
@@ -122,7 +122,7 @@ class SubmissionsApiController < ApplicationController
           # we've already got all the assignments loaded, so bypass AR loading
           # here and just give the submission its assignment
           submission.assignment = assignments_hash[submission.assignment_id]
-          hash[:submissions] << submission_json(submission, submission.assignment, @context, includes)
+          hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
         end unless assignments.empty?
         if includes.include?('total_scores') && params[:grouped].present?
           hash.merge!(
@@ -151,7 +151,7 @@ class SubmissionsApiController < ApplicationController
     @submission = @assignment.submission_for_student(@user)
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
-      render :json => submission_json(@submission, @assignment, @context, includes).to_json
+      render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes).to_json
     end
   end
 
@@ -263,7 +263,7 @@ class SubmissionsApiController < ApplicationController
       # fix this at some point.
       @submission.reload
 
-      render :json => submission_json(@submission, @assignment, @context, %w(submission_comments)).to_json
+      render :json => submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments)).to_json
     end
   end
 
