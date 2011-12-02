@@ -307,6 +307,9 @@ class PseudonymSessionsController < ApplicationController
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
         redirect_uri = session[:oauth2][:redirect_uri]
         if redirect_uri == OAUTH2_OOB_URI
+          # destroy this user session, it's only for generating the token
+          @pseudonym_session.try(:destroy)
+          reset_session
           format.html { redirect_to oauth2_auth_url(:code => code) }
         else
           format.html { redirect_to "#{redirect_uri}?code=#{code}" }
@@ -330,12 +333,10 @@ class PseudonymSessionsController < ApplicationController
   OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
   def oauth2_auth
-    if session[:oauth2] && params[:code]
+    if params[:code]
       # hopefully the user never sees this, since it's an oob response and the
       # browser should be closed automatically. but we'll at least display
       # something basic.
-      @pseudonym_session.try(:destroy)
-      reset_session
       return render()
     end
 

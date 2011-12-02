@@ -1049,13 +1049,18 @@ class ApplicationController < ActionController::Base
     bank
   end
 
+  SKIP_JSON_CSRF_REGEX = %r{\A/login/oauth}
+  def skip_json_csrf?
+    !!request.path.match(SKIP_JSON_CSRF_REGEX)
+  end
+
   def render(options = nil, extra_options = {}, &block)
     if options && options.key?(:json)
       json = options.delete(:json)
       json = ActiveSupport::JSON.encode(json) unless json.is_a?(String)
       # prepend our CSRF protection to the JSON response, unless this is an API
       # call that didn't use session auth.
-      if @pseudonym_session && !@pseudonym_session.used_basic_auth?
+      if @pseudonym_session && !@pseudonym_session.used_basic_auth? && !skip_json_csrf?
         json = "while(1);#{json}"
       end
 
