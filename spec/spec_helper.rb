@@ -45,6 +45,11 @@ def truncate_table(model)
   case model.connection.adapter_name
   when "SQLite"
     model.delete_all
+    begin
+      model.connection.execute("delete from sqlite_sequence where name='#{model.connection.quote_table_name(model.table_name)}';")
+      model.connection.execute("insert into sqlite_sequence (name, seq) values ('#{model.connection.quote_table_name(model.table_name)}', #{rand(100)});")
+    rescue
+    end
   else
     model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
   end
