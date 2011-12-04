@@ -138,10 +138,12 @@ describe "grade exchange course settings tab" do
   end
 
   it "should support grade submission" do
+    pending "spec being rewritten in a refactor"
     grade_passback_setup(false)
   end
 
   it "should support grade submission and result writeback" do
+    pending "spec being rewritten in a refactor"
     grade_passback_setup(true)
     process_csv_data_cleanly(
       "enrollment_id,grade_publishing_status,message",
