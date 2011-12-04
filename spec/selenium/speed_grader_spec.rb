@@ -255,9 +255,10 @@ describe "speedgrader selenium tests" do
     student_submission :username => "student1@example.com"
     student_submission :username => "student2@example.com"
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
-    keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').click }
+    keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').displayed? }
+    driver.find_element(:css, '.toggle_full_rubric').click
     wait_for_animations
     rubric = driver.find_element(:id, 'rubric_full')
     rubric.should be_displayed
