@@ -212,8 +212,8 @@ shared_examples_for "dashboard selenium tests" do
       driver.action.move_to(course_menu).perform
       course_menu.should include_text('My Courses')
       course_menu.should include_text('View all courses')
-      course_menu.find_element(:css, '.customListOpen').click
       keep_trying_until {
+        course_menu.find_element(:css, '.customListOpen').click
         course_menu.find_element(:css, '.customListWrapper').should be_displayed
       }
     end
