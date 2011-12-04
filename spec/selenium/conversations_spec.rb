@@ -110,10 +110,10 @@ shared_examples_for "conversations selenium tests" do
       element = prev_elements.detect{ |e| e.last == name } or raise "menu item does not exist"
 
       element.first.click
+      wait_for_ajaximations
       keep_trying_until{
         find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
       }
-      wait_for_animations
 
       @elements = nil
       elements
