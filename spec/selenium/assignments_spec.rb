@@ -260,7 +260,7 @@ describe "assignment selenium tests" do
 
     #save changes
     driver.find_element(:id, 'edit_assignment_form').submit
-    wait_for_animations
+    wait_for_ajaximations
     driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
   end
 
