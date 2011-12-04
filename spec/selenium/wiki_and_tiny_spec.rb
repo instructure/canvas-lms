@@ -160,6 +160,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       first_folder = @tree1.find_elements(:css, 'li.folder').first
       first_folder.find_element(:css, '.sign.plus').click
+      wait_for_ajax_requests
       subfolder = first_folder.find_element(:css, '.folder')
       subfolder.find_element(:css, '.sign.plus').click
       wait_for_ajax_requests
