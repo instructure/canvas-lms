@@ -16,19 +16,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Object
-  def try_rescue(method, *args)
-    if block_given?
-      try(method, *args){ |*block_args| yield(*block_args) }
-    else
-      try(method, *args)
-    end
-  rescue
-    nil
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
+describe "Object#try_rescue" do
+  it "should return nil when nil is the receiver" do
+    nil.try_rescue(:asdf).should be_nil
+    nil.try_rescue(:asdf){}.should be_nil
   end
-end
-class NilClass
-  def try_rescue(*args)
-    self
+
+  it "should call the method" do
+    "1".try_rescue(:to_i).should eql 1
+  end
+
+  it "should pass along the block" do
+    [1, 2, 3].try_rescue(:map){|i|i+1}.should eql [2, 3, 4]
+  end
+
+  it "should rescue nil" do
+    "1".try_rescue(:asdf).should be_nil
+    [1, 2, 3].try_rescue(:asdf){|i|i+1}.should be_nil
   end
 end
