@@ -4,7 +4,6 @@
   can_manage_admin_users = managed_accounts
   account ||= managed_accounts.first
   root_account = account.root_account || account if account
-  can_manage_user_logins = @user.associated_root_accounts.active.any?{|a| can_do(a, @current_user, :manage_user_logins) } 
 %>
 <% jammit_js :user_name %>
   <fieldset id="name_and_email">
@@ -56,13 +55,13 @@
               <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>
             <% end %>
           <% end %>
-          <% if can_manage_user_logins %>
+          <% if @user.associated_root_accounts.active.any?{|a| can_do(a, @current_user, :manage_user_logins) }  %>
             | 
             <a href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User') %></a>
-            <% if (@context.is_a?(User) || @context.is_a?(Account)) && root_account %>
-              |
-              <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
-            <% end %>
+          <% end %>
+          <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.grants_right?(@current_user, session, :manage_logins) %>
+            |
+            <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
           <% end %>
         </td>
       <% end %>

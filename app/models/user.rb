@@ -657,12 +657,14 @@ class User < ActiveRecord::Base
   end
   
   alias_method :destroy!, :destroy
-  def destroy
-    self.workflow_state = 'deleted'
-    self.save
-    self.pseudonyms.each{|p| p.destroy }
-    self.communication_channels.each{|cc| cc.destroy }
-    self.enrollments.each{|e| e.destroy }
+  def destroy(even_if_managed_passwords=false)
+    ActiveRecord::Base.transaction do
+      self.workflow_state = 'deleted'
+      self.save
+      self.pseudonyms.each{|p| p.destroy(even_if_managed_passwords) }
+      self.communication_channels.each{|cc| cc.destroy }
+      self.enrollments.each{|e| e.destroy }
+    end
   end
   
   def remove_from_root_account(account)

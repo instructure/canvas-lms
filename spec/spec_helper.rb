@@ -175,18 +175,13 @@ Spec::Runner.configure do |config|
   end
 
   def user_with_pseudonym(opts={})
-    user = user_with_communication_channel(opts)
-    username = opts[:username] || "nobody@example.com"
-    password = opts[:password] || "asdfasdf"
-    password = nil if password == :autogenerate
-    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
-    @pseudonym.communication_channel = @cc
+    user(opts) unless opts[:user]
+    user = opts[:user] || @user
+    @pseudonym = pseudonym(user, opts)
     user
   end
 
-  def user_with_communication_channel(opts={})
-    user(opts) unless opts[:user]
-    user = opts[:user] || @user
+  def communication_channel(user, opts={})
     username = opts[:username] || "nobody@example.com"
     @cc = user.communication_channels.create!(:path_type => 'email', :path => username) do |cc|
       cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
@@ -194,6 +189,45 @@ Spec::Runner.configure do |config|
     end
     @cc.should_not be_nil
     @cc.should_not be_new_record
+    @cc
+  end
+
+  def user_with_communication_channel(opts={})
+    user(opts) unless opts[:user]
+    user = opts[:user] || @user
+    @cc = communication_channel(user, opts)
+    user
+  end
+
+  def pseudonym(user, opts={})
+    username = opts[:username] || "nobody@example.com"
+    password = opts[:password] || "asdfasdf"
+    password = nil if password == :autogenerate
+    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym.communication_channel = communication_channel(user, opts)
+    @pseudonym
+  end
+
+  def managed_pseudonym(user, opts={})
+    other_account = opts[:account] || account_with_saml
+    if other_account.password_authentication?
+      config = AccountAuthorizationConfig.new
+      config.auth_type = "saml"
+      config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
+      other_account.account_authorization_configs << config
+    end
+    opts[:account] = other_account
+    pseudonym(user, opts)
+    @pseudonym.sis_user_id = opts[:sis_user_id] || "U001"
+    @pseudonym.save!
+    @pseudonym.should be_managed_password
+    @pseudonym
+  end
+
+  def user_with_managed_pseudonym(opts={})
+    user(opts) unless opts[:user]
+    user = opts[:user] || @user
+    managed_pseudonym(user, opts)
     user
   end
 

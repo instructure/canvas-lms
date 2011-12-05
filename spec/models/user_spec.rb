@@ -320,6 +320,29 @@ describe User do
     ]
   end
 
+  it "should delete the user transactionally in case the pseudonym removal fails" do
+    user_with_managed_pseudonym
+    @pseudonym.should be_managed_password
+    @user.workflow_state.should == "pre_registered"
+    lambda { @user.destroy }.should raise_error("Cannot delete system-generated pseudonyms")
+    @user.workflow_state.should == "deleted"
+    @user.reload
+    @user.workflow_state.should == "pre_registered"
+    @account.account_authorization_config.destroy
+    @pseudonym.should_not be_managed_password
+    @user.destroy
+    @user.workflow_state.should == "deleted"
+    @user.reload
+    @user.workflow_state.should == "deleted"
+    user_with_managed_pseudonym
+    @pseudonym.should be_managed_password
+    @user.workflow_state.should == "pre_registered"
+    @user.destroy(true)
+    @user.workflow_state.should == "deleted"
+    @user.reload
+    @user.workflow_state.should == "deleted"
+  end
+
   context "move_to_user" do
     it "should delete the old user" do
       @user1 = user_model

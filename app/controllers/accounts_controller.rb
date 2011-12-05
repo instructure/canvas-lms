@@ -144,9 +144,10 @@ class AccountsController < ApplicationController
   end
 
   def confirm_delete_user
-    if authorized_action(@account, @current_user, :manage_user_logins)
-      @context = @account
-      @user = @account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
+    @root_account = @account.root_account || @account
+    if authorized_action(@root_account, @current_user, :manage_user_logins)
+      @context = @root_account
+      @user = @root_account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
       if !@user
         flash[:error] = t(:no_user_message, "No user found with that id")
         redirect_to account_url(@account)
@@ -155,26 +156,23 @@ class AccountsController < ApplicationController
   end
   
   def remove_user
-    if authorized_action(@account, @current_user, :manage_user_logins)
-      @user = UserAccountAssociation.find_by_account_id_and_user_id(@account.id, params[:user_id]).user rescue nil
+    @root_account = @account.root_account || @account
+    if authorized_action(@root_account, @current_user, :manage_user_logins)
+      @user = UserAccountAssociation.find_by_account_id_and_user_id(@root_account.id, params[:user_id]).user rescue nil
       # if the user is in any account other then the
       # current one, remove them from the current account
       # instead of deleting them completely
-      account_ids = []
       if @user
-        account_ids = @user.associated_root_accounts.map(&:id)
-      end
-      account_ids = account_ids.compact.uniq - [@account.id]
-      if @user && !account_ids.empty?
-        @root_account = @account.root_account || @account
-        @user.remove_from_root_account(@root_account)
-      else
-        @user && @user.destroy
+        if !(@user.associated_root_accounts.map(&:id).compact.uniq - [@root_account.id]).empty?
+          @user.remove_from_root_account(@root_account)
+        else
+          @user.destroy(true)
+        end
+        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
       end
       respond_to do |format|
-        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name) if @user
-        format.html { redirect_to account_url(@account) }
-        format.json { render :json => @user.to_json }
+        format.html { redirect_to account_users_url(@account) }
+        format.json { render :json => (@user || {}).to_json }
       end
     end
   end
