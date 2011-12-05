@@ -14,8 +14,9 @@ shared_examples_for "quiz selenium tests" do
   it "should create a new quiz" do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
-    driver.find_element(:css, '.new-quiz-link').click
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:css, '.new-quiz-link').click
+    }
     #check url
     driver.current_url.should match %r{/courses/\d+/quizzes/(\d+)\/edit}
     driver.current_url =~ %r{/courses/\d+/quizzes/(\d+)\/edit}
@@ -133,8 +134,9 @@ shared_examples_for "quiz selenium tests" do
     course_with_teacher_logged_in
     
     get "/courses/#{@course.id}/quizzes"
-    driver.find_element(:css, '.new-quiz-link').click
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:css, '.new-quiz-link').click
+    }
 
     driver.find_element(:css, '.add_question_link').click 
   end
@@ -570,8 +572,9 @@ shared_examples_for "quiz selenium tests" do
   it "should calculate correct quiz question points total" do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
-    driver.find_element(:css, '.new-quiz-link').click
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:css, '.new-quiz-link').click
+    }
     @question_count = 0
     @points_total = 0
 
@@ -834,12 +837,14 @@ shared_examples_for "quiz selenium tests" do
     q.save!
     get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
 
-    driver.find_element(:css, '.publish_quiz_button').click
+    expect_new_page_load {
+      driver.find_element(:css, '.publish_quiz_button').click
+    }
     wait_for_ajax_requests
-    wait_for_dom_ready
 
-    driver.find_element(:link, 'Take the Quiz').click
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:link, 'Take the Quiz').click
+    }
 
     #flag first question
     hover_and_click("#question_#{quest1.id} .flag_icon")
@@ -852,8 +857,9 @@ shared_examples_for "quiz selenium tests" do
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.dismiss
     driver.find_element(:css, "#question_#{quest1.id} .answers .answer:last-child input").click
-    driver.find_element(:id, 'submit_quiz_form').submit
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:id, 'submit_quiz_form').submit
+    }
     driver.find_element(:id, 'quiz_title').text.should == q.title
   end
 
@@ -876,9 +882,9 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:css, '.publish_quiz_button')
 
     get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-    driver.find_element(:link_text, 'Take the Quiz').click
-    wait_for_dom_ready
-    wait_for_ajax_requests
+    expect_new_page_load {
+      driver.find_element(:link_text, 'Take the Quiz').click
+    }
 
     # sleep because display is updated on timer, not ajax callback
     sleep(1)
@@ -919,12 +925,13 @@ shared_examples_for "quiz selenium tests" do
     question.submit
     wait_for_ajax_requests
 
-    driver.find_element(:css, '.publish_quiz_button').click
-    wait_for_ajax_requests
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:css, '.publish_quiz_button').click
+    }
 
-    driver.find_element(:link, 'Take the Quiz').click
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:link, 'Take the Quiz').click
+    }
 
     input = driver.find_element(:css, 'input[type=text]')
     input.click
@@ -932,8 +939,9 @@ shared_examples_for "quiz selenium tests" do
     driver.execute_script <<-JS
       $('input[type=text]').trigger('change');
     JS
-    driver.find_element(:css, '.submit_button').click
-    wait_for_dom_ready
+    expect_new_page_load {
+      driver.find_element(:css, '.submit_button').click
+    }
     driver.find_element(:css, '.score_value').text.strip.should == '1'
   end
 
