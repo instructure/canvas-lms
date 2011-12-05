@@ -338,6 +338,31 @@ shared_examples_for "all selenium tests" do
     tiny_frame
   end
 
+  def expect_fired_alert(&block)
+    driver.execute_script(<<-ENDSCRIPT)
+      window.canvasTestSavedAlert = window.alert;
+      window.canvasTestAlertFired = false;
+      window.alert = function() {
+        window.canvasTestAlertFired = true;
+        return true;
+      }
+    ENDSCRIPT
+    
+    yield
+    
+    keep_trying_until {
+      driver.execute_script(<<-ENDSCRIPT)
+        var value = window.canvasTestAlertFired;
+        window.canvasTestAlertFired = false;
+        return value;
+      ENDSCRIPT
+    }
+    
+    driver.execute_script(<<-ENDSCRIPT)
+      window.alert = window.canvasTestSavedAlert;
+    ENDSCRIPT
+  end
+
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
     driver.switch_to.frame id
