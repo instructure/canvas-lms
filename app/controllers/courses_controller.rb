@@ -95,10 +95,30 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API
+  # Create a new course
+  #
+  # @argument account_id [Integer] The unique ID of the account to create to course under.
+  # @argument course[name] [String] [optional] The name of the course. If omitted, the course will be named "Unnamed Course."
+  # @argument course[course_code] [String] [optional] The course code for the course.
+  # @argument course[start_at] [Datetime] [optional] Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  # @argument course[conclude_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
+  # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
+  # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
+  # @argument course[allow_student_assignment_edits] [optional] Set to true if students should be allowed to make modifications to assignments.
+  # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
+  # @argument course[allow_student_forum_attachments] [Boolean] [optional] If true, students can attach files to forum posts.
+  # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
+  # @argument course[self_enrollment] [Boolean] [optional] Set to true if the course is self enrollment.
+  # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
+  # @argument course[sis_name] [String] [optional] The SIS course name.
+  # @argument course[sis_course_code] [optional] The SIS course code.
+  # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
+  #
   def create
     @account = Account.find(params[:account_id])
     if authorized_action(@account, @current_user, :manage_courses)
-
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
       end
@@ -107,11 +127,26 @@ class CoursesController < ApplicationController
         params[:course][:enrollment_term] = (@account.root_account || @account).enrollment_terms.find(enrollment_term_id)
       end
 
+      sis_attributes = [:sis_course_id, :sis_course_code, :sis_name]
+      sis_info = sis_attributes.map { |s| params[:course].delete(s) }
       @course = (@sub_account || @account).courses.build(params[:course])
+      sis_attributes.each_with_index { |s, n|
+        @course.send("#{s}=", sis_info[n])
+      } if api_request? && @account.grants_right?(@current_user, :manage_sis)
+      @course.offer if api_request? and params[:offer].present?
       respond_to do |format|
         if @course.save
           format.html
-          format.json { render :json => @course.to_json }
+          format.json { render :json => course_json(
+            @course,
+            @current_user,
+            session,
+            [:start_at, :conclude_at, :license, :publish_grades_immediately,
+             :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
+             :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
+             :sis_name, :sis_course_code, :root_account_id, :account_id],
+             nil)
+          }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
           format.html { redirect_to :root_url }
@@ -120,7 +155,7 @@ class CoursesController < ApplicationController
       end
     end
   end
-  
+
   def backup
     get_context
     if authorized_action(@context, @current_user, :update)
