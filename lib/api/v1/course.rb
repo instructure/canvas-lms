@@ -24,7 +24,9 @@ module Api::V1::Course
     include_syllabus = includes.include?('syllabus_body')
     include_total_scores = includes.include?('total_scores') && !course.settings[:hide_final_grade]
 
-    hash = api_json(course, user, session, :only => %w(id name course_code))
+    base_attributes = %w(id name course_code)
+    allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes
+    hash = api_json(course, user, session, :only => allowed_attributes)
     hash['sis_course_id'] = course.sis_source_id
     if enrollments
       hash['enrollments'] = enrollments.map do |e|

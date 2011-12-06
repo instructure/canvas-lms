@@ -656,6 +656,7 @@ ActionController::Routing::Routes.draw do |map|
   ApiRouteSet::V1.route(map) do |api|
     api.with_options(:controller => :courses) do |courses|
       courses.get 'courses', :action => :index
+      courses.post 'accounts/:account_id/courses', :action => :create
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students

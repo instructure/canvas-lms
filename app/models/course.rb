@@ -1235,7 +1235,11 @@ class Course < ActiveRecord::Base
       end
     end
   end
-  
+
+  # included to make it easier to work with api, which returns
+  # sis_source_id as sis_course_id.
+  alias_attribute :sis_course_id, :sis_source_id
+
   def grading_standard_title
     if self.grading_standard_enabled?
       self.grading_standard.try(:title) || t('default_grading_scheme_name', "Default Grading Scheme")
