@@ -124,4 +124,15 @@ describe PseudonymSessionsController do
       session[:cas_login].should == true
     end
   end
+
+  it "should redirect back for jobs controller" do
+    user_with_pseudonym(:password => 'qwerty', :active_all => 1)
+    Account.site_admin.add_user(@user)
+
+    get jobs_url
+    response.should redirect_to login_url
+
+    post login_url, :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+    response.should redirect_to jobs_url
+  end
 end

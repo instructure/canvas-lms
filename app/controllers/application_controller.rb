@@ -991,7 +991,8 @@ class ApplicationController < ActionController::Base
   def require_site_admin_with_permission(permission)
     unless current_user_is_site_admin?(permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
-      redirect_to root_url
+      store_location
+      redirect_to @current_user ? root_url : login_url
       return false
     end
   end
