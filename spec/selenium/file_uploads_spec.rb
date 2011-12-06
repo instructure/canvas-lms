@@ -88,7 +88,7 @@ describe "file uploads Windows-Firefox-Local-Tests" do
   prepend_before(:each) {
     Setting.set("file_storage_test_override", "local")
   }
-  prepend_before(:all) {63/5963/18
+  prepend_before(:all) {
     Setting.set("file_storage_test_override", "local")
   }
 
@@ -109,10 +109,16 @@ describe "file uploads Windows-Firefox-Local-Tests" do
         $('.add_topic_link:first').click();
         $('#editor_tabs ul li:eq(1) a').click();
       JS
+      wait_for_ajax_requests
       
       driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
-      driver.find_element(:css, '#tree1 .folder .sign.plus').click
-      keep_trying_until { find_with_jquery('#tree1 .folder .loading').blank? }
+      disclosure_button = driver.find_element(:css, '#tree1 .folder .sign')
+      disclosure_button.click
+      # work around bizarre bug where the click above doesn't register the first time
+      # when testing firefox on windows xp WITHOUT firebug installed. (works with firebug enabled!)
+      disclosure_button.click if disclosure_button.attribute(:class) !~ /minus/
+      wait_for_ajax_requests
+
       files = driver.find_elements(:css, '#tree1 .folder .file')
       if first_time
         files.should be_empty
