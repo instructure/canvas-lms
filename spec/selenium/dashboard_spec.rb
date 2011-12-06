@@ -208,14 +208,25 @@ shared_examples_for "dashboard selenium tests" do
 
       get "/"
 
+      # Now artificially make the next ajax request slower. We want to make sure that we click the
+      # customize button before the ajax request returns. Delaying the request by 1s should
+      # be enough.
+      UsersController.before_filter { sleep 1; true }
+
       course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
-      driver.action.move_to(course_menu).perform
+      driver.execute_script(%{$("#menu li.menu-item:first").trigger('mouseenter')})
+      sleep 0.4 # there's a fixed 300ms delay before the menu will display
+
+      # For some reason, a normal webdriver click here causes strangeness on FF in XP with
+      # firebug installed.
+      driver.execute_script("$('#menu .customListOpen:first').click()")
+      wait_for_ajaximations
+
+      UsersController.filter_chain.pop
+
       course_menu.should include_text('My Courses')
       course_menu.should include_text('View all courses')
-      keep_trying_until {
-        course_menu.find_element(:css, '.customListOpen').click
-        course_menu.find_element(:css, '.customListWrapper').should be_displayed
-      }
+      course_menu.find_element(:css, '.customListWrapper').should be_displayed
     end
   end
 
