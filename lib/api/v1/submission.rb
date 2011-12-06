@@ -32,7 +32,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("submission_comments")
-      hash['submission_comments'] = submission.submission_comments.map do |sc|
+      hash['submission_comments'] = submission.comments_for(@current_user).map do |sc|
         sc_hash = sc.as_json(
           :include_root => false,
           :only => %w(author_id author_name created_at comment))

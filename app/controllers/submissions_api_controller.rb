@@ -149,6 +149,7 @@ class SubmissionsApiController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:id])
     @submission = @assignment.submission_for_student(@user)
+
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
       render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes).to_json
