@@ -521,12 +521,17 @@ shared_examples_for "all selenium tests" do
   end
 
   def make_full_screen
-    driver.execute_script <<-JS
+    w, h = driver.execute_script <<-JS
       if (window.screen) {
-        window.moveTo(0, 0);
-        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+        return [ window.screen.availWidth, window.screen.availHeight ];
       }
+      return [ 0, 0 ];
     JS
+
+    if w > 0 and h > 0
+      driver.manage.window.move_to(0, 0)
+      driver.manage.window.resize_to(w, h)
+    end
   end
 
   def replace_content(el, value)
