@@ -116,7 +116,6 @@ class ProfileController < ApplicationController
         policy = @user.notification_policies.build
         policy.notification = category
         policy.communication_channel = @user.communication_channel
-        @policies << policy
       end
     end
     has_facebook_installed = !@current_user.user_services.for_service('facebook').empty?

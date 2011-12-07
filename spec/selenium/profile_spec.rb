@@ -33,28 +33,28 @@ shared_examples_for "profile selenium tests" do
     communication_channel_model(:user_id => @user.id, :path => second_email, :path_type => 'email')
 
     notification_model(:category => 'Grading')
-    notification_policy_model(:notification_id => @notification.id)
     get "/profile"
    
     #Test modifying notifications
     driver.find_element(:css, '#section-tabs .notifications').click
     content_tbody = driver.find_element(:css, '#content > table > tbody')
+    content_tbody.find_elements(:css, 'tr.preference').length.should == 1
 
     content_tbody.find_element(:css, 'tr:nth-child(2) > td').
       should include_text(I18n.t(:grading_description, 'For course grading alerts'))
     #add new notification and select different email
     content_tbody.find_element(:css, '.add_notification_link').click
     wait_for_animations
-    email_select_css = '#content > table > tbody > tr:nth-child(4) > td > span > select'
+    email_select_css = '#content > table > tbody > tr:nth-child(3) > td > span > select'
     option_value = find_option_value(:css, email_select_css, second_email)
 
     find_with_jquery("#{email_select_css} > option[value=\"#{option_value}\"]'").click
     #change notification setting for first notification
-    daily_select = content_tbody.find_element(:css, 'tr:nth-child(5) > td:nth-child(3) > div')
+    daily_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(3) > div')
     daily_select.click
     daily_select.find_element(:xpath, '..').should have_class('selected_pending')
     #change notification setting for second notification
-    never_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(5) > div')
+    never_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(5) > div')
     never_select.click
     never_select.find_element(:xpath, '..').should have_class('selected_pending')
     driver.find_element(:css, '#content .save_preferences_button').click
