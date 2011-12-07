@@ -788,10 +788,7 @@ class CoursesController < ApplicationController
     get_context
     params[:enrollment_type] ||= 'StudentEnrollment'
     params[:course_section_id] ||= @context.default_section.id
-    can_add = %w(StudentEnrollment ObserverEnrollment).include?(params[:enrollment_type]) && @context.grants_right?(@current_user, session, :manage_students)
-    can_add ||= params[:enrollment_type] == 'TeacherEnrollment' && @context.teacherless? && @context.grants_right?(@current_user, session, :manage_students)
-    can_add ||= @context.grants_right?(@current_user, session, :manage_admin_users)
-    if can_add
+    if @current_user && @current_user.can_create_enrollment_for?(@context, session, params[:enrollment_type])
       params[:user_list] ||= ""
       
       respond_to do |format|

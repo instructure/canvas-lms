@@ -2127,6 +2127,14 @@ class User < ActiveRecord::Base
     enrollment && enrollment.course_section
   end
 
+  def can_create_enrollment_for?(course, session, type)
+    can_add = %w{StudentEnrollment ObserverEnrollment}.include?(type) && course.grants_right?(self, session, :manage_students)
+    can_add ||= type == 'TeacherEnrollment' && course.teacherless? && course.grants_right?(self, session, :manage_students)
+    can_add ||= course.grants_right?(self, session, :manage_admin_users)
+
+    can_add
+  end
+
   def group_member_json(context)
     h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
     if context && context.is_a?(Course) && (section = self.section_for_course(context))
