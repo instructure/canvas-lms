@@ -476,7 +476,7 @@ describe SIS::CSV::UserImporter do
     p.should be_deleted
     u = p.user
     u.communication_channels.length.should == 1
-    u.email_channel.should be_retired
+    u.communication_channels.first.should be_retired
   end
 
   it "should not add a user with the same login id as another user" do
