@@ -175,6 +175,15 @@
         </li>
       </ul>
     </div>
+    <div id="copy_external_tools_list">
+      <h3><%= check_box :copy, :all_external_tools, :class => "copy_all" %><%= label :copy, :all_external_tools, image_tag('ball.png') + " " + t('#labels.external_tools', "External Tools") %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="external_tool" style="display: none;">
+          <input type="checkbox" value="1" name="copy[external_tools][id]" id="copy_external_tools_id"/>
+          <label for="copy_external_tools_id">...</label>
+        </li>
+      </ul>
+    </div>
     <div style="margin-top: 20px;">
       <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, :en => "Adjust events and due dates" %></h3>
       <div style="display: none; margin-left: 50px;" class="shift_dates_settings">
@@ -354,6 +363,15 @@ $(document).ready(function() {
         var $wiki = $("#copy_wikis_list .wiki:first").clone(true);
         populateItem($wiki, wiki.migration_id, wiki.title, 'copy[wikis]');
         $("#copy_wikis_list ul").append($wiki);
+      }
+    }
+    $("#copy_external_tools_list").showIf(data.external_tools && data.external_tools.length > 0);
+    if(data.external_tools) {
+      for(var idx in data.external_tools) {
+        var tool = data.external_tools[idx];
+        var $tool = $("#copy_external_tools_list .external_tool:first").clone(true);
+        populateItem($tool, tool.migration_id, tool.title, 'copy[external_tools]');
+        $("#copy_external_tools_list ul").append($tool);
       }
     }
     var topic_count = 0;

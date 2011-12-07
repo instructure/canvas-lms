@@ -167,7 +167,7 @@
   <% end %>
   <% if !@topic_uneditable && can_do(@topic, @current_user, :reply) && !params[:combined]%>
     <div style="text-align: center; margin: 10px;">
-      <a href="#" class="add_entry_link add button big-button"> <%= image_tag "add.png" %> <%= t :add_new_entry, "Add New Entry" %></a><br/>
+      <a href="#" id="add_entry_bottom" class="add_entry_link add button big-button"> <%= image_tag "add.png" %> <%= t :add_new_entry, "Add New Entry" %></a><br/>
     </div>
   <% elsif @topic.locked? %>
     <div style="text-align: center; margin: 10px;">

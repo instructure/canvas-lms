@@ -24,6 +24,10 @@ class HostUrl
     @@file_host = nil
     @@domain_config = nil
 
+    def reset_cache!
+      @@default_host = @@file_host = @@domain_config = nil
+    end
+
     def domain_config
       if !@@domain_config
         @@domain_config = File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].try(:with_indifferent_access)

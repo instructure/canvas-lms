@@ -80,6 +80,7 @@ Spec::Runner.configure do |config|
     Time.zone = 'UTC'
     Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
+    HostUrl.reset_cache!
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -250,6 +251,7 @@ Spec::Runner.configure do |config|
     session = mock()
     session.stubs(:record).returns(pseudonym)
     session.stubs(:session_credentials).returns(nil)
+    session.stubs(:used_basic_auth?).returns(false)
     PseudonymSession.stubs(:find).returns(session)
   end
 
@@ -488,5 +490,9 @@ Spec::Runner.configure do |config|
     attachment_obj_with_context(obj, opts)
     @attachment.save!
     @attachment
+  end
+
+  def json_parse(json_string = response.body)
+    JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
   end
 end

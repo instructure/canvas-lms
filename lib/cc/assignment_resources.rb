@@ -89,6 +89,10 @@ module CC
       atts.each do |att|
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
       end
+      if assignment.external_tool_tag
+        node.external_tool_url assignment.external_tool_tag.url 
+        node.external_tool_new_tab assignment.external_tool_tag.new_tab
+      end
     end
 
   end

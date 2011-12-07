@@ -22,6 +22,7 @@
     </div>
   <% end %>
   <div>
+    <div id="last_saved_indicator"><%= t("not_saved", "Not saved") %></div>
     <span class="time_header"><%= before_label(:time_running, "Time Running") %></span>
     <span style="font-size: 0.8em; padding-left: 10px;">
       <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
@@ -34,8 +35,9 @@
     <% end %>
     <div class="clear"></div>
   </div>
-  <div class="time_running" style="font-size: 1.2em; padding-left: 20px; color: #444;"></div>
+  <div class="time_running"></div>
   </div>
+
 <% end %>
 <% jammit_css :quizzes %>
 

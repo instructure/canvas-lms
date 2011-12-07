@@ -159,16 +159,76 @@ $(document).ready(function() {
   });
   $("#context_external_tools_select .tools").delegate('.tool', 'click', function() {
     var $tool = $(this);
-    if($(this).hasClass('selected')) { 
+    if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) { 
       $(this).removeClass('selected'); 
       return; 
     }
     $tool.parents(".tools").find(".tool.selected").removeClass('selected');
     $tool.addClass('selected');
-    $("#external_tool_create_url").val($tool.data('url') || '');
-    $("#context_external_tools_select .domain_message").showIf($tool.data('domain'))
-      .find(".domain").text($tool.data('domain'));
-    $("#external_tool_create_title").val($tool.data('name'));
+    if($tool.hasClass('resource_selection')) {
+      var tool = $tool.data('tool');
+      var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
+      var width = tool.resource_selection_settings.selection_width;
+      var height = tool.resource_selection_settings.selection_height;
+      var $dialog = $("#resource_selection_dialog");
+      if($dialog.length == 0) {
+        $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
+        $dialog.append($("<iframe/>", {id: 'resource_selection_iframe', style: 'width: 800px; height: ' + frameHeight + 'px; border: 0;', src: '/images/ajax-loader-medium-444.gif', borderstyle: '0'}));
+        $("body").append($dialog.hide());
+        $dialog
+          .dialog({
+            autoOpen: false,
+            width: 'auto',
+            resizable: true,
+            close: function() {
+              $dialog.find("iframe").attr('src', '/images/ajax-loader-medium-444.gif');
+            },
+            title: I18n.t('link_from_external_tool', "Link Resource from External Tool")
+          })
+          .bind('dialogresize', function() {
+            $(this).find('iframe').add('.fix_for_resizing_over_iframe').height($(this).height()).width($(this).width());
+          })
+          .bind('dialogresizestop', function() {
+            $(".fix_for_resizing_over_iframe").remove();
+          })
+          .bind('dialogresizestart', function() {
+            $(this).find('iframe').each(function(){
+              $('<div class="fix_for_resizing_over_iframe" style="background: #fff;"></div>')
+                .css({
+                  width: this.offsetWidth+"px", height: this.offsetHeight+"px",
+                  position: "absolute", opacity: "0.001", zIndex: 10000000
+                })
+                .css($(this).offset())
+                .appendTo("body");
+            });
+          })
+          .bind('selection', function(event, data) {
+            if(data.embed_type == 'basic_lti' && data.url) {
+              $("#external_tool_create_url").val(data.url);
+              $("#external_tool_create_title").val(data.text || tool.name);
+              $("#context_external_tools_select .domain_message").hide();
+            } else {
+              alert(I18n.t('invalid_lti_resource_selection', "There was a problem retrieving a valid link from the external tool"));
+              $("#external_tool_create_url").val('');
+              $("#external_tool_create_title").val('');
+            }
+            $("#resource_selection_dialog iframe").attr('src', 'about:blank');
+            $("#resource_selection_dialog").dialog('close');
+          });
+      }
+      $dialog.dialog('close')
+        .dialog('option', 'width', width || 800)
+        .dialog('option', 'height', height || frameHeight || 400)
+        .dialog('open');
+      $dialog.triggerHandler('dialogresize');
+      var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.id);
+      $dialog.find("iframe").attr('src', url);
+    } else {
+      $("#external_tool_create_url").val($tool.data('url') || '');
+      $("#context_external_tools_select .domain_message").showIf($tool.data('domain'))
+        .find(".domain").text($tool.data('domain'));
+      $("#external_tool_create_title").val($tool.data('name'));
+    }
   });
   var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();
   $("#add_module_item_select").change(function() {
@@ -186,10 +246,12 @@ $(document).ready(function() {
           for(var idx in data) {
             var tool = data[idx];
             var $tool = $tool_template.clone(true);
+            $tool.toggleClass('resource_selection', !!tool.resource_selection_settings);
             $tool.fillTemplateData({
               data: tool,
               dataValues: ['id', 'url', 'domain', 'name']
             });
+            $tool.data('tool', tool);
             $select.find(".tools").append($tool.show());
           }
         }, function(data) {

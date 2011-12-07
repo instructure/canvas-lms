@@ -1,4 +1,4 @@
-!define('jst/AssignmentDetailsDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['AssignmentDetailsDialog'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -195,5 +195,7 @@ function program1(depth0,data) {
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</td>\n    </tr>\n  </table>\n</div>";
   return buffer;});
-  return templates['AssignmentDetailsDialog'];
-});
+  define('jst/AssignmentDetailsDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['AssignmentDetailsDialog'];
+  });
+})();

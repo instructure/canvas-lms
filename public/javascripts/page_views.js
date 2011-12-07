@@ -30,7 +30,7 @@ I18n.scoped('page_views', function(I18n) {
       var match = document.cookie.match(/last_page_view=([^;]+)/);
       if(match && match[1]) {
         try {
-          var data = JSON.parse(unescape(match[1]));
+          var data = $.parseJSON(unescape(match[1]));
           if(data && data.url && data.seconds) {
             setTimeout(function() {
               $.ajaxJSON(data.url, "PUT", {interaction_seconds: data.seconds}, function() {

@@ -378,6 +378,48 @@ describe CommunicationChannelsController do
         response.should render_template('confirm')
         assigns[:merge_opportunities].should == [[@user1, [@user1.pseudonym]]]
       end
+
+      it "should not show users that can't have a pseudonym created for the correct account" do
+        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
+        @account1 = Account.create!
+        @account1.account_authorization_configs.create!(:auth_type => 'cas')
+        user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
+
+        @account2 = Account.create!
+        course(:active_all => 1, :account => @account2)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_user(@user)
+
+        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        response.should render_template('confirm')
+        assigns[:merge_opportunities].should == []
+      end
+
+      it "should create a pseudonym in the target account by copying an existing pseudonym when merging" do
+        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
+        user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
+        @old_user = @user
+
+        @account2 = Account.create!
+        course(:active_all => 1, :account => @account2)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_user(@user)
+        user_session(@old_user, @old_user.pseudonym)
+
+        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :confirm => 1
+        response.should redirect_to(course_url(@course))
+        @old_user.reload
+        @user.reload
+        @user.should be_deleted
+        @enrollment.reload
+        @enrollment.user.should == @old_user
+        @old_user.pseudonyms.length.should == 2
+        @old_user.pseudonyms.detect { |p| p.account == @account2 }.unique_id.should == 'jt@instructure.com'
+      end
     end
 
     describe "invitations" do
@@ -449,6 +491,27 @@ describe CommunicationChannelsController do
         @enrollment.user.should == @user
       end
     end
+
+    it "should uncache user's cc's when confirming a CC" do
+      user_with_pseudonym(:active_user => true)
+      user_session(@user, @pseudonym)
+      puts @user.updated_at
+      puts @user.cache_key
+      User.record_timestamps = false
+      begin
+        @user.update_attribute(:updated_at, 1.second.ago)
+        enable_cache do
+          @user.cached_active_emails.should == []
+          @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+          @user.cached_active_emails.should == []
+          get 'confirm', :nonce => @cc.confirmation_code
+          @user.reload
+          @user.cached_active_emails.should == ['jt@instructure.com']
+        end
+      ensure
+        User.record_timestamps = true
+      end
+    end
   end
 
   it "should re-send communication channel invitation for an invited channel" do
@@ -472,5 +535,27 @@ describe CommunicationChannelsController do
     assigns[:user].should eql(@user)
     assigns[:enrollment].should eql(@enrollment)
     assigns[:enrollment].messages_sent.should_not be_nil
+  end
+
+  it "should uncache user's cc's when retiring a CC" do
+    user_with_pseudonym(:active_user => true)
+    user_session(@user, @pseudonym)
+    User.record_timestamps = false
+    begin
+      @user.update_attribute(:updated_at, 10.seconds.ago)
+      enable_cache do
+        @user.cached_active_emails.should == []
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # still cached
+        @user.cached_active_emails.should == []
+        @user.update_attribute(:updated_at, 5.seconds.ago)
+        @user.cached_active_emails.should == ['jt@instructure.com']
+        delete 'destroy', :id => @cc.id
+        @user.reload
+        @user.cached_active_emails.should == []
+      end
+    ensure
+      User.record_timestamps = true
+    end
   end
 end

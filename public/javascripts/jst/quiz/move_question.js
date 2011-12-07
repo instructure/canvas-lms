@@ -1,4 +1,4 @@
-!define('jst/quiz/move_question', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['quiz/move_question'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -53,5 +53,7 @@ function program1(depth0,data) {
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n";
   return buffer;});
-  return templates['quiz/move_question'];
-});
+  define('jst/quiz/move_question', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['quiz/move_question'];
+  });
+})();

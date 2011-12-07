@@ -23,7 +23,7 @@ describe Assignment do
     setup_assignment
     @c.assignments.create!(assignment_valid_attributes)
   end
-  
+
   it "should have a useful state machine" do
     assignment_model
     @a.state.should eql(:published)
@@ -36,7 +36,7 @@ describe Assignment do
     @assignment.save!
     @assignment.assignment_group.should_not be_nil
   end
-  
+
   it "should be able to submit homework" do
     setup_assignment_with_homework
     @assignment.submissions.size.should eql(1)
@@ -44,7 +44,7 @@ describe Assignment do
     @submission.user_id.should eql(@user.id)
     @submission.versions.length.should eql(1)
   end
-  
+
   it "should be able to grade a submission" do
     setup_assignment_without_submission
     s = @assignment.grade_student(@user, :grade => "10")
@@ -78,7 +78,7 @@ describe Assignment do
     @assignment.reload
     @assignment.needs_grading_count.should eql(0)
   end
-  
+
   it "should update needs_grading_count when enrollment changes" do
     setup_assignment_with_homework
     @assignment.needs_grading_count.should eql(1)
@@ -90,8 +90,28 @@ describe Assignment do
     e.accept
     @assignment.reload
     @assignment.needs_grading_count.should eql(1)
+
+    # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
+    e2 = @course.student_enrollments.create(:user => @user, :workflow_state => 'invited', :course_section => @course.default_section)
+    e2.accept
+    e3 = @course.student_enrollments.create(:user => @user, :workflow_state => 'active', :course_section => @course.default_section)
+    @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(3)
+    @assignment.reload
+    @assignment.needs_grading_count.should eql(1)
+
+    # and as long as one enrollment is still active, the count should not change
+    e2.destroy
+    e3.complete
+    @assignment.reload
+    @assignment.needs_grading_count.should eql(1)
+
+    # ok, now gone for good
+    e.destroy
+    @assignment.reload
+    @assignment.needs_grading_count.should eql(0)
+    @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(0)
   end
-  
+
   it "should preserve pass/fail with zero points possible" do
     setup_assignment_without_submission
     @assignment.grading_type = 'pass_fail'
@@ -167,7 +187,7 @@ describe Assignment do
     @submission.reload
     @submission.grade.should eql("2")
   end
-  
+
   it "should be able to grade an already-existing submission" do
     setup_assignment_without_submission
 
@@ -179,7 +199,7 @@ describe Assignment do
     s.versions.length.should eql(1)
     s2[0].state.should eql(:graded)
   end
-  
+
   describe  "interpret_grade" do
     it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
       Assignment.interpret_grade("", 20, GradingStandard.default_grading_standard).should be_nil
@@ -283,7 +303,7 @@ describe Assignment do
         res.map{|a| a.assessor_asset}.should be_include(s)
       end
     end
-    
+
     it "should allow setting peer_reviews_assign_at" do
       setup_assignment
       assignment_model
@@ -291,7 +311,7 @@ describe Assignment do
       @assignment.peer_reviews_assign_at = now
       @assignment.peer_reviews_assign_at.should == now
     end
-    
+
     it "should assign multiple peer reviews" do
       setup_assignment
       assignment_model
@@ -318,7 +338,7 @@ describe Assignment do
     it "should assign late peer reviews" do
       setup_assignment
       assignment_model
-      
+
       @submissions = []
       5.times do |i|
         e = @c.enroll_user(User.create(:name => "user #{i}"))
@@ -333,7 +353,7 @@ describe Assignment do
         # assets = res.select{|a| a.asset == s}
         # assets.length.should be > 0 #eql(2)
         # assets.map{|a| a.assessor_id}.uniq.length.should eql(assets.length)
-        
+
         # # This user should be assigned two unique submissions to assess
         # assessors = res.select{|a| a.assessor_asset == s}
         # assessors.length.should eql(2)
@@ -346,7 +366,7 @@ describe Assignment do
       res.length.should >= 2
       res.any?{|a| a.assessor_asset == s}.should eql(true)
     end
-    
+
     it "should assign late peer reviews to each other if there is more than one" do
       setup_assignment
       assignment_model
@@ -363,12 +383,12 @@ describe Assignment do
         # assets = res.select{|a| a.asset == s}
         # assets.length.should be > 0 #eql(2)
         # assets.map{|a| a.assessor_id}.uniq.length.should eql(assets.length)
-        
+
         # assessors = res.select{|a| a.assessor_asset == s}
         # assessors.length.should eql(2)
         # assessors[0].asset_id.should_not eql(assessors[1].asset_id)
       # end
-      
+
       @late_submissions = []
       3.times do |i|
         e = @c.enroll_user(User.create(:name => "new user #{i}"))
@@ -382,14 +402,14 @@ describe Assignment do
         # assets = res.select{|a| a.asset == s}
         # assets.length.should be > 0 #eql(2)
         # assets.all?{|a| a.assessor_id != s.user_id && ids.include?(a.assessor_id) }.should eql(true)
-        
+
         # assessor_assets = res.select{|a| a.assessor_asset == s}
         # assessor_assets.length.should eql(2)
         # assets.all?{|a| a.assessor_id != s.user_id && ids.include?(a.assessor_id) }.should eql(true)
       # end
     end
   end
-  
+
   context "publishing" do
     it "should publish automatically if set that way" do
       course_model(:publish_grades_immediately => true)
@@ -402,7 +422,7 @@ describe Assignment do
       @sub1.score.should == 9.0
       @sub1.published_score.should == @sub1.score
     end
-    
+
     it "should NOT publish automatically if set that way" do
       course_model(:publish_grades_immediately => false)
       @course.offer!
@@ -416,7 +436,7 @@ describe Assignment do
       # Took this out until someone asks for it
       # @sub1.published_score.should_not == @sub1.score
     end
-    
+
     it "should publish past submissions when the assignment is published" do
       course_model(:publish_grades_immediately => false)
       @course.offer!
@@ -480,7 +500,7 @@ describe Assignment do
       @sub2.score.should == 7
       @sub2.published_score.should == 7
     end
-    
+
     it "should fire off assignment graded notification on first publish" do
       setup_unpublished_assignment_with_students
       @assignment.publish!
@@ -496,7 +516,7 @@ describe Assignment do
       @assignment.should be_muted
       @assignment.messages_sent.should_not be_include("Assignment Graded")
     end
-    
+
     it "should fire off submission graded notifications if already published" do
       setup_unpublished_assignment_with_students
       @assignment.publish!
@@ -520,7 +540,7 @@ describe Assignment do
       @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
       @sub2.messages_sent.should_not be_include("Submission Grade Changed")
     end
-    
+
     it "should not fire off assignment graded notification if started as published" do
       setup_assignment
       Notification.create!(:name => "Assignment Graded")
@@ -528,7 +548,7 @@ describe Assignment do
       @assignment2.workflow_state = 'published'
       @assignment2.messages_sent.should_not be_include("Assignment Graded")
     end
-    
+
     it "should update grades when assignment changes" do
       setup_assignment_without_submission
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
@@ -538,14 +558,14 @@ describe Assignment do
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'C').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
-      
+
       @assignment.points_possible = 30
       @assignment.save!
       @sub.reload
       @sub.score.should eql(15.2)
       @sub.grade.should eql('F')
     end
-    
+
     it "should accept lowercase letter grades" do
       setup_assignment_without_submission
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
@@ -556,7 +576,7 @@ describe Assignment do
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
     end
-    
+
     it "should not fire off assignment graded notification on second publish" do
       setup_unpublished_assignment_with_students
       @assignment.publish!
@@ -571,7 +591,7 @@ describe Assignment do
       @assignment.should be_published
       @assignment.messages_sent.should_not be_include("Assignment Graded")
     end
-    
+
     it "should not fire off submission graded notifications while unpublished" do
       setup_unpublished_assignment_with_students
       @assignment.publish!
@@ -623,7 +643,7 @@ describe Assignment do
       hash["assignment"]["permissions"].should_not be_empty
       hash["assignment"]["permissions"]["read"].should eql(true)
     end
-    
+
     it "should serialize with roots included in nested elements" do
       course_model
       @course.assignments.create!(:title => "some assignment")
@@ -633,7 +653,7 @@ describe Assignment do
       hash["course"]["assignments"][0].should_not be_nil
       hash["course"]["assignments"][0]["assignment"].should_not be_nil
     end
-    
+
     it "should serialize with permissions" do
       assignment_model
       @course.offer!
@@ -645,7 +665,7 @@ describe Assignment do
       hash["course"]["permissions"].should_not be_empty
       hash["course"]["permissions"]["read"].should eql(true)
     end
-    
+
     it "should exclude root" do
       assignment_model
       @course.offer!
@@ -665,7 +685,7 @@ describe Assignment do
       hash["assignment"]["group_category"].should == "Something"
     end
   end
-  
+
   context "ical" do
     it ".to_ics should not fail for null due dates" do
       assignment_model(:due_at => "")
@@ -673,13 +693,13 @@ describe Assignment do
       res.should_not be_nil
       res.match(/DTSTART/).should be_nil
     end
-    
+
     it ".to_ics should not return data for null due dates" do
       assignment_model(:due_at => "")
       res = @assignment.to_ics(false)
       res.should be_nil
     end
-    
+
     it ".to_ics should return string data for assignments with due dates" do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am")
@@ -691,7 +711,7 @@ describe Assignment do
       res.match(/DTSTART:20080903T115500Z/).should_not be_nil
       res.match(/DTSTAMP:20080903T120500Z/).should_not be_nil
     end
-    
+
     it ".to_ics should return string data for assignments with due dates in correct tz" do
       Time.zone = 'Alaska' # -0800
       assignment_model(:due_at => "Sep 3 2008 11:55am")
@@ -733,17 +753,17 @@ describe Assignment do
       res.dtstamp.icalendar_tzid.should == 'UTC'
       res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S').should == Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
     end
-    
+
     it ".to_ics should return string dates for all_day events" do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:59pm")
       @assignment.all_day.should eql(true)
       res = @assignment.to_ics
       res.match(/DTSTART;VALUE=DATE:20080903/).should_not be_nil
-      res.match(/DTEND;VALUE=DATE:20080903/).should_not be_nil      
+      res.match(/DTEND;VALUE=DATE:20080903/).should_not be_nil
     end
   end
-  
+
   context "quizzes and topics" do
     it "should create a quiz if none exists and specified" do
       assignment_model(:submission_types => "online_quiz")
@@ -757,7 +777,7 @@ describe Assignment do
       @a.quiz.should_not be_nil
       @a.quiz.assignment_id.should eql(@a.id)
     end
-    
+
     it "should delete a quiz if no longer specified" do
       assignment_model(:submission_types => "online_quiz")
       @a.reload
@@ -769,7 +789,7 @@ describe Assignment do
       @a.reload
       @a.quiz.should be_nil
     end
-    
+
     it "should not delete the assignment when unlinked from a quiz" do
       assignment_model(:submission_types => "online_quiz")
       @a.reload
@@ -787,7 +807,7 @@ describe Assignment do
       @a.quiz.should be_nil
       @a.state.should eql(:published)
     end
-    
+
     it "should not delete the quiz if non-empty when unlinked" do
       assignment_model(:submission_types => "online_quiz")
       @a.reload
@@ -809,7 +829,7 @@ describe Assignment do
       @quiz.assignment_id.should eql(nil)
       @quiz.state.should eql(:created)
     end
-    
+
     it "should grab the original quiz if unlinked and relinked" do
       assignment_model(:submission_types => "online_quiz")
       @a.reload
@@ -840,7 +860,7 @@ describe Assignment do
       @a.discussion_topic.should_not be_nil
       @a.discussion_topic.assignment_id.should eql(@a.id)
     end
-    
+
     it "should delete a discussion_topic if no longer specified" do
       assignment_model(:submission_types => "discussion_topic")
       @a.submission_types.should eql('discussion_topic')
@@ -851,7 +871,7 @@ describe Assignment do
       @a.reload
       @a.discussion_topic.should be_nil
     end
-    
+
     it "should not delete the assignment when unlinked from a topic" do
       assignment_model(:submission_types => "discussion_topic")
       @a.submission_types.should eql('discussion_topic')
@@ -868,7 +888,7 @@ describe Assignment do
       @a.discussion_topic.should be_nil
       @a.state.should eql(:published)
     end
-    
+
     it "should not delete the topic if non-empty when unlinked" do
       assignment_model(:submission_types => "discussion_topic")
       @a.submission_types.should eql('discussion_topic')
@@ -886,7 +906,7 @@ describe Assignment do
       @topic.assignment_id.should eql(nil)
       @topic.state.should eql(:active)
     end
-    
+
     it "should grab the original topic if unlinked and relinked" do
       assignment_model(:submission_types => "discussion_topic")
       @a.submission_types.should eql('discussion_topic')
@@ -913,19 +933,19 @@ describe Assignment do
       @a.should be_respond_to(:dispatch)
       @a.should be_respond_to(:to)
     end
-    
+
     it "should have policies defined" do
       assignment_model
       @a.broadcast_policy_list.should_not be_empty
     end
-    
-    
+
+
     context "due date changed" do
       it "should have an 'Assignment Due Date Changed' policy" do
         assignment_model
         @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Due Date Changed')
       end
-      
+
       it "should create a message when an assignment due date has changed" do
         Notification.create(:name => 'Assignment Due Date Changed')
         assignment_model(:title => 'Assignment with unstable due date')
@@ -935,7 +955,7 @@ describe Assignment do
         @a.save!
         @a.messages_sent.should be_include('Assignment Due Date Changed')
       end
-      
+
       it "should NOT create a message when everything but the assignment due date has changed" do
         Notification.create(:name => 'Assignment Due Date Changed')
         t = Time.parse("Sep 1, 2009 5:00pm")
@@ -951,7 +971,7 @@ describe Assignment do
         @a.messages_sent.should_not be_include('Assignment Due Date Changed')
       end
     end
-    
+
     context "assignment graded" do
       it "should notify students when their grade is changed" do
         setup_unpublished_assignment_with_students
@@ -1006,7 +1026,7 @@ describe Assignment do
         @assignment.set_default_grade(:default_grade => 10)
         @assignment.messages_sent.should be_empty
       end
-      
+
       it "should notify affected students of a grade change when the assignment is republished" do
         setup_unpublished_assignment_with_students
         @assignment.publish!
@@ -1028,7 +1048,7 @@ describe Assignment do
         @sub.messages_sent.should_not be_nil
         @sub.messages_sent['Submission Grade Changed'].should be_nil
       end
-      
+
       it "should not notify unaffected students of a grade change when the assignment is republished" do
         setup_unpublished_assignment_with_students
         @assignment.publish!
@@ -1056,13 +1076,13 @@ describe Assignment do
         Assignment.need_grading_info(15, []).find_by_id(@assignment.id).should_not be_nil
       end
     end
-    
+
     context "assignment changed" do
       it "should have an 'Assignment Changed' policy" do
         assignment_model
         @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Changed')
       end
-      
+
       it "should create a message when an assigment changes after it's been published" do
         Notification.create(:name => 'Assignment Changed')
         assignment_model
@@ -1073,7 +1093,7 @@ describe Assignment do
         @a.save
         @a.messages_sent.should be_include('Assignment Changed')
       end
-      
+
       it "should NOT create a message when an assigment changes SHORTLY AFTER it's been created" do
         Notification.create(:name => 'Assignment Changed')
         assignment_model
@@ -1092,7 +1112,7 @@ describe Assignment do
         @a.save
         @a.messages_sent.should be_empty
       end
-      
+
       # it "should NOT create a message when the content changes to an empty string" do
         # Notification.create(:name => 'Assignment Changed')
         # assignment_model(:name => 'Assignment with unstable due date')
@@ -1103,13 +1123,13 @@ describe Assignment do
         # @a.messages_sent.should_not be_include('Assignment Changed')
       # end
     end
-    
+
     context "assignment created" do
       it "should have an 'Assignment Created' policy" do
         assignment_model
         @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Created')
       end
-      
+
       # it "should create a message when an assigment is added to a course in process" do
       #   Notification.create(:name => 'Assignment Created')
       #   @course = Course.create
@@ -1121,13 +1141,13 @@ describe Assignment do
       #   @a.messages_sent.should be_include('Assignment Created')
       # end
     end
-    
+
     context "assignment graded" do
       it "should have an 'Assignment Graded' policy" do
         assignment_model
         @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Graded')
       end
-      
+
       it "should create a message when an assignment is published" do
         setup_assignment
         Notification.create(:name => 'Assignment Graded')
@@ -1145,8 +1165,8 @@ describe Assignment do
         @a.messages_sent.should be_include('Assignment Graded')
       end
     end
-    
-    
+
+
   end
   context "group assignment" do
     it "should submit the homework for all students in the same group" do
@@ -1216,7 +1236,7 @@ describe Assignment do
       res.find{|s| s.user == @u3}.submission_comments.should_not be_empty
     end
   end
-    
+
   context "adheres_to_policy" do
     it "should return the same grants_right? with nil parameters" do
       course_with_teacher(:active_all => true)
@@ -1226,7 +1246,7 @@ describe Assignment do
       rights.should == @assignment.grants_rights?(@user, nil)
       rights.should == @assignment.grants_rights?(@user, nil, nil)
     end
-    
+
     it "should serialize permissions" do
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
@@ -1237,7 +1257,7 @@ describe Assignment do
       data['assignment']['permissions'].should_not be_empty
     end
   end
-  
+
   context "assignment reminders" do
     it "should generate reminders" do
       course_with_student
@@ -1250,7 +1270,7 @@ describe Assignment do
       @assignment.assignment_reminders[0].remind_at.should eql(@assignment.due_at - @user.reminder_time_for_due_dates)
     end
   end
-  
+
   context "clone_for" do
     it "should clone for another course" do
       course_with_teacher
@@ -1263,7 +1283,7 @@ describe Assignment do
       @new_assignment.needs_grading_count.should == 0
     end
   end
-  
+
   context "modules" do
     it "should be locked when part of a locked module" do
       course :active_all => true
@@ -1271,7 +1291,7 @@ describe Assignment do
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => course)
       a1.locked_for?(@user).should be_false
-      
+
       m = @course.context_modules.create!
       ct = ContentTag.new
       ct.content_id = a1.id
@@ -1283,7 +1303,7 @@ describe Assignment do
       ct.context_module_id = m.id
       ct.context_code = "course_#{@course.id}"
       ct.save!
-      
+
       m.unlock_at = Time.now.in_time_zone + 1.day
       m.save
       a1.reload

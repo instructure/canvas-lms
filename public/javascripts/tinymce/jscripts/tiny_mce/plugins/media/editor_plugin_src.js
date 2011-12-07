@@ -23,7 +23,9 @@
 		["Java", "8ad9c840-044e-11d1-b3e9-00805f499d93", "application/x-java-applet", "http://java.sun.com/products/plugin/autodl/jinstall-1_5_0-windows-i586.cab#Version=1,5,0,0"],
 		["Silverlight", "dfeaf541-f3e1-4c24-acac-99c30715084a", "application/x-silverlight-2"],
 		["Iframe"],
-		["Video"]
+		["Video"],
+		["EmbeddedAudio"],
+		["Audio"]
 	];
 
 	function toArray(obj) {
@@ -86,11 +88,12 @@
 				"silverlight=xap;" +
 				"flash=swf,flv;" +
 				"shockwave=dcr;" +
-				"quicktime=mov,qt,mpg,mp3,mpeg;" +
+				"quicktime=mov,qt,mpg,mpeg;" +
 				"shockwave=dcr;" +
 				"windowsmedia=avi,wmv,wm,asf,asx,wmx,wvx;" +
 				"realmedia=rm,ra,ram;" +
-				"java=jar"
+				"java=jar;" +
+				"audio=mp3,ogg"
 			).split(';'), function(item) {
 				var i, extensions, type;
 
@@ -155,17 +158,20 @@
 
 				img = ed.selection.getNode();
 				if (isMediaImg(img)) {
-					data = JSON.parse(ed.dom.getAttrib(img, 'data-mce-json'));
+					data = ed.dom.getAttrib(img, 'data-mce-json');
+					if (data) {
+						data = JSON.parse(data);
 
-					// Add some extra properties to the data object
-					tinymce.each(rootAttributes, function(name) {
-						var value = ed.dom.getAttrib(img, name);
+						// Add some extra properties to the data object
+						tinymce.each(rootAttributes, function(name) {
+							var value = ed.dom.getAttrib(img, name);
 
-						if (value)
-							data[name] = value;
-					});
+							if (value)
+								data[name] = value;
+						});
 
-					data.type = self.getType(img.className).name.toLowerCase();
+						data.type = self.getType(img.className).name.toLowerCase();
+					}
 				}
 
 				if (!data) {
@@ -245,13 +251,15 @@
 				id : data.id,
 				style : data.style,
 				align : data.align,
+				hspace : data.hspace,
+				vspace : data.vspace,
 				src : self.editor.theme.url + '/img/trans.gif',
 				'class' : 'mceItemMedia mceItem' + self.getType(data.type).name,
 				'data-mce-json' : JSON.serialize(data, "'")
 			});
 
-			img.width = data.width || "320";
-			img.height = data.height || "240";
+			img.width = data.width || (data.type == 'audio' ? "300" : "320");
+			img.height = data.height || (data.type == 'audio' ? "32" : "240");
 
 			return img;
 		},
@@ -260,7 +268,7 @@
 		 * Converts the JSON data object to a HTML string.
 		 */
 		dataToHtml : function(data, force_absolute) {
-			return this.editor.serializer.serialize(this.dataToImg(data, force_absolute), {force_absolute : force_absolute});
+			return this.editor.serializer.serialize(this.dataToImg(data, force_absolute), {forced_root_block : '', force_absolute : force_absolute});
 		},
 
 		/**
@@ -320,7 +328,7 @@
 		imgToObject : function(node, args) {
 			var self = this, editor = self.editor, video, object, embed, iframe, name, value, data,
 				source, sources, params, param, typeItem, i, item, mp4Source, replacement,
-				posterSrc, style;
+				posterSrc, style, audio;
 
 			// Adds the flash player
 			function addPlayer(video_src, poster_src) {
@@ -363,7 +371,11 @@
 				}
 			};
 
-			data = JSON.parse(node.attr('data-mce-json'));
+			data = node.attr('data-mce-json');
+			if (!data)
+				return;
+
+			data = JSON.parse(data);
 			typeItem = this.getType(node.attr('class'));
 
 			style = node.attr('data-mce-style')
@@ -456,6 +468,57 @@
 					data.params.src = '';
 			}
 
+			// Add HTML5 audio element
+			if (typeItem.name === 'Audio' && data.video.sources[0]) {
+				// Create new object element
+				audio = new Node('audio', 1).attr(tinymce.extend({
+					id : node.attr('id'),
+					width: node.attr('width'),
+					height: node.attr('height'),
+					style : style
+				}, data.video.attrs));
+
+				// Get poster source and use that for flash fallback
+				if (data.video.attrs)
+					posterSrc = data.video.attrs.poster;
+
+				sources = data.video.sources = toArray(data.video.sources);
+				if (!sources[0].type) {
+					audio.attr('src', sources[0].src);
+					sources.splice(0, 1);
+				}
+
+				for (i = 0; i < sources.length; i++) {
+					source = new Node('source', 1).attr(sources[i]);
+					source.shortEnded = true;
+					audio.append(source);
+				}
+
+				data.params.src = '';
+			}
+
+			if (typeItem.name === 'EmbeddedAudio') {
+				embed = new Node('embed', 1);
+				embed.shortEnded = true;
+				embed.attr({
+					id: node.attr('id'),
+					width: node.attr('width'),
+					height: node.attr('height'),
+					style : style,
+					type: node.attr('type')
+				});
+
+				for (name in data.params)
+					embed.attr(name, data.params[name]);
+
+				tinymce.each(rootAttributes, function(name) {
+					if (data[name] && name != 'type')
+						embed.attr(name, data[name]);
+				});
+
+				data.params.src = '';
+			}
+
 			// Do we have a params src then we can generate object
 			if (data.params.src) {
 				// Is flv movie add player for it
@@ -474,8 +537,13 @@
 				});
 
 				tinymce.each(rootAttributes, function(name) {
-					if (data[name] && name != 'type')
-						object.attr(name, data[name]);
+					var value = data[name];
+
+					if (name == 'class' && value)
+						value = value.replace(/mceItem.+ ?/g, '');
+
+					if (value && name != 'type')
+						object.attr(name, value);
 				});
 
 				// Add params
@@ -548,8 +616,19 @@
 				}
 			}
 
-			if (video || object)
-				node.replace(video || object);
+			if (audio) {
+				// Insert raw HTML
+				if (data.video_html) {
+					value = new Node('#text', 3);
+					value.raw = true;
+					value.value = data.video_html;
+					audio.append(value);
+				}
+			}
+
+			var n = video || audio || object || embed;
+			if (n)
+				node.replace(n);
 			else
 				node.remove();
 		},
@@ -567,7 +646,8 @@
 			var object, embed, video, iframe, img, name, id, width, height, style, i, html,
 				param, params, source, sources, data, type, lookup = this.lookup,
 				matches, attrs, urlConverter = this.editor.settings.url_converter,
-				urlConverterScope = this.editor.settings.url_converter_scope;
+				urlConverterScope = this.editor.settings.url_converter_scope,
+				hspace, vspace, align, bgcolor;
 
 			function getInnerHTML(node) {
 				return new tinymce.html.Serializer({
@@ -575,6 +655,15 @@
 					validate: false
 				}).serialize(node);
 			};
+
+			function lookupAttribute(o, attr) {
+				return lookup[(o.attr(attr) || '').toLowerCase()];
+			}
+
+			function lookupExtension(src) {
+				var ext = src.replace(/^.*\.([^.]+)$/, '$1');
+				return lookup[ext.toLowerCase() || ''];
+			}
 
 			// If node isn't in document
 			if (!node.parent)
@@ -608,7 +697,7 @@
 
 			// Video element
 			name = node.name;
-			if (name === 'video') {
+			if (name === 'video' || name == 'audio') {
 				video = node;
 				object = node.getAll('object')[0];
 				embed = node.getAll('embed')[0];
@@ -624,7 +713,7 @@
 
 				source = node.attr('src');
 				if (source)
-					data.video.sources.push({src : urlConverter.call(urlConverterScope, source, 'src', 'video')});
+					data.video.sources.push({src : urlConverter.call(urlConverterScope, source, 'src', node.name)});
 
 				// Get all sources
 				sources = video.getAll("source");
@@ -640,7 +729,7 @@
 
 				// Convert the poster URL
 				if (attrs.poster)
-					attrs.poster = urlConverter.call(urlConverterScope, attrs.poster, 'poster', 'video');
+					attrs.poster = urlConverter.call(urlConverterScope, attrs.poster, 'poster', node.name);
 			}
 
 			// Object element
@@ -665,6 +754,11 @@
 				height = height || object.attr('height');
 				style = style || object.attr('style');
 				id = id || object.attr('id');
+				hspace = hspace || object.attr('hspace');
+				vspace = vspace || object.attr('vspace');
+				align = align || object.attr('align');
+				bgcolor = bgcolor || object.attr('bgcolor');
+				data.name = object.attr('name');
 
 				// Get all object params
 				params = object.getAll("param");
@@ -685,6 +779,10 @@
 				height = height || embed.attr('height');
 				style = style || embed.attr('style');
 				id = id || embed.attr('id');
+				hspace = hspace || embed.attr('hspace');
+				vspace = vspace || embed.attr('vspace');
+				align = align || embed.attr('align');
+				bgcolor = bgcolor || embed.attr('bgcolor');
 
 				// Get all embed attributes
 				for (name in embed.attributes.map) {
@@ -699,6 +797,10 @@
 				height = iframe.attr('height');
 				style = style || iframe.attr('style');
 				id = iframe.attr('id');
+				hspace = iframe.attr('hspace');
+				vspace = iframe.attr('vspace');
+				align = iframe.attr('align');
+				bgcolor = iframe.attr('bgcolor');
 
 				tinymce.each(rootAttributes, function(name) {
 					img.attr(name, iframe.attr(name));
@@ -721,14 +823,23 @@
 			if (data.params.src)
 				data.params.src = urlConverter.call(urlConverterScope, data.params.src, 'src', 'object');
 
-			if (video)
-				type = lookup.video.name;
+			if (video) {
+				if (node.name === 'video')
+					type = lookup.video.name;
+				else if (node.name === 'audio')
+					type = lookup.audio.name;
+			}
 
 			if (object && !type)
-				type = (lookup[(object.attr('clsid') || '').toLowerCase()] || lookup[(object.attr('type') || '').toLowerCase()] || {}).name;
+				type = (lookupAttribute(object, 'clsid') || lookupAttribute(object, 'classid') || lookupAttribute(object, 'type') || {}).name;
 
 			if (embed && !type)
-				type = (lookup[(embed.attr('type') || '').toLowerCase()] || {}).name;
+				type = (lookupAttribute(embed, 'type') || lookupExtension(data.params.src) || {}).name;
+
+			// for embedded audio we preserve the original specified type
+			if (embed && type == 'EmbeddedAudio') {
+				data.params.type = embed.attr('type');
+			}
 
 			// Replace the video/object/embed element with a placeholder image containing the data
 			node.replace(img);
@@ -753,13 +864,22 @@
 					data.video_html = html;
 			}
 
+			data.hspace = hspace;
+			data.vspace = vspace;
+			data.align = align;
+			data.bgcolor = bgcolor;
+
 			// Set width/height of placeholder
 			img.attr({
 				id : id,
 				'class' : 'mceItemMedia mceItem' + (type || 'Flash'),
 				style : style,
-				width : width || "320",
-				height : height || "240",
+				width : width || (node.name == 'audio' ? "300" : "320"),
+				height : height || (node.name == 'audio' ? "32" : "240"),
+				hspace : hspace,
+				vspace : vspace,
+				align : align,
+				bgcolor : bgcolor,
 				"data-mce-json" : JSON.serialize(data, "'")
 			});
 		}

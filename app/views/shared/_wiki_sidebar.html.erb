@@ -11,6 +11,12 @@
   </ul>
   <div id="editor_tabs_1">
     <%= @context.is_a?(Group) ? t('group_links', 'Link to other content in the group.') : t('course_links', 'Link to other content in the course.') %>
+    <% if @context.is_a?(Course) || @context.is_a?(Group) %>
+      <a href="<%= context_url(@context, :retrieve_context_external_tools_url, :url => "{{ url }}") %>" id="external_tool_retrieve_url" style="display: none;">&nbsp;</a>
+    <% end %>
+    <% if @context.is_a?(Course) %>
+      <a href="<%= context_url(@context, :context_external_tool_resource_selection_url, "{{ id }}", :editor => '1') %>" id="context_external_tool_resource_selection_url" style="display: none;">&nbsp;</a>
+    <% end %>
     <%= t('click_links', %{Click any page to insert a link to that page.}) %>
     <div id="pages_accordion">
       <% if @context.respond_to?(:wiki) %>

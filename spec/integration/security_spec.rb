@@ -88,46 +88,227 @@ describe "security" do
     end
   end
 
-  it "should make both session-related cookies httponly" do
-    u = user_with_pseudonym :active_user => true,
-                            :username => "nobody@example.com",
-                            :password => "asdfasdf"
-    u.save!
+  describe 'session cookies' do
+    it "should always set the primary cookie to session expiration" do
+      # whether they select "stay logged in" or not, the actual session cookie
+      # should go away with the user agent session. the secondary
+      # pseudonym_credentials cookie will stick around and authenticate them
+      # again (there's separate specs for that).
+      u = user_with_pseudonym :active_user => true,
+                              :username => "nobody@example.com",
+                              :password => "asdfasdf"
+      u.save!
+      https!
 
-    https!
+      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf"
+      assert_response 302
+      c = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c.should_not match(/expires=/)
+      reset!
+      https!
+      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf",
+        "pseudonym_session[remember_me]" => "1"
+      assert_response 302
+      c = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c.should_not match(/expires=/)
+    end
 
-    post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
-      "pseudonym_session[password]" => "asdfasdf",
-      "pseudonym_session[remember_me]" => "1",
-      "redirect_to_ssl" => "1"
-    assert_response 302
-    c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
-    c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
-    c1.should match(/; *HttpOnly/)
-    c2.should match(/; *HttpOnly/)
-    c1.should_not match(/; *secure/)
-    c2.should_not match(/; *secure/)
+    it "should not return pseudonym_credentials when not remember_me" do
+      u = user_with_pseudonym :active_user => true,
+                              :username => "nobody@example.com",
+                              :password => "asdfasdf"
+      u.save!
+      https!
+      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf"
+      assert_response 302
+      c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
+      c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c1.should_not be_present
+      c2.should be_present
+    end
+
+    it "should make both cookies httponly" do
+      u = user_with_pseudonym :active_user => true,
+                              :username => "nobody@example.com",
+                              :password => "asdfasdf"
+      u.save!
+      https!
+      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf",
+        "pseudonym_session[remember_me]" => "1"
+      assert_response 302
+      c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
+      c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c1.should match(/; *HttpOnly/)
+      c2.should match(/; *HttpOnly/)
+      c1.should_not match(/; *secure/)
+      c2.should_not match(/; *secure/)
+    end
+
+    it "should make both cookies secure only if configured" do
+      ActionController::Base.session_options[:secure] = true
+      u = user_with_pseudonym :active_user => true,
+                              :username => "nobody@example.com",
+                              :password => "asdfasdf"
+      u.save!
+      https!
+
+      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf",
+        "pseudonym_session[remember_me]" => "1"
+      assert_response 302
+      c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
+      c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c1.should match(/; *secure/)
+      c2.should match(/; *secure/)
+      ActionController::Base.session_options[:secure] = nil
+    end
   end
 
-  it "should make both session-related cookies secure only if configured" do
-    ActionController::Base.session_options[:secure] = true
-    u = user_with_pseudonym :active_user => true,
-                            :username => "nobody@example.com",
-                            :password => "asdfasdf"
-    u.save!
+  describe "remember me" do
+    before do
+      @u = user_with_pseudonym :active_all => true,
+                              :username => "nobody@example.com",
+                              :password => "asdfasdf"
+      @u.save!
+      @p = @u.pseudonym
+      https!
+    end
 
-    https!
+    it "should not remember me when the wrong token is given" do
+      # plain persistence_token no longer works
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{@p.persistence_token}"
+      response.should redirect_to("https://www.example.com/login")
+      token = SessionPersistenceToken.generate(@p)
+      # correct token id, but nonsense uuid and persistence_token
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.id}::blah::blah"
+      response.should redirect_to("https://www.example.com/login")
+      # correct token id and persistence_token, but nonsense uuid
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.id}::#{@p.persistence_token}::blah"
+      response.should redirect_to("https://www.example.com/login")
+    end
 
-    post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
-      "pseudonym_session[password]" => "asdfasdf",
-      "pseudonym_session[remember_me]" => "1",
-      "redirect_to_ssl" => "1"
-    assert_response 302
-    c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
-    c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
-    c1.should match(/; *secure/)
-    c2.should match(/; *secure/)
-    ActionController::Base.session_options[:secure] = nil
+    it "should login via persistence token when no session exists" do
+      token = SessionPersistenceToken.generate(@p)
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
+      response.should be_success
+      cookies['_normandy_session'].should be_present
+    end
+
+    it "should not allow login via the same valid token twice" do
+      token = SessionPersistenceToken.generate(@p)
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
+      response.should be_success
+      SessionPersistenceToken.find_by_id(token.id).should be_nil
+      reset!
+      https!
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
+      response.should redirect_to("https://www.example.com/login")
+    end
+
+    it "should generate a new valid token when a token is used" do
+      token = SessionPersistenceToken.generate(@p)
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
+      response.should be_success
+      s1 = cookies['_normandy_session']
+      s1.should be_present
+      cookie = cookies['pseudonym_credentials']
+      cookie.should be_present
+      token2 = SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(cookie))
+      token2.should be_present
+      token2.should_not == token
+      token2.pseudonym.should == @p
+      reset!
+      https!
+      # check that the new token is valid too
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{cookie}"
+      response.should be_success
+      s2 = cookies['_normandy_session']
+      s2.should be_present
+      s2.should_not == s1
+    end
+
+    it "should generate and return a token when remember_me is checked" do
+      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf",
+        "pseudonym_session[remember_me]" => "1"
+      assert_response 302
+      cookie = cookies['pseudonym_credentials']
+      cookie.should be_present
+      token = SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(cookie))
+      token.should be_present
+      token.pseudonym.should == @p
+
+      # verify that the session is now persisting via the session cookie, not
+      # using and re-generating a one-time-use pseudonym_credentials token on each request
+      get "/"
+      cookies['pseudonym_credentials'].should == cookie
+    end
+
+    it "should destroy the token both user agent and server side on logout" do
+      expect {
+        post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+          "pseudonym_session[password]" => "asdfasdf",
+          "pseudonym_session[remember_me]" => "1"
+      }.to change(SessionPersistenceToken, :count).by(1)
+      c = cookies['pseudonym_credentials']
+      c.should be_present
+
+      expect {
+        get "/logout"
+      }.to change(SessionPersistenceToken, :count).by(-1)
+      cookies['pseudonym_credentials'].should_not be_present
+      SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(c)).should be_nil
+    end
+
+    it "should allow multiple remember_me tokens for the same user" do
+      s1 = open_session
+      s1.https!
+      s2 = open_session
+      s2.https!
+      s1.post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf",
+        "pseudonym_session[remember_me]" => "1"
+      c1 = s1.cookies['pseudonym_credentials']
+      s2.post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+        "pseudonym_session[password]" => "asdfasdf",
+        "pseudonym_session[remember_me]" => "1"
+      c2 = s2.cookies['pseudonym_credentials']
+      c1.should_not == c2
+
+      s3 = open_session
+      s3.https!
+      s3.get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{c1}"
+      s3.response.should be_success
+      s3.get "/logout"
+      # make sure c2 can still work
+      s4 = open_session
+      s4.https!
+      s4.get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{c2}"
+      s4.response.should be_success
+    end
+
+    it "should not login if the pseudonym is deleted" do
+      token = SessionPersistenceToken.generate(@p)
+      @p.destroy
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
+      response.should redirect_to("https://www.example.com/login")
+    end
+
+    it "should not login if the pseudonym.persistence_token gets changed (pw change)" do
+      token = SessionPersistenceToken.generate(@p)
+      creds = token.pseudonym_credentials
+      pers1 = @p.persistence_token
+      @p.password = @p.password_confirmation = 'newpass'
+      @p.save!
+      pers2 = @p.persistence_token
+      pers1.should_not == pers2
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{creds}"
+      response.should redirect_to("https://www.example.com/login")
+    end
   end
 
   if Canvas.redis_enabled?
@@ -202,7 +383,7 @@ describe "security" do
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
     assert_response :success
-    ActiveSupport::JSON.decode(response.body).should == {
+    json_parse.should == {
       "duplicates" => [],
       "errored_users" => [{"address" => "A345678", "details" => "not_found"}],
       "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id.to_s }]

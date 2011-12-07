@@ -124,11 +124,8 @@ class PseudonymSessionsController < ApplicationController
       return
     end
 
-    # TODO: don't allow logins from other root accounts anymore
-    # If authlogic fails and this account allows handles from other account,
-    # try to log in with a handle from another account
-    if !found && !@domain_root_account.require_account_pseudonym? && params[:pseudonym_session]
-      valid_alternative = Pseudonym.custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).find{|p|
+    if !found && params[:pseudonym_session]
+      valid_alternative = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).find{|p|
         (p.valid_password?(params[:pseudonym_session][:password]) && p.account.password_authentication?) rescue false
       }
       if valid_alternative
@@ -165,11 +162,11 @@ class PseudonymSessionsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     # the saml message has to survive a couple redirects and reset_session calls
     message = session[:delegated_message]
-    @pseudonym_session.destroy rescue true 
+    @pseudonym_session.destroy rescue true
 
     if @domain_root_account.saml_authentication? and session[:name_id]
       # logout at the saml identity provider
@@ -189,7 +186,7 @@ class PseudonymSessionsController < ApplicationController
       reset_session
       flash[:delegated_message] = message if message
     end
-    
+
     flash[:notice] = t 'notices.logged_out', "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
@@ -203,13 +200,13 @@ class PseudonymSessionsController < ApplicationController
       format.json { render :json => "OK".to_json, :status => :ok }
     end
   end
-  
+
   def clear_file_session
     session['file_access_user_id'] = nil
     session['file_access_expiration'] = nil
     render :text => "ok"
   end
-  
+
   def saml_consume
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
       settings = @domain_root_account.account_authorization_config.saml_settings(request.env['canvas.account_domain'])
@@ -234,6 +231,7 @@ class PseudonymSessionsController < ApplicationController
             session[:name_id] = response.name_id
             session[:name_qualifier] = response.name_qualifier
             session[:session_index] = response.session_index
+            session[:return_to] = params[:RelayState] if params[:RelayState] && params[:RelayState] =~ /\A\/(\z|[^\/])/
 
             successful_login(@user, @pseudonym)
           else
@@ -274,7 +272,7 @@ class PseudonymSessionsController < ApplicationController
       redirect_to login_url(:no_auto=>'true')
     end
   end
-  
+
   def saml_logout
     redirect_to :action => :destroy
   end
@@ -311,6 +309,9 @@ class PseudonymSessionsController < ApplicationController
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
         redirect_uri = session[:oauth2][:redirect_uri]
         if redirect_uri == OAUTH2_OOB_URI
+          # destroy this user session, it's only for generating the token
+          @pseudonym_session.try(:destroy)
+          reset_session
           format.html { redirect_to oauth2_auth_url(:code => code) }
         else
           format.html { redirect_to "#{redirect_uri}?code=#{code}" }
@@ -334,12 +335,10 @@ class PseudonymSessionsController < ApplicationController
   OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
   def oauth2_auth
-    if session[:oauth2] && params[:code]
+    if params[:code]
       # hopefully the user never sees this, since it's an oob response and the
       # browser should be closed automatically. but we'll at least display
       # something basic.
-      @pseudonym_session.try(:destroy)
-      reset_session
       return render()
     end
 
