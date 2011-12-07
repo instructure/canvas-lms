@@ -221,6 +221,7 @@ javascripts:
     - public/javascripts/jst/_submission_detail.js
     - public/javascripts/jst/SubmissionDetailsDialog.js
     - public/javascripts/compiled/SubmissionDetailsDialog.js
+    - public/javascripts/jst/gradebook2/section_to_show_menu.js
     - public/javascripts/compiled/gradebook2/Gradebook.js
     - public/javascripts/compiled/gradebook2/SubmissionCell.js
   gradebooks:
