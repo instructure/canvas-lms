@@ -666,6 +666,10 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
     end
 
+    api.with_options(:controller => :enrollments_api) do |enrollments|
+      enrollments.post 'courses/:course_id/enrollments', :action => :create
+    end
+
     api.with_options(:controller => :assignments_api) do |assignments|
       assignments.get 'courses/:course_id/assignments', :action => :index
       assignments.get 'courses/:course_id/assignments/:id', :action => :show

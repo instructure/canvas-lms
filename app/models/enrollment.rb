@@ -38,7 +38,7 @@ class Enrollment < ActiveRecord::Base
   before_save :audit_groups_for_deleted_enrollments
   after_save :clear_email_caches
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :limit_privileges_to_course_section
 
   no_other_enrollments_sql = "NOT EXISTS (SELECT 1 FROM enrollments WHERE workflow_state = 'active' AND user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id LIMIT 1)"
   trigger_sql = {:default => <<-SQL, :mysql => <<-MYSQL} # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables

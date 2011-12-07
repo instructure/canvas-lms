@@ -1268,6 +1268,7 @@ class Course < ActiveRecord::Base
     e = self.enrollments.find_by_user_id_and_type(user.id, type) if user
     e.attributes = { :workflow_state => 'invited', :course_section => section, :limit_privileges_to_course_section => limit_privileges_to_course_section } if e && (e.completed? || e.rejected?)
     e ||= self.send(type.underscore.pluralize).build(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_privileges_to_course_section => limit_privileges_to_course_section)
+    e.sis_source_id = opts[:sis_source_id]
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
