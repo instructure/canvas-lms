@@ -23,7 +23,7 @@ def check_syntax(files)
   show_stoppers = []
   Array(files).each do |js_file|
     js_file.strip!
-    if files_not_to_lint.include?(js_file) || !js_file.match('public/javascripts/')
+    if files_not_to_lint.include?(js_file) || !js_file.match('public/javascripts/') || js_file.match('public/javascripts/vendor/')
       puts " --> \033[1;35m  skipping: #{js_file}\033[0m"
     else
       file_path = File.join(Rails.root, js_file)
