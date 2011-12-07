@@ -1,3 +1,73 @@
+canvas-lms (2011.12.07.14.59) testing; urgency=low
+
+  * Package ref: ef98d7e66bd2a65860d29920352273c2f962572e
+  *
+  * [+a7f5a9e] fix timing issues in assignment selenium external_tool specs
+  * [+1443dec] reset HostUrl caches between specs
+  * [+b7bf2ba] introduce a named scope for finding non-account-pseudonyms
+  * [+ba28a28] copy and export/import external tool assignments
+  * [+4649500] make sure sis import libraries depend on the right files
+  * [+f69d403] add instafail to rspec
+  * [+6782081] consistent link naming for discussion reply links
+  * [+c438ad3] hide "Add New Entry" link when adding a new entry
+  * [+d571046] update account assocations when a pseudonym is deleted fixes #6215
+  * [+6e4eab5] add api for copying course content
+  * [+f55f736] fix cert verification in delicious calls
+  * [+8c54919] mark selenium group conversations specs as pending
+  * [+869622b] extractor support for multi-line define/require
+  * [+a29233e] added indicator when quiz is saved, fixes #6222
+  * [+b9b15e5] fixed bad merge in gerrit 6797
+  * [+adc9754] Basic LTI link selection helper
+  * [+081b3d4] remove_column, not drop_column
+  * [+0fb3b5a] show invitations for temporary users to users that have the same e-mail
+  * [+a237e85] reflect i18n language in lang attribute
+  * [+dfda98b] upgrade tinyMCE, refs: #4570
+  * [+ca0c0c4] fix performance and correctness of triggers, closes #4471, #5168
+  * [+ceb2909] take header off mobile login screen
+  * [+a8f6fa9] always give the session cookie browser session expiry
+  * [+aa1bc1f] don't return the session cookie when remember_me isn't selected
+  * [+cad54cc] upgrade selenium
+  * [+4757b59] protect against csrf, closes #6381
+  * [+4ef50c1] make "stay logged in" use a one-time token
+  * [+b802279] move domready call to the end, fixes sporadic js error
+  * [+06ed4ed] ignore generated js from our qUnit specs
+  * [+43c058f] better options flow when adding users to a course
+  * [+ae717a8] external tool resource selector in WYSIWYG editor
+  * [+9e1e6c3] add user/pseudonym creation api. fixes #6331
+  * [+056fe1f] RelayState absolute path support, closes #6044
+  * [+4a309b4] fix auto-suggest in webkit, fixes: #6448
+  * [+f613cf4] postgresql 9.1 GROUP BY fix
+  * [+a2c1e78] re-sync compiled jet templates
+  * [+310ebfc] remove unused methods
+  * [+1546835] create pseudonyms in the target account when merging temporary users
+  * [+dd5ef48] don't special case the default account to be "Instructure"
+  * [+47c0578] create the site admin's pseudonym in the site admin account refs #6199
+  * [+8dc786c] api_find_all
+  * [+9bb60e4] don't allow setting sis id on root accounts
+  * [+4dd8253] fix specs that tried to type in tinyMCE
+  * [+6caf502] drop SisCrossListedSection
+  * [+40c4954] default "search only existing users" to the behavior non-admins would get
+  * [+f43f858] only show courses and groups in conversation dropdown
+  * [+0f6e4f0] fix popdown menu in webkit (fixes #5765)
+  * [+d315baa] keep root_account_id in sync between course/enrollments
+  * [+5cc3082] fix conversation-replying in activity stream
+  * [+23d0a6d] drop sticky_xlists from course_sections
+  * [+ce0c02c] stop spinner on success OR failure
+  * [+4a0bee6] create pseudonyms in the target account when self-enrolling
+  * [+8513885] disable open registration for accounts with delegated authentication
+  * [+59e34de] prepend protection loop to json responses in app ajax calls
+  * [+beca2fc] force rendering json as text in file-related actions
+  * [+f87a3fd] allow relative urls for everything except blti and oembed
+  * [+5babb1d] fix some pageless calls (switching to $.parseJSON)
+  * [+f14f7fc] s/JSON.parse/$.parseJSON in javascript
+  * [+dd6ba96] fix speed grader when the uri has no hash
+  * [+b241c49] default email should not include retired emails
+  * [+58e0ffe] don't prepend csrf json protection to oauth2 post response
+  * [+6fbb228] add missing route, fixes #6537
+  * [+ef98d7e] move the x-ua-compatible meta tag to an actual http header
+
+ -- JT Olds <jt@instructure.com>  Wed, 07 Dec 2011 14:59:34 -0700
+
 canvas-lms (1.1-85) professional; urgency=low
 
   * Package ref: ffd4387ef88a89bd8aa5d8366435a713d10ec6d2
