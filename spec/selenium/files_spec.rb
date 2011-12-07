@@ -169,9 +169,10 @@ describe "collaborations folder in files menu" do
   
   def load_collab_folder
     get "/groups/#{@group.id}/files"
-    colab_link = keep_trying_until { driver.find_element(:css, "li.collaborations span.name") }
-    colab_link.click
-    message_node = keep_trying_until { driver.find_element(:css, "ul.files_content li.message") }
+    message_node = keep_trying_until {
+      driver.find_element(:css, "li.collaborations span.name").click
+      driver.find_element(:css, "ul.files_content li.message")
+    }
     message_node.text
   end
   
