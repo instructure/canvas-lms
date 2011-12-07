@@ -35,4 +35,9 @@ describe "site-wide" do
     response.status.should == "404 Not Found"
     ErrorReport.last.category.should == "404"
   end
+
+  it "should set the x-ua-compatible http header" do
+    get "/"
+    response['x-ua-compatible'].should == "IE=edge,chrome=1"
+  end
 end
