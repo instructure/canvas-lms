@@ -6,6 +6,7 @@ require([
   'specs/jQuery.instructureMiscPluginsSpec',
   'specs/userNamePartsSpec',
   'specs/objectCollectionSpec',
-  'specs/util/BackoffPollerSpec'
+  'specs/util/BackoffPollerSpec',
+  'specs/jQuery.instructureJqueryPatches'
 ]);
 

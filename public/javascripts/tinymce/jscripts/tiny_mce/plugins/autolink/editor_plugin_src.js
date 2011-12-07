@@ -30,9 +30,12 @@
 		ed.onKeyDown.add(function(ed, e) {
 			if (e.keyCode == 13)
 				return t.handleEnter(ed);
-			if (e.shiftKey && e.keyCode == 48)
-				return t.handleEclipse(ed);
 			});
+
+		ed.onKeyPress.add(function(ed, e) {
+			if (e.which == 41)
+				return t.handleEclipse(ed);
+		});
 
 		// Add a key up handler
 		ed.onKeyUp.add(function(ed, e) {
@@ -132,7 +135,7 @@
 				bookmark = ed.selection.getBookmark();
 
 				ed.selection.setRng(r);
-				tinyMCE.execCommand('mceInsertLink',false, matches[1] + matches[2]);
+				tinyMCE.execCommand('createlink',false, matches[1] + matches[2]);
 				ed.selection.moveToBookmark(bookmark);
 
 				// TODO: Determine if this is still needed.

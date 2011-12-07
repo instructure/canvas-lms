@@ -39,9 +39,9 @@
       <div class="link_box">
         <span class="links">
           <% if !@topic_agglomerated && (!entry || !entry.new_record?) %>
-            <a href="<%= context_url(entry_context, :new_context_discussion_entry_url) %>" class="add_entry_link disabled_link atr-reply"><%= t :reply_to_message, "Reply to this Message" %></a>
-            <a href="<%= context_url(entry_context, :edit_context_discussion_entry_url, entry_id) %>" class="edit_entry_link disabled_link atr-edit"><%= t :edit_message, "Edit this Message" %></a>
-            <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry_id) %>" class="delete_entry_link disabled_link atr-delete"><%= t :delete_message, "Delete this Message" %></a>
+            <a href="<%= context_url(entry_context, :new_context_discussion_entry_url) %>" class="add_entry_link disabled_link atr-reply" title="<%= t :reply_to_message, "Make a Side Comment" %>"><%= t :reply_to_message, "Make a Side Comment" %></a>
+            <a href="<%= context_url(entry_context, :edit_context_discussion_entry_url, entry_id) %>" class="edit_entry_link disabled_link atr-edit" title="<%= t :edit_message, "Edit this Message" %>"><%= t :edit_message, "Edit this Message" %></a>
+            <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry_id) %>" class="delete_entry_link disabled_link atr-delete" title="<%= t :delete_message, "Delete this Message" %>"><%= t :delete_message, "Delete this Message" %></a>
           <% end %>
         </span>
       </div>

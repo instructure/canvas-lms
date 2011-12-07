@@ -1,4 +1,4 @@
-!define('jst/mute_dialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['mute_dialog'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -111,5 +111,7 @@
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n  </p>\n</div>";
   return buffer;});
-  return templates['mute_dialog'];
-});
+  define('jst/mute_dialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['mute_dialog'];
+  });
+})();

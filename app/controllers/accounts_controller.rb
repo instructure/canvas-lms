@@ -82,6 +82,7 @@ class AccountsController < ApplicationController
       respond_to do |format|
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
+        global_includes = !!params[:account][:settings].try(:delete, :global_includes)
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
             @account.set_service_availability(key, value == '1')
@@ -93,12 +94,12 @@ class AccountsController < ApplicationController
           @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if params[:account][:settings]
             @account.settings[:admins_can_change_passwords] = !!params[:account][:settings][:admins_can_change_passwords]
-            @account.settings[:global_includes] = !!params[:account][:settings][:global_includes]
+            @account.settings[:global_includes] = global_includes
             @account.settings[:enable_eportfolios] = !!params[:account][:settings][:enable_eportfolios] unless @account.site_admin?
           end
         end
         if sis_id = params[:account].delete(:sis_source_id)
-          if sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
+          if !@account.root_account? && sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
               @account.sis_source_id = nil
             else
@@ -323,9 +324,11 @@ class AccountsController < ApplicationController
           @account.current_sis_batch_id = batch.id
           @account.save
           batch.process
-          render :text => batch.to_json(:include => :sis_batch_log_entries)
+          render :json => batch.to_json(:include => :sis_batch_log_entries),
+                 :as_text => true
         else
-          render :text => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json
+          render :json => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json,
+                 :as_text => true
         end
       end
     end

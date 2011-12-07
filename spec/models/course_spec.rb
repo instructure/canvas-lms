@@ -754,6 +754,72 @@ describe Course, "backup" do
       @new_course.syllabus_body.should match(/\/courses\/#{@new_course.id}\/discussion_topics\/#{@new_topic.id}/)
     end
 
+    it "should copy external tools" do
+      course_model
+      copy_from = @course
+      tool_from = copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+      tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool_from.save
+      
+      course_model
+      copy_to = @course
+      copy_to.merge_into_course(copy_from, :course_settings => true, tool_from.asset_string.to_sym => true)
+      copy_to.context_external_tools.count.should == 1
+      
+      tool_to = copy_to.context_external_tools.first
+      tool_to.name.should == tool_from.name
+      tool_to.consumer_key.should == tool_from.consumer_key
+      tool_to.settings.should == tool_from.settings
+      tool_to.has_course_navigation.should == true
+    end
+
+    it "should not duplicate external tools used in modules" do
+      course_model
+      copy_from = @course
+      tool_from = copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+      tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool_from.save
+      
+      mod1 = copy_from.context_modules.create!(:name => "some module")
+      tag = mod1.add_item({:type => 'context_external_tool', 
+                           :title => 'Example URL', 
+                           :url => "http://www.example.com",
+                           :new_tab => true})
+      tag.save
+      
+      course_model
+      copy_to = @course
+      copy_to.merge_into_course(copy_from, :course_settings => true, :all_external_tools => true, :all_modules => true)
+      copy_to.context_external_tools.count.should == 1
+      
+      tool_to = copy_to.context_external_tools.first
+      tool_to.name.should == tool_from.name
+      tool_to.consumer_key.should == tool_from.consumer_key
+      tool_to.settings.should == tool_from.settings
+      tool_to.has_course_navigation.should == true
+    end
+
+    it "should copy external tool assignments" do
+      course_model
+      copy_from = @course
+      assignment_model(:course => copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
+      tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
+      tag_from.content_type = 'ContextExternalTool'
+      tag_from.save!
+
+      course_model
+      copy_to = @course
+      copy_to.merge_into_course(copy_from, :course_settings => true, :all_assignments => true, :all_external_tools => true)
+
+      asmnt_2 = copy_to.assignments.first
+      asmnt_2.submission_types.should == "external_tool"
+      asmnt_2.external_tool_tag.should_not be_nil
+      tag_to = asmnt_2.external_tool_tag
+      tag_to.content_type.should == tag_from.content_type
+      tag_to.url.should == tag_from.url
+      tag_to.new_tab.should == tag_from.new_tab
+    end
+
     it "should merge implied content into another course" do
       course_model
       attachment_model
@@ -1552,5 +1618,22 @@ describe Course, "section_visibility" do
       html = Course.migrate_content_links(orig, c1, c2, ['files'])
       html.should == orig
     end
+  end
+end
+
+describe Course, "enrollments" do
+  it "should update enrollments' root_account_id when necessary" do
+    a1 = Account.create!
+    a2 = Account.create!
+
+    course_with_student
+    @course.root_account = a1
+    @course.save!
+
+    @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
+
+    @course.root_account = a2
+    @course.save!
+    @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
   end
 end

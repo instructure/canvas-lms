@@ -128,6 +128,7 @@ class Account < ActiveRecord::Base
   
   # these settings either are or could be easily added to
   # the account settings page
+  add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :global_javascript, :condition => :global_includes, :root_only => true
   add_setting :global_stylesheet, :condition => :global_includes, :root_only => true
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
@@ -143,14 +144,14 @@ class Account < ActiveRecord::Base
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
-  add_setting :open_registration, :boolean => true, :root_only => true, :default => false
-  
+  add_setting :open_registration, :boolean => true, :root_only => true, :default => false, :condition => :non_delegated_authentication
+
   def settings=(hash)
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
           opts = account_settings_options[key.to_sym]
-          if (opts[:root_only] && root_account_id) || (opts[:condition] && !settings[opts[:condition].to_sym])
+          if (opts[:root_only] && root_account_id) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
             settings.delete key.to_sym
           elsif opts[:boolean]
             settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
@@ -198,15 +199,16 @@ class Account < ActiveRecord::Base
   
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
-    root = self.root_account || self
+    if self.root_account?
+      self.errors.add(:sis_source_id, t('#account.root_account_cant_have_sis_id', "SIS IDs cannot be set on root accounts"))
+      return false
+    end
+
+    root = self.root_account
     existing_account = Account.find_by_root_account_id_and_sis_source_id(root.id, self.sis_source_id)
     
-    if self.root_account?
-      return true if !existing_account
-    elsif root.sis_source_id != self.sis_source_id
-      return true if !existing_account || existing_account.id == self.id
-    end
-    
+    return true if !existing_account || existing_account.id == self.id
+
     self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
@@ -331,15 +333,6 @@ class Account < ActiveRecord::Base
   
   def self.account_lookup_cache_key(id)
     ['_account_lookup2', id].cache_key
-  end
-  
-  def find_user_by_unique_id(unique_id)
-    self.pseudonyms.find_by_unique_id(unique_id_or_email).user rescue nil
-  end
-  
-  def clear_cache_keys!
-    Rails.cache.delete(self.id)
-    true
   end
   
   def self.invalidate_cache(id)
@@ -651,7 +644,11 @@ class Account < ActiveRecord::Base
   def delegated_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
   end
-  
+
+  def non_delegated_authentication?
+    !delegated_authentication?
+  end
+
   def forgot_password_external_url
     account_authorization_config.try(:change_password_url)
   end
@@ -668,10 +665,6 @@ class Account < ActiveRecord::Base
     !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?)
   end
   
-  def require_account_pseudonym?
-    false
-  end
-  
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd
@@ -679,10 +672,6 @@ class Account < ActiveRecord::Base
   # invitation.
   def allow_invitation_previews?
     self == Account.default
-  end
-  
-  def pseudonym_session_scope
-    self.require_account_pseudonym? ? self.pseudonym_sessions : PseudonymSession
   end
   
   def find_courses(string)

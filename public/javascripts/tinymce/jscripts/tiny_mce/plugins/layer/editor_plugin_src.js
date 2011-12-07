@@ -9,6 +9,14 @@
  */
 
 (function() {
+	function findParentLayer(node) {
+		do {
+			if (node.className && node.className.indexOf('mceItemLayer') != -1) {
+				return node;
+			}
+		} while (node = node.parentNode);
+	};
+
 	tinymce.create('tinymce.plugins.Layer', {
 		init : function(ed, url) {
 			var t = this;
@@ -37,8 +45,41 @@
 			ed.addButton('insertlayer', {title : 'layer.insertlayer_desc', cmd : 'mceInsertLayer'});
 
 			ed.onInit.add(function() {
+				var dom = ed.dom;
+
 				if (tinymce.isIE)
 					ed.getDoc().execCommand('2D-Position', false, true);
+			});
+
+			// Remove serialized styles when selecting a layer since it might be changed by a drag operation
+			ed.onMouseUp.add(function(ed, e) {
+				var layer = findParentLayer(e.target);
+	
+				if (layer) {
+					ed.dom.setAttrib(layer, 'data-mce-style', '');
+				}
+			});
+
+			// Fixes edit focus issues with layers on Gecko
+			// This will enable designMode while inside a layer and disable it when outside
+			ed.onMouseDown.add(function(ed, e) {
+				var node = e.target, doc = ed.getDoc(), parent;
+
+				if (tinymce.isGecko) {
+					if (findParentLayer(node)) {
+						if (doc.designMode !== 'on') {
+							doc.designMode = 'on';
+
+							// Repaint caret
+							node = doc.body;
+							parent = node.parentNode;
+							parent.removeChild(node);
+							parent.appendChild(node);
+						}
+					} else if (doc.designMode == 'on') {
+						doc.designMode = 'off';
+					}
+				}
 			});
 
 			ed.onNodeChange.add(t._nodeChange, t);
@@ -81,11 +122,13 @@
 			var dom = ed.dom;
 
 			tinymce.each(dom.select('div,p', e), function(e) {
-				if (/^(absolute|relative|static)$/i.test(e.style.position)) {
+				if (/^(absolute|relative|fixed)$/i.test(e.style.position)) {
 					if (s)
 						dom.addClass(e, 'mceItemVisualAid');
 					else
-						dom.removeClass(e, 'mceItemVisualAid');	
+						dom.removeClass(e, 'mceItemVisualAid');
+
+					dom.addClass(e, 'mceItemLayer');
 				}
 			});
 		},
@@ -153,9 +196,9 @@
 		},
 
 		_insertLayer : function() {
-			var ed = this.editor, p = ed.dom.getPos(ed.dom.getParent(ed.selection.getNode(), '*'));
+			var ed = this.editor, dom = ed.dom, p = dom.getPos(dom.getParent(ed.selection.getNode(), '*')), body = ed.getBody();
 
-			ed.dom.add(ed.getBody(), 'div', {
+			ed.dom.add(body, 'div', {
 				style : {
 					position : 'absolute',
 					left : p.x,
@@ -163,8 +206,12 @@
 					width : 100,
 					height : 100
 				},
-				'class' : 'mceItemVisualAid'
+				'class' : 'mceItemVisualAid mceItemLayer'
 			}, ed.selection.getContent() || ed.getLang('layer.content'));
+
+			// Workaround for IE where it messes up the JS engine if you insert a layer on IE 6,7
+			if (tinymce.isIE)
+				dom.setHTML(body, body.innerHTML);
 		},
 
 		_toggleAbsolute : function() {
@@ -184,6 +231,7 @@
 					});
 
 					ed.dom.removeClass(le, 'mceItemVisualAid');
+					ed.dom.removeClass(le, 'mceItemLayer');
 				} else {
 					if (le.style.left == "")
 						le.style.left = 20 + 'px';

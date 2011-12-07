@@ -6,7 +6,7 @@
     <input type="hidden" name="enrollment_type" value="StudentEnrollment" />
     <% if @context.open_registration_for?(@current_user, session) && can_do(account, @current_user, :read) %>
       <div style="white-space: nowrap;">
-        <input type='checkbox' name='only_search_existing_users' value="1" />
+        <input type='checkbox' name='only_search_existing_users' value="1"<%= ' checked="checked"'.html_safe unless root_account.open_registration? %>/>
         <%= label_tag :only_search_existing_users, :en => 'only search existing users' %>
       </div>
     <% end %>

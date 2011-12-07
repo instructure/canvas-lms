@@ -19,7 +19,9 @@
 (function($){
   
   // have UI dialogs default to modal:true
-  $.widget('instructure.dialog', $.ui.dialog, { options: {modal: true} });
+  if ($.ui) {
+    $.widget('instructure.dialog', $.ui.dialog, { options: {modal: true} });
+  }
 
   // This is so that if you disable an element, that it also gives it the class disabled.  
   // that way you can add css classes for our friend IE6. so rather than using selector:disabled, 
@@ -43,6 +45,24 @@
       }
     });
   });
+
+  // monkey patch jquery's JSON parsing so we can have all of our ajax responses return with
+  // 'while(1);' prepended to them to protect against a CSRF attack vector.
+  var _parseJSON = $.parseJSON;
+  $.parseJSON = function() {
+    "use strict";
+    if (arguments[0]) {
+      try {
+        var newData = arguments[0].replace(/^while\(1\);/, '');
+        arguments[0] = newData;
+      } catch (err) {
+        // data was not a string or something, just pass along to the real parseJSON
+        // and let it handle errors.
+      }
+    }
+    return _parseJSON.apply($, arguments);
+  };
+  $.ajaxSettings.converters["text json"] = $.parseJSON;
 
   // this is a patch so you can set the "method" atribute on rails' REST-ful forms.
   $.attrHooks.method = $.extend($.attrHooks.method, {
@@ -71,7 +91,7 @@
   $.windowScrollTop = function() {
     return ($.browser.safari ? $("body") : $("html")).scrollTop();
   };
-  
 
+  define('jquery.instructure_jquery_patches', [], function() { return $ });
 
 })(jQuery);

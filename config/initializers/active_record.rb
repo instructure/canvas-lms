@@ -1,5 +1,5 @@
 class ActiveRecord::Base
-  extend ActiveSupport::Memoizable # used for a lot of the reporting queries  
+  extend ActiveSupport::Memoizable # used for a lot of the reporting queries
 
   class ProtectedAttributeAssigned < Exception; end
   def log_protected_attribute_removal_with_raise(*attributes)
@@ -15,17 +15,17 @@ class ActiveRecord::Base
     id = self.uuid rescue self.id
     "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
   end
-  
+
   def opaque_identifier(column)
     str = send(column).to_s
     raise "Empty value" if str.blank?
     Canvas::Security.hmac_sha1(str)
   end
-  
+
   def self.maximum_text_length
     @maximum_text_length ||= 64.kilobytes-1
   end
-  
+
   def self.maximum_long_text_length
     @maximum_long_text_length ||= 500.kilobytes-1
   end
@@ -56,28 +56,28 @@ class ActiveRecord::Base
     res.id = id if res
     res
   end
-  
+
   def asset_string
     @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
   end
-  
+
   def export_columns(format = nil)
     self.class.content_columns.map(&:name)
   end
-  
+
   def to_row(format = nil)
     export_columns(format).map { |c| self.send(c) }
   end
-  
+
   def is_a_context?
     false
   end
-  
+
   def self.clear_cached_contexts
     @@cached_contexts = {}
     @@cached_permissions = {}
   end
-  
+
   def cached_context_grants_right?(user, session, *permissions)
     @@cached_contexts = nil if ENV['RAILS_ENV'] == "test"
     @@cached_contexts ||= {}
@@ -103,11 +103,11 @@ class ActiveRecord::Base
       raise "Can only call cached_context_short_name on items with a context"
     end
   end
-  
+
   def self.skip_touch_context(skip=true)
     @@skip_touch_context = skip
   end
-  
+
   def save_without_touching_context
     @skip_touch_context = true
     self.save
@@ -138,7 +138,7 @@ class ActiveRecord::Base
     "#{self.context_type.downcase.pluralize}/#{self.context_id}"
   end
 
-  # Example: 
+  # Example:
   # obj.to_json(:permissions => {:user => u, :policies => [:read, :write, :update]})
   def as_json(options = nil)
     options = options.try(:dup) || {}
@@ -453,6 +453,8 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 
   def group_by(*columns)
+    # the first item should be the primary key(s) that the other
+    # columns are functionally dependent on
     Array(columns.first).join(", ")
   end
 end
@@ -481,7 +483,10 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
     end
 
     def group_by(*columns)
-      return super if postgresql_version >= 90100
+      # although postgres 9.1 lets you omit columns that are functionally
+      # dependent on the primary keys, that's only true if the FROM items are
+      # all tables (i.e. not subselects). to keep things simple, we always
+      # specify all columns for postgres
       columns.flatten.join(', ')
     end
   end

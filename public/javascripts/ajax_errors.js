@@ -87,7 +87,7 @@ $(document).ready(function() {
     try {
       status = request.status;
       text = request.responseText;
-      json_data = JSON.parse(text);
+      json_data = $.parseJSON(text);
     } catch(e) {}
     $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
       if(json_data && json_data.status == 'AUT') {

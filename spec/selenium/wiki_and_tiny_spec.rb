@@ -355,7 +355,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     driver.find_element(:css, '.mceIcon.mce_italic').click
     first_text = 'This is my text.'
 
-    driver.execute_script("$('#wiki_page_body').editorBox('execute', 'mceInsertContent',false, '#{first_text}')")
+    type_in_tiny('#wiki_page_body', first_text)
     in_frame "wiki_page_body_ifr" do
       driver.find_element(:id, 'tinymce').text.include?(first_text).should be_true
     end

@@ -58,3 +58,5 @@ doc/api/*
 doc/plugins/*
 public/doc/api/*
 .yardoc/*
+spec/javascripts/*Spec.js
+spec/javascripts/*/*Spec.js

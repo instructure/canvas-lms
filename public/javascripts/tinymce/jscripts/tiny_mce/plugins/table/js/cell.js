@@ -63,6 +63,11 @@ function init() {
 function updateAction() {
 	var el, inst = ed, tdElm, trElm, tableElm, formObj = document.forms[0];
 
+	if (!AutoValidator.validate(formObj)) {
+		tinyMCEPopup.alert(AutoValidator.getErrorMessages(formObj).join('. ') + '.');
+		return false;
+	}
+
 	tinyMCEPopup.restoreSelection();
 	el = ed.selection.getStart();
 	tdElm = ed.dom.getParent(el, "td,th");
@@ -120,6 +125,36 @@ function updateAction() {
 			do {
 				cell = updateCell(cell, true);
 			} while ((cell = nextCell(cell)) != null);
+
+			break;
+
+		case "col":
+			var curr, col = 0, cell = trElm.firstChild, rows = tableElm.getElementsByTagName("tr");
+
+			if (cell.nodeName != "TD" && cell.nodeName != "TH")
+				cell = nextCell(cell);
+
+			do {
+				if (cell == tdElm)
+					break;
+				col += cell.getAttribute("colspan");
+			} while ((cell = nextCell(cell)) != null);
+
+			for (var i=0; i<rows.length; i++) {
+				cell = rows[i].firstChild;
+
+				if (cell.nodeName != "TD" && cell.nodeName != "TH")
+					cell = nextCell(cell);
+
+				curr = 0;
+				do {
+					if (curr == col) {
+						cell = updateCell(cell, true);
+						break;
+					}
+					curr += cell.getAttribute("colspan");
+				} while ((cell = nextCell(cell)) != null);
+			}
 
 			break;
 

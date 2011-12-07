@@ -59,7 +59,7 @@ describe UsersController do
     get 'manageable_courses', :user_id => @teacher.id, :term => "MyCourse"
     response.should be_success
 
-    courses = ActiveSupport::JSON.decode(response.body)
+    courses = json_parse
     courses.map { |c| c['id'] }.should == [course2.id]
   end
 

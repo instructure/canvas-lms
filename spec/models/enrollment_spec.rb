@@ -909,4 +909,60 @@ describe Enrollment do
       group.users.should_not be_include(user)
     end
   end
+
+  describe "for_email" do
+    it "should return candidate enrollments" do
+      course(:active_all => 1)
+
+      user
+      @user.update_attribute(:workflow_state, 'creation_pending')
+      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      @course.enroll_user(@user)
+      Enrollment.invited.for_email('jt@instructure.com').count.should == 1
+    end
+
+    it "should not return non-candidate enrollments" do
+      course(:active_all => 1)
+      # mismatched e-mail
+      user
+      @user.update_attribute(:workflow_state, 'creation_pending')
+      @user.communication_channels.create!(:path => 'bob@instructure.com')
+      @course.enroll_user(@user)
+      # registered user
+      user
+      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      @user.register!
+      @course.enroll_user(@user)
+      # active e-mail
+      user
+      @user.update_attribute(:workflow_state, 'creation_pending')
+      @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      @course.enroll_user(@user)
+      # accepted enrollment
+      user
+      @user.update_attribute(:workflow_state, 'creation_pending')
+      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      @course.enroll_user(@user).accept
+      # rejected enrollment
+      user
+      @user.update_attribute(:workflow_state, 'creation_pending')
+      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      @course.enroll_user(@user).reject
+
+      Enrollment.invited.for_email('jt@instructure.com').should == []
+    end
+  end
+
+  it "should uncache temporary user invitations when state changes" do
+    enable_cache do
+      course(:active_all => 1)
+      user
+      @user.update_attribute(:workflow_state, 'creation_pending')
+      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      @enrollment = @course.enroll_user(@user)
+      Enrollment.cached_temporary_invitations('jt@instructure.com').length.should == 1
+      @enrollment.accept
+      Enrollment.cached_temporary_invitations('jt@instructure.com').should == []
+    end
+  end
 end
