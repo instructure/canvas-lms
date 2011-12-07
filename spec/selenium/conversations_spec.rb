@@ -21,9 +21,9 @@ shared_examples_for "conversations selenium tests" do
 
     if opts[:add_recipient] && browser = find_with_jquery("#create_message_form .browser:visible")
       browser.click
-      wait_for_ajaximations
+      wait_for_ajaximations(150)
       find_with_jquery('.selectable:visible').click
-      wait_for_ajaximations
+      wait_for_ajaximations(150)
       find_with_jquery('.toggleable:visible .toggle').click
       wait_for_ajaximations
       driver.find_elements(:css, '.token_input ul li').length.should > 0
