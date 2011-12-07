@@ -40,7 +40,8 @@ class ApplicationController < ActionController::Base
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
   before_filter :fix_xhr_requests
-  before_filter :init_body_classes_and_active_tab
+  before_filter :init_body_classes
+  before_filter :set_ua_header
 
   add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
 
@@ -58,11 +59,14 @@ class ApplicationController < ActionController::Base
     I18n.localizer = nil
   end
 
-  def init_body_classes_and_active_tab
+  def init_body_classes
     @body_classes = []
-    active_tab = nil
   end
-  
+
+  def set_ua_header
+    headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
+  end
+
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
   # see http://codetunes.com/2009/01/31/rails-222-ajax-and-respond_to/ for why
   def fix_xhr_requests
