@@ -1,3 +1,12 @@
+canvas-lms (2011.12.07.14.52) stable; urgency=low
+
+  * Package ref: 7d6a855e8ea1e9e33d5c72f55caf89ad4e2ff4c2
+  *
+  * [+c015df7] default email should not include retired emails
+  * [+7d6a855] add missing route, fixes #6537
+
+ -- JT Olds <jt@instructure.com>  Wed, 07 Dec 2011 14:52:52 -0700
+
 canvas-lms (1.1-85) professional; urgency=low
 
   * Package ref: ffd4387ef88a89bd8aa5d8366435a713d10ec6d2
