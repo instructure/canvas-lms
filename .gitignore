@@ -1,3 +1,10 @@
+debian/canvas-lms.postinst.debhelper
+debian/canvas-lms.postrm.debhelper
+debian/canvas-lms.prerm.debhelper
+debian/canvas-lms.debhelper.log
+debian/canvas-lms.substvars
+debian/canvas-lms/*
+debian/files
 .rvmrc
 .rdebug_hist
 .DS_Store
@@ -51,10 +58,3 @@ doc/api/*
 doc/plugins/*
 public/doc/api/*
 .yardoc/*
-debian/canvas-lms.postinst.debhelper
-debian/canvas-lms.postrm.debhelper
-debian/canvas-lms.prerm.debhelper
-debian/canvas-lms.debhelper.log
-debian/canvas-lms.substvars
-debian/canvas-lms/*
-debian/files
