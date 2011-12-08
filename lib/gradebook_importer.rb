@@ -44,7 +44,10 @@ class GradebookImporter
   
   def parse!
     @student_columns = 3 # name, user id, section
-    
+    # preload a ton of data that presumably we'll be querying
+    @all_assignments = @context.assignments.active.gradeable.find(:all, :select => 'id, title, points_possible, grading_type').inject({}) { |r, a| r[a.id] = a; r}
+    @all_students = @context.students.find(:all, :select => 'users.id, name, sortable_name').inject({}) { |r, s| r[s.id] = s; r }
+
     csv = FasterCSV.new(self.contents, :converters => :nil)
     header = csv.shift
     @assignments = process_header(header)
@@ -58,7 +61,7 @@ class GradebookImporter
         next
       end
       
-      @students << process_student(row.shift(@student_columns))
+      @students << process_student(row)
       @submissions << process_submissions(row, @students.last)
     end
   end
@@ -85,8 +88,8 @@ class GradebookImporter
     
     row.map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
-      assignment = @context.assignments.active.gradeable.find_by_id(id) if id.present?
-      assignment ||= @context.assignments.active.gradeable.find_by_title(name_and_id) #backward compat
+      assignment = @all_assignments[id.to_i] if id.present?
+      assignment ||= @all_assignments.detect { |id, a| a.title == name_and_id }.try(:last) #backward compat
       assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.original_id = assignment.id
       assignment.id ||= NegativeId.generate
@@ -101,13 +104,15 @@ class GradebookImporter
   end
   
   def process_student(row)
-    unsorted_name = to_unsorted_name(row[0])
     student_id = row[1] # the second column in the csv should have the student_id for each row
-    student = @context.students.find_by_id(student_id) if student_id.present?
-    student ||= @context.students.find_by_id(@context.root_account.pseudonyms.find_by_sis_user_id(row[@sis_user_id_column]).try(:user_id)) if @sis_user_id_column && row[@sis_user_id_column].present?
-    student ||= @context.students.find_by_id(@context.root_account.pseudonyms.active.find_by_unique_id(row[@sis_login_id_column]).try(:user_id)) if @sis_login_id_column && row[@sis_login_id_column].present?
-    student ||= @context.students.find_by_name(unsorted_name) if unsorted_name.present?
-    student ||= User.new(:name => unsorted_name)
+    student = @all_students[student_id.to_i] if student_id.present?
+    unless student
+      pseudonym = pseudonyms_by_sis_id[row[@sis_user_id_column]] if @sis_user_id_column && row[@sis_user_id_column].present?
+      pseudonym ||= pseudonyms_by_login_id[row[@sis_login_id_column]] if @sis_login_id_column && row[@sis_login_id_column].present?
+      student = @all_students[pseudonym.user_id] if pseudonym
+    end
+    student ||= @all_students.detect { |id, s| s.name == row[0] || s.sortable_name == row[0] }.try(:last) if row[0].present?
+    student ||= User.new(:name => row[0])
     student.original_id = student.id
     student.id ||= NegativeId.generate
     student
@@ -117,7 +122,7 @@ class GradebookImporter
     l = []
     @assignments.each_with_index do |assignment, idx|
       l << {
-        'grade' => row[idx],
+        'grade' => row[idx + @student_columns],
         'assignment_id' => assignment.new_record? ? assignment.id : assignment.original_id
       }
     end
@@ -125,36 +130,45 @@ class GradebookImporter
   end
   
   def to_json
+    student_data = []
+    @students.each_with_index { |s, idx| student_data << student_to_hash(s, idx) }
     {
-      :students => @students.inject([]) { |l, s| l << student_to_hash(s) },
-      :assignments => @assignments.inject([]) { |l, a| l << assignment_to_hash(a)}
+      :students => student_data,
+      :assignments => @assignments.map { |a| assignment_to_hash(a) }
     }.to_json
   end
   
   protected
-
-    def student_to_hash(user)
-      user_attributes = wanted_user_keys.inject({}) do |h, k|
-        h[k] = user.send(k.to_sym)
-        h
-      end
-      user_attributes[:submissions] = @submissions[@students.index(user)]
-      user_attributes
+    def all_pseudonyms
+      @all_pseudonyms ||= @context.root_account.pseudonyms.active.find(:all, :select => 'id, unique_id, sis_user_id, user_id', :conditions => {:user_id => @all_students.values.map(&:id)})
     end
-    
-    def wanted_user_keys
-      @wanted_user_keys ||= %w(last_name_first name original_id id)
+
+    def pseudonyms_by_sis_id
+      @pseudonyms_by_sis_id ||= all_pseudonyms.inject({}) { |r, p| r[p.sis_user_id] = p if p.sis_user_id; r }
+    end
+
+    def pseudonyms_by_login_id
+      @pseudonyms_by_login_id ||= all_pseudonyms.inject({}) { |r, p| r[p.unique_id] = p; r }
+    end
+
+    def student_to_hash(user, idx)
+      {
+        :last_name_first => user.last_name_first,
+        :name => user.name,
+        :original_id => user.original_id,
+        :id => user.id,
+        :submissions => @submissions[idx]
+      }
     end
     
     def assignment_to_hash(assignment)
-      wanted_assignment_keys.inject({}) do |h, k|
-        h[k] = assignment.send(k.to_sym)
-        h
-      end
-    end
-    
-    def wanted_assignment_keys
-      %w(title original_id points_possible grading_type id)
+      {
+        :id => assignment.id,
+        :original_id => assignment.original_id,
+        :title => assignment.title,
+        :points_possible => assignment.points_possible,
+        :grading_type => assignment.grading_type
+      }
     end
 
     def valid_context?(context=nil)
@@ -166,15 +180,5 @@ class GradebookImporter
         :assignments=, 
         :submissions=
       ].all?{ |m| context.respond_to?(m) }
-    end
-    
-    def to_unsorted_name(name)
-      comma_separated = name.split(",")
-      last_name = comma_separated[0]
-      first_name = comma_separated[1]
-      tail = comma_separated[2..-1]
-      full_name = "#{first_name} #{last_name}".strip
-      full_name += "," + tail.join(', ') if tail and not tail.empty?
-      full_name
     end
 end
