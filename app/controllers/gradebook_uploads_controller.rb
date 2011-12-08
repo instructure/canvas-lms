@@ -63,19 +63,20 @@ class GradebookUploadsController < ApplicationController
         @assignments = @data_to_load["assignments"]
         assignment_map = {}
         new_assignment_ids = {}
-        @assignments.each do |assignment|
-          if !assignment['original_id'] && assignment['id'].to_i < 0
-            a = @context.assignments.create!(:title => assignment['title'], :points_possible => assignment['points_possible'])
-            new_assignment_ids[assignment['id']] = a.id
-            assignment['id'] = a.id
-            assignment['original_id'] = a.id
-          else
-            a = @context.assignments.find(assignment['id'].to_i)
-          end
+        new_assignments, old_assignments = @assignments.partition { |a| !a['original_id'] && a['id'].to_i < 0 }
+        new_assignments.each do |assignment|
+          a = @context.assignments.create!(:title => assignment['title'], :points_possible => assignment['points_possible'])
+          new_assignment_ids[assignment['id']] = a.id
+          assignment['id'] = a.id
+          assignment['original_id'] = a.id
           assignment_map[a.id] = a
         end
+        @context.assignments.find(old_assignments.map { |a| a['id'].to_i }).each do |a|
+          assignment_map[a.id] = a
+        end
+
         @submissions = @students.inject([]) do |list, student_record|
-          student_record['submissions'].map do |submission_record|
+          student_record['submissions'].each do |submission_record|
             list << {
               :assignment_id => new_assignment_ids[submission_record['assignment_id']] || submission_record['assignment_id'].to_i,
               :user_id => student_record['original_id'].to_i,
@@ -84,13 +85,24 @@ class GradebookUploadsController < ApplicationController
           end
           list
         end
+
+        all_submissions = {}
+        @context.submissions.find(:all,
+          :include => { :exclude => :quiz_submission },
+          :conditions => {
+            :assignment_id => assignment_map.keys,
+            :user_id => @students.map { |s| s['original_id'].to_i }
+          }).each do |s|
+          all_submissions[[s.assignment_id, s.user_id]] = s
+        end
       
         submissions_updated_count = 0
         @submissions.each do |sub|
           next unless @assignments
           assignment = assignment_map[sub[:assignment_id].to_i]
           next unless assignment
-          submission = assignment.find_or_create_submission(sub[:user_id])
+          submission = all_submissions[[assignment.id, sub[:user_id]]]
+          submission ||= Submission.new(:assignment => assignment) { |s| s.user_id = sub[:user_id] }
           # grade_to_score expects a string so call to_s here, otherwise things that have a score of zero will return nil
           score = assignment.grade_to_score(sub[:grade].to_s)
           unless score == submission.score

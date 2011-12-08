@@ -762,8 +762,8 @@ end
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
   }
 
-  def get_file(filename)
-    data = TEST_FILE_UUIDS[filename]
+  def get_file(filename, data = nil)
+    data ||= TEST_FILE_UUIDS[filename]
     @file = Tempfile.new(filename.split(/(?=\.)/))
     @file.write data
     @file.close
