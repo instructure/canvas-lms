@@ -112,11 +112,12 @@ describe "file uploads Windows-Firefox-Local-Tests" do
       wait_for_ajax_requests
       
       driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
-      disclosure_button = driver.find_element(:css, '#tree1 .folder .sign')
-      disclosure_button.click
+      driver.find_element(:css, '#tree1 .folder .sign').click
       # work around bizarre bug where the click above doesn't register the first time
       # when testing firefox on windows xp WITHOUT firebug installed. (works with firebug enabled!)
-      disclosure_button.click if disclosure_button.attribute(:class) !~ /minus/
+      if driver.find_element(:css, '#tree1 .folder .sign').attribute(:class) !~ /minus/
+        driver.find_element(:css, '#tree1 .folder .sign').click
+      end
       wait_for_ajax_requests
 
       files = driver.find_elements(:css, '#tree1 .folder .file')
