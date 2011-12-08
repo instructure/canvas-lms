@@ -666,7 +666,7 @@ class Assignment < ActiveRecord::Base
     @locks ||= {}
     locked = false
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, user].cache_key, :expires_in => 1.minute) do
+    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && self.unlock_at > Time.now)
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}

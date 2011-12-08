@@ -544,7 +544,7 @@ class Quiz < ActiveRecord::Base
   def locked_for?(user=nil, opts={})
     @locks ||= {}
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, user].cache_key, :expires_in => 1.minute) do
+    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && self.unlock_at > Time.now)
         sub = user && quiz_submissions.find_by_user_id(user.id)
