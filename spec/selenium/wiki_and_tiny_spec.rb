@@ -313,9 +313,12 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
 
       @image_list.find_elements(:css, 'img.img').length.should == 2
-      @image_list.find_elements(:css, 'img.img').first.click
-      in_frame "wiki_page_body_ifr" do
-        driver.find_element(:css, '#tinymce img').should be_displayed
+      keep_trying_until do
+        driver.find_elements(:css, '#editor_tabs_3 .image_list img.img').first.click
+        in_frame "wiki_page_body_ifr" do
+          driver.find_element(:css, '#tinymce img').should be_displayed
+        end
+        true
       end
 
       driver.find_element(:id, 'wiki_page_submit').click
