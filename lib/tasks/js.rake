@@ -13,7 +13,13 @@ namespace :js do
         File.open(destination, 'wb') { |out| out.write CoffeeScript.compile(File.open(coffee)) }
       end
     end
-    exec("phantomjs spec/javascripts/support/qunit/test.js spec/javascripts/runner.html")
+
+    puts "--> executing phantomjs tests"
+    phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js spec/javascripts/runner.html`
+    exit_status = $?.exitstatus
+    puts phantomjs_output
+    raise "PhantomJS tests failed" if exit_status != 0
+
   end
 
 end
