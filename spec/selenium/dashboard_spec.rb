@@ -251,8 +251,8 @@ shared_examples_for "dashboard selenium tests" do
     calendar_event_model({
       :title => "super fun party",
       :description => 'celebrating stuff',
-      :start_at => 5.minutes.ago,
-      :end_at => 5.minutes.from_now
+      :start_at => 5.minutes.from_now,
+      :end_at => 10.minutes.from_now
     })
     get "/"
     driver.find_element(:css, 'div.events_list .event a').should include_text(@event.title)
