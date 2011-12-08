@@ -126,12 +126,12 @@
         </itemfeedback>
         <itemfeedback ident="QUES_516156_630296_IF2899444">
           <material>
-            <mattext texttype="text/plain"/>
+            <mattext texttype="text/html"/>
           </material>
         </itemfeedback>
         <itemfeedback ident="QUES_516156_630296_IF2899445">
           <material>
-            <mattext texttype="text/plain"/>
+            <mattext texttype="text/html"/>
           </material>
         </itemfeedback>
       </item>

@@ -350,7 +350,7 @@ class AssessmentItemConverter
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
       id = feedback['identifier']
       node = feedback.at_css('p') || feedback.at_css('div')
-      feedback_hash[id] = node
+      feedback_hash[id] = node if node
     end
     
     #clear extra entries

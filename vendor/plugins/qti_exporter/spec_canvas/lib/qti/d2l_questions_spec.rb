@@ -79,12 +79,10 @@ module D2LExpected
                                    :comments=>""},
                                   {:weight=>0,
                                    :text=>"gamma",
-                                   :migration_id=>"QUES_516156_630296_A2899444",
-                                   :comments=>""},
+                                   :migration_id=>"QUES_516156_630296_A2899444"},
                                   {:weight=>0,
                                    :text=>"omega",
-                                   :migration_id=>"QUES_516156_630296_A2899445",
-                                   :comments=>""}
+                                   :migration_id=>"QUES_516156_630296_A2899445"}
                           ],
                   :question_bank_id=>"SECT_3981973",
                   :points_possible=>1,
