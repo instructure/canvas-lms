@@ -1,11 +1,7 @@
 var _gaq = _gaq || [];
 
 (function($, INST) {
-
-  // insert ga.js async
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  var asyncScriptInserted = false;
 
   /**
    * Enables Google Analytics tracking on the page from which it's called.
@@ -22,6 +18,16 @@ var _gaq = _gaq || [];
    *
    */
   $.trackPage = function(account_id, options) {
+
+    if (!asyncScriptInserted) {
+      asyncScriptInserted = true;
+
+      // insert ga.js async
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    }
+
     options = $.extend({status_code: 200}, options);
     _gaq.push(['_setAccount', account_id]);
     if (options.domain) {
