@@ -474,6 +474,28 @@
         }, this));
       }, this), 100);
     };
+    TokenSelector.prototype.add_by_user_id = function(user_id, from_conversation_id) {
+      this.set_loading();
+      return $.ajaxJSON(this.url, 'POST', {
+        user_id: user_id,
+        from_conversation_id: from_conversation_id
+      }, __bind(function(data) {
+        var user;
+        this.clear_loading();
+        this.close();
+        user = data[0];
+        if (user) {
+          return this.input.add_token({
+            value: user.id,
+            text: user.name,
+            data: user
+          });
+        }
+      }, this), __bind(function(data) {
+        this.clear_loading();
+        return this.close();
+      }, this));
+    };
     TokenSelector.prototype.open = function() {
       this.container.show();
       return this.reposition();
@@ -924,17 +946,9 @@
       if ($selected_conversation) {
         $selected_conversation.scrollIntoView();
       } else {
-        if (params.user_id && params.user_name) {
-          $('#recipients').data('token_input').add_token({
-            value: params.user_id,
-            text: params.user_name,
-            data: {
-              id: params.user_id,
-              name: params.user_name,
-              can_add_notes: params.can_add_notes
-            }
-          });
+        if (params.user_id) {
           $('#from_conversation_id').val(params.from_conversation_id);
+          $('#recipients').data('token_input').selector.add_by_user_id(params.user_id, params.from_conversation_id);
         }
         return;
       }

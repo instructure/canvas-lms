@@ -468,6 +468,8 @@ class ConversationsController < ApplicationController
   #   user ids or course/group ids prefixed with "course_" or "group_"
   #   respectively, e.g. [1, 2, "course_3"].
   # @argument type ["user"|"context"] Limit the search just to users or contexts (groups/courses).
+  # @argument user_id [Integer] Search for a specific user id. This ignores the other above parameters, and will never return more than one result.
+  # @argument from_conversation_id [Integer] When searching by user_id, only users that could be normally messaged by this user will be returned. This parameter allows you to specify a conversation that will be referenced for a shared context -- if both the current user and the searched user are in the conversation, the user will be returned. This is used to start new side conversations.
   #
   # @example_response
   #   [
@@ -501,7 +503,9 @@ class ConversationsController < ApplicationController
     exclude = params[:exclude] || []
 
     recipients = []
-    if (params[:context] || params[:search]) && ['user', 'context', nil].include?(params[:type])
+    if params[:user_id]
+      recipients = matching_participants(:ids => [params[:user_id]], :conversation_id => params[:from_conversation_id])
+    elsif (params[:context] || params[:search]) && ['user', 'context', nil].include?(params[:type])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
       contexts = params[:type] == 'user' ? [] : matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX)))

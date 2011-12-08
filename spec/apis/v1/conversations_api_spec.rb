@@ -407,6 +407,43 @@ describe ConversationsController, :type => :integration do
       ]
     end
 
+    it "should return recipients found by id" do
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{@bob.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => @bob.id.to_s })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+      ]
+    end
+
+    it "should ignore other parameters when searching by id" do
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{@bob.id}&search=asdf",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => @bob.id.to_s, :search => "asdf" })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+      ]
+    end
+
+    it "should return recipients by id if contactable, or if a shared conversation is referenced" do
+      other = User.create(:name => "other personage")
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{other.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => other.id.to_s })
+      json.should == []
+      # now they have a conversation in common
+      c = Conversation.initiate([@user.id, other.id], true)
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{other.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => other.id.to_s })
+      json.should == []
+      # ... but it has to be explicity referenced via from_conversation_id
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{other.id}&from_conversation_id=#{c.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => other.id.to_s, :from_conversation_id => c.id.to_s })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => other.id, "name" => "other personage", "common_courses" => {}, "common_groups" => {}},
+      ]
+    end
+
     context "synthetic contexts" do
       it "should return synthetic contexts within a course" do
         json = api_call(:get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}&synthetic_contexts=1",

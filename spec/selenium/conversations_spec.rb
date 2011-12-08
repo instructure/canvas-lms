@@ -82,13 +82,13 @@ shared_examples_for "conversations selenium tests" do
       @course.default_section.update_attribute(:name, "the section")
       @other_section = @course.course_sections.create(:name => "the other section")
 
-      s1 = User.create(:name => "student 1")
-      @course.enroll_user(s1)
-      s2 = User.create(:name => "student 2")
-      @course.enroll_user(s2, "StudentEnrollment", :section => @other_section)
+      @s1 = User.create(:name => "student 1")
+      @course.enroll_user(@s1)
+      @s2 = User.create(:name => "student 2")
+      @course.enroll_user(@s2, "StudentEnrollment", :section => @other_section)
 
       @group = @course.groups.create(:name => "the group")
-      @group.users << s1 << @user
+      @group.users << @s1 << @user
 
       new_conversation
       @input = find_with_jquery("#create_message_form input:visible")
@@ -316,6 +316,34 @@ shared_examples_for "conversations selenium tests" do
           end
         end
       end
+    end
+
+    it "should allow a user id in the url hash to add recipient" do
+      # check without any user_name
+      get "/conversations#/conversations?user_id=#{@s1.id}"
+      wait_for_ajaximations
+      tokens.should eql ["student 1"]
+      # explanation of user_name param: we used to pass the user name in the
+      # hash fragment, and it was spoofable. now we load that data via ajax.
+      get "/conversations#/conversations?user_id=#{@s1.id}&user_name=some_fake_name"
+      wait_for_ajaximations
+      tokens.should eql ["student 1"]
+    end
+
+    it "should reject a non-contactable user id in the url hash" do
+      other = User.create(:name => "other guy")
+      get "/conversations#/conversations?user_id=#{other.id}"
+      wait_for_ajaximations
+      tokens.should eql []
+    end
+
+    it "should allow a non-contactable user in the hash if a shared conversation exists" do
+      other = User.create(:name => "other guy")
+      # if the users have a conversation in common already, then the recipient can be added
+      c = Conversation.initiate([@user.id, other.id], true)
+      get "/conversations#/conversations?user_id=#{other.id}&from_conversation_id=#{c.id}"
+      wait_for_ajaximations
+      tokens.should eql ["other guy"]
     end
   end
 
