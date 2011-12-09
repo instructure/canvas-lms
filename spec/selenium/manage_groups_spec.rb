@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require 'thread'
 
 describe "manage_groups selenium tests" do
   it_should_behave_like "in-process server selenium tests"
@@ -397,14 +398,19 @@ describe "manage_groups selenium tests" do
       assign_students = find_with_jquery("#category_#{@category.id} .assign_students_link:visible")
       assign_students.should_not be_nil
       assign_students.click
+
+      # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
+      lock = Mutex.new
+      lock.lock
+      GroupsController.before_filter { lock.lock; true }
+
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
-
-      # very narrow potential race condition if the ajax query finishes updates
-      # visual state before we make this assertion...
       loading = find_with_jquery("#category_#{@category.id} .group_blank .loading_members:visible")
-      loading.should_not be_nil
       loading.text.should == 'Assigning Students...'
+
+      lock.unlock
+      GroupsController.filter_chain.pop
 
       # make sure we wait before moving on
       wait_for_ajax_requests
