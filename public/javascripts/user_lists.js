@@ -66,7 +66,7 @@ I18n.scoped('user_lists', function(I18n) {
         });
       });
       $form.find("#enrollment_type").change(function() {
-        $("#limit_priveleges_to_course_section_holder").showIf($(this).val() == "TeacherEnrollment" || $(this).val() == "TaEnrollment");
+        $("#limit_privileges_to_course_section_holder").showIf($(this).val() == "TeacherEnrollment" || $(this).val() == "TaEnrollment");
       }).change();
 
       $(".unenroll_user_link").click(function(event) {

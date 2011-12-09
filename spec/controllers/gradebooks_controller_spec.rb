@@ -189,7 +189,7 @@ describe GradebooksController do
 
     it "should not allow updating submissions in other sections when limited" do
       course_with_teacher_logged_in(:active_all => true)
-      @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+      @enrollment.update_attribute(:limit_privileges_to_course_section, true)
       s1 = submission_model(:course => @course)
       s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"), :assignment => @assignment)
 

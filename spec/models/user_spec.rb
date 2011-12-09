@@ -649,7 +649,7 @@ describe User do
 
     it "should not include users from other sections if visibility is limited to sections" do
       set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       messageable_users = @student.messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
@@ -693,7 +693,7 @@ describe User do
 
     it "should respect section visibility when returning users for a specified group" do
       set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
 
