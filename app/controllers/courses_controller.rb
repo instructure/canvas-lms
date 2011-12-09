@@ -519,7 +519,7 @@ class CoursesController < ApplicationController
       @enrollment.self_enrolled = true
       @enrollment.accept
       new_pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@context.root_account)
-      new_pseudonym.save if new_pseudonym && new_pseudonym.new_record?
+      new_pseudonym.save if new_pseudonym && new_pseudonym.changed?
       flash[:notice] = t('notices.enrolled', "You are now enrolled in this course.")
       return redirect_to course_url(@context)
     end
