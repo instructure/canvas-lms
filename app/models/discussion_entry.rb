@@ -30,7 +30,6 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
-  has_many :attachments, :as => :context
   has_one :external_feed_entry, :as => :asset
   
   before_create :infer_parent_id

@@ -87,8 +87,13 @@ class DiscussionTopicsApiController < ApplicationController
   # @response_field created_at The creation time of the entry, in ISO8601
   #   format.
   #
+  # @response_field updated_at The updated time of the entry, in ISO8601 format.
+  #
   # @response_field attachment JSON representation of the attachment for the
   #   entry, if any. Present only if there is an attachment.
+  #
+  # @response_field attachments *Deprecated*. Same as attachment, but returned
+  #   as a one-element array. Present only if there is an attachment.
   #
   # @response_field recent_replies The 10 most recent replies for the entry,
   #   newest first. Present only if there is at least one reply.

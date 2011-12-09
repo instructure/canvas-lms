@@ -47,6 +47,7 @@ class DiscussionTopicsController < ApplicationController
   # @response_field title The title of the topic
   # @response_field topic_children An array of topic_ids for the group discussions the user is a part of
   # @response_field user_name The username of the creator
+  # @response_field url The URL to the discussion topic in canvas
   #
   # @example_response
   #     [
@@ -86,7 +87,7 @@ class DiscussionTopicsController < ApplicationController
         format.html
         format.json do
           if api_request?
-            render :json => discussion_topic_api_json(@topics, @context, @current_user, session)
+            render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
           else
             render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count], :permissions => {:user => @current_user, :session => session })
           end

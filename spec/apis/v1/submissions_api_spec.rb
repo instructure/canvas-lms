@@ -238,16 +238,20 @@ describe SubmissionsApiController, :type => :integration do
 
     json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
       [{
+        'id' => se1.id,
         'message' => 'sub 1',
         'user_id' => @student.id,
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
+        'user_name' => 'User',
       },
       {
+        'id' => se2.id,
         'message' => 'student 1',
         'user_id' => @student.id,
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
+        'user_name' => 'User',
       }].sort_by { |h| h['user_id'] }
 
     # don't include discussion entries if response_fields limits the response
@@ -295,14 +299,18 @@ describe SubmissionsApiController, :type => :integration do
 
     json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
       [{
+        'id' => se1.id,
         'message' => 'sub 1',
         'user_id' => @student.id,
+        'user_name' => 'User',
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
       },
       {
+        'id' => se2.id,
         'message' => 'student 1',
         'user_id' => @student.id,
+        'user_name' => 'User',
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
       }].sort_by { |h| h['user_id'] }
