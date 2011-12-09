@@ -124,13 +124,13 @@
           <tr>
             <td style="border-top: 1px solid #eee; padding-top: 5px; vertical-align: top; font-weight: bold;"><%= before_label('user_privileges', %{Privileges}) %></td>
             <td style="border-top: 1px solid #eee; padding-top: 5px;">
-              <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_priveleges_to_course_section } %>">
+              <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
                 <%= t('user_only_view_section', %{this user can only view students in their assigned course section(s)}) %>
                 <div style="margin-left: 10px; font-size: 0.8em;">
                   <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link"><%= t('links.user_view_all_sections', %{let this user see all course users}) %></a>
                 </div>
               </div>
-              <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_priveleges_to_course_section } %>">
+              <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
                 <%= t('user_view_all_sections', %{this user can view students in any course section}) %>
                 <div style="margin-left: 10px; font-size: 0.8em;">
                   <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link"><%= t('links.user_only_view_section', %{limit this user to only see fellow section users}) %></a>

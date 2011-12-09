@@ -216,7 +216,7 @@ describe "speedgrader selenium tests" do
   end
 
   it "should not show students in other sections if visibility is limited" do
-    @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+    @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"

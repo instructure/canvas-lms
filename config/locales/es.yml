@@ -2656,7 +2656,7 @@ es:
         indexed: "Incluya este curso en el índice de cursos públicos"
         is_public: "Haga la visibilidad de este curso pública"
         license: Licencia
-        limit_priveleges_to_course_section: "estos administradores solo pueden calificar estudiantes en su sección"
+        limit_privileges_to_course_section: "estos administradores solo pueden calificar estudiantes en su sección"
         observers: Observadores
         open_enrollment: "Agregue un enlace de \"Únase a este Curso\" a la página de inicio del curso"
         restrict_enrollments_to_course_dates: "Usuarios solo pueden tener acceso al curso entre estas fechas"

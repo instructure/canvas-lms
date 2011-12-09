@@ -143,7 +143,7 @@ class User < ActiveRecord::Base
   }
   named_scope :for_course_section, lambda{|sections|
     section_ids = Array(sections).map{|s| s.is_a?(Fixnum) ? s : s.id }
-    {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{User.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
+    {:conditions => "enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section != #{User.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
     { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", User.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
@@ -904,7 +904,7 @@ class User < ActiveRecord::Base
   end
   
   def available_courses
-    # this list should be longer if the person has admin priveleges...
+    # this list should be longer if the person has admin privileges...
     self.courses
   end
   

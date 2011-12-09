@@ -2512,7 +2512,7 @@ describe Course, "section_visibility" do
     @course.enroll_teacher(@teacher)
 
     @ta = User.create
-    @course.enroll_user(@ta, "TaEnrollment", :limit_priveleges_to_course_section => true)
+    @course.enroll_user(@ta, "TaEnrollment", :limit_privileges_to_course_section => true)
 
     @student1 = User.create
     @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
