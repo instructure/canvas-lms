@@ -744,6 +744,7 @@ end
     "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
     "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
     "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
+    "attachments.zip" => File.read(File.dirname(__FILE__) + "/../fixtures/attachments.zip"),
     "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'),
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
   }

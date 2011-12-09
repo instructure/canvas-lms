@@ -16,12 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Move this  global
-# config.gem "zip", :lib => "zip/zip"
-require 'zip/zip'
-
 # This is used to take a zipped file, unzip it, add directories to a
-# course, and attach the files in the correct directories.
+# context, and attach the files in the correct directories.
 class UnzipAttachment
   THINGS_TO_IGNORE_REGEX  = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
 
@@ -33,55 +29,62 @@ class UnzipAttachment
     end
   end
 
-  attr_reader :course, :filename, :root_folders, :course_files_folder, :course_files_folder
+  attr_reader :context, :filename, :root_folders, :context_files_folder
+  attr_accessor :progress_proc
 
-  # Usage:
-  # UnzipAttachment.new(:course => Course.find(1), :filename => 'some_file.zip')
-  # Optionally:
-  # UnzipAttachment.new(:course => Course.find(1), :filename => 'some_file.zip', :root_directory => 'some directory other than course files')
+  # for backwards compatibility
+  def course
+    self.context
+  end
+  def course_files_folder
+    self.context_files_folder
+  end
+
   def initialize(opts={})
-    @course = opts[:course]
+    @context = opts[:course] || opts[:context]
     @filename = opts[:filename]
-    @batch = SisBatch.find_or_create_by_account_id_and_batch_id(0, opts[:batch_id]) if opts[:batch_id]
-    @course_files_folder = opts[:root_directory]
-    @course_files_folder ||= Folder.root_folders(@course).first
-    @tick_callback = opts[:callback]
+    # opts[:callback] is for backwards-compatibility, it's just a progress proc
+    # that doesn't expect any argument giving it the percent progress
+    @progress_proc = opts[:callback]
+    @context_files_folder = opts[:root_directory] || Folder.root_folders(@context).first
     @valid_paths = opts[:valid_paths]
     @logger ||= opts[:logger]
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
 
-    raise ArgumentError, "Must provide a course." unless self.course and self.course.is_a?(Course)
+    raise ArgumentError, "Must provide a context." unless self.context && self.context.is_a_context?
     raise ArgumentError, "Must provide a filename." unless self.filename
-    raise ArgumentError, "Must provide a course files folder." unless self.course_files_folder
+    raise ArgumentError, "Must provide a context files folder." unless self.context_files_folder
   end
-  
+
   def update_progress(pct)
-    return unless @batch
-    @batch.data ||= {}
-    @batch.data[:progress] = pct
-    @batch.data[:complete] = true if pct >= 1
-    @batch.save!
+    return unless @progress_proc
+    if @progress_proc.arity == 0
+      # for backwards compatibility with callback procs that expect no arguments
+      @progress_proc.call()
+    else
+      @progress_proc.call(pct)
+    end
   end
-  
+
   def logger
     @logger ||= Rails.logger
   end
 
   # For all files in a zip file,
-  # 1) create a folder in the course like the one in the zip file, if necessary
+  # 1) create a folder in the context like the one in the zip file, if necessary
   # 2) create a unique filename to store the file
   # 3) extract the file into the unique filename
-  # 4) attach the file to the course, in the appropriate folder, with a decent display name
+  # 4) attach the file to the context, in the appropriate folder, with a decent display name
   #
   # E.g.,
   # the zipfile has some_entry/some_file.txt
-  # the course will have root_folder/some_entry added to its folder structure
+  # the context will have root_folder/some_entry added to its folder structure
   # the filesystem will get an empty file called something like:
   # /tmp/some_file.txt20091012-16997-383kbv-0
   # the contents of some_entry/some_file.txt in the zip file will be extracted to
   # /tmp/some_file.txt20091012-16997-383kbv-0
-  # The course will get the contents of this file added to a new attachment called 'Some file.txt'
+  # The context will get the contents of this file added to a new attachment called 'Some file.txt'
   # added to the root_folder/some_entry folder in the database
   # Tempfile will unlink its new file as soon as f is garbage collected.
   def process
@@ -98,7 +101,7 @@ class UnzipAttachment
     cnt = 1 if cnt == 0
     idx = 0
     @attachments = []
-    last_position = @course.attachments.active.map(&:position).compact.last || 0
+    last_position = @context.attachments.active.map(&:position).compact.last || 0
     path_positions = {}
     id_positions = {}
     paths.sort.each_with_index{|p, idx| path_positions[p] = idx + last_position }
@@ -108,15 +111,14 @@ class UnzipAttachment
       next if entry.name =~ THINGS_TO_IGNORE_REGEX
       next if @valid_paths && !@valid_paths.include?(entry.name)
 
-      @tick_callback.call if @tick_callback
-      list = File.split(@course_files_folder.full_name) rescue []
+      list = File.split(@context_files_folder.full_name) rescue []
       list.shift if list[0] == '.'
       zip_list = File.split(entry.name)
       zip_list.shift if zip_list[0] == '.'
       filename = zip_list.pop
       list += zip_list
       folder_name = list.join('/')
-      folder = Folder.assert_path(folder_name, @course) #infer_folder(entry.name)
+      folder = Folder.assert_path(folder_name, @context)
       pct = idx.to_f / cnt.to_f
       update_progress(pct)
       # Hyphenate the path.  So, /some/file/path becomes some-file-path
@@ -127,19 +129,12 @@ class UnzipAttachment
       
       begin
         entry.extract(path) { true }
-        if @batch
-          @batch.data ||= {}
-          @batch.data[:last_entry] = entry.name
-          @batch.data[:last_size] = f.size rescue -1
-          @batch.data[:last_path] = path
-          @batch.save
-        end
         # This is where the attachment actually happens.  See file_in_context.rb
         attachment = nil
         begin
-          attachment = FileInContext.attach(self.course, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
+          attachment = FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
         rescue
-          attachment = FileInContext.attach(self.course, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
+          attachment = FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
         end
         id_positions[attachment.id] = path_positions[entry.name]
         if migration_id = @migration_id_map[entry.name]
@@ -166,7 +161,7 @@ class UnzipAttachment
     unless scribdable_attachments.blank?
       Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, scribdable_attachments.map(&:id))
     end
-    Course.update_all({:updated_at => Time.now.utc}, {:id => @course.id})
+    @context.touch
     update_progress(1.0)
   end
 
@@ -197,7 +192,7 @@ class UnzipAttachment
     # Actually creates the folder in the database.
     def assert_folder(root, dir)
       folder = Folder.new(:parent_folder_id => root.id, :name => dir)
-      folder.context = self.course
+      folder.context = self.context
       folder.save!
       folder
     end
@@ -207,7 +202,7 @@ class UnzipAttachment
     def folders(reset=false)
       @folders = nil if reset
       return @folders if @folders
-      root_folders = Folder.root_folders(self.course)
-      @folders = OpenStruct.new(:root_directory => self.course_files_folder)
+      root_folders = Folder.root_folders(self.context)
+      @folders = OpenStruct.new(:root_directory => self.context_files_folder)
     end
 end

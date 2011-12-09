@@ -139,23 +139,16 @@ require([
               if(unzip) {
                 var file = filesToUpload[0];
                 folder.context_string;
-                var batch_id = folder.context_string + '_full_files_' + Math.round(Math.random() * 999999);
                 var url = $("." + folder.context_string + "_zip_import_url").attr('href');
                 var params = {
-                  'zip_import_batch_id': batch_id,
                   'folder_id': folder.id,
                   'zip_file': filesToUpload[0],
                   'format': 'json'
                 };
-                $.ajaxFileUpload({
-                  url: url,
-                  data: params,
-                  method: 'POST',
-                  success: function(data) { },
-                  error: function(data) { }
-                });
+                var import_id = null;
+                
                 var $dialog = $("<div/>");
-                $dialog.append("Extracting <b>" + htmlEscape(file.name) + "</b><br/>to " + htmlEscape(folder.name) + "...");
+                $dialog.append("Uploading and extracting <b>" + htmlEscape(file.name) + "</b><br/>to " + htmlEscape(folder.name) + "...");
                 $dialog.append("<div class='progress'/>");
                 var $progress = $dialog.find(".progress");
                 $progress.css('margin', '10px');
@@ -170,6 +163,7 @@ require([
                     }, 500);
                   }
                 }).dialog('open');
+                
                 var importFailed = function(errors) {
                   $dialog.text(I18n.t('errors.extracting', "There were errors extracting the zip file.  Please try again."));
                   var $ul = $("<ul/>");
@@ -181,31 +175,34 @@ require([
                   }
                   $dialog.append($ul);
                 };
-                var pollImport = function() {
+                var pollImport = function(zip_import_id) {
                   var pollUrl = $("#file_context_links ." + folder.context_string + "_zip_import_status_url").attr('href');
-                  pollUrl = pollUrl + "?batch_id=" + batch_id;
+                  pollUrl = $.replaceTags(pollUrl, 'id', zip_import_id);
                   $.ajaxJSON(pollUrl, 'GET', {}, function(data) {
+                    var zfi = data.zip_file_import;
                     if($dialog.data('closed')) { return; }
-                    if(data && data.errors) {
-                      importFailed(data.errors);
-                    } else if(data && data.complete) {
+                    if(zfi && zfi.data && zfi.data.errors) {
+                      importFailed(zfi.data.errors);
+                    } else if(zfi && zfi.workflow_state == 'imported') {
                       $progress.progressbar('value', 100);
-                      $dialog.append(I18n.t('messages.extraction_complete', "Extraction complete!  Updating File Structure..."));
+                      $dialog.append(I18n.t('messages.extraction_complete', "Extraction complete!  Updating..."));
                       files.refreshContext(folder.context_string, function() {
                         $dialog.dialog('close');
                       });
-                    } else if(!data || data.length == 0) {
+                    } else if(!zfi) {
                       pollImport.blankCount = pollImport.blankCount || 0;
                       pollImport.blankCount++;
                       if(pollImport.blankCount > 30) {
                         importFailed([I18n.t('errors.server_returned_invalid_status', "The server stopped returning a valid status")]);
                       } else {
-                        setTimeout(pollImport, 2000);
+                        setTimeout(function() { pollImport(zip_import_id) }, 2000);
                       }
+                    } else if (zfi && zfi.workflow_state == 'failed') {
+                      importFailed([]);
                     } else {
                       pollImport.errorCount = 0;
-                      setTimeout(pollImport, 2000);
-                      $progress.progressbar('value', ((data.progress || 0) * 100));
+                      setTimeout(function() { pollImport(zip_import_id) }, 2000);
+                      $progress.progressbar('value', ((zfi.progress || 0) * 100));
                     }
                   }, function(data) {
                     pollImport.errorCount = pollImport.errorCount || 0;
@@ -213,11 +210,22 @@ require([
                     if(pollImport.errorCount > 5) {
                       importFailed([I18n.t('errors.server_unresponsive', "The server stopped responding to status requests")]);
                     } else {
-                      setTimeout(pollImport, 2000);
+                      setTimeout(function() { pollImport(zip_import_id) }, 2000);
                     }
                   });
                 };
-                setTimeout(pollImport, 3000);
+                $.ajaxFileUpload({
+                  url: url,
+                  data: params,
+                  method: 'POST',
+                  success: function(data) {
+                    zip_import_id = data.zip_file_import.id;
+                    pollImport(zip_import_id);
+                  },
+                  error: function(data) {
+                    $dialog.text(I18n.t('errors.uploading_zip', "There were errors uploading the zip file."));
+                  }
+                });
               } else {
                 var folder = files.currentItemData();
                 var filenames = [];
@@ -1443,7 +1451,7 @@ require([
                   $panel.find(".lock_item_link").showIf(data.parent_folder_id && !data.currently_locked);
                   $panel.find(".unlock_item_link").showIf(data.parent_folder_id && data.currently_locked);
                   $panel.find(".download_zip").showIf(data.permissions && data.permissions.read_contents);
-                  $panel.find(".upload_zip").showIf(data.context && data.context.permissions && data.context.permissions.manage_files && (data.context_type && data.context_type == 'Course'));
+                  $panel.find(".upload_zip").showIf(data.context && data.context.permissions && data.context.permissions.manage_files);
                   $panel.find(".edit_link").showIf(data.context && data.context.permissions && data.context.permissions.manage_files);
                   $panel.fillTemplateData({data: data});
                   $panel.data('node', node);

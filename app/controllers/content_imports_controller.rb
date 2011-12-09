@@ -18,12 +18,18 @@
 
 # @API Courses
 class ContentImportsController < ApplicationController
-  before_filter :require_context
-  add_crumb(proc { t 'crumbs.content_imports', "Content Imports" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
+  before_filter :require_context, :add_imports_crumb
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   
   include Api::V1::Course
+
+  def add_imports_crumb
+    if @context.is_a?(Course)
+      add_crumb(t('crumbs.content_imports', "Content Imports"), named_context_url(@context, :context_imports_url))
+    end
+    true
+  end
   
   def intro
     authorized_action(@context, @current_user, [:manage_content, :manage_files, :manage_quizzes])

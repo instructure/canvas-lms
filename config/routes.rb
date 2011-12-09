@@ -131,6 +131,11 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
 
+  def add_zip_file_imports(context)
+    context.resources :zip_file_imports, :only => [:new, :create, :show]
+    context.import_files 'imports/files', :controller => 'content_imports', :action => 'files'
+  end
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -184,8 +189,7 @@ ActionController::Routing::Routes.draw do |map|
     course.attendance 'attendance', :controller => 'gradebooks', :action => 'attendance'
     course.attendance_user 'attendance/:user_id', :controller => 'gradebooks', :action => 'attendance'
     course.imports 'imports', :controller => 'content_imports', :action => 'intro'
-    course.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    course.import_files 'imports/files', :controller => 'content_imports', :action => 'files'
+    add_zip_file_imports(course)
     course.import_quizzes 'imports/quizzes', :controller => 'content_imports', :action => 'quizzes'
     course.import_content 'imports/content', :controller => 'content_imports', :action => 'content'
     course.import_copy 'imports/copy', :controller => 'content_imports', :action => 'copy_course', :conditions => {:method => :get}
@@ -384,8 +388,8 @@ ActionController::Routing::Routes.draw do |map|
     add_discussions(group)
     group.resources :calendar_events
     add_chat(group)
-    group.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     add_files(group, :images => true, :folders => true)
+    add_zip_file_imports(group)
     group.resources :external_tools, :only => [:show], :collection => {:retrieve => :get}
     add_wiki(group)
     add_conferences(group)
@@ -447,7 +451,6 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :rubric_associations do |association|
       association.resources :rubric_assessments, :as => 'assessments'
     end
-    account.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     add_files(account, :relative => true, :images => true, :folders => true)
     add_media(account)
     add_groups(account)
@@ -487,6 +490,7 @@ ActionController::Routing::Routes.draw do |map|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
     add_files(user, :images => true)
+    add_zip_file_imports(user)
     user.resources :page_views, :only => [:index]
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -509,7 +513,6 @@ ActionController::Routing::Routes.draw do |map|
     user.resources :user_notes
     user.manageable_courses 'manageable_courses', :controller => 'users', :action => 'manageable_courses'
     user.outcomes 'outcomes', :controller => 'outcomes', :action => 'user_outcome_results'
-    user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'

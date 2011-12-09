@@ -192,3 +192,116 @@ describe "collaborations folder in files menu" do
   end
 end
 
+describe "zip file uploads" do
+  it_should_behave_like "in-process server selenium tests"
+
+  shared_examples_for "zip file uploads" do
+    it "should allow unzipping into a folder from the form" do
+      get @files_url
+      folder = Folder.root_folders(@context).first
+      expect_new_page_load { f('a.upload_zip_link').click }
+
+      URI.parse(driver.current_url).path.should == @files_import_url
+
+      filename, path, data, file = get_file('attachments.zip')
+      first_selected_option(f('#upload_to select')).attribute('value').should == folder.id.to_s
+      f('input#zip_file').send_keys(path)
+      f('button.submit_button').click
+
+      zfi = keep_trying_until { ZipFileImport.last(:order => :id) }
+      zfi.context.should == @context
+      zfi.folder.should == folder
+
+      f('#uploading_please_wait_dialog') # verify it's visible
+
+      job = Delayed::Job.last(:order => :id)
+      job.tag.should == 'ZipFileImport#process_without_send_later'
+      run_job(job)
+
+      keep_trying_until { URI.parse(driver.current_url).path == @files_url }
+
+      zfi.reload.state.should == :imported
+
+      folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
+      folder.sub_folders.active.count.should == 1
+      sub = folder.sub_folders.active.first
+      sub.name.should == "adir"
+      sub.attachments.active.map(&:display_name).should == ["second_entry.txt"]
+    end
+
+    it "should allow unzipping into a folder from drag-and-drop" do
+      # we can't actually drag a file into the browser from selenium, so we have
+      # to mock some of the process
+      get @files_url
+
+      next unless driver.execute_script("return $.handlesHTML5Files;") == true
+
+      folder = Folder.root_folders(@context).first
+      keep_trying_until { !f('#files_content .message.no_content') }
+
+      filename, path, data, file = get_file('attachments.zip')
+
+      # the drop event that we're mocking requires an actual JS File object,
+      # which can't be created through javascript. so we add a file input field
+      # to the page so we can enter the file path, and then pull the data from
+      # that.
+      driver.execute_script(%{$("<input/>").attr({type:'file',id:'mock-file-data'}).appendTo('body');})
+      f('#mock-file-data').send_keys(path)
+
+      driver.execute_script(%{$("#files_content").trigger($.Event("drop", { originalEvent: { dataTransfer: { files: $('#mock-file-data')[0].files } } }));})
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      wait_for_ajax_requests
+
+      zfi = keep_trying_until { ZipFileImport.last(:order => :id) }
+      zfi.context.should == @context
+      zfi.folder.should == folder
+
+      f('#uploading_please_wait_dialog') # verify it's visible
+
+      job = Delayed::Job.last(:order => :id)
+      job.tag.should == 'ZipFileImport#process_without_send_later'
+      run_job(job)
+
+      keep_trying_until { !f('#uploading_please_wait_dialog') } # wait until it's no longer visible
+
+      zfi.reload.state.should == :imported
+
+      folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
+      folder.sub_folders.active.count.should == 1
+      sub = folder.sub_folders.active.first
+      sub.name.should == "adir"
+      sub.attachments.active.map(&:display_name).should == ["second_entry.txt"]
+    end
+  end
+
+  context "courses" do
+    it_should_behave_like "zip file uploads"
+    before do
+      course_with_teacher_logged_in
+      @files_url = "/courses/#{@course.id}/files"
+      @files_import_url = "/courses/#{@course.id}/imports/files"
+      @context = @course
+    end
+  end
+
+  context "groups" do
+    it_should_behave_like "zip file uploads"
+    before do
+      group_with_user_logged_in(:group_context => course)
+      @files_url = "/groups/#{@group.id}/files"
+      @files_import_url = "/groups/#{@group.id}/imports/files"
+      @context = @group
+    end
+  end
+
+  context "profile" do
+    it_should_behave_like "zip file uploads"
+    before do
+      course_with_student_logged_in
+      @files_url = "/dashboard/files"
+      @files_import_url = "/users/#{@user.id}/imports/files"
+      @context = @user
+    end
+  end
+end

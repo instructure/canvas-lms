@@ -319,7 +319,7 @@ Spec::Runner.configure do |config|
 
   def group(opts={})
     if opts[:group_context]
-      opts[:group_context].groups.create!
+      @group = opts[:group_context].groups.create!
     else
       @group = Group.create!
     end
@@ -685,5 +685,9 @@ Spec::Runner.configure do |config|
     Attachment.local_storage?.should eql(true)
     Attachment.s3_storage?.should eql(false)
     Attachment.local_storage?.should eql(true)
+  end
+
+  def run_job(job)
+    Delayed::Worker.new.perform(job)
   end
 end
