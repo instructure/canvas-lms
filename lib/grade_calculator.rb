@@ -79,8 +79,10 @@ class GradeCalculator
               :submission_count => 0}
       
       # collect submissions for this user for all the assignments
+      # if an assignment is muted it will be treated as if there is no submission
       group_assignments.each do |assignment|
         submission = submissions.detect { |s| s.assignment_id == assignment.id }
+        submission = nil if assignment.muted
         submission ||= OpenStruct.new(:assignment_id=>assignment.id, :score=>0) unless ignore_ungraded
         assignment_submissions << {:assignment => assignment, :submission => submission}
       end

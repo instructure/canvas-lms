@@ -170,7 +170,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_grades_if_details_changed
-    if @points_possible_was != self.points_possible || @grades_affected
+    if @points_possible_was != self.points_possible || @grades_affected || @muted_was != self.muted
       begin
         self.context.recompute_student_scores
       rescue
@@ -246,6 +246,7 @@ class Assignment < ActiveRecord::Base
     self.anonymous_peer_reviews = true if self.peer_reviews
     @workflow_state_was = self.workflow_state_was
     @points_possible_was = self.points_possible_was
+    @muted_was = self.muted_was
     @submission_types_was = self.submission_types_was
     @due_at_was = self.due_at_was
     self.points_possible = nil if self.submission_types == 'not_graded'
