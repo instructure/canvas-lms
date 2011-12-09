@@ -30,7 +30,7 @@ describe GradebooksController do
     end
 
   end
-  
+
   describe "GET 'grade_summary'" do
     it "should redirect teacher to gradebook" do
       course_with_teacher_logged_in(:active_all => true)
@@ -38,7 +38,7 @@ describe GradebooksController do
       response.should be_redirect
       response.should redirect_to(:action => 'show')
     end
-    
+
     it "should render for current user" do
       course_with_student_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id
@@ -46,7 +46,7 @@ describe GradebooksController do
       get 'grade_summary', :course_id => @course.id, :id => @user.id
       response.should render_template('grade_summary')
     end
-    
+
     it "should not allow access for wrong user" do
       course_with_student(:active_all => true)
       @student = @user
@@ -57,7 +57,7 @@ describe GradebooksController do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       assert_unauthorized
     end
-    
+
     it" should allow access for a linked observer" do
       course_with_student(:active_all => true)
       @student = @user
@@ -70,7 +70,7 @@ describe GradebooksController do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should render_template('grade_summary')
     end
-    
+
     it "should allow concluded teachers to see a student grades pages" do
       course_with_teacher_logged_in(:active_all => true)
       @enrollment.conclude
@@ -81,7 +81,7 @@ describe GradebooksController do
       response.should be_success
       response.should render_template('grade_summary')
     end
-  
+
     it "should allow concluded students to see their grades pages" do
       course_with_student_logged_in(:active_all => true)
       @enrollment.conclude
@@ -107,15 +107,27 @@ describe GradebooksController do
           should == [assignment1, assignment2].map{ |a| a.group_category.name }
       end
     end
+
+    describe "csv" do
+      it "should recompute cached grades" do
+        course_with_teacher_logged_in(:active_all => true)
+        assignment1 = @course.assignments.create(:title => "Assignment 1")
+        assignment2 = @course.assignments.create(:title => "Assignment 2")
+        Enrollment.expects(:recompute_final_score).once
+        get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+        response.should be_success
+        response.body.should match(/\AStudent,/)
+      end
+    end
   end
 
   describe "POST 'update_submission'" do
-    
+
     it "should have a route for update_submission" do
-      params_from(:post, "/courses/20/gradebook/update_submission").should == 
+      params_from(:post, "/courses/20/gradebook/update_submission").should ==
         {:controller => "gradebooks", :action => "update_submission", :course_id => "20"}
     end
-    
+
     it "should allow adding comments for submission" do
       course_with_teacher_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
@@ -128,7 +140,7 @@ describe GradebooksController do
       assigns[:submissions][0].submission_comments.should_not be_nil
       assigns[:submissions][0].submission_comments[0].comment.should eql("some comment")
     end
-    
+
     it "should allow attaching files to comments for submission" do
       course_with_teacher_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
@@ -146,7 +158,7 @@ describe GradebooksController do
       assigns[:submissions][0].submission_comments[0].attachments.length.should eql(1)
       assigns[:submissions][0].submission_comments[0].attachments[0].display_name.should eql("doc.doc")
     end
-    
+
     it "should not allow updating submissions for concluded courses" do
       course_with_teacher_logged_in(:active_all => true)
       @enrollment.complete
@@ -169,13 +181,13 @@ describe GradebooksController do
       proc { post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => s2.user_id} }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end
-  
+
   describe "GET 'speed_grader'" do
     it "should have a route for speed_grader" do
-      params_from(:get, "/courses/20/gradebook/speed_grader").should == 
+      params_from(:get, "/courses/20/gradebook/speed_grader").should ==
         {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
     end
-    
+
   end
-  
+
 end
