@@ -30,7 +30,7 @@ class UsersController < ApplicationController
   include DeliciousDiigo
   before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
   before_filter :require_open_registration, :only => [:new, :create]
-  
+
   def grades
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
@@ -48,7 +48,7 @@ class UsersController < ApplicationController
       #@prior_enrollments.concat @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
 
       @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
-      
+
       @observer_enrollments = @current_enrollments.select{|e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
       @observed_enrollments = []
       @observer_enrollments.each do |e|
@@ -98,7 +98,7 @@ class UsersController < ApplicationController
       redirect_to Facebook.authorize_url(oauth_request)
     end
   end
-  
+
   def oauth_success
     oauth_request = nil
     if params[:oauth_token]
@@ -106,7 +106,7 @@ class UsersController < ApplicationController
     elsif params[:state] && params[:service] == 'facebook'
       oauth_request = OauthRequest.find_by_id(Facebook.oauth_request_id(params[:state]))
     end
-    
+
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
       flash[:error] = t('oauth_fail', "OAuth Request failed. Couldn't find valid request")
       redirect_to (@current_user ? profile_url : root_url)
@@ -175,7 +175,7 @@ class UsersController < ApplicationController
         end
         format.json  {
           cancel_cache_buster
-          expires_in 30.minutes 
+          expires_in 30.minutes
           render :json => @users.map{ |u| {:label => u.name, :id => u.id} }
         }
       end
@@ -200,11 +200,11 @@ class UsersController < ApplicationController
 
   def user_dashboard
     get_context
-    
+
     # dont show crubms on dashboard because it does not make sense to have a breadcrumb
     # trail back to home if you are already home
-    clear_crumbs 
-    
+    clear_crumbs
+
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
@@ -327,7 +327,7 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.json  {
           cancel_cache_buster
-          expires_in 30.minutes 
+          expires_in 30.minutes
           render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
         }
       end
@@ -390,17 +390,17 @@ class UsersController < ApplicationController
     StreamItemInstance.update_all({ :hidden => true }, { :stream_item_id => params[:id], :user_id => @current_user.id })
     render :json => { :hidden => true }
   end
-  
+
   def close_notification
     @current_user.close_notification(params[:id])
     render :json => @current_user.to_json
   end
-  
+
   def delete_user_service
     @current_user.user_services.find(params[:id]).destroy
     render :json => {:deleted => true}
   end
-  
+
   def create_user_service
     begin
       user_name = params[:user_service][:user_name]
@@ -422,7 +422,7 @@ class UsersController < ApplicationController
       render :json => {:errors => true}, :status => :bad_request
     end
   end
-  
+
   def services
     params[:service_types] ||= params[:service_type]
     json = Rails.cache.fetch(['user_services', @current_user, params[:service_type]].cache_key) do
@@ -434,7 +434,7 @@ class UsersController < ApplicationController
     end
     render :json => json
   end
-  
+
   def bookmark_search
     @service = @current_user.user_services.find_by_type_and_service('BookmarkService', params[:service_type]) rescue nil
     res = nil
@@ -463,7 +463,7 @@ class UsersController < ApplicationController
       end
     end
   end
-  
+
   def external_tool
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
     @resource_title = @tool.label_for(:user_navigation)
@@ -478,7 +478,7 @@ class UsersController < ApplicationController
     add_crumb(@current_user.short_name, profile_path)
     render :template => 'external_tools/tool_show'
   end
-  
+
   def new
     @user = User.new
     @pseudonym = @current_user ? @current_user.pseudonyms.build(:account => @context) : Pseudonym.new(:account => @context)
@@ -562,7 +562,7 @@ class UsersController < ApplicationController
       end
     end
   end
-  
+
   def registered
     @pseudonym_session.destroy if @pseudonym_session
     @pseudonym = Pseudonym.find_by_id(flash[:pseudonym_id]) if flash[:pseudonym_id].present?
@@ -575,7 +575,7 @@ class UsersController < ApplicationController
       redirect_to root_url
     end
   end
-  
+
   def update
     @user = params[:id] ? User.find(params[:id]) : @current_user
     rename = params[:rename]
@@ -616,7 +616,7 @@ class UsersController < ApplicationController
         nil
       end
     end
-    
+
     if url
       if params[:redirect] == '1'
         if %w(mp3 mp4).include?(params[:type])
@@ -639,11 +639,11 @@ class UsersController < ApplicationController
       render :status => 404, :text => t('could_not_find_url', "Could not find download URL")
     end
   end
-  
+
   def merge
     @user_about_to_go_away = User.find_by_uuid(session[:merge_user_uuid]) if session[:merge_user_uuid].present?
     @user_about_to_go_away = nil unless @user_about_to_go_away.id == params[:user_id].to_i
-    
+
     if params[:new_user_uuid] && @true_user = User.find_by_uuid(params[:new_user_uuid])
       if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
         @user_that_will_still_be_around = @true_user
@@ -670,7 +670,7 @@ class UsersController < ApplicationController
       redirect_to dashboard_url
     end
   end
-  
+
   def admin_merge
     @user = User.find(params[:user_id])
     pending_user_id = params[:pending_user_id] || session[:pending_user_id]
@@ -692,7 +692,7 @@ class UsersController < ApplicationController
       render :action => 'admin_merge'
     end
   end
-  
+
   def confirm_merge
     @user = User.find_by_uuid(session[:merge_user_uuid]) if session[:merge_user_uuid].present?
     @user = nil unless @user && @user.id == session[:merge_user_id]
@@ -705,7 +705,7 @@ class UsersController < ApplicationController
       render :action => 'merge'
     end
   end
-  
+
   def assignments_needing_grading
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, :read)
@@ -713,14 +713,14 @@ class UsersController < ApplicationController
       render :json => res.to_json
     end
   end
-  
+
   def assignments_needing_submitting
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, :read)
       render :json => @user.assignments_needing_submitting.to_json
     end
   end
-  
+
   def mark_avatar_image
     if params[:remove]
       if authorized_action(@user, @current_user, :remove_avatar)
@@ -759,7 +759,7 @@ class UsersController < ApplicationController
         @pseudonym_session.destroy rescue true
         reset_session
       end
-      
+
       respond_to do |format|
         flash[:notice] = t('user_is_deleted', "%{user_name} has been deleted", :user_name => @user.name)
         if @user == @current_user
@@ -782,7 +782,7 @@ class UsersController < ApplicationController
     end
     render :json => {:ok => true}
   end
-  
+
   def update_avatar_image
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, :remove_avatar)
@@ -791,7 +791,7 @@ class UsersController < ApplicationController
       render :json => @user.to_json(:include_root => false)
     end
   end
-  
+
   def public_feed
     return unless get_feed_context(:only => [:user])
     feed = Atom::Feed.new do |f|
@@ -815,7 +815,7 @@ class UsersController < ApplicationController
       format.atom { render :text => feed.to_xml }
     end
   end
-  
+
   def require_open_registration
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
@@ -854,6 +854,7 @@ class UsersController < ApplicationController
         enrollments = student.student_enrollments.active.all(:include => :course)
         enrollments.each do |enrollment|
           if enrollment.course.user_is_teacher?(@teacher) && enrollment.course.enrollments_visible_to(@teacher).find_by_id(enrollment.id) && enrollment.course.grants_right?(@current_user, :read_reports)
+            Enrollment.recompute_final_score_if_stale(student.id, enrollment.course.id) { enrollment.reload }
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
           end
         end
@@ -869,6 +870,7 @@ class UsersController < ApplicationController
           flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
+          Enrollment.recompute_final_score_if_stale(course.students.map(&:id), course.id)
           @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher))
         end
       end
