@@ -522,9 +522,9 @@ class Enrollment < ActiveRecord::Base
     GradeCalculator.recompute_final_score(user_ids, course_id)
   end
 
-  def self.recompute_final_score_if_stale(user_ids, course_id)
-    Rails.cache.fetch(['recompute_final_scores', course_id, user_ids].cache_key, :expires_in => Setting.get_cached('recompute_grades_window', 600).to_i) do
-      recompute_final_score user_ids, course_id
+  def self.recompute_final_score_if_stale(course, user=nil)
+    Rails.cache.fetch(['recompute_final_scores', course, user].cache_key, :expires_in => Setting.get_cached('recompute_grades_window', 600).to_i) do
+      recompute_final_score user ? user.id : course.student_enrollments.map(&:user_id), course.id
       yield if block_given?
       true
     end
