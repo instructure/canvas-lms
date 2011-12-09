@@ -276,8 +276,8 @@ describe Enrollment do
       course_with_student
       Enrollment.expects(:recompute_final_score).once
       enable_cache do
-        Enrollment.recompute_final_score_if_stale @user.id, @course.id
-        Enrollment.recompute_final_score_if_stale @user.id, @course.id
+        Enrollment.recompute_final_score_if_stale @course
+        Enrollment.recompute_final_score_if_stale @course
       end
     end
 
@@ -286,8 +286,8 @@ describe Enrollment do
       Enrollment.expects(:recompute_final_score).once
       count = 1
       enable_cache do
-        Enrollment.recompute_final_score_if_stale(@user.id, @course.id){ count += 1 }
-        Enrollment.recompute_final_score_if_stale(@user.id, @course.id){ count += 1 }
+        Enrollment.recompute_final_score_if_stale(@course, @user){ count += 1 }
+        Enrollment.recompute_final_score_if_stale(@course, @user){ count += 1 }
       end
       count.should eql 2
     end
