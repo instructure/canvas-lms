@@ -507,25 +507,27 @@ Spec::Runner.configure do |config|
     ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
   end
 
-  def start_test_http_server
+  def start_test_http_server(requests=1)
     post_lines = []
     server = TCPServer.open(0)
     port = server.addr[1]
     post_lines = []
     server_thread = Thread.new(server, post_lines) do |server, post_lines|
-      client = server.accept
-      content_length = 0
-      loop do
-        line = client.readline
-        post_lines << line.strip unless line =~ /\AHost: localhost:|\AContent-Length: /
-        content_length = line.split(":")[1].to_i if line.strip =~ /\AContent-Length: [0-9]+\z/
-        if line.strip.blank?
-          post_lines << client.read(content_length)
-          break
+      requests.times do
+        client = server.accept
+        content_length = 0
+        loop do
+          line = client.readline
+          post_lines << line.strip unless line =~ /\AHost: localhost:|\AContent-Length: /
+          content_length = line.split(":")[1].to_i if line.strip =~ /\AContent-Length: [0-9]+\z/
+          if line.strip.blank?
+            post_lines << client.read(content_length)
+            break
+          end
         end
+        client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
+        client.close
       end
-      client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
-      client.close
       server.close
     end
     return server, server_thread, post_lines
