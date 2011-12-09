@@ -311,6 +311,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       wiki_page_body = clear_rce
       driver.find_element(:css, '.wiki_switch_views_link').click
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajax_requests
 
       @image_list.find_elements(:css, 'img.img').length.should == 2
       keep_trying_until do
