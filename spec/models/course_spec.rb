@@ -1174,17 +1174,18 @@ describe Course, 'grade_publishing' do
           e.grade_publishing_status = "invalid status"
           e.save!
         end
-        @course.grade_publishing_statuses.should == [{
-            "Unknown status, invalid status: cause of this reason" => [@student_enrollments[1]],
-            "Unknown status, invalid status: cause of that reason" => [@student_enrollments[3]],
-            "Unknown status, invalid status" => [
-                @student_enrollments[0],
-                @student_enrollments[2],
-                @student_enrollments[4],
-                @student_enrollments[5],
-                @student_enrollments[7],
-                @student_enrollments[8]]
-          }, "error"]
+        messages, overall_status = @course.grade_publishing_statuses
+        overall_status.should == "error"
+        messages.count.should == 3
+        messages["Unknown status, invalid status: cause of this reason"].should == [@student_enrollments[1]]
+        messages["Unknown status, invalid status: cause of that reason"].should == [@student_enrollments[3]]
+        messages["Unknown status, invalid status"].sort_by(&:id).should == [
+            @student_enrollments[0],
+            @student_enrollments[2],
+            @student_enrollments[4],
+            @student_enrollments[5],
+            @student_enrollments[7],
+            @student_enrollments[8]].sort_by(&:id)
       end
 
       it 'should fall back to the right overall status' do
