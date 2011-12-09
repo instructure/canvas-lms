@@ -174,6 +174,7 @@ class GradebooksController < ApplicationController
         end
         format.csv {
           cancel_cache_buster
+          Enrollment.recompute_final_score_if_stale @context
           send_data(
             @context.gradebook_to_csv(:include_sis_id => @context.grants_right?(@current_user, session, :manage_students)),
             :type => "text/csv", 
