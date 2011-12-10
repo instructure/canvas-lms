@@ -271,6 +271,11 @@ class QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
+      if @quiz.muted? && !@quiz.grants_right?(@current_user, session, :grade)
+        flash[:notice] = t('notices.cant_view_submission_while_muted', "You cannot view the quiz history while the quiz is muted.")
+        redirect_to named_context_url(@context, :context_quiz_url, @quiz)
+        return
+      end
       if authorized_action(@submission, @current_user, :read)
         add_crumb((!@submission.user || @submission.user == @current_user ? t(:default_history_crumb, "History") : @submission.user.name))
         @headers = !params[:headless]
