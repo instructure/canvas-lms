@@ -252,6 +252,57 @@ describe ContextExternalTool do
     end
   end
   
+  describe "label_for" do
+    it "should return the tool name if nothing else is configured and no key is sent" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.save!
+      tool.label_for(nil).should == 'tool'
+    end
+    
+    it "should return the tool name if nothing is configured on the sent key" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:course_navigation => {:bob => 'asfd'}}
+      tool.save!
+      tool.label_for(:course_navigation).should == 'tool'
+    end
+    
+    it "should return the tool's 'text' value if no key is sent" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
+      tool.save!
+      tool.label_for(nil).should == 'tool label'
+    end
+    
+    it "should return the tool's 'text' value if no 'text' value is set for the sent key" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:bob => 'asdf'}}
+      tool.save!
+      tool.label_for(:course_navigation).should == 'tool label'
+    end
+    
+    it "should return the setting's 'text' value for the sent key if available" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
+      tool.save!
+      tool.label_for(:course_navigation).should == 'course nav'
+    end
+    
+    it "should return the locale-specific label if specified and matching exactly" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}}
+      tool.save!
+      tool.label_for(:course_navigation, 'en-US').should == 'english nav'
+      tool.label_for(:course_navigation, 'es').should == 'course nav'
+    end
+    
+    it "should return the locale-specific label if specified and matching based on general locale" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en' => 'english nav'}}}
+      tool.save!
+      tool.label_for(:course_navigation, 'en-US').should == 'english nav'
+    end
+  end
+  
   describe "find_for" do
     def new_external_tool(context)
       context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")

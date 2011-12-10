@@ -132,7 +132,7 @@ describe "Canvas Cartridge importing" do
     a_2 = ag2_2.assignments.first 
     ag2_2.rules.should == "drop_lowest:2\ndrop_highest:5\nnever_drop:%s\n" % a_2.id
   end
-
+  
   it "should import external tools" do
     tool1 = @copy_from.context_external_tools.new
     tool1.url = 'http://instructure.com'
