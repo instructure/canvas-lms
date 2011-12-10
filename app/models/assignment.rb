@@ -1427,6 +1427,10 @@ class Assignment < ActiveRecord::Base
       new_topic.assignment_id = dup.id
       dup.submission_types = 'discussion_topic'
       new_topic.save!
+    elsif self.submission_types == 'external_tool' && self.external_tool_tag
+      tag = dup.build_external_tool_tag(:url => external_tool_tag.url, :new_tab => external_tool_tag.new_tab)
+      tag.content_type = 'ContextExternalTool'
+      tag.save
     end
     dup.assignment_group_id = context.merge_mapped_id(self.assignment_group) rescue nil
     if dup.assignment_group_id.nil? && self.assignment_group
@@ -1502,6 +1506,13 @@ class Assignment < ActiveRecord::Base
     end
     if item.submission_types == "discussion_topic"
       item.saved_by = :discussion_topic
+    end
+    if item.submission_types == 'external_tool'
+      tag = item.build_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+      tag.content_type = 'ContextExternalTool'
+      if !tag.save && tag.errors["url"]
+        context.add_migration_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title))
+      end
     end
     
     if hash[:grading_type]

@@ -489,7 +489,7 @@ describe GroupsController do
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group.group_category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.should_not be_nil
       data['users'].map{ |u| u['user_id'] }.sort.
         should == [u1, u2, u3].map{ |u| u.id }.sort
@@ -516,21 +516,21 @@ describe GroupsController do
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group1.group_category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.should_not be_nil
       data['users'].map{ |u| u['user_id'] }.sort.
         should == [u2, u3].map{ |u| u.id }.sort
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group2.group_category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.should_not be_nil
       data['users'].map{ |u| u['user_id'] }.sort.
         should == [u1, u3].map{ |u| u.id }.sort
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group3.group_category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.should_not be_nil
       data['users'].map{ |u| u['user_id'] }.should == [ u1.id ]
     end
@@ -544,7 +544,7 @@ describe GroupsController do
       group.add_user(u1)
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group.group_category.id
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data['users'].first['section_id'].should == @course.default_section.id
       data['users'].first['section_code'].should == @course.default_section.section_code
     end
@@ -558,7 +558,7 @@ describe GroupsController do
       group.add_user(u1)
 
       get 'context_group_members', :group_id => group.id
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.first['section_id'].should == @course.default_section.id
       data.first['section_code'].should == @course.default_section.section_code
     end
@@ -643,7 +643,7 @@ describe GroupsController do
       # group2 instead of group1
       post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.size.should == 1
       data.first['id'].should == group2.id
     end
@@ -660,7 +660,7 @@ describe GroupsController do
       # student1 shouldn't get assigned, already being in a group
       post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.map{ |g| g['new_members'] }.flatten.map{ |u| u['user_id'] }.should_not be_include(student1.id)
     end
 
@@ -676,7 +676,7 @@ describe GroupsController do
       # student2 should get assigned, not being in a group
       post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.map{ |g| g['new_members'] }.flatten.map{ |u| u['user_id'] }.should be_include(student2.id)
     end
 
@@ -698,7 +698,7 @@ describe GroupsController do
       # bring them both to three
       post 'assign_unassigned_members', :course_id => @course.id, :category_id => category.id
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.size.should == 2
       data.map{ |g| g['id'] }.sort.should == [group1.id, group2.id].sort
 

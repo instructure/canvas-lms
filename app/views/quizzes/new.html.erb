@@ -82,13 +82,13 @@
             <tr>
               <td colspan="2">
                 <%= check_box :quiz, :shuffle_answers %>
-                <%= label :quiz, :shuffle_answers, :en => "Shuffle Answers" %>  
+                <%= label :quiz, :shuffle_answers, :en => "Shuffle Answers" %>
               </td>
             </tr>
             <tr>
               <td colspan="2">
                 <input type="checkbox" <%= "checked" if @quiz.time_limit %> name="time_limit" id="time_limit_option"/>
-                <label for="time_limit_option"> <%= before_label(:time_limit, "Time Limit") %></label> 
+                <label for="time_limit_option"> <%= before_label(:time_limit, "Time Limit") %></label>
                 <%= text_field :quiz, :time_limit, :style => "width: 30px;" %>
                 <%= label :quiz, :time_limit, :time_limit_minutes, :en => "minutes" %>
               </td>
@@ -120,7 +120,7 @@
                     <%= select(:quiz, :scoring_policy, [[t('keep_highest', 'Highest'), 'keep_highest'], [t('keep_latest', 'Latest'), 'keep_latest'],], {}, :id => 'keep_score_select') %>
                   </div>
                   <div>
-                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/><label for="limit_attempts_option"> <%= before_label(:limited_attempts, "Allowed Attempts") %></label> 
+                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/><label for="limit_attempts_option"> <%= before_label(:limited_attempts, "Allowed Attempts") %></label>
                     <%= text_field :quiz, :allowed_attempts, :style => "width: 20px;", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts) %>
                   </div>
                 </div>
@@ -190,7 +190,7 @@
                 </div>
               </td>
             </tr>
-            <tr>          
+            <tr>
               <td class="nobr"><%= before_label(:locked_until, "Locked Until") %></td>
               <td style="width: 200px;">
                 <div style="margin-right: 1px;">
@@ -214,7 +214,7 @@
       </div>
       <div class="button-container rs-margin-lr">
         <div>
-            <a href="<%= context_url(@context, :context_quiz_take_url, @quiz, :preview => 1) %>"><%= t('links.preview_quiz', "Preview the Quiz") %></a>
+            <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post do %><%= t('links.preview_quiz', "Preview the Quiz") %><% end %>
         </div>
         <button type="submit" class="save_quiz_button button"><%= t('buttons.save_settings', "Save Settings") %></button>
         <button type="submit" class="publish_quiz_button button button-default"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
@@ -316,7 +316,7 @@ $(document).ready(function() {
 <div id="ip_filters_dialog" style="display: none;">
   <h2><%= t('headers.ip_filters', "What are Quiz IP Filters?") %></h2>
   <p class="explanation"><%= t(:ip_filters, <<-TEXT)
-  Quiz IP filters are a way to limit access to quizzes to 
+  Quiz IP filters are a way to limit access to quizzes to
   computers in a specified IP range.  Filters can be a comma-separated
   list of addresses, or an address followed by a mask
   ("192.168.217.1", "192.168.217.1/24" or "192.168.217.1/255.255.255.0").

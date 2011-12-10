@@ -49,6 +49,22 @@ shared_examples_for "dashboard selenium tests" do
     find_all_with_jquery("div.communication_message.conversation .communication_sub_message:visible").size.should == 3 # two messages, plus add message form
   end
 
+  it "should allow replying to conversation stream items" do
+    course_with_student_logged_in(:active_all => true)
+    c = User.create.initiate_conversation([@user.id, User.create.id])
+    c.add_message('test')
+
+    get "/"
+    driver.find_element(:css, ".reply_message .textarea").click
+    driver.find_element(:css, "textarea[name='body']").send_keys("hey there")
+    driver.find_element(:css, ".communication_sub_message .submit_button").click
+    wait_for_ajax_requests
+    messages = find_all_with_jquery(".communication_message.conversation .communication_sub_message:visible")
+
+    # messages[-1] is the reply form
+    messages[-2].text.should =~ /hey there/
+  end
+
   it "should display assignment in to do list" do
     course_with_student_logged_in
 

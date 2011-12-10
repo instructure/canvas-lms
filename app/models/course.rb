@@ -17,7 +17,6 @@
 #
 
 class Course < ActiveRecord::Base
-  
 
   include Context
   include Workflow
@@ -602,6 +601,11 @@ class Course < ActiveRecord::Base
     elsif self.deleted?
       Enrollment.update_all({:workflow_state => 'deleted'}, "course_id=#{self.id} AND workflow_state!='deleted'")
     end
+
+    if self.root_account_id_changed?
+      Enrollment.update_all({:root_account_id => self.root_account_id}, :course_id => self.id)
+    end
+
     case Enrollment.connection.adapter_name
     when 'MySQL'
       Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
@@ -1571,6 +1575,7 @@ class Course < ActiveRecord::Base
     @full_migration_hash = data
     @external_url_hash = {}
     @migration_results = []
+    @content_migration = migration
     (data['web_link_categories'] || []).map{|c| c['links'] }.flatten.each do |link|
       @external_url_hash[link['link_id']] = link
     end
@@ -1585,7 +1590,7 @@ class Course < ActiveRecord::Base
       # we'll wait synchronously for the media objects to be uploaded, so that
       # we have the media_ids that we need later.
       unless mo_attachments.blank?
-        import_media_objects_and_attachments(mo_attachments, migration)
+        import_media_objects_and_attachments(mo_attachments)
       end
     end
 
@@ -1646,7 +1651,7 @@ class Course < ActiveRecord::Base
         end
       end
     rescue
-      migration.add_warning("Couldn't adjust the due dates.", $!)
+      add_migration_warning("Couldn't adjust the due dates.", $!)
     end
     migration.progress=100
     migration.migration_settings ||= {}
@@ -1657,7 +1662,7 @@ class Course < ActiveRecord::Base
     self.touch
     @imported_migration_items
   end
-  attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash
+  attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash, :content_migration
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :assignment_group_no_drop_assignments
   
   def import_settings_from_migration(data)
@@ -1673,7 +1678,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def import_media_objects_and_attachments(mo_attachments, migration)
+  def import_media_objects_and_attachments(mo_attachments)
     MediaObject.add_media_files(mo_attachments, true)
     # attachments in /media_objects were created on export, soley to
     # download and include a media object in the export. now that they've
@@ -1681,7 +1686,7 @@ class Course < ActiveRecord::Base
     failed_uploads, mo_attachments = mo_attachments.partition { |a| a.media_object.nil? }
 
     unless failed_uploads.empty?
-      migration.add_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), failed_uploads.map(&:id).join(','))
+      add_migration_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), failed_uploads.map(&:id).join(','))
     end
 
     to_remove = mo_attachments.find_all { |a| a.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/') }
@@ -1693,7 +1698,12 @@ class Course < ActiveRecord::Base
       folder.destroy
     end
   rescue Exception => e
-    migration.add_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), e)
+    add_migration_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), e)
+  end
+  
+  def add_migration_warning(message, exception='')
+    return unless @content_migration
+    @content_migration.add_warning(message, exception)
   end
   
   def backup_to_json
@@ -1739,6 +1749,8 @@ class Course < ActiveRecord::Base
   end
   
   attr_accessor :merge_mappings
+  COPY_OPTIONS = [:all_course_settings, :all_assignments, :all_external_tools, :all_files, :all_topics, 
+                  :all_calendar_events, :all_quizzes, :all_wiki_pages, :all_modules, :all_outcomes]
   def merge_into_course(course, options, course_import = nil)
     @merge_mappings = {}
     @merge_results = []
@@ -1747,7 +1759,7 @@ class Course < ActiveRecord::Base
     added_items = []
     delete_placeholder = nil
     
-    if bool_res(options[:course_settings])
+    if bool_res(options[:course_settings]) || bool_res(options[:all_course_settings])
       #Copy the course settings too
       course.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
         self.send("#{attr}=", course.send(attr))
@@ -1768,6 +1780,14 @@ class Course < ActiveRecord::Base
         added_items << new_group
         new_group.save_without_broadcasting!
         map_merge(group, new_group)
+      end
+    end
+    course.context_external_tools.active.each do |old_tool|
+      course_import.tick(82) if course_import
+      if bool_res(options[:everything]) || bool_res(options[:all_external_tools]) || bool_res(options[old_tool.asset_string.to_sym])
+        new_tool = old_tool.clone_for(self)
+        new_tool.save
+        added_items << new_tool
       end
     end
     course.assignments.no_graded_quizzes_or_topics.active.select{|a| a.assignment_group_id }.each do |assignment|

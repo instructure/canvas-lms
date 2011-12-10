@@ -91,7 +91,7 @@ shared_examples_for "conversations selenium tests" do
       @course.enroll_user(s2, "StudentEnrollment", :section => @other_section)
 
       @group = @course.groups.create(:name => "the group")
-      @group.users << s1
+      @group.users << s1 << @user
 
       new_conversation
       @input = find_with_jquery("#create_message_form input:visible")
@@ -173,7 +173,7 @@ shared_examples_for "conversations selenium tests" do
     it "should allow browsing" do
       browse_menu
 
-      menu.should eql ["the course", "the group", "the other section", "the section"]
+      menu.should eql ["the course", "the group"]
       browse "the course" do
         menu.should eql ["Everyone", "Teachers", "Students", "Course Sections", "Student Groups"]
         browse("Everyone") { menu.should eql ["Select All", "nobody@example.com", "student 1", "student 2"] }
@@ -194,27 +194,17 @@ shared_examples_for "conversations selenium tests" do
         end
         browse "Student Groups" do
           menu.should eql ["the group"]
-          browse("the group") { menu.should eql ["student 1"] }
+          browse("the group") { menu.should eql ["Select All", "nobody@example.com", "student 1"] }
         end
       end
-      browse("the group") { menu.should eql ["student 1"] }
-      browse "the other section" do
-        menu.should eql ["Students"]
-        browse("Students") { menu.should eql ["student 2"] }
-      end
-      browse "the section" do
-        menu.should eql ["Everyone", "Teachers", "Students"]
-        browse("Everyone") { menu.should eql ["Select All", "nobody@example.com", "student 1"] }
-        browse("Teachers") { menu.should eql ["nobody@example.com"] }
-        browse("Students") { menu.should eql ["student 1"] }
-      end
+      browse("the group") { menu.should eql ["Select All", "nobody@example.com", "student 1"] }
     end
 
     it "should check already-added tokens when browsing" do
       browse_menu
 
       browse("the group") do
-        menu.should eql ["student 1"]
+        menu.should eql ["Select All", "nobody@example.com", "student 1"]
         toggle "student 1"
         tokens.should eql ["student 1"]
       end
@@ -578,6 +568,7 @@ shared_examples_for "conversations selenium tests" do
 
   context "group conversations" do
     before do
+      pending("tests in this context intermittently causes the build to fail on aws")
       @course.update_attribute(:name, "the course")
       @course.default_section.update_attribute(:name, "the section")
       @other_section = @course.course_sections.create(:name => "the other section")
@@ -652,6 +643,7 @@ shared_examples_for "conversations selenium tests" do
       @checkbox.should be_displayed
       is_checked(@checkbox).should be_false
     end
+
   end
 end
 

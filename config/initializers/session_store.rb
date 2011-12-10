@@ -11,6 +11,7 @@ config = {
       ActiveSupport::SecureRandom.hex(64)) rescue ActiveSupport::SecureRandom.hex(64)),
 }.merge((Setting.from_config("session_store") || {}).symbolize_keys)
 
+config[:expires] = nil # we always want the cookie to have session expiry
 session_store = config.delete(:session_store).to_sym
 
 case session_store

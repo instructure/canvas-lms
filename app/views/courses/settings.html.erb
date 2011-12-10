@@ -530,6 +530,16 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <% end %>
           <option value="ObserverEnrollment"><%= t('option.observers', %{Observers}) %></option>
         </select>
+      </div>
+      <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
+        <%= label_tag :course_section_id, :en => 'For the section' %>
+        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
+          <% @context.course_sections.active.each do |section| %>
+            <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
+          <% end %>
+        </select>
+      </div>
+      <div>
         <span id="limit_priveleges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
           <input type="checkbox" id="limit_priveleges_to_course_section" name="limit_priveleges_to_course_section" value="1"/>
           <%= label_tag :limit_priveleges_to_course_section, :en => 'these admins can only grade students in their section' %>
@@ -540,14 +550,6 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <%= label_tag :auto_accept_enrollment, :en => "don't send invite, just auto-accept these users" %>
           </div>
         <% end %>
-      </div>
-      <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
-        <%= label_tag :course_section_id, :en => 'For the section' %>
-        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
-          <% @context.course_sections.active.each do |section| %>
-            <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
-          <% end %>
-        </select>
       </div>
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
         <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative priveleges for this course.}) %>

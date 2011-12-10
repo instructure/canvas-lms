@@ -12,10 +12,10 @@ describe "Canvas Cartridge importing" do
     exporter = CC::CCExporter.new(nil, :course=>@copy_from, :user=>@from_teacher)
     manifest = CC::Manifest.new(exporter)
     @resource = CC::Resource.new(manifest, nil)
-    @migration = Object.new
-    @migration.stubs(:to_import).returns(nil)
-    @migration.stubs(:context).returns(@copy_to)
-    @migration.stubs(:add_warning).returns('')
+    @migration = ContentMigration.new
+    @migration.context = @copy_to
+    @migration.save
+    @copy_to.content_migration = @migration
   end
 
   it "should import course settings" do
@@ -624,6 +624,63 @@ describe "Canvas Cartridge importing" do
     asmnt_2.mastery_score.should be_nil
     asmnt_2.max_score.should be_nil
     asmnt_2.min_score.should be_nil
+  end
+  
+  it "should import external tool assignments" do
+    course_with_teacher_logged_in
+    assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
+    tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
+    tag_from.content_type = 'ContextExternalTool'
+    tag_from.save!
+    
+    #export to xml/html
+    migration_id = CC::CCHelper.create_key(@assignment)
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    builder.assignment("identifier" => migration_id) { |a| CC::AssignmentResources.create_assignment(a, @assignment) }
+    html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@assignment.description, "Assignment: " + @assignment.title)
+    #convert to json
+    meta_doc = Nokogiri::XML(builder.target!)
+    html_doc = Nokogiri::HTML(html)
+    hash = @converter.convert_assignment(meta_doc, html_doc)
+    hash = hash.with_indifferent_access
+    #import
+    Assignment.import_from_migration(hash, @copy_to)
+
+    asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
+    asmnt_2.submission_types.should == "external_tool"
+    
+    asmnt_2.external_tool_tag.should_not be_nil
+    tag_to = asmnt_2.external_tool_tag
+    tag_to.content_type.should == tag_from.content_type
+    tag_to.url.should == tag_from.url
+    tag_to.new_tab.should == tag_from.new_tab
+  end
+  
+  it "should add error for invalid external tool urls" do
+    xml = <<XML
+<assignment identifier="ia24c092694901d2a5529c142accdaf0b">
+  <title>assignment title</title>
+  <points_possible>40</points_possible>
+  <grading_type>points</grading_type>
+  <submission_types>external_tool</submission_types>
+  <external_tool_url>/one</external_tool_url>
+  <external_tool_new_tab>true</external_tool_new_tab>
+</assignment>
+XML
+    #convert to json
+    meta_doc = Nokogiri::XML(xml)
+    html_doc = Nokogiri::HTML("<html><head><title>value for title</title></head><body>haha</body></html>")
+    hash = @converter.convert_assignment(meta_doc, html_doc)
+    hash = hash.with_indifferent_access
+    #import
+    Assignment.import_from_migration(hash, @copy_to)
+
+    asmnt_2 = @copy_to.assignments.find_by_migration_id('ia24c092694901d2a5529c142accdaf0b')
+    asmnt_2.submission_types.should == "external_tool"
+    
+    # the url was invalid so it won't be there
+    asmnt_2.external_tool_tag.should be_nil
+    @migration.warnings.should == ["The url for the external tool assignment \"assignment title\" wasn't valid."]
   end
   
   it "should import announcements (discussion topics)" do

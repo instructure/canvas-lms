@@ -1,4 +1,4 @@
-<% q = quiz_summary || nil 
+<% q = quiz_summary || nil
   submission = nil
   submission = @submissions_hash[q.id] if q
   submission = nil if submission && submission.settings_only?
@@ -41,7 +41,7 @@
           <% end %>
         <% elsif submission %>
           <%= datetime_string(submission.started_at) %><br/>
-          <a href="<%= context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id) %>"><%= q.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz") %></a>
+          <% link_to context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id), :method => :post do %><%= q.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz") %><% end %>
         <% else %>
           <% unless q.ungraded? %>
             <%= q.points_possible ? t(:quiz_points_possible, "Point", :count => q.points_possible) : t(:quiz_no_points, "No Points") %><br/>

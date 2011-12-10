@@ -143,6 +143,17 @@ I18n.scoped('instructure', function(I18n) {
     $("#equella_dialog").dialog('close');
   });
   
+  window.external_tool = {
+    ready: function(data) {
+      $("#external_tool_button_dialog:visible").triggerHandler('selection', data);
+      $("#resource_selection_dialog:visible").triggerHandler('selection', data);
+    },
+    cancel: function() {
+      $("#external_tool_button_dialog").dialog('close');
+      $("#resource_selection_dialog").dialog('close');
+    }
+  }
+  
   window.jsonFlickrApi = function(data) {
     $("#instructure_image_search").triggerHandler('search_results', data);
   };

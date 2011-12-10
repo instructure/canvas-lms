@@ -1,9 +1,9 @@
-<% max_to_show ||= nil; course_name_counts ||= nil; link_text ||= nil; custom ||= nil %>
+<% max_to_show ||= nil; link_text ||= nil; custom ||= nil %>
 <% if collection && !collection.empty? %>
   <td class="menu-item-drop-column">
     <h2><%= title %></h2>
     <ul class="menu-item-drop-column-list">
-      <%= render :partial => partial, :collection => max_to_show ? collection.first(max_to_show) : collection, :locals => {:title => title, :course_name_counts => course_name_counts} %>
+      <%= render :partial => partial, :collection => max_to_show ? collection.first(max_to_show) : collection, :locals => {:title => title } %>
       <% if link_text %>
         <li><%= link_to("#{link_text} (#{(collection_size || collection.size)})", more_link_for_over_max, :class => "menu-item-drop-float-right" ) %></li>
       <% end %>

@@ -25,11 +25,11 @@ describe QuizzesController do
     @quiz.save!
     @quiz
   end
-  
+
   def quiz_question
     @quiz.quiz_questions.create
   end
-  
+
   def quiz_group
     @quiz.quiz_groups.create
   end
@@ -40,7 +40,7 @@ describe QuizzesController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       course_with_student_logged_in(:active_all => true)
       @course.update_attribute(:tab_configuration, [{'id'=>4,'hidden'=>true}])
@@ -48,7 +48,7 @@ describe QuizzesController do
       response.should be_redirect
       flash[:notice].should match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       get 'index', :course_id => @course.id
@@ -56,11 +56,11 @@ describe QuizzesController do
       assigns[:unpublished_quizzes].should_not be_nil
       assigns[:submissions_hash].should_not be_nil
     end
-    
+
     it "should retrieve quizzes" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz(:active => true)
-      
+
       get 'index', :course_id => @course.id
       assigns[:quizzes].should_not be_nil
       assigns[:quizzes].should_not be_empty
@@ -74,31 +74,31 @@ describe QuizzesController do
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       get 'new', :course_id => @course.id
       assigns[:quiz].should_not be_nil
       q = assigns[:quiz]
     end
-    
+
     it "subsequent requests should return the same quiz unless ?fresh=1" do
       course_with_teacher_logged_in(:active_all => true)
       get 'new', :course_id => @course.id
       assigns[:quiz].should_not be_nil
       q = assigns[:quiz]
-      
+
       get 'new', :course_id => @course.id
       assigns[:quiz].should_not be_nil
       assigns[:quiz].should_not eql(q)
-      
+
       get 'new', :course_id => @course.id, :fresh => 1
       # Quiz.find_by_id(q.id).should be_deleted
       assigns[:quiz].should_not be_nil
       assigns[:quiz].should_not eql(q)
     end
   end
-  
+
   describe "GET 'edit'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -107,7 +107,7 @@ describe QuizzesController do
       assert_unauthorized
       assigns[:quiz].should_not be_nil
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
@@ -117,7 +117,7 @@ describe QuizzesController do
       response.should render_template("new")
     end
   end
-  
+
   describe "GET 'show'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -127,7 +127,7 @@ describe QuizzesController do
       assigns[:quiz].should_not be_nil
       assigns[:quiz].should eql(@quiz)
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
@@ -139,7 +139,7 @@ describe QuizzesController do
       assigns[:stored_params].should_not be_nil
     end
   end
-  
+
   describe "POST 'reorder'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -147,7 +147,7 @@ describe QuizzesController do
       post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => ""
       assert_unauthorized
     end
-    
+
     it "should require authorization" do
       course_with_student_logged_in(:active_all => true)
       course_quiz
@@ -174,7 +174,7 @@ describe QuizzesController do
       q3.position.should eql(1)
       response.should be_success
     end
-    
+
     it "should reorder questions AND groups" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
@@ -198,41 +198,41 @@ describe QuizzesController do
       response.should be_success
     end
   end
-  
-  describe "GET 'take'" do
+
+  describe "POST 'take'" do
     it "should require authorization" do
       course_with_student(:active_all => true)
       course_quiz(true)
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       assert_unauthorized
     end
-    
+
     it "should allow taking the quiz" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('take_quiz')
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
-    
+
     it "should render verification page if password required" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
       @quiz.access_code = 'bacon'
       @quiz.save!
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should render_template('access_code')
     end
-    
+
     it "should not let them take the quiz if it's locked" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
       @quiz.locked = true
       @quiz.save!
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should render_template('show')
       assigns[:locked].should_not be_nil
     end
-    
+
     it "should let them take the quiz if it's locked but they've been explicitly unlocked" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
@@ -241,22 +241,22 @@ describe QuizzesController do
       @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
       @sub.manually_unlocked = true
       @sub.save!
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('take_quiz')
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
-    
+
     it "should use default duration if no extensions specified" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
       @quiz.time_limit = 60
       @quiz.save!
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('take_quiz')
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
       assigns[:submission].should_not be_nil
       assigns[:submission].user.should eql(@user)
       (assigns[:submission].end_at - assigns[:submission].started_at).to_i.should eql(60.minutes.to_i)
     end
-    
+
     it "should give user more time if specified" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
@@ -265,8 +265,8 @@ describe QuizzesController do
       @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
       @sub.extra_time = 30
       @sub.save!
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('take_quiz')
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
       assigns[:submission].should_not be_nil
       assigns[:submission].user.should eql(@user)
       (assigns[:submission].end_at - assigns[:submission].started_at).to_i.should eql(90.minutes.to_i)
@@ -277,21 +277,59 @@ describe QuizzesController do
       course_quiz(true)
       @quiz.ip_filter = '123.123.123.123'
       @quiz.save!
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should render_template('invalid_ip')
     end
-    
-    it" should let the user take the page if the ip_filter matches" do
+
+    it" should let the user take the quiz if the ip_filter matches" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
       @quiz.ip_filter = '123.123.123.123'
       @quiz.save!
       request.env['REMOTE_ADDR'] = '123.123.123.123'
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('take_quiz')
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
   end
-  
+
+  describe "GET 'take'" do
+    it "should require authorization" do
+      course_with_student(:active_all => true)
+      course_quiz(true)
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      assert_unauthorized
+    end
+
+    it "should render the quiz page if the user hasn't started the quiz" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('show')
+    end
+
+    it "should render ip_filter page if the ip_filter stops matching" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.ip_filter = '123.123.123.123'
+      @quiz.save!
+      @quiz.generate_submission(@user)
+
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('invalid_ip')
+    end
+
+    it "should allow taking the quiz" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.generate_submission(@user)
+
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('take_quiz')
+      assigns[:submission].should_not be_nil
+      assigns[:submission].user.should eql(@user)
+    end
+  end
+
   describe "GET 'history'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -299,7 +337,7 @@ describe QuizzesController do
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id
       assert_unauthorized
     end
-    
+
     it "should redirect if there are no submissions for the user" do
       course_with_student_logged_in(:active_all => true)
       course_quiz
@@ -307,13 +345,13 @@ describe QuizzesController do
       response.should be_redirect
       response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       course_quiz
       @submission = @quiz.generate_submission(@user)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id
-      
+
       response.should be_success
       assigns[:user].should_not be_nil
       assigns[:user].should eql(@user)
@@ -322,7 +360,7 @@ describe QuizzesController do
       assigns[:submission].should_not be_nil
       assigns[:submission].should eql(@submission)
     end
-    
+
     it "should not allow viewing other submissions if not a teacher" do
       u = user(:active_all => true)
       course_with_student_logged_in(:active_all => true)
@@ -338,7 +376,7 @@ describe QuizzesController do
       assigns[:submission].should_not be_nil
       assigns[:submission].should eql(@submission)
     end
-    
+
     it "should allow viewing other submissions if a teacher" do
       u = user(:active_all => true)
       course_with_teacher_logged_in(:active_all => true)
@@ -347,7 +385,7 @@ describe QuizzesController do
       s = @quiz.generate_submission(u)
       @submission = @quiz.generate_submission(@user)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => u.id
-      
+
       response.should be_success
       assigns[:user].should_not be_nil
       assigns[:user].should eql(u)
@@ -357,20 +395,20 @@ describe QuizzesController do
       assigns[:submission].should eql(s)
     end
   end
-  
+
   describe "POST 'create'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to create quizzes" do
       course_with_student_logged_in(:active_all => true)
       post 'create', :course_id => @course.id, :quiz => {:title => "some quiz"}
       assert_unauthorized
     end
-    
+
     it "should create quiz" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', :course_id => @course.id, :quiz => {:title => "some quiz"}
@@ -379,7 +417,7 @@ describe QuizzesController do
       response.should be_success
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -387,14 +425,14 @@ describe QuizzesController do
       put 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "test"}
       assert_unauthorized
     end
-    
+
     it "should not allow students to update quizzes" do
       course_with_student_logged_in(:active_all => true)
       course_quiz
       post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}
       assert_unauthorized
     end
-    
+
     it "should update quizzes" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
@@ -403,7 +441,7 @@ describe QuizzesController do
       assigns[:quiz].should eql(@quiz)
       assigns[:quiz].title.should eql("some quiz")
     end
-    
+
     it "should lock and unlock without removing assignment" do
       course_with_teacher_logged_in(:active_all => true)
       a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -420,7 +458,7 @@ describe QuizzesController do
       @quiz.assignment.should_not be_nil
     end
   end
-  
+
   describe "GET 'statistics'" do
     it "should allow concluded teachers to see a quiz's statistics" do
       course_with_teacher_logged_in(:active_all => true)
@@ -428,14 +466,14 @@ describe QuizzesController do
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('statistics')
-      
+
       @enrollment.conclude
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('statistics')
     end
   end
-  
+
   describe "GET 'read_only'" do
     it "should allow concluded teachers to see a read-only view of a quiz" do
       course_with_teacher_logged_in(:active_all => true)
@@ -443,25 +481,25 @@ describe QuizzesController do
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('read_only')
-      
+
       @enrollment.conclude
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('read_only')
     end
-  
+
     it "should not allow students to see a read-only view of a quiz" do
       course_with_student_logged_in(:active_all => true)
       course_quiz
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
       assert_unauthorized
-      
+
       @enrollment.conclude
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
       assert_unauthorized
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -469,14 +507,14 @@ describe QuizzesController do
       delete 'destroy', :course_id => @course.id, :id => @quiz.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to delete quizzes" do
       course_with_student_logged_in(:active_all => true)
       course_quiz
       delete 'destroy', :course_id => @course.id, :id => @quiz.id
       assert_unauthorized
     end
-    
+
     it "should delete quizzes" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
@@ -487,4 +525,4 @@ describe QuizzesController do
     end
   end
 end
-  
+

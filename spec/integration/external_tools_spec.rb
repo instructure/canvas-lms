@@ -77,5 +77,29 @@ describe "External Tools" do
       response.should redirect_to(course_url(@course))
       flash[:error].should be_present
     end
+    
+    it "should render inline external tool links with a full return url" do
+      student_in_course(:active_all => true)
+      user_session(@user)
+      get "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(@tag.url)}"
+      response.should be_success
+      doc = Nokogiri::HTML.parse(response.body)
+      doc.at_css('#tool_form').should_not be_nil
+      doc.at_css("input[name='launch_presentation_return_url']")['value'].should match(/^http/)
+    end
+    
+    it "should render user navigation tools with a full return url" do
+      tool = @course.root_account.context_external_tools.build(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
+      tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.save!
+      
+      student_in_course(:active_all => true)
+      user_session(@user)
+      get "/users/#{@user.id}/external_tools/#{tool.id}"
+      response.should be_success
+      doc = Nokogiri::HTML.parse(response.body)
+      doc.at_css('#tool_form').should_not be_nil
+      doc.at_css("input[name='launch_presentation_return_url']")['value'].should match(/^http/)
+    end
   end
 end

@@ -1,4 +1,4 @@
-!define('jst/_submission_detail', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['_submission_detail'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -203,5 +203,7 @@ function program10(depth0,data) {
   return buffer;});
 Handlebars.registerPartial('submission_detail', templates['_submission_detail']);
 
-  return templates['_submission_detail'];
-});
+  define('jst/_submission_detail', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['_submission_detail'];
+  });
+})();
