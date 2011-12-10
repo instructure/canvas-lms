@@ -1,3 +1,11 @@
+canvas-lms (2011.12.10.11.42) stable; urgency=low
+
+  * Package ref: 3d3c699e836ab39309504e9fbbc7bad34947166b
+  *
+  * [+3d3c699] don't allow students to see quiz history on muted quizzes
+
+ -- JT Olds <jt@instructure.com>  Sat, 10 Dec 2011 11:42:54 -0700
+
 canvas-lms (2011.12.10.09.00) stable; urgency=low
 
   * Package ref: dc32de92158d498fb9e0112881245f23826140d0
