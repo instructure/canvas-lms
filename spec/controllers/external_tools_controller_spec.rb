@@ -93,4 +93,138 @@ describe ExternalToolsController do
       assigns[:tool].should == tool
     end
   end
+  
+  describe "POST 'create'" do
+    it "should require authentication" do
+      course_with_teacher(:active_all => true)
+      post 'create', :course_id => @course.id
+      response.should be_redirect
+    end
+    
+    it "should accept basic configurations" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}
+      response.should be_success
+      assigns[:tool].should_not be_nil
+      assigns[:tool].name.should == "tool name"
+      assigns[:tool].url.should == "http://example.com"
+      assigns[:tool].consumer_key.should == "key"
+      assigns[:tool].shared_secret.should == "secret"
+    end
+    
+    it "should handle advanced xml configurations" do
+      course_with_teacher_logged_in(:active_all => true)
+      xml = <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+    <blti:title>Other Name</blti:title>
+    <blti:description>Description</blti:description>
+    <blti:launch_url>http://example.com/other_url</blti:launch_url>
+    <blti:extensions platform="canvas.instructure.com">
+      <lticm:property name="privacy_level">public</lticm:property>
+      <lticm:options name="editor_button">
+        <lticm:property name="url">http://example.com/editor</lticm:property>
+        <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
+        <lticm:property name="text">Editor Button</lticm:property>
+        <lticm:property name="selection_width">500</lticm:property>
+        <lticm:property name="selection_height">300</lticm:property>
+      </lticm:options>
+    </blti:extensions>
+    <cartridge_bundle identifierref="BLTI001_Bundle"/>
+    <cartridge_icon identifierref="BLTI001_Icon"/>
+</cartridge_basiclti_link>  
+      XML
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      response.should be_success
+      assigns[:tool].should_not be_nil
+      # User-entered name overrides name provided in xml
+      assigns[:tool].name.should == "tool name"
+      assigns[:tool].description.should == "Description"
+      assigns[:tool].url.should == "http://example.com/other_url"
+      assigns[:tool].consumer_key.should == "key"
+      assigns[:tool].shared_secret.should == "secret"
+      assigns[:tool].has_editor_button.should be_true
+    end
+    
+    it "should fail gracefully on invalid xml configurations" do
+      course_with_teacher_logged_in(:active_all => true)
+      xml = "bob"
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      response.should_not be_success
+      assigns[:tool].should be_new_record
+      json = json_parse(response.body)
+      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'invalid xml syntax')
+
+      course_with_teacher_logged_in(:active_all => true)
+      xml = "<a><b>c</b></a>"
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      response.should_not be_success
+      assigns[:tool].should be_new_record
+      json = json_parse(response.body)
+      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'invalid xml syntax')
+    end
+    
+    it "should handle advanced xml configurations by URL retrieval" do
+      course_with_teacher_logged_in(:active_all => true)
+      xml = <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+    <blti:title>Other Name</blti:title>
+    <blti:description>Description</blti:description>
+    <blti:launch_url>http://example.com/other_url</blti:launch_url>
+    <blti:extensions platform="canvas.instructure.com">
+      <lticm:property name="privacy_level">public</lticm:property>
+      <lticm:options name="editor_button">
+        <lticm:property name="url">http://example.com/editor</lticm:property>
+        <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
+        <lticm:property name="text">Editor Button</lticm:property>
+        <lticm:property name="selection_width">500</lticm:property>
+        <lticm:property name="selection_height">300</lticm:property>
+      </lticm:options>
+    </blti:extensions>
+    <cartridge_bundle identifierref="BLTI001_Bundle"/>
+    <cartridge_icon identifierref="BLTI001_Icon"/>
+</cartridge_basiclti_link>  
+      XML
+      Net::HTTP.expects(:get).with(URI.parse("http://config.example.com")).returns(xml)
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}
+      response.should be_success
+      assigns[:tool].should_not be_nil
+      # User-entered name overrides name provided in xml
+      assigns[:tool].name.should == "tool name"
+      assigns[:tool].description.should == "Description"
+      assigns[:tool].url.should == "http://example.com/other_url"
+      assigns[:tool].consumer_key.should == "key"
+      assigns[:tool].shared_secret.should == "secret"
+      assigns[:tool].has_editor_button.should be_true
+    end
+    
+    it "should fail gracefully on invalid URL retrieval or timeouts" do
+      Net::HTTP.expects(:get).with(URI.parse("http://config.example.com")).raises(Timeout::Error)
+      course_with_teacher_logged_in(:active_all => true)
+      xml = "bob"
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}
+      response.should_not be_success
+      assigns[:tool].should be_new_record
+      json = json_parse(response.body)
+      json['errors']['base'][0]['message'].should == I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
+    end
+    
+  end
 end

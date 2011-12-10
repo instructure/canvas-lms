@@ -6,6 +6,8 @@ $(document).ready(function() {
     var formData = {
       domain: "",
       url: "",
+      config_url: "",
+      config_xml: "",
       description: "",
       name: "",
       custom_fields_string: "",
@@ -24,7 +26,9 @@ $(document).ready(function() {
       .attr('method', 'POST')
       .attr('action', $dialog.find(".external_tools_url").attr('href'));
     $dialog.fillFormData(formData, {object_name: 'external_tool'});
+    $dialog.find(".config_type_option").show();
     $("#external_tool_match_by").val('domain').change();
+    $("#external_tool_config_type").val('manual').change();
   });
   $dialog.find("form").formSubmit({
     beforeSubmit: function(data) {
@@ -44,6 +48,12 @@ $(document).ready(function() {
         hrefValues: ['id'],
         id: 'external_tool_' + tool.id
       });
+      $tool
+        .toggleClass('has_editor_button', tool.has_editor_button)
+        .toggleClass('has_resource_selection', tool.has_resource_selection)
+        .toggleClass('has_course_navigation', tool.has_course_navigation)
+        .toggleClass('has_user_navigation', tool.has_user_navigation)
+        .toggleClass('has_account_navigation', tool.has_account_navigation);
       $tool.find(".tool_url").showIf(tool.url).end()
         .find(".tool_domain").showIf(tool.domain);
       $tool.show();
@@ -73,6 +83,8 @@ $(document).ready(function() {
       width: 600,
       height: 420
     }).dialog('open');
+    $dialog.find(".config_type_option").hide();
+    $("#external_tool_config_type").val('manual').change();
   }).delegate('.delete_tool_link', 'click', function(event) {
     event.preventDefault();
     var $tool = $(this).parents(".external_tool");
@@ -95,6 +107,10 @@ $(document).ready(function() {
       $(this).parents("form").find(".tool_url").hide().find(":text").val("").end().end()
         .find(".tool_domain").show();
     }
+  });
+  $("#external_tool_config_type").change(function(event) {
+    $("#external_tool_form .config_type").hide();
+    $("#external_tool_form .config_type." + $(this).val()).show();
   });
 });
 });

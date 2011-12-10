@@ -216,13 +216,15 @@ class ExternalToolsController < ApplicationController
   # @argument resource_selection[url] [string] [optional] The url of the external tool
   # @argument resource_selection[selection_width] [string] [optional] The width of the dialog the tool is launched in
   # @argument resource_selection[selection_height] [string] [optional] The height of the dialog the tool is launched in
+  # @argument config_type [string] [optional] Configuration can be passed in as CC xml instead of using query parameters. If this value is "by_url" or "by_xml" then an xml configuration will be expected in either the "config_xml" or "config_url" parameter. Note that the name parameter overrides the tool name provided in the xml
+  # @argument config_xml [string] [optional] XML tool configuration, as specified in the CC xml specification. This is required if "config_type" is set to "by_xml"
+  # @argument config_url [string] [optional] URL where the server can retrieve an XML tool configuration, as specified in the CC xml specification. This is required if "config_type" is set to "by_url"
   #
   # @example_request
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/external_tools' \ 
-  #        -u '<username>:<password>' \ 
-  #        -F 'api_key=<key>' \ 
+  #        -F 'access_token=<token>' \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
   #        -F 'shared_secret=lkjh' \ 
@@ -238,8 +240,7 @@ class ExternalToolsController < ApplicationController
   #
   #   This would create a tool on the account with navigation for the user profile page
   #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
-  #        -u '<username>:<password>' \ 
-  #        -F 'api_key=<key>' \ 
+  #        -F 'access_token=<token>' \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
   #        -F 'shared_secret=lkjh' \ 
@@ -247,6 +248,17 @@ class ExternalToolsController < ApplicationController
   #        -F 'privacy_level=name_only' \ 
   #        -F 'user_navigation[url]=http://example.com/ims/lti/user_endpoint' \ 
   #        -F 'user_navigation[text]=Soemthing Cool'  
+  # 
+  # @example_request
+  #
+  #   This would create a tool on the account with configuration pulled from an external URL
+  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
+  #        -F 'access_token=<token>' \ 
+  #        -F 'name=LTI Example' \ 
+  #        -F 'consumer_key=asdfg' \ 
+  #        -F 'shared_secret=lkjh' \ 
+  #        -F 'config_type=by_url' \ 
+  #        -F 'config_url=http://example.com/ims/lti/tool_config.xml'
   def create
     if authorized_action(@context, @current_user, :update)
       @tool = @context.context_external_tools.new
@@ -272,8 +284,7 @@ class ExternalToolsController < ApplicationController
   #
   #   This would update the specified keys on this external tool
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
-  #        -u '<username>:<password>' \ 
-  #        -F 'api_key=<key>' \ 
+  #        -F 'access_token=<token>' \ 
   #        -F 'name=Public Example' \ 
   #        -F 'privacy_level=public' 
   def update
@@ -318,7 +329,8 @@ class ExternalToolsController < ApplicationController
   def set_tool_attributes(tool, params)
     [:name, :description, :url, :domain, :privacy_level, :consumer_key, :shared_secret,
     :custom_fields, :custom_fields_string, :account_navigation, :user_navigation, 
-    :course_navigation, :editor_button, :resource_selection].each do |prop|
+    :course_navigation, :editor_button, :resource_selection,
+    :config_type, :config_url, :config_xml].each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
   end

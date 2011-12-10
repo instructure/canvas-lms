@@ -13,7 +13,33 @@
         +opacity(0.5)
     .content
       padding: 0 20px 5px
+    .extras
+      display: none
+      div
+        font-style: italic
+        font-size: 0.9em
     &:hover
       background-color: #eee
       .links
         +opacity(1.0)
+    &.has_editor_button,&.has_resource_selection,&.has_course_navigation,&.has_user_navigation,&.has_account_navigation
+      .extras
+        display: table-row      
+        div
+          display: none
+    &.has_editor_button
+      div.editor_button
+        display: block
+    &.has_resource_selection
+      div.resource_selection
+        display: block
+    &.has_course_navigation
+      div.course_nagivation
+        display: block
+    &.has_user_navigation
+      div.user_navigation
+        display: block
+    &.has_account_navigation
+      div.account_navigation
+        display: block
+        

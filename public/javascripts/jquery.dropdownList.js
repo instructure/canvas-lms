@@ -89,7 +89,7 @@
       $list.empty();
       $.each(options.options, function(optionName, callback){
         var $option = $("<div class='option minimal' style='cursor: pointer; padding: 2px 5px; overflow: hidden; white-space: nowrap;'>" +
-                        "  <span tabindex='-1'>" + optionName.replace(/_/g, " ") + "</span>" +
+                        "  <span tabindex='-1'>" + optionName + "</span>" +
                         "</div>").appendTo($list);
 
         if($.isFunction(callback)) {

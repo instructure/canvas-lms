@@ -7,14 +7,17 @@ class ContextExternalTool < ActiveRecord::Base
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
-                  :resource_selection, :editor_button
+                  :resource_selection, :editor_button,
+                  :config_type, :config_url, :config_xml
   validates_presence_of :name
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
   validate :url_or_domain_is_set
   serialize :settings
+  attr_accessor :config_type, :config_url, :config_xml
   
   before_save :infer_defaults
+  validate :check_for_xml_error
 
   workflow do
     state :anonymous
@@ -44,8 +47,23 @@ class ContextExternalTool < ActiveRecord::Base
   
   def label_for(key, lang=nil)
     labels = settings[key] && settings[key][:labels]
-    (labels && labels[lang]) || (settings[key] && settings[key][:text]) || name || "External Tool"
+    (labels && labels[lang]) || 
+      (labels && lang && labels[lang.split('-').first]) || 
+      (settings[key] && settings[key][:text]) || 
+      settings[:text] || name || "External Tool"
   end
+  
+  def xml_error(error)
+    @xml_error = error
+  end
+  
+  def check_for_xml_error
+    if @xml_error
+      errors.add_to_base(@xml_error)
+      false
+    end
+  end
+  protected :check_for_xml_error
   
   def readable_state
     workflow_state.titleize
@@ -65,6 +83,43 @@ class ContextExternalTool < ActiveRecord::Base
     (settings[:custom_fields] || {}).map{|key, val|
       "#{key}=#{val}"
     }.join("\n")
+  end
+  
+  def config_type=(val)
+    @config_type = val
+    process_extended_configuration
+  end
+  
+  def config_xml=(val)
+    @config_xml = val
+    process_extended_configuration
+  end
+  
+  def config_url=(val)
+    @config_url = val
+    process_extended_configuration
+  end
+  
+  def process_extended_configuration
+    return unless (config_type == 'by_url' && config_url) || (config_type == 'by_xml' && config_xml)
+    tool_hash = nil
+    begin
+      converter = CC::Importer::Canvas::Converter.new({:no_archive_file => true})
+      if config_type == 'by_url'
+        tool_hash = converter.retrieve_and_convert_blti_url(config_url)
+      else
+        tool_hash = converter.convert_blti_xml(config_xml)
+      end
+    rescue CC::Importer::BLTIConverter::CCImportError => e
+      tool_hash = {:error => e.message}
+    end
+    real_name = self.name
+    if tool_hash[:error]
+      xml_error(tool_hash[:error])
+    else
+      ContextExternalTool.import_from_migration(tool_hash, self.context, self)
+    end
+    self.name = real_name unless real_name.blank?
   end
   
   def custom_fields_string=(str)
@@ -354,8 +409,8 @@ class ContextExternalTool < ActiveRecord::Base
     item.url = hash[:url] unless hash[:url].blank?
     item.domain = hash[:domain] unless hash[:domain].blank?
     item.privacy_level = hash[:privacy_level] || 'name_only'
-    item.consumer_key = 'fake'
-    item.shared_secret = 'fake'
+    item.consumer_key ||= 'fake'
+    item.shared_secret ||= 'fake'
     item.settings = hash[:settings].with_indifferent_access if hash[:settings].is_a?(Hash)
     if hash[:custom_fields].is_a? Hash
       item.settings[:custom_fields] ||= {}
