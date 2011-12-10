@@ -271,28 +271,6 @@ describe Enrollment do
     end
   end
 
-  context "recompute_final_score_if_stale" do
-    it "should only call recompute_final_score once within the cache window" do
-      course_with_student
-      Enrollment.expects(:recompute_final_score).once
-      enable_cache do
-        Enrollment.recompute_final_score_if_stale @course
-        Enrollment.recompute_final_score_if_stale @course
-      end
-    end
-
-    it "should yield iff it calls recompute_final_score" do
-      course_with_student
-      Enrollment.expects(:recompute_final_score).once
-      count = 1
-      enable_cache do
-        Enrollment.recompute_final_score_if_stale(@course, @user){ count += 1 }
-        Enrollment.recompute_final_score_if_stale(@course, @user){ count += 1 }
-      end
-      count.should eql 2
-    end
-  end
-
   context "date restrictions" do
     context "accept" do
       it "should accept into the right state based on availability dates on enrollment" do
