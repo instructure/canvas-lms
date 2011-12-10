@@ -406,6 +406,10 @@ shared_examples_for "all selenium tests" do
     wait_for_dom_ready
   end
 
+  def type_in_tiny(selector, content)
+    driver.execute_script("$('#{selector}').editorBox('execute', 'mceInsertContent',false, '#{content}')")
+  end
+
   def make_full_screen
     driver.execute_script <<-JS
       if (window.screen) {

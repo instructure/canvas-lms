@@ -102,8 +102,7 @@ Implemented for: Canvas LMS}
 
   describe "delegated auth" do
     before do
-      @account = account_with_cas
-      @pseudonym.update_attribute(:account, @account)
+      @account = account_with_cas(:account => Account.default)
     end
 
     it "should error if token is required" do

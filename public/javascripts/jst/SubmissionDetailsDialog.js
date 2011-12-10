@@ -1,4 +1,4 @@
-!define('jst/SubmissionDetailsDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['SubmissionDetailsDialog'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers; partials = partials || Handlebars.partials;
@@ -425,5 +425,7 @@ function program20(depth0,data) {
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n  </form>\n</div>\n";
   return buffer;});
-  return templates['SubmissionDetailsDialog'];
-});
+  define('jst/SubmissionDetailsDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['SubmissionDetailsDialog'];
+  });
+})();

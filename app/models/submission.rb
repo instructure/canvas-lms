@@ -159,8 +159,11 @@ class Submission < ActiveRecord::Base
   
   set_policy do
     given {|user| user && user.id == self.user_id }
-    can :read and can :comment and can :make_group_comment and can :read_grade and can :submit
-    
+    can :read and can :comment and can :make_group_comment and can :submit
+
+    given { |user| user && user.id == self.user_id && !self.assignment.muted? }
+    can :read_grade
+
     given {|user| self.assignment && self.assignment.context && user && self.user &&
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active') }
     can :read and can :read_comments
@@ -961,5 +964,18 @@ class Submission < ActiveRecord::Base
     self.attachment = attachment
     self.processed = true
     self.save!
+  end
+
+  def comments_for(user)
+    grants_right?(user, :read_grade)? submission_comments : visible_submission_comments
+  end
+
+  def filter_attributes_for_user(hash, user, session)
+    unless grants_right?(user, :read_grade)
+      %w(score published_grade published_score grade).each do |secret_attr|
+        hash.delete secret_attr
+      end
+    end
+    hash
   end
 end

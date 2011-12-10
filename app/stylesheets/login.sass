@@ -12,7 +12,7 @@ body.modal
     border: 0 none
     margin: 0
     padding: 0
-    
+
   #modal-box-top
     background: url(/images/login-bg.jpg) no-repeat
     width: $modal_box_width
@@ -72,10 +72,20 @@ body.modal
       width: 204px
       color: #303030
       margin: 0 6px 6px 0
-
     .radio_spacer
       width: 25px
       display: inline-block
+
+// weird specificity here is to match the input.text above
+body.webkit #modal-box input.text,
+body.webkit #modal-box-arbitrary-size input.text
+  background: #F6F6F6 none
+  border: 6px solid rgba(255, 255, 255, 0.25)
+  border-radius: 7px
+  padding: 12px 9px 12px 17px
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.4)
+  background-clip: padding-box
+  width: 197px
 
 #login_form
   margin: 200px auto 0
@@ -85,7 +95,7 @@ body.modal
   width: 435px
   button.button
     margin: 7px
-  
+
 span.field-with-fancyplaceholder
   display: block
   display: inline-block
@@ -108,7 +118,7 @@ span.field-with-fancyplaceholder
 
     &.focus
       color: #ccc
-      
+
   // gets rid of yello autofill bg for safari but doesnt work in chrome :(
   input:-webkit-autofill
     background-color: transparent !important
@@ -123,7 +133,7 @@ span.field-with-fancyplaceholder
       color: #000
       background: none repeat scroll 0 0 transparent
       overflow: hidden
-      
+
 #register_link
   position: absolute
   display: block
@@ -136,4 +146,3 @@ span.field-with-fancyplaceholder
   font-size: 11px
   font-weight: bold
   line-height: 27px
-  

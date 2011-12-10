@@ -5,7 +5,7 @@ shared_examples_for "discussions selenium tests" do
 
   it "should load both topics and images via pageless without conflict" do
     course_with_teacher_logged_in
-    
+
     # create some topics. 11 is enough to trigger pageless with default value
     # of 10 per page
     11.times do |i|
@@ -13,7 +13,7 @@ shared_examples_for "discussions selenium tests" do
     end
 
     # create some images
-    2.times do |i| 
+    2.times do |i|
       @attachment = @course.attachments.build
       @attachment.filename = "image#{i}.png"
       @attachment.file_state = 'available'
@@ -58,10 +58,7 @@ shared_examples_for "discussions selenium tests" do
     driver.execute_script("return INST.errorCount;").should == 0
 
     form.find_element(:id, "discussion_topic_title").send_keys("This is my test title")
-    tiny_frame = wait_for_tiny(form.find_element(:css, '.content_box'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is the discussion description.')
-    end
+    type_in_tiny '#add_topic_form_topic_new .content_box', 'This is the discussion description.'
 
     form.find_element(:css, ".submit_button").click
     keep_trying_until { DiscussionTopic.count.should == 1 }
@@ -81,10 +78,8 @@ shared_examples_for "discussions selenium tests" do
     }
 
     form.find_element(:id, "discussion_topic_title").send_keys("This is my test title")
-    tiny_frame = wait_for_tiny(form.find_element(:css, '.content_box'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is the discussion description.')
-    end
+    type_in_tiny '#add_topic_form_topic_new .content_box', 'This is the discussion description.'
+
     form.find_element(:css, '.more_options_link').click
     form.find_element(:id, 'discussion_topic_podcast_enabled').click
 
@@ -111,10 +106,7 @@ shared_examples_for "discussions selenium tests" do
       find_with_jquery('.add_sub_message_form:visible')
     }
 
-    tiny_frame = wait_for_tiny(form.find_element(:css, 'textarea'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys("My side comment!")
-    end
+    type_in_tiny '.add_sub_message_form:visible textarea', "My side comment!"
     form.find_element(:css, '.submit_button').click
     wait_for_ajax_requests
     wait_for_animations

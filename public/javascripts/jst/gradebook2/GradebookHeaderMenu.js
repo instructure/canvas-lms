@@ -1,4 +1,4 @@
-!define('jst/gradebook2/GradebookHeaderMenu', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['gradebook2/GradebookHeaderMenu'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -106,5 +106,7 @@
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</a></li>\n  <li><a data-action=\"toggleMuting\" href=\"#\"></a></li>\n</ul>\n";
   return buffer;});
-  return templates['gradebook2/GradebookHeaderMenu'];
-});
+  define('jst/gradebook2/GradebookHeaderMenu', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['gradebook2/GradebookHeaderMenu'];
+  });
+})();

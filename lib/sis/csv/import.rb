@@ -17,6 +17,7 @@
 #
 
 require 'zip/zip'
+require 'lib/sis/csv/base_importer'
 
 module SIS
   module CSV

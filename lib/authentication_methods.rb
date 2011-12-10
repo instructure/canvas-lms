@@ -70,7 +70,7 @@ module AuthenticationMethods
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
       else
-        @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
+        @pseudonym_session = PseudonymSession.find
         @current_pseudonym = @pseudonym_session && @pseudonym_session.record
       end
       if params[:login_success] == '1' && !@current_pseudonym
@@ -239,7 +239,7 @@ module AuthenticationMethods
 
   def initiate_cas_login(cas_client = nil)
     reset_session_for_login
-    if @domain_root_account.account_authorization_config.log_in_url.present?
+    if @domain_root_account.account_authorization_config.log_in_url.present? && !in_oauth_flow?
       session[:exit_frame] = true
       delegated_auth_redirect(@domain_root_account.account_authorization_config.log_in_url)
     else
@@ -258,5 +258,10 @@ module AuthenticationMethods
 
   def delegated_auth_redirect(uri)
     redirect_to(uri)
+  end
+
+  # if true, the user is currently stepping through the oauth2 flow for the canvas api
+  def in_oauth_flow?
+    !!session[:oauth2]
   end
 end

@@ -20,11 +20,10 @@ class CourseSection < ActiveRecord::Base
   include Workflow
 
   attr_protected :sis_source_id, :sis_batch_id, :course_id,
-      :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
+      :root_account_id, :enrollment_term_id
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
-  belongs_to :sis_cross_listed_section
   belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :students, :through => :student_enrollments, :source => :user, :order => User.sortable_name_order_by_clause

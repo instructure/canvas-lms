@@ -593,6 +593,11 @@
 
 				if (evt.altKey) {
 		 			if (evt.keyCode === DOM_VK_F10) {
+						// Make sure focus is given to toolbar in Safari.
+						// We can't do this in IE as it prevents giving focus to toolbar when editor is in a frame
+						if (tinymce.isWebKit) {
+							window.focus();
+						}
 						t.toolbarGroup.focus();
 						return Event.cancel(evt);
 					} else if (evt.keyCode === DOM_VK_F11) {
@@ -752,7 +757,7 @@
 			each(explode(s.theme_advanced_containers || ''), function(c, i) {
 				var v = s['theme_advanced_container_' + c] || '';
 
-				switch (v.toLowerCase()) {
+				switch (c.toLowerCase()) {
 					case 'mceeditor':
 						n = DOM.add(tb, 'tr');
 						n = ic = DOM.add(n, 'td', {'class' : 'mceIframeContainer'});
@@ -869,7 +874,7 @@
 			
 
 			if (s.theme_advanced_resizing) {
-				DOM.add(td, 'a', {id : ed.id + '_resize', href : 'javascript:;', onclick : "return false;", 'class' : 'mceResize'});
+				DOM.add(td, 'a', {id : ed.id + '_resize', href : 'javascript:;', onclick : "return false;", 'class' : 'mceResize', tabIndex:"-1"});
 
 				if (s.theme_advanced_resizing_use_cookie) {
 					ed.onPostRender.add(function() {
@@ -936,10 +941,10 @@
 		},
 
 		_updateUndoStatus : function(ed) {
-			var cm = ed.controlManager;
+			var cm = ed.controlManager, um = ed.undoManager;
 
-			cm.setDisabled('undo', !ed.undoManager.hasUndo() && !ed.typing);
-			cm.setDisabled('redo', !ed.undoManager.hasRedo());
+			cm.setDisabled('undo', !um.hasUndo() && !um.typing);
+			cm.setDisabled('redo', !um.hasRedo());
 		},
 
 		_nodeChanged : function(ed, cm, n, co, ob) {
@@ -1095,11 +1100,8 @@
 				getParent(function(n) {
 					var na = n.nodeName.toLowerCase(), u, pi, ti = '';
 
-					if (n.getAttribute('data-mce-bogus'))
-						return;
-
-					// Ignore non element and hidden elements
-					if (n.nodeType != 1 || n.nodeName === 'BR' || (DOM.hasClass(n, 'mceItemHidden') || DOM.hasClass(n, 'mceItemRemoved')))
+					// Ignore non element and bogus/hidden elements
+					if (n.nodeType != 1 || na === 'br' || n.getAttribute('data-mce-bogus') || DOM.hasClass(n, 'mceItemHidden') || DOM.hasClass(n, 'mceItemRemoved'))
 						return;
 
 					// Handle prefix
@@ -1223,7 +1225,7 @@
 			ed.windowManager.open({
 				url : this.url + '/charmap.htm',
 				width : 550 + parseInt(ed.getLang('advanced.charmap_delta_width', 0)),
-				height : 250 + parseInt(ed.getLang('advanced.charmap_delta_height', 0)),
+				height : 260 + parseInt(ed.getLang('advanced.charmap_delta_height', 0)),
 				inline : true
 			}, {
 				theme_url : this.url

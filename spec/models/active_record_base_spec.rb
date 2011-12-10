@@ -64,4 +64,12 @@ describe ActiveRecord::Base do
       end
     end
   end
+
+  it "should have a valid GROUP BY clause when group_by is used correctly" do
+    conn = ActiveRecord::Base.connection
+    lambda {
+      User.find_by_sql "SELECT id, name FROM users GROUP BY #{conn.group_by('id', 'name')}"
+      User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM users) u GROUP BY #{conn.group_by('id', 'name')}"
+    }.should_not raise_error
+  end
 end

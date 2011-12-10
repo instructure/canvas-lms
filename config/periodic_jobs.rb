@@ -18,6 +18,12 @@ if ActionController::Base.session_store == ActiveRecord::SessionStore
   end
 end
 
+persistence_token_expire_after = (Setting.from_config("session_store") || {})[:expire_remember_me_after]
+persistence_token_expire_after ||= 1.month
+Delayed::Periodic.cron 'SessionPersistenceToken.delete_all', '35 11 * * *' do
+  SessionPersistenceToken.delete_all(['updated_at < ?', persistence_token_expire_after.ago])
+end
+
 Delayed::Periodic.cron 'ExternalFeedAggregator.process', '*/30 * * * *' do
   ExternalFeedAggregator.process
 end

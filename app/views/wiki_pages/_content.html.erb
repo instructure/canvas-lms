@@ -160,7 +160,7 @@ course will see this page first.  You can change that from [the course home page
           scrape: function(data) {
             if(typeof(data) == 'string') {
               try {
-                data = JSON.parse(data);
+                data = $.parseJSON(data);
               } catch(e) {
                 data = [];
               }

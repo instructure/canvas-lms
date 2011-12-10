@@ -461,7 +461,7 @@ describe CoursesController do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
       user
-      user_session(@user)
+      user_session(@user, @pseudonym)
 
       get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
       response.should redirect_to(course_url(@course))
@@ -471,6 +471,26 @@ describe CoursesController do
       @enrollment.course.should == @course
       @enrollment.workflow_state.should == 'active'
       @enrollment.should be_self_enrolled
+    end
+
+    it "should create a compatible pseudonym" do
+      @account2 = Account.create!
+      course(:active_all => true, :account => @account2)
+      @course.update_attribute(:self_enrollment, true)
+      user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
+      user_session(@user, @pseudonym)
+      @new_pseudonym = Pseudonym.new(:account => @account2, :unique_id => 'jt@instructure.com', :user => @user)
+      User.any_instance.stubs(:find_or_initialize_pseudonym_for_account).with(@account2).once.returns(@new_pseudonym)
+
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      response.should redirect_to(course_url(@course))
+      flash[:notice].should_not be_empty
+      @user.enrollments.length.should == 1
+      @enrollment = @user.enrollments.first
+      @enrollment.course.should == @course
+      @enrollment.workflow_state.should == 'active'
+      @enrollment.should be_self_enrolled
+      @user.reload.pseudonyms.length.should == 2
     end
 
     it "should not enroll for incorrect code" do

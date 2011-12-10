@@ -346,6 +346,16 @@ module MigratorHelper
         wiki[:title] = w[:title]
       end
     end
+    if @course[:external_tools]
+      @overview[:external_tools] = []
+      @course[:external_tools].each do |ct|
+        next unless ct
+        tool = {}
+        @overview[:external_tools] << tool
+        tool[:migration_id] = ct[:migration_id]
+        tool[:title] = ct[:title]
+      end
+    end
     
     if dates.length > 0
       @overview[:start_timestamp] ||= dates.min

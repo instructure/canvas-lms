@@ -82,14 +82,10 @@ describe "eportfolios" do
       driver.find_element(:css, "#page_sidebar .edit_content_link")
     }.click
     driver.find_element(:css, '.add_content_link.add_rich_content_link').click
-    wait_for_tiny(driver.find_element(:css, 'textarea.edit_section'))
 
     #send text to tiny
-    tiny_frame = wait_for_tiny(driver.find_element(:css, 'textarea.edit_section'))
     first_text = 'This is my eportfolio'
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys(first_text)
-    end
+    type_in_tiny  'textarea.edit_section', first_text
 
     driver.find_element(:id, 'edit_page_form').submit
     driver.find_element(:css, '#page_content .section_content').should include_text(first_text)

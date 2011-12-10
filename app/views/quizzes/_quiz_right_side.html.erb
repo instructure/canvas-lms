@@ -14,6 +14,7 @@
         <th><%= before_label(:time, "Time") %></th>
         <td><%= time_ago_in_words(Time.now - ((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at)) %></td>
       </tr>
+      <% unless @quiz.assignment.present? && @quiz.assignment.muted? %>
       <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
         <th><%= before_label(:current_score, "Current Score") %></th>
         <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
@@ -26,13 +27,14 @@
                   :score => @submission.kept_score,
                   :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
       </tr>
+      <% end %>
     </table>
     </div>
   </div>
     <% if @submission && params[:preview] %>
-      <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1) %>"><%= @quiz.survey? ?
+      <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1), :method => :post do %><%= @quiz.survey? ?
           t('links.preview_survey_again', "Preview the Survey Again") :
-          t('links.preview_quiz_again', "Preview the Quiz Again") %></a><br/>
+          t('links.preview_quiz_again', "Preview the Quiz Again") %><% end %><br/>
     <% elsif !@quiz.single_attempt? || can_do(@quiz, @current_user, :update) %>
       <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
         <% if @submission.attempt > 1 || (@submission.attempt == 1 && can_do(@quiz, @current_user, :update)) %>
@@ -53,9 +55,9 @@
       <% if allow_take && can_do(@quiz, @current_user, :submit) %>
         <div style="margin-top: 10px; font-size: 1.2em;">
         <% if (!@locked && (@quiz.unlimited_attempts? || @submission.attempts_left > 0)) || can_do(@quiz, @current_user, :update) %>
-          <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>"><%= @quiz.survey? ?
+          <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id), :method => :post do %><%= @quiz.survey? ?
             t('links.take_survey_again', "Take the Survey Again") :
-            t('links.take_quiz_again', "Take the Quiz Again") %></a><br/>
+            t('links.take_quiz_again', "Take the Quiz Again") %><% end %><br/>
           <span style="font-size: 0.7em; padding-left: 20px;">
             (<%= @quiz.scoring_policy == "keep_highest" ?
                  t(:will_keep_highest_score, "Will keep the highest of all your scores") :

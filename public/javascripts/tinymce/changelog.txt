@@ -1,3 +1,183 @@
+Version 3.4.7 (2011-11-03)
+	Modified the caret formatting behavior to word similar to common desktop wordprocessors like Word or Libre Office.
+	Fixed bug in Webkit - Cursor positioning does not work vertically within a table cell with multiple lines of text.
+	Fixed bug in IE where Inserting a table in IE8 places cursor in the second cell of the first row.
+	Fixed bug in IE where editor in a frame doesn't give focus to the toolbar using ALT-F10.
+	Fix for webkit and gecko so that deleting bullet from start of list outdents inner list items and moves first item into paragraph.
+	Fix new list items in IE8 not displayed on a new line when list contains nested list items.
+	Clear formatting in table cell breaks the cell.
+	Made media type list localisable.
+	Fix out of memory error when using prototype in media dialog.
+	Fixed bug where could not add a space in the middle of a th cell.
+	Fixed bug where adding a bullet between two existing bullets adds an extra one
+	Fixed bug where trying to insert a new entry midway through a bulleted list fails dismally when the next entry is tabbed in.
+	Fixed bug where pressing enter on an empty list item does not outdent properly in FF
+	Fixed bug where adding a heading after a list item in a table cell changes all styles in that cell
+	Fixed bug where hitting enter to exit from a bullet list moves cursor to the top of the page in Firefox.
+	Fixed bug where pressing backspace would not delete HRs in Firefox and IE when next to an empty paragraph.
+	Fixed bug where deleting part of the link text can cause a link with no destination to be saved.
+	Fixed bug where css style border widths wasn't handled correctly in table dialog.
+	Fixed bug where parsing invalid html contents on IE or WebKit could produce an infinite loop.
+	Fixed bug where scripts with custom script types wasn't properly passed though the editor.
+	Fixed issue where some Japanese kanji characters wasn't properly entity encoded when numeric entity mode was enabled.
+	Made emoticons dialog use the keyboard naviation.
+	Added navigation instructions to the symbols dialog.
+	Added ability to set default values for the media plugin.
+	Added new font_size_legacy_values option for converting old font element sizes to span with font-size properties.
+	Fixed bug where the symbols dialog was not accessible.
+	Added quirk for IE ensuring that the body of the document containing tinyMCE has a role="application" for accessibility.
+	Fixed bug where the advanced color picker wasn't working properly on FF 7.
+	Fixed issue where the advanced color picker was producing uppercase hex codes.
+	Fixed bug where IE 8 could throw exceptions if the contents contained resizable content elements.
+	Fixed bug where caret formatting wouldn't be correctly applied to previous sibling on WebKit.
+	Fixed bug where the select boxes for font size/family would loose it's value on WebKit due to recent iOS fixes.
+Version 3.4.6 (2011-09-29)
+	Fixed bug where list items were being created for empty divs.
+	Added support in Media plugin for audio media using the embed tag
+	Fixed accessibility bugs in WebKit and IE8 where toolbar items were not being read.
+	Added new use_accessible_selects option to ensure accessible list boxes are used in all browsers (custom widget in firefox native on other browsers)
+	Fixed bug where classid attribute was not being checked from embed objects.
+	Fixed bug in jsrobot tests with intermittently failing.
+	Fixed bug where anchors wasn't updated properly if you edited them using IE 8.
+	Fixed bug where input method on WebKit on Mac OS X would fail to initialize when sometimes focusing the editor.
+	Fixed bug where it wasn't possible to select HR elements on WebKit by simply clicking on them.
+	Fixed bug where the media plugin wouldn't work on IE9 when not using the inlinepopups plugin.
+	Fixed bug where hspace,vspace,align and bgcolor would be removed from object elements in the media plugin.
+	Fixed bug where the new youtube format wouldn't be properly parsed by the media plugin.
+	Fixed bug where the style attribute of layers wasn't properly updated on IE and Gecko.
+	Fixed bug where editing contents in a layer would fail on Gecko since contentEditable doesn't inherit properly.
+	Fixed bug where IE 6/7 would produce JS errors when serializing contents containing layers.
+Version 3.4.5 (2011-09-06)
+	Fixed accessibility bug in WebKit where the right and left arrow keys would update native list boxes.
+	Added new whitespace_elements option to enable users to specify specific elements where the whitespace is preserved.
+	Added new merge_siblings option to formats. This option makes it possible to disable the auto merging of siblings when applying formats.
+	Fixed bug in IE where trailing comma in paste plugin would cause plugin to not run correctly.
+	Fixed bug in WebKit where console messages would be logged when deleting an empty document.
+	Fixed bug in IE8 where caret positioned is on list item instead of paragraph when outdent splits the list
+	Fixed bug with image dialogs not inserting an image if id was omitted from valid_elements.
+	Fixed bug where the selection normalization logic wouldn't properly handle image elements in specific config cases.
+	Fixed bug where the map elements coords attribute would be messed up by IE when serializing the DOM.
+	Fixed bug where IE wouldn't properly handle custom elements when the contents was serialized.
+	Fixed bug where you couldn't move the caret in Gecko if you focused the editor using the API or a UI control.
+	Fixed bug where adjacent links would get merged on IE due to bugs in their link command.
+	Fixed bug where the color split buttons would loose the selection on IE if the editor was placed in a frame/iframe.
+	Fixed bug where floated images in WebKit wouldn't get properly linked.
+	Fixed bug where the fullscreen mode in a separate window wasn't forced into IE9+ standards mode.
+	Fixed bug where pressing enter in an empty editor on WebKit could produce DIV elements instead of P.
+	Fixed bug where spans would get removed incorrectly when merging two blocks on backspace/delete on WebKit.
+	Fixed bug where the editor contents wouldn't be completely removed on backspace/delete on WebKit.
+	Fixed bug where the fullpage plugin wouldn't properly render style elements in the head on IE 6/7.
+	Fixed bug where the nonbreaking_force_tab option in the nonbreaking plugin wouldn't work on Gecko/WebKit.
+	Fixed bug where the isDirty state would become true on non IE browsers if there was an table at the end of the contents.
+	Fixed bug where entities wasn't properly encoded on WebKit when pasting text as plain text.
+	Fixed bug where empty editors would produce an exception of valid_elements didn't include body and forced_root_blocks where disabled.
+	Fixed bug where the fullscreen mode wouldn't retain the header/footer in the fullpage plugin.
+	Fixed issue where the plaintext_mode and plaintext_mode_sticky language keys where swapped.
+Version 3.4.4 (2011-08-04)
+	Added new html5 audio support. Patch contributed by Ronald M. Clifford.
+	Added mute option for video elements and preload options for video/audio patch contributed by Dmitry Kalinkin.
+	Fixed selection to match visual selection before applying formatting changes.
+	Fixed browser specific bugs in lists for WebKit and IE.
+	Fixed bug where IE would scroll the window if you closed an inline dialog that was larger than the viewport. Patch by Laurence Keijmel.
+	Fixed bug where pasting contents near a span element could remove parts of that span. Patch contributed by Wesley Walser.
+	Fixed bug where formatting change would be lost after pressing enter.
+	Fixed bug in WebKit where deleting across blocks would add extra styles.
+	Fixed bug where moving cursor vertically in tables in WebKit wasn't working.
+	Fixed bug in IE where deleting would cause error in console.
+	Fixed bug where the formatter was not applying formats across list elements.
+	Fixed bug where the wordcount plugin would try and update the wordcount if tinymce had been destroyed.
+	Fixed bug where tabfocus plugin would attempt to focus elements not displayed when their parent element was hidden.
+	Fixed bug where the contentEditable state would sometimes be removed if you deleted contents in Gecko.
+	Fixed bug where inserting contents using mceInsertContent would fail if "span" was disabled in valid_elements.
+	Fixed bug where initialization might fail if some resource on gecko wouldn't load properly and fire the onload event.
+	Fixed bug where ctrl+7/8/9 keys wouldn't properly add the specific formats associated with them.
+	Fixed bug where the HTML tags wasn't properly closed in the style plugins properties dialog.
+	Fixed bug where the list plugin would produce an exception if the user tried to delete an element at the very first location.
+Version 3.4.3.2 (2011-06-30)
+	Fixed bug where deleting all of a paragraph inside a table cell would behave badly in webkit.
+	Fixed bugs in tests in firefox5 and WebKit.
+	Fixed bug where selection of table cells would produce an exception on Gecko.
+	Fixed bug where the caret wasn't properly rendered on Gecko when the editor was hidden.
+	Fixed bug where pasting plain text into WebKit would produce a pre element it will now produce more semantic markup.
+	Fixed bug where selecting list type formats using the advlist plugin on IE8 would loose editor selection.
+	Fixed bug where forced root blocks logic wouldn't properly pad elements created if they contained data attributes.
+	Fixed bug where it would remove all contents of the editor if you inserted an image when not having a caret in the document.
+	Fixed bug where the YUI compressor wouldn't properly encode strings with only a quote in them.
+	Fixed bug where WebKit on iOS5 wouldn't call nodeChanged when the selection was changed.
+	Fixed bug where mceFocus command wouldn't work properly on Gecko since it didn't focus the body element.
+	Fixed performance issue with the noneditable plugin where it would enable/disable controls to often.
+Version 3.4.3.1 (2011-06-16)
+	Fixed bug where listboxes were not being handled correctly by JAWS in firefox with the o2k7 skin.
+	Fixed bug where custom buttons were not being rendered correctly when in high contrast mode.
+	Added support for iOS 5 that now supporting contentEditable in it's latest beta.
+	Fixed bug where urls in style attributes with a _ character followed by a number would cause incorrect output.
+	Fixed bug where custom_elements option wasn't working properly on IE browsers.
+	Fixed bug where custom_elements marked as block elements wouldn't get correctly treated as block elements.
+	Fixed bug where attributes with </> wasn't properly encoded as XML entities.
+Version 3.4.3 (2011-06-09)
+	Fixed bug where deleting backwards before an image into a list would put the cursor in the wrong location.
+	Fixed bug where styles plugin would not apply styles across multiple selected block elements correctly.
+	Fixed bug where cursor would jump to start of document when selection contained empty table cells in IE8.
+	Fixed bug where applied styles wouldn't be kept if you pressed enter twice to produce two paragraphs.
+	Fixed bug where a ghost like caret would appear on Gecko when pressing enter while having a text color applied.
+	Fixed bug where IE would produce absolute urls if you inserted a image/link and reloaded the page.
+	Fixed bug where applying a heading style to a list item would cascade style to children list items.
+	Fixed bug where Editor loses focus when backspacing and changing styles in WebKit.
+	Fixed bug where exception was thrown in tinymce.util.URI when parsing a relative URI and no base_uri setting was provided.
+	Fixed bug where alt-f10 was not always giving focus to the toolbar on Safari.
+	Added new 'allow_html_in_named_anchor' option to allow html to occur within a named anchor tag.  Use at own risk.
+	Added plugin dependency support.  Will autoload plugins specified as a dependency if they haven't been loaded.
+	Fixed bug where the autolink plugin didn't work with non-English keyboards when pressing ).
+	Added possibility to change properties of all table cells in a column.
+	Added external_image_list option to get images list from user-defined variable or function.
+	Fixed bug where the autoresize plugin wouldn't reduce the editors height on Chrome.
+	Fixed bug where table size inputs were to small for values with size units.
+	Fixed bug where table cell/row size input values were not validated.
+	Fixed bug where menu item line-height would be set to wrong value by external styles.
+	Fixed bug where hasUndo() would return wrong answer.
+	Fixed bug where page title would be set to undefined by fullpage plugin.
+	Fixed bug where HTML5 video properties were not updated in embedded media settings.
+	Fixed bug where HTML comment on the first line would cause an error.
+	Fixed bug where spellchecker menu was positioned incorrectly on IE.
+	Fixed bug where breaking out of list elements on WebKit would produce a DIV instead of P after the list.
+	Fixed bug where pasting from Word in IE9 would add extra BR elements when text was word wrapped.
+	Fixed bug where numeric entities with leading zeros would produce incorrect decoding.
+	Fixed bug where hexadecimal entities wasn't properly decoded.
+	Fixed bug where bookmarks wasn't properly stored/restored on undo/redo.
+	Fixed bug where the mceInsertCommand didn't retain the values of links if they contained non url contents.
+	Fixed bug where the valid_styles option wouldn't be properly used on styles for specific elements.
+	Fixed so contentEditable is used for the body of the editor if it's supported.
+	Fixed so trailing BR elements gets removed even when forced_root_blocks option was set to false/null.
+	Fixed performance issue with mceInsertCommand and inserting very simple contents.
+	Fixed performance issue with older IE version and huge documents by optimizing the forced root blocks logic.
+	Fixed performance issue with table plugin where it checked for selected cells to often.
+	Fixed bug where creating a link on centered/floated image would produce an error on WebKit browsers.
+	Fixed bug where Gecko would remove single paragraphs if there where contents before/after it.
+	Fixed bug where the scrollbar would move up/down when pasting contents using the paste plugin.
+Version 3.4.2 (2011-04-07)
+	Added new 'paste_text_sticky_default' option to paste plugin, enables you to set the default state for paste as plain text.
+	Added new autoresize_bottom_margin option to autoresize plugin that enables you to add an extra margin at the bottom. Patch contributed by Andrew Ozz.
+	Rewritten the fullpage plugin to handle style contents better and have a more normalized behavior across browsers.
+	Fixed bug where contents inserted with mceInsertContent wasn't parsed using the default dom parser.
+	Fixed bug where blocks containing a single anchor element would be treated as empty.
+	Fixed bug where merging of table cells on IE 6, 7 wouldn't look correctly until the contents was refreshed.
+	Fixed bug where context menu wouldn't work properly on Safari since it was passing out the ctrl key as pressed.
+	Fixed bug where image border color/style values were overwritten by advimage plugin.
+	Fixed bug where setting border in advimage plugin would throw error in IE.
+	Fixed bug where empty anchors list in link settings wasn't hidden.
+	Fixed bug where xhtmlextras popups were missing localized popup-size parameters.
+	Fixed bug where the context menu wouldn't select images on WebKit browsers.
+	Fixed bug where paste plugin wouldn't properly extract the contents on WebKit due to recent changes in browser behavior.
+	Fixed bug where focus of the editor would get on control contents on IE lost due to a bug in the ColorSplitButton control.
+	Fixed bug where contextmenu wasn't disabled on noneditable elements.
+	Fixed bug where getStyle function would trigger error when called on element without style property.
+	Fixed bug where editor fail to load if Javascript Compressor was used.
+	Fixed bug where list-style-type=lower-greek would produce errors in IE<8.
+	Fixed bug where spellchecker plugin would produce errors on IE6-7.
+	Fixed bug where theme_advanced_containers configuration option causes error.
+	Fixed bug where the mceReplaceContent command would produce an error since it didn't correctly handle a return value.
+	Fixed bug where you couldn't enter float point values for em in dialog input fields since it wouldn't be considered a valid size.
+	Fixed bug in xhtmlxtras plugin where it wasn't possible to remove some attributes in the attributes dialog.
 Version 3.4.1 (2011-03-24)
 	Added significantly improved list handling via the new 'lists' plugin.
 	Added 'autolink' plugin to enable automatically linking URLs. Similar to the behavior IE has by default.

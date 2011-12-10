@@ -46,7 +46,7 @@ module I18nExtraction
       <%\s*(end|\})\s*%>
     /mx
 
-    SCOPED_BLOCK_START = /((require|define)\([^\n]+I18n.*?I18n\s*=\s*|())I18n\.scoped/m
+    SCOPED_BLOCK_START = /((require|define)\(.*?function\(.*?I18n.*?I18n\s*=\s*|())I18n\.scoped/m
     SCOPED_BLOCK = /^([ \t]*)#{SCOPED_BLOCK_START}\(#{I18N_KEY}(,\s*function\s*\(I18n\)\s*\{|\);)\s?\n((\1[^ ].*?\n)?( *\n|\1(  |\t)[^\n]+\n)+)/m
 
     I18N_ANY = /(I18n)/

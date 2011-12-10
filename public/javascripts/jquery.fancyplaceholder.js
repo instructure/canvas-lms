@@ -18,7 +18,7 @@
 
 // markup required:
 // <span class=" field-with-fancyplaceholder"><label for="email">Email Address</span></label><input type="text" id="login_apple_id"></span>
-// 
+//
 // css required:
 // span.field-with-fancyplaceholder{display:block;display:inline-block;position:relative;vertical-align:top;}
 // span.field-with-fancyplaceholder label.placeholder{color:#999;cursor:text;pointer-events:none;}
@@ -27,7 +27,7 @@
 // span.field-with-fancyplaceholder label.hidden{color:#fff;}
 // span.field-with-fancyplaceholder input.invalid{background:#ffffc5;color:#F30;}
 // span.field-with-fancyplaceholder input.editing{color:#000;background:none repeat scroll 0 0 transparent;overflow:hidden;}
-// 
+//
 // then: $(".field-with-fancyplaceholder input").fancyPlaceholder();
 
 (function($) {
@@ -49,7 +49,7 @@
 	      'font-family'   : $input.css('font-family'),
         'font-size'     : $input.css('font-size')
 	    });
-	    
+
 	    $input
         .focus(function(){
           $label.addClass('focus', 300);
@@ -58,23 +58,17 @@
           $label.removeClass('focus', 300);
         })
         .bind('keyup', hideOrShowLabels);
-      
-      // because webkit is lame and forces a yello background on things it autofills
-      // see: http://code.google.com/p/chromium/issues/detail?id=1334
-      if (window.devicePixelRatio) { //this is to detect if it is a webkit browser
-        $input.attr('autocomplete', 'off');
-      }
-      
+
       // if this was already focused before we got here, make it light gray now. sorry, ie7 cant do :focus selector, it doesn't get this.
       try {
         if ($("input:focus").get(0) == this) {
           $input.triggerHandler('focus');
-        }  
+        }
       } catch(e) {}
-      
+
 
       foundInputsAndLables.push([$input, $label]);
-      
+
       if (!pollingInterval) {
         window.setInterval(hideOrShowLabels, 100);
       }

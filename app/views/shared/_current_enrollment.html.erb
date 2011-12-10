@@ -23,6 +23,7 @@
       <%= t('accept_or_reject', "When you're ready, you can either accept or reject the invitation.") %>
       <div class="button-container button-container-right-aligned">
         <% form_tag course_enrollment_invitation_path(current_enrollment.course_id) do %>
+          <input type="hidden" name="invitation" value="<%= current_enrollment.uuid %>" />
           <button type="submit" name="accept" class="button positive button-default"><%= t('buttons.accept', 'Accept Invitation') %></button>
           <button type="submit" name="reject" class="button reject_button"><%= t('buttons.reject', 'Reject Invitation') %></button>
         <% end %>

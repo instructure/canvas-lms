@@ -20,7 +20,8 @@ class Pseudonym < ActiveRecord::Base
   include Workflow
 
   attr_accessible :user, :account, :password, :password_confirmation, :path, :path_type, :password_auto_generated, :unique_id
-  
+
+  has_many :session_persistence_tokens
   belongs_to :account
   belongs_to :user
   has_many :communication_channels, :order => 'position'
@@ -163,12 +164,11 @@ class Pseudonym < ActiveRecord::Base
   def authentication_type
     :email_login
   end
-  
+
   def works_for_account?(account)
-    return false unless account
-    self.account_id == account.id || (!account.require_account_pseudonym? && self.account.password_authentication?)
+    true
   end
-  
+
   def save_without_updating_passwords_on_related_pseudonyms
     @dont_update_passwords_on_related_pseudonyms = true
     self.save
@@ -212,7 +212,9 @@ class Pseudonym < ActiveRecord::Base
     raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
-    self.save
+    result = self.save
+    self.user.try(:update_account_associations) if result
+    result
   end
   
   def never_logged_in?
@@ -248,11 +250,6 @@ class Pseudonym < ActiveRecord::Base
     self.user.email=(e)
     user.save!
     user.email
-  end
-  
-  def account_name
-    return "Instructure" if self.account == Account.default
-    self.account.name rescue "Canvas"
   end
   
   def chat
@@ -377,9 +374,9 @@ class Pseudonym < ActiveRecord::Base
   named_scope :account_unique_ids, lambda{|account, *unique_ids|
     {:conditions => {:account_id => account.id, :unique_id => unique_ids}, :order => :unique_id}
   }
-  named_scope :active, lambda{
-    {:conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted'] }
-  }
+  named_scope :active, :conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted']
+  # returns pseudonyms not from account, but that can be used by account
+  named_scope :trusted_by, lambda { |account| {:conditions => ['account_id<>?', account.id]} }
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 end

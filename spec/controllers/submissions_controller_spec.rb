@@ -151,13 +151,17 @@ describe SubmissionsController do
     end
   end
 
-  describe "GET zip" do
-    it "should zip and download" do
+  def course_with_student_and_submitted_homework
       course_with_teacher_logged_in(:active_all => true)
       @teacher = @user
       student_in_course
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
+  end
+
+  describe "GET zip" do
+    it "should zip and download" do
+      course_with_student_and_submitted_homework
 
       get 'index', :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1', :format => 'json'
       response.should be_success
@@ -171,6 +175,19 @@ describe SubmissionsController do
       get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }, 'HTTP_ACCEPT' => '*/*'
       response.should be_success
       response['content-type'].should == 'test/file'
+    end
+  end
+
+  describe "GET show" do
+    it "should not expose muted assignment's scores" do
+      course_with_student_and_submitted_homework
+
+      get "show", :id => @submission.to_param, :assignment_id => @assignment.to_param, :course_id => @course.to_param
+      response.should be_success
+
+      %w(score published_grade published_score grade).each do |secret_attr|
+        assigns[:submission].send(secret_attr).should be_nil
+      end
     end
   end
 end

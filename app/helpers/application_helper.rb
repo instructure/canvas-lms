@@ -435,20 +435,43 @@ var I18n = I18n || {};
   def inst_env
     global_inst_object = { :environment =>  Rails.env }
     {
-      :allowMediaComments     => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings        => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes'),
-      :equellaEnabled         => !!equella_enabled?,
-      :googleAnalyticsAccount => Setting.get_cached('google_analytics_key', nil),
-      :http_status            => @status,
-      :error_id               => @error && @error.id,
-      :disableGooglePreviews  => !service_enabled?(:google_docs_previews), 
-      :disableScribdPreviews  => !feature_enabled?(:scribd),
-      :logPageViews           => !@body_class_no_headers,
+      :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
+      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes'),
+      :equellaEnabled           => !!equella_enabled?,
+      :googleAnalyticsAccount   => Setting.get_cached('google_analytics_key', nil),
+      :http_status              => @status,
+      :error_id                 => @error && @error.id,
+      :disableGooglePreviews    => !service_enabled?(:google_docs_previews), 
+      :disableScribdPreviews    => !feature_enabled?(:scribd),
+      :logPageViews             => !@body_class_no_headers,
+      :maxVisibleEditorButtons  => 3,
+      :editorButtons            => editor_buttons,
     }.each do |key,value|
       # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
       global_inst_object[key] = value if value
     end
     global_inst_object
+  end
+  
+  def editor_buttons
+    tools = []
+    contexts = []
+    contexts << @context if @context && @context.respond_to?(:context_external_tools)
+    contexts += @context.account_chain if @context.respond_to?(:account_chain)
+    contexts << @domain_root_account if @domain_root_account
+    Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
+      tools = ContextExternalTool.having_setting('editor_button').scoped(:conditions => contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
+      tools.sort_by(&:id).map do |tool|
+        {
+          :name => tool.label_for(:editor_button, nil),
+          :id => tool.id,
+          :url => tool.settings[:editor_button][:url],
+          :icon_url => tool.settings[:editor_button][:icon_url],
+          :width => tool.settings[:editor_button][:selection_width],
+          :height => tool.settings[:editor_button][:selection_height]
+        }
+      end
+    end
   end
 
   def nbsp
@@ -534,7 +557,7 @@ var I18n = I18n || {};
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
-        :href => course_path(course),
+        :href => course_path(course, :invitation => course.read_attribute(:invitation)),
         :term => term || nil,
         :subtitle => subtitle,
         :id => course.id
@@ -587,7 +610,7 @@ var I18n = I18n || {};
   def show_home_menu?
     @current_user.set_menu_data(session[:enrollment_uuid])
     [
-      @current_user.menu_data[:enrollments],
+      @current_user.menu_courses(session[:enrollment_uuid]),
       @current_user.accounts,
       @current_user.cached_current_group_memberships,
       @current_user.enrollments.ended

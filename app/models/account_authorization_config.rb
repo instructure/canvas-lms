@@ -27,6 +27,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
                   :certificate_fingerprint, :entity_id, :change_password_url,
                   :login_handle_name, :ldap_filter, :auth_filter
 
+  validates_presence_of :account_id
+  after_save :disable_open_registration_if_delegated
+
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
     require 'net/ldap'
@@ -228,5 +231,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       )
     end
     false
+  end
+
+  def disable_open_registration_if_delegated
+    if self.delegated_authentication? && self.account.open_registration?
+      @account.settings = { :open_registration => false }
+      @account.save!
+    end
   end
 end
