@@ -66,13 +66,13 @@ end
 group :test do
   gem 'barista',        '1.2.1'
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallel_tests', '0.6.4'
+  gem 'parallel_tests', '0.6.11'
   gem 'mocha',        '0.10.0'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-instafail', '0.1.9'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.14.0'
+  gem 'selenium-webdriver', '2.15.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.7.2'
 end
