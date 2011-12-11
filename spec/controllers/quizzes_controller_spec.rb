@@ -221,6 +221,22 @@ describe QuizzesController do
       @quiz.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should render_template('access_code')
+
+      # shouldn't let you in on a bad access code
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'wrongpass'
+      response.should_not be_redirect
+      response.should render_template('access_code')
+
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'bacon'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should_not be_redirect
+      response.should_not render_template('access_code')
+
+      # it should ask for the access code again if you reload the quiz
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('access_code')
     end
 
     it "should not let them take the quiz if it's locked" do
