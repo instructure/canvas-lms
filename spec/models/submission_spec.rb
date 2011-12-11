@@ -174,6 +174,18 @@ describe Submission do
         }.should change StreamItemInstance, :count
         @user.stream_item_instances.last.should be_hidden
       end
+
+      it "should hide any existing stream_item_instances when muted" do
+        Notification.create :name => "Submission Graded"
+        submission_spec_model
+        @cc = @user.communication_channels.create :path => "somewhere"
+        lambda {
+          @submission = @assignment.grade_student(@user, :grade => 10)[0]
+        }.should change StreamItemInstance, :count
+        @user.stream_item_instances.last.should_not be_hidden
+        @assignment.mute!
+        @user.stream_item_instances.last.should be_hidden
+      end
     end
 
     it "should create a stream_item_instance when graded and published" do
