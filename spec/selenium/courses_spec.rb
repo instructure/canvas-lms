@@ -114,10 +114,10 @@ shared_examples_for "course selenium tests" do
 
     driver.find_element(:id, 'copy_context_form').submit
     wait_for_ajaximations
-    
+
     # since jobs aren't running
     CourseImport.last.perform
-    
+
     keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
   end
 
@@ -130,11 +130,11 @@ shared_examples_for "course selenium tests" do
       wait_for_dom_ready
       driver.find_element(:id, 'copy_context_form').submit
       wait_for_ajaximations
-      
+
       CourseImport.last.perform
-      
+
       keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
-      
+
       @new_course = Course.last(:order => :id)
       get "/courses/#{@new_course.id}"
       driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")
@@ -143,10 +143,11 @@ shared_examples_for "course selenium tests" do
 
   it "should correctly update the course quota" do
     course_with_admin_logged_in
-    
+
     # first try setting the quota explicitly
     get "/courses/#{@course.id}/details"
     form = driver.find_element(:css, "#course_form")
+    keep_trying_until{ driver.find_element(:css, "#course_form .edit_course_link").should be_displayed }
     form.find_element(:css, ".edit_course_link").click
     quota_input = form.find_element(:css, "input#course_storage_quota_mb")
     quota_input.clear
@@ -154,7 +155,7 @@ shared_examples_for "course selenium tests" do
     form.find_element(:css, 'button[type="submit"]').click
     keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
     form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
-    
+
     # then try just saving it (without resetting it)
     get "/courses/#{@course.id}/details"
     form = driver.find_element(:css, "#course_form")
@@ -163,7 +164,7 @@ shared_examples_for "course selenium tests" do
     form.find_element(:css, 'button[type="submit"]').click
     keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
     form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
-    
+
     # then make sure it's right after a reload
     get "/courses/#{@course.id}/details"
     form = driver.find_element(:css, "#course_form")
@@ -175,7 +176,7 @@ shared_examples_for "course selenium tests" do
   it "should allow moving a student to a different section" do
     # this spec does lots of find_element where we expect that it won't exist.
     driver.manage.timeouts.implicit_wait = 0
-    
+
     c = course :active_course => true
     users = {:plain => {}, :sis => {}}
     [:plain, :sis].each do |sis_type|

@@ -286,13 +286,18 @@ describe "assignment selenium tests" do
       option_value = find_option_value(:css, '.assignment_submission_types', 'External Tool')
       driver.find_element(:css, '.assignment_submission_types > option[value="'+option_value+'"]').click
       driver.find_element(:css, '.more_options_link').click
-      keep_trying_until {
-        driver.find_elements(:css, '#context_external_tools_select td.tools .tool').length > 0
-      }
+      keep_trying_until do
+        driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].displayed?
+      end
       driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].click
-      driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
+      sleep 2 # wait for javascript to execute
+      keep_trying_until do
+        driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
+      end
       driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[1].click
-      driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
+      keep_trying_until do
+        driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
+      end
       driver.find_element(:css, '#select_context_content_dialog .add_item_button').click
       driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t2.url
       driver.find_element(:css, 'form.new_assignment').submit

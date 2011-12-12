@@ -88,13 +88,22 @@ shared_examples_for "profile selenium tests" do
     dialog.find_element(:css, ".add_pic_link").click
     filename, fullpath, data = get_file("graded.png")
     dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
+
+    # Make ajax request slow down to verify transitional state
+    FilesController.before_filter { sleep 4; true }
+
     dialog.find_element(:css, 'button[type="submit"]').click
     spans = dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img")
     spans.length.should == 3
     new_image = spans.last.find_element(:css, 'img')
     new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
-    keep_trying_until { spans.last.attribute('class') =~ /selected/ }
-    new_image.attribute('src').should =~ %r{/images/thumbnails/}
+
+    FilesController.filter_chain.pop
+
+    keep_trying_until do
+      spans.last.attribute('class') =~ /selected/
+      new_image.attribute('src').should =~ %r{/images/thumbnails/}
+    end
     dialog.find_element(:css, 'button.select_button').click
     keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
     

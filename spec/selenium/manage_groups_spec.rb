@@ -402,7 +402,7 @@ describe "manage_groups selenium tests" do
       # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
       lock = Mutex.new
       lock.lock
-      GroupsController.before_filter { lock.lock; true }
+      GroupsController.before_filter { lock.lock; lock.unlock; true }
 
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
@@ -458,7 +458,8 @@ def add_category(course, name, opts={})
   end
 
   form.submit
-  wait_for_ajaximations
+  sleep 3 # wait_for_ajax_requests times out
+  keep_trying_until { find_with_jquery("#add_category_form:visible").should be_nil }
 
   category = course.group_categories.find_by_name(name)
   category.should_not be_nil
@@ -496,7 +497,8 @@ def assign_students(category)
   assign_students.click
   confirm_dialog = driver.switch_to.alert
   confirm_dialog.accept
-  wait_for_ajaximations
+  # wait_for_ajax_requests times out here
+  sleep 5
 end
 
 def should_flash(type, message)
@@ -505,7 +507,9 @@ def should_flash(type, message)
     when :notice then '#flash_notice_message'
     when :error then '#flash_error_message'
     end
-  flash = find_with_jquery("#{element}:visible")
-  flash.should_not be_nil
-  flash.text.should =~ /#{message}/
+  keep_trying_until do
+    flash = find_with_jquery("#{element}:visible")
+    flash.should_not be_nil
+    flash.text.should =~ /#{message}/
+  end
 end
