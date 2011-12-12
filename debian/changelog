@@ -1,3 +1,16 @@
+canvas-lms (2011.12.12.16.41) testing; urgency=low
+
+  * Package ref: 2b0c4a0281406ed635810330b483ec899a102ce9
+  *
+  * [+dbf30e3] don't prepend any /login json responses
+  * [+54725e6] cleaning up grade exchange
+  * [+3a20562] moving delayed job message sending extensions into DJ plugin
+  * [+d8fe03a] handle_asynchronously_if_production
+  * [+091d10a] don't return description of locked assignments in the API
+  * [+2b0c4a0] Revert "cleaning up grade exchange"
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 12 Dec 2011 16:41:46 -0700
+
 canvas-lms (2011.12.11.18.31) testing; urgency=low
 
   * Package ref: 9eeeb45dd6d17fab9d8736c7aae265a347d12231
