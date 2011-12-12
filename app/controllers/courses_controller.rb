@@ -957,20 +957,8 @@ class CoursesController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :manage_grades)
     @context.publish_final_grades(@current_user) if publish_grades
-
-    processed_grade_publishing_statuses = {}
-    grade_publishing_statuses, overall_status = @context.grade_publishing_statuses
-    grade_publishing_statuses.each do |message, enrollments|
-      processed_grade_publishing_statuses[message] = enrollments.map do |enrollment|
-        { :id => enrollment.user.id,
-          :name => enrollment.user.name,
-          :sortable_name => enrollment.user.sortable_name,
-          :url => course_user_url(@context, enrollment.user) }
-      end
-    end
-
-    render :json => { :sis_publish_overall_status => overall_status,
-                      :sis_publish_statuses => processed_grade_publishing_statuses }
+    render :json => {:sis_publish_messages => @context.grade_publishing_messages,
+                     :sis_publish_status => @context.grade_publishing_status}
   end
 
   def reset_content
