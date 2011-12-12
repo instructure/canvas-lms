@@ -149,6 +149,52 @@ describe SubmissionsApiController, :type => :integration do
       json['user_id'].should == @student1.id
     end
 
+    it "should not show grades or hidden comments to students on muted assignments" do
+      @a1.mute!
+      @a1.grade_student(@student1, :grade => 5)
+
+      @a1.update_submission(@student1, :hidden => false, :comment => "visible comment")
+      @a1.update_submission(@student1, :hidden => true, :comment => "hidden comment")
+
+      @user = @student1
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
+            { :controller => 'submissions_api', :action => 'show',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+              :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+            { :include => %w(submission_comments rubric_assessment) })
+
+      %w(score published_grade published_score grade).each do |a|
+        json[a].should be_nil
+      end
+
+      json["submission_comments"].size.should == 1
+      json["submission_comments"][0]["comment"].should == "visible comment"
+
+      # should still show this stuff to the teacher
+      @user = @teacher
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
+            { :controller => 'submissions_api', :action => 'show',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+              :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+            { :include => %w(submission_comments rubric_assessment) })
+      json["submission_comments"].size.should == 2
+      json["grade"].should == "5"
+
+      # should show for an admin with no enrollments in the course
+      account_admin_user
+      @user.enrollments.should be_empty
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
+            { :controller => 'submissions_api', :action => 'show',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+              :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+            { :include => %w(submission_comments rubric_assessment) })
+      json["submission_comments"].size.should == 2
+      json["grade"].should == "5"
+    end
+
     it "should not find sections in other root accounts" do
       acct = account_model(:name => 'other root')
       @first_course = @course

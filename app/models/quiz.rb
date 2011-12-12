@@ -144,6 +144,10 @@ class Quiz < ActiveRecord::Base
     self.assignment_id && self.assignment && self.assignment.submission_types == 'online_quiz'
   end
 
+  def muted?
+    self.assignment && self.assignment.muted?
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'

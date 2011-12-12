@@ -23,6 +23,7 @@ module Mutable
   def mute!
     self.update_attribute(:muted, true)
     clear_sent_messages
+    hide_stream_items
   end
 
   def unmute!
@@ -40,6 +41,17 @@ module Mutable
   protected
   def clear_sent_messages
     self.clear_broadcast_messages if self.respond_to? :clear_broadcast_messages
+  end
+
+  def hide_stream_items
+    if self.respond_to? :submissions
+      item_asset_strings = submissions.map { |s| "submission_#{s.id}" }
+      stream_item_ids   = StreamItem.all(
+        :select => "id",
+        :conditions => { :item_asset_string => item_asset_strings }
+      ).map(&:id)
+      StreamItemInstance.update_all({ :hidden => true }, { :stream_item_id => stream_item_ids })
+    end
   end
 
   def show_stream_items
