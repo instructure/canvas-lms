@@ -343,7 +343,7 @@
 
 <script>
   var lastGradebookUpdate = "<%= ActiveSupport::TimeWithZone.new(Time.now, Time.zone).strftime("%Y-%m-%dT%H:%M:%S") %>";
-  var sisPublishEnabled = <%= PluginSetting.settings_for_plugin('grade_export')[:enabled] %>;
+  var sisPublishEnabled = <%= @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) ? "true" : "false" %>;
   var readOnlyGradebook = <%= !can_do(@context, @current_user, :manage_grades) %>;
   <% if @context.grading_standard_enabled? %>
     var grading_scheme = <%= raw (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard).to_json %>
