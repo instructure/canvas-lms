@@ -381,23 +381,18 @@ class AccountsController < ApplicationController
     end
   end
   
+  # TODO Refactor add_account_user and remove_account_user actions into
+  # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
       list = UserList.new(params[:user_list], @context, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
       users = list.users
       account_users = users.map do |user|
-        account_user = @context.add_user(user, params[:membership_type])
-
-        if user.registered?
-          account_user.account_user_notification!
-        else
-          account_user.account_user_registration!
-        end
-
+        admin = user.flag_as_admin(@context, params[:membership_type])
         { :enrollment => {
-          :id => account_user.id,
+          :id => admin.id,
           :name => user.name,
-          :membership_type => account_user.membership_type,
+          :membership_type => admin.membership_type,
           :workflow_state => 'active',
           :user_id => user.id,
           :type => 'admin',

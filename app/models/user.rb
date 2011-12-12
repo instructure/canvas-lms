@@ -2167,4 +2167,14 @@ class User < ActiveRecord::Base
     end
     pseudonym
   end
+
+  def flag_as_admin(account, membership_type=nil)
+    admin = account.add_user(self, membership_type)
+    if self.registered?
+      admin.account_user_notification!
+    else
+      admin.account_user_registration!
+    end
+    admin
+  end
 end
