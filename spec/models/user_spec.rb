@@ -1178,4 +1178,50 @@ describe User do
       (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
     end
   end
+
+  describe "flag_as_admin" do
+    it "should add an AccountUser" do
+      @account = account_model
+      u = User.create!
+      u.account_users.should be_empty
+      u.flag_as_admin(@account)
+      u.reload
+      u.account_users.size.should == 1
+      admin = u.account_users.first
+      admin.account.should == @account
+    end
+
+    it "should default to the AccountAdmin membership type" do
+      @account = account_model
+      u = User.create!
+      u.flag_as_admin(@account)
+      u.reload
+      admin = u.account_users.first
+      admin.membership_type.should == 'AccountAdmin'
+    end
+
+    it "should respect a provided membership type" do
+      @account = account_model
+      u = User.create!
+      u.flag_as_admin(@account, "CustomAccountUser")
+      u.reload
+      admin = u.account_users.first
+      admin.membership_type.should == 'CustomAccountUser'
+    end
+
+    it "should send an account registration email for users that haven't registered yet" do
+      AccountUser.any_instance.expects(:account_user_registration!)
+      @account = account_model
+      u = User.create!
+      u.flag_as_admin(@account)
+    end
+
+    it "should send the pre-registered account registration email for users the have already registered" do
+      AccountUser.any_instance.expects(:account_user_notification!)
+      @account = account_model
+      u = User.create!
+      u.register
+      u.flag_as_admin(@account)
+    end
+  end
 end
