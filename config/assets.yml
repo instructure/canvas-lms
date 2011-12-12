@@ -151,9 +151,11 @@ javascripts:
     - public/javascripts/edit_rubric.js
     - public/javascripts/find_outcome.js
   slickgrid:
-    - public/javascripts/vendor/slickgrid-1.4.3/lib/jquery.event.drag-2.0.min.js
-    - public/javascripts/vendor/slickgrid-1.4.3/slick.grid.js
-    - public/javascripts/vendor/slickgrid-1.4.3/slick.editors.js
+    - public/javascripts/vendor/slickgrid/lib/jquery.event.drag-2.0.min.js
+    - public/javascripts/vendor/slickgrid/slick.core.js
+    - public/javascripts/vendor/slickgrid/plugins/slick.rowselectionmodel.js
+    - public/javascripts/vendor/slickgrid/slick.grid.js
+    - public/javascripts/vendor/slickgrid/slick.editors.js
   syllabus:
     - public/javascripts/calendar_move.js
     - public/javascripts/syllabus.js
@@ -436,7 +438,7 @@ stylesheets:
   statistics:
     - public/stylesheets/compiled/statistics.css
   slickgrid:
-    - public/javascripts/vendor/slickgrid-1.4.3/slick.grid.css
+    - public/javascripts/vendor/slickgrid/slick.grid.css
   sub_accounts:
     - public/stylesheets/compiled/sub_accounts.css
   user_logins:
