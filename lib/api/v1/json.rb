@@ -16,13 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::Account
-  include Api::V1::Json
-
-  def account_json(account, user, session, includes)
-    api_json(account, user, session, :only => %w(id name parent_account_id root_account_id)).tap do |hash|
-      hash['sis_account_id'] = account.sis_source_id
-    end
+module Api::V1::Json
+  # go through this helper for all json serialization in the api -- it handles
+  # some tasks that all api json should do, like not including the root wrapper
+  # object, and passing the user permissions info into the serialization engine.
+  #
+  # this returns the ruby hash of the json data, not the raw json string. you can still pass that hash to render like
+  # render :json => hash
+  # and it'll be stringified properly.
+  def api_json(obj, user, session, opts = {})
+    obj.as_json({ :include_root => false,
+                  :permissions => { :user => user, :session => session, :include_permissions => false } }.merge(opts))
   end
 end
-

@@ -17,51 +17,53 @@
 #
 
 module Api::V1::Assignment
-  def assignment_json(assignment, includes = [], show_admin_fields = false)
-  # no includes supported right now
-  hash = assignment.as_json(:include_root => false, :only => %w(id grading_type points_possible position due_at))
+  include Api::V1::Json
 
-  hash['course_id'] = assignment.context_id
-  hash['name'] = assignment.title
-  hash['description'] = api_user_content(assignment.description, @context || assignment.context)
+  def assignment_json(assignment, user, session, includes = [], show_admin_fields = false)
+    # no includes supported right now
+    hash = api_json(assignment, user, session, :only => %w(id grading_type points_possible position due_at description))
 
-  if show_admin_fields
-    hash['needs_grading_count'] = assignment.needs_grading_count
-  end
+    hash['course_id'] = assignment.context_id
+    hash['name'] = assignment.title
+    hash['description'] = api_user_content(hash['description'], @context || assignment.context)
 
-  hash['submission_types'] = assignment.submission_types.split(',')
-
-  if assignment.quiz
-    hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
-  end
-
-  hash['muted'] = assignment.muted?
-
-  if assignment.rubric_association
-    hash['use_rubric_for_grading'] =
-      !!assignment.rubric_association.use_for_grading
-    if assignment.rubric_association.rubric
-      hash['free_form_criterion_comments'] =
-        !!assignment.rubric_association.rubric.free_form_criterion_comments
+    if show_admin_fields
+      hash['needs_grading_count'] = assignment.needs_grading_count
     end
-  end
 
-  hash['rubric'] = assignment.rubric.data.map do |row|
-    row_hash = row.slice(:id, :points, :description, :long_description)
-    row_hash["ratings"] = row[:ratings].map { |c| c.slice(:id, :points, :description) }
-    row_hash
-  end if assignment.rubric
+    hash['submission_types'] = assignment.submission_types.split(',')
 
-  if assignment.discussion_topic
-    hash['discussion_topic'] = {
-      'id' => assignment.discussion_topic.id,
-      'url' => named_context_url(assignment.context,
-                                 :context_discussion_topic_url,
-                                 assignment.discussion_topic,
-                                 :include_host => true)
-    }
-  end
+    if assignment.quiz
+      hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
+    end
 
-  hash
+    hash['muted'] = assignment.muted?
+
+    if assignment.rubric_association
+      hash['use_rubric_for_grading'] =
+        !!assignment.rubric_association.use_for_grading
+      if assignment.rubric_association.rubric
+        hash['free_form_criterion_comments'] =
+          !!assignment.rubric_association.rubric.free_form_criterion_comments
+      end
+    end
+
+    hash['rubric'] = assignment.rubric.data.map do |row|
+      row_hash = row.slice(:id, :points, :description, :long_description)
+      row_hash["ratings"] = row[:ratings].map { |c| c.slice(:id, :points, :description) }
+      row_hash
+    end if assignment.rubric
+
+    if assignment.discussion_topic
+      hash['discussion_topic'] = {
+        'id' => assignment.discussion_topic.id,
+        'url' => named_context_url(assignment.context,
+                                   :context_discussion_topic_url,
+                                   assignment.discussion_topic,
+                                   :include_host => true)
+      }
+    end
+
+    hash
   end
 end

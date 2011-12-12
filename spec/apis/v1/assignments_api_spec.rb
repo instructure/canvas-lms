@@ -230,4 +230,19 @@ describe AssignmentsApiController, :type => :integration do
         :id => @assignment.id.to_s })
     json["muted"].should eql false
   end
+
+  it "should not return the assignment description if locked for user" do
+    course_with_student(:active_all => true)
+    @assignment1 = @course.assignments.create! :title => "Test Assignment", :description => "public stuff"
+    @assignment2 = @course.assignments.create! :title => "Locked Assignment", :description => "secret stuff"
+    @assignment2.any_instantiation.expects(:locked_for?).returns(true)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments.json",
+          { :controller => 'assignments_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s })
+    json.size.should == 2
+    json.find { |e| e['name'] == "Test Assignment" }['description'].should == "public stuff"
+    json.find { |e| e['name'] == "Locked Assignment" }['description'].should be_nil
+  end
 end

@@ -43,12 +43,6 @@ describe DiscussionTopicsController, :type => :integration do
                   "id"=>@topic.id,
                   "user_name"=>"User Name",
                   "last_reply_at"=>@topic.last_reply_at.as_json,
-                  "permissions"=>{"delete"=>true,
-                                   "reply"=>true,
-                                   "read"=>true,
-                                   "attach"=>true,
-                                   "create"=>true,
-                                   "update"=>true},
                   "message"=>"<p>content here</p>",
                   "posted_at"=>@topic.posted_at.as_json,
                   "root_topic_id"=>nil,
@@ -111,13 +105,6 @@ describe DiscussionTopicsController, :type => :integration do
                           "id"=>gtopic.id,
                           "user_name"=>"User Name",
                           "last_reply_at"=>gtopic.last_reply_at.as_json,
-                          "permissions"=>
-                                  {"delete"=>true,
-                                   "reply"=>true,
-                                   "read"=>true,
-                                   "attach"=>true,
-                                   "create"=>true,
-                                   "update"=>true},
                           "message"=>"<p>content here</p>",
                           "attachments"=>
                                   [{"content-type"=>"unknown/unknown",
@@ -190,10 +177,6 @@ describe DiscussionTopicsController, :type => :integration do
         "user_name" => @user.name,
         "message" => @message,
         "created_at" => @entry.created_at.utc.iso8601,
-        "permissions" => {
-          "delete" => true, "reply" => true, "read" => true,
-          "attach" => true, "create" => true, "update" => true
-        }
       }
     end
 
