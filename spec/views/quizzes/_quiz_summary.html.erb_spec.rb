@@ -28,5 +28,28 @@ describe "/quizzes/_quiz_summary" do
     render :partial => "quizzes/quiz_summary", :object => assigns[:quiz]
     response.should_not be_nil
   end
+  
+  it "should not show scores on muted quizzes" do
+    course_with_student
+    view_context
+    @quiz = @course.quizzes.create!
+    @quiz.generate_quiz_data
+    @quiz.workflow_state = 'available'
+    @quiz.published_at = Time.now
+    @quiz.save
+
+    @quiz.assignment.should_not be_nil
+    @quiz.assignment.mute!
+    @submission = @quiz.generate_submission(@user)
+    @submission.grade_submission
+
+    view_context
+    assigns[:quiz] = @quiz
+    assigns[:submissions_hash] = { @quiz.id => @submission }
+    render :partial => "quizzes/quiz_summary", :object => @quiz
+
+    response.should_not be_nil
+    response.body.should =~ /Instructor is working on grades/
+  end
 end
 

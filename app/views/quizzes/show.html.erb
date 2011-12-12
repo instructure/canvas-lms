@@ -215,7 +215,7 @@
     <% end %>
   <% end %>
   <% if @submission && @submission.completed? %>
-    <%= render :partial => "quizzes/quiz_submission" %>
+    <%= @quiz.assignment && @quiz.assignment.muted? ? render(:partial => "quizzes/muted") : render(:partial => "quizzes/quiz_submission") %>
   <% end %>
   <% if can_do(@quiz, @current_user, :grade) %>
     <%= render :partial => "shared/message_students" %>

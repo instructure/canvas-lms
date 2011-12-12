@@ -195,6 +195,8 @@ describe "OAuth2", :type => :integration do
     it "should execute for cas login" do
       flow do
         account = account_with_cas(:account => Account.default)
+        # it should *not* redirect to the alternate log_in_url on the config, when doing oauth
+        account.account_authorization_config.update_attribute(:log_in_url, "https://www.example.com/bogus")
 
         cas = CASClient::Client.new(:cas_base_url => account.account_authorization_config.auth_base)
         cas.instance_variable_set(:@stub_user, @user)

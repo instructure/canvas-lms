@@ -221,6 +221,22 @@ describe QuizzesController do
       @quiz.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should render_template('access_code')
+
+      # shouldn't let you in on a bad access code
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'wrongpass'
+      response.should_not be_redirect
+      response.should render_template('access_code')
+
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'bacon'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should_not be_redirect
+      response.should_not render_template('access_code')
+
+      # it should ask for the access code again if you reload the quiz
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('access_code')
     end
 
     it "should not let them take the quiz if it's locked" do
@@ -393,6 +409,46 @@ describe QuizzesController do
       assigns[:quiz].should eql(@quiz)
       assigns[:submission].should_not be_nil
       assigns[:submission].should eql(s)
+    end
+
+    it "should not allow student viewing if the assignment is muted" do
+      u = user(:active_all => true)
+      course_with_student_logged_in(:active_all => true)
+      course_quiz
+      @quiz.generate_quiz_data
+      @quiz.workflow_state = 'available'
+      @quiz.published_at = Time.now
+      @quiz.save
+      
+      @quiz.assignment.should_not be_nil
+      @quiz.assignment.mute!
+      s = @quiz.generate_submission(u)
+      @submission = @quiz.generate_submission(@user)
+      get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => u.id
+
+      response.should be_redirect
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
+      flash[:notice].should match(/You cannot view the quiz history while the quiz is muted/)
+    end
+    
+    it "should allow teacher viewing if the assignment is muted" do
+      u = user(:active_all => true)
+      course_with_teacher_logged_in(:active_all => true)
+      @course.enroll_student(u)
+      
+      course_quiz
+      @quiz.generate_quiz_data
+      @quiz.workflow_state = 'available'
+      @quiz.published_at = Time.now
+      @quiz.save
+      
+      @quiz.assignment.should_not be_nil
+      @quiz.assignment.mute!
+      s = @quiz.generate_submission(u)
+      @submission = @quiz.generate_submission(@user)
+      get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => u.id
+
+      response.should be_success
     end
   end
 

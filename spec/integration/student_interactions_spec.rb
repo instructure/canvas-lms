@@ -32,31 +32,52 @@ describe "student interactions links" do
     @e.save!
     @teacher = u
     user_session(@user, @pseudonym)
-    
+
     user_model
     @student = @user
     @course.enroll_student(@student).accept
+
+    user_model
+    @student2 = @user
+    @course.enroll_student(@student2).accept
   end
-  
+
   it "should show the student link on the student's page" do
     get "/courses/#{@course.id}/users/#{@student.id}"
     response.should be_success
     response.body.should match(/Your Interactions Report with #{@student.name}/)
   end
-  
+
   it "should show the teacher link on the teacher's page" do
     get "/courses/#{@course.id}/users/#{@teacher.id}"
     response.should be_success
     response.body.should match(/Student Interactions Report for #{@teacher.name}/)
   end
-  
+
   it "should show mail link for teachers" do
     get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
     response.should be_success
     html = Nokogiri::HTML(response.body)
     html.css('.message_student_link').should_not be_nil
   end
-  
+
+  it "should recalculate grades on the first page load" do
+    Enrollment.expects(:recompute_final_score).twice # once for the course, once for the student ('s course)
+    enable_cache do
+      get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
+      response.should be_success
+
+      get "/users/#{@teacher.id}/teacher_activity/student/#{@student.id}"
+      response.should be_success
+
+      get "/users/#{@teacher.id}/teacher_activity/student/#{@student.id}"
+      response.should be_success
+
+      get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
+      response.should be_success
+    end
+  end
+
   it "should not show mail link for admins" do
     user_model
     Account.site_admin.add_user(@user)

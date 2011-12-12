@@ -28,5 +28,27 @@ describe "/quizzes/show" do
     render "quizzes/show"
     response.should_not be_nil
   end
+
+  it "should render a notice instead of grades if muted" do
+    course_with_student_logged_in(:active_all => true)
+    quiz = @course.quizzes.create
+    quiz.workflow_state = "available"
+    quiz.save!
+    quiz.assignment = @course.assignments.create(:title => quiz.title, :due_at => quiz.due_at, :submission_types => 'online_quiz')
+    quiz.assignment.mute!
+    quiz.assignment.grade_student(@student, :grade => 5)
+    submission = quiz.quiz_submissions.create
+    submission.score = 5
+    submission.user = @student
+    submission.attempt = 1
+    submission.workflow_state = "complete"
+    submission.save
+    assigns[:quiz] = quiz
+    assigns[:submission] = submission
+    view_context
+    render "quizzes/show"
+    response.should have_tag ".muted-notice"
+    true
+  end
 end
 

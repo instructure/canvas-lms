@@ -46,8 +46,9 @@
       </ul>
     <% end %>
     <div style="font-size: 11px; padding-top: 10px; max-height: 300px; overflow: auto;"><b><%= t 'titles.comments', "Comments:" %> </b>
-      <%= t('messages.no_comments', "No Comments") if @current_user_submission.submission_comments.empty? %>
-      <% @current_user_submission.submission_comments.each do |comment| %>
+      <% visible_comments = @current_user_submission.visible_submission_comments -%>
+      <%= t('messages.no_comments', "No Comments") if visible_comments.empty? %>
+      <% visible_comments.each do |comment| %>
         <div style="margin-left: 10px;">
           <%= comment.comment %>
           <div class="comment_attachments">
