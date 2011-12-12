@@ -216,6 +216,18 @@ describe "assignment selenium tests" do
     driver.find_element(:css, 'h2.title').should include_text(assignment_name)
   end
 
+  it "should create an assignment with more options" do
+    expected_text = "Assignment 1"
+    course_with_teacher_logged_in
+
+    get "/courses/#{@course.id}/assignments"
+    driver.find_element(:css, '.add_assignment_link').click
+    driver.find_element(:css, '.more_options_link').click
+    expect_new_page_load{ driver.find_element(:css, '#edit_assignment_form').submit }
+    driver.find_element(:css, '.no_assignments_message').should_not be_displayed
+    driver.find_element(:css, '#groups').should include_text(expected_text)
+  end
+
   it "should edit an assignment" do
     course_with_teacher_logged_in
     assignment_name = 'first test assignment'
