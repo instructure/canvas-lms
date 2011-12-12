@@ -724,6 +724,10 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
     end
 
+    api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
+      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => 'update_all'
+    end
+
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
     api.get 'users/:user_id/profile', :controller => :profile, :action => :show
 
