@@ -1,3 +1,23 @@
+canvas-lms (2011.12.11.18.31) testing; urgency=low
+
+  * Package ref: 9eeeb45dd6d17fab9d8736c7aae265a347d12231
+  *
+  * [+3267c07] don't use the alternate CAS login url during api oauth flow
+  * [+fc76f36] hide grades for muted quizzes. fixes #6485
+  * [+bc82fd8] add missing description for ungraded timespan alerts, refs #4317
+  * [+1eb40f3] recalculate grades on csv download and activity report load
+  * [+2300310] more efficient recompute_final_score_if_stale
+  * [+8df2d20] don't leak submission data in muted assignments in api
+  * [+dc32de9] don't leak muted assignment data (fixes #6321)
+  * [+3d3c699] don't allow students to see quiz history on muted quizzes
+  * [+1eaa5bd] don't show muted quiz scores on the quiz index page
+  * [+ba0b9e3] Revert taking feedback partial out of layout
+  * [+b6e1317] don't show the submission score in the coming up tooltip when muted
+  * [+de1332d] hide existing stream items when an assignment is muted
+  * [+9eeeb45] fix taking a quiz with an access code
+
+ -- Zach Wily <zach@instructure.com>  Sun, 11 Dec 2011 18:31:29 -0700
+
 canvas-lms (2011.12.07.14.59) testing; urgency=low
 
   * Package ref: ef98d7e66bd2a65860d29920352273c2f962572e
