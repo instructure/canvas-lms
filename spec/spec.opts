@@ -1,3 +1,5 @@
 --colour
---format nested
+--require rspec/instafail
+--format RSpec::Instafail
 --format html:tmp/spec_html/index.html
+

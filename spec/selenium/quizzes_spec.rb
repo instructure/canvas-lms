@@ -27,8 +27,8 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:css, '#quiz_options_form input#quiz_title').send_keys('new quiz')
     test_text = "new description"
     keep_trying_until{ driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
+    type_in_tiny '#quiz_description', test_text
     in_frame "quiz_description_ifr" do
-      driver.find_element(:id, 'tinymce').send_keys(test_text)
       driver.find_element(:id, 'tinymce').should include_text(test_text)
     end
     driver.find_element(:css, '.save_quiz_button').click
@@ -67,8 +67,8 @@ shared_examples_for "quiz selenium tests" do
 
     test_text = "changed description"
     keep_trying_until{ driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
+    type_in_tiny '#quiz_description', test_text
     in_frame "quiz_description_ifr" do
-      driver.find_element(:id, 'tinymce').send_keys(test_text)
       driver.find_element(:id, 'tinymce').text.include?(test_text).should be_true
     end
     driver.find_element(:css, '.save_quiz_button').click
@@ -159,10 +159,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="multiple_choice_question"]').click
     
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('Hi, this is a multiple choice question.')
-    end
+    type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
     
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(4)
@@ -213,10 +210,7 @@ shared_examples_for "quiz selenium tests" do
     
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
     
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is not a true/false question.')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'This is not a true/false question.'
     
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(2)
@@ -243,10 +237,7 @@ shared_examples_for "quiz selenium tests" do
     
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
     
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a fill in the _________ question.')
-    end
+    type_in_tiny '.question_form:visible textarea.question_content', 'This is a fill in the _________ question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
@@ -271,10 +262,7 @@ shared_examples_for "quiz selenium tests" do
     
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
     
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('Roses are [color1], violets are [color2]')
-    end
+    type_in_tiny ".question:visible textarea.question_content", 'Roses are [color1], violets are [color2]'
 
     #check answer select
     select_box = question.find_element(:css, '.blank_id_select')
@@ -323,10 +311,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="multiple_answers_question"]').click
     
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a multiple answer question.')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'This is a multiple answer question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
 
@@ -353,10 +338,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="multiple_dropdowns_question"]').click
  
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('Roses are [color1], violets are [color2]')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'Roses are [color1], violets are [color2]'
 
     #check answer select
     select_box = question.find_element(:css, '.blank_id_select')
@@ -405,10 +387,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="matching_question"]').click
 
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a matching question.')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
     
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0] = question.find_element(:name, 'answer_match_left').send_keys('first left side')
@@ -441,10 +420,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="numerical_question"]').click
 
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
     
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0].find_element(:name, 'answer_exact').send_keys('1')
@@ -474,10 +450,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="calculated_question"]').click
     
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('If [x] + [y] is a whole number, then this is a formula question.')
-    end
+    type_in_tiny '.question_form:visible textarea.question_content','If [x] + [y] is a whole number, then this is a formula question.'
     
     find_with_jquery('button.recompute_variables').click
     find_with_jquery('.supercalc:visible').send_keys('x + y')
@@ -511,10 +484,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="essay_question"]').click
 
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is an essay question.')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'This is an essay question.'
     question.submit
     wait_for_ajax_requests
 
@@ -534,10 +504,7 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="text_only_question"]').click
 
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a text question.')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'This is a text question.'
     question.submit
     wait_for_ajax_requests
 
@@ -891,6 +858,48 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:id, 'quiz_title').text.should == q.title
   end
 
+  it "should indicate when it was last saved" do
+    course_with_teacher_logged_in
+    @context = @course
+    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    q = quiz_model
+    a = AssessmentQuestion.create!
+    b = AssessmentQuestion.create!
+    bank.assessment_questions << a
+    bank.assessment_questions << b
+    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+    quest1 = q.quiz_questions.create!(:question_data => { :name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    quest2 = q.quiz_questions.create!(:question_data => { :name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+
+    q.generate_quiz_data
+    q.save!
+    get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
+    driver.find_element(:css, '.publish_quiz_button')
+
+    get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+    wait_for_dom_ready
+    wait_for_ajax_requests
+
+    # sleep because display is updated on timer, not ajax callback
+    sleep(1)
+    indicator = driver.find_element(:css, '#last_saved_indicator')
+
+    indicator.text.should == 'Not saved'
+    driver.find_element(:css, 'input[type=radio]').click
+
+    # too fast, this always fails
+    #indicator.text.should == 'Saving...'
+
+    wait_for_ajax_requests
+    indicator.text.should match(/^Saved at \d+:\d+(pm|am)$/)
+
+    #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+    driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
+    confirm_dialog = driver.switch_to.alert
+    confirm_dialog.accept
+    wait_for_dom_ready
+  end
+
   it "should round numeric questions thes same when created and taking a quiz" do
     start_quiz_question
     quiz = Quiz.last
@@ -899,10 +908,8 @@ shared_examples_for "quiz selenium tests" do
       find_element(:css, 'select.question_type').
       find_element(:css, 'option[value="numerical_question"]').click
 
-    tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
-    in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('This is a numerical question.')
-    end
+    type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
+
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0].find_element(:name, 'answer_exact').send_keys('0.000675')
     driver.execute_script <<-JS
@@ -958,18 +965,6 @@ shared_examples_for "quiz selenium tests" do
       wait_for_dom_ready
     end
 
-    it "should prevent mousewheel events on select elements when taking a quiz" do
-      driver.execute_script <<-EOF
-        window.mousewheelprevented = false;
-        jQuery('select').bind('mousewheel', function(event) {
-          mousewheelprevented = event.isDefaultPrevented();
-        }).trigger('mousewheel');
-      EOF
-  
-      is_prevented = driver.execute_script('return window.mousewheelprevented')
-      is_prevented.should be_true
-    end
-
     # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
     it "should not unhover a question so long as one of its selects has focus" do
       container = driver.find_element(:css, '.question')
@@ -984,6 +979,19 @@ shared_examples_for "quiz selenium tests" do
       driver.execute_script("$('.question select').blur()")
       container.attribute(:class).should_not match(/hover/)
     end
+
+    it "should cancel mousewheel events on select elements" do
+      driver.execute_script <<-EOF
+        window.mousewheelprevented = false;
+        jQuery('select').bind('mousewheel', function(event) {
+          mousewheelprevented = event.isDefaultPrevented();
+        }).trigger('mousewheel');
+      EOF
+
+      is_prevented = driver.execute_script('return window.mousewheelprevented')
+      is_prevented.should be_true
+    end
+
   end
 
   it "should display quiz statistics" do

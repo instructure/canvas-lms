@@ -1,4 +1,4 @@
-!define('jst/SetDefaultGradeDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['SetDefaultGradeDialog'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers; partials = partials || Handlebars.partials;
@@ -97,5 +97,7 @@
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n</form>\n";
   return buffer;});
-  return templates['SetDefaultGradeDialog'];
-});
+  define('jst/SetDefaultGradeDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['SetDefaultGradeDialog'];
+  });
+})();

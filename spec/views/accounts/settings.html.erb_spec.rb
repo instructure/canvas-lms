@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "accounts/settings.html.erb" do
   describe "sis_source_id edit box" do
     before do
-      @account = Account.default
+      @account = Account.default.sub_accounts.create!
       @account.sis_source_id = "so_special_sis_id"
       @account.save
       
@@ -49,6 +49,30 @@ describe "accounts/settings.html.erb" do
       render
       response.should have_tag("span.sis_source_id", @account.sis_source_id)
       response.should_not have_tag("input#account_sis_source_id")
+    end
+  end
+
+  describe "open registration" do
+    before do
+      @account = Account.default
+      assigns[:account] = @account
+      assigns[:account_users] = []
+      assigns[:root_account] = @account
+      assigns[:associated_courses_count] = 0
+      assigns[:account_notifications] = []
+      admin = account_admin_user
+      view_context(@account, admin)
+    end
+
+    it "should show by default" do
+      render
+      response.should have_tag("input#account_settings_open_registration")
+    end
+
+    it "should not show when a delegated auth config is around" do
+      @account.account_authorization_configs.create!(:auth_type => 'cas')
+      render
+      response.should_not have_tag("input#account_settings_open_registration")
     end
   end
 end

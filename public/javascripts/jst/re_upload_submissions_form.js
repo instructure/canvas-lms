@@ -1,4 +1,4 @@
-!define('jst/re_upload_submissions_form', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['re_upload_submissions_form'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -59,5 +59,7 @@
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n</form>\n";
   return buffer;});
-  return templates['re_upload_submissions_form'];
-});
+  define('jst/re_upload_submissions_form', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['re_upload_submissions_form'];
+  });
+})();

@@ -21,15 +21,15 @@ class QuizzesController < ApplicationController
   add_crumb(proc { t(:top_level_crumb, "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
   before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only]
-  
+
   def index
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
       @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || Time.parse("Jan 1 2020"), q.title || ""]}
       @unpublished_quizzes = @quizzes.select{|q| !q.available?}
       @quizzes = @quizzes.select{|q| q.available?}
-      @assignment_quizzes = @quizzes.select{|q| q.assignment_id} 
-      @open_quizzes = @quizzes.select{|q| q.quiz_type == 'practice_quiz'} 
+      @assignment_quizzes = @quizzes.select{|q| q.assignment_id}
+      @open_quizzes = @quizzes.select{|q| q.quiz_type == 'practice_quiz'}
       @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
       @submissions_hash = {}
       @submissions_hash
@@ -37,7 +37,7 @@ class QuizzesController < ApplicationController
       log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
     end
   end
-  
+
   def new
     if authorized_action(@context.quizzes.new, @current_user, :create)
       @assignment = nil
@@ -65,16 +65,16 @@ class QuizzesController < ApplicationController
         format.csv {
           cancel_cache_buster
           send_data(
-            @quiz.statistics_csv(:include_all_versions => params[:all_versions] == '1', :anonymous => !@quiz.graded? && @quiz.anonymous_submissions), 
-            :type => "text/csv", 
-            :filename => t(:statistics_filename, "%{title} %{type} Report", :title => @quiz.title, :type => @quiz.readable_type) + ".csv", 
+            @quiz.statistics_csv(:include_all_versions => params[:all_versions] == '1', :anonymous => !@quiz.graded? && @quiz.anonymous_submissions),
+            :type => "text/csv",
+            :filename => t(:statistics_filename, "%{title} %{type} Report", :title => @quiz.title, :type => @quiz.readable_type) + ".csv",
             :disposition => "attachment"
           )
         }
       end
     end
   end
-  
+
   def edit
     @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :update)
@@ -93,7 +93,7 @@ class QuizzesController < ApplicationController
       render :action => "new"
     end
   end
-  
+
   def read_only
     @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :read_statistics)
@@ -101,7 +101,7 @@ class QuizzesController < ApplicationController
       render
     end
   end
-  
+
   def show
     if @quiz.deleted?
       flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
@@ -110,7 +110,7 @@ class QuizzesController < ApplicationController
     end
     if authorized_action(@quiz, @current_user, :read)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-      
+
       @headers = !params[:headless]
 
       if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
@@ -142,10 +142,12 @@ class QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && @submission.untaken?
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
-      take_quiz if params[:take] && !@locked
+      if params[:take] && can_take_quiz?
+        request.post? ? start_quiz! : take_quiz
+      end
     end
   end
-  
+
   def managed_quiz_data
     @submissions = @quiz.quiz_submissions.select{|s| !s.settings_only? }
     submission_ids = {}
@@ -168,52 +170,6 @@ class QuizzesController < ApplicationController
     render
   end
 
-  def take_quiz
-    return unless authorized_action(@quiz, @current_user, :submit)
-
-    if @quiz.require_lockdown_browser?
-      return unless check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.to_param))
-    end
-
-    can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || @quiz.grants_right?(@current_user, session, :update))
-    preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
-    if !@submission || @submission.settings_only? || (@submission.completed? && can_retry && !@just_graded) || preview
-      if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
-        render :action => 'access_code'
-        return
-      elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-        render :action => 'invalid_ip'
-        return
-      else
-        user_code = @current_user 
-        user_code = nil if preview
-        user_code ||= temporary_user_code
-        @submission = @quiz.generate_submission(user_code, !!preview)
-      end
-    end
-    
-    if @submission && (@submission.untaken? || @submission.preview?) && !@just_graded
-      if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
-        render :action => 'access_code'
-      elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-        render :action => 'invalid_ip'
-      else
-        log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
-        flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
-        render :action => "take_quiz"
-      end
-    else
-      if @just_graded
-        if params[:take]
-          redirect_to named_context_url(@context, :context_quiz_url, @quiz)
-        end
-      else
-        flash[:error] = t('errors.no_more_attempts', "You have no quiz attempts left")
-      end
-    end
-  end
-  protected :take_quiz
-  
   def publish
     if authorized_action(@context, @current_user, :manage_assignments)
       @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact.select{|q| !q.available? }
@@ -230,7 +186,7 @@ class QuizzesController < ApplicationController
       redirect_to named_context_url(@context, :context_quizzes_url)
     end
   end
-  
+
   def filters
     if authorized_action(@quiz, @current_user, :update)
       @filters = []
@@ -255,7 +211,7 @@ class QuizzesController < ApplicationController
       render :json => @filters.to_json
     end
   end
-  
+
   def reorder
     if authorized_action(@quiz, @current_user, :update)
       items = []
@@ -288,7 +244,7 @@ class QuizzesController < ApplicationController
       render :json => {:reorder => true}
     end
   end
-  
+
   def history
     if authorized_action(@context, @current_user, :read)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
@@ -315,6 +271,11 @@ class QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
+      if @quiz.muted? && !@quiz.grants_right?(@current_user, session, :grade)
+        flash[:notice] = t('notices.cant_view_submission_while_muted', "You cannot view the quiz history while the quiz is muted.")
+        redirect_to named_context_url(@context, :context_quiz_url, @quiz)
+        return
+      end
       if authorized_action(@submission, @current_user, :read)
         add_crumb((!@submission.user || @submission.user == @current_user ? t(:default_history_crumb, "History") : @submission.user.name))
         @headers = !params[:headless]
@@ -332,7 +293,7 @@ class QuizzesController < ApplicationController
           @version_number = "current" if @current_version
         end
         log_asset_access(@quiz, "quizzes", 'quizzes')
-        
+
         if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
           return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
         end
@@ -380,7 +341,7 @@ class QuizzesController < ApplicationController
       end
     end
   end
-  
+
   def update
     n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
@@ -397,7 +358,7 @@ class QuizzesController < ApplicationController
         # been moved to the model quiz.rb instead.  See Quiz:build_assignment.
         params[:quiz][:assignment_group_id] = @assignment_group && @assignment_group.id
       end
-      
+
       if params[:activate]
         @quiz.with_versioning(true) do
           @quiz.generate_quiz_data
@@ -432,7 +393,7 @@ class QuizzesController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     if authorized_action(@quiz, @current_user, :delete)
       respond_to do |format|
@@ -446,7 +407,7 @@ class QuizzesController < ApplicationController
       end
     end
   end
-  
+
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
       @all_students = @context.students
@@ -493,5 +454,52 @@ class QuizzesController < ApplicationController
     @headers = false
     @show_left_side = false
     @padless = true
+  end
+
+  def start_quiz!
+    can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || @quiz.grants_right?(@current_user, session, :update))
+    preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
+    if !@submission || @submission.settings_only? || (@submission.completed? && can_retry && !@just_graded) || preview
+      user_code = @current_user
+      user_code = nil if preview
+      user_code ||= temporary_user_code
+      @submission = @quiz.generate_submission(user_code, !!preview)
+    end
+    if quiz_submission_active?
+      redirect_to named_context_url(@context, 'context_quiz_take_url', @quiz.id)
+    else
+      flash[:error] = t('errors.no_more_attempts', "You have no quiz attempts left") unless @just_graded
+      redirect_to named_context_url(@context, :context_quiz_url, @quiz)
+    end
+  end
+
+  def take_quiz
+    return unless quiz_submission_active?
+    log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
+    flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
+    render :action => 'take_quiz'
+  end
+
+  def can_take_quiz?
+    return false if @locked
+    return false unless authorized_action(@quiz, @current_user, :submit)
+    return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
+    quiz_access_code_key = "quiz_#{@quiz.id}_#{@current_user.id}_entered_access_code"
+    if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] == @quiz.access_code
+      flash[quiz_access_code_key] = true
+    end
+    if @quiz.access_code && !@quiz.access_code.empty? && flash[quiz_access_code_key] != true
+      render :action => 'access_code'
+      false
+    elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+      render :action => 'invalid_ip'
+      false
+    else
+      true
+    end
+  end
+
+  def quiz_submission_active?
+    @submission && (@submission.untaken? || @submission.preview?) && !@just_graded
   end
 end

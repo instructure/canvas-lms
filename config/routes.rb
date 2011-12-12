@@ -156,6 +156,7 @@ ActionController::Routing::Routes.draw do |map|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
     course.resources :external_tools, :collection => {:retrieve => :get} do |tools|
+      tools.resource_selection 'resource_selection', :controller => 'external_tools', :action => 'resource_selection'
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     course.resources :submissions
@@ -275,6 +276,7 @@ ActionController::Routing::Routes.draw do |map|
   map.media_object_thumbnail 'media_objects/:id/thumbnail', :controller => 'context', :action => 'media_object_thumbnail'
 
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
+  map.external_content_oembed_retrieve 'external_content/retrieve/oembed', :controller => 'external_content', :action => 'oembed_retrieve'
   map.external_content_cancel 'external_content/cancel/:service', :controller => 'external_content', :action => 'cancel'
 
   # We offer a bunch of atom and ical feeds for the user to get
@@ -356,6 +358,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    group.resources :external_tools, :only => [:show], :collection => {:retrieve => :get}
     group.images 'images', :controller => 'files', :action => 'images'
     group.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -657,6 +660,8 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
       courses.get 'courses/:course_id/todo', :action => :todo_items
+      courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
+      courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -709,6 +714,7 @@ ActionController::Routing::Routes.draw do |map|
 
       users.get 'users/self/todo', :action => :todo_items
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
+      users.post 'accounts/:account_id/users', :action => :create
     end
 
     api.with_options(:controller => :accounts) do |accounts|
@@ -762,6 +768,7 @@ ActionController::Routing::Routes.draw do |map|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
   map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
+  map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
   # See how all your routes lay out with "rake routes"
 end

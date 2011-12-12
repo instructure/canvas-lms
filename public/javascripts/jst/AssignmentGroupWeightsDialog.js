@@ -1,4 +1,4 @@
-!define('jst/AssignmentGroupWeightsDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+!(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['AssignmentGroupWeightsDialog'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
@@ -59,5 +59,7 @@
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</button>\n</div>\n";
   return buffer;});
-  return templates['AssignmentGroupWeightsDialog'];
-});
+  define('jst/AssignmentGroupWeightsDialog', ['compiled/handlebars_helpers'], function (Handlebars) {
+    return templates['AssignmentGroupWeightsDialog'];
+  });
+})();

@@ -22,13 +22,13 @@ module DeliciousDiigo
   require 'uri'
   
   def delicious_generate_request(url, method, user_name, password)
-    rootCA = 'etc/ssl/certs'
+    rootCA = '/etc/ssl/certs'
     
     url = URI.parse url
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = (url.scheme == 'https')
-    if File.exist? rootCA
-      http.ca_file = rootCA
+    if File.directory? rootCA
+      http.ca_path = rootCA
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       http.verify_depth = 5
     else

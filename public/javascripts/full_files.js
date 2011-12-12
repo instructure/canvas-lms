@@ -2447,7 +2447,7 @@ I18n.scoped('files', function(I18n) {
       }, 5000);
       if(response) {
         try {
-          var data = JSON.parse(response);
+          var data = $.parseJSON(response);
           if("errors" in data && !jQuery.isEmptyObject(data["errors"])) {
             fileUpload.swfFileError(event, id, file, {type: "server", info: JSON.stringify(data["errors"])}, false);
           } else {

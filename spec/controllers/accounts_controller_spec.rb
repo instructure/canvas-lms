@@ -141,4 +141,38 @@ describe AccountsController do
 
     assigns[:associated_courses_count].should == 1
   end
+
+  describe "update" do
+    it "should allow admins to set the sis_source_id on sub accounts" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      post 'update', :id => @account.id, :account => { :sis_source_id => 'abc' }
+      @account.reload
+      @account.sis_source_id.should == 'abc'
+    end
+
+    it "should not allow setting the sis_source_id on root accounts" do
+      account_with_admin_logged_in
+      post 'update', :id => @account.id, :account => { :sis_source_id => 'abc' }
+      @account.reload
+      @account.sis_source_id.should be_nil
+    end
+
+    it "should not allow non-site-admins to update global_includes" do
+      account_with_admin_logged_in
+      post 'update', :id => @account.id, :account => { :settings => { :global_includes => true } }
+      @account.reload
+      @account.global_includes?.should be_false
+    end
+
+    it "should allow site_admin to update global_includes" do
+      user
+      user_session(@user)
+      @account = Account.create!
+      Account.site_admin.add_user(@user)
+      post 'update', :id => @account.id, :account => { :settings => { :global_includes => true } }
+      @account.reload
+      @account.global_includes?.should be_true
+    end
+  end
 end

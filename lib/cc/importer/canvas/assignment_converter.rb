@@ -51,13 +51,13 @@ module CC::Importer::Canvas
       assignment["rubric_migration_id"] = get_node_val(meta_doc, "rubric_identifierref")
       assignment["quiz_migration_id"] = get_node_val(meta_doc, "quiz_identifierref")
       
-      ['title', "allowed_extensions", "grading_type", "submission_types"].each do |string_type|
+      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url"].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
       ["all_day", "turnitin_enabled", "peer_reviews_assigned", "peer_reviews", 
        "automatic_peer_reviews", "anonymous_peer_reviews",
-       "grade_group_students_individually"].each do |bool_val|
+       "grade_group_students_individually", "external_tool_new_tab"].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?
       end

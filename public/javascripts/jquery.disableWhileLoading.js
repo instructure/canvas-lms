@@ -42,7 +42,7 @@ I18n.scoped('instructure', function(I18n) {
         });
       });
     
-      $.when(deferred).then(function(){
+      $.when(deferred).always(function(){
         $this.spin(false); // stop spinner
         $disabledArea.css('opacity', function(){ return $(this).data(dataKey+'opacityBefore') });
         $inputsToDisable.prop('disabled', false);

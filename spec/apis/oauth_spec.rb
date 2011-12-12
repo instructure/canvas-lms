@@ -57,9 +57,14 @@ describe "OAuth2", :type => :integration do
 
     # don't need developer key when we have an actual application session
     post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+    response.should redirect_to("http://www.example.com/?login_success=1")
     get "/api/v1/courses.json", {}
     response.should be_success
-    JSON.parse(response.body).size.should == 1
+    # because this is a normal application session, the response is prepended
+    # with our anti-csrf measure
+    json = response.body
+    json.should match(%r{^while\(1\);})
+    JSON.parse(json.sub(%r{^while\(1\);}, '')).size.should == 1
     reset!
 
     post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
@@ -111,9 +116,6 @@ describe "OAuth2", :type => :integration do
         code = response['Location'].match(/code=([^\?&]+)/)[1]
         code.should be_present
 
-        get response['Location']
-        response.should be_success
-
         # make sure the user is now logged out, or the app also has full access to their session
         get '/'
         response.should be_redirect
@@ -154,6 +156,18 @@ describe "OAuth2", :type => :integration do
       end
     end
 
+    it "should not prepend the csrf protection even if the post has a session" do
+      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+      post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+      code = ActiveSupport::SecureRandom.hex(64)
+      code_data = { 'user' => @user.id, 'client_id' => @client_id }
+      Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
+      post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
+      response.should be_success
+      json = JSON.parse(response.body)
+      json['access_token'].should == AccessToken.last.token
+    end
+
     it "should execute for password/ldap login" do
       flow do
         get response['Location']
@@ -181,6 +195,8 @@ describe "OAuth2", :type => :integration do
     it "should execute for cas login" do
       flow do
         account = account_with_cas(:account => Account.default)
+        # it should *not* redirect to the alternate log_in_url on the config, when doing oauth
+        account.account_authorization_config.update_attribute(:log_in_url, "https://www.example.com/bogus")
 
         cas = CASClient::Client.new(:cas_base_url => account.account_authorization_config.auth_base)
         cas.instance_variable_set(:@stub_user, @user)
@@ -193,7 +209,9 @@ describe "OAuth2", :type => :integration do
         response.should redirect_to(cas.add_service_to_login_url(login_url))
 
         get '/login', :ticket => 'ST-abcd'
-        session[:cas_login].should == true
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/auth\?code=})
+        session.should be_blank
       end
     end
 

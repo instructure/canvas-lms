@@ -30,7 +30,7 @@ class GradebooksController < ApplicationController
       redirect_to named_context_url(@context, :context_gradebook_url)
       return
     end
-    
+
     id = params[:id]
     if !id
       if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
@@ -51,7 +51,7 @@ class GradebooksController < ApplicationController
       respond_to do |format|
         if @student
           add_crumb(@student.name, named_context_url(@context, :context_student_grades_url, @student.id))
-          
+
           @groups = @context.assignment_groups.active.all
           @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title')
           groups_assignments =
@@ -72,7 +72,7 @@ class GradebooksController < ApplicationController
       end
     end
   end
-  
+
   def grading_rubrics
     @rubric_contexts = @context.rubric_contexts(@current_user)
     if params[:context_code]
@@ -93,7 +93,7 @@ class GradebooksController < ApplicationController
     updated ||= Time.parse("Jan 1 2000")
     @submissions = @context.submissions.find(:all, :include => [:quiz_submission, :submission_comments, :attachments], :conditions => ['submissions.updated_at > ?', updated]).to_a
     @new_submissions = @submissions
-    
+
     respond_to do |format|
       if @new_submissions.empty?
         format.json { render :json => [].to_json }
@@ -130,7 +130,7 @@ class GradebooksController < ApplicationController
       # redirect
     end
   end
-  
+
   # GET /gradebooks/1
   # GET /gradebooks/1.xml
   # GET /gradebooks/1.json
@@ -147,7 +147,7 @@ class GradebooksController < ApplicationController
       newest = Time.parse("Jan 1 2010")
       @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
       @assignments = @just_assignments.dup + groups_as_assignments(@groups)
-      @gradebook_upload = @context.build_gradebook_upload      
+      @gradebook_upload = @context.build_gradebook_upload
       @submissions = []
       @submissions = @context.submissions
       @new_submissions = @submissions
@@ -163,7 +163,7 @@ class GradebooksController < ApplicationController
       @enrollments_hash = {}
       @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
       @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name.downcase }.uniq
-      
+
       log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")
       respond_to do |format|
         if params[:view] == "simple"
@@ -174,12 +174,13 @@ class GradebooksController < ApplicationController
         end
         format.csv {
           cancel_cache_buster
+          Enrollment.recompute_final_score_if_stale @context
           send_data(
             @context.gradebook_to_csv(:include_sis_id => @context.grants_right?(@current_user, session, :manage_students)),
-            :type => "text/csv", 
-            :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv", 
+            :type => "text/csv",
+            :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
             :disposition => "attachment"
-          ) 
+          )
         }
         format.json  { render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments]) }
       end
@@ -190,7 +191,7 @@ class GradebooksController < ApplicationController
     # res = "{"
     if params[:assignments]
       # you need to specify specifically which assignment fields you want returned to the gradebook via json here
-      # that makes it so we do a lot less querying to the db, which means less active record instantiation, 
+      # that makes it so we do a lot less querying to the db, which means less active record instantiation,
       # which means less AR -> JSON serialization overhead which means less data transfer over the wire and faster request.
       # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
       render :json => @context.assignments.active.gradeable.scoped(
@@ -223,7 +224,7 @@ class GradebooksController < ApplicationController
     end
   end
   protected :gradebook_init_json
-  
+
   def history
     if authorized_action(@context, @current_user, :manage_grades)
       # TODO this whole thing could go a LOT faster if you just got ALL the versions of ALL the submissions in this course then did a ruby sort_by day then grader
@@ -278,23 +279,24 @@ class GradebooksController < ApplicationController
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
           format.xml  { head :created, :location => course_gradebook_url(@assignment.context) }
-          format.json { 
+          format.json {
             render :json => @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context)
           }
-          format.text { 
-            render_for_text @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context)
+          format.text {
+            render :json => @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context),
+                   :as_text => true
           }
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
           format.html { render :action => "show", :course_id => @assignment.context.id }
           format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }
           format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
-          format.text { render_for_text({:errors => {:base => @error_message}}.to_json) }
+          format.text { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
         end
       end
     end
   end
-  
+
   def submissions_zip_upload
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if !params[:submissions_zip] || params[:submissions_zip].is_a?(String)
@@ -308,7 +310,7 @@ class GradebooksController < ApplicationController
                          :other => "Files and comments created for %{count} user submissions" },
                        :count => @comments.length)
   end
-  
+
   def speed_grader
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -327,10 +329,10 @@ class GradebooksController < ApplicationController
     @headers = false
     render :action => "blank_submission"
   end
-  
+
   def public_feed
     return unless get_feed_context(:only => [:course])
-    
+
     respond_to do |format|
       feed = Atom::Feed.new do |f|
         f.title = t('titles.feed_for_course', "%{course} Gradebook Feed", :course => @context.name)
@@ -356,7 +358,7 @@ class GradebooksController < ApplicationController
       number_to_percentage(weight, :precision => precision)
     end
 
-    points_possible = 
+    points_possible =
       (@context.group_weighting_scheme == "percent") ?
         (options[:out_of_final] ?
           lambda{ |group| t(:out_of_final, "%{weight} of Final", :weight => percentage[group.group_weight]) } :

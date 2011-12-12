@@ -91,6 +91,157 @@ describe "editing external tools" do
     @tag.url.should == "http://www.example.com"
   end
   
+  it "should allow adding an external tool with resource selection enabled to a course module" do
+    course_with_teacher_logged_in
+    @module = @course.context_modules.create!(:name => "module")
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:resource_selection] = {
+      :url => "http://#{HostUrl.default_host}/selection_test",
+      :selection_width => 400,
+      :selection_height => 400
+    }
+    tool.save!
+    tool2 = @course.context_external_tools.new(:name => "not bob", :consumer_key => "not bob", :shared_secret => "not bob", :url => "https://www.example.com")
+    tool2.save!
+    get "/courses/#{@course.id}/modules"
+    
+    keep_trying_until{ driver.execute_script("return window.modules.refreshed == true") }
+
+    driver.find_element(:css, "#context_module_#{@module.id} .add_module_item_link").click
+    driver.find_element(:css, "#add_module_item_select option[value='context_external_tool']").click
+    
+    keep_trying_until { driver.find_elements(:css, "#context_external_tools_select .tools .tool").length > 0 }
+    
+    tools = driver.find_elements(:css, "#context_external_tools_select .tools .tool")
+    tools[0].find_element(:css, ".name").text.should_not match(/not/)
+    tools[1].find_element(:css, ".name").text.should match(/not bob/)
+    tools[1].click
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == "https://www.example.com"
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == "not bob"
+    
+    tools[0].click
+    
+    keep_trying_until { driver.find_elements(:css, "#resource_selection_dialog")[0].try(:displayed?) }
+    
+    in_frame('resource_selection_iframe') do
+      keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
+      driver.find_elements(:css, ".link").length.should == 4
+      driver.find_element(:css, "#basic_lti_link").click
+    end
+    
+    keep_trying_until { !driver.find_element(:css, "#resource_selection_dialog").displayed? }
+    
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == "http://www.example.com"
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == "lti embedded link"
+  end
+  
+  it "should alert when invalid url data is returned by a resource selection dialog" do
+    course_with_teacher_logged_in
+    @module = @course.context_modules.create!(:name => "module")
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:resource_selection] = {
+      :url => "http://#{HostUrl.default_host}/selection_test",
+      :selection_width => 400,
+      :selection_height => 400
+    }
+    tool.save!
+    tool2 = @course.context_external_tools.new(:name => "not bob", :consumer_key => "not bob", :shared_secret => "not bob", :url => "https://www.example.com")
+    tool2.save!
+    get "/courses/#{@course.id}/modules"
+    
+    keep_trying_until{ driver.execute_script("return window.modules.refreshed == true") }
+
+    driver.find_element(:css, "#context_module_#{@module.id} .add_module_item_link").click
+    driver.find_element(:css, "#add_module_item_select option[value='context_external_tool']").click
+    
+    keep_trying_until { driver.find_elements(:css, "#context_external_tools_select .tools .tool").length > 0 }
+    
+    tools = driver.find_elements(:css, "#context_external_tools_select .tools .tool")
+    tools[0].find_element(:css, ".name").text.should_not match(/not/)
+    tools[1].find_element(:css, ".name").text.should match(/not bob/)
+    tools[1].click
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == "https://www.example.com"
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == "not bob"
+    
+    tools[0].click
+    
+    keep_trying_until { driver.find_elements(:css, "#resource_selection_dialog")[0].try(:displayed?) }
+    
+    in_frame('resource_selection_iframe') do
+      keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
+      driver.find_elements(:css, ".link").length.should == 4
+      driver.find_element(:css, "#bad_url_basic_lti_link").click
+    end
+    
+    driver.switch_to.alert.accept
+    
+    driver.find_element(:css, "#resource_selection_dialog").should_not be_displayed
+    
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == ""
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == ""
+
+    tools[0].click
+    
+    keep_trying_until { driver.find_elements(:css, "#resource_selection_dialog")[0].try(:displayed?) }
+    
+    in_frame('resource_selection_iframe') do
+      keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
+      driver.find_elements(:css, ".link").length.should == 4
+      driver.find_element(:css, "#no_url_basic_lti_link").click
+    end
+    
+    driver.switch_to.alert.accept
+    
+    driver.find_element(:css, "#resource_selection_dialog").should_not be_displayed
+    
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == ""
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == ""
+  end
+
+  it "should use the tool name if no link text is returned" do
+    course_with_teacher_logged_in
+    @module = @course.context_modules.create!(:name => "module")
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:resource_selection] = {
+      :url => "http://#{HostUrl.default_host}/selection_test",
+      :selection_width => 400,
+      :selection_height => 400
+    }
+    tool.save!
+    tool2 = @course.context_external_tools.new(:name => "not bob", :consumer_key => "not bob", :shared_secret => "not bob", :url => "https://www.example.com")
+    tool2.save!
+    get "/courses/#{@course.id}/modules"
+    
+    keep_trying_until{ driver.execute_script("return window.modules.refreshed == true") }
+
+    driver.find_element(:css, "#context_module_#{@module.id} .add_module_item_link").click
+    driver.find_element(:css, "#add_module_item_select option[value='context_external_tool']").click
+    
+    keep_trying_until { driver.find_elements(:css, "#context_external_tools_select .tools .tool").length > 0 }
+    
+    tools = driver.find_elements(:css, "#context_external_tools_select .tools .tool")
+    tools[0].find_element(:css, ".name").text.should_not match(/not/)
+    tools[1].find_element(:css, ".name").text.should match(/not bob/)
+    tools[1].click
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == "https://www.example.com"
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == "not bob"
+    
+    tools[0].click
+    
+    keep_trying_until { driver.find_elements(:css, "#resource_selection_dialog")[0].try(:displayed?) }
+    
+    in_frame('resource_selection_iframe') do
+      keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
+      driver.find_elements(:css, ".link").length.should == 4
+      driver.find_element(:css, "#no_text_basic_lti_link").click
+    end
+    
+    keep_trying_until { !driver.find_element(:css, "#resource_selection_dialog").displayed? }
+    
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == "http://www.example.com"
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == "bob"
+  end
+  
   it "should allow editing the settings for a tool in a module" do
     course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
@@ -134,7 +285,7 @@ describe "editing external tools" do
     keep_trying_until { driver.find_element(:css, "#tool_content").displayed? }
   end
 
-  it "should automatically load tools with defaul configuration" do
+  it "should automatically load tools with default configuration" do
     course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     @module = @course.context_modules.create!(:name => "module")

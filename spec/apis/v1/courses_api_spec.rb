@@ -140,8 +140,8 @@ describe CoursesController, :type => :integration do
 
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
-    json.should == api_json_response([first_user, new_user],
-        :only => USER_API_FIELDS)
+    json.sort_by{|x| x["id"]}.should == api_json_response([first_user, new_user],
+        :only => USER_API_FIELDS).sort_by{|x| x["id"]}
   end
 
   it "should not include user sis id or login id for non-admins" do
@@ -238,8 +238,8 @@ describe CoursesController, :type => :integration do
 
     json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
             { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
-    json.should == api_json_response([first_user, new_user],
-        :only => USER_API_FIELDS)
+    json.sort_by{|x| x["id"]}.should == api_json_response([first_user, new_user],
+        :only => USER_API_FIELDS).sort_by{|x| x["id"]}
 
     json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
             { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
@@ -313,4 +313,174 @@ describe CoursesController, :type => :integration do
             { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
     json['id'].should == @course1.id
   end
+end
+
+def each_copy_option
+  [[:assignments, :assignments], [:external_tools, :context_external_tools], [:files, :attachments], 
+   [:topics, :discussion_topics], [:calendar_events, :calendar_events], [:quizzes, :quizzes], 
+   [:modules, :context_modules], [:outcomes, :learning_outcomes]].each{|o| yield o}
+end
+
+describe ContentImportsController, :type => :integration do
+  before(:each) do
+    course_with_teacher_logged_in(:active_all => true, :name => 'origin story')
+    @copy_from = @course
+    @copy_from.sis_source_id = 'from_course'
+    
+    # create one of everything that can be copied
+    group = @course.assignment_groups.create!(:name => 'group1')
+    @course.assignments.create!(:title => 'Assignment 1', :points_possible => 10, :assignment_group => group)
+    @copy_from.discussion_topics.create!(:title => "Topic 1", :message => "<p>watup?</p>")
+    @copy_from.syllabus_body = "haha"
+    @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => 'hi')
+    @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com')
+    Attachment.create!(:filename => 'wut.txt', :display_name => "huh?", :uploaded_data => StringIO.new('uh huh.'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+    @copy_from.calendar_events.create!(:title => 'event', :description => 'hi', :start_at => 1.day.from_now)
+    @copy_from.context_modules.create!(:name => "a module")
+    @copy_from.quizzes.create!(:title => 'quiz')
+    LearningOutcomeGroup.default_for(@copy_from).add_item(@copy_from.learning_outcomes.create!(:short_description => 'oi'))
+    @copy_from.save
+    
+    course_with_teacher(:active_all => true, :name => 'whatever', :user => @user)
+    @copy_to = @course
+    @copy_to.sis_source_id = 'to_course'
+    @copy_to.save
+  end
+  
+  def run_copy(to_id=nil, from_id=nil, options={})
+    to_id ||= @copy_to.to_param
+    from_id ||= @copy_from.to_param
+    api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
+            { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
+    {:source_course => from_id}.merge(options))
+    data = JSON.parse(response.body)
+    
+    status_url = data['status_url']
+    dj = Delayed::Job.last
+    
+    api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
+    (JSON.parse(response.body)).tap do |res|
+      res['workflow_state'].should == 'created'
+      res['progress'].should be_nil
+    end
+    
+    dj.invoke_job
+    
+    api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
+    (JSON.parse(response.body)).tap do |res|
+      res['workflow_state'].should == 'completed'
+      res['progress'].should == 100
+    end
+  end
+  
+  def run_unauthorized(to_id, from_id)
+    status = raw_api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
+            { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
+    {:source_course => from_id})
+    status.should == 401
+  end
+  
+  def run_not_found(to_id, from_id)
+    status = raw_api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
+            { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
+    {:source_course => from_id})
+    response.status.should == "404 Not Found"
+  end
+  
+  def run_only_copy(option)
+    run_copy(nil, nil, {:only => [option]})
+  end
+  
+  def run_except_copy(option)
+    run_copy(nil, nil, {:except => [option]})
+  end
+  
+  def check_counts(expected_count, skip = nil)
+    each_copy_option do |option, association|
+      next if skip && option == skip
+      @copy_to.send(association).count.should == expected_count
+    end
+  end
+  
+  it "should copy a course with canvas id" do
+    run_copy
+    check_counts 1
+  end
+  
+  it "should copy a course using sis ids" do
+    run_copy('sis_course_id:to_course', 'sis_course_id:from_course')
+    check_counts 1
+  end
+  
+  it "should not allow copying into an unauthorized course" do
+    course_with_teacher_logged_in(:active_all => true, :name => 'origin story')
+    run_unauthorized(@copy_to.to_param, @course.to_param)
+  end
+  
+  it "should not allow copying from an unauthorized course" do
+    course_with_teacher_logged_in(:active_all => true, :name => 'origin story')
+    run_unauthorized(@course.to_param, @copy_from.to_param)
+  end
+  
+  it "should return 404 for a source course that isn't found" do
+    run_not_found(@copy_to.to_param, "0")
+  end
+  
+  it "should return 404 for a destination course that isn't found" do
+    run_not_found("0", @copy_from.to_param)
+  end
+  
+  it "should return 404 for an import that isn't found" do
+    raw_api_call(:get, "/api/v1/courses/#{@copy_to.id}/course_copy/444", 
+                 { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => '444', :format => 'json' })
+    response.status.should == "404 Not Found"
+  end
+  
+  it "shouldn't allow both only and except options" do
+    raw_api_call(:post, "/api/v1/courses/#{@copy_to.id}/course_copy",
+            { :controller => 'content_imports', :action => 'copy_course_content', :course_id => @copy_to.to_param, :format => 'json' },
+    {:source_course => @copy_from.to_param, :only => [:topics], :except => [:assignments]})
+    response.status.to_i.should == 400
+    json = JSON.parse(response.body)
+    json['errors'].should == 'You can not use "only" and "except" options at the same time.'
+  end
+  
+  it "should only copy course settings" do
+    run_only_copy(:course_settings)
+    check_counts 0
+    @copy_to.reload
+    @copy_to.syllabus_body.should == "haha"
+  end
+  it "should only copy wiki pages" do
+    run_only_copy(:wiki_pages)
+    check_counts 0
+    @copy_to.wiki.wiki_pages.count.should == 1
+  end
+  each_copy_option do |option, association|
+    it "should only copy #{option}" do
+      run_only_copy(option)
+      @copy_to.send(association).count.should == 1
+      check_counts(0, option)
+    end
+  end
+  
+  it "should skip copy course settings" do
+    run_except_copy(:course_settings)
+    check_counts 1
+    @copy_to.reload
+    @copy_to.syllabus_body.should == nil
+  end
+  it "should skip copy wiki pages" do
+    run_except_copy(:wiki_pages)
+    check_counts 1
+    @copy_to.wiki.wiki_pages.count.should == 0
+  end
+  each_copy_option do |option, association|
+    it "should skip copy #{option}" do
+      run_except_copy(option)
+      @copy_to.send(association).count.should == 0
+      check_counts(1, option)
+    end
+  end
+  
 end

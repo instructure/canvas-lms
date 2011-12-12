@@ -149,6 +149,7 @@ class SubmissionsApiController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:id])
     @submission = @assignment.submission_for_student(@user)
+
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
       render :json => submission_json(@submission, @assignment, @context, includes).to_json
@@ -268,7 +269,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User).compact unless user_ids.blank?
+    Api.map_ids(user_ids, User, @domain_root_account)
   end
 
   def get_course_from_section

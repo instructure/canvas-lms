@@ -71,7 +71,7 @@ describe Pseudonym do
     Pseudonym.all.sort.map(&:id).should eql([p3.id, p2.id, p1.id])
   end
   
-  it "should update user account associations on create and update" do
+  it "should update user account associations on CRUD" do
     account_model
     user_model
     account1 = account_model
@@ -89,6 +89,10 @@ describe Pseudonym do
     @user.reload
     @user.user_account_associations.length.should eql(1)
     @user.user_account_associations.first.account.should eql(account2)
+
+    @pseudonym.destroy
+    @user.reload
+    @user.user_account_associations.should == []
   end
   
   it "should allow deleting pseudonyms" do

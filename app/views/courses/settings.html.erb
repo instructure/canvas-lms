@@ -21,7 +21,7 @@
   observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]}
   has_multiple_sections = @context.course_sections.active.count > 1
 
-  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true' && can_do(@context, @current_user, :manage_grades)
+  publishing_enabled = @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades)
 
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 %>
@@ -308,13 +308,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         </td>
         <td>
           <span class="course_info grading_scheme_set">
-            <%= @context.grading_standard_id ? (@context.grading_standard_title || t('grading_standard_currently_set', "Currently Set")) : t('grading_standard_not_set', "Not Set") %>
+            <%= @context.grading_standard_enabled? ? (@context.grading_standard_title || t('grading_standard_currently_set', "Currently Set")) : t('grading_standard_not_set', "Not Set") %>
           </span>
           <span class="course_form">
             <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox" %>
             <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
             <div class="grading_standard_link" style="margin-left: 20px;">
-              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_id ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
+              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
             </div>
           </span>
         </td>
@@ -530,6 +530,16 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <% end %>
           <option value="ObserverEnrollment"><%= t('option.observers', %{Observers}) %></option>
         </select>
+      </div>
+      <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
+        <%= label_tag :course_section_id, :en => 'For the section' %>
+        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
+          <% @context.course_sections.active.each do |section| %>
+            <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
+          <% end %>
+        </select>
+      </div>
+      <div>
         <span id="limit_priveleges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
           <input type="checkbox" id="limit_priveleges_to_course_section" name="limit_priveleges_to_course_section" value="1"/>
           <%= label_tag :limit_priveleges_to_course_section, :en => 'these admins can only grade students in their section' %>
@@ -540,14 +550,6 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <%= label_tag :auto_accept_enrollment, :en => "don't send invite, just auto-accept these users" %>
           </div>
         <% end %>
-      </div>
-      <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
-        <%= label_tag :course_section_id, :en => 'For the section' %>
-        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
-          <% @context.course_sections.active.each do |section| %>
-            <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
-          <% end %>
-        </select>
       </div>
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
         <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative priveleges for this course.}) %>

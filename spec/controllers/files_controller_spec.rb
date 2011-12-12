@@ -138,7 +138,7 @@ describe FilesController do
       a1 = folder_file
       get 'index', :course_id => @course.id, :format => 'json'
       response.should be_success
-      data = JSON.parse(response.body) rescue nil
+      data = json_parse
       data.should_not be_nil
       data['contexts'].length.should eql(1)
       data['contexts'][0]['course']['id'].should eql(@course.id)
@@ -240,7 +240,7 @@ describe FilesController do
     it "should mark files as viewed for module progressions if the file is previewed inline" do
       file_in_a_module
       get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
-      response.body.should eql({:ok => true}.to_json)
+      json_parse.should == {'ok' => true}
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
     end
@@ -420,7 +420,7 @@ describe FilesController do
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil
-      json = JSON.parse(response.body) rescue nil
+      json = json_parse
       json.should_not be_nil
       json['id'].should eql(assigns[:attachment].id)
       json['upload_url'].should_not be_nil
@@ -447,7 +447,7 @@ describe FilesController do
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil
-      json = JSON.parse(response.body) rescue nil
+      json = json_parse
       json.should_not be_nil
       json['id'].should eql(assigns[:attachment].id)
       json['upload_url'].should_not be_nil
@@ -498,7 +498,7 @@ describe FilesController do
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil
-      json = JSON.parse(response.body) rescue nil
+      json = json_parse
       json.should_not be_nil
       json['id'].should eql(assigns[:attachment].id)
       json['upload_url'].should_not be_nil

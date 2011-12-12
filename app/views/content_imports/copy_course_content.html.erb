@@ -120,6 +120,14 @@ HEREDOC
         <% end %>
       </ul>
     <% end %>
+    <% if @context.context_external_tools.active.length > 0 %>
+      <h3><%= t('labels.external_tools', "External Tools for %{course}", :course => @context.name) %></h3>
+      <ul class="unstyled_list asset_list">
+        <% @context.context_external_tools.active.each do |tool| %>
+          <li class="<%= 'added' if @copies.include?(tool.asset_string) %>"><%= tool.name %></li>
+        <% end %>
+      </ul>
+    <% end %>
 
   <ul class="unstyled_list" style="display: none;">
   <% @results.each do |result| %>

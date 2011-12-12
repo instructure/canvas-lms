@@ -81,7 +81,7 @@
     }
     $("#"+editorID+"_tbl").css('height', '');
   }
-
+  
   function EditorBox(id, search_url, submit_url, content_url, options) {
     options = $.extend({}, options);
     if (options.fullHeight) {
@@ -96,6 +96,16 @@
       width = $("#" + id).closest(":visible").width();
     }
     var instructure_buttons = ",instructure_embed,instructure_equation";
+    for(var idx in INST.editorButtons) {
+      // maxVisibleEditorButtons should be the max number of external tool buttons
+      // that are visible, INCLUDING the catchall "more external tools" button that
+      // will appear if there are too many to show at once.
+      if(INST.editorButtons.length <= INST.maxVisibleEditorButtons || idx < INST.maxVisibleEditorButtons - 1) {
+        instructure_buttons = instructure_buttons + ",instructure_external_button_" + INST.editorButtons[idx].id;
+      } else if(!instructure_buttons.match(/instructure_external_button_clump/)) {
+        instructure_buttons = instructure_buttons + ",instructure_external_button_clump";
+      }
+    }
     if(INST && INST.allowMediaComments) {
       instructure_buttons = instructure_buttons + ",instructure_record";
     }
@@ -123,7 +133,7 @@
       mode : "exact",
       elements: id,
       theme : "advanced",
-      plugins: "instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
+      plugins: "instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
       dialog_type: 'modal',
       relative_urls: false,
       remove_script_host: true,
@@ -353,9 +363,11 @@
   var editorBoxIdCounter = 1;
   
   $.fn.editorBox = function(options, more_options) {
+    var args = arguments;
     if(this.length > 1) {
       return this.each(function() {
-        $(this).editorBox(options, more_options);
+        var $this = $(this);
+        $this.editorBox.apply($this, args);
       });
     }
     if (editorBoxIdCounter === 1) init();
@@ -559,6 +571,8 @@
       url = "http://" + url;
     }
     var classes = options.classes || "";
+    var defaultText = options.text || options.title || "Link";
+    var target = options.target || null;
     var id = $(this).attr('id');
     if(url.indexOf("@") != -1) {
       options.file = false;
@@ -603,27 +617,36 @@
     
     var selectedContent = selection.getContent();
     if($instructureEditorBoxList._getEditor(id).isHidden()) {
-      selectionText = title || "Link";
+      selectionText = defaultText;
       var $div = $("<div><a/></div>");
       $div.find("a")
-        [link_id ? 'attr' : 'removeAttr']('id', link_id)
-        .attr('title', title)
-        .attr('href', url)
+        [link_id ? 'attr' : 'removeAttr']('id', link_id).attr({
+          title: title,
+          href: url,
+          target: target
+        })
         [classes ? 'attr' : 'removeAttr']('class', classes)
         .text(selectionText);
       var link_html = $div.html();
       $(this).replaceSelection(link_html);
     } else if(!selectedContent || selectedContent == "") {
       if(anchor) {
-        $(anchor).attr('href', url).attr('_mce_href', url).attr('title', title || '').attr('id', link_id).attr('class', classes);
+        $(anchor).attr({
+          href: url,
+          '_mce_href': url,
+          title: title || '',
+          id: link_id,
+          'class': classes,
+          target: target
+        });
       } else {
-        selectionText = title || "Link";
+        selectionText = defaultText;
         var $div = $("<div/>");
-        $div.append($("<a/>", {id: link_id, title: title, href: url, 'class': classes}).text(selectionText));
+        $div.append($("<a/>", {id: link_id, target: target, title: title, href: url, 'class': classes}).text(selectionText));
         tinyMCE.get(id).execCommand('mceInsertContent', false, $div.html());
       }
     } else {
-      tinyMCE.get(id).execCommand('mceInsertLink', false, {title: (title || ''), href: url, 'class': classes, 'id': link_id});
+      tinyMCE.get(id).execCommand('mceInsertLink', false, {target: (target || ''), title: (title || ''), href: url, 'class': classes, 'id': link_id});
     }
 
     var ed = tinyMCE.get(id);

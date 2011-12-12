@@ -1,4 +1,4 @@
-<% q = quiz_summary || nil 
+<% q = quiz_summary || nil
   submission = nil
   submission = @submissions_hash[q.id] if q
   submission = nil if submission && submission.settings_only?
@@ -36,12 +36,18 @@
         </div>
         <% if submission && submission.completed? %>
           <%= datetime_string(submission.finished_at) %><br/>
-          <% unless q.ungraded? %>
-            <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}", :score => submission.score, :points_possible => q.points_possible) %>
+          <% if q.muted? %>
+            <%= t(:points_possible, "%{points_possible} points possible", :points_possible => q.points_possible) %><br />
+            <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
+            <%= t(:student_mute_notification, "Instructor is working on grades") %>
+          <% else %>
+            <% unless q.ungraded? %>
+              <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}", :score => submission.score, :points_possible => q.points_possible) %>
+            <% end %>
           <% end %>
         <% elsif submission %>
           <%= datetime_string(submission.started_at) %><br/>
-          <a href="<%= context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id) %>"><%= q.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz") %></a>
+          <% link_to context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id), :method => :post do %><%= q.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz") %><% end %>
         <% else %>
           <% unless q.ungraded? %>
             <%= q.points_possible ? t(:quiz_points_possible, "Point", :count => q.points_possible) : t(:quiz_no_points, "No Points") %><br/>

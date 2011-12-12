@@ -1,4 +1,5 @@
-<%- 
+<%-
+  @locale = raw I18n.locale.to_json
   @body_classes ||= []
   @body_class_no_headers = @headers == false
   @body_classes << "no-headers" if @body_class_no_headers
@@ -17,13 +18,12 @@
   @body_classes << "padless-content" if @padless
   @body_classes << "context-#{@context.asset_string}" if @context
 -%><!DOCTYPE html>
-<!--[if IE 7 ]>    <html class="ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]>    <html class="ie ie8" lang="en"> <![endif]-->
-<!--[if gte IE 9 ]><html class="ie ie9" lang="en"> <![endif]-->
-<!--[if !(IE)]><!--> <html class="not-ie" lang="en"> <!--<![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7" lang=<%= @locale %>> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8" lang=<%= @locale %>> <![endif]-->
+<!--[if gte IE 9 ]><html class="ie ie9" lang=<%= @locale %>> <![endif]-->
+<!--[if !(IE)]><!--> <html class="not-ie" lang=<%= @locale %>> <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title><%= yield :page_title || t('missing_page_title', "Add a page title here.") %></title>
   <noscript> <meta http-equiv=refresh content="0; URL=/javascript-is-required.html" /> </noscript> 
   <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
@@ -262,7 +262,7 @@
 
 <%= include_javascripts :common %>
 <script>
-  I18n.locale = <%= raw I18n.locale.to_json %>;
+  I18n.locale = <%= @locale %>;
 </script>
 
 <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>

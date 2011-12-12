@@ -19,6 +19,7 @@
 var wikiSidebar;
 I18n.scoped('topics', function(I18n) {
   function editEntry($entry, params) {
+    $("#add_entry_bottom").hide();
     var $form = $("#add_entry_form").clone(true);
     if($entry.attr('id') == 'entry_id') { $entry.attr('id', 'entry_new'); }
     var id = $entry.attr('id');
@@ -393,6 +394,7 @@ I18n.scoped('topics', function(I18n) {
     });
     $("#add_entry_form .cancel_button").click(function(event) {
       var $entry = $(this).parents(".discussion_entry");
+      $("#add_entry_bottom").show();
       removeEntryForm();
       if($entry.attr('id') == 'entry_new') {
         removeEntry($entry);
@@ -490,7 +492,7 @@ I18n.scoped('topics', function(I18n) {
       if(fragment.match(/^#reply/)) {
         var params = null;
         try {
-          params = JSON.parse(fragment.substring(6));
+          params = $.parseJSON(fragment.substring(6));
         } catch(e) { }
         $("#sidebar .add_entry_link:visible:first").triggerHandler('click', params);
       }

@@ -518,6 +518,8 @@ class CoursesController < ApplicationController
       @enrollment = @context.enroll_student(@current_user, :no_notify => true)
       @enrollment.self_enrolled = true
       @enrollment.accept
+      new_pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@context.root_account)
+      new_pseudonym.save if new_pseudonym && new_pseudonym.new_record?
       flash[:notice] = t('notices.enrolled', "You are now enrolled in this course.")
       return redirect_to course_url(@context)
     end
@@ -955,8 +957,20 @@ class CoursesController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :manage_grades)
     @context.publish_final_grades(@current_user) if publish_grades
-    render :json => {:sis_publish_messages => @context.grade_publishing_messages,
-                     :sis_publish_status => @context.grade_publishing_status}
+
+    processed_grade_publishing_statuses = {}
+    grade_publishing_statuses, overall_status = @context.grade_publishing_statuses
+    grade_publishing_statuses.each do |message, enrollments|
+      processed_grade_publishing_statuses[message] = enrollments.map do |enrollment|
+        { :id => enrollment.user.id,
+          :name => enrollment.user.name,
+          :sortable_name => enrollment.user.sortable_name,
+          :url => course_user_url(@context, enrollment.user) }
+      end
+    end
+
+    render :json => { :sis_publish_overall_status => overall_status,
+                      :sis_publish_statuses => processed_grade_publishing_statuses }
   end
 
   def reset_content
