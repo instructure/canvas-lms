@@ -19,19 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/gradebooks/_gradebook" do
-  it "should render" do
-    course_with_student
-    view_context
-    a = @course.assignments.create!(:title => "some assignment")
-    assigns[:assignments] = [a]
-    assigns[:students] = [@user]
-    assigns[:submissions] = []
-    assigns[:gradebook_upload] = @course.build_gradebook_upload      
-    render :partial => "gradebooks/gradebook"
-    response.should_not be_nil
-  end
-
+describe "/gradebook2/show" do
   def test_grade_publishing(course_allows, permissions_allow)
     course_with_student
     view_context
@@ -40,14 +28,15 @@ describe "/gradebooks/_gradebook" do
     assigns[:students] = [@user]
     assigns[:submissions] = []
     assigns[:gradebook_upload] = @course.build_gradebook_upload
+    assigns[:body_classes] = []
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
     @course.expects(:grants_rights?).with(@user, {}, nil).returns(permissions_allow ? {:manage_grades=>true} : {}) if course_allows
-    render :partial => "gradebooks/gradebook"
+    render "gradebook2/show"
     response.should_not be_nil
     if course_allows && permissions_allow
-      response.body.should =~ /var sisPublishEnabled = true;\n/
+      response.body.should =~ /Publish grades to SIS/
     else
-      response.body.should =~ /var sisPublishEnabled = false;\n/
+      response.body.should_not =~ /Publish grades to SIS/
     end
   end
 
