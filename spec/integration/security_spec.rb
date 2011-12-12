@@ -168,6 +168,37 @@ describe "security" do
     end
   end
 
+  it "should not prepend login json responses with protection" do
+    u = user_with_pseudonym :active_user => true,
+      :username => "nobody@example.com",
+      :password => "asdfasdf"
+    u.save!
+    post "/login", { "pseudonym_session[unique_id]" => "nobody@example.com",
+      "pseudonym_session[password]" => "asdfasdf",
+      "pseudonym_session[remember_me]" => "1" }, { 'Accept' => 'application/json' }
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should_not match(%r{^while\(1\);})
+    json = JSON.parse response.body
+    json['pseudonym']['unique_id'].should == "nobody@example.com"
+  end
+
+  it "should prepend GET JSON responses with protection" do
+    course_with_teacher_logged_in
+    get "/courses.json"
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should match(%r{^while\(1\);})
+  end
+
+  it "should not prepend non-GET JSON responses with protection" do
+    course_with_teacher_logged_in
+    delete "/dashboard/ignore_stream_item/1"
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should_not match(%r{^while\(1\);})
+  end
+
   describe "remember me" do
     before do
       @u = user_with_pseudonym :active_all => true,

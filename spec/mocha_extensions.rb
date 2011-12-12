@@ -23,3 +23,34 @@ module Mocha
     end
   end
 end
+
+# allows setting up mocks/stubs that will be automatically applied any time
+# this AR instance is instantiated, through find or whatever
+# the record must be saved before calling any_instantiation, so that it has an id
+class ActiveRecord::Base
+
+  def self.reset_any_instantiation!
+    @@any_instantiation = {}
+  end
+
+  def self.add_any_instantiation(ar_obj)
+    raise(ArgumentError, "need to save first") if ar_obj.new_record?
+    @@any_instantiation[ [ar_obj.class.base_ar_class, ar_obj.id] ] = ar_obj
+    ar_obj
+  end
+
+  def self.instantiate_with_any_instantiation(a)
+    if obj = @@any_instantiation[[base_ar_class, a['id'].to_i]]
+      obj
+    else
+      instantiate_without_any_instantiation(a)
+    end
+  end
+  class << self
+    alias_method_chain :instantiate, :any_instantiation
+  end
+
+  def any_instantiation
+    ActiveRecord::Base.add_any_instantiation(self)
+  end
+end
