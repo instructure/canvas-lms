@@ -184,7 +184,7 @@ define 'compiled/Gradebook', [
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
         @staticCellFormatter(row, col, '')
-      else if !submission?.grade
+      else if !submission?
         @staticCellFormatter(row, col, '-')
       else
         assignment = @assignments[submission.assignment_id]
@@ -487,7 +487,6 @@ define 'compiled/Gradebook', [
 
         if ''+assignment.submission_types is "not_graded"
           columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded'
-          columnDef.unselectable = true
 
         if fieldName in @assignmentsToHide
           columnDef.width = 10
