@@ -6,6 +6,6 @@ require([
   'specs/userNamePartsSpec',
   'specs/objectCollectionSpec',
   'specs/util/BackoffPollerSpec',
-  'specs/jQuery.instructureJqueryPatches'
+  'specs/jQuery.instructureJqueryPatches',
+  'specs/ENVSpec'
 ]);
-
