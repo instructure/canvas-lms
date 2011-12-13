@@ -84,7 +84,6 @@ group :development do
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
   gem 'guard'
-  gem 'guard-coffeescript'
 end
 
 group :redis do
