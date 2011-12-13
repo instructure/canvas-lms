@@ -88,7 +88,7 @@ class CoursesController < ApplicationController
         hash = []
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
           course = course_enrollments.first.course
-          hash << course_json(course, includes, course_enrollments)
+          hash << course_json(course, @current_user, session, includes, course_enrollments)
         end
         render :json => hash.to_json
       }
@@ -202,7 +202,7 @@ class CoursesController < ApplicationController
             proxy = proxy.scoped(:include => :user)
           end
           res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
-            map { |e| user_json(e.user) }
+            map { |e| user_json(e.user, @current_user, session) }
         end
         res
       end
@@ -228,7 +228,7 @@ class CoursesController < ApplicationController
       if user_json_is_admin?
         proxy = proxy.scoped(:include => :pseudonym)
       end
-      render :json => proxy.map { |u| user_json(u) }
+      render :json => proxy.map { |u| user_json(u, @current_user, session) }
     end
   end
 
@@ -253,8 +253,8 @@ class CoursesController < ApplicationController
   def todo_items
     get_context
     if authorized_action(@context, @current_user, :read)
-      grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, 'grading') }
-      submitting = @current_user.assignments_needing_submitting(:contexts => [@context]).map { |a| todo_item_json(a, 'submitting') }
+      grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'grading') }
+      submitting = @current_user.assignments_needing_submitting(:contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'submitting') }
       render :json => (grading + submitting)
     end
   end
@@ -574,7 +574,7 @@ class CoursesController < ApplicationController
       if authorized_action(@context, @current_user, :read)
         enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
         includes = Set.new(Array(params[:include]))
-        render :json => course_json(@context, includes, enrollments)
+        render :json => course_json(@context, @current_user, session, includes, enrollments)
       end
       return
     end
@@ -957,20 +957,8 @@ class CoursesController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :manage_grades)
     @context.publish_final_grades(@current_user) if publish_grades
-
-    processed_grade_publishing_statuses = {}
-    grade_publishing_statuses, overall_status = @context.grade_publishing_statuses
-    grade_publishing_statuses.each do |message, enrollments|
-      processed_grade_publishing_statuses[message] = enrollments.map do |enrollment|
-        { :id => enrollment.user.id,
-          :name => enrollment.user.name,
-          :sortable_name => enrollment.user.sortable_name,
-          :url => course_user_url(@context, enrollment.user) }
-      end
-    end
-
-    render :json => { :sis_publish_overall_status => overall_status,
-                      :sis_publish_statuses => processed_grade_publishing_statuses }
+    render :json => {:sis_publish_messages => @context.grade_publishing_messages,
+                     :sis_publish_status => @context.grade_publishing_status}
   end
 
   def reset_content

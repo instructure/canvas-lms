@@ -195,7 +195,7 @@ class ContentImportsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_content)
       import = @context.course_imports.find(params[:id])
       respond_to do |format|
-        format.json { render :json => copy_status_json(import, @context)}
+        format.json { render :json => copy_status_json(import, @context, @current_user, session)}
       end
     end
   end
@@ -249,7 +249,7 @@ class ContentImportsController < ApplicationController
       @import = CourseImport.create!(:import_type => "instructure_copy", :source => @copy_context, :course => @context, :parameters => copy_params)
       @import.perform_later
       respond_to do |format|
-        format.json { render :json => copy_status_json(@import, @context) }
+        format.json { render :json => copy_status_json(@import, @context, @current_user, session) }
       end
     end
   end
