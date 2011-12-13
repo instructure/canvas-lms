@@ -206,6 +206,22 @@ describe Attachment do
       ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
     end
+
+    describe "submit_to_scribd job" do
+      it "should queue for scribdable types" do
+        scribdable_attachment_model
+        @attachment.after_attachment_saved
+        Delayed::Job.count(:conditions => { :tag => 'Attachment#submit_to_scribd!' }).should == 1
+        @attachment.should be_pending_upload
+      end
+
+      it "should not queue for non-scribdable types" do
+        attachment_model
+        @attachment.after_attachment_saved
+        Delayed::Job.count(:conditions => { :tag => 'Attachment#submit_to_scribd!' }).should == 0
+        @attachment.should be_processed
+      end
+    end
     
     it "should upload scribdable attachments" do
       scribdable_attachment_model
