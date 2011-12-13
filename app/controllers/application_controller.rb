@@ -1054,7 +1054,8 @@ class ApplicationController < ActionController::Base
     bank
   end
 
-  SKIP_JSON_CSRF_REGEX = %r{\A/login}
+  # refs #6632 -- once the speed grader ipad app is upgraded, we can remove these exceptions
+  SKIP_JSON_CSRF_REGEX = %r{\A(?:/login|/logout|/dashboard/comment_session)}
   def prepend_json_csrf?
     request.get? && @pseudonym_session && !@pseudonym_session.used_basic_auth? && !request.path.match(SKIP_JSON_CSRF_REGEX)
   end
