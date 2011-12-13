@@ -191,7 +191,15 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       response.should be_redirect
     end
-    
+
+    it "should force download when download_frd is set" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_file
+      # this call should happen inside of FilesController#send_attachment
+      FilesController.any_instance.expects(:send_stored_file).with(@file, false, true)
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
+    end
+
     it "should allow concluded teachers to read and download files" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
