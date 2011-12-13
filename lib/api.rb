@@ -170,7 +170,7 @@ module Api
   end
   
   def attachment_json(attachment)
-    url = file_download_url(attachment, :verifier => attachment.uuid, :download => '1')
+    url = file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1')
     {
       'content-type' => attachment.content_type,
       'display_name' => attachment.display_name,

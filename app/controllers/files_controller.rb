@@ -298,9 +298,14 @@ class FilesController < ApplicationController
   end
   
   def send_attachment(attachment)
-    if params[:inline] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code' || attachment.mime_class == 'image')
+    # check for download_frd param and, if it's present, force the user to download the
+    # file and don't display it inline. we use download_frd instead of looking to the
+    # download param because the download param is used all over the place to mean stuff
+    # other than actually download the file. Long term we probably ought to audit the files
+    # controller, make download mean download, and remove download_frd.
+    if params[:inline] && !params[:download_frd] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code' || attachment.mime_class == 'image')
       send_stored_file(attachment)
-    elsif attachment.inline_content? && !@context.is_a?(AssessmentQuestion)
+    elsif attachment.inline_content? && !params[:download_frd] && !@context.is_a?(AssessmentQuestion)
       if params[:file_path] || !params[:wrap]
         send_stored_file(attachment)
       else
@@ -318,7 +323,7 @@ class FilesController < ApplicationController
     attachment.context_module_action(@current_user, :read) if @current_user && !params[:preview]
     log_asset_access(@attachment, "files", "files") unless params[:preview]
     if safer_domain_available?
-      redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier])
+      redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier], !inline)
     elsif Attachment.local_storage?
       @headers = false if @files_domain
       cancel_cache_buster

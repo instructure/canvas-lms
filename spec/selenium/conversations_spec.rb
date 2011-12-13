@@ -416,8 +416,9 @@ shared_examples_for "conversations selenium tests" do
 
       find_all_with_jquery("#{message} .message_attachments li").size.should == 1
       find_with_jquery("#{message} .message_attachments li a .title").text.should == filename
-      find_with_jquery("#{message} .message_attachments li a").click
-      driver.page_source.should match data
+      download_link = driver.find_element(:css, "#{message} .message_attachments li a")
+      file = open(download_link.attribute('href'))
+      file.read.should match data
     end
 
     it "should save attachments on new messages on existing conversations" do

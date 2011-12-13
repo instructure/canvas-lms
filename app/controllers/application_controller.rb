@@ -888,7 +888,7 @@ class ApplicationController < ActionController::Base
   
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host=nil, verifier = nil) # TODO: generalize this
+  def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
     res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
     ts, sig = @current_user && @current_user.access_verifier
 
@@ -898,6 +898,7 @@ class ApplicationController < ActionController::Base
     # of content.
     opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
     opts[:verifier] = verifier if verifier.present?
+    opts[:download_frd] = 1 if download
 
     if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
       # if the context is one that supports relative paths (which requires extra
