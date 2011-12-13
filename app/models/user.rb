@@ -1956,6 +1956,11 @@ class User < ActiveRecord::Base
     user_condition_sql = user_conditions.present? ? "AND " + user_conditions.join(" AND ") : ""
     user_sql = []
 
+    # this is redundant (and potentially less restrictive than course_sql),
+    # but it allows the planner to initially limit enrollments to relevant
+    # courses much more efficiently than the OR'ed course_sql does
+    all_course_ids = (course_hash[:full_course_ids] + course_hash[:section_id_hash].keys + restricted_course_hash.keys).compact
+
     course_sql = []
     course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
     course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
@@ -1964,7 +1969,8 @@ class User < ActiveRecord::Base
     user_sql << <<-SQL if course_sql.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
       FROM users, enrollments, courses
-      WHERE (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
+      WHERE course_id IN (#{all_course_ids.join(', ')})
+        AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
