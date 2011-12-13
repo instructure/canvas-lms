@@ -24,6 +24,8 @@ tmp_*
 public/files/**/*
 public/javascripts/cached/*
 public/javascripts/translations/*
+public/javascripts/compiled/*
+public/javascripts/jst/*
 public/stylesheets/compiled/*
 public/stylesheets/compiled/**/*
 public/stylesheets/cached/*
