@@ -125,10 +125,13 @@ class PseudonymSessionsController < ApplicationController
     end
 
     if !found && params[:pseudonym_session]
-      valid_alternative = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).find{|p|
-        (p.valid_password?(params[:pseudonym_session][:password]) && p.account.password_authentication?) rescue false
+      valid_alternatives = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).select {|p|
+        p.valid_arbitrary_credentials?(params[:pseudonym_session][:password])
       }
-      if valid_alternative
+      # only log them in if these credentials match a single user
+      if valid_alternatives.map(&:user).uniq.length == 1
+        # prefer a pseudonym from Site Admin if possible, otherwise just choose one
+        valid_alternative = valid_alternatives.find {|p| p.account_id == Account.site_admin.id } || valid_alternatives.first
         @pseudonym_session = PseudonymSession.new(valid_alternative, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save
         found = true
