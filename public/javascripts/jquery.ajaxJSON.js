@@ -176,7 +176,7 @@
         var page_view_id = null;
         if(xhr && xhr.getResponseHeader && (page_view_id = xhr.getResponseHeader("X-Canvas-Page-View-Id"))) {
           setTimeout(function() {
-            $(document).triggerHandler('page_view_id_recieved', page_view_id);
+            $(document).triggerHandler('page_view_id_received', page_view_id);
           }, 50);
         }
         if(!data.length && data['errors']) {

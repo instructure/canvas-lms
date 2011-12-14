@@ -45,7 +45,7 @@ I18n.scoped('page_views', function(I18n) {
     if($page_view_id.length > 0) {
       var secondsSinceLastEvent = 0;
       var intervalInSeconds = 60*5;
-      $(document).bind('page_view_id_recieved', function(event, id) {
+      $(document).bind('page_view_id_received', function(event, id) {
         $("#page_view_id").text(id);
         update_url = "/page_views/" + id;
       });
