@@ -28,6 +28,7 @@ end
 # this AR instance is instantiated, through find or whatever
 # the record must be saved before calling any_instantiation, so that it has an id
 class ActiveRecord::Base
+  @@any_instantiation = {}
 
   def self.reset_any_instantiation!
     @@any_instantiation = {}
