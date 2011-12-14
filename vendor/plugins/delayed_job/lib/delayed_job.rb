@@ -1,3 +1,10 @@
+module Delayed
+  HIGH_PRIORITY = 0
+  NORMAL_PRIORITY = 10
+  LOW_PRIORITY = 20
+  LOWER_PRIORITY = 50
+end
+
 require File.dirname(__FILE__) + '/delayed/message_sending'
 require File.dirname(__FILE__) + '/delayed/performable_method'
 require File.dirname(__FILE__) + '/delayed/backend/base'
