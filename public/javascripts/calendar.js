@@ -1153,7 +1153,7 @@ I18n.scoped('calendars', function(I18n) {
       date.setMonth(date.getMonth() + 1);
       var data = {};
       try {
-        data = $.parseJSON($.decodeFromHex(location.hash.substring(1)));
+        data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {};
       } catch(e) { data = {}; }
       data.month = date.getMonth() + 1;
       data.year = date.getFullYear();
@@ -1165,7 +1165,7 @@ I18n.scoped('calendars', function(I18n) {
       date.setMonth(date.getMonth() - 1);
       var data = {};
       try {
-        data = $.parseJSON($.decodeFromHex(location.hash.substring(1)));
+        data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {};
       } catch(e) { data = {}; }
       data.month = date.getMonth() + 1;
       data.year = date.getFullYear();
