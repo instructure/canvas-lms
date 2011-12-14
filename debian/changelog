@@ -1,3 +1,13 @@
+canvas-lms (2011.12.14.13.04) testing; urgency=low
+
+  * Package ref: 501b246c4d50a22bde7a32b77f92570beec085b5
+  *
+  * [+446a3bb] fix up lockdown browser launching with new quiz csrf protection
+  * [+654cd4e] work around more ipad speedgrader json calls
+  * [+501b246] don't queue job for attachments that won't be scribd anyway
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 14 Dec 2011 13:04:29 -0700
+
 canvas-lms (2011.12.12.16.41) testing; urgency=low
 
   * Package ref: 2b0c4a0281406ed635810330b483ec899a102ce9
