@@ -2298,7 +2298,7 @@
             var conversation, _j, _len2;
             if (typeof data === 'string') {
               try {
-                data = $.parseJSON(data);
+                data = $.parseJSON(data) || [];
               } catch (error) {
                 data = [];
               }
