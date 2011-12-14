@@ -18,6 +18,33 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+class TestCourseApi
+  include Api::V1::Course
+  def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
+  def course_url(course); return "course_url(Course.find(#{course.id}))"; end
+end
+
+describe Api::V1::Course do
+  before do
+    @test_api = TestCourseApi.new
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @me = @user
+    @course1 = @course
+    course_with_student(:user => @user, :active_all => true)
+    @course2 = @course
+    @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
+    @user.pseudonym.update_attribute(:sis_user_id, 'user1')
+  end
+
+  it 'should support optionally providing the url' do
+    @test_api.course_json(@course1, @me, {}, ['url'], []).should encompass({
+      "url" => "course_url(Course.find(#{@course1.id}))"
+    })
+    @test_api.course_json(@course1, @me, {}, [], []).has_key?("url").should be_false
+  end
+
+end
+
 describe CoursesController, :type => :integration do
   USER_API_FIELDS = %w(id name sortable_name short_name)
   before do

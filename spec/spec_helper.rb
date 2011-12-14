@@ -70,6 +70,18 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
   end
 end
 
+Spec::Matchers.define :encompass do |expected|
+  match do |actual|
+    if expected.is_a?(Array) && actual.is_a?(Array)
+      expected.size == actual.size && expected.zip(actual).all?{|e,a| a.slice(*e.keys) == e}
+    elsif expected.is_a?(Hash) && actual.is_a?(Hash)
+      actual.slice(*expected.keys) == expected
+    else
+      false
+    end
+  end
+end
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record

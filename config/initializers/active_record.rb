@@ -303,7 +303,7 @@ end
 
 class ActiveRecord::Serialization::Serializer
   def serializable_record
-    hash = {}.tap do |serializable_record|
+    hash = HashWithIndifferentAccess.new.tap do |serializable_record|
       user_content_fields = options[:user_content] || []
       serializable_names.each do |name|
         val = @record.send(name)
@@ -323,7 +323,7 @@ class ActiveRecord::Serialization::Serializer
         end
       end
     end
-    hash = { @record.class.base_ar_class.model_name.element => hash } if options[:include_root]
+    hash = { @record.class.base_ar_class.model_name.element => hash }.with_indifferent_access if options[:include_root]
     hash
   end
 

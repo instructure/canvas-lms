@@ -69,7 +69,7 @@ class ConversationParticipant < ActiveRecord::Base
       :private => private?,
       :label => label,
       :properties => properties(latest)
-    }
+    }.with_indifferent_access
   end
 
   [:attachments].each do |association|
