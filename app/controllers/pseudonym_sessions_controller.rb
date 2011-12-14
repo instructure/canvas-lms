@@ -31,7 +31,7 @@ class PseudonymSessionsController < ApplicationController
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
 
-    session[:expected_user_id] = params[:expected_user_id]
+    session[:expected_user_id] = params[:expected_user_id].to_i
     session[:confirm] = params[:confirm]
     session[:enrollment] = params[:enrollment]
 
