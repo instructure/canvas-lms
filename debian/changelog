@@ -1,3 +1,12 @@
+canvas-lms (2011.12.15.10.27) testing; urgency=low
+
+  * Package ref: 32f2850ad22ebc24dbcd316d0755bee7b48a9981
+  *
+  * [+f8c54e2] default values to match the JSON.parse behavior
+  * [+32f2850] improve data hygiene in GradingStandards
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 15 Dec 2011 10:27:51 -0700
+
 canvas-lms (2011.12.14.13.04) testing; urgency=low
 
   * Package ref: 501b246c4d50a22bde7a32b77f92570beec085b5
