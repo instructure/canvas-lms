@@ -67,4 +67,19 @@ describe "calendar selenium tests" do
     driver.find_element(:css, "##{date_holder_id} #event_assignment_#{second_assignment.id}").should_not be_displayed
   end
 
+  it "should allow flipping through months" do
+    course_with_student_logged_in
+    get "/calendar"
+
+    month_name = driver.find_element(:css, ".calendar_month .month_name").text
+    driver.find_element(:css, ".calendar_month .prev_month_link").click
+    wait_for_ajax_requests
+    driver.find_element(:css, ".calendar_month .month_name").text.should_not == month_name
+    driver.find_element(:css, ".calendar_month .next_month_link").click
+    wait_for_ajax_requests
+    driver.find_element(:css, ".calendar_month .next_month_link").click
+    wait_for_ajax_requests
+    driver.find_element(:css, ".calendar_month .month_name").text.should_not == month_name
+  end
+
 end
