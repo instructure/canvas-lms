@@ -78,9 +78,9 @@ end
 
 
 def serialize_static_pages
-  %w( authentication.md object_ids.md pagination.md oauth.md sis_csv.md ).each do |file|
-    options[:file] = "doc/templates/rest/#{file}"
-    serialize(file.sub(/\..*$/, '.html'))
+  Dir.glob("doc/templates/rest/*.md").each do |file|
+    options[:file] = file
+    serialize(File.split(file).last.sub(/\..*$/, '.html'))
     options.delete(:file)
   end
 end
