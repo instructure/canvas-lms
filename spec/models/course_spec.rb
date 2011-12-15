@@ -471,6 +471,21 @@ describe Course, "gradebook_to_csv" do
     rows[4][2].should be_nil
     rows[4][3].should be_nil
   end
+
+  it "should only include students once" do
+    # students might have multiple enrollments in a course
+    course(:active_all => true)
+    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+    student_in_course(:user => @user1)
+    @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
+    student_in_course(:user => @user2)
+    @s2 = @course.course_sections.create!(:name => 'section2')
+    StudentEnrollment.create!(:user => @user1, :course => @course, :course_section => @s2)
+    @course.reload
+    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    rows = FasterCSV.parse(csv)
+    rows.length.should == 4
+  end
 end
 
 describe Course, "merge_into" do

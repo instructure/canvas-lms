@@ -155,11 +155,6 @@ class GradebooksController < ApplicationController
         d = DateTime.parse(params[:updated])
         @new_submissions = @submissions.select{|s| s.updated_at > d}
       end
-      already_enrolled = {}
-      @context.enrollments.each do |e|
-        e.destroy if already_enrolled[[e.user_id,e.course_id]]
-        already_enrolled[[e.user_id,e.course_id]] = true if e.is_a?(StudentEnrollment)
-      end
       @enrollments_hash = {}
       @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
       @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name.downcase }.uniq
