@@ -24,7 +24,7 @@ I18n.scoped("learning_outcome", function(I18n) {
       scrape: function(data) {
         if(typeof(data) == 'string') {
           try {
-            data = $.parseJSON(data);
+            data = $.parseJSON(data) || [];
           } catch(e) {
             data = [];
           }

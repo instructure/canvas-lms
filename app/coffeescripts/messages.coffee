@@ -1676,7 +1676,7 @@ I18n.scoped 'conversations', (I18n) ->
         scrape: (data) ->
           if typeof(data) == 'string'
             try
-              data = $.parseJSON(data)
+              data = $.parseJSON(data) || []
             catch error
               data = []
             for conversation in data
