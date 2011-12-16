@@ -1191,7 +1191,7 @@ describe User do
       admin.account.should == @account
     end
 
-    it "should default to the AccountAdmin membership type" do
+    it "should default to the AccountAdmin role" do
       @account = account_model
       u = User.create!
       u.flag_as_admin(@account)
@@ -1200,7 +1200,7 @@ describe User do
       admin.membership_type.should == 'AccountAdmin'
     end
 
-    it "should respect a provided membership type" do
+    it "should respect a provided role" do
       @account = account_model
       u = User.create!
       u.flag_as_admin(@account, "CustomAccountUser")

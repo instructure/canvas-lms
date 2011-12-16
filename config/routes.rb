@@ -729,6 +729,10 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
     end
 
+    api.with_options(:controller => :role_overrides) do |roles|
+      roles.post 'accounts/:account_id/roles', :action => :add_role
+    end
+
     api.with_options(:controller => :admins) do |admins|
       admins.post 'accounts/:account_id/admins', :action => :create
     end

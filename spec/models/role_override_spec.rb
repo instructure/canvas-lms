@@ -67,4 +67,93 @@ describe RoleOverride do
       RoleOverride.permission_for(@group, :read_course_content, "TeacherEnrollment")
     }.should_not raise_error
   end
+
+  describe "manage_role_override" do
+    before :each do
+      @account = account_model(:parent_account => Account.default)
+      @role = 'NewRole'
+      @permission = 'read_reports'
+    end
+
+    describe "override already exists" do
+      before :each do
+        @existing_override = @account.role_overrides.build(
+          :permission => @permission,
+          :enrollment_type => @role)
+        @existing_override.enabled = true
+        @existing_override.locked = false
+        @existing_override.save!
+        @initial_count = @account.role_overrides.size
+      end
+
+      it "should update an existing override if override has a value" do
+        new_override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
+        @account.role_overrides.size.should == @initial_count
+        new_override.should == @existing_override.reload
+        @existing_override.enabled.should be_false
+      end
+
+      it "should update an existing override if override is nil but locked is truthy" do
+        new_override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => true)
+        @account.role_overrides.size.should == @initial_count
+        new_override.should == @existing_override.reload
+        @existing_override.locked.should be_true
+      end
+
+      it "should only update the parts that are specified" do
+        new_override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
+        @existing_override.reload
+        @existing_override.locked.should be_false
+
+        @existing_override.enabled = true
+        @existing_override.save
+
+        new_override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => true)
+        @existing_override.reload
+        @existing_override.enabled.should be_true
+      end
+
+      it "should delete an existing override if override is nil and locked is not truthy" do
+        new_override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => false)
+        @account.role_overrides.size.should == @initial_count - 1
+        new_override.should be_nil
+        RoleOverride.find_by_id(@existing_override.id).should be_nil
+      end
+    end
+
+    describe "no override yet" do
+      before :each do
+        @initial_count = @account.role_overrides.size
+      end
+
+      it "should not create an override if override is nil and locked is not truthy" do
+        override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => false)
+        override.should be_nil
+        @account.role_overrides.size.should == @initial_count
+      end
+
+      it "should create the override if override has a value" do
+        override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
+        @account.role_overrides.size.should == @initial_count + 1
+        override.enabled.should be_false
+      end
+
+      it "should create the override if override is nil but locked is truthy" do
+        override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => true)
+        @account.role_overrides.size.should == @initial_count + 1
+        override.locked.should be_true
+      end
+
+      it "should only set the parts that are specified" do
+        override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
+        override.enabled.should be_false
+        override.locked.should be_nil
+        override.destroy
+
+        override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => true)
+        override.enabled.should be_nil
+        override.locked.should be_true
+      end
+    end
+  end
 end

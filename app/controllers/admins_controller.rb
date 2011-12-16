@@ -28,13 +28,13 @@ class AdminsController < ApplicationController
   #
   # @argument user_id The id of the user to promote.
   #
-  # @argument membership_type [Optional] The user's admin relationship with the
-  #   account will be created with the given membership type. Defaults to
+  # @argument role [Optional] The user's admin relationship with the
+  #   account will be created with the given role. Defaults to
   #   'AccountAdmin'.
   def create
     if authorized_action(@context, @current_user, :manage_account_memberships)
       user = api_find(User, params[:user_id])
-      admin = user.flag_as_admin(@context, params[:membership_type])
+      admin = user.flag_as_admin(@context, params[:role])
       render :json => admin_json(admin, @current_user, session)
     end
   end
