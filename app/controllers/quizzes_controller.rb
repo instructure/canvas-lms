@@ -472,7 +472,13 @@ class QuizzesController < ApplicationController
       @submission = @quiz.generate_submission(user_code, !!preview)
     end
     if quiz_submission_active?
-      redirect_to named_context_url(@context, 'context_quiz_take_url', @quiz.id)
+      if request.get?
+        # currently, the only way to start_quiz! with a get request is to use the LDB
+        take_quiz
+      else
+        # redirect to avoid refresh issues
+        redirect_to named_context_url(@context, 'context_quiz_take_url', @quiz.id)
+      end
     else
       flash[:error] = t('errors.no_more_attempts', "You have no quiz attempts left") unless @just_graded
       redirect_to named_context_url(@context, :context_quiz_url, @quiz)
