@@ -139,6 +139,105 @@ describe ContextExternalTool do
       ContextExternalTool.all_tools_for(@course).should eql(@tools.sort_by(&:name))
     end
   end
+  
+  describe "infer_defaults" do
+    it "should require valid configuration for user navigation settings" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:user_navigation => {:bob => 'asfd'}}
+      tool.save
+      tool.settings[:user_navigation].should be_nil
+      tool.settings = {:user_navigation => {:url => "http://www.example.com"}}
+      tool.save
+      tool.settings[:user_navigation].should_not be_nil
+    end
+    
+    it "should require valid configuration for course navigation settings" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:course_navigation => {:bob => 'asfd'}}
+      tool.save
+      tool.settings[:course_navigation].should be_nil
+      tool.settings = {:course_navigation => {:url => "http://www.example.com"}}
+      tool.save
+      tool.settings[:course_navigation].should_not be_nil
+    end
+    
+    it "should require valid configuration for account navigation settings" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:account_navigation => {:bob => 'asfd'}}
+      tool.save
+      tool.settings[:account_navigation].should be_nil
+      tool.settings = {:account_navigation => {:url => "http://www.example.com"}}
+      tool.save
+      tool.settings[:account_navigation].should_not be_nil
+    end
+    
+    it "should require valid configuration for resource selection settings" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:resource_selection => {:bob => 'asfd'}}
+      tool.save
+      tool.settings[:resource_selection].should be_nil
+      tool.settings = {:resource_selection => {:url => "http://www.example.com"}}
+      tool.save
+      tool.settings[:resource_selection].should be_nil
+      tool.settings = {:resource_selection => {:url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
+      tool.save
+      tool.settings[:resource_selection].should_not be_nil
+    end
+    
+    it "should require valid configuration for editor button settings" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:editor_button => {:bob => 'asfd'}}
+      tool.save
+      tool.settings[:editor_button].should be_nil
+      tool.settings = {:editor_button => {:url => "http://www.example.com"}}
+      tool.save
+      tool.settings[:editor_button].should be_nil
+      tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
+      tool.save
+      tool.settings[:editor_button].should_not be_nil
+    end
+    
+    it "should set has_user_navigation if navigation configured" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:user_navigation => {:url => "http://www.example.com"}}
+      tool.has_user_navigation.should be_false
+      tool.save
+      tool.has_user_navigation.should be_true
+    end
+    
+    it "should set has_course_navigation if navigation configured" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:course_navigation => {:url => "http://www.example.com"}}
+      tool.has_course_navigation.should be_false
+      tool.save
+      tool.has_course_navigation.should be_true
+    end
+
+    it "should set has_account_navigation if navigation configured" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:account_navigation => {:url => "http://www.example.com"}}
+      tool.has_account_navigation.should be_false
+      tool.save
+      tool.has_account_navigation.should be_true
+    end
+
+    it "should set has_resource_selection if selection configured" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:resource_selection => {:url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
+      tool.has_resource_selection.should be_false
+      tool.save
+      tool.has_resource_selection.should be_true
+    end
+
+    it "should set has_editor_button if button configured" do
+      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
+      tool.has_editor_button.should be_false
+      tool.save
+      tool.has_editor_button.should be_true
+    end
+
+  end
 
   describe "standardize_url" do
     it "should standardize urls" do

@@ -25,7 +25,8 @@
   <% 
     jammit_css :gradebooks, :datagrid
     jammit_js :datagrid, :gradebooks
-    @show_left_side = false 
+    @show_left_side = false
+    add_crumb t(:try_out_the_new_gradebook, "Try out the new gradebook"), context_url(@context, :change_gradebook_version_context_gradebook_url), :id => 'change_gradebook_version_link_holder'
   %>
   <div style="display: none;"><input type="checkbox" id="hide_students_option"/><label for="hide_students_option"><%= t(:hide_names, "Hide Student Names") %></label></div>
   <div class="clear"></div>
@@ -342,9 +343,9 @@
 
 <script>
   var lastGradebookUpdate = "<%= ActiveSupport::TimeWithZone.new(Time.now, Time.zone).strftime("%Y-%m-%dT%H:%M:%S") %>";
-  var sisPublishEnabled = <%= PluginSetting.settings_for_plugin('grade_export')[:enabled] %>;
+  var sisPublishEnabled = <%= @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) ? "true" : "false" %>;
   var readOnlyGradebook = <%= !can_do(@context, @current_user, :manage_grades) %>;
-  <% if @context.grading_standard_id %>
+  <% if @context.grading_standard_enabled? %>
     var grading_scheme = <%= raw (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard).to_json %>
   <% end %>
 </script>

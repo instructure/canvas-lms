@@ -24,14 +24,26 @@ describe QuizSubmission do
     course
     @quiz = @course.quizzes.create!
   end
-  
+
+  it "should copy the quiz's points_possible whenever it's saved" do
+    Quiz.update_all("points_possible = 1.1", "id = #{@quiz.id}")
+    q = @quiz.quiz_submissions.create!
+    q.reload.quiz_points_possible.should eql 1.1
+
+    Quiz.update_all("points_possible = 1.9", "id = #{@quiz.id}")
+    q.reload.quiz_points_possible.should eql 1.1
+
+    q.save!
+    q.reload.quiz_points_possible.should eql 1.9
+  end
+
   it "should not allow updating scores on an uncompleted submission" do
     q = @quiz.quiz_submissions.create!
     q.state.should eql(:untaken)
     res = q.update_scores rescue false
     res.should eql(false)
   end
-  
+
   it "should allow updating scores on a completed version of a submission while the current version is in progress" do
     course_with_student(:active_all => true)
     @quiz = @course.quizzes.create!
@@ -39,14 +51,14 @@ describe QuizSubmission do
     qs.workflow_state = 'complete'
     qs.submission_data = [{ :points => 0, :text => "", :correct => "undefined", :question_id => -1 }]
     qs.with_versioning(true, &:save)
-    
+
     qs = @quiz.generate_submission(@user)
     qs.submission_data = { "foo" => "bar" } # simulate k/v pairs we store for quizzes in progress
     qs.save
     lambda {qs.update_scores}.should raise_error
     lambda {qs.update_scores(:submission_version_number => 1) }.should_not raise_error
   end
-  
+
   it "should not allowed grading on an already-graded submission" do
     q = @quiz.quiz_submissions.create!
     q.workflow_state = "complete"
@@ -64,13 +76,13 @@ describe QuizSubmission do
     end
     res.should eql(false)
   end
-  
+
   it "should know if it is overdue" do
     now = Time.now
     q = @quiz.quiz_submissions.new
     q.end_at = now
     q.save!
-    
+
     q.overdue?.should eql(false)
     q.end_at = now - (3 * 60)
     q.save!
@@ -82,7 +94,7 @@ describe QuizSubmission do
     q.overdue?.should eql(true)
     q.overdue?(true).should eql(true)
   end
-  
+
   it "should calculate score based on quiz scoring policy" do
     q = @course.quizzes.create!(:scoring_policy => "keep_latest")
     s = q.quiz_submissions.new
@@ -92,13 +104,13 @@ describe QuizSubmission do
     s.with_versioning(true, &:save!)
     s.score.should eql(5.0)
     s.kept_score.should eql(5.0)
-    
+
     s.score = 4.0
     s.attempt = 2
     s.with_versioning(true, &:save!)
     s.version_number.should eql(2)
     s.kept_score.should eql(4.0)
-    
+
     q.update_attributes!(:scoring_policy => "keep_highest")
     s.reload
     s.score = 3.0
@@ -108,6 +120,81 @@ describe QuizSubmission do
 
     s.update_scores(:submission_version_number => 2, :fudge_points => 6.0)
     s.kept_score.should eql(6.0)
+  end
+
+  describe "with an essay question" do
+    before(:each) do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
+        {
+          "text_after_answers"            => "",
+          "question_#{@questions[0].id}"  => "<p>Lorem ipsum answer.</p>",
+          "context_id"                    => "#{@course.id}",
+          "context_type"                  => "Course",
+          "user_id"                       => "#{@user.id}",
+          "quiz_id"                       => "#{@quiz.id}",
+          "course_id"                     => "#{@course.id}",
+          "question_text"                 => "Lorem ipsum question",
+        }
+      end
+    end
+
+    it "should leave a submission in pending_review state if there are essay questions" do
+      @quiz_submission.submission.workflow_state.should eql 'pending_review'
+    end
+
+    it "should mark a submission as complete once an essay question has been graded" do
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1'
+      })
+      @quiz_submission.submission.workflow_state.should eql 'graded'
+    end
+  end
+
+  describe "with multiple essay questions" do
+    before(:each) do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}},
+                                   {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
+        {
+          "text_after_answers"            => "",
+          "question_#{@questions[0].id}"  => "<p>Lorem ipsum answer 1.</p>",
+          "question_#{@questions[1].id}"  => "<p>Lorem ipsum answer 2.</p>",
+          "context_id"                    => "#{@course.id}",
+          "context_type"                  => "Course",
+          "user_id"                       => "#{@user.id}",
+          "quiz_id"                       => "#{@quiz.id}",
+          "course_id"                     => "#{@course.id}",
+          "question_text"                 => "Lorem ipsum question",
+        }
+      end
+    end
+
+    it "should not mark a submission complete if there are essay questions without grades" do
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1',
+        "question_score_#{@questions[1].id}" => "--"
+      })
+      @quiz_submission.submission.workflow_state.should eql 'pending_review'
+    end
+
+    it "should mark a submission complete if all essay questions have been graded" do
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1',
+        "question_score_#{@questions[1].id}" => "0"
+      })
+      @quiz_submission.submission.workflow_state.should eql 'graded'
+    end
   end
 
   it "should update associated submission" do
@@ -129,10 +216,10 @@ describe QuizSubmission do
     q.save!
     q.kept_score.should eql(5.0)
     s.reload
-    
+
     s.score.should eql(5.0)
   end
-  
+
   describe "learning outcomes" do
     it "should create learning outcome results when aligned to assessment questions" do
       course_with_student(:active_all => true)
@@ -165,7 +252,7 @@ describe QuizSubmission do
       @results.last.associated_asset.should eql(@q2.assessment_question)
       @results.last.mastery.should eql(false)
     end
-    
+
     it "should update learning outcome results when aligned to assessment questions" do
       course_with_student(:active_all => true)
       @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
@@ -196,7 +283,7 @@ describe QuizSubmission do
       @results.first.mastery.should eql(true)
       @results.last.associated_asset.should eql(@q2.assessment_question)
       @results.last.mastery.should eql(false)
-      
+
       @sub = @quiz.generate_submission(@user)
       @sub.attempt.should eql(2)
       @sub.submission_data = {}
@@ -254,7 +341,7 @@ describe QuizSubmission do
       user_answer[:correct].should be_false
       user_answer[:points].should == 0
     end
-    
+
     it "should not escape user responses in fimb questions" do
       course_with_student(:active_all => true)
       q = {:neutral_comments=>"",

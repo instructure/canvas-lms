@@ -22,12 +22,13 @@ eolist
     driver.find_element(:css, "button.add_users_button").click
     wait_for_ajax_requests
     wait_for_animations
-    keep_trying_until {driver.find_element(:css, "#enrollment_#{Enrollment.last.id}").text.should == ("user, login_name" + (include_short_name ? "\nlogin_name user" : "") + "\nA124123") }
+    enrollment = user.reload.enrollments.last
+    keep_trying_until {driver.find_element(:css, "#enrollment_#{enrollment.id}").text.should == ("user, login_name" + (include_short_name ? "\nlogin_name user" : "") + "\nA124123") }
     
     unique_ids = ["user1@example.com", "bob@thesagatfamily.name", "A124123"]
     browser_text = ["user1@example.com\nuser1@example.com\nuser1@example.com", "sagat, bob\nbob sagat\nbob@thesagatfamily.name", "user, login_name\nlogin_name user\nA124123"] if include_short_name
     browser_text = ["user1@example.com\nuser1@example.com", "sagat, bob\nbob@thesagatfamily.name", "user, login_name\nA124123"] unless include_short_name
-    Enrollment.all.last(3).each do |e|
+    Enrollment.all.last(3).sort_by { |e| unique_ids.index(e.user.communication_channels.first.path) }.each do |e|
       e.user.communication_channels.first.path.should == unique_ids.shift
       driver.find_element(:css, "#enrollment_#{e.id}").text.should == browser_text.shift
     end

@@ -58,9 +58,10 @@ shared_examples_for "discussions selenium tests" do
     driver.execute_script("return INST.errorCount;").should == 0
 
     form.find_element(:id, "discussion_topic_title").send_keys("This is my test title")
-    type_in_tiny '#add_topic_form_topic_new .content_box', 'This is the discussion description.'
+    type_in_tiny '#add_topic_form_topic_new .topic_content', 'This is the discussion description.'
 
     form.find_element(:css, ".submit_button").click
+    wait_for_ajax_requests
     keep_trying_until { DiscussionTopic.count.should == 1 }
 
     find_all_with_jquery(".add_topic_form_new:visible").length.should == 0
@@ -78,14 +79,13 @@ shared_examples_for "discussions selenium tests" do
     }
 
     form.find_element(:id, "discussion_topic_title").send_keys("This is my test title")
-    type_in_tiny '#add_topic_form_topic_new .content_box', 'This is the discussion description.'
+    type_in_tiny '#add_topic_form_topic_new .topic_content', 'This is the discussion description.'
 
     form.find_element(:css, '.more_options_link').click
     form.find_element(:id, 'discussion_topic_podcast_enabled').click
 
     form.find_element(:css, ".submit_button").click
-    wait_for_ajax_requests
-    wait_for_animations
+    wait_for_ajaximations
 
     driver.find_element(:css, '.discussion_topic .podcast img').click
     wait_for_animations

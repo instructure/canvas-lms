@@ -4,12 +4,14 @@ class LoadAccount
   end
 
   def call(env)
-    domain_root_account = Account.default
+    domain_root_account = LoadAccount.default_domain_root_account
     configure_for_root_account(domain_root_account)
 
     env['canvas.domain_root_account'] = domain_root_account
     @app.call(env)
   end
+
+  def self.default_domain_root_account; Account.default; end
 
   protected
 

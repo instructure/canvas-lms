@@ -63,6 +63,108 @@ describe UsersController do
     courses.map { |c| c['id'] }.should == [course2.id]
   end
 
+  context "GET 'delete'" do
+    it "should fail when the user doesn't exist" do
+      account_admin_user
+      user_session(@admin)
+      lambda { get 'delete', :user_id => (User.all.map(&:id).max + 1)}.should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "should fail when the current user doesn't have user manage permissions" do
+      course_with_teacher_logged_in
+      student_in_course :course => @course
+      get 'delete', :user_id => @student.id
+      response.status.should =~ /401 Unauthorized/
+    end
+
+    it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
+      course_with_student_logged_in
+      get 'delete', :user_id => @student.id
+      response.should be_success
+    end
+
+    it "should fail when the current user won't be able to delete managed pseudonyms" do
+      course_with_student_logged_in
+      managed_pseudonym @student
+      get 'delete', :user_id => @student.id
+      flash[:error].should =~ /cannot delete a system-generated user/
+      response.redirected_to.should == profile_url
+    end
+
+    it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
+      account_admin_user
+      user_session(@admin)
+      course_with_student
+      managed_pseudonym @student
+      get 'delete', :user_id => @student.id
+      flash[:error].should_not =~ /cannot delete a system-generated user/
+      response.should be_success
+    end
+  end
+
+  context "POST 'destroy'" do
+    it "should fail when the user doesn't exist" do
+      account_admin_user
+      user_session(@admin)
+      PseudonymSession.find(1).stubs(:destroy).returns(nil)
+      lambda { post 'destroy', :id => (User.all.map(&:id).max + 1)}.should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "should fail when the current user doesn't have user manage permissions" do
+      course_with_teacher_logged_in
+      student_in_course :course => @course
+      PseudonymSession.find(1).stubs(:destroy).returns(nil)
+      post 'destroy', :id => @student.id
+      response.status.should =~ /401 Unauthorized/
+      @student.reload.workflow_state.should_not == 'deleted'
+    end
+
+    it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
+      course_with_student_logged_in
+      PseudonymSession.find(1).stubs(:destroy).returns(nil)
+      post 'destroy', :id => @student.id
+      response.redirected_to.should == root_url
+      @student.reload.workflow_state.should == 'deleted'
+    end
+
+    it "should fail when the current user won't be able to delete managed pseudonyms" do
+      course_with_student_logged_in
+      managed_pseudonym @student
+      PseudonymSession.find(1).stubs(:destroy).returns(nil)
+      lambda { post 'destroy', :id => @student.id }.should raise_error
+      @student.reload.workflow_state.should_not == 'deleted'
+    end
+
+    it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
+      account_admin_user
+      user_session(@admin)
+      course_with_student
+      managed_pseudonym @student
+      PseudonymSession.find(1).stubs(:destroy).returns(nil)
+      post 'destroy', :id => @student.id
+      response.redirected_to.should == users_url
+      @student.reload.workflow_state.should == 'deleted'
+    end
+
+    it "should clear the session and log the user out when the current user deletes himself, with managed pseudonyms and :manage_login permissions" do
+      account_admin_user
+      user_session(@admin)
+      managed_pseudonym @admin
+      PseudonymSession.find(1).expects(:destroy).returns(nil)
+      post 'destroy', :id => @admin.id
+      response.redirected_to.should == root_url
+      @admin.reload.workflow_state.should == 'deleted'
+    end
+
+    it "should clear the session and log the user out when the current user deletes himself, without managed pseudonyms and :manage_login permissions" do
+      course_with_student_logged_in
+      PseudonymSession.find(1).expects(:destroy).returns(nil)
+      post 'destroy', :id => @student.id
+      response.redirected_to.should == root_url
+      @student.reload.workflow_state.should == 'deleted'
+    end
+  end
+
   context "POST 'create'" do
     it "should not allow creating when open_registration is disabled and you're not an admin'" do
       post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }

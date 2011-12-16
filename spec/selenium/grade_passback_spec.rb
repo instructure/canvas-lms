@@ -28,6 +28,7 @@ describe "grade exchange course settings tab" do
   end
 
   def grade_passback_setup(wait_for_success)
+
     process_csv_data_cleanly(
       "user_id,login_id,password,first_name,last_name,email,status",
       "T1,Teacher1,,T,1,t1@example.com,active",
@@ -92,24 +93,26 @@ describe "grade exchange course settings tab" do
       s.save
     end
 
-    @course.grading_standard_id = 0
+    @course.grading_standard_enabled = true
     @course.save!
     GradeCalculator.recompute_final_score(["S1", "S2", "S3", "S4"].map{|x|getuser(x).id}, @course.id)
     @course.reload
 
-    PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
-    PluginSetting.settings_for_plugin('grade_export')[:format_type] = "instructure_csv"
-    PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = wait_for_success ? "yes" : "no"
     server, server_thread, post_lines = start_test_http_server
-    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
+    @plugin = Canvas::Plugin.find!('grade_export')
+    @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+    @ps.posted_settings = @plugin.default_settings.merge({
+        :format_type => "instructure_csv",
+        :wait_for_success => wait_for_success ? "yes" : "no",
+        :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+      })
+    @ps.save!
 
     @course.offer!
     user_session(@teacher)
 
     @course.grading_standard_id = 0
     @course.save!
-
-    PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
 
     get "/courses/#{@course.id}/settings"
     driver.find_element(:css, "a#tab-grade-publishing-link").click
@@ -128,20 +131,22 @@ describe "grade exchange course settings tab" do
         "Content-Type: text/csv",
         "",
         "publisher_id,publisher_sis_id,section_id,section_sis_id,student_id," +
-        "student_sis_id,enrollment_id,enrollment_status,grade,score\n" +
-        "#{@teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S1").id},S1,#{getenroll("S1", "S1").id},active,C-,70\n" +
-        "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S2").id},S2,#{getenroll("S2", "S2").id},active,C,75\n" +
-        "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").id},S3,#{getenroll("S3", "S2").id},active,B-,80\n" +
-        "#{@teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").id},S4,#{getenroll("S4", "S1").id},active,F,0\n" +
-        "#{@teacher.id},T1,#{getsection("S3").id},S3,#{@stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(@stud5.user.id, getsection("S3").id).id},active,B,85\n" +
-        "#{@teacher.id},T1,#{@sec4.id},,#{@stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(@stud6.user.id, @sec4.id).id},active,A-,90\n"]
+        "student_sis_id,enrollment_id,enrollment_status,score,grade\n" +
+        "#{@teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" +
+        "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S2").user.id},S2,#{getenroll("S2", "S2").id},active,75,C\n" +
+        "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
+        "#{@teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
+        "#{@teacher.id},T1,#{getsection("S3").id},S3,#{@stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(@stud5.user.id, getsection("S3").id).id},active,85,B\n" +
+        "#{@teacher.id},T1,#{@sec4.id},,#{@stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(@stud6.user.id, @sec4.id).id},active,90,A-\n"]
   end
 
   it "should support grade submission" do
+    pending "spec being rewritten in a refactor"
     grade_passback_setup(false)
   end
 
   it "should support grade submission and result writeback" do
+    pending "spec being rewritten in a refactor"
     grade_passback_setup(true)
     process_csv_data_cleanly(
       "enrollment_id,grade_publishing_status,message",

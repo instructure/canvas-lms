@@ -47,10 +47,6 @@ class CalendarsController < ApplicationController
         events = calendar_events_for_request_format
         render :json => events unless @dont_render_again
       end
-      format.xml  { 
-        events = calendar_events_for_request_format
-        render :xml => events unless @dont_render_again
-      }
       format.ics { 
         events = calendar_events_for_request_format
         render :text => events unless @dont_render_again

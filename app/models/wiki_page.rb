@@ -31,17 +31,18 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
   has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
   has_many :wiki_page_comments, :order => "created_at DESC"
-  acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
+  acts_as_url :title_with_id, :scope => [:wiki_id, :not_deleted], :sync_url => true
   
-  before_save :set_revised_at
+  before_save       :set_revised_at
   before_validation :ensure_unique_title
+  after_create      :resave_url_with_id
+  after_validation  :resave_url_with_id, :if => lambda { |page| page.title_changed? }, :unless => lambda { |page| page.new_record? }
   
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
   
   def ensure_unique_title
-    return if deleted?
+    return if deleted? || !self.wiki
     self.title ||= (self.url || "page").to_cased_title
-    return unless self.wiki
     # TODO i18n (see wiki.rb)
     if self.title == "Front Page" && self.new_record?
       baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
@@ -56,8 +57,9 @@ class WikiPage < ActiveRecord::Base
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
       end while self.wiki.wiki_pages.not_deleted.find_by_title(new_title)
-      
+
       self.title = new_title
+      title
     end
   end
   
@@ -66,6 +68,12 @@ class WikiPage < ActiveRecord::Base
     base_url = self.send(url_attribute)
     base_url = self.send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !self.only_when_blank
     conditions = [wildcard("#{url_attribute}", base_url, :type => :right)]
+    # This check only needs to happen for pages named "Front Page;" everything
+    # else will be unique because it includes the object ID.
+    unless title.strip.match /^Front Page$/i
+      write_attribute url_attribute, base_url
+      return
+    end
     unless new_record?
       conditions.first << " and id != ?"
       conditions << id
@@ -100,6 +108,13 @@ class WikiPage < ActiveRecord::Base
     else
       write_attribute url_attribute, base_url
     end
+  end
+
+  # When a record is first created, the ID isn't properly appended to the
+  # URL because the ID doesn't exist. So once a record is created, re-save
+  # it to make sure that the ID is prepended to the URL.
+  def resave_url_with_id
+    id_changed? ? self.update_attribute(:url, title_with_id.to_url) : self.url = title_with_id.to_url
   end
 
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
@@ -196,7 +211,7 @@ class WikiPage < ActiveRecord::Base
   def locked_for?(context, user, opts={})
     return false unless self.could_be_locked
     @locks ||= {}
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, context, user].cache_key, :expires_in => 1.minute) do
+    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       m = context_module_tag_for(context, user).context_module rescue nil
       locked = false
       if (m && !m.available_for?(user))
@@ -342,6 +357,12 @@ class WikiPage < ActiveRecord::Base
   
   def to_param
     url
+  end
+
+  def title_with_id
+    # don't make any changes to front page URL b/c app matches against
+    # that name for deleting logic.
+    title == "Front Page" ? title : "#{id} #{title}"
   end
   
   def last_revision_at

@@ -137,22 +137,22 @@ tr.question td .number_answer.correct_answer {
     <% if @quiz.graded? %>
       <tr>
         <td><%= before_label(:average_correct, "Average Correct") %></td>
-        <td><%= @statistics[:submission_correct_count_average].to_f.round(2) %></td>
+        <td><%= render_score(@statistics[:submission_correct_count_average]) %></td>
       </tr><tr>
         <td><%= before_label(:average_incorrect, "Average Incorrect") %></td>
-        <td><%= @statistics[:submission_incorrect_count_average].to_f.round(2) %></td>
+        <td><%= render_score(@statistics[:submission_incorrect_count_average]) %></td>
       </tr><tr>
         <td><%= before_label(:high_score, "High Score") %></td>
-        <td><%= @statistics[:submission_score_max].to_f.round(2) %></td>
+        <td><%= render_score(@statistics[:submission_score_high]) %></td>
       </tr><tr>
         <td><%= before_label(:low_score, "Low Score") %></td>
-        <td><%= @statistics[:submission_score_min].to_f.round(2) %></td>
+        <td><%= render_score(@statistics[:submission_score_low]) %></td>
       </tr><tr>
         <td><%= before_label(:mean_score, "Mean Score") %></td>
-        <td><%= @statistics[:submission_score_average].to_f.round(2) %></td>
+        <td><%= render_score(@statistics[:submission_score_average]) %></td>
       </tr><tr>
         <td><%= before_label(:standard_deviation, "Standard Deviation") %></td>  
-        <td><%= @statistics[:submission_score_stdev].to_f.round(2) %></td>
+        <td><%= render_score(@statistics[:submission_score_stdev]) %></td>
       </tr>
     <% end %>
     </table>

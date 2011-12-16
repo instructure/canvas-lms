@@ -143,6 +143,9 @@ class SisBatch < ActiveRecord::Base
   end
 
   def remove_previous_imports
+    # we shouldn't be able to get here without a term, but if we do, skip
+    return unless self.batch_mode_term
+
     # delete courses that weren't in this batch, in the selected term
     scope = Course.active.for_term(self.batch_mode_term).scoped(:conditions => ["courses.root_account_id = ?", self.account.id])
     scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id.to_s]).find_each do |course|

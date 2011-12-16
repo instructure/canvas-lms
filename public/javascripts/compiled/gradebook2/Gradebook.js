@@ -349,7 +349,7 @@
             _results = [];
             for (key in student) {
               value = student[key];
-              if (key.match(/^assignment_/)) {
+              if (key.match(/^assignment_(?!group)/)) {
                 _results.push(value);
               }
             }

@@ -715,9 +715,17 @@ I18n.scoped('gradebook', function(I18n) {
       return snapshot && $.map(jsonData.context.students, function(student) {
         return (snapshot == student) && student.name;
       })[0]; 
-    });
-    
-    if (userNamesWithPendingQuizSubmission.length) {
+    })
+      hasPendingQuizSubmissions = (function(){
+        var ret = false;
+        if (userNamesWithPendingQuizSubmission.length){
+          for (var i = 0, max = userNamesWithPendingQuizSubmission.length; i < max; i++){
+            if (userNamesWithPendingQuizSubmission[i] !== false) { ret = true; }
+          }
+        }
+        return ret;
+      })();
+    if (hasPendingQuizSubmissions) {
       return I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
     }
   };
@@ -880,9 +888,8 @@ I18n.scoped('gradebook', function(I18n) {
     handleFragmentChange: function(){
       var hash;
       try {
-        hash = $.parseJSON(decodeURIComponent(document.location.hash.substr(1))); //get rid of the first charicter "#" of the hash
-      } catch(e) {
-      }
+        hash = JSON.parse(decodeURIComponent(document.location.hash.substr(1))); //get rid of the first charicter "#" of the hash
+      } catch(e) {}
       if (!hash) {
         hash = {};
       }

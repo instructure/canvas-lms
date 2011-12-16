@@ -40,7 +40,7 @@ shared_examples_for "files selenium tests" do
         "authenticity_token" => authenticity_token,
         "no_redirect" => true}, { "Cookie" => @cookie })
     resp.code.should == "200"
-    data = ActiveSupport::JSON.decode(body)
+    data = json_parse(body)
     data["upload_url"] = data["proxied_upload_url"] || data["upload_url"]
     data["upload_url"] = "#{app_host}#{data["upload_url"]}" if data["upload_url"] =~ /^\//
     data["success_url"] = "#{app_host}#{data["success_url"]}" if data["success_url"] =~ /^\//
@@ -157,3 +157,35 @@ describe "files Windows-Firefox-S3-Tests" do
     Setting.set("file_storage_test_override", "s3")
   }
 end
+
+describe "collaborations folder in files menu" do
+  it_should_behave_like "in-process server selenium tests"
+  
+  before (:each) do
+    course_with_teacher_logged_in
+    group_category = @course.group_categories.create(:name => "groupage")
+    @group = Group.create!(:name=>"group1", :group_category => group_category, :context => @course)
+  end
+  
+  def load_collab_folder
+    get "/groups/#{@group.id}/files"
+    message_node = keep_trying_until {
+      driver.find_element(:css, "li.collaborations span.name").click
+      driver.find_element(:css, "ul.files_content li.message")
+    }
+    message_node.text
+  end
+  
+  it "should not show 'add collaboration' paragraph to teacher not participating in group" do
+    message = load_collab_folder
+    message.should_not =~ /click "New collaboration"/
+  end
+  
+  it "should show 'add collaboration' paragraph to participating user" do
+    @group.participating_users << @user
+    message = load_collab_folder
+    message.should =~ /click "New collaboration"/
+  end
+  
+end
+

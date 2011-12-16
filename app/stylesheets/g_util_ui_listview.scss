@@ -28,7 +28,7 @@
     color: #444;
     text-shadow: 0 1px 1px #f6f6f6;
     text-decoration: none;
-    @include vertical-gradiant(#fdfdfd, #eeeeee);
+    @include vertical-gradient(#fdfdfd, #eeeeee);
     .ui-listview-text{
       display: block;
       position: relative;
@@ -45,7 +45,7 @@
       color:          #101010;
       text-decoration: none;
       text-shadow: 0 1px 1px  #fff;
-      @include vertical-gradiant(#ededed, #dadada);
+      @include vertical-gradient(#ededed, #dadada);
       a{ text-decoration: none;}
     }
     &:active, &.active {
@@ -56,7 +56,7 @@
       cursor: pointer;
       text-shadow: 0 -1px 1px #999;
       text-decoration: none;
-      @include vertical-gradiant(#ccc, #aaa);
+      @include vertical-gradient(#ccc, #aaa);
       outline: none;
       a { color: #fff; }
     }
@@ -76,7 +76,7 @@
       color: #747575;
       font-weight: normal;
       text-shadow: 0 -1px 1px #cce6d6;
-      @include vertical-gradiant(#c8e0d1, #b3cbbc);
+      @include vertical-gradient(#c8e0d1, #b3cbbc);
     }
   }
 }

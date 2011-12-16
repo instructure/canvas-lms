@@ -185,7 +185,6 @@ class SubmissionsController < ApplicationController
         respond_to do |format|
           flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
           format.html { redirect_to course_assignment_url(@context, @assignment) }
-          format.xml  { render :xml => e.record.errors.to_xml }
           format.json { render :json => e.record.errors.to_json, :status => :bad_request }
         end
         return
@@ -195,12 +194,10 @@ class SubmissionsController < ApplicationController
           log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
           format.html { redirect_to course_assignment_url(@context, @assignment) }
-          format.xml  { head :created, :location => course_gradebook_url(@submission.assignment.context) }
           format.json { render :json => @submission.to_json(:include => :submission_comments), :status => :created, :location => course_gradebook_url(@submission.assignment.context) }
         else
           flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
           format.html { render :action => "show", :id => @submission.assignment.context.id }
-          format.xml  { render :xml => @submission.errors.to_xml }
           format.json { render :json => @submission.errors.to_json, :status => :bad_request }
         end
       end
@@ -267,7 +264,6 @@ class SubmissionsController < ApplicationController
           @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
           flash[:notice] = t('assignment_submitted', 'Assignment submitted.')
           format.html { redirect_to course_assignment_url(@context, @assignment) }
-          format.xml  { head :created, :location => course_gradebook_url(@submission.assignment.context) }
           excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
           comments_type = @context_enrollment.admin? ? :submission_comments : :visible_submission_comments
           format.json { 
@@ -280,7 +276,6 @@ class SubmissionsController < ApplicationController
           @error_message = t('errors_update_failed', "Update Failed")
           flash[:error] = @error_message
           format.html { render :action => "show", :id => @assignment.context.id }
-          format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }
           format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
           format.text { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
         end

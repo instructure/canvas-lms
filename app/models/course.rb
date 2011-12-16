@@ -433,7 +433,7 @@ class Course < ActiveRecord::Base
        UNION SELECT courses.id AS course_id, e.user_id FROM courses
          INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment')
-         WHERE courses.workflow_state NOT IN ('aborted', 'deleted')) as course_users
+         WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id"
     }
   }
@@ -631,8 +631,9 @@ class Course < ActiveRecord::Base
   end
   
   def recompute_student_scores
-    Enrollment.send_later_if_production(:recompute_final_score, self.students.map(&:id), self.id)
+    Enrollment.recompute_final_score(self.students.map(&:id), self.id)
   end
+  handle_asynchronously_if_production :recompute_student_scores
   
   def home_page
     WikiNamespace.default_for_context(self).wiki.wiki_page
@@ -699,22 +700,18 @@ class Course < ActiveRecord::Base
     state :created do
       event :claim, :transitions_to => :claimed
       event :offer, :transitions_to => :available
-      event :abort_it, :transitions_to => :aborted
       event :complete, :transitions_to => :completed
     end
     
     state :claimed do
       event :offer, :transitions_to => :available
-      event :abort_it, :transitions_to => :aborted
       event :complete, :transitions_to => :completed
     end
     
     state :available do
-      event :abort_it, :transitions_to => :aborted
       event :complete, :transitions_to => :completed
     end
 
-    state :aborted
     state :completed do
       event :unconclude, :transitions_to => :available
     end
@@ -989,164 +986,186 @@ class Course < ActiveRecord::Base
     WikiNamespace.default_for_context(self)
   end
 
-  def grade_publishing_messages
-    messages = {}
-    student_enrollments.count(:all, :group => [:grade_publishing_message, :grade_publishing_status]).each do |key, count|
-      status = key.last
-      status = "unpublished" if status.blank?
-      message = key.first
-      case status
-      when 'error'
-        if message.present?
-          message = t('grade_publishing_status.error_with_message', "Error: %{message}", :message => message)
-        else
-          message = t('grade_publishing_status.error', "Error")
-        end
-      when 'unpublished'
-        if message.present?
-          message = t('grade_publishing_status.unpublished_with_message', "Unpublished: %{message}", :message => message)
-        else
-          message = t('grade_publishing_status.unpublished', "Unpublished")
-        end
-      when 'pending'
-        if message.present?
-          message = t('grade_publishing_status.pending_with_message', "Pending: %{message}", :message => message)
-        else
-          message = t('grade_publishing_status.pending', "Pending")
-        end
-      when 'publishing'
-        if message.present?
-          message = t('grade_publishing_status.publishing_with_message', "Publishing: %{message}", :message => message)
-        else
-          message = t('grade_publishing_status.publishing', "Publishing")
-        end
-      when 'published'
-        if message.present?
-          message = t('grade_publishing_status.published_with_message', "Published: %{message}", :message => message)
-        else
-          message = t('grade_publishing_status.published', "Published")
-        end
-      when 'unpublishable'
-        if message.present?
-          message = t('grade_publishing_status.unpublishable_with_message', "Unpublishable: %{message}", :message => message)
-        else
-          message = t('grade_publishing_status.unpublishable', "Unpublishable")
-        end
+  def grade_publishing_status_translation(status, message)
+    status = "unpublished" if status.blank?
+    case status
+    when 'error'
+      if message.present?
+        message = t('grade_publishing_status.error_with_message', "Error: %{message}", :message => message)
       else
-        if message.present?
-          message = t('grade_publishing_status.unknown_with_message', "Unknown status, %{status}: %{message}", :message => message, :status => status)
-        else
-          message = t('grade_publishing_status.unknown', "Unknown status, %{status}", :status => status)
-        end
+        message = t('grade_publishing_status.error', "Error")
       end
-      messages[message] ||= 0
-      messages[message] += count
+    when 'unpublished'
+      if message.present?
+        message = t('grade_publishing_status.unpublished_with_message', "Unpublished: %{message}", :message => message)
+      else
+        message = t('grade_publishing_status.unpublished', "Unpublished")
+      end
+    when 'pending'
+      if message.present?
+        message = t('grade_publishing_status.pending_with_message', "Pending: %{message}", :message => message)
+      else
+        message = t('grade_publishing_status.pending', "Pending")
+      end
+    when 'publishing'
+      if message.present?
+        message = t('grade_publishing_status.publishing_with_message', "Publishing: %{message}", :message => message)
+      else
+        message = t('grade_publishing_status.publishing', "Publishing")
+      end
+    when 'published'
+      if message.present?
+        message = t('grade_publishing_status.published_with_message', "Published: %{message}", :message => message)
+      else
+        message = t('grade_publishing_status.published', "Published")
+      end
+    when 'unpublishable'
+      if message.present?
+        message = t('grade_publishing_status.unpublishable_with_message', "Unpublishable: %{message}", :message => message)
+      else
+        message = t('grade_publishing_status.unpublishable', "Unpublishable")
+      end
+    else
+      if message.present?
+        message = t('grade_publishing_status.unknown_with_message', "Unknown status, %{status}: %{message}", :message => message, :status => status)
+      else
+        message = t('grade_publishing_status.unknown', "Unknown status, %{status}", :status => status)
+      end
     end
-    messages
+    message
+  end
+  memoize :grade_publishing_status_translation
+
+  def grade_publishing_statuses
+    found_statuses = [].to_set
+    enrollments = student_enrollments.group_by do |e|
+      found_statuses.add e.grade_publishing_status
+      grade_publishing_status_translation(e.grade_publishing_status, e.grade_publishing_message)
+    end
+    overall_status = "error"
+    overall_status = "unpublished" unless found_statuses.size > 0
+    overall_status = (%w{error unpublished pending publishing published unpublishable}).detect{|s| found_statuses.include?(s)} || overall_status
+    return enrollments, overall_status
   end
 
-  def grade_publishing_status
-    # this will return the overall course grade publishing status
-    statuses = {}
-    student_enrollments.count(:all, :group => [:grade_publishing_status]).each do |key, count|
-      statuses[key || "unpublished"] = true
-    end
-    return "unpublished" unless statuses.size > 0
-    ["error", "unpublished", "pending", "publishing", "published", "unpublishable"].each do |status|
-      return status if statuses.has_key?(status)
-    end
-    return "error"
-  end
-
-  def publish_final_grades(publishing_user)
-    # we want to set all the publishing statuses to 'pending' immediately,
-    # and then as a delayed job, actually go publish them.
-
-    settings = PluginSetting.settings_for_plugin('grade_export')
-    raise "final grade publishing disabled" unless settings[:enabled] == "true"
-    raise "endpoint undefined" if settings[:publish_endpoint].nil? || settings[:publish_endpoint].empty?
-
-    last_publish_attempt_at = Time.now.utc
-    self.student_enrollments.update_all :grade_publishing_status => "pending",
-                                        :last_publish_attempt_at => last_publish_attempt_at
-
-    send_later_if_production(:send_final_grades_to_endpoint, publishing_user)
-    send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if settings[:success_timeout].present? && settings[:wait_for_success] && Rails.env.production?
+  def should_kick_off_grade_publishing_timeout?
+    settings = Canvas::Plugin.find!('grade_export').settings
+    settings[:success_timeout].to_i > 0 && Canvas::Plugin.value_to_boolean(settings[:wait_for_success])
   end
 
   def self.valid_grade_export_types
     @valid_grade_export_types ||= {
         "instructure_csv" => {
             :name => t('grade_export_types.instructure_csv', "Instructure formatted CSV"),
-            :callback => lambda { |course, enrollments, publishing_pseudonym|
-                course.generate_grade_publishing_csv_output(enrollments, publishing_pseudonym)
-            }
+            :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                course.generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
+            },
+            :requires_grading_standard => false,
+            :requires_publishing_pseudonym => false
           }
       }
+  end
+
+  def allows_grade_publishing_by(user)
+    return false unless Canvas::Plugin.find!('grade_export').enabled?
+    settings = Canvas::Plugin.find!('grade_export').settings
+    format_settings = Course.valid_grade_export_types[settings[:format_type]]
+    return false unless format_settings
+    return false if user.sis_pseudonym_for(self).nil? and format_settings[:requires_publishing_pseudonym]
+    return true
+  end
+
+  def publish_final_grades(publishing_user)
+    # we want to set all the publishing statuses to 'pending' immediately,
+    # and then as a delayed job, actually go publish them.
+
+    raise "final grade publishing disabled" unless Canvas::Plugin.find!('grade_export').enabled?
+    settings = Canvas::Plugin.find!('grade_export').settings
+
+    last_publish_attempt_at = Time.now.utc
+    self.student_enrollments.update_all :grade_publishing_status => "pending",
+                                        :grade_publishing_message => nil,
+                                        :last_publish_attempt_at => last_publish_attempt_at
+
+    send_later_if_production(:send_final_grades_to_endpoint, publishing_user)
+    send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
   end
 
   def send_final_grades_to_endpoint(publishing_user)
     # actual grade publishing logic is here, but you probably want
     # 'publish_final_grades'
 
+    self.recompute_student_scores_without_send_later
     enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
+
+    errors = []
+    posts_to_make = []
+    posted_enrollment_ids = []
+    all_enrollment_ids = enrollments.map(&:id)
 
     begin
 
-      settings = PluginSetting.settings_for_plugin('grade_export')
-      raise "final grade publishing disabled" unless settings[:enabled] == "true"
+      raise "final grade publishing disabled" unless Canvas::Plugin.find!('grade_export').enabled?
+      settings = Canvas::Plugin.find!('grade_export').settings
       raise "endpoint undefined" if settings[:publish_endpoint].blank?
+      format_settings = Course.valid_grade_export_types[settings[:format_type]]
+      raise "unknown format type: #{settings[:format_type]}" unless format_settings
+      raise "grade publishing requires a grading standard" if !self.grading_standard_enabled? && format_settings[:requires_grading_standard]
 
-      publishing_pseudonym = publishing_user.pseudonyms.active.find_by_account_id(self.root_account_id, :order => "sis_user_id DESC")
+      publishing_pseudonym = publishing_user.sis_pseudonym_for(self)
+      raise "publishing disallowed for this publishing user" if publishing_pseudonym.nil? and format_settings[:requires_publishing_pseudonym]
 
-      errors = []
-      posts_to_make = []
-      ignored_enrollment_ids = []
+      callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
 
-      if Course.valid_grade_export_types.has_key?(settings[:format_type])
-        callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
-        posts_to_make, ignored_enrollment_ids = callback.call(self, enrollments,
-            publishing_pseudonym)
-      end
+      posts_to_make = callback.call(self, enrollments, publishing_user, publishing_pseudonym)
 
-    rescue
-      Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollments.map(&:id) })
-      raise
+    rescue => e
+      Enrollment.update_all({ :grade_publishing_status => "error", :grade_publishing_message => "#{e}"}, { :id => all_enrollment_ids })
+      raise e
     end
-
-    Enrollment.update_all({ :grade_publishing_status => "unpublishable" }, { :id => ignored_enrollment_ids })
 
     posts_to_make.each do |enrollment_ids, res, mime_type|
       begin
+        posted_enrollment_ids += enrollment_ids
         SSLCommon.post_data(settings[:publish_endpoint], res, mime_type)
-        Enrollment.update_all({ :grade_publishing_status => (settings[:wait_for_success] == "yes" ? "publishing" : "published") }, { :id => enrollment_ids })
+        Enrollment.update_all({ :grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil }, { :id => enrollment_ids })
       rescue => e
         errors << e
-        Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollment_ids })
+        Enrollment.update_all({ :grade_publishing_status => "error", :grade_publishing_message => "#{e}"}, { :id => enrollment_ids })
       end
     end
+
+    Enrollment.update_all({ :grade_publishing_status => "unpublishable", :grade_publishing_message => nil }, { :id => (all_enrollment_ids.to_set - posted_enrollment_ids.to_set).to_a })
 
     raise errors[0] if errors.size > 0
   end
   
-  def generate_grade_publishing_csv_output(enrollments, publishing_pseudonym)
+  def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
     enrollment_ids = []
     res = FasterCSV.generate do |csv|
-      csv << ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "grade", "score"]
+      row = ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
+      row << "grade" if self.grading_standard_enabled?
+      csv << row
       enrollments.each do |enrollment|
-        enrollment_ids << enrollment.id
         next unless enrollment.computed_final_score
-        enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).each do |user_pseudonym|
-          csv << [publishing_pseudonym.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id, enrollment.course_section.sis_source_id, user_pseudonym.id, user_pseudonym.sis_user_id, enrollment.id, enrollment.workflow_state, enrollment.computed_final_grade, enrollment.computed_final_score]
+        enrollment_ids << enrollment.id
+        pseudonym_sis_ids = enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).map{|p| p.sis_user_id}
+        pseudonym_sis_ids = [nil] if pseudonym_sis_ids.empty?
+        pseudonym_sis_ids.each do |pseudonym_sis_id|
+          row = [publishing_user.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id,
+              enrollment.course_section.sis_source_id, enrollment.user.id, pseudonym_sis_id, enrollment.id,
+              enrollment.workflow_state, enrollment.computed_final_score]
+          row << enrollment.computed_final_grade if self.grading_standard_enabled?
+          csv << row
         end
       end
     end
-    return [[enrollment_ids, res, "text/csv"]], []
+    return [[enrollment_ids, res, "text/csv"]]
   end
 
   def expire_pending_grade_publishing_statuses(last_publish_attempt_at)
     self.student_enrollments.scoped(:conditions => ["grade_publishing_status IN ('pending', 'publishing') AND last_publish_attempt_at = ?",
-      last_publish_attempt_at]).update_all :grade_publishing_status => 'error'
+      last_publish_attempt_at]).update_all :grade_publishing_status => 'error', :grade_publishing_message => "Timed out."
   end
 
   def gradebook_to_csv(options = {})
@@ -1159,6 +1178,9 @@ class Course < ActiveRecord::Base
     end
     single = assignments.length == 1
     student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    # remove duplicate enrollments for students enrolled in multiple sections
+    seen_users = []
+    student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
     submissions = self.submissions.inject({}) { |h, sub|
       h[[sub.user_id, sub.assignment_id]] = sub; h
     }
@@ -1180,7 +1202,7 @@ class Course < ActiveRecord::Base
       row << "Section"
       row.concat(assignments.map{|a| single ? [a.title_with_id, 'Comments'] : a.title_with_id})
       row.concat(["Current Score", "Final Score"])
-      row.concat(["Final Grade"]) if self.grading_standard_id
+      row.concat(["Final Grade"]) if self.grading_standard_enabled?
       csv << row.flatten
       
       #Second Row
@@ -1188,7 +1210,7 @@ class Course < ActiveRecord::Base
       row.concat(["", ""]) if options[:include_sis_id]
       row.concat(assignments.map{|a| single ? [a.points_possible, ''] : a.points_possible})
       row.concat([read_only, read_only])
-      row.concat([read_only]) if self.grading_standard_id
+      row.concat([read_only]) if self.grading_standard_enabled?
       csv << row.flatten
       
       student_enrollments.each do |student_enrollment|
@@ -1206,7 +1228,7 @@ class Course < ActiveRecord::Base
         row << student_section
         row.concat(student_submissions)
         row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])
-        if self.grading_standard_id
+        if self.grading_standard_enabled?
           row.concat([score_to_grade(student_enrollment.computed_final_score)])
         end
         csv << row.flatten
@@ -1215,7 +1237,7 @@ class Course < ActiveRecord::Base
   end
   
   def grading_standard_title
-    if self.grading_standard_id
+    if self.grading_standard_enabled?
       self.grading_standard.try(:title) || t('default_grading_scheme_name', "Default Grading Scheme")
     else
       nil
@@ -1223,7 +1245,7 @@ class Course < ActiveRecord::Base
   end
   
   def score_to_grade(score)
-    return "" unless self.grading_standard_id && score
+    return nil unless self.grading_standard_enabled? && score
     scheme = self.grading_standard.try(:data) || GradingStandard.default_grading_standard
     GradingStandard.score_to_grade(scheme, score)
   end
@@ -1274,12 +1296,13 @@ class Course < ActiveRecord::Base
   def grading_standard_enabled
     !!self.grading_standard_id
   end
+  alias_method :grading_standard_enabled?, :grading_standard_enabled
   
   def grading_standard_enabled=(val)
-    if val == false || val == '0' || val == 'false' || val == 'off'
-      self.grading_standard = nil
-    else
+    if Canvas::Plugin.value_to_boolean(val)
       self.grading_standard_id ||= 0
+    else
+      self.grading_standard = self.grading_standard_id = nil
     end
   end
   
@@ -1508,16 +1531,9 @@ class Course < ActiveRecord::Base
   end
   
   def bool_res(val)
-    val == '1' || val == true || val == 'yes'
+    Canvas::Plugin.value_to_boolean(val)
   end
   
-  def boolean_hash(hash)
-    res = {}
-    hash.each do |key, val|
-      res[key] = true if bool_res(hash[key])
-    end
-  end
-
   def process_migration_files(data, migration)
     return unless data['all_files_export'] && data['all_files_export']['file_path']
     return unless File.exist?(data['all_files_export']['file_path'])

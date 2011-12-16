@@ -30,7 +30,6 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
-  has_many :attachments, :as => :context
   has_one :external_feed_entry, :as => :asset
   
   before_create :infer_parent_id
@@ -88,13 +87,13 @@ class DiscussionEntry < ActiveRecord::Base
       # If the topic has been going for more than two weeks and it suddenly
       # got "popular" again, move it back up in user streams
       if !self.discussion_topic.for_assignment? && self.created_at && self.created_at > self.discussion_topic.created_at + 2.weeks && recent_entries.select{|e| e.created_at && e.created_at > 24.hours.ago }.length > 10
-        self.discussion_topic.participants
+        self.discussion_topic.active_participants
       # If the topic has beeng going for more than two weeks, only show
       # people who have been participating in the topic
       elsif self.created_at > self.discussion_topic.created_at + 2.weeks
         recent_entries.map(&:user_id).uniq
       else
-        self.discussion_topic.participants
+        self.discussion_topic.active_participants
       end
     else
       []

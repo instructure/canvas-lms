@@ -64,7 +64,6 @@ class ConferencesController < ApplicationController
           format.json { render :json => WebConference.find(@conference).to_json(:permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => 'index' }
-          format.xml { render :xml => @conference.errors.to_xml, :status => :bad_request }
           format.json { render :json => @conference.errors.to_json, :status => :bad_request }
         end
       end
@@ -89,7 +88,6 @@ class ConferencesController < ApplicationController
           format.json { render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "edit" }
-          format.xml { render :xml => @conference.errors.to_xml, :status => :bad_request }
           format.json { render :json => @conference.errors.to_json, :status => :bad_request }
         end
       end
@@ -150,7 +148,6 @@ class ConferencesController < ApplicationController
       @conference.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
-        format.xml { head :ok }
         format.json { render :json => @conference.to_json }
       end      
     end

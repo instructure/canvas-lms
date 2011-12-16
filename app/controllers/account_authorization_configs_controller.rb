@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Account Authentication Services
 class AccountAuthorizationConfigsController < ApplicationController
   before_filter :require_context, :require_root_account_management
 
@@ -27,13 +28,153 @@ class AccountAuthorizationConfigsController < ApplicationController
     @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
   end
 
+  # @API
+  # Set the external account authentication service(s) for the account.
+  # Services may be CAS, SAML, or LDAP.
+  #
+  # Each authentication service is specified as a set of parameters as
+  # described below. A service specification must include an 'auth_type'
+  # parameter with a value of 'cas', 'saml', or 'ldap'. The other recognized
+  # parameters depend on this auth_type; unrecognized parameters are discarded.
+  # Service specifications not specifying a valid auth_type are ignored.
+  #
+  # Any service specification may include an optional 'login_handle_name'
+  # parameter. This parameter specifies the label used for unique login
+  # identifiers; for example: 'Login', 'Username', 'Student ID', etc. The
+  # default is 'Email'.
+  #
+  # For CAS authentication services, the additional recognized parameters are:
+  #
+  # - auth_base
+  #
+  #   The CAS server's URL.
+  #
+  # - log_in_url [Optional]
+  #
+  #   An alternate SSO URL for logging into CAS. You probably should not set
+  #   this.
+  #
+  # For SAML authentication services, the additional recognized parameters are:
+  #
+  # - log_in_url
+  #
+  #   The SAML service's SSO target URL
+  #
+  # - log_out_url
+  #
+  #   The SAML service's SLO target URL
+  #
+  # - certificate_fingerprint
+  #
+  #   The SAML service's certificate fingerprint.
+  #
+  # - change_password_url [Optional]
+  #
+  #   Forgot Password URL. Leave blank for default Canvas behavior.
+  #
+  # - identifier_format
+  #
+  #   The SAML service's identifier format. Must be one of:
+  #
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:entity
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName
+  #
+  # For LDAP authentication services, the additional recognized parameters are:
+  #
+  # - auth_host
+  #
+  #   The LDAP server's URL.
+  #
+  # - auth_port [Optional, Integer]
+  #
+  #   The LDAP server's TCP port. (default: 389)
+  #
+  # - auth_over_tls [Optional, Boolean]
+  #
+  #   Whether to use simple TLS encryption. Only simple TLS encryption is
+  #   supported at this time. (default: false)
+  #
+  # - auth_base [Optional]
+  #
+  #   A default treebase parameter for searches performed against the LDAP
+  #   server.
+  #
+  # - auth_filter
+  #
+  #   LDAP search filter. Use \{{login}} as a placeholder for the username
+  #   supplied by the user. For example: "(sAMAccountName=\{{login}})".
+  #
+  # - auth_username
+  #
+  #   Username
+  #
+  # - auth_password
+  #
+  #   Password
+  #
+  # - change_password_url [Optional]
+  #
+  #   Forgot Password URL. Leave blank for default Canvas behavior.
+  #
+  # @argument account_authorization_config[n]
+  #   The nth service specification as described above. For instance, the
+  #   auth_type of the first service is given by the
+  #   account_authorization_config[0][auth_type] parameter. There must be
+  #   either a single CAS or SAML specification, or one or more LDAP
+  #   specifications. Additional services after an initial CAS or SAML service
+  #   are ignored; additional non-LDAP services after an initial LDAP service
+  #   are ignored.
+  #
+  # Examples:
+  #
+  # Simple CAS server integration.
+  #
+  #   account_authorization_config[0][auth_type]=cas&
+  #   account_authorization_config[0][auth_base]=cas.mydomain.edu
+  #
+  # Simple SAML server integration.
+  #
+  #   account_authorization_config[0][log_in_url]=saml-sso.mydomain.com&
+  #   account_authorization_config[0][log_out_url]=saml-slo.mydomain.com&
+  #   account_authorization_config[0][certificate_fingerprint]=1234567890ABCDEF&
+  #   account_authorization_config[0][identifier_format]=urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+  #
+  # Single LDAP server integration.
+  #
+  #   account_authorization_config[0][auth_type]=ldap&
+  #   account_authorization_config[0][auth_host]=ldap.mydomain.edu&
+  #   account_authorization_config[0][auth_filter]=(sAMAccountName={{login}})&
+  #   account_authorization_config[0][auth_username]=username&
+  #   account_authorization_config[0][auth_password]=password
+  #
+  # Multiple LDAP server integration.
+  #
+  #   account_authorization_config[0][auth_type]=ldap&
+  #   account_authorization_config[0][auth_host]=faculty-ldap.mydomain.edu&
+  #   account_authorization_config[0][auth_filter]=(sAMAccountName={{login}})&
+  #   account_authorization_config[0][auth_username]=username&
+  #   account_authorization_config[0][auth_password]=password&
+  #   account_authorization_config[1][auth_type]=ldap&
+  #   account_authorization_config[1][auth_host]=student-ldap.mydomain.edu&
+  #   account_authorization_config[1][auth_filter]=(sAMAccountName={{login}})&
+  #   account_authorization_config[1][auth_username]=username&
+  #   account_authorization_config[1][auth_password]=password
+  #
   def update_all
     account_configs_to_delete = @account.account_authorization_configs.to_a.dup
     account_configs = {}
-    params[:account_authorization_config].sort {|a,b| a[0] <=> b[0] }.each do |idx, data|
+    (params[:account_authorization_config] || {}).sort {|a,b| a[0] <=> b[0] }.each do |idx, data|
       id = data.delete :id
       disabled = data.delete :disabled
       next if disabled == '1'
+      data = filter_data(data)
+      next if data.empty?
 
       result = if id.to_i == 0
         account_config = @account.account_authorization_configs.build(data)
@@ -129,5 +270,26 @@ class AccountAuthorizationConfigsController < ApplicationController
       c.destroy
     end
     redirect_to :account_account_authorization_configs
+  end
+
+  protected
+  def recognized_params(auth_type)
+    case auth_type
+    when 'cas'
+      [ :auth_type, :auth_base, :log_in_url, :login_handle_name ]
+    when 'ldap'
+      [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
+        :auth_filter, :auth_username, :auth_password, :change_password_url,
+        :login_handle_name ]
+    when 'saml'
+      [ :auth_type, :log_in_url, :log_out_url, :change_password_url,
+        :certificate_fingerprint, :identifier_format, :login_handle_name ]
+    else
+      []
+    end
+  end
+
+  def filter_data(data)
+    data ? data.slice(*recognized_params(data[:auth_type])) : {}
   end
 end
