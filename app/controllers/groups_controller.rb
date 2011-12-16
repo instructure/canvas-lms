@@ -101,7 +101,6 @@ class GroupsController < ApplicationController
       @home_page = WikiNamespace.default_for_context(@group).wiki.wiki_page
       respond_to do |format|
         format.html
-        format.xml  { render :xml => @group.to_xml }
       end
     end
   end
@@ -194,11 +193,9 @@ class GroupsController < ApplicationController
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
-          format.xml  { head :created, :location => group_url(@group) }
           format.json { render :json => @group.to_json }
         else
           format.html { render :action => "new" }
-          format.xml  { render :xml => @group.errors.to_xml }
           format.json { render :json => @group.errors.to_json }
         end
       end
@@ -226,11 +223,9 @@ class GroupsController < ApplicationController
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to group_url(@group) }
           format.json { render :json => @group.to_json }
-          format.xml  { head :ok }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @group.errors.to_json }
-          format.xml  { render :xml => @group.errors.to_xml }
         end
       end
     end
@@ -244,13 +239,11 @@ class GroupsController < ApplicationController
         flash[:notice] = t('notices.delete_success', "Group successfully deleted")
         respond_to do |format|
           format.html { redirect_to(dashboard_url) }
-          format.xml  { head :ok }
           format.json { render :json => @group.to_json }
         end
       rescue Exception => e
         respond_to do |format|
           format.html { redirect_to(dashboard_url) }
-          format.xml  { render :xml => @group.to_xml }
           format.json { render :json => @group.to_json, :status => :bad_request }
         end
       end
@@ -341,7 +334,6 @@ class GroupsController < ApplicationController
         else
           format.html { render :action => 'context_groups' }
         end
-        format.xml  { render :xml => @groups.to_xml }
         format.atom { render :xml => @groups.to_atom.to_xml }
       end
     end

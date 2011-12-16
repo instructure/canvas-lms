@@ -113,7 +113,7 @@ class CommunicationChannelsController < ApplicationController
         @user.move_to_user(@current_user) if @user != @current_user
         # create a new pseudonym if necessary and possible
         pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account)
-        pseudonym.save! if pseudonym && pseudonym.new_record?
+        pseudonym.save! if pseudonym && pseudonym.changed?
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
         if params[:transfer_enrollment].present?
           cc.active? || cc.confirm

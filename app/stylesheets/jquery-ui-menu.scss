@@ -105,7 +105,7 @@ $kyle-menu-border-radius: 10px;
   li:first-of-type a { @include border-top-radius($kyle-menu-border-radius) }
   li:last-child a { @include border-bottom-radius($kyle-menu-border-radius) }
   .ui-state-focus {
-    @include vertical-gradiant(#0abdff, #008fd6);
+    @include vertical-gradient(#0abdff, #008fd6);
     border-top: 1px solid #d5f1fe;
     border-bottom: 1px solid #1e7eca;
     color: white;

@@ -172,7 +172,6 @@
       dataType: "json",
       type: submit_type,
       success: function(data) {
-        $.ajaxJSON.inFlightRequests -= 1;
         data = data || {};
         var page_view_id = null;
         if(xhr && xhr.getResponseHeader && (page_view_id = xhr.getResponseHeader("X-Canvas-Page-View-Id"))) {
@@ -192,7 +191,6 @@
         }
       },
       error: function() {
-        $.ajaxJSON.inFlightRequests -= 1;
         ajaxError.apply(this, arguments);
       },
       data: data
@@ -200,12 +198,10 @@
     if(options && options.timeout) {
       params['timeout'] = options.timeout;
     }
-    $.ajaxJSON.inFlightRequests += 1;
     var xhr = $.ajax(params);
     $.ajaxJSON.storeRequest(xhr, url, submit_type, data);
     return xhr;
   };
-  $.ajaxJSON.inFlightRequests = 0;
   $.ajaxJSON.unhandledXHRs = [];
   $.ajaxJSON.ignoredXHRs = [];
   $.ajaxJSON.passedRequests = [];

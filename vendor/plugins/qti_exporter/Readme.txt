@@ -1,4 +1,4 @@
-The QTI exporter won't work unless you have the Python QTI 1.2 to QTI 2.1 converter installed
+The QTI converter won't work unless you have the Python QTI 1.2 to QTI 2.1 converter installed
 
 The plugin will first check to see if the python app is in
 "RAILS_ROOT/vendor/QTIMigrationTool"

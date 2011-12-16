@@ -58,7 +58,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_sections) }
     can :read and can :create and can :update and can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_students, :manage_admin_users) }

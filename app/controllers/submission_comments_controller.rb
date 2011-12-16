@@ -23,7 +23,6 @@ class SubmissionCommentsController < ApplicationController
     if authorized_action(@submission_comment, @current_user, :delete)
       @submission_comment.destroy
       respond_to do |format|
-        format.xml  { head :ok }
         format.json { render :json => @submission_comment.to_json }
       end
     end

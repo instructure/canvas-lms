@@ -71,6 +71,15 @@ describe PseudonymSessionsController do
   end
 
   context "merging" do
+    it "should set merge params correctly in the session" do
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+      @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
+      get 'new', :confirm => @cc.confirmation_code, :expected_user_id => @user.id
+      response.should render_template 'new'
+      session[:confirm].should == @cc.confirmation_code
+      session[:expected_user_id].should == @user.id
+    end
+
     it "should redirect back to merge users" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')

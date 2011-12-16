@@ -5,7 +5,7 @@
     <% if can_do(@section, @current_user, :update) %>
       <a href="#" class="button button-sidebar-wide edit_section_link"><%= image_tag "edit.png" %> <%= t('buttons.edit_section', 'Edit Section') %></a>
       <% if @section.nonxlist_course_id %>
-        <% if can_do(@section.nonxlist_course, @current_user, :manage) %>
+        <% if can_do(@section.nonxlist_course, @current_user, :manage_sections) %>
           <a href="#" class="button button-sidebar-wide uncrosslist_link"><%= image_tag "move.png" %> <%= t('buttons.uncrosslist_section', 'De-Cross-List this Section') %></a>
         <% end %>
         <a href="#" class="button button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>

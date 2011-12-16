@@ -95,6 +95,16 @@ describe WikiPagesController do
       assigns[:page].title.should eql("Some Page")
     end
     
+    it "should still have old urls work when a page is renamed" do
+      course_with_teacher_logged_in(:active_all => true)
+      wiki = WikiNamespace.default_for_context(@course).wiki
+      page = wiki.wiki_pages.create(:title => 'old page name', :body => 'test content')
+      old_page_url = page.url
+      page.update_attribute(:title, 'new page name')
+      get 'show', :course_id => @course.id, :id => old_page_url
+      assigns[:page].title.should eql 'new page name'
+    end
+
     it "should allow students when allowed" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', :course_id => @course.id, :wiki_page => {:title => "Some Secret Page"}

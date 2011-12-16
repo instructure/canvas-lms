@@ -1,12 +1,12 @@
 (function() {
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   this.SubmissionCell = (function() {
     function SubmissionCell(opts) {
       this.opts = opts;
@@ -48,7 +48,9 @@
       url = url.replace(":assignment", submission.assignment_id).replace(":submission", submission.user_id);
       return $.ajaxJSON(url, "PUT", {
         "submission[posted_grade]": state
-      });
+      }, __bind(function(submission) {
+        return $.publish('submissions_updated', [[submission]]);
+      }, this));
     };
     SubmissionCell.prototype.isValueChanged = function() {
       return this.val !== this.$input.val();
@@ -181,9 +183,6 @@
     pass_fail.prototype.destroy = function() {
       return this.$wrapper.remove();
     };
-    pass_fail.prototype.focus = function() {
-      return this.$input.focus();
-    };
     pass_fail.prototype.transitionValue = function(newValue) {
       return this.$input.removeClass('gradebook-checkbox-pass gradebook-checkbox-fail').addClass('gradebook-checkbox-' + classFromSubmission({
         grade: newValue
@@ -194,20 +193,6 @@
     };
     pass_fail.prototype.serializeValue = function() {
       return this.$input.data('value');
-    };
-    pass_fail.prototype.applyValue = function(item, state) {
-      item[this.opts.column.field].grade = state;
-      return this.postValue(item, state);
-    };
-    pass_fail.prototype.postValue = function(item, state) {
-      var submission, url;
-      submission = item[this.opts.column.field];
-      url = this.opts.grid.getOptions().change_grade_url;
-      url = url.replace(":assignment", submission.assignment_id).replace(":submission", submission.user_id);
-      $.ajaxJSON(url, "PUT", {
-        "submission[posted_grade]": state
-      });
-      return this.$input.effect('highlight');
     };
     pass_fail.prototype.isValueChanged = function() {
       return this.val !== this.$input.data('value');

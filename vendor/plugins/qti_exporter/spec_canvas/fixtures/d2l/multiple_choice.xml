@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item d2l_2p0:id="14" ident="OBJ_1519236" label="QUES_516156_630296" d2l_2p0:page="1">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Multiple Choice</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>1.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/plain">The first letter of the Greek alphabet is?</mattext>
+            </material>
+            <response_extension>
+              <d2l_2p0:display_style>2</d2l_2p0:display_style>
+              <d2l_2p0:enumeration>6</d2l_2p0:enumeration>
+              <d2l_2p0:grading_type>0</d2l_2p0:grading_type>
+            </response_extension>
+            <response_lid ident="QUES_516156_630296_LID" rcardinality="Single">
+              <render_choice shuffle="yes">
+                <flow_label class="Block">
+                  <response_label ident="QUES_516156_630296_A2899442">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/plain">alpha</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+                <flow_label class="Block">
+                  <response_label ident="QUES_516156_630296_A2899443">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/plain">beta</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+                <flow_label class="Block">
+                  <response_label ident="QUES_516156_630296_A2899444">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/plain">gamma</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+                <flow_label class="Block">
+                  <response_label ident="QUES_516156_630296_A2899445">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/plain">omega</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+              </render_choice>
+            </response_lid>
+          </flow>
+        </presentation>
+        <resprocessing>
+          <respcondition title="Response Condition 1">
+            <conditionvar>
+              <varequal respident="QUES_516156_630296_LID">
+                QUES_516156_630296_A2899442
+              </varequal>
+            </conditionvar>
+            <setvar action="Set">100.000000000</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="QUES_516156_630296_IF2899442"/>
+          </respcondition>
+          <respcondition title="Response Condition 2">
+            <conditionvar>
+              <varequal respident="QUES_516156_630296_LID">
+                QUES_516156_630296_A2899443
+              </varequal>
+            </conditionvar>
+            <setvar action="Set">0.000000000</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="QUES_516156_630296_IF2899443"/>
+          </respcondition>
+          <respcondition title="Response Condition 3">
+            <conditionvar>
+              <varequal respident="QUES_516156_630296_LID">
+                QUES_516156_630296_A2899444
+              </varequal>
+            </conditionvar>
+            <setvar action="Set">0.000000000</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="QUES_516156_630296_IF2899444"/>
+          </respcondition>
+          <respcondition title="Response Condition 4">
+            <conditionvar>
+              <varequal respident="QUES_516156_630296_LID">
+                QUES_516156_630296_A2899445
+              </varequal>
+            </conditionvar>
+            <setvar action="Set">0.000000000</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="QUES_516156_630296_IF2899445"/>
+          </respcondition>
+        </resprocessing>
+        <itemfeedback ident="QUES_516156_630296_IF2899442">
+          <material>
+            <mattext texttype="text/plain"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_516156_630296_IF2899443">
+          <material>
+            <mattext texttype="text/plain"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_516156_630296_IF2899444">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_516156_630296_IF2899445">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>

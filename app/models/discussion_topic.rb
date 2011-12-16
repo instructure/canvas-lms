@@ -240,13 +240,13 @@ class DiscussionTopic < ActiveRecord::Base
   
   on_create_send_to_streams do
     if should_send_to_stream
-      self.participants
+      self.active_participants
     end
   end
   
   on_update_send_to_streams do
     if should_send_to_stream && (@delayed_just_posted || @content_changed || changed_state(:active, :post_delayed))
-      self.participants
+      self.active_participants
     end
   end
   
@@ -419,7 +419,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
-    p.to { participants - [user] }
+    p.to { active_participants - [user] }
     p.whenever { |record|
       record.context.available? and
       ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))
@@ -431,6 +431,14 @@ class DiscussionTopic < ActiveRecord::Base
   
   def participants
     ([self.user] + context.participants).uniq.select{|u| u}
+  end
+  
+  def active_participants
+    if !self.context.available? && self.context.respond_to?(:participating_admins)
+      self.context.participating_admins
+    else
+      self.participants
+    end
   end
   
   def posters
@@ -446,7 +454,7 @@ class DiscussionTopic < ActiveRecord::Base
   def locked_for?(user=nil, opts={})
     @locks ||= {}
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, user].cache_key, :expires_in => 1.minute) do
+    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}

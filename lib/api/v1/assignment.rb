@@ -18,6 +18,7 @@
 
 module Api::V1::Assignment
   include Api::V1::Json
+  include Api::V1::DiscussionTopics
 
   def assignment_json(assignment, user, session, includes = [], show_admin_fields = false)
     # no includes supported right now
@@ -55,13 +56,7 @@ module Api::V1::Assignment
     end if assignment.rubric
 
     if assignment.discussion_topic
-      hash['discussion_topic'] = {
-        'id' => assignment.discussion_topic.id,
-        'url' => named_context_url(assignment.context,
-                                   :context_discussion_topic_url,
-                                   assignment.discussion_topic,
-                                   :include_host => true)
-      }
+      hash['discussion_topic'] = discussion_topic_api_json(assignment.discussion_topic, assignment.discussion_topic.context, user, session)
     end
 
     hash

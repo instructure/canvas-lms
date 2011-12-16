@@ -75,8 +75,10 @@ module CC::Importer
         ext[:custom_fields] = get_custom_properties(extension)
         
         if ext[:platform] == CANVAS_PLATFORM
-          tool[:privacy_level] = ext[:custom_fields]['privacy_level']
-          tool[:domain] = ext[:custom_fields]['domain']
+          tool[:privacy_level] = ext[:custom_fields].delete 'privacy_level'
+          tool[:domain] = ext[:custom_fields].delete 'domain'
+          
+          tool[:settings] = ext[:custom_fields]
         else
           tool[:extensions] << ext
         end
@@ -87,8 +89,12 @@ module CC::Importer
     def get_custom_properties(node)
       props = {}
       node.children.each do |property|
-        next unless property.name == 'property'
-        props[property['name']] = property.text
+        next if property.name == 'text'
+        if property.name == 'property'
+          props[property['name']] = property.text
+        elsif property.name == 'options'
+          props[property['name']] = get_custom_properties(property)
+        end
       end
       props
     end

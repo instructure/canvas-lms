@@ -91,7 +91,7 @@
 <% js_block do %>
   <script type="text/javascript">
     var originalGradebook = <%= raw @context.gradebook_json %>;
-    var uploadedGradebook = <%= raw @uploaded_gradebook.to_json %>
+    var uploadedGradebook = <%= raw @uploaded_gradebook.to_json %>;
 
     $(function(){
       GradebookUploader.handleThingsNeedingToBeResolved();

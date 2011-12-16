@@ -34,7 +34,7 @@ I18n.scoped('instructure', function(I18n) {
   $.detect = function(collection, callback) {
     var result;
     $.each(collection, function(index, value) {
-      if (callback.call(value, index, collection)) {
+      if (callback.call(value, value, index, collection)) {
         result = value;
         return false; // we found it, break the $.each() loop iteration by returning false
       }

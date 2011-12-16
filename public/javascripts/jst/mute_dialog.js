@@ -32,6 +32,19 @@
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n  </p>\n  <ul>\n    <li>";
+  stack1 = "Their grade for the assignment";
+  stack2 = "see_grade";
+  stack3 = {};
+  stack4 = "mute_dialog";
+  stack3['scope'] = stack4;
+  stack4 = helpers['t'] || depth0['t'];
+  tmp1 = {};
+  tmp1.hash = stack3;
+  if(typeof stack4 === functionType) { stack1 = stack4.call(depth0, stack2, stack1, tmp1); }
+  else if(stack4=== undef) { stack1 = helperMissing.call(depth0, "t", stack2, stack1, tmp1); }
+  else { stack1 = stack4; }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "</li>\n    <li>";
   stack1 = "Grade change notifications";
   stack2 = "grade_change_notifications";
   stack3 = {};
@@ -109,7 +122,7 @@
   else if(stack4=== undef) { stack1 = helperMissing.call(depth0, "t", stack2, stack1, tmp1); }
   else { stack1 = stack4; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n  </p>\n</div>";
+  buffer += "\n  </p>\n</div>\n";
   return buffer;});
   define('jst/mute_dialog', ['compiled/handlebars_helpers'], function (Handlebars) {
     return templates['mute_dialog'];

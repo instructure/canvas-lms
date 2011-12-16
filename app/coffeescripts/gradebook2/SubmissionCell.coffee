@@ -23,7 +23,6 @@ class @SubmissionCell
   serializeValue: () ->
     @$input.val()
 
-
   applyValue: (item, state) ->
     item[@opts.column.field].grade = state
     @wrapper?.remove()
@@ -34,7 +33,8 @@ class @SubmissionCell
     submission = item[@opts.column.field]
     url = @opts.grid.getOptions().change_grade_url
     url = url.replace(":assignment", submission.assignment_id).replace(":submission", submission.user_id)
-    $.ajaxJSON url, "PUT", { "submission[posted_grade]": state }
+    $.ajaxJSON url, "PUT", { "submission[posted_grade]": state }, (submission) =>
+      $.publish 'submissions_updated', [[submission]]
 
   isValueChanged: () ->
     @val != @$input.val()
@@ -134,9 +134,6 @@ class SubmissionCell.pass_fail extends SubmissionCell
   destroy: () ->
     @$wrapper.remove()
 
-  focus: () ->
-    @$input.focus()
-
   transitionValue: (newValue) ->
     @$input
       .removeClass('gradebook-checkbox-pass gradebook-checkbox-fail')
@@ -146,21 +143,8 @@ class SubmissionCell.pass_fail extends SubmissionCell
   loadValue: () ->
     @val = @opts.item[@opts.column.field].grade || ""
 
-
   serializeValue: () ->
     @$input.data('value')
-
-  applyValue: (item, state) ->
-    item[@opts.column.field].grade = state
-    this.postValue(item, state)
-    # TODO: move selection down to the next row, same column
-
-  postValue: (item, state) ->
-    submission = item[@opts.column.field]
-    url = @opts.grid.getOptions().change_grade_url
-    url = url.replace(":assignment", submission.assignment_id).replace(":submission", submission.user_id)
-    $.ajaxJSON url, "PUT", { "submission[posted_grade]": state }
-    @$input.effect('highlight') #TODO: also highlight the group total and the TotalScore
 
   isValueChanged: () ->
     @val != @$input.data('value')
