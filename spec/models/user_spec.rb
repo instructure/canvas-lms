@@ -1224,4 +1224,13 @@ describe User do
       u.flag_as_admin(@account)
     end
   end
+
+  describe "email=" do
+    it "should work" do
+      @user = User.create!
+      @user.email = 'john@example.com'
+      @user.communication_channels.map(&:path).should == ['john@example.com']
+      @user.email.should == 'john@example.com'
+    end
+  end
 end
