@@ -981,6 +981,15 @@ describe Course, "backup" do
     other_course.learning_outcomes.should be_include(other_outcome)
   end
 
+  it "should not count learning outcome groups as having outcomes" do
+    course = course_model
+    default_group = LearningOutcomeGroup.default_for(course)
+    other_group = course.learning_outcome_groups.create!
+    default_group.add_item(other_group)
+    
+    course.has_outcomes.should == false
+  end
+
   it "should copy learning outcomes into the new course" do
     old_course = course_model
     lo = old_course.learning_outcomes.new

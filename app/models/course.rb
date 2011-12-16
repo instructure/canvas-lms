@@ -90,8 +90,8 @@ class Course < ActiveRecord::Base
   has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
   has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment') and enrollments.workflow_state = 'active'"
 
-  has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content
-  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.content_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'LearningOutcome', 'deleted']
+  has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
+  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
   has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
   has_many :learning_outcome_groups, :as => :context
   has_many :course_account_associations
@@ -373,7 +373,7 @@ class Course < ActiveRecord::Base
   
   def has_outcomes
     Rails.cache.fetch(['has_outcomes', self].cache_key) do
-      self.learning_outcome_tags.count > 0
+      self.learning_outcomes.count > 0
     end
   end
   

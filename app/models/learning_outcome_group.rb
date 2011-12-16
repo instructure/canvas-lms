@@ -51,7 +51,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     tags.each{|t| positions[t.content_asset_string] = t.position }
     ids_to_find = tags.select{|t| t.content_type == 'LearningOutcome'}.map(&:content_id)
     ids_to_find = (ids_to_find & outcome_ids) unless outcome_ids.empty?
-    group_ids_to_find = tags.select{|t| t.content_type == 'LearningOutcomeGroup'}.map(&:content_id)
+    group_ids_to_find = tags.select { |t| t.content_type == 'LearningOutcomeGroup' && !is_ancestor?(t.content_id) }.map(&:content_id)
     objects = []
     objects += LearningOutcome.active.find_all_by_id(ids_to_find).compact unless ids_to_find.empty?
     objects += LearningOutcomeGroup.active.find_all_by_id(group_ids_to_find).compact unless group_ids_to_find.empty?
@@ -85,6 +85,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
     ordered = []
     updates = []
     orders.compact.uniq.each_with_index do |asset_string, idx|
+      if asset_string =~ /learning_outcome_group_(\d*)/
+        next if self.is_ancestor?($1.to_i)
+      end
       tag = all_tags.detect{|t| t.content_asset_string == asset_string }
       if !tag
         tag ||= ContentTag.new(:content_asset_string => asset_string)
@@ -104,6 +107,37 @@ class LearningOutcomeGroup < ActiveRecord::Base
   
   def all_tags_for_context
     self.context.learning_outcome_tags.active
+  end
+  
+  def parent_ids
+    self.all_tags_for_context.find_all_by_content_type_and_content_id("LearningOutcomeGroup", self.id).map(&:associated_asset_id).uniq
+  end
+  
+  # this finds all the ids of the ancestors avoiding relation loops
+  # because of old broken behavior a group can have multiple parents, including itself
+  def ancestor_ids
+    if !@ancestor_ids
+      @ancestor_ids = [self.id]
+      
+      ids_to_check = parent_ids - @ancestor_ids
+      until ids_to_check.empty?
+        @ancestor_ids += ids_to_check
+        
+        new_ids = []
+        ids_to_check.each do |id|
+          group = self.context.learning_outcome_groups.active.find_by_id(id)
+          new_ids += group.parent_ids if group
+        end
+        
+        ids_to_check = new_ids.uniq - @ancestor_ids
+      end
+    end
+    
+    @ancestor_ids
+  end
+  
+  def is_ancestor?(id)
+    ancestor_ids.member?(id)
   end
   
   # use_outcome should be a lambda that takes an outcome and returns a boolean
@@ -139,6 +173,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
       tag.save!
       tag
     elsif item.is_a?(LearningOutcomeGroup)
+      return if is_ancestor?(item.id)
       all_tags = all_tags_for_context
       tag = all_tags.detect{|t| t.content_asset_string == item.asset_string }
       if !tag
