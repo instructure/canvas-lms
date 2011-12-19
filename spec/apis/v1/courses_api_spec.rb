@@ -91,7 +91,7 @@ describe CoursesController, :type => :integration do
           'conclude_at' => '2011-05-01T07:00:00Z'
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
-        new_course = Course.first(:order => 'created_at DESC')
+        new_course = Course.find(json['id'])
         [:name, :course_code, :start_at, :conclude_at, :publish_grades_immediately,
         :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_code, :sis_course_id,
@@ -109,11 +109,11 @@ describe CoursesController, :type => :integration do
       end
 
       it "should offer a course if passed the 'offer' parameter" do
-        api_call(:post, @resource_path,
+        json = api_call(:post, @resource_path,
           @resource_params,
           { :account_id => @account.id, :offer => true, :course => { :name => 'Test Course' } }
         )
-        new_course = Course.first(:order => 'created_at DESC')
+        new_course = Course.find(json['id'])
         new_course.should be_available
       end
     end
