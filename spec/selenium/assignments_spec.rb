@@ -183,7 +183,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, 'input.weight').clear
     #need to wait for the total to update
     wait_for_animations
-    keep_trying_until{ driver.find_element(:id, 'group_weight_total').text.should == '50%' }
+    keep_trying_until{ find_with_jquery('#group_weight_total').text.should == '50%' }
   end
 
   it "should create an assignment" do
@@ -222,8 +222,8 @@ describe "assignment selenium tests" do
 
     get "/courses/#{@course.id}/assignments"
     driver.find_element(:css, '.add_assignment_link').click
-    driver.find_element(:css, '.more_options_link').click
-    expect_new_page_load{ driver.find_element(:css, '#edit_assignment_form').submit }
+    expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
+    expect_new_page_load { driver.find_element(:css, '#edit_assignment_form').submit }
     driver.find_element(:css, '.no_assignments_message').should_not be_displayed
     driver.find_element(:css, '#groups').should include_text(expected_text)
   end
@@ -242,9 +242,8 @@ describe "assignment selenium tests" do
 
     get "/courses/#{@course.id}/assignments"
 
-    driver.find_element(:link, assignment_name).click
+    expect_new_page_load { driver.find_element(:link, assignment_name).click }
     driver.find_element(:css, '.edit_full_assignment_link').click
-    driver.find_element(:id, 'assignment_title').send_keys(' edit')
     driver.find_element(:css, '.more_options_link').click
     driver.find_element(:id, 'assignment_assignment_group_id').should be_displayed
     option_value = find_option_value(:css, '#assignment_assignment_group_id', second_group.name)
@@ -269,6 +268,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '#edit_assignment_form #assignment_peer_reviews_assign_at + img').click
     datepicker = datepicker_next
     datepicker.find_element(:css, '.ui-datepicker-ok').click
+    driver.find_element(:id, 'assignment_title').send_keys(' edit')
 
     #save changes
     driver.find_element(:id, 'edit_assignment_form').submit
@@ -297,11 +297,11 @@ describe "assignment selenium tests" do
       driver.find_element(:id, 'assignment_points_possible').send_keys('5')
       option_value = find_option_value(:css, '.assignment_submission_types', 'External Tool')
       driver.find_element(:css, '.assignment_submission_types > option[value="'+option_value+'"]').click
-      driver.find_element(:css, '.more_options_link').click
+      expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
       keep_trying_until do
-        driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].displayed?
+        find_with_jquery('#context_external_tools_select td.tools .tool:first-child:visible').click
+        true
       end
-      driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].click
       sleep 2 # wait for javascript to execute
       keep_trying_until do
         driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url

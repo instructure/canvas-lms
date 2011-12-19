@@ -90,7 +90,7 @@ shared_examples_for "profile selenium tests" do
     dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
 
     # Make ajax request slow down to verify transitional state
-    FilesController.before_filter { sleep 4; true }
+    FilesController.before_filter { sleep 5; true }
 
     dialog.find_element(:css, 'button[type="submit"]').click
     spans = dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img")

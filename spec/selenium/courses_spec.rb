@@ -15,6 +15,7 @@ shared_examples_for "course selenium tests" do
     get "/getting_started?fresh=1"
     expect {
       expect_new_page_load { driver.find_element(:css, ".next_step_button").click }
+      wait_for_animations
       driver.find_element(:css, ".add_assignment_link").click
       expect_new_page_load { driver.find_element(:css, ".more_options_link").click }
       expect_new_page_load { driver.find_element(:css, "#edit_assignment_form button[type='submit']").click }

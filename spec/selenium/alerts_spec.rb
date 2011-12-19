@@ -92,8 +92,8 @@ describe "Alerts" do
 
     driver.find_element(:css, '#tab-alerts-link').click
     driver.find_element(:css, '.add_alert_link').click
-    alert = driver.find_element(:css, '.alert.new')
-    alert.find_element(:css, '.delete_link').click
+    wait_for_animations
+    driver.find_element(:css, '.alert.new .delete_link').click
     wait_for_animations
     keep_trying_until { driver.find_elements(:css, ".alert.new").should be_empty }
 
@@ -105,8 +105,8 @@ describe "Alerts" do
 
     driver.find_element(:css, '#tab-alerts-link').click
     driver.find_element(:css, '.add_alert_link').click
-    alert = driver.find_element(:css, '.alert.new')
-    alert.find_element(:css, '.cancel_button').click
+    wait_for_animations
+    driver.find_element(:css, '.alert.new .cancel_button').click
     wait_for_animations
     keep_trying_until { find_all_with_jquery(".alert.new").should be_empty }
 
