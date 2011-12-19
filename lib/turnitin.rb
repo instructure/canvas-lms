@@ -102,7 +102,7 @@ module Turnitin
       return true if assignment.turnitin_settings[:current]
 
       course = assignment.context
-      today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
+      today = Time.zone.today
       settings = assignment.turnitin_settings.dup
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution

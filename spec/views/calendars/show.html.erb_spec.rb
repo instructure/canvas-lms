@@ -21,15 +21,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/calendars/show" do
   it "should render" do
+    today = Time.zone.today
     course_with_student
     view_context(@course, @user)
     assigns[:events] = []
     assigns[:events] << @course.calendar_events.create!(:title => "some event", :start_at => Time.now, :end_at => Time.now)
     assigns[:events] << @course.assignments.create!(:title => "some assignment", :due_at => Time.now + 1000)
     assigns[:contexts] = [@course]
-    assigns[:first_day] = Date.today
-    assigns[:last_day] = Date.today + 30
-    assigns[:current] = Date.today + 2
+    assigns[:first_day] = today
+    assigns[:last_day] = today + 30
+    assigns[:current] = today + 2
     assigns[:assignment_groups_for] = {}
     render 'calendars/show'
     response.should_not be_nil
