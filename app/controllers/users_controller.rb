@@ -354,6 +354,7 @@ class UsersController < ApplicationController
   #       'assignment': { .. assignment object .. },
   #       'ignore': '.. url ..',
   #       'ignore_permanently': '.. url ..',
+  #       'html_url': '.. url ..',
   #       'needs_grading_count': 3, // number of submissions that need grading
   #       'context_type': 'course', // course|group
   #       'course_id': 1,
@@ -364,6 +365,7 @@ class UsersController < ApplicationController
   #       'assignment' => { .. assignment object .. },
   #       'ignore' => '.. url ..',
   #       'ignore_permanently' => '.. url ..',
+  #       'html_url': '.. url ..',
   #       'context_type': 'course',
   #       'course_id': 1,
   #     }

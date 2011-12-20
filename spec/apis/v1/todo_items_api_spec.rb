@@ -49,6 +49,7 @@ describe UsersController, :type => :integration do
         },
         'ignore' => api_v1_users_todo_ignore_url(@a.asset_string, 'submitting', :permanent => 0),
         'ignore_permanently' => api_v1_users_todo_ignore_url(@a.asset_string, 'submitting', :permanent => 1),
+        'html_url' => "#{course_assignment_url(@a.context_id, @a.id)}#submit",
         'context_type' => 'Course',
         'course_id' => @student_course.id,
       }
@@ -68,6 +69,7 @@ describe UsersController, :type => :integration do
         'needs_grading_count' => 1,
         'ignore' => api_v1_users_todo_ignore_url(@a2.asset_string, 'grading', :permanent => 0),
         'ignore_permanently' => api_v1_users_todo_ignore_url(@a2.asset_string, 'grading', :permanent => 1),
+        'html_url' => speed_grader_course_gradebook_url(@a2.context_id, :assignment_id => @a2.id),
         'context_type' => 'Course',
         'course_id' => @teacher_course.id,
       }
