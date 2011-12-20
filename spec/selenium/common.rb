@@ -403,9 +403,9 @@ shared_examples_for "all selenium tests" do
         return true;
       }
     JS
-    
+
     yield
-    
+
     keep_trying_until {
       driver.execute_script(<<-JS)
         var value = window.canvasTestAlertFired;
@@ -413,7 +413,7 @@ shared_examples_for "all selenium tests" do
         return value;
       JS
     }
-    
+
     driver.execute_script(<<-JS)
       window.alert = window.canvasTestSavedAlert;
     JS
@@ -618,6 +618,11 @@ def get_file(filename)
     end
   end
   [filename, fullpath, data, @file]
+end
+
+def click_option_by_text(select_element, option_text)
+  select = Selenium::WebDriver::Support::Select.new(select_element)
+  select.select_by(:text, option_text)
 end
 
 shared_examples_for "in-process server selenium tests" do
