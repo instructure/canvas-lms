@@ -709,6 +709,18 @@ ActionController::Routing::Routes.draw do |map|
       topics.get 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'group_discussion_replies'
     end
 
+    api.with_options(:controller => :external_tools) do |tools|
+      def et_routes(route_object, context)
+        route_object.get "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :show, :path_name => "#{context}_external_tool_show"
+        route_object.get "#{context}s/:#{context}_id/external_tools", :action => :index, :path_name => "#{context}_external_tools"
+        route_object.post "#{context}s/:#{context}_id/external_tools", :action => :create, :path_name => "#{context}_external_tools_create"
+        route_object.put "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :update, :path_name => "#{context}_external_tools_update"
+        route_object.delete "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :destroy, :path_name => "#{context}_external_tools_delete"
+      end
+      et_routes(tools, "course")
+      et_routes(tools, "account")
+    end
+
     api.with_options(:controller => :sis_imports_api) do |sis|
       sis.post 'accounts/:account_id/sis_imports', :action => :create
       sis.get 'accounts/:account_id/sis_imports/:id', :action => :show

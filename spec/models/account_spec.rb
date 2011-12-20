@@ -549,7 +549,7 @@ describe Account do
   context "tabs_available" do
     it "should not include external tools if not configured for course navigation" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       tool.has_account_navigation.should == false
@@ -559,7 +559,7 @@ describe Account do
     
     it "should include external tools if configured on the account" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.settings[:account_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       tool.has_account_navigation.should == true
@@ -573,7 +573,7 @@ describe Account do
     
     it "should include external tools if configured on the root account" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.settings[:account_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       tool.has_account_navigation.should == true

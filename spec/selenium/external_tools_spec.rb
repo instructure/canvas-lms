@@ -94,7 +94,7 @@ describe "editing external tools" do
   it "should allow adding an external tool with resource selection enabled to a course module" do
     course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
       :url => "http://#{HostUrl.default_host}/selection_test",
       :selection_width => 400,
@@ -138,7 +138,7 @@ describe "editing external tools" do
   it "should alert when invalid url data is returned by a resource selection dialog" do
     course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
       :url => "http://#{HostUrl.default_host}/selection_test",
       :selection_width => 400,
@@ -201,7 +201,7 @@ describe "editing external tools" do
   it "should use the tool name if no link text is returned" do
     course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
       :url => "http://#{HostUrl.default_host}/selection_test",
       :selection_width => 400,

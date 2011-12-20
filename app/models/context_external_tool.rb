@@ -4,10 +4,14 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :assignments
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
-  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, :name, :description, :custom_fields, :custom_fields_string
+  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
+                  :name, :description, :custom_fields, :custom_fields_string,
+                  :course_navigation, :account_navigation, :user_navigation,
+                  :resource_selection, :editor_button
   validates_presence_of :name
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
+  validate :url_or_domain_is_set
   serialize :settings
   
   before_save :infer_defaults
@@ -22,6 +26,16 @@ class ContextExternalTool < ActiveRecord::Base
   set_policy do 
     given { |user, session| self.cached_context_grants_right?(user, session, :update) }
     can :read and can :update and can :delete
+  end
+  
+  def url_or_domain_is_set
+    if url.present? && domain.present?
+      errors.add(:url, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
+      errors.add(:domain, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
+    elsif url.blank? && domain.blank?
+      errors.add(:url, t('url_or_domain_required', "Either the url or domain should be set."))
+      errors.add(:domain, t('url_or_domain_required', "Either the url or domain should be set."))
+    end
   end
   
   def settings
@@ -43,6 +57,10 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
   
+  def privacy_level
+    self.workflow_state
+  end
+  
   def custom_fields_string
     (settings[:custom_fields] || {}).map{|key, val|
       "#{key}=#{val}"
@@ -60,6 +78,51 @@ class ContextExternalTool < ActiveRecord::Base
   
   def custom_fields=(hash)
     settings[:custom_fields] = hash if hash.is_a?(Hash)
+  end
+  
+  def custom_fields
+    settings[:custom_fields]
+  end
+
+  def course_navigation=(hash)
+    tool_setting(:course_navigation, hash) { |nav_settings|
+      if hash[:visibility] == 'members' || hash[:visibility] == 'admins'
+        nav_settings[:visibility] = hash[:visibility]
+      end
+      nav_settings[:default] = !!hash[:default]
+    }
+  end
+
+  def account_navigation=(hash)
+    tool_setting(:account_navigation, hash)
+  end
+
+  def account_navigation
+    settings[:account_navigation]
+  end
+
+  def user_navigation=(hash)
+    tool_setting(:user_navigation, hash)
+  end
+
+  def user_navigation
+    settings[:user_navigation]
+  end
+
+  def resource_selection=(hash)
+    tool_setting(:resource_selection, hash, :selection_width, :selection_height)
+  end
+
+  def resource_selection
+    settings[:resource_selection]
+  end
+
+  def editor_button=(hash)
+    tool_setting(:editor_button, hash, :selection_width, :selection_height, :icon_url)
+  end
+
+  def editor_button
+    settings[:editor_button]
   end
   
   def shared_secret=(val)
@@ -233,8 +296,6 @@ class ContextExternalTool < ActiveRecord::Base
   
   def self.serialization_excludes; [:shared_secret,:settings]; end
   
-  def self.serialization_methods; [:custom_fields_string]; end
-  
   def self.process_migration(data, migration)
     tools = data['external_tools'] ? data['external_tools']: []
     to_import = migration.to_import 'external_tools'
@@ -316,6 +377,26 @@ class ContextExternalTool < ActiveRecord::Base
     item.save!
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item
+  end
+
+  private
+
+  def tool_setting(setting, hash, *keys)
+    if !hash || !hash.is_a?(Hash)
+      settings.delete setting
+      return
+    else
+      settings[setting] = {}
+    end
+
+    settings[setting][:url] = hash[:url]
+    settings[setting][:text] = hash[:text] if hash[:text]
+    keys.each { |key| settings[setting][key] = hash[key] }
+
+    # if the type needs to do some validations for specific keys
+    yield settings[setting] if block_given?
+
+    settings[setting]
   end
   
 end
