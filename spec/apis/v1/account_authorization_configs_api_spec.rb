@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "AccountAuthorizationConfigs API", :type => :integration do
   before do
-    user_with_pseudonym(:active_all => true)
     @account = account_model(:name => 'root')
+    user_with_pseudonym(:active_all => true, :account => @account)
     @account.add_user(@user)
   end
 
