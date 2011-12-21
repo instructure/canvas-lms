@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Accounts API", :type => :integration do
   before do
+    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
     user_with_pseudonym(:active_all => true)
     @a1 = account_model(:name => 'root')
     @a1.add_user(@user)
