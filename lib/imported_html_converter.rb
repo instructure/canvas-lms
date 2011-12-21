@@ -47,7 +47,7 @@ class ImportedHtmlConverter
             type_for_url = type
             type = 'context_modules' if type == 'modules'
             if type == 'wiki'
-              if page = context.wiki.wiki_pages.select { |s| s.url.match(/#{migration_id}$/) }[0]
+              if page = context.wiki.wiki_pages.find_by_url(migration_id)
                 node[attr] = URI::escape("#{course_path}/wiki/#{page.url}")
               end
             elsif type == 'attachments'
