@@ -48,9 +48,9 @@ describe "Importing wikis" do
     # The wiki references should resolve to course urls
     WikiPage.count.should == 18
     wiki = WikiPage.find_by_migration_id('res00146')
-    (wiki.body =~ /\/courses\/\d+\/wiki\/\d+-course-glossary-a-to-d/).should_not be_nil
-    (wiki.body =~ /\/courses\/\d+\/wiki\/\d+-course-glossary-e-f-g-h/).should_not be_nil
-    (wiki.body =~ /\/courses\/\d+\/wiki\/\d+-course-glossary-i-j-k-l-m/).should_not be_nil
-    (wiki.body =~ /\/courses\/\d+\/wiki\/\d+-course-glossary-n-o-p-q-r/).should_not be_nil
+    (wiki.body =~ /\/courses\/\d+\/wiki\/course-glossary-a-to-d/).should_not be_nil
+    (wiki.body =~ /\/courses\/\d+\/wiki\/course-glossary-e-f-g-h/).should_not be_nil
+    (wiki.body =~ /\/courses\/\d+\/wiki\/course-glossary-i-j-k-l-m/).should_not be_nil
+    (wiki.body =~ /\/courses\/\d+\/wiki\/course-glossary-n-o-p-q-r/).should_not be_nil
   end
 end
