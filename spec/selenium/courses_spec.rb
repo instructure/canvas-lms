@@ -135,6 +135,7 @@ shared_examples_for "course selenium tests" do
     get "/courses/#{@course.id}/details"
     driver.find_element(:link, 'Course Details').click
     form = driver.find_element(:css, "#course_form")
+    driver.find_element(:css, "#course_form .edit_course_link").should be_displayed
     form.find_element(:css, ".edit_course_link").click
     quota_input = form.find_element(:css, "input#course_storage_quota_mb")
     quota_input.clear

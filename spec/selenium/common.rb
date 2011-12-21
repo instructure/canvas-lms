@@ -475,6 +475,12 @@ shared_examples_for "all selenium tests" do
     exists
   end
 
+  def first_selected_option(select_element)
+    select = Selenium::WebDriver::Support::Select.new(select_element)
+    option = select.first_selected_option
+    option
+  end
+
   def datepicker_prev
     datepicker = driver.find_element(:css, '#ui-datepicker-div')
     datepicker.find_element(:css, '.ui-datepicker-prev').click
