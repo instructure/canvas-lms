@@ -1,3 +1,11 @@
+canvas-lms (2011.12.21.10.17) testing; urgency=low
+
+  * Package ref: 920f7bc9f421ec02fdf62905ead764453a88cacb
+  *
+  * [+920f7bc] Revert "add id to wiki page urls. fixes #2635."
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 21 Dec 2011 10:17:43 -0700
+
 canvas-lms (2011.12.20.20.00) testing; urgency=low
 
   * Package ref: 74f52ff2956372ec6a190ce87414f84497b19d8e
