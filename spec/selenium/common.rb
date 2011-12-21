@@ -572,7 +572,7 @@ shared_examples_for "all selenium tests" do
 
   append_before(:each) do
     driver.manage.timeouts.implicit_wait = 1
-    driver.manage.timeouts.script_timeout = 5
+    driver.manage.timeouts.script_timeout = 60
   end
 
   append_before(:all) do
