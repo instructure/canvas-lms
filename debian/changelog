@@ -1,3 +1,13 @@
+canvas-lms (2011.12.20.20.00) testing; urgency=low
+
+  * Package ref: 74f52ff2956372ec6a190ce87414f84497b19d8e
+  *
+  * [+d481624] fix error clicking forgot password fixes #6573
+  * [+b629250] refactor not-this-account logins a little
+  * [+74f52ff] allow access to authentication settings for site admin
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 20 Dec 2011 20:00:44 -0700
+
 canvas-lms (2011.12.16.16.18) testing; urgency=low
 
   * Package ref: d56dcb8cc7350a58a2d27b47c4f682786367e778
