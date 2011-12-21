@@ -70,6 +70,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
       token = @user.access_tokens.first
       token ||= @user.access_tokens.create!(:purpose => 'test')
       params[:access_token] = token.token
+      @user.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :account => opts[:domain_root_account]) unless @user.pseudonym(true)
     end
 
     LoadAccount.stubs(:default_domain_root_account).returns(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)

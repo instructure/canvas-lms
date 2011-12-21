@@ -27,6 +27,7 @@ describe CoursesController, :type => :integration do
   end
   
   it "should accept access_token" do
+    @user.pseudonyms.create!(:unique_id => 'test@example.com')
     @token = @user.access_tokens.create!(:purpose => "test")
 
     @token.last_used_at.should be_nil
@@ -42,6 +43,7 @@ describe CoursesController, :type => :integration do
   end
   
   it "should not accept an invalid access_token" do
+    @user.pseudonyms.create!(:unique_id => 'test@example.com')
     @token = @user.access_tokens.create!(:purpose => "test")
 
     raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json?access_token=1234",
@@ -52,7 +54,20 @@ describe CoursesController, :type => :integration do
   end
   
   it "should not accept an expired access_token" do
+    @user.pseudonyms.create!(:unique_id => 'test@example.com')
     @token = @user.access_tokens.create!(:purpose => "test", :expires_at => 2.weeks.ago)
+
+    raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json?access_token=#{@token.token}",
+            { :access_token => @token.token, :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
+    response.status.to_i.should == 400
+    json = JSON.parse(response.body)
+    json['errors'].should == "Invalid access token"
+  end
+
+  it "should require an active pseudonym" do
+    @token = @user.access_tokens.create!(:purpose => "test")
+
+    @token.last_used_at.should be_nil
 
     raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json?access_token=#{@token.token}",
             { :access_token => @token.token, :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
