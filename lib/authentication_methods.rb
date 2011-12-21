@@ -58,8 +58,8 @@ module AuthenticationMethods
         return false
       end
       @current_user = @access_token.user
-      @current_pseudonym = @current_user.pseudonym
-      unless @current_user
+      @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account)
+      unless @current_user && @current_pseudonym
         render :json => {:errors => "Invalid access token"}, :status => :bad_request
         return false
       end
