@@ -1,3 +1,11 @@
+canvas-lms (2011.12.21.13.29) testing; urgency=low
+
+  * Package ref: 7397569e560a055c4a36d56b30f824565834fdcf
+  *
+  * [+7397569] require an active pseudonym (in the applicable account) for API requests
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 21 Dec 2011 13:29:41 -0700
+
 canvas-lms (2011.12.21.10.17) testing; urgency=low
 
   * Package ref: 920f7bc9f421ec02fdf62905ead764453a88cacb
