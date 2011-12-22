@@ -26,6 +26,11 @@ describe "OAuth2", :type => :integration do
     @key = DeveloperKey.create!
     @client_id = @key.id
     @client_secret = @key.api_key
+    ActionController::Base.consider_all_requests_local = false
+  end
+
+  after do
+    ActionController::Base.consider_all_requests_local = true
   end
 
   it "should require a valid client id" do
@@ -301,6 +306,63 @@ describe "OAuth2", :type => :integration do
           AccessToken.last.token.should == token
         end
       end
+    end
+  end
+
+  describe "access token" do
+    before do
+      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+      course_with_teacher(:user => @user)
+      @token = @user.access_tokens.create!
+    end
+
+    def check_used
+      @token.last_used_at.should be_nil
+      yield
+      response.should be_success
+      @token.reload.last_used_at.should_not be_nil
+    end
+
+    it "should allow passing the access token in the query string" do
+      check_used { get "/api/v1/courses?access_token=#{@token.token}" }
+      JSON.parse(response.body).size.should == 1
+    end
+
+    it "should allow passing the access token in the authorization header" do
+      check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.token}" } }
+      JSON.parse(response.body).size.should == 1
+    end
+
+    it "should allow passing the access token in the post body" do
+      @me = @user
+      Account.default.add_user(@user)
+      u2 = user
+      @user = @me
+      check_used do
+        post "/api/v1/accounts/#{Account.default.id}/admins", {
+          'user_id' => u2.id,
+          'access_token' => @token.token,
+        }
+      end
+      Account.default.reload.users.should be_include(u2)
+    end
+
+    it "should return a proper www-authenticate header if no access token is given" do
+      pending "needs api error response improvements"
+      get "/api/v1/courses"
+      response.status.to_i.should == 401
+      response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
+    end
+
+    it "should return www-authenticate if the access token is expired or non-existent" do
+      pending "needs api error response improvements"
+      get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
+      response.status.to_i.should == 401
+      response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
+      @token.update_attribute(:expires_at, 1.hour.ago)
+      get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
+      response.status.to_i.should == 401
+      response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
     end
   end
 end

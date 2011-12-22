@@ -50,7 +50,7 @@ your user is enrolled in as a teacher:
 *This authentication approach is deprecated*
 
 You can use HTTP Basic Auth to authenticate with any username/password
-combination. Note that all requests will need the Authentication header,
+combination. Note that all requests will need the Authorization header,
 not just the first request. All API requests using Basic Auth will need
 to include an API key (developer key) as well. Most API calls will only
 return data that is visible to the authenticated user. For example, to

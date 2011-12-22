@@ -134,7 +134,18 @@ The response will be a JSON argument containing the access_token:
 ### Step 4: Using the access token to access the API
 
 The access token allows you to make requests to the API on behalf of the
-user, e.g.
+user. The access token can be passed either through the Authorization
+HTTP header, or via a query string parameter. Using the HTTP Header is recommended. See the <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08">OAuth 2.0 Bearer Token documentation.</a>
+
+Authorization HTTP Header:
+
+<div class="method_details">
+
+<h3>Authorization: Bearer &lt;token&gt;</h3>
+
+</div>
+
+Query string:
 
 <div class="method_details">
 
@@ -260,7 +271,18 @@ The response will be a JSON argument containing the access_token:
 ### Step 4: Using the access token to access the API
 
 The access token allows you to make requests to the API on behalf of the
-user, e.g.
+user. The access token can be passed either through the Authorization
+HTTP header, or via a query string parameter. Using the HTTP Header is recommended. See the <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08">OAuth 2.0 Bearer Token documentation.</a>
+
+Authorization HTTP Header:
+
+<div class="method_details">
+
+<h3>Authorization: Bearer &lt;token&gt;</h3>
+
+</div>
+
+Query string:
 
 <div class="method_details">
 
