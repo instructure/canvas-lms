@@ -189,7 +189,7 @@ class ApplicationController < ActionController::Base
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
-      format.json { render :json => { 'status' => 'unauthorized' }, :status => :unauthorized }
+      format.json { render :json => { 'status' => 'unauthorized', 'message' => 'You are not authorized to perform that action.' }, :status => :unauthorized }
     end
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
@@ -688,19 +688,63 @@ class ApplicationController < ActionController::Base
         :format => request.format,
       }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
 
-      @headers = nil
-      session[:last_error_id] = @error.id rescue nil
-      if request.xhr? || request.format == :text
-        render :json => {:errors => {:base => "Unexpected error, ID: #{@error.id rescue "unknown"}"}, :status => @status}, :status => @status_code
+      if api_request?
+        rescue_action_in_api(exception, @error)
       else
-        @status = '500' unless File.exists?(File.join('app', 'views', 'shared', 'errors', "#{@status.to_s[0,3]}_message.html.erb"))
-        render :template => "shared/errors/#{@status.to_s[0, 3]}_message.html.erb", 
-          :layout => 'application', :status => @status, :locals => {:error => @error, :exception => exception, :status => @status}
+        @headers = nil
+        session[:last_error_id] = @error.id rescue nil
+        if request.xhr? || request.format == :text
+          render :json => {:errors => {:base => "Unexpected error, ID: #{@error.id rescue "unknown"}"}, :status => @status}, :status => @status_code
+        else
+          @status = '500' unless File.exists?(File.join('app', 'views', 'shared', 'errors', "#{@status.to_s[0,3]}_message.html.erb"))
+          render :template => "shared/errors/#{@status.to_s[0, 3]}_message.html.erb", 
+            :layout => 'application', :status => @status, :locals => {:error => @error, :exception => exception, :status => @status}
+        end
       end
     rescue => e
       # error generating the error page? failsafe.
       render_optional_error_file response_code_for_rescue(exception)
       ErrorReport.log_exception(:default, e)
+    end
+  end
+
+  rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+
+  def rescue_action_in_api(exception, error_report)
+    status_code = response_code_for_rescue(exception) || 500
+    if status_code.is_a?(Symbol)
+      status_code_string = status_code.to_s
+    else
+      # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
+      status_code_string = interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
+    end
+
+    data = { :status => status_code_string }
+    if error_report.try(:id)
+      data[:error_report_id] = error_report.id
+    end
+
+    # inject exception-specific data into the response
+    case exception
+    when ActiveRecord::RecordNotFound
+      data[:message] = 'The specified resource does not exist.'
+    when AuthenticationMethods::AccessTokenError
+      response['WWW-Authenticate'] = %{Bearer realm="canvas-lms"}
+      data[:message] = 'Invalid access token.'
+    end
+
+    data[:message] ||= "An error occurred."
+    render :json => data, :status => status_code
+  end
+
+  def rescue_action_locally(exception)
+    if api_request?
+      # we want api requests to behave the same on error locally as in prod, to
+      # ease testing and development. you can still view the backtrace, etc, in
+      # the logs.
+      rescue_action_in_api(exception, nil)
+    else
+      super
     end
   end
 
@@ -723,10 +767,6 @@ class ApplicationController < ActionController::Base
     session[:claim_course_uuid] = nil
     session[:course_uuid] = nil
   end
-
-  class InvalidDeveloperAPIKey < ActionController::InvalidAuthenticityToken #:nodoc:
-  end
-  rescue_responses['ApplicationController::InvalidDeveloperAPIKey'] = rescue_responses['ActionController::InvalidAuthenticityToken']
 
   # Had to overwrite this method so we can say you don't need to have an
   # authenticity_token if the request is coming from an api request.

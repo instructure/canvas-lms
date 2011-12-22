@@ -79,12 +79,7 @@ module AuthenticationMethods
   def load_user
     @current_user = @current_pseudonym = nil
 
-    begin
-      load_pseudonym_from_access_token
-    rescue AccessTokenError
-      render :json => {:errors => "Invalid access token"}, :status => :bad_request
-      return false
-    end
+    load_pseudonym_from_access_token
 
     if !@current_pseudonym
       if @policy_pseudonym_id
@@ -105,13 +100,17 @@ module AuthenticationMethods
         # just using an app session
         # this basic auth support is deprecated and marked for removal in 2012
         @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
-        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || raise(ApplicationController::InvalidDeveloperAPIKey)
+        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || raise(AccessTokenError)
       end
     end
 
     if @current_user && @current_user.unavailable?
       @current_pseudonym = nil
       @current_user = nil
+    end
+
+    if api_request? && !@current_user
+      raise AccessTokenError
     end
 
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
