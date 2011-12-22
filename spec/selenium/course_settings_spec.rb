@@ -55,9 +55,11 @@ describe "course settings tests" do
   it "should delete a section" do
     new_section = add_section('Delete Section')
     new_section.find_element(:css, '.delete_section_link').click
-    keep_trying_until { driver.switch_to.alert.should_not be_nil
-    driver.switch_to.alert.accept
-    true }
+    keep_trying_until do
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.accept
+      true
+    end
     wait_for_ajaximations
     driver.find_elements(:css, 'ul#sections > .section').count.should == 1
   end
@@ -69,8 +71,9 @@ describe "course settings tests" do
     section_input = driver.find_element(:id, 'course_section_name')
     keep_trying_until { section_input.should be_displayed }
     replace_content(section_input, edit_text)
-    driver.find_element(:link, 'Sections').click
-    keep_trying_until { validate_text(driver.find_elements(:css, 'ul#sections > .section')[1], edit_text) }
+    section_input.send_keys(:return)
+    wait_for_ajaximations
+    validate_text(driver.find_elements(:css, 'ul#sections > .section')[1], edit_text)
   end
 
   it "should add a user to a section" do

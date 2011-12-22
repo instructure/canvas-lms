@@ -467,6 +467,12 @@ shared_examples_for "all selenium tests" do
     option_value
   end
 
+  def close_visible_dialog
+    visible_dialog_element = find_with_jquery('.ui-dialog:visible')
+    visible_dialog_element.find_element(:css, '.ui-dialog-titlebar-close').click
+    visible_dialog_element.should_not be_displayed
+  end
+
   def element_exists(selector_type, selector)
     exists = false
     begin
@@ -494,17 +500,16 @@ shared_examples_for "all selenium tests" do
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stubs(:config).returns({
-    'domain' => 'www.instructuremedia.com',
-    'resource_domain' => 'www.instructuremedia.com',
-    'partner_id' => '100',
-    'subpartner_id' => '10000',
-    'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-    'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-    'player_ui_conf' => '1',
-    'kcw_ui_conf' => '1',
-    'upload_ui_conf' => '1'
+      'domain' => 'www.instructuremedia.com',
+      'resource_domain' => 'www.instructuremedia.com',
+      'partner_id' => '100',
+      'subpartner_id' => '10000',
+      'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+      'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+      'player_ui_conf' => '1',
+      'kcw_ui_conf' => '1',
+      'upload_ui_conf' => '1'
     })
-
     kal = mock('Kaltura::ClientV3')
     kal.stubs(:startSession).returns "new_session_id_here"
     Kaltura::ClientV3.stubs(:new).returns(kal)
@@ -603,7 +608,8 @@ TEST_FILE_UUIDS = {
     "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
     "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
     "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
-    "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png')}
+    "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'
+    )}
 
 def get_file(filename)
   data = TEST_FILE_UUIDS[filename]
