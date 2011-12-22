@@ -569,14 +569,14 @@ describe Attachment do
     it "should include response-content-disposition" do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => "attachment; filename=foo; filename*=UTF-8''foo"))
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
       attachment.cacheable_s3_url
     end
 
     it "should use the display_name, not filename, in the response-content-disposition" do
       attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => "attachment; filename=foo; filename*=UTF-8''foo"))
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
       attachment.cacheable_s3_url
     end
 
@@ -591,7 +591,7 @@ describe Attachment do
       a = attachment_with_context(@course, :display_name => "糟糕.pdf")
       sanitized_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", a.display_name)
       a.expects(:authenticated_s3_url).at_least(0)
-      a.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename=#{sanitized_filename}; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
+      a.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
       a.cacheable_s3_url
     end
   end

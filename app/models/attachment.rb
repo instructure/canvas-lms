@@ -747,7 +747,6 @@ class Attachment < ActiveRecord::Base
       # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
       # quote the filename string, though.
       quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
-      quoted_ascii = %("#{quoted_ascii}") unless quoted_ascii == ascii_filename
 
       quoted_unicode = "UTF-8''#{URI.escape(display_name)}"
 
@@ -755,7 +754,7 @@ class Attachment < ActiveRecord::Base
         :expires_in => 144.hours,
         # awesome browsers will use the filename* and get the proper unicode filename,
         # everyone else will get the sanitized ascii version of the filename
-        "response-content-disposition" => "attachment; filename=#{quoted_ascii}; filename*=#{quoted_unicode}"
+        "response-content-disposition" => %(attachment; filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
       )
       self.s3_url_cached_at = Time.now
       save
