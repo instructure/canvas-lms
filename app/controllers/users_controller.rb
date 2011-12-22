@@ -373,8 +373,8 @@ class UsersController < ApplicationController
       return render_unauthorized_action
     end
 
-    grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, 'grading') }
-    submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, 'submitting') }
+    grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, @current_user, session, 'grading') }
+    submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, @current_user, session, 'submitting') }
     render :json => (grading + submitting)
   end
 
@@ -553,7 +553,7 @@ class UsersController < ApplicationController
         flash[:user_id] = @user.id
         flash[:pseudonym_id] = @pseudonym.id
         format.html { redirect_to registered_url }
-        format.json { api_request? ? render(:json => user_json(@user)) : render(:json => data) }
+        format.json { api_request? ? render(:json => user_json(@user, @current_user, session)) : render(:json => data) }
       end
     else
       respond_to do |format|
@@ -594,11 +594,9 @@ class UsersController < ApplicationController
         if @user.update_attributes(params[:user])
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
-          format.xml  { head :ok }
           format.json { render :json => @user.to_json(:methods => :default_pseudonym_id) }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @user.errors.to_xml }
         end
       end
     end
@@ -743,18 +741,20 @@ class UsersController < ApplicationController
 
   def delete
     @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, :manage)
-      if @user.pseudonyms.any?{|p| p.managed_password? }
-        flash[:notice] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-        redirect_to profile_url
+    if authorized_action(@user, @current_user, [:manage, :manage_logins])
+      if @user.pseudonyms.any? {|p| p.managed_password? }
+        unless @user.grants_right?(@current_user, session, :manage_logins)
+          flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
+          redirect_to profile_url
+        end
       end
     end
   end
 
   def destroy
     @user = User.find(params[:id])
-    if authorized_action(@user, @current_user, :manage)
-      @user.destroy
+    if authorized_action(@user, @current_user, [:manage, :manage_logins])
+      @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       if @user == @current_user
         @pseudonym_session.destroy rescue true
         reset_session
@@ -767,7 +767,6 @@ class UsersController < ApplicationController
         else
           format.html { redirect_to(users_url) }
         end
-        format.xml  { head :ok }
         format.json { render :json => @user.to_json }
       end
     end
@@ -930,6 +929,3 @@ class UsersController < ApplicationController
   end
 
 end
-
-
-

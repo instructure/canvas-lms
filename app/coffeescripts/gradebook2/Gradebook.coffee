@@ -211,7 +211,7 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     calculateStudentGrade: (student) =>
       if student.loaded
-        submissionsAsArray = (value for key, value of student when key.match /^assignment_/)
+        submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
         result = INST.GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[if @include_ungraded_assignments then 'final' else 'current']

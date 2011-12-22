@@ -20,8 +20,6 @@ module CC::Importer::Standard
     include CC::Importer
 
     def create_file_map
-      file_map = {}
-
       resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
         main_file = {}
         main_file[:migration_id] = res[:migration_id]
@@ -43,16 +41,14 @@ module CC::Importer::Standard
           sub_file[:migration_id] = Digest::MD5.hexdigest(main_file[:path_name])
           sub_file[:file_name] = File.basename sub_file[:path_name]
           sub_file[:type] = 'FILE_TYPE'
-          file_map[sub_file[:migration_id]] = sub_file
+          add_course_file(sub_file)
         end
         
         main_file[:file_name] = File.basename main_file[:path_name]
         main_file[:type] = 'FILE_TYPE'
 
-        file_map[main_file[:migration_id]] = main_file
+        add_course_file(main_file, true)
       end
-
-      file_map
     end
 
     def package_course_files(file_map)

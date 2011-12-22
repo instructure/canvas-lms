@@ -317,6 +317,23 @@ describe DiscussionTopic do
       @parent_topic.should_send_to_stream.should be_true
       @subtopic.should_send_to_stream.should be_false
     end
+    
+    it "should not send stream items to students if course isn't published'" do
+      course
+      course_with_teacher(:course => @course, :active_all => true)
+      student_in_course(:course => @course, :active_all => true)
+      
+      topic = @course.discussion_topics.create(:title => "secret topic", :user => @teacher)
+      
+      StreamItem.for_user(@student).count.should == 0
+      StreamItem.for_user(@teacher).count.should == 1
+
+      topic.discussion_entries.create!
+
+      StreamItem.for_user(@student).count.should == 0
+      StreamItem.for_user(@teacher).count.should == 1
+    end
+    
   end
   
   context "posting first to view" do

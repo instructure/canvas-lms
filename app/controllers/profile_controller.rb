@@ -66,14 +66,14 @@ class ProfileController < ApplicationController
         render :action => "profile"
       end
       format.json do
-        hash = user_json(@user)
-        hash['primary_email'] = @default_email_channel.try(:path)
-        hash['login_id'] ||= @default_pseudonym.try(:unique_id)
+        hash = user_json(@user, @current_user, session)
+        hash[:primary_email] = @default_email_channel.try(:path)
+        hash[:login_id] ||= @default_pseudonym.try(:unique_id)
         if service_enabled?(:avatars)
-          hash['avatar_url'] = avatar_image_url(@user.id)
+          hash[:avatar_url] = avatar_image_url(@user.id)
         end
         if @user == @current_user
-          hash['calendar'] = { 'ics' => "#{feeds_calendar_url(@user.feed_code)}.ics" }
+          hash[:calendar] = { :ics => "#{feeds_calendar_url(@user.feed_code)}.ics" }
         end
         render :json => hash
       end
@@ -116,7 +116,6 @@ class ProfileController < ApplicationController
         policy = @user.notification_policies.build
         policy.notification = category
         policy.communication_channel = @user.communication_channel
-        @policies << policy
       end
     end
     has_facebook_installed = !@current_user.user_services.for_service('facebook').empty?

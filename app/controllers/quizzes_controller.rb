@@ -143,7 +143,12 @@ class QuizzesController < ApplicationController
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
       if params[:take] && can_take_quiz?
-        request.post? ? start_quiz! : take_quiz
+        # allow starting the quiz via a GET request, but only when using a lockdown browser
+        if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
+          start_quiz!
+        else
+          take_quiz
+        end
       end
     end
   end
@@ -444,7 +449,7 @@ class QuizzesController < ApplicationController
     elsif !plugin.authorized?(self)
       redirect_to(:action => 'lockdown_browser_required', :quiz_id => @quiz.id)
       return false
-    elsif @query_params = plugin.popup_window(self, security_level)
+    elsif !session['lockdown_browser_popup'] && @query_params = plugin.popup_window(self, security_level)
       @security_level = security_level
       session['lockdown_browser_popup'] = true
       render(:action => 'take_quiz_in_popup')
@@ -454,6 +459,7 @@ class QuizzesController < ApplicationController
     @headers = false
     @show_left_side = false
     @padless = true
+    return true
   end
 
   def start_quiz!
@@ -484,7 +490,11 @@ class QuizzesController < ApplicationController
     return false if @locked
     return false unless authorized_action(@quiz, @current_user, :submit)
     return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
-    if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
+    quiz_access_code_key = "quiz_#{@quiz.id}_#{@current_user.id}_entered_access_code"
+    if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] == @quiz.access_code
+      flash[quiz_access_code_key] = true
+    end
+    if @quiz.access_code && !@quiz.access_code.empty? && flash[quiz_access_code_key] != true
       render :action => 'access_code'
       false
     elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)

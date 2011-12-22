@@ -150,7 +150,7 @@ module Api
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
-    per_page = [(controller.params[:per_page] || 10).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
+    per_page = [(controller.params[:per_page] || Setting.get_cached('api_per_page', '10')).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
     collection = collection.paginate({ :page => controller.params[:page], :per_page => per_page }.merge(pagination_args))
     return unless collection.respond_to?(:next_page)
     links = []
@@ -170,7 +170,7 @@ module Api
   end
   
   def attachment_json(attachment)
-    url = file_download_url(attachment, :verifier => attachment.uuid, :download => '1')
+    url = file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1')
     {
       'content-type' => attachment.content_type,
       'display_name' => attachment.display_name,

@@ -118,32 +118,38 @@ class UserList
     pseudonyms.concat emails
 
     # Search for matching pseudonyms
-    @root_account.pseudonyms.connection.select_all("
-        SELECT p.unique_id AS address, u.name AS name, p.user_id AS user_id
-        FROM pseudonyms p INNER JOIN users u ON p.user_id = u.id
-        WHERE p.account_id=#{@root_account.id}
-          AND p.workflow_state='active'
-          AND LOWER(p.unique_id) IN (#{pseudonyms.map {|x| Pseudonym.sanitize(x[:address].downcase)}.join(", ")})
-        ").map(&:symbolize_keys).each do |login|
+    Pseudonym.trusted_by_including_self(@root_account).active.find(:all,
+      :select => 'unique_id AS address, users.name AS name, user_id, account_id',
+      :joins => :user,
+      :conditions => ["pseudonyms.workflow_state='active' AND LOWER(unique_id) IN (?)", pseudonyms.map {|x| x[:address].downcase}]
+    ).map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
       addresses = @addresses.select { |a| [:pseudonym, :email].include?(a[:type]) && a[:address].downcase == login[:address].downcase }
-      #sis_user_id = login.delete(:sis_user_id)
       addresses.each do |address|
+        # already found a matching pseudonym
+        if address[:user_id]
+          # we already have the one from this-account, just go with it
+          next if address[:account_id] == @root_account.id
+          # neither is from this-account, flag an error
+          if login[:account_id] != @root_account.id && login[:user_id] != address[:user_id]
+            address[:type] = :pseudonym if address[:type] == :email
+            address[:user_id] = false
+            address[:details] = :non_unique
+            next
+          end
+          # allow this one to overrule, since it's from this-account
+          address.delete(:details)
+        end
         address.merge!(login)
         address[:type] = :pseudonym if address[:type] == :email
       end
     end if !pseudonyms.empty?
 
     # Search for matching emails (only if open registration is disabled)
-    CommunicationChannel.connection.select_all("
-        SELECT cc.path AS address, u.name AS name, cc.user_id AS user_id, cc.workflow_state AS workflow_state
-        FROM communication_channels cc
-          INNER JOIN users u ON cc.user_id=u.id
-          INNER JOIN pseudonyms p ON p.user_id=u.id
-        WHERE p.account_id=#{@root_account.id}
-          AND p.workflow_state='active'
-          AND cc.workflow_state<>'retired'
-          AND LOWER(cc.path) IN (#{emails.map {|x| CommunicationChannel.sanitize(x[:address].downcase)}.join(", ")})
-        ").map(&:symbolize_keys).each do |login|
+    Pseudonym.trusted_by_including_self(@root_account).active.find(:all,
+        :select => 'path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state',
+        :joins => { :user => :communication_channels },
+        :conditions => ["communication_channels.workflow_state<>'retired' AND LOWER(path) IN (?)", emails.map { |x| x[:address].downcase}]
+    ).map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
       addresses = @addresses.select { |a| a[:type] == :email && a[:address].downcase == login[:address].downcase }
       addresses.each do |address|
         # if all we've seen is unconfirmed, and this one is active, we'll allow this one to overrule
@@ -156,8 +162,8 @@ class UserList
 
         # ccs are not unique; just error out on duplicates
         # we're in a bit of a pickle if open registration is disabled, and there are conflicting
-        # e-mails, but none of them are from an SIS pseudonym
-        if address.has_key?(:user_id)
+        # e-mails, but none of them are from a pseudonym
+        if address.has_key?(:user_id) && address[:user_id] != login[:user_id]
           address[:user_id] = false
           address[:details] = :non_unique
         else
@@ -168,21 +174,21 @@ class UserList
 
     # Search for matching SMS
     smses = @addresses.select { |a| a[:type] == :sms }
-    CommunicationChannel.connection.select_all("
-        SELECT communication_channels.path AS address, users.name AS name, communication_channels.user_id AS user_id
-        FROM communication_channels INNER JOIN users ON communication_channels.user_id = users.id
-        WHERE communication_channels.workflow_state='active'
-          AND communication_channels.path_type='sms'
-          AND (#{smses.map{|x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})
-        ").map(&:symbolize_keys).each do |sms|
+    sms_scope = @open_registration ? Pseudonym : Pseudonym.trusted_by_including_self(@root_account)
+    sms_scope.active.find(:all,
+        :select => 'path AS address, users.name AS name, communication_channels.user_id AS user_id',
+        :joins => { :user => :communication_channels },
+        :conditions => "communication_channels.workflow_state='active' AND (#{smses.map{|x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})"
+    ).map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
       address = sms.delete(:address)[/\d+/]
       addresses = @addresses.select { |a| a[:type] == :sms && a[:address].gsub(/[^\d]/, '') == address }
       addresses.each do |address|
         # ccs are not unique; just error out on duplicates
-        if address.has_key?(:user_id)
+        if address.has_key?(:user_id) && address[:user_id] != login[:user_id]
           address[:user_id] = false
           address[:details] = :non_unique
         else
+          sms[:user_id] = sms[:user_id].to_i
           address.merge!(sms)
         end
       end
@@ -191,15 +197,16 @@ class UserList
     all_addresses = @addresses
     @addresses = []
     all_addresses.each do |address|
-      # This is a temporary flag
+      # This is temporary working data
       address.delete :workflow_state
+      address.delete :account_id
       # Only allow addresses that we found a user, or that we can implicitly create the user
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] } ? @duplicate_addresses : @addresses) << address
       elsif address[:type] == :email && @open_registration
         (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
       else
-        @errors << { :address => address[:address], :details => (address[:details] || :not_found) }
+        @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
       end
     end
   end

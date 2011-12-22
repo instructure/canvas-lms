@@ -27,7 +27,7 @@ describe "announcements selenium tests" do
     topic_title.send_keys "First Announcement"
 
     first_text = 'Hi, this is my first announcement'
-    type_in_tiny('textarea.topic_content', first_text)
+    type_in_tiny('textarea.topic_content:first', first_text)
     driver.find_element(:css, '.add_topic_form_new').submit
     wait_for_ajaximations
     announcement = driver.find_element(:css, '#topic_list .topic')
@@ -44,7 +44,7 @@ describe "announcements selenium tests" do
     driver.find_element(:css, '.content .replies').click
     driver.find_element(:css, '#content .add_entry_link').click
     entry_text = 'new entry text'
-    type_in_tiny('textarea.entry_content', entry_text)
+    type_in_tiny('textarea.entry_content:first', entry_text)
     driver.find_element(:id, 'add_entry_form_entry_new').submit
     wait_for_ajaximations
     driver.find_element(:css, '#entry_list .discussion_entry .content').should include_text(entry_text)

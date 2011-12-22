@@ -525,13 +525,13 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :read_course_content => {
-        :label => lambda { t('permission.read_course_content', "View course content") },
+        :label => lambda { t('permissions.read_course_content', "View course content") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_content => {
-        :label => lambda { t('permission.manage_content', "Manage all other course content") },
+        :label => lambda { t('permissions.manage_content', "Manage all other course content") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -564,6 +564,16 @@ class RoleOverride < ActiveRecord::Base
         :account_only => :site_admin,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
+      },
+      :change_course_state => {
+        :label => lambda { t('permissions.change_course_state', "Change course state") },
+        :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
+      },
+      :manage_sections => {
+        :label => lambda { t('permissions.manage_sections', "Manage (create / edit / delete) course sections") },
+        :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
       }
     }.freeze
   def self.permissions

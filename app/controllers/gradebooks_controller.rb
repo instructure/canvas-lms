@@ -27,7 +27,7 @@ class GradebooksController < ApplicationController
   def grade_summary
     # do this as the very first thing, if the current user is a teacher in the course and they are not trying to view another user's grades, redirect them to the gradebook
     if (@context.grants_right?(@current_user, nil, :manage_grades) || @context.grants_right?(@current_user, nil, :view_all_grades)) && !params[:id]
-      redirect_to named_context_url(@context, :context_gradebook_url)
+      redirect_to_appropriate_gradebook_version
       return
     end
 
@@ -155,11 +155,6 @@ class GradebooksController < ApplicationController
         d = DateTime.parse(params[:updated])
         @new_submissions = @submissions.select{|s| s.updated_at > d}
       end
-      already_enrolled = {}
-      @context.enrollments.each do |e|
-        e.destroy if already_enrolled[[e.user_id,e.course_id]]
-        already_enrolled[[e.user_id,e.course_id]] = true if e.is_a?(StudentEnrollment)
-      end
       @enrollments_hash = {}
       @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
       @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name.downcase }.uniq
@@ -278,7 +273,6 @@ class GradebooksController < ApplicationController
         if @submissions && !@error_message#&& !@submission.errors || @submission.errors.empty?
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
-          format.xml  { head :created, :location => course_gradebook_url(@assignment.context) }
           format.json {
             render :json => @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context)
           }
@@ -289,7 +283,6 @@ class GradebooksController < ApplicationController
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
           format.html { render :action => "show", :course_id => @assignment.context.id }
-          format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }
           format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
           format.text { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
         end
@@ -346,6 +339,22 @@ class GradebooksController < ApplicationController
       format.atom { render :text => feed.to_xml }
     end
   end
+
+  def change_gradebook_version
+    if params[:reset]
+      @current_user.preferences.delete :use_gradebook2
+    else
+      @current_user.preferences[:use_gradebook2] = true
+    end
+    @current_user.save!
+    redirect_to_appropriate_gradebook_version
+  end
+
+  def redirect_to_appropriate_gradebook_version
+    gradebook_version_to_use = @current_user.preferences[:use_gradebook2] ? 'gradebook2' : 'gradebook'
+    redirect_to named_context_url(@context, "context_#{gradebook_version_to_use}_url")
+  end
+  protected :redirect_to_appropriate_gradebook_version
 
   def groups_as_assignments(groups=nil, options = {})
     groups ||= @context.assignment_groups.active

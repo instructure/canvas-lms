@@ -206,10 +206,10 @@ describe "collaborations" do
       it "should distinguish checkbox lists when someone clicks (de)select all" do
         PluginSetting.create!(:name => collab_type, :settings => {})
         course_with_teacher_logged_in
-        @students = [student_in_course(:course => @course, :name => "test student 1"),
-                     student_in_course(:course => @course, :name => "test student 2"),
-                     student_in_course(:course => @course, :name => "test student 3"),
-                     student_in_course(:course => @course, :name => "test student 4")]
+        @students = [student_in_course(:course => @course, :name => "test student 1").user,
+                     student_in_course(:course => @course, :name => "test student 2").user,
+                     student_in_course(:course => @course, :name => "test student 3").user,
+                     student_in_course(:course => @course, :name => "test student 4").user]
         @collaboration1 = Collaboration.typed_collaboration_instance(collab_title)
         @collaboration1.context = @course
         @collaboration1.attributes = {:title => "My Collab 1"}

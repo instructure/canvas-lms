@@ -21,18 +21,12 @@ shared_examples_for "conversations selenium tests" do
 
     if opts[:add_recipient] && browser = find_with_jquery("#create_message_form .browser:visible")
       browser.click
-      keep_trying_until{
-        if elem = find_with_jquery('.selectable:visible')
-          elem.click
-        end
-        elem
-      }
-      keep_trying_until{
-        if elem = find_with_jquery('.toggleable:visible .toggle')
-          elem.click
-        end
-        elem
-      }
+      wait_for_ajaximations(150)
+      find_with_jquery('.selectable:visible').click
+      wait_for_ajaximations(150)
+      find_with_jquery('.toggleable:visible .toggle').click
+      wait_for_ajaximations
+      driver.find_elements(:css, '.token_input ul li').length.should > 0
       find_with_jquery("#create_message_form input:visible").send_keys("\t")
     end
 
@@ -54,6 +48,9 @@ shared_examples_for "conversations selenium tests" do
         $("#action_media_comment").hide()
       JS
     end
+
+    group_conversation_link = driver.find_element(:id, "group_conversation")
+    group_conversation_link.click if group_conversation_link.displayed?
 
     expect {
       driver.find_element(:id, "create_message_form").submit
@@ -85,13 +82,13 @@ shared_examples_for "conversations selenium tests" do
       @course.default_section.update_attribute(:name, "the section")
       @other_section = @course.course_sections.create(:name => "the other section")
 
-      s1 = User.create(:name => "student 1")
-      @course.enroll_user(s1)
-      s2 = User.create(:name => "student 2")
-      @course.enroll_user(s2, "StudentEnrollment", :section => @other_section)
+      @s1 = User.create(:name => "student 1")
+      @course.enroll_user(@s1)
+      @s2 = User.create(:name => "student 2")
+      @course.enroll_user(@s2, "StudentEnrollment", :section => @other_section)
 
       @group = @course.groups.create(:name => "the group")
-      @group.users << s1 << @user
+      @group.users << @s1 << @user
 
       new_conversation
       @input = find_with_jquery("#create_message_form input:visible")
@@ -113,10 +110,10 @@ shared_examples_for "conversations selenium tests" do
       element = prev_elements.detect{ |e| e.last == name } or raise "menu item does not exist"
 
       element.first.click
+      wait_for_ajaximations(150)
       keep_trying_until{
         find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
       }
-      wait_for_animations
 
       @elements = nil
       elements
@@ -320,6 +317,34 @@ shared_examples_for "conversations selenium tests" do
         end
       end
     end
+
+    it "should allow a user id in the url hash to add recipient" do
+      # check without any user_name
+      get "/conversations#/conversations?user_id=#{@s1.id}"
+      wait_for_ajaximations
+      tokens.should eql ["student 1"]
+      # explanation of user_name param: we used to pass the user name in the
+      # hash fragment, and it was spoofable. now we load that data via ajax.
+      get "/conversations#/conversations?user_id=#{@s1.id}&user_name=some_fake_name"
+      wait_for_ajaximations
+      tokens.should eql ["student 1"]
+    end
+
+    it "should reject a non-contactable user id in the url hash" do
+      other = User.create(:name => "other guy")
+      get "/conversations#/conversations?user_id=#{other.id}"
+      wait_for_ajaximations
+      tokens.should eql []
+    end
+
+    it "should allow a non-contactable user in the hash if a shared conversation exists" do
+      other = User.create(:name => "other guy")
+      # if the users have a conversation in common already, then the recipient can be added
+      c = Conversation.initiate([@user.id, other.id], true)
+      get "/conversations#/conversations?user_id=#{other.id}&from_conversation_id=#{c.id}"
+      wait_for_ajaximations
+      tokens.should eql ["other guy"]
+    end
   end
 
   context "media comments" do
@@ -391,8 +416,9 @@ shared_examples_for "conversations selenium tests" do
 
       find_all_with_jquery("#{message} .message_attachments li").size.should == 1
       find_with_jquery("#{message} .message_attachments li a .title").text.should == filename
-      find_with_jquery("#{message} .message_attachments li a").click
-      driver.page_source.should match data
+      download_link = driver.find_element(:css, "#{message} .message_attachments li a")
+      file = open(download_link.attribute('href'))
+      file.read.should match data
     end
 
     it "should save attachments on new messages on existing conversations" do
@@ -568,7 +594,6 @@ shared_examples_for "conversations selenium tests" do
 
   context "group conversations" do
     before do
-      pending("tests in this context intermittently causes the build to fail on aws")
       @course.update_attribute(:name, "the course")
       @course.default_section.update_attribute(:name, "the section")
       @other_section = @course.course_sections.create(:name => "the other section")
@@ -591,11 +616,13 @@ shared_examples_for "conversations selenium tests" do
       level = 1
 
       @input.send_keys(name)
+      wait_for_ajaximations(150)
       loop do
         keep_trying_until{ find_all_with_jquery('.autocomplete_menu:visible .list').size == level }
         driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").detect { |e|
           (e.find_element(:tag_name, :b).text rescue e.text) == name
         }.click
+        wait_for_ajaximations
 
         break if names.empty?
 

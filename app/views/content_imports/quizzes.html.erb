@@ -26,7 +26,7 @@
     <p><%= t 'messages.uploading', "Uploading and processing your zip file, if it is large it may take a while." %></p>
   </div>
   <% form_tag context_url(@context, :context_import_migrate_url), :method => :post, :id => "qti_file_import_form", :multipart => true do %>
-    <input type="hidden" name="migration_settings[migration_type]" value="qti_exporter"/>
+    <input type="hidden" name="migration_settings[migration_type]" value="qti_converter"/>
     <input type="hidden" name="export_file_enabled" value="1"/>
     
     <fieldset id="file_upload">

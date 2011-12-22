@@ -168,6 +168,47 @@ describe "security" do
     end
   end
 
+  it "should not prepend exceptional json responses with protection" do
+    u = user_with_pseudonym :active_user => true,
+      :username => "nobody@example.com",
+      :password => "asdfasdf"
+    u.save!
+    post "/login", { "pseudonym_session[unique_id]" => "nobody@example.com",
+      "pseudonym_session[password]" => "asdfasdf",
+      "pseudonym_session[remember_me]" => "1" }, { 'Accept' => 'application/json' }
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should_not match(%r{^while\(1\);})
+    json = JSON.parse response.body
+    json['pseudonym']['unique_id'].should == "nobody@example.com"
+
+    stub_kaltura
+    Kaltura::ClientV3.any_instance.expects(:startSession).returns("true")
+    get "/dashboard/comment_session"
+    response.should be_success
+    response.body.should_not match(%r{^while\(1\);})
+
+    get "/logout", {}, { 'accept' => 'application/json' }
+    response.should be_success
+    response.body.should_not match(%r{^while\(1\);})
+  end
+
+  it "should prepend GET JSON responses with protection" do
+    course_with_teacher_logged_in
+    get "/courses.json"
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should match(%r{^while\(1\);})
+  end
+
+  it "should not prepend non-GET JSON responses with protection" do
+    course_with_teacher_logged_in
+    delete "/dashboard/ignore_stream_item/1"
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should_not match(%r{^while\(1\);})
+  end
+
   describe "remember me" do
     before do
       @u = user_with_pseudonym :active_all => true,
@@ -385,8 +426,8 @@ describe "security" do
     assert_response :success
     json_parse.should == {
       "duplicates" => [],
-      "errored_users" => [{"address" => "A345678", "details" => "not_found"}],
-      "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id.to_s }]
+      "errored_users" => [{"address" => "A345678", "details" => "not_found", "type" => "pseudonym"}],
+      "users" => [{ "address" => "A1234567", "name" => "test user", "type" => "pseudonym", "user_id" => u.id }]
     }
   end
 
@@ -516,6 +557,12 @@ describe "security" do
       Account.site_admin.role_overrides.create!(:permission => permission.to_s,
         :enrollment_type => 'Limited Admin',
         :enabled => true)
+    end
+
+    def remove_permission(permission, enrollment_type)
+      Account.default.role_overrides.create!(:permission => permission.to_s,
+              :enrollment_type => enrollment_type,
+              :enabled => false)
     end
 
     describe "site admin" do
@@ -930,7 +977,6 @@ describe "security" do
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
         response.body.should match /Delete this Course/
-        response.body.should match /End this Course/
         html = Nokogiri::HTML(response.body)
         html.css('#course_account_id').should_not be_empty
         html.css('#course_enrollment_term_id').should_not be_empty
@@ -981,6 +1027,36 @@ describe "security" do
 
         get "/courses/#{@course.id}/users/#{@student.id}/usage"
         response.should be_success
+      end
+
+      it 'manage_sections' do
+        course_with_teacher_logged_in(:active_all => 1)
+        remove_permission(:manage_sections, 'TeacherEnrollment')
+
+        get "/courses/#{@course.id}/settings"
+        response.should be_success
+        response.body.should_not match 'Add Section'
+
+        post "/courses/#{@course.id}/sections"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
+        response.should be_success
+
+        put "/courses/#{@course.id}/sections/#{@course.default_section.id}"
+        response.status.should == '401 Unauthorized'
+      end
+
+      it 'change_course_state' do
+        course_with_teacher_logged_in(:active_all => 1)
+        remove_permission(:change_course_state, 'TeacherEnrollment')
+
+        get "/courses/#{@course.id}/settings"
+        response.should be_success
+        response.body.should_not match 'End this Course'
+
+        delete "/courses/#{@course.id}", :event => 'conclude'
+        response.status.should == '401 Unauthorized'
       end
     end
   end

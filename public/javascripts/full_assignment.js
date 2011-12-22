@@ -33,7 +33,7 @@ jQuery(function($){
     $assignment.find(".description").show();
     $assignment.find(".edit_full_assignment_link").show();
   };
-  
+
   function doFocus(id) {
     if(!$("#" + id).editorBox('focus')) {
       setTimeout(function(){
@@ -41,7 +41,7 @@ jQuery(function($){
       }, 500);
     }
   }
-  
+
   function editFullAssignment() {
     var $assignment = $("#full_assignment"),
         $form = $("#edit_assignment_form");
@@ -79,12 +79,13 @@ jQuery(function($){
       }, 500);
     }
   }
-  
+
   if(wikiSidebar) {
     wikiSidebar.init();
   }
   var $edit_assignment_form = $('#edit_assignment_form');
   $edit_assignment_form.find(".more_options_link").click(function(event) {
+    $(this).focus(); // to ensure its errorBox gets cleaned up (if it has one)
     event.preventDefault();
     $edit_assignment_form.find(".more_options_link").hide();
     $edit_assignment_form.find(".more_assignment_values").show();
@@ -179,6 +180,15 @@ jQuery(function($){
         }
       }
     },
+    onFormError: function(errors) {
+      var hiddenErrors = [];
+      $.each(errors, function(name, details) {
+        if (!details.object.is(':visible')) hiddenErrors.push($.h(details.message));
+      });
+      if (hiddenErrors.length) {
+        $(this).find('a.more_options_link').errorBox($.h(I18n.t('messages.hidden_errors', 'There were errors on one or more advanced options')));
+      }
+    },
     processData: function(data) {
       var date;
       if($(this).find(".more_grading_options").css('display') == 'none') {
@@ -235,7 +245,7 @@ jQuery(function($){
         lock_at: $.parseFromISO(assignment.lock_at).datetime_formatted,
         unlock_at: $.parseFromISO(assignment.unlock_at).datetime_formatted
       });
-      
+
       $assignment.find(".quiz_content").showIf(assignment.submission_types == "online_quiz" && assignment.quiz);
       $assignment.find(".discussion_topic_content").showIf(assignment.submission_types == "discussion_topic" && assignment.discussion_topic);
       $("#turnitin_enabled").showIf(assignment.turnitin_enabled);
@@ -292,7 +302,7 @@ jQuery(function($){
       var data = $(this).parents(".criterion").getTemplateData({textValues: ['long_description', 'description']}),
           is_learning_outcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion"),
           $dialog = $("#rubric_long_description_dialog");
-      
+
       $dialog.fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )});
       $dialog.find(".editing").hide();
       $dialog.find(".displaying").show();

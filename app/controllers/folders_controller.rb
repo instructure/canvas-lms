@@ -118,11 +118,9 @@ class FoldersController < ApplicationController
           end
           flash[:notice] = t :event_updated, 'Event was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.xml  { head :ok }
           format.json { render :json => @folder.to_json(:methods => [:currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @folder.errors.to_xml }
           format.json { render :json => @folder.errors.to_json, :status => :bad_request }
         end
       end
@@ -148,11 +146,9 @@ class FoldersController < ApplicationController
         if @folder.save
           flash[:notice] = t :folder_created, 'Folder was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.xml  { head :created, @folder.to_xml }
           format.json { render :json => @folder.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "new" }
-          format.xml  { render :xml => @folder.errors.to_xml }
           format.json { render :json => @folder.errors.to_json }
         end
       end
@@ -165,7 +161,6 @@ class FoldersController < ApplicationController
       @folder.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_files_url) }# show.rhtml
-        format.xml  { render :xml => @folder.to_xml }
         format.json { render :json => @folder.to_json }
       end
     end

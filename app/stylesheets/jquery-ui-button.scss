@@ -39,19 +39,19 @@ $button-text-color: #525252;
 //gets precendence over the .ui-state-default, .ui-widget-content .ui-state-default 
 //background image in jquery-ui-theme.css
 .ui-button, .ui-widget-content .ui-button { 
-  @include vertical-gradiant(#f3f3f3, #cecece);
+  @include vertical-gradient(#f3f3f3, #cecece);
 }
 .ui-button { 
   @include border-radius(10px);
   @include box-shadow(rgba(0,0,0,0.5), 0px, 1px, 2px, 0);
   border: 1px solid #bdbdbd;
   &.ui-state-hover {
-    @include vertical-gradiant(#ffffff, #dfdfdf);
+    @include vertical-gradient(#ffffff, #dfdfdf);
     transition: all 0.25s ease-in-out;
     -webkit-transition: all 0.9s ease-in-out;
     -moz-transition: all 0.9s ease-in-out;
   }
-  &.ui-state-active { @include vertical-gradiant(#a8a8a8, #c6c6c6) }
+  &.ui-state-active { @include vertical-gradient(#a8a8a8, #c6c6c6) }
   
   .ui-button-text {
     font-size: 12px;

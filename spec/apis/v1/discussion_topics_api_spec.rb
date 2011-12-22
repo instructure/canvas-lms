@@ -43,17 +43,12 @@ describe DiscussionTopicsController, :type => :integration do
                   "id"=>@topic.id,
                   "user_name"=>"User Name",
                   "last_reply_at"=>@topic.last_reply_at.as_json,
-                  "permissions"=>{"delete"=>true,
-                                   "reply"=>true,
-                                   "read"=>true,
-                                   "attach"=>true,
-                                   "create"=>true,
-                                   "update"=>true},
                   "message"=>"<p>content here</p>",
                   "posted_at"=>@topic.posted_at.as_json,
                   "root_topic_id"=>nil,
+                  "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "attachments"=>[{"content-type"=>"unknown/unknown",
-                                   "url"=>"http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}",
+                                   "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                                    "filename"=>"content.txt",
                                    "display_name"=>"content.txt"}],
                   "topic_children"=>[sub.id]}
@@ -111,17 +106,11 @@ describe DiscussionTopicsController, :type => :integration do
                           "id"=>gtopic.id,
                           "user_name"=>"User Name",
                           "last_reply_at"=>gtopic.last_reply_at.as_json,
-                          "permissions"=>
-                                  {"delete"=>true,
-                                   "reply"=>true,
-                                   "read"=>true,
-                                   "attach"=>true,
-                                   "create"=>true,
-                                   "update"=>true},
                           "message"=>"<p>content here</p>",
+                          "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
                           "attachments"=>
                                   [{"content-type"=>"unknown/unknown",
-                                    "url"=>"http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}",
+                                    "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                                     "filename"=>"content.txt",
                                     "display_name"=>"content.txt"}],
                           "posted_at"=>gtopic.posted_at.as_json,
@@ -190,10 +179,7 @@ describe DiscussionTopicsController, :type => :integration do
         "user_name" => @user.name,
         "message" => @message,
         "created_at" => @entry.created_at.utc.iso8601,
-        "permissions" => {
-          "delete" => true, "reply" => true, "read" => true,
-          "attach" => true, "create" => true, "update" => true
-        }
+        "updated_at" => @entry.updated_at.as_json,
       }
     end
 
@@ -323,7 +309,7 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       entry_json = json.first
       entry_json['attachment'].should_not be_nil
-      entry_json['attachment']['url'].should == "http://www.example.com/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+      entry_json['attachment']['url'].should == "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     end
 
     it "should include replies on top level entries" do

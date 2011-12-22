@@ -1,13 +1,13 @@
-<% 
-# TODO: I am assuming that any new submission or grading will touch the course (or the user) so that will make this cache work, 
+<%
+# TODO: I am assuming that any new submission or grading will touch the course (or the user) so that will make this cache work,
 # if not we need to cache smarter. -RS
 # BTW if you add a new thing here, it probably needs adding to the /users/self/todo API
-cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do 
+cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
  show_context = !contexts || contexts.length > 1
  max_to_show = 16
  if @current_user && [
-    @current_user.assignments_needing_submitting(:contexts => contexts, :limit => max_to_show), 
-    @current_user.assignments_needing_grading(:contexts => contexts)[0,max_to_show], 
+    @current_user.assignments_needing_submitting(:contexts => contexts, :limit => max_to_show),
+    @current_user.assignments_needing_grading(:contexts => contexts)[0,max_to_show],
   ].any?{ |set| set.length > 0} %>
   <h2><%= t('headings.to_do', %{To Do}) %></h2>
   <% cnt = 0 %>
@@ -58,7 +58,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
                 </span>
               </span>
             <% end %>
-            <b><%= assignment.submission_action_string %> <%= assignment.title %></b>
+            <b><%= assignment.submission_action_string %></b>
             <em><%= t 'due_at', 'Due %{date}', :date => datetime_string(assignment.due_at) %></em>
           </a>
           <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>

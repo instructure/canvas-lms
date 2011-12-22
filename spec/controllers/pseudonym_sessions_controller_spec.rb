@@ -70,7 +70,49 @@ describe PseudonymSessionsController do
     assigns[:pseudonym_session].should_not be_nil
   end
 
+  context "trusted logins" do
+    before do
+      Pseudonym.stubs(:trusted_by).with(Account.default).returns(Pseudonym.scoped({}))
+    end
+
+    it "should login for a pseudonym from a different account" do
+      account = Account.create!
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
+      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
+      response.should redirect_to(dashboard_url(:login_success => 1))
+    end
+
+    it "should login for a user with multiple identical pseudonyms" do
+      account1 = Account.create!
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account1)
+      @pseudonym = @user.pseudonyms.create!(:account => Account.site_admin, :unique_id => 'jt@instructure.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      # it should have preferred the site admin pseudonym
+      assigns[:pseudonym].should == @pseudonym
+    end
+
+    it "should not login for multiple users with identical pseudonyms" do
+      account1 = Account.create!
+      account2 = Account.create!
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account1)
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account2)
+      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
+      response.should_not be_success
+      response.should render_template('pseudonym_sessions/new')
+    end
+  end
+
   context "merging" do
+    it "should set merge params correctly in the session" do
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+      @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
+      get 'new', :confirm => @cc.confirmation_code, :expected_user_id => @user.id
+      response.should render_template 'new'
+      session[:confirm].should == @cc.confirmation_code
+      session[:expected_user_id].should == @user.id
+    end
+
     it "should redirect back to merge users" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')

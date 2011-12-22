@@ -61,6 +61,13 @@ describe "speedgrader selenium tests" do
 
   end
 
+  it "should not error if there are no submissions" do
+    student_in_course
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajax_requests
+    driver.execute_script("return INST.errorCount").should == 0
+  end
+
   it "should display submission late notice message" do
     @assignment.due_at = Time.now - 2.days
     @assignment.save!
@@ -215,6 +222,7 @@ describe "speedgrader selenium tests" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_animations
 
+    keep_trying_until { find_all_with_jquery('#students_selectmenu option').size > 0 }
     find_all_with_jquery('#students_selectmenu option').size.should eql(1) # just the one student
     find_all_with_jquery('#section-menu ul li').size.should eql(1) # "Show all sections"
     find_with_jquery('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
@@ -232,7 +240,7 @@ describe "speedgrader selenium tests" do
     expect_new_page_load {
       driver.find_element(:css, '#settings_form .submit_button').click
     }
-    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
 
     # make sure it works a second time too
     driver.find_element(:id, "settings_link").click
@@ -240,15 +248,16 @@ describe "speedgrader selenium tests" do
     expect_new_page_load {
       driver.find_element(:css, '#settings_form .submit_button').click
     }
-    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
   end
 
   it "should leave the full rubric open when switching submissions" do
     student_submission :username => "student1@example.com"
     student_submission :username => "student2@example.com"
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
+    keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').displayed? }
     driver.find_element(:css, '.toggle_full_rubric').click
     wait_for_animations
     rubric = driver.find_element(:id, 'rubric_full')

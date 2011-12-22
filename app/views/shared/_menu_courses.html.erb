@@ -1,12 +1,10 @@
 <td class="menu-item-drop-column" id="menu_enrollments">
-  <% if too_many_courses %>
+  <% if edit %>
     <a class="customListOpen"><%= edit %></a>
   <% end %>
   <h2><%= title %></h2>
   <ul class="menu-item-drop-column-list">
     <%= render :partial => 'shared/menu_course', :collection => collection %>
-    <% if too_many_courses %>
-      <li><%= link_to("#{link_text} (#{collection_size})", more_link_for_over_max, :class => "menu-item-drop-float-right" ) %></li>
-    <% end %>
+    <li><%= link_to "#{link_text} (#{collection_size})", more_link_for_over_max, :class => "menu-item-drop-float-right" %></li>
   </ul>
 </td>

@@ -6460,10 +6460,10 @@ es:
         secret_key: "Código Secreto"
     notices: 
       settings_updated: "Configuraciones del complemento actualizado con éxito."
-    qti_exporter: 
+    qti_converter: 
       file_description: "archivo QTI .zip"
       name: "Exportador QTI"
-    qti_exporter_settings: 
+    qti_converter_settings: 
       labels: 
         enabled: Activado
     registration_form_recaptcha: 

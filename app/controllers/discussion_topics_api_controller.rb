@@ -55,7 +55,7 @@ class DiscussionTopicsApiController < ApplicationController
           @entry.attachment = @attachment
           @entry.save
         end
-        render :json => discussion_entry_api_json([@entry], @context).first, :status => :created
+        render :json => discussion_entry_api_json([@entry], @context, @current_user, session).first, :status => :created
       end
     end
   end
@@ -87,11 +87,13 @@ class DiscussionTopicsApiController < ApplicationController
   # @response_field created_at The creation time of the entry, in ISO8601
   #   format.
   #
-  # @response_field permissions Permissions granted to the authenticated user
-  #   for the entry.
+  # @response_field updated_at The updated time of the entry, in ISO8601 format.
   #
   # @response_field attachment JSON representation of the attachment for the
   #   entry, if any. Present only if there is an attachment.
+  #
+  # @response_field attachments *Deprecated*. Same as attachment, but returned
+  #   as a one-element array. Present only if there is an attachment.
   #
   # @response_field recent_replies The 10 most recent replies for the entry,
   #   newest first. Present only if there is at least one reply.
@@ -107,9 +109,6 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_name": "nobody@example.com",
   #       "message": "Newer entry",
   #       "created_at": "2011-11-03T21:33:29Z",
-  #       "permissions": {
-  #         "delete": true, "reply": true, "read": true,
-  #         "attach": true, "create": true, "update": true },
   #       "attachment": {
   #         "content-type": "unknown/unknown",
   #         "url": "http://www.example.com/files/681/download?verifier=JDG10Ruitv8o6LjGXWlxgOb5Sl3ElzVYm9cBKUT3",
@@ -121,25 +120,19 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_name": "nobody@example.com",
   #       "message": "first top-level entry",
   #       "created_at": "2011-11-03T21:32:29Z",
-  #       "permissions": {
-  #         "delete": true, "reply": true, "read": true,
-  #         "attach": true, "create": true, "update": true },
   #       "recent_replies": [
   #         {
   #           "id": 1017,
   #           "user_id": 7086,
   #           "user_name": "nobody@example.com",
   #           "message": "Reply message",
-  #           "created_at": "2011-11-03T21:32:29Z",
-  #           "permissions": {
-  #             "delete": true, "reply": true, "read": true,
-  #             "attach": true, "create": true, "update": true },
+  #           "created_at": "2011-11-03T21:32:29Z"
   #         } ],
   #       "has_more_replies": false } ]
   def entries
     if authorized_action(@topic, @current_user, :read)
       @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_path(@topic))
-      render :json => discussion_entry_api_json(@entries, @context)
+      render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
     end
   end
 
@@ -164,7 +157,7 @@ class DiscussionTopicsApiController < ApplicationController
     @entry = build_entry(@parent.discussion_subentries)
     if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
       if save_entry
-        render :json => discussion_entry_api_json([@entry], @context).first, :status => :created
+        render :json => discussion_entry_api_json([@entry], @context, @current_user, session).first, :status => :created
       end
     end
   end
@@ -190,33 +183,24 @@ class DiscussionTopicsApiController < ApplicationController
   # @response_field created_at The creation time of the reply, in ISO8601
   #   format.
   #
-  # @response_field permissions Permissions granted to the authenticated user
-  #   for the reply.
-  #
   # @example_response
   #   [ {
   #       "id": 1015,
   #       "user_id": 7084,
   #       "user_name": "nobody@example.com",
   #       "message": "Newer message",
-  #       "created_at": "2011-11-03T21:27:44Z",
-  #       "permissions": {
-  #         "delete": true, "reply": true, "read": true,
-  #         "attach": true, "create": true, "update": true } },
+  #       "created_at": "2011-11-03T21:27:44Z" },
   #     {
   #       "id": 1014,
   #       "user_id": 7084,
   #       "user_name": "nobody@example.com",
   #       "message": "Older message",
-  #       "created_at": "2011-11-03T21:26:44Z",
-  #       "permissions": {
-  #         "delete": true, "reply": true, "read": true,
-  #         "attach": true, "create": true, "update": true } } ]
+  #       "created_at": "2011-11-03T21:26:44Z" } ]
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
     if authorized_action(@topic, @current_user, :read)
       @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_path(@parent))
-      render :json => discussion_entry_api_json(@replies, @context)
+      render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
     end
   end
 

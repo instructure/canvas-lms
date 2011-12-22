@@ -113,6 +113,14 @@ describe FilesController do
         doc.at_css('iframe#file_content')['src'].should =~ %r{^http://test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
 
+      it "should not inline the file if passed download_frd param" do
+        HostUrl.stubs(:file_host).returns('files-test.host')
+        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download?download_frd=1&verifier=#{@att.uuid}"
+        response.should be_redirect
+        get response['Location']
+        response.headers['Content-Disposition'].should match /attachment/
+      end
+
     end
   end
 

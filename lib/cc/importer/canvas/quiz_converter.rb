@@ -97,7 +97,7 @@ module CC::Importer::Canvas
       raise "The QTI must be converted to 2.1 before converting to JSON" unless @converted
       questions = {}
       begin
-        manifest_file = File.join(@dest_dir_2_1, Qti::QtiExporter::MANIFEST_FILE)
+        manifest_file = File.join(@dest_dir_2_1, Qti::Converter::MANIFEST_FILE)
         questions[:assessment_questions] = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::CANVAS)
       rescue
         questions[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
@@ -109,7 +109,7 @@ module CC::Importer::Canvas
       raise "The QTI must be converted to 2.1 before converting to JSON" unless @converted
       quizzes = {}
       begin
-        manifest_file = File.join(@dest_dir_2_1, Qti::QtiExporter::MANIFEST_FILE)
+        manifest_file = File.join(@dest_dir_2_1, Qti::Converter::MANIFEST_FILE)
         quizzes[:assessments] = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::CANVAS)
       rescue
         quizzes[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"

@@ -73,4 +73,100 @@ describe ContextModule do
       end
     end
   end
+  
+  describe "progressing before job is run" do
+    def progression_testing
+      enable_cache do
+        @is_attachment = false
+        course_with_student_logged_in(:active_all => true)
+        @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
+    
+        @mod1 = @course.context_modules.create!(:name => "some module")
+        @mod1.require_sequential_progress = true
+        @mod1.save!
+        @tag1 = @mod1.add_item(:type => 'quiz', :id => @quiz.id)
+        @mod1.completion_requirements = {@tag1.id => {:type => 'min_score', :min_score => 1}}
+        @mod1.save!
+    
+        @mod2 = @course.context_modules.create!(:name => "dependant module")
+        @mod2.prerequisites = "module_#{@mod1.id}"
+        @mod2.save!
+        
+        yield '<div id="test_content">yay!</div>'
+        
+        get @test_url
+        response.should be_success
+        html = Nokogiri::HTML(response.body)
+        html.css('#test_content').length.should == 0
+    
+        p1 = @mod1.evaluate_for(@user, true, true)
+    
+        @quiz_submission = @quiz.generate_submission(@user)
+        @quiz_submission.grade_submission
+        @quiz_submission.workflow_state = 'completed'
+        @quiz_submission.kept_score = 1
+        @quiz_submission.save!
+    
+        #emulate settings on progression if the user took the quiz but background jobs haven't run yet
+        p1.requirements_met = [{:type=>"min_score", :min_score=>"1", :max_score=>nil, :id=>@quiz.id}]
+        p1.save!
+    
+        get "/courses/#{@course.id}/modules/items/#{@tag2.id}"
+        response.should be_redirect
+        response.location.ends_with?(@test_url).should be_true
+            
+        get @test_url
+        response.should be_success
+        html = Nokogiri::HTML(response.body)
+        if @is_attachment
+          html.at_css('#file_content')['src'].should =~ %r{#{@test_url}}
+        else
+          html.css('#test_content').length.should == 1
+        end
+      end
+    end
+    
+    it "should progress to assignment" do
+      progression_testing do |content|
+        asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
+        @test_url = "/courses/#{@course.id}/assignments/#{asmnt.id}"
+        @tag2 = @mod2.add_item(:type => 'assignment', :id => asmnt.id)
+      end
+    end
+    
+    it "should progress to discussion topic" do
+      progression_testing do |content|
+        discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
+        @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
+        @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
+      end
+    end
+    
+    it "should progress to a quiz" do
+      progression_testing do |content|
+        quiz = @course.quizzes.create!(:title => "quiz", :description => content)
+        @test_url = "/courses/#{@course.id}/quizzes/#{quiz.id}"
+        @tag2 = @mod2.add_item(:type => 'quiz', :id => quiz.id)
+      end
+    end
+    
+    it "should progress to a wiki page" do
+      progression_testing do |content|
+        page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
+        @test_url = "/courses/#{@course.id}/wiki/#{page.url}"
+        @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
+      end
+    end
+    
+    it "should progress to an attachment" do
+      progression_testing do |content|
+        @is_attachment = true
+        att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
+        @test_url = "/courses/#{@course.id}/files/#{att.id}"
+        @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
+      end
+    end
+    
+  end
+  
 end

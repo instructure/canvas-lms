@@ -17,8 +17,10 @@
 #
 
 module Api::V1::Account
-  def account_json(account, includes)
-    account.as_json(:include_root => false, :only => %w(id name parent_account_id root_account_id)).tap do |hash|
+  include Api::V1::Json
+
+  def account_json(account, user, session, includes)
+    api_json(account, user, session, :only => %w(id name parent_account_id root_account_id)).tap do |hash|
       hash['sis_account_id'] = account.sis_source_id
     end
   end

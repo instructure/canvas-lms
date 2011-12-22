@@ -31,7 +31,7 @@ class PseudonymSessionsController < ApplicationController
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
 
-    session[:expected_user_id] = params[:expected_user_id]
+    session[:expected_user_id] = params[:expected_user_id].to_i
     session[:confirm] = params[:confirm]
     session[:enrollment] = params[:enrollment]
 
@@ -125,10 +125,13 @@ class PseudonymSessionsController < ApplicationController
     end
 
     if !found && params[:pseudonym_session]
-      valid_alternative = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).find{|p|
-        (p.valid_password?(params[:pseudonym_session][:password]) && p.account.password_authentication?) rescue false
+      valid_alternatives = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).select {|p|
+        p.valid_arbitrary_credentials?(params[:pseudonym_session][:password])
       }
-      if valid_alternative
+      # only log them in if these credentials match a single user
+      if valid_alternatives.map(&:user).uniq.length == 1
+        # prefer a pseudonym from Site Admin if possible, otherwise just choose one
+        valid_alternative = valid_alternatives.find {|p| p.account_id == Account.site_admin.id } || valid_alternatives.first
         @pseudonym_session = PseudonymSession.new(valid_alternative, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save
         found = true
@@ -157,7 +160,6 @@ class PseudonymSessionsController < ApplicationController
         @pre_registered = @user if @user && !@user.registered?
         @headers = false
         format.html { maybe_render_mobile_login :bad_request }
-        format.xml  { render :xml => @pseudonym_session.errors.to_xml }
         format.json { render :json => @pseudonym_session.errors.to_json, :status => :bad_request }
       end
     end
@@ -196,7 +198,6 @@ class PseudonymSessionsController < ApplicationController
       else
         format.html { redirect_to login_url }
       end
-      format.xml { head :ok }
       format.json { render :json => "OK".to_json, :status => :ok }
     end
   end

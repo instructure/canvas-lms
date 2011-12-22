@@ -83,6 +83,7 @@ describe "learning outcome test" do
     rating_row.find_element(:css, '#edit_rating_form input[name="points"]').clear
     rating_row.find_element(:css, '#edit_rating_form input[name="points"]').send_keys('3')
     rating_row.find_element(:id, 'edit_rating_form').submit
+    sleep 1
     driver.find_element(:css, '#criterion_1 .criterion_points').clear
     driver.find_element(:css, '#criterion_1 .criterion_points').send_keys('4')
 

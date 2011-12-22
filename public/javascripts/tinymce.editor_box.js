@@ -344,18 +344,24 @@
 
 // --------------------------------------------------------------------
 
-
+  // these 2 variables here are to prevent infinite recursion in ie8
+  var inFocusLoop = false;
+  var inBlurLoop = false;
   function init() {
     // ensure that blur/change/focus events fire for the active form element
     // when we click into or out of tiny (they don't normally, since we are
     // technically changing windows).
-    $(window).blur(function(e) {
-      if (document.activeElement && this == e.target) {
+    $(window).blur(function(event) {
+      if (document.activeElement && window == event.target && !inBlurLoop) {
+        inBlurLoop = true;
         $(document.activeElement).filter(':input').blur().change();
+        inBlurLoop = false;
       }
-    }).focus(function(e) {
-      if (document.activeElement && this == e.target) {
+    }).focus(function(event) {
+      if (document.activeElement && window == event.target && !inFocusLoop) {
+        inFocusLoop = true;
         $(document.activeElement).filter(':input').focus();
+        inFocusLoop = false;
       }
     });
   }

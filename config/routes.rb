@@ -94,6 +94,7 @@ ActionController::Routing::Routes.draw do |map|
     course.update_nav 'update_nav', :controller => 'courses', :action => 'update_nav'
     course.formatted_enroll_users 'enroll_users.:format', :controller => 'courses', :action => 'enroll_users'
     course.resource :gradebook, :collection => {
+      :change_gradebook_version => :get,
       :blank_submission => :get,
       :speed_grader => :get,
       :update_submission => :post,
@@ -721,6 +722,14 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts', :action => :index, :path_name => :accounts
       accounts.get 'accounts/:id', :action => :show
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
+    end
+
+    api.with_options(:controller => :admins) do |admins|
+      admins.post 'accounts/:account_id/admins', :action => :create
+    end
+
+    api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
+      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => 'update_all'
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'

@@ -35,4 +35,22 @@ else
       target
     end
   end
+
+  # https://github.com/rails/rails/commit/0e17cf17ebeb70490d7c7cd25c6bf8f9401e44b3
+  # In master, should be in the next 3.1 release
+  ERB::Util.module_eval do
+    def html_escape(s)
+      s = s.to_s
+      if s.html_safe?
+        s
+      else
+        s.gsub(/[&"><]/n) { |special| ERB::Util::HTML_ESCAPE[special] }.html_safe
+      end
+    end
+    remove_method(:h)
+    alias h html_escape
+
+    module_function :h
+    module_function :html_escape
+  end
 end
