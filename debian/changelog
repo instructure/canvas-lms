@@ -1,3 +1,139 @@
+canvas-lms (2011.12.22.10.02) stable; urgency=low
+
+  * Package ref: 7397569e560a055c4a36d56b30f824565834fdcf
+  *
+  * [+62d13b7] center spinner in element even if hidden
+  * [+df55776] remove completely unused aborted workflow state
+  * [+6d5ddda] correctly update quiz status re: essay questions. fixes #5436
+  * [+a749628] translate links on imported assessment questions
+  * [+1b1c015] fix $.detect to have right argument order
+  * [+28c7973] simplifying and correcting the stats library
+  * [+d3e8c8c] get rid of compiled js files where cs was deleted
+  * [+73cc5b1] gitignore javascript spec helpers
+  * [+a7bb281] retry starting and stopping remote selenium clients
+  * [+7880784] don't try and remove old batches without a term
+  * [+ae6b766] Revert taking feedback partial out of layout
+  * [+4adaa76] fix collaborations selenium spec
+  * [+301958b] fixes for a bundle of failing selenium specs
+  * [+e4d78a2] fix quiz selenium tests
+  * [+5a1c509] fix race condition in feedback selenium spec
+  * [+13bee25] fix race conditions in speedgrader selenium test
+  * [+5f2747e] fix typo
+  * [+ac73426] don't show a user to create a new collaboration when not allowed
+  * [+8b42ca4] fix selenium user_lists_spec.rb
+  * [+88005ea] fix race condition in assignments selenium tests
+  * [+9de1c59] Date#in_time_zone
+  * [+87e0359] set quiz due_at to 11:59pm if only given a date. fixes #6329
+  * [+2ea48c5] refactor qti exporter and make all specs run in CI
+  * [+790553d] changed message about muting assignments fixes #6486
+  * [+ceb49e2] display dates in user's time zone, fixes #6028
+  * [+7aab6f6] missing i18n
+  * [+6c821b1] fix race condition in layout selenium spec
+  * [+9d45cf5] allow specifying browser path in selenium.yml
+  * [+0047568] fix external tool assignment spec
+  * [+ee219b2] don't sync file names and content tag names
+  * [+c4dcfe9] don't show discussion stream items to students in an unpublished course
+  * [+892c0fc] use the new selenium webdriver remote file upload functionality
+  * [+bc525a8] fixes: #6500 border spacing on non-tinyMCE tables
+  * [+60554f6] make all of jquery available to specs
+  * [+e0a3526] add jquery mockjax
+  * [+b4b27c4] make an INST module to expose global to AMD
+  * [+d9d5715] add id to wiki page urls. fixes #2635.
+  * [+6aca46b] fix error when recording JS errors
+  * [+a971a1d] fix speedGrader to not error if no url hash present
+  * [+001cae2] fix spelling of gradient in sass mixin.
+  * [+b7ff643] moving delayed job message sending extensions into DJ plugin
+  * [+8a98850] always link to courses page from courses dropdown
+  * [+0c5860b] Don't limit wiki page list when editing module
+  * [+6c8b0fc] switch to using the built in jquery ajax request counter
+  * [+662d0d6] allow forcing the server host and ip to be used for selenium tests
+  * [+cfcdebc] fix race condition in conversations spec
+  * [+aab4824] remove extraenous respond_to { format.xml } blocks
+  * [+e4ac7ce] handle_asynchronously_if_production
+  * [+8f87621] randomly shuffle the initial rowid for sqlite tests
+  * [+bf7421a] fix race condition in wiki selenium spec
+  * [+285d620] removed broken grade passback selenium tests being rewritten in another change
+  * [+daf74e0] fix race condition in conversations selenium spec
+  * [+573e001] fix Customize and View all courses links, closes #6394
+  * [+0fb0f4e] show errors for hidden fields, fixes #4560
+  * [+688bf55] fix race condition in assignments selenium spec
+  * [+71e4a6e] fix error in speed_grader selenium spec
+  * [+b425a2f] switch to using expect_new_page_load in quiz selenium specs
+  * [+153be9f] recompile qUint coffee scripts before running tests
+  * [+5302be8] change qti upload package type to .zip from .imscc
+  * [+d1d6143] fix quiz_submission.quiz_points_possible
+  * [+8c3a8d9] ERB::Util.h speedup
+  * [+cf557d9] allow account admins to delete managed pseudonyms. fixes #6059
+  * [+59ff221] fixed failing CustomList spec
+  * [+e756bb8] fix race condition in dashboard selenium spec
+  * [+dbd2a6c] fix race condition with alerts in external tool selenium specs
+  * [+4a411d9] fix race conditions in wiki selenium specs
+  * [+9757dc2] fix course list customization timing spec in selenium
+  * [+2645081] don't lint vendor javascripts
+  * [+f906956] fix weird selenium bug in file uploads with clicks being eaten
+  * [+5f9fe9f] make wait_for_ajax and wait_for_animations not poll any more
+  * [+fd91a24] fix selenium spec that relied on window geometry
+  * [+def9816] add specific permissions for concluding courses, and managing sections
+  * [+9dad5ca] fixes qti file importing for packages without full path references
+  * [+859bdd2] fix race condition in files collaboration selenium spec
+  * [+4492d22] fix duplicated notification policies showing for new accounts; fixes #6247
+  * [+61887e1] fix InfoController#health_check for sqlite
+  * [+d21d816] fix conversations selenium spec race conditions
+  * [+9224f6b] make rake js:test task fail when a qunit test fails
+  * [+0fa7d2d] pull user information from server in conversation user_id links
+  * [+3e500da] fix calendar event selenium spec
+  * [+fc8e05e] fix bug in file uploads selenium spec
+  * [+17443b3] work around a rare race condition in the wiki selenium spec
+  * [+720079f] fix spelling of vertical-gradient mixin.
+  * [+b15b7bf] optimize gradebook uploads refs #6088
+  * [+1b754db] fix wiki selenium spec that failed intermittently
+  * [+631924d] fix user api json response having duplicate login_id keys
+  * [+cc26d1e] don't return description of locked assignments in the API
+  * [+0a2df3c] blti extensions in common cartridge export/import
+  * [+52e2dc7] allow module progression when background job hasn't finished
+  * [+07e6b44] don't fail when parsing empty question feedbacks
+  * [+f39c453] cleaning up grade exchange
+  * [+2a6e1f0] fixing intermittently broken spec
+  * [+1fd4d60] allow test http server to receive multiple requests
+  * [+03bf11f] don't show muted quiz scores on the quiz index page
+  * [+398ade7] don't show the submission score in the coming up tooltip when muted
+  * [+efa93fc] hide existing stream items when an assignment is muted
+  * [+a9a9c67] fix taking a quiz with an access code
+  * [+17c07f3] try_rescue speedup
+  * [+032a317] use defined discussion formats in assignment and submission apis
+  * [+57e85e2] don't fail if common cartridge manifest lists file twice
+  * [+0b79afb] don't prepend any /login json responses
+  * [+fb8d2a9] change api_per_page to a setting instead of hard-coded value.
+  * [+43c5f0e] when searching for existing users, also search trusted accounts closes #6534
+  * [+61c8670] add support for specifying domain root account to api spec helper
+  * [+e7d4fa2] don't treat a user with multiple pseudonyms as a dup
+  * [+a2af176] save "new" pseudonyms if they've changed, not just if they're new
+  * [+f15f39f] require an active pseudonym trusted by the target account fixes #6536
+  * [+f06f689] don't forget where you're going when site admin privileges are required
+  * [+82325cb] update total and group percentages on cell update
+  * [+ec6cd62] add opt-in button for gradebook2
+  * [+4e0ce77] AccountAuthorizationConfig#update_all as API
+  * [+b40e064] stricter checks to avoid casting error
+  * [+d82a2e4] create admin API call
+  * [+c82324b] fix up lockdown browser launching with new quiz csrf protection
+  * [+8b9edfa] work around more ipad speedgrader json calls
+  * [+a86d05f] fix gradebook grade publishing links
+  * [+ff134c4] don't queue job for attachments that won't be scribd anyway
+  * [+fc49df8] fix auto-confirm after login for merging closes #6643
+  * [+4d3fb35] don't delete enrollments for students with multiple in the same course
+  * [+d9f711e] default values to match the JSON.parse behavior
+  * [+e480df2] improve data hygiene in GradingStandards
+  * [+0c0d1f0] Not indicating questions answered fixes #6655
+  * [+f8fc9ed] force download of attachments in conversations. fixes #6492
+  * [+d56dcb8] prevent infinite recursion in ie8 in quizzes
+  * [+d481624] fix error clicking forgot password fixes #6573
+  * [+b629250] refactor not-this-account logins a little
+  * [+74f52ff] allow access to authentication settings for site admin
+  * [+920f7bc] Revert "add id to wiki page urls. fixes #2635."
+  * [+7397569] require an active pseudonym (in the applicable account) for API requests
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 22 Dec 2011 10:06:16 -0700
+
 canvas-lms (2011.12.10.11.42) stable; urgency=low
 
   * Package ref: 3d3c699e836ab39309504e9fbbc7bad34947166b
