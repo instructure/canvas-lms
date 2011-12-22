@@ -746,7 +746,7 @@ class Attachment < ActiveRecord::Base
       # quote the filename string, though.
       raw_filename = self.display_name
       quoted_filename = raw_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
-      quoted_filename = "\"#{quoted_filename}\"" unless quoted_filename == raw_filename
+      quoted_filename = "\"#{quoted_filename}\""
       self.cached_s3_url = authenticated_s3_url(:expires_in => 144.hours,
         'response-content-disposition' => "attachment; filename=#{quoted_filename}")
       self.s3_url_cached_at = Time.now
