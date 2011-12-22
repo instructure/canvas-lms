@@ -580,4 +580,122 @@ describe CoursesController do
       @enrollment.should be_active
     end
   end
+
+  describe "GET 'sis_publish_status'" do
+    it 'should check for authorization' do
+      course_with_student_logged_in :active_all => true
+      get 'sis_publish_status', :course_id => @course.id
+      response.status.should =~ /401 Unauthorized/
+    end
+
+    it 'should not try and publish grades' do
+      Course.any_instance.expects(:publish_final_grades).times(0)
+      course_with_teacher_logged_in :active_all => true
+      get 'sis_publish_status', :course_id => @course.id
+      response.should be_success
+      json_parse(response.body).should == {"sis_publish_overall_status" => "unpublished", "sis_publish_statuses" => {}}
+    end
+
+    it 'should return reasonable json for a few enrollments' do
+      course_with_teacher_logged_in :active_all => true
+      students = [
+          student_in_course({:course => @course, :active_all => true}),
+          student_in_course({:course => @course, :active_all => true}),
+          student_in_course({:course => @course, :active_all => true})
+        ]
+      students[0].tap do |enrollment|
+        enrollment.grade_publishing_status = "published"
+        enrollment.save!
+      end
+      students[1].tap do |enrollment|
+        enrollment.grade_publishing_status = "error"
+        enrollment.grade_publishing_message = "cause of this reason"
+        enrollment.save!
+      end
+      students[2].tap do |enrollment|
+        enrollment.grade_publishing_status = "published"
+        enrollment.save!
+      end
+      get 'sis_publish_status', :course_id => @course.id
+      response.should be_success
+      response_body = json_parse(response.body)
+      response_body["sis_publish_statuses"]["Published"].sort!{|x,y|x["id"] <=> y["id"]}
+      response_body.should == {
+          "sis_publish_overall_status" => "error",
+          "sis_publish_statuses" => {
+              "Error: cause of this reason" => [
+                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[1].user), "id"=>students[1].user.id}
+                ],
+              "Published" => [
+                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[0].user), "id"=>students[0].user.id},
+                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[2].user), "id"=>students[2].user.id}
+                ].sort_by{|x|x["id"]}
+            }
+        }
+    end
+  end
+
+  describe "POST 'publish_to_sis'" do
+    it "should publish grades and return results" do
+      course_with_teacher_logged_in :active_all => true
+      @teacher = @user
+      students = [
+          student_in_course({:course => @course, :active_all => true}),
+          student_in_course({:course => @course, :active_all => true}),
+          student_in_course({:course => @course, :active_all => true})
+        ]
+      students[0].tap do |enrollment|
+        enrollment.grade_publishing_status = "published"
+        enrollment.save!
+      end
+      students[1].tap do |enrollment|
+        enrollment.grade_publishing_status = "error"
+        enrollment.grade_publishing_message = "cause of this reason"
+        enrollment.save!
+      end
+      students[2].tap do |enrollment|
+        enrollment.grade_publishing_status = "published"
+        enrollment.save!
+      end
+
+      server, server_thread, post_lines = start_test_http_server
+      @plugin = Canvas::Plugin.find!('grade_export')
+      @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+      @ps.posted_settings = @plugin.default_settings.merge({
+          :format_type => "instructure_csv",
+          :wait_for_success => "no",
+          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+        })
+      @ps.save!
+
+      @course.assignment_groups.create(:name => "Assignments")
+      @course.grading_standard_enabled = true
+      @course.save!
+      a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
+      a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
+      a1.grade_student(students[0].user, { :grade => "9", :grader => @teacher })
+      a2.grade_student(students[0].user, { :grade => "10", :grader => @teacher })
+      a1.grade_student(students[1].user, { :grade => "6", :grader => @teacher })
+      a2.grade_student(students[1].user, { :grade => "7", :grader => @teacher })
+
+      post "publish_to_sis", :course_id => @course.id
+
+      server_thread.join
+
+      response.should be_success
+      response_body = json_parse(response.body)
+      response_body["sis_publish_statuses"]["Published"].sort!{|x,y|x["id"] <=> y["id"]}
+      response_body.should == {
+          "sis_publish_overall_status" => "published",
+          "sis_publish_statuses" => {
+              "Published" => [
+                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[0].user), "id"=>students[0].user.id},
+                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[1].user), "id"=>students[1].user.id},
+                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[2].user), "id"=>students[2].user.id}
+                ].sort_by{|x|x["id"]}
+            }
+        }
+    end
+
+  end
 end

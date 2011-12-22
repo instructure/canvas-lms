@@ -320,6 +320,29 @@ describe User do
     ]
   end
 
+  it "should delete the user transactionally in case the pseudonym removal fails" do
+    user_with_managed_pseudonym
+    @pseudonym.should be_managed_password
+    @user.workflow_state.should == "pre_registered"
+    lambda { @user.destroy }.should raise_error("Cannot delete system-generated pseudonyms")
+    @user.workflow_state.should == "deleted"
+    @user.reload
+    @user.workflow_state.should == "pre_registered"
+    @account.account_authorization_config.destroy
+    @pseudonym.should_not be_managed_password
+    @user.destroy
+    @user.workflow_state.should == "deleted"
+    @user.reload
+    @user.workflow_state.should == "deleted"
+    user_with_managed_pseudonym
+    @pseudonym.should be_managed_password
+    @user.workflow_state.should == "pre_registered"
+    @user.destroy(true)
+    @user.workflow_state.should == "deleted"
+    @user.reload
+    @user.workflow_state.should == "deleted"
+  end
+
   context "move_to_user" do
     it "should delete the old user" do
       @user1 = user_model
@@ -1074,6 +1097,131 @@ describe User do
       u.email_channel.should be_nil
       active = u.communication_channels.build(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
       u.email_channel.should == active
+    end
+  end
+
+  describe "sis_pseudonym_for" do
+    it "should return active pseudonyms only" do
+      course :active_all => true, :account => Account.default
+      u = User.create!
+      u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'deleted'; x.sis_user_id = "user2"; x.save!}
+      u.sis_pseudonym_for(@course).should be_nil
+      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user1"; x.save!}
+      u.sis_pseudonym_for(@course).should == @p
+    end
+
+    it "should return pseudonyms in the right account" do
+      course :active_all => true, :account => Account.default
+      other_account = account_model
+      u = User.create!
+      u.pseudonyms.new(:account => other_account, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user1"; x.save!}
+      u.sis_pseudonym_for(@course).should be_nil
+      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user2"; x.save!}
+      u.sis_pseudonym_for(@course).should == @p
+    end
+
+    it "should return pseudonyms with a sis id only" do
+      course :active_all => true, :account => Account.default
+      u = User.create!
+      u.pseudonyms.new(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.save!}
+      u.sis_pseudonym_for(@course).should be_nil
+      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user2"; x.save!}
+      u.sis_pseudonym_for(@course).should == @p
+    end
+
+    it "should find the right root account for a course" do
+      @account = account_model
+      course :active_all => true, :account => @account
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@course).should == 42
+    end
+
+    it "should find the right root account for a group" do
+      @account = account_model
+      course :active_all => true, :account => @account
+      @group = group :group_context => @course
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@group).should == 42
+    end
+
+    it "should find the right root account for a non-root-account" do
+      @root_account = account_model
+      @account = @root_account.sub_accounts.create!
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@root_account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@account).should == 42
+    end
+
+    it "should find the right root account for a root account" do
+      @account = account_model
+      u = User.create!
+      pseudonyms = mock()
+      u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:active).returns(pseudonyms)
+      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
+      u.sis_pseudonym_for(@account).should == 42
+    end
+
+    it "should bail if it can't find a root account" do
+      context = Course.new # some context that doesn't have an account
+      (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+    end
+  end
+
+  describe "flag_as_admin" do
+    it "should add an AccountUser" do
+      @account = account_model
+      u = User.create!
+      u.account_users.should be_empty
+      u.flag_as_admin(@account)
+      u.reload
+      u.account_users.size.should == 1
+      admin = u.account_users.first
+      admin.account.should == @account
+    end
+
+    it "should default to the AccountAdmin membership type" do
+      @account = account_model
+      u = User.create!
+      u.flag_as_admin(@account)
+      u.reload
+      admin = u.account_users.first
+      admin.membership_type.should == 'AccountAdmin'
+    end
+
+    it "should respect a provided membership type" do
+      @account = account_model
+      u = User.create!
+      u.flag_as_admin(@account, "CustomAccountUser")
+      u.reload
+      admin = u.account_users.first
+      admin.membership_type.should == 'CustomAccountUser'
+    end
+
+    it "should send an account registration email for users that haven't registered yet" do
+      AccountUser.any_instance.expects(:account_user_registration!)
+      @account = account_model
+      u = User.create!
+      u.flag_as_admin(@account)
+    end
+
+    it "should send the pre-registered account registration email for users the have already registered" do
+      AccountUser.any_instance.expects(:account_user_notification!)
+      @account = account_model
+      u = User.create!
+      u.register
+      u.flag_as_admin(@account)
     end
   end
 end

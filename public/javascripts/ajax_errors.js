@@ -64,7 +64,7 @@ window.onerror = function (msg, url, line) {
   // we're going to ignore errors generated from javascript that isn't served from canvas.
   // this prevents a whole ton of errors about not being able to load google
   // analytics because of firewall rules, etc.
-  if (!url.match(window.location.hostname)) {
+  if (url && url.match && !url.match(window.location.hostname)) {
     return true;
   }
 

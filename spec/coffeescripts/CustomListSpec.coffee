@@ -73,13 +73,13 @@ define [
   asyncTest 'should reset', 2, ->
     originalLength = @list.targetList.children().length
     simulateClick @lis[0]
+
     setTimeout =>
       ok originalLength isnt @list.targetList.children().length, 'length should be different'
 
-      button = jQuery('.customListRestore')[0]
-      simulateClick button
+      @list.reset()
       length = @list.targetList.children().length
       equal length, originalLength, 'targetList items restored'
       start()
-    , 600
+    , 300
 

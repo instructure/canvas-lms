@@ -214,8 +214,23 @@ describe AssignmentsApiController, :type => :integration do
           { :controller => 'assignments_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
             :id => @assignment.id.to_s, })
-    json['discussion_topic']['id'].should == @topic.id
-    json['discussion_topic']['url'].should == "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    json['discussion_topic'].should == {
+      'id' => @topic.id,
+      'title' => 'assignment1',
+      'message' => nil,
+      'posted_at' => @topic.posted_at.as_json,
+      'last_reply_at' => @topic.last_reply_at.as_json,
+      'require_initial_post' => nil,
+      'discussion_subentry_count' => 0,
+      'assignment_id' => @assignment.id,
+      'delayed_post_at' => nil,
+      'user_name' => @topic.user_name,
+      'topic_children' => [],
+      'root_topic_id' => @topic.root_topic_id,
+      'podcast_url' => nil,
+      'url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+      'attachments' => [],
+    }
   end
 
   it "should return the mute status of the assignment" do
@@ -229,5 +244,20 @@ describe AssignmentsApiController, :type => :integration do
         :format => "json", :course_id => @course.id.to_s,
         :id => @assignment.id.to_s })
     json["muted"].should eql false
+  end
+
+  it "should not return the assignment description if locked for user" do
+    course_with_student(:active_all => true)
+    @assignment1 = @course.assignments.create! :title => "Test Assignment", :description => "public stuff"
+    @assignment2 = @course.assignments.create! :title => "Locked Assignment", :description => "secret stuff"
+    @assignment2.any_instantiation.expects(:locked_for?).returns(true)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments.json",
+          { :controller => 'assignments_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s })
+    json.size.should == 2
+    json.find { |e| e['name'] == "Test Assignment" }['description'].should == "public stuff"
+    json.find { |e| e['name'] == "Locked Assignment" }['description'].should be_nil
   end
 end

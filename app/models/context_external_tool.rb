@@ -69,6 +69,19 @@ class ContextExternalTool < ActiveRecord::Base
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
+    
+    settings.delete(:user_navigation) if settings[:user_navigation] && (!settings[:user_navigation][:url])
+    settings.delete(:course_navigation) if settings[:course_navigation] && (!settings[:course_navigation][:url])
+    settings.delete(:account_navigation) if settings[:account_navigation] && (!settings[:account_navigation][:url])
+    settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:url] || !settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
+    settings.delete(:editor_button) if settings[:editor_button] && (!settings[:editor_button][:url] || !settings[:editor_button][:icon_url])
+    [:resource_selection, :editor_button].each do |type|
+      if settings[type]
+        settings[type][:selection_width] = settings[type][:selection_width].to_i
+        settings[type][:selection_height] = settings[type][:selection_height].to_i
+      end
+    end
+
     self.has_user_navigation = !!settings[:user_navigation]
     self.has_course_navigation = !!settings[:course_navigation]
     self.has_account_navigation = !!settings[:account_navigation]
@@ -282,6 +295,7 @@ class ContextExternalTool < ActiveRecord::Base
     item.privacy_level = hash[:privacy_level] || 'name_only'
     item.consumer_key = 'fake'
     item.shared_secret = 'fake'
+    item.settings = hash[:settings].with_indifferent_access if hash[:settings].is_a?(Hash)
     if hash[:custom_fields].is_a? Hash
       item.settings[:custom_fields] ||= {}
       item.settings[:custom_fields].merge! hash[:custom_fields] 

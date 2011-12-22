@@ -42,25 +42,56 @@ describe AssessmentQuestion do
     course
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
 
-    data = {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]}
+    @attachments = {}
+    attachment_tag = lambda {|key|
+      @attachments[key] ||= []
+      a = @course.attachments.build(:filename => "foo-#{key}.gif")
+      a.content_type = 'image/gif'
+      a.save!
+      @attachments[key] << a
+      "<img src=\"/courses/#{@course.id}/files/#{a.id}/download\">"
+    }
+    data = {
+      :name => 'test question',
+      :question_type => 'multiple_choice_question',
+      :question_text => "which ones are like this one? #{attachment_tag.call("[:question_text]")} what about: #{attachment_tag.call("[:question_text]")}",
+      :correct_comments => "yay! #{attachment_tag.call("[:correct_comments]")}",
+      :incorrect_comments => "boo! #{attachment_tag.call("[:incorrect_comments]")}",
+      :neutral_comments => "meh. #{attachment_tag.call("[:neutral_comments]")}",
+      :text_after_answers => "oh btw #{attachment_tag.call("[:text_after_answers]")}",
+      :answers => [
+        { :weight => 1, :text => "A",
+          :html => "A #{attachment_tag.call("[:answers][0][:html]")}",
+          :comments_html => "yeppers #{attachment_tag.call("[:answers][0][:comments_html]")}" },
+        { :weight => 1, :text => "B",
+          :html => "B #{attachment_tag.call("[:answers][1][:html]")}",
+          :comments_html => "yeppers #{attachment_tag.call("[:answers][1][:comments_html]")}" }
+      ]
+    }
+
+    serialized_data_before = Marshal.dump(data)
+
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    @attachment1 = attachment_with_context(@course)
-    @attachment2 = attachment_with_context(@course)
+    @attachments.each {|k, ary| ary.each {|a| a.reload; a.cloned_item.attachments.length.should == 2 } }
+    @attachment_clones = Hash[@attachments.map{|k, ary| [k, ary.map {|a| a.cloned_item.attachments.last }]}]
 
-    data['question_text'] = "This url should be translated: <img src='/courses/#{@course.id}/files/#{@attachment1.id}/download'> and so should this one: <img src='/courses/#{@course.id}/files/#{@attachment2.id}/download'>"
-    @question.question_data = data
-    @question.save
-
-    @attachment1.reload
-    @attachment2.reload
-    @question.reload
-
-    @attachment1.cloned_item.attachments.length.should == 2
-    @attachment2.cloned_item.attachments.length.should == 2
-    @clone1 = @attachment1.cloned_item.attachments.last
-    @clone2 = @attachment2.cloned_item.attachments.last
-
-    @question.question_data['question_text'].should match %r{'/assessment_questions/#{@question.id}/files/#{@clone1.id}/download\?verifier=#{@clone1.uuid}'.*'/assessment_questions/#{@question.id}/files/#{@clone2.id}/download\?verifier=#{@clone2.uuid}'}
+    @attachment_clones.each do |key, ary|
+      string = eval "@question.question_data#{key}"
+      matches = string.scan %r{/assessment_questions/\d+/files/\d+/download\?verifier=\w+}
+      matches.length.should == ary.length
+      matches.each_with_index do |match, index|
+        a = ary[index]
+        match.should == "/assessment_questions/#{@question.id}/files/#{a.id}/download\?verifier=#{a.uuid}"
+      end
+    end
+    
+    # the original data hash should not have changed during the link translation
+    serialized_data_after = Marshal.dump(data)
+    serialized_data_before.should == serialized_data_after
+  end
+  
+  it "should not modify the question_data hash in place when translating links" do
+    
   end
 end

@@ -17,16 +17,18 @@
 #
 
 module Api::V1::Submission
+  include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::DiscussionTopics
 
-  def submission_json(submission, assignment, context = nil, includes = [])
+  def submission_json(submission, assignment, user, session, context = nil, includes = [])
     context ||= assignment.context
-    hash = submission_attempt_json(submission, assignment, nil, context)
+    hash = submission_attempt_json(submission, assignment, user, session, nil, context)
 
     if includes.include?("submission_history")
       hash['submission_history'] = []
       submission.submission_history.each_with_index do |ver, idx|
-        hash['submission_history'] << submission_attempt_json(ver, assignment, idx, context)
+        hash['submission_history'] << submission_attempt_json(ver, assignment, user, session, idx, context)
       end
     end
 
@@ -52,7 +54,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("assignment")
-      hash['assignment'] = assignment_json(assignment)
+      hash['assignment'] = assignment_json(assignment, user, session)
     end
 
     hash
@@ -61,7 +63,7 @@ module Api::V1::Submission
   SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
 
-  def submission_attempt_json(attempt, assignment, version_idx = nil, context = nil)
+  def submission_attempt_json(attempt, assignment, user, session, version_idx = nil, context = nil)
     context ||= assignment.context
 
     json_fields = SUBMISSION_JSON_FIELDS
@@ -80,9 +82,7 @@ module Api::V1::Submission
       other_fields -= params[:exclude_response_fields]
     end
 
-    hash = attempt.as_json(
-      :include_root => false,
-      :only => json_fields)
+    hash = api_json(attempt, user, session, :only => json_fields)
 
     hash['preview_url'] = course_assignment_submission_url(
       @context, assignment, attempt[:user_id], 'preview' => '1',
@@ -118,17 +118,7 @@ module Api::V1::Submission
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
       end
-      hash['discussion_entries'] = entries.map do |entry|
-        ehash = entry.as_json(
-          :include_root => false,
-          :only => %w(message user_id created_at updated_at)
-        )
-        attachments = (entry.attachments.dup + [entry.attachment]).compact
-        ehash['attachments'] = attachments.map do |attachment|
-          attachment_json(attachment)
-        end.compact unless attachments.blank?
-        ehash
-      end
+      hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
 
     hash

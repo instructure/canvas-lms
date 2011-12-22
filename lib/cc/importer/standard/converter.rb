@@ -49,8 +49,7 @@ module CC::Importer::Standard
       check_metadata_namespaces
 
       get_all_resources(@manifest)
-      @course[:file_map] = create_file_map
-      @course[:file_map].values.each {|f|@file_path_migration_id[f[:path_name]] = f[:migration_id]}
+      create_file_map
       @course[:discussion_topics] = convert_discussions
       @course[:external_tools] = convert_blti_links(resources_by_type("imsbasiclti"))
       @course[:assessment_questions], @course[:assessments] = convert_quizzes
@@ -77,6 +76,20 @@ module CC::Importer::Standard
     
     def get_canvas_att_replacement_url(path)
       "$CANVAS_OBJECT_REFERENCE$/attachments/#{find_file_migration_id(path)}"
+    end
+
+    def add_file(file)
+      @course[:file_map][file[:migration_id]] = file
+    end
+
+    def add_course_file(file, overwrite=false)
+      if @file_path_migration_id[file[:path_name]] && overwrite
+        @course[:file_map].delete @file_path_migration_id[file[:path_name]]
+      elsif @file_path_migration_id[file[:path_name]]
+        return
+      end
+      @file_path_migration_id[file[:path_name]] = file[:migration_id]
+      add_file(file)
     end
     
     def get_all_resources(manifest)

@@ -34,7 +34,6 @@ class CalendarEventsController < ApplicationController
       log_asset_access(@event, "calendar", "calendar")
       respond_to do |format|
         format.html { render :action => 'new' }
-        format.xml  { render :xml => @event.to_xml }
         format.json { render :json => @event.to_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end
@@ -60,11 +59,9 @@ class CalendarEventsController < ApplicationController
         if @event.save
           flash[:notice] = t 'notices.created', "Event was successfully created."
           format.html { redirect_to calendar_url_for(@context) }
-          format.xml  { head :created, :location => named_context_url(@context, :context_calendar_url) }
           format.json { render :json => @event.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
           format.html { render :action => "new" }
-          format.xml  { render :xml => @event.errors.to_xml }
           format.json { render :json => @event.errors.to_json, :status => :bad_request }
         end
       end
@@ -94,11 +91,9 @@ class CalendarEventsController < ApplicationController
           log_asset_access(@event, "calendar", "calendar", 'participate')
           flash[:notice] = t 'notices.updated', "Event was successfully updated."
           format.html { redirect_to calendar_url_for(@context) }
-          format.xml  { head :ok }
           format.json { render :json => @event.to_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @event.errors.to_xml }
           format.json { render :json => @event.errors.to_json, :status => :bad_request }
         end
       end
@@ -111,7 +106,6 @@ class CalendarEventsController < ApplicationController
       @event.destroy
       respond_to do |format|
         format.html { redirect_to calendar_url_for(@context) }
-        format.xml  { head :ok }
         format.json { render :json => @event.to_json, :status => :ok }
       end
     end

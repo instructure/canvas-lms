@@ -40,4 +40,13 @@ module HasContentTags
     klass.send(:after_save, :update_associated_content_tags_later)
     klass.send(:before_save, :check_if_associated_content_tags_need_updating)
   end
+  
+  def locked_cache_key(user)
+    ['_locked_for', self, user].cache_key
+  end
+  
+  def clear_locked_cache(user)
+    Rails.cache.delete locked_cache_key(user)
+  end
+
 end

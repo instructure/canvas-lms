@@ -167,30 +167,30 @@ describe "editing external tools" do
     
     keep_trying_until { driver.find_elements(:css, "#resource_selection_dialog")[0].try(:displayed?) }
     
-    in_frame('resource_selection_iframe') do
-      keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
-      driver.find_elements(:css, ".link").length.should == 4
-      driver.find_element(:css, "#bad_url_basic_lti_link").click
+    expect_fired_alert do
+      in_frame('resource_selection_iframe') do
+        keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
+        driver.find_elements(:css, ".link").length.should == 4
+        driver.find_element(:css, "#bad_url_basic_lti_link").click
+      end
     end
     
-    driver.switch_to.alert.accept
-    
     driver.find_element(:css, "#resource_selection_dialog").should_not be_displayed
-    
+  
     driver.find_element(:css, "#external_tool_create_url").attribute('value').should == ""
     driver.find_element(:css, "#external_tool_create_title").attribute('value').should == ""
 
     tools[0].click
-    
+  
     keep_trying_until { driver.find_elements(:css, "#resource_selection_dialog")[0].try(:displayed?) }
     
-    in_frame('resource_selection_iframe') do
-      keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
-      driver.find_elements(:css, ".link").length.should == 4
-      driver.find_element(:css, "#no_url_basic_lti_link").click
+    expect_fired_alert do
+      in_frame('resource_selection_iframe') do
+        keep_trying_until{ driver.find_elements(:css, "#basic_lti_link").length > 0 }
+        driver.find_elements(:css, ".link").length.should == 4
+        driver.find_element(:css, "#no_url_basic_lti_link").click
+      end
     end
-    
-    driver.switch_to.alert.accept
     
     driver.find_element(:css, "#resource_selection_dialog").should_not be_displayed
     

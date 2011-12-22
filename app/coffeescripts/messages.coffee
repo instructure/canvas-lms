@@ -361,6 +361,23 @@ class TokenSelector
           @clear_loading()
     , 100
 
+  add_by_user_id: (user_id, from_conversation_id) ->
+    @set_loading()
+    $.ajaxJSON @url, 'POST', { user_id: user_id, from_conversation_id: from_conversation_id },
+      (data) =>
+        @clear_loading()
+        @close()
+        user = data[0]
+        if user
+          @input.add_token
+            value: user.id
+            text: user.name
+            data: user
+      ,
+      (data) =>
+        @clear_loading()
+        @close()
+
   open: ->
     @container.show()
     @reposition()
@@ -670,9 +687,9 @@ I18n.scoped 'conversations', (I18n) ->
     if $selected_conversation
       $selected_conversation.scrollIntoView()
     else
-      if params.user_id and params.user_name
-        $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name, data: {id: params.user_id, name: params.user_name, can_add_notes: params.can_add_notes}
+      if params.user_id
         $('#from_conversation_id').val(params.from_conversation_id)
+        $('#recipients').data('token_input').selector.add_by_user_id(params.user_id, params.from_conversation_id)
       return
 
     $form.loadingImage()
@@ -1676,7 +1693,7 @@ I18n.scoped 'conversations', (I18n) ->
         scrape: (data) ->
           if typeof(data) == 'string'
             try
-              data = $.parseJSON(data)
+              data = $.parseJSON(data) || []
             catch error
               data = []
             for conversation in data

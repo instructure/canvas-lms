@@ -177,8 +177,10 @@ class ActiveRecord::Base
       if self.respond_to?(:filter_attributes_for_user)
         self.filter_attributes_for_user(obj_hash, options[:permissions][:user], options[:permissions][:session])
       end
-      permissions_hash = self.grants_rights?(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
-      obj_hash["permissions"] = permissions_hash
+      unless options[:permissions][:include_permissions] == false
+        permissions_hash = self.grants_rights?(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
+        obj_hash["permissions"] = permissions_hash
+      end
     end
 
     self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)

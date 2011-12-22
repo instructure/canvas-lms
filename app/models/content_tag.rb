@@ -193,7 +193,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def sync_title_to_asset_title?
-    self.tag_type != "learning_outcome_association" && self.content_type != 'ContextExternalTool'
+    self.tag_type != "learning_outcome_association" && !['ContextExternalTool', 'Attachment'].member?(self.content_type)
   end
   
   def context_module_action(user, action, points=nil)
