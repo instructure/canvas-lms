@@ -969,7 +969,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_account_management(on_root_account = false)
-    if (@context.root_account != nil && on_root_account) || !@context.is_a?(Account)
+    if (!@context.root_account? && on_root_account) || !@context.is_a?(Account)
       redirect_to named_context_url(@context, :context_url)
       return false
     else

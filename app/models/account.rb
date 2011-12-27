@@ -151,7 +151,7 @@ class Account < ActiveRecord::Base
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
           opts = account_settings_options[key.to_sym]
-          if (opts[:root_only] && root_account_id) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
+          if (opts[:root_only] && !self.root_account?) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
             settings.delete key.to_sym
           elsif opts[:boolean]
             settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
@@ -613,7 +613,7 @@ class Account < ActiveRecord::Base
   
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
-    unless self.root_account_id
+    if self.root_account?
       @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     end
   end
@@ -755,17 +755,7 @@ class Account < ActiveRecord::Base
       pseudonym.save!
     end
   end
-  
-  def self.root_account_id_for(obj)
-    res = nil
-    if obj.respond_to?(:root_account_id)
-      res = obj.root_account_id
-    elsif obj.respond_to?(:context)
-      res = obj.context.root_account_id rescue nil
-    end
-    raise "Root account ID is undiscoverable for #{obj.inspect}" unless res
-  end
-  
+
   def course_count
     self.child_courses.not_deleted.count('DISTINCT course_id')
   end
@@ -1052,24 +1042,12 @@ class Account < ActiveRecord::Base
     root_account.grants_right?(user, session, :manage_user_logins)
   end
 
-  named_scope :sis_sub_accounts, lambda{|account, *sub_account_source_ids|
-    {:conditions => {:root_account_id => account.id, :sis_source_id => sub_account_source_ids}, :order => :sis_source_id}
-  }
-  named_scope :root_accounts, lambda{
-    {:conditions => {:root_account_id => nil} }
-  }
-  named_scope :needs_parent_account, lambda{|account, limit|
-    {:conditions => {:parent_account_id => nil, :root_account_id => account.id}, :limit => limit }
-  }
-  named_scope :processing_sis_batch, lambda{ 
-    {:conditions => ['accounts.current_sis_batch_id IS NOT NULL'], :order => :updated_at}
-  }
+  named_scope :root_accounts, :conditions => {:root_account_id => nil}
+  named_scope :processing_sis_batch, :conditions => ['accounts.current_sis_batch_id IS NOT NULL'], :order => :updated_at
   named_scope :name_like, lambda { |name|
     { :conditions => wildcard('accounts.name', name) }
   }
-  named_scope :active, lambda {
-    { :conditions => ['accounts.workflow_state != ?', 'deleted'] }
-  }
+  named_scope :active, :conditions => ['accounts.workflow_state != ?', 'deleted']
   named_scope :limit, lambda {|limit|
     {:limit => limit}
   }

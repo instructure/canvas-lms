@@ -83,7 +83,7 @@
               </td>
             </tr>
             <% end %>
-            <% if @account.root_account_id == nil %>
+            <% if @account.root_account? %>
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>
                 <td>
@@ -282,7 +282,7 @@
           </fieldset>
         <% end %>
 
-        <% if @account.root_account_id == nil and not Account.services_exposed_to_ui_hash.empty? %>
+        <% if @account.root_account? and not Account.services_exposed_to_ui_hash.empty? %>
           <fieldset>
             <legend><%= t(:enabled_web_serices_title, "Enabled Web Services") %></legend>
             <% f.fields_for :services do |services| %>

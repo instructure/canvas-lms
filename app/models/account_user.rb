@@ -20,7 +20,6 @@ class AccountUser < ActiveRecord::Base
   belongs_to :account
   belongs_to :user
   has_many :role_overrides, :as => :context
-  has_many :all_account_courses, :class_name => 'Course', :foreign_key => 'root_account_id', :primary_key => 'account_id'
   has_a_broadcast_policy
   before_save :infer_defaults
   before_save :set_update_account_associations_if_changed
