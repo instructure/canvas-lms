@@ -36,6 +36,8 @@ describe Quiz do
   it "should set the due time to 11:59pm if only given a date" do
     params = { :quiz => { :title => "Test Quiz", :due_at => Time.zone.today.to_s } }
     q = @course.quizzes.create!(params[:quiz])
+    q.due_at.should be_an_instance_of ActiveSupport::TimeWithZone
+    q.due_at.time_zone.should == Time.zone
     q.due_at.hour.should eql 23
     q.due_at.min.should eql 59
   end
@@ -55,6 +57,17 @@ describe Quiz do
     quiz.due_at.zone.should eql 'AKST'
     quiz.due_at.hour.should eql 23
     quiz.due_at.min.should eql 59
+  end
+  
+  it "should set the due date time correctly" do
+    time_string = "Dec 30, 2011 12:00 pm"
+    expected = "Fri Dec 30 19:00:00 UTC 2011"
+    Time.zone = "Mountain Time (US & Canada)"
+    quiz = @course.quizzes.create(:title => "sad quiz", :due_at => time_string, :lock_at => time_string, :unlock_at => time_string)
+    quiz.due_at.utc.to_s.should == expected
+    quiz.lock_at.utc.to_s.should == expected
+    quiz.unlock_at.utc.to_s.should == expected
+    Time.zone = nil
   end
 
   it "should initialize with default settings" do
