@@ -1,3 +1,11 @@
+canvas-lms (2011.12.27.10.37) testing; urgency=low
+
+  * Package ref: e72e7399cc748cd58f5d44aaf46ece9dc1cb008e
+  *
+  * [+e72e739] always wrap content-disposition-filename in quotes
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 27 Dec 2011 10:37:46 -0700
+
 canvas-lms (2011.12.21.13.29) testing; urgency=low
 
   * Package ref: 7397569e560a055c4a36d56b30f824565834fdcf
