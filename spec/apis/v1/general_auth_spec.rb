@@ -93,23 +93,6 @@ describe CoursesController, :type => :integration do
       'login_id' => nil,
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
     }
-
-    # as_user_id is ignored if it's not allowed
-    @user = @student
-    user_with_pseudonym(:user => @user, :username => "nobody2@example.com")
-    raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
-             :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
-    assigns['current_user'].should == @student
-    assigns['real_current_user'].should be_nil
-    json.should == {
-      'id' => @student.id,
-      'name' => 'User',
-      'sortable_name' => 'User',
-      'short_name' => 'User',
-      'primary_email' => nil,
-      'login_id' => nil,
-      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-    }
   end
 
   it "should allow sis_user_id as an as_user_id" do
@@ -131,6 +114,26 @@ describe CoursesController, :type => :integration do
       'login_id' => 'nobody_sis@example.com',
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
     }
+  end
+
+  it "should not be silent about an unknown as_user_id" do
+    account_admin_user(:account => Account.site_admin)
+    user_with_pseudonym(:user => @user)
+
+    raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:bogus",
+             :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => "sis_user_id:bogus")
+    response.status.should == '401 Unauthorized'
+    JSON.parse(response.body).should == { 'errors' => 'Invalid as_user_id' }
+  end
+
+  it "should not allow non-admins to become other people" do
+    account_admin_user(:account => Account.site_admin)
+
+    @user = @student
+    raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
+             :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
+    response.status.should == '401 Unauthorized'
+    JSON.parse(response.body).should == { 'errors' => 'Invalid as_user_id' }
   end
 
   it "should not prepend the CSRF protection to API requests" do

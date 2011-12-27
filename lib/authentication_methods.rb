@@ -128,14 +128,20 @@ module AuthenticationMethods
 
     as_user_id = api_request? && params[:as_user_id]
     as_user_id ||= session[:become_user_id]
-    begin
-      if as_user_id && (user = api_find(User, as_user_id)) && user.grants_right?(@current_user, session, :become_user)
+    if as_user_id
+      begin
+        user = api_find(User, as_user_id)
+      rescue ActiveRecord::RecordNotFound
+      end
+      if user && user.grants_right?(@current_user, session, :become_user)
         @real_current_user = @current_user
         @current_user = user
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
+      elsif api_request?
+        # fail silently for UI, but not for API
+        render :json => {:errors => "Invalid as_user_id"}, :status => :unauthorized
+        return false
       end
-    rescue ActiveRecord::RecordNotFound
-      # fail silently
     end
 
     @current_user
