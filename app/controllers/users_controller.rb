@@ -193,7 +193,7 @@ class UsersController < ApplicationController
         end
         return_url = session[:masquerade_return_to]
         session[:masquerade_return_to] = nil
-        return return_to(return_url, request.referer)
+        return return_to(return_url, request.referer || dashboard_url)
       end
     end
   end
