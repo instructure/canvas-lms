@@ -2028,7 +2028,7 @@ class Course < ActiveRecord::Base
 
   def clone_for(account, opts={})
     new_course = Course.new
-    root_account = account.root_account || account
+    root_account = account.root_account
     self.attributes.delete_if{|k,v| [:id, :section, :account_id, :workflow_state, :created_at, :updated_at, :root_account_id, :enrollment_term_id, :sis_source_id, :sis_batch_id].include?(k.to_sym) }.each do |key, val|
       new_course.send("#{key}=", val)
     end
@@ -2409,7 +2409,7 @@ class Course < ActiveRecord::Base
   end
   
   def enable_user_notes
-    (root_account || account).enable_user_notes rescue false
+    root_account.enable_user_notes rescue false
   end
   
   def equella_settings

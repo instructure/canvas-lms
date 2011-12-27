@@ -253,11 +253,17 @@ class Account < ActiveRecord::Base
   def root_account?
     !self.root_account_id
   end
-  
+
+  def root_account_with_self
+    return self if self.root_account?
+    root_account_without_self
+  end
+  alias_method_chain :root_account, :self
+
   def sub_accounts_as_options(indent = 0, preloaded_accounts = nil)
     unless preloaded_accounts
       preloaded_accounts = {}
-      (self.root_account || self).all_accounts.active.each do |account|
+      self.root_account.all_accounts.active.each do |account|
         (preloaded_accounts[account.parent_account_id] ||= []) << account
       end
     end
@@ -327,8 +333,7 @@ class Account < ActiveRecord::Base
   end
 
   def file_namespace
-    root = self.root_account || self
-    "account_#{root.id}"
+    "account_#{self.root_account.id}"
   end
   
   def self.account_lookup_cache_key(id)
@@ -568,7 +573,7 @@ class Account < ActiveRecord::Base
     can :read and can :manage and can :update and can :delete
 
     given { |user|
-      root_account = self.root_account || self
+      root_account = self.root_account
       result = false
       site_admin = self.site_admin?
 
@@ -744,14 +749,14 @@ class Account < ActiveRecord::Base
   # points to the new root account as well.
   def consume_account(account)
     account.all_accounts.each do |sub_account|
-      sub_account.root_account = self.root_account || self
+      sub_account.root_account = self.root_account
       sub_account.save!
     end
     account.parent_account = self
-    account.root_account = self.root_account || self
+    account.root_account = self.root_account
     account.save!
     account.pseudonyms.each do |pseudonym|
-      pseudonym.account = self.root_account || self
+      pseudonym.account = self.root_account
       pseudonym.save!
     end
   end
@@ -1033,11 +1038,11 @@ class Account < ActiveRecord::Base
   end
 
   def manually_created_courses_account
-    (self.root_account || self).sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
+    self.root_account.sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
   end
 
   def open_registration_for?(user, session = nil)
-    root_account = self.root_account || self
+    root_account = self.root_account
     return true if root_account.open_registration?
     root_account.grants_right?(user, session, :manage_user_logins)
   end

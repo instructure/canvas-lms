@@ -915,7 +915,7 @@ class User < ActiveRecord::Base
   memoize :courses_with_grades
   
   def sis_pseudonym_for(context)
-    root_account = context.root_account || context
+    root_account = context.root_account
     raise "could not resolve root account" unless root_account.is_a?(Account)
     self.pseudonyms.active.find_by_account_id(root_account.id, :conditions => ["sis_user_id IS NOT NULL"])
   end

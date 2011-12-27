@@ -275,7 +275,7 @@ class Group < ActiveRecord::Base
   def account_id=(new_account_id)
     write_attribute(:account_id, new_account_id)
     if self.account_id_changed?
-      self.root_account = self.account(true).try(:root_account) || self.account
+      self.root_account = self.account(true).try(:root_account)
     end
   end
 

@@ -158,7 +158,7 @@ class UsersController < ApplicationController
   def index
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      @root_account = @context.root_account || @account
+      @root_account = @context.root_account
       @users = []
       @query = (params[:user] && params[:user][:name]) || params[:term]
       if @context && @context.is_a?(Account) && @query
@@ -833,7 +833,7 @@ class UsersController < ApplicationController
   def require_open_registration
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
-    @context = @context.root_account || @context
+    @context = @context.root_account
     if !@context.grants_right?(@current_user, session, :manage_user_logins) && (!@context.open_registration? || !@context.no_enrollments_can_create_courses? || @context != Account.default)
       flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
       respond_to do |format|

@@ -236,7 +236,7 @@ class CountsReport
   end
 
   def is_default_account(account)
-    (account.root_account || account).external_status == ExternalStatuses.default_external_status.to_s
+    account.root_account.external_status == ExternalStatuses.default_external_status.to_s
   end
 
   def new_counts_hash

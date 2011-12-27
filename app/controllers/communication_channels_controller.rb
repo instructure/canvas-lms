@@ -58,7 +58,7 @@ class CommunicationChannelsController < ApplicationController
       @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
       unless @root_account
         account = @user.account_users.first.try(:account)
-        @root_account = account.try(:root_account) || account
+        @root_account = account.try(:root_account)
       end
       @root_account ||= @domain_root_account
 

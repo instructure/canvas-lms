@@ -99,7 +99,7 @@ class AccountsController < ApplicationController
           end
         end
         if sis_id = params[:account].delete(:sis_source_id)
-          if !@account.root_account? && sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
+          if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
               @account.sis_source_id = nil
             else
@@ -144,7 +144,7 @@ class AccountsController < ApplicationController
   end
 
   def confirm_delete_user
-    @root_account = @account.root_account || @account
+    @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)
       @context = @root_account
       @user = @root_account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
@@ -156,7 +156,7 @@ class AccountsController < ApplicationController
   end
   
   def remove_user
-    @root_account = @account.root_account || @account
+    @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)
       @user = UserAccountAssociation.find_by_account_id_and_user_id(@root_account.id, params[:user_id]).user rescue nil
       # if the user is in any account other then the
@@ -185,7 +185,7 @@ class AccountsController < ApplicationController
   end
   
   def load_course_right_side
-    @root_account = @account.root_account || @account
+    @root_account = @account.root_account
     @maximum_courses_im_gonna_show = 100
     @term = nil
     if params[:enrollment_term_id].present?
@@ -387,7 +387,7 @@ class AccountsController < ApplicationController
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list], @context.root_account || @context, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
+      list = UserList.new(params[:user_list], @context.root_account, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
       users = list.users
       account_users = users.map do |user|
         admin = user.flag_as_admin(@context, params[:membership_type])
