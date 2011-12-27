@@ -343,8 +343,25 @@ class ActiveRecord::Serialization::Serializer
 end
 
 class ActiveRecord::Errors
-  def to_json
-    {:errors => @errors}.to_json
+  def as_json(*a)
+    {:errors => @errors}.as_json(*a)
+  end
+end
+
+# We are currently using the ActiveRecord::Errors modification above to return
+# the errors to our javascript in a specific expected format. however, this
+# format was returning the @base attribute of each ActiveRecord::Error, which
+# is a data leakage issue since that's the full json representation of the AR object.
+#
+# This modification removes the @base attribute from the json, which
+# fortunately wasn't being used by our javascript.
+# further development will eventually remove these two modifications
+# completely, and switch our javascript to use the default json formatting of
+# ActiveRecord::Errors
+# See #6733
+class ActiveRecord::Error
+  def as_json(*a)
+    super.slice('attribute', 'type', 'message')
   end
 end
 
