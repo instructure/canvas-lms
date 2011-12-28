@@ -1,3 +1,12 @@
+canvas-lms (2011.12.28.16.31) testing; urgency=low
+
+  * Package ref: 296922fb0c4927aca1b9d4743ed2d4f05d97a25b
+  *
+  * [+f9553bc] correctly account for time zone in quiz#due_at=
+  * [+296922f] Find ePortfolio page attachments by ID. Fixes #6380.
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 28 Dec 2011 16:31:55 -0700
+
 canvas-lms (2011.12.27.10.37) testing; urgency=low
 
   * Package ref: e72e7399cc748cd58f5d44aaf46ece9dc1cb008e
