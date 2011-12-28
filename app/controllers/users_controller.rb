@@ -147,6 +147,14 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API
+  # Retrieve the list of users associated with this account.
+  #
+  # @example_response
+  # [
+  #   { "id": 1, "name": "Dwight Schrute", "sortable_name": "Schrute, Dwight", "short_name": "Dwight", "login_id": "dwight@example.com", "sis_user_id": "12345", "sis_login_id": null },
+  #   { "id": 2, "name": "Gob Bluth", "sortable_name": "Bluth, Gob", "short_name": "Gob Bluth", "login_id": "gob@example.com", "sis_user_id": "67890", "sis_login_id": null }
+  # ]
   def index
     get_context
     if authorized_action(@context, @current_user, :read_roster)
@@ -160,7 +168,10 @@ class UsersController < ApplicationController
       else
         @users = @context.fast_all_users
       end
-      @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+
+      @users = api_request? ?
+        Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name) :
+        @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
       respond_to do |format|
         if @users.length == 1 && params[:term]
           format.html {
@@ -176,7 +187,9 @@ class UsersController < ApplicationController
         format.json  {
           cancel_cache_buster
           expires_in 30.minutes
-          render :json => @users.map{ |u| {:label => u.name, :id => u.id} }
+          api_request? ?
+            render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
+            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
         }
       end
     end

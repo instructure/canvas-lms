@@ -144,6 +144,51 @@ describe "Users API", :type => :integration do
     json.size.should == 1
   end
 
+  describe "user account listing" do
+    it "should return users for an account" do
+      @account = @user.account
+      users = []
+      [['Test User1', 'test@example.com'], ['Test User2', 'test2@example.com'], ['Test User3', 'test3@example.com']].each_with_index do |u, i|
+        users << User.create(:name => u[0])
+        users[i].pseudonyms.create(:unique_id => u[1], :password => '123456', :password_confirmation => '123456')
+        users[i].pseudonym.update_attribute(:sis_user_id, (i + 1) * 100)
+        users[i].pseudonym.update_attribute(:account_id, @account.id)
+      end
+      @account.all_users.scoped(:order => :sortable_name).each_with_index do |user, i|
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+               { :controller => 'users', :action => 'index', :account_id => @account.id.to_param, :format => 'json' },
+               { :per_page => 1, :page => i + 1 })
+        json.should == [{
+          'name' => user.name,
+          'sortable_name' => user.sortable_name,
+          'sis_user_id' => user.sis_user_id,
+          'id' => user.id,
+          'short_name' => user.short_name,
+          'login_id' => user.pseudonym.unique_id,
+          'sis_login_id' => user.pseudonym.sis_user_id ? user.pseudonym.unique_id : nil
+        }]
+      end
+    end
+
+    it "should limit the maximum number of users returned" do
+      @account = @user.account
+      15.times do |n|
+        user = User.create(:name => "u#{n}")
+        user.pseudonyms.create!(:unique_id => "u#{n}@example.com", :account => @account)
+      end
+      api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=12", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '12').size.should == 12
+      Setting.set('api_max_per_page', '5')
+      api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=12", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '12').size.should == 5
+    end
+
+    it "should return unauthorized for users without permissions" do
+      @account = @student.account
+      @user    = @student
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => "json")
+      response.code.should eql "401"
+    end
+  end
+
   describe "user account creation" do
     it "should allow site admins to create users" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
