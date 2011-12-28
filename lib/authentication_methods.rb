@@ -284,7 +284,11 @@ module AuthenticationMethods
   end
 
   def delegated_auth_redirect(uri)
-    redirect_to(uri)
+    redirect_to(delegated_auth_redirect_uri(uri))
+  end
+
+  def delegated_auth_redirect_uri(uri)
+    uri
   end
 
   # if true, the user is currently stepping through the oauth2 flow for the canvas api

@@ -211,7 +211,7 @@ describe "OAuth2", :type => :integration do
         CASClient::Client.stubs(:new).returns(cas)
 
         get response['Location']
-        response.should redirect_to(cas.add_service_to_login_url(login_url))
+        response.should redirect_to(@controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(login_url)))
 
         get '/login', :ticket => 'ST-abcd'
         response.should be_redirect

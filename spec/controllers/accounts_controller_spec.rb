@@ -215,7 +215,7 @@ describe AccountsController do
     config = { :cas_base_url => account.account_authorization_config.auth_base }
     cas_client = CASClient::Client.new(config)
     get 'show', :id => account.id
-    response.should redirect_to(cas_client.add_service_to_login_url(login_url))
+    response.should redirect_to(@controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(login_url)))
   end
 
   it "should count total courses correctly" do
