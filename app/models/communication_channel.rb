@@ -151,7 +151,7 @@ class CommunicationChannel < ActiveRecord::Base
     if connection_pool.spec.config[:adapter] == 'mysql'
       { :conditions => {:path => path } }
     else
-      { :conditions => ["LOWER(communication_channels.path)=?", path.downcase]}
+      { :conditions => ["LOWER(communication_channels.path)=?", path.try(:downcase)]}
     end
   }
 

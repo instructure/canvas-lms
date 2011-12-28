@@ -501,7 +501,7 @@ class UsersController < ApplicationController
   # @argument pseudonym[:send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
   def create
     # Look for an incomplete registration with this pseudonym
-    @pseudonym = @context.pseudonyms.find_by_unique_id_and_workflow_state(params[:pseudonym][:unique_id], 'active')
+    @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
     @pseudonym = nil if @pseudonym && !['creation_pending', 'pre_registered', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
@@ -527,7 +527,8 @@ class UsersController < ApplicationController
 
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'
-    @cc = @user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
+    @cc = @user.communication_channels.email.by_path(email).first
+    @cc ||= @user.communication_channels.build(:path => email)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
     @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
