@@ -29,8 +29,12 @@ module EportfolioPage
     @files ||= []
     @folders ||= []
     @attachments = []
-    @page.content_sections.each do |section|
-      attachment = @portfolio.user.attachments.find_by_uuid(section["attachment_id"]) rescue nil
+    @page.content_sections.select {|s| s[:section_type] == 'attachment'}.each do |section|
+      begin
+        attachment = @portfolio.user.attachments.find(section["attachment_id"])
+      rescue ActiveRecord::RecordNotFound
+        next
+      end
       @attachments << attachment if attachment
     end
     @entries = @category.eportfolio_entries
