@@ -56,7 +56,7 @@ describe CoursesController, :type => :integration do
   describe "course creation" do
     context "an account admin" do
       before do
-        @account = Account.first
+        @account = Account.default
         account_admin_user
         @resource_path = "/api/v1/accounts/#{@account.id}/courses"
         @resource_params = { :controller => 'courses', :action => 'create', :format => 'json', :account_id => @account.id.to_s }
