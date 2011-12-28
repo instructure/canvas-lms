@@ -105,14 +105,15 @@ class Pseudonym < ActiveRecord::Base
 
   named_scope :by_unique_id, lambda { |unique_id|
     if connection_pool.spec.config[:adapter] == 'mysql'
-      { :conditions => {:unique_id => unique_id, :workflow_state => 'active' } }
+      { :conditions => {:unique_id => unique_id } }
     else
-      { :conditions => ["LOWER(#{quoted_table_name}.unique_id)=? AND #{quoted_table_name}.workflow_state='active'", unique_id.mb_chars.downcase] }
+      { :conditions => ["LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase] }
     end
   }
 
   def self.custom_find_by_unique_id(unique_id, which = :first)
-    self.by_unique_id(unique_id).find(which)
+    return nil unless unique_id
+    self.active.by_unique_id(unique_id).find(which)
   end
   
   def set_password_changed
@@ -349,7 +350,8 @@ class Pseudonym < ActiveRecord::Base
     res = @ldap_result
     if res && res[:mail] && res[:mail][0]
       email = res[:mail][0]
-      cc = self.user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
+      cc = self.user.communication_channels.email.by_path(email).first
+      cc ||= self.user.communication_channels.build(:path => email)
       cc.workflow_state = 'active'
       cc.user = self.user
       cc.save if cc.changed?

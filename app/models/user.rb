@@ -2164,7 +2164,7 @@ class User < ActiveRecord::Base
       templates.concat active_pseudonyms
       templates.uniq!
 
-      template = templates.detect { |template| !account.pseudonyms.find_by_unique_id(template.unique_id) }
+      template = templates.detect { |template| !account.pseudonyms.custom_find_by_unique_id(template.unique_id) }
       if template
         # creating this not attached to the user's pseudonyms is intentional
         pseudonym = account.pseudonyms.build
