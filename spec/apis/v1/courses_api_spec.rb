@@ -121,7 +121,7 @@ describe CoursesController, :type => :integration do
     describe "a user without permissions" do
       it "should return 401 Unauthorized if a user lacks permissions" do
         course_with_student(:active_all => true)
-        account = Account.first
+        account = Account.default
         raw_api_call(:post, "/api/v1/accounts/#{account.id}/courses",
           { :controller => 'courses', :action => 'create', :format => 'json', :account_id => account.id.to_s },
           {
