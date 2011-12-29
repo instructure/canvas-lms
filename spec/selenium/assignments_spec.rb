@@ -217,15 +217,23 @@ describe "assignment selenium tests" do
   end
 
   it "should create an assignment with more options" do
-    expected_text = "Assignment 1"
-    course_with_teacher_logged_in
-
-    get "/courses/#{@course.id}/assignments"
-    driver.find_element(:css, '.add_assignment_link').click
-    expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
-    expect_new_page_load { driver.find_element(:css, '#edit_assignment_form').submit }
-    driver.find_element(:css, '.no_assignments_message').should_not be_displayed
-    driver.find_element(:css, '#groups').should include_text(expected_text)
+    enable_cache do
+      expected_text = "Assignment 1"
+      course_with_teacher_logged_in
+    
+      get "/courses/#{@course.id}/assignments"
+      group = @course.assignment_groups.first
+      AssignmentGroup.update_all({ :updated_at => 1.hour.ago }, { :id => group.id })
+      first_stamp = group.reload.updated_at.to_i
+      driver.find_element(:css, '.add_assignment_link').click
+      expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
+      expect_new_page_load { driver.find_element(:css, '#edit_assignment_form').submit }
+      @course.assignments.count.should == 1
+      driver.find_element(:css, '.no_assignments_message').should_not be_displayed
+      driver.find_element(:css, '#groups').should include_text(expected_text)
+      group.reload
+      group.updated_at.to_i.should_not == first_stamp
+    end
   end
 
   it "should edit an assignment" do
