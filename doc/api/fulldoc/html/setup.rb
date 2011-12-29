@@ -61,7 +61,7 @@ def serialize_resource(resource, controllers)
 end
 
 def serialize_index
-  options[:file] = "doc/templates/rest/README.md"
+  options[:file] = "doc/api/README.md"
   serialize('index.html')
   options.delete(:file)
 end
@@ -78,7 +78,7 @@ end
 
 
 def serialize_static_pages
-  Dir.glob("doc/templates/rest/*.md").each do |file|
+  Dir.glob("doc/api/*.md").each do |file|
     options[:file] = file
     serialize(File.split(file).last.sub(/\..*$/, '.html'))
     options.delete(:file)
