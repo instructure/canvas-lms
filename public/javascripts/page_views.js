@@ -100,4 +100,4 @@ I18n.scoped('page_views', function(I18n) {
     }
   });
 })(jQuery, INST);
-})
+});
