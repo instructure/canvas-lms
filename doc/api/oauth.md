@@ -1,24 +1,62 @@
 OAuth
 =====
 
-OAuth2 is a protocol designed to let third-party applications request
-authorization to perform actions as a user, without getting the user's
-password. This is the preferred method of authentication and
-authorization for the Canvas API, rather than HTTP Basic Auth.
+OAuth2 is a protocol designed to let third-party applications
+authenticate to perform actions as a user, without getting the user's
+password. Canvas uses OAuth2 for authentication and
+authorization of the Canvas API. HTTP Basic Auth is deprecated and will be removed.
 
-You will need to register your application to get started. A registered
-third-party application is assigned a unique client ID and client
-secret. The secret should never be shared.
+Authenticating a Request
+------------------------
 
-For desktop and mobile applications, it's recognized that the client
-secret can never be completely secured against discovery. However,
-clients should do their best to make the secret non-obvious through
-obfuscation or other means.
+Once you have an OAuth access token, you can use it to make API
+requests. If possible, using the HTTP Authorization header is
+recommended. Sending the access token in the query string or POST
+parameters is also supported.
 
-Canvas CV Users
----------------
+OAuth2 Token sent in header:
 
-For open source Canvas users, you will need to generate a client\_id and client\_secret for your application. There isn't yet any UI for generating these keys. The <a href="authentication.html">Authentication</a> section of this documentation describes how to generate an API developer key -- the id of this key is the client\_id , and the api\_key is the client\_secret.
+    curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
+
+OAuth2 Token sent in query string:
+
+    curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
+
+Manual Token Generation
+-----------------------
+
+If your application only needs to access the API as a single user, the
+simplest option is to generate an access token on the user's profile page.
+
+  1. Click the "profile" link in the top right menu bar, or navigate to
+     `/profile`
+  2. Under the "Approved Integrations" section, click the button to
+     generate a new access token.
+  3. Once the token is generated, you cannot view it again, and you'll
+     have to generate a new token if you forget it. Remember that access
+     tokens are password equivalent, so keep it secret.
+
+OAuth2 Token Request Flow
+-------------------------
+
+If your application will be used by others, you will need to implement
+the full OAuth2 token request workflow, so that you can request an access
+token for each user of your application.
+
+Performing the OAuth2 token request flow requires an application client
+ID and client secret. To obtain these application credentials, you will
+need to register your application.  The client secret should never be shared.
+
+For open source Canvas users, you will need to generate a client\_id and
+client\_secret for your application. There isn't yet any UI for
+generating these keys, so you will need to generate an API key from the Rails console:
+
+    $ script/console
+    > key = DeveloperKey.create!(
+        :email => 'your_email',
+        :user_name => 'your name',
+        :account => Account.default)
+    > puts "client_id: #{key.id} client_secret: #{key.api_key}"
 
 Web Application Flow
 --------------------
@@ -128,28 +166,6 @@ The response will be a JSON argument containing the access_token:
     </div>
   </li>
 </ul>
-
-</div>
-
-### Step 4: Using the access token to access the API
-
-The access token allows you to make requests to the API on behalf of the
-user. The access token can be passed either through the Authorization
-HTTP header, or via a query string parameter. Using the HTTP Header is recommended. See the <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08">OAuth 2.0 Bearer Token documentation.</a>
-
-Authorization HTTP Header:
-
-<div class="method_details">
-
-<h3>Authorization: Bearer &lt;token&gt;</h3>
-
-</div>
-
-Query string:
-
-<div class="method_details">
-
-<h3>GET https://&lt;canvas-install-url&gt;/api/v1/courses.json?access_token=&lt;token&gt;</h3>
 
 </div>
 
@@ -265,27 +281,5 @@ The response will be a JSON argument containing the access_token:
     </div>
   </li>
 </ul>
-
-</div>
-
-### Step 4: Using the access token to access the API
-
-The access token allows you to make requests to the API on behalf of the
-user. The access token can be passed either through the Authorization
-HTTP header, or via a query string parameter. Using the HTTP Header is recommended. See the <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08">OAuth 2.0 Bearer Token documentation.</a>
-
-Authorization HTTP Header:
-
-<div class="method_details">
-
-<h3>Authorization: Bearer &lt;token&gt;</h3>
-
-</div>
-
-Query string:
-
-<div class="method_details">
-
-<h3>GET https://&lt;canvas-install-url&gt;/api/v1/courses.json?access_token=&lt;token&gt;</h3>
 
 </div>

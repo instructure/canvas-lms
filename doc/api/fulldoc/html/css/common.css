@@ -10,6 +10,7 @@ body {
 }
 #content {
   margin: 10px 20px 0 220px;
+  max-width: 800px;
 }
 #header {
   background-color: #c0d9ca;
@@ -41,7 +42,7 @@ h2 {
 #sidebar {
   background-color: #F2F5F7;
 }
-#sidebar a, #sidebar h2 {
+#sidebar nav > a, #sidebar h2 {
   display:block;
   border: none;
   border-top: 1px solid #D0D0D0;
@@ -58,16 +59,16 @@ h2 {
 #sidebar h2.first {
   border-top:none;
 }
-#sidebar a {
+#sidebar nav > a {
   padding:8px 26px;
   color: #4B7092;
   text-decoration: none;
 }
-#sidebar a:hover, #sidebar a:focus {
+#sidebar nav > a:hover, #sidebar nav > a:focus {
   background-color: #DEE2E4;
   text-decoration: none;
 }
-#sidebar a.current {
+#sidebar nav > a.current {
   background-color: white;
   border-right: none;
   padding:12px 26px;
@@ -150,4 +151,11 @@ table.tool tr td:last-child {
 }
 #footer a {
   color: #999;
+}
+
+pre.code {
+  padding: 15px;
+  background-color:#ddd;
+  border: 1px solid black;
+  overflow: scroll;
 }

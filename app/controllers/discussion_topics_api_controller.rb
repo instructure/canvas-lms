@@ -39,10 +39,9 @@ class DiscussionTopicsApiController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \ 
-  #        -u '<username>:<password>' \ 
-  #        -F 'api_key=<key>' \ 
   #        -F 'message=<message>' \ 
-  #        -F 'attachment=@<filename>'
+  #        -F 'attachment=@<filename>' \ 
+  #        -H "Authorization: Bearer <token>"
   def add_entry
     @entry = build_entry(@topic.discussion_entries)
     if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
@@ -151,9 +150,8 @@ class DiscussionTopicsApiController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \ 
-  #        -u '<username>:<password>' \ 
-  #        -F 'api_key=<key>' \ 
-  #        -F 'message=<message>'
+  #        -F 'message=<message>' \ 
+  #        -H "Authorization: Bearer <token>"
   def add_reply
     @parent = root_entries(@topic).find(params[:entry_id])
     @entry = build_entry(@parent.discussion_subentries)

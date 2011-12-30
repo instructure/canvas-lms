@@ -8,7 +8,9 @@ with the `?per_page` parameter. There is an unspecified limit to how big you can
 
 Pagination information is provided in the [Link header](http://www.w3.org/Protocols/9707-link-header.html):
 
-    Link: </courses/:id/discussion_topics.json?page=2&per_page=10>; rel="next",</courses/:id/discussion_topics.json?page=1&per_page=10>; rel="first",</courses/:id/discussion_topics.json?page=5&per_page=10>; rel="last"
+    Link: </courses/:id/discussion_topics.json?page=2&per_page=10>; rel="next",
+          </courses/:id/discussion_topics.json?page=1&per_page=10>; rel="first",
+          </courses/:id/discussion_topics.json?page=5&per_page=10>; rel="last"
 
 The possible `rel` values are:
 

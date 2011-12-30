@@ -3,25 +3,45 @@ Welcome to the Canvas LMS API Documentation
 
 Canvas LMS includes a REST API for accessing and modifying data
 externally from the main application, in your own programs and scripts.
+This documentation describes the resources that make up the API.
 
-The API is currently under rapid development and many areas of the
-application are still unavailable via the external API, but you can get
-started on what's there today by learning the Basics and then viewing
-information on the exposed Resource types.
+To get started, you'll want to review the general basics, including the
+information below and the page on <a href="oauth.html">Authentication using OAuth2</a>.
 
 Schema
 ------
 
+All API access is over HTTPS, against your normal canvas domain.
+
 All API responses are in <a href="http://www.json.org/">JSON format</a>.
+
+For POST and PUT requests, parameters are sent using standard
+<a href="http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4">HTML form
+encoding</a> (the application/x-www-form-urlencoded content type).
+
+All timestamps are sent and returned in ISO 8601 format (UTC time zone):
+
+    YYYY-MM-DDTHH:MM:SSZ
+
+Authentication
+--------------
+
+API authentication is done with OAuth2. If possible, using the HTTP
+Authorization header is recommended. Sending the access token in the
+query string or POST parameters is also supported.
+
+OAuth2 Token sent in header:
+
+    curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
+
+OAuth2 Token sent in query string:
+
+    curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
+
+Read more about <a href="oauth.html">OAuth2 and how to get access tokens.</a>
 
 SSL
 ---
-
-Canvas Cloud Edition requires all API access to be over SSL, using
-HTTPS. By default, open source installs have this requirement as well.
-Open source installs are strongly encouraged to require SSL for API
-calls, since the username and password are sent in the clear for HTTP
-Basic Auth, or the access token for oauth, if SSL is not used.
 
 Note that if you make an API call using HTTP instead of HTTPS, you will
 be redirected to HTTPS. However, at that point, the credentials
@@ -32,10 +52,9 @@ About this Documentation
 ------------------------
 
 This documentation is generated directly from the Canvas LMS code
-itself, using YARD. You can generate this documentation yourself if
-you've set up a local canvas environment following the instructions on
-<a href="https://www.github.com/instructure/canvas-lms/wiki">Github</a>, run
-the following command from your canvas directory:
+itself. You can generate this documentation yourself if you've set up a
+local Canvas environment following the instructions on <a href="https://www.github.com/instructure/canvas-lms/wiki">Github</a>,
+run the following command from your Canvas directory:
 
-    $ rake doc:api
+    bundle exec rake doc:api
 
