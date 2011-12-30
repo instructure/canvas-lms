@@ -94,4 +94,31 @@ describe AssessmentQuestion do
   it "should not modify the question_data hash in place when translating links" do
     
   end
+  
+  it "should not drop non-string/array/hash data types when translate links" do
+    course
+    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    
+    data = {
+            :name => 'mc question',
+            :question_type => 'multiple_choice_question',
+            :question_text => "text text text",
+            :points_possible => "10",
+            :correct_comments => "",
+            :incorrect_comments => "",
+            :answers => {
+                    "answer_0" => {:answer_weight => 100, :answer_text => "1", :id => "0", :answer_comments => "hi there"}
+            }
+    }
+
+    question = bank.assessment_questions.create!(:question_data => data)
+    question.question_data[:points_possible].should == "10"
+    data[:points_possible] = "50"
+    question.form_question_data = data
+    question.save
+    question.question_data[:points_possible].should == 50
+    question.question_data[:answers][0][:weight].should == 100
+    question.question_data[:answers][0][:id].should_not be_nil
+    question.question_data[:assessment_question_id].should == question.id
+  end
 end
