@@ -103,6 +103,8 @@ class AssessmentQuestion < ActiveRecord::Base
             match
           end
         end
+      else
+        obj
       end
     end
     
