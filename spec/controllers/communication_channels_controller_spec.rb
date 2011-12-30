@@ -495,8 +495,6 @@ describe CommunicationChannelsController do
     it "should uncache user's cc's when confirming a CC" do
       user_with_pseudonym(:active_user => true)
       user_session(@user, @pseudonym)
-      puts @user.updated_at
-      puts @user.cache_key
       User.record_timestamps = false
       begin
         @user.update_attribute(:updated_at, 1.second.ago)
