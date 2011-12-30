@@ -546,7 +546,7 @@ class UsersController < ApplicationController
         message_sent = true
         @pseudonym.send_registration_notification!
       else
-        other_cc_count = CommunicationChannel.count(:all, :joins => { :user => :pseudonyms }, :conditions => ["path=? AND path_type='email' AND communication_channels.user_id<>? AND communication_channels.workflow_state='active' AND pseudonyms.workflow_state='active'", @cc.path, @user.id])
+        other_cc_count = CommunicationChannel.email.active.by_path(@cc.path).count(:all, :joins => { :user => :pseudonyms }, :conditions => ["communication_channels.user_id<>? AND pseudonyms.workflow_state='active'", @user.id])
         @cc.send_merge_notification! if other_cc_count != 0
       end
 

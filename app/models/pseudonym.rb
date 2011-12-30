@@ -102,13 +102,17 @@ class Pseudonym < ActiveRecord::Base
     self.save!
     @send_confirmation = false
   end
-  
-  def self.custom_find_by_unique_id(unique_id, which = :first)
-    if connection.adapter_name.downcase == 'mysql'
-      find(which, :conditions => { :unique_id => unique_id, :workflow_state => 'active'})
+
+  named_scope :by_unique_id, lambda { |unique_id|
+    if connection_pool.spec.config[:adapter] == 'mysql'
+      { :conditions => {:unique_id => unique_id, :workflow_state => 'active' } }
     else
-      find(which, :conditions => ["LOWER(#{quoted_table_name}.unique_id)=? AND workflow_state='active'", unique_id.mb_chars.downcase])
+      { :conditions => ["LOWER(#{quoted_table_name}.unique_id)=? AND #{quoted_table_name}.workflow_state='active'", unique_id.mb_chars.downcase] }
     end
+  }
+
+  def self.custom_find_by_unique_id(unique_id, which = :first)
+    self.by_unique_id(unique_id).find(which)
   end
   
   def set_password_changed
@@ -121,7 +125,7 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def communication_channel
-    self.user.communication_channels.find_by_path(self.unique_id)
+    self.user.communication_channels.by_path(self.unique_id).find(:first)
   end
   
   def confirmation_code

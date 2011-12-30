@@ -571,7 +571,7 @@ class User < ActiveRecord::Base
   def gmail_channel
     google_services = self.user_services.find_all_by_service_domain("google.com")
     addr = google_services.find{|s| s.service_user_id}.service_user_id rescue nil
-    self.communication_channels.find_by_path_and_path_type(addr, 'email')
+    self.communication_channels.email.by_path(addr).find(:first)
   end
   
   def gmail

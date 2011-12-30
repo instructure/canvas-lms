@@ -179,16 +179,19 @@ module SIS
             @users_to_update_account_associations << user.id if should_update_account_associations
 
             if email.present?
-              conditions = [ "path=? AND path_type='email' AND ", email, user.id]
               # find all CCs for this user, and active conflicting CCs for all users
               # unless we're deleting this user, then only find CCs for this user
-              conditions.first << (status_is_active ? "(workflow_state='active' OR user_id=?)" : 'user_id=?')
+              if status_is_active
+                ccs = CommunicationChannel.scoped(:conditions => ["workflow_state='active' OR user_id=?", user.id])
+              else
+                ccs = user.communication_channels
+              end
+              ccs = ccs.email.by_path(email).all
 
-              ccs = CommunicationChannel.find(:all, :conditions => conditions)
               sis_cc = ccs.find { |cc| cc.id == pseudo.sis_communication_channel_id } if pseudo.sis_communication_channel_id
               # Have to explicitly load the old sis communication channel, in case it changed (should only happen if user_id got messed up)
               sis_cc ||= pseudo.sis_communication_channel
-              other_cc = ccs.find { |cc| cc.path = email && cc.user_id == user.id && cc.id != sis_cc.try(:id) }
+              other_cc = ccs.find { |cc| cc.user_id == user.id && cc.id != sis_cc.try(:id) }
               # Handle the case where the SIS CC changes to match an already existing CC
               if sis_cc && other_cc
                 sis_cc.destroy
