@@ -57,13 +57,7 @@ describe Message do
       message_model(:notification_id => @notification.id)
       Message.by_name('Some Name').should eql([@message])
     end
-    
-    it "should filter on its recipient" do
-      communication_channel_model
-      message_model(:communication_channel_id => @communication_channel.id)
-      Message.directed_to(@communication_channel.path).should eql([@message])
-    end
-    
+
     it "should offer staged messages (waiting to be dispatched)" do
       message_model(:dispatch_at => Time.now + 100, :user => user)
       Message.staged.should eql([@message])
