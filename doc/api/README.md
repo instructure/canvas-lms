@@ -40,6 +40,11 @@ OAuth2 Token sent in query string:
 
 Read more about <a href="oauth.html">OAuth2 and how to get access tokens.</a>
 
+API Terms of Service
+--------------------
+
+Please carefully review <a href="http://www.instructure.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
+
 SSL
 ---
 
