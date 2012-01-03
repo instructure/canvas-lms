@@ -18,6 +18,7 @@
 
 class CalendarsController < ApplicationController
   before_filter :require_user, :except => [ :public_feed ]
+  before_filter :check_preferred_calendar, :only => [ :show, :show2 ]
 
   def show
     get_context
@@ -216,4 +217,33 @@ class CalendarsController < ApplicationController
       end
     end
   end
+
+  def switch_calendar
+    if @domain_root_account.enable_scheduler?
+      if params[:preferred_calendar] == '2' &&
+        @current_user.preferences.delete(:use_calendar1)
+      else
+        @current_user.preferences[:use_calendar1] = true
+      end
+      @current_user.save!
+    end
+    check_preferred_calendar(true)
+  end
+
+  def check_preferred_calendar(always_redirect=false)
+    preferred_calendar = 'show'
+    preferred_calendar = 'show2' if @domain_root_account.enable_scheduler? && !@current_user.preferences[:use_calendar1]
+    if always_redirect || params[:action] != preferred_calendar
+      redirect_to :action => preferred_calendar
+      return false
+    end
+    if @domain_root_account.enable_scheduler?
+      if preferred_calendar == 'show'
+        add_crumb @template.link_to(t(:use_new_calendar, "Try out the new calendar"), switch_calendar_url('2'), :method => :post), nil, :id => 'change_calendar_version_link_holder'
+      else
+        add_crumb @template.link_to(t(:use_old_calendar, "Go back to the old calendar"), switch_calendar_url('1'), :method => :post), nil, :id => 'change_calendar_version_link_holder'
+      end
+    end
+  end
+  protected :check_preferred_calendar
 end
