@@ -293,6 +293,23 @@ describe Enrollment do
     end
   end
 
+  context "recompute_final_scores" do
+    it "should only recompute once per student, per course" do
+      course_with_student(:active_all => true)
+      @c1 = @course
+      @s2 = @course.course_sections.create!(:name => 's2')
+      @course.student_enrollments.create!(:user => @user, :course_section => @s2)
+      @user.student_enrollments(true).count.should == 2
+      course_with_student(:user => @user)
+      @c2 = @course
+      Enrollment.recompute_final_scores(@user.id)
+      jobs = Delayed::Job.all(:conditions => { :tag => 'Enrollment.recompute_final_score' })
+      jobs.size.should == 2
+      # pull the course ids out of the job params
+      jobs.map { |j| j.payload_object.args[1] }.sort.should == [@c1.id, @c2.id]
+    end
+  end
+
   context "date restrictions" do
     context "accept" do
       it "should accept into the right state based on availability dates on enrollment" do
