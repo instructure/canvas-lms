@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "calendar2 selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  before do
+    Account.default.update_attribute(:settings, {:enable_scheduler => true})
+  end
+
   def make_event(params = {})
     opts = {
       :context     => @user,
