@@ -51,7 +51,6 @@ describe "gradebook2 selenium tests" do
     end
     comment.click
     details_dialog = find_with_jquery('.ui-dialog:visible')
-    details_dialog.should be_displayed
     details_dialog
   end
 
@@ -320,9 +319,11 @@ describe "gradebook2 selenium tests" do
     dialog_form = dialog.find_element(:css, '.ui-dialog-content')
     driver.find_element(:css, '.grading_value').send_keys("45")
     dialog_form.submit
-    keep_trying_until { driver.switch_to.alert.should_not be_nil
-    driver.switch_to.alert.dismiss
-    true }
+    keep_trying_until do
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.dismiss
+      true
+    end
     driver.switch_to.default_content
     grade_grid = driver.find_element(:css, '#gradebook_grid')
     2.times do |n|
@@ -351,9 +352,11 @@ describe "gradebook2 selenium tests" do
     curve_form = driver.find_element(:css, '#curve_grade_dialog')
     curve_form.find_element(:css, '#middle_score').send_keys(curved_grade_text)
     curve_form.submit
-    keep_trying_until { driver.switch_to.alert.should_not be_nil
-    driver.switch_to.alert.dismiss
-    true }
+    keep_trying_until do
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.dismiss
+      true
+    end
     driver.switch_to.default_content
     find_slick_cells(1, driver.find_element(:css, '#gradebook_grid'))[0].text.should == curved_grade_text
   end
