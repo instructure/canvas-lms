@@ -188,6 +188,10 @@ module SIS
               end
               ccs = ccs.email.by_path(email).all
 
+              # sis_cc could be set from the previous user, if we're not on a transaction boundary,
+              # and the previous user had an sis communication channel, and this user doesn't have one
+              # then it would have "stolen" to sis_cc from the previous user
+              sis_cc = nil
               sis_cc = ccs.find { |cc| cc.id == pseudo.sis_communication_channel_id } if pseudo.sis_communication_channel_id
               # Have to explicitly load the old sis communication channel, in case it changed (should only happen if user_id got messed up)
               sis_cc ||= pseudo.sis_communication_channel
