@@ -1,3 +1,53 @@
+canvas-lms (2012.01.03.13.57) testing; urgency=low
+
+  * Package ref: c0dc9e9c13f5e00c78b62ad498c6c2ec5aa60a52
+  *
+  * [-920f7bc] Revert "add id to wiki page urls. fixes #2635."
+  * [+bb52e40] allow sending an expected status to api_call spec helper
+  * [+6ddcb22] updated stats lib to have histogram
+  * [+bc98116] fix main content scrolling on top of #right_side
+  * [+a9f4cff] update selenium-webdriver and parallel_tests gems
+  * [+83e66a4] sleep groups_controller to fix intermittently failing selenium test
+  * [+9253533] environment javascript module
+  * [+a5e32b9] initialize any_instantiation class variable
+  * [+fb6fcc9] fix intermittently failing selenium specs
+  * [+30906c5] remove section completed status from sis csv doc
+  * [+4ae0e78] ignore rb-fsevent in rake i18n:check
+  * [+acb7ee9] move Delayed::Job priorities into the plugin
+  * [+5bc5b76] scroll gradebook2 "section to show" if needed
+  * [+fa8497b] gitignore compiled handlebars and coffeescript
+  * [+15aa326] don't bother validating the length of Notification bodies
+  * [+452e04a] don't include the GA script until asked to
+  * [+7174981] add spec to ensure csv grading by percent is allowed
+  * [+d67246f] make it obvious if you forgot to add to assets.yml
+  * [+13e2aa9] @example_request API doc tag
+  * [+86580eb] add course creation to api. fixes #6539
+  * [+9ca61fc] fix worker_spec.rb when run alone
+  * [+7eaf2a3] added new test case for bug 6540
+  * [+31926d1] fix courses api specs for mysql.
+  * [+e98c505] fix infinite recursion in outcome groups
+  * [+f9f9f53] use the association for User#email=
+  * [+3ca0c20] fix spelling of "privileges" in enrollments.
+  * [+82ad7ee] add course enrollment creation api. fixes #6559.
+  * [+686d138] make task to just gen coffee script and handlebars
+  * [+399355c] replace usage of Date.today
+  * [+dc07470] Roles API; refs #6182
+  * [+4ad9929] only export active external tools
+  * [+30c2a77] fix speedGrader submissions showing for wrong student
+  * [+95235f3] fixes invalid url to api docs from access key gen
+  * [+3070f65] increase selenium script_timeout
+  * [+2918b9a] add url to todo item assignment objects. fixes #6635.
+  * [+7c01e34] latest es translations
+  * [+9d047b7] fix intermittently failing selenium spec
+  * [+46b392a] properly handle unicode filenames (fixes #6376)
+  * [+200ab29] api for external tools on courses and accounts
+  * [+d725a78] xml config for blti extensions
+  * [+f79fe1f] add lti documentation to api docs
+  * [+74392c5] search for communication channels case insensitively fixes #6750
+  * [+c0dc9e9] fix adding existing users as admins to sub accounts fixes #6533
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 03 Jan 2012 13:58:02 -0700
+
 canvas-lms (2011.12.30.10.33) testing; urgency=low
 
   * Package ref: 34918ecac17dbdcb01345aec350266e7b266637c
