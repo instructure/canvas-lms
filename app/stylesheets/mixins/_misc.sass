@@ -38,7 +38,11 @@
   background-image:     -ms-linear-gradient(top, $topColor, $bottomColor) /* IE10 */
   background-image:      -o-linear-gradient(top, $topColor, $bottomColor) /* Opera 11.10+ */
   background-image:         linear-gradient(top, $topColor, $bottomColor)
-  filter:           "progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$topColor}', EndColorStr='#{$bottomColor}')" /* IE6–IE9 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$topColor}',EndColorStr='#{$bottomColor}')"
+  zoom: 1
+  //ie9 does the ms-filter thing bug the backgroun gradient bleeds outside of the border-radius, just make it square
+  .ie9 &
+    border-radius: 0 !important
 
 =accessible_text_replacement
   display: inline-block

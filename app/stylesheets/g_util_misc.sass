@@ -1,4 +1,6 @@
 @import environment.sass
+@import utilities/admin_links.scss
+@import utilities/alert_message.scss
 
 .clear
   :clear both
@@ -161,3 +163,19 @@ table.zebra-stripes
       position: relative
       right: 50%
       text-align: left
+
+// CLOSE ICONS
+// -----------
+a.x-close-link
+  float: right
+  color: black !important
+  font-size: 20px
+  font-weight: bold
+  line-height: 13.5px
+  text-shadow: 0 1px 0 white
+  text-decoration: none
+  +opacity(.25)
+  &:hover, &:focus
+    color: black
+    text-decoration: none
+    +opacity(.60)

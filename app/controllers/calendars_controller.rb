@@ -18,7 +18,7 @@
 
 class CalendarsController < ApplicationController
   before_filter :require_user, :except => [ :public_feed ]
-  
+
   def show
     get_context
     if @context != @current_user
@@ -30,7 +30,7 @@ class CalendarsController < ApplicationController
     end
     get_all_pertinent_contexts(true) # passing true has it return groups too.
     build_calendar_dates
-    
+
     respond_to do |format|
       format.html do
         @events = []
@@ -47,20 +47,53 @@ class CalendarsController < ApplicationController
         events = calendar_events_for_request_format
         render :json => events unless @dont_render_again
       end
-      format.ics { 
+      format.ics {
         events = calendar_events_for_request_format
         render :text => events unless @dont_render_again
       }
     end
   end
-  
+
+  def show2
+    get_context
+    get_all_pertinent_contexts(true) # passing true has it return groups too.
+    @manage_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :manage_calendar) }.map(&:asset_string)
+    @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
+    @contexts_json = @contexts.map do |context|
+      info = {
+        :name => context.name,
+        :asset_string => context.asset_string,
+        :id => context.id,
+        :url => named_context_url(context, :context_url),
+        :create_calendar_event_url => context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_events_url) : '',
+        :create_assignment_url => context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignments_url) : '',
+        :create_appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url() : '',
+        :new_calendar_event_url => context.respond_to?("calendar_events") ? named_context_url(context, :new_context_calendar_event_url) : '',
+        :new_assignment_url => context.respond_to?("assignments") ? named_context_url(context, :new_context_assignment_url) : '',
+        :calendar_event_url => context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_event_url, '{{ id }}') : '',
+        :assignment_url => context.respond_to?("assignments") ? named_context_url(context, :context_assignment_url, '{{ id }}') : '',
+        :appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(:id => '{{ id }}') : '',
+        :can_create_calendar_events => context.respond_to?("calendar_events") && context.calendar_events.new.grants_right?(@current_user, session, :create),
+        :can_create_assignments => context.respond_to?("assignments") && context.assignments.new.grants_right?(@current_user, session, :create),
+        :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.scoped(:select => "id, name").map {|g| { :id => g.id, :name => g.name } } : [],
+        :can_create_appointment_groups => context.respond_to?("appointment_groups") && context.appointment_groups.new.grants_right?(@current_user, session, :create),
+      }
+      if info[:can_create_appointment_groups] && context.respond_to?("course_sections")
+        info[:course_sections] = context.course_sections.active.scoped(:select => "id, name").map {|cs| { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name } }
+      end
+      if info[:can_create_appointment_groups] && context.respond_to?("group_categories")
+        info[:group_categories] = context.group_categories.active.scoped(:select => "id, name").map {|gc| { :id => gc.id, :asset_string => gc.asset_string, :name => gc.name } }
+      end
+      info
+    end
+  end
+
   def build_calendar_events
     opts = {
-      :contexts => @contexts, 
-      :start_at => @first_day, 
-      :end_at => @last_day + 1, 
-      :include_undated => !!params[:include_undated], 
-      :include_forum => false, 
+      :contexts => @contexts,
+      :start_at => @first_day,
+      :end_at => @last_day + 1,
+      :include_undated => !!params[:include_undated],
       :include_deleted_events => request.format == :json,
       :updated_at => @updated_at
     }
@@ -81,15 +114,15 @@ class CalendarsController < ApplicationController
     @events.concat(@undated_events).send("to_#{format}", *args)
   end
   protected :build_calendar_events
-  
+
   def calendar_events_for_request_format
     @updated_at = params[:last_update_at] && !params[:last_update_at].empty? && (Time.parse(params[:last_update_at]) rescue nil)
     if @updated_at
       build_calendar_events
     else #if we are rendering a request that does not have a ?last_udpated_at, then it is cacheable both server and client side.
       cache_key = ['calendar_month', request.format, @month, @year, Digest::MD5.hexdigest(@contexts.map(&:cache_key).join)[0, 10]].join('/')
-      
-      # This tries to 304 cache these on the clients browser, it is safe because it is not public, it is just for ajax requests, 
+
+      # This tries to 304 cache these on the clients browser, it is safe because it is not public, it is just for ajax requests,
       # so we dont have the back button problem we have elsewhere, and Assignments and Calendar Events will both touch their context so that cache key is always accurate.
       cancel_cache_buster
       response.etag = cache_key
@@ -97,36 +130,54 @@ class CalendarsController < ApplicationController
         @dont_render_again = true
         head :not_modified and return
       end
-      
-      Rails.cache.fetch(cache_key) { 
+
+      Rails.cache.fetch(cache_key) {
         build_calendar_events
       }
     end
   end
   protected :calendar_events_for_request_format
-  
+
   def build_calendar_dates
     @today = Time.zone.today
-    @month = params[:month].to_i
-    @month = !@month || @month == 0 ? @today.month : @month
-    @year = params[:year].to_i
-    @year = !@year || @year == 0 ? @today.year : @year
-    
-    first_day_of_month = Date.new(y=@year, m=@month, d=1)
-    last_day_of_previous_month = first_day_of_month - 1
-    @current = first_day_of_month
-    last_day_of_month = (first_day_of_month >> 1) - 1
-    first_day_of_next_month = last_day_of_month + 1
-    @first_day = last_day_of_previous_month - last_day_of_previous_month.wday
-    @last_day = first_day_of_next_month + (6 - first_day_of_next_month.wday) + 7
+
+    if params[:start_day] && params[:end_day]
+      @first_day = Date.parse(params[:start_day])
+      @last_day = Date.parse(params[:end_day])
+      if @first_day.day != 1
+        # TODO: this is assuming a month is asked for at a time, which is a bad assumption
+        @month = (@first_day + 1.month).month
+        @year = (@first_day + 1.month).year
+      else
+        @month = @first_day.month
+        @year = @first_day.year
+      end
+      @current = Date.new(y = @year, m = @month, d = 1)
+    else
+      @month = params[:month].to_i
+      @month = !@month || @month == 0 ? @today.month : @month
+      @year = params[:year].to_i
+      @year = !@year || @year == 0 ? @today.year : @year
+
+      @first_day = Date.parse(params[:start_day]) if params[:start_day]
+      @last_day = Date.parse(params[:end_day]) if params[:end_day]
+
+      first_day_of_month = Date.new(y=@year, m=@month, d=1)
+      last_day_of_previous_month = first_day_of_month - 1
+      @current = first_day_of_month
+      last_day_of_month = (first_day_of_month >> 1) - 1
+      first_day_of_next_month = last_day_of_month + 1
+      @first_day = last_day_of_previous_month - last_day_of_previous_month.wday
+      @last_day = first_day_of_next_month + (6 - first_day_of_next_month.wday) + 7
+    end
   end
   protected :build_calendar_dates
-  
-    
+
+
   def public_feed
     return unless get_feed_context
     get_all_pertinent_contexts
-    
+
     @events = []
     @contexts.each do |context|
       @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
@@ -165,5 +216,4 @@ class CalendarsController < ApplicationController
       end
     end
   end
-  
 end

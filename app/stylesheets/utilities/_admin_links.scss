@@ -1,0 +1,92 @@
+/*
+give the parent box that when you hover over, the trigger should appear the class 'admin-link-hover-area'
+
+sample markup:
+
+<div class="admin-link-hover-area">
+  <div class="admin-links">
+    <button class="al-trigger"><span class="al-trigger-inner">Manage (will be accessibly hidden)</span></button>
+    <ul class="al-options">
+      <li><a href="#"><span class="ui-icon ui-icon-pencil" />Edit</a></li>
+      <li><a href="#"><span class="ui-icon ui-icon-trash" />Delete (from database)</a></li>
+      <li><a href="#"><span class="ui-icon ui-icon-close" />Hide from this screen</a></li>
+      <li><a href="#">an option with no icon/a></li>
+    </ul>
+  </div>
+  put all of the content here
+</div>
+*/
+
+.admin-links {
+  float: right;
+}
+.al-options { 
+  display: none;
+  &.ui-menu{
+    display: block;
+  }
+}
+.al-trigger{
+  @include opacity(0);
+  .ui-button-text{ padding: 0; font-size: 10px;}
+  .al-trigger-inner {
+    display: inline-block;
+    text-indent: -100px;
+    overflow: hidden;
+  }
+  outline: none;
+  cursor: pointer;
+  zoom: 1;
+  border: 1px solid;
+  box-shadow: none;
+  border-color: #b6b6b6;
+  padding: 3px 4px;
+  @include vertical-gradient(#fafafa, #d3d4d8);
+  @include border-radius(15px);
+  border: 1px solid #c2c2c2;
+  border-bottom-color: #bfbfbf;
+  &:hover, &.ui-state-active {
+    @include vertical-gradient(#ffffff, #dfdfdf);
+  }
+  &:active, &.ui-state-active { @include vertical-gradient(#a8a8a8, #c6c6c6) }
+}
+.al-options {
+  background-color: transparent;
+  border: none;
+  box-shadow: rgba(0,0,0, 0.8) 0px 3px 5px 0px;
+  .ui-menu-item a {
+    background-color: black; /* ie<=8 */
+    background-color: rgba(0,0,0, 0.7);
+    color: #fff;
+    text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
+  }
+  .ui-menu-carat {
+    border-color: transparent;
+  }
+  .ui-menu-carat span {
+    border-color: black transparent; /* ie<=8 */
+    border-color: rgba(0,0,0,0.7) transparent;
+  }
+  .ui-state-focus{
+    margin: 0 !important;
+    border: none;
+  }
+  .ui-icon {background-image: url(/images/jqueryui/ui-icons_ffffff_256x240.png); }
+}
+.admin-link-hover-area:hover .al-trigger, 
+.admin-link-hover-area.active .al-trigger, 
+.al-trigger.ui-state-active{ @include opacity(1) }
+
+//this should be in main jquery css along with other buttons but it is not a sass file yet
+$image: "cog-with-droparrow.png";
+.ui-icon-cog-with-droparrow, .al-trigger-inner  {
+  height: image-height($image);
+  width: image-width($image);
+  background: inline-image($image);
+}
+.al-trigger:active .al-trigger-inner,
+.al-trigger.ui-state-active .al-trigger-inner,
+.ui-state-active .ui-icon-cog-with-droparrow{ 
+  background: inline-image('cog-with-droparrow-active.png')
+}
+

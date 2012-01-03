@@ -197,31 +197,40 @@ describe CalendarEvent do
       end
 
       it "should notify all participants except the person reserving" do
-        slot = @appointment2.reserve_for(@group, @student1)
-        slot.messages_sent.should be_include("Appointment Reserved For User")
-        slot.messages_sent["Appointment Reserved For User"].map(&:user_id).sort.uniq.should eql [@student2.id]
+        reservation = @appointment2.reserve_for(@group, @student1)
+        reservation.messages_sent.should be_include("Appointment Reserved For User")
+        reservation.messages_sent["Appointment Reserved For User"].map(&:user_id).sort.uniq.should eql [@student2.id]
       end
 
-      it "should notify all participants except the person canceling" do
-        slot = @appointment2.reserve_for(@group, @student1)
-        slot.updating_user = @student1
-        slot.destroy
-        slot.messages_sent.should be_include("Appointment Deleted For User")
-        slot.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student2.id]
+      it "should notify all participants except the person canceling the reservation" do
+        reservation = @appointment2.reserve_for(@group, @student1)
+        reservation.updating_user = @student1
+        reservation.destroy
+        reservation.messages_sent.should be_include("Appointment Deleted For User")
+        reservation.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student2.id]
+      end
+
+      it "should notify all participants when the the time slot is canceled" do
+        reservation = @appointment2.reserve_for(@group, @student1)
+        @appointment2.updating_user = @teacher
+        @appointment2.destroy
+        @appointment2.messages_sent.should be_empty
+        reservation.messages_sent.should be_include("Appointment Deleted For User")
+        reservation.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student1.id, @student2.id]
       end
 
       it "should notify admins when a user reserves" do
-        slot = @appointment.reserve_for(@user, @user)
-        slot.messages_sent.should be_include("Appointment Reserved By User")
-        slot.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
+        reservation = @appointment.reserve_for(@user, @user)
+        reservation.messages_sent.should be_include("Appointment Reserved By User")
+        reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
       end
 
       it "should notify admins when a user cancels" do
-        slot = @appointment.reserve_for(@student1, @student1)
-        slot.updating_user = @student1
-        slot.destroy
-        slot.messages_sent.should be_include("Appointment Canceled By User")
-        slot.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
+        reservation = @appointment.reserve_for(@student1, @student1)
+        reservation.updating_user = @student1
+        reservation.destroy
+        reservation.messages_sent.should be_include("Appointment Canceled By User")
+        reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
       end
     end
 

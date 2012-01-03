@@ -1,0 +1,60 @@
+<button class="button single_item_done_button">Done, Go Back To List</button>
+<h2 id="appointment-group-list-header">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
+<ul id="appointment-group-list">
+  {{#each appointment_groups}}
+    <li class='appointment-group-item admin-link-hover-area {{#if requiring_action}}requiring-action{{/if}}' data-appointment-group-id='{{id}}'>
+      {{#if is_manageable}}
+        <div class="admin-links">
+          <button class="al-trigger"><span class="al-trigger-inner">Manage</span></button>
+          <ul class="al-options">
+            <li><a class="edit_link" href="#"><span class="ui-icon ui-icon-pencil" />Edit</a></li>
+            <li><a class="delete_link" href="#"><span class="ui-icon ui-icon-trash" />Delete</a></li>
+          </ul>
+        </div>
+      {{/if}}
+      {{#if requiring_action}}
+        <div class="alert-message block-message warning">
+          <p>
+            You need to <a class="view_calendar_link" href="#">sign up</a> for this.
+          </p>
+        </div>
+      {{else}}
+        {{#if signed_up_times}}
+          <div class="alert-message block-message success">
+            <p>You're signed up for</p>
+            {{#each signed_up_times}}
+              <p><strong><a href="#" class="show_event_link" data-event-id="{{id}}">{{formatted_time}}</a></strong></p>
+            {{/each}}
+          </div>
+        {{/if}}
+      {{/if}}
+      
+      <h3><a class="view_calendar_link" href="#">{{title}}</a></h3>
+      {{#if context}}
+        <div class='ag-context'><a href="{{context.url}}">{{context.name}}</a></div>
+      {{/if}}
+      {{#if location_name}}
+        <div class="ag-location">
+          <strong>{{#t "location"}}Location:{{/t}}</strong>
+          <span>{{location_name}}</span>
+        </div>
+      {{/if}}
+      {{#if description}}
+        <p class="ag-description">{{newlinesToBreak description}}</p>
+      {{/if}}
+      {{#if is_manageable}}
+        <div class="ag-x-of-x-signed-up">
+          {{#ifEqual participant_type "Group"}}
+            {{#t "x_groups_have_signed_up"}}
+              {{signed_up}} groups have signed up
+            {{/t}}
+          {{else}}
+            {{#t "x_people_have_signed_up"}}
+              {{signed_up}} people have signed up
+            {{/t}}
+          {{/ifEqual}}
+        </div>
+      {{/if}}
+    </li>
+  {{/each}}
+</ul>
