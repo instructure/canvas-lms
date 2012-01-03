@@ -170,8 +170,17 @@ module TextHelper
     end
     return I18n.l(start_date, :format => :medium)
   end
-  def date_string(*args)
-    TextHelper.date_string(*args)
+  def date_string(start_date, *args)
+    style = args.last.is_a?(Symbol) ? args.pop : :normal
+    end_date = args.pop
+    if end_date.nil? || start_date == end_date
+      TextHelper.date_string(start_date, style)
+    else
+      I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}",
+        :start_date_and_time => TextHelper.date_string(start_date, style),
+        :end_date_and_time => TextHelper.date_string(end_date, style)
+      )
+    end
   end
 
   def time_string(start_time, end_time=nil)

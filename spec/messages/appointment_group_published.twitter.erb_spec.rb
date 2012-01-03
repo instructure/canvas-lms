@@ -16,15 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe "/shared/_notification_list" do
+describe 'appointment_group_published.twitter' do
   it "should render" do
-    course_with_student
-    view_context
-    render :partial => "shared/notification_list"
-    response.should_not be_nil
+    user = user_model
+    appointment_group_model(:context => course_model)
+
+    generate_message(:appointment_group_published, :twitter, @appointment_group)
+
+    @message.body.should include('some title')
   end
 end
-

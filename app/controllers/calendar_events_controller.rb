@@ -18,10 +18,10 @@
 
 class CalendarEventsController < ApplicationController
   before_filter :require_context
-  
+
   add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
-  
-  
+
+
   def show
     @event = @context.calendar_events.find(params[:id])
     add_crumb(@event.title, named_context_url(@context, :context_calendar_event_url, @event))
@@ -55,7 +55,7 @@ class CalendarEventsController < ApplicationController
     @event = @context.calendar_events.build(params[:calendar_event])
     if authorized_action(@event, @current_user, :create)
       respond_to do |format|
-        @event.content_being_saved_by(@current_user)
+        @event.updating_user = @current_user
         if @event.save
           flash[:notice] = t 'notices.created', "Event was successfully created."
           format.html { redirect_to calendar_url_for(@context) }
@@ -86,7 +86,7 @@ class CalendarEventsController < ApplicationController
     if authorized_action(@event, @current_user, :update)
       respond_to do |format|
         params[:calendar_event][:time_zone_edited] = Time.zone.name if params[:calendar_event]
-        @event.content_being_saved_by(@current_user)
+        @event.updating_user = @current_user
         if @event.update_attributes(params[:calendar_event])
           log_asset_access(@event, "calendar", "calendar", 'participate')
           flash[:notice] = t 'notices.updated', "Event was successfully updated."

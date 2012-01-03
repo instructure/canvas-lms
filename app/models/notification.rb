@@ -382,6 +382,14 @@ class Notification < ActiveRecord::Base
       'immediately'
     when 'Calendar'
       'never'
+    when 'Student Appointment Signups'
+      'never'
+    when 'Appointment Availability'
+      'immediately'
+    when 'Appointment Signups'
+      'immediately'
+    when 'Appointment Cancelations'
+      'immediately'
     when 'Course Content'
       'never'
     when 'Files'
@@ -491,6 +499,13 @@ class Notification < ActiveRecord::Base
     t 'names.updated_wiki_page', 'Updated Wiki Page'
     t 'names.web_conference_invitation', 'Web Conference Invitation'
     t 'names.alert', 'Alert'
+    t 'names.appointment_canceled_by_user', 'Appointment Canceled By User'
+    t 'names.appointment_deleted_for_user', 'Appointment Deleted For User'
+    t 'names.appointment_group_deleted', 'Appointment Group Deleted'
+    t 'names.appointment_group_published', 'Appointment Group Published'
+    t 'names.appointment_group_updated', 'Appointment Group Updated'
+    t 'names.appointment_reserved_by_user', 'Appointment Reserved By User'
+    t 'names.appointment_reserved_for_user', 'Appointment Reserved For User'
   end
 
   # TODO: i18n ... show these anywhere we show the category today
@@ -498,6 +513,10 @@ class Notification < ActiveRecord::Base
     t 'categories.all_submissions', 'All Submissions'
     t 'categories.announcement', 'Announcement'
     t 'categories.calendar', 'Calendar'
+    t 'categories.student_appointment_signups', 'Student Appointment Signups'
+    t 'categories.appointment_availability', 'Appointment Availability'
+    t 'categories.appointment_signups', 'Appointment Signups'
+    t 'categories.appointment_cancelations', 'Appointment Cancelations'
     t 'categories.course_content', 'Course Content'
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
@@ -546,6 +565,14 @@ class Notification < ActiveRecord::Base
       t(:other_description, "For any other notifications")
     when 'Calendar'
       t(:calendar_description, "For calendar changes")
+    when 'Student Appointment Signups'
+      t(:student_appointment_description, "For student appointment signups and cancelations")
+    when 'Appointment Availability'
+      t(:appointment_availability_description, "For changes to appointment time slots")
+    when 'Appointment Signups'
+      t(:appointment_signups_description, "For appointments you get signed up for")
+    when 'Appointment Cancelations'
+      t(:appointment_cancelations_description, "For your appointments that get canceled")
     when 'Message'
       t(:message_description, "For new email messages")
     when 'Student Message'

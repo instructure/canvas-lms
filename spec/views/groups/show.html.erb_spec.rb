@@ -27,7 +27,6 @@ describe "/groups/show" do
     assigns[:group] = @group
     assigns[:topics] = []
     assigns[:upcoming_events] = []
-    assigns[:recent_events] = []
     assigns[:context] = @group
     render "groups/show"
     response.should_not be_nil

@@ -16,18 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe "/notifications/index" do
+describe 'appointment_reserved_by_user.summary' do
   it "should render" do
-    course_with_student
-    view_context
-    assigns[:recent_events] = []
-    assigns[:upcoming_events] = []
-    assigns[:message_types] = {}
-    render "notifications/index"
-    response.should_not be_nil
+    user = user_model
+    appointment_participant_model(:updating_user => user, :participant => user)
+
+    generate_message(:appointment_reserved_by_user, :summary, @event)
+
+    @message.subject.should include('some title')
+    @message.body.should include('some title')
+    @message.body.should include(user.name)
   end
 end
-
