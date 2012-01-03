@@ -37,10 +37,10 @@ describe Api::V1::Course do
   end
 
   it 'should support optionally providing the url' do
-    @test_api.course_json(@course1, @me, {}, ['url'], []).should encompass({
-      "url" => "course_url(Course.find(#{@course1.id}))"
+    @test_api.course_json(@course1, @me, {}, ['html_url'], []).should encompass({
+      "html_url" => "course_url(Course.find(#{@course1.id}))"
     })
-    @test_api.course_json(@course1, @me, {}, [], []).has_key?("url").should be_false
+    @test_api.course_json(@course1, @me, {}, [], []).has_key?("html_url").should be_false
   end
 
 end
