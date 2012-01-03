@@ -2,7 +2,7 @@ require File.expand_path("../spec_helper", __FILE__)
 
 describe Delayed::Worker do
   def job_create(opts = {})
-    Delayed::Job.create(opts.merge(:payload_object => SimpleJob.new))
+    Delayed::Job.create({:payload_object => SimpleJob.new, :queue => Delayed::Worker.queue}.merge(opts))
   end
   def worker_create(opts = {})
     Delayed::Worker.new(opts.merge(:max_priority => nil, :min_priority => nil, :quiet => true))

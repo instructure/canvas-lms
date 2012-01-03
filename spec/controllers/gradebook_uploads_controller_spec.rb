@@ -138,4 +138,43 @@ describe GradebookUploadsController do
     upload.assignments[1].should eql(@assignment2)
     upload.students.length.should eql(1)
   end
+
+  describe "POST 'update'" do
+
+    it "should allow entering a percentage for a score" do
+      course_with_student(:active_all => true)
+      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :grading_type => 'percent', :assignment_group => @group)
+      @student = @user
+      user_model
+      @course.enroll_teacher(@user).accept
+      user_session(@user)
+      uploaded_json = <<-JSON
+      {
+        "students": [{
+          "original_id": #{@student.id},
+          "name": "#{@student.name}",
+          "submissions": [{
+            "grade": "40%",
+            "assignment_id": #{@assignment.id}
+          }],
+          "id": #{@student.id},
+          "last_name_first": "#{@student.last_name_first}"
+        }],
+        "assignments": [{
+          "original_id": #{@assignment.id},
+          "title": "#{@assignment.title}",
+          "id": #{@assignment.id},
+          "points_possible": #{@assignment.points_possible},
+          "grading_type": "#{@assignment.grading_type}"
+        }]
+      }
+      JSON
+      post 'update', :course_id => @course.id, :json_data_to_submit => uploaded_json
+      @submission = @assignment.reload.submissions.find_by_user_id(@student.id)
+      @submission.grade.should == "40%"
+      @submission.score.should == 4
+    end
+
+  end
 end

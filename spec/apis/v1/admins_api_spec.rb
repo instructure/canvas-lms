@@ -40,7 +40,7 @@ describe "Admins API", :type => :integration do
       admin.account.should == @admin.account
     end
 
-    it "should default the membership type of the admin association to AccountAdmin" do
+    it "should default the role of the admin association to AccountAdmin" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
         { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
         { :user_id => @new_user.id })
@@ -49,10 +49,10 @@ describe "Admins API", :type => :integration do
       admin.membership_type.should == 'AccountAdmin'
     end
 
-    it "should respect the provided membership type, if any" do
+    it "should respect the provided role, if any" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
         { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        { :user_id => @new_user.id, :membership_type => "CustomAccountUser" })
+        { :user_id => @new_user.id, :role => "CustomAccountUser" })
       @new_user.reload
       admin = @new_user.account_users.first
       admin.membership_type.should == 'CustomAccountUser'
@@ -66,7 +66,7 @@ describe "Admins API", :type => :integration do
       admin = @new_user.account_users.first
       json.should == {
         "id" => admin.id,
-        "membership_type" => admin.membership_type,
+        "role" => admin.membership_type,
         "user" => {
           "id" => @new_user.id,
           "name" => @new_user.name,

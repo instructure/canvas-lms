@@ -19,7 +19,6 @@
 class Notification < ActiveRecord::Base
   include LocaleSelection
 
-  validates_length_of :body, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   include Workflow
   
   TYPES_TO_SHOW_IN_FEED = ["Assignment Due Date Changed", 

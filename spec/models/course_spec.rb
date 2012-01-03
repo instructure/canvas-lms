@@ -981,6 +981,15 @@ describe Course, "backup" do
     other_course.learning_outcomes.should be_include(other_outcome)
   end
 
+  it "should not count learning outcome groups as having outcomes" do
+    course = course_model
+    default_group = LearningOutcomeGroup.default_for(course)
+    other_group = course.learning_outcome_groups.create!
+    default_group.add_item(other_group)
+    
+    course.has_outcomes.should == false
+  end
+
   it "should copy learning outcomes into the new course" do
     old_course = course_model
     lo = old_course.learning_outcomes.new
@@ -2181,9 +2190,13 @@ describe Course, 'grade_publishing' do
 end
 
 describe Course, 'tabs_available' do
+  def new_exernal_tool(context)
+    context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
+  end
+  
   it "should not include external tools if not configured for course navigation" do
     course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @course
     tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == false
@@ -2195,7 +2208,7 @@ describe Course, 'tabs_available' do
   
   it "should include external tools if configured on the course" do
     course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @course
     tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
@@ -2213,7 +2226,7 @@ describe Course, 'tabs_available' do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
     @course.move_to_account(@account.root_account, @account)
-    tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @account
     tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
@@ -2231,7 +2244,7 @@ describe Course, 'tabs_available' do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
     @course.move_to_account(@account.root_account, @account)
-    tool = @account.root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @account.root_account
     tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
@@ -2250,7 +2263,7 @@ describe Course, 'tabs_available' do
     @course.offer
     @course.is_public = true
     @course.save!
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @course
     tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'admins'}
     tool.save!
     tool.has_course_navigation.should == true
@@ -2276,7 +2289,7 @@ describe Course, 'tabs_available' do
     @course.offer
     @course.is_public = true
     @course.save!
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @course
     tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'members'}
     tool.save!
     tool.has_course_navigation.should == true
@@ -2299,7 +2312,7 @@ describe Course, 'tabs_available' do
   
   it "should allow reordering external tool position in course navigation" do
     course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @course
     tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
@@ -2313,7 +2326,7 @@ describe Course, 'tabs_available' do
   
   it "should not show external tools that are hidden in course navigation" do
     course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool = new_exernal_tool @course
     tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
@@ -2512,7 +2525,7 @@ describe Course, "section_visibility" do
     @course.enroll_teacher(@teacher)
 
     @ta = User.create
-    @course.enroll_user(@ta, "TaEnrollment", :limit_priveleges_to_course_section => true)
+    @course.enroll_user(@ta, "TaEnrollment", :limit_privileges_to_course_section => true)
 
     @student1 = User.create
     @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')

@@ -24,7 +24,7 @@ describe UsersController do
       course_with_teacher_logged_in(:active_all => true)
       @course.update_attribute(:name, 'coursename1')
       @teacher = @user
-      @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+      @enrollment.update_attribute(:limit_privileges_to_course_section, true)
       @s1 = @course.course_sections.first
       @s2 = @course.course_sections.create!(:name => 'Section B')
       @e1 = student_in_course

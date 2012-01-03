@@ -103,8 +103,13 @@ describe "files without s3 and forked tests" do
     driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
     wait_for_ajax_requests
     Folder.last.name.should == "my folder"
-    driver.find_element(:css, "#files_content .folder_item .rename_item_link").click
-    driver.find_element(:css, "#files_content #rename_entry_field").send_keys("my folder 2\n")
+    entry_field = keep_trying_until do
+      driver.find_element(:css, "#files_content .folder_item .rename_item_link").click
+      entry_field = driver.find_element(:css, "#files_content #rename_entry_field")
+      entry_field.should be_displayed
+      entry_field
+    end
+    entry_field.send_keys("my folder 2\n")
     wait_for_ajax_requests
     Folder.last.name.should == "my folder 2"
   end

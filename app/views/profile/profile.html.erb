@@ -434,7 +434,7 @@ TEXT
     <a href="#" class="button add_access_token_link"><%= image_tag "add.png" %> <%= t('buttons.new_access_token', "New Access Token") %></a>
   </div>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
-    <p><%= t(:access_token_description, <<-TEXT, :wrapper => '<a href="http://instructure.github.com/canvas-lms/doc/api/index.html" target="_blank" class="external">\1</a>')
+    <p><%= t(:access_token_description, <<-TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
       Access tokens can be used to allow other applications to make API calls
       on your behalf.  You can also generate access tokens and *use the Canvas
       Open API* to come up with your own integrations.
@@ -483,7 +483,7 @@ TEXT
   </div>
   <div id="add_access_token_dialog" style="display: none;" title="<%= t('titles.new_access_token', "New Access Token") %>">
     <h2><%= t('headers.generate_access_token', "Generate an Access Token") %></h2>
-    <%= mt(:generate_access_token_description, <<-TEXT, :documentation_url => 'http://instructure.github.com/canvas-lms/doc/api/index.html')
+    <%= mt(:generate_access_token_description, <<-TEXT, :documentation_url => 'https://canvas.instructure.com/doc/api/index.html')
 Access tokens are what allow third-party applications to access Canvas
 resources on your behalf. These tokens are normally created automatically for
 applications as needed, but if [you're developing a new or limited

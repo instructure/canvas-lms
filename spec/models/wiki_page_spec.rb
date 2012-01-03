@@ -19,8 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WikiPage do
-  it "should send page updated notifications" do
+  before(:each) do
     course_with_teacher(:active_all => true)
+  end
+
+  it "should send page updated notifications" do
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :user => @user, :frequency => "immediately")
     p = @course.wiki.wiki_pages.create(:title => "some page")
@@ -37,7 +40,6 @@ describe WikiPage do
   end
 
   it "should validate the title" do
-    course_with_teacher(:active_all => true)
     @course.wiki.wiki_pages.new(:title => "").valid?.should_not be_true
     @course.wiki.wiki_pages.new(:title => "!!!").valid?.should_not be_true
     @course.wiki.wiki_pages.new(:title => "a"*256).valid?.should_not be_true
@@ -45,15 +47,13 @@ describe WikiPage do
   end
 
   it "should make the title/url unique" do
-    course_with_teacher(:active_all => true)
     p1 = @course.wiki.wiki_pages.create(:title => "Asdf")
     p2 = @course.wiki.wiki_pages.create(:title => "Asdf")
     p2.title.should eql('Asdf-2')
-    p2.url.should eql('asdf-2')
+    p2.url.should eql("#{p2.id}-asdf-2")
   end
 
   it "should make the title unique and truncate to proper length" do
-    course_with_teacher(:active_all => true)
     p1 = @course.wiki.wiki_pages.create!(:title => "a" * WikiPage::TITLE_LENGTH)
     p2 = @course.wiki.wiki_pages.create!(:title => p1.title)
     p3 = @course.wiki.wiki_pages.create!(:title => p1.title)
@@ -67,7 +67,6 @@ describe WikiPage do
   end
 
   it "should let you reuse the title/url of a deleted page" do
-    course_with_teacher(:active_all => true)
     p1 = @course.wiki.wiki_pages.create(:title => "Asdf")
     p1.workflow_state = 'deleted'
     p1.save
@@ -75,17 +74,29 @@ describe WikiPage do
     p2 = @course.wiki.wiki_pages.create(:title => "Asdf")
     p2.reload
     p2.title.should eql('Asdf')
-    p2.url.should eql('asdf')
+    p2.url.should eql("#{p2.id}-asdf")
 
     # so long as it's deleted, we don't care about uniqueness of the title/url
     p1.save.should be_true
     p1.title.should eql('Asdf')
-    p1.url.should eql('asdf')
-    
+    p1.url.should eql("#{p1.id}-asdf")
+
     p1.workflow_state = 'active'
     p1.save.should be_true
     p1.title.should eql('Asdf-2')
-    p1.url.should eql('asdf-2')
+    p1.url.should eql("#{p1.id}-asdf-2")
+  end
+
+  it "should prepend the id to its url" do
+    page = @course.wiki.wiki_pages.create(:title => "The Unbearable Lightness of Being")
+    page.url.should eql "#{page.id}-the-unbearable-lightness-of-being"
+  end
+
+  it "should change its url when renamed" do
+    page = @course.wiki.wiki_pages.create(:title => "Blood Meridian")
+    page.title = "Blood Meridian, or the Evening Redness in the West"
+    page.save
+    page.url.should eql "#{page.id}-blood-meridian-or-the-evening-redness-in-the-west"
   end
 
   context "atom" do

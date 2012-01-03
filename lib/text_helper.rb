@@ -157,7 +157,7 @@ module TextHelper
   def self.date_string(start_date, style=:normal)
     return nil unless start_date
     start_date = start_date.in_time_zone.to_date rescue start_date.to_date
-    today = Time.zone.now.to_date
+    today = Time.zone.today
     if style != :long
       if style != :no_words
         string = nil
