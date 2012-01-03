@@ -196,7 +196,7 @@ class UsersController < ApplicationController
   end
 
   def masquerade
-    @user = User.find_by_id(params[:user_id])
+    @user = User.find(:first, :conditions => {:id => params[:user_id]})
     if (authorized_action(@user, @real_current_user || @current_user, :become_user))
       if request.post?
         if @user == @real_current_user
