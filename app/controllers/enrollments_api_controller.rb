@@ -29,6 +29,34 @@ class EnrollmentsApiController < ApplicationController
   @@valid_types = %w{StudentEnrollment TeacherEnrollment TaEnrollment ObserverEnrollment}
 
   include Api::V1::Enrollment
+  #
+  # @API
+  # Return a list of all enrolled users in a course. Includes students,
+  # teachers, TAs, and observers. Any enrollment types without members
+  # are omitted.
+  #
+  # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are retuurned.
+  #
+  # @response_field id The unique identifier for the course member.
+  # @response_field name The full course member name.
+  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
+  #
+  # @example_response
+  # {
+  #   "students": [ { "id": 1, "name": "Justin Bieber", "sortable_name": "Bieber, Justin", "short_name": "Justin B.", "login_id": "jbieber@example.com", "sis_user_id": null, "sis_login_id": null },
+  #                 { "id": 2, "name": "Selena Gomez", "sortable_name": "Gomez, Selena", "short_name": "Selena G.", "login_id": "sgomez@example.com", "sis_user_id": "from-sis", "sis_login_id": "login-from-sis" }
+  #               ],
+  #   "teachers": [ { "id": 3, "name": "Señor Chang", "sortable_name": "Chang, Señor", "short_name": "S. Chang", "login_id": "changyourmind@example.com", "sis_user_id": null, "sis_login_id": null } ]
+  # }
+  def index
+    get_context
+    return unless authorized_action(@context, @current_user, :read_roster)
+    conditions = {}.tap { |c| c[:type] = params[:type] if params[:type].present? }
+    enrollments = Api.paginate(
+      @context.current_enrollments.scoped(:include => :user, :conditions => conditions, :order => 'enrollments.type ASC, users.sortable_name ASC'),
+      self, api_v1_enrollments_path)
+    render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, [:user]) }
+  end
 
   # @API
   # Create a new user enrollment for a course.

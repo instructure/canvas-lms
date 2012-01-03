@@ -262,6 +262,7 @@ class CoursesController < ApplicationController
     end
   end
 
+
   include Api::V1::StreamItem
   # @API
   # Returns the current user's course-specific activity stream.
