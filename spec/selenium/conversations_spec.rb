@@ -71,8 +71,19 @@ shared_examples_for "conversations selenium tests" do
       keep_trying_until{
         elements = find_all_with_jquery("#conversations > ul > li:visible")
         elements.last.location_once_scrolled_into_view
-        elements.size == num  
+        elements.size == num
       }
+    end
+
+    it "should properly clear the identity header when conversations are read" do
+      enable_cache do
+        @me = @user
+        5.times { conversation(@me, user).update_attribute(:workflow_state, 'unread') }
+        get '/conversations'
+        driver.find_element(:css, '.conversations li:first-child').click
+        get '/conversations'
+        driver.find_element(:css, '.unread-messages-count').text.should eql '4'
+      end
     end
   end
 

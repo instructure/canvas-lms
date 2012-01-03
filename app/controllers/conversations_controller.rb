@@ -252,7 +252,7 @@ class ConversationsController < ApplicationController
   #   }
   def show
     return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" + (params[:message] ? '?message=' + URI.encode(params[:message], Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")) : '') unless request.xhr? || params[:format] == 'json'
-    
+
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread?
     submissions = []
     if @conversation.one_on_one?
