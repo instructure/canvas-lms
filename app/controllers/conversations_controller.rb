@@ -576,6 +576,7 @@ class ConversationsController < ApplicationController
     @current_user.concluded_courses.each do |course|
       @contexts[:courses][course.id] = {
         :id => course.id,
+        :url => course_url(course),
         :name => course.name,
         :type => :course,
         :active => course.recently_ended?,
@@ -586,6 +587,7 @@ class ConversationsController < ApplicationController
     @current_user.courses.each do |course|
       @contexts[:courses][course.id] = {
         :id => course.id,
+        :url => course_url(course),
         :name => course.name,
         :type => :course,
         :active => true,
