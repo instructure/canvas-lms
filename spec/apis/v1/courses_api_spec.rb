@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 class TestCourseApi
   include Api::V1::Course
   def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
-  def course_url(course); return "course_url(Course.find(#{course.id}))"; end
+  def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
 end
 
 describe Api::V1::Course do
@@ -38,7 +38,7 @@ describe Api::V1::Course do
 
   it 'should support optionally providing the url' do
     @test_api.course_json(@course1, @me, {}, ['html_url'], []).should encompass({
-      "html_url" => "course_url(Course.find(#{@course1.id}))"
+      "html_url" => "course_url(Course.find(#{@course1.id}), :host => #{HostUrl.context_host(@course1)})"
     })
     @test_api.course_json(@course1, @me, {}, [], []).has_key?("html_url").should be_false
   end

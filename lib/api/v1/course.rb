@@ -48,7 +48,7 @@ module Api::V1::Course
     if include_syllabus
       hash['syllabus_body'] = course.syllabus_body
     end
-    hash['html_url'] = course_url(course) if include_url
+    hash['html_url'] = course_url(course, :host => HostUrl.context_host(course)) if include_url
     hash
   end
 
