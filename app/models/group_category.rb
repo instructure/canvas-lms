@@ -22,6 +22,10 @@ class GroupCategory < ActiveRecord::Base
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
 
+  named_scope :active, lambda {
+    { :conditions => ['group_categories.deleted_at is null'] }
+  }
+
   named_scope :other_than, lambda{ |cat|
     { :conditions => ['group_categories.id != ?', cat.id || 0] }
   }

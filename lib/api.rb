@@ -145,7 +145,7 @@ module Api
     find_params[:include] = sis_mapping[:joins] if sis_mapping[:joins]
     return find_params
   end
-  
+
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
@@ -154,21 +154,22 @@ module Api
     collection = collection.paginate({ :page => controller.params[:page], :per_page => per_page }.merge(pagination_args))
     return unless collection.respond_to?(:next_page)
     links = []
-    template = "<#{base_url}#{base_url =~ /\?/ ? '&': '?'}page=%s&per_page=#{collection.per_page}>; rel=\"%s\""
+    base_url += (base_url =~ /\?/ ? '&': '?')
+    template = "<%spage=%s&per_page=#{collection.per_page}>; rel=\"%s\""
     if collection.next_page
-      links << template % [collection.next_page, "next"]
+      links << template % [base_url, collection.next_page, "next"]
     end
     if collection.previous_page
-      links << template % [collection.previous_page, "prev"]
+      links << template % [base_url, collection.previous_page, "prev"]
     end
-    links << template % [1, "first"]
+    links << template % [base_url, 1, "first"]
     if collection.total_pages && collection.total_pages > 1
-      links << template % [collection.total_pages, "last"]
+      links << template % [base_url, collection.total_pages, "last"]
     end
     controller.response.headers["Link"] = links.join(',') if links.length > 0
     collection
   end
-  
+
   def attachment_json(attachment)
     url = file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1')
     {

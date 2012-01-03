@@ -61,6 +61,15 @@ class ActiveRecord::Base
     @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
   end
 
+  # little helper to keep checks concise and avoid a db lookup
+  def has_asset?(asset, field = :context)
+    asset.id == send("#{field}_id") && asset.class.base_ar_class.name == send("#{field}_type")
+  end
+
+  def context_string(field = :context)
+    send("#{field}_type").underscore + "_" + send("#{field}_id").to_s if send("#{field}_type")
+  end
+
   def export_columns(format = nil)
     self.class.content_columns.map(&:name)
   end
@@ -299,6 +308,10 @@ class ActiveRecord::Base
 
     result
   end
+
+  named_scope :order, lambda { |order_by|
+    {:order => order_by}
+  }
 end
 
 class ActiveRecord::Serialization::Serializer
