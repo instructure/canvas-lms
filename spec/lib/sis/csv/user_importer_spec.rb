@@ -867,4 +867,24 @@ describe SIS::CSV::UserImporter do
     end
   end
 
+  it "should not steal the communication channel of the previous user" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    user_1 = Pseudonym.find_by_unique_id('user1').user
+    user_1.email.should == 'user1@example.com'
+    user_1.pseudonym.sis_communication_channel.should == user_1.email_channel
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active"
+    )
+    user_1 = Pseudonym.find_by_unique_id('user1').user
+    user_2 = Pseudonym.find_by_unique_id('user2').user
+    user_1.email.should == 'user1@example.com'
+    user_2.email.should == 'user2@example.com'
+    user_1.pseudonym.sis_communication_channel.should == user_1.email_channel
+    user_2.pseudonym.sis_communication_channel.should == user_2.email_channel
+  end
 end
