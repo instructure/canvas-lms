@@ -7,7 +7,7 @@ describe "course wizard" do
     setup_permissions(true, true, true)
   end
 
-  VALID_EMAILS = ["jake@jake.com", "test@test.com", "hey@hey.com", "new@new.com", "what@what.com"]
+  VALID_EMAILS = ["jake@example.com", "test@example.com", "hey@example.com", "new@example.com", "what@example.com"]
 
   def setup_permissions(is_open_registration, is_no_enrollments_can_create_courses, can_teachers_create_courses)
     account = Account.default
