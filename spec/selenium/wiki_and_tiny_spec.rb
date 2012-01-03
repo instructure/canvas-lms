@@ -84,6 +84,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       @image_list.find_elements(:css, 'img.img').length.should == 0
 
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
       keep_trying_until { @image_list.find_elements(:css, 'img.img').length }.should == 2
     end
 
@@ -118,6 +119,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       @image_list.find_elements(:css, 'img.img').length.should == 0
 
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
       keep_trying_until { @image_list.find_elements(:css, 'img.img').length }.should == 30
 
       driver.execute_script('image_list = $(".image_list")')
@@ -221,8 +223,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '.upload_new_image_link').click
       driver.find_element(:css, '.wiki_switch_views_link').click
       wiki_page_body = clear_rce
-
-      @image_list.find_elements(:css, 'img.img').length.should == 2
+      wait_for_ajaximations
+      keep_trying_until{ @image_list.find_elements(:css, 'img.img').length.should == 2 }
 
       upload_file('#sidebar_upload_image_form', :text)
 
@@ -270,8 +272,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '.upload_new_image_link').click
       driver.find_element(:css, '.wiki_switch_views_link').click
       wiki_page_body = clear_rce
-
-      @image_list.find_elements(:css, 'img.img').length.should == 2
+      wait_for_ajaximations
+      keep_trying_until{ @image_list.find_elements(:css, 'img.img').length.should == 2 }
 
       upload_file('#sidebar_upload_image_form', :text)
 

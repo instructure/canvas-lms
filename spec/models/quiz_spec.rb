@@ -34,7 +34,7 @@ describe Quiz do
   end
 
   it "should set the due time to 11:59pm if only given a date" do
-    params = { :quiz => { :title => "Test Quiz", :due_at => Date.today.to_s } }
+    params = { :quiz => { :title => "Test Quiz", :due_at => Time.zone.today.to_s } }
     q = @course.quizzes.create!(params[:quiz])
     q.due_at.should be_an_instance_of ActiveSupport::TimeWithZone
     q.due_at.time_zone.should == Time.zone
@@ -51,7 +51,7 @@ describe Quiz do
 
   it "should convert a date object to a time and set the time to 11:59pm" do
     Time.zone = 'Alaska'
-    params = { :quiz => { :title => 'Test Quiz', :due_at => Date.today } }
+    params = { :quiz => { :title => 'Test Quiz', :due_at => Time.zone.today } }
     quiz = @course.quizzes.create!(params[:quiz])
     quiz.due_at.should be_an_instance_of ActiveSupport::TimeWithZone
     quiz.due_at.zone.should eql 'AKST'

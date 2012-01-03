@@ -334,7 +334,7 @@ This identifier must not change for the account, and must be globally unique. In
 <td>status</td>
 <td>enum</td>
 <td>active</td>
-<td>active, deleted, completed</td>
+<td>active, deleted</td>
 </tr>
 <tr>
 <td>start_date</td>

@@ -32,10 +32,10 @@
   </span>
   <a href="<%= context_url(@context, :context_user_url, enrollment.try_rescue(:user_id) || "{{ user_id }}") %>" class="name"><%= enrollment.try_rescue(:user).try_rescue(:last_name_first) %></a>
   <div class="short_name"><%= enrollment.try_rescue(:user).try_rescue(:short_name) %></div>
-  <% if include_type || (enrollment && enrollment.limit_priveleges_to_course_section) %>
+  <% if include_type || (enrollment && enrollment.limit_privileges_to_course_section) %>
     <div class="enrollment_type">
       <%=
-        if enrollment.try(:limit_priveleges_to_course_section)
+        if enrollment.try(:limit_privileges_to_course_section)
           case enrollment.try(:type)
             when 'TeacherEnrollment'
               t :enrolled_as_limited_teacher, "enrolled as a teacher with section-only access"

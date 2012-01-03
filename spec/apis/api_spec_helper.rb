@@ -35,7 +35,12 @@ end
 # don't affect routing.
 def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   raw_api_call(method, path, params, body_params, headers, opts)
-  response.should be_success, response.body
+  if opts[:expected_status]
+    response.status.to_i.should == opts[:expected_status]
+  else
+    response.should be_success, response.body
+  end
+
   case params[:format]
   when 'json'
     response.header['content-type'].should == 'application/json; charset=utf-8'

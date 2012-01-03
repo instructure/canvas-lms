@@ -69,5 +69,29 @@ module Stats
     # population standard deviation
     def stddev; @items.empty? ? nil : Math::sqrt(variance); end
     alias :standard_deviation :stddev
+    
+    def histogram(bin_width=1.0,bin_base=0.0)
+      # returns a hash representing a histogram
+      # divides @items into bin_width sized bins
+      # and counts how many items fall into each bin
+      # set bin_base to center off something other than zero
+      # this would usually be the median for a bell curve
+      
+      # need floats for the math to work
+      bin_width = Float(bin_width)
+      bin_base = Float(bin_base)
+      ret_val = {:bin_width => bin_width, :bin_base => bin_base}
+      bins = {}
+      @items.each do |i|
+        bin = ((i-bin_base)/bin_width).floor * bin_width + bin_base
+        if bins.has_key?(bin)
+          bins[bin] = bins[bin] +1
+        else
+          bins[bin] = 1
+        end
+      end
+      ret_val[:data] = bins
+      ret_val
+    end  
   end
 end

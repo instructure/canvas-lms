@@ -741,14 +741,21 @@ class Attachment < ActiveRecord::Base
   def cacheable_s3_url
     cached = cached_s3_url && s3_url_cached_at && s3_url_cached_at >= (Time.now - 24.hours.to_i)
     if !cached
+      ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
+
       # response-content-disposition will be url encoded in the depths of
       # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
       # quote the filename string, though.
-      raw_filename = self.display_name
-      quoted_filename = raw_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
-      quoted_filename = "\"#{quoted_filename}\""
-      self.cached_s3_url = authenticated_s3_url(:expires_in => 144.hours,
-        'response-content-disposition' => "attachment; filename=#{quoted_filename}")
+      quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
+
+      quoted_unicode = "UTF-8''#{URI.escape(display_name)}"
+
+      self.cached_s3_url = authenticated_s3_url(
+        :expires_in => 144.hours,
+        # awesome browsers will use the filename* and get the proper unicode filename,
+        # everyone else will get the sanitized ascii version of the filename
+        "response-content-disposition" => %(attachment; filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
+      )
       self.s3_url_cached_at = Time.now
       save
     end

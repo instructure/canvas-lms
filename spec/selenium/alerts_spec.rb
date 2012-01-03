@@ -92,8 +92,8 @@ describe "Alerts" do
 
     driver.find_element(:css, '#tab-alerts-link').click
     driver.find_element(:css, '.add_alert_link').click
-    alert = driver.find_element(:css, '.alert.new')
-    alert.find_element(:css, '.delete_link').click
+    wait_for_animations
+    driver.find_element(:css, '.alert.new .delete_link').click
     wait_for_animations
     keep_trying_until { driver.find_elements(:css, ".alert.new").should be_empty }
 
@@ -105,10 +105,10 @@ describe "Alerts" do
 
     driver.find_element(:css, '#tab-alerts-link').click
     driver.find_element(:css, '.add_alert_link').click
-    alert = driver.find_element(:css, '.alert.new')
-    alert.find_element(:css, '.cancel_button').click
     wait_for_animations
-    keep_trying_until { driver.find_elements(:css, ".alert.new").should be_empty }
+    driver.find_element(:css, '.alert.new .cancel_button').click
+    wait_for_animations
+    keep_trying_until { find_all_with_jquery(".alert.new").should be_empty }
 
     @alerts.should be_empty
   end
@@ -164,23 +164,25 @@ describe "Alerts" do
     driver.find_element(:css, '.add_alert_link').click
     alert = driver.find_element(:css, '.alert.new')
     alert.find_element(:css, 'input[name="repetition"][value="value"]').click
-    alert.find_element(:css, '.submit_button').click
-    sleep 1 #need to wait for javascript to process
-    wait_for_animations
-    keep_trying_until { driver.find_elements(:css, '.error_box').length == 4 }
+    keep_trying_until do
+      find_with_jquery('.alert.new .submit_button').click
+      sleep 2 #need to wait for javascript to process
+      wait_for_animations
+      find_all_with_jquery('.error_box').length == 4
+    end
 
     # clicking "do not repeat" should remove the number of days error
     alert.find_element(:css, 'input[name="repetition"][value="none"]').click
-    keep_trying_until { driver.find_elements(:css, '.error_box').length == 3 }
+    keep_trying_until { find_all_with_jquery('.error_box').length == 3 }
 
     # adding recipients and criterion make the errors go away
     alert.find_element(:css, '.add_recipient_link').click
     alert.find_element(:css, '.add_criterion_link').click
-    keep_trying_until { driver.find_elements(:css, '.error_box').length == 1 }
+    keep_trying_until { find_all_with_jquery('.error_box').length == 1 }
 
     alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
     alert.find_element(:css, '.submit_button').click
-    keep_trying_until { driver.find_elements(:css, '.error_box').length == 2 }
+    keep_trying_until { find_all_with_jquery('.error_box').length == 2 }
   end
 
 end

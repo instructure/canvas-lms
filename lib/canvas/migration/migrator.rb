@@ -34,7 +34,7 @@ class Migrator
     @course = {:file_map=>{}, :wikis=>[]}
     @course[:name] = @settings[:course_name]
 
-    return if settings[:testing]
+    return if settings[:no_archive_file]
 
     unless settings[:archive_file]
       MigratorHelper::download_archive(settings)

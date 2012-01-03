@@ -405,6 +405,25 @@ describe SIS::CSV::UserImporter do
     Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
   end
 
+  it "should not have a problem adding an existing e-mail that differs in case" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    user1 = Pseudonym.find_by_unique_id('user1').user
+    user1.communication_channels.create!(:path => 'JT@instructure.com')
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,jt@instructure.com,active"
+    )
+    user1.reload
+    user1.communication_channels.count.should == 2
+    user1.communication_channels.active.count.should == 1
+    user1.email_channel.should be_active
+    user1.email.should == 'jt@instructure.com'
+  end
+
   it "should re-activate retired e-mails" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",

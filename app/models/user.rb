@@ -143,7 +143,7 @@ class User < ActiveRecord::Base
   }
   named_scope :for_course_section, lambda{|sections|
     section_ids = Array(sections).map{|s| s.is_a?(Fixnum) ? s : s.id }
-    {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{User.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
+    {:conditions => "enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section != #{User.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
     { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", User.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
@@ -571,7 +571,7 @@ class User < ActiveRecord::Base
   def gmail_channel
     google_services = self.user_services.find_all_by_service_domain("google.com")
     addr = google_services.find{|s| s.service_user_id}.service_user_id rescue nil
-    self.communication_channels.find_by_path_and_path_type(addr, 'email')
+    self.communication_channels.email.by_path(addr).find(:first)
   end
   
   def gmail
@@ -589,7 +589,8 @@ class User < ActiveRecord::Base
     if e.is_a?(CommunicationChannel) and e.user_id == self.id
       cc = e
     else
-      cc = CommunicationChannel.find_or_create_by_path_and_user_id(e, self.id)
+      cc = self.communication_channels.find_or_create_by_path_and_path_type(e, 'email')
+      cc.user = self
     end
     cc.move_to_top
     cc.save!
@@ -904,7 +905,7 @@ class User < ActiveRecord::Base
   end
   
   def available_courses
-    # this list should be longer if the person has admin priveleges...
+    # this list should be longer if the person has admin privileges...
     self.courses
   end
   
@@ -2126,6 +2127,14 @@ class User < ActiveRecord::Base
     enrollment && enrollment.course_section
   end
 
+  def can_create_enrollment_for?(course, session, type)
+    can_add = %w{StudentEnrollment ObserverEnrollment}.include?(type) && course.grants_right?(self, session, :manage_students)
+    can_add ||= type == 'TeacherEnrollment' && course.teacherless? && course.grants_right?(self, session, :manage_students)
+    can_add ||= course.grants_right?(self, session, :manage_admin_users)
+
+    can_add
+  end
+
   def group_member_json(context)
     h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
     if context && context.is_a?(Course) && (section = self.section_for_course(context))
@@ -2168,8 +2177,8 @@ class User < ActiveRecord::Base
     pseudonym
   end
 
-  def flag_as_admin(account, membership_type=nil)
-    admin = account.add_user(self, membership_type)
+  def flag_as_admin(account, role=nil)
+    admin = account.add_user(self, role)
     if self.registered?
       admin.account_user_notification!
     else

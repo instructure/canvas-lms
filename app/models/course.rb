@@ -90,8 +90,8 @@ class Course < ActiveRecord::Base
   has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
   has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment') and enrollments.workflow_state = 'active'"
 
-  has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content
-  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.content_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'LearningOutcome', 'deleted']
+  has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
+  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
   has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
   has_many :learning_outcome_groups, :as => :context
   has_many :course_account_associations
@@ -373,7 +373,7 @@ class Course < ActiveRecord::Base
   
   def has_outcomes
     Rails.cache.fetch(['has_outcomes', self].cache_key) do
-      self.learning_outcome_tags.count > 0
+      self.learning_outcomes.count > 0
     end
   end
   
@@ -487,7 +487,7 @@ class Course < ActiveRecord::Base
   end
   
   def admins_in_charge_of(user_id)
-    section_ids = current_enrollments.find(:all, :select => 'course_section_id, course_id, user_id, limit_priveleges_to_course_section', :conditions => {:course_id => self.id, :user_id => user_id}).map(&:course_section_id).compact.uniq
+    section_ids = current_enrollments.find(:all, :select => 'course_section_id, course_id, user_id, limit_privileges_to_course_section', :conditions => {:course_id => self.id, :user_id => user_id}).map(&:course_section_id).compact.uniq
     if section_ids.empty?
       participating_admins
     else
@@ -1235,7 +1235,11 @@ class Course < ActiveRecord::Base
       end
     end
   end
-  
+
+  # included to make it easier to work with api, which returns
+  # sis_source_id as sis_course_id.
+  alias_attribute :sis_course_id, :sis_source_id
+
   def grading_standard_title
     if self.grading_standard_enabled?
       self.grading_standard.try(:title) || t('default_grading_scheme_name', "Default Grading Scheme")
@@ -1257,13 +1261,14 @@ class Course < ActiveRecord::Base
   def enroll_user(user, type='StudentEnrollment', opts={}) 
     enrollment_state = opts[:enrollment_state]
     section = opts[:section]
-    limit_priveleges_to_course_section = opts[:limit_priveleges_to_course_section]
+    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     enrollment_state = 'invited' if enrollment_state == 'creation_pending' && (type == 'TeacherEnrollment' || type == 'TaEnrollment')
     e = self.enrollments.find_by_user_id_and_type(user.id, type) if user
-    e.attributes = { :workflow_state => 'invited', :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section } if e && (e.completed? || e.rejected?)
-    e ||= self.send(type.underscore.pluralize).build(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_priveleges_to_course_section => limit_priveleges_to_course_section)
+    e.attributes = { :workflow_state => 'invited', :course_section => section, :limit_privileges_to_course_section => limit_privileges_to_course_section } if e && (e.completed? || e.rejected?)
+    e ||= self.send(type.underscore.pluralize).build(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_privileges_to_course_section => limit_privileges_to_course_section)
+    e.sis_source_id = opts[:sis_source_id]
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
@@ -2134,13 +2139,13 @@ class Course < ActiveRecord::Base
 
   def section_visibilities_for(user)
     Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-      Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id } }
+      Enrollment.find(:all, :select => "course_section_id, limit_privileges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_privileges_to_course_section => e.limit_privileges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id } }
     end
   end
   memoize :section_visibilities_for
 
   def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
-    !visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
+    !visibilities.any?{|s| !s[:limit_privileges_to_course_section] }
   end
   
   # returns a scope, not an array of users/enrollments

@@ -114,7 +114,7 @@ class CourseSection < ActiveRecord::Base
     # - otherwise, just use name
     # - use the method display_name to consolidate this logic
     self.name ||= self.course.name if self.default_section
-    self.name ||= "#{self.course.name} #{Date.today.to_s}"
+    self.name ||= "#{self.course.name} #{Time.zone.today.to_s}"
     self.section_code ||= self.name
     self.long_section_code ||= self.name
     if name_had_changed

@@ -146,7 +146,15 @@ class CommunicationChannel < ActiveRecord::Base
       {}
     end
   }
-  
+
+  named_scope :by_path, lambda { |path|
+    if connection_pool.spec.config[:adapter] == 'mysql'
+      { :conditions => {:path => path } }
+    else
+      { :conditions => ["LOWER(communication_channels.path)=?", path.downcase]}
+    end
+  }
+
   named_scope :email, :conditions => { :path_type => 'email' }
   named_scope :active, :conditions => { :workflow_state => 'active' }
   named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']

@@ -84,7 +84,7 @@ class CommunicationChannelsController < ApplicationController
       end
 
       # load merge opportunities
-      other_ccs = CommunicationChannel.find(:all, :conditions => ["path=? AND path_type=? AND id<>? AND workflow_state='active'", cc.path, cc.path_type, cc.id], :include => :user)
+      other_ccs = CommunicationChannel.active.by_path(cc.path).of_type(cc.path_type).find(:all, :conditions => ["communication_channels.id<>?", cc.id], :include => :user)
       merge_users = (other_ccs.map(&:user)).uniq
       merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
       User.send(:preload_associations, merge_users, { :pseudonyms => :account })
