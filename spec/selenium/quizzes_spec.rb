@@ -3,6 +3,24 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "quiz selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  def quiz_with_new_questions
+    course_with_teacher_logged_in
+    @context = @course
+    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    @q = quiz_model
+    a = AssessmentQuestion.create!
+    b = AssessmentQuestion.create!
+    bank.assessment_questions << a
+    bank.assessment_questions << b
+    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+    @quest1 = @q.quiz_questions.create!(:question_data => { :name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    @quest2 = @q.quiz_questions.create!(:question_data => { :name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+
+    @q.generate_quiz_data
+    @q.save!
+    get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
+  end
+
   it "should allow a teacher to create a quiz from the quizzes tab directly" do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
@@ -150,6 +168,29 @@ shared_examples_for "quiz selenium tests" do
     el.find_element(:css, ".comment_focus").click
     el.find_element(:css, "textarea").should be_displayed
     el.find_element(:css, "textarea").send_keys(text)
+  end
+
+  it "should reorder questions with drag and drop" do
+    quiz_with_new_questions
+
+    # ensure they are in the right order
+    names = driver.find_elements(:css, '.question_name')
+    names[0].text.should == 'first question'
+    names[1].text.should == 'second question'
+
+    # load the simulate plugin to simulate a drag event
+    js = File.read('spec/selenium/jquery.simulate.js')
+    driver.execute_script js
+
+    # drag the first question down 100px (next slot)
+    driver.execute_script <<-JS
+      $('.move_icon:eq(0)').show().simulate('drag', {dx: 0, dy: 100});
+    JS
+
+    # verify they were swapped
+    names = driver.find_elements(:css, '.question_name')
+    names[0].text.should == 'second question'
+    names[1].text.should == 'first question'
   end
 
   it "should create a quiz with a multiple choice question" do
@@ -821,21 +862,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should flag a quiz question while taking a quiz as a teacher" do
-    course_with_teacher_logged_in
-    @context = @course
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-    q = quiz_model
-    a = AssessmentQuestion.create!
-    b = AssessmentQuestion.create!
-    bank.assessment_questions << a
-    bank.assessment_questions << b
-    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
-    quest1 = q.quiz_questions.create!(:question_data => { :name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
-    quest2 = q.quiz_questions.create!(:question_data => { :name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
-
-    q.generate_quiz_data
-    q.save!
-    get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
+    quiz_with_new_questions
 
     expect_new_page_load {
       driver.find_element(:css, '.publish_quiz_button').click
@@ -847,20 +874,20 @@ shared_examples_for "quiz selenium tests" do
     }
 
     #flag first question
-    hover_and_click("#question_#{quest1.id} .flag_icon")
+    hover_and_click("#question_#{@quest1.id} .flag_icon")
 
     #click second answer
-    driver.find_element(:css, "#question_#{quest2.id} .answers .answer:first-child input").click
+    driver.find_element(:css, "#question_#{@quest2.id} .answers .answer:first-child input").click
     driver.find_element(:id, 'submit_quiz_form').submit
 
     #dismiss dialog and submit quiz
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.dismiss
-    driver.find_element(:css, "#question_#{quest1.id} .answers .answer:last-child input").click
+    driver.find_element(:css, "#question_#{@quest1.id} .answers .answer:last-child input").click
     expect_new_page_load {
       driver.find_element(:id, 'submit_quiz_form').submit
     }
-    driver.find_element(:id, 'quiz_title').text.should == q.title
+    driver.find_element(:id, 'quiz_title').text.should == @q.title
   end
 
   it "should indicate when it was last saved" do
