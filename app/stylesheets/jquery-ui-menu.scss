@@ -23,7 +23,7 @@
 .ui-menu-icons .ui-menu-item a { position: relative; padding-left: 2em; }
 
 /* left-aligned */
-.ui-menu .ui-icon { position: absolute; top: .6em; left: .4em; }
+.ui-menu .ui-icon { position: absolute; top: .5em; left: .4em; }
 
 /* right-aligned */
 .ui-menu .ui-menu-icon { position: static; float: right; }
@@ -47,9 +47,42 @@
 $kyle-menu-bg-color: #e6e7e9;
 $kyle-menu-border-color: #b0afaf;
 $kyle-menu-carat-size: 10px;
-$kyle-menu-border-radius: 10px;
+$kyle-menu-border-radius: 8px;
 
 
+// the .ui-menu-carat is the outer border of the carat to make it match the border of the popup
+// and the span inside it is the same
+.ui-menu-carat, .ui-menu-carat span {
+  border-style: solid;
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: 50%;
+  content: "";
+
+  border-color: $kyle-menu-border-color transparent;
+  border-width: 0px $kyle-menu-carat-size+1px $kyle-menu-carat-size+1px;
+  top: -$kyle-menu-carat-size - 1px;
+  margin-left: -$kyle-menu-carat-size - 1px;
+}
+.ui-menu-carat span {
+  border-color: $kyle-menu-bg-color transparent;
+  border-width: 0px $kyle-menu-carat-size $kyle-menu-carat-size;
+  top: 1px;
+  margin-left: -$kyle-menu-carat-size;
+}
+.carat-bottom {
+  .ui-menu-carat, .ui-menu-carat span {
+    top: auto;
+    bottom: -$kyle-menu-carat-size - 1px;
+    border-width: $kyle-menu-carat-size+1px $kyle-menu-carat-size+1px 0;
+  }
+  .ui-menu-carat span {
+    top: auto;
+    bottom: 1px;
+    border-width: $kyle-menu-carat-size $kyle-menu-carat-size 0;
+  }
+}
 .ui-kyle-menu {
   margin-top: $kyle-menu-carat-size;
   background-color: $kyle-menu-bg-color;
@@ -68,27 +101,7 @@ $kyle-menu-border-radius: 10px;
     -webkit-transform-origin-y: 0;
   }
 
-  // the .ui-menu-carat is the outer border of the carat to make it match the border of the popup
-  // and the span inside it is the same
-  .ui-menu-carat, .ui-menu-carat span {
-    border-style: solid;
-    position: absolute;
-    width: 0;
-    height: 0;
-    left: 50%;
-    content: "";
 
-    border-color: $kyle-menu-border-color transparent;
-    border-width: 0px $kyle-menu-carat-size+1px $kyle-menu-carat-size+1px;
-    top: -$kyle-menu-carat-size - 1px;
-    margin-left: -$kyle-menu-carat-size - 1px;
-  }
-  .ui-menu-carat span {
-    border-color: $kyle-menu-bg-color transparent;
-    border-width: 0px $kyle-menu-carat-size $kyle-menu-carat-size;
-    top: 1px;
-    margin-left: -$kyle-menu-carat-size;
-  }
   a { color: #525252}
   .ui-menu-item {
     hr {
@@ -125,4 +138,12 @@ $kyle-menu-border-radius: 10px;
 	55%  { opacity:0.9; -webkit-transform: scale(1.1,1.1); }
 	60%  { opacity:1.0; -webkit-transform: scale(1,1); }
 	to   { opacity:1.0; -webkit-transform: scale(1,1); }
+}
+
+.ui-menu-small {
+  font-size: 11px;
+  font-weight: normal;
+  white-space: nowrap;
+  .ui-state-focus {font-weight: normal; text-shadow: none;}
+  .ui-menu-item a {padding: 3px 5px}
 }

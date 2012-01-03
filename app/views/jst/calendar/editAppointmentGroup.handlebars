@@ -1,0 +1,58 @@
+<form action='#' id='edit_appointment_form'>
+  <div class="left-column-wrapper">
+    <p>
+      <b>{{#t "name"}}Name{{/t}}</b><br />
+      <input type="text" name="title" style="width: 150px" value="{{appointment_group.title}}">
+    </p>
+    <p>
+      <b>{{#t "location"}}Location{{/t}}</b><br />
+      <input type="text" name="location" style="width: 150px" value="{{appointment_group.location_name}}">
+    </p>
+    <p>
+      <b>{{#t "calendar"}}Calendar{{/t}}</b><br />
+      <select name="context_code" class="context_id">
+        {{#each contexts}}
+          {{#if can_create_appointment_groups}}
+            <option value="{{asset_string}}">{{name}}</option>
+          {{/if}}
+        {{/each}}
+      </select>
+    </p>
+    <p>
+      <input type="checkbox" class="group-signup-checkbox" id="group-signup-checkbox" name="use_group_signup" value="1" {{#ifEqual participant_type "Group"}}checked{{/ifEqual}}>
+      <label for="group-signup-checkbox">Have students sign up in Groups.</label>
+    </p>
+    <p>
+      <div class="section-signup">
+        <b>{{#t "course_section"}}Limit Signups to{{/t}}</b><br />
+        <div class="section_select">
+          <select name="section_id"></select>
+        </div>
+      </div>
+      <div class="group-signup" style="display: none">
+        <b>{{#t "group_category"}}Group Category{{/t}}</b><br />
+        <div class="group_select">
+          <select name="group_category_id"></select>
+        </div>
+      </div>
+    </p>
+  </div>
+  <div class="right-column-wrapper">
+    <div class="time-block-list-wrapper"></div>
+    <p>
+      <b>Options</b><br />
+      <input type="checkbox" id="appointment-blocks-per-slot-option-button" name="per_slot_option" value="1" />
+      <label for="appointment-blocks-per-slot-option-button">Allow</label>
+      <input name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" style="width: 30px;" />
+      <label for="appointment-blocks-per-slot-option-button"> users or groups per time slot.</label>
+      <br />
+      <br />
+      <input type="checkbox" id="appointment-blocks-participant-visibility-button" name="participant_visibility" value="1" />
+      <label for="appointment-blocks-participant-visibility-button">Allow students to see who has signed up for time slots in this group.</label>
+    </p>
+  </div>
+  <div class="details-wrapper">
+    <b>Details:</b><br />
+    <textarea name="description" style="width: 100%">{{appointment_group.description}}</textarea>
+  </div>
+</form>

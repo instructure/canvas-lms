@@ -1,0 +1,16 @@
+<div id="delete_event_dialog">
+  <p>
+    {{message}}
+  </p>
+  {{#if details}}
+  <p>
+    {{details}}
+  </p>
+  {{/if}}
+  {{#unless hide_reason}}
+  <div>
+    <label for="cancel_reason">{{#t "deletion_reason"}}Reason for deletion:{{/t}}</label><br />
+    <textarea id="cancel_reason"></textarea>
+  </div>
+  {{/unless}}
+</div>

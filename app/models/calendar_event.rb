@@ -161,20 +161,27 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   alias_method :destroy!, :destroy
-  def destroy(possibly_touch_context=true)
+  def destroy(update_context_or_parent=true)
     transaction do
-      self.context.touch if possibly_touch_context && context_type == 'AppointmentGroup' # ensures end_at/start_at get updated
       self.workflow_state = 'deleted'
       self.deleted_at = Time.now.utc
       save!
-      # note: this won't suffice if we let child events have child events
-      child_events.update_all(["workflow_state = ?, deleted_at = ?", 'deleted', Time.now.utc])
-      if parent_event && parent_event.locked? && parent_event.child_events.active.size == 0
+      child_events.each do |e|
+        e.cancel_reason = cancel_reason
+        e.updating_user = updating_user
+        e.destroy(false)
+      end
+      return true unless update_context_or_parent
+
+      if appointment_group
+        context.touch if context_type == 'AppointmentGroup' # ensures end_at/start_at get updated
+        # when deleting an appointment or appointment_participant, make sure we reset the cache
+        appointment_group.clear_cached_available_slots!
+      end
+      if parent_event && parent_event.locked? && parent_event.child_events.size == 0
         parent_event.workflow_state = 'active'
         parent_event.save!
       end
-      # when deleting an appointment or appointment_participant, make sure we reset the cache
-      appointment_group.clear_cached_available_slots! if possibly_touch_context && appointment_group
       true
     end
   end

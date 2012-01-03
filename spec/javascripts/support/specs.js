@@ -8,5 +8,6 @@ require([
   'specs/helpDialogSpec',
   'specs/util/BackoffPollerSpec',
   'specs/jQuery.instructureJqueryPatches',
-  'specs/ENVSpec'
+  'specs/ENVSpec',
+  'specs/calendar/TimeBlockListManagerSpec'
 ]);

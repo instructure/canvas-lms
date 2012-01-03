@@ -1,0 +1,88 @@
+<div class="event-details carat-bottom">
+  <div class='event-details-header'>
+    <a href="#" class="popover_close x-close-link">×</a>
+    <h3 class="details_title title">
+      {{#if fullDetailsURL}}
+        <a href="{{fullDetailsURL}}" class="view_event_link">{{title}}</a>
+      {{else}}
+        {{title}}
+      {{/if}}
+    </h3>
+  </div>
+  <div class="event-details-content">
+    <div class="event-details-timestring">{{{displayTimeString}}}</div>
+    <table cellspacing="0">
+      {{#if contextInfo}}
+        <tr>
+          <th scope="row">{{#t "calendar"}}Calendar{{/t}}</th>
+          <td><a href="{{contextInfo.url}}">{{contextInfo.name}}</a></td>
+        </tr>
+      {{/if}}
+      {{#if location_name}}
+        <tr>
+          <th scope="row">{{#t "location"}}Location{{/t}}</th>
+          <td>{{location_name}}</td>
+        </tr>
+      {{/if}}
+      {{#if description}}
+        <tr>
+          <th scope="row">{{#t "details"}}Details{{/t}}</th>
+          <td>{{{description}}}</td>
+        </tr>
+      {{/if}}
+      {{#if reserved_users}}
+        <tr>
+          <th scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
+          <td>
+            <ul>
+              {{#each reserved_users}}
+                <!-- TODO: put avatar images here if enabled -->
+                <li>{{name}}</li>
+              {{/each}}
+            </ul>
+          </td>
+        </tr>
+      {{/if}}
+      {{#if reserved_groups}}
+        <tr>
+          <th scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
+          <td>
+            <ul>
+              {{#each reserved_groups}}
+                <li>{{name}}</li>
+              {{/each}}
+            </ul>
+          </td>
+        </tr>
+      {{/if}}
+      {{#if availableSlotsText}}
+        <tr>
+          <th scope="row">{{#t "slots_available"}}Slots available{{/t}}</th>
+          <td>{{availableSlotsText}}</td>
+        </tr>
+      {{/if}}
+    </table>
+    <div class="details_description lock_explanation">{{{lock_explanation}}}</div>
+    {{#if available_slots_text}}
+      <div class="available_slots">
+        {{available_slots_text}}
+      </div>
+    {{/if}}
+  </div>
+  <div class="popover-links-holder event-details-footer">
+    {{#if can_delete }}
+      <a href="#" class="button-secondary delete_event_link">{{#t "links.delete"}}Delete{{/t}}</a>
+    {{/if}}
+    <div class="event-details-links">
+      {{#if can_reserve }}
+        <a href="#" class="reserve_event_link"><strong>{{#t "links.reserve"}}Reserve{{/t}}</strong></a>
+      {{/if}}
+      {{#if can_unreserve }}
+        <a href="#" class="unreserve_event_link">{{#t "links.unreserve"}}Un-reserve{{/t}}</a>
+      {{/if}}
+      {{#if can_edit }}
+        <a href="#" class="edit_event_link">{{#t "links.edit"}}Edit{{/t}}</a>
+      {{/if}}
+    </div>
+  </div>
+</div>

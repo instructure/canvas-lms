@@ -103,6 +103,7 @@ class CalendarEventsController < ApplicationController
   def destroy
     @event = @context.calendar_events.find(params[:id])
     if authorized_action(@event, @current_user, :delete)
+      @event.cancel_reason = params[:cancel_reason]
       @event.destroy
       respond_to do |format|
         format.html { redirect_to calendar_url_for(@context) }
