@@ -97,4 +97,14 @@ class Array
   def to(position)
     self[0..position]
   end
+
+  # backport from ActiveSupport 3.x
+  # Like uniq, but using a criteria given by a block, similar to sort_by
+  unless instance_methods.include?('uniq_by')
+    def uniq_by
+      hash, array = {}, []
+      each { |i| hash[yield(i)] ||= (array << i) }
+      array
+    end
+  end
 end
