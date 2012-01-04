@@ -45,9 +45,12 @@ module ActiveRecord
                   "#{configuration[:scope].to_s} = \#{#{configuration[:scope].to_s}}"
                 end
               end
+              def in_scope?
+                 !#{configuration[:scope].to_s}.nil?
+              end
             )
           else
-            scope_condition_method = "def scope_condition() \"#{configuration[:scope]}\" end"
+            scope_condition_method = "def scope_condition() \"#{configuration[:scope]}\" end; def in_scope?; true; end"
           end
 
           class_eval <<-EOV
@@ -76,6 +79,7 @@ module ActiveRecord
       module InstanceMethods
         # Insert the item at the given position (defaults to the top position of 1).
         def insert_at(position = 1)
+          return unless in_scope?
           insert_at_position(position)
         end
 
@@ -169,15 +173,18 @@ module ActiveRecord
 
         # Test if this record is in a list
         def in_list?
-          !send(position_column).nil?
+          !send(position_column).nil? && in_scope?
         end
 
         private
           def add_to_list_top
+            return unless in_scope?
             increment_positions_on_all_items
           end
 
           def add_to_list_bottom
+            return unless in_scope?
+            return if in_list?
             self[position_column] = bottom_position_in_list.to_i + 1
           end
 
