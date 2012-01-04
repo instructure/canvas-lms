@@ -51,6 +51,8 @@ describe "gradebook2 selenium tests" do
     end
     comment.click
     details_dialog = find_with_jquery('.ui-dialog:visible')
+    keep_trying_until { driver.find_element(:id, "add_a_comment").should be_displayed }
+    wait_for_ajax_requests
     details_dialog
   end
 
@@ -286,7 +288,6 @@ describe "gradebook2 selenium tests" do
     comment_text = "This is a new comment!"
 
     open_comment_dialog
-    wait_for_ajax_requests
     comment_box = find_with_jquery("#add_a_comment")
     comment_box.clear
     comment_box.send_keys(comment_text)
