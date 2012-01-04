@@ -570,6 +570,12 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def load_simulate_js
+    # load the simulate plugin to simulate a drag event
+    js = File.read('spec/selenium/jquery.simulate.js')
+    driver.execute_script js
+  end
+
   self.use_transactional_fixtures = false
 
   append_after(:each) do

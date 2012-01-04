@@ -178,9 +178,7 @@ shared_examples_for "quiz selenium tests" do
     names[0].text.should == 'first question'
     names[1].text.should == 'second question'
 
-    # load the simulate plugin to simulate a drag event
-    js = File.read('spec/selenium/jquery.simulate.js')
-    driver.execute_script js
+    load_simulate_js
 
     # drag the first question down 100px (next slot)
     driver.execute_script <<-JS

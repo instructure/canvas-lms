@@ -341,6 +341,39 @@ Spec::Runner.configure do |config|
     @quiz_submission.grade_submission
   end
 
+  def rubric_for_course
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
+    @rubric.data = [
+      {
+        :points => 3,
+        :description => "First row",
+        :long_description => "The first row in the rubric",
+        :id => 1,
+        :ratings => [
+          {
+            :points => 3,
+            :description => "Rockin'",
+            :criterion_id => 1,
+            :id => 2
+          },
+          {
+            :points => 2,
+            :description => "Rockin'",
+            :criterion_id => 1,
+            :id => 3
+          },
+          {
+            :points => 0,
+            :description => "Lame",
+            :criterion_id => 1,
+            :id => 4
+          }
+        ]
+      }
+    ]
+    @rubric.save!
+  end
+
   def outcome_with_rubric(opts={})
     @outcome_group ||= LearningOutcomeGroup.default_for(@course)
     @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')

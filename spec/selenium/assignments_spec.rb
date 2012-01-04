@@ -339,18 +339,22 @@ describe "assignment selenium tests" do
     end
   end
 
-  it "should add a new rubric to assignment" do
-    course_with_teacher_logged_in
+  def create_assignment_with_points(points)
     assignment_name = 'first test assignment'
     due_date = Time.now.utc + 2.days
     @group = @course.assignment_groups.create!(:name => "default")
-    @second_group = @course.assignment_groups.create!(:name => "second default")
     @assignment = @course.assignments.create(
       :name => assignment_name,
       :due_at => due_date,
+      :points_possible => points,
       :assignment_group => @group
-      )
+    )
+  end
 
+  it "should add a new rubric to assignment" do
+    course_with_teacher_logged_in
+    create_assignment_with_points(2)
+    
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     driver.find_element(:css, '.add_rubric_link').click
@@ -363,19 +367,12 @@ describe "assignment selenium tests" do
 
   it "should import rubric to assignment" do
     course_with_teacher_logged_in
-    assignment_name = 'first test assignment'
-    due_date = Time.now.utc + 2.days
-    group = @course.assignment_groups.create!(:name => "default")
-    second_group = @course.assignment_groups.create!(:name => "second default")
-    assignment = @course.assignments.create!(
-      :name => assignment_name,
-      :due_at => due_date,
-      :assignment_group => group
-      )
+    create_assignment_with_points(2)
+
     outcome_with_rubric
     @rubric.associate_with(@course, @course, :purpose => 'grading')
 
-    get "/courses/#{@course.id}/assignments/#{assignment.id}"
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     driver.find_element(:css, '.add_rubric_link').click
     driver.find_element(:css, '#rubric_new .editing .find_rubric_link').click
@@ -389,13 +386,7 @@ describe "assignment selenium tests" do
 
   it "should not adjust assignment points possible for grading rubric" do
     course_with_teacher_logged_in
-    assignment_name = 'first test assignment'
-    @group = @course.assignment_groups.create!(:name => "default")
-    @assignment = @course.assignments.create(
-      :name => assignment_name,
-      :assignment_group => @group,
-      :points_possible => 2
-      )
+    create_assignment_with_points(2)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
@@ -411,13 +402,7 @@ describe "assignment selenium tests" do
 
   it "should adjust assignment points possible for grading rubric" do
     course_with_teacher_logged_in
-    assignment_name = 'first test assignment'
-    @group = @course.assignment_groups.create!(:name => "default")
-    @assignment = @course.assignments.create(
-      :name => assignment_name,
-      :assignment_group => @group,
-      :points_possible => 2
-      )
+    create_assignment_with_points(2)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
@@ -430,6 +415,31 @@ describe "assignment selenium tests" do
 
     driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
     driver.find_element(:css, "#full_assignment .points_possible").text.should == '5'
+  end
+
+  it "should carry decimal values through rubric to grading" do
+    course_with_teacher_logged_in
+    student_in_course
+    create_assignment_with_points(2.5)
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+    driver.find_element(:css, '.add_rubric_link').click
+    driver.find_element(:css, '#criterion_1 .criterion_points').send_key :backspace
+    driver.find_element(:css, '#criterion_1 .criterion_points').send_key "2.5"
+    driver.find_element(:id, 'grading_rubric').click
+    driver.find_element(:id, 'edit_rubric_form').submit
+    wait_for_ajaximations
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+    wait_for_ajaximations
+    driver.find_element(:css, '.toggle_full_rubric').click
+    find_with_jquery('#rubric_holder .criterion:visible .rating').click
+    driver.find_element(:css, '#rubric_holder .save_rubric_button').click
+    wait_for_ajaximations
+
+    driver.find_element(:css, '#rubric_summary_container .rubric_total').text.should == '2.5'
   end
 
   it "should show a \"more errors\" errorBox if any invalid fields are hidden" do
