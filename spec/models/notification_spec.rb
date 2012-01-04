@@ -219,9 +219,17 @@ describe Notification do
       messages.select{|m| m.to != 'dashboard'}.should be_empty
       DelayedMessage.count.should eql(1)
     end
-    
+
+    it "should not use notification policies for unconfirmed communication channels" do
+      notification_set
+      cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'unconfirmed', :path => "nope")
+      notification_policy_model(:communication_channel_id => cc.id, :notification_id => @notification.id, :user_id => @user.id )
+      messages = @notification.create_message(@assignment, @user)
+      messages.size.should == 2
+      messages.map(&:to).sort.should == ['dashboard', 'value for path']
+    end
   end
-  
+
   context "record_delayed_messages" do
     before do
       user_model
