@@ -37,7 +37,6 @@ describe EnrollmentsApiController, :type => :integration do
             :user_id                            => @unenrolled_user.id,
             :type                               => 'StudentEnrollment',
             :enrollment_state                     => 'active',
-            :sis_source_id                      => '12345',
             :course_section_id                  => @section.id,
             :limit_privileges_to_course_section => true
           }
@@ -51,7 +50,6 @@ describe EnrollmentsApiController, :type => :integration do
         'limit_privileges_to_course_section' => true,
         'enrollment_state'                   => 'active',
         'course_id'                          => @course.id,
-        'sis_source_id'                      => '12345',
         'type'                               => 'StudentEnrollment'
       }
       new_enrollment.root_account_id.should eql @course.account.id
@@ -60,7 +58,6 @@ describe EnrollmentsApiController, :type => :integration do
       new_enrollment.limit_privileges_to_course_section.should eql true
       new_enrollment.workflow_state.should eql 'active'
       new_enrollment.course_id.should eql @course.id
-      new_enrollment.sis_source_id.should eql '12345'
       new_enrollment.should be_an_instance_of StudentEnrollment
     end
 
@@ -71,7 +68,6 @@ describe EnrollmentsApiController, :type => :integration do
             :user_id => @unenrolled_user.id,
             :type    => 'TeacherEnrollment',
             :enrollment_state => 'active',
-            :sis_source_id => '12345',
             :course_section_id => @section.id,
             :limit_privileges_to_course_section => true
           }
@@ -86,7 +82,6 @@ describe EnrollmentsApiController, :type => :integration do
             :user_id => @unenrolled_user.id,
             :type    => 'TaEnrollment',
             :enrollment_state => 'active',
-            :sis_source_id => '12345',
             :course_section_id => @section.id,
             :limit_privileges_to_course_section => true
           }
@@ -101,7 +96,6 @@ describe EnrollmentsApiController, :type => :integration do
             :user_id => @unenrolled_user.id,
             :type    => 'ObserverEnrollment',
             :enrollment_state => 'active',
-            :sis_source_id => '12345',
             :course_section_id => @section.id,
             :limit_privileges_to_course_section => true
           }
@@ -168,7 +162,6 @@ describe EnrollmentsApiController, :type => :integration do
             :user_id                            => @unenrolled_user.id,
             :type                               => 'StudentEnrollment',
             :enrollment_state                   => 'active',
-            :sis_source_id                      => '12345',
             :course_section_id                  => @section.id,
             :limit_privileges_to_course_section => true
           }
@@ -182,7 +175,6 @@ describe EnrollmentsApiController, :type => :integration do
         'limit_privileges_to_course_section' => true,
         'enrollment_state'                   => 'active',
         'course_id'                          => @course.id,
-        'sis_source_id'                      => '12345',
         'type'                               => 'StudentEnrollment'
       }
       new_enrollment.root_account_id.should eql @course.account.id
@@ -191,7 +183,6 @@ describe EnrollmentsApiController, :type => :integration do
       new_enrollment.limit_privileges_to_course_section.should eql true
       new_enrollment.workflow_state.should eql 'active'
       new_enrollment.course_id.should eql @course.id
-      new_enrollment.sis_source_id.should eql '12345'
       new_enrollment.should be_an_instance_of StudentEnrollment
     end
 
