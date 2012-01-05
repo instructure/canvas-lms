@@ -120,8 +120,15 @@ define 'compiled/calendar/Calendar', [
         required = 0
         for group in data
           required += 1 if group.requiring_action
-        if required > 0
-          @el.find("#calendar-header .counter-badge").text(required)
+        @el.find("#calendar-header .counter-badge")
+          .toggle(required > 0)
+          .text(required)
+
+      window.setTimeout =>
+        if data.view_name == 'scheduler'
+          $("#scheduler").click()
+          if data.appointment_group_id
+            @scheduler.viewCalendarForGroupId data.appointment_group_id
 
     # FullCalendar callbacks
 
@@ -232,12 +239,14 @@ define 'compiled/calendar/Calendar', [
     eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
       event.saveDates null, revertFunc
 
-    viewDisplay: (view) =>
+    updateFragment: (opts) ->
       data = @dataFromDocumentHash()
-      data.view_name = view.name
-      data.view_start = $.dateToISO8601UTC(view.start)
-
+      for k, v of opts
+        data[k] = v
       location.replace("#" + $.encodeToHex(JSON.stringify(data)))
+
+    viewDisplay: (view) =>
+      @updateFragment view_start: $.dateToISO8601UTC(view.start)
 
     drop: (date, allDay, jsEvent, ui) =>
       el = $(jsEvent.target)
@@ -328,6 +337,8 @@ define 'compiled/calendar/Calendar', [
     gotoDate: (d) -> @calendar.fullCalendar("gotoDate", d)
 
     loadView: (view) =>
+      @updateFragment view_name: view
+
       if view != 'scheduler'
         @currentView = view
         @calendar.removeClass('scheduler-mode')

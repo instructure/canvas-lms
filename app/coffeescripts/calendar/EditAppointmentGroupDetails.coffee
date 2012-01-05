@@ -43,7 +43,7 @@ define 'compiled/calendar/EditAppointmentGroupDetails', [
       if @apptGroup.appointmentEvents
         for appt in @apptGroup.appointmentEvents
           timeBlocks.push [appt.start, appt.end, !appt.can_edit]
-      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-wrapper"), timeBlocks)
+      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body-wrapper"), @form.find(".splitter"), timeBlocks)
 
       @form.find('[name="slot_duration"]').change (e) =>
         if @form.find('[name="autosplit_option"]').is(":checked")
@@ -53,9 +53,11 @@ define 'compiled/calendar/EditAppointmentGroupDetails', [
       @form.find('[name="participant_visibility"]').prop('checked', @apptGroup.participant_visibility == 'protected')
 
       @form.find(".group-signup-checkbox").change (jsEvent) =>
-        checkbox = jsEvent.target
-        @form.find(".section-signup").toggle(!checkbox.checked)
-        @form.find(".group-signup").toggle(checkbox.checked)
+        checked = !!jsEvent.target.checked
+        @form.find('.per_appointment_groups_label').toggle(checked)
+        @form.find('.per_appointment_users_label').toggle(!checked)
+        @form.find(".section-signup").toggle(!checked)
+        @form.find(".group-signup").toggle(checked)
       @form.find(".group-signup-checkbox").change()
 
       @form.find('[name="per_slot_option"]').change (jsEvent) =>

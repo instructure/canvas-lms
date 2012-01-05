@@ -23,9 +23,16 @@ class AppointmentGroupsController < ApplicationController
   before_filter :get_context, :only => :create
   before_filter :get_appointment_group, :only => [:show, :update, :destroy]
 
+  def calendar_fragment(opts)
+    opts.to_json.unpack('H*')
+  end
+  private :calendar_fragment
+
   def index
-    # TODO: fragment hash fu to load appointment groups
-    return redirect_to calendar2_url unless request.format == :json
+    unless request.format == :json
+      anchor = calendar_fragment :view_name => :scheduler
+      return redirect_to calendar2_url(:anchor => anchor)
+    end
 
     if params[:scope] == 'manageable'
       scope = AppointmentGroup.manageable_by(@current_user)
@@ -58,8 +65,10 @@ class AppointmentGroupsController < ApplicationController
 
   def show
     if authorized_action(@group, @current_user, :read)
-      # TODO: fragment hash fu to load the appointment group
-      return redirect_to calendar2_url unless request.format == :json
+      unless request.format == :json
+        anchor = calendar_fragment :view_name => :scheduler, :appointment_group_id => @group.id
+        return redirect_to calendar2_url(:anchor => anchor)
+      end
 
       render :json => appointment_group_json(@group, @current_user, session, :include => ((params[:include] || []) | ['appointments']))
     end

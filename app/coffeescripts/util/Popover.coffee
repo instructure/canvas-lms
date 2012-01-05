@@ -73,5 +73,5 @@ define 'compiled/util/Popover', [
         at: 'center top',
         of: @trigger,
         offset: '0 -10px',
-        within: '#main',
-        collision: 'flipfit flipfit'
+        within: 'body',
+        collision: 'fit fit'
