@@ -52,21 +52,20 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_reminders, :dependent => :destroy
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
-  after_save :save_external_tool_tag
-
-  def external_tool_tag_attributes=(attrs)
-    attrs.delete(:id)
-    @tmp_tag = self.external_tool_tag || self.build_external_tool_tag
-    @tmp_tag.attributes = attrs
-    @tmp_tag.content_type = 'ContextExternalTool'
-  end
-
-  def save_external_tool_tag
-    if @tmp_tag
-      @tmp_tag.context = self
-      @tmp_tag.save!
+  validates_associated :external_tool_tag, :if => :external_tool?
+  accepts_nested_attributes_for :external_tool_tag, :reject_if => proc { |attrs|
+    # only accept the url and new_tab params, the other accessible
+    # params don't apply to an content tag being used as an external_tool_tag
+    attrs.slice!(:url, :new_tab)
+    false
+  }
+  before_validation do |assignment|
+    if assignment.external_tool? && assignment.external_tool_tag
+      assignment.external_tool_tag.context = assignment
+      assignment.external_tool_tag.content_type = "ContextExternalTool"
+    else
+      assignment.external_tool_tag = nil
     end
-    true
   end
 
   def external_tool?
@@ -1507,13 +1506,6 @@ class Assignment < ActiveRecord::Base
     if item.submission_types == "discussion_topic"
       item.saved_by = :discussion_topic
     end
-    if item.submission_types == 'external_tool'
-      tag = item.build_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
-      tag.content_type = 'ContextExternalTool'
-      if !tag.save && tag.errors["url"]
-        context.add_migration_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title))
-      end
-    end
 
     if hash[:grading_type]
       item.grading_type = hash[:grading_type]
@@ -1575,6 +1567,15 @@ class Assignment < ActiveRecord::Base
 
     context.imported_migration_items << item if context.imported_migration_items && new_record
     item.save_without_broadcasting!
+
+    if item.submission_types == 'external_tool'
+      tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+      tag.content_type = 'ContextExternalTool'
+      if !tag.save
+        context.add_migration_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title)) if tag.errors["url"]
+        item.external_tool_tag = nil
+      end
+    end
 
     if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
       if group = context.assignment_group_no_drop_assignments[item.migration_id]
