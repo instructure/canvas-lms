@@ -41,4 +41,12 @@ module ContentImportsHelper
       context_url(@context, :context_url)
     end
   end
+  
+  def error_link_or_message(string)
+    if string =~ /ErrorReport(?: id)?: ?(\d+)\z/
+      %{<a href="#{error_url($1)}">Error Report #{$1}</a>}.html_safe
+    else
+      user_content(string)
+    end
+  end
 end

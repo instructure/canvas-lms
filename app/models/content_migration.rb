@@ -169,7 +169,7 @@ class ContentMigration < ActiveRecord::Base
     migration_settings[:warnings] ||= []
     if exception_or_info.is_a?(Exception)
       er = ErrorReport.log_exception(:content_migration, exception_or_info)
-      migration_settings[:warnings] << [user_message, "ErrorReport id: #{er.id}"]
+      migration_settings[:warnings] << [user_message, "ErrorReport:#{er.id}"]
     else
       migration_settings[:warnings] << [user_message, exception_or_info]
     end
@@ -249,10 +249,9 @@ class ContentMigration < ActiveRecord::Base
       self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
     rescue => e
       self.workflow_state = :failed
-      message = "#{e.to_s}: #{e.backtrace.join("\n")}"
-      migration_settings[:last_error] = message
-      ErrorReport.log_exception(:content_migration, e)
-      logger.error message
+      er = ErrorReport.log_exception(:content_migration, e)
+      migration_settings[:last_error] = "ErrorReport:#{er.id}"
+      logger.error e
       self.save
       raise e
     ensure
