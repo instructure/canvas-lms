@@ -52,10 +52,10 @@ describe SisBatch do
     end
   end
 
-  it "should always set attachments to position 0" do
-    create_csv_data('abc') { |batch| batch.attachment.position.should == 0}
-    create_csv_data('abc') { |batch| batch.attachment.position.should == 0}
-    create_csv_data('abc') { |batch| batch.attachment.position.should == 0}
+  it "should not add attachments to the list" do
+    create_csv_data('abc') { |batch| batch.attachment.position.should be_nil}
+    create_csv_data('abc') { |batch| batch.attachment.position.should be_nil}
+    create_csv_data('abc') { |batch| batch.attachment.position.should be_nil}
   end
 
   describe "batch mode" do
