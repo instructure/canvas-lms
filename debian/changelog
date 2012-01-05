@@ -1,3 +1,16 @@
+canvas-lms (2012.01.05.09.54) stable; urgency=low
+
+  * Package ref: 0a67260ffd9db5d0949f5e7ebb2e6b91954d3eb4
+  *
+  * [+9d59284] search for communication channels case insensitively fixes #6750
+  * [+4e1afee] better indexes for pseudonyms closes #6193
+  * [+bcb52a4] fix sis communication channels inadvertently switching users fixes #6707
+  * [+3de6236] don't add items to list if their scope is nil
+  * [+5c93fb8] only queue one recompute_final_score per user+course
+  * [+0a67260] fix existing bad data from the sis_cc bug refs #6707
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 05 Jan 2012 09:54:39 -0700
+
 canvas-lms (2012.01.05.09.49) stable; urgency=low
 
   * Package ref: 34918ecac17dbdcb01345aec350266e7b266637c
