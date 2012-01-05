@@ -1,3 +1,14 @@
+canvas-lms (2012.01.05.08.57) testing; urgency=low
+
+  * Package ref: aa3fa504b7d4385d41239393013622df054636f3
+  *
+  * [+83c2b96] fix sis communication channels inadvertently switching users fixes #6707
+  * [+0fe62ca] don't add items to list if their scope is nil
+  * [+80644d9] only queue one recompute_final_score per user+course
+  * [+aa3fa50] use Pseudonym.custom_find_by_unique_id instead of find_by_unique_id
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 05 Jan 2012 08:57:39 -0700
+
 canvas-lms (2012.01.03.13.57) testing; urgency=low
 
   * Package ref: c0dc9e9c13f5e00c78b62ad498c6c2ec5aa60a52
