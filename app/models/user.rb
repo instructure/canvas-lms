@@ -680,9 +680,6 @@ class User < ActiveRecord::Base
     return unless new_user
     return if new_user == self
     max_position = (new_user.pseudonyms.last.position || 0) rescue 0
-    new_user.creation_email ||= self.creation_email
-    new_user.creation_unique_id ||= self.creation_unique_id
-    new_user.creation_sis_batch_id ||= self.creation_sis_batch_id
     new_user.save
     updates = []
     self.pseudonyms.each do |p|
@@ -1349,7 +1346,7 @@ class User < ActiveRecord::Base
     read_attribute(:uuid)
   end
 
-  def self.serialization_excludes; [:uuid,:phone,:creation_unique_id,:creation_email,:features_used]; end
+  def self.serialization_excludes; [:uuid,:phone,:features_used]; end
 
   def migrate_content_links(html, from_course)
     Course.migrate_content_links(html, from_course, self)

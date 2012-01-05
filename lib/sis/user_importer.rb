@@ -34,7 +34,6 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      User.update_all({:creation_sis_batch_id => @batch_id}, {:id => importer.users_to_set_sis_batch_ids}) if @batch_id && !importer.users_to_set_sis_batch_ids.empty?
       Pseudonym.update_all({:sis_batch_id => @batch_id}, {:id => importer.pseudos_to_set_sis_batch_ids}) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
@@ -159,7 +158,6 @@ module SIS
             begin
               User.transaction(:requires_new => true) do
                 if user.changed?
-                  user.creation_sis_batch_id = @batch_id if @batch_id
                   raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
                 elsif @batch_id
                   @users_to_set_sis_batch_ids << user.id

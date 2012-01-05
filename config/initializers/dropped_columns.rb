@@ -22,7 +22,7 @@ class ActiveRecord::Base
     'attachments' => %w(enrollment_id),
     'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist),
     'courses' => %w(section hidden_tabs),
-    'users' => %w(type),
+    'users' => %w(type creation_unique_id creation_sis_batch_id creation_email),
     'role_overrides' => %w(context_code),
     'enrollment_terms' => %w(sis_data),
     'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id),
