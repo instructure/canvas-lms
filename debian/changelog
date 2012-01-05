@@ -1,3 +1,11 @@
+canvas-lms (2012.01.05.10.54) stable; urgency=low
+
+  * Package ref: 83cf3264fb5f833990e8a865d42fa8602cc6a7a7
+  *
+  * [+83cf326] pin fssm gem
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 05 Jan 2012 10:54:38 -0700
+
 canvas-lms (2012.01.05.09.54) stable; urgency=low
 
   * Package ref: 0a67260ffd9db5d0949f5e7ebb2e6b91954d3eb4
