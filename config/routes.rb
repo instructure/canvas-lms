@@ -121,6 +121,7 @@ ActionController::Routing::Routes.draw do |map|
     course.import_review 'imports/review', :controller => 'content_imports', :action => 'review'
     course.import_list 'imports/list', :controller => 'content_imports', :action => 'index'
     course.import_copy_status 'imports/:id', :controller => 'content_imports', :action => 'copy_course_status', :conditions => {:method => :get}
+    course.download_import_archive 'imports/:id/download_archive', :controller => 'content_imports', :action => 'download_archive', :conditions => {:method => :get}
     course.resource :gradebook_upload
     course.resources :notifications, :only => [:index, :destroy, :update], :collection => {:clear => :post}
     course.grades "grades", :controller => 'gradebooks', :action => 'grade_summary', :id => nil
