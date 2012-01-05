@@ -40,7 +40,7 @@
     </div>
   <% elsif !@merge_opportunities.empty? %>
     <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
-      <% if @merge_opportunities.length == 1 && (@user.registered? || !@current_user || @current_user.communication_channels.active.email.find_by_path(@communication_channel.path)) %>
+      <% if @merge_opportunities.length == 1 && (@user.registered? || !@current_user || @current_user.communication_channels.active.email.by_path(@communication_channel.path).first) %>
         <p><% if @enrollment %>
           <%= mt 'details.account_exists_course', "The invitation for %{course} was sent to **%{email}**. An account already exists for this email address. Would you like to use this account?", :course => @course.name, :email => @communication_channel.path %>
         <% elsif @user.registered? %>

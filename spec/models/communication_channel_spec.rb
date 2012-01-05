@@ -272,5 +272,12 @@ describe CommunicationChannel do
       @communication_channel.should_not be_can_notify
     end
   end
-  
+
+  describe "by_email" do
+    it "should return matching ccs case-insensitively" do
+      @user = User.create!
+      @cc = @user.communication_channels.create!(:path => 'user@example.com')
+      @user.communication_channels.by_path('USER@EXAMPLE.COM').should == [@cc]
+    end
+  end
 end
