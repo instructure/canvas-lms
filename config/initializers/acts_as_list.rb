@@ -37,10 +37,6 @@ module ActiveRecord
           end
           acts_as_list_class.update_all("position=CASE #{updates.join(" ")} ELSE 0 END", "#{scope_condition}") unless updates.empty?
         end
-        def add_to_list_bottom_with_in_list_check
-          add_to_list_bottom_without_in_list_check unless in_list?
-        end
-        alias_method_chain :add_to_list_bottom, :in_list_check
       end
     end
   end

@@ -1023,8 +1023,8 @@ namespace :db do
 
     def create_admin(email, password)
       begin
-        pseudonym = Account.site_admin.pseudonyms.active.find_by_unique_id(email)
-        pseudonym ||= Account.default.pseudonyms.active.find_by_unique_id(email)
+        pseudonym = Account.site_admin.pseudonyms.active.custom_find_by_unique_id(email)
+        pseudonym ||= Account.default.pseudonyms.active.custom_find_by_unique_id(email)
         user = pseudonym ? pseudonym.user : User.create!
         user.register! unless user.registered?
         unless pseudonym

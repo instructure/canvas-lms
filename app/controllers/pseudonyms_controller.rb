@@ -28,7 +28,7 @@ class PseudonymsController < ApplicationController
       @ccs += CommunicationChannel.find_all_by_path_and_path_type(email, 'email') if email and !email.empty?
     end
     if @domain_root_account && email && !email.empty?
-      @domain_root_account.pseudonyms.active.find_all_by_unique_id(email).each do |p|
+      @domain_root_account.pseudonyms.active.custom_find_by_unique_id(email, :all).each do |p|
         cc = p.communication_channel if p.communication_channel && p.user
         cc ||= p.user.communication_channel rescue nil
         @ccs << cc

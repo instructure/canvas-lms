@@ -493,7 +493,8 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_scores(user_id)
     user = User.find(user_id)
-    user.student_enrollments.each do |enrollment|
+    enrollments = user.student_enrollments.uniq_by { |e| e.course_id }
+    enrollments.each do |enrollment|
       send_later(:recompute_final_score, user_id, enrollment.course_id)
     end
   end

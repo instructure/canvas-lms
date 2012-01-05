@@ -57,7 +57,6 @@ class SisBatch < ActiveRecord::Base
     att.context = batch
     att.uploaded_data = attachment
     att.display_name = t :upload_filename, "sis_upload_%{id}.zip", :id => batch.id
-    att.position = 0
     att.save
     Attachment.skip_scribd_submits(false)
     batch.attachment = att
