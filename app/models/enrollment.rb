@@ -493,7 +493,8 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_scores(user_id)
     user = User.find(user_id)
-    user.student_enrollments.each do |enrollment|
+    enrollments = user.student_enrollments.uniq_by { |e| e.course_id }
+    enrollments.each do |enrollment|
       send_later(:recompute_final_score, user_id, enrollment.course_id)
     end
   end
@@ -615,7 +616,7 @@ class Enrollment < ActiveRecord::Base
   named_scope :for_email, lambda { |email|
     {
       :joins => { :user => :communication_channels },
-      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND path=?", email]
+      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase]
     }
   }
   def self.cached_temporary_invitations(email)
