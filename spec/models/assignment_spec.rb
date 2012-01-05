@@ -36,6 +36,22 @@ describe Assignment do
     @assignment.save!
     @assignment.assignment_group.should_not be_nil
   end
+  
+  it "should touch assignment group on create/save" do
+    course
+    group = @course.assignment_groups.create!(:name => "Assignments")
+    AssignmentGroup.update_all({ :updated_at => 1.hour.ago }, { :id => group.id })
+    orig_time = group.reload.updated_at.to_i
+    a = @course.assignments.build(
+                                          "title"=>"test", 
+                                          "external_tool_tag_attributes"=>{"url"=>"", "new_tab"=>""} 
+                                  )
+    a.assignment_group = group
+    a.save!
+    @course.assignments.count.should == 1
+    group.reload
+    group.updated_at.to_i.should_not == orig_time
+  end
 
   it "should be able to submit homework" do
     setup_assignment_with_homework

@@ -183,8 +183,12 @@ class Quiz < ActiveRecord::Base
 
   def due_at=(val)
     val = val.in_time_zone.end_of_day if val.is_a?(Date)
-    super(val)
-    infer_times if (val.is_a?(String) && !val.match(/:/))
+    if val.is_a?(String)
+      super(Time.zone.parse(val))
+      infer_times unless val.match(/:/)
+    else
+      super(val)
+    end
   end
   
   def assignment?
