@@ -26,8 +26,6 @@ define 'compiled/calendar/commonEventFactory', [
         contextInfo = context
         break
 
-    console.log("#{type} #{data.id} #{contextInfo}")
-
     # If we can't find the context, then we're not sure
     # how to handle or display this, so we ditch it.
     if contextInfo == null

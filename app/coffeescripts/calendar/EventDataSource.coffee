@@ -114,10 +114,8 @@ define 'compiled/calendar/EventDataSource', [
       events
 
     processNextRequest: () =>
-      console.log "processNextRequest called with #{@pendingRequests.length} events in queue"
       request = @pendingRequests.shift()
       if request
-        console.log "processing request..."
         method = request[0]
         args = request[1]
         method args...
@@ -200,7 +198,6 @@ define 'compiled/calendar/EventDataSource', [
 
     getEvents: (start, end, contexts, cb) =>
       if @inFlightRequest
-        console.log "deferring getEvents request"
         @pendingRequests.push([@getEvents, arguments])
         return
 

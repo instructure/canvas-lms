@@ -8,10 +8,12 @@ define 'compiled/calendar/TimeBlockList', [
     # blocks is an array of [ Date, Date ] pairs, representing
     # start/end times. The UI only supports start/end times which
     # are in the same day in the user's timezone.
-    constructor: (selector, blocks) ->
+    constructor: (selector, splitterSelector, blocks) ->
       @div = $ selector
+      @splitterDiv = $ splitterSelector
       @blocksManager = new TimeBlockListManager(blocks)
       @render()
+      @splitterDiv.find('.split-link').click @splitClick
 
     render: (blocks) =>
       data = { time_blocks: blocks || [] }
@@ -28,8 +30,6 @@ define 'compiled/calendar/TimeBlockList', [
       @div.html timeBlockListTemplate(data)
 
       @addHandlers(row) for row in @div.find('tr')
-
-      @div.find('.split-link').click @splitClick
 
       @lastRow = @div.find('tr:last')
 
@@ -48,13 +48,12 @@ define 'compiled/calendar/TimeBlockList', [
       input = event.target
 
       $row = $(input).closest('tr')
-      if $row.get(0) == $('.time-block-list-body tr:last').get(0)
-        $('.time-block-list-body').append timeBlockTemplate(locked: false, formatted_date: "", formatted_start_time: "", formatted_end_time: "")
-        @addHandlers('.time-block-list-body tr:last')
+      if $row.get(0) == @div.find('.time-block-list-body tr:last').get(0)
+        @addRow()
 
         # refocus the field we were in previously
-        numRows = $('.time-block-list-body').find('tr').length
-        $focusRow = $('.time-block-list-body').find("tr:nth-child(#{numRows - 1})")
+        numRows = @div.find('.time-block-list-body').find('tr').length
+        $focusRow = @div.find('.time-block-list-body').find("tr:nth-child(#{numRows - 1})")
         # please don't hate me for doing this
         $focusRow.find("[name='#{input.name}']").parent().next().find("input").focus()
 
@@ -75,12 +74,15 @@ define 'compiled/calendar/TimeBlockList', [
       event.preventDefault()
       $(event.target).closest("tr").remove()
 
-    inputFocus: (event) ->
+      if @div.find('.time-block-list-body').find('tr[class!="locked"]').length == 0
+        @addRow()
+
+    inputFocus: (event) =>
       input  = event.target
       $input = $(input)
       $input.removeClass 'error'
 
-      $('.time-block-list-body').find('tr').each (i, row) =>
+      @div.find('.time-block-list-body').find('tr').each (i, row) =>
         $row = $(row)
 
         if row == $input.closest('tr').get(0)
@@ -88,9 +90,13 @@ define 'compiled/calendar/TimeBlockList', [
         else
           $row.removeClass 'focused'
 
+    addRow: =>
+      @div.find('.time-block-list-body').append timeBlockTemplate()
+      @addHandlers('.time-block-list-body tr:last')
+
     splitClick: (event) =>
       event.preventDefault()
-      duration = @div.find('[name=duration]').val()
+      duration = @splitterDiv.find('[name=duration]').val()
       if duration && @validate()
         @split(duration)
         @render()
@@ -103,9 +109,9 @@ define 'compiled/calendar/TimeBlockList', [
       valid = true
 
       @blocksManager.reset()
-      lastRow = $('.time-block-list-body tr:last').get(0)
+      lastRow = @div.find('.time-block-list-body tr:last').get(0)
 
-      $('.time-block-list-body').find('tr').each (i, row) =>
+      @div.find('.time-block-list-body').find('tr').each (i, row) =>
         return if row == lastRow
 
         $row = $(row)
@@ -121,7 +127,7 @@ define 'compiled/calendar/TimeBlockList', [
           locked = $(row).hasClass('locked')
           @blocksManager.add start, end, locked
 
-      alert "fix your errors" unless valid
+      alert "There are errors in your time block selections." unless valid
       valid
 
     validField: (input) ->

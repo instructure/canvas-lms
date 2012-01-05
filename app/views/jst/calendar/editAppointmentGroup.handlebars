@@ -20,7 +20,7 @@
     </p>
     <p>
       <input type="checkbox" class="group-signup-checkbox" id="group-signup-checkbox" name="use_group_signup" value="1" {{#ifEqual participant_type "Group"}}checked{{/ifEqual}}>
-      <label for="group-signup-checkbox">Have students sign up in Groups.</label>
+      <label for="group-signup-checkbox">Have students sign up in groups.</label>
     </p>
     <p>
       <div class="section-signup">
@@ -38,13 +38,32 @@
     </p>
   </div>
   <div class="right-column-wrapper">
-    <div class="time-block-list-wrapper"></div>
+    <div class="time-block-list-wrapper">
+      <div class="time-block-list">
+        <table class="time-block-list-header">
+          <tr>
+            <th class="date-column">Date</th>
+            <th class="time-range-column" colspan="4">Time Range</th>
+          </tr>
+        </table>
+        <div class="time-block-list-body-wrapper">
+        </div>
+        <div class="splitter" style="font-size: 0.8em">
+          <p>
+            <a class="split-link button small-button" href="#">Split</a>into slots of <input type="number" name="duration" value="30" style="width: 40px" /> minutes each.
+          </p>
+        </div>
+      </div>
+    </div>
     <p>
       <b>Options</b><br />
       <input type="checkbox" id="appointment-blocks-per-slot-option-button" name="per_slot_option" value="1" />
-      <label for="appointment-blocks-per-slot-option-button">Allow</label>
-      <input name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" style="width: 30px;" />
-      <label for="appointment-blocks-per-slot-option-button"> users or groups per time slot.</label>
+      <label for="appointment-blocks-per-slot-option-button">Limit each time slot to</label>
+      <input type="number" name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" style="width: 40px;" />
+      <label for="appointment-blocks-per-slot-option-button">
+        <span {{#ifEqual participant_type "Group"}} {{else}} style="display:none;" {{/ifEqual}} class="per_appointment_groups_label">groups.</span>
+        <span {{#ifEqual participant_type "Group"}} style="display:none;" {{/ifEqual}} class="per_appointment_users_label">users.</span>
+      </label>
       <br />
       <br />
       <input type="checkbox" id="appointment-blocks-participant-visibility-button" name="participant_visibility" value="1" />

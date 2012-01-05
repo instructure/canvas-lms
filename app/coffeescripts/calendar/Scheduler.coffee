@@ -58,6 +58,7 @@ define 'compiled/calendar/Scheduler', [
     toggleListMode: (showListMode)->
       if showListMode
         delete @viewingGroup
+        @calendar.updateFragment appointment_group_id: null
         @showList()
         if @canManageAGroup()
           $('#right-side .rs-section').hide()
@@ -96,6 +97,9 @@ define 'compiled/calendar/Scheduler', [
       false
 
     loadData: () =>
+      if not @loadingDeferred || (@loadingDeferred && not @loadingDeferred.isResolved())
+        @loadingDeferred = new $.Deferred()
+
       @groups = {}
       @loadingDiv ?= $('<div id="scheduler-loading" />').appendTo(@div).spin()
 
@@ -103,6 +107,7 @@ define 'compiled/calendar/Scheduler', [
         for group in data
           @groups[group.id] = group
         @redraw()
+        @loadingDeferred.resolve()
 
     redraw: () =>
       @loadingDiv.hide()
@@ -134,7 +139,7 @@ define 'compiled/calendar/Scheduler', [
 
         html = appointmentGroupListTemplate
           appointment_groups: groups
-
+          canManageAGroup: @canManageAGroup()
         @listDiv.find(".list-wrapper").html html
 
         if @viewingGroup
@@ -170,22 +175,29 @@ define 'compiled/calendar/Scheduler', [
       @viewCalendarForGroup(@groups?[groupId])
       group
 
+    viewCalendarForGroupId: (id) =>
+      @loadData()
+      @loadingDeferred.done =>
+        @viewCalendarForGroup @groups?[id]
+
     viewCalendarForGroup: (group) =>
+      @calendar.updateFragment appointment_group_id: group.id
       @toggleListMode(false)
       @viewingGroup = group
 
-      @div.addClass('showing-single')
+      @loadingDeferred.done =>
+        @div.addClass('showing-single')
 
-      @calendar.calendar.show()
-      @calendar.calendar.fullCalendar('changeView', 'agendaWeek')
+        @calendar.calendar.show()
+        @calendar.calendar.fullCalendar('changeView', 'agendaWeek')
 
-      if @viewingGroup.start_at
-        @calendar.gotoDate($.parseFromISO(@viewingGroup.start_at).time)
-      else
-        @calendar.gotoDate(new Date())
+        if @viewingGroup.start_at
+          @calendar.gotoDate($.parseFromISO(@viewingGroup.start_at).time)
+        else
+          @calendar.gotoDate(new Date())
 
-      @calendar.displayAppointmentEvents = @viewingGroup
-      $.publish "Calendar/refetchEvents"
+        @calendar.displayAppointmentEvents = @viewingGroup
+        $.publish "Calendar/refetchEvents"
 
     doneClick: (jsEvent) =>
       jsEvent.preventDefault()
