@@ -745,7 +745,7 @@ shared_examples_for "quiz selenium tests" do
     }
     find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
 
-    driver.find_element(:css, '.ui-icon-closethick').click
+    close_visible_dialog
     keep_trying_until {
       driver.find_element(:css, '.add_question_group_link').click
       driver.find_element(:css, '.find_bank_link').should be_displayed

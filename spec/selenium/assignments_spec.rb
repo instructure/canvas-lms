@@ -70,7 +70,7 @@ describe "assignment selenium tests" do
     driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
     driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
            text.should == "<b>This text should not be bold</b>"
-    driver.find_element(:css, '.ui-icon-closethick').click
+    close_visible_dialog
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
@@ -266,7 +266,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, 'a.edit_letter_grades_link').click
     wait_for_animations
     driver.find_element(:id, 'ui-dialog-title-edit_letter_grades_form').should be_displayed
-    driver.find_element(:css, '.ui-icon-closethick').click
+    close_visible_dialog
     driver.find_element(:id, 'ui-dialog-title-edit_letter_grades_form').should_not be_displayed
 
     #check peer reviews option
