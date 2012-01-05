@@ -1,3 +1,15 @@
+canvas-lms (2012.01.05.09.49) stable; urgency=low
+
+  * Package ref: 34918ecac17dbdcb01345aec350266e7b266637c
+  *
+  * [+e72e739] always wrap content-disposition-filename in quotes
+  * [+f9553bc] correctly account for time zone in quiz#due_at=
+  * [+296922f] Find ePortfolio page attachments by ID. Fixes #6380.
+  * [+016bd86] don't strip numeric (and other) types when saving questions
+  * [+34918ec] fix assignment after_saves not running
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 05 Jan 2012 09:49:48 -0700
+
 canvas-lms (2011.12.22.10.02) stable; urgency=low
 
   * Package ref: 7397569e560a055c4a36d56b30f824565834fdcf
