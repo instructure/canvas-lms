@@ -35,8 +35,7 @@ describe "course settings tests" do
     replace_content(name_input, course_name)
     code_input = course_form.find_element(:id, 'course_course_code')
     replace_content(code_input, course_code)
-    locale_select = driver.find_element(:id, 'course_locale')
-    click_option_by_text(locale_select, locale_text)
+    click_option('#course_locale', locale_text)
     driver.find_element(:css, '.course_form_more_options_link').click
     wait_for_animations
     driver.find_element(:css, '.course_form_more_options').should be_displayed
@@ -89,8 +88,7 @@ describe "course settings tests" do
     add_button = driver.find_element(:css, '.add_users_link')
     keep_trying_until { add_button.should be_displayed }
     add_button.click
-    select = driver.find_element(:css, '#course_section_id_holder > #course_section_id')
-    click_option_by_text(select, section_name)
+    click_option('#course_section_id_holder > #course_section_id', section_name)
     driver.find_element(:css, 'textarea.user_list').send_keys(student.name)
     driver.find_element(:css, '.verify_syntax_button').click
     wait_for_ajax_requests

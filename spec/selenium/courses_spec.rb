@@ -84,8 +84,7 @@ shared_examples_for "course selenium tests" do
     second_group.find_elements(:css, 'option').length.should == 1
     second_group.attribute('label').should == 'Test Term'
 
-    option_value = find_option_value(:id, 'copy_from_course', 'second course')
-    driver.find_element(:css, '#copy_from_course option[value="'+option_value+'"]').click
+    click_option('#copy_from_course', 'second course')
     driver.find_element(:css, '#content form').submit
 
     #modify course dates

@@ -6,8 +6,7 @@ describe "people" do
   DEFAULT_PASSWORD = 'qwerty'
 
   def add_user(option_text, username, user_list_selector)
-    option_value = find_option_value(:css, '#enrollment_type', option_text)
-    driver.find_element(:css, '#enrollment_type'+' option[value="'+option_value+'"]').click
+    click_option('#enrollment_type', option_text)
     driver.find_element(:css, 'textarea.user_list').send_keys(username)
     find_with_jquery('.verify_syntax_button').click
     wait_for_ajax_requests

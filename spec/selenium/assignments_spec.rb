@@ -140,27 +140,16 @@ describe "assignment selenium tests" do
     driver.find_element(:css, 'input.drop_count').send_keys('2')
     #set number of highest scores to drop
     driver.find_element(:css, '.add_rule_link').click
-    option_value = find_option_value(
-      :css,
-      '.form_rules div:nth-child(2) select',
-      I18n.t('options.drop_highest', 'Drop the Highest')
-    )
-    driver.find_element(:css, '.form_rules div:nth-child(2) select option[value="'+option_value+'"]').click
+    click_option('.form_rules div:nth-child(2) select', 'Drop the Highest')
     driver.find_element(:css, '.form_rules div:nth-child(2) input').send_keys('3')
     #set assignment to never drop
     driver.find_element(:css, '.add_rule_link').click
     never_drop_css = '.form_rules div:nth-child(3) select'
-    option_value = find_option_value(
-      :css,
-      never_drop_css,
-      I18n.t('options.never_drop', 'Never Drop')
-    )
-    driver.find_element(:css, never_drop_css + ' option[value="'+option_value+'"]').click
+    click_option(never_drop_css, 'Never Drop')
     wait_for_animations
     assignment_css = '.form_rules div:nth-child(3) .never_drop_assignment select'
     keep_trying_until{ driver.find_element(:css, assignment_css).displayed? }
-    option_value = find_option_value(:css, assignment_css, assignment.title)
-    driver.find_element(:css, assignment_css+' option[value="'+option_value+'"]').click
+    click_option(assignment_css, assignment.title)
     #delete second grading rule and save
     driver.find_element(:css, '.form_rules div:nth-child(2) a img').click
     driver.find_element(:css, '#add_group_form button[type="submit"]').click
@@ -194,8 +183,7 @@ describe "assignment selenium tests" do
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
-    option_value = find_option_value(:css, '#right-side select.assignment_groups_select', 'second group')
-    driver.find_element(:css, '#right-side select.assignment_groups_select > option[value="'+option_value+'"]').click
+    click_option('#right-side select.assignment_groups_select', 'second group')
     driver.find_element(:css, '.add_assignment_link').click
     driver.find_element(:id, 'assignment_title').send_keys(assignment_name)
     driver.find_element(:css, '.ui-datepicker-trigger').click
@@ -254,8 +242,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '.edit_full_assignment_link').click
     driver.find_element(:css, '.more_options_link').click
     driver.find_element(:id, 'assignment_assignment_group_id').should be_displayed
-    option_value = find_option_value(:css, '#assignment_assignment_group_id', second_group.name)
-    driver.find_element(:css, '#assignment_assignment_group_id > option[value="'+option_value+'"]').click
+    click_option('#assignment_assignment_group_id', second_group.name)
     #not using select_option_text because there is a carriage return in the option text
     driver.find_element(:id, 'assignment_grading_type').click
     driver.find_element(:css, '#assignment_grading_type option[value="letter_grade"]').click
@@ -295,16 +282,14 @@ describe "assignment selenium tests" do
       get "/courses/#{@course.id}/assignments"
 
       #create assignment
-      option_value = find_option_value(:css, '#right-side select.assignment_groups_select', 'Assignments')
-      driver.find_element(:css, '#right-side select.assignment_groups_select > option[value="'+option_value+'"]').click
+      click_option('#right-side select.assignment_groups_select', 'Assignments')
       driver.find_element(:css, '.add_assignment_link').click
       driver.find_element(:id, 'assignment_title').send_keys('test1')
       driver.find_element(:css, '.ui-datepicker-trigger').click
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       driver.find_element(:id, 'assignment_points_possible').send_keys('5')
-      option_value = find_option_value(:css, '.assignment_submission_types', 'External Tool')
-      driver.find_element(:css, '.assignment_submission_types > option[value="'+option_value+'"]').click
+      click_option('.assignment_submission_types', 'External Tool')
       expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
       keep_trying_until do
         find_with_jquery('#context_external_tools_select td.tools .tool:first-child:visible').click

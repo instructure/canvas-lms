@@ -453,18 +453,10 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(input['onchange']) if input['onchange']
   end
 
-  def find_option_value(selector_type, selector_css, option_text)
-    select = driver.find_element(selector_type, selector_css)
-    select.click
-    options = select.find_elements(:css, 'option')
-    option_value = ''
-    for option in options
-      if option.text == option_text
-        option_value = option.attribute('value')
-        break
-      end
-    end
-    option_value
+  def click_option(select_css, option_text, select_by = :text)
+    element = find_with_jquery(select_css)
+    select = Selenium::WebDriver::Support::Select.new(element)
+    select.select_by(select_by, option_text)
   end
 
   def close_visible_dialog
@@ -624,11 +616,6 @@ def get_file(filename)
     end
   end
   [filename, fullpath, data, @file]
-end
-
-def click_option_by_text(select_element, option_text)
-  select = Selenium::WebDriver::Support::Select.new(select_element)
-  select.select_by(:text, option_text)
 end
 
 shared_examples_for "in-process server selenium tests" do

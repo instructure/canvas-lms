@@ -98,9 +98,8 @@ describe "profile tests" do
       content_tbody.find_element(:css, '.add_notification_link').click
       wait_for_animations
       email_select_css = '#content > table > tbody > tr:nth-child(3) > td > span > select'
-      option_value = find_option_value(:css, email_select_css, second_email)
 
-      find_with_jquery("#{email_select_css} > option[value=\"#{option_value}\"]'").click
+      click_option(email_select_css, second_email)
       #change notification setting for first notification
       daily_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(3) > div')
       daily_select.click
@@ -191,7 +190,7 @@ describe "profile tests" do
     it "should change the language" do
       get "/profile"
       edit_form = click_edit
-      click_option_by_text(edit_form.find_element(:id, 'user_locale'), "Español")
+      click_option('#user_locale', 'Español')
       expect_new_page_load { edit_form.submit }
       driver.find_element(:css, '.profile_table').should include_text('Nombre')
     end
@@ -202,7 +201,7 @@ describe "profile tests" do
       driver.find_element(:css, '.add_contact_link').click
       register_form = driver.find_element(:id, 'register_sms_number')
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
-      click_option_by_text(register_form.find_element(:css, 'select.user_selected.carrier'), 'AT&T')
+      click_option('select.user_selected.carrier', 'AT&T')
       register_form.submit
       wait_for_ajaximations
       close_visible_dialog
