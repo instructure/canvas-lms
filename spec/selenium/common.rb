@@ -201,7 +201,9 @@ shared_examples_for "all selenium tests" do
   include SeleniumTestsHelperMethods
   include CustomSeleniumRspecMatchers
 
-  def selenium_driver; $selenium_driver; end
+  def selenium_driver;
+    $selenium_driver;
+  end
 
   alias_method :driver, :selenium_driver
 
@@ -498,16 +500,16 @@ shared_examples_for "all selenium tests" do
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stubs(:config).returns({
-      'domain' => 'www.instructuremedia.com',
-      'resource_domain' => 'www.instructuremedia.com',
-      'partner_id' => '100',
-      'subpartner_id' => '10000',
-      'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-      'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-      'player_ui_conf' => '1',
-      'kcw_ui_conf' => '1',
-      'upload_ui_conf' => '1'
-    })
+                                                 'domain' => 'www.instructuremedia.com',
+                                                 'resource_domain' => 'www.instructuremedia.com',
+                                                 'partner_id' => '100',
+                                                 'subpartner_id' => '10000',
+                                                 'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+                                                 'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+                                                 'player_ui_conf' => '1',
+                                                 'kcw_ui_conf' => '1',
+                                                 'upload_ui_conf' => '1'
+                                             })
     kal = mock('Kaltura::ClientV3')
     kal.stubs(:startSession).returns "new_session_id_here"
     Kaltura::ClientV3.stubs(:new).returns(kal)
@@ -628,6 +630,13 @@ def get_file(filename)
     end
   end
   [filename, fullpath, data, @file]
+end
+
+def validate_link(link_element, breadcrumb_text)
+  expect_new_page_load { link_element.click }
+  breadcrumb = driver.find_element(:id, 'breadcrumbs')
+  breadcrumb.should include_text(breadcrumb_text)
+  driver.execute_script("return INST.errorCount;").should == 0
 end
 
 shared_examples_for "in-process server selenium tests" do
