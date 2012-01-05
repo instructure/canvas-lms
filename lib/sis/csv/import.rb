@@ -362,6 +362,22 @@ module SIS
       def process_file(base, file)
         csv = { :base => base, :file => file, :fullpath => File.join(base, file) }
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
+          # validate UTF-8
+          begin
+            Iconv.open('UTF-8', 'UTF-8') do |iconv|
+              File.open(csv[:fullpath]) do |file|
+                chunk = file.read(4096)
+                while chunk
+                  iconv.iconv(chunk)
+                  chunk = file.read(4096)
+                end
+                iconv.iconv(nil)
+              end
+            end
+          rescue Iconv::Failure
+            add_error(csv, "Invalid UTF-8")
+            return
+          end
           FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS) do |row|
             importer = IMPORTERS.index do |importer|
               if SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
