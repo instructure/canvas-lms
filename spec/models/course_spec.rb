@@ -952,6 +952,19 @@ describe Course, "backup" do
       # new_assignment.due_at.should == today + 1.day does not work
       (new_assignment.due_at.to_i - (today + 1.day).to_i).abs.should < 60
     end
+
+    it "should copy a quiz when the quiz is not selected but the quiz's assignment is" do
+      course_model
+      @quiz = @course.quizzes.create!
+      @quiz.did_edit
+      @quiz.offer!
+      @quiz.assignment.should_not be_nil
+      @old_course = @course
+      @new_course = course_model
+      @new_course.merge_into_course(@old_course, "assignment_#{@quiz.assignment_id}" => true)
+      @new_quiz = @new_course.quizzes.first
+      @new_quiz.should_not be_nil
+    end
   end
   
   it "should not cross learning outcomes with learning outcome groups in the association" do
@@ -1045,7 +1058,6 @@ describe Course, "backup" do
     lo_2.description.should == lo2.description
     lo_2.data.should == lo2.data
   end
-  
 end
 
 def course_to_backup

@@ -1898,7 +1898,7 @@ class Course < ActiveRecord::Base
     end
     course.quizzes.active.each do |quiz|
       course_import.tick(60) if course_import
-      if bool_res(options[:everything] ) || bool_res(options[:all_quizzes] ) || bool_res(options[quiz.asset_string.to_sym] ) || (quiz.assignment_id && bool_res(["assignment_#{quiz.assignment_id}"]))
+      if bool_res(options[:everything] ) || bool_res(options[:all_quizzes] ) || bool_res(options[quiz.asset_string.to_sym] ) || (quiz.assignment_id && bool_res(options["assignment_#{quiz.assignment_id}"]))
         new_quiz = quiz.clone_for(self)
         to_shift_dates << new_quiz if new_quiz.clone_updated || same_dates?(quiz, new_quiz, [:due_at, :lock_at, :unlock_at])
         added_items << new_quiz
