@@ -54,7 +54,7 @@ module Api::V1::Course
 
   def copy_status_json(import, course, user, session)
     hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state))
-    hash[:status_url] = api_v1_course_copy_status_path(course, import)
+    hash[:status_url] = api_v1_course_copy_status_url(course, import)
     hash
   end
 end

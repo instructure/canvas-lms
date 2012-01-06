@@ -180,11 +180,13 @@ class ContentImportsController < ApplicationController
   #
   # @response_field id The unique identifier for the course copy.
   #
+  # @response_field created_at The time that the copy was initiated.
+  #
   # @response_field progress The progress of the copy as an integer. It is null before the copying starts, and 100 when finished.
   #
   # @response_field workflow_state The current status of the course copy. Possible values: "created", "started", "completed", "failed"
   #
-  # @response_field status_url The relative url for the course copy status API endpoint.
+  # @response_field status_url The url for the course copy status API endpoint.
   #
   # @example_response
   #   {'status':'completed', 'workflow_state':100, 'id':257, 'created_at':'2011-11-17T16:50:06Z', 'status_url':'/api/v1/courses/9457/course_copy/257'}

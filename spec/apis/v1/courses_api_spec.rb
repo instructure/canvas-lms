@@ -459,14 +459,22 @@ describe ContentImportsController, :type => :integration do
   def run_copy(to_id=nil, from_id=nil, options={})
     to_id ||= @copy_to.to_param
     from_id ||= @copy_from.to_param
-    api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
+    data = api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
     {:source_course => from_id}.merge(options))
-    data = JSON.parse(response.body)
-    
+
+    import = CourseImport.last(:order => :id)
+    data.should == {
+      'id' => import.id,
+      'progress' => nil,
+      'status_url' => "http://www.example.com/api/v1/courses/#{@copy_to.to_param}/course_copy/#{import.id}",
+      'created_at' => import.created_at.as_json,
+      'workflow_state' => 'created',
+    }
+
     status_url = data['status_url']
     dj = Delayed::Job.last
-    
+
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
     (JSON.parse(response.body)).tap do |res|
       res['workflow_state'].should == 'created'
