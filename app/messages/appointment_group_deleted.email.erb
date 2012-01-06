@@ -9,7 +9,7 @@
 <%= t :message, 'All appointments for "%{appointment_name}" have been canceled.', :appointment_name => asset.title %>
 
 <%= before_label :details, "Appointment details" %>
-<%= before_label :dates, "Date(s)" %> <%= date_string(asset.start_at, asset.end_at) %>
+<%= before_label :dates, "Date(s)" %> <%= date_string(asset.start_at, asset.end_at, :no_words) %>
 <%= before_label :course, "Course" %> <%= asset.context.name %>
 
 <%= before_label :cancel_reason, "Reason for canceling" %>
