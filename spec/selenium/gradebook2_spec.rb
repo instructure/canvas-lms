@@ -49,10 +49,12 @@ describe "gradebook2 selenium tests" do
       comment.should be_displayed
       comment
     end
-    comment.click
-    wait_for_ajax_requests
-    keep_trying_until { driver.find_element(:id, "add_a_comment").should be_displayed }
-    details_dialog = find_with_jquery('.ui-dialog:visible')
+    keep_trying_until do
+      comment.click
+      wait_for_ajax_requests
+      find_with_jquery("#add_a_comment").should be_displayed
+    end
+      details_dialog = find_with_jquery('.ui-dialog:visible')
     details_dialog
   end
 
