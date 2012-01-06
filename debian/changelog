@@ -1,3 +1,15 @@
+canvas-lms (2012.01.06.15.58) testing; urgency=low
+
+  * Package ref: 16423fea94186f315f86e9a87b464bd195279447
+  *
+  * [+789b0d2] remove sis_name and sis_course_code from the API
+  * [+5d6cbfa] remove sis_source_id from enrollments API
+  * [+00cb030] migration to fix bad assessment question data
+  * [+32fc5e8] validate UTF-8 in SIS CSVs fixes #6780
+  * [+16423fe] improve communication channel uniqueness check
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 06 Jan 2012 15:58:45 -0700
+
 canvas-lms (2012.01.05.08.57) testing; urgency=low
 
   * Package ref: aa3fa504b7d4385d41239393013622df054636f3
