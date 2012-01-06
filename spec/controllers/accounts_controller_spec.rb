@@ -132,14 +132,14 @@ describe AccountsController do
     it "should set batch mode and term if given" do
       account_with_admin_logged_in
       @account.update_attribute(:allow_sis_import, true)
-      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1'
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv', :batch_mode => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.batch_mode.should be_true
       batch.batch_mode_term.should be_nil
       batch.destroy
 
-      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1', :batch_mode_term_id => @account.enrollment_terms.first.id
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv', :batch_mode => '1', :batch_mode_term_id => @account.enrollment_terms.first.id
       batch = SisBatch.last
       batch.should_not be_nil
       batch.batch_mode.should be_true
@@ -151,21 +151,21 @@ describe AccountsController do
       @account.update_attribute(:allow_sis_import, true)
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip'
+          :import_type => 'instructure_csv'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == {}
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1'
+          :import_type => 'instructure_csv', :override_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == { :override_sis_stickiness => true }
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1',
+          :import_type => 'instructure_csv', :override_sis_stickiness => '1',
           :add_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
@@ -173,7 +173,7 @@ describe AccountsController do
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1',
+          :import_type => 'instructure_csv', :override_sis_stickiness => '1',
           :clear_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
@@ -181,14 +181,14 @@ describe AccountsController do
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :clear_sis_stickiness => '1'
+          :import_type => 'instructure_csv', :clear_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == {}
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :add_sis_stickiness => '1'
+          :import_type => 'instructure_csv', :add_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == {}
