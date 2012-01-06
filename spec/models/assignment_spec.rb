@@ -1447,6 +1447,33 @@ describe Assignment do
       assignment.turnitin_settings[:current].should be_nil
     end
   end
+
+  context "generate comments from submissions" do
+    it "should infer_comment_context_from_filename" do
+      setup_assignment_without_submission
+
+      attachment = @user.attachments.new :filename => "homework.doc"
+      attachment.content_type = "foo/bar"
+      attachment.size = 10
+      attachment.save!
+
+      submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [attachment]
+
+      @assignment.instance_variable_set :@ignored_files, []
+      @assignment.send(:infer_comment_context_from_filename, "grocery_list.txt").should be_nil
+      @assignment.instance_variable_get(:@ignored_files).should == ["grocery_list.txt"]
+
+      filename = [@user.last_name_first, @user.id, attachment.id, attachment.display_name].join("_")
+
+      @assignment.send(:infer_comment_context_from_filename, filename).should == ({
+        :user => @user,
+        :submission => submission,
+        :filename => filename,
+        :display_name => attachment.display_name
+      })
+      @assignment.instance_variable_get(:@ignored_files).should == ["grocery_list.txt"]
+    end
+  end
 end
 
 def setup_assignment_with_group
