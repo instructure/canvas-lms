@@ -1,9 +1,10 @@
-define 'compiled/calendar/MiniCalendar', [], () ->
-
-  class
-    constructor: (selector, mainCalendar) ->
-      @mainCalendar = mainCalendar
-      @calendar = $(selector).fullCalendar
+define 'compiled/calendar/MiniCalendar', ['i18n'], (I18n) ->
+  I18n = I18n.scoped 'calendar'
+  
+  class MiniCalendar
+    constructor: (selector, @mainCalendar) ->
+      @calendar = $(selector)
+      @calendar.fullCalendar
         height: 240
         weekMode: "variable"
         allDayDefault: false
@@ -25,7 +26,9 @@ define 'compiled/calendar/MiniCalendar', [], () ->
       # Since we have caching (lazyFetching) turned off, we can rely on this
       # getting called every time we switch views, *before* the events are rendered.
       # That makes this a great place to clear out the previous classes.
-      $(".fc-content td").removeClass "event"
+      @calendar.find(".fc-content td")
+        .removeClass("event slot-available")
+        .removeAttr('title')
       @mainCalendar.getEvents start, end, cb
 
     dayClick: (date) =>
@@ -33,9 +36,14 @@ define 'compiled/calendar/MiniCalendar', [], () ->
 
     eventRender: (event, element, view) =>
       cell = view.dateCell(event.start)
-      view.element
-        .find("tr:nth-child(#{cell.row+1}) td:nth-child(#{cell.col+1})")
-        .addClass("event")
+      td = view.element.find("tr:nth-child(#{cell.row+1}) td:nth-child(#{cell.col+1})")
+      td.addClass("event")
+      tooltip = I18n.t 'event_on_this_day', 'There is an event on this day'
+      appointmentGroupBeingViewed = @mainCalendar.displayAppointmentEvents?.id
+      if appointmentGroupBeingViewed && appointmentGroupBeingViewed == event.calendarEvent?.appointment_group_id && event.object.available_slots
+        td.addClass("slot-available")
+        tooltip = I18n.t 'open_appointment_on_this_day', 'There is an open appointment on this day'
+      td.attr('title', tooltip)
       false # don't render the event
 
     visibleContextListChanged: (list) =>
