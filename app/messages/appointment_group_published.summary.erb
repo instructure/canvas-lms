@@ -6,4 +6,4 @@
   <%= t('subject', 'Appointment "%{appointment_name}" is available for signup (%{course})', :appointment_name => asset.title, :course => asset.context.name) %>
 <% end %>
 
-<%= t :message, 'Time slots for "%{appointment_name}" are now available for signup (%{dates}).', :appointment_name => asset.title, :dates => date_string(asset.start_at, asset.end_at) %>
+<%= t :message, 'Time slots for "%{appointment_name}" are now available for signup (%{dates}).', :appointment_name => asset.title, :dates => date_string(asset.start_at, asset.end_at, :no_words) %>

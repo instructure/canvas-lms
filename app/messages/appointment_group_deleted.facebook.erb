@@ -1,7 +1,7 @@
 <%= t :message, 'All appointments for "%{appointment_name}" have been canceled.', :appointment_name => asset.title %><br>
 <br>
 <b><%= before_label :details, "Appointment details" %></b><br>
-<%= before_label :dates, "Date(s)" %> <%= date_string(asset.start_at, asset.end_at) %><br>
+<%= before_label :dates, "Date(s)" %> <%= date_string(asset.start_at, asset.end_at, :no_words) %><br>
 <%= before_label :course, "Course" %> <%= asset.context.name %><br>
 <br>
 <b><%= before_label :cancel_reason, "Reason for canceling" %></b><br>

@@ -9,7 +9,7 @@
 <%= t :message, 'Time slots have been added to "%{appointment_name}" and are available for signup.', :appointment_name => asset.title %>
 
 <%= before_label :details, "Appointment details" %>
-<%= before_label :dates, "Date(s)" %> <%= date_string(asset.start_at, asset.end_at) %>
+<%= before_label :dates, "Date(s)" %> <%= date_string(asset.start_at, asset.end_at, :no_words) %>
 <%= before_label :signup_type, "Signup Type" %> <%=
   asset.participant_type == 'Group' ?
     t(:group_signup, "Group (%{group_category})", :group_category => asset.sub_context.name) :

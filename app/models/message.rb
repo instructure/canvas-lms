@@ -90,6 +90,10 @@ class Message < ActiveRecord::Base
   def notification_category
     @cat ||= self.notification.category
   end
+
+  def notification_display_category
+    notification.display_category
+  end
   
   named_scope :for, lambda { |context| 
     { :conditions => ['messages.context_type = ? and messages.context_id = ?', context.class.base_ar_class.to_s, context.id]}
