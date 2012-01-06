@@ -112,8 +112,6 @@ class CoursesController < ApplicationController
   # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
   # @argument course[self_enrollment] [Boolean] [optional] Set to true if the course is self enrollment.
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
-  # @argument course[sis_name] [String] [optional] The SIS course name.
-  # @argument course[sis_course_code] [optional] The SIS course code.
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
   def create
@@ -127,12 +125,9 @@ class CoursesController < ApplicationController
         params[:course][:enrollment_term] = (@account.root_account || @account).enrollment_terms.find(enrollment_term_id)
       end
 
-      sis_attributes = [:sis_course_id, :sis_course_code, :sis_name]
-      sis_info = sis_attributes.map { |s| params[:course].delete(s) }
+      sis_course_id = params[:course].delete(:sis_course_id)
       @course = (@sub_account || @account).courses.build(params[:course])
-      sis_attributes.each_with_index { |s, n|
-        @course.send("#{s}=", sis_info[n])
-      } if api_request? && @account.grants_right?(@current_user, :manage_sis)
+      @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
       @course.offer if api_request? and params[:offer].present?
       respond_to do |format|
         if @course.save
@@ -144,7 +139,7 @@ class CoursesController < ApplicationController
             [:start_at, :conclude_at, :license, :publish_grades_immediately,
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
-             :sis_name, :sis_course_code, :root_account_id, :account_id],
+             :root_account_id, :account_id],
              nil)
           }
         else

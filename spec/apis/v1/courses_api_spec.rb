@@ -79,8 +79,6 @@ describe CoursesController, :type => :integration do
             'open_enrollment'                 => true,
             'self_enrollment'                 => true,
             'license'                         => 'Creative Commons',
-            'sis_course_code'                 => 'TEST-001',
-            'sis_name'                        => 'SIS Test Course',
             'sis_course_id'                   => '12345'
           }
         }
@@ -94,8 +92,8 @@ describe CoursesController, :type => :integration do
         new_course = Course.find(json['id'])
         [:name, :course_code, :start_at, :conclude_at, :publish_grades_immediately,
         :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
-        :open_enrollment, :self_enrollment, :license, :sis_course_code, :sis_course_id,
-        :sis_name, :allow_student_forum_attachments].each do |attr|
+        :open_enrollment, :self_enrollment, :license, :sis_course_id,
+        :allow_student_forum_attachments].each do |attr|
           [:start_at, :conclude_at].include?(attr) ?
             new_course.send(attr).should == Time.parse(post_params['course'][attr.to_s]) :
             new_course.send(attr).should == post_params['course'][attr.to_s]
