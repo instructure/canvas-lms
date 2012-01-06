@@ -30,6 +30,14 @@ describe SIS::CSV::Import do
     importer.errors.first.last.should == "Couldn't find Canvas CSV import headers"
   end
 
+  it "should error files with invalid UTF-8" do
+    importer = process_csv_data(
+      "xlist_course_id,section_id,status",
+      "ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active"
+    )
+    importer.errors.first.last.should == "Invalid UTF-8"
+  end
+
   it "should work for a mass import" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",

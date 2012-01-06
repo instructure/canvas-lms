@@ -280,4 +280,17 @@ describe CommunicationChannel do
       @user.communication_channels.by_path('USER@EXAMPLE.COM').should == [@cc]
     end
   end
+
+  it "should properly validate the uniqueness of path" do
+    @user = User.create!
+    @cc = @user.communication_channels.create!(:path => 'user1@example.com')
+    # should allow a different address
+    @user.communication_channels.create!(:path => 'user2@example.com')
+    # should allow a different path_type
+    @user.communication_channels.create!(:path => 'user1@example.com', :path_type => 'sms')
+    # should allow a retired duplicate
+    @user.communication_channels.create!(:path => 'user1@example.com') { |cc| cc.workflow_state = 'retired' }
+    # the unconfirmed should still be valid, even though a retired exists
+    @cc.should be_valid
+  end
 end
