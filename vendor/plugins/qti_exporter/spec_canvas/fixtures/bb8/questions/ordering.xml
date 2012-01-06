@@ -14,6 +14,7 @@
       <bbmd_is_extracredit>false</bbmd_is_extracredit>
       <qmd_absolutescore_max>10.0</qmd_absolutescore_max>
       <qmd_weighting>0.0</qmd_weighting>
+      <qmd_timelimit>0</qmd_timelimit>
     </itemmetadata>
     <presentation>
       <flow class="Block">
