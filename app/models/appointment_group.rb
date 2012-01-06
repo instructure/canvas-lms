@@ -77,6 +77,11 @@ class AppointmentGroup < ActiveRecord::Base
   attr_accessor :validation_event_override
   attr_accessor :cancel_reason
 
+  def reload
+    remove_instance_variable :@new_appointments if @new_appointments
+    super
+  end
+
   def sub_context_code=(code)
     if new_record?
       self.sub_context = case code
@@ -159,7 +164,7 @@ class AppointmentGroup < ActiveRecord::Base
 
     dispatch :appointment_group_updated
     to       { possible_users }
-    whenever { active? && new_appointments }
+    whenever { active? && new_appointments && !workflow_state_changed? }
 
     dispatch :appointment_group_deleted
     to       { possible_users }

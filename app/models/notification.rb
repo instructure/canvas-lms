@@ -49,6 +49,9 @@ class Notification < ActiveRecord::Base
     "Show In Feed",
     "Migration Import Finished",
     "Migration Import Failed",
+    "Appointment Group Published",
+    "Appointment Group Updated",
+    "Appointment Reserved For User",
   ].freeze
   
   has_many :messages
@@ -585,7 +588,17 @@ class Notification < ActiveRecord::Base
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end
   end
-  
+
+  def display_category
+    case category
+      when 'Student Appointment Signups', 'Appointment Availability',
+           'Appointment Signups', 'Appointment Cancelations'
+        'Calendar'
+      else
+        category
+    end
+  end
+
   def type_name
     return category
   end

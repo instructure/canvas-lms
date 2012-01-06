@@ -24,13 +24,14 @@ end
 def appointment_participant_model(opts={})
   participant = opts.delete(:participant) || user_model
   @course = opts[:course] ||= course_model
-  @course.offer!
+  @course.offer! unless @course.available?
   if participant.is_a?(User)
     @course.enroll_student(participant).update_attribute(:workflow_state, 'active')
   else
     opts[:sub_context] ||= participant.group_category
   end
   parent_event = opts.delete(:parent_event) || appointment_model(opts)
+  parent_event.context.publish! unless opts[:no_publish]
   updating_user = opts.delete(:updating_user) || user_model
   @event = parent_event.reserve_for(participant, updating_user)
 end
@@ -39,6 +40,8 @@ def appointment_model(opts={})
   appointment_group = opts[:appointment_group] || appointment_group_model(:sub_context => opts.delete(:sub_context))
   appointment_group.update_attributes(:new_appointments => [[opts[:start_at] || Time.now.utc + 1.hour, opts[:end_at] || Time.now.utc + 1.hour]])
   @appointment = appointment_group.new_appointments.first
+  appointment_group.reload
+  @appointment
 end
 
 def appointment_group_model(opts={})
@@ -47,6 +50,7 @@ def appointment_group_model(opts={})
     opts[:sub_context_code] = sub_context.asset_string
   end
   @appointment_group = @course.appointment_groups.create!(valid_appointment_group_attributes.merge(opts))
+  @appointment_group
 end
 
 def valid_calendar_event_attributes
