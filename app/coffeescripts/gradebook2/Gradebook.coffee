@@ -563,7 +563,6 @@ define 'compiled/Gradebook', [
       @gradeGrid.onCellChange.subscribe (event, data) =>
         @calculateStudentGrade(data.item)
         @gradeGrid.invalidate
-      @gradeGrid.onBeforeCellEditorDestroy.subscribe (event,data) -> debugger
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
         student.row = i for student, i in @rows
