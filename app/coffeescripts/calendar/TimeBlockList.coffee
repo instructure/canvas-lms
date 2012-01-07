@@ -61,12 +61,9 @@ define 'compiled/calendar/TimeBlockList', [
       input = event.target
       $input = $(input)
       unless @validField(input)
+        row = $input.closest('tr')
         # blank rows are OK
-        allBlank = true
-        for i in $input.closest('tr').find('input')
-          allBlank = false if i.value != ''
-
-        $input.addClass 'error' unless allBlank
+        $input.addClass 'error' unless @rowIsBlank(row)
       else
         $input.val $input.nextAll('.datetime_suggest').text()
 
@@ -109,10 +106,9 @@ define 'compiled/calendar/TimeBlockList', [
       valid = true
 
       @blocksManager.reset()
-      lastRow = @div.find('.time-block-list-body tr:last').get(0)
 
       @div.find('.time-block-list-body').find('tr').each (i, row) =>
-        return if row == lastRow
+        return if @rowIsBlank(row)
 
         $row = $(row)
         for fieldName in ['date', 'start_time', 'end_time']
@@ -134,6 +130,12 @@ define 'compiled/calendar/TimeBlockList', [
       $input = $(input)
       invalidDate = $input.nextAll('.datetime_suggest').hasClass('invalid_datetime')
       !($input.val() == '') && !invalidDate
+
+    rowIsBlank: (row) ->
+      blank = true
+      for i in $(row).find('input')
+        blank = false if i.value != ''
+      blank
 
     blocks: () ->
       ary = []
