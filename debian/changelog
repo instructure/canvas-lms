@@ -1,3 +1,12 @@
+canvas-lms (2012.01.07.11.30) testing; urgency=low
+
+  * Package ref: 84343d317c7d42739a8311208e755edebbd881e0
+  *
+  * [+a04d5cc] fix typo; fixes #6755
+  * [+84343d3] add the current user to the course wizard cache key; fixes #6821
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 07 Jan 2012 11:30:27 -0700
+
 canvas-lms (2012.01.07.07.03) testing; urgency=low
 
   * Package ref: 9cc29527a9bc733c977da0c417dfe83f19cdb28d
