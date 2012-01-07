@@ -20,7 +20,7 @@ $(document).ready(function() {
 <% end %>
 
 <% content_for :wizard_box do %>
-  <% cache(['wizard_box_partial', @context].cache_key) do %>
+  <% cache(['wizard_box_partial', @context, @current_user].cache_key) do %>
   <div class="wizard_options" >
     <h3><%= t('headings.next_steps', %{Next Steps}) %></h3>
     <ul class="wizard_options_list">
