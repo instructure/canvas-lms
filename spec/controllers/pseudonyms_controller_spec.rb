@@ -48,28 +48,37 @@ describe PseudonymsController do
       @cc.should_not be_active
     end
 
-    it "should send password-change email for a registered user" do
-      user_with_pseudonym
-      get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
-      response.should be_redirect
-      assigns[:ccs].should include(@cc)
-      assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
-    end
+    describe "forgot password" do
+      before :each do
+        Notification.create(:name => 'Forgot Password')
+      end
 
-    it "should send password-change email case insensitively" do
-      user_with_pseudonym(:username => 'user1@example.com')
-      get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'USER1@EXAMPLE.COM'}
-      response.should be_redirect
-      assigns[:ccs].should include(@cc)
-      assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
-    end
+      it "should send password-change email for a registered user" do
+        user_with_pseudonym
+        get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
+        response.should be_redirect
+        assigns[:ccs].should include(@cc)
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
+      end
 
-    it "should send password-change email for users with pseudonyms in a different account" do
-      user_with_pseudonym(:account => Account.site_admin)
-      get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
-      response.should be_redirect
-      assigns[:ccs].should include(@cc)
-      assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+      it "should send password-change email case insensitively" do
+        user_with_pseudonym(:username => 'user1@example.com')
+        get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'USER1@EXAMPLE.COM'}
+        response.should be_redirect
+        assigns[:ccs].should include(@cc)
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
+      end
+
+      it "should send password-change email for users with pseudonyms in a different account" do
+        user_with_pseudonym(:account => Account.site_admin)
+        get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
+        response.should be_redirect
+        assigns[:ccs].should include(@cc)
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
+      end
     end
 
     it "should render confirm change password view for registered user's email" do
