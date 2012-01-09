@@ -312,6 +312,28 @@ class ActiveRecord::Base
   named_scope :order, lambda { |order_by|
     {:order => order_by}
   }
+
+  module UniqueConstraintViolation
+    def self.===(error)
+      ActiveRecord::StatementInvalid === error &&
+      error.message.match(/PGError: ERROR: +duplicate key value violates unique constraint|Mysql::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
+    end
+  end
+
+  def self.unique_constraint_retry
+    # runs the block in a (possibly nested) transaction. if a unique constraint
+    # violation occurs, it will run it a second time. the nested transaction
+    # (savepoint) ensures we don't mess up things for the outer transaction.
+    # useful for possible race conditions where we don't want to take a lock
+    # (e.g. when we create a submission).
+    2.times do
+      begin
+        transaction(:requires_new => true) { yield }
+        break
+      rescue UniqueConstraintViolation
+      end
+    end
+  end
 end
 
 class ActiveRecord::Serialization::Serializer

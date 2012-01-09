@@ -72,4 +72,54 @@ describe ActiveRecord::Base do
       User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM users) u GROUP BY #{conn.group_by('id', 'name')}"
     }.should_not raise_error
   end
+
+  context "unique_constraint_retry" do
+    before do
+      @user = user_model
+      @assignment = assignment_model
+      @orig_user_count = User.count
+    end
+
+    it "should normally run once" do
+      User.unique_constraint_retry do
+        User.create!
+      end
+      User.count.should eql @orig_user_count + 1
+    end
+
+    it "should run twice if it gets a UniqueConstraintViolation" do
+      Submission.create!(:user => @user, :assignment => @assignment)
+      tries = 0
+      User.unique_constraint_retry do
+        tries += 1
+        User.create!
+        Submission.create!(:user => @user, :assignment => @assignment)
+      end
+      Submission.count.should eql 1
+      tries.should eql 2
+      User.count.should eql @orig_user_count
+    end
+
+    it "should not cause outer transactions to roll back" do
+      Submission.create!(:user => @user, :assignment => @assignment)
+      User.transaction do
+        User.create!
+        User.unique_constraint_retry do
+          User.create!
+          Submission.create!(:user => @user, :assignment => @assignment)
+        end
+        User.create!
+      end
+      Submission.count.should eql 1
+      User.count.should eql @orig_user_count + 2
+    end
+
+    it "should not eat other ActiveRecord::StatementInvalid exceptions" do
+      lambda { User.unique_constraint_retry { User.connection.execute "this is not valid sql" } }.should raise_error(ActiveRecord::StatementInvalid)
+    end
+
+    it "should not eat any other exceptions" do
+      lambda { User.unique_constraint_retry { raise "oh crap" } }.should raise_error
+    end
+  end
 end

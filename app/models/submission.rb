@@ -412,7 +412,6 @@ class Submission < ActiveRecord::Base
     end
     true
   end
-  attr_accessor :created_correctly_from_assignment_rb
 
   def update_admins_if_just_submitted
     if @just_submitted
