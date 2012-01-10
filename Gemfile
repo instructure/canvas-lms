@@ -31,7 +31,7 @@ gem 'mime-types',     '1.16',   :require => 'mime/types'
 # with mini_magick 3.1
 gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
-gem 'nokogiri',       '1.4.1'
+gem 'nokogiri',       '1.4.7'
 gem 'oauth',          '0.4.5'
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'rake',           '< 0.10'
