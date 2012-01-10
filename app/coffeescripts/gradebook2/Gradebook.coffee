@@ -1,6 +1,11 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
-I18n.scoped 'gradebook2', (I18n) ->
-  class @Gradebook
+define 'compiled/Gradebook', [
+  'i18n'
+  'jst/gradebook2/section_to_show_menu'
+], (I18n, sectionToShowMenuTemplate) ->
+  I18n = I18n.scoped 'gradebook2'
+
+  class Gradebook
     minimumAssignmentColumWidth = 10
 
     constructor: (@options) ->
@@ -29,7 +34,7 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     gotAssignmentGroups: (assignmentGroups) =>
       @assignmentGroups = {}
-      @assignments       = {}
+      @assignments      = {}
 
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
@@ -211,7 +216,7 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     calculateStudentGrade: (student) =>
       if student.loaded
-        submissionsAsArray = (value for key, value of student when key.match /^assignment_/)
+        submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
         result = INST.GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[if @include_ungraded_assignments then 'final' else 'current']
@@ -389,25 +394,25 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     initHeader: =>
       if @sections_enabled
-        $courseSectionTemplate = $('#course_section_template').removeAttr('id').detach()
-        $sectionToShowMenu = $('#section_to_show').next()
-        allSectionsText = $('#section_being_shown').text()
-        $('#section_being_shown').text(@sections[@sectionToShow].name) if @sectionToShow
-        for i, section of @sections
-          $courseSectionTemplate.clone().appendTo($sectionToShowMenu)
-            .find('label')
-              .attr('for', "section_option_#{section.id}")
-              .text(section.name)
-            .end()
-            .find('input')
-              .attr(id: "section_option_#{section.id}", value: section.id)
-              .prop('checked', section.id == @sectionToShow)
-        $('#section_to_show').show().kyleMenu
+        $section_being_shown = $('#section_being_shown')
+        allSectionsText = I18n.t('all_sections', 'All Sections')
+        sections = [{ name: allSectionsText, checked: !@sectionToShow}]
+        for id, s of @sections
+          sections.push
+            name: s.name
+            id: id
+            checked: @sectionToShow is id
+
+        $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections, scrolling: sections.length > 15))
+        (updateSectionBeingShownText = =>
+          $section_being_shown.text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
+        )()
+        $('#section_to_show').after($sectionToShowMenu).show().kyleMenu
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
         $sectionToShowMenu.bind 'menuselect', (event, ui) =>
           @sectionToShow = Number($sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()) || undefined
           $.store[ if @sectionToShow then 'userSet' else 'userRemove']("grading_show_only_section#{@options.context_id}", @sectionToShow)
-          $('#section_being_shown').text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
+          updateSectionBeingShownText()
           @buildRows()
 
       $settingsMenu = $('#gradebook_settings').next()

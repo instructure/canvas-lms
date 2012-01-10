@@ -17,7 +17,7 @@
  */
 
 I18n.scoped('instructure', function(I18n) {
-  
+
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
   // NOTE: because IE only allows form methods to be "POST" or "GET",
@@ -84,7 +84,7 @@ I18n.scoped('instructure', function(I18n) {
           return false;
         }
       }
-      
+
       if (options.disableWhileLoading) {
         var loadingPromise = $.Deferred(),
             oldHandlers = {};
@@ -99,7 +99,7 @@ I18n.scoped('instructure', function(I18n) {
           };
         });
       }
-      
+
       var doUploadFile = options.fileUpload;
       if($.isFunction(options.fileUpload)) {
         try {
@@ -166,7 +166,7 @@ I18n.scoped('instructure', function(I18n) {
               // error function
               var $formObj = $form,
                   needValidForm = true;
-              
+
               if(options.error && $.isFunction(options.error)) {
                 data = data || {};
                 var $obj = options.error.call($form, data.errors || data, submitParam);
@@ -178,7 +178,7 @@ I18n.scoped('instructure', function(I18n) {
                 needValidForm = true;
               }
               if($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
-                $formObj.formErrors(data);
+                $formObj.formErrors(data, options);
               } else if(needValidForm) {
                 $.ajaxJSON.unhandledXHRs.push(request);
               }
@@ -209,7 +209,7 @@ I18n.scoped('instructure', function(I18n) {
         }
 
         $.ajaxJSON.storeRequest(request, action, method, formData);
-        
+
         $frame.bind('form_response_loaded', function() {
           var $form = $originalForm,
               i = $frame[0],
@@ -241,7 +241,7 @@ I18n.scoped('instructure', function(I18n) {
           if(exception || data.errors) {
             var $formObj = $form,
                 needValidForm = true;
-            
+
             request.responseText = text;
             if(options.error && $.isFunction(options.error)) {
               var $obj = options.error.call($form, (data.errors || text), submitParam);
@@ -253,7 +253,7 @@ I18n.scoped('instructure', function(I18n) {
               needValidForm = true;
             }
             if($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
-              $formObj.formErrors(data.errrors || data);
+              $formObj.formErrors(data.errrors || data, options);
             } else if(needValidForm) {
               $.ajaxJSON.unhandledXHRs.push(request);
             }
@@ -290,7 +290,7 @@ I18n.scoped('instructure', function(I18n) {
             needValidForm = true;
           }
           if($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
-            $formObj.formErrors(data);
+            $formObj.formErrors(data, options);
           } else if(needValidForm) {
             $.ajaxJSON.unhandledXHRs.push(request);
           }
@@ -299,7 +299,7 @@ I18n.scoped('instructure', function(I18n) {
     });
     return this;
   };
-  
+
   $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest);
   if($.handlesHTML5Files) {
     $("input[type='file']").live('change', function(event) {
@@ -362,7 +362,7 @@ I18n.scoped('instructure', function(I18n) {
     if(xhr.upload) {
       xhr.upload.addEventListener('progress', function(event) {
         if(options.progress && $.isFunction(options.progress)) {
-          options.progress.call(this, event); 
+          options.progress.call(this, event);
         }
       }, false);
       xhr.upload.addEventListener('error', function(event) {
@@ -406,7 +406,7 @@ I18n.scoped('instructure', function(I18n) {
       xhr.send(options.form_data);
     } else {
       xhr.overrideMimeType(options.content_type || "multipart/form-data");
-      
+
       xhr.setRequestHeader('Content-Type', options.content_type || "multipart/form-data");
       xhr.setRequestHeader('Content-Length', body.length);
       if(not_binary) {
@@ -420,7 +420,7 @@ I18n.scoped('instructure', function(I18n) {
       }
     }
   };
-  
+
   $.fileData = function(file_object) {
     return {
       name: file_object.name || file_object.fileName,
@@ -429,14 +429,14 @@ I18n.scoped('instructure', function(I18n) {
       forced_type: file_object.type || "application/octet-stream"
     };
   };
-    
+
   $.toMultipartForm = function(params, callback) {
     var boundary = "-----AaB03x" + $.uniqueId(),
         result = {content_type: "multipart/form-data; boundary=" + boundary},
         body = "--" + boundary + "\r\n",
         paramsList = [],
         hasFakeFile = false;
-    
+
     for(var idx in params) {
       paramsList.push([idx, params[idx]]);
       if (params[idx] && params[idx].fake_file) {
@@ -477,7 +477,7 @@ I18n.scoped('instructure', function(I18n) {
       var param = paramsList.shift(),
           name = param[0],
           value = param[1];
-      
+
       if(window.FileList && (value instanceof FileList)) {
         value = value[0];
       }
@@ -502,7 +502,7 @@ I18n.scoped('instructure', function(I18n) {
           var file = fileList.shift(),
               fileData = $.fileData(file),
               reader = new FileReader();
-          
+
           reader.onloadend = function() {
             body += "--" + innerBoundary + "\r\n" +
                     "Content-Disposition: file; filename=\"" + sanitizeQuotedString(fileData.name) + "\"\r\n" +
@@ -521,39 +521,39 @@ I18n.scoped('instructure', function(I18n) {
         reader.onloadend = function() {
           body += "Content-Disposition: file; name=\"" + sanitizeQuotedString(name) + "\"; filename=\"" + fileData.name + "\"\r\n" +
                   "Content-Type: " + fileData.forced_type + "\r\n" +
-                  "Content-Transfer-Encoding: binary\r\n" + 
-                  "\r\n" + 
-                  reader.result + 
+                  "Content-Transfer-Encoding: binary\r\n" +
+                  "\r\n" +
+                  reader.result +
                   "\r\n--" + boundary + "\r\n";
           nextParam();
         };
         reader.readAsBinaryString(value);
       } else if(value && value.fake_file) {
-        body += "Content-Disposition: file; name=\"" + sanitizeQuotedString(name) + "\"; filename=\"" + value.name + "\"\r\n" + 
-                "Content-Type: " + value.content_type + "\r\n" + 
-                "Content-Transfer-Encoding: binary\r\n" + 
-                "\r\n" + 
-                value.content + 
+        body += "Content-Disposition: file; name=\"" + sanitizeQuotedString(name) + "\"; filename=\"" + value.name + "\"\r\n" +
+                "Content-Type: " + value.content_type + "\r\n" +
+                "Content-Transfer-Encoding: binary\r\n" +
+                "\r\n" +
+                value.content +
                 "\r\n--" + boundary + "\r\n";
         nextParam();
       } else {
-        body += "Content-Disposition: form-data; name=\"" + sanitizeQuotedString(name) + "\"\r\n" + 
-                "\r\n" + 
-                (value || "").toString() + "\r\n" + 
+        body += "Content-Disposition: form-data; name=\"" + sanitizeQuotedString(name) + "\"\r\n" +
+                "\r\n" +
+                (value || "").toString() + "\r\n" +
                 "--" + boundary + "\r\n";
         nextParam();
       }
     };
     nextParam();
   };
-  
+
   // Used to make a fake XHR request, useful if there's errors on an
   // asynchronous request generated using the iframe trick.
   $.fakeXHR = function(status_code, text) {
     this.status = status_code;
     this.responseText = text;
   };
-  
+
   // Defines a default error for all ajax requests.  Will always be called
   // in the development environment, and as a last-ditch error catching
   // otherwise.  See "ajax_errors.js"
@@ -576,7 +576,7 @@ I18n.scoped('instructure', function(I18n) {
     };
     this.ajaxError($.fn.defaultAjaxError.func);
   };
-  
+
   // Fills the selected form object with the collected data values.
   // Handles select boxes, check boxes and radios as well.
   //  object_name: Name of the object form form elements.  So if
@@ -677,8 +677,8 @@ I18n.scoped('instructure', function(I18n) {
     return result;
   };
   $.fn.getFormData.defaults = {object_name: null};
-  
-  
+
+
   // Used internally to prepend object_name to data key names
   // Supports nested names, e.g.
   //      assignment[id] => discussion_topic[assignment][id]
@@ -691,7 +691,7 @@ I18n.scoped('instructure', function(I18n) {
     var original_name,
         new_name,
         first_bracket;
-        
+
     for(var i in data) {
       if(data instanceof Array) {
         original_name = data[i];
@@ -762,7 +762,7 @@ I18n.scoped('instructure', function(I18n) {
     }
     return new_result;
   };
-  
+
   // Validated the selected form.  Pops up little error messages
   // next to form elements that have errors.
   //  object_name: specify to make error checking easier.  If object_name == "assignment"
@@ -795,8 +795,8 @@ I18n.scoped('instructure', function(I18n) {
     if (options.required) {
       $.each(options.required, function(i, name) {
         if (!data[name]) {
-          if (!errors[name]) { 
-            errors[name] = []; 
+          if (!errors[name]) {
+            errors[name] = [];
           }
           errors[name].push(I18n.t('errors.field_is_required', "This field is required"));
         }
@@ -806,8 +806,8 @@ I18n.scoped('instructure', function(I18n) {
       $.each(options.date_fields, function(i, name) {
         var $item = $form.find("input[name='" + name + "']").filter(".datetime_field_enabled");
         if($item.length && $item.parent().children(".datetime_suggest").hasClass('invalid_datetime')) {
-          if (!errors[name]) { 
-            errors[name] = []; 
+          if (!errors[name]) {
+            errors[name] = [];
           }
           errors[name].push(I18n.t('errors.invalid_datetime', "Invalid date/time value"));
         }
@@ -817,8 +817,8 @@ I18n.scoped('instructure', function(I18n) {
       $.each(options.numbers, function(i, name){
         var val = parseFloat(data[name]);
         if(isNaN(val)) {
-          if(!errors[name]) { 
-            errors[name] = []; 
+          if(!errors[name]) {
+            errors[name] = [];
           }
           errors[name].push(I18n.t('errors.invalid_number', "This should be a number."));
         }
@@ -844,7 +844,7 @@ I18n.scoped('instructure', function(I18n) {
       break;
     }
     if(hasErrors) {
-      $form.formErrors(errors);
+      $form.formErrors(errors, options);
       $.trackEvent("Form Errors", this.attr('id') || this.attr('class') || document.title, JSON.stringify(errors));
       return false;
     }
@@ -854,7 +854,7 @@ I18n.scoped('instructure', function(I18n) {
   // Takes in an errors object and creates little pop-up message boxes over
   // each errored form field displaying the error text.  Still needs some
   // css lovin'.
-  $.fn.formErrors = function(data_errors) {
+  $.fn.formErrors = function(data_errors, options) {
     if(this.length === 0) {
       return;
     }
@@ -864,8 +864,8 @@ I18n.scoped('instructure', function(I18n) {
     if(data_errors && data_errors['errors']) {
       data_errors = data_errors['errors'];
     }
-    if(typeof(data_errors) == 'string') { 
-      data_errors = {base: data_errors}; 
+    if(typeof(data_errors) == 'string') {
+      data_errors = {base: data_errors};
     }
     $.each(data_errors, function(i, val) {
       if(typeof(val) == "string") {
@@ -916,6 +916,7 @@ I18n.scoped('instructure', function(I18n) {
     var hasErrors = false;
     var highestTop = 0;
     var currentTop = $(document).scrollTop();
+    var errorDetails = {};
     $.each(errors, function(name, msg) {
       var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":first");
       if(!$obj || $obj.length === 0 || name == "general") {
@@ -924,9 +925,10 @@ I18n.scoped('instructure', function(I18n) {
       if($obj[0].tagName == 'TEXTAREA' && $obj.next('.mceEditor').length) {
         $obj = $obj.next().find(".mceIframeContainer");
       }
+      errorDetails[name] = {object: $obj, message: msg};
       hasErrors = true;
       var offset = $obj.errorBox(msg).offset();
-      if(offset.top > highestTop) {
+      if (offset.top > highestTop) {
         highestTop = offset.top;
       }
     });
@@ -940,6 +942,7 @@ I18n.scoped('instructure', function(I18n) {
       }
     }
     if(hasErrors) {
+      if (options && options.onFormError) options.onFormError.call($form, errorDetails);
       $('html,body').scrollTo({top: highestTop, left:0});
     }
     return this;
@@ -956,9 +959,9 @@ I18n.scoped('instructure', function(I18n) {
       }
       var $template = $("#error_box_template");
       if(!$template.length) {
-        $template = $("<div id='error_box_template' class='error_box errorBox' style=''>" + 
+        $template = $("<div id='error_box_template' class='error_box errorBox' style=''>" +
                           "<div class='error_text' style=''></div>" +
-                          "<img src='/images/error_bottom.png' class='error_bottom'/>" + 
+                          "<img src='/images/error_bottom.png' class='error_bottom'/>" +
                         "</div>").appendTo("body");
       }
       var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
@@ -973,7 +976,7 @@ I18n.scoped('instructure', function(I18n) {
         top: offset.top - height + 2,
         left: offset.left + objLeftIndent
       }).fadeIn('fast');
-      
+
       $obj.data({
         associated_error_box :$box,
         associated_error_object: $obj
@@ -982,7 +985,7 @@ I18n.scoped('instructure', function(I18n) {
           $box.remove();
         });
       });
-        
+
       $box.click(function() {
         $(this).fadeOut('fast', function() {
           $(this).remove();
@@ -1000,26 +1003,14 @@ I18n.scoped('instructure', function(I18n) {
   };
   $.fn.errorBox.errorBoxes = [];
   $.moveErrorBoxes = function() {
-    if(!$.fn.errorBox.isBeingAdjusted) {
-      $.fn.errorBox.isBeingAdjusted = true;
-      setInterval($.moveErrorBoxes, 500);
-    }
     var list = [];
     var prevList = $.fn.errorBox.errorBoxes;
-    $(".error_box:visible").each(function() {
-      var $box = $(this);
-      if(!$box.data('associated_error_object') || $box.data('associated_error_object').filter(":visible").length === 0) {
-        $box.hide();
-      }
-    });
     for(var idx in prevList) {
-      var $obj = prevList[idx].filter(":visible:first");
-      if($obj.data('associated_error_box')) {
+      var $obj = prevList[idx],
+          $box = $obj.data('associated_error_box');
+      if($box.length && $box[0].parentNode) {
         list.push($obj);
-        var $box = $obj.data('associated_error_box');
-        if($obj.filter(":visible").length === 0) {
-          $box.hide();
-        } else {
+        if($obj.filter(":visible").length) {
           var offset = $obj.offset();
           var height = $box.outerHeight();
           var objLeftIndent = Math.round($obj.outerWidth() / 5);
@@ -1030,10 +1021,17 @@ I18n.scoped('instructure', function(I18n) {
             top: offset.top - height + 2,
             left: offset.left + objLeftIndent
           }).show();
+        } else {
+          $box.hide();
         }
       }
     }
     $.fn.errorBox.errorBoxes = list;
+    if (list.length) {
+      $.fn.errorBox.isBeingAdjusted = setTimeout($.moveErrorBoxes, 500);
+    } else {
+      delete $.fn.errorBox.isBeingAdjusted;
+    }
   };
   // Hides all error boxes for the given form element and its input elements.
   $.fn.hideErrors = function(options) {
@@ -1054,7 +1052,7 @@ I18n.scoped('instructure', function(I18n) {
     }
     return this;
   };
-  
+
   // Shows a gray-colored text suggestion for the form object when it is
   // blank, i.e. a date field would show DD-MM-YYYY until the user clicks on it.
   // I may phase this out or rewrite it, I'm undecided.  It's not
@@ -1083,7 +1081,7 @@ I18n.scoped('instructure', function(I18n) {
           $this.addClass("form_text_hint");
         }
       })
-      // Workaround a strage bug where the input would be selected then immediately unselected 
+      // Workaround a strage bug where the input would be selected then immediately unselected
       // every other time you clicked on the input with its defaultValue being shown
       .mouseup(false)
       .change(function(event) {
@@ -1097,7 +1095,7 @@ I18n.scoped('instructure', function(I18n) {
           $this.toggleClass("form_text_hint", $this.val() == title);
         }
       }).addClass('suggestion_title');
-      
+
       var title = $this.attr('title'),
           val   = $this.val();
       if ( title && ( val === "" || val == title) ) {
@@ -1106,5 +1104,5 @@ I18n.scoped('instructure', function(I18n) {
     });
   };
   $.fn.formSuggestion.suggestions = [];
-  
+
 });

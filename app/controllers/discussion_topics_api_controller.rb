@@ -36,7 +36,8 @@ class DiscussionTopicsApiController < ApplicationController
   #   attachment. Attachments larger than 1 kilobyte are subject to quota
   #   restrictions.
   #
-  # Example:
+  # @example_request
+  #
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \ 
   #        -u '<username>:<password>' \ 
   #        -F 'api_key=<key>' \ 
@@ -87,8 +88,13 @@ class DiscussionTopicsApiController < ApplicationController
   # @response_field created_at The creation time of the entry, in ISO8601
   #   format.
   #
+  # @response_field updated_at The updated time of the entry, in ISO8601 format.
+  #
   # @response_field attachment JSON representation of the attachment for the
   #   entry, if any. Present only if there is an attachment.
+  #
+  # @response_field attachments *Deprecated*. Same as attachment, but returned
+  #   as a one-element array. Present only if there is an attachment.
   #
   # @response_field recent_replies The 10 most recent replies for the entry,
   #   newest first. Present only if there is at least one reply.
@@ -142,7 +148,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @argument message The body of the entry.
   #
-  # Example:
+  # @example_request
+  #
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \ 
   #        -u '<username>:<password>' \ 
   #        -F 'api_key=<key>' \ 

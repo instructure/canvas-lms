@@ -21,7 +21,7 @@
   observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]}
   has_multiple_sections = @context.course_sections.active.count > 1
 
-  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true' && can_do(@context, @current_user, :manage_grades)
+  publishing_enabled = @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades)
 
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 %>
@@ -35,7 +35,7 @@
       <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> <%= t('links.calendar', %{Course Calendar}) %></a>
     <% end %>
 
-    <% if can_do(@context, @current_user, :update) %>
+    <% if can_do(@context, @current_user, :change_course_state) %>
       <% if @context.completed? %>
         <% form_tag context_url(@context, :context_unconclude_url) do %>
           <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %><%= t('buttons.unconclude', %{Un-Conclude Course}) %></button>
@@ -243,13 +243,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </tr><tr>
         <td style="width: 10%;"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry" %></span>
+          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => date_string(@context.start_at, :long) %></span>
           <span class="course_info start_at"><%= datetime_string(@context.start_at) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
         <td style="width: 10%;"><%= f.blabel :conclude_at, :en => "Ends" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry" %></span>
+          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => date_string(@context.conclude_at, :long) %></span>
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
@@ -308,13 +308,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         </td>
         <td>
           <span class="course_info grading_scheme_set">
-            <%= @context.grading_standard_id ? (@context.grading_standard_title || t('grading_standard_currently_set', "Currently Set")) : t('grading_standard_not_set', "Not Set") %>
+            <%= @context.grading_standard_enabled? ? (@context.grading_standard_title || t('grading_standard_currently_set', "Currently Set")) : t('grading_standard_not_set', "Not Set") %>
           </span>
           <span class="course_form">
             <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox" %>
             <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
             <div class="grading_standard_link" style="margin-left: 20px;">
-              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_id ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
+              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
             </div>
           </span>
         </td>
@@ -540,9 +540,9 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         </select>
       </div>
       <div>
-        <span id="limit_priveleges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
-          <input type="checkbox" id="limit_priveleges_to_course_section" name="limit_priveleges_to_course_section" value="1"/>
-          <%= label_tag :limit_priveleges_to_course_section, :en => 'these admins can only grade students in their section' %>
+        <span id="limit_privileges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
+          <input type="checkbox" id="limit_privileges_to_course_section" name="limit_privileges_to_course_section" value="1"/>
+          <%= label_tag :limit_privileges_to_course_section, :en => 'these admins can only grade students in their section' %>
         </span>
         <% if can_do(@context.account, @current_user, :manage_admin_users) %>
           <div style="white-space: nowrap;">
@@ -552,7 +552,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         <% end %>
       </div>
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
-        <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative priveleges for this course.}) %>
+        <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative privileges for this course.}) %>
       </div>
       <%= render :partial => 'shared/user_lists' %>
       <% unless @context.available? %>

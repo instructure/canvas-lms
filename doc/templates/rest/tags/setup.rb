@@ -18,7 +18,7 @@
 
 def init
   super
-  sections :argument, :example_request, :request_field, :example_response, :response_field
+  sections :argument, :request_field, :response_field, :example_request, :example_response
 end
 
 def request_field

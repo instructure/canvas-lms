@@ -715,9 +715,17 @@ I18n.scoped('gradebook', function(I18n) {
       return snapshot && $.map(jsonData.context.students, function(student) {
         return (snapshot == student) && student.name;
       })[0]; 
-    });
-    
-    if (userNamesWithPendingQuizSubmission.length) {
+    })
+      hasPendingQuizSubmissions = (function(){
+        var ret = false;
+        if (userNamesWithPendingQuizSubmission.length){
+          for (var i = 0, max = userNamesWithPendingQuizSubmission.length; i < max; i++){
+            if (userNamesWithPendingQuizSubmission[i] !== false) { ret = true; }
+          }
+        }
+        return ret;
+      })();
+    if (hasPendingQuizSubmissions) {
       return I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
     }
   };
@@ -796,6 +804,7 @@ I18n.scoped('gradebook', function(I18n) {
       $grade.change(EG.handleGradeSubmit);
 
       $submission_to_view.change(function(){
+        if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
         EG.currentStudent.submission.currentSelectedIndex = parseInt($(this).val(), 10);
         EG.handleSubmissionSelectionChange();
       });
@@ -880,9 +889,8 @@ I18n.scoped('gradebook', function(I18n) {
     handleFragmentChange: function(){
       var hash;
       try {
-        hash = $.parseJSON(decodeURIComponent(document.location.hash.substr(1))); //get rid of the first charicter "#" of the hash
-      } catch(e) {
-      }
+        hash = JSON.parse(decodeURIComponent(document.location.hash.substr(1))); //get rid of the first charicter "#" of the hash
+      } catch(e) {}
       if (!hash) {
         hash = {};
       }
@@ -943,12 +951,17 @@ I18n.scoped('gradebook', function(I18n) {
     handleSubmissionSelectionChange: function(){
       try {
         var submissionToViewVal = $submission_to_view.filter(":visible").val(),
-            currentSelectedIndex = Number(submissionToViewVal) || 
+            currentSelectedIndex = Number(submissionToViewVal) ||
                                   ( this.currentStudent &&
                                     this.currentStudent.submission &&
                                     this.currentStudent.submission.currentSelectedIndex ) 
                                   || 0,
-            submission  = this.currentStudent.submission.submission_history[currentSelectedIndex].submission,
+            submission  = this.currentStudent &&
+                          this.currentStudent.submission &&
+                          this.currentStudent.submission.submission_history &&
+                          this.currentStudent.submission.submission_history[currentSelectedIndex] &&
+                          this.currentStudent.submission.submission_history[currentSelectedIndex].submission
+                          || {},
             dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
             submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
             gradedAt    = submission.graded_at && $.parseFromISO(submission.graded_at),
@@ -969,7 +982,7 @@ I18n.scoped('gradebook', function(I18n) {
 
         //handle the files
         $submission_files_list.empty();
-        $.each(submission.versioned_attachments, function(i,a){
+        $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
           if (attachment.scribd_doc && attachment.scribd_doc.created) {
             scribdableAttachments.push(attachment);
@@ -1016,7 +1029,7 @@ I18n.scoped('gradebook', function(I18n) {
             .show();
         });
 
-        $submission_files_container.showIf(submission.versioned_attachments.length);
+        $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
 
         // load up a preview of one of the attachments if we can.
         // do it in this order:
@@ -1318,6 +1331,15 @@ I18n.scoped('gradebook', function(I18n) {
       // find the student this submission belongs to and update their submission with this new one, if they dont have a submission, set this as their submission.
       var student =  $.grep(jsonData.studentsWithSubmissions, function(s){ return s.id === submission.user_id; })[0];
       student.submission = student.submission || {};
+
+      // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange
+      // depends on it being there. so mimic it.
+      if (typeof submission.submission_history === 'undefined') {
+        submission.submission_history = [{
+          submission: $.extend(true, {}, submission)
+        }];
+      }
+
       $.extend(true, student.submission, submission);
       return student;
     },

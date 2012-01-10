@@ -42,7 +42,7 @@ DOC
     </tr>
   </thead>
   <tbody>
-    <% today = Date.today
+    <% today = Time.zone.today
       @dates.each do |d| %>
       <% events = @events.select{|e| e.start_at != nil && e.start_at.to_date == d}.sort_by{ |e| [e.start_at, e.title] } %>
       <%= render :partial => "assignments/syllabus_row", :object => events, :locals => {:date => d, :date_passed => (d < today)} %>

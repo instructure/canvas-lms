@@ -2883,7 +2883,7 @@ en:
         is_public: "Make this course publicly visible"
         language: Language
         license: License
-        limit_priveleges_to_course_section: "these admins can only grade students in their section"
+        limit_privileges_to_course_section: "these admins can only grade students in their section"
         observers: Observers
         open_enrollment: "Add a \"Join this Course\" link to the course home page"
         restrict_enrollments_to_course_dates: "Users can only participate in the course between these dates"
@@ -2954,7 +2954,7 @@ en:
         sections: Sections
         tools: "External Tools"
         users: Users
-      teacherless_invite_details: "If you invite a teacher and they accept, you will give up administrative priveleges for this course."
+      teacherless_invite_details: "If you invite a teacher and they accept, you will give up administrative privileges for this course."
       titles: 
         course_section: "Course Section"
         edit_navigation: "Edit Course Navigation"
@@ -6644,10 +6644,10 @@ en:
         secret_key: "Secret Key"
     notices: 
       settings_updated: "Plugin settings successfully updated."
-    qti_exporter: 
+    qti_converter: 
       file_description: "QTI .zip file"
-      name: "QTI Exporter"
-    qti_exporter_settings: 
+      name: "QTI Converter"
+    qti_converter_settings: 
       labels: 
         enabled: Enabled
     registration_form_recaptcha: 
@@ -6658,7 +6658,7 @@ en:
       name: "Respondus SOAP Endpoint"
     respondus_soap_endpoint_settings: 
       labels: 
-        enabled: "Enabled (must enable QTI exporter as well)"
+        enabled: "Enabled (must enable QTI converter as well)"
     scribd: 
       description: "Scribd document previews"
       name: Scribd

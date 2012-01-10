@@ -37,6 +37,18 @@ class ContextModulesController < ApplicationController
   def item_redirect
     if authorized_action(@context, @current_user, :read)
       @tag = @context.context_module_tags.active.include_progressions.find(params[:id])
+      
+      # if the object is locked for this user, reevaluate all the modules and clear the cache so it will be checked again when loaded
+      if @tag.content && @tag.content.respond_to?(:locked_for?)
+        locked = @tag.content.is_a?(WikiPage) ? @tag.content.locked_for?(@context, @current_user) : @tag.content.locked_for?(@current_user) 
+        if locked
+          @context.context_modules.each { |m| m.evaluate_for(@current_user, true, true) }
+          if @tag.content.respond_to?(:clear_locked_cache)
+            @tag.content.clear_locked_cache(@current_user)
+          end
+        end
+      end
+      
       @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
       @progression.uncollapse! if @progression && @progression.collapsed != false
       content_tag_redirect(@context, @tag, :context_context_modules_url)

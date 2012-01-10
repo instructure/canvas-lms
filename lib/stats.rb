@@ -16,138 +16,82 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Adapted from Chris Eppstein's LameStats.  Fixed some errors and wrote my own specs.
 module Stats
   class Counter
-    include Enumerable
+    attr_reader :max, :min, :sum, :sum_of_squares
+    alias :total :sum
     
-    # Takes an optional enumerable argument.
-    def initialize(enumerable = nil)
-      @hash = Hash.new
-      @counts = 0
-      @total = 0
-      add_all(enumerable) unless enumerable.nil?
+    def initialize(enumerable=[])
+      @items = []
+      @cache = {}
+      @max = nil
+      @min = nil
+      @sum = 0
+      @sum_of_squares = 0
+      enumerable.each { |item| self << item }
     end
     
-    # Adds an element in the hash and increments the global count.
-    def add_with_count(key,c)
-      @hash[key] = (@hash[key] || 0) + c
-      @counts += c
-      @total += key
-    end
-    protected :add_with_count
-    
-    # Adds an enumerable to this object
-    def add_all(enumerable)
-      enumerable.each {|key| self << key }
+    def each
+      @items.each {|i| yield i}
     end
     
-    # Pushes a new object into the list
-    def <<(key)
-      add_with_count(key,1)
+    def <<(item)
+      raise "invalid value" if item.nil?
+      @cache = {}
+      @items << item
+      if @max.nil? || @min.nil?
+        @max = @min = item
+      else
+        if item > @max
+          @max = item
+        elsif item < @min
+          @min = item
+        end
+      end
+      @sum += item
+      @sum_of_squares += item**2
     end
     alias :push :<<
     
-    # The number of unique objects
-    def size
-      @hash.map{|k, c| c}.sum
-    end
+    def size; @items.size; end
+    alias :count :size
+    def empty?; @items.size == 0; end
+    def sum_of_squares; @sum_of_squares; end
+    def mean; @items.empty? ? nil : (sum.to_f / @items.size); end
+    alias :avg :mean
     
-    # Offers access to the unique values in the collection
-    def unique_values
-      @hash.keys
+    # population variance
+    def var
+      @items.empty? ? nil : (sum_of_squares.to_f / @items.size) - (mean**2)
     end
+    alias :variance :var
     
-    # The number of items matching key or nil
-    def [](key)
-      @hash[key]
-    end
+    # population standard deviation
+    def stddev; @items.empty? ? nil : Math::sqrt(variance); end
+    alias :standard_deviation :stddev
     
-    # Iterate the unique values of the list only
-    def each
-      @hash.each_key { |k|
-        yield k
-      }
-    end
-    
-    def all
-      res = []
-      @hash.each{|k, c|
-        c.times { res << k }
-      }
-      res
-    end
-    
-    # Delete from the hash all entries found by the block.
-    # Example deletes all entries where there is only one value found:
-    # @c.delete_if {|k, v| v < 1 }
-    def delete_if
-      @hash.delete_if do |k,v|
-        returning(yield(k,v)) do |deleted|
-          @counts -= v if deleted
+    def histogram(bin_width=1.0,bin_base=0.0)
+      # returns a hash representing a histogram
+      # divides @items into bin_width sized bins
+      # and counts how many items fall into each bin
+      # set bin_base to center off something other than zero
+      # this would usually be the median for a bell curve
+      
+      # need floats for the math to work
+      bin_width = Float(bin_width)
+      bin_base = Float(bin_base)
+      ret_val = {:bin_width => bin_width, :bin_base => bin_base}
+      bins = {}
+      @items.each do |i|
+        bin = ((i-bin_base)/bin_width).floor * bin_width + bin_base
+        if bins.has_key?(bin)
+          bins[bin] = bins[bin] +1
+        else
+          bins[bin] = 1
         end
       end
-    end
-    
-    # The first item
-    def first
-      [(k = @hash.keys.first),@hash[k]]
-    end
-    
-    # The last item
-    def last
-      [(k = @hash.keys.last),@hash[k]]
-    end
-    
-    # Iterates over the counts of each value only
-    def each_count
-      @hash.each_value { |v|
-        yield v
-      }
-    end
-    
-    # Key, value iterator over each unique value and its count
-    def each_with_count
-      each { |k|
-        yield k, self[k]
-      }
-    end
-    
-    # The count of entries, not unique entries
-    def count
-      @counts
-    end
-    
-    # The cached total entries in the object
-    def total
-      return @total
-    end
-    alias :total_entries :total
-    
-    # The highest count of any one item
-    def max_count
-      @hash.values.max
-    end
-    
-    def mean
-      size > 0 ? total.to_f / size : 0
-    end
-    
-    def variance
-      if size > 0
-        all.map {|value|
-          diff = value - mean
-          diff*diff
-        }.sum / size.to_f
-      else
-        0
-      end
-    end
-    
-    def standard_deviation
-      Math::sqrt(variance)
-    end
-    
+      ret_val[:data] = bins
+      ret_val
+    end  
   end
-  
 end

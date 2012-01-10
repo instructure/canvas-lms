@@ -145,7 +145,7 @@ jQuery(function($) {
           json = {};
           
       try{
-        json = $.parseJSON(anchor);
+        json = $.parseJSON(anchor) || {};
       } catch(e) {
         json = {};
       }

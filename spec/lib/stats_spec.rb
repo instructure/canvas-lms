@@ -17,124 +17,103 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
-# It's faster to just test this one file, but later, comment these out
-# and run it through Normandy. 
-# require 'rubygems'
-# require 'spec'
-# require "#{File.dirname(__FILE__)}/../../lib/stats"
-# class Object
-#   def returning(value)
-#     yield(value)
-#     value
-#   end
-# end
-
-include Stats
+require 'lib/stats'
 
 describe Stats do
-  context Counter do
-    it "should not return NaN with no values" do
-      c = Counter.new
-      c.mean.should == 0
+  context Stats::Counter do
+    def check_stats_with_matchers(c, empty, size, max, min, sum, mean, var, stddev, histogram)
+      c.empty?.should empty
+      c.size.should size
+      c.count.should size
+      c.max.should max
+      c.min.should min
+      c.sum.should sum
+      c.total.should sum
+      c.mean.should mean
+      c.avg.should mean
+      c.var.should var
+      c.variance.should var
+      c.stddev.should stddev
+      c.standard_deviation.should stddev
+      c.histogram.should histogram
+    end
+
+    def check_stats(c, size, max, min, sum, mean, var, histogram)
+      check_stats_with_matchers c,
+                                (size > 0 ? be_false : be_true),
+                                eql(size),
+                                eql(max),
+                                eql(min),
+                                eql(sum),
+                                be_close(mean, 0.0000000001),
+                                be_close(var, 0.0000000001),
+                                be_close(Math::sqrt(var), 0.0000000001),
+                                eql(histogram)
+    end
+
+    it "should be able to initialize with an array" do
+      lambda{Stats::Counter.new([1,2,4,6,9])}.should_not raise_error
     end
     
-  #   before do
-  #     @a = [1,2,4,6,9]
-  #     @c = Counter.new(@a)
-  #   end
-  #   
-  #   it "should be able to initialize with an array" do
-  #     lambda{Counter.new(@a)}.should_not raise_error
-  #   end
-  #   
-  #   it "should be able to receive a new value" do
-  #     @c << 18
-  #     @c.size.should eql(6)
-  #     @c[18].should eql(1)
-  #   end
-  #   
-  #   it "should be able to add one enumerable to another" do
-  #     @c.add_all [1,2,3]
-  #     @c[1].should eql(2)
-  #     @c[2].should eql(2)
-  #     @c[3].should eql(1)
-  #   end
-  #   
-  #   it "should know the number of unique values in the counter" do
-  #     @c.size.should eql(5)
-  #     @c << 1
-  #     @c.size.should eql(5)
-  #     @c << 18
-  #     @c.size.should eql(6)
-  #   end
-  #   
-  #   it "should have an iterator over the unique values" do
-  #     @c.add_all [1,2,3]
-  #     keys = @a | [1,2,3]
-  #     @c.each {|key| keys.should be_include(key)}
-  #   end
-  #   
-  #   it "should have an iterator over the counts" do
-  #     @c = Counter.new [2,2,4,4,4,4,6,6,6,6,6,6]
-  #     values = [2,4,6]
-  #     found = []
-  #     @c.each_count do |v|
-  #       values.should be_include(v)
-  #       found << v
-  #     end
-  #     found.sort.should eql([2,4,6])
-  #   end
-  #   
-  #   it "should have a key, value iterator" do
-  #     @c = Counter.new [2,2,4,4,4,4,6,6,6,6,6,6]
-  #     values = [2,4,6]
-  #     found = []
-  #     @c.each_with_count do |k, v|
-  #       values.should be_include(k)
-  #       values.should be_include(v)
-  #       found << v
-  #     end
-  #     found.sort.should eql([2,4,6])
-  #   end
-  #   
-  #   it "should offer the total count of the object" do
-  #     @c.count.should eql(5)
-  #     @c << 1
-  #     @c.count.should eql(6)
-  #     @c.size.should eql(5)
-  #   end
-  #   
-  #   it "should offer the highest mode with max_count" do
-  #     @c.add_all [1,1,1]
-  #     @c.max_count.should eql(4)
-  #   end
-  #   
-  #   it "should offer a count histogram" do
-  #     @c.add_all [1,1,1, 8, 8]
-  #     @c.count_histogram.should be_is_a(Histogram)
-  #   end
-  #   
-  #   it "should be filterable with delete_if" do
-  #     @c.delete_if {|k, v| k == 1}
-  #     @c[1].should be_nil
-  #   end
-  # 
-  #   # I may have ruined that part.
-  #   # it "should offer the t-value for each item in the list" do
-  #   #   @c = Counter.new [1,2,2,3,3,3,4,4,4,4]
-  #   #   found = []
-  #   #   expected = [2.68328157299975,0.894427190999916,-0.894427190999916, -2.68328157299975]
-  #   #   @c.each_t_value {|t| found << t}
-  #   #   found.each_with_index do |e, i|
-  #   #     e.should be_close(expected[i], 0.00001)
-  #   #   end
-  #   # end
-  #   
-  #   it "should offer the mean and standard deviation of the collection" do
-  #     @c = Counter.new [1.0, 2.0, 3.0, 4.0]
-  #     @c.mean.should eql(2.5)
-  #     @c.standard_deviation.should be_close( 0.612372435695794, 0.000000001)
-  #   end
+    it "should return some basic statistics" do
+      c = Stats::Counter.new([1,2,4,9])
+      check_stats(c, 4, 9, 1, 16, 4.0, 9.5, {:bin_width => 1.0, :bin_base => 0.0, :data =>{1.0=>1,2.0=>1,4.0=>1,9.0=>1}})
+      c << 6
+      check_stats(c, 5, 9, 1, 22, 4.4, 8.24, {:bin_width => 1.0, :bin_base => 0.0, :data =>{1.0=>1,2.0=>1,4.0=>1,9.0=>1,6.0=>1}})
+      c << -1
+      check_stats(c, 6, 9, -1, 21, 3.5, 139.0/6 - 12.25, {:bin_width => 1.0, :bin_base => 0.0, :data =>{1.0=>1,2.0=>1,4.0=>1,9.0=>1,6.0=>1,-1.0=>1}})
+      c << 3
+      check_stats(c, 7, 9, -1, 24, 24.0/7, 148.0/7 - 576.0/49, {:bin_width => 1.0, :bin_base => 0.0, :data =>{1.0=>1,2.0=>1,4.0=>1,9.0=>1,6.0=>1,-1.0=>1,3.0=>1}})
+      c << 21
+      check_stats(c, 8, 21, -1, 45, 5.625, 41.984375, {:bin_width => 1.0, :bin_base => 0.0, :data =>{1.0=>1,2.0=>1,4.0=>1,9.0=>1,6.0=>1,-1.0=>1,3.0=>1,21.0=>1}})
+    end
+
+    it "should return the right things with no values" do
+      c = Stats::Counter.new
+      check_stats_with_matchers c,
+                                be_true,
+                                eql(0),
+                                be_nil,
+                                be_nil,
+                                eql(0),
+                                be_nil,
+                                be_nil,
+                                be_nil,
+                                eql({:bin_width => 1.0, :bin_base => 0.0, :data =>{}})
+                                
+      c << -5
+      check_stats(c, 1, -5, -5, -5, -5.0, 0,{:bin_width => 1.0, :bin_base => 0.0, :data =>{-5.0=>1}})
+      c << 5
+      check_stats(c, 2, 5, -5, 0, 0.0, 25.0,{:bin_width => 1.0, :bin_base => 0.0, :data =>{-5.0=>1,5.0=>1}})
+    end
+
+    it "should support .each, .<<, and .push" do
+      c = Stats::Counter.new([1,2,3])
+      test = []
+      c.each { |item| test << item }
+      c << 4
+      c.push 5
+      c.each { |item| test << item }
+      test.should == [1,2,3,1,2,3,4,5]
+    end
+    
+    it "should put negative numbers in the proper bin in histograms" do
+      c = Stats::Counter.new([-1, -0.5, 0, 0.5, 1])
+      h = c.histogram
+      h.should == {:bin_width => 1.0, :bin_base => 0.0, :data =>{-1.0=>2, 0.0=>2, 1.0=>1 }}
+    end
+    
+    it "should work with strange bin widths in histogram" do
+      c = Stats::Counter.new([-7,-3,0,1,2,3,4,5,6])
+      h = c.histogram(bin_width = 2.5, bin_base = 0.0)
+      h.should == {:bin_width=>2.5, :bin_base=>0.0, :data=>{0.0=>3, -5.0=>1, 5.0=>2, -7.5=>1, 2.5=>2}}
+    end
+    
+    it "should work with strange bin bases in histogram" do
+      c = Stats::Counter.new([-7,-3,0,1,2,3,4,5,6])
+      h = c.histogram(bin_width = 2.5, bin_base = 1.5)
+      h.should == {:bin_width=>2.5, :bin_base=>1.5, :data=>{1.5=>2, 4.0=>3, -3.5=>1, -8.5=>1, -1.0=>2}}
+    end
+    
   end
 end

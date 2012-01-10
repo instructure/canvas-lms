@@ -354,6 +354,7 @@ class UsersController < ApplicationController
   #       'assignment': { .. assignment object .. },
   #       'ignore': '.. url ..',
   #       'ignore_permanently': '.. url ..',
+  #       'html_url': '.. url ..',
   #       'needs_grading_count': 3, // number of submissions that need grading
   #       'context_type': 'course', // course|group
   #       'course_id': 1,
@@ -364,6 +365,7 @@ class UsersController < ApplicationController
   #       'assignment' => { .. assignment object .. },
   #       'ignore' => '.. url ..',
   #       'ignore_permanently' => '.. url ..',
+  #       'html_url': '.. url ..',
   #       'context_type': 'course',
   #       'course_id': 1,
   #     }
@@ -499,7 +501,7 @@ class UsersController < ApplicationController
   # @argument pseudonym[:send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
   def create
     # Look for an incomplete registration with this pseudonym
-    @pseudonym = @context.pseudonyms.find_by_unique_id_and_workflow_state(params[:pseudonym][:unique_id], 'active')
+    @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
     @pseudonym = nil if @pseudonym && !['creation_pending', 'pre_registered', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
@@ -525,7 +527,8 @@ class UsersController < ApplicationController
 
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'
-    @cc = @user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
+    @cc = @user.communication_channels.email.by_path(email).first
+    @cc ||= @user.communication_channels.build(:path => email)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
     @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
@@ -544,7 +547,7 @@ class UsersController < ApplicationController
         message_sent = true
         @pseudonym.send_registration_notification!
       else
-        other_cc_count = CommunicationChannel.count(:all, :joins => { :user => :pseudonyms }, :conditions => ["path=? AND path_type='email' AND communication_channels.user_id<>? AND communication_channels.workflow_state='active' AND pseudonyms.workflow_state='active'", @cc.path, @user.id])
+        other_cc_count = CommunicationChannel.email.active.by_path(@cc.path).count(:all, :joins => { :user => :pseudonyms }, :conditions => ["communication_channels.user_id<>? AND pseudonyms.workflow_state='active'", @user.id])
         @cc.send_merge_notification! if other_cc_count != 0
       end
 
@@ -594,11 +597,9 @@ class UsersController < ApplicationController
         if @user.update_attributes(params[:user])
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
-          format.xml  { head :ok }
           format.json { render :json => @user.to_json(:methods => :default_pseudonym_id) }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @user.errors.to_xml }
         end
       end
     end
@@ -743,18 +744,20 @@ class UsersController < ApplicationController
 
   def delete
     @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, :manage)
-      if @user.pseudonyms.any?{|p| p.managed_password? }
-        flash[:notice] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-        redirect_to profile_url
+    if authorized_action(@user, @current_user, [:manage, :manage_logins])
+      if @user.pseudonyms.any? {|p| p.managed_password? }
+        unless @user.grants_right?(@current_user, session, :manage_logins)
+          flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
+          redirect_to profile_url
+        end
       end
     end
   end
 
   def destroy
     @user = User.find(params[:id])
-    if authorized_action(@user, @current_user, :manage)
-      @user.destroy
+    if authorized_action(@user, @current_user, [:manage, :manage_logins])
+      @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       if @user == @current_user
         @pseudonym_session.destroy rescue true
         reset_session
@@ -767,7 +770,6 @@ class UsersController < ApplicationController
         else
           format.html { redirect_to(users_url) }
         end
-        format.xml  { head :ok }
         format.json { render :json => @user.to_json }
       end
     end
@@ -930,6 +932,3 @@ class UsersController < ApplicationController
   end
 
 end
-
-
-

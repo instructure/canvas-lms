@@ -18,9 +18,9 @@
 module CC
   module BasicLTILinks
     def create_basic_lti_links
-      return nil unless @course.context_external_tools.count > 0
+      return nil unless @course.context_external_tools.active.count > 0
 
-      @course.context_external_tools.each do |tool|
+      @course.context_external_tools.active.each do |tool|
 
         migration_id = CCHelper::create_key(tool)
 
@@ -77,6 +77,32 @@ module CC
         blti_node.blti(:extensions, :platform => CC::CCHelper::CANVAS_PLATFORM) do |ext_node|
           ext_node.lticm :property, tool.workflow_state, 'name' => 'privacy_level'
           ext_node.lticm(:property, tool.domain, 'name' => 'domain') unless tool.domain.blank?
+          [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button].each do |type|
+            if tool.settings[type]
+              ext_node.lticm(:options, :name => type.to_s) do |type_node|
+                type_node.lticm(:property, tool.settings[type][:url], 'name' => 'url')
+                type_node.lticm(:property, tool.settings[type][:text], 'name' => 'text') if tool.settings[type][:text]
+                if [:resource_selection,:editor_button].include?(type)
+                  type_node.lticm(:property, tool.settings[type][:selection_width], 'name' => 'selection_width')
+                  type_node.lticm(:property, tool.settings[type][:selection_height], 'name' => 'selection_height')
+                end
+                if type == :course_navigation
+                  type_node.lticm(:property, tool.settings[type][:visibility], 'name' => 'visibility') if tool.settings[type][:visibility]
+                  type_node.lticm(:property, tool.settings[type][:default], 'name' => 'default') if tool.settings[type][:default]
+                end
+                if type == :editor_button
+                  type_node.lticm(:property, tool.settings[type][:icon_url], 'name' => 'icon_url') if tool.settings[type][:icon_url]
+                end
+                if tool.settings[type][:labels]
+                  type_node.lticm(:options, :name => 'labels') do |labels_node|
+                    tool.settings[type][:labels].each do |lang, text|
+                      labels_node.lticm(:property, text, 'name' => lang)
+                    end
+                  end
+                end
+              end
+            end
+          end
         end
         
         if tool.settings[:vendor_extensions]

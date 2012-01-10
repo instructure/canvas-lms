@@ -293,6 +293,23 @@ describe Enrollment do
     end
   end
 
+  context "recompute_final_scores" do
+    it "should only recompute once per student, per course" do
+      course_with_student(:active_all => true)
+      @c1 = @course
+      @s2 = @course.course_sections.create!(:name => 's2')
+      @course.student_enrollments.create!(:user => @user, :course_section => @s2)
+      @user.student_enrollments(true).count.should == 2
+      course_with_student(:user => @user)
+      @c2 = @course
+      Enrollment.recompute_final_scores(@user.id)
+      jobs = Delayed::Job.all(:conditions => { :tag => 'Enrollment.recompute_final_score' })
+      jobs.size.should == 2
+      # pull the course ids out of the job params
+      jobs.map { |j| j.payload_object.args[1] }.sort.should == [@c1.id, @c2.id]
+    end
+  end
+
   context "date restrictions" do
     context "accept" do
       it "should accept into the right state based on availability dates on enrollment" do
@@ -985,6 +1002,24 @@ describe Enrollment do
       Enrollment.cached_temporary_invitations('jt@instructure.com').length.should == 1
       @enrollment.accept
       Enrollment.cached_temporary_invitations('jt@instructure.com').should == []
+    end
+  end
+
+  context "named scopes" do
+    describe "ended" do
+      it "should work" do
+        course(:active_all => 1)
+        user
+        Enrollment.ended.should == []
+        @enrollment = Enrollment.create!(:user => @user, :course => @course)
+        Enrollment.ended.should == []
+        @enrollment.update_attribute(:workflow_state, 'active')
+        Enrollment.ended.should == []
+        @enrollment.update_attribute(:workflow_state, 'completed')
+        Enrollment.ended.should == [@enrollment]
+        @enrollment.update_attribute(:workflow_state, 'rejected')
+        Enrollment.ended.should == [@enrollment]
+      end
     end
   end
 end

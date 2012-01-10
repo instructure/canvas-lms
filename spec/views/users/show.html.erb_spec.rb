@@ -28,9 +28,10 @@ describe "/users/show" do
     assigns[:topics] = []
     assigns[:recent_events] = []
     assigns[:upcoming_events] = []
+    assigns[:enrollments] = []
+    assigns[:group_memberships] = []
     
-    # render "users/show"
-    # response.should_not be_nil
+    render "users/show"
+    response.should_not be_nil
   end
 end
-

@@ -61,6 +61,32 @@ describe "speedgrader selenium tests" do
 
   end
 
+  it "should not error if there are no submissions" do
+    student_in_course
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajax_requests
+    driver.execute_script("return INST.errorCount").should == 0
+  end
+
+  it "should have a submission_history after a submitting a comment" do
+    # a student without a submission
+    @student_2 = User.create!(:name => 'student 2')
+    @student_2.register
+    @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+    @course.enroll_user(@student_2, "StudentEnrollment", :enrollment_state => 'active')
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajax_requests
+
+    #add comment
+    driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')
+    driver.find_element(:css, '#add_a_comment *[type="submit"]').click
+    keep_trying_until{ driver.find_element(:css, '#comments > .comment').displayed? }
+
+    # the ajax from that add comment form comes back without a submission_history, the js should mimic it.
+    driver.execute_script('return jsonData.studentsWithSubmissions[0].submission.submission_history.length').should == 1
+  end
+
   it "should display submission late notice message" do
     @assignment.due_at = Time.now - 2.days
     @assignment.save!
@@ -209,12 +235,13 @@ describe "speedgrader selenium tests" do
   end
 
   it "should not show students in other sections if visibility is limited" do
-    @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+    @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_animations
 
+    keep_trying_until { find_all_with_jquery('#students_selectmenu option').size > 0 }
     find_all_with_jquery('#students_selectmenu option').size.should eql(1) # just the one student
     find_all_with_jquery('#section-menu ul li').size.should eql(1) # "Show all sections"
     find_with_jquery('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
@@ -232,7 +259,7 @@ describe "speedgrader selenium tests" do
     expect_new_page_load {
       driver.find_element(:css, '#settings_form .submit_button').click
     }
-    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
 
     # make sure it works a second time too
     driver.find_element(:id, "settings_link").click
@@ -240,15 +267,16 @@ describe "speedgrader selenium tests" do
     expect_new_page_load {
       driver.find_element(:css, '#settings_form .submit_button').click
     }
-    driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
   end
 
   it "should leave the full rubric open when switching submissions" do
     student_submission :username => "student1@example.com"
     student_submission :username => "student2@example.com"
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
+    keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').displayed? }
     driver.find_element(:css, '.toggle_full_rubric').click
     wait_for_animations
     rubric = driver.find_element(:id, 'rubric_full')

@@ -53,6 +53,8 @@ class GradingStandard < ActiveRecord::Base
   
   named_scope :active, :conditions => ['grading_standards.workflow_state != ?', 'deleted']
 
+  VERSION = 2
+
   def version
     read_attribute(:version).presence || 1
   end
@@ -91,20 +93,26 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def data=(new_val)
-    self.version = 2
+    self.version = VERSION
     # round values to the nearest 0.1 (0.001 since e.g. 78 is stored as .78)
-    new_val = new_val.dup.each { |row| row[1] = (row[1] * 1000).to_i / 1000.0 }
+    # and dup the data while we're at it. (new_val.dup only dups one level, the
+    # elements of new_val.dup are the same objects as the elements of new_val)
+    new_val = new_val.map{ |row| [ row[0], (row[1] * 1000).to_i / 1000.0 ] }
     write_attribute(:data, new_val)
   end
 
   def data
-    data = read_attribute(:data)
-    GradingStandard.upgrade_data(data, self.version)
+    unless self.version == VERSION
+      data = read_attribute(:data)
+      data = GradingStandard.upgrade_data(data, self.version)
+      self.data = data
+    end
+    read_attribute(:data)
   end
 
   def self.upgrade_data(data, version)
     case version.to_i
-    when 2
+    when VERSION
       data
     when 1
       0.upto(data.length-2) do |i|

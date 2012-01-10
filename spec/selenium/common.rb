@@ -25,7 +25,7 @@ require File.expand_path(File.dirname(__FILE__) + '/server')
 include I18nUtilities
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
-SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
+SERVER_IP = SELENIUM_CONFIG[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 60
@@ -34,7 +34,14 @@ $server_port = nil
 $app_host_and_port = nil
 
 at_exit do
-  $selenium_driver.try(:quit)
+  [1,2,3].each do
+    begin
+      $selenium_driver.try(:quit)
+      break
+    rescue Timeout::Error => te
+      puts "rescued timeout error from selenium_driver quit : #{te}"
+    end
+  end
 end
 
 module SeleniumTestsHelperMethods
@@ -48,6 +55,9 @@ module SeleniumTestsHelperMethods
       if SELENIUM_CONFIG[:firefox_profile].present? && browser == :firefox
         options[:profile] = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
       end
+      if path = SELENIUM_CONFIG[:paths].try(:[], browser)
+        Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
+      end
       driver = Selenium::WebDriver.for(browser, options)
     else
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
@@ -55,11 +65,22 @@ module SeleniumTestsHelperMethods
         profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
         caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
       end
-      driver = Selenium::WebDriver.for(
-        :remote,
-        :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
-        :desired_capabilities => caps
-      )
+
+      driver = nil
+      [1,2,3].each do |times|
+        begin
+          driver = Selenium::WebDriver.for(
+            :remote,
+            :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
+            :desired_capabilities => caps
+          )
+          break
+        rescue Exception => e
+          puts "Error attempting to start remote webdriver: #{e}"
+          raise e if times == 3
+        end
+      end
+
     end
     driver.manage.timeouts.implicit_wait = 1
     driver
@@ -75,6 +96,12 @@ module SeleniumTestsHelperMethods
   end
 
   def self.setup_host_and_port(tries = 60)
+    if SELENIUM_CONFIG[:server_port]
+      $server_port = SELENIUM_CONFIG[:server_port]
+      $app_host_and_port = "#{SERVER_IP}:#{$server_port}"
+      return $server_port
+    end
+
     tried_ports = Set.new
     while tried_ports.length < 60
       port = rand(65535 - 1024) + 1024
@@ -100,12 +127,9 @@ module SeleniumTestsHelperMethods
     raise "couldn't find an available port after #{tried_ports.length} tries! ports tried: #{tried_ports.join ", "}"
   end
 
-
   def self.start_in_process_webrick_server
     setup_host_and_port
 
-    HostUrl.default_host = $app_host_and_port
-    HostUrl.file_host = $app_host_and_port
     server = SpecFriendlyWEBrickServer
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
@@ -133,8 +157,6 @@ module SeleniumTestsHelperMethods
     old_domain = domain_conf[Rails.env]["domain"]
     domain_conf[Rails.env]["domain"] = $app_host_and_port
     File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-    HostUrl.default_host = $app_host_and_port
-    HostUrl.file_host = $app_host_and_port
     server_pid = fork do
       base = File.expand_path(File.dirname(__FILE__))
       STDOUT.reopen(File.open("/dev/null", "w"))
@@ -255,24 +277,77 @@ shared_examples_for "all selenium tests" do
     JS
     dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
     until (dom_is_ready) do
-      sleep 1
+      sleep 0.1
       dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
     end
   end
 
-  def wait_for_ajax_requests
-    return if driver.execute_script("return typeof($) == 'undefined' || typeof($.ajaxJSON) == 'undefined' || typeof($.ajaxJSON.inFlightRequests) == 'undefined'")
-    keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlightRequests") == 0 }
+  def wait_for_ajax_requests(wait_start = 0)
+    driver.execute_async_script(<<-JS)
+      var callback = arguments[arguments.length - 1];
+      if (typeof($) == 'undefined') {
+        callback(-1);
+      } else {
+        var waitForAjaxStop = function(value) {
+          $(document).bind('ajaxStop.canvasTestAjaxWait', function() {
+            $(document).unbind('.canvasTestAjaxWait');
+            callback(value);
+          });
+        }
+        if ($.active == 0) {
+          // if there are no active requests, wait {wait_start}ms for one to start
+          var timeout = window.setTimeout(function() {
+            $(document).unbind('.canvasTestAjaxWait');
+            callback(0);
+          }, #{wait_start});
+          $(document).bind('ajaxStart.canvasTestAjaxWait', function() {
+            window.clearTimeout(timeout);
+            waitForAjaxStop(2);
+          });
+        } else {
+          waitForAjaxStop(1);
+        }
+      }
+    JS
   end
 
-  def wait_for_animations
-    return if driver.execute_script("return typeof($) == 'undefined'")
-    keep_trying_until { driver.execute_script("return $(':animated').length") == 0 }
+  def wait_for_animations(wait_start = 0)
+    driver.execute_async_script(<<-JS)
+      var callback = arguments[arguments.length - 1];
+      if (typeof($) == 'undefined') {
+        callback(-1);
+      } else {
+        var waitForAnimateStop = function(value) {
+          var _stop = $.fx.stop;
+          $.fx.stop = function() {
+            $.fx.stop = _stop;
+            _stop.apply(this, arguments);
+            callback(value);
+          }
+        }
+        if ($.timers.length == 0) {
+          var _tick = $.fx.tick;
+          // wait {wait_start}ms for an animation to start
+          var timeout = window.setTimeout(function() {
+            $.fx.tick = _tick;
+            callback(0);
+          }, #{wait_start});
+          $.fx.tick = function() {
+            window.clearTimeout(timeout);
+            $.fx.tick = _tick;
+            waitForAnimateStop(2);
+            _tick.apply(this, arguments);
+          }
+        } else {
+          waitForAnimateStop(1);
+        }
+      }
+    JS
   end
 
-  def wait_for_ajaximations
-    wait_for_ajax_requests
-    wait_for_animations
+  def wait_for_ajaximations(wait_start = 0)
+    wait_for_ajax_requests(wait_start)
+    wait_for_animations(wait_start)
   end
 
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
@@ -316,11 +391,46 @@ shared_examples_for "all selenium tests" do
     tiny_frame
   end
 
+  def expect_fired_alert(&block)
+    driver.execute_script(<<-JS)
+      window.canvasTestSavedAlert = window.alert;
+      window.canvasTestAlertFired = false;
+      window.alert = function() {
+        window.canvasTestAlertFired = true;
+        return true;
+      }
+    JS
+    
+    yield
+    
+    keep_trying_until {
+      driver.execute_script(<<-JS)
+        var value = window.canvasTestAlertFired;
+        window.canvasTestAlertFired = false;
+        return value;
+      JS
+    }
+    
+    driver.execute_script(<<-JS)
+      window.alert = window.canvasTestSavedAlert;
+    JS
+  end
+
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
     driver.switch_to.frame id
     yield
     driver.switch_to.window saved_window_handle
+  end
+
+  def type_in_tiny(tiny_controlling_element, text)
+    scr = "$(#{tiny_controlling_element.to_s.to_json}).editorBox('execute', 'mceInsertContent', false, #{text.to_s.to_json})"
+    driver.execute_script(scr)
+  end
+
+  def hover_and_click(element_jquery_finder)
+    find_with_jquery(element_jquery_finder.to_s).should be_present
+    driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
   end
 
   def is_checked(selector)
@@ -411,12 +521,17 @@ shared_examples_for "all selenium tests" do
   end
 
   def make_full_screen
-    driver.execute_script <<-JS
+    w, h = driver.execute_script <<-JS
       if (window.screen) {
-        window.moveTo(0, 0);
-        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+        return [ window.screen.availWidth, window.screen.availHeight ];
       }
+      return [ 0, 0 ];
     JS
+
+    if w > 0 and h > 0
+      driver.manage.window.move_to(0, 0)
+      driver.manage.window.resize_to(w, h)
+    end
   end
 
   def replace_content(el, value)
@@ -457,6 +572,7 @@ shared_examples_for "all selenium tests" do
 
   append_before(:each) do
     driver.manage.timeouts.implicit_wait = 1
+    driver.manage.timeouts.script_timeout = 60
   end
 
   append_before(:all) do
@@ -485,15 +601,15 @@ TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
                        "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png') }
 def get_file(filename)
   data = TEST_FILE_UUIDS[filename]
-  if !SELENIUM_CONFIG[:host_and_port]
-    @file = Tempfile.new(filename.split(/(?=\.)/))
-    @file.write data
-    @file.close
-    fullpath = @file.path
-    filename = File.basename(@file.path)
-  else
-    @file = nil
-    fullpath = "C:\\testfiles\\#{filename}"
+  @file = Tempfile.new(filename.split(/(?=\.)/))
+  @file.write data
+  @file.close
+  fullpath = @file.path
+  filename = File.basename(@file.path)
+  if SELENIUM_CONFIG[:host_and_port]
+    driver.file_detector = proc do |args|
+      args.first if File.exist?(args.first.to_s)
+    end
   end
   [filename, fullpath, data, @file]
 end
@@ -502,6 +618,10 @@ shared_examples_for "in-process server selenium tests" do
   it_should_behave_like "all selenium tests"
   prepend_before(:all) do
     $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
+  end
+  before do
+    HostUrl.default_host = $app_host_and_port
+    HostUrl.file_host = $app_host_and_port
   end
 end
 

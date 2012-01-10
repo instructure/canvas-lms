@@ -27,7 +27,10 @@ class ContentTag < ActiveRecord::Base
   belongs_to :rubric_association
   belongs_to :cloned_item
   has_many :learning_outcome_results
-  validates_presence_of :context_id, :context_type
+  # This allows bypassing loading context for validation if we have
+  # context_id and context_type set, but still allows validating when
+  # context is not yet saved.
+  validates_presence_of :context, :unless => proc { |tag| tag.context_id && tag.context_type }
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   before_save :default_values
   after_save :enforce_unique_in_modules
@@ -72,7 +75,7 @@ class ContentTag < ActiveRecord::Base
     self.title ||= t(:no_title, "No title")
     self.comments ||= ""
     self.comments = "" if self.comments == "Comments"
-    self.context_code = "#{self.context_type.to_s.underscore}_#{self.context_id}" rescue nil
+    self.context_code = "#{self.context_type.to_s.underscore}_#{self.context_id}"
   end
   protected :default_values
   
@@ -193,7 +196,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def sync_title_to_asset_title?
-    self.tag_type != "learning_outcome_association" && self.content_type != 'ContextExternalTool'
+    self.tag_type != "learning_outcome_association" && !['ContextExternalTool', 'Attachment'].member?(self.content_type)
   end
   
   def context_module_action(user, action, points=nil)

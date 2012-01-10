@@ -3,7 +3,7 @@ require 'zip/zipfilesystem'
 
 if Qti.migration_executable
 
-describe 'QtiExporter' do
+describe Qti::Converter do
   before do
     course_with_teacher(:active_all => true)
   end
@@ -21,6 +21,16 @@ describe 'QtiExporter' do
     quiz.quiz_questions.each do |q|
       text = Nokogiri::HTML::DocumentFragment.parse(q.question_data['question_text'])
       text.css('img').first['src'].should == "/courses/#{@course.id}/files/#{attachment.id}/preview"
+
+      # verify that the associated assessment_question got links translated
+      aq = q.assessment_question
+      text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['question_text'])
+      text.css('img').first['src'].should =~ %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+
+      if aq.question_data['answers'][1]["comments_html"] =~ /\<img/
+        text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['answers'][1]["comments_html"])
+        text.css('img').first['src'].should =~ %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+      end
     end
     quiz.assignment.should be_nil
   end
@@ -138,7 +148,7 @@ describe 'QtiExporter' do
     @migration = ContentMigration.new(:context => @course,
                                      :user => @user)
     @migration.update_migration_settings({
-      :migration_type => 'qti_exporter',
+      :migration_type => 'qti_converter',
     })
     @migration.save!
 

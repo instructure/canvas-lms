@@ -43,7 +43,6 @@ class AssignmentsController < ApplicationController
           @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => @upcoming_assignments.map(&:id)}) 
           format.html { render :action => "student_index" }
         end
-        format.xml  { render :xml => @assignments.to_xml }
         # TODO: eager load the rubric associations
         format.json { render :json => @assignments.to_json(:include => [ :rubric_association, :rubric ]) }
       end
@@ -98,12 +97,11 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id) }
         elsif @assignment.submission_types == 'attendance' && !@editing
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
-        elsif @assignment.submission_types == 'external_tool' && !@editing
+        elsif @assignment.submission_types == 'external_tool' && !@editing && @assignment.external_tool_tag
           format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
         else
           format.html { render :action => 'show' }
         end
-        format.xml  { render :xml => @assignment.to_xml }
         format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end
@@ -267,11 +265,9 @@ class AssignmentsController < ApplicationController
           end
           flash[:notice] = t 'notices.created', "Assignment was successfully created."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.xml  { head :created, :location => named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
           format.html { render :action => "new" }
-          format.xml  { render :xml => @assignment.errors.to_xml }
           format.json { render :json => @assignment.errors.to_json, :status => :bad_request }
         end
       end
@@ -336,11 +332,9 @@ class AssignmentsController < ApplicationController
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.xml  { head :ok }
           format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :methods => [:readable_submission_types], :include => [:quiz, :discussion_topic]), :status => :ok }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @assignment.errors.to_xml }
           format.json { render :json => @assignment.errors.to_json, :status => :bad_request }
         end
       end
@@ -354,7 +348,6 @@ class AssignmentsController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }
-        format.xml  { head :ok }
         format.json { render :json => @assignment.to_json }
       end
     end

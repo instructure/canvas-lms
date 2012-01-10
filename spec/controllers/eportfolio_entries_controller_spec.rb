@@ -41,12 +41,19 @@ describe EportfolioEntriesController do
       eportfolio_with_user_logged_in(:active_all => true)
       eportfolio_category
       eportfolio_entry(@category)
+      attachment = @portfolio.user.attachments.build(:filename => 'some_file.pdf')
+      attachment.content_type = ''
+      attachment.save!
+      @entry.content = [{:section_type => 'attachment', :attachment_id => attachment.id}]
+      @entry.save!
       get 'show', :eportfolio_id => @portfolio.id, :id => @entry.id
       response.should be_success
       assigns[:category].should eql(@category)
       assigns[:page].should eql(@entry)
       assigns[:entries].should_not be_nil
       assigns[:entries].should_not be_empty
+      assigns[:attachments].should_not be_nil
+      assigns[:attachments].should_not be_empty
     end
     
     it "should work off of category and entry names" do

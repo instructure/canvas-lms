@@ -16,28 +16,31 @@ var page = new WebPage();
 
 // Route "console.log()" calls from within the Page context to the main Phantom context (i.e. current "this")
 var timer;
+var errors = [];
 page.onConsoleMessage = function (msg) {
   console.log(msg);
+  if (msg.match(/^Assertion Failed/)) errors.push(msg);
   clearTimeout(timer);
   // exit after 3 seconds of no messages
   timer = setTimeout(function () {
-    phantom.exit();
-  }, 1750);
+    phantom.exit(errors.length);
+  }, 3000);
 };
 
 page.open(url, function(status){
   if (status !== "success") {
     console.log("Unable to access network: " + status);
     phantom.exit(1);
-  } else {
-    page.evaluate(addLogging);
-    var interval = setInterval(function() {
-      if (finished()) {
-        clearInterval(interval);
-        onfinishedTests();
-      }
-    }, 500);
+    return
   }
+
+  page.evaluate(addLogging);
+  var interval = setInterval(function() {
+    if (finished()) {
+      clearInterval(interval);
+      onfinishedTests();
+    }
+  }, 500);
 });
 
 function finished() {
@@ -100,6 +103,6 @@ function addLogging() {
     timer = setTimeout(function () {
       console.log('');
       console.log('Took ' + result.runtime +  'ms to run ' + result.total + ' tests. ' + result.passed + ' passed, ' + result.failed + ' failed.');
-    }, 1500);
+    }, 2500);
   };
 }

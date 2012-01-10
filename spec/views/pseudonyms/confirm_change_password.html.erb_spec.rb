@@ -25,7 +25,7 @@ describe "/pseudonyms/confirm_change_password" do
     assigns[:user] = @user
     assigns[:current_user] = @user
     assigns[:pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaa", :password_confirmation => "asdfaa")
-    assigns[:cc] = @user.communication_channels.create!
+    assigns[:cc] = @user.communication_channels.create!(:path => 'unique@example.com')
     render "pseudonyms/confirm_change_password"
     response.should_not be_nil
   end

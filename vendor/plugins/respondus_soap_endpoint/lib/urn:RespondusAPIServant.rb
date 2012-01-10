@@ -512,7 +512,7 @@ Implemented for: Canvas LMS}]
     end
 
     settings = {
-      :migration_type => 'qti_exporter',
+      :migration_type => 'qti_converter',
       :apply_respondus_settings_file => (itemType != 'qdb'),
       :skip_import_notification => true,
       :files_import_allow_rename => true,

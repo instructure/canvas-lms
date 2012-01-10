@@ -144,9 +144,10 @@ class AccountsController < ApplicationController
   end
 
   def confirm_delete_user
-    if authorized_action(@account, @current_user, :manage_user_logins)
-      @context = @account
-      @user = @account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
+    @root_account = @account.root_account || @account
+    if authorized_action(@root_account, @current_user, :manage_user_logins)
+      @context = @root_account
+      @user = @root_account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
       if !@user
         flash[:error] = t(:no_user_message, "No user found with that id")
         redirect_to account_url(@account)
@@ -155,26 +156,23 @@ class AccountsController < ApplicationController
   end
   
   def remove_user
-    if authorized_action(@account, @current_user, :manage_user_logins)
-      @user = UserAccountAssociation.find_by_account_id_and_user_id(@account.id, params[:user_id]).user rescue nil
+    @root_account = @account.root_account || @account
+    if authorized_action(@root_account, @current_user, :manage_user_logins)
+      @user = UserAccountAssociation.find_by_account_id_and_user_id(@root_account.id, params[:user_id]).user rescue nil
       # if the user is in any account other then the
       # current one, remove them from the current account
       # instead of deleting them completely
-      account_ids = []
       if @user
-        account_ids = @user.associated_root_accounts.map(&:id)
-      end
-      account_ids = account_ids.compact.uniq - [@account.id]
-      if @user && !account_ids.empty?
-        @root_account = @account.root_account || @account
-        @user.remove_from_root_account(@root_account)
-      else
-        @user && @user.destroy
+        if !(@user.associated_root_accounts.map(&:id).compact.uniq - [@root_account.id]).empty?
+          @user.remove_from_root_account(@root_account)
+        else
+          @user.destroy(true)
+        end
+        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
       end
       respond_to do |format|
-        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name) if @user
-        format.html { redirect_to account_url(@account) }
-        format.json { render :json => @user.to_json }
+        format.html { redirect_to account_users_url(@account) }
+        format.json { render :json => (@user || {}).to_json }
       end
     end
   end
@@ -245,13 +243,15 @@ class AccountsController < ApplicationController
   
   def statistics_page_views
     if authorized_action(@account, @current_user, :view_statistics)
+      today = Time.zone.today
+
       start_at = Date.parse(params[:start_at]) rescue nil
       start_at ||= 1.month.ago.to_date
       end_at = Date.parse(params[:end_at]) rescue nil
-      end_at ||= Date.today
+      end_at ||= today
 
-      @end_at = [[start_at, end_at].max, Date.today].min
-      @start_at = [[start_at, end_at].min, Date.today].min
+      @end_at = [[start_at, end_at].max, today].min
+      @start_at = [[start_at, end_at].min, today].min
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
       add_crumb(t(:crumb_page_views, "Page Views"))
     end
@@ -383,23 +383,18 @@ class AccountsController < ApplicationController
     end
   end
   
+  # TODO Refactor add_account_user and remove_account_user actions into
+  # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list], @context, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
+      list = UserList.new(params[:user_list], @context.root_account || @context, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
       users = list.users
       account_users = users.map do |user|
-        account_user = @context.add_user(user, params[:membership_type])
-
-        if user.registered?
-          account_user.account_user_notification!
-        else
-          account_user.account_user_registration!
-        end
-
+        admin = user.flag_as_admin(@context, params[:membership_type])
         { :enrollment => {
-          :id => account_user.id,
+          :id => admin.id,
           :name => user.name,
-          :membership_type => account_user.membership_type,
+          :membership_type => admin.membership_type,
           :workflow_state => 'active',
           :user_id => user.id,
           :type => 'admin',

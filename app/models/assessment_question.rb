@@ -78,36 +78,37 @@ class AssessmentQuestion < ActiveRecord::Base
     regex = Regexp.new("/#{context_type.downcase.pluralize}/#{context_id}/files/(\\d+)/(download|preview)")
     file_substitutions = {}
     
-    translate_in_hash = lambda do |hash|
-      hash.each do |key, value|
-        if value.is_a?(Hash)
-          hash[key] = translate_in_hash.call(value)
-        elsif value.is_a?(String)
-          hash[key] = value.gsub(regex) do |match|
-            if !file_substitutions[$1]
-              file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
-              begin
-                new_file = file.clone_for(self)
-              rescue => e
-                new_file = nil
-                er = ErrorReport.log_exception(:file_clone_during_translate_links, e)
-                logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{self.id} error_report: #{er.id}")
-              end
-              new_file.save if new_file
-              file_substitutions[$1] = new_file
+    deep_translate = lambda do |obj|
+      if obj.is_a?(Hash)
+        obj.inject({}) {|h,(k,v)| h[k] = deep_translate.call(v); h}
+      elsif obj.is_a?(Array)
+        obj.map {|v| deep_translate.call(v) }
+      elsif obj.is_a?(String)
+        obj.gsub(regex) do |match|
+          if !file_substitutions[$1]
+            file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
+            begin
+              new_file = file.clone_for(self)
+            rescue => e
+              new_file = nil
+              er = ErrorReport.log_exception(:file_clone_during_translate_links, e)
+              logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{self.id} error_report: #{er.id}")
             end
-            if file_substitutions[$1]
-              "/assessment_questions/#{self.id}/files/#{file_substitutions[$1].id}/download?verifier=#{file_substitutions[$1].uuid}"
-            else
-              match
-            end
+            new_file.save if new_file
+            file_substitutions[$1] = new_file
+          end
+          if file_substitutions[$1]
+            "/assessment_questions/#{self.id}/files/#{file_substitutions[$1].id}/download?verifier=#{file_substitutions[$1].uuid}"
+          else
+            match
           end
         end
+      else
+        obj
       end
-      hash
     end
     
-    hash = translate_in_hash.call(self.question_data)
+    hash = deep_translate.call(self.question_data)
     self.question_data = hash
     
     @skip_translate_links = true
@@ -471,6 +472,16 @@ class AssessmentQuestion < ActiveRecord::Base
         
         begin
           question = AssessmentQuestion.import_from_migration(question, migration.context, banks[hash_id])
+          
+          # If the question appears to have links, we need to translate them so that file links point
+          # to the AssessmentQuestion. Ideally we would just do this before saving the question, but
+          # the link needs to include the id of the AQ, which we don't have until it's saved. This will
+          # be a problem as long as we use the question as a context for its attachments. (We're turning this
+          # hash into a string so we can quickly check if anywhere in the hash might have a URL.)
+          if question.to_s =~ %r{/files/\d+/(download|preview)}
+            AssessmentQuestion.find(question[:assessment_question_id]).translate_links
+          end
+          
           question_data[:aq_data][question['migration_id']] = question
         rescue
           migration.add_warning("Couldn't import quiz question \"#{question[:question_name]}\"", $!)

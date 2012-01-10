@@ -47,10 +47,6 @@ class CalendarsController < ApplicationController
         events = calendar_events_for_request_format
         render :json => events unless @dont_render_again
       end
-      format.xml  { 
-        events = calendar_events_for_request_format
-        render :xml => events unless @dont_render_again
-      }
       format.ics { 
         events = calendar_events_for_request_format
         render :text => events unless @dont_render_again
@@ -110,7 +106,7 @@ class CalendarsController < ApplicationController
   protected :calendar_events_for_request_format
   
   def build_calendar_dates
-    @today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
+    @today = Time.zone.today
     @month = params[:month].to_i
     @month = !@month || @month == 0 ? @today.month : @month
     @year = params[:year].to_i

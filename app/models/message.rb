@@ -114,15 +114,7 @@ class Message < ActiveRecord::Base
   named_scope :by_name, lambda { |notification_name|
     { :conditions => ['messages.notification_name = ?', notification_name]}
   }
-  
-  named_scope :directed_to, lambda { |to|
-    if to == "dashboard"
-      { :conditions => ['messages.to = ?', to]}
-    else
-      { :conditions => ['messages.communication_channel_id = ?', CommunicationChannel.find_by_path(to)]}
-    end
-  }
-  
+
   named_scope :before, lambda { |date|
     {:conditions => ['messages.created_at < ?', date] }
   }

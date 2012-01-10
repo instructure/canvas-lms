@@ -39,6 +39,95 @@ describe AccountsController do
     @course2.course_sections.first.crosslist_to_course(@course1)
   end
 
+  context "confirm_delete_user" do
+    it "should confirm deletion of canvas-authenticated users" do
+      account_with_admin_logged_in
+      user_with_pseudonym :account => @account
+      get 'confirm_delete_user', :account_id => @account.id, :user_id => @user.id
+      response.should be_success
+    end
+
+    it "should not confirm deletion of non-existent users" do
+      account_with_admin_logged_in
+      get 'confirm_delete_user', :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1)
+      response.should redirect_to(account_url(@account))
+      flash[:error].should =~ /No user found with that id/
+    end
+
+    it "should confirm deletion of managed password users" do
+      account_with_admin_logged_in
+      user_with_managed_pseudonym :account => @account
+      get 'confirm_delete_user', :account_id => @account.id, :user_id => @user.id
+      response.should be_success
+    end
+  end
+
+  context "remove_user" do
+    it "should delete canvas-authenticated users" do
+      account_with_admin_logged_in
+      user_with_pseudonym :account => @account
+      @user.workflow_state.should == "pre_registered"
+      post 'remove_user', :account_id => @account.id, :user_id => @user.id
+      flash[:notice].should =~ /successfully deleted/
+      response.should redirect_to(account_users_url(@account))
+      @user.reload
+      @user.workflow_state.should == "deleted"
+    end
+
+    it "should do nothing for non-existent users as html" do
+      account_with_admin_logged_in
+      post 'remove_user', :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1)
+      flash[:notice].should be_nil
+      response.should redirect_to(account_users_url(@account))
+    end
+
+    it "should do nothing for non-existent users as json" do
+      account_with_admin_logged_in
+      post 'remove_user', :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1), :format => "json"
+      flash[:notice].should be_nil
+      json_parse(response.body).should == {}
+    end
+
+    it "should only remove users from the current account if the user exists in multiple accounts" do
+      @other_account = account_model
+      account_with_admin_logged_in
+      user_with_pseudonym :account => @account, :username => "nobody@example.com"
+      pseudonym @user, :account => @other_account, :username => "nobody2@example.com"
+      @user.workflow_state.should == "pre_registered"
+      @user.associated_accounts.map(&:id).include?(@account.id).should be_true
+      @user.associated_accounts.map(&:id).include?(@other_account.id).should be_true
+      post 'remove_user', :account_id => @account.id, :user_id => @user.id
+      flash[:notice].should =~ /successfully deleted/
+      response.should redirect_to(account_users_url(@account))
+      @user.reload
+      @user.workflow_state.should == "pre_registered"
+      @user.associated_accounts.map(&:id).include?(@account.id).should be_false
+      @user.associated_accounts.map(&:id).include?(@other_account.id).should be_true
+    end
+
+    it "should delete users who have managed passwords with html" do
+      account_with_admin_logged_in
+      user_with_managed_pseudonym :account => @account
+      @user.workflow_state.should == "pre_registered"
+      post 'remove_user', :account_id => @account.id, :user_id => @user.id
+      flash[:notice].should =~ /successfully deleted/
+      response.should redirect_to(account_users_url(@account))
+      @user.reload
+      @user.workflow_state.should == "deleted"
+    end
+
+    it "should delete users who have managed passwords with json" do
+      account_with_admin_logged_in
+      user_with_managed_pseudonym :account => @account
+      @user.workflow_state.should == "pre_registered"
+      post 'remove_user', :account_id => @account.id, :user_id => @user.id, :format => "json"
+      flash[:notice].should =~ /successfully deleted/
+      @user = json_parse(@user.reload.to_json)
+      json_parse(response.body).should == @user
+      @user["user"]["workflow_state"].should == "deleted"
+    end
+  end
+
   describe "SIS imports" do
     it "should set batch mode and term if given" do
       account_with_admin_logged_in
@@ -107,7 +196,7 @@ describe AccountsController do
     end
   end
 
-  describe "managing admins" do
+  describe "add_account_user" do
     it "should allow adding a new account admin" do
       account_with_admin_logged_in
 
@@ -118,6 +207,15 @@ describe AccountsController do
       new_admin.should_not be_nil
       @account.reload
       @account.account_users.map(&:user).should be_include(new_admin)
+    end
+
+    it "should allow adding an existing user to a sub account" do
+      account_with_admin_logged_in(:active_all => 1)
+      @subaccount = @account.sub_accounts.create!
+      @munda = user_with_pseudonym(:account => @account, :active_all => 1, :username => 'munda@instructure.com')
+      post 'add_account_user', :account_id => @subaccount.id, :membership_type => 'AccountAdmin', :user_list => 'munda@instructure.com', :only_search_existing_users => 1
+      response.should be_success
+      @subaccount.account_users.map(&:user).should == [@munda]
     end
   end
 

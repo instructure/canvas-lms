@@ -28,7 +28,7 @@ class PseudonymsController < ApplicationController
       @ccs += CommunicationChannel.find_all_by_path_and_path_type(email, 'email') if email and !email.empty?
     end
     if @domain_root_account && email && !email.empty?
-      @domain_root_account.pseudonyms.active.find_all_by_unique_id(email).each do |p|
+      @domain_root_account.pseudonyms.active.custom_find_by_unique_id(email, :all).each do |p|
         cc = p.communication_channel if p.communication_channel && p.user
         cc ||= p.user.communication_channel rescue nil
         @ccs << cc
@@ -40,7 +40,7 @@ class PseudonymsController < ApplicationController
       else
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
-        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (!@domain_root_account.require_account_pseudonym? && p.account && p.account.password_authentication?) }
+        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (p.works_for_account?(@domain_root_account) && p.account && p.account.password_authentication?) }
       end
     end
     respond_to do |format|

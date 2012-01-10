@@ -1,5 +1,5 @@
 def check_syntax(files)
-  quick = ENV["quick"] && ENV["quick"] == "true" 
+  quick = ENV["quick"] && ENV["quick"] == "true"
 
   files_not_to_lint = %w{
     public/javascripts/date.js
@@ -23,13 +23,13 @@ def check_syntax(files)
   show_stoppers = []
   Array(files).each do |js_file|
     js_file.strip!
-    if files_not_to_lint.include?(js_file) || !js_file.match('public/javascripts/')
+    if files_not_to_lint.include?(js_file) || !js_file.match('public/javascripts/') || js_file.match('public/javascripts/vendor/')
       puts " --> \033[1;35m  skipping: #{js_file}\033[0m"
     else
       file_path = File.join(Rails.root, js_file)
-      
+
       unless quick
-        # to use this, you need to have jshint installed from npm 
+        # to use this, you need to have jshint installed from npm
         # (which means you need to have node.js installed)
         # on osx you can do:
         # brew install node
@@ -39,7 +39,7 @@ def check_syntax(files)
           js_hint_errors = `jshint #{file_path} --config "#{File.join(Rails.root, '.jshintrc')}"`
           puts js_hint_errors
         end
-        
+
         # Checks for coding style problems using google's js style guide.
         # Only works if you have gjslint installed.
         # Download from http://code.google.com/closure/utilities/
@@ -49,7 +49,7 @@ def check_syntax(files)
           puts gjslint_errors = gjslint_errors.split("\n").reject{ |l| l.match("Line too long") }.join("\n")
         end
       end
-      
+
       raise "jsl needs to be in your $PATH, download from: javascriptlint.com" if `which jsl`.empty?
       puts " --> \033[1;33m  Checking #{js_file} using jsl: \033[0m"
       jsl_output = `jsl -process "#{file_path}" -nologo -conf "#{File.join(Rails.root, 'config', 'jslint.conf')}"`
@@ -60,7 +60,7 @@ def check_syntax(files)
           jsl_output << "fatal trailing comma found. Stupid IE!"
         end
         if exit_status >= 2
-          show_stoppers << jsl_output 
+          show_stoppers << jsl_output
           puts "\033[1;31m #{jsl_output} \033[0m"
         else
           puts jsl_output
@@ -90,7 +90,7 @@ namespace :canvas do
     end
     puts "Compressed #{processed} assets, #{before_bytes} -> #{after_bytes} bytes (#{"%.0f" % ((before_bytes.to_f - after_bytes.to_f) / before_bytes * 100)}% reduction)"
   end
-  
+
   task :check_syntax  => "canvas:check_syntax:all"
   namespace :check_syntax do
     desc "Checks all js files that are staged for commiting to git for syntax errors. Make your .git/hooks/pre-commit look like: rake canvas:check_syntax:changed quick=true to not allow committing js with syntax errors"
@@ -98,7 +98,7 @@ namespace :canvas do
       files = `git diff-index --name-only --cached HEAD -- | grep '\.js$'`
       check_syntax(files)
     end
-    
+
     desc "Checks all js files for sytax errors."
     task :all do
       bundles = YAML.load(ERB.new(File.read('config/assets.yml')).result)['javascripts']
@@ -109,23 +109,14 @@ namespace :canvas do
       end
     end
   end
-  
+
   desc "Compile javascript and css assets."
   task :compile_assets do
     puts "--> Compiling static assets [compass compile -e production --force]"
     output = `bundle exec compass compile -e production --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
 
-    puts "--> Pre-compiling all handlebars templates"
-    Rake::Task['jst:compile'].invoke
-    puts "--> Compiling all Coffeescript using barista"
-    require 'coffee-script'
-    require 'fileutils'
-    Dir[Rails.root+'app/coffeescripts/**/*.coffee'].each do |coffee|
-      destination = coffee.sub('app/coffeescripts', 'public/javascripts/compiled').sub(%r{\.coffee$}, '.js')
-      FileUtils.mkdir_p(File.dirname(destination))
-      File.open(destination, 'wb') { |out| out.write CoffeeScript.compile(File.open(coffee)) }
-    end
+    Rake::Task['js:generate'].invoke
 
     puts "--> Generating js localization bundles"
     Rake::Task['i18n:generate_js'].invoke

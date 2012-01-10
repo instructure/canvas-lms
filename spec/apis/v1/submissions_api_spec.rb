@@ -238,16 +238,20 @@ describe SubmissionsApiController, :type => :integration do
 
     json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
       [{
+        'id' => se1.id,
         'message' => 'sub 1',
         'user_id' => @student.id,
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
+        'user_name' => 'User',
       },
       {
+        'id' => se2.id,
         'message' => 'student 1',
         'user_id' => @student.id,
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
+        'user_name' => 'User',
       }].sort_by { |h| h['user_id'] }
 
     # don't include discussion entries if response_fields limits the response
@@ -295,14 +299,18 @@ describe SubmissionsApiController, :type => :integration do
 
     json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
       [{
+        'id' => se1.id,
         'message' => 'sub 1',
         'user_id' => @student.id,
+        'user_name' => 'User',
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
       },
       {
+        'id' => se2.id,
         'message' => 'student 1',
         'user_id' => @student.id,
+        'user_name' => 'User',
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
       }].sort_by { |h| h['user_id'] }
@@ -482,7 +490,7 @@ describe SubmissionsApiController, :type => :integration do
         "attachments" =>
          [
            { "content-type" => "application/loser",
-             "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?verifier=#{sub1.attachments.first.uuid}",
+             "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser" },
          ],
@@ -525,7 +533,7 @@ describe SubmissionsApiController, :type => :integration do
            "attachments" =>
             [
               { "content-type" => "application/loser",
-                "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?verifier=#{sub1.attachments.first.uuid}",
+                "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser" },
             ],
@@ -583,11 +591,11 @@ describe SubmissionsApiController, :type => :integration do
              {"content-type" => "image/png",
               "display_name" => "ss2.png",
               "filename" => "ss2.png",
-              "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?verifier=#{sub2.attachments.first.uuid}",},
+              "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",},
              {"content-type" => "image/png",
               "display_name" => "snapshot.png",
               "filename" => "snapshot.png",
-              "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?verifier=#{sub2.attachment.uuid}",},
+              "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",},
             ],
            "score"=>9}],
         "attempt"=>1,
@@ -599,11 +607,11 @@ describe SubmissionsApiController, :type => :integration do
           {"content-type" => "image/png",
            "display_name" => "ss2.png",
            "filename" => "ss2.png",
-           "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?verifier=#{sub2.attachments.first.uuid}",},
+           "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",},
           {"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?verifier=#{sub2.attachment.uuid}",},
+           "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",},
          ],
         "submission_comments"=>[],
         "score"=>9,
@@ -1277,7 +1285,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should not allow accessing other sections when limited" do
     course_with_teacher(:active_all => true)
-    @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+    @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     @teacher = @user
     s1 = submission_model(:course => @course)
     section2 = @course.course_sections.create(:name => "another section")

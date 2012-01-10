@@ -64,4 +64,12 @@ describe InfoController do
     response.should be_redirect
     response.should redirect_to(root_url)
   end
+
+  describe "GET 'health_check'" do
+    it "should work" do
+      get 'health_check'
+      response.should be_success
+      response.body.should == 'canvas ok'
+    end
+  end
 end

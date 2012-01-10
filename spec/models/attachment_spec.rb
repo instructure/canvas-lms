@@ -206,6 +206,22 @@ describe Attachment do
       ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
     end
+
+    describe "submit_to_scribd job" do
+      it "should queue for scribdable types" do
+        scribdable_attachment_model
+        @attachment.after_attachment_saved
+        Delayed::Job.count(:conditions => { :tag => 'Attachment#submit_to_scribd!' }).should == 1
+        @attachment.should be_pending_upload
+      end
+
+      it "should not queue for non-scribdable types" do
+        attachment_model
+        @attachment.after_attachment_saved
+        Delayed::Job.count(:conditions => { :tag => 'Attachment#submit_to_scribd!' }).should == 0
+        @attachment.should be_processed
+      end
+    end
     
     it "should upload scribdable attachments" do
       scribdable_attachment_model
@@ -553,22 +569,30 @@ describe Attachment do
     it "should include response-content-disposition" do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename=foo'))
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
       attachment.cacheable_s3_url
     end
 
     it "should use the display_name, not filename, in the response-content-disposition" do
       attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename=foo'))
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
       attachment.cacheable_s3_url
     end
 
     it "should http quote the filename in the response-content-disposition if necessary" do
       attachment = attachment_with_context(@course, :display_name => 'fo"o')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => 'attachment; filename="fo\\"o"'))
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="fo\\"o"; filename*=UTF-8''fo%22o)))
       attachment.cacheable_s3_url
+    end
+
+    it "should sanitize filename with iconv" do
+      a = attachment_with_context(@course, :display_name => "糟糕.pdf")
+      sanitized_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", a.display_name)
+      a.expects(:authenticated_s3_url).at_least(0)
+      a.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
+      a.cacheable_s3_url
     end
   end
 end

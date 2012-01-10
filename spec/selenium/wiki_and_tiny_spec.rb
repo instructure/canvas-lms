@@ -59,8 +59,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       root_folders.first.find_element(:css, '.name').text.should == 'course files'
 
       root_folders.first.find_element(:css, '.sign.plus').click
+      wait_for_ajaximations
 
-      keep_trying_until { root_folders.first.find_elements(:css, 'li.folder').length }
       sub_folders = root_folders.first.find_elements(:css, 'li.folder')
       sub_folders.length.should == 1
       sub_folders.first.find_element(:css, '.name').text.should == 'subfolder'
@@ -70,8 +70,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       text_file.first.find_element(:css, '.name').text.should == 'text_file.txt'
 
       sub_folders.first.find_element(:css, '.sign.plus').click
+      wait_for_ajaximations
 
-      keep_trying_until { sub_folders.first.find_elements(:css, 'li.folder').length }
       sub_sub_folders = sub_folders.first.find_elements(:css, 'li.folder')
       sub_sub_folders.length.should == 1
       sub_sub_folders.first.find_element(:css, '.name').text.should == 'subsubfolder'
@@ -84,6 +84,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       @image_list.find_elements(:css, 'img.img').length.should == 0
 
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
       keep_trying_until { @image_list.find_elements(:css, 'img.img').length }.should == 2
     end
 
@@ -118,6 +119,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       @image_list.find_elements(:css, 'img.img').length.should == 0
 
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
       keep_trying_until { @image_list.find_elements(:css, 'img.img').length }.should == 30
 
       driver.execute_script('image_list = $(".image_list")')
@@ -160,6 +162,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       first_folder = @tree1.find_elements(:css, 'li.folder').first
       first_folder.find_element(:css, '.sign.plus').click
+      wait_for_ajax_requests
       subfolder = first_folder.find_element(:css, '.folder')
       subfolder.find_element(:css, '.sign.plus').click
       wait_for_ajax_requests
@@ -194,6 +197,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       root_folders = @tree1.find_elements(:css, 'li.folder')
       root_folders.first.find_element(:css, '.sign.plus').click
+      wait_for_ajaximations
       root_folders.first.find_elements(:css, '.file.text').length.should == 1
 
       upload_file('#sidebar_upload_file_form', :text)
@@ -219,8 +223,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '.upload_new_image_link').click
       driver.find_element(:css, '.wiki_switch_views_link').click
       wiki_page_body = clear_rce
-
-      @image_list.find_elements(:css, 'img.img').length.should == 2
+      wait_for_ajaximations
+      keep_trying_until{ @image_list.find_elements(:css, 'img.img').length.should == 2 }
 
       upload_file('#sidebar_upload_image_form', :text)
 
@@ -237,6 +241,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       root_folders = @tree1.find_elements(:css, 'li.folder')
       root_folders.first.find_element(:css, '.sign.plus').click
+      wait_for_ajaximations
       root_folders.first.find_elements(:css, '.file.text').length.should == 1
       root_folders.first.find_elements(:css, '.file.text span').first.click
 
@@ -259,15 +264,16 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       root_folders = @tree1.find_elements(:css, 'li.folder')
       root_folders.first.find_element(:css, '.sign.plus').click
-      keep_trying_until { root_folders.first.find_elements(:css, '.file.text').length.should == 1 }
+      wait_for_ajaximations
+      root_folders.first.find_elements(:css, '.file.text').length.should == 1
 
       wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       driver.find_element(:css, '.upload_new_image_link').click
       driver.find_element(:css, '.wiki_switch_views_link').click
       wiki_page_body = clear_rce
-
-      @image_list.find_elements(:css, 'img.img').length.should == 2
+      wait_for_ajaximations
+      keep_trying_until{ @image_list.find_elements(:css, 'img.img').length.should == 2 }
 
       upload_file('#sidebar_upload_image_form', :text)
 
@@ -282,6 +288,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       root_folders = @tree1.find_elements(:css, 'li.folder')
       root_folders.first.find_element(:css, '.sign.plus').click
+      wait_for_ajaximations
+
       root_folders.first.find_elements(:css, '.file.image').length.should == 2
 
       wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
@@ -305,11 +313,15 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       wiki_page_body = clear_rce
       driver.find_element(:css, '.wiki_switch_views_link').click
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajax_requests
 
       @image_list.find_elements(:css, 'img.img').length.should == 2
-      @image_list.find_elements(:css, 'img.img').first.click
-      in_frame "wiki_page_body_ifr" do
-        driver.find_element(:css, '#tinymce img').should be_displayed
+      keep_trying_until do
+        driver.find_elements(:css, '#editor_tabs_3 .image_list img.img').first.click
+        in_frame "wiki_page_body_ifr" do
+          driver.find_element(:css, '#tinymce img').should be_displayed
+        end
+        true
       end
 
       driver.find_element(:id, 'wiki_page_submit').click

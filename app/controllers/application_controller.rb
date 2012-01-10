@@ -189,7 +189,6 @@ class ApplicationController < ActionController::Base
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
-      format.xml { render :xml => { 'status' => 'unauthorized' }, :status => :unauthorized }
       format.json { render :json => { 'status' => 'unauthorized' }, :status => :unauthorized }
     end
     response.headers["Pragma"] = "no-cache"
@@ -889,7 +888,7 @@ class ApplicationController < ActionController::Base
   
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host=nil, verifier = nil) # TODO: generalize this
+  def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
     res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
     ts, sig = @current_user && @current_user.access_verifier
 
@@ -899,6 +898,7 @@ class ApplicationController < ActionController::Base
     # of content.
     opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
     opts[:verifier] = verifier if verifier.present?
+    opts[:download_frd] = 1 if download
 
     if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
       # if the context is one that supports relative paths (which requires extra
@@ -992,7 +992,8 @@ class ApplicationController < ActionController::Base
   def require_site_admin_with_permission(permission)
     unless current_user_is_site_admin?(permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
-      redirect_to root_url
+      store_location
+      redirect_to @current_user ? root_url : login_url
       return false
     end
   end
@@ -1054,7 +1055,8 @@ class ApplicationController < ActionController::Base
     bank
   end
 
-  SKIP_JSON_CSRF_REGEX = %r{\A/login}
+  # refs #6632 -- once the speed grader ipad app is upgraded, we can remove these exceptions
+  SKIP_JSON_CSRF_REGEX = %r{\A(?:/login|/logout|/dashboard/comment_session)}
   def prepend_json_csrf?
     request.get? && @pseudonym_session && !@pseudonym_session.used_basic_auth? && !request.path.match(SKIP_JSON_CSRF_REGEX)
   end

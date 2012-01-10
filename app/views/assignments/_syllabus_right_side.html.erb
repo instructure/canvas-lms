@@ -1,6 +1,6 @@
 <% course_home ||= false %>
 <div id="sidebar_content" class="rs-margin-lr <%= 'rs-margin-top' unless course_home %>">
-  <% current = Date.today
+  <% current = Time.zone.today
     first_day_of_month = Date.new(y=current.year, m=current.month, d=1)
     last_day_of_previous_month = first_day_of_month - 1
     current = first_day_of_month

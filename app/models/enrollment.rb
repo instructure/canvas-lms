@@ -38,7 +38,7 @@ class Enrollment < ActiveRecord::Base
   before_save :audit_groups_for_deleted_enrollments
   after_save :clear_email_caches
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :limit_privileges_to_course_section
 
   no_other_enrollments_sql = "NOT EXISTS (SELECT 1 FROM enrollments WHERE workflow_state = 'active' AND user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id LIMIT 1)"
   trigger_sql = {:default => <<-SQL, :mysql => <<-MYSQL} # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables
@@ -135,7 +135,7 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :ended,
               :joins => :course,
-              :conditions => "courses.workflow_state = 'aborted' or courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
+              :conditions => "courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
 
 
   READABLE_TYPES = {
@@ -493,7 +493,8 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_scores(user_id)
     user = User.find(user_id)
-    user.student_enrollments.each do |enrollment|
+    enrollments = user.student_enrollments.uniq_by { |e| e.course_id }
+    enrollments.each do |enrollment|
       send_later(:recompute_final_score, user_id, enrollment.course_id)
     end
   end
@@ -615,7 +616,7 @@ class Enrollment < ActiveRecord::Base
   named_scope :for_email, lambda { |email|
     {
       :joins => { :user => :communication_channels },
-      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND path=?", email]
+      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase]
     }
   }
   def self.cached_temporary_invitations(email)
@@ -638,8 +639,22 @@ class Enrollment < ActiveRecord::Base
     read_attribute(:uuid)
   end
 
-  def self.limit_priveleges_to_course_section!(course, user, limit)
-    Enrollment.update_all({:limit_priveleges_to_course_section => !!limit}, {:course_id => course.id, :user_id => user.id})
+  # overwrite the accessors to limit_priveleges and limit_privileges to return the value wherever
+  # it exists.
+  [:limit_privileges_to_course_section, :limit_priveleges_to_course_section].each do |method_name|
+    define_method(method_name) do
+      read_attribute(:limit_privileges_to_course_section).nil? ?
+        read_attribute(:limit_priveleges_to_course_section) :
+        read_attribute(:limit_privileges_to_course_section)
+    end
+  end
+
+  def limit_priveleges_to_course_section=(value)
+    self.limit_privileges_to_course_section = value
+  end
+
+  def self.limit_privileges_to_course_section!(course, user, limit)
+    Enrollment.update_all({:limit_privileges_to_course_section => !!limit}, {:course_id => course.id, :user_id => user.id})
     user.touch
   end
 

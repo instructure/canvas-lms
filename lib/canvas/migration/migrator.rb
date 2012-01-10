@@ -34,7 +34,7 @@ class Migrator
     @course = {:file_map=>{}, :wikis=>[]}
     @course[:name] = @settings[:course_name]
 
-    return if settings[:testing]
+    return if settings[:no_archive_file]
 
     unless settings[:archive_file]
       MigratorHelper::download_archive(settings)
@@ -98,5 +98,25 @@ class Migrator
       FileUtils.copy(@archive_file.path, full_path)
     end
   end
+  
+  def package_course_files
+    zip_file = File.join(@base_export_dir, MigratorHelper::ALL_FILES_ZIP)
+    make_export_dir
+
+    Zip::ZipFile.open(zip_file, 'w') do |zipfile|
+      @course[:file_map].each_value do |val|
+        file_path = File.join(@unzipped_file_path, val[:real_path] || val[:path_name])
+        val.delete :real_path
+        if File.exists?(file_path)
+          zipfile.add(val[:path_name], file_path)
+        else
+          add_warning(I18n.t('canvas.migration.errors.file_does_not_exist', 'The file "%{file_path}" did not exist in the content package and could not be imported.', :file_path => val[:path_name]))
+        end
+      end
+    end
+
+    File.expand_path(zip_file)
+  end
+  
 end
 end

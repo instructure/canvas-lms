@@ -2,6 +2,7 @@
   content_for :page_title, "Gradebook - #{@context.name}"
   @body_classes << "gradebook2"
   @show_left_side = false
+  add_crumb t(:go_back_to_the_old_gradebook, "Go back to the old gradebook"), context_url(@context, :change_gradebook_version_context_gradebook_url, :reset => true), :id => 'change_gradebook_version_link_holder'
   jammit_js :jquery_ui_menu, :slickgrid, :assignmentMuter, :gradebook2
   jammit_css :slickgrid, :gradebook2
   options = {
@@ -21,17 +22,12 @@
 <div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
   <div id="gradebook-toolbar">
     <button style="display:none;" id="section_to_show">Showing: <span id="section_being_shown">All Sections</span></button>
-    <ul style="display: none; width: 200px;">
-      <li>Choose a section to show</li>
-      <li><a href="#"><label for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" checked /></a></li>
-      <li id="course_section_template"><a href="#"><label class="section_name" for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" /></a></li>
-    </ul>
     <button id="gradebook_settings">&nbsp;</button>
     <ul style="display: none;">
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
       <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
-      <% if PluginSetting.settings_for_plugin('grade_export')[:enabled] %>
+      <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>
       <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url, :fragment => "tab-grade-publishing") %>"><%= t('publish_to_sis', 'Publish grades to SIS') %></a></li>
       <% end %>
       <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('set_group_weights', 'Set Group Weights') %></a></li>
@@ -60,6 +56,9 @@
       :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
       :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading'),
     }.to_json.html_safe %>;
-    var gradebook = new Gradebook(<%= options.to_json.html_safe %>);
+    require(['compiled/Gradebook'], function(Gradebook){
+      new Gradebook(<%= options.to_json.html_safe %>);
+    });
+
   </script>
 <% end %>

@@ -59,6 +59,8 @@ class RoleOverride < ActiveRecord::Base
 
   # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
   # for legacy reasons
+  # NOTE: if you add a permission, please also update the API documentation for
+  # RoleOverridesController#add_role
   PERMISSIONS =
     {
       :manage_wiki => {
@@ -525,13 +527,13 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :read_course_content => {
-        :label => lambda { t('permission.read_course_content', "View course content") },
+        :label => lambda { t('permissions.read_course_content', "View course content") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_content => {
-        :label => lambda { t('permission.manage_content', "Manage all other course content") },
+        :label => lambda { t('permissions.manage_content', "Manage all other course content") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -564,10 +566,35 @@ class RoleOverride < ActiveRecord::Base
         :account_only => :site_admin,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
+      },
+      :change_course_state => {
+        :label => lambda { t('permissions.change_course_state', "Change course state") },
+        :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
+      },
+      :manage_sections => {
+        :label => lambda { t('permissions.manage_sections', "Manage (create / edit / delete) course sections") },
+        :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
       }
     }.freeze
+
+  RESERVED_ROLES =
+    [
+      'AccountAdmin', 'AccountMembership', 'DesignerEnrollment',
+      'ObserverEnrollment', 'StudentEnrollment', 'TaEnrollment',
+      'TeacherEnrollment', 'TeacherlessStudentEnrollment'
+    ].freeze
+
   def self.permissions
     PERMISSIONS
+  end
+
+  def self.manageable_permissions(context)
+    permissions = self.permissions.dup
+    permissions.reject!{ |k, p| p[:account_only] == :site_admin } unless context.site_admin?
+    permissions.reject!{ |k, p| p[:account_only] == :root } unless context.root_account?
+    permissions.keys
   end
 
   def self.css_class_for(context, permission, enrollment_type)
@@ -698,4 +725,21 @@ class RoleOverride < ActiveRecord::Base
     @cached_permissions[key] = generated_permission
   end
   
+  # settings is a hash with recognized keys :override and :locked. each key
+  # differentiates nil, false, and truthy as possible values
+  def self.manage_role_override(context, role, permission, settings)
+    role_override = context.role_overrides.find_by_permission_and_enrollment_type(permission, role)
+    if !settings[:override].nil? || settings[:locked]
+      role_override ||= context.role_overrides.build(
+        :permission => permission,
+        :enrollment_type => role)
+      role_override.enabled = settings[:override] unless settings[:override].nil?
+      role_override.locked = settings[:locked] unless settings[:locked].nil?
+      role_override.save!
+    elsif role_override
+      role_override.destroy
+      role_override = nil
+    end
+    role_override
+  end
 end

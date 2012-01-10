@@ -31,7 +31,8 @@ class CommunicationChannel < ActiveRecord::Base
   
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
-  validates_uniqueness_of :path, :case_sensitive => false, :scope => [:path_type, :user_id], :if => lambda { |cc| cc.user_id && !cc.retired? }
+  validates_presence_of :path
+  validate :uniqueness_of_path
 
   acts_as_list :scope => :user_id
   
@@ -89,6 +90,20 @@ class CommunicationChannel < ActiveRecord::Base
     self.user.pseudonyms.active
   end
   memoize :active_pseudonyms
+
+  def uniqueness_of_path
+    return if path.nil?
+    return if retired?
+    return unless user_id
+    conditions = ["LOWER(path)=? AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path.mb_chars.downcase, user_id, path_type]
+    unless new_record?
+      conditions.first << " AND id<>?"
+      conditions << id
+    end
+    if self.class.exists?(conditions)
+      self.errors.add(:path, :taken, :value => path)
+    end
+  end
   
   def path_description
     if self.path_type == 'facebook'
@@ -146,7 +161,15 @@ class CommunicationChannel < ActiveRecord::Base
       {}
     end
   }
-  
+
+  named_scope :by_path, lambda { |path|
+    if connection_pool.spec.config[:adapter] == 'mysql'
+      { :conditions => {:path => path } }
+    else
+      { :conditions => ["LOWER(communication_channels.path)=?", path.try(:downcase)]}
+    end
+  }
+
   named_scope :email, :conditions => { :path_type => 'email' }
   named_scope :active, :conditions => { :workflow_state => 'active' }
   named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']

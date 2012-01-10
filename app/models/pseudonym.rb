@@ -102,13 +102,18 @@ class Pseudonym < ActiveRecord::Base
     self.save!
     @send_confirmation = false
   end
-  
-  def self.custom_find_by_unique_id(unique_id, which = :first)
-    if connection.adapter_name.downcase == 'mysql'
-      find(which, :conditions => { :unique_id => unique_id, :workflow_state => 'active'})
+
+  named_scope :by_unique_id, lambda { |unique_id|
+    if connection_pool.spec.config[:adapter] == 'mysql'
+      { :conditions => {:unique_id => unique_id } }
     else
-      find(which, :conditions => ["LOWER(#{quoted_table_name}.unique_id)=? AND workflow_state='active'", unique_id.mb_chars.downcase])
+      { :conditions => ["LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase] }
     end
+  }
+
+  def self.custom_find_by_unique_id(unique_id, which = :first)
+    return nil unless unique_id
+    self.active.by_unique_id(unique_id).find(which)
   end
   
   def set_password_changed
@@ -121,7 +126,7 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def communication_channel
-    self.user.communication_channels.find_by_path(self.unique_id)
+    self.user.communication_channels.by_path(self.unique_id).find(:first)
   end
   
   def confirmation_code
@@ -345,7 +350,8 @@ class Pseudonym < ActiveRecord::Base
     res = @ldap_result
     if res && res[:mail] && res[:mail][0]
       email = res[:mail][0]
-      cc = self.user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
+      cc = self.user.communication_channels.email.by_path(email).first
+      cc ||= self.user.communication_channels.build(:path => email)
       cc.workflow_state = 'active'
       cc.user = self.user
       cc.save if cc.changed?
@@ -377,6 +383,7 @@ class Pseudonym < ActiveRecord::Base
   named_scope :active, :conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted']
   # returns pseudonyms not from account, but that can be used by account
   named_scope :trusted_by, lambda { |account| {:conditions => ['account_id<>?', account.id]} }
+  named_scope :trusted_by_including_self, lambda { |account| {} }
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 end

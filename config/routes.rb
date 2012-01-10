@@ -94,6 +94,7 @@ ActionController::Routing::Routes.draw do |map|
     course.update_nav 'update_nav', :controller => 'courses', :action => 'update_nav'
     course.formatted_enroll_users 'enroll_users.:format', :controller => 'courses', :action => 'enroll_users'
     course.resource :gradebook, :collection => {
+      :change_gradebook_version => :get,
       :blank_submission => :get,
       :speed_grader => :get,
       :update_submission => :post,
@@ -655,6 +656,7 @@ ActionController::Routing::Routes.draw do |map|
   ApiRouteSet::V1.route(map) do |api|
     api.with_options(:controller => :courses) do |courses|
       courses.get 'courses', :action => :index
+      courses.post 'accounts/:account_id/courses', :action => :create
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
@@ -662,6 +664,10 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
+    end
+
+    api.with_options(:controller => :enrollments_api) do |enrollments|
+      enrollments.post 'courses/:course_id/enrollments', :action => :create
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -703,6 +709,18 @@ ActionController::Routing::Routes.draw do |map|
       topics.get 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'group_discussion_replies'
     end
 
+    api.with_options(:controller => :external_tools) do |tools|
+      def et_routes(route_object, context)
+        route_object.get "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :show, :path_name => "#{context}_external_tool_show"
+        route_object.get "#{context}s/:#{context}_id/external_tools", :action => :index, :path_name => "#{context}_external_tools"
+        route_object.post "#{context}s/:#{context}_id/external_tools", :action => :create, :path_name => "#{context}_external_tools_create"
+        route_object.put "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :update, :path_name => "#{context}_external_tools_update"
+        route_object.delete "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :destroy, :path_name => "#{context}_external_tools_delete"
+      end
+      et_routes(tools, "course")
+      et_routes(tools, "account")
+    end
+
     api.with_options(:controller => :sis_imports_api) do |sis|
       sis.post 'accounts/:account_id/sis_imports', :action => :create
       sis.get 'accounts/:account_id/sis_imports/:id', :action => :show
@@ -721,6 +739,18 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts', :action => :index, :path_name => :accounts
       accounts.get 'accounts/:id', :action => :show
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
+    end
+
+    api.with_options(:controller => :role_overrides) do |roles|
+      roles.post 'accounts/:account_id/roles', :action => :add_role
+    end
+
+    api.with_options(:controller => :admins) do |admins|
+      admins.post 'accounts/:account_id/admins', :action => :create
+    end
+
+    api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
+      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => 'update_all'
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'

@@ -75,8 +75,10 @@ module CC::Importer
         ext[:custom_fields] = get_custom_properties(extension)
         
         if ext[:platform] == CANVAS_PLATFORM
-          tool[:privacy_level] = ext[:custom_fields]['privacy_level']
-          tool[:domain] = ext[:custom_fields]['domain']
+          tool[:privacy_level] = ext[:custom_fields].delete 'privacy_level'
+          tool[:domain] = ext[:custom_fields].delete 'domain'
+          
+          tool[:settings] = ext[:custom_fields]
         else
           tool[:extensions] << ext
         end
@@ -84,11 +86,33 @@ module CC::Importer
       tool
     end
     
+    def convert_blti_xml(xml)
+      doc = Nokogiri::XML(xml)
+      begin
+        convert_blti_link(doc)
+      rescue Nokogiri::XML::XPath::SyntaxError
+        raise CCImportError.new(I18n.t(:invalid_xml_syntax, "invalid xml syntax"))
+      end
+    end
+    
+    def retrieve_and_convert_blti_url(url)
+      begin
+        config_xml = Net::HTTP.get(URI.parse(url))
+        convert_blti_xml(config_xml)
+      rescue Timeout::Error
+        raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))
+      end
+    end
+    
     def get_custom_properties(node)
       props = {}
       node.children.each do |property|
-        next unless property.name == 'property'
-        props[property['name']] = property.text
+        next if property.name == 'text'
+        if property.name == 'property'
+          props[property['name']] = property.text
+        elsif property.name == 'options'
+          props[property['name']] = get_custom_properties(property)
+        end
       end
       props
     end
@@ -101,6 +125,6 @@ module CC::Importer
       end
       "blti"
     end
-    
+    class CCImportError < Exception; end
   end
 end

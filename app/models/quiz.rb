@@ -180,6 +180,16 @@ class Quiz < ActiveRecord::Base
     @assignment_id_set = true
     write_attribute(:assignment_id, val)
   end
+
+  def due_at=(val)
+    val = val.in_time_zone.end_of_day if val.is_a?(Date)
+    if val.is_a?(String)
+      super(Time.zone.parse(val))
+      infer_times unless val.match(/:/)
+    else
+      super(val)
+    end
+  end
   
   def assignment?
     self.quiz_type == 'assignment'
@@ -542,7 +552,7 @@ class Quiz < ActiveRecord::Base
   def locked_for?(user=nil, opts={})
     @locks ||= {}
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, user].cache_key, :expires_in => 1.minute) do
+    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && self.unlock_at > Time.now)
         sub = user && quiz_submissions.find_by_user_id(user.id)
@@ -854,8 +864,6 @@ class Quiz < ActiveRecord::Base
       points = answers.map{|a| a[:points] }.sum
       score_counter << points
       stats[:submission_score_tally] += points
-      stats[:submission_score_max] = [stats[:submission_score_max] || 0, points].max
-      stats[:submission_score_min] = [stats[:submission_score_min] || 0, points].min
       stats[:submission_incorrect_tally] += answers.select{|a| a[:correct] == false }.length
       stats[:submission_correct_tally] += answers.select{|a| a[:correct] == true }.length
       stats[:submission_duration_tally] += ((sub.finished_at - sub.started_at).to_i rescue 30)
@@ -864,11 +872,11 @@ class Quiz < ActiveRecord::Base
         questions_hash[question[:id]] ||= question
       end
     end
-    stats[:submission_score_average] = score_counter.mean.to_f rescue 0
+    stats[:submission_score_average] = score_counter.mean
     stats[:submission_score_high] = score_counter.max
     stats[:submission_score_low] = score_counter.min
     stats[:submission_duration_average] = stats[:submission_count] > 0 ? stats[:submission_duration_tally].to_f / stats[:submission_count].to_f : 0
-    stats[:submission_score_stdev] = score_counter.standard_deviation rescue 0
+    stats[:submission_score_stdev] = score_counter.standard_deviation
     stats[:submission_incorrect_count_average] = stats[:submission_count] > 0 ? stats[:submission_incorrect_tally].to_f / stats[:submission_count].to_f : 0
     stats[:submission_correct_count_average] = stats[:submission_count] > 0 ? stats[:submission_correct_tally].to_f / stats[:submission_count].to_f : 0
     assessment_questions = question_ids.empty? ? [] : AssessmentQuestion.find_all_by_id(question_ids).compact

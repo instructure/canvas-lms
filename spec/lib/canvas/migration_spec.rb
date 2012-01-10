@@ -12,8 +12,8 @@ describe "Detecting content package type" do
           "Common Cartridge 1.0" => ["cc1-0", CC::Importer::Standard::Converter],
           "Common Cartridge 1.1" => ["cc1-1", CC::Importer::Standard::Converter],
           "Common Cartridge 1.2" => ["cc1-2", CC::Importer::Standard::Converter],
-          "QTI packages" => [:qti, Qti::QtiExporter],
-          "WebCT exports (as qti packages)" => [:webct, Qti::QtiExporter],
+          "QTI packages" => [:qti, Qti::Converter],
+          "WebCT exports (as qti packages)" => [:webct, Qti::Converter],
   }
   
   unsupported = {

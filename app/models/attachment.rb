@@ -103,7 +103,12 @@ class Attachment < ActiveRecord::Base
   # it to scribd from that point does not make the user wait since that 
   # does happen asynchronously and the data goes directly from s3 to scribd.
   def after_attachment_saved
-    send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 }) unless Attachment.skip_scribd_submits? || !ScribdAPI.enabled?
+    if self.pending_upload? and not self.scribdable?
+      self.process # we aren't scribdable, so just mark as processed
+    elsif ScribdAPI.enabled? && !Attachment.skip_scribd_submits?
+      send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 })
+    end
+
     if respond_to?(:process_attachment_with_processing) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
       temp_file = temp_path || create_temp_file
       self.class.attachment_options[:thumbnails].each { |suffix, size| send_later_if_production(:create_thumbnail_size, suffix) }
@@ -736,14 +741,21 @@ class Attachment < ActiveRecord::Base
   def cacheable_s3_url
     cached = cached_s3_url && s3_url_cached_at && s3_url_cached_at >= (Time.now - 24.hours.to_i)
     if !cached
+      ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
+
       # response-content-disposition will be url encoded in the depths of
       # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
       # quote the filename string, though.
-      raw_filename = self.display_name
-      quoted_filename = raw_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
-      quoted_filename = "\"#{quoted_filename}\"" unless quoted_filename == raw_filename
-      self.cached_s3_url = authenticated_s3_url(:expires_in => 144.hours,
-        'response-content-disposition' => "attachment; filename=#{quoted_filename}")
+      quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
+
+      quoted_unicode = "UTF-8''#{URI.escape(display_name)}"
+
+      self.cached_s3_url = authenticated_s3_url(
+        :expires_in => 144.hours,
+        # awesome browsers will use the filename* and get the proper unicode filename,
+        # everyone else will get the sanitized ascii version of the filename
+        "response-content-disposition" => %(attachment; filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
+      )
       self.s3_url_cached_at = Time.now
       save
     end
@@ -890,7 +902,7 @@ class Attachment < ActiveRecord::Base
     @locks ||= {}
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     return {:manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, user].cache_key, :expires_in => 1.minute) do
+    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}

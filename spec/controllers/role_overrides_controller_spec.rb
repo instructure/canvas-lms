@@ -1,0 +1,146 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe RoleOverridesController do
+  before :each do
+    @account = account_model(:parent_account => Account.default)
+    account_admin_user(:account => @account)
+    user_session(@admin)
+  end
+
+  describe "add_role" do
+    it "should add the role type to the account" do
+      @account.account_membership_types.should_not include('NewRole')
+      post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
+      @account.reload
+      @account.account_membership_types.should include('NewRole')
+    end
+
+    it "should check require a role type" do
+      post 'add_role', :account_id => @account.id
+      flash[:error].should == 'Role creation failed'
+    end
+
+    it "should fail when given an existing role type" do
+      @account.add_account_membership_type('NewRole')
+      post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
+      flash[:error].should == 'Role creation failed'
+    end
+  end
+
+  describe "create" do
+    before :each do
+      @role = 'NewRole'
+      @permission = 'read_reports'
+      @account.add_account_membership_type(@role)
+    end
+
+    def post_with_settings(settings={})
+      post 'create', :account_id => @account.id, :account_roles => 1, :permissions => { @permission => { @role => settings } }
+    end
+
+    describe "override already exists" do
+      before :each do
+        @existing_override = @account.role_overrides.build(
+          :permission => @permission,
+          :enrollment_type => @role)
+        @existing_override.enabled = true
+        @existing_override.locked = false
+        @existing_override.save!
+        @initial_count = @account.role_overrides.size
+      end
+
+      it "should update an existing override if override has a value" do
+        post_with_settings(:override => 'unchecked')
+        @account.role_overrides(true).size.should == @initial_count
+        @existing_override.reload
+        @existing_override.enabled.should be_false
+      end
+
+      it "should update an existing override if override is nil but locked is truthy" do
+        post_with_settings(:locked => 'true')
+        @account.role_overrides(true).size.should == @initial_count
+        @existing_override.reload
+        @existing_override.locked.should be_true
+      end
+
+      it "should only update the parts that are specified" do
+        post_with_settings(:override => 'unchecked')
+        @existing_override.reload
+        @existing_override.locked.should be_false
+
+        @existing_override.enabled = true
+        @existing_override.save
+
+        post_with_settings(:locked => 'true')
+        @existing_override.reload
+        @existing_override.enabled.should be_true
+      end
+
+      it "should delete an existing override if override is nil and locked is not truthy" do
+        post_with_settings(:locked => '0')
+        @account.role_overrides(true).size.should == @initial_count - 1
+        RoleOverride.find_by_id(@existing_override.id).should be_nil
+      end
+    end
+
+    describe "no override yet" do
+      before :each do
+        @initial_count = @account.role_overrides.size
+      end
+
+      it "should not create an override if override is nil and locked is not truthy" do
+        post_with_settings(:locked => '0')
+        @account.role_overrides(true).size.should == @initial_count
+      end
+
+      it "should create the override if override has a value" do
+        post_with_settings(:override => 'unchecked')
+        @account.role_overrides(true).size.should == @initial_count + 1
+        override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+        override.should_not be_nil
+        override.enabled.should be_false
+      end
+
+      it "should create the override if override is nil but locked is truthy" do
+        post_with_settings(:locked => 'true')
+        @account.role_overrides(true).size.should == @initial_count + 1
+        override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+        override.should_not be_nil
+        override.locked.should be_true
+      end
+
+      it "should only set the parts that are specified" do
+        post_with_settings(:override => 'unchecked')
+        override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
+        override.should_not be_nil
+        override.enabled.should be_false
+        override.locked.should be_nil
+        override.destroy
+
+        post_with_settings(:locked => 'true')
+        override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
+        override.should_not be_nil
+        override.enabled.should be_nil
+        override.locked.should be_true
+      end
+    end
+  end
+end

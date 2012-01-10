@@ -64,7 +64,6 @@ class PageViewsController < ApplicationController
             :disposition => "attachment"
           ) 
         }
-        format.xml { render :xml => @user.page_views.scoped(:limit=>params[:report_count] || 300).to_xml } 
       end
     end
   end

@@ -53,6 +53,88 @@ describe CoursesController, :type => :integration do
     ]
   end
 
+  describe "course creation" do
+    context "an account admin" do
+      before do
+        @account = Account.first
+        account_admin_user
+        @resource_path = "/api/v1/accounts/#{@account.id}/courses"
+        @resource_params = { :controller => 'courses', :action => 'create', :format => 'json', :account_id => @account.id.to_s }
+      end
+
+      it "should create a new course" do
+        post_params = {
+          'account_id' => @account.id,
+          'offer'      => true,
+          'course'     => {
+            'name'                            => 'Test Course',
+            'course_code'                     => 'Test Course',
+            'start_at'                        => '2011-01-01T00:00:00-0700',
+            'conclude_at'                     => '2011-05-01T00:00:00-0700',
+            'publish_grades_immediately'      => true,
+            'is_public'                       => true,
+            'allow_student_assignment_edits'  => true,
+            'allow_wiki_comments'             => true,
+            'allow_student_forum_attachments' => true,
+            'open_enrollment'                 => true,
+            'self_enrollment'                 => true,
+            'license'                         => 'Creative Commons',
+            'sis_course_id'                   => '12345'
+          }
+        }
+        course_response = post_params['course'].merge({
+          'account_id' => @account.id,
+          'root_account_id' => @account.id,
+          'start_at' => '2011-01-01T07:00:00Z',
+          'conclude_at' => '2011-05-01T07:00:00Z'
+        })
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        new_course = Course.find(json['id'])
+        [:name, :course_code, :start_at, :conclude_at, :publish_grades_immediately,
+        :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
+        :open_enrollment, :self_enrollment, :license, :sis_course_id,
+        :allow_student_forum_attachments].each do |attr|
+          [:start_at, :conclude_at].include?(attr) ?
+            new_course.send(attr).should == Time.parse(post_params['course'][attr.to_s]) :
+            new_course.send(attr).should == post_params['course'][attr.to_s]
+        end
+        new_course.workflow_state.should eql 'available'
+        course_response.merge!(
+          'id' => new_course.id,
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" }
+        )
+        json.should eql course_response
+      end
+
+      it "should offer a course if passed the 'offer' parameter" do
+        json = api_call(:post, @resource_path,
+          @resource_params,
+          { :account_id => @account.id, :offer => true, :course => { :name => 'Test Course' } }
+        )
+        new_course = Course.find(json['id'])
+        new_course.should be_available
+      end
+    end
+
+    describe "a user without permissions" do
+      it "should return 401 Unauthorized if a user lacks permissions" do
+        course_with_student(:active_all => true)
+        account = Account.first
+        raw_api_call(:post, "/api/v1/accounts/#{account.id}/courses",
+          { :controller => 'courses', :action => 'create', :format => 'json', :account_id => account.id.to_s },
+          {
+            :account_id => account.id,
+            :course => {
+              :name => 'Test Course'
+            }
+          }
+        )
+
+        response.status.should eql '401 Unauthorized'
+      end
+    end
+  end
+
   it "should include scores in course list if requested" do
     @course2.grading_standard_enabled = true
     @course2.save

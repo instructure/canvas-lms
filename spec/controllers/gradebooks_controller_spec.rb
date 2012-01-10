@@ -121,6 +121,25 @@ describe GradebooksController do
     end
   end
 
+  describe "GET 'change_gradebook_version'" do
+    it 'should switch to gradebook2 if clicked and back to gradebook1 if clicked with reset=true' do
+      course_with_teacher_logged_in(:active_all => true)
+      get 'grade_summary', :course_id => @course.id
+
+      response.should be_redirect
+      response.should redirect_to(:action => 'show')
+
+      # tell it to use gradebook 2
+      get 'change_gradebook_version', :course_id => @course.id
+      response.should redirect_to(:action => 'show', :controller => :gradebook2)
+
+      # reset back to showing the old gradebook
+      get 'change_gradebook_version', :course_id => @course.id, :reset => true
+      response.should redirect_to(:action => 'show')
+    end
+
+  end
+
   describe "POST 'update_submission'" do
 
     it "should have a route for update_submission" do
@@ -170,7 +189,7 @@ describe GradebooksController do
 
     it "should not allow updating submissions in other sections when limited" do
       course_with_teacher_logged_in(:active_all => true)
-      @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+      @enrollment.update_attribute(:limit_privileges_to_course_section, true)
       s1 = submission_model(:course => @course)
       s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"), :assignment => @assignment)
 

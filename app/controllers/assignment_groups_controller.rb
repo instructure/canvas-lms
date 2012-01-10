@@ -73,7 +73,6 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@context.assignment_groups.new, @current_user, :read)
 
       respond_to do |format|
-        format.xml  { render :xml => @groups.to_xml }
         format.json {
           hashes = @groups.map do |group|
             hash = group.as_json(:include_root => false,
@@ -150,10 +149,8 @@ class AssignmentGroupsController < ApplicationController
           @assignment_group.insert_at(1)
           flash[:notice] = t 'notices.created', 'Assignment Group was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.xml  { head :created, :location => named_context_url(@context, :context_assignments_url) }
           format.json { render :json => @assignment_group.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
-          format.xml  { render :xml => @assignment_group.errors.to_xml }
           format.json { render :json => @assignment_group.errors.to_json, :status => :bad_request }
         end
       end
@@ -167,10 +164,8 @@ class AssignmentGroupsController < ApplicationController
         if @assignment_group.update_attributes(params[:assignment_group])
           flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.xml  { head :ok }
           format.json { render :json => @assignment_group.to_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
-          format.xml  { render :xml => @assignment_group.errors.to_xml }
           format.json { render :json => @assignment_group.errors.to_json, :status => :bad_request }
         end
       end

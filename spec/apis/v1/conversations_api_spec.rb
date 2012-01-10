@@ -336,7 +336,7 @@ describe ConversationsController, :type => :integration do
                 "id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "attachments" => [],
                 "forwarded_messages" => [
                   {
-                    "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [{'filename' => 'test my file? hai!&.png', 'url' => "http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png'}]
+                    "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [{'filename' => 'test my file? hai!&.png', 'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png'}]
                   }
                 ]
               }
@@ -404,6 +404,43 @@ describe ConversationsController, :type => :integration do
         {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
         {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
         {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}}
+      ]
+    end
+
+    it "should return recipients found by id" do
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{@bob.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => @bob.id.to_s })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+      ]
+    end
+
+    it "should ignore other parameters when searching by id" do
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{@bob.id}&search=asdf",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => @bob.id.to_s, :search => "asdf" })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+      ]
+    end
+
+    it "should return recipients by id if contactable, or if a shared conversation is referenced" do
+      other = User.create(:name => "other personage")
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{other.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => other.id.to_s })
+      json.should == []
+      # now they have a conversation in common
+      c = Conversation.initiate([@user.id, other.id], true)
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{other.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => other.id.to_s })
+      json.should == []
+      # ... but it has to be explicity referenced via from_conversation_id
+      json = api_call(:get, "/api/v1/conversations/find_recipients?user_id=#{other.id}&from_conversation_id=#{c.id}",
+              { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :user_id => other.id.to_s, :from_conversation_id => c.id.to_s })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => other.id, "name" => "other personage", "common_courses" => {}, "common_groups" => {}},
       ]
     end
 
@@ -588,7 +625,7 @@ describe ConversationsController, :type => :integration do
             "attachments" => [
               {
                 "filename" => "test.txt",
-                "url" => "http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}",
+                "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                 "content-type" => "unknown/unknown",
                 "display_name" => "test.txt",
               }

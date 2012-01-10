@@ -743,10 +743,6 @@ class ContextModule < ActiveRecord::Base
       file = self.context.attachments.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if file
         title = hash[:title] || hash[:linked_resource_title]
-        if file.display_name != title
-          file.display_name = title
-          file.save
-        end
         item = self.add_item({
           :title => title,
           :type => 'attachment',

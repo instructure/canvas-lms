@@ -1478,6 +1478,10 @@ I18n.scoped('files', function(I18n) {
                     }
                     if($files_content.find(".message.no_content").length === 0) {
                       if (node.hasClass('collaborations')) {
+                        var find_out_more = "";
+                        if(data.context.permissions.create_collaborations) {
+                          find_out_more = '<p>' + I18n.t('descriptions.collaborations2', 'To find out more about a particular type of collaboration, click &quot;New collaboration&quot; and then choose that type in the dropdown list.') + '</p>';
+                        }
                         $no_content.html([
                           '<div class="ui-state-highlight" style="padding:1em;">',
                             '<p>', I18n.t('descriptions.collaborations',
@@ -1486,8 +1490,7 @@ I18n.scoped('files', function(I18n) {
                             'to work collaboratively on tasks like group papers or note-taking.  This is a special folder that shows you any collaborations you have created ' +
                             'so you have an easy place to keep track of and create those collaborations'),
                             '</p>',
-                            '<p>', I18n.t('descriptions.collaborations2', 'To find out more about a particular type of collaboration, click &quot;New collaboration&quot;' +
-                            'and then choose that type in the dropdown list.'), '</p>',
+                            find_out_more,
                           '</div>',
                           '<p>', I18n.t('messages.no_collaborations', "There are no collaborations to show"), '</p>'
                         ].join('').replace('Google Docs', '<a href="http://docs.google.com">Google Docs</a>').replace('EtherPad', '<a href="http://www.etherpad.org">EtherPad</a>'));

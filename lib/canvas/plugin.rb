@@ -171,6 +171,15 @@ module Canvas
       raise(NoPluginError) if id.nil?
       @registered_plugins[id.to_s] || raise(NoPluginError)
     end
+
+    def self.value_to_boolean(value)
+      if value.is_a?(String) || value.is_a?(Symbol)
+        return true if ["yes", "true", "on"].include?(value.to_s.downcase)
+        return false if ["no", "false", "off"].include?(value.to_s.downcase)
+      end
+      return value if [true, false].include?(value)
+      return value.to_i != 0
+    end
   end
   
   module Plugins

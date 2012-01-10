@@ -19,6 +19,7 @@
 module Api::V1::Submission
   include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::DiscussionTopics
 
   def submission_json(submission, assignment, user, session, context = nil, includes = [])
     context ||= assignment.context
@@ -117,17 +118,7 @@ module Api::V1::Submission
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
       end
-      hash['discussion_entries'] = entries.map do |entry|
-        ehash = entry.as_json(
-          :include_root => false,
-          :only => %w(message user_id created_at updated_at)
-        )
-        attachments = (entry.attachments.dup + [entry.attachment]).compact
-        ehash['attachments'] = attachments.map do |attachment|
-          attachment_json(attachment)
-        end.compact unless attachments.blank?
-        ehash
-      end
+      hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
 
     hash

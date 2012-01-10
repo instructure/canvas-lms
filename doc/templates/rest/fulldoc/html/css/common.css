@@ -43,14 +43,13 @@ h2 {
 }
 #sidebar a, #sidebar h2 {
   display:block;
-  padding:12px 26px;
   border: none;
   border-top: 1px solid #D0D0D0;
   font-size: 1.1em;
   border-right: 1px solid #D0D0D0;
 }
 #sidebar h2 {
-  padding-left: 10px;
+  padding:10px 26px 10px 10px;
   font-family: Skolar, Georgia, Cambria, 'Times New Roman', Times, serif;
   font-size: 20px;
   font-weight: normal;
@@ -60,6 +59,7 @@ h2 {
   border-top:none;
 }
 #sidebar a {
+  padding:8px 26px;
   color: #4B7092;
   text-decoration: none;
 }
@@ -70,6 +70,7 @@ h2 {
 #sidebar a.current {
   background-color: white;
   border-right: none;
+  padding:12px 26px;
 }
 
 .service h1 {
@@ -115,6 +116,27 @@ table.sis_csv th, table.sis_csv td {
 }
 table.sis_csv th {
     background-color: #DDD;
+}
+
+table.tool {
+	border: 1px solid gray;
+	border-collapse: collapse;
+	width: 75%;
+}
+table.tool th, table.tool td {
+    padding: 2px 4px;
+    border: 1px inset gray;
+    border-spacing: 1px;
+}
+table.tool th {
+    background-color: #DDD;
+}
+table.tool tr td:first-child {
+    font-weight: bold;
+    width: 20%;
+}
+table.tool tr td:last-child {
+    width: 20%;
 }
 
 /* Footer */

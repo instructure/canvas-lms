@@ -4,12 +4,12 @@
   <script>
     $(function() {
 
-      $("#plugin_qti_exporter").bind("pluginShown", function(event, enableFileUpload) {
-        enableFileUpload(".imscc");
+      $("#plugin_qti_converter").bind("pluginShown", function(event, enableFileUpload) {
+        enableFileUpload();
         $(".migration_part_selection").hide();
       });
       
-      $("#plugin_qti_exporter").bind("pluginHidden", function(event) {
+      $("#plugin_qti_converter").bind("pluginHidden", function(event) {
         $(".migration_part_selection").show();
       });
 

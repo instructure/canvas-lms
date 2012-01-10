@@ -26,7 +26,8 @@ class CommunicationChannelsController < ApplicationController
       @pseudonym.generate_temporary_password
       return render :json => @pseudonym.errors.to_json, :status => :bad_request unless @pseudonym.valid?
     end
-    @cc = @current_user.communication_channels.find_or_initialize_by_path_and_path_type(params[:pseudonym][:unique_id], params[:path_type])
+    @cc = @current_user.communication_channels.by_path(params[:pseudonym][:unique_id]).find_by_path_type(params[:path_type])
+    @cc ||= @current_user.communication_channels.build(:path => params[:pseudonym][:unique_id], :path_type => params[:path_type])
     if (!@cc.new_record? && !@cc.retired?)
       @cc.errors.add(:path, "unique!")
       return render :json => @cc.errors.to_json, :status => :bad_request
@@ -84,7 +85,7 @@ class CommunicationChannelsController < ApplicationController
       end
 
       # load merge opportunities
-      other_ccs = CommunicationChannel.find(:all, :conditions => ["path=? AND path_type=? AND id<>? AND workflow_state='active'", cc.path, cc.path_type, cc.id], :include => :user)
+      other_ccs = CommunicationChannel.active.by_path(cc.path).of_type(cc.path_type).find(:all, :conditions => ["communication_channels.id<>?", cc.id], :include => :user)
       merge_users = (other_ccs.map(&:user)).uniq
       merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
       User.send(:preload_associations, merge_users, { :pseudonyms => :account })
@@ -113,7 +114,7 @@ class CommunicationChannelsController < ApplicationController
         @user.move_to_user(@current_user) if @user != @current_user
         # create a new pseudonym if necessary and possible
         pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account)
-        pseudonym.save! if pseudonym && pseudonym.new_record?
+        pseudonym.save! if pseudonym && pseudonym.changed?
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
         if params[:transfer_enrollment].present?
           cc.active? || cc.confirm
@@ -142,7 +143,7 @@ class CommunicationChannelsController < ApplicationController
         @pseudonym ||= @user.pseudonyms.build(:account => @root_account, :unique_id => cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
         # up with something new
-        @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.find_by_unique_id(@pseudonym.unique_id)
+        @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.custom_find_by_unique_id(@pseudonym.unique_id)
 
         # Have to either have a pseudonym to register with, or be looking at merge opportunities
         return render :action => 'confirm_failed', :status => :bad_request if !@pseudonym && @merge_opportunities.empty?
@@ -164,7 +165,8 @@ class CommunicationChannelsController < ApplicationController
 
           # They may have switched e-mail address when they logged in; create a CC if so
           if @pseudonym.unique_id != cc.path
-            new_cc = @user.communication_channels.find_or_initialize_by_path_and_path_type(@pseudonym.unique_id, 'email')
+            new_cc = @user.communication_channels.email.by_path(@pseudonym.unique_id).first
+            new_cc ||= @user.communication_channels.build(:path => @pseudonym.unique_id)
             new_cc.user = @user
             new_cc.workflow_state = 'unconfirmed' if new_cc.retired?
             new_cc.send_confirmation! if new_cc.unconfirmed?
