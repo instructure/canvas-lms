@@ -1,3 +1,11 @@
+canvas-lms (2012.01.10.13.09) testing; urgency=low
+
+  * Package ref: 2f0734e67c85324f7c496c039b439d5b589e62d6
+  *
+  * [+2f0734e] upgrade nokogiri to 1.4.7
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 10 Jan 2012 13:09:28 -0700
+
 canvas-lms (2012.01.07.11.30) testing; urgency=low
 
   * Package ref: 84343d317c7d42739a8311208e755edebbd881e0
