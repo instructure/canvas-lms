@@ -44,15 +44,12 @@ describe "gradebook2 selenium tests" do
 
   def open_comment_dialog(jquery_selector = "first")
     driver.execute_script("$('.gradebook-cell:"+jquery_selector+"').mouseenter()") #move_to occasionally breaks in the hudson build
-    comment = keep_trying_until do
+    keep_trying_until do
       comment = find_with_jquery('.gradebook-cell-comment:visible')
       comment.should be_displayed
-      comment
-    end
-    keep_trying_until do
       comment.click
       wait_for_ajax_requests
-      find_with_jquery("#add_a_comment").should be_displayed
+      keep_trying_until(10) { find_with_jquery("#add_a_comment").should be_displayed }
     end
       details_dialog = find_with_jquery('.ui-dialog:visible')
     details_dialog
