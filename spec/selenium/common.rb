@@ -639,6 +639,10 @@ def validate_link(link_element, breadcrumb_text)
   driver.execute_script("return INST.errorCount;").should == 0
 end
 
+def validate_text(element, text)
+  element.text.should == text
+end
+
 shared_examples_for "in-process server selenium tests" do
   it_should_behave_like "all selenium tests"
   prepend_before(:all) do

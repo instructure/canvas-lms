@@ -3,10 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "course settings tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  def validate_text(element, text)
-    element.text.should == text
-  end
-
   def add_section(section_name)
     driver.find_element(:link, 'Sections').click
     section_input = driver.find_element(:id, 'course_section_name')
