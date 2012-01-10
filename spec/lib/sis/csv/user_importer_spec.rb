@@ -887,4 +887,29 @@ describe SIS::CSV::UserImporter do
     user_1.pseudonym.sis_communication_channel.should == user_1.email_channel
     user_2.pseudonym.sis_communication_channel.should == user_2.email_channel
   end
+
+  it "should not resurrect a non SIS user" do
+    @non_sis_user = user_with_pseudonym(:active_all => 1)
+    @non_sis_user.remove_from_root_account(Account.default)
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,#{@pseudonym.unique_id},User,Uno,#{@pseudonym.unique_id},active"
+    )
+    user_1 = Pseudonym.find_by_sis_user_id('user_1').user
+    user_1.should_not == @non_sis_user
+    user_1.pseudonym.should_not == @pseudonym
+  end
+
+  it "should not resurrect a non SIS pseudonym" do
+    @non_sis_user = user_with_pseudonym(:active_all => 1)
+    @pseudonym = @user.pseudonyms.create!(:unique_id => 'user1', :account => Account.default)
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    user_1 = Pseudonym.find_by_sis_user_id('user_1').user
+    user_1.should_not == @non_sis_user
+    user_1.pseudonym.should_not == @pseudonym
+  end
+
 end

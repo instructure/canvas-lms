@@ -87,9 +87,9 @@ module SIS
             user_id, login_id, status, first_name, last_name, email, password, ssha_password = user_row
 
             pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id)
-            pseudo_by_login = @root_account.pseudonyms.by_unique_id(login_id).first
+            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
             pseudo ||= pseudo_by_login
-            pseudo ||= @root_account.pseudonyms.by_unique_id(email).first if email.present?
+            pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
 
             if pseudo
               if pseudo.sis_user_id.present? && pseudo.sis_user_id != user_id
