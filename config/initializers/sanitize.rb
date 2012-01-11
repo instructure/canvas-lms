@@ -8,7 +8,7 @@ class Sanitize
   def clean_element!(node)
     res = original_clean_element!(node)
     if node['style']
-      styles = {}
+      styles = []
       style = node['style']
       # taken from https://github.com/flavorjones/loofah/blob/master/lib/loofah/html5/scrub.rb
       # the gauntlet
@@ -20,10 +20,10 @@ class Sanitize
         valid = (@config[:style_properties] || []).include?(property)
         valid ||= (@config[:style_expressions] || []).any?{|e| property.match(e) }
         if valid
-          styles[property] = clean_style_value(value)
+          styles << [property, clean_style_value(value)]
         end
       end
-      node['style'] = styles.select{|k,v| v}.map{|k,v| "#{k}: #{v}"}.join('; ') + ";"
+      node['style'] = styles.select { |k,v| v }.map{|k,v| "#{k}: #{v}"}.join('; ') + ";"
     end
     res
   end
