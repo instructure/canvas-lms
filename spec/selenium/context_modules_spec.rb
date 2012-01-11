@@ -164,7 +164,7 @@ describe "context_modules selenium tests" do
       edit_form.submit
       edit_form.should_not be_displayed
       wait_for_ajaximations
-      validate_text(driver.find_element(:css, '.context_module > .header'), edit_text)
+      driver.find_element(:css, '.context_module > .header').should include_text(edit_text)
     end
 
     it "should delete a module item" do
