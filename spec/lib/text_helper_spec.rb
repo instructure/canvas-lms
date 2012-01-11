@@ -193,6 +193,23 @@ describe TextHelper do
     end
   end
 
+  context "truncate_html" do
+    it "should truncate in the middle of an element" do
+      str = "<div>a b c d e</div>"
+      th.truncate_html(str, :num_words => 3).should == "<div>a b c<span>...</span>\n</div>"
+    end
+
+    it "should truncate at the end of an element" do
+      str = "<div><div>a b c</div>d e</div>"
+      th.truncate_html(str, :num_words => 3).should == "<div><div>a b c<span>...</span>\n</div></div>"
+    end
+
+    it "should truncate at the beginning of an element" do
+      str = "<div>a b c<div>d e</div></div>"
+      th.truncate_html(str, :num_words => 3).should == "<div>a b c<span>...</span>\n</div>"
+    end
+  end
+
   it "should insert reply to into subject" do
     TextHelper.make_subject_reply_to('ohai').should == 'Re: ohai'
     TextHelper.make_subject_reply_to('Re: ohai').should == 'Re: ohai'
