@@ -37,9 +37,9 @@ describe CommunicationChannel do
       c = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => "path3@example.com")
       d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
       notification_model
-      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id, :user_id => @user.id )
-      notification_policy_model(:communication_channel_id => b.id, :notification_id => @notification.id, :user_id => @user.id )
-      notification_policy_model(:communication_channel_id => c.id, :notification_id => @notification.id, :user_id => @user.id )
+      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id )
+      notification_policy_model(:communication_channel_id => b.id, :notification_id => @notification.id )
+      notification_policy_model(:communication_channel_id => c.id, :notification_id => @notification.id )
       @user.reload
       channels = CommunicationChannel.find_all_for(@user, @notification)
       channels.should include(a)
@@ -53,8 +53,8 @@ describe CommunicationChannel do
       a = communication_channel_model(:user_id => @user.id, :workflow_state => 'active')
       d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
       notification_model
-      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id, :user_id => @user.id )
-      notification_policy_model(:communication_channel_id => d.id, :notification_id => @notification.id, :user_id => @user.id )
+      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id )
+      notification_policy_model(:communication_channel_id => d.id, :notification_id => @notification.id )
       @user.reload
       channels = CommunicationChannel.find_all_for(@user, @notification)
       channels.should include(a)
@@ -70,7 +70,7 @@ describe CommunicationChannel do
       a.should 
 
       @n = Notification.create(:name => "New Notification")
-      @u.notification_policies.create(:communication_channel => a, :notification => @n)
+      a.notification_policies.create!(:notification => @n)
       channels = CommunicationChannel.find_all_for(@u, @n)
       channels.should eql([@u.communication_channel])
     end
@@ -106,7 +106,7 @@ describe CommunicationChannel do
       channels.should include(a)
       channels.should_not include(b)
       
-      @user.notification_policies.create!(:communication_channel => b, :notification => @n, :frequency => 'immediately')
+      b.notification_policies.create!(:notification => @n, :frequency => 'immediately')
       channels = CommunicationChannel.find_all_for(@user, @n)
       channels.should include(b)
       channels.should_not include(a)
@@ -117,7 +117,7 @@ describe CommunicationChannel do
       a = @user.communication_channels.create(:path => "a@example.com")
       a.confirm!
       @n = Notification.create!(:name => "New notification")
-      @user.notification_policies.create!(:communication_channel => a, :notification => @n, :frequency => 'daily')
+      a.notification_policies.create!(:notification => @n, :frequency => 'daily')
       channels = CommunicationChannel.find_all_for(@user, @n)
       channels.should be_empty
     end

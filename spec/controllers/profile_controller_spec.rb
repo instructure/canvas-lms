@@ -58,7 +58,7 @@ describe ProfileController do
       user_model
       user_session(@user)
       cc = @user.communication_channels.create!(:path => 'user@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
-      @user.notification_policies.create!(:notification => nil, :communication_channel => cc, :frequency => 'daily')
+      cc.notification_policies.create!(:notification => nil, :frequency => 'daily')
 
       get 'communication'
       response.should be_success

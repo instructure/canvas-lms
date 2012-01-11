@@ -1,17 +1,3 @@
-<% list ||= [] 
-  if list.empty?
-    list << NotificationPolicy.new(:frequency => "never", :communication_channel => @user.communication_channel)
-  end
-  found = {}
-  list = list.select do |policy|
-    if !found[[policy.communication_channel_id, policy.frequency]]
-      true
-    else
-      false
-    end
-  end
-  list.compact!
-%>
   <tr>
     <td colspan="7" class="notification_type">
       <%= notification_preference.category_description %>
