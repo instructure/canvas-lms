@@ -75,11 +75,12 @@ describe "gradebook2 selenium tests" do
     e1.save!
     @course.reload
     #add second student
+    @other_section = @course.course_sections.create(:name => "the other section")
     @student_2 = User.create!(:name => STUDENT_NAME_2)
     @student_2.register!
     @student_2.pseudonyms.create!(:unique_id => STUDENT_NAME_2, :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+    e2 = @course.enroll_student(@student_2, :section => @other_section)
 
-    e2 = @course.enroll_student(@student_2)
     e2.workflow_state = 'active'
     e2.save!
     @course.reload
@@ -160,6 +161,29 @@ describe "gradebook2 selenium tests" do
     driver.find_elements(:css, '.student-name').count.should == @course.students.count
   end
 
+  it "should allow showing only a certain section" do
+    button = driver.find_element(:id, 'section_to_show')
+    button.should include_text "All Sections"
+    button.click
+    sleep 1 #TODO find a better way to wait for css3 anmation to end
+    driver.find_element(:id, 'section-to-show-menu').should be_displayed
+    driver.find_element(:css, "label[for='section_option_#{@other_section.id}']").click
+    button.should include_text @other_section.name
+
+    # verify that it remembers the section to show across page loads
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    button = driver.find_element(:id, 'section_to_show')
+    button.should include_text @other_section.name
+
+    # now verify that you can set it back
+    button.click
+    sleep 1 #TODO find a better way to wait for css3 anmation to end
+    driver.find_element(:id, 'section-to-show-menu').should be_displayed
+    driver.find_element(:css, "label[for='section_option_']").click
+    button.should include_text "All Sections"
+  end
+
   it "should validate initial grade totals are correct" do
     grade_grid = driver.find_element(:css, '#gradebook_grid')
     first_row_cells = find_slick_cells(0, grade_grid)
@@ -221,7 +245,7 @@ describe "gradebook2 selenium tests" do
     grade_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
 
     #filter validation
-    validate_cell_text(meta_cells[0], STUDENT_NAME_2)
+    validate_cell_text(meta_cells[0], STUDENT_NAME_2 + "\n" + @other_section.name)
     validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
     validate_cell_text(grade_cells[4], EXPECTED_ASSIGN_2_TOTAL)
   end

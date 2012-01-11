@@ -364,7 +364,6 @@ define 'compiled/Gradebook', [
 
     initHeader: =>
       if @sections_enabled
-        $section_being_shown = $('#section_being_shown')
         allSectionsText = I18n.t('all_sections', 'All Sections')
         sections = [{ name: allSectionsText, checked: !@sectionToShow}]
         for id, s of @sections
@@ -375,7 +374,7 @@ define 'compiled/Gradebook', [
 
         $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections, scrolling: sections.length > 15))
         (updateSectionBeingShownText = =>
-          $section_being_shown.text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
+          $('#section_being_shown').text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
         )()
         $('#section_to_show').after($sectionToShowMenu).show().kyleMenu
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
