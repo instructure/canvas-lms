@@ -422,6 +422,10 @@ class Notification < ActiveRecord::Base
       'weekly'
     when 'TestNever'
       'never'
+    when 'Conversation Message'
+      'immediately'
+    when 'Added To Conversation'
+      'immediately'
     else
       'daily'
     end

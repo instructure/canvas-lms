@@ -29,6 +29,18 @@
   <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
   
   <%= yield :auto_discovery %>
+  <% if @active_tab %>
+    <style>
+      #section-tabs .<%= @active_tab %> {
+        position: relative;
+        background-color: white;
+        margin-right: -1px;
+        z-index: 11;
+        padding: 7px 0 7px 23px;
+        font-size: 17px;
+      }
+    </style>
+  <% end %>
   <%= include_stylesheets :common, :media => "all" %>
   <% if @eportfolio_view === true %>
     <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
