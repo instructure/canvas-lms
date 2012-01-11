@@ -1,3 +1,15 @@
+canvas-lms (2012.01.11.09.59) testing; urgency=low
+
+  * Package ref: b712abf98c3639417041696ddecbfe72f6fcee81
+  *
+  * [+090d682] put 'active' tab indication back.
+  * [+b48bcdf] clean up and expand sanitize specs
+  * [+8005fcb] upgrade nokogiri and sanitize gems
+  * [+082b7c7] fix truncate_html for nokogiri 1.5.0
+  * [+b712abf] make conversation message "immediately" by default
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 11 Jan 2012 09:59:16 -0700
+
 canvas-lms (2012.01.10.13.09) testing; urgency=low
 
   * Package ref: 2f0734e67c85324f7c496c039b439d5b589e62d6
