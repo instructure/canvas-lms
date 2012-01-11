@@ -28,7 +28,7 @@ describe "/profile/communication" do
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
     assigns[:notification_categories] = Notification.dashboard_categories
-    assigns[:policies] = @user.notification_policies
+    assigns[:policies] = NotificationPolicy.for(@user)
     assigns[:user] = @user
     render "profile/communication"
     response.should_not be_nil

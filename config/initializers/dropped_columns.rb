@@ -26,6 +26,7 @@ class ActiveRecord::Base
     'enrollment_terms' => %w(sis_data sis_name),
     'enrollments' => %w(invitation_email),
     'groups' => %w(sis_name),
+    'notification_policies' => %w(user_id),
     'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id),
     'role_overrides' => %w(context_code),
     'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name),

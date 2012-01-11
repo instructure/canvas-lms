@@ -42,7 +42,7 @@ describe NotificationPolicy do
     @default_cc.confirm!
     @cc = @student.communication_channels.create(:path => "secondary@example.com")
     @cc.confirm!
-    @policy = NotificationPolicy.create(:user => @student, :notification => @notif, :communication_channel => @cc, :frequency => "immediately")
+    @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
     @assignment.publish!
     @assignment.messages_sent.should be_include("Assignment Graded")
     m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "default@example.com"}
@@ -56,7 +56,7 @@ describe NotificationPolicy do
     @assignment.unpublish!
     @cc = @student.communication_channels.create(:path => "secondary@example.com")
     @cc.confirm!
-    @policy = NotificationPolicy.create(:user => @student, :notification => @notif, :communication_channel => @cc, :frequency => "never")
+    @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
     @assignment.previously_published = false
     @assignment.save
     @assignment.publish!
@@ -68,21 +68,15 @@ describe NotificationPolicy do
   
   context "named scopes" do
     it "should have a named scope for users" do
-      user_model
-      notification_policy_model(:user_id => @user.id)
+      user_with_pseudonym(:active_all => 1)
+      notification_policy_model(:communication_channel_id => @cc.id)
       NotificationPolicy.for(@user).should eql([@notification_policy])
     end
-    
+
     it "should have a named scope for notifications" do
       notification_model
       notification_policy_model(:notification_id => @notification.id)
       NotificationPolicy.for(@notification).should eql([@notification_policy])
-    end
-    
-    it "should have a named scope for communication_channels" do
-      communication_channel_model
-      notification_policy_model(:communication_channel_id => @communication_channel.id)
-      NotificationPolicy.for(@communication_channel).should eql([@notification_policy])
     end
     
     it "should not slow down from other kinds of input on the *for* named scope" do
@@ -111,16 +105,16 @@ describe NotificationPolicy do
       end
       
       it "should be able to combine an array of frequencies with a for scope" do
-        user_model
+        user_with_pseudonym(:active_all => 1)
         n1 = notification_policy_model(
-        :user_id => @user.id,
+          :communication_channel => @cc,
           :frequency => 'daily'
         )
         n2 = notification_policy_model(
-          :user_id => @user.id,
+            :communication_channel => @cc,
           :frequency => 'weekly'
         )
-        n3 = notification_policy_model(:user_id => @user.id)
+        n3 = notification_policy_model(:communication_channel => @cc)
         NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(n1)
         NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(n2)
         NotificationPolicy.for(@user).by([:daily, :weekly]).should_not be_include(n3)
@@ -135,8 +129,7 @@ describe NotificationPolicy do
       NotificationPolicy.delete_all
       
       trifecta_opts = {
-        :user_id => @user.id, 
-        :communication_channel_id => @communication_channel.id, 
+        :communication_channel_id => @communication_channel.id,
         :notification_id => @notification.id
       }
       
