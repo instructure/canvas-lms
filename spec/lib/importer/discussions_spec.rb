@@ -39,7 +39,8 @@ describe "Importing discussion topics" do
 
         topic = DiscussionTopic.find_by_migration_id(data[:migration_id])
         topic.title.should == data[:title]
-        topic.message.index(data[:description]).should_not be_nil
+        parsed_description = Nokogiri::HTML::DocumentFragment.parse(data[:description]).to_s
+        topic.message.index(parsed_description).should_not be_nil
 
         if data[:grading]
           Assignment.count.should == 1

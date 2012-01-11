@@ -18,11 +18,61 @@
 
 module Instructure #:nodoc:
   module SanitizeField #:nodoc:
-    
+
     def self.included(klass)
       klass.extend(ClassMethods)
     end
-    
+
+    # modified from sanitize.rb to support mid-value matching
+    REGEX_STYLE_PROTOCOL = /([A-Za-z0-9\+\-\.\&\;\#\s]*?)(?:\:|&#0*58|&#x0*3a)/i
+    REGEX_STYLE_METHOD = /([A-Za-z0-9\+\-\.\&\;\#\s]*?)(?:\(|&#0*40|&#x0*28)/i
+
+    # used as a sanitize.rb transformer, below
+    def self.sanitize_style(env)
+      node = env[:node]
+      styles = []
+      style = node['style'] || ""
+      # taken from https://github.com/flavorjones/loofah/blob/master/lib/loofah/html5/scrub.rb
+      # the gauntlet
+      style = '' unless style =~ /\A([:,\;#%.\(\)\/\sa-zA-Z0-9!]|\w-\w|\'[\s\w]+\'|\"[\s\w]+\"|\([\d,\s]+\))*\z/
+      style = '' unless style =~ /\A\s*([-\w]+\s*:[^\;]*(\;\s*|$))*\z/
+
+      config = env[:config]
+
+      style.scan(/([-\w]+)\s*:\s*([^;]*)/) do |property, value|
+        property = property.downcase
+        valid = (config[:style_properties] || []).include?(property)
+        valid ||= (config[:style_expressions] || []).any?{|e| property.match(e) }
+        if valid
+          styles << [property, clean_style_value(config, value)]
+        end
+      end
+      node['style'] = styles.select { |k,v| v }.map{|k,v| "#{k}: #{v}"}.join('; ') + ";"
+    end
+
+    def self.clean_style_value(config, value)
+      # checks for any colons anywhere in the string
+      # to make sure they're preceded by a valid protocol
+      protocols = config[:protocols]['style']['any']
+
+      # no idea what these are called in css, but it's
+      # a name followed by open-paren 
+      # (i.e. url(...) or expression(...))
+      methods = config[:style_methods]
+
+      if methods
+        value.to_s.downcase.scan(REGEX_STYLE_METHOD) do |match|
+          return nil if !methods.include?(match[0].downcase)
+        end
+      end
+      if protocols
+        value.to_s.downcase.scan(REGEX_STYLE_PROTOCOL) do |match|
+          return nil if !protocols.include?(match[0].downcase)
+        end
+      end
+      value
+    end
+
     SANITIZE = {
       :elements => [
         'a', 'b', 'blockquote', 'br', 'caption', 'cite', 'code', 'col',
@@ -87,7 +137,8 @@ module Instructure #:nodoc:
         /\Alist-style-(?:image|position|type)\z/,
         /\Amargin-(?:bottom|left|right|top|offset)\z/,
         /\Apadding-(?:bottom|left|right|top)\z/
-      ]
+      ],
+      :transformers => lambda { |env| Instructure::SanitizeField.sanitize_style(env) if env[:node]['style'] }
     }
     
     module ClassMethods
