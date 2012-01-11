@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Sanitize do
   it "should sanitize style attributes width invalid url protocols" do
-    str = "<div style='width: 200px; background: transparent url(httpx://www.google.com) no-repeat left center; height: 10px;'></div>"
+    str = "<div style='width: 200px; background: url(httpx://www.google.com) no-repeat left center; height: 10px;'></div>"
     res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
     res.should_not match(/background/)
     res.should_not match(/google/)
@@ -52,7 +52,7 @@ describe Sanitize do
   end
   
   it "should sanitize style attributes width invalid methods" do
-    str = "<div style='width: 200px; background: transparent xurl(http://www.google.com) no-repeat left center; height: 10px;'></div>"
+    str = "<div style='width: 200px; background: xurl(http://www.google.com) no-repeat left center; height: 10px;'></div>"
     res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
     res.should_not match(/background/)
     res.should_not match(/google/)
@@ -80,7 +80,13 @@ describe Sanitize do
     res.should match(/border-left-color/)
     res.should_not match(/bacon/)
   end
-  
+
+  it "should allow valid css methods with valid css protocols" do
+    str = %{<div style="width: 200px; background: url(http://www.google.com) no-repeat left center; height: 10px;"></div>}
+    res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
+    res.should == str
+  end
+
   Dir.glob(File.join(RAILS_ROOT, 'spec', 'fixtures', 'xss', '*.xss')) do |filename|
     name = File.split(filename).last
     it "should sanitize xss attempts for #{name}" do
