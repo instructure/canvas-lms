@@ -713,6 +713,10 @@ ActionController::Routing::Routes.draw do |map|
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
     end
 
+    api.with_options(:controller => :pseudonyms) do |pseudonyms|
+      pseudonyms.post 'accounts/:account_id/logins', :action => :create
+    end
+
     api.with_options(:controller => :accounts) do |accounts|
       accounts.get 'accounts', :action => :index, :path_name => :accounts
       accounts.get 'accounts/:id', :action => :show
