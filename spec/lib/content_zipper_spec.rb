@@ -24,7 +24,7 @@ describe ContentZipper do
       course_with_student(:active_all => true)
       submission_model
       attachment = Attachment.new(:display_name => 'my_download.zip')
-      attachment.user_id = @user.id
+      attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
@@ -43,7 +43,7 @@ describe ContentZipper do
       course_with_student(:active_all => true)
       submission_model(:body => "hai this is my answer")
       attachment = Attachment.new(:display_name => 'my_download.zip')
-      attachment.user_id = @user.id
+      attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
@@ -55,6 +55,23 @@ describe ContentZipper do
           f.get_input_stream.read.should be_include("hai this is my answer")
         end
       end
+    end
+
+    it "should only include submissions in the correct section " do
+      course_with_student(:active_all => true)
+      submission_model(:body => "hai this is my answer")
+      @section = @course.course_sections.create!
+      @ta = user_with_pseudonym(:active_all => 1)
+      @course.enroll_user(@ta, "TaEnrollment", :limit_privileges_to_course_section => true, :section => @section)
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user = @ta
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      ContentZipper.process_attachment(attachment)
+      attachment.reload
+      # no submissions
+      attachment.workflow_state.should == 'errored'
     end
   end
 

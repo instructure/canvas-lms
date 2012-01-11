@@ -83,12 +83,17 @@ class ContentZipper
     zip_attachment.scribd_attempts += 1
     zip_attachment.save!
     filename = "#{assignment.context.short_name}-#{assignment.title} submissions".gsub(/ /, "_").gsub(/[^\w-]/, "")
+    submissions = assignment.submissions
+    if zip_attachment.user && assignment.context.enrollment_visibility_level_for(zip_attachment.user) != :full
+      visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).find(:all, :select => 'user_id').map(&:user_id)
+      submissions = submissions.scoped(:conditions => { :user_id => visible_student_ids})
+    end
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
       submissions_added = 0
       Zip::ZipFile.open(zip_name, Zip::ZipFile::CREATE) do |zipfile|
-        count = assignment.submissions.count
-        assignment.submissions.each_with_index do |submission, idx|
+        count = submissions.length
+        submissions.each_with_index do |submission, idx|
           submissions_added += 1
           @assignment = assignment
           @submission = submission
