@@ -24,7 +24,7 @@ describe ContentZipper do
       course_with_student(:active_all => true)
       submission_model
       attachment = Attachment.new(:display_name => 'my_download.zip')
-      attachment.user_id = @user.id
+      attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
@@ -43,7 +43,7 @@ describe ContentZipper do
       course_with_student(:active_all => true)
       submission_model(:body => "hai this is my answer")
       attachment = Attachment.new(:display_name => 'my_download.zip')
-      attachment.user_id = @user.id
+      attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
