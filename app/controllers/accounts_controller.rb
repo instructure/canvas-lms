@@ -253,22 +253,6 @@ class AccountsController < ApplicationController
     end
   end
   
-  def statistics_page_views
-    if authorized_action(@account, @current_user, :view_statistics)
-      today = Time.zone.today
-
-      start_at = Date.parse(params[:start_at]) rescue nil
-      start_at ||= 1.month.ago.to_date
-      end_at = Date.parse(params[:end_at]) rescue nil
-      end_at ||= today
-
-      @end_at = [[start_at, end_at].max, today].min
-      @start_at = [[start_at, end_at].min, today].min
-      add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
-      add_crumb(t(:crumb_page_views, "Page Views"))
-    end
-  end
-  
   def avatars
     if authorized_action(@account, @current_user, :manage_admin_users)
       @users = @account.all_users

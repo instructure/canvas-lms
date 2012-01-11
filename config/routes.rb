@@ -400,7 +400,6 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :grading_standards, :only => %w(index create update destroy)
 
     account.statistics 'statistics', :controller => 'accounts', :action => 'statistics'
-    account.statistics_page_views 'statistics/page_views', :controller => 'accounts', :action => 'statistics_page_views'
     account.statistics_graph 'statistics/over_time/:attribute', :controller => 'accounts', :action => 'statistics_graph'
     account.formatted_statistics_graph 'statistics/over_time/:attribute.:format', :controller => 'accounts', :action => 'statistics_graph'
     account.turnitin_confirmation 'turnitin/:id/:shared_secret', :controller => 'accounts', :action => 'turnitin_confirmation'

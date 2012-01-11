@@ -649,9 +649,6 @@ describe "security" do
         get "/accounts/#{Account.default.id}/statistics"
         response.status.should == "401 Unauthorized"
 
-        get "/accounts/#{Account.default.id}/statistics/page_views"
-        response.status.should == "401 Unauthorized"
-
         get "/accounts/#{Account.default.id}/settings"
         response.should be_success
         response.body.should_not match /Statistics/
@@ -659,9 +656,6 @@ describe "security" do
         add_permission :view_statistics
 
         get "/accounts/#{Account.default.id}/statistics"
-        response.should be_success
-
-        get "/accounts/#{Account.default.id}/statistics/page_views"
         response.should be_success
 
         get "/accounts/#{Account.default.id}/settings"
