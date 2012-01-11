@@ -1280,7 +1280,11 @@ I18n.scoped 'conversations', (I18n) ->
         $(this).loadingImage()
       success: (data) ->
         $(this).loadingImage 'remove'
-        if data.length > 1 # e.g. we just sent bulk private messages
+        if data.length == 0
+          # this is the case if a bulk message is sent to recipients the sender
+          # has no conversations with
+          $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
+        else if data.length > 1 # e.g. we just sent bulk private messages
           for conversation in data
             $conversation = $('#conversation_' + conversation.id)
             update_conversation($conversation, conversation, 'immediate') if $conversation.length

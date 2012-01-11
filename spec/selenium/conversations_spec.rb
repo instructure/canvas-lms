@@ -472,19 +472,19 @@ shared_examples_for "conversations selenium tests" do
     end
   end
 
+  def add_recipient(search)
+    input = find_with_jquery("#create_message_form input:visible")
+    input.send_keys(search)
+    keep_trying_until{ driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
+    input.send_keys(:return)
+  end
+
   context "user notes" do
     before do
       @the_teacher = User.create(:name => "teacher bob")
       @course.enroll_teacher(@the_teacher)
       @the_student = User.create(:name => "student bob")
       @course.enroll_student(@the_student)
-    end
-
-    def add_recipient(search)
-      input = find_with_jquery("#create_message_form input:visible")
-      input.send_keys(search)
-      keep_trying_until{ driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
-      input.send_keys(:return)
     end
 
     it "should not allow user notes if not enabled" do
@@ -708,6 +708,33 @@ shared_examples_for "conversations selenium tests" do
       new_conversation
 
       find_all_with_jquery("#conversations .audience a").should be_empty
+    end
+  end
+
+  context "batch messages" do
+    it "shouldn't show anything in conversation list when sending batch messages to new recipients" do
+      @course.default_section.update_attribute(:name, "the section")
+
+      @s1 = User.create(:name => "student1")
+      @s2 = User.create(:name => "student2")
+      @course.enroll_user(@s1)
+      @course.enroll_user(@s2)
+
+      get "/conversations"
+
+      add_recipient("student1")
+      add_recipient("student2")
+      driver.find_element(:id, "body").send_keys "testing testing"
+      driver.find_element(:css, '#create_message_form button[type="submit"]').click
+
+      wait_for_ajaximations
+
+      driver.find_element(:id, "flash_notice_message").text.should =~ /Messages Sent/
+
+      # no conversations should show up in the conversation list
+      conversations = driver.find_elements(:css, "#conversations > ul > li")
+      conversations.size.should == 1
+      conversations.first["id"].should == "conversations_loader"
     end
   end
 end
