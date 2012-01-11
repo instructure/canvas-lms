@@ -574,4 +574,51 @@ describe "assignment selenium tests" do
       driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
     end
   end
+
+  def build_assignment_with_type(text)
+    get "/courses/#{@course.to_param}/assignments"
+
+    driver.find_element(:css, ".header_content .add_assignment_link").click
+    wait_for_animations
+
+    click_option(".assignment_submission_types", text)
+    driver.find_element(:css, "#add_assignment_form").submit
+    wait_for_ajaximations
+  end
+
+  context "discussions assignments" do
+    it "should create a discussion topic when created" do
+      course_with_teacher_logged_in
+      build_assignment_with_type("Discussion")
+
+      driver.find_element(:css, "#left-side .discussions").click
+      wait_for_dom_ready
+      driver.find_elements(:css, "#topic_list .discussion_topic").should_not be_empty
+    end
+
+    it "should redirect to the discussion topic" do
+      course_with_teacher_logged_in
+      build_assignment_with_type("Discussion")
+
+      driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click
+      wait_for_dom_ready
+      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
+    end
+
+    it "should create a discussion topic when edited from a regular assignment" do
+      course_with_teacher_logged_in
+      build_assignment_with_type("Assignment")
+
+      driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click
+      wait_for_dom_ready
+      driver.find_element(:css, ".edit_full_assignment_link").click
+      wait_for_animations
+      click_option(".assignment_type", "Discussion")
+      driver.find_element(:css, "#edit_assignment_form").submit
+      wait_for_ajaximations
+      driver.find_element(:css, ".assignment_topic_link").click
+      wait_for_dom_ready
+      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
+    end
+  end
 end
