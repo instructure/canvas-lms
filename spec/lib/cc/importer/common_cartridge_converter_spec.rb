@@ -39,11 +39,11 @@ describe "Standard Common Cartridge importing" do
     file2_id = @course.attachments.find_by_migration_id("I_00006_Media").id
     
     dt =  @course.discussion_topics.find_by_migration_id("I_00006_R")
-    dt.message.should == %{<p>Your face is ugly. <br /><img src="/courses/#{@course.id}/files/#{file1_id}/preview" /></p>}
+    dt.message.should == %{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>}
     dt.attachment_id = file2_id
     
     dt =  @course.discussion_topics.find_by_migration_id("I_00009_R")
-    dt.message.should == %{<p>Monkeys: Go!</p>\n<ul><li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>} 
+    dt.message.should == %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>} 
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
