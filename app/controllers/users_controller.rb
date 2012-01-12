@@ -592,9 +592,17 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API
+  # Modify an existing user. To modify a user's login, see the documentation for logins.
+  # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
+  # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
+  # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
+  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed [here](http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone).
   def update
-    @user = params[:id] ? User.find(params[:id]) : @current_user
-    rename = params[:rename]
+    @user = api_request? ?
+      api_find(User, params[:id]) :
+      params[:id] ? User.find(params[:id]) : @current_user
+    rename = params[:rename] || api_request?
     if (!rename ? authorized_action(@user, @current_user, :manage) : authorized_action(@user, @current_user, :rename))
       if rename
         params[:default_pseudonym_id] = nil
@@ -610,7 +618,7 @@ class UsersController < ApplicationController
         if @user.update_attributes(params[:user])
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
-          format.json { render :json => @user.to_json(:methods => :default_pseudonym_id) }
+          format.json { render :json => user_json(@user, @current_user, session, [], @current_user.pseudonym.account) }
         else
           format.html { render :action => "edit" }
         end

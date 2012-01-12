@@ -427,4 +427,50 @@ describe "Users API", :type => :integration do
       errors['unique_id'].length.should be > 0
     end
   end
+
+  describe "user account updates" do
+    before do
+      @admin = account_admin_user
+      course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'student@example.com'))
+      @student = @user
+      @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
+      @user = @admin
+      @path = "/api/v1/users/#{@student.id}"
+      @path_options = { :controller => 'users', :action => 'update', :format => 'json', :id => @student.id.to_param }
+      user_with_pseudonym(:user => @user, :username => 'admin@example.com')
+    end
+    context "an admin user" do
+      it "should be able to update a user" do
+        json = api_call(:put, @path, @path_options, {
+          :user => {
+            :name => 'Tobias Funke',
+            :short_name => 'Tobias',
+            :sortable_name => 'Funke, Tobias',
+            :time_zone => 'America/Juneau'
+          }
+        })
+        user = User.find(json['id'])
+        json.should == {
+          'name' => 'Tobias Funke',
+          'sortable_name' => 'Funke, Tobias',
+          'sis_user_id' => 'sis-user-id',
+          'id' => user.id,
+          'short_name' => 'Tobias',
+          'login_id' => 'student@example.com',
+          'sis_login_id' => 'student@example.com'
+        }
+        user.time_zone.should eql 'America/Juneau'
+      end
+    end
+
+    context "an unauthorized user" do
+      it "should receive a 401" do
+        user
+        raw_api_call(:put, @path, @path_options, {
+          :user => { :name => 'Gob Bluth' }
+        })
+        response.code.should eql '401'
+      end
+    end
+  end
 end

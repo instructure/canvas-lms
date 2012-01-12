@@ -711,6 +711,8 @@ ActionController::Routing::Routes.draw do |map|
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
+
+      users.put 'users/:id', :action => :update
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
