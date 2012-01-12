@@ -2724,6 +2724,25 @@ describe Course, "section_visibility" do
   end
 end
 
+describe Course, ".import_from_migration" do
+  before do
+    attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+    course_with_teacher
+  end
+
+  it "should wait for media objects on canvas cartridge import" do
+    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Canvas::Converter' }.with_indifferent_access)
+    MediaObject.expects(:add_media_files).with([@attachment], true)
+    @course.import_media_objects([@attachment], migration)
+  end
+
+  it "should not wait for media objects on other import" do
+    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Standard::Converter' }.with_indifferent_access)
+    MediaObject.expects(:add_media_files).with([@attachment], false)
+    @course.import_media_objects([@attachment], migration)
+  end
+end
+
 describe Course, "enrollments" do
   it "should update enrollments' root_account_id when necessary" do
     a1 = Account.create!
