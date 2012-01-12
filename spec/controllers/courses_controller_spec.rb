@@ -326,6 +326,41 @@ describe CoursesController do
         session[:enrollment_uuid].should == @enrollment2.uuid
       end
     end
+
+    it "should redirect html to settings page when user can :read_as_admin, but not :read" do
+      course(:active_all => true)
+      @designer = user(:active_all => true)
+      @enrollment = @course.enroll_user(@designer, 'DesignerEnrollment')
+      @enrollment.course = @course
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+      @course.reload
+      user_session(@designer)
+
+      @course.workflow_state = 'claimed'
+      @course.save!
+
+      get 'show', :id => @course.id
+      response.status.should == '302 Found'
+      response.location.should match(%r{/courses/#{@course.id}/settings})
+    end
+
+    it "should not redirect xhr to settings page when user can :read_as_admin, but not :read" do
+      course(:active_all => true)
+      @designer = user(:active_all => true)
+      @enrollment = @course.enroll_user(@designer, 'DesignerEnrollment')
+      @enrollment.course = @course
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+      @course.reload
+      user_session(@designer)
+
+      @course.workflow_state = 'claimed'
+      @course.save!
+
+      xhr :get, 'show', :id => @course.id
+      response.status.should == '200 OK'
+    end
   end
   
   describe "POST 'unenroll'" do

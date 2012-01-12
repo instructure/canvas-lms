@@ -619,6 +619,18 @@ class CoursesController < ApplicationController
     check_pending_teacher
     check_unknown_user
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
+
+    if request.xhr?
+      if authorized_action(@context, @current_user, [:read, :read_as_admin])
+        if is_authorized_action?(@context, @current_user, [:manage_students, :manage_admin_users])
+          render :json => @context.to_json(:include => {:current_enrollments => {:methods => :email}})
+        else
+          render :json => @context.to_json
+        end
+      end
+      return
+    end
+
     if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
       return redirect_to course_settings_path(@context.id)
     end
@@ -666,15 +678,6 @@ class CoursesController < ApplicationController
       
       if @current_user and (@show_recent_feedback = (@current_user.student_enrollments.active.count > 0))
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
-      end
-
-      respond_to do |format|
-        format.html
-        if @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users)
-          format.json { render :json => @context.to_json(:include => {:current_enrollments => {:methods => :email}}) }
-        else
-          format.json { render :json => @context.to_json }
-        end
       end
     end
   end
