@@ -42,17 +42,14 @@ describe "gradebook2 selenium tests" do
     element_to_click.click if element_to_click != nil
   end
 
-  def open_comment_dialog(jquery_selector = "first")
-    keep_trying_until do
-      driver.execute_script("$('.l0.r0.slick-cell').addClass('hover')") #move_to occasionally breaks in the hudson build
-      comment = find_with_jquery('.gradebook-cell-comment:visible')
-      comment.should be_displayed
-      comment.click
-      wait_for_ajax_requests
-      keep_trying_until(10) { find_with_jquery("#add_a_comment").should be_displayed }
-    end
-    details_dialog = find_with_jquery('.ui-dialog:visible')
-    details_dialog
+  def open_comment_dialog
+    #move_to occasionally breaks in the hudson build
+    cell = driver.execute_script "return $('#gradebook_grid .slick-row:first .slick-cell:first').addClass('hover')[0]"
+    cell.find_element(:css, '.gradebook-cell-comment').click
+    # the dialog fetches the comments async after it displays and then innerHTMLs the whole
+    # thing again once it has fetched them from the server, completely replacing it
+    wait_for_ajax_requests
+    find_with_jquery '.submission_details_dialog:visible'
   end
 
   def open_assignment_options(cell_index)
@@ -315,17 +312,17 @@ describe "gradebook2 selenium tests" do
   it "should validate posting a comment to a graded assignment" do
     comment_text = "This is a new comment!"
 
-    open_comment_dialog
-    comment_box = find_with_jquery("#add_a_comment")
-    comment_box.clear
-    comment_box.send_keys(comment_text)
+    dialog = open_comment_dialog
+    set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     driver.find_element(:css, "form.submission_details_add_comment_form.clearfix > button.button").click
     wait_for_ajaximations
-    #have to refresh the page in order to get open_comment_dialog to work again
+
+    #make sure it is still there if you reload the page
     refresh_page
     wait_for_ajaximations
-    dialog = open_comment_dialog
-    keep_trying_until { dialog.find_element(:css, '.comment').should include_text(comment_text) }
+
+    comment = open_comment_dialog.find_element(:css, '.comment')
+    comment.should include_text(comment_text)
   end
 
   it "should validate assignment details" do
