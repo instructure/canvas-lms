@@ -213,7 +213,7 @@ class CommunicationChannel < ActiveRecord::Base
     # The trick here is that if the user has ANY policies defined for this notification
     # then we shouldn't overwrite it with the default channel -- but we only want to
     # return the list of channels for immediate dispatch
-    communication_channels = [user.communication_channels.first] if all_channels.empty? && notification.default_frequency == 'immediately'
+    communication_channels = [user.email_channel] if all_channels.empty? && notification.default_frequency == 'immediately'
     communication_channels.compact!
 
     # Remove ALL channels if one is 'never'?  No, I think we should just remove any paths that are set to 'never'
