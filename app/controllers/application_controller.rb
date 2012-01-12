@@ -130,7 +130,7 @@ class ApplicationController < ActionController::Base
 
   # retrieves the root account for the given domain
   def load_account
-    @domain_root_account = request.env['canvas.domain_root_account'] || Account.default
+    @domain_root_account = request.env['canvas.domain_root_account'] || LoadAccount.default_domain_root_account
     @files_domain = request.host_with_port != HostUrl.context_host(@domain_root_account) && HostUrl.is_file_host?(request.host_with_port)
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
@@ -296,9 +296,18 @@ class ApplicationController < ActionController::Base
         @context_enrollment = @context.enrollments.find_all_by_user_id(@current_user.id).sort_by{|e| [e.state_sortable, e.rank_sortable] }.first if @context && @current_user
         @context_membership = @context_enrollment
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
-        @context = api_request? ?
-          api_find(Account, params[:account_id]) : Account.find(params[:account_id])
-        params[:context_id] = params[:account_id]
+        case params[:account_id]
+        when 'self'
+          @context = @domain_root_account
+        when 'default'
+          @context = Account.default
+        when 'site_admin'
+          @context = Account.site_admin
+        else
+          @context = api_request? ?
+            api_find(Account, params[:account_id]) : Account.find(params[:account_id])
+        end
+        params[:context_id] = @context.id
         params[:context_type] = "Account"
         @context_enrollment = @context.account_users.find_by_user_id(@current_user.id) if @context && @current_user
         @context_membership = @context_enrollment
