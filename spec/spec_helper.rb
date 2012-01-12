@@ -33,6 +33,7 @@ ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
         next unless model < ActiveRecord::Base
         model
       }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
+ALL_MODELS << Version
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
