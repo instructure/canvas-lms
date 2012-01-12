@@ -103,8 +103,11 @@ class Attachment < ActiveRecord::Base
   # it to scribd from that point does not make the user wait since that 
   # does happen asynchronously and the data goes directly from s3 to scribd.
   def after_attachment_saved
-    if self.pending_upload? and not self.scribdable?
-      self.process # we aren't scribdable, so just mark as processed
+    if !self.scribdable?
+      # We aren't scribdable, so just mark as processed. (pending_upload and processing are the
+      # only states that define transitions to process, so for other states this is correctly
+      # a no-op.)
+      self.process
     elsif ScribdAPI.enabled? && !Attachment.skip_scribd_submits?
       send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 })
     end
