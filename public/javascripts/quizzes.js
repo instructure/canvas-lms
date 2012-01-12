@@ -2133,8 +2133,10 @@ I18n.scoped('quizzes', function(I18n) {
             var id = $obj.find(".assessment_question_id").text();
             list.push(id);
           } else if($obj.hasClass('question_holder')) {
-            var id = 'question_' + ($obj.find(".question").attr('id').substring(9) || $obj.find(".question .id").text());
-            list.push(id);
+            var $question = $obj.find('.question');
+            var attrID = $question.attr('id');
+            var id = attrID ? attrID.substring(9) : $question.find(".id").text();
+            list.push('question_' + id);
           } else {
             var id = 'group_' + $obj.attr('id').substring(10);
             list.push(id);
