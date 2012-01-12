@@ -62,8 +62,12 @@ describe CommunicationChannel do
       channels.should eql([@u.communication_channel])
     end
     
-    it "should find a default channel if no policies are specified" do
+    it "should find a default email (and active) channel if no policies are specified" do
       @u = user_model(:workflow_state => 'registered')
+      x = @u.communication_channels.create(:path => "notme@example.com")
+      x.retire!
+      sms = @u.communication_channels.create(:path => "123456@example.com", :path_type => "sms")
+      sms.confirm!
       a = @u.communication_channels.create(:path => "a@example.com")
       a.confirm!
       b = @u.communication_channels.create(:path => "b@example.com")
@@ -71,6 +75,7 @@ describe CommunicationChannel do
       @n = Notification.create(:name => "New Notification", :category => 'TestImmediately')
       @u.reload
       channels = CommunicationChannel.find_all_for(@u, @n)
+      channels.should_not include(x)
       channels.should include(a)
       channels.should_not include(b)
       channels.should_not include(c)
