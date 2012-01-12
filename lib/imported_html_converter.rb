@@ -69,8 +69,15 @@ class ImportedHtmlConverter
             else
               node[attr] = replace_relative_file_url(rel_path, context, course_path)
             end
-          elsif relative_url?(node[attr])
-            node[attr] = replace_relative_file_url(node[attr], context, course_path)
+          else
+            begin
+              if relative_url?(node[attr])
+                node[attr] = replace_relative_file_url(node[attr], context, course_path)
+              end
+            rescue URI::InvalidURIError
+              Rails.logger.warn "attempting to translate invalid url: #{node[attr]}"
+              # leave the url as it was
+            end
           end
         end
       end
@@ -122,7 +129,7 @@ class ImportedHtmlConverter
     end
     unless new_url
       # the rel_path should already be escaped
-      new_url = URI::escape("#{course_path}/file_contents/#{Folder.root_folders(context).first.name}/") + rel_path
+      new_url = File.join(URI::escape("#{course_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path)
     end
     new_url
   end
@@ -146,7 +153,7 @@ class ImportedHtmlConverter
   end
   
   def self.relative_url?(url)
-    (url.match(/[\/#\?]/) || (url.match(/\./) && !url.match(/@/))) && !url.match(/\A\w+:/) && !url.match(/\A\//)
+    URI.parse(url).relative?
   end
   
   def self.convert_text(text, context, import_source=:webct)
