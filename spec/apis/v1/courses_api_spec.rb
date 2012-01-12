@@ -64,6 +64,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course1.id,
         'name' => @course1.name,
+        'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
@@ -72,6 +73,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course2.id,
         'name' => @course2.name,
+        'account_id' => @course2.account_id,
         'course_code' => @course2.course_code,
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
@@ -125,6 +127,7 @@ describe CoursesController, :type => :integration do
             new_course.send(attr).should == Time.parse(post_params['course'][attr.to_s]) :
             new_course.send(attr).should == post_params['course'][attr.to_s]
         end
+        new_course.account_id.should eql @account.id
         new_course.workflow_state.should eql 'available'
         course_response.merge!(
           'id' => new_course.id,
@@ -156,7 +159,6 @@ describe CoursesController, :type => :integration do
             }
           }
         )
-
         response.status.should eql '401 Unauthorized'
       end
     end
@@ -179,6 +181,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course1.id,
         'name' => @course1.name,
+        'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
@@ -187,6 +190,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course2.id,
         'name' => @course2.name,
+        'account_id' => @course2.account_id,
         'course_code' => @course2.course_code,
         'enrollments' => [{'type' => 'student',
                            'computed_current_score' => expected_current_score,
@@ -211,6 +215,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course1.id,
         'name' => @course1.name,
+        'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
@@ -219,6 +224,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course2.id,
         'name' => @course2.name,
+        'account_id' => @course2.account_id,
         'course_code' => @course2.course_code,
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
@@ -234,6 +240,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course1.id,
         'name' => @course1.name,
+        'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
@@ -390,6 +397,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course1.id,
         'name' => @course1.name,
+        'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'needs_grading_count' => 1,
@@ -408,6 +416,7 @@ describe CoursesController, :type => :integration do
       {
         'id' => @course1.id,
         'name' => @course1.name,
+        'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'syllabus_body' => @course1.syllabus_body,
