@@ -19,11 +19,24 @@
 # @API Logins
 # API for creating and viewing user logins under an account
 class PseudonymsController < ApplicationController
-  before_filter :get_context, :only => [:create]
+  before_filter :get_context, :only => [:index, :create]
   before_filter :require_user, :only => [:create, :show, :edit, :update]
   protect_from_forgery :except => [:registration_confirmation, :change_password, :forgot_password]
 
   include Api::V1::Pseudonym
+
+  # @API
+  # Given a user ID, return that user's logins for the given account.
+  #
+  # @argument user[id] The ID of the user to search on.
+  def index
+    @user = api_find(User, params[:user][:id])
+    return unless context_is_root_account?(@context) && authorized_action(@user, @current_user, :read)
+    @pseudonyms = Api.paginate(
+      @user.pseudonyms.scoped(:conditions => { :account_id => @context.id }),
+      self, api_v1_pseudonyms_path)
+    render :json => @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
+  end
 
   def forgot_password
     email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
@@ -234,7 +247,7 @@ class PseudonymsController < ApplicationController
     if context.root_account?
       true
     else
-      render(:json => { 'message' => 'Must create login on a root account.' }.to_json, :status => :bad_request)
+      render(:json => { 'message' => 'Action must be called on a root account.' }.to_json, :status => :bad_request)
       false
     end
   end

@@ -953,7 +953,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_students) })
       )
     end
-    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics
+    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :read
 
     given do |user|
       user && (
@@ -961,7 +961,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) })
       )
     end
-    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics
+    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :read
 
     given do |user|
       user && ((

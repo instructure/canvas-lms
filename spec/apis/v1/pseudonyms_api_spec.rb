@@ -19,11 +19,71 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe PseudonymsController, :type => :integration do
+  before do
+    course_with_student(:active_all => true)
+    account_admin_user
+    @account = @user.account
+  end
+  describe "pseudonym listing" do
+    before do
+      @path = "/api/v1/accounts/#{@account.id}/logins"
+      @path_options = { :controller => 'pseudonyms', :action => 'index', :format => 'json', :account_id => @account.id.to_param }
+    end
+    context "An authorized user with a valid query" do
+      it "should return a list of pseudonyms" do
+        json = api_call(:get, @path, @path_options, {
+          :user => { :id => @student.id }
+        })
+        json.should == @student.pseudonyms.map do |p|
+          {
+            'account_id' => p.account_id,
+            'id' => p.id,
+            'sis_user_id' => p.sis_user_id,
+            'unique_id' => p.unique_id,
+            'user_id' => p.user_id
+          }
+        end
+      end
+      it "should return multiple pseudonyms if they exist" do
+        %w{ one@example.com two@example.com }.each { |id| @student.pseudonyms.create(:unique_id => id) }
+        json = api_call(:get, @path, @path_options, {
+          :user => { :id => @student.id }
+        })
+        json.count.should eql 2
+      end
+      it "should paginate results" do
+        %w{ one@example.com two@example.com }.each { |id| @student.pseudonyms.create(:unique_id => id) }
+        json = api_call(:get, "#{@path}?per_page=1", @path_options.merge({ :per_page => '1' }), {
+          :user => { :id => @student.id }
+        })
+        json.count.should eql 1
+        headers = response.headers['Link'].split(',')
+        headers[0].should match /page=2&per_page=1/ # next page
+        headers[1].should match /page=1&per_page=1/ # first page
+        headers[2].should match /page=2&per_page=1/ # last page
+      end
+    end
+    context "An authorized user with an empty query" do
+      it "should return an empty array" do
+        json = api_call(:get, @path, @path_options, {
+          :user => { :id => @student.id }
+        })
+        json.should be_empty
+      end
+    end
+    context "An unauthorized user" do
+      it "should return 401 unauthorized" do
+        @user = user_with_pseudonym
+        raw_api_call(:get, @path, @path_options, {
+          :user => { :id => @student.id }
+        })
+        response.code.should eql '401'
+      end
+    end
+  end
+
   describe "pseudonym creation" do
     before do
-      course_with_student(:active_all => true)
-      account_admin_user
-      @account = @user.account
       @path = "/api/v1/accounts/#{@account.id}/logins"
       @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :account_id => @account.id.to_param }
     end
