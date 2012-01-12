@@ -1,3 +1,13 @@
+canvas-lms (2012.01.12.13.29) testing; urgency=low
+
+  * Package ref: 8e771e4c330481f854b716ab7de4c9f7193dd195
+  *
+  * [+fe43f71] drag and drop issues on quizzes fixes #6419
+  * [+bbffd75] try harder not to create scribd jobs for non-scribdable files
+  * [+8e771e4] use the first active email channel when using default notification policy
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 12 Jan 2012 13:29:37 -0700
+
 canvas-lms (2012.01.11.09.59) testing; urgency=low
 
   * Package ref: b712abf98c3639417041696ddecbfe72f6fcee81
