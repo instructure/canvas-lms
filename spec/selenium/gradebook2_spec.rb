@@ -9,7 +9,7 @@ describe "gradebook2 selenium tests" do
   ATTENDANCE_POINTS = "15"
 
   EXPECTED_ASSIGN_1_TOTAL = "100%"
-  EXPECTED_ASSIGN_2_TOTAL = "67%"
+  EXPECTED_ASSIGN_2_TOTAL = "66.7%"
 
   STUDENT_NAME_1 = "nobody1@example.com"
   STUDENT_NAME_2 = "nobody2@example.com"
@@ -173,7 +173,6 @@ describe "gradebook2 selenium tests" do
   end
 
   it "should change grades and validate course total is correct" do
-    pending("Bug in gradebook2 with grade rounding, gradebook1 shows 33.3% gradebook2 shows 33%")
     expected_edited_total = "33.3%"
     grade_grid = driver.find_element(:css, '#gradebook_grid')
     first_row_cells = find_slick_cells(0, grade_grid)
@@ -197,10 +196,16 @@ describe "gradebook2 selenium tests" do
     second_row_total = validate_cell_text(second_row_cells[4], expected_edited_total)
 
     #go back to grade book one get those total values and compare to make sure they match
-    expect_new_page_load { driver.find_element(:css, '#change_gradebook_version_link_holder > a').click }
-    wait_for_ajax_requests
-    first_row_total.should == find_with_jquery(".assignment_final-grade > span:nth-child(1)").text
-    second_row_total.should == find_with_jquery(".assignment_final-grade > span:nth-child(2)").text
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
+    # this keep_trying_untill is there because gradebook1 loads it's cells in a bunch of setTimeouts
+    keep_trying_until(5) {
+      # gradebook1 has a space between number and % like: "33.3 %"
+      gradebook1_first_row_total = driver.find_element(:css, ".final_grade .student_#{@student_1.id}").text.sub ' ', ''
+      first_row_total.should eql gradebook1_first_row_total
+    }
+    gradebook1_second_row_total = driver.find_element(:css, ".final_grade .student_#{@student_2.id}").text.sub ' ', ''
+    second_row_total.should eql gradebook1_second_row_total
   end
 
   it "should validate that gradebook settings is displayed when button is clicked" do

@@ -202,7 +202,8 @@ define 'compiled/Gradebook', [
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
       gradeToShow = val
-      percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 100)
+      # rounds percentage to one decimal place
+      percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 1000) / 10
       percentage = 0 if isNaN(percentage)
       if !gradeToShow.possible then percentage = '-' else percentage += "%"
       """
