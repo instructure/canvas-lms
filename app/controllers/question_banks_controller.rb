@@ -70,18 +70,19 @@ class QuestionBanksController < ApplicationController
       params[:questions].each do |key, value|
         ids << key.to_i if value != '0' && key.to_i != 0
       end
-      @questions = @bank.assessment_questions.find_all_by_id(ids)
-      @new_questions = []
-      @questions.each do |question|
-        new_question = question
-        if params[:move] != '1'
-          new_question = question.clone_for(@new_bank)
-        end
-        new_question.assessment_question_bank = @new_bank
-        new_question.save
-        @new_questions << new_question
+      @questions = @bank.assessment_questions.scoped(:conditions => { :id => ids})
+      if params[:move] != '1'
+        attributes = @questions.columns.map(&:name) - %w{id created_at updated_at assessment_question_bank_id}
+        connection = @questions.connection
+        attributes = attributes.map { |attr| connection.quote_column_name(attr) }
+        now = connection.quote(Time.now.utc)
+        connection.execute(
+            "INSERT INTO assessment_questions (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
+            @questions.construct_finder_sql(:select => ([@new_bank.id, now, now] + attributes).join(', ')))
+      else
+        @questions.update_all(:assessment_question_bank_id => @new_bank.id)
       end
-      render :json => @new_questions.to_json
+      render :json => {}
     end
   end
   
