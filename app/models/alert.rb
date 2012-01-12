@@ -124,7 +124,7 @@ class Alert < ActiveRecord::Base
       student_ids_to_section_ids[enrollment.user_id] << enrollment.course_section_id
     end
 
-    teacher_enrollments = course.admin_enrollments.active
+    teacher_enrollments = course.instructor_enrollments.active
     teacher_ids = teacher_enrollments.map(&:user_id)
     return if teacher_ids.empty?
     section_ids_to_teachers_list = {}

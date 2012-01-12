@@ -36,12 +36,12 @@ class User < ActiveRecord::Base
   has_one :communication_channel, :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
-  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment'or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment')))", :order => 'enrollments.created_at'
+  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
+  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')))", :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
+           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
                            OR
-                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment'or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment'))) )"
+                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment'))) )"
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments
@@ -1173,6 +1173,7 @@ class User < ActiveRecord::Base
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
 
+  # Returns the LTI membership based on the LTI specs here: http://www.imsglobal.org/LTI/v1p1pd/ltiIMGv1p1pd.html#_Toc309649701
   def lti_role_types(context=nil)
     memberships = []
     if context.is_a?(Course)
@@ -1190,6 +1191,8 @@ class User < ActiveRecord::Base
         'Instructor'
       when TaEnrollment
         'Instructor'
+      when DesignerEnrollment
+        'ContentDeveloper'
       when ObserverEnrollment
         'urn:lti:instrole:ims/lis/Observer'
       when AccountUser
@@ -1402,7 +1405,7 @@ class User < ActiveRecord::Base
 
   def generate_reminders!
     enrollments = self.current_enrollments
-    mgmt_course_ids = enrollments.select{|e| e.admin? }.map(&:course_id).uniq
+    mgmt_course_ids = enrollments.select{|e| e.instructor? }.map(&:course_id).uniq
     student_course_ids = enrollments.select{|e| !e.admin? }.map(&:course_id).uniq
     assignments = Assignment.for_courses(mgmt_course_ids + student_course_ids).active.due_after(Time.now)
     student_assignments = assignments.select{|a| student_course_ids.include?(a.context_id) }

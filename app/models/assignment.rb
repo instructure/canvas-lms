@@ -1312,7 +1312,7 @@ class Assignment < ActiveRecord::Base
         r.update_for(self)
       end
     end
-    admins = self.context.admins
+    admins = self.context.instructors
     needed_ids = admins.map{|a| a.id} - grading_user_ids
     admins.select{|a| needed_ids.include?(a.id)}.each do |a|
       r = assignment_reminders.build(:user => a, :reminder_type => 'grading')

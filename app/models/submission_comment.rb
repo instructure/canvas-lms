@@ -89,9 +89,9 @@ class SubmissionComment < ActiveRecord::Base
   on_create_send_to_streams do
     if self.submission
       if self.author_id == self.submission.user_id
-        self.submission.context.admins_in_charge_of(self.author_id)
+        self.submission.context.instructors_in_charge_of(self.author_id)
       else
-        # self.submission.context.admins.map(&:id) + [self.submission.user_id] - [self.author_id]
+        # self.submission.context.instructors.map(&:id) + [self.submission.user_id] - [self.author_id]
         self.submission.user_id
       end
     end
@@ -115,11 +115,11 @@ class SubmissionComment < ActiveRecord::Base
       record.just_created &&
       record.submission.assignment &&
       !record.submission.assignment.muted? &&
-      (!record.submission.assignment.context.admins.include?(author) || record.submission.assignment.published?)
+      (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }
 
     p.dispatch :submission_comment_for_teacher
-    p.to { submission.assignment.context.admins_in_charge_of(author_id) - [author] }
+    p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
     p.whenever {|record|
       record.just_created &&
       record.submission.user_id == record.author_id
@@ -129,7 +129,7 @@ class SubmissionComment < ActiveRecord::Base
   def update_participants
     self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.submission.user_id, 'submitter')
     self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.author_id, 'author')
-    (submission.assignment.context.participating_admins - [author]).each do |user|
+    (submission.assignment.context.participating_instructors - [author]).each do |user|
       self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(user.id, 'admin')
     end
   end

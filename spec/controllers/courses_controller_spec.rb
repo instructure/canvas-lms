@@ -328,17 +328,14 @@ describe CoursesController do
     end
 
     it "should redirect html to settings page when user can :read_as_admin, but not :read" do
+      # an account user on the site admin will always have :read_as_admin
+      # permission to any course, but will not have :read permission unless
+      # they've been granted the :read_course_content role override, which
+      # defaults to false for everyone except those with the AccountAdmin role
       course(:active_all => true)
-      @designer = user(:active_all => true)
-      @enrollment = @course.enroll_user(@designer, 'DesignerEnrollment')
-      @enrollment.course = @course
-      @enrollment.workflow_state = 'active'
-      @enrollment.save!
-      @course.reload
-      user_session(@designer)
-
-      @course.workflow_state = 'claimed'
-      @course.save!
+      user(:active_all => true)
+      Account.site_admin.add_user(@user, 'LimitedAccess')
+      user_session(@user)
 
       get 'show', :id => @course.id
       response.status.should == '302 Found'
@@ -347,16 +344,9 @@ describe CoursesController do
 
     it "should not redirect xhr to settings page when user can :read_as_admin, but not :read" do
       course(:active_all => true)
-      @designer = user(:active_all => true)
-      @enrollment = @course.enroll_user(@designer, 'DesignerEnrollment')
-      @enrollment.course = @course
-      @enrollment.workflow_state = 'active'
-      @enrollment.save!
-      @course.reload
-      user_session(@designer)
-
-      @course.workflow_state = 'claimed'
-      @course.save!
+      user(:active_all => true)
+      Account.site_admin.add_user(@user, 'LimitedAccess')
+      user_session(@user)
 
       xhr :get, 'show', :id => @course.id
       response.status.should == '200 OK'

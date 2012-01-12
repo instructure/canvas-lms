@@ -229,7 +229,6 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'TaEnrollment',
-          'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
         ]

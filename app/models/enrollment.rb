@@ -273,8 +273,24 @@ class Enrollment < ActiveRecord::Base
     self.is_a?(ObserverEnrollment) && self.state_based_on_date == :active
   end
 
+  def participating_teacher?
+    self.is_a?(TeacherEnrollment) && self.state_based_on_date == :active
+  end
+
+  def participating_ta?
+    self.is_a?(TaEnrollment) && self.state_based_on_date == :active
+  end
+
+  def participating_instructor?
+    participating_teacher? || participating_ta?
+  end
+
+  def participating_designer?
+    self.is_a?(DesignerEnrollment) && self.state_based_on_date == :active
+  end
+
   def participating_admin?
-    (self.is_a?(TeacherEnrollment) || self.is_a?(TaEnrollment)) && self.state_based_on_date == :active
+    participating_instructor? || participating_designer?
   end
 
   def associated_user_name
@@ -568,8 +584,24 @@ class Enrollment < ActiveRecord::Base
     type.constantize
   end
 
-  def admin?
+  def teacher?
     false
+  end
+
+  def ta?
+    false
+  end
+
+  def instructor?
+    teacher? || ta?
+  end
+
+  def designer?
+    false
+  end
+
+  def admin?
+    instructor? || designer?
   end
 
   def to_atom

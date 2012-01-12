@@ -42,7 +42,7 @@ module Api::V1::Course
       end
     end
     hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
-    if include_grading && enrollments && enrollments.any? { |e| e.participating_admin? }
+    if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
       hash['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
     end
     if include_syllabus

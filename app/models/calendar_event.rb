@@ -210,7 +210,7 @@ class CalendarEvent < ActiveRecord::Base
     }
 
     dispatch :appointment_reserved_by_user
-    to { appointment_group.admins }
+    to { appointment_group.instructors }
     whenever {
       appointment_group && parent_event &&
       just_created &&
@@ -218,7 +218,7 @@ class CalendarEvent < ActiveRecord::Base
     }
 
     dispatch :appointment_canceled_by_user
-    to { appointment_group.admins }
+    to { appointment_group.instructors }
     whenever {
       appointment_group && parent_event &&
       deleted? &&

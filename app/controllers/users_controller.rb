@@ -62,7 +62,7 @@ class UsersController < ApplicationController
       end
       Enrollment.send(:preload_associations, @observed_enrollments, :course)
 
-      @teacher_enrollments = @current_enrollments.select{|e| e.admin? }
+      @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
       #Enrollment.send(:preload_associations, @prior_enrollments, :course)
       @course_grade_summaries = {}
       @teacher_enrollments.each do |enrollment|

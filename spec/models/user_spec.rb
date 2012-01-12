@@ -791,13 +791,16 @@ describe User do
       course_model
       @course.offer
       teacher = user_model
+      designer = user_model
       student = user_model
       nobody = user_model
       admin = user_model
       @course.root_account.add_user(admin)
       @course.enroll_teacher(teacher).accept
+      @course.enroll_designer(designer).accept
       @course.enroll_student(student).accept
       teacher.lti_role_types(@course).should == ['Instructor']
+      designer.lti_role_types(@course).should == ['ContentDeveloper']
       student.lti_role_types(@course).should == ['Learner']
       nobody.lti_role_types(@course).should == ['urn:lti:sysrole:ims/lis/None']
       admin.lti_role_types(@course).should == ['urn:lti:instrole:ims/lis/Administrator']
@@ -1248,7 +1251,7 @@ describe User do
 
       it "should include manageable appointments" do
         course(:active_all => true)
-        @user = @course.admins.first
+        @user = @course.instructors.first
         ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
         events = @user.calendar_events_for_calendar
         events.size.should eql 1
@@ -1259,7 +1262,7 @@ describe User do
     describe "upcoming_events" do
       it "should include manageable appointment groups" do
         course(:active_all => true)
-        @user = @course.admins.first
+        @user = @course.instructors.first
         ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
         events = @user.upcoming_events
         events.size.should eql 1

@@ -326,4 +326,27 @@ describe UsersController do
       end
     end
   end
+
+  context "GET 'grades'" do
+    it "should not include designers in the teacher enrollments" do
+      # teacher needs to be in two courses to get to the point where teacher
+      # enrollments are queried
+      @course1 = course(:active_all => true)
+      @course2 = course(:active_all => true)
+      @teacher = user(:active_all => true)
+      @designer = user(:active_all => true)
+      @course1.enroll_teacher(@teacher).accept!
+      @course2.enroll_teacher(@teacher).accept!
+      @course2.enroll_designer(@designer).accept!
+
+      user_session(@teacher)
+      get 'grades', :course_id => @course.id
+      response.should be_success
+
+      assigns[:teacher_enrollments].should_not be_nil
+      teachers = assigns[:teacher_enrollments].map{ |e| e.user }
+      teachers.should be_include(@teacher)
+      teachers.should_not be_include(@designer)
+    end
+  end
 end

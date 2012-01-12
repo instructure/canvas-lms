@@ -222,7 +222,7 @@ describe CalendarEvent do
       it "should notify admins when a user reserves" do
         reservation = @appointment.reserve_for(@user, @user)
         reservation.messages_sent.should be_include("Appointment Reserved By User")
-        reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
+        reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq.should eql @course.instructors.map(&:id).sort
       end
 
       it "should notify admins when a user cancels" do
@@ -230,7 +230,7 @@ describe CalendarEvent do
         reservation.updating_user = @student1
         reservation.destroy
         reservation.messages_sent.should be_include("Appointment Canceled By User")
-        reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
+        reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq.should eql @course.instructors.map(&:id).sort
       end
     end
 

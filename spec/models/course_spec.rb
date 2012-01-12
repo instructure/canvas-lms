@@ -59,14 +59,18 @@ describe Course do
       account_admin_user_with_role_changes(:membership_type => 'managesis', :role_changes => {:manage_sis => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
+      @designer = user(:active_all => true)
+      @course.enroll_designer(@designer).accept!
 
       @course.grants_right?(@teacher, nil, :delete).should be_true
+      @course.grants_right?(@designer, nil, :delete).should be_true
       @course.grants_right?(@admin1, nil, :delete).should be_true
       @course.grants_right?(@admin2, nil, :delete).should be_false
 
       @course.complete!
 
       @course.grants_right?(@teacher, nil, :delete).should be_true
+      @course.grants_right?(@designer, nil, :delete).should be_true
       @course.grants_right?(@admin1, nil, :delete).should be_true
       @course.grants_right?(@admin2, nil, :delete).should be_false
 
@@ -74,6 +78,7 @@ describe Course do
       @course.save!
 
       @course.grants_right?(@teacher, nil, :delete).should be_false
+      @course.grants_right?(@designer, nil, :delete).should be_false
       @course.grants_right?(@admin1, nil, :delete).should be_true
       @course.grants_right?(@admin2, nil, :delete).should be_true
     end
@@ -86,6 +91,39 @@ describe Course do
       @enrollment.state_based_on_date.should == :completed
       @course.prior_enrollments.should == []
       @course.grants_right?(@teacher, nil, :read_as_admin).should be_true
+    end
+
+    it "should grant read_as_admin, read, manage, and update to date-active designer" do
+      course(:active_all => 1)
+      @designer = user(:active_all => 1)
+      @course.enroll_designer(@designer).accept!
+      @course.grants_right?(@designer, nil, :read_as_admin).should be_true
+      @course.grants_right?(@designer, nil, :read).should be_true
+      @course.grants_right?(@designer, nil, :manage).should be_true
+      @course.grants_right?(@designer, nil, :update).should be_true
+    end
+
+    it "should grant read_as_admin, read_roster, and read_prior_roster to date-completed designer" do
+      course(:active_all => 1)
+      @designer = user(:active_all => 1)
+      @enrollment = @course.enroll_designer(@designer)
+      @enrollment.accept!
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.save!
+      @enrollment.state_based_on_date.should == :completed
+      @course.prior_enrollments.should == []
+      @course.grants_right?(@designer, nil, :read_as_admin).should be_true
+      @course.grants_right?(@designer, nil, :read_roster).should be_true
+      @course.grants_right?(@designer, nil, :read_prior_roster).should be_true
+    end
+
+    it "should not grant read_user_notes or view_all_grades to designer" do
+      course(:active_all => 1)
+      @designer = user(:active_all => 1)
+      @course.enroll_designer(@designer).accept!
+      @course.grants_right?(@designer, nil, :read_user_notes).should be_false
+      @course.grants_right?(@designer, nil, :view_all_grades).should be_false
     end
 
     it "should grant read_grades to date-completed student" do
@@ -255,6 +293,13 @@ describe Course, "enroll" do
     @te = @course.teacher_enrollments.first
     @te.user_id.should eql(@user.id)
     @te.course_id.should eql(@course.id)
+  end
+  
+  it "should be able to enroll a designer" do
+    @course.enroll_designer(@user)
+    @de = @course.designer_enrollments.first
+    @de.user_id.should eql(@user.id)
+    @de.course_id.should eql(@course.id)
   end
   
   it "should enroll a student as creation_pending if the course isn't published" do
@@ -2410,6 +2455,14 @@ describe Course, "manageable_by_user" do
     Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
   end
 
+  it "should include courses the user is actively enrolled in as a designer" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_designer(user).accept
+
+    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+  end
+
   it "should not include courses the user is enrolled in when the enrollment is non-active" do
     course = Course.create
     user = user_with_pseudonym
@@ -2633,5 +2686,28 @@ describe Course, "enrollments" do
     @course.root_account = a2
     @course.save!
     @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
+  end
+end
+
+describe Course, "user_is_teacher?" do
+  it "should be true for teachers" do
+    course = Course.create
+    teacher = user_with_pseudonym
+    course.enroll_teacher(teacher).accept
+    course.user_is_teacher?(teacher).should be_true
+  end
+
+  it "should be false for designers" do
+    course = Course.create
+    ta = user_with_pseudonym
+    course.enroll_ta(ta).accept
+    course.user_is_teacher?(ta).should be_true
+  end
+
+  it "should be false for designers" do
+    course = Course.create
+    designer = user_with_pseudonym
+    course.enroll_designer(designer).accept
+    course.user_is_teacher?(designer).should be_false
   end
 end

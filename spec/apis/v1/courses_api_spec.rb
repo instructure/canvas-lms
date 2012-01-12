@@ -43,6 +43,21 @@ describe Api::V1::Course do
     @test_api.course_json(@course1, @me, {}, [], []).has_key?("html_url").should be_false
   end
 
+  it 'should only include needs_grading_count if requested' do
+    @teacher_enrollment = @course1.teacher_enrollments.first
+    @test_api.course_json(@course1, @me, {}, [], [@teacher_enrollment]).has_key?("needs_grading_count").should be_false
+  end
+
+  it 'should honor needs_grading_count for teachers' do
+    @teacher_enrollment = @course1.teacher_enrollments.first
+    @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@teacher_enrollment]).has_key?("needs_grading_count").should be_true
+  end
+
+  it 'should not honor needs_grading_count for designers' do
+    @designer_enrollment = @course1.enroll_designer(@me)
+    @designer_enrollment.accept!
+    @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@designer_enrollment]).has_key?("needs_grading_count").should be_false
+  end
 end
 
 describe CoursesController, :type => :integration do
