@@ -162,7 +162,10 @@ class UnzipAttachment
     Attachment.skip_scribd_submits(false)
     FileInContext.queue_files_to_delete(false)
     FileInContext.destroy_queued_files
-    Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, @attachments.map(&:id)) unless @attachments.blank?
+    scribdable_attachments = @attachments.select {|a| a.scribdable? }
+    unless scribdable_attachments.blank?
+      Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, scribdable_attachments.map(&:id))
+    end
     Course.update_all({:updated_at => Time.now.utc}, {:id => @course.id})
     update_progress(1.0)
   end
