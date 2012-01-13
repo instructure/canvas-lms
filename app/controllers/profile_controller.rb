@@ -115,6 +115,8 @@ class ProfileController < ApplicationController
       @notification_categories.each do |category|
         policy = @user.notification_policies.build
         policy.notification = category
+        # Currently, we only support "immediately" default policies.
+        policy.frequency = category.default_frequency == "immediately" ? "immediately" : "never"
         policy.communication_channel = @user.communication_channel
       end
     end

@@ -212,7 +212,8 @@ class CommunicationChannel < ActiveRecord::Base
     
     # The trick here is that if the user has ANY policies defined for this notification
     # then we shouldn't overwrite it with the default channel -- but we only want to
-    # return the list of channels for immediate dispatch
+    # return the list of channels for immediate dispatch.
+    # (As a side effect, the non-immediate default notifications are assumed to be "never". TODO: fix that.)
     communication_channels = [user.email_channel] if all_channels.empty? && notification.default_frequency == 'immediately'
     communication_channels.compact!
     
