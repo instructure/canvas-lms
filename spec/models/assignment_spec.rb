@@ -950,18 +950,7 @@ describe Assignment do
       @a.should be_respond_to(:to)
     end
 
-    it "should have policies defined" do
-      assignment_model
-      @a.broadcast_policy_list.should_not be_empty
-    end
-
-
     context "due date changed" do
-      it "should have an 'Assignment Due Date Changed' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Due Date Changed')
-      end
-
       it "should create a message when an assignment due date has changed" do
         Notification.create(:name => 'Assignment Due Date Changed')
         assignment_model(:title => 'Assignment with unstable due date')
@@ -1094,11 +1083,6 @@ describe Assignment do
     end
 
     context "assignment changed" do
-      it "should have an 'Assignment Changed' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Changed')
-      end
-
       it "should create a message when an assigment changes after it's been published" do
         Notification.create(:name => 'Assignment Changed')
         assignment_model
@@ -1141,11 +1125,6 @@ describe Assignment do
     end
 
     context "assignment created" do
-      it "should have an 'Assignment Created' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Created')
-      end
-
       # it "should create a message when an assigment is added to a course in process" do
       #   Notification.create(:name => 'Assignment Created')
       #   @course = Course.create
@@ -1159,11 +1138,6 @@ describe Assignment do
     end
 
     context "assignment graded" do
-      it "should have an 'Assignment Graded' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Graded')
-      end
-
       it "should create a message when an assignment is published" do
         setup_assignment
         Notification.create(:name => 'Assignment Graded')

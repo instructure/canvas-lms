@@ -2670,6 +2670,13 @@ describe Course, "section_visibility" do
       html.should == orig
     end
   end
+
+  it "should be marshal-able" do
+    c = Course.new(:name => 'c1')
+    Marshal.dump(c)
+    c.save!
+    Marshal.dump(c)
+  end
 end
 
 describe Course, "enrollments" do
