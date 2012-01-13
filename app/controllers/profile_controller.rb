@@ -108,15 +108,18 @@ class ProfileController < ApplicationController
     @policies = @user.notification_policies
     @context = UserProfile.new(@user)
     @active_tab = "communication-preferences"
-    if @policies.empty?
-      @notification_categories.each do |category|
-        policy = @user.notification_policies.build
-        policy.notification = category
-        # Currently, we only support "immediately" default policies.
-        policy.frequency = category.default_frequency == "immediately" ? "immediately" : "never"
-        policy.communication_channel = @user.communication_channel
-      end
+
+    # build placeholder notification policies for categories the user does not have policies for already
+    user_categories = @user.notification_policies.map {|np| np.notification.category }
+    @notification_categories.each do |category|
+      # category is actually a Notification
+      next if user_categories.include?(category.category)
+      policy = @user.notification_policies.build
+      policy.notification = category
+      policy.frequency = category.default_frequency
+      policy.communication_channel = @user.communication_channel
     end
+
     has_facebook_installed = !@current_user.user_services.for_service('facebook').empty?
     @policies = @policies.select{|p| (p.communication_channel && p.communication_channel.path_type != 'facebook') || has_facebook_installed }
     @email_channels = @channels.select{|c| c.path_type == "email"}
