@@ -1004,7 +1004,7 @@ describe User do
       @account2 = Account.create!
       @account3 = Account.create!
       Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
-      Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default).returns(true)
+      Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default, false).returns(true)
     end
 
     it "should return an active pseudonym" do
