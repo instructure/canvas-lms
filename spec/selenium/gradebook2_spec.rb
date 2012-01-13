@@ -379,7 +379,7 @@ describe "gradebook2 selenium tests" do
     open_assignment_options(2)
     driver.find_element(:css, '#ui-menu-1-4').click
     curve_form = driver.find_element(:css, '#curve_grade_dialog')
-    curve_form.find_element(:css, '#middle_score').send_keys(curved_grade_text)
+    set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
     curve_form.submit
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
