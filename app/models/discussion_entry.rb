@@ -198,7 +198,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user and self.discussion_subentries.empty? && !self.discussion_topic.locked? }
     can :delete
     
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }#
+    given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }#
     can :read
     
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }# students.find_by_id(user) }

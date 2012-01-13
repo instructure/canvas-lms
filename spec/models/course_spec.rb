@@ -83,14 +83,19 @@ describe Course do
       @course.grants_right?(@admin2, nil, :delete).should be_true
     end
 
-    it "should grant read_as_admin to date-completed teacher" do
-      course_with_teacher(:active_all => 1)
+    def make_date_completed
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
       @enrollment.state_based_on_date.should == :completed
+    end
+
+    it "should grant read_as_admin and read_forum to date-completed teacher" do
+      course_with_teacher(:active_all => 1)
+      make_date_completed
       @course.prior_enrollments.should == []
       @course.grants_right?(@teacher, nil, :read_as_admin).should be_true
+      @course.grants_right?(@teacher, nil, :read_forum).should be_true
     end
 
     it "should grant read_as_admin, read, manage, and update to date-active designer" do
@@ -126,14 +131,12 @@ describe Course do
       @course.grants_right?(@designer, nil, :view_all_grades).should be_false
     end
 
-    it "should grant read_grades to date-completed student" do
+    it "should grant read_grades read_forum to date-completed student" do
       course_with_student(:active_all => 1)
-      @enrollment.start_at = 4.days.ago
-      @enrollment.end_at = 2.days.ago
-      @enrollment.save!
-      @enrollment.state_based_on_date.should == :completed
+      make_date_completed
       @course.prior_enrollments.should == []
       @course.grants_right?(@student, nil, :read_grades).should be_true
+      @course.grants_right?(@student, nil, :read_forum).should be_true
     end
   end
 
@@ -706,6 +709,20 @@ describe Course, "tabs_available" do
     @user.reload
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should be_include(Course::TAB_GRADES)
+  end
+
+  it "should show discussion tab for observers by default" do
+    course_with_observer
+    tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+    tab_ids.should be_include(Course::TAB_DISCUSSIONS)
+  end
+
+  it "should not show discussion tab for observers without read_forum" do
+    course_with_observer
+    RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
+                         :enrollment_type => "ObserverEnrollment", :enabled => false)
+    tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+    tab_ids.should_not be_include(Course::TAB_DISCUSSIONS)
   end
 end
 
