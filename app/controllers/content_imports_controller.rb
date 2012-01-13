@@ -273,6 +273,27 @@ class ContentImportsController < ApplicationController
       @failed = ContentMigration.failed.find_all_by_context_id(@context.id)
     end
   end
+  
+  def download_archive
+    if authorized_action(@context, @current_user, :manage_content)
+      @migration = ContentMigration.for_context(@context).find(params[:id])
+      @attachment = @migration.attachment
+      
+      respond_to do |format|
+        if @attachment
+          if Attachment.s3_storage?
+            format.html { redirect_to @attachment.cacheable_s3_url }
+          else
+            cancel_cache_buster
+            format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'attachment') }
+          end
+        else
+          flash[:notice] = t('notices.no_archive', "There is no archive for this content migration")
+          format.html { redirect_to course_import_list(@context) }
+        end
+      end
+    end
+  end
 
   private
 
