@@ -91,7 +91,12 @@ describe Notification do
       notification_model(:category => 'TestDaily',:name => "Show In Feed")
       @notification.default_frequency.should eql("daily")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
-      u1.communication_channels.create(:path => "user1@example.com").confirm!
+      
+      # make the first channel retired, to verify that it'll get an active one
+      retired_cc = u1.communication_channels.create(:path => "retired@example.com").retire!
+      cc = u1.communication_channels.create(:path => "active@example.com")
+      cc.confirm!
+      
       @a = Assignment.create
       messages = @notification.create_message(@a, u1)
       messages.should_not be_empty
@@ -100,7 +105,7 @@ describe Notification do
       DelayedMessage.all.should_not be_empty
       DelayedMessage.last.should_not be_nil
       DelayedMessage.last.notification_id.should eql(@notification.id)
-      DelayedMessage.last.communication_channel_id.should eql(u1.communication_channel.id)
+      DelayedMessage.last.communication_channel_id.should eql(cc.id)
       DelayedMessage.last.send_at.should > Time.now.utc
     end
     

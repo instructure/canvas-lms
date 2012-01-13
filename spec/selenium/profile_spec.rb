@@ -124,22 +124,32 @@ shared_examples_for "profile selenium tests" do
   context "notification preferences" do
     before (:each) do
       course_with_teacher_logged_in
+
+      @immediate = notification_model(:name => "Immediate", :category => "TestImmediately")
+      @daily     = notification_model(:name => "Daily", :category => "TestDaily")
+      @weekly    = notification_model(:name => "Weekly", :category => "TestWeekly")
+      @never     = notification_model(:name => "Never", :category => "TestNever")
     end
 
     it "should show the correct defaults when there are no policies set" do
-      immediate = notification_model(:name => "Immediate", :category => "TestImmediately")
-      daily     = notification_model(:name => "Daily", :category => "TestDaily")
-      weekly    = notification_model(:name => "Weekly", :category => "TestWeekly")
-      never     = notification_model(:name => "Never", :category => "TestNever")
+      get "/profile/communication"
+
+      driver.find_element(:css, ".preference_#{@immediate.id}").find_elements(:css, ".frequency.immediately.selected").length.should == 1
+      driver.find_element(:css, ".preference_#{@daily.id}").find_elements(:css, ".frequency.daily.selected").length.should == 1
+      driver.find_element(:css, ".preference_#{@weekly.id}").find_elements(:css, ".frequency.weekly.selected").length.should == 1
+      driver.find_element(:css, ".preference_#{@never.id}").find_elements(:css, ".frequency.never.selected").length.should == 1
+    end
+
+    it "should show the correct defaults for the rest of the policies when at least one is set" do
+      @user.notification_policies.create!(:notification => @immediate, :communication_channel => @user.email_channel, :frequency => "immediately")
+      @user.notification_policies.create!(:notification => @daily, :communication_channel => @user.email_channel, :frequency => "immediately")
 
       get "/profile/communication"
 
-      # For now, only immediate notifications will work for people who have not set notification preferences,
-      # so we want to reflect that in the UI.
-      driver.find_element(:css, ".preference_#{immediate.id}").find_elements(:css, ".frequency.immediately.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{daily.id}").find_elements(:css, ".frequency.never.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{weekly.id}").find_elements(:css, ".frequency.never.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{never.id}").find_elements(:css, ".frequency.never.selected").length.should == 1
+      driver.find_element(:css, ".preference_#{@immediate.id}").find_elements(:css, ".frequency.immediately.selected").length.should == 1
+      driver.find_element(:css, ".preference_#{@daily.id}").find_elements(:css, ".frequency.immediately.selected").length.should == 1
+      driver.find_element(:css, ".preference_#{@weekly.id}").find_elements(:css, ".frequency.weekly.selected").length.should == 1
+      driver.find_element(:css, ".preference_#{@never.id}").find_elements(:css, ".frequency.never.selected").length.should == 1
     end
   end
 end

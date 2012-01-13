@@ -98,7 +98,7 @@ class Notification < ActiveRecord::Base
 
     policies = user.notification_policies.select{|p| p.notification_id == self.id && p.communication_channel_id}
     policies << NotificationPolicy.create(:notification => self, :user => user, :communication_channel => cc, :frequency => self.default_frequency) if policies.empty? && cc && cc.active?
-    policies = policies.select{|p| [:daily,:weekly].include?(p.frequency.to_sym) } #NotificationPolicy.for(self).for(user).by([:daily, :weekly])
+    policies = policies.select{|p| [:daily,:weekly].include?(p.frequency.to_sym) }
     
     # If we pass in a fallback_channel, that means this message has been
     # throttled, so it definitely needs to go to at least one communication
@@ -178,7 +178,7 @@ class Notification < ActiveRecord::Base
         user = cc.user
       elsif recipient.is_a?(User)
         user = recipient
-        cc = user.communication_channels.first
+        cc = user.email_channel
       end
       I18n.locale = infer_locale(:user => user)
       
