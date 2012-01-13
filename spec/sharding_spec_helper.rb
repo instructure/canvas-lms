@@ -16,46 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Shard
-  def self.stubbed?
-    true
-  end
+require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-  def self.default
-    @default ||= Shard.new
-  end
-
-  def self.current
-    default
-  end
-
-  def self.partition_by_shard(array)
-    yield array
-  end
-
-  def activate
-    yield
-  end
-
-  def default?
-    true
-  end
-
-  module RSpec
-    def self.included(klass)
-      klass.before do
-        pending "needs a sharding implementation"
-      end
-    end
-  end
-end
-
-ActiveRecord::Base.class_eval do
-  def shard
-    Shard.default
-  end
-
-  def global_id
-    id
-  end
+shared_examples_for "sharding" do
+  include Shard::RSpec
 end
