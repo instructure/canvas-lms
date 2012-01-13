@@ -27,40 +27,40 @@ describe "assignment selenium tests" do
     get "/courses/#{@course.id}/assignments/syllabus"
 
     driver.find_element(:css, ".mini_calendar_day.date_#{due_date.strftime("%m_%d_%Y")}").
-      attribute('class').should match /has_event/
+        attribute('class').should match /has_event/
   end
 
   it "should not allow XSS attacks through rubric descriptions" do
     course_with_teacher_logged_in
 
     student = user_with_pseudonym :active_user => true,
-      :username => "student@example.com",
-      :password => "password"
+                                  :username => "student@example.com",
+                                  :password => "password"
     @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
 
     @assignment = @course.assignments.create(:name => 'assignment with rubric')
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
-      {
-        :points => 3,
-        :description => "XSS Attack!",
-        :long_description => "<b>This text should not be bold</b>",
-        :id => 1,
-        :ratings => [
-          {
+        {
             :points => 3,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 2
-          },
-          {
-            :points => 0,
-            :description => "Lame",
-            :criterion_id => 1,
-            :id => 3
-          }
-        ]
-      }
+            :description => "XSS Attack!",
+            :long_description => "<b>This text should not be bold</b>",
+            :id => 1,
+            :ratings => [
+                {
+                    :points => 3,
+                    :description => "Rockin'",
+                    :criterion_id => 1,
+                    :id => 2
+                },
+                {
+                    :points => 0,
+                    :description => "Lame",
+                    :criterion_id => 1,
+                    :id => 3
+                }
+            ]
+        }
     ]
     @rubric.save!
     @rubric.associate_with(@assignment, @course, :purpose => 'grading')
@@ -69,7 +69,7 @@ describe "assignment selenium tests" do
 
     driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
     driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
-           text.should == "<b>This text should not be bold</b>"
+        text.should == "<b>This text should not be bold</b>"
     close_visible_dialog
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -79,7 +79,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '#criterion_1 .long_description_link').click
     keep_trying_until { driver.find_element(:id, 'rubric_long_description_dialog').should be_displayed }
     driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
-           text.should == "<b>This text should not be bold</b>"
+        text.should == "<b>This text should not be bold</b>"
   end
 
   it "should display assignment on calendar and link to assignment" do
@@ -148,7 +148,7 @@ describe "assignment selenium tests" do
     click_option(never_drop_css, 'Never Drop')
     wait_for_animations
     assignment_css = '.form_rules div:nth-child(3) .never_drop_assignment select'
-    keep_trying_until{ driver.find_element(:css, assignment_css).displayed? }
+    keep_trying_until { driver.find_element(:css, assignment_css).displayed? }
     click_option(assignment_css, assignment.title)
     #delete second grading rule and save
     driver.find_element(:css, '.form_rules div:nth-child(2) a img').click
@@ -172,7 +172,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, 'input.weight').clear
     #need to wait for the total to update
     wait_for_animations
-    keep_trying_until{ find_with_jquery('#group_weight_total').text.should == '50%' }
+    keep_trying_until { find_with_jquery('#group_weight_total').text.should == '50%' }
   end
 
   it "should create an assignment" do
@@ -191,7 +191,7 @@ describe "assignment selenium tests" do
     datepicker.find_element(:css, '.ui-datepicker-ok').click
     driver.find_element(:id, 'assignment_points_possible').send_keys('5')
     driver.
-      find_element(:id, 'add_assignment_form').submit
+        find_element(:id, 'add_assignment_form').submit
 
     #make sure assignment was added to correct assignment group
     wait_for_animations
@@ -208,10 +208,10 @@ describe "assignment selenium tests" do
     enable_cache do
       expected_text = "Assignment 1"
       course_with_teacher_logged_in
-    
+
       get "/courses/#{@course.id}/assignments"
       group = @course.assignment_groups.first
-      AssignmentGroup.update_all({ :updated_at => 1.hour.ago }, { :id => group.id })
+      AssignmentGroup.update_all({:updated_at => 1.hour.ago}, {:id => group.id})
       first_stamp = group.reload.updated_at.to_i
       driver.find_element(:css, '.add_assignment_link').click
       expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
@@ -231,10 +231,10 @@ describe "assignment selenium tests" do
     group = @course.assignment_groups.create!(:name => "default")
     second_group = @course.assignment_groups.create!(:name => "second default")
     assignment = @course.assignments.create!(
-      :name => assignment_name,
-      :due_at => due_date,
-      :assignment_group => group
-      )
+        :name => assignment_name,
+        :due_at => due_date,
+        :assignment_group => group
+    )
 
     get "/courses/#{@course.id}/assignments"
 
@@ -249,7 +249,7 @@ describe "assignment selenium tests" do
 
     #check grading levels dialog
     wait_for_animations
-    keep_trying_until{ driver.find_element(:css, 'a.edit_letter_grades_link').should be_displayed }
+    keep_trying_until { driver.find_element(:css, 'a.edit_letter_grades_link').should be_displayed }
     driver.find_element(:css, 'a.edit_letter_grades_link').click
     wait_for_animations
     driver.find_element(:id, 'ui-dialog-title-edit_letter_grades_form').should be_displayed
@@ -344,17 +344,17 @@ describe "assignment selenium tests" do
     due_date = Time.now.utc + 2.days
     @group = @course.assignment_groups.create!(:name => "default")
     @assignment = @course.assignments.create(
-      :name => assignment_name,
-      :due_at => due_date,
-      :points_possible => points,
-      :assignment_group => @group
+        :name => assignment_name,
+        :due_at => due_date,
+        :points_possible => points,
+        :assignment_group => @group
     )
   end
 
   it "should add a new rubric to assignment" do
     course_with_teacher_logged_in
     create_assignment_with_points(2)
-    
+
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     driver.find_element(:css, '.add_rubric_link').click
@@ -447,11 +447,11 @@ describe "assignment selenium tests" do
     assignment_name = 'first test assignment'
     @group = @course.assignment_groups.create!(:name => "default")
     @assignment = @course.assignments.create(
-      :name => assignment_name,
-      :assignment_group => @group,
-      :points_possible => 2,
-      :due_at => Time.now,
-      :lock_at => 1.month.ago # this will trigger the client-side validation error
+        :name => assignment_name,
+        :assignment_group => @group,
+        :points_possible => 2,
+        :due_at => Time.now,
+        :lock_at => 1.month.ago # this will trigger the client-side validation error
     )
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -510,14 +510,14 @@ describe "assignment selenium tests" do
 
     def expected_settings
       {
-        'originality_report_visibility' => 'after_due_date',
-        's_paper_check' => '0',
-        'internet_check' => '0',
-        'journal_check' => '0',
-        'exclude_biblio' => '0',
-        'exclude_quoted' => '0',
-        'exclude_type' => '1',
-        'exclude_value' => '5'
+          'originality_report_visibility' => 'after_due_date',
+          's_paper_check' => '0',
+          'internet_check' => '0',
+          'journal_check' => '0',
+          'exclude_biblio' => '0',
+          'exclude_quoted' => '0',
+          'exclude_type' => '1',
+          'exclude_value' => '5'
       }
     end
 
@@ -527,7 +527,7 @@ describe "assignment selenium tests" do
 
         driver.find_element(:id, 'assignment_title').send_keys('test assignment')
         change_turnitin_settings
-      }.to_not change{ Assignment.count } # although we "saved" the dialog, we haven't actually posted anything yet
+      }.to_not change { Assignment.count } # although we "saved" the dialog, we haven't actually posted anything yet
 
       driver.find_element(:id, 'edit_assignment_form').submit
       wait_for_ajaximations
@@ -538,10 +538,10 @@ describe "assignment selenium tests" do
 
     it "should edit turnitin settings" do
       assignment = @course.assignments.create!(
-        :name => 'test assignment',
-        :due_at => (Time.now.utc + 2.days),
-        :assignment_group => @course.assignment_groups.create!(:name => "default")
-        )
+          :name => 'test assignment',
+          :due_at => (Time.now.utc + 2.days),
+          :assignment_group => @course.assignment_groups.create!(:name => "default")
+      )
 
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
 
@@ -568,7 +568,7 @@ describe "assignment selenium tests" do
       outcome_with_rubric
       @rubric.associate_with @assignment, @course, :purpose => "grading"
 
-      get "/courses/#{@course.to_param}/assignments/#{@assignment.to_param}"
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       driver.find_element(:css, ".details").text.should =~ /comment before muting/
       driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
@@ -576,7 +576,7 @@ describe "assignment selenium tests" do
   end
 
   def build_assignment_with_type(text)
-    get "/courses/#{@course.to_param}/assignments"
+    get "/courses/#{@course.id}/assignments"
 
     driver.find_element(:css, ".header_content .add_assignment_link").click
     wait_for_animations
@@ -591,8 +591,7 @@ describe "assignment selenium tests" do
       course_with_teacher_logged_in
       build_assignment_with_type("Discussion")
 
-      driver.find_element(:css, "#left-side .discussions").click
-      wait_for_dom_ready
+      expect_new_page_load { driver.find_element(:css, "#left-side .discussions").click }
       driver.find_elements(:css, "#topic_list .discussion_topic").should_not be_empty
     end
 
@@ -600,8 +599,7 @@ describe "assignment selenium tests" do
       course_with_teacher_logged_in
       build_assignment_with_type("Discussion")
 
-      driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click
-      wait_for_dom_ready
+      expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
       driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
     end
 
@@ -609,16 +607,33 @@ describe "assignment selenium tests" do
       course_with_teacher_logged_in
       build_assignment_with_type("Assignment")
 
-      driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click
-      wait_for_dom_ready
+      expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
       driver.find_element(:css, ".edit_full_assignment_link").click
       wait_for_animations
       click_option(".assignment_type", "Discussion")
       driver.find_element(:css, "#edit_assignment_form").submit
       wait_for_ajaximations
-      driver.find_element(:css, ".assignment_topic_link").click
-      wait_for_dom_ready
+      expect_new_page_load { driver.find_element(:css, ".assignment_topic_link").click }
       driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
+    end
+
+    it "should create a discussion topic with requires peer reviews" do
+      assignment_title = 'discussion assignment peer reviews'
+      course_with_teacher_logged_in
+      get "/courses/#{@course.id}/assignments"
+
+      driver.find_element(:css, ".header_content .add_assignment_link").click
+      wait_for_animations
+      click_option(".assignment_submission_types", 'Discussion')
+      expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
+      edit_form = driver.find_element(:id, 'edit_assignment_form')
+      edit_form.should be_displayed
+      replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
+      edit_form.find_element(:id, 'assignment_peer_reviews').click
+      edit_form.submit
+      wait_for_ajaximations
+      expect_new_page_load { driver.find_element(:link, assignment_title).click }
+      driver.find_element(:css, '.for_assignment').should include_text('Grading will be based on posts submitted to this topic')
     end
   end
 end
