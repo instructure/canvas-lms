@@ -100,7 +100,6 @@ describe "grades selenium tests" do
   end
 
   it "should display rubric on assignment" do
-    
     #click rubric
     driver.find_element(:css, '.toggle_rubric_assessments_link').click
     wait_for_animations 
@@ -109,8 +108,7 @@ describe "grades selenium tests" do
     driver.find_element(:css, '#assessor .rubric_total').text.include?('2').should be_true
 
     #check rubric comment
-    driver.find_element(:css, "tr.rubric_assessments table#rubric_#{@rubric.id} tr div.displaying a.criterion_comments").click
-    driver.find_element(:id, 'rubric_criterion_comments_dialog').should be_displayed
+    driver.find_element(:css, '.assessment-comments div').text.should == 'cool, yo'
   end
 
   it "should display teacher comment and assignment statistics" do
