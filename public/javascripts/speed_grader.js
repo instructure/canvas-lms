@@ -1056,16 +1056,15 @@ I18n.scoped('gradebook', function(I18n) {
     refreshSubmissionsToView: function(){
       var dueAt = jsonData.due_at && $.parseFromISO(jsonData.due_at);
 
-      //if there are multiple submissions
-      if (this.currentStudent && this.currentStudent.submission && this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
-        var innerHTML = "",
-            submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
+      var innerHTML = "";
+      if (this.currentStudent.submission.submission_history.length > 0) {
+        submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
 
         $.each(this.currentStudent.submission.submission_history, function(i, s){
           s = s.submission;
           var submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
               late        = dueAt && submittedAt && submittedAt.timestamp > dueAt.timestamp;
-              
+
           innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
                         (s == submissionToSelect ? "selected='selected'" : "") + ">" +
                         (submittedAt ? submittedAt.datetime_formatted : I18n.t('no_submission_time', 'no submission time')) +
@@ -1073,7 +1072,11 @@ I18n.scoped('gradebook', function(I18n) {
                         (s.grade && s.grade_matches_current_submission ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
                        "</option>";
         });
-        $submission_to_view.html(innerHTML);
+      }
+      $submission_to_view.html(innerHTML);
+
+      //if there are multiple submissions
+      if (this.currentStudent && this.currentStudent.submission && this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
         $multiple_submissions.show();
         $single_submission.hide();
       }
@@ -1173,7 +1176,8 @@ I18n.scoped('gradebook', function(I18n) {
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
               this.currentStudent.submission &&
-              !isNaN(this.currentStudent.submission.currentSelectedIndex ) ?
+              !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
+              this.currentStudent.submission.currentSelectedIndex != null ?
               '&version=' + this.currentStudent.submission.currentSelectedIndex :
               ''
             ) +'" frameborder="0"></iframe>')

@@ -4,7 +4,7 @@ describe "speedgrader selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   def student_submission(options = {})
-    submission_model(options.merge(:assignment => @assignment, :body => "first student submission text"))
+    submission_model({ :assignment => @assignment, :body => "first student submission text" }.merge(options))
   end
 
   before(:each) do
@@ -307,6 +307,60 @@ describe "speedgrader selenium tests" do
     driver.find_element(:id, 'rubric_full').should be_displayed
     driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
     driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
+  end
+
+  it "should handle versions correctly" do
+    submission1 = student_submission :username => "student1@example.com", :body => 'first student, first version'
+    submission2 = student_submission :username => "student2@example.com", :body => 'second student'
+    submission3 = student_submission :username => "student3@example.com", :body => 'third student'
+
+    # This is "no submissions" guy
+    submission3.delete
+
+    submission1.submitted_at = 10.minutes.from_now
+    submission1.body = 'first student, second version'
+    submission1.with_versioning(:explicit => true) { submission1.save }
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    # The first user shoud have multiple submissions. We want to make sure we go through the first student
+    # because the original bug was caused by a user with multiple versions putting data on the page that
+    # was carried through to other students, ones with only 1 version.
+    driver.find_element(:id, 'submission_to_view').find_elements(:css, 'option').length.should == 2
+
+    in_frame 'speedgrader_iframe' do
+      driver.find_element(:id, 'content').should include_text('first student, second version')
+    end
+
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, 'submission_to_view')).select_by(:value, '0')
+    wait_for_ajaximations
+
+    in_frame 'speedgrader_iframe' do
+      wait_for_ajaximations
+      driver.find_element(:id, 'content').should include_text('first student, first version')
+    end
+
+    driver.find_element(:css, '#gradebook_header .next').click
+    wait_for_ajaximations
+
+    # The second user just has one, and grading the user shouldn't trigger a page error.
+    # (In the original bug, it would trigger a change on the select box for choosing submission versions,
+    # which had another student's data in it, so it would try to load a version that didn't exist.)
+    driver.find_element(:id, 'submission_to_view').find_elements(:css, 'option').length.should == 1
+    driver.find_element(:id, 'grade_container').find_element(:css, 'input').send_keys("5\n")
+    wait_for_ajaximations
+
+    in_frame 'speedgrader_iframe' do
+      driver.find_element(:id, 'content').should include_text('second student')
+    end
+
+    submission2.reload.score.should == 5
+
+    driver.find_element(:css, '#gradebook_header .next').click
+    wait_for_ajaximations
+
+    driver.find_element(:id, 'this_student_does_not_have_a_submission').should be_displayed
   end
 
 end
