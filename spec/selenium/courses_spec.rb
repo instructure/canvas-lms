@@ -297,15 +297,22 @@ describe "course selenium tests" do
 
   describe "course as a student" do
 
+    def enroll_student(student, accept_invitation)
+      if accept_invitation
+        @course.enroll_student(student).accept
+      else
+        @course.enroll_student(student)
+      end
+    end
+
     before (:each) do
-      course(:active_all => true, :name => 'discussion course')
+      course_with_teacher(:active_all => true, :name => 'discussion course')
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
-      @teacher = user_with_pseudonym(:active_user => true, :username => 'teacher@example.com', :name => 'teacher@example.com', :password => 'asdfasdf')
-      @course.enroll_student(@student)
-      @course.enroll_teacher(@teacher).accept
     end
 
     it "should accept the course invitation" do
+      enroll_student(@student, false)
+
       login_as(@student.name)
       get "/courses/#{@course.id}"
       driver.find_element(:css, ".reminder .button[name='accept'] ").click
@@ -313,11 +320,18 @@ describe "course selenium tests" do
     end
 
     it "should reject a course invitation" do
+      enroll_student(@student, false)
+
       login_as(@student.name)
       get "/courses/#{@course.id}"
       driver.find_element(:css, ".reminder .reject_button").click
       driver.switch_to.alert.accept
       assert_flash_notice_message /Invitation cancelled./
+    end
+
+    it "should validate that a user cannot see a course they are not enrolled in" do
+      login_as(@student.name)
+      driver.find_element(:css, '#menu').should_not include_text('Courses')
     end
   end
 end
