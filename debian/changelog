@@ -1,3 +1,14 @@
+canvas-lms (2012.01.13.11.02) testing; urgency=low
+
+  * Package ref: 6e2c57f97b893f9705fc3e6e6748a140fa3430a6
+  *
+  * [+769e005] fix page errors related to submission versions in speedgrader; fixes #6869
+  * [+91378f4] improve errors on content migrations list
+  * [+2c8293f] reload enrollment association before caching
+  * [+6e2c57f] show the default notification policies for users with no policies; fixes #6876
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 13 Jan 2012 11:02:09 -0700
+
 canvas-lms (2012.01.12.13.29) testing; urgency=low
 
   * Package ref: 8e771e4c330481f854b716ab7de4c9f7193dd195
