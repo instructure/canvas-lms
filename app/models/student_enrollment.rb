@@ -19,4 +19,7 @@
 class StudentEnrollment < Enrollment
   belongs_to :student, :foreign_key => :user_id, :class_name => 'Student'
 
+  def student?
+    true
+  end
 end
