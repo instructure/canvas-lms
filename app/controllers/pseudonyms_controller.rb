@@ -134,7 +134,8 @@ class PseudonymsController < ApplicationController
   # @argument login[password] The new login's password.
   # @arugment login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def create
-    return unless context_is_root_account?(@context) && get_user
+    return unless get_user
+
     if api_request?
       params[:pseudonym] = params[:login]
       params[:pseudonym][:password_confirmation] = params[:pseudonym][:password]
@@ -146,11 +147,16 @@ class PseudonymsController < ApplicationController
 
     if current_user_is_site_admin?(:manage_user_logins)
       params[:pseudonym][:account] = Account.root_accounts.find(account_id)
+    elsif @context.is_a?(Account) && @context.root_account?
+      params[:pseudonym][:account] = @context
+    else
+      render(:json => { 'message' => 'Must create login on a root account.' }.to_json, :status => :bad_request)
+      return
     end
-    params[:pseudonym][:account] ||= @context
+
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
     @pseudonym = @user.pseudonyms.build(params[:pseudonym])
-    @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @context.grants_right?(@current_user, session, :manage_sis)
+    @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
     unless @pseudonym.account && @pseudonym.account.settings[:admins_can_change_passwords]
       params[:pseudonym].delete :password
       params[:pseudonym].delete :password_confirmation

@@ -177,4 +177,17 @@ describe PseudonymsController do
       @p2.should be_active
     end
   end
+
+  describe "create" do
+    before :each do
+      user_with_pseudonym(:active_all => true)
+      Account.site_admin.add_user(@user)
+      user_session(@user, @pseudonym)
+    end
+
+    it "should work with a user as context and account in params" do
+      post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'unique1' }
+      response.should be_success
+    end
+  end
 end
