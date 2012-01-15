@@ -141,6 +141,7 @@ Spec::Runner.configure do |config|
       e = @course.enroll_teacher(u)
       e.workflow_state = 'active'
       e.save!
+      @teacher = u
     end
     @course
   end
