@@ -28,7 +28,7 @@ describe ContentZipper do
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
-      ContentZipper.process_attachment(attachment)
+      ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       attachment.workflow_state.should == 'zipped'
       Zip::ZipFile.foreach(attachment.full_filename) do |f|
@@ -47,7 +47,7 @@ describe ContentZipper do
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
-      ContentZipper.process_attachment(attachment)
+      ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       attachment.workflow_state.should == 'zipped'
       Zip::ZipFile.foreach(attachment.full_filename) do |f|
@@ -68,7 +68,7 @@ describe ContentZipper do
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
-      ContentZipper.process_attachment(attachment)
+      ContentZipper.process_attachment(attachment, @ta)
       attachment.reload
       # no submissions
       attachment.workflow_state.should == 'errored'
@@ -76,32 +76,68 @@ describe ContentZipper do
   end
 
   describe "zip_folder" do
-    it "should only zip up files/folders the user has access to" do
-      course_with_student(:active_all => true)
-      folder = Folder.root_folders(@course).first
-      attachment_model(:uploaded_data => stub_png_data('hidden.png'), :content_type => 'image/png', :hidden => true, :folder => folder)
-      attachment_model(:uploaded_data => stub_png_data('visible.png'), :content_type => 'image/png', :folder => folder)
-      attachment_model(:uploaded_data => stub_png_data('locked.png'), :content_type => 'image/png', :folder => folder, :locked => true)
-      hidden_folder = folder.sub_folders.create!(:context => @course, :name => 'hidden', :hidden => true)
-      visible_folder = folder.sub_folders.create!(:context => @course, :name => 'visible')
-      locked_folder = folder.sub_folders.create!(:context => @course, :name => 'locked', :locked => true)
-      attachment_model(:uploaded_data => stub_png_data('sub-hidden.png'), :content_type => 'image/png', :folder => hidden_folder)
-      attachment_model(:uploaded_data => stub_png_data('sub-vis.png'), :content_type => 'image/png', :folder => visible_folder)
-      attachment_model(:uploaded_data => stub_png_data('sub-locked.png'), :content_type => 'image/png', :folder => visible_folder, :locked => true)
-      attachment_model(:uploaded_data => stub_png_data('sub-locked-vis.png'), :content_type => 'image/png', :folder => locked_folder)
+    context "checking permissions" do
+      before(:each) do
+        course_with_student(:active_all => true)
+        folder = Folder.root_folders(@course).first
+        attachment_model(:uploaded_data => stub_png_data('hidden.png'), :content_type => 'image/png', :hidden => true, :folder => folder)
+        attachment_model(:uploaded_data => stub_png_data('visible.png'), :content_type => 'image/png', :folder => folder)
+        attachment_model(:uploaded_data => stub_png_data('locked.png'), :content_type => 'image/png', :folder => folder, :locked => true)
+        hidden_folder = folder.sub_folders.create!(:context => @course, :name => 'hidden', :hidden => true)
+        visible_folder = folder.sub_folders.create!(:context => @course, :name => 'visible')
+        locked_folder = folder.sub_folders.create!(:context => @course, :name => 'locked', :locked => true)
+        attachment_model(:uploaded_data => stub_png_data('sub-hidden.png'), :content_type => 'image/png', :folder => hidden_folder)
+        attachment_model(:uploaded_data => stub_png_data('sub-vis.png'), :content_type => 'image/png', :folder => visible_folder)
+        attachment_model(:uploaded_data => stub_png_data('sub-locked.png'), :content_type => 'image/png', :folder => visible_folder, :locked => true)
+        attachment_model(:uploaded_data => stub_png_data('sub-locked-vis.png'), :content_type => 'image/png', :folder => locked_folder)
 
-      attachment = Attachment.new(:display_name => 'my_download.zip')
-      attachment.user_id = @user.id
-      attachment.workflow_state = 'to_be_zipped'
-      attachment.context = folder
-      attachment.save!
-      ContentZipper.process_attachment(attachment, @user)
-      names = []
-      attachment.reload
-      Zip::ZipFile.foreach(attachment.full_filename) do |f|
-        names << f.name if f.file?
+        @attachment = Attachment.new(:display_name => 'my_download.zip')
+        @attachment.workflow_state = 'to_be_zipped'
+        @attachment.context = folder
       end
-      names.sort.should == ['visible.png', 'visible/sub-vis.png']
+
+      def zipped_files_for_user(user)
+        @attachment.user_id = user.id if user
+        @attachment.save!
+        ContentZipper.process_attachment(@attachment, user)
+        names = []
+        @attachment.reload
+        Zip::ZipFile.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
+        names
+      end
+
+      context "in a private course" do
+        it "should give logged in students some files" do
+          zipped_files_for_user(@user).should == ['visible.png', 'visible/sub-vis.png']
+        end
+
+        it "should give logged in teachers all files" do
+          zipped_files_for_user(@teacher).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
+        end
+
+        it "should give logged out people no files" do
+          zipped_files_for_user(nil).should == []
+        end
+      end
+
+      context "in a public course" do
+        before(:each) do
+          @course.is_public = true
+          @course.save!
+        end
+
+        it "should give logged in students some files" do
+          zipped_files_for_user(@user).should == ['visible.png', 'visible/sub-vis.png']
+        end
+
+        it "should give logged in teachers all files" do
+          zipped_files_for_user(@teacher).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
+        end
+
+        it "should give logged out people the same thing as students" do
+          zipped_files_for_user(nil).should == ['visible.png', 'visible/sub-vis.png']
+        end
+      end
     end
 
     it "should not error on empty folders" do
