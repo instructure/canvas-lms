@@ -477,7 +477,7 @@ class QuizzesController < ApplicationController
         take_quiz
       else
         # redirect to avoid refresh issues
-        redirect_to named_context_url(@context, 'context_quiz_take_url', @quiz.id)
+        redirect_to polymorphic_url([@context, @quiz, 'take'], :preview => params[:preview])
       end
     else
       flash[:error] = t('errors.no_more_attempts', "You have no quiz attempts left") unless @just_graded

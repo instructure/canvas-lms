@@ -31,7 +31,7 @@ describe "quizzes" do
     assert_flash_notice_message /Quiz data saved/
   end
 
-  it "should create a new quiz" do
+  it "should create and preview a new quiz" do
     skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
@@ -53,13 +53,19 @@ describe "quizzes" do
     in_frame "quiz_description_ifr" do
       driver.find_element(:id, 'tinymce').should include_text(test_text)
     end
+
+    #add a question
+    driver.find_element(:css, '.add_question_link').click
+    question = find_with_jquery('.question_form:visible').submit
+    wait_for_ajax_requests
+
+    #save the quiz
     driver.find_element(:css, '.save_quiz_button').click
     wait_for_ajax_requests
 
     #check quiz preview
     driver.find_element(:link, 'Preview the Quiz').click
-    driver.find_element(:css ,'#content h2').text.should == 'new quiz'
-
+    driver.find_element(:id, 'questions').should be_present
   end
 
   it "should correctly hide form when cancelling quiz edit" do
@@ -157,21 +163,20 @@ describe "quizzes" do
 
   def start_quiz_question
     course_with_teacher_logged_in
-    
+
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
       driver.find_element(:css, '.new-quiz-link').click
     }
 
     driver.find_element(:css, '.add_question_link').click
-    wait_for_animations
   end
- 
+
   def replace_content(el, value)
     el.clear
     el.send_keys(value)
   end
-    
+
   def set_feedback_content(el, text)
     el.find_element(:css, ".comment_focus").click
     el.find_element(:css, "textarea").should be_displayed
