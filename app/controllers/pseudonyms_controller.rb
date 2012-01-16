@@ -149,28 +149,18 @@ class PseudonymsController < ApplicationController
         params[:pseudonym][:account] = Account.root_accounts.find(account_id)
       else
         params[:pseudonym][:account] = @domain_root_account
+        unless @domain_root_account.settings[:admins_can_change_passwords]
+          params[:pseudonym].delete :password
+          params[:pseudonym].delete :password_confirmation
+        end
       end
-    end
-
-    if !params[:pseudonym][:password]
-      @existing_pseudonym = @user.pseudonyms.active.select{|p| p.account == Account.default }.first
     end
 
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
     @pseudonym = @user.pseudonyms.build(params[:pseudonym])
     @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
-    unless @pseudonym.account && @pseudonym.account.settings[:admins_can_change_passwords]
-      params[:pseudonym].delete :password
-      params[:pseudonym].delete :password_confirmation
-    end
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
     if @pseudonym.save
-      if @existing_pseudonym
-        @pseudonym.password_salt = @existing_pseudonym.password_salt
-        @pseudonym.crypted_password = @existing_pseudonym.crypted_password
-        @pseudonym.password_auto_generated = @existing_pseudonym.password_auto_generated
-        @pseudonym.save
-      end
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
         format.html { redirect_to profile_url }
