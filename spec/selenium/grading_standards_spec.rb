@@ -32,6 +32,7 @@ shared_examples_for "grading standards selenium tests" do
   end
   
   it "should allow setting a grading standard for an assignment" do
+    skip_if_ie("Out of memory")
     course_with_teacher_logged_in
     
     @assignment = @course.assignments.create!(:title => "new assignment")
@@ -142,7 +143,7 @@ shared_examples_for "grading standards selenium tests" do
   end
 end
 
-describe "grading standards Windows-Firefox-Tests" do
+describe "grading standards tests" do
   it_should_behave_like "grading standards selenium tests"
 end
 

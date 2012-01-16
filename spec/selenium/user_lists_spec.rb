@@ -41,6 +41,7 @@ eolist
 
   ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].each do |type|
     it "should support adding #{type} enrollments by both email addresses and user names on the course details page" do
+      skip_if_ie('Out of memory')
       course_with_teacher_logged_in(:active_all => true)
       get "/courses/#{@course.id}/details"
       driver.find_element(:css, "a#tab-users-link").click
@@ -50,12 +51,14 @@ eolist
   end
 
   it "should support both email addresses and user names on the getting started page" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in(:active_all => true)
     get "/getting_started/students"
     add_users_to_user_list(false)
   end
 
   it "should support adding an enrollment to an enrollmentless course" do
+    skip_if_ie('Out of memory')
     user_logged_in
     Account.default.add_user(@user)
     course

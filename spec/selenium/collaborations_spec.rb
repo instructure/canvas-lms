@@ -55,6 +55,7 @@ describe "collaborations" do
         end
 
         it 'should leave the collaboration wizard open when someone navigates to the add_collaboration fragment and there is no collaborations' do
+          skip_if_ie('Java crashes')
           PluginSetting.create!(:name => collab_type, :settings => {})
           course_with_teacher_logged_in
 
@@ -65,6 +66,7 @@ describe "collaborations" do
         end
 
         it 'should leave the collaboration wizard open when someone navigates to the add_collaboration fragment and there is some collaborations' do
+          skip_if_ie('Java crashes')
           PluginSetting.create!(:name => collab_type, :settings => {})
           course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
@@ -136,6 +138,7 @@ describe "collaborations" do
         end
 
         it 'should leave the collaboration wizard open when the last collaboration is deleted' do
+          skip_if_ie('Java crashes')
           PluginSetting.create!(:name => collab_type, :settings => {})
           course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)

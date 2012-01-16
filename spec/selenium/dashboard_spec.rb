@@ -268,7 +268,7 @@ shared_examples_for "dashboard selenium tests" do
 
     get "/"
 
-    driver.find_element(:css, '#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
+    find_with_jquery('#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
   end
 
   it "should display calendar events in the coming up list" do
@@ -326,6 +326,6 @@ shared_examples_for "dashboard selenium tests" do
 
 end
 
-describe "dashboard Windows-Firefox-Tests" do
+describe "dashboard tests" do
   it_should_behave_like "dashboard selenium tests"
 end

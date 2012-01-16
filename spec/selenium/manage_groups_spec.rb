@@ -25,7 +25,7 @@ describe "manage_groups selenium tests" do
     group_divs = find_all_with_jquery("div.group_category")
     group_divs.size.should == 4 # three groups + blank
 
-    ids = group_divs.map{ |div| div.attribute(:id) }
+    ids = group_divs.map { |div| div.attribute(:id) }
     ids.should be_include("category_#{group_category1.id}")
     ids.should be_include("category_#{group_category2.id}")
     ids.should be_include("category_#{group_category3.id}")
@@ -51,7 +51,7 @@ describe "manage_groups selenium tests" do
     find_all_with_jquery("div.group_category").size.should == 3
     find_all_with_jquery("div.group_category.student_organized").size.should == 1
     find_with_jquery("div.group_category.student_organized").attribute(:id).
-      should == "category_#{group_category1.id}"
+        should == "category_#{group_category1.id}"
   end
 
   it "should show one li.category per category" do
@@ -75,7 +75,7 @@ describe "manage_groups selenium tests" do
     group_divs = find_all_with_jquery("li.category")
     group_divs.size.should == 3 # three groups, no blank on this one
 
-    labels = group_divs.map{ |div| div.find_element(:css, "a").text }
+    labels = group_divs.map { |div| div.find_element(:css, "a").text }
     labels.should be_include(group_category1.name)
     labels.should be_include(group_category2.name)
     labels.should be_include(group_category3.name)
@@ -239,6 +239,7 @@ describe "manage_groups selenium tests" do
   end
 
   it "should move students from a deleted group back to unassigned" do
+    skip_if_ie("Switch to alert and accept hangs in IE 257")
     course_with_teacher_logged_in
 
     @course.enroll_student(john = user_model(:name => "John Doe"))
@@ -253,10 +254,12 @@ describe "manage_groups selenium tests" do
     category.find_elements(:css, ".group_blank .user_id_#{john.id}").should be_empty
 
     driver.execute_script("$('#group_#{group.id} .delete_group_link').hover().click()") #move_to occasionally breaks in the hudson build
-    confirm_dialog = driver.switch_to.alert
-    confirm_dialog.accept
+    keep_trying_until do
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.accept
+      true
+    end
     wait_for_ajaximations
-
     category.find_elements(:css, ".group_blank .user_id_#{john.id}").should_not be_empty
   end
 
@@ -367,6 +370,7 @@ describe "manage_groups selenium tests" do
     end
 
     it "should be visible iff category is not restricted self signup" do
+      skip_if_ie("Element must not be hidden, disabled or read-only line 378")
       new_category = add_category(@course, "Unrestricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => false)
       find_with_jquery("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
 
@@ -504,9 +508,11 @@ end
 def should_flash(type, message)
   [:notice, :error].should be_include(type)
   element = case type
-    when :notice then '#flash_notice_message'
-    when :error then '#flash_error_message'
-    end
+              when :notice then
+                '#flash_notice_message'
+              when :error then
+                '#flash_error_message'
+            end
   keep_trying_until do
     flash = find_with_jquery("#{element}:visible")
     flash.should_not be_nil

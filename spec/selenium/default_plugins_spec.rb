@@ -183,7 +183,7 @@ shared_examples_for "plugins selenium tests" do
 
 end
 
-describe "plugins Windows-Firefox-Tests" do
+describe "plugins tests" do
   it_should_behave_like "plugins selenium tests"
 end
 

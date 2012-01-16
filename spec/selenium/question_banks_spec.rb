@@ -19,6 +19,6 @@ shared_examples_for "question bank selenium tests" do
   end
 end
 
-describe "question bank Windows-Firefox-Tests" do
+describe "question bank tests" do
   it_should_behave_like "question bank selenium tests"
 end

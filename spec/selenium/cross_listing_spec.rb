@@ -54,6 +54,6 @@ shared_examples_for "cross-listing selenium tests" do
   end
 end
 
-describe "cross-listing Windows-Firefox-Tests" do
+describe "cross-listing tests" do
   it_should_behave_like "cross-listing selenium tests"
 end

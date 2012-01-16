@@ -54,6 +54,7 @@ shared_examples_for "files selenium tests" do
   end
 
   it "should show students link to download zip of folder" do
+    skip_if_ie("Page wouldn't load in IE'")
     user_with_pseudonym :username => "nobody3@example.com",
                         :password => "asdfasdf3"
     course_with_student_logged_in :user => @user
@@ -115,7 +116,7 @@ describe "files without s3 and forked tests" do
   end
 end
 
-describe "files Windows-Firefox-Local-Tests" do
+describe "files local tests" do
   it_should_behave_like "files selenium tests"
   prepend_before(:each) {
     Setting.set("file_storage_test_override", "local")
@@ -125,6 +126,7 @@ describe "files Windows-Firefox-Local-Tests" do
   }
 
   it "should allow you to edit html files" do
+    skip_if_ie("IE hangs")
     user_with_pseudonym :username => "nobody2@example.com",
                         :password => "asdfasdf2"
     course_with_teacher_logged_in :user => @user
@@ -153,7 +155,7 @@ describe "files Windows-Firefox-Local-Tests" do
   end
 end
 
-describe "files Windows-Firefox-S3-Tests" do
+describe "files S3 tests" do
   it_should_behave_like "files selenium tests"
   prepend_before(:each) {
     Setting.set("file_storage_test_override", "s3")

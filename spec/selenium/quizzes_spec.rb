@@ -22,6 +22,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should allow a teacher to create a quiz from the quizzes tab directly" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load { driver.find_element(:css, ".new-quiz-link").click }
@@ -31,6 +32,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should create a new quiz" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
@@ -61,6 +63,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should correctly hide form when cancelling quiz edit" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes/new"
@@ -76,6 +79,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should edit a quiz" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     @context = @course
     q = quiz_model
@@ -100,6 +104,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should edit a quiz question" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     @context = @course
     q = quiz_model
@@ -136,6 +141,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should not show 'Missing Word' option in question types dropdown" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     
     get "/courses/#{@course.id}/quizzes/new"
@@ -194,6 +200,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should create a quiz with a multiple choice question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -243,6 +250,7 @@ shared_examples_for "quiz selenium tests" do
 
 
   it "should create a quiz question with a true false question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -270,6 +278,7 @@ shared_examples_for "quiz selenium tests" do
   end 
 
   it "should create a quiz question with a fill in the blank question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -295,6 +304,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should create a quiz question with a fill in multiple blanks question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -346,6 +356,7 @@ shared_examples_for "quiz selenium tests" do
   end 
 
   it "should create a quiz question with a multiple answers question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -373,6 +384,7 @@ shared_examples_for "quiz selenium tests" do
   end 
 
   it "should create a quiz question with a multiple dropdown question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
  
@@ -422,6 +434,7 @@ shared_examples_for "quiz selenium tests" do
   end 
 
   it "should create a quiz question with a matching question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -456,6 +469,7 @@ shared_examples_for "quiz selenium tests" do
     #### Numerical Answer
   it "should create a quiz question with a numerical question" do
     pending("selenium reports answer_range_end is not displayed")
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
 
@@ -485,6 +499,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should create a quiz question with a formula question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -519,6 +534,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should create a quiz question with an essay question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -539,6 +555,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should create a quiz question with a text question" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     
@@ -559,6 +576,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should not show the display details for text questions" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
 
@@ -576,6 +594,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should not show the display details for essay questions" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
 
@@ -593,6 +612,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should show the display details when questions other than text or essay questions exist" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     show_el = driver.find_element(:id, 'show_question_details')
     quiz = Quiz.last
@@ -611,6 +631,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should calculate correct quiz question points total" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
@@ -703,6 +724,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should allow you to use inherited question banks" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     @course.account = Account.default
     @course.save
@@ -733,6 +755,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should allow you to use bookmarked question banks" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     @course.account = Account.default
     @course.save
@@ -764,6 +787,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should check permissions when retrieving question banks" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     @course.account = Account.default
     @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
@@ -811,6 +835,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should import questions from a question bank" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes/new"
@@ -827,6 +852,7 @@ shared_examples_for "quiz selenium tests" do
 
 
   it "should create a new question group" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes/new"
@@ -862,6 +888,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should flag a quiz question while taking a quiz as a teacher" do
+    skip_if_ie('Out of memory')
     quiz_with_new_questions
 
     expect_new_page_load {
@@ -891,6 +918,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should indicate when it was last saved" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     @context = @course
     bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
@@ -934,6 +962,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should round numeric questions thes same when created and taking a quiz" do
+    skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
     question = find_with_jquery(".question:visible")
@@ -1017,6 +1046,7 @@ shared_examples_for "quiz selenium tests" do
     end
 
     it "should cancel mousewheel events on select elements" do
+      skip_if_ie('Out of memory')
       driver.execute_script <<-EOF
         window.mousewheelprevented = false;
         jQuery('select').bind('mousewheel', function(event) {
@@ -1031,6 +1061,7 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "should display quiz statistics" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     quiz_with_submission
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -1041,6 +1072,6 @@ shared_examples_for "quiz selenium tests" do
   end
 end
 
-describe "quiz Windows-Firefox-Tests" do
+describe "quizzes" do
   it_should_behave_like "quiz selenium tests"
 end

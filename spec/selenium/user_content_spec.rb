@@ -51,6 +51,6 @@ MESSAGE
   end
 end
 
-describe "user_content Windows-Firefox-Tests" do
+describe "user_content tests" do
   it_should_behave_like "user_content selenium tests"
 end

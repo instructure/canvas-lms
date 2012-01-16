@@ -230,7 +230,7 @@ describe "speedgrader selenium tests" do
 
     #make sure gradebook link works
     driver.find_element(:css, '#x_of_x_students a').click
-    driver.find_element(:css, 'body.grades').should be_displayed
+    find_with_jquery('body.grades').should be_displayed
 
   end
 
@@ -253,9 +253,9 @@ describe "speedgrader selenium tests" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    driver.find_element(:id, "settings_link").click
+    driver.find_element(:css, "#settings_link").click
     driver.find_element(:css, 'select#eg_sort_by option[value="submitted_at"]').click
-    driver.find_element(:id, 'hide_student_names').click
+    driver.find_element(:css, '#hide_student_names').click
     expect_new_page_load {
       driver.find_element(:css, '#settings_form .submit_button').click
     }

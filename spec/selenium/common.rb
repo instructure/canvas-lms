@@ -562,6 +562,7 @@ shared_examples_for "all selenium tests" do
     element.tag_name.should == 'a'
     temp_file = open(element.attribute('href'))
     temp_file.size.should > 0
+    temp_file
   end
 
   def assert_flash_notice_message(okay_message_regex)
@@ -637,6 +638,10 @@ def validate_link(link_element, breadcrumb_text)
   breadcrumb = driver.find_element(:id, 'breadcrumbs')
   breadcrumb.should include_text(breadcrumb_text)
   driver.execute_script("return INST.errorCount;").should == 0
+end
+
+def skip_if_ie(additional_error_text)
+  pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
 end
 
 shared_examples_for "in-process server selenium tests" do

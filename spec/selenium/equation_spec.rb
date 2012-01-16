@@ -4,6 +4,7 @@ shared_examples_for "equation editor selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should support multiple equation editors on the same page" do
+    skip_if_ie("Stack overflow ")
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes"
@@ -42,6 +43,6 @@ shared_examples_for "equation editor selenium tests" do
   end
 end
 
-describe "equation editor Windows-Firefox-Tests" do
+describe "equation editor tests" do
   it_should_behave_like "equation editor selenium tests"
 end

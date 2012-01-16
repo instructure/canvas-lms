@@ -31,6 +31,7 @@ describe "assignment selenium tests" do
   end
 
   it "should not allow XSS attacks through rubric descriptions" do
+    skip_if_ie('Unexpected page behavior')
     course_with_teacher_logged_in
 
     student = user_with_pseudonym :active_user => true,
@@ -225,6 +226,7 @@ describe "assignment selenium tests" do
   end
 
   it "should edit an assignment" do
+    skip_if_ie('Out of memory')
     course_with_teacher_logged_in
     assignment_name = 'first test assignment'
     due_date = Time.now.utc + 2.days
@@ -276,6 +278,7 @@ describe "assignment selenium tests" do
     end
 
     it "should allow creating" do
+      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/assignments"
 
       #create assignment
@@ -312,6 +315,7 @@ describe "assignment selenium tests" do
     end
 
     it "should allow editing" do
+      skip_if_ie('Out of memory')
       a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
       a.create_external_tool_tag(:url => @t1.url)
       a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
@@ -517,6 +521,7 @@ describe "assignment selenium tests" do
     end
 
     it "should create turnitin settings" do
+      skip_if_ie('Out of memory')
       expect {
         get "/courses/#{@course.id}/assignments/new"
 
@@ -532,6 +537,7 @@ describe "assignment selenium tests" do
     end
 
     it "should edit turnitin settings" do
+      skip_if_ie('Out of memory')
       assignment = @course.assignments.create!(
           :name => 'test assignment',
           :due_at => (Time.now.utc + 2.days),

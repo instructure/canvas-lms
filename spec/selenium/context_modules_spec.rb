@@ -278,15 +278,15 @@ describe "context_modules selenium tests" do
     end
 
     it "should rearrange modules" do
+      skip_if_ie("Drag and Drop not working in IE, line 65")
       m1 = @course.context_modules.create!(:name => 'module 1')
       m2 = @course.context_modules.create!(:name => 'module 2')
 
       refresh_page
-
       sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
-      m1_img = driver.find_element(:css, '#context_modules .context_module:first-child .reorder_module_link img')
-      m2_img = driver.find_element(:css, '#context_modules .context_module:last-child .reorder_module_link img')
+      m1_img = find_with_jquery('#context_modules .context_module:first-child .reorder_module_link img')
+      m2_img = find_with_jquery('#context_modules .context_module:last-child .reorder_module_link img')
       driver.action.drag_and_drop(m2_img, m1_img).perform
       wait_for_ajax_requests
 

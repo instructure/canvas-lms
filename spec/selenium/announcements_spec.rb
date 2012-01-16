@@ -72,7 +72,7 @@ describe "announcements selenium tests" do
 
     #delete external feed
     driver.find_element(:link, feed_name).should be_displayed
-    driver.find_element(:css, '#external_feeds li:nth-child(2) .delete_feed_link').click
+    find_with_jquery('#external_feeds li:nth-child(2) .delete_feed_link').click
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.accept
     wait_for_ajaximations

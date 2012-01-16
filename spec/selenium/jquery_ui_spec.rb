@@ -105,6 +105,7 @@ describe "jquery ui selenium tests" do
     end
 
     it "should accept jquery object dialog titles" do
+      skip_if_ie("expected: <i>i want formatting <b>for realz</b></i>,got: <I>i want formatting <B>for realz</B></I> (using ==)")
       title = "<i>i want formatting <b>for realz</b></i>"
       driver.execute_script(<<-JS).should == title
         return $('<div id="jqueryui_test">here we go</div>')

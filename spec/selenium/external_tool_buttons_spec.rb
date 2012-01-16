@@ -40,6 +40,7 @@ describe "external tool buttons selenium tests" do
   end
   
   it "should allow inserting basic lti links from external tool buttons" do
+    skip_if_ie("IE hangs")
     load_selection_test_tool do
       driver.find_element(:css, "#basic_lti_link").click
     end

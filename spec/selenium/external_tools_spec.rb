@@ -242,6 +242,7 @@ describe "editing external tools" do
   end
 
   it "should alert when invalid url data is returned by a resource selection dialog" do
+    skip_if_ie("Out of memory / Stack overflow")
     course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")

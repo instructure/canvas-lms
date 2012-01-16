@@ -100,6 +100,7 @@ describe "sis imports ui" do
   end
 
   it 'should pass options along to the batch' do
+    skip_if_ie("Java crashes")
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"

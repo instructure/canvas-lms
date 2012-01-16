@@ -98,7 +98,6 @@ describe "profile tests" do
       content_tbody.find_element(:css, '.add_notification_link').click
       wait_for_animations
       email_select_css = '#content > table > tbody > tr:nth-child(3) > td > span > select'
-
       click_option(email_select_css, second_email)
       #change notification setting for first notification
       daily_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(3) > div')

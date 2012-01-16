@@ -117,6 +117,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should lazy load files" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
@@ -145,6 +146,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should lazy load images" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         @image_list.should_not have_class('initialized')
         @image_list.find_elements(:css, 'img.img').length.should == 0
@@ -155,6 +157,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should properly clone images, including thumbnails, and display" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         old_course = @course
         new_course = old_course.clone_for(old_course.account)
@@ -173,6 +176,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should infini-scroll images" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         90.times do |i|
           image = @root_folder.attachments.build(:context => @course)
@@ -201,6 +205,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should lazy load directory structure for upload form" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
@@ -213,6 +218,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should be able to upload a file when nothing has been loaded" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         keep_trying_until { driver.find_element(:css, "form#new_wiki_page").should be_displayed }
         driver.find_element(:css, '.wiki_switch_views_link').click
@@ -243,6 +249,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should show uploaded files in file tree and add them to the rce" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
         driver.find_element(:css, '.wiki_switch_views_link').click
@@ -273,6 +280,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should not show uploaded files in image list" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
@@ -294,6 +302,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should show files uploaded on the images tab in the file tree" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
         root_folders = @tree1.find_elements(:css, 'li.folder')
@@ -317,6 +326,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should show images uploaded on the files tab in the image list" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
@@ -341,6 +351,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
 
       it "should show uploaded images in image list and add the image to the rce" do
+        skip_if_ie('Out of memory')
         file_tree_setup
         wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
         driver.find_element(:css, '.wiki_switch_views_link').click
@@ -376,6 +387,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should add bold and italic text to the rce" do
+      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
@@ -454,6 +466,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should add an equation to the rce" do
+      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       driver.find_element(:css, '.mce_instructure_equation').click
@@ -479,6 +492,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should add image from flickr" do
+      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       #add image from flickr to rce
@@ -499,6 +513,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should put flickr images into the right editor" do
+      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/quizzes"
       driver.find_element(:css, ".new-quiz-link").click
       keep_trying_until { driver.find_element(:css, ".mce_instructure_embed").should be_displayed }
@@ -515,6 +530,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should display record video dialog" do
+      skip_if_ie('Out of memory')
       stub_kaltura
       get "/courses/#{@course.id}/wiki"
 
@@ -527,6 +543,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should resize the WYSIWYG editor height gracefully" do
+      skip_if_ie('Out of memory')
       file_tree_setup
       wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
       make_full_screen
@@ -549,6 +566,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should handle table borders correctly" do
+      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       def check_table(attributes = {})
