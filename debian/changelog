@@ -1,3 +1,12 @@
+canvas-lms (2012.01.16.16.16) testing; urgency=low
+
+  * Package ref: 867c8db4fb0e8ff1e1bbe969916f64ed7b215489
+  *
+  * [+d3e6c6b] don't send files to users in public courses we shouldn't; fixes #6868
+  * [+867c8db] don't error on the comm prefs page; refs #6914
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 16 Jan 2012 16:16:42 -0700
+
 canvas-lms (2012.01.16.10.25) testing; urgency=low
 
   * Package ref: fbc7a227e7202f73c04dd0d6317c0ed105b1a800
