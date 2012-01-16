@@ -113,7 +113,9 @@ class ProfileController < ApplicationController
     @active_tab = "communication-preferences"
 
     # build placeholder notification policies for categories the user does not have policies for already
-    user_categories = @user.notification_policies.map {|np| np.notification.category }
+    # Note that currently a NotificationPolicy might not have a Notification attached to it.
+    # See the relevant spec in profile_controller_spec.rb for more details.
+    user_categories = @user.notification_policies.map {|np| np.notification.try(:category) }
     @notification_categories.each do |category|
       # category is actually a Notification
       next if user_categories.include?(category.category)
