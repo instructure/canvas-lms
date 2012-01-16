@@ -68,6 +68,26 @@ $(document).ready(function() {
       width: 400
     }).dialog('open');
   });
+
+  var $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank'),
+      uniqueCounter = 1000;
+  $(".add_custom_help_link").click(function(event) {
+    event.preventDefault();
+    var $newContainer = $blankCustomHelpLink.clone(true).appendTo('#custom_help_links').show(),
+        newId = uniqueCounter++;
+    // need to replace the unique id in the inputs so they get sent back to rails right,
+    // chage the 'for' on the lables to match.
+    $.each(['id', 'name', 'for'], function(i, prop){
+      $newContainer.find('['+prop+']').attr(prop, function(i, previous){
+        return previous.replace(/\d+/, newId);
+      });
+    });
+  });
+  $(".custom_help_link .delete").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".custom_help_link").remove();
+  });
+
   $(".remove_account_user_link").click(function(event) {
     event.preventDefault();
     var $item = $(this).parent("li");
@@ -155,7 +175,7 @@ $(document).ready(function() {
       $(this).parent(".report_dialog").dialog('close');
     }
   });
-  
+
   $(".configure_report_link").click(function(event) {
     event.preventDefault();
     $(this).parent("td").find(".report_dialog").clone(true).dialog({
@@ -163,22 +183,22 @@ $(document).ready(function() {
       title: I18n.t('titles.configure_report', 'Configure Report')
     });
   })
-  
+
   $('.service_help_dialog').each(function(index) {
     var $dialog = $(this),
         serviceName = $dialog.attr('id').replace('_help_dialog', '');
-    
+
     $dialog.dialog({
       autoOpen: false,
       width: 560
     });
-    
+
     $('<a class="help" href="#">&nbsp;</a>')
       .click(function(event){
         event.preventDefault();
         $dialog.dialog('open');
       })
-      .appendTo('label[for="account_services_' + serviceName + '"]');    
+      .appendTo('label[for="account_services_' + serviceName + '"]');
   });
 });
 });

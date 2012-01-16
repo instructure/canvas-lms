@@ -23,6 +23,7 @@ module Api::V1::Course
     include_grading = includes.include?('needs_grading_count')
     include_syllabus = includes.include?('syllabus_body')
     include_total_scores = includes.include?('total_scores') && !course.settings[:hide_final_grade]
+    include_url = includes.include?('html_url')
 
     base_attributes = %w(id name course_code)
     allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes
@@ -47,13 +48,13 @@ module Api::V1::Course
     if include_syllabus
       hash['syllabus_body'] = course.syllabus_body
     end
+    hash['html_url'] = course_url(course) if include_url
     hash
   end
 
   def copy_status_json(import, course, user, session)
     hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state))
-    hash[:status_url] = api_v1_course_copy_status_path(course, import)
+    hash[:status_url] = api_v1_course_copy_status_url(course, import)
     hash
   end
 end
-

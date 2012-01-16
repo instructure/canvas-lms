@@ -127,6 +127,17 @@ describe TextHelper do
       th.date_string(nextyear).split[2].to_i.should == nextyear.year
     end
 
+    it "should ignore the end date if it matches the start date" do
+      start_date = Time.parse("2012-01-01 12:00:00")
+      end_date = Time.parse("2012-01-01 13:00:00")
+      th.date_string(start_date, end_date).should == th.date_string(start_date)
+    end
+
+    it "should do date ranges if the end date differs from the start date" do
+      start_date = Time.parse("2012-01-01 12:00:00")
+      end_date = Time.parse("2012-01-08 12:00:00")
+      th.date_string(start_date, end_date).should == "#{th.date_string(start_date)} to #{th.date_string(end_date)}"
+    end
   end
 
   context "format_message" do
@@ -218,7 +229,7 @@ describe TextHelper do
         th.mt(:foo, "We **don't** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h").
           should == "We <strong>don't</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
       end
-  
+
       it "should not escape MarkdownSafeBuffers" do
         th.mt(:foo, "We **do** trust the following input: %{input}", :input => th.markdown_safe("`a` **b** _c_ ![d](e)\n# f\n + g\n - h")).
           should == <<-HTML.strip
@@ -240,7 +251,7 @@ describe TextHelper do
         th.mt(:foo, "**this** is another test\n\nwhat will happen?").
           should == "<p><strong>this</strong> is another test</p>\n\n<p>what will happen?</p>"
       end
-  
+
       it "should not inlinify single paragraphs if :inlinify => :never" do
         th.mt(:foo, "**one** more test", :inlinify => :never).
           should == "<p><strong>one</strong> more test</p>"

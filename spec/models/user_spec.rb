@@ -1233,4 +1233,37 @@ describe User do
       @user.email.should == 'john@example.com'
     end
   end
+
+  describe "event methods" do
+    describe "calendar_events_for_calendar" do
+      it "should include own scheduled appointments" do
+        course_with_student(:active_all => true)
+        ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour], [Time.now + 1.hour, Time.now + 2.hour]])
+        ag.appointments.first.reserve_for(@user, @user)
+        events = @user.calendar_events_for_calendar
+        events.size.should eql 1
+        events.first.title.should eql 'test appointment'
+      end
+
+      it "should include manageable appointments" do
+        course(:active_all => true)
+        @user = @course.admins.first
+        ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
+        events = @user.calendar_events_for_calendar
+        events.size.should eql 1
+        events.first.title.should eql 'test appointment'
+      end
+    end
+
+    describe "upcoming_events" do
+      it "should include manageable appointment groups" do
+        course(:active_all => true)
+        @user = @course.admins.first
+        ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
+        events = @user.upcoming_events
+        events.size.should eql 1
+        events.first.title.should eql 'test appointment'
+      end
+    end
+  end
 end

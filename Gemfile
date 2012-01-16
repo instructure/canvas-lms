@@ -70,7 +70,6 @@ group :test do
   gem 'mocha',        '0.10.0'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
-  gem 'rspec-instafail', '0.1.9'
   gem 'rspec-rails',  '1.3.4'
   gem 'selenium-webdriver', '2.14.0'
   gem 'webrat',       '0.7.3'
@@ -85,7 +84,6 @@ group :development do
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
   gem 'guard'
-  gem 'guard-coffeescript'
 end
 
 group :redis do

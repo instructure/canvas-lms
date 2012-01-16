@@ -66,10 +66,10 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
   enable_forgery_protection do
     params_from_with_nesting(method, path).should == params
 
-    if !params.key?(:api_key) && !params.key?(:access_token) && @user
+    if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('Authorization') && @user
       token = @user.access_tokens.first
       token ||= @user.access_tokens.create!(:purpose => 'test')
-      params[:access_token] = token.token
+      headers['Authorization'] = "Bearer #{token.token}"
       @user.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :account => opts[:domain_root_account]) unless @user.pseudonym(true)
     end
 

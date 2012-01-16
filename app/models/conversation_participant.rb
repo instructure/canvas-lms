@@ -69,7 +69,7 @@ class ConversationParticipant < ActiveRecord::Base
       :private => private?,
       :label => label,
       :properties => properties(latest)
-    }
+    }.with_indifferent_access
   end
 
   [:attachments].each do |association|
@@ -216,7 +216,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def update_unread_count
     if workflow_state_changed? && [workflow_state, workflow_state_was].include?('unread')
-      User.update_all "unread_conversations_count = unread_conversations_count #{workflow_state == 'unread' ? '+' : '-'} 1",
+      User.update_all "unread_conversations_count = unread_conversations_count #{workflow_state == 'unread' ? '+' : '-'} 1, updated_at = '#{Time.now.to_s(:db)}'",
                       :id => user_id
     end
   end

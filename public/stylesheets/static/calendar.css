@@ -115,7 +115,7 @@ td.calendar_day_holder.drop_target .calendar_day, .calendar_undated.drop_target 
 	top: 0px;
 	left: 3px;
 }
-#event_details .content, #edit_event .content {
+#event_details .content, .event_details .content, #edit_event .content {
 	padding: 5px;
 }
 #edit_event select {
@@ -135,7 +135,7 @@ td.calendar_day_holder.drop_target .calendar_day, .calendar_undated.drop_target 
 	padding: 2px 10px;
 	font-size: 0.9em;
 }
-#event_details .links {
+#event_details .links, .event_details .links {
 	text-align: right;
 	margin: 5px;
 }

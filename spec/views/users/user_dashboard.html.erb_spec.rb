@@ -27,10 +27,8 @@ describe "/users/user_dashboard" do
     assigns[:enrollments] = [@enrollment]
     assigns[:group_memberships] = []
     assigns[:topics] = []
-    assigns[:message_types] = {}
-    assigns[:recent_events] = []
     assigns[:upcoming_events] = []
-    
+
     render "users/user_dashboard"
     response.should_not be_nil
   end
@@ -42,8 +40,6 @@ describe "/users/user_dashboard" do
     assigns[:enrollments] = []
     assigns[:group_memberships] = []
     assigns[:topics] = []
-    assigns[:message_types] = {}
-    assigns[:recent_events] = []
     assigns[:upcoming_events] = []
     assigns[:account_notifications] = [AccountNotification.new(:subject => "My Global Announcement")]
     render "users/user_dashboard"

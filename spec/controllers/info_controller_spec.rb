@@ -24,19 +24,13 @@ describe InfoController do
     it "should be successful" do
       post 'record_error'
       assert_recorded_error
-      
+
       post 'record_error', :error => {:title => 'ugly', :message => 'bacon', :fried_ham => 'stupid'}
       assert_recorded_error
     end
 
-    it "should be successful for teacher feedback too" do
-      course_with_student_logged_in(:active_all => true)
-      post 'record_error', "feedback_type"=>"teacher", "comments"=>"OHAI", "subject"=>"help me.", "course_id"=>@course.id, "error"=>{"comments"=>"OHAI", "subject"=>"help me.", "backtrace"=>"Posted as a _PROBLEM_", "email"=>""}, "email"=>""
-      assert_recorded_error("Thanks for your feedback!  Your teacher has been notified.")
-    end
-    
   end
-  
+
   describe "GET 'avatar_image_url'" do
     it "should redirect to no_pic if no avatar is set" do
       course_with_student_logged_in(:active_all => true)

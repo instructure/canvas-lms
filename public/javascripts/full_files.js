@@ -1599,7 +1599,7 @@ I18n.scoped('files', function(I18n) {
                 $subpanel.find(".subcontent .etherpad_icon").showIf(data.collaboration_type == 'etherpad');
                 $subpanel.find(".view_item_link").attr('href', collaboration_url);
                 $subpanel.find(".collaborators").empty();
-                var ids = (subdata.collaborator_ids || []).split(',');
+                var ids = (subdata.collaborator_ids || '').split(',');
                 for(var idx in ids) {
                   var id = ids[idx];
                   var $user = $("." + data.context_string + "_user_list:first .collaborator_" + id).clone(true);

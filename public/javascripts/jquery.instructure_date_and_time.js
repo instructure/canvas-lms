@@ -151,6 +151,37 @@ I18n.scoped('instructure', function(I18n) {
       return $.parseFromISO.defaults;
     }
   };
+  // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
+  // difference between the user's configured timezone in their profile, and the timezone
+  // of the browser. We want to display times in the timezone of their profile. Use
+  // unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
+  $.fudgeDateForProfileTimezone = function(date, unfudge) {
+    var today = new Date();
+    var user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
+    if (date.getTimezoneOffset() != today.getTimezoneOffset()) {
+      user_offset = user_offset - (date.getTimezoneOffset() - today.getTimezoneOffset());
+    }
+    var minutes_shift = user_offset + date.getTimezoneOffset();
+
+    if (minutes_shift == 0) {
+      return date;
+    }
+
+    time = date.getTime(); // in ms
+    time += minutes_shift * 60 * 1000 * (unfudge === true ? -1 : 1);
+    var newDate = new Date();
+    newDate.setTime(time);
+    return newDate;
+  }
+  $.unfudgeDateForProfileTimezone = function(date) {
+    return $.fudgeDateForProfileTimezone(date, true);
+  }
+  
+  // The following method is simply a helper to use the logic from $.parseFromISO on
+  // an existing Date() object. This is not the right solution and should be replaced.
+  $.parseFromDateUTC = function(date, datetime_type) {
+    return $.parseFromISO($.dateToISO8601UTC(date), datetime_type)
+  };
   $.parseFromISO.ref_date = new Date();
   $.parseFromISO.offset = $.parseFromISO.ref_date.getTimezoneOffset() * 60000;
   $.parseFromISO.defaults = {
@@ -165,6 +196,25 @@ I18n.scoped('instructure', function(I18n) {
       time_formatted: "",
       time_string: ""
   };
+  $.dateToISO8601UTC = function(date) {
+    var padZero = function(n) { return n < 10 ? '0' + n : n; }
+    return date.getUTCFullYear() + '-' +
+      padZero(date.getUTCMonth() + 1) + '-' +
+      padZero(date.getUTCDate()) + 'T' +
+      padZero(date.getUTCHours()) + ':' +
+      padZero(date.getUTCMinutes()) + ':' +
+      padZero(date.getUTCSeconds()) + 'Z'
+  }
+  $.dateToISO8601 = function(date) {
+    var padZero = function(n) { n < 10 ? '0' + n : n }
+    return date.getFullYear() + '-' +
+      padZero(date.getMonth() + 1) + '-' +
+      padZero(date.getDate()) + 'T' +
+      padZero(date.getHours()) + ':' +
+      padZero(date.getMinutes()) + ':' +
+      padZero(date.getSeconds()) + 'Z'
+  }
+  
   var today = new Date();
   $.thisYear = function(date) {
     return date && (date.getFullYear() == today.getFullYear());

@@ -178,9 +178,7 @@ shared_examples_for "quiz selenium tests" do
     names[0].text.should == 'first question'
     names[1].text.should == 'second question'
 
-    # load the simulate plugin to simulate a drag event
-    js = File.read('spec/selenium/jquery.simulate.js')
-    driver.execute_script js
+    load_simulate_js
 
     # drag the first question down 100px (next slot)
     driver.execute_script <<-JS
@@ -786,7 +784,7 @@ shared_examples_for "quiz selenium tests" do
     }
     find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
 
-    driver.find_element(:css, '.ui-icon-closethick').click
+    close_visible_dialog
     keep_trying_until {
       driver.find_element(:css, '.add_question_group_link').click
       driver.find_element(:css, '.find_bank_link').should be_displayed

@@ -139,9 +139,7 @@ define 'compiled/Gradebook', [
         else 0
 
       student.row = i for student, i in @rows
-      @multiGrid.removeAllRows()
-      @multiGrid.updateRowCount()
-      @multiGrid.render()
+      @multiGrid.invalidate()
 
     getSubmissionsChunks: =>
       loop
@@ -161,7 +159,7 @@ define 'compiled/Gradebook', [
         student = @students[data.user_id]
         @updateSubmission(submission) for submission in data.submissions
         student.loaded = true
-        @multiGrid.removeRow(student.row)
+        @multiGrid.invalidateRow(student.row)
         @calculateStudentGrade(student)
       @multiGrid.render()
 
@@ -179,14 +177,14 @@ define 'compiled/Gradebook', [
       for submission in submissions
         student = @students[submission.user_id]
         @updateSubmission(submission)
-        @multiGrid.removeRow(student.row)
+        @multiGrid.invalidateRow(student.row)
         @calculateStudentGrade(student)
       @multiGrid.render()
 
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
         @staticCellFormatter(row, col, '')
-      else if !submission?.grade
+      else if !submission?
         @staticCellFormatter(row, col, '-')
       else
         assignment = @assignments[submission.assignment_id]
@@ -216,11 +214,13 @@ define 'compiled/Gradebook', [
 
     calculateStudentGrade: (student) =>
       if student.loaded
+        finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
         submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
         result = INST.GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
-          student["assignment_group_#{group.group.id}"] = group[if @include_ungraded_assignments then 'final' else 'current']
-        student["total_grade"] = result[if @include_ungraded_assignments then 'final' else 'current']
+          student["assignment_group_#{group.group.id}"] = group[finalOrCurrent]
+        student["total_grade"] = result[finalOrCurrent]
+
 
     highlightColumn: (columnIndexOrEvent) =>
       if isNaN(columnIndexOrEvent)
@@ -334,8 +334,7 @@ define 'compiled/Gradebook', [
       @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
           alsoResize: '#gradebook_students_grid',
-          onResize: () =>
-            @multiGrid.resizeCanvas()
+          onResize: => @multiGrid.resizeCanvas()
         })
         .delegate '.slick-cell',
           'mouseenter.gradebook focusin.gradebook' : @highlightColumn
@@ -361,36 +360,6 @@ define 'compiled/Gradebook', [
           else if isMinimized
             @unminimizeColumn($columnHeader)
       $(document).trigger('gridready')
-
-      # # debugging stuff, remove
-      # events =
-      #   onSort: null,
-      #   onHeaderContextMenu: null,
-      #   onHeaderClick: null,
-      #   onClick: null,
-      #   onDblClick: null,
-      #   onContextMenu: null,
-      #   onKeyDown: null,
-      #   onAddNewRow: null,
-      #   onValidationError: null,
-      #   onViewportChanged: null,
-      #   onSelectedRowsChanged: null,
-      #   onColumnsReordered: null,
-      #   onColumnsResized: null,
-      #   onBeforeMoveRows: null,
-      #   onMoveRows: null,
-      #   # onCellChange: "Raised when cell has been edited.   Args: row,cell,dataContext.",
-      #   onBeforeEditCell : "Raised before a cell goes into edit mode.  Return false to cancel.  Args: row,cell,dataContext."
-      #   onBeforeCellEditorDestroy: "Raised before a cell editor is destroyed.  Args: current cell editor."
-      #   onBeforeDestroy: "Raised just before the grid control is destroyed (part of the destroy() method)."
-      #   onCurrentCellChanged: "Raised when the selected (active) cell changed.  Args: {row:currentRow, cell:currentCell}."
-      #   onCellRangeSelected: "Raised when a user selects a range of cells.  Args: {from:{row,cell}, to:{row,cell}}."
-      # $.each events, (event, documentation) =>
-      #   old = @multiGrid.grids[1][event]
-      #   @multiGrid.grids[1][event] = () ->
-      #     $.isFunction(old) && old.apply(this, arguments)
-      #     console.log(event, documentation, arguments)
-      # set up row sorting options
 
     initHeader: =>
       if @sections_enabled
@@ -420,7 +389,8 @@ define 'compiled/Gradebook', [
         $settingsMenu.find("##{setting}").prop('checked', @[setting]).change (event) =>
           @[setting] = $(event.target).is(':checked')
           $.store.userSet "#{setting}_#{@options.context_code}", (''+@[setting])
-          @buildRows()
+          @gradeGrid.setColumns @getVisibleGradeGridColumns()
+          @gradeGrid.invalidate()
 
       # don't show the "show attendance" link in the dropdown if there's no attendance assignments
       unless ($.detect @gradeGrid.getColumns(), -> this.object?.submission_types == "attendance")
@@ -456,12 +426,20 @@ define 'compiled/Gradebook', [
               $('#gradebook-upload-help').show()
         $upload_modal.dialog('open')
 
+    getVisibleGradeGridColumns: ->
+      res = []
+      for column in @allAssignmentColumns
+        submissionType = ''+ column.object.submission_types
+        res.push(column) unless submissionType is "not_graded" and !@include_ungraded_assignments or
+                                submissionType is "attendance" and !@show_attendance
+      res.concat(@aggregateColumns)
+
     initGrid: =>
       #this is used to figure out how wide to make each column
       $widthTester = $('<span style="padding:10px" />').appendTo('#content')
       testWidth = (text, minWidth) -> Math.max($widthTester.text(text).outerWidth(), minWidth)
 
-      @columns = [{
+      @parentColumns = [{
         id: 'student'
         name: I18n.t 'student_name', 'Student Name'
         field: 'display_name'
@@ -480,7 +458,7 @@ define 'compiled/Gradebook', [
         sortable: true
       }]
 
-      for id, assignment of @assignments
+      @allAssignmentColumns = for id, assignment of @assignments
         href = "#{@options.context_url}/assignments/#{assignment.id}"
         html = "<a class='assignment-name' href='#{href}'>#{assignment.name}</a>
                 <a class='gradebook-header-drop' data-assignment-id='#{assignment.id}' href='#' role='button'>#{I18n.t 'assignment_options', 'Assignment Options'}</a>"
@@ -509,21 +487,26 @@ define 'compiled/Gradebook', [
 
         if ''+assignment.submission_types is "not_graded"
           columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded'
-          columnDef.unselectable = true
+
         if fieldName in @assignmentsToHide
           columnDef.width = 10
           do (fieldName) =>
             $(document)
               .bind('gridready', => @minimizeColumn(@$grid.find("[id*='#{fieldName}']")))
               .unbind('gridready.render')
-              .bind('gridready.render', => @gradeGrid.invalidate())
-        @columns.push columnDef
+              .bind('gridready.render', @gradeGrid.invalidate)
+        columnDef
 
-      for id, group of @assignmentGroups
+      @aggregateColumns = for id, group of @assignmentGroups
         html = "#{group.name}"
-        html += "<div class='assignment-points-possible'>#{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: I18n.toPercentage(group.group_weight, precision: 0)}</div>" if group.group_weight?
-
-        @columns.push
+        if group.group_weight?
+          percentage =  I18n.toPercentage(group.group_weight, precision: 0)
+          html += """
+            <div class='assignment-points-possible'>
+              #{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
+            </div>
+          """
+        {
           id: "assignment_group_#{id}"
           field: "assignment_group_#{id}"
           formatter: @groupTotalFormatter
@@ -535,8 +518,9 @@ define 'compiled/Gradebook', [
           cssClass: "meta-cell assignment-group-cell",
           sortable: true
           type: 'assignment_group'
+        }
 
-      @columns.push
+      @aggregateColumns.push
         id: "total_grade"
         field: "total_grade"
         formatter: @groupTotalFormatter
@@ -557,14 +541,15 @@ define 'compiled/Gradebook', [
         asyncPostRenderDelay: 1
         autoEdit: true # whether to go into edit-mode as soon as you tab to a cell
         rowHeight: 35
+        headerHeight: 38
       }, @options)
 
       grids = [{
         selector: '#gradebook_students_grid'
-        columns:  @columns[0..1]
+        columns:  @parentColumns
       }, {
         selector: '#gradebook_grid'
-        columns:  @columns[2...@columns.length]
+        columns:  @getVisibleGradeGridColumns()
         options:
           enableCellNavigation: true
           editable: true
@@ -575,27 +560,30 @@ define 'compiled/Gradebook', [
       @multiGrid = new MultiGrid(@rows, options, grids, 1)
       # this is the magic that actually updates group and final grades when you edit a cell
       @gradeGrid = @multiGrid.grids[1]
-      @gradeGrid.onCellChange = (row, col, student) => @calculateStudentGrade(student)
+      @gradeGrid.onCellChange.subscribe (event, data) =>
+        @calculateStudentGrade(data.item)
+        @gradeGrid.invalidate
+      @gradeGrid.onBeforeCellEditorDestroy.subscribe (event,data) -> debugger
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
         student.row = i for student, i in @rows
         @multiGrid.invalidate()
-      @gradeGrid.onSort = (sortCol, sortAsc) =>
+      @gradeGrid.onSort.subscribe (event, data) =>
         sortRowsBy (a, b) ->
-          aScore = a[sortCol.field]?.score
-          bScore = b[sortCol.field]?.score
+          aScore = a[data.sortCol.field]?.score
+          bScore = b[data.sortCol.field]?.score
           aScore = -99999999999 if not aScore and aScore != 0
           bScore = -99999999999 if not bScore and bScore != 0
-          if sortAsc then bScore - aScore else aScore - bScore
-      @multiGrid.grids[0].onSort = (sortCol, sortAsc) =>
-        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier'}[sortCol.field]
+          if data.sortAsc then bScore - aScore else aScore - bScore
+      @multiGrid.grids[0].onSort.subscribe (event, data) =>
+        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier'}[data.sortCol.field]
         sortRowsBy (a, b) ->
           res = if a[propertyToSortBy] < b[propertyToSortBy] then -1
           else if a[propertyToSortBy] > b[propertyToSortBy] then 1
           else 0
-          if sortAsc then res else 0 - res
+          if data.sortAsc then res else 0 - res
 
-      @multiGrid.parent_grid.onKeyDown = () =>
+      @multiGrid.parent_grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed
         false
       @onGridInit()

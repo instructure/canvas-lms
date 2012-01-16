@@ -37,6 +37,7 @@ class Enrollment < ActiveRecord::Base
   before_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   after_save :clear_email_caches
+  after_save :cancel_future_appointments
 
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :limit_privileges_to_course_section
 
@@ -210,6 +211,12 @@ class Enrollment < ActiveRecord::Base
   def clear_email_caches
     if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
       self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+    end
+  end
+
+  def cancel_future_appointments
+    if workflow_state_changed? && completed?
+      course.appointment_participants.active.current.for_context_codes(user.asset_string).update_all(:workflow_state => 'deleted')
     end
   end
 

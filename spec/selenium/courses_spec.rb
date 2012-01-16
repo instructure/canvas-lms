@@ -9,19 +9,6 @@ shared_examples_for "course selenium tests" do
     account.save!
   end
 
-  it "should not create two assignments when using more options in the wizard" do
-    course_with_teacher_logged_in
-
-    get "/getting_started?fresh=1"
-    expect {
-      expect_new_page_load { driver.find_element(:css, ".next_step_button").click }
-      wait_for_animations
-      driver.find_element(:css, ".add_assignment_link").click
-      expect_new_page_load { driver.find_element(:css, ".more_options_link").click }
-      expect_new_page_load { driver.find_element(:css, "#edit_assignment_form button[type='submit']").click }
-    }.to change(Assignment, :count).by(1)
-  end
-
   it "should properly hide the wizard and remember its hidden state" do
     course_with_teacher_logged_in
 
@@ -97,8 +84,7 @@ shared_examples_for "course selenium tests" do
     second_group.find_elements(:css, 'option').length.should == 1
     second_group.attribute('label').should == 'Test Term'
 
-    option_value = find_option_value(:id, 'copy_from_course', 'second course')
-    driver.find_element(:css, '#copy_from_course option[value="'+option_value+'"]').click
+    click_option('#copy_from_course', 'second course')
     driver.find_element(:css, '#content form').submit
 
     #modify course dates
@@ -147,8 +133,9 @@ shared_examples_for "course selenium tests" do
 
     # first try setting the quota explicitly
     get "/courses/#{@course.id}/details"
+    driver.find_element(:link, 'Course Details').click
     form = driver.find_element(:css, "#course_form")
-    keep_trying_until{ driver.find_element(:css, "#course_form .edit_course_link").should be_displayed }
+    driver.find_element(:css, "#course_form .edit_course_link").should be_displayed
     form.find_element(:css, ".edit_course_link").click
     quota_input = form.find_element(:css, "input#course_storage_quota_mb")
     quota_input.clear

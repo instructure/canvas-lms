@@ -53,4 +53,57 @@ else
     module_function :h
     module_function :html_escape
   end
+
+
+  # Fix for has_many :through where the through and target reflections are the
+  # same table (the through table needs to be aliased)
+  # https://github.com/rails/rails/issues/669 (fixed in rails 3.1)
+  ActiveRecord::Associations::HasManyThroughAssociation.module_eval do
+    protected
+
+    def aliased_through_table_name
+      @reflection.table_name == @reflection.through_reflection.table_name ?
+          ActiveRecord::Base.connection.quote_table_name(@reflection.through_reflection.table_name + '_join') :
+          ActiveRecord::Base.connection.quote_table_name(@reflection.through_reflection.table_name)
+    end
+
+    def construct_conditions
+      conditions = construct_quoted_owner_attributes(@reflection.through_reflection).map do |attr, value|
+        "#{aliased_through_table_name}.#{attr} = #{value}"
+      end
+      conditions << sql_conditions if sql_conditions
+      "(" + conditions.join(') AND (') + ")"
+    end
+
+    def construct_joins(custom_joins = nil)
+      polymorphic_join = nil
+      if @reflection.source_reflection.macro == :belongs_to
+        reflection_primary_key = @reflection.klass.primary_key
+        source_primary_key     = @reflection.source_reflection.primary_key_name
+        if @reflection.options[:source_type]
+          polymorphic_join = "AND %s.%s = %s" % [
+            aliased_through_table_name, "#{@reflection.source_reflection.options[:foreign_type]}",
+            @owner.class.quote_value(@reflection.options[:source_type])
+          ]
+        end
+      else
+        reflection_primary_key = @reflection.source_reflection.primary_key_name
+        source_primary_key     = @reflection.through_reflection.klass.primary_key
+        if @reflection.source_reflection.options[:as]
+          polymorphic_join = "AND %s.%s = %s" % [
+            @reflection.quoted_table_name, "#{@reflection.source_reflection.options[:as]}_type",
+            @owner.class.quote_value(@reflection.through_reflection.klass.name)
+          ]
+        end
+      end
+
+      "INNER JOIN %s %s ON %s.%s = %s.%s %s #{@reflection.options[:joins]} #{custom_joins}" % [
+        @reflection.through_reflection.quoted_table_name,
+        aliased_through_table_name,
+        @reflection.quoted_table_name, reflection_primary_key,
+        aliased_through_table_name, source_primary_key,
+        polymorphic_join
+      ]
+    end
+  end
 end

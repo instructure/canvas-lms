@@ -19,7 +19,7 @@
 class TermsController < ApplicationController
   before_filter :require_context, :require_root_account_management
   def index
-    @root_account = @context.root_account || @context
+    @root_account = @context.root_account
     @context.default_enrollment_term
     @terms = @context.enrollment_terms.active.sort_by{|t| t.start_at || t.created_at }.reverse
   end
@@ -38,7 +38,7 @@ class TermsController < ApplicationController
   def update
     overrides = params[:enrollment_term].delete(:overrides) rescue nil
     @term = @context.enrollment_terms.active.find(params[:id])
-    root_account = @context.root_account || @context
+    root_account = @context.root_account
     if sis_id = params[:enrollment_term].delete(:sis_source_id)
       if sis_id != @account.sis_source_id && root_account.grants_right?(@current_user, session, :manage_sis)
         if sis_id == ''

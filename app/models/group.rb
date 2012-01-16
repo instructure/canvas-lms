@@ -60,10 +60,10 @@ class Group < ActiveRecord::Base
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
   has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :media_objects, :as => :context
-  
+
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted
-  
+
   include StickySisFields
   are_sis_sticky :name
 
@@ -76,19 +76,19 @@ class Group < ActiveRecord::Base
     end
     res
   end
-  
+
   def auto_accept?(user)
     return false unless user
     self.student_organized? && self.context.users.include?(user) &&
     self.join_level == 'parent_context_auto_join'
   end
-  
+
   def allow_join_request?(user)
     return false unless user
     self.student_organized? && self.context.users.include?(user) &&
     ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
-  
+
   def allow_self_signup?(user)
     return false unless user && self.group_category
     self.group_category.unrestricted_self_signup? ||
@@ -98,44 +98,48 @@ class Group < ActiveRecord::Base
   def free_association?(user)
     allow_join_request?(user) || allow_self_signup?(user)
   end
-  
+
   def participants
     participating_users.uniq
   end
-  
+
   def context_code
     raise "DONT USE THIS, use .short_name instead" unless ENV['RAILS_ENV'] == "production"
   end
-  
+
+  def appointment_context_codes
+    {:primary => [context_string], :secondary => [group_category.asset_string]}
+  end
+
   def membership_for_user(user)
     self.group_memberships.find_by_user_id(user && user.id)
   end
-  
+
   def short_name
     name
   end
-  
+
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }.compact
     Group.find(ids)
   end
-  
+
   workflow do
     state :available do
       event :complete, :transitions_to => :completed
       event :close, :transitions_to => :closed
     end
-    
+
     # Closed to new entrants
     state :closed do
       event :complete, :transitions_to => :completed
       event :open, :transitions_to => :available
     end
-    
+
     state :completed
     state :deleted
   end
-  
+
   def active?
     self.available? || self.closed?
   end
@@ -146,36 +150,36 @@ class Group < ActiveRecord::Base
     self.deleted_at = Time.now
     self.save
   end
-  
+
   def close_memberships_if_deleted
     return unless self.deleted?
     memberships = self.group_memberships
     User.update_all({:updated_at => Time.now.utc}, {:id => memberships.map(&:user_id).uniq})
     GroupMembership.update_all({:workflow_state => 'deleted'}, {:id => memberships.map(&:id).uniq})
   end
-  
+
   named_scope :active, :conditions => ['groups.workflow_state != ?', 'deleted']
-  
+
   def full_name
     res = before_label(self.name) + " "
     res += (self.context.course_code rescue self.context.name) if self.context
   end
 
-  
+
   def is_public
     false
   end
-  
+
   def to_atom
     Atom::Entry.new do |entry|
       entry.title     = self.name
       entry.updated   = self.updated_at
       entry.published = self.created_at
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "/groups/#{self.id}")
     end
   end
-  
+
   def add_user(user)
     return nil if !user
     unless member = self.group_memberships.find_by_user_id(user.id)
@@ -183,7 +187,7 @@ class Group < ActiveRecord::Base
     end
     return member
   end
-  
+
   def invite_user(user)
     return nil if !user
     res = nil
@@ -197,7 +201,7 @@ class Group < ActiveRecord::Base
     end
     res
   end
-  
+
   def request_user(user)
     return nil if !user
     res = nil
@@ -211,7 +215,7 @@ class Group < ActiveRecord::Base
     end
     res
   end
-  
+
   def invitees=(params)
     invitees = []
     (params || {}).each do |key, val|
@@ -223,24 +227,24 @@ class Group < ActiveRecord::Base
     end
     invitees.compact.map{|i| self.invite_user(i) }.compact
   end
-  
+
   def peer_groups
     return [] if !self.context || self.student_organized?
     category = self.group_category || GroupCategory.student_organized_for(self.context)
     return [] unless category
     category.groups.find(:all, :conditions => ["id != ?", self.id])
   end
-  
+
   def migrate_content_links(html, from_course)
     Course.migrate_content_links(html, from_course, self)
   end
-  
+
   attr_accessor :merge_mappings
   attr_accessor :merge_results
   def merge_mapped_id(*args)
     nil
   end
-  
+
   def map_merge(*args)
   end
   def log_merge_result(text)
@@ -275,7 +279,7 @@ class Group < ActiveRecord::Base
   def account_id=(new_account_id)
     write_attribute(:account_id, new_account_id)
     if self.account_id_changed?
-      self.root_account = self.account(true).try(:root_account) || self.account
+      self.root_account = self.account(true).try(:root_account)
     end
   end
 
@@ -291,19 +295,19 @@ class Group < ActiveRecord::Base
       can :manage_calendar and
       can :update and can :delete and can :create and
       can :manage_wiki
-    
+
     given { |user| user && self.invited_users.include?(user) }
     can :read
-    
+
     given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
     can :create
-    
+
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
     can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum and can :manage_wiki and can :manage_files
-    
+
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
-    
+
     given { |user, session| self.context && self.free_association?(user) }
     can :read_roster
   end
@@ -311,7 +315,7 @@ class Group < ActiveRecord::Base
   def file_structure_for(user)
     User.file_structure_for(self, user)
   end
-  
+
   def is_a_context?
     true
   end
@@ -355,7 +359,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.serialization_excludes; [:uuid]; end
-  
+
   def self.process_migration(data, migration)
     groups = data['groups'] ? data['groups']: []
     to_import = migration.to_import 'groups'
@@ -369,7 +373,7 @@ class Group < ActiveRecord::Base
       end
     end
   end
-  
+
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access
     return nil if hash[:migration_id] && hash[:groups_to_import] && !hash[:groups_to_import][hash[:migration_id]]
@@ -382,7 +386,7 @@ class Group < ActiveRecord::Base
     item.group_category = hash[:group_category].present? ?
       context.group_categories.find_or_initialize_by_name(hash[:group_category]) :
       GroupCategory.imported_for(context)
-    
+
     item.save!
     context.imported_migration_items << item
     item
@@ -410,7 +414,7 @@ class Group < ActiveRecord::Base
       # remove anything coming automatically from deprecated db column
       json['group'].delete('category')
       if self.group_category
-        # put back version from association 
+        # put back version from association
         json['group']['group_category'] = self.group_category.name
       end
     end

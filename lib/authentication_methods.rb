@@ -49,24 +49,39 @@ module AuthenticationMethods
     session.destroy if skip_session_save
   end
 
-  def load_user
-    if api_request? && params[:access_token]
-      @access_token = AccessToken.find_by_token(params[:access_token])
-      @developer_key = @access_token.try(:developer_key)
+  class AccessTokenError < Exception
+  end
+
+  def load_pseudonym_from_access_token
+    return unless api_request?
+
+    auth_header = ActionController::HttpAuthentication::Basic.authorization(request)
+    token_string = if auth_header.present? && (header_parts = auth_header.split(' ', 2)) && header_parts[0] == 'Bearer'
+      header_parts[1]
+    elsif params[:access_token].present?
+      params[:access_token]
+    end
+
+    if token_string
+      @access_token = AccessToken.find_by_token(token_string)
       if !@access_token.try(:usable?)
-        render :json => {:errors => "Invalid access token"}, :status => :bad_request
-        return false
+        raise AccessTokenError
       end
       @current_user = @access_token.user
       @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account)
       unless @current_user && @current_pseudonym
-        render :json => {:errors => "Invalid access token"}, :status => :bad_request
-        return false
+        raise AccessTokenError
       end
       @access_token.used!
     end
+  end
 
-    if !@access_token
+  def load_user
+    @current_user = @current_pseudonym = nil
+
+    load_pseudonym_from_access_token
+
+    if !@current_pseudonym
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
       else
@@ -83,14 +98,19 @@ module AuthenticationMethods
       if api_request?
         # only allow api_key to be used if basic auth was sent, not if they're
         # just using an app session
+        # this basic auth support is deprecated and marked for removal in 2012
         @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
-        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || raise(ApplicationController::InvalidDeveloperAPIKey)
+        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || raise(AccessTokenError)
       end
     end
 
     if @current_user && @current_user.unavailable?
       @current_pseudonym = nil
-      @current_user = nil 
+      @current_user = nil
+    end
+
+    if api_request? && !@current_user
+      raise AccessTokenError
     end
 
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
@@ -128,20 +148,26 @@ module AuthenticationMethods
 
     as_user_id = api_request? && params[:as_user_id]
     as_user_id ||= session[:become_user_id]
-    begin
-      if as_user_id && (user = api_find(User, as_user_id)) && user.grants_right?(@current_user, session, :become_user)
+    if as_user_id
+      begin
+        user = api_find(User, as_user_id)
+      rescue ActiveRecord::RecordNotFound
+      end
+      if user && user.grants_right?(@current_user, session, :become_user)
         @real_current_user = @current_user
         @current_user = user
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
+      elsif api_request?
+        # fail silently for UI, but not for API
+        render :json => {:errors => "Invalid as_user_id"}, :status => :unauthorized
+        return false
       end
-    rescue ActiveRecord::RecordNotFound
-      # fail silently
     end
 
     @current_user
   end
   private :load_user
-  
+
   def require_user_for_context
     get_context
     if !@context
@@ -257,7 +283,11 @@ module AuthenticationMethods
   end
 
   def delegated_auth_redirect(uri)
-    redirect_to(uri)
+    redirect_to(delegated_auth_redirect_uri(uri))
+  end
+
+  def delegated_auth_redirect_uri(uri)
+    uri
   end
 
   # if true, the user is currently stepping through the oauth2 flow for the canvas api

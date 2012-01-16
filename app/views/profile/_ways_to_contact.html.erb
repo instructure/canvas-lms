@@ -240,7 +240,7 @@ $(document).ready(function() {
     event.preventDefault();
     var channel_id = $(this).parents(".channel").getTemplateData({textValues: ['channel_id']}).channel_id;
     var formData = {
-      'default_communication_channel_id': channel_id
+      'default_email_id': channel_id
     }
     $.ajaxJSON($(this).attr('href'), 'PUT', formData, function(data) {
       var channel_id = data.user.communication_channel.id;
