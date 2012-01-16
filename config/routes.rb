@@ -41,6 +41,7 @@ ActionController::Routing::Routes.draw do |map|
   map.oauth_success "oauth_success", :controller => "users", :action => "oauth_success"
 
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
+  map.help_links 'help_links', :controller => 'info', :action => 'help_links'
 
   question_bank_resources = lambda do |bank|
     bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
@@ -123,7 +124,6 @@ ActionController::Routing::Routes.draw do |map|
     course.import_copy_status 'imports/:id', :controller => 'content_imports', :action => 'copy_course_status', :conditions => {:method => :get}
     course.download_import_archive 'imports/:id/download_archive', :controller => 'content_imports', :action => 'download_archive', :conditions => {:method => :get}
     course.resource :gradebook_upload
-    course.resources :notifications, :only => [:index, :destroy, :update], :collection => {:clear => :post}
     course.grades "grades", :controller => 'gradebooks', :action => 'grade_summary', :id => nil
     course.grading_rubrics "grading_rubrics", :controller => 'gradebooks', :action => 'grading_rubrics'
     course.student_grades "grades/:id", :controller => 'gradebooks', :action => 'grade_summary'
@@ -340,7 +340,6 @@ ActionController::Routing::Routes.draw do |map|
     group.add_user 'add_user', :controller => 'groups', :action => 'add_user'
     group.members 'members.:format', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
     group.members 'members', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
-    group.resources :notifications, :only => [:index, :destroy, :update], :collection => {:clear => :post}
     group.resources :announcements
     group.resources :discussion_topics, :collection => {:reorder => :post} do |topic|
       topic.permissions 'permissions', :controller => 'discussion_topics', :action => 'permissions'
@@ -508,7 +507,6 @@ ActionController::Routing::Routes.draw do |map|
     end
     user.resources :calendar_events
     user.external_tool 'external_tools/:id', :controller => 'users', :action => 'external_tool'
-    user.resources :notifications, :only => [:destroy, :update], :collection => {:clear => :post}
     user.resources :rubrics
     user.resources :rubric_associations do |association|
       association.invite_assessor "invite", :controller => "rubric_assessments", :action => "invite"
@@ -559,7 +557,6 @@ ActionController::Routing::Routes.draw do |map|
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
     dashboard.close_notification 'account_notifications/:id', :controller => 'users', :action => 'close_notification', :conditions => {:method => :delete}
-    dashboard.resources :notifications, :only => [:index, :destroy, :update]
     dashboard.eportfolios "eportfolios", :controller => "eportfolios", :action => "user_index"
     dashboard.grades "grades", :controller => "users", :action => "grades"
     dashboard.resources :rubrics, :as => :assessments
@@ -588,12 +585,16 @@ ActionController::Routing::Routes.draw do |map|
     :controller => 'getting_started', :action => 'finalize', :conditions => { :method => :post }
 
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
+  map.calendar2 'calendar2', :controller => 'calendars', :action => 'show2', :conditions => { :method => :get }
+  map.switch_calendar 'switch_calendar/:preferred_calendar', :controller => 'calendars', :action => 'switch_calendar', :conditions => { :method => :post }
   map.files 'files', :controller => 'files', :action => 'full_index', :conditions => { :method => :get }
   map.s3_success 'files/s3_success/:id', :controller => 'files', :action => 's3_success'
   map.public_url 'files/:id/public_url.:format', :controller => 'files', :action => 'public_url'
   map.file_preflight 'files/preflight', :controller => 'files', :action => 'preflight'
   map.file_create_pending 'files/pending', :controller=> 'files', :action => 'create_pending'
   map.assignments 'assignments', :controller => 'assignments', :action => 'index', :conditions => { :method => :get }
+
+  map.resources :appointment_groups, :only => [:index, :show]
 
   # The priority is based upon order of creation: first created -> highest priority.
 
@@ -668,11 +669,12 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
+      enrollments.get  'courses/:course_id/enrollments', :action => :index, :path_name => 'enrollments'
       enrollments.post 'courses/:course_id/enrollments', :action => :create
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
-      assignments.get 'courses/:course_id/assignments', :action => :index
+      assignments.get 'courses/:course_id/assignments', :action => :index, :path_name => 'course_assignments'
       assignments.get 'courses/:course_id/assignments/:id', :action => :show
       assignments.post 'courses/:course_id/assignments', :action => :create
       assignments.put 'courses/:course_id/assignments/:id', :action => :update
@@ -734,6 +736,7 @@ ActionController::Routing::Routes.draw do |map|
       users.get 'users/self/todo', :action => :todo_items
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
+      users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
     end
 
     api.with_options(:controller => :accounts) do |accounts|
@@ -773,6 +776,24 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :services_api) do |services|
       services.get 'services/kaltura', :action => :show_kaltura_config
       services.post 'services/kaltura_session', :action => :start_kaltura_session
+    end
+
+    api.with_options(:controller => :calendar_events_api) do |events|
+      events.get 'calendar_events', :action => :index, :path_name => 'calendar_events'
+      events.post 'calendar_events', :action => :create
+      events.get 'calendar_events/:id', :action => :show, :path_name => 'calendar_event'
+      events.put 'calendar_events/:id', :action => :update
+      events.delete 'calendar_events/:id', :action => :destroy
+      events.post 'calendar_events/:id/reservations', :action => :reserve
+      events.post 'calendar_events/:id/reservations/:participant_id', :action => :reserve, :path_name => 'calendar_event_reserve'
+    end
+
+    api.with_options(:controller => :appointment_groups) do |groups|
+      groups.get 'appointment_groups', :action => :index, :path_name => 'appointment_groups'
+      groups.post 'appointment_groups', :action => :create
+      groups.get 'appointment_groups/:id', :action => :show, :path_name => 'appointment_group'
+      groups.put 'appointment_groups/:id', :action => :update
+      groups.delete 'appointment_groups/:id', :action => :destroy
     end
   end
 

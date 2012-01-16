@@ -224,7 +224,7 @@ class ExternalToolsController < ApplicationController
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/external_tools' \ 
-  #        -F 'access_token=<token>' \ 
+  #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
   #        -F 'shared_secret=lkjh' \ 
@@ -240,7 +240,7 @@ class ExternalToolsController < ApplicationController
   #
   #   This would create a tool on the account with navigation for the user profile page
   #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
-  #        -F 'access_token=<token>' \ 
+  #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
   #        -F 'shared_secret=lkjh' \ 
@@ -253,7 +253,7 @@ class ExternalToolsController < ApplicationController
   #
   #   This would create a tool on the account with configuration pulled from an external URL
   #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
-  #        -F 'access_token=<token>' \ 
+  #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
   #        -F 'shared_secret=lkjh' \ 
@@ -284,7 +284,7 @@ class ExternalToolsController < ApplicationController
   #
   #   This would update the specified keys on this external tool
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
-  #        -F 'access_token=<token>' \ 
+  #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=Public Example' \ 
   #        -F 'privacy_level=public' 
   def update

@@ -47,6 +47,8 @@ describe ConversationsController do
       get 'index'
       response.should be_success
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
+      assigns[:contexts][:courses].to_a.map{|p|p[1]}.
+        reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
     end
 
     it "should work for an admin as well" do

@@ -62,6 +62,18 @@ shared_examples_for "conversations selenium tests" do
     message
   end
 
+  def get_messages
+    get "/conversations"
+    elements = nil
+    keep_trying_until {
+      elements = find_all_with_jquery("#conversations > ul > li:visible")
+      elements.size == 1
+    }
+    elements.first.click
+    wait_for_ajaximations
+    msgs = driver.find_elements(:css, "div#messages ul.messages > li")
+  end
+
   context "conversation loading" do
     it "should load all conversations" do
       @me = @user
@@ -71,8 +83,19 @@ shared_examples_for "conversations selenium tests" do
       keep_trying_until{
         elements = find_all_with_jquery("#conversations > ul > li:visible")
         elements.last.location_once_scrolled_into_view
-        elements.size == num  
+        elements.size == num
       }
+    end
+
+    it "should properly clear the identity header when conversations are read" do
+      enable_cache do
+        @me = @user
+        5.times { conversation(@me, user).update_attribute(:workflow_state, 'unread') }
+        get '/conversations'
+        driver.find_element(:css, '.conversations li:first-child').click
+        get '/conversations'
+        driver.find_element(:css, '.unread-messages-count').text.should eql '4'
+      end
     end
   end
 
@@ -549,18 +572,6 @@ shared_examples_for "conversations selenium tests" do
       coms.last.find_element(:css, 'p').text.should == 'hey bob'
     end
 
-    def get_messages
-      get "/conversations"
-      elements = nil
-      keep_trying_until {
-        elements = find_all_with_jquery("#conversations > ul > li:visible")
-        elements.size == 1
-      }
-      elements.first.click
-      wait_for_ajaximations
-      msgs = driver.find_elements(:css, "div#messages ul.messages > li")
-    end
-
     it "should interleave submissions with messages based on comment time" do
       @me = @user
       @bob = student_in_course(:name => "bob", :active_all => true).user
@@ -670,7 +681,34 @@ shared_examples_for "conversations selenium tests" do
       @checkbox.should be_displayed
       is_checked(@checkbox).should be_false
     end
+  end
 
+  context "form audience" do
+    before do
+      # have @course, @teacher from before
+      # creates @student
+      student_in_course({:course => @course})
+
+      @course.update_attribute(:name, "the course")
+
+      @group = @course.groups.create(:name => "the group")
+      @group.participating_users << @student
+
+      conversation(@teacher, @student)
+    end
+
+    it "should link to the course page" do
+      get_messages
+
+      find_with_jquery("#create_message_form .audience a").click
+      driver.current_url.should match %r{/courses/#{@course.id}}
+    end
+
+    it "should not be a link in the left conversation list panel" do
+      new_conversation
+
+      find_all_with_jquery("#conversations .audience a").should be_empty
+    end
   end
 end
 

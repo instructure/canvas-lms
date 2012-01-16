@@ -700,8 +700,7 @@ class Submission < ActiveRecord::Base
   def quiz_submission_version
     return nil unless self.quiz_submission
     self.quiz_submission.versions.each do |version|
-      submission = version.model
-      return version.number if submission.finished_at && submission.finished_at <= self.submitted_at
+      return version.number if version.model.finished_at
     end
     nil
   end

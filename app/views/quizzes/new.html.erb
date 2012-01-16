@@ -97,7 +97,7 @@
               <td colspan="2">
                 <input type="hidden" name="quiz[hide_results][never]" value="0"/>
                 <input type="checkbox" name="quiz[hide_results][never]" value="1" id="never_hide_results" <%= 'checked' if @quiz.hide_results != 'always' %> />
-                <label for="never_hide_results"><%= t('labels.never_hide_results', "Let Students See their Quiz Results") %></label>
+                <label for="never_hide_results"><%= t('labels.never_hide_results', "Let Students See their Quiz Responses") %></label>
                 <div style="padding-left: 20px;" class="show_quiz_results_options">
                   <div id="hide_results_only_after_last_holder">
                     <input type="hidden" name="quiz[hide_results][last_attempt]" value="0"/>
@@ -106,7 +106,7 @@
                   </div>
                   <div>
                     <%= check_box :quiz, :show_correct_answers %>
-                    <%= label :quiz, :show_correct_answers, :en => "Show the Correct Answers" %>
+                    <%= label :quiz, :show_correct_answers, :en => "Show Which Answers Were Correct" %>
                   </div>
                 </div>
               </td>

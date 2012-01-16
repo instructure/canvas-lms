@@ -18,6 +18,7 @@
 
 class ActiveRecord::Base
   DROPPED_COLUMNS = {
+    'accounts' => %w(type),
     'attachments' => %w(enrollment_id),
     'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist),
     'courses' => %w(section hidden_tabs),

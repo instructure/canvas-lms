@@ -35,6 +35,10 @@ describe AccountAuthorizationConfig do
   end
   
   context "SAML settings" do
+    before(:each) do
+      @account = Account.create!(:name => "account")
+    end
+    
     it "should load encryption settings" do
       file_that_exists = File.expand_path(__FILE__)
       Setting.set_config('saml', {
@@ -48,11 +52,21 @@ describe AccountAuthorizationConfig do
         }
       })
       
-      @account = Account.new
       config = @account.account_authorization_configs.build(:auth_type => 'saml')
       
       s = config.saml_settings
       s.encryption_configured?.should be_true
+    end
+    
+    it "should set the entity_id with the current domain" do
+      HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
+      @aac = @account.account_authorization_configs.create!(:auth_type => "saml")
+      @aac.entity_id.should == "http://bob.cody.instructure.com/saml2"
+    end
+    
+    it "should not overwrite a specific entity_id" do
+      @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :entity_id => "http://wtb.instructure.com/saml2")
+      @aac.entity_id.should == "http://wtb.instructure.com/saml2"
     end
   end
   

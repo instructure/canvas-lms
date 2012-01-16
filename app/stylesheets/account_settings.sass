@@ -1,40 +1,40 @@
 @import environment.sass
 
-.admins_list  
+.admins_list
   list-style-type: none
   padding-left: 10px
 
-.admins_list li  
+.admins_list li
   width: 300px
   padding: 2px 5px
   margin-bottom: 5px
 
-.admins_list li:hover  
+.admins_list li:hover
   background-color: #eee
   +border-radius(3px)
 
-.admins_list .user_name  
+.admins_list .user_name
   font-weight: bold
   float: left
 
-.admins_list .email  
+.admins_list .email
   clear: left
   display: block
   font-size: 0.8em
   color: #888
   padding-left: 10px
 
-.admins_list .membership_type  
+.admins_list .membership_type
   clear: left
   display: block
   font-size: 0.8em
   padding-left: 10px
 
-.admins_list .remove_account_user_link  
+.admins_list .remove_account_user_link
   float: right
   opacity: 0.5
 
-.admins_list li:hover .remove_account_user_link  
+.admins_list li:hover .remove_account_user_link
   opacity: 1.0
 
 #account_notification_icon
@@ -49,6 +49,11 @@
       background-image: url(/images/help.png)
     &.file
       background-image: url(/images/file.png)
+.custom_help_link
+  border-top: 1px solid #ccc
+  .delete
+    float: right
+
 .announcements_list
   padding-left: 20px
   li

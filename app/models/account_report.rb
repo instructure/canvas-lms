@@ -50,7 +50,7 @@ class AccountReport < ActiveRecord::Base
   end
   
   def root_account
-    self.account.root_account || self.account
+    self.account.root_account
   end
   
   def in_progress?
@@ -75,7 +75,7 @@ class AccountReport < ActiveRecord::Base
   
   def self.available_reports(account)
     # check if there is a reports plugin for this account
-    Canvas::AccountReports.for_account((account.root_account || account).id)
+    Canvas::AccountReports.for_account(account.root_account.id)
   end
   
 end

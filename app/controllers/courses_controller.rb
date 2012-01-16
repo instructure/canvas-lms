@@ -122,7 +122,7 @@ class CoursesController < ApplicationController
       end
 
       if enrollment_term_id = params[:course].delete(:enrollment_term_id)
-        params[:course][:enrollment_term] = (@account.root_account || @account).enrollment_terms.find(enrollment_term_id)
+        params[:course][:enrollment_term] = @account.root_account.enrollment_terms.find(enrollment_term_id)
       end
 
       sis_course_id = params[:course].delete(:sis_course_id)
@@ -261,6 +261,7 @@ class CoursesController < ApplicationController
       render :json => proxy.map { |u| user_json(u, @current_user, session) }
     end
   end
+
 
   include Api::V1::StreamItem
   # @API
@@ -872,7 +873,7 @@ class CoursesController < ApplicationController
       account ||= @domain_root_account.manually_created_courses_account
       return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
       if account.grants_rights?(@current_user, session, :manage_courses)
-        root_account = account.root_account || account
+        root_account = account.root_account
         args[:enrollment_term] = if params[:course][:enrollment_term_id].present?
           root_account.enrollment_terms.find_by_id(params[:course][:enrollment_term_id])
         end
