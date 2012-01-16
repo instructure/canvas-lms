@@ -41,7 +41,7 @@ class Migrator
     end
     @archive_file = settings[:archive_file]
     @archive_file_path = @archive_file.path 
-    config = Setting.from_config('external_migration')
+    config = Setting.from_config('external_migration') || {}
     @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
     @course[:export_folder_path] = File.expand_path(@base_export_dir)
@@ -53,24 +53,17 @@ class Migrator
   end
 
   def unzip_archive
-    begin
-      command = MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
-      logger.debug "Running unzip command: #{command}"
-      zip_std_out = `#{command}`
+    command = MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
+    logger.debug "Running unzip command: #{command}"
+    zip_std_out = `#{command}`
 
-      if $?.exitstatus == 0
-        return true
-      else
-        #todo: error handling
-        message = "Could not unzip archive file: #{zip_std_out}"
-        logger.error message
-      end
-    rescue => e
-      message = "Error unzipping archive file: #{e.message}"
-      add_error "qti", message, nil, e
+    if $?.exitstatus == 0
+      return true
+    elsif $?.exitstatus == 127
+      raise "unzip isn't installed on this system, exit status #{$?.exitstatus}, message: #{zip_std_out}"
+    else
+      raise "Could not unzip archive file, exit status #{$?.exitstatus}, message: #{zip_std_out}"
     end
-
-    false
   end
 
   def delete_unzipped_archive

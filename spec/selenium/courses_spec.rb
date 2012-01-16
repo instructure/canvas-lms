@@ -61,6 +61,9 @@ describe "courses" do
       course_with_teacher_logged_in
       @second_course = Course.create!(:name => 'second course')
       @second_course.offer!
+      5.times do |i|
+        @second_course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}")
+      end
       #add teacher as a user
       e = @second_course.enroll_teacher(@user)
       e.workflow_state = 'active'
@@ -88,6 +91,8 @@ describe "courses" do
 
       click_option('#copy_from_course', 'second course')
       driver.find_element(:css, '#content form').submit
+      
+      driver.find_element(:id, 'copy_everything').click
 
       #modify course dates
       driver.find_element(:id, 'copy_shift_dates').click
@@ -108,14 +113,20 @@ describe "courses" do
       CourseImport.last.perform
 
       keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+      @course.reload
+      @course.wiki.wiki_pages.count.should == 5
     end
 
     it "should copy the course" do
       enable_cache do
         course_with_teacher_logged_in
+        5.times do |i|
+          @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}")
+        end
 
         get "/courses/#{@course.id}/copy"
         expect_new_page_load { driver.find_element(:css, "div#content form").submit }
+        driver.find_element(:id, 'copy_everything').click
         driver.find_element(:id, 'copy_context_form').submit
         wait_for_ajaximations
 
@@ -126,6 +137,7 @@ describe "courses" do
         @new_course = Course.last(:order => :id)
         get "/courses/#{@new_course.id}"
         driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")
+        @new_course.wiki.wiki_pages.count.should == 5
       end
     end
 
