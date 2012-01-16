@@ -502,7 +502,5 @@ stylesheets:
   messages:
     - public/stylesheets/compiled/messages.css
     - public/stylesheets/compiled/slideshow.css
-  dashboard:
-    - public/stylesheets/compiled/g_dashboard_conversations.css
   alerts:
     - public/stylesheets/compiled/alerts.css

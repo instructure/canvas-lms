@@ -583,12 +583,13 @@ describe "conversations tests" do
     end
 
     it "should interleave submissions with messages based on comment time" do
+      SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(10.minutes.ago, 8.minutes.ago)
       @me = @user
       @bob = student_in_course(:name => "bob", :active_all => true).user
       @conversation = conversation(@bob).conversation
-      submission1 = submission_model(:course => @course, :user => @bob)
-      submission1.add_comment(:comment => "hey bob", :author => @me).update_attribute(:created_at, 10.minutes.ago)
       @conversation.conversation_messages.first.update_attribute(:created_at, 9.minutes.ago)
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission1.add_comment(:comment => "hey bob", :author => @me)
 
       # message comes first, then submission, due to creation times
       msgs = get_messages
@@ -597,7 +598,7 @@ describe "conversations tests" do
       msgs[1].should have_class('submission')
 
       # now new submission comment bumps it up
-      submission1.add_comment(:comment => "hey teach", :author => @bob).update_attribute(:created_at, 8.minutes.ago)
+      submission1.add_comment(:comment => "hey teach", :author => @bob)
       msgs = get_messages
       msgs.size.should == 2
       msgs[0].should have_class('submission')
@@ -610,6 +611,31 @@ describe "conversations tests" do
       msgs[0].should have_class('message')
       msgs[1].should have_class('submission')
       msgs[2].should have_class('message')
+    end
+
+    it "should allow deleting submission messages from the conversation" do
+      @me = @user
+      @bob = student_in_course(:name => "bob", :active_all => true).user
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission1.add_comment(:comment => "hey teach", :author => @bob)
+      @conversation = @me.conversations.first
+      @conversation.should be_present
+
+      msgs = get_messages
+      msgs.size.should == 1
+      msgs.first.click
+      wait_for_animations
+      delete = driver.find_element(:id, 'action_delete')
+      delete.should be_displayed
+      delete.click
+      driver.switch_to.alert.accept
+
+      keep_trying_until {
+        elements = find_all_with_jquery("#conversations > ul > li:visible")
+        elements.size == 0
+      }
+      @conversation.reload
+      @conversation.last_message_at.should be_nil
     end
   end
 

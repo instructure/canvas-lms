@@ -325,4 +325,51 @@ describe Conversation do
       rconvo.unread?.should be_true
     end
   end
+
+  context "update_all_for_asset" do
+    it "should delete all messages if requested" do
+      asset = mock
+      asset_messages = mock
+      asset_messages.expects(:destroy_all).returns([])
+      asset.expects(:lock!).returns(true)
+      asset.expects(:conversation_messages).at_least_once.returns(asset_messages)
+      Conversation.update_all_for_asset asset, :delete_all => true
+    end
+
+    it "should not create conversations if only_existing is set" do
+      u1 = user
+      u2 = user
+      conversation = Conversation.initiate([u1.id, u2.id], true)
+      asset = Submission.new(:user => u1)
+      asset.expects(:conversation_groups).returns([[u1.id, u2.id]])
+      asset.expects(:lock!).returns(true)
+      asset.expects(:conversation_messages).at_least_once.returns([])
+      Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
+      conversation.conversation_messages.size.should eql 1
+    end
+
+    it "should create conversations by default" do
+      u1 = user
+      u2 = user
+      conversation = Conversation.initiate([u1.id, u2.id], true)
+      asset = Submission.new(:user => u1)
+      asset.expects(:conversation_groups).returns([[u1.id, u2.id]])
+      asset.expects(:lock!).returns(true)
+      asset.expects(:conversation_messages).at_least_once.returns([])
+      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author_id => u1.id, :body => "asdf"})
+      Conversation.expects(:initiate).returns(conversation)
+      Conversation.update_all_for_asset asset, :update_message => true
+      conversation.conversation_messages.size.should eql 1
+    end
+
+    it "should delete obsolete messages" do
+      old_message = mock
+      old_message.expects(:destroy).returns(true)
+      asset = mock
+      asset.expects(:lock!).returns(true)
+      asset.expects(:conversation_groups).returns([])
+      asset.expects(:conversation_messages).at_least_once.returns([old_message])
+      Conversation.update_all_for_asset(asset, {})
+    end
+  end
 end

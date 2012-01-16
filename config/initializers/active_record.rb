@@ -313,6 +313,43 @@ class ActiveRecord::Base
     {:order => order_by}
   }
 
+  # set up class-specific getters/setters for a polymorphic association, e.g.
+  #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
+  def self.belongs_to(name, options={})
+    if types = options.delete(:types)
+      add_polymorph_methods(name, Array(types))
+    end
+    super
+  end
+
+  def self.add_polymorph_methods(generic, specifics)
+    specifics.each do |specific|
+      next if instance_methods.include?(specific.to_s)
+      class_name = specific.to_s.classify
+      correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
+
+      class_eval <<-CODE
+      def #{specific}
+        #{generic} if #{correct_type}
+      end
+
+      def #{specific}=(val)
+        if val.nil?
+          # we don't want to unset it if it's currently some other type, i.e.
+          # foo.bar = Bar.new
+          # foo.baz = nil
+          # foo.bar.should_not be_nil
+          self.#{generic} = nil if #{correct_type}
+        elsif val.is_a?(#{class_name})
+          self.#{generic} = val
+        else
+          raise ArgumentError, "argument is not a #{class_name}"
+        end
+      end
+      CODE
+    end
+  end
+
   module UniqueConstraintViolation
     def self.===(error)
       ActiveRecord::StatementInvalid === error &&

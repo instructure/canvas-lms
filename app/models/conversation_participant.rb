@@ -28,6 +28,7 @@ class ConversationParticipant < ActiveRecord::Base
            # conditions are redundant, but they let us use the best index
 
   named_scope :visible, :conditions => "last_message_at IS NOT NULL"
+  named_scope :deleted, :conditions => "last_message_at IS NULL"
   named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
   named_scope :unread, :conditions => "workflow_state = 'unread'"
   named_scope :archived, :conditions => "workflow_state = 'archived'"
@@ -90,17 +91,18 @@ class ConversationParticipant < ActiveRecord::Base
   def participants(options = {})
     options = {
       :include_context_info => true,
-      :include_forwarded_participants => false
+      :include_indirect_participants => false
     }.merge(options)
 
     context_info = {}
     participants = conversation.participants
-    if options[:include_forwarded_participants]
-      user_ids = messages.select{ |m|
-        m.forwarded_messages
-      }.map{ |m|
-        m.forwarded_messages.map(&:author_id)
-      }.flatten.uniq - participants.map(&:id)
+    if options[:include_indirect_participants]
+      user_ids =
+        messages.map(&:all_forwarded_messages).flatten.map(&:author_id) |
+        messages.map{
+          |m| m.submission.submission_comments.map(&:author_id) if m.submission
+        }.compact.flatten
+      user_ids -= participants.map(&:id)
       participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
     end
     return participants unless options[:include_context_info]
@@ -134,7 +136,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def add_message(body, options={}, &blk)
-    conversation.add_message(user, body, options.update(:generated => false), &blk)
+    conversation.add_message(user, body, options.merge(:generated => false), &blk)
   end
 
   def remove_messages(*to_delete)
@@ -166,7 +168,7 @@ class ConversationParticipant < ActiveRecord::Base
     super unless private?
     if subscribed_changed?
       if subscribed?
-        update_cached_data(false)
+        update_cached_data(:recalculate_count => false, :set_last_message_at => false)
         self.workflow_state = 'unread' if last_message_at_changed? && last_message_at > last_message_at_was
       else
         self.workflow_state = 'read' if unread?
@@ -197,11 +199,22 @@ class ConversationParticipant < ActiveRecord::Base
     state :archived
   end
 
-  private
-  def update_cached_data(recalculate_count=true)
+  def update_cached_data(options = {})
+    options = {:recalculate_count => true, :set_last_message_at => true}.update(options)
     if latest = messages.human.first
-      self.message_count = messages.human.size if recalculate_count
-      self.last_message_at = latest.created_at
+      self.message_count = messages.human.size if options[:recalculate_count]
+      self.last_message_at = if last_message_at.nil?
+        options[:set_last_message_at] ? latest.created_at : nil
+      elsif subscribed?
+        latest.created_at
+      else
+        # not subscribed, so set last_message_at to itself (or if that message
+        # was just removed to the closest one before it, or if none, the
+        # closest one after it)
+        times = messages.map(&:created_at)
+        older = times.reject!{ |t| t <= last_message_at} || []
+        older.first || times.reverse.first
+      end
       self.has_attachments = attachments.size > 0
       self.has_media_objects = messages.with_media_comments.size > 0
     else
@@ -212,8 +225,22 @@ class ConversationParticipant < ActiveRecord::Base
       self.has_media_objects = false
       self.label = nil
     end
+    # note that last_authored_at doesn't know/care about messages you may
+    # have deleted... this is because it is only used by other participants
+    # when displaying the most active participants in the conversation.
+    # TODO: track visible_last_authored_at (from user's POV) for "By Me" filter
+    if options[:recalculate_last_authored_at]
+      my_latest = conversation.conversation_messages.human.first(:conditions => {:author_id => user_id})
+      self.last_authored_at = my_latest ? my_latest.created_at : nil
+    end
   end
 
+  def update_cached_data!(*args)
+    update_cached_data(*args)
+    save!
+  end
+
+  private
   def update_unread_count
     if workflow_state_changed? && [workflow_state, workflow_state_was].include?('unread')
       User.update_all "unread_conversations_count = unread_conversations_count #{workflow_state == 'unread' ? '+' : '-'} 1, updated_at = '#{Time.now.to_s(:db)}'",

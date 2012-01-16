@@ -122,4 +122,68 @@ describe ActiveRecord::Base do
       lambda { User.unique_constraint_retry { raise "oh crap" } }.should raise_error
     end
   end
+
+  context "add_polymorphs" do
+    class OtherPolymorphyThing; end
+    before :all do
+      # it already has :submission
+      ConversationMessage.add_polymorph_methods :asset, [:other_polymorphy_thing]
+    end
+    
+    before do
+      @conversation = Conversation.create
+      @user = user_model
+      @assignment = assignment_model
+    end
+
+    context "getter" do
+      it "should return the polymorph" do
+        sub = @user.submissions.create!(:assignment => @assignment)
+        m = @conversation.conversation_messages.build
+        m.asset = sub
+
+        m.submission.should be_an_instance_of(Submission)
+      end
+
+      it "should not return the polymorph if the type is wrong" do
+        m = @conversation.conversation_messages.build
+        m.asset = @user.submissions.create!(:assignment => @assignment)
+
+        m.other_polymorphy_thing.should be_nil
+      end
+    end
+
+    context "setter" do
+      it "should set the underlying association" do
+        m = @conversation.conversation_messages.build
+        s = @user.submissions.create!(:assignment => @assignment)
+        m.submission = s
+        
+        m.asset_type.should eql 'Submission'
+        m.asset_id.should eql s.id
+        m.asset.should eql s
+        m.submission.should eql s
+        
+        m.submission = nil
+
+        m.asset_type.should be_nil
+        m.asset_id.should be_nil
+        m.asset.should be_nil
+        m.submission.should be_nil
+      end
+
+      it "should not change the underlying association if it's another object and we're setting nil" do
+        m = @conversation.conversation_messages.build
+        s =  @user.submissions.create!(:assignment => @assignment)
+        m.submission = s
+        m.other_polymorphy_thing = nil
+
+        m.asset_type.should eql 'Submission'
+        m.asset_id.should eql s.id
+        m.asset.should eql s
+        m.submission.should eql s
+        m.other_polymorphy_thing.should be_nil
+      end
+    end
+  end
 end

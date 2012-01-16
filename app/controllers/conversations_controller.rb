@@ -43,6 +43,10 @@ class ConversationsController < ApplicationController
   #   When scope is set to "labeled", you can use this argument to limit the
   #   results to a particular label.
   #
+  # @argument interleave_submissions Boolean, default false. If true, the
+  #   message_count will also include these submission-based messages in the
+  #   total. See the show action for more information.
+  #
   # @response_field id The unique identifier for the conversation.
   # @response_field workflow_state The current state of the conversation
   #   (read, unread or archived)
@@ -166,7 +170,7 @@ class ConversationsController < ApplicationController
       else
         render :json => [jsonify_conversation(@conversation.reload,
                                              :include_context_info => true,
-                                             :include_forwarded_participants => true,
+                                             :include_indirect_participants => true,
                                              :messages => [@message])]
       end
     else
@@ -178,6 +182,12 @@ class ConversationsController < ApplicationController
   # Returns information for a single conversation. Response includes all
   # fields that are present in the list/index action, as well as messages,
   # submissions, and extended participant information.
+  #
+  # @argument interleave_submissions Boolean, default false. If true,
+  #   submission data will be returned as first class messages interleaved
+  #   with other messages. The submission details (comments, assignment, etc.)
+  #   will be stored as the submission property on the message. Note that if
+  #   set, the message_count will also include these messages in the total.
   #
   # @response_field participants Array of relevant users. Includes current
   #   user. If there are forwarded messages in this conversation, the authors
@@ -254,15 +264,19 @@ class ConversationsController < ApplicationController
     return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" + (params[:message] ? '?message=' + URI.encode(params[:message], Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")) : '') unless request.xhr? || params[:format] == 'json'
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread?
-    submissions = []
-    if @conversation.one_on_one?
-      submissions = Submission.for_conversation_participant(@conversation).with_comments
-      submissions = submissions.sort_by{ |s| s.submission_comments.last.created_at }.reverse
+    messages = @conversation.messages
+    ConversationMessage.send(:preload_associations, messages, :asset)
+    submissions = messages.map(&:submission).compact
+    Submission.send(:preload_associations, submissions, [:assignment, :submission_comments])
+    if interleave_submissions
+      submissions = nil
+    else
+      messages = messages.select{ |message| message.submission.nil? }
     end
     render :json => jsonify_conversation(@conversation,
                                          :include_context_info => true,
-                                         :include_forwarded_participants => true,
-                                         :messages => @conversation.messages,
+                                         :include_indirect_participants => true,
+                                         :messages => messages,
                                          :submissions => submissions)
   end
 
@@ -689,7 +703,7 @@ class ConversationsController < ApplicationController
       ret[:context_name] = context[:context_name] if context[:context_name] && context_name.nil?
       ret
     }
-    
+
     result.reject!{ |context| terms.any?{ |part| !context[:name].downcase.include?(part) } } if terms.present?
     result.reject!{ |context| exclude.include?(context[:id]) }
 
@@ -756,6 +770,11 @@ class ConversationsController < ApplicationController
     audience = conversation.participants.reject{ |u| u.id == conversation.user_id }
     result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
     result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
+    unless interleave_submissions
+      result['message_count'] = result[:submissions] ?
+        result['message_count'] - result[:submissions].size :
+        conversation.messages.human.scoped(:conditions => "asset_id IS NULL").size
+    end
     result[:audience] = audience.map(&:id)
     result[:audience_contexts] = contexts_for(audience)
     result[:avatar_url] = avatar_url_for(conversation)
@@ -765,11 +784,12 @@ class ConversationsController < ApplicationController
 
   def jsonify_messages(messages)
     messages.map{ |message|
-      message = message.as_json
-      message['media_comment'] = media_comment_json(message['media_comment']) if message['media_comment']
-      message['attachments'] = message['attachments'].map{ |attachment| attachment_json(attachment) }
-      message['forwarded_messages'] = jsonify_messages(message['forwarded_messages'])
-      message
+      result = message.as_json
+      result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
+      result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment) }
+      result['forwarded_messages'] = jsonify_messages(result['forwarded_messages'])
+      result['submission'] = submission_json(message.submission, message.submission.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) if message.submission
+      result
     }
   end
 
@@ -791,5 +811,9 @@ class ConversationsController < ApplicationController
       hash[:avatar_url] = avatar_url_for_user(user, options[:blank_avatar_fallback]) if options[:include_participant_avatars]
       hash
     }
+  end
+
+  def interleave_submissions
+    params[:interleave_submissions] || !api_request?
   end
 end

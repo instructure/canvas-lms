@@ -715,17 +715,7 @@ I18n.scoped 'conversations', (I18n) ->
       inbox_resize()
       $messages.show()
       i = j = 0
-      message = data.messages[0]
-      submission = data.submissions[0]
-      while message || submission
-        if message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.submission_comments[submission.submission_comments.length - 1]?.created_at).datetime)
-          # there's another message, and the next submission (if any) is not newer than it
-          $message_list.append build_message(message)
-          message = data.messages[++i]
-        else
-          # no more messages, or the next submission is newer than the next message
-          $message_list.append build_submission(submission)
-          submission = data.submissions[++j]
+      $message_list.append build_message(message) for message in data.messages
       $form.loadingImage 'remove'
       $message_list.hide().slideDown 'fast'
       if $selected_conversation.hasClass 'unread'
@@ -843,6 +833,7 @@ I18n.scoped 'conversations', (I18n) ->
     message = processed_lines.join "\n"
 
   build_message = (data) ->
+    return build_submission(data) if data.submission
     $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id)
     $message.data('id', data.id)
     $message.addClass(if data.generated
@@ -852,6 +843,7 @@ I18n.scoped 'conversations', (I18n) ->
     else
       'other'
     )
+    $message.addClass('forwardable')
     user = MessageInbox.user_cache[data.author_id]
     if avatar = user?.avatar_url
       $message.prepend $('<img />').attr('src', avatar).addClass('avatar')
@@ -909,12 +901,10 @@ I18n.scoped 'conversations', (I18n) ->
       e.stopPropagation()
     $attachment
 
-  submission_id = (data) ->
-    "submission_#{data.assignment_id}_#{data.user_id}"
-
   build_submission = (data) ->
-    $submission = $("#submission_blank").clone(true).attr('id', submission_id(data))
-    $submission.data('id', submission_id(data))
+    $submission = $("#submission_blank").clone(true).attr('id', data.id)
+    $submission.data('id', data.id)
+    data = data.submission
     $ul = $submission.find('ul')
     $header = $ul.find('li.header')
     href = $.replaceTags($header.find('a').attr('href'), course_id: data.assignment.course_id, assignment_id: data.assignment_id, id: data.user_id)
@@ -923,8 +913,11 @@ I18n.scoped 'conversations', (I18n) ->
     user.html_name ?= html_name_for_user(user) if user
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
     $header.find('.title').html $.h(data.assignment.name)
-    if data.submitted_at
-      $header.find('span.date').text $.parseFromISO(data.submitted_at).datetime_formatted
+    $header.find('span.date').text(if data.submitted_at
+      $.parseFromISO(data.submitted_at).datetime_formatted
+    else
+      I18n.t('not_applicable', 'N/A')
+    )
     $header.find('.audience').html user?.html_name || $.h(user_name)
     if data.score && data.assignment.points_possible
       score = "#{data.score} / #{data.assignment.points_possible}"
@@ -1234,6 +1227,7 @@ I18n.scoped 'conversations', (I18n) ->
       $message_list.find('> li :checkbox').attr('checked', false)
     else
       state = !!$message_list.find('li.selected').length
+    $('#action_forward').parent().showIf(state and $message_list.find('li.selected.forwardable').length)
     if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
     $form[if state then 'addClass' else 'removeClass']('disabled')
 
@@ -1332,7 +1326,7 @@ I18n.scoped 'conversations', (I18n) ->
         # intended for us, just let it go
       else
         $message = $(e.target).closest('#messages > ul > li')
-        unless $message.hasClass('generated') or $message.hasClass('submission')
+        unless $message.hasClass('generated')
           $selected_conversation?.addClass('inactive')
           $message.toggleClass('selected')
           $message.find('> :checkbox').attr('checked', $message.hasClass('selected'))
@@ -1475,13 +1469,13 @@ I18n.scoped 'conversations', (I18n) ->
         $selected_messages.fadeOut 'fast'
         inbox_action $(this),
           loading_node: $selected_conversation
-          data: {remove: (parseInt message.id.replace(/message_/, '') for message in $selected_messages)}
+          data: {remove: ($(message).data('id') for message in $selected_messages)}
           success: ($node, data) ->
             # TODO: once we've got infinite scroll hooked up, we should
             # have the response tell us the number of messages still in
             # the conversation, and key off of that to know if we should
             # delete the conversation (or possibly reload its messages)
-            if $message_list.find('> li').not('.selected, .generated, .submission').length
+            if $message_list.find('> li').not('.selected, .generated').length
               $selected_messages.remove()
               update_conversation($node, data)
             else
@@ -1493,7 +1487,7 @@ I18n.scoped 'conversations', (I18n) ->
       $forward_form.find("input[name!=authenticity_token], textarea").val('').change()
       $preview = $forward_form.find('ul.messages').first()
       $preview.html('')
-      $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'))
+      $preview.html($message_list.find('> li.selected.forwardable').clone(true).removeAttr('id').removeClass('self'))
       $preview.find('> li')
         .removeClass('selected odd')
         .find('> :checkbox')

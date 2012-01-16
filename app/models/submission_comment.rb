@@ -18,7 +18,7 @@
 
 class SubmissionComment < ActiveRecord::Base
   include SendToStream
-  
+
   belongs_to :submission #, :touch => true
   belongs_to :author, :class_name => 'User'
   belongs_to :recipient, :class_name => 'User'
@@ -34,40 +34,16 @@ class SubmissionComment < ActiveRecord::Base
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
 
   attr_accessible :comment, :submission, :submission_id, :recipient, :recipient_id, :author, :context_id, :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden
-  
+
   before_save :infer_details
   after_save :update_submission
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
-
-  trigger.after(:insert) do
-    <<-SQL
-    UPDATE submissions
-    SET has_admin_comment=EXISTS(
-      SELECT 1 FROM submission_comments AS sc, assignments AS a, courses AS c, enrollments AS e
-      WHERE sc.submission_id = submissions.id AND a.id = submissions.assignment_id
-        AND c.id = a.context_id AND a.context_type = 'Course' AND e.course_id = c.id
-        AND e.user_id = sc.author_id AND e.workflow_state = 'active'
-        AND e.type IN ('TeacherEnrollment', 'TaEnrollment'))
-    WHERE id = NEW.submission_id;
-    SQL
-  end
-
-  trigger.after(:delete) do
-    <<-SQL
-    UPDATE submissions
-    SET has_admin_comment=EXISTS(
-      SELECT 1 FROM submission_comments AS sc, assignments AS a, courses AS c, enrollments AS e
-      WHERE sc.submission_id = submissions.id AND a.id = submissions.assignment_id
-        AND c.id = a.context_id AND a.context_type = 'Course' AND e.course_id = c.id
-        AND e.user_id = sc.author_id AND e.workflow_state = 'active'
-        AND e.type IN ('TeacherEnrollment', 'TaEnrollment'))
-    WHERE id = OLD.submission_id;
-    SQL
-  end
+  after_create { |c| c.submission.create_or_update_conversations!(:create) unless c.hidden? }
+  after_destroy { |c| c.submission.create_or_update_conversations!(:destroy) unless c.hidden? }
 
   serialize :cached_attachments
-  
+
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
     SubmissionComment.find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
@@ -75,17 +51,17 @@ class SubmissionComment < ActiveRecord::Base
       comment.destroy
     end
   end
-  
+
   def skip_destroy_callbacks!
     @skip_destroy_callbacks = true
   end
-  
+
   has_a_broadcast_policy
 
   def media_comment?
     self.media_comment_id && self.media_comment_type
   end
-  
+
   on_create_send_to_streams do
     if self.submission
       if self.author_id == self.submission.user_id
@@ -100,14 +76,14 @@ class SubmissionComment < ActiveRecord::Base
   set_policy do
     given {|user,session| !self.teacher_only_comment && (self.submission.grants_right?(user, session, :read_grade) || !self.hidden?) }
     can :read
-    
+
     given {|user| self.author == user}
     can :read and can :delete
-    
+
     given {|user, session| self.submission.grants_right?(user, session, :grade) }
     can :read and can :delete
   end
-  
+
   set_broadcast_policy do |p|
     p.dispatch :submission_comment
     p.to { [submission.user] - [author] }
@@ -125,7 +101,7 @@ class SubmissionComment < ActiveRecord::Base
       record.submission.user_id == record.author_id
     }
   end
-  
+
   def update_participants
     self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.submission.user_id, 'submitter')
     self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.author_id, 'author')
@@ -133,7 +109,7 @@ class SubmissionComment < ActiveRecord::Base
       self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(user.id, 'admin')
     end
   end
-  
+
   def reply_from(opts)
     user = opts[:user]
     message = opts[:text].strip
@@ -153,15 +129,15 @@ class SubmissionComment < ActiveRecord::Base
       })
     end
   end
-  
+
   def context
     read_attribute(:context) || self.submission.assignment.context rescue nil
   end
-  
+
   def attachment_ids=(ids)
     # raise "Cannot set attachment id's directly"
   end
-  
+
   def attachments=(attachments)
     # Accept attachments that were already approved, those that were just created
     # or those that were part of some outside context.  This is all to prevent
@@ -171,39 +147,39 @@ class SubmissionComment < ActiveRecord::Base
     old_ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
     write_attribute(:attachment_ids, attachments.select{|a| old_ids.include?(a.id) || a.recently_created || a.context != self.submission.assignment }.map{|a| a.id}.join(","))
   end
-  
+
   def infer_details
     self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
   end
-  
+
   def force_reload_cached_attachments
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.save
   end
-  
-  
+
+
   def attachments
     ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
     attachments = associated_attachments
     attachments += self.submission.assignment.attachments rescue []
     attachments.select{|a| ids.include?(a.id) }
   end
-  
+
   def update_submission
     return nil if hidden?
     comments_count = SubmissionComment.count(:conditions => { :submission_id => submission_id, :hidden => false })
     Submission.update_all({ :submission_comments_count => comments_count }, { :id => submission_id }) rescue nil
   end
-  
+
   def formatted_body(truncate=nil)
     self.extend TextHelper
     res = format_message(comment).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
     res
   end
-  
+
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
   end

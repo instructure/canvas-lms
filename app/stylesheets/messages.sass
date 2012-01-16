@@ -212,7 +212,7 @@ ul.messages, ul.conversations
           padding: 0 1em
           border: none
           color: #000
-  > li.selected
+  > li.selected, > li.submission.selected ul > li, > li.submission.selected ul > li.header
     background-color: #e5f3ff
   .audience
     color: #222
@@ -300,8 +300,9 @@ ul.messages
   .audience
     color: #636363
   > li.submission
-    padding: 0px
-    margin: 12px 24px 12px 48px
+    padding: 0 40px 0 0
+    margin: 12px 24px 12px 24px
+    background-color: #ebebeb
     ul
       margin: 0px
       padding: 0px
@@ -310,10 +311,14 @@ ul.messages
         position: relative
         padding: 14px 50px 14px 78px
         margin: 0
+        background-color: #fff
+        border-right: 1px solid #cccccc
       > li.header
         padding: 10px
+        margin-right: -40px
         background-color: #ebebeb
         color: #888
+        border-right: none
         b.title
           display: block
           font-size: 1.2em

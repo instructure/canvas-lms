@@ -3,7 +3,7 @@
   content_for :page_title, join_title(@assignment.title, @submission.user.name)
   add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
   add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
-  add_crumb(@user.try_rescue(:short_name)) 
+  add_crumb(@user.try_rescue(:short_name))
   @active_tab = "assignments"
 %>
 <% content_for :stylesheets do %>
@@ -233,18 +233,18 @@
           $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'audio');
         }
       })
-      
+
       // this is to prevent the default behavior of loading the video inline from happening
       // the .delegate(".play_comment_link"... and the .delegate('a.instructure_inline_media_comment'...
       // are actually selecting the same links I just wanted to use the different selectors because
       // instructure.js uses 'a.instructure_inline_media_comment' as the selector for its .live handler
       // to show things inline.
-      .delegate('a.instructure_inline_media_comment', 'click', function(e){ 
+      .delegate('a.instructure_inline_media_comment', 'click', function(e){
         // dont let it bubble past this so it doesnt get to the .live handler to show the video inline
-        e.preventDefault(); 
+        e.preventDefault();
         e.stopPropagation();
       });
-    
+
   });
   $(document).fragmentChange(function(event, hash) {
     if(hash == '#rubric') {
@@ -274,7 +274,7 @@
         <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
       <% end %>
       <% if can_do(@submission, @current_user, :read_grade) && !@assignment.muted? %>
-        <%= before_label('grade', 'Grade') %> 
+        <%= before_label('grade', 'Grade') %>
           <% if can_do(@assignment, @current_user, :grade) %>
             <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
           <% elsif can_do(@submission, @current_user, :read_grade) %>
@@ -282,15 +282,15 @@
           <% end %>
           <br/>
         <% if can_do(@assignment, @current_user, :grade) %>
-          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.published_score %></span> 
+          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.published_score %></span>
         <% elsif can_do(@submission, @current_user, :read_grade) %>
-          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span> 
+          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span>
         <% end %>
         <% if @submission.assignment.points_possible %>
           <%= t('out_of_points', 'out of %{points_possible}', :points_possible => @submission.assignment.points_possible) %>
         <% end %>
         <br/>
-        
+
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) && turnitin_score[:similarity_score] %>
             <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
@@ -304,7 +304,7 @@
     <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
     <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= context_user_name(@context, @submission.user) %></span>
     <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">
-      <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %> 
+      <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
       <%= t('late_submission', '(late)') if @submission.late? %>
     </span>
     <% if can_do(@context, @current_user, :grade) %>
@@ -319,10 +319,10 @@
       </div>
       <div class="assessment_request_incomplete_message" style="<%= hidden if @assessment_request.completed? %>">
         <% if @assessment_request && @assessment_request.rubric_association %>
-          <%= mt('peer_review_not_done_rubric', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment and fill out the rubric form to the right.") 
+          <%= mt('peer_review_not_done_rubric', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment and fill out the rubric form to the right.")
           %>
         <% else %>
-          <%= mt('peer_review_not_done', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment.") 
+          <%= mt('peer_review_not_done', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment.")
             %>
         <% end %>
       </div>
@@ -331,7 +331,7 @@
     <% end %>
     <div class="clear"></div>
   </div>
-  
+
   <% if @assignment.rubric_association %>
     <% @visible_rubric_assessments ||= [] %>
   <div id="rubric_holder" style="position: absolute; right: 0px; padding: 5px; background-color: #fff; border: 1px solid #aaa; border-right-width: 0; display: none;">
@@ -359,7 +359,7 @@
     <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
   </div>
   <% end %>
-  
+
   <div style="display: none;">
     <% if can_do(@context, @current_user, :manage_grades) %>
       <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_url">&nbsp;</a>
@@ -381,7 +381,7 @@
             <% unless can_do(@submission, @current_user, :read_grade) %>
               <i><%= t('only_see_your_own_comments', "You may not see all comments right now because the assignment is currently being graded, or you are reviewing your peer's assignment") %></i><br/><br/>
             <% end %>
-            <% @submission.submission_comments(:visible).each do |comment| %>
+            <% @submission.visible_submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
               <div class="comment" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
