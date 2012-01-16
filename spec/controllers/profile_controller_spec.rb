@@ -48,4 +48,20 @@ describe ProfileController do
       @cc.reload.position.should == 2
     end
   end
+
+  describe "GET 'communication'" do
+    it "should not fail when a user has a notification policy with no notification" do
+      # A user might have a NotificationPolicy with no Notification if the policy was created
+      # as part of throttling a user's "immediate" messages. Eventually we should fix how that
+      # works, but for now we just make sure that that state does not cause an error for the
+      # user when they go to their notification preferences.
+      user_model
+      user_session(@user)
+      cc = @user.communication_channels.create!(:path => 'user@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+      @user.notification_policies.create!(:notification => nil, :communication_channel => cc, :frequency => 'daily')
+
+      get 'communication'
+      response.should be_success
+    end
+  end
 end
