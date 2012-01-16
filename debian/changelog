@@ -1,3 +1,85 @@
+canvas-lms (2012.01.16.10.25) testing; urgency=low
+
+  * Package ref: fbc7a227e7202f73c04dd0d6317c0ed105b1a800
+  *
+  * [-9cc2952] Revert "add id to wiki page urls. fixes #2635."
+  * [+ff2ecff] error on invalid as_user_id in API calls
+  * [+3827675] support authorization header for api access tokens
+  * [+908e406] don't show "infinity%" in gradebook2, fixes: #6571
+  * [+156d5f8] expose IE version to INST.browser
+  * [+b6127a2] upgrade slickgrid
+  * [+6e6eff6] show submission_type icons in gradebook2
+  * [+bad526a] fix url path to assignment groups
+  * [+21cbaf1] fix masquerading page error with no referer refs #6533
+  * [+3c4f81e] fix courses api spec
+  * [+cbbc1c5] more s/Account.first/Account.default/
+  * [+e0b58c2] add a rspec nested_instafail_formatter
+  * [+e9e5329] delegated_auth_redirect_uri for easier testing of delegated_auth_redirect
+  * [+e08b0d2] fix intermittent qti spec failure
+  * [+ed6951f] reword quiz settings to be more clear
+  * [+4d70f07] rename doc/templates/rest to doc/api
+  * [+6ce92e5] remove basic auth from api documentation, fixes #6716
+  * [+926f391] selenium test for course wizard
+  * [+8536f19] selenium gradebook2 tests
+  * [+e363203] better indexes for pseudonyms closes #6193
+  * [+0d2026f] add link to api terms of service page
+  * [+d32988b] s/recieved/received/g
+  * [+1bca358] getting coffeescript and handlebars to work with plugins
+  * [+71cac7d] fix js files to not error when minified
+  * [+bdd79a4] add account user list to users api. fixes #6741.
+  * [+e280a30] don't use presence/absence of root_account(_id) to determine if an account is a root account
+  * [+de92da4] remove the account.root_account || account idiom
+  * [+cc8ef79] initial sharding stubs
+  * [+f9a8f32] api json conversion improvements
+  * [+3edc9dd] graphael amd module
+  * [+36cc02b] changing course api url to html_url
+  * [+ca26020] a little whitespace cleanup on quizzes.js
+  * [+08f11d1] changed emails used in course wizard to use @example.com
+  * [+08d6797] Clean up in selenium gradebook2 tests
+  * [+e2fba03] selenium syllabus tests
+  * [+22097f8] make selenium people_spec.rb more robust
+  * [+0c891b8] selenium login logout tests
+  * [+406ed4f] selenium course settings tests
+  * [+95ab7c7] fixing spec that is failing inconsistently
+  * [+9bb915f] build framework for api error responses
+  * [+47d0c0f] fixing inconsistently failing selenium courses spec
+  * [+2c160d7] don't send notifications to unconfirmed communication channels
+  * [+b158878] make the selenium profile_spec more robust
+  * [+c37a83b] fix existing bad data from the sis_cc bug refs #6707
+  * [+a417559] help dialog overhaul fixes: #5784
+  * [+1065c8d] use close_visible_dialog in several selenium specs
+  * [+59edf79] fix collaborations on files page
+  * [+320a3ba] replace find_option_value with click_option in several selenium specs
+  * [+79075a7] fixing selenium spec in gradebook2 that keeps failing
+  * [+28198d2] remove identity bar from cache when inbox count changes. fixes #6027.
+  * [+257a2f1] course name in conversations should be a link
+  * [+80c9058] calendar and scheduler apis; refs #3395
+  * [+6059b1c] calendar2 and scheduler front-end; refs #3395
+  * [+c2eca84] Use versions in Submission#quiz_submission_version
+  * [+640008a] calendar redirection, switcher link
+  * [+afa8220] selenium modules tests
+  * [+1cb590e] make the migration only send later if production
+  * [+7c4b96e] wrap opening dialog with keep_trying_until in gradebook2 selenium spec
+  * [+3f4adf0] fix changing default e-mail when editing username is disabled
+  * [+3686b2d] drop unused column accounts.type
+  * [+2a86f49] instructure_csv_zip is not a valid import type
+  * [+64d687e] handle decimal points in rubrics correctly
+  * [+cd723f0] return absolute uri for course copy api responses
+  * [+6b821e0] add api to list all enrollments in a course. fixes #6762
+  * [+23da7a4] a bunch of scheduler improvements
+  * [+51dd4d6] made the time block separator column a little wider
+  * [+81d0d75] add qti test case for metadata out of place
+  * [+3e6821d] fix breadcrumbs when viewing wiki pages in a group; fixes #6822
+  * [+b3a6dea] Revert "add id to wiki page urls."
+  * [+4f5607e] make saml entity use the account's domain
+  * [+0da76b8] fix time block bug
+  * [+0ea9ed8] highlight days with appointment slots available
+  * [+63a2c22] fix dashboard notifications for appointments
+  * [+9b139a9] fix showing the date range for a reserved appointment in scheduler
+  * [+fbc7a22] fix showing default notification preferences, again; refs #6876
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 16 Jan 2012 10:25:25 -0700
+
 canvas-lms (2012.01.13.11.02) testing; urgency=low
 
   * Package ref: 6e2c57f97b893f9705fc3e6e6748a140fa3430a6
