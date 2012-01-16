@@ -238,10 +238,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
           end
         end
         upload_file('#sidebar_upload_file_form', :text)
-        wait_for_ajax_requests
-
-
-        subfolder.find_elements(:css, '.file.text').length.should == 1
+        wait_for_ajaximations
+        keep_trying_until { driver.find_element(:css, '.file_list').should include_text('testfile') }
       end
 
       it "should show uploaded files in file tree and add them to the rce" do

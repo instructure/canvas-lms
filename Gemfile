@@ -71,7 +71,7 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.14.0'
+  gem 'selenium-webdriver', '2.15.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.7.2'
 end

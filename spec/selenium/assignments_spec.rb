@@ -243,18 +243,15 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '.more_options_link').click
     driver.find_element(:id, 'assignment_assignment_group_id').should be_displayed
     click_option('#assignment_assignment_group_id', second_group.name)
-    #not using select_option_text because there is a carriage return in the option text
-    driver.find_element(:id, 'assignment_grading_type').click
-    driver.find_element(:css, '#assignment_grading_type option[value="letter_grade"]').click
+    click_option('#assignment_grading_type', 'Letter Grade')
 
     #check grading levels dialog
     wait_for_animations
     keep_trying_until { driver.find_element(:css, 'a.edit_letter_grades_link').should be_displayed }
     driver.find_element(:css, 'a.edit_letter_grades_link').click
     wait_for_animations
-    driver.find_element(:id, 'ui-dialog-title-edit_letter_grades_form').should be_displayed
+    driver.find_element(:id, 'edit_letter_grades_form').should be_displayed
     close_visible_dialog
-    driver.find_element(:id, 'ui-dialog-title-edit_letter_grades_form').should_not be_displayed
 
     #check peer reviews option
     driver.find_element(:css, '#edit_assignment_form #assignment_peer_reviews').click

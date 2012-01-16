@@ -25,8 +25,10 @@ describe "gradebook2 selenium tests" do
   end
 
   def edit_grade(cell, grade)
-    cell.click
-    grade_input = cell.find_element(:css, '.grade')
+    grade_input = keep_trying_until do
+      cell.click
+      cell.find_element(:css, '.grade')
+    end
     grade_input.clear
     grade_input.send_keys(grade)
     grade_input.send_keys(:return)
