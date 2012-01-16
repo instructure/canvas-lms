@@ -288,19 +288,17 @@ describe "assignment selenium tests" do
       driver.find_element(:css, '.ui-datepicker-trigger').click
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
+      driver.find_element(:id, 'assignment_points_possible').clear
       driver.find_element(:id, 'assignment_points_possible').send_keys('5')
       click_option('.assignment_submission_types', 'External Tool')
       expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
       keep_trying_until do
         find_with_jquery('#context_external_tools_select td.tools .tool:first-child:visible').click
-        true
-      end
-      sleep 2 # wait for javascript to execute
-      keep_trying_until do
+        sleep 2 # wait for javascript to execute
         driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
       end
-      driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[1].click
       keep_trying_until do
+        driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[1].click
         driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
       end
       driver.find_element(:css, '#select_context_content_dialog .add_item_button').click

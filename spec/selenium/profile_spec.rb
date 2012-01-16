@@ -133,7 +133,7 @@ describe "profile tests" do
       get "/profile"
       keep_trying_until { driver.find_element(:css, ".profile_pic_link.none") }.click
       dialog = driver.find_element(:id, "profile_pic_dialog")
-      dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img").length.should == 2
+      dialog.find_elements(:css, ".profile_pic_list span.img").length.should == 2
       dialog.find_element(:css, ".add_pic_link").click
       filename, fullpath, data = get_file("graded.png")
       dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
@@ -142,10 +142,10 @@ describe "profile tests" do
       FilesController.before_filter { sleep 5; true }
 
       dialog.find_element(:css, 'button[type="submit"]').click
-      spans = dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img")
-      spans.length.should == 3
+      spans = dialog.find_elements(:css, ".profile_pic_list span.img")
       new_image = spans.last.find_element(:css, 'img')
       new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+      spans.length.should == 3
 
       FilesController.filter_chain.pop
 

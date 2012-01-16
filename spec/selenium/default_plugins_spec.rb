@@ -125,12 +125,12 @@ shared_examples_for "plugins selenium tests" do
   it "should allow configuring scribd plugin" do
     settings = Canvas::Plugin.find(:scribd).try(:settings)
     settings.should be_nil
-    
+
     ScribdAPI.stubs(:config_check).returns("Bad check")
     get "/plugins/scribd"
 
     driver.find_element(:css, "#plugin_setting_disabled").click
-    
+
     driver.find_element(:css, "#settings_api_key").send_keys("asdf")
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
     keep_trying_until {
@@ -139,14 +139,13 @@ shared_examples_for "plugins selenium tests" do
       driver.find_element(:css, "#flash_error_message").should be_displayed
     }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
-    
+
     ScribdAPI.stubs(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
-    
-    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
-    driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
-    
+
+    keep_trying_until{ assert_flash_notice_message /successfully updated/ }
+
     settings = Canvas::Plugin.find(:scribd).try(:settings)
     settings.should_not be_nil
     settings[:api_key].should == 'asdf'
@@ -166,16 +165,16 @@ shared_examples_for "plugins selenium tests" do
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_error_message").should be_displayed }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     Tinychat.stubs(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
-    
-    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
-    driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
-    
+
+    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").should be_displayed }
+    assert_flash_notice_message /successfully updated/
+
     settings = Canvas::Plugin.find(:tinychat).try(:settings)
     settings.should_not be_nil
     settings[:api_key].should == 'asdf'
