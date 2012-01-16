@@ -117,12 +117,13 @@ class PageView < ActiveRecord::Base
     when :log
       Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
     when :cache
-      begin
-        json = self.attributes.as_json
-        json['is_update'] = true if self.is_update
-        Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
-      rescue Exception
-        # we're going to ignore the error for now, if redis is unavailable
+      json = self.attributes.as_json
+      json['is_update'] = true if self.is_update
+      if Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
+        true
+      else
+        # redis failed, push right to the db
+        self.save
       end
     when :db
       self.save
