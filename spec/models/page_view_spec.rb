@@ -31,11 +31,22 @@ describe PageView do
   end
 
   if Canvas.redis_enabled?
-    it "should store into redis through to the db in cache mode" do
+    before do
       Setting.set('enable_page_views', 'cache')
+    end
+
+    it "should store into redis through to the db in cache mode" do
       @page_view.store.should be_true
       PageView.count.should == 0
       PageView.process_cache_queue
+      PageView.count.should == 1
+      PageView.first.attributes.except('created_at', 'updated_at').should == @page_view.attributes.except('created_at', 'updated_at')
+    end
+
+    it "should store directly to the db if redis is down" do
+      Canvas::Redis.patch
+      Redis::Client.any_instance.expects(:ensure_connected).raises(Timeout::Error)
+      @page_view.store.should be_true
       PageView.count.should == 1
       PageView.first.attributes.except('created_at', 'updated_at').should == @page_view.attributes.except('created_at', 'updated_at')
     end
