@@ -32,6 +32,7 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
   named_scope :unread, :conditions => "workflow_state = 'unread'"
   named_scope :archived, :conditions => "workflow_state = 'archived'"
+  named_scope :starred, :conditions => "label = 'starred'"
   named_scope :labeled, lambda { |label|
     {:conditions => label ?
       ["label = ?", label] :
@@ -46,6 +47,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def self.labels
     (@labels ||= {})[I18n.locale] ||= [
+      ['starred', I18n.t('labels.starred', "Starred")],
       ['red', I18n.t('labels.red', "Red")],
       ['orange', I18n.t('labels.orange', "Orange")],
       ['yellow', I18n.t('labels.yellow', "Yellow")],
@@ -68,7 +70,8 @@ class ConversationParticipant < ActiveRecord::Base
       :message_count => message_count,
       :subscribed => subscribed?,
       :private => private?,
-      :label => label,
+      :starred => label == 'starred',
+      :label => label != 'starred' ? label : nil,
       :properties => properties(latest)
     }.with_indifferent_access
   end

@@ -524,17 +524,28 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       color: #636363
       .audience
         color: #222
-      .action_remove_label, .action_add_label, .action_mark_as_read, .action_mark_as_unread
+      .action_remove_label, .action_add_label
+        display: none
+      // .action_remove_label, .action_add_label,
+      .action_mark_as_read, .action_mark_as_unread, .action_star, .action_unstar
         text-indent: -9999em
         overflow: hidden
         position: absolute
-      .action_remove_label, .action_add_label
+      // .action_remove_label, .action_add_label,
+      .action_star, .action_unstar
         top: -1px
         left: 0
         width: 24px
         height: 24px
         background-color: transparent
-      .action_remove_label
+        background-repeat: no-repeat
+        background-position: 3px 3px
+      .action_star
+        background-image: url(/images/messages/star.png)
+      .action_unstar
+        background-image: url(/images/messages/star-lit.png)
+      // .action_remove_label,
+      .action_unstar
         display: none
       .action_mark_as_read, .action_mark_as_unread
         top: 50%
@@ -543,7 +554,8 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
         height: 24px
         margin-top: -12px
         background: transparent url(/images/messages/new-replied-icon_sprite.png) 1px 0 no-repeat
-      .action_mark_as_read, .action_remove_label
+      // .action_remove_label,
+      .action_mark_as_read, .action_unstar
         display: none
       .action_mark_as_unread
         background-position: 1px 48px
@@ -566,17 +578,24 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
     > li:hover, > li.menu_active
       .action_mark_as_unread:hover
         background-position: 1px -24px
+      .action_star
+        background-image: url(/images/messages/star-active.png)
       cursor: pointer
       .actions
         display: block
         right: 17px
       .date
         visibility: hidden
-    > li.labeled
+    // > li.labeled
       .action_add_label
         display: none
       .action_remove_label
         background-position: 1px -24px
+        display: block
+    > li.starred
+      .action_star
+        display: none
+      .action_unstar
         display: block
     > li.attachments .attachments, > li.media_objects .media_objects
       display: inline

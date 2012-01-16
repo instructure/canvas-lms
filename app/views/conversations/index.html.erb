@@ -22,6 +22,7 @@
             <ul>
               <li class="<%= 'checked' if @scope == :inbox %>"><%= link_to t('inbox_views.inbox', "Inbox"), conversations_url %></li>
               <li class="<%= 'checked' if @scope == :unread %>"><%= link_to t('inbox_views.unread_messages', "Unread"), conversations_unread_url %></li>
+              <li class="<%= 'checked' if @scope == :starred %>"><%= link_to t('inbox_views.starred_messages', "Starred"), conversations_starred_url %></li>
               <li class="label_group">
               <%= before_label t('labels.conversation_label', 'Label') %><br />
               <% ConversationParticipant.labels.each do |label, text| %>
@@ -111,6 +112,8 @@
     <%= link_to t('inbox_actions.remove_label', "Remove Label"), conversation_url('{{ id }}', :conversation => {:label => ''}), :title => t('inbox_actions.remove_label', "Remove Label"), :class => 'action_remove_label label_icon' %>
     <%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :title => t('inbox_actions.mark_as_unread', "Mark as Unread"), :class => :action_mark_as_unread %>
     <%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :title => t('inbox_actions.mark_as_read', "Mark as Read"), :class => :action_mark_as_read %>
+    <%= link_to t('inbox_actions.star', "Star"), conversation_url('{{ id }}', :conversation => {:starred => true}), :title =>  t('inbox_actions.star', "Star"), :class => :action_star %>
+    <%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :title => t('inbox_actions.unstar', "Unstar"), :class => :action_unstar %>
     <span class="date"></span>
     <img class="attachments" src="/images/messages/attach-gray.png" title="<%= t('has_attachments', 'This conversation has one or more attachments') %>">
     <img class="media_objects" src="/images/messages/audio-gray.png" title="<%= t('has_audio', 'This conversation has one or more audio comments') %>">
@@ -177,6 +180,8 @@
     <ul>
       <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :id => 'action_mark_as_unread', :class => :action_mark_as_unread %></li>
       <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => 'action_mark_as_read', :class => :action_mark_as_read %></li>
+      <li><%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :id => 'action_unstar', :class => :action_unstar %></li>
+      <li><%= link_to t('inbox_actions.star', "Star"), conversation_url('{{ id }}', :conversation => {:starred => true}), :id => 'action_star', :class => :action_star %></li>
       <li class="label_group">
       <%= before_label t('labels.conversation_label', 'Label') %><br />
       <% ConversationParticipant.labels.each do |label, text| %>

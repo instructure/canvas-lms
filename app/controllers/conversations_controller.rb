@@ -33,7 +33,7 @@ class ConversationsController < ApplicationController
   # @API
   # Returns the list of conversations for the current user, most recent ones first.
   #
-  # @argument scope [optional, "unread"|"labeled"|"archived"]
+  # @argument scope [optional, "unread"|"starred"|"labeled"|"archived"]
   #   When set, only return conversations of the specified type. For example,
   #   set to "unread" to return only conversations that haven't been read.
   #   The default behavior is to return all non-archived conversations (i.e.
@@ -58,6 +58,7 @@ class ConversationsController < ApplicationController
   #   subscribed to the conversation
   # @response_field private Indicates whether this is a private conversation
   #   (i.e. audience of one)
+  # @response_field starred Whether the conversation is starred
   # @response_field label Current label for this conversation, if set
   # @response_field properties Additional conversation flags (last_author,
   #   attachments, media_objects). Each listed property means the flag is
@@ -85,6 +86,7 @@ class ConversationsController < ApplicationController
   #       "message_count": 2,
   #       "subscribed": true,
   #       "private": true,
+  #       "starred": false,
   #       "label": null,
   #       "properties": ["attachments"],
   #       "audience": [2],
@@ -100,10 +102,15 @@ class ConversationsController < ApplicationController
         @view_name = I18n.t('index.inbox_views.unread', 'Unread')
         @no_messages = I18n.t('no_unread_messages', 'You have no unread messages')
         @current_user.conversations.unread
+      when 'starred'
+        @view_name = I18n.t('index.inbox_views.starred', 'Starred')
+        @no_messages = I18n.t('no_starred_messages', 'You have no starred messages')
+        @current_user.conversations.starred
       when 'labeled'
         @label, @view_name = ConversationParticipant.labels.detect{ |l| l.first == params[:label] }
         @view_name ||= I18n.t('index.inbox_views.labeled', 'Labeled')
         @no_messages = case @label
+          when 'starred'; I18n.t('no_starred_messages', 'You have no starred messages')
           when 'red'; I18n.t('no_red_messages', 'You have no red messages')
           when 'orange'; I18n.t('no_orange_messages', 'You have no orange messages')
           when 'yellow'; I18n.t('no_yellow_messages', 'You have no yellow messages')
@@ -217,6 +224,7 @@ class ConversationsController < ApplicationController
   #     "message_count": 2,
   #     "subscribed": true,
   #     "private": true,
+  #     "starred": false,
   #     "label": null,
   #     "properties": ["attachments"],
   #     "audience": [2],
@@ -289,6 +297,7 @@ class ConversationsController < ApplicationController
   #
   # @argument conversation[workflow_state] ["read"|"unread"|"archived"] Change the state of this conversation
   # @argument conversation[subscribed] [true|false] Toggle the current user's subscription to the conversation (only valid for group conversations). If unsubscribed, the user will still have access to the latest messages, but the conversation won't be automatically flagged as unread, nor will it jump to the top of the inbox.
+  # @argument conversation[starred] [true|false] Toggle the starred state of the current user's view of the conversation. Takes precedence over labels; if starred is true, label is forced to null.
   # @argument conversation[label] ["red"|"orange"|"yellow"|"green"|"blue"|"purple"|null] Set/unset a flag on this conversation
   #
   # @example_response
@@ -300,10 +309,23 @@ class ConversationsController < ApplicationController
   #     "message_count": 2,
   #     "subscribed": true,
   #     "private": true,
+  #     "starred": false,
   #     "label": null,
   #     "properties": ["attachments"]
   #   }
   def update
+    # force label to 'starred' if starred is true. set label to nil (to unstar)
+    # if starred is false, unless label is already set (if so, use the set
+    # value). do nothing if starred is absent.
+    starred = params[:conversation].delete(:starred)
+    unless starred.nil?
+      if ['true', true, '1', 1].include?(starred)
+        params[:conversation][:label] = 'starred'
+      else
+        params[:conversation][:label] ||= nil
+      end
+    end
+
     if @conversation.update_attributes(params[:conversation])
       render :json => @conversation
     else
@@ -333,6 +355,7 @@ class ConversationsController < ApplicationController
   #     "message_count": 0,
   #     "subscribed": true,
   #     "private": true,
+  #     "starred": false,
   #     "label": null,
   #     "properties": []
   #   }
@@ -359,6 +382,7 @@ class ConversationsController < ApplicationController
   #     "message_count": 2,
   #     "subscribed": true,
   #     "private": false,
+  #     "starred": null,
   #     "label": null,
   #     "properties": [],
   #     "audience": [2, 3, 4],
@@ -405,6 +429,7 @@ class ConversationsController < ApplicationController
   #     "message_count": 2,
   #     "subscribed": true,
   #     "private": false,
+  #     "starred": null,
   #     "label": null,
   #     "properties": [],
   #     "audience": [2, 3],
@@ -451,6 +476,7 @@ class ConversationsController < ApplicationController
   #     "message_count": 1,
   #     "subscribed": true,
   #     "private": true,
+  #     "starred": null,
   #     "label": null,
   #     "properties": ["attachments"]
   #   }

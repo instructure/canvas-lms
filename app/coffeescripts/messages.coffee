@@ -1065,12 +1065,14 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation.find('span.date').text $.friendlyDatetime($.parseFromISO(data.last_message_at).datetime)
     move_direction = if $conversation.data('last_message_at') > data.last_message_at then 'down' else 'up'
     $conversation.data 'last_message_at', data.last_message_at
-    $conversation.data 'label', data.label
+    $conversation.data 'label', (if data.starred then null else data.label)
+    $conversation.data 'starred', data.starred
     $p = $conversation.find('p')
     $p.text data.last_message
     ($conversation.addClass(property) for property in data.properties) if data.properties.length
     $conversation.addClass('private') if data['private']
-    $conversation.addClass('labeled').addClass(data['label']) if data['label']
+    $conversation.addClass('labeled').addClass(data.label) if data.label && !data.starred
+    $conversation.addClass('starred') if data.starred
     $conversation.addClass('unsubscribed') unless data.subscribed
     set_conversation_state $conversation, data.workflow_state
     reposition_conversation($conversation, move_direction, move_mode) if move_mode
@@ -1121,6 +1123,8 @@ I18n.scoped 'conversations', (I18n) ->
       actions      :
         markAsRead   : $('#action_mark_as_read').parent()
         markAsUnread : $('#action_mark_as_unread').parent()
+        unstar       : $('#action_unstar').parent()
+        star         : $('#action_star').parent()
         unsubscribe  : $('#action_unsubscribe').parent()
         subscribe    : $('#action_subscribe').parent()
         forward      : $('#action_forward').parent()
@@ -1150,6 +1154,11 @@ I18n.scoped 'conversations', (I18n) ->
     # show/hide relevant links
     elements.actions.markAsRead.show() if elements.conversation.hasClass 'unread'
     elements.actions.markAsUnread.show() if elements.conversation.hasClass 'read'
+
+    if elements.conversation.hasClass 'starred'
+      elements.actions.unstar.show()
+    else
+      elements.actions.star.show()
 
     elements.labels.group.show()
     elements.labels.icon.removeClass 'checked'
@@ -1375,6 +1384,42 @@ I18n.scoped 'conversations', (I18n) ->
         before: ($node) -> set_conversation_state $node, 'unread'
         error: ($node) -> set_conversation_state $node, 'read'
 
+    $('.action_unstar').click (e) ->
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      starred = null
+      inbox_action $(this),
+        method: 'PUT'
+        before: ($node) ->
+          starred = $node.data('starred')
+          $node.removeClass('starred') if starred
+          starred
+        success: ($node, data) ->
+          update_conversation($node, data)
+          remove_conversation $node if MessageInbox.scope == 'starred'
+        error: ($node) ->
+          $node.addClass('starred')
+
+    $('.action_star').click (e) ->
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      starred = null
+      current_label = null
+      inbox_action $(this),
+        method: 'PUT'
+        before: ($node, options) ->
+          current_label = $node.data('label')
+          starred = $node.data('starred')
+          if !starred
+            $node.addClass('starred')
+            $node.removeClass('labeled ' + current_label) if current_label
+          !starred
+        success: ($node, data) ->
+          update_conversation($node, data)
+        error: ($node) ->
+          $node.removeClass('starred')
+          $node.addClass('labeled ' + current_label) if current_label
+
     $('.action_remove_label').click (e) ->
       e.preventDefault()
       e.stopImmediatePropagation()
@@ -1396,15 +1441,20 @@ I18n.scoped 'conversations', (I18n) ->
       e.stopImmediatePropagation()
       label = null
       current_label = null
+      starred = null
       inbox_action $(this),
         method: 'PUT'
         before: ($node, options) ->
           current_label = $node.data('label')
           label = options.url.match(/%5Blabel%5D=(.*)/)[1]
+          starred = $node.data('starred')
           if label is 'last'
             label = $last_label
             options.url = options.url.replace(/%5Blabel%5D=last/, '%5Blabel%5D=' + label)
-          $node.removeClass('red orange yellow green blue purple').addClass('labeled').addClass(label)
+          if label isnt current_label
+            $node.removeClass('labeled ' + current_label) if current_label
+            $node.removeClass('starred') if starred
+            $node.addClass('labeled').addClass(label)
           label isnt current_label
         success: ($node, data) ->
           update_conversation($node, data)
@@ -1412,6 +1462,7 @@ I18n.scoped 'conversations', (I18n) ->
           remove_conversation $node if MessageInbox.label_scope and MessageInbox.label_scope isnt label
         error: ($node) ->
           $node.removeClass('labeled ' + label)
+          $node.addClass('starred') if starred
           $node.addClass('labeled ' + current_label) if current_label
 
     $('#action_add_recipients').click (e) ->

@@ -62,6 +62,7 @@ describe ConversationsController, :type => :integration do
           "subscribed" => false,
           "private" => false,
           "label" => nil,
+          "starred" => false,
           "properties" => ["last_author"],
           "audience" => [@billy.id, @bob.id],
           "audience_contexts" => {
@@ -83,6 +84,7 @@ describe ConversationsController, :type => :integration do
           "subscribed" => true,
           "private" => true,
           "label" => "blue",
+          "starred" => false,
           "properties" => ["last_author"],
           "audience" => [@bob.id],
           "audience_contexts" => {
@@ -131,6 +133,7 @@ describe ConversationsController, :type => :integration do
           "subscribed" => false,
           "private" => false,
           "label" => "green",
+          "starred" => false,
           "properties" => ["last_author"],
           "audience" => [@billy.id, @bob.id],
           "audience_contexts" => {
@@ -144,6 +147,27 @@ describe ConversationsController, :type => :integration do
           ]
         }
       ]
+    end
+
+    it "should include starred conversations in starred scope regardless of if read or archived" do
+      @c1 = conversation(@bob, :workflow_state => 'unread', :label => "starred")
+      @c2 = conversation(@billy, :workflow_state => 'read', :label => "starred")
+      @c3 = conversation(@jane, :workflow_state => 'archived', :label => "starred")
+
+      json = api_call(:get, "/api/v1/conversations.json?scope=starred",
+              { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'starred' })
+      json.size.should == 3
+      json.map{ |c| c["id"] }.sort.should == [@c1, @c2, @c3].map{ |c| c.conversation_id }.sort
+    end
+
+    it "should not include unstarred conversations in starred scope regardless of if read or archived" do
+      @c1 = conversation(@bob, :workflow_state => 'unread')
+      @c2 = conversation(@billy, :workflow_state => 'read', :label => "blue")
+      @c3 = conversation(@jane, :workflow_state => 'archived')
+
+      json = api_call(:get, "/api/v1/conversations.json?scope=starred",
+              { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'starred' })
+      json.should be_empty
     end
 
     it "should mark all conversations as read" do
@@ -182,6 +206,7 @@ describe ConversationsController, :type => :integration do
             "subscribed" => true,
             "private" => true,
             "label" => nil,
+            "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@bob.id],
             "audience_contexts" => {
@@ -220,6 +245,7 @@ describe ConversationsController, :type => :integration do
             "subscribed" => true,
             "private" => false,
             "label" => nil,
+            "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@billy.id, @bob.id],
             "audience_contexts" => {
@@ -262,6 +288,7 @@ describe ConversationsController, :type => :integration do
             "subscribed" => true,
             "private" => true,
             "label" => nil,
+            "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@bob.id],
             "audience_contexts" => {
@@ -320,6 +347,7 @@ describe ConversationsController, :type => :integration do
             "subscribed" => true,
             "private" => true,
             "label" => nil,
+            "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@billy.id],
             "audience_contexts" => {
@@ -597,6 +625,7 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => true,
         "label" => nil,
+        "starred" => false,
         "properties" => ["last_author", "attachments", "media_objects"],
         "audience" => [@bob.id],
         "audience_contexts" => {
@@ -635,6 +664,27 @@ describe ConversationsController, :type => :integration do
         ],
         "submissions" => []
       })
+    end
+
+    it "should properly flag if starred in the response" do
+      conversation1 = conversation(@bob)
+      conversation2 = conversation(@billy, :label => "starred")
+      conversation3 = conversation(@jane, :label => "blue")
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation1.conversation_id}",
+              { :controller => 'conversations', :action => 'show', :id => conversation1.conversation_id.to_s, :format => 'json' })
+      json["label"].should be_nil
+      json["starred"].should be_false
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation2.conversation_id}",
+              { :controller => 'conversations', :action => 'show', :id => conversation2.conversation_id.to_s, :format => 'json' })
+      json["label"].should be_nil
+      json["starred"].should be_true
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation3.conversation_id}",
+              { :controller => 'conversations', :action => 'show', :id => conversation3.conversation_id.to_s, :format => 'json' })
+      json["label"].should == "blue"
+      json["starred"].should be_false
     end
 
     context "submission comments" do
@@ -717,6 +767,7 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => true,
         "label" => nil,
+        "starred" => false,
         "properties" => ["last_author"],
         "audience" => [@bob.id],
         "audience_contexts" => {
@@ -753,6 +804,7 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => false,
         "label" => nil,
+        "starred" => false,
         "properties" => ["last_author"],
         "audience" => [@billy.id, @bob.id, @jane.id, @joe.id, @tommy.id],
         "audience_contexts" => {
@@ -790,8 +842,59 @@ describe ConversationsController, :type => :integration do
         "subscribed" => false,
         "private" => false,
         "label" => 'red',
+        "starred" => false,
         "properties" => ["last_author"]
       })
+    end
+
+    it "should be able to star the conversation via update" do
+      conversation = conversation(@bob, @billy)
+
+      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+              { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :conversation => {:starred => true} })
+      json["label"].should be_nil
+      json["starred"].should be_true
+    end
+
+    it "should be able to unstar the conversation via update" do
+      conversation = conversation(@bob, @billy, :label => "starred")
+
+      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+              { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :conversation => {:starred => false} })
+      json["label"].should be_nil
+      json["starred"].should be_false
+    end
+
+    it "should prefer stars over labels if both present in update" do
+      conversation = conversation(@bob, @billy)
+
+      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+              { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :conversation => {:starred => true, :label => "red"} })
+      json["label"].should be_nil
+      json["starred"].should be_true
+    end
+
+    it "should use any provided label when unstarring via update" do
+      conversation = conversation(@bob, @billy, :label => "starred")
+
+      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+              { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :conversation => {:starred => false, :label => "red"} })
+      json["label"].should == "red"
+      json["starred"].should be_false
+    end
+
+    it "should respect provided label when no starryness specified for update" do
+      conversation = conversation(@bob, @billy, :label => "starred")
+
+      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+              { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :conversation => {:label => "red"} })
+      json["label"].should == "red"
+      json["starred"].should be_false
     end
 
     it "should delete messages from the conversation" do
@@ -811,6 +914,7 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => true,
         "label" => nil,
+        "starred" => false,
         "properties" => ["last_author"]
       })
     end
@@ -829,6 +933,7 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => true,
         "label" => nil,
+        "starred" => false,
         "properties" => []
       })
     end
