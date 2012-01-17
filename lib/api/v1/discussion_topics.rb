@@ -33,7 +33,7 @@ module Api::V1::DiscussionTopics
 
     url = nil
     if topic.podcast_enabled
-      code = @context_enrollment ? @context_enrollment.feed_code : @context.feed_code
+      code = (@context_enrollment || @context || context).feed_code
       url = feeds_topic_format_path(topic.id, code, :rss)
     end
 
