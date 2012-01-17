@@ -202,7 +202,8 @@ describe ExternalToolsController do
     <cartridge_icon identifierref="BLTI001_Icon"/>
 </cartridge_basiclti_link>  
       XML
-      Net::HTTP.expects(:get).with(URI.parse("http://config.example.com")).returns(xml)
+      obj = OpenStruct.new({:body => xml})
+      Net::HTTP.any_instance.stubs(:request).returns(obj)
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}
       response.should be_success
       assigns[:tool].should_not be_nil
@@ -216,7 +217,7 @@ describe ExternalToolsController do
     end
     
     it "should fail gracefully on invalid URL retrieval or timeouts" do
-      Net::HTTP.expects(:get).with(URI.parse("http://config.example.com")).raises(Timeout::Error)
+      Net::HTTP.any_instance.stubs(:request).raises(Timeout::Error)
       course_with_teacher_logged_in(:active_all => true)
       xml = "bob"
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}
