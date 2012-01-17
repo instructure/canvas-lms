@@ -77,4 +77,32 @@ describe "rubrics" do
     find_all_with_jquery(".rubric .criterion:visible .rating .points").count.should == 3
     find_all_with_jquery(".rubric .criterion:visible .rating .points")[1].text.should == '0'
   end
+
+  context "importing" do
+    it "should create a allow immediate editing when adding an imported rubric to a new assignment" do
+      rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+
+      @old_course = @course
+      @course = nil
+      course_with_teacher(:user => @user, :active_all => true)
+
+      @course.merge_into_course(@old_course, :everything => true)
+      @assignment = @course.assignments.create!(assignment_valid_attributes.merge({:title => "New Course Assignment"}))
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      driver.find_element(:css, "#right-side-wrapper .add_rubric_link").click
+      find_with_jquery(".find_rubric_link:visible").click
+      wait_for_ajaximations
+      find_with_jquery(".select_rubric_link:visible").click
+      wait_for_ajax_requests
+      wait_for_animations(500)
+      find_with_jquery(".edit_rubric_link:visible").click
+      find_with_jquery(".rubric_custom_rating:visible").click
+      find_with_jquery(".save_button:visible").click
+      wait_for_ajax_requests
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      find_all_with_jquery(".custom_ratings:visible").size.should eql(1)
+    end
+  end
 end
