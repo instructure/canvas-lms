@@ -2,7 +2,8 @@
 define 'compiled/Gradebook', [
   'i18n'
   'jst/gradebook2/section_to_show_menu'
-], (I18n, sectionToShowMenuTemplate) ->
+  'jst/gradebook2/column_header'
+], (I18n, sectionToShowMenuTemplate, columnHeaderTemplate) ->
   I18n = I18n.scoped 'gradebook2'
 
   class Gradebook
@@ -18,7 +19,7 @@ define 'compiled/Gradebook', [
       @show_attendance = $.store.userGet("show_attendance_#{@options.context_code}") == 'true'
       @include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_#{@options.context_code}") == 'true'
       $.subscribe 'assignment_group_weights_changed', @buildRows
-      $.subscribe 'assignment_muting_toggled', @buildRows
+      $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
       promise = $.when(
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
@@ -114,6 +115,14 @@ define 'compiled/Gradebook', [
 
     rowFilter: (student) =>
       !@sectionToShow || (student.section.id == @sectionToShow)
+
+    handleAssignmentMutingChange: (assignment) =>
+      idx = @gradeGrid.getColumnIndex("assignment_#{assignment.id}")
+      colDef = @gradeGrid.getColumns()[idx]
+      colDef.name = @assignmentHeaderHtml(assignment)
+      @gradeGrid.setColumns(@gradeGrid.getColumns())
+      @fixColumnReordering()
+      @buildRows()
 
     # filter, sort, and build the dataset for slickgrid to read from, then force
     # a full redraw
@@ -434,6 +443,12 @@ define 'compiled/Gradebook', [
                                 submissionType is "attendance" and !@show_attendance
       res.concat(@aggregateColumns)
 
+    assignmentHeaderHtml: (assignment) ->
+      columnHeaderTemplate
+        assignment: assignment
+        href: "#{@options.context_url}/assignments/#{assignment.id}"
+        showPointsPossible: assignment.points_possible?
+
     initGrid: =>
       #this is used to figure out how wide to make each column
       $widthTester = $('<span style="padding:10px" />').appendTo('#content')
@@ -459,10 +474,6 @@ define 'compiled/Gradebook', [
       }]
 
       @allAssignmentColumns = for id, assignment of @assignments
-        href = "#{@options.context_url}/assignments/#{assignment.id}"
-        html = "<a class='assignment-name' href='#{href}'>#{assignment.name}</a>
-                <a class='gradebook-header-drop' data-assignment-id='#{assignment.id}' href='#' role='button'>#{I18n.t 'assignment_options', 'Assignment Options'}</a>"
-        html += "<div class='assignment-points-possible'>#{I18n.t 'points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible}</div>" if assignment.points_possible?
         outOfFormatter = assignment &&
                          assignment.grading_type == 'points' &&
                          assignment.points_possible? &&
@@ -472,7 +483,7 @@ define 'compiled/Gradebook', [
         columnDef =
           id: fieldName
           field: fieldName
-          name: html
+          name: @assignmentHeaderHtml(assignment)
           object: assignment
           formatter: this.cellFormatter
           editor: outOfFormatter ||
@@ -484,7 +495,6 @@ define 'compiled/Gradebook', [
           sortable: true
           toolTip: true
           type: 'assignment'
-
 
         if fieldName in @assignmentsToHide
           columnDef.width = 10

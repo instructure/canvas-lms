@@ -221,6 +221,29 @@ describe "gradebook2 selenium tests" do
     final_score_for_row(1).should eql STUDENT_2_TOTAL_IGNORING_UNGRADED
   end
 
+  def toggle_muting(assignment)
+    find_with_jquery(".gradebook-header-drop[data-assignment-id='#{assignment.id}']").click
+    find_with_jquery('[data-action="toggleMuting"]').click
+    find_with_jquery('.ui-dialog-buttonpane .ui-button:visible').click
+    wait_for_ajaximations
+  end
+
+  it "should handle muting/unmuting correctly" do
+    toggle_muting(@second_assignment)
+    find_with_jquery(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+    @second_assignment.reload.should be_muted
+
+    # reload the page and make sure it remembered the setting
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    find_with_jquery(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+
+    # make sure you can un-mute
+    toggle_muting(@second_assignment)
+    find_with_jquery(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
+    @second_assignment.reload.should_not be_muted
+  end
+
   it "should treat ungraded as 0's when asked, and ignore when not" do
     # make sure it shows like it is not treating ungraded as 0's by default
     is_checked('#include_ungraded_assignments').should be_false
