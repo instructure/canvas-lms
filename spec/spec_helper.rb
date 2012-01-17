@@ -115,7 +115,7 @@ Spec::Runner.configure do |config|
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb
+      Canvas.redis.flushdb rescue nil
     end
     Canvas.redis_used = false
   end
@@ -532,9 +532,8 @@ Spec::Runner.configure do |config|
     importer.warnings.should == []
   end
 
-  def enable_cache
+  def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
     old_cache = RAILS_CACHE
-    new_cache = ActiveSupport::Cache::MemoryStore.new
     ActionController::Base.cache_store = new_cache
     silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
     old_perform_caching = ActionController::Base.perform_caching

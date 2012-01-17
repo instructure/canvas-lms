@@ -45,5 +45,58 @@ describe "Canvas::Redis" do
       ttl.should <= 15
     end
   end
+
+  describe "redis failure" do
+    before do
+      Canvas::Redis.patch
+      Redis::Client.any_instance.expects(:ensure_connected).raises(Timeout::Error).once
+    end
+
+    after do
+      Canvas::Redis.reset_redis_failure
+    end
+
+    it "should not fail cache.read" do
+      enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
+        Rails.cache.read('blah').should == nil
+      end
+    end
+
+    it "should not call redis again after an error" do
+      enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
+        Rails.cache.read('blah').should == nil
+        # call again, the .once means that if it hits Redis::Client again it'll fail
+        Rails.cache.read('blah').should == nil
+      end
+    end
+
+    it "should not fail cache.write" do
+      enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
+        Rails.cache.write('blah', 'someval').should == nil
+      end
+    end
+
+    it "should not fail cache.delete" do
+      enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
+        Rails.cache.delete('blah').should == nil
+      end
+    end
+
+    it "should not fail cache.exist?" do
+      enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
+        Rails.cache.exist?('blah').should == nil
+      end
+    end
+
+    it "should not fail cache.delete_matched" do
+      enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
+        Rails.cache.delete_matched('blah').should == false
+      end
+    end
+
+    it "should not fail raw redis commands" do
+      Canvas.redis.setnx('my_key', 5).should == nil
+    end
+  end
 end
 end
