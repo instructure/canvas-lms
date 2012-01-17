@@ -433,6 +433,13 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(scr)
   end
 
+  def clear_rce
+    wiki_page_body = driver.find_element(:id, :wiki_page_body)
+    wiki_page_body.clear
+    wiki_page_body[:value].should be_empty
+    wiki_page_body
+  end
+
   def hover_and_click(element_jquery_finder)
     find_with_jquery(element_jquery_finder.to_s).should be_present
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
@@ -563,6 +570,33 @@ shared_examples_for "all selenium tests" do
     temp_file = open(element.attribute('href'))
     temp_file.size.should > 0
     temp_file
+  end
+
+  def wiki_page_tools_upload_file(form, type)
+    name, path, data = get_file({:text => 'testfile1.txt', :image => 'graded.png'}[type])
+
+    driver.find_element(:css, "#{form} .file_name").send_keys(path)
+    driver.find_element(:css, "#{form} button").click
+    keep_trying_until { find_all_with_jquery("#{form}:visible").empty? }
+  end
+
+  def wiki_page_tools_file_tree_setup
+    @root_folder = Folder.root_folders(@course).first
+    @sub_folder = @root_folder.sub_folders.create!(:name => 'subfolder', :context => @course);
+    @sub_sub_folder = @sub_folder.sub_folders.create!(:name => 'subsubfolder', :context => @course);
+    @text_file = @root_folder.attachments.create!(:filename => 'text_file.txt', :context => @course) { |a| a.content_type = 'text/plain' }
+    @image1 = @root_folder.attachments.build(:context => @course)
+    path = File.expand_path(File.dirname(__FILE__) + '/../../public/images/email.png')
+    @image1.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+    @image1.save!
+    @image2 = @root_folder.attachments.build(:context => @course)
+    path = File.expand_path(File.dirname(__FILE__) + '/../../public/images/graded.png')
+    @image2.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+    @image2.save!
+    get "/courses/#{@course.id}/wiki"
+
+    @tree1 = driver.find_element(:id, :tree1)
+    @image_list = driver.find_element(:css, '#editor_tabs_3 .image_list')
   end
 
   def assert_flash_notice_message(okay_message_regex)
