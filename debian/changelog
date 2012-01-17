@@ -1,3 +1,12 @@
+canvas-lms (2012.01.17.13.20) testing; urgency=low
+
+  * Package ref: 56c44fe79b40c30839edef699711c6d1d20b422f
+  *
+  * [+f08ba68] moved rubric criterion comments fixes #6659
+  * [+56c44fe] handle Timeout::Error in redis caching
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 17 Jan 2012 13:20:39 -0700
+
 canvas-lms (2012.01.16.16.16) testing; urgency=low
 
   * Package ref: 867c8db4fb0e8ff1e1bbe969916f64ed7b215489
