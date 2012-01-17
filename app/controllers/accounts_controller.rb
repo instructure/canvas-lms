@@ -375,7 +375,7 @@ class AccountsController < ApplicationController
   
   def build_course_stats
     teachers = TeacherEnrollment.for_courses_with_user_name(@courses).admin.active
-    students = StudentEnrollment.for_courses_with_user_name(@courses).student
+    students = StudentEnrollment.for_courses_with_user_name(@courses).student_in_claimed_or_available
     @courses.each do |course|
       course.write_attribute(:student_count, students.select{|e| e.course_id == course.id }.once_per(&:user_id).length)
       course.write_attribute(:teacher_names, teachers.select{|e| e.course_id == course.id }.once_per(&:user_id).map(&:user_name))
