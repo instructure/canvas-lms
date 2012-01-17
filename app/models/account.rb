@@ -406,6 +406,10 @@ class Account < ActiveRecord::Base
     res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     res.compact
   end
+
+  def associated_accounts
+    self.account_chain
+  end
   
   def account_chain_ids(opts={})
     account_chain(opts).map(&:id)
