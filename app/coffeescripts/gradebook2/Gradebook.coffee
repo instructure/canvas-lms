@@ -389,8 +389,8 @@ define 'compiled/Gradebook', [
         $settingsMenu.find("##{setting}").prop('checked', @[setting]).change (event) =>
           @[setting] = $(event.target).is(':checked')
           $.store.userSet "#{setting}_#{@options.context_code}", (''+@[setting])
-          @gradeGrid.setColumns @getVisibleGradeGridColumns()
-          @gradeGrid.invalidate()
+          @gradeGrid.setColumns @getVisibleGradeGridColumns() if setting is 'show_attendance'
+          @buildRows()
 
       # don't show the "show attendance" link in the dropdown if there's no attendance assignments
       unless ($.detect @gradeGrid.getColumns(), -> this.object?.submission_types == "attendance")
@@ -430,7 +430,7 @@ define 'compiled/Gradebook', [
       res = []
       for column in @allAssignmentColumns
         submissionType = ''+ column.object.submission_types
-        res.push(column) unless submissionType is "not_graded" and !@include_ungraded_assignments or
+        res.push(column) unless submissionType is "not_graded" or
                                 submissionType is "attendance" and !@show_attendance
       res.concat(@aggregateColumns)
 
@@ -485,8 +485,6 @@ define 'compiled/Gradebook', [
           toolTip: true
           type: 'assignment'
 
-        if ''+assignment.submission_types is "not_graded"
-          columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded'
 
         if fieldName in @assignmentsToHide
           columnDef.width = 10
@@ -562,7 +560,7 @@ define 'compiled/Gradebook', [
       @gradeGrid = @multiGrid.grids[1]
       @gradeGrid.onCellChange.subscribe (event, data) =>
         @calculateStudentGrade(data.item)
-        @gradeGrid.invalidate
+        @gradeGrid.invalidate()
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
         student.row = i for student, i in @rows
