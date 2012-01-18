@@ -557,18 +557,36 @@ describe Account do
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
     end
     
-    it "should include external tools if configured on the account" do
+    it "should include active external tools if configured on the account" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
-      tool.settings[:account_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-      tool.save!
-      tool.has_account_navigation.should == true
-      tabs = @account.tabs_available(nil)
-      tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-      tab = tabs.detect{|t| t[:id] == tool.asset_string }
-      tab[:label].should == tool.settings[:account_navigation][:text]
+      tools = []
+      2.times do |n|
+        t = @account.context_external_tools.new(
+          :name => "bob",
+          :consumer_key => "bob",
+          :shared_secret => "bob",
+          :domain => "example.com"
+        )
+        t.account_navigation = {
+          :text => "Example URL",
+          :url  =>  "http://www.example.com",
+        }
+        t.save!
+        tools << t
+      end
+      tool1, tool2 = tools
+      tool2.destroy
+
+      tools.each { |t| t.has_account_navigation.should == true }
+
+      tabs = @account.tabs_available
+      tab_ids = tabs.map{|t| t[:id] }
+      tab_ids.should be_include(tool1.asset_string)
+      tab_ids.should_not be_include(tool2.asset_string)
+      tab = tabs.detect{|t| t[:id] == tool1.asset_string }
+      tab[:label].should == tool1.settings[:account_navigation][:text]
       tab[:href].should == :account_external_tool_path
-      tab[:args].should == [@account.id, tool.id]
+      tab[:args].should == [@account.id, tool1.id]
     end
     
     it "should include external tools if configured on the root account" do

@@ -2296,9 +2296,9 @@ class Course < ActiveRecord::Base
   end
 
   def external_tool_tabs(opts)
-    tools = self.context_external_tools.having_setting('course_navigation')
+    tools = self.context_external_tools.active.having_setting('course_navigation')
     account_ids = self.account_chain_ids
-    tools += ContextExternalTool.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
+    tools += ContextExternalTool.active.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,

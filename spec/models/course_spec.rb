@@ -724,6 +724,34 @@ describe Course, "tabs_available" do
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should_not be_include(Course::TAB_DISCUSSIONS)
   end
+
+  it "should include tabs for active external tools" do
+    course_with_student(:active_all => true)
+
+    tools = []
+    2.times do |n|
+      tools << @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tool #{n+1}",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+    end
+    t1, t2 = tools
+
+    t2.workflow_state = "deleted"
+    t2.save!
+
+    tabs = @course.tabs_available.map { |tab| tab[:id] }
+
+    tabs.should be_include(t1.asset_string)
+    tabs.should_not be_include(t2.asset_string)
+  end
 end
 
 describe Course, "backup" do

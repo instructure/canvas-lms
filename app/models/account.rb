@@ -837,7 +837,7 @@ class Account < ActiveRecord::Base
   TAB_QUESTION_BANKS = 13
 
   def external_tool_tabs(opts)
-    tools = ContextExternalTool.find_all_for(self, :account_navigation)
+    tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,
