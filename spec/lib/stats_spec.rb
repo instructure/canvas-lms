@@ -115,5 +115,11 @@ describe Stats do
       h.should == {:bin_width=>2.5, :bin_base=>1.5, :data=>{1.5=>2, 4.0=>3, -3.5=>1, -8.5=>1, -1.0=>2}}
     end
     
+    it "should return quarties properly" do
+      c = Stats::Counter.new([6,4,2,-7,0,1,3,5,-3,20])
+      q = c.quartiles
+      q.should == [-0.75, 2.5, 5.25]
+    end
+    
   end
 end
