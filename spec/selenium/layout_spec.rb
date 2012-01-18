@@ -33,4 +33,10 @@ describe "layout selenium tests" do
     body.attribute(:class).should_not match /with-scrolling-right-side/
     body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
   end
+
+  it "should have ENV available to the JavaScript from js_env" do
+    course_with_student_logged_in
+    get "/"
+    driver.execute_script("return ENV.current_user_id").should == @user.id
+  end
 end

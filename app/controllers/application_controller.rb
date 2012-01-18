@@ -45,6 +45,49 @@ class ApplicationController < ActionController::Base
 
   add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
 
+  ##
+  # Sends data from rails to JavaScript
+  #
+  # The data you send will eventually make its way into the view by simply
+  # calling `to_json` on the data.
+  #
+  # It won't allow you to overwrite a key that has already been set
+  #
+  # Please use *ALL_CAPS* for keys since these are considered constants
+  # Also, please don't name it stuff from JavaScript's Object.prototype
+  # like `hasOwnProperty`, `constructor`, `__defineProperty__` etc.
+  #
+  # This method is available in controllers and views
+  #
+  # example:
+  #
+  #     # ruby
+  #     js_env :FOO_BAR => [1,2,3], :COURSE => @course
+  #
+  #     # coffeescript
+  #     require ['ENV'], (ENV) ->
+  #       ENV.FOO_BAR #> [1,2,3]
+  #
+  def js_env(hash = {})
+    # set some defaults
+    @js_env ||= {
+      :current_user_id => @current_user.try(:id),
+      :current_user_roles => @current_user.try(:roles),
+      :context_asset_string => @context.try(:asset_string)
+    }
+
+    hash.each do |k,v|
+      if @js_env[k]
+        raise "js_env key #{k} is already taken"
+      else
+        @js_env[k] = v
+      end
+    end
+
+    @js_env
+  end
+  helper_method :js_env
+
   protected
 
   def set_locale
@@ -226,7 +269,7 @@ class ApplicationController < ActionController::Base
     url = clean_return_to(url)
     redirect_to url
   end
-  
+
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 
   # Can be used as a before_filter, or just called from controller code.

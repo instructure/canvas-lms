@@ -17,6 +17,7 @@
   @body_classes << "with-right-side" if right_side and not right_side.strip.empty? 
   @body_classes << "padless-content" if @padless
   @body_classes << "context-#{@context.asset_string}" if @context
+
 -%><!DOCTYPE html>
 <!--[if IE 7 ]>    <html class="ie ie7" lang=<%= @locale %>> <![endif]-->
 <!--[if IE 8 ]>    <html class="ie ie8" lang=<%= @locale %>> <![endif]-->
@@ -256,7 +257,7 @@
 <script>
   window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>');
   var INST = <%= raw(inst_env.to_json) %>;
-  var ENV = <%= raw env.to_json %>;
+  var ENV = <%= raw js_env.to_json %>;
 </script>
 
 <%= include_javascripts :common %>
