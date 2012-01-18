@@ -601,9 +601,17 @@ shared_examples_for "all selenium tests" do
 
   def assert_flash_notice_message(okay_message_regex)
     keep_trying_until do
-      text = driver.find_element(:css, "#flash_notice_message").text
+      text = driver.find_element(:id, "flash_notice_message").text
       raise "server error" if text =~ /The last request didn't work out/
       text =~ okay_message_regex
+    end
+  end
+
+  def assert_flash_error_message(fail_message_regex)
+    keep_trying_until do
+      text = driver.find_element(:id, "flash_error_message").text
+      raise "server error" if text =~ /The last request didn't work out/
+      text =~ fail_message_regex
     end
   end
 

@@ -423,12 +423,12 @@ describe "manage_groups selenium tests" do
     it "should give 'Nothing to do.' error flash if no unassigned students" do
       assign_students(@category)
       assign_students(@category)
-      should_flash(:error, 'Nothing to do.')
+      assert_flash_error_message /Nothing to do/
     end
 
     it "should give 'Students assigned to groups.' success flash otherwise" do
       assign_students(@category)
-      should_flash(:notice, 'Students assigned to groups.')
+      assert_flash_notice_message /Students assigned to groups/
     end
   end
 end
@@ -503,19 +503,4 @@ def assign_students(category)
   confirm_dialog.accept
   # wait_for_ajax_requests times out here
   sleep 5
-end
-
-def should_flash(type, message)
-  [:notice, :error].should be_include(type)
-  element = case type
-              when :notice then
-                '#flash_notice_message'
-              when :error then
-                '#flash_error_message'
-            end
-  keep_trying_until do
-    flash = find_with_jquery("#{element}:visible")
-    flash.should_not be_nil
-    flash.text.should =~ /#{message}/
-  end
 end

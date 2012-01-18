@@ -131,7 +131,7 @@ describe "account authentication configs" do
 
     wait_for_ajaximations
     driver.find_element(:id, 'add_course_dialog').should_not be_displayed
-    driver.find_element(:id, 'flash_notice_message').text.should match 'Test Course successfully added!'
+    assert_flash_notice_message /Test Course successfully added/
   end
 
   it "should be able to update term dates" do

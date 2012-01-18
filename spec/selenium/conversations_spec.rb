@@ -732,7 +732,7 @@ shared_examples_for "conversations selenium tests" do
 
       wait_for_ajaximations
 
-      driver.find_element(:id, "flash_notice_message").text.should =~ /Messages Sent/
+      assert_flash_notice_message /Messages Sent/
 
       # no conversations should show up in the conversation list
       conversations = driver.find_elements(:css, "#conversations > ul > li")
