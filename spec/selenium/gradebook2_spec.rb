@@ -335,6 +335,7 @@ describe "gradebook2 selenium tests" do
   end
 
   it "should validate posting a comment to a graded assignment" do
+    pending("opening the comment dialog frequently fails")
     comment_text = "This is a new comment!"
 
     dialog = open_comment_dialog
