@@ -130,22 +130,24 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     wiki_page_tools_file_tree_setup
     wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
     make_full_screen
-    resizer = driver.find_element(:class, 'editor_box_resizer')
     # TODO: there's an issue where we can drag the box smaller than it's supposed to be on the first resize.
     # Until we can track that down, first we do a fake drag to make sure the rest of the resizing machinery
     # works.
-    driver.action.drag_and_drop_by(resizer, 0, -1).perform
-    resizer_to = 1 - resizer.location.y
+    driver.action.drag_and_drop_by(driver.find_element(:class, 'editor_box_resizer'), 0, -1).perform
+    resizer_to = 1 - driver.find_element(:class, 'editor_box_resizer').location.y
     # drag the resizer way up to the top of the screen (to make the wysiwyg the shortest it will go)
-    driver.action.drag_and_drop_by(resizer, 0, resizer_to).perform
-    keep_trying_until { driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200) }
-    resizer.attribute('style').should be_blank
+    keep_trying_until do
+      driver.action.drag_and_drop_by(driver.find_element(:class, 'editor_box_resizer'), 0, resizer_to).perform
+      sleep 3
+      driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200)
+    end
+    driver.find_element(:class, 'editor_box_resizer').attribute('style').should be_blank
 
     # now move it down 30px from 200px high
-    resizer = driver.find_element(:class, 'editor_box_resizer')
-    keep_trying_until { driver.action.drag_and_drop_by(resizer, 0, 30).perform; true }
+    keep_trying_until { driver.action.drag_and_drop_by(driver.find_element(:class, 'editor_box_resizer'), 0, 30).perform; true }
     driver.execute_script("return $('#wiki_page_body_ifr').height()").should be_close(230, 5)
-    resizer.attribute('style').should be_blank
+    driver.find_element(:class, 'editor_box_resizer').attribute('style').should be_blank
+    resize_screen_to_default
   end
 
   it "should handle table borders correctly" do

@@ -548,6 +548,19 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def resize_screen_to_default
+    h = driver.execute_script <<-JS
+      if (window.screen) {
+        return window.screen.availHeight;
+      }
+    return 0;
+    JS
+    if h > 0
+      driver.manage.window.move_to(0, 0)
+      driver.manage.window.resize_to(1024, h)
+    end
+  end
+
   def replace_content(el, value)
     el.clear
     el.send_keys(value)
