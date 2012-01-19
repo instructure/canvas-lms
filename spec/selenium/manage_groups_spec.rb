@@ -33,7 +33,6 @@ describe "manage groups" do
     end
 
     form.submit
-    sleep 3 # wait_for_ajax_requests times out
     keep_trying_until { find_with_jquery("#add_category_form:visible").should be_nil }
 
     category = course.group_categories.find_by_name(name)
@@ -72,8 +71,8 @@ describe "manage groups" do
     assign_students.click
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.accept
-    # wait_for_ajax_requests times out here
-    sleep 5
+    wait_for_ajax_requests
+    keep_trying_until { driver.find_element(:css, '.right_side .group .user_count').text.should == '0 students' }
   end
 
 
@@ -464,7 +463,7 @@ describe "manage groups" do
       assign_students(@category)
 
       @student.reload
-      @student.groups.size.should == 1
+      keep_trying_until { @student.groups.size.should == 1 }
       group = @student.groups.first
 
       find_with_jquery("#category_#{@category.id} .group_blank .user_id_#{@student.id}").should be_nil
