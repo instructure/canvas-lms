@@ -13,8 +13,8 @@ describe "quizzes" do
     bank.assessment_questions << a
     bank.assessment_questions << b
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
-    @quest1 = @q.quiz_questions.create!(:question_data => { :name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
-    @quest2 = @q.quiz_questions.create!(:question_data => { :name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+    @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
 
     @q.generate_quiz_data
     @q.save!
@@ -48,7 +48,7 @@ describe "quizzes" do
     driver.find_element(:css, '#quiz_options_form input#quiz_title').clear
     driver.find_element(:css, '#quiz_options_form input#quiz_title').send_keys('new quiz')
     test_text = "new description"
-    keep_trying_until{ driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
+    keep_trying_until { driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
     type_in_tiny '#quiz_description', test_text
     in_frame "quiz_description_ifr" do
       driver.find_element(:id, 'tinymce').should include_text(test_text)
@@ -66,6 +66,7 @@ describe "quizzes" do
     #check quiz preview
     driver.find_element(:link, 'Preview the Quiz').click
     driver.find_element(:id, 'questions').should be_present
+    keep_trying_until { driver.find_element(:css, '#content h2').text.should == 'new quiz' }
   end
 
   it "should correctly hide form when cancelling quiz edit" do
@@ -96,7 +97,7 @@ describe "quizzes" do
     wait_for_ajax_requests
 
     test_text = "changed description"
-    keep_trying_until{ driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
+    keep_trying_until { driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
     type_in_tiny '#quiz_description', test_text
     in_frame "quiz_description_ifr" do
       driver.find_element(:id, 'tinymce').text.include?(test_text).should be_true
@@ -106,7 +107,7 @@ describe "quizzes" do
 
     get "/courses/#{@course.id}/quizzes/#{q.id}"
 
-    driver.find_element(:css, '#main .description').should include_text(test_text) 
+    driver.find_element(:css, '#main .description').should include_text(test_text)
   end
 
   it "should edit a quiz question" do
@@ -114,7 +115,7 @@ describe "quizzes" do
     course_with_teacher_logged_in
     @context = @course
     q = quiz_model
-    quest1 = q.quiz_questions.create!(:question_data => { :name => "first question" } )
+    quest1 = q.quiz_questions.create!(:question_data => {:name => "first question"})
     q.generate_quiz_data
     q.save!
     get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
@@ -124,8 +125,8 @@ describe "quizzes" do
     wait_for_animations
     question = find_with_jquery(".question_form:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="multiple_choice_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="multiple_choice_question"]').click
     question.find_element(:css, 'input[name="question_name"]').clear
     question.find_element(:css, 'input[name="question_name"]').send_keys('edited question')
 
@@ -149,9 +150,9 @@ describe "quizzes" do
   it "should not show 'Missing Word' option in question types dropdown" do
     skip_if_ie('Out of memory')
     course_with_teacher_logged_in
-    
+
     get "/courses/#{@course.id}/quizzes/new"
-    
+
     driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
 
     keep_trying_until {
@@ -208,14 +209,14 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question_form:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="multiple_choice_question"]').click
-    
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="multiple_choice_question"]').click
+
     type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
-    
+
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(4)
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
@@ -224,14 +225,14 @@ describe "quizzes" do
     set_feedback_content(answers[1].find_element(:css, ".answer_comments"), "Bad job :(")
     replace_content(answers[2].find_element(:css, ".select_answer input"), "Second Wrong Answer")
     replace_content(answers[3].find_element(:css, ".select_answer input"), "Wrongest Answer")
-    
+
     set_feedback_content(question.find_element(:css, "div.text .question_correct_comment"), "Good job on the question!")
     set_feedback_content(question.find_element(:css, "div.text .question_incorrect_comment"), "You know what they say - study long study wrong.")
     set_feedback_content(question.find_element(:css, "div.text .question_neutral_comment"), "Pass or fail, you're a winner!")
-    
+
     question.submit
     wait_for_ajax_requests
-    
+
     quiz.reload
     question_data = quiz.quiz_questions[0].question_data
 
@@ -258,50 +259,50 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="true_false_question"]').click
-    
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="true_false_question"]').click
+
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
-    
+
     type_in_tiny '.question:visible textarea.question_content', 'This is not a true/false question.'
-    
+
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(2)
     answers[1].find_element(:css, ".select_answer_link").click # false - get it?
     answers[1].find_element(:css, ".comment_focus").click
     answers[1].find_element(:css, ".answer_comments textarea").send_keys("Good job!")
-    
+
     question.submit
     wait_for_ajax_requests
-    
+
     quiz.reload
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
-  end 
+  end
 
   it "should create a quiz question with a fill in the blank question" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question_form:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="short_answer_question"]').click
-    
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="short_answer_question"]').click
+
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
-    
+
     type_in_tiny '.question_form:visible textarea.question_content', 'This is a fill in the _________ question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
     replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
-    
+
     question.submit
     wait_for_ajax_requests
-    
+
     quiz.reload
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
@@ -310,14 +311,14 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="fill_in_multiple_blanks_question"]').click
-    
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="fill_in_multiple_blanks_question"]').click
+
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
-    
+
     type_in_tiny ".question:visible textarea.question_content", 'Roses are [color1], violets are [color2]'
 
     #check answer select
@@ -331,19 +332,19 @@ describe "quizzes" do
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0].find_element(:css, ".select_answer_link").click
 
-    replace_content( answers[0].find_element(:css, '.short_answer input'), 'red')
-    replace_content( answers[1].find_element(:css, '.short_answer input'), 'green')
+    replace_content(answers[0].find_element(:css, '.short_answer input'), 'red')
+    replace_content(answers[1].find_element(:css, '.short_answer input'), 'green')
     options[1].click
     wait_for_animations
     answers = question.find_elements(:css, ".form_answers > .answer")
 
     answers[2].find_element(:css, ".select_answer_link").click
-    replace_content( answers[2].find_element(:css, '.short_answer input'), 'blue')
-    replace_content( answers[3].find_element(:css, '.short_answer input'), 'purple')
-    
+    replace_content(answers[2].find_element(:css, '.short_answer input'), 'blue')
+    replace_content(answers[3].find_element(:css, '.short_answer input'), 'purple')
+
     question.submit
     wait_for_ajax_requests
-    
+
     driver.find_element(:id, 'show_question_details').click
     quiz.reload
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
@@ -355,24 +356,24 @@ describe "quizzes" do
     options = select_box.find_elements(:css, 'option')
     options[0].text.should == 'color1'
     options[1].text.should == 'color2'
-  end 
+  end
 
   it "should create a quiz question with a multiple answers question" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="multiple_answers_question"]').click
-    
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="multiple_answers_question"]').click
+
     type_in_tiny '.question:visible textarea.question_content', 'This is a multiple answer question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
 
-    replace_content( answers[0].find_element(:css, '.select_answer input'), 'first answer')
-    replace_content( answers[2].find_element(:css, '.select_answer input'), 'second answer')
+    replace_content(answers[0].find_element(:css, '.select_answer input'), 'first answer')
+    replace_content(answers[2].find_element(:css, '.select_answer input'), 'second answer')
     answers[2].find_element(:css, ".select_answer_link").click
 
     question.submit
@@ -381,19 +382,19 @@ describe "quizzes" do
     driver.find_element(:id, 'show_question_details').click
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
-    finished_question.find_elements(:css, '.correct_answer').length.should == 2 
-  end 
+    finished_question.find_elements(:css, '.correct_answer').length.should == 2
+  end
 
   it "should create a quiz question with a multiple dropdown question" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
- 
+
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="multiple_dropdowns_question"]').click
- 
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="multiple_dropdowns_question"]').click
+
     type_in_tiny '.question:visible textarea.question_content', 'Roses are [color1], violets are [color2]'
 
     #check answer select
@@ -407,19 +408,19 @@ describe "quizzes" do
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0].find_element(:css, ".select_answer_link").click
 
-    replace_content( answers[0].find_element(:css, '.select_answer input'), 'red')
-    replace_content( answers[1].find_element(:css, '.select_answer input'), 'green')
+    replace_content(answers[0].find_element(:css, '.select_answer input'), 'red')
+    replace_content(answers[1].find_element(:css, '.select_answer input'), 'green')
     options[1].click
     wait_for_animations
     answers = question.find_elements(:css, ".form_answers > .answer")
 
     answers[2].find_element(:css, ".select_answer_link").click
-    replace_content( answers[2].find_element(:css, '.select_answer input'), 'blue')
-    replace_content( answers[3].find_element(:css, '.select_answer input'), 'purple')
-    
+    replace_content(answers[2].find_element(:css, '.select_answer input'), 'blue')
+    replace_content(answers[3].find_element(:css, '.select_answer input'), 'purple')
+
     question.submit
     wait_for_ajax_requests
-    
+
     driver.find_element(:id, 'show_question_details').click
     quiz.reload
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
@@ -431,20 +432,20 @@ describe "quizzes" do
     options = select_box.find_elements(:css, 'option')
     options[0].text.should == 'color1'
     options[1].text.should == 'color2'
-  end 
+  end
 
   it "should create a quiz question with a matching question" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="matching_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="matching_question"]').click
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
-    
+
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers[0] = question.find_element(:name, 'answer_match_left').send_keys('first left side')
     answers[0] = question.find_element(:name, 'answer_match_right').send_keys('first right side')
@@ -465,30 +466,24 @@ describe "quizzes" do
     first_answer.find_element(:css, '.answer_match_right').should include_text('first right side')
   end
 
-    #### Numerical Answer
+  #### Numerical Answer
   it "should create a quiz question with a numerical question" do
-    pending("selenium reports answer_range_end is not displayed")
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
 
     click_option('select.question_type', 'Numerical Answer')
-    wait_for_animations
-
     type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
-    
-    answers = driver.find_elements(:css, ".form_answers > .answer")
-    answers[0].find_element(:name, 'answer_exact').send_keys('1')
-    answers[0].find_element(:name, 'answer_error_margin').send_keys('0.1')
-    select_box = answers[1].find_element(:css, '.numerical_answer_type')
-    select_box.click
-    select_box.find_element(:css, 'option[value="range_answer"]').click
-    sleep 2 # wait for javascript to execute
-    answers[1].find_element(:name, 'answer_range_start').send_keys('2')
-    answers[1].find_element(:name, 'answer_range_end').send_keys('5')
 
-    driver.find_element(:css, '.question_form').submit
-    wait_for_ajax_requests
+    quiz_form = driver.find_element(:css, '.question_form')
+    answers = quiz_form.find_elements(:css, ".form_answers > .answer")
+    replace_content(answers[0].find_element(:name, 'answer_exact'), 5)
+    replace_content(answers[0].find_element(:name, 'answer_error_margin'), 2)
+    click_option('select.numerical_answer_type:eq(1)', 'Answer in the Range:')
+    replace_content(answers[1].find_element(:name, 'answer_range_start'), 5)
+    replace_content(answers[1].find_element(:name, 'answer_range_end'), 10)
+    quiz_form.submit
+    wait_for_ajaximations
 
     driver.find_element(:id, 'show_question_details').click
     quiz.reload
@@ -500,14 +495,14 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question_form:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="calculated_question"]').click
-    
-    type_in_tiny '.question_form:visible textarea.question_content','If [x] + [y] is a whole number, then this is a formula question.'
-    
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="calculated_question"]').click
+
+    type_in_tiny '.question_form:visible textarea.question_content', 'If [x] + [y] is a whole number, then this is a formula question.'
+
     find_with_jquery('button.recompute_variables').click
     find_with_jquery('.supercalc:visible').send_keys('x + y')
     find_with_jquery('button.save_formula_button').click
@@ -522,10 +517,10 @@ describe "quizzes" do
       button.text == 'Generate'
     }
     find_all_with_jquery('table.combinations:visible tr').size.should eql 11 # plus header row
-    
+
     question.submit
     wait_for_ajax_requests
-    
+
     quiz.reload
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
@@ -534,11 +529,11 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="essay_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="essay_question"]').click
 
     type_in_tiny '.question:visible textarea.question_content', 'This is an essay question.'
     question.submit
@@ -554,11 +549,11 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-    
+
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="text_only_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="text_only_question"]').click
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a text question.'
     question.submit
@@ -577,8 +572,8 @@ describe "quizzes" do
 
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="text_only_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="text_only_question"]').click
     question.submit
     wait_for_ajax_requests
 
@@ -595,8 +590,8 @@ describe "quizzes" do
 
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="essay_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="essay_question"]').click
     question.submit
     wait_for_ajax_requests
 
@@ -616,8 +611,8 @@ describe "quizzes" do
     show_el.should_not be_displayed
 
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="multiple_choice_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="multiple_choice_question"]').click
     question.submit
     wait_for_ajax_requests
     quiz.reload
@@ -638,7 +633,7 @@ describe "quizzes" do
     def add_quiz_question(points)
       @points_total += points.to_i
       @question_count += 1
-      driver.find_element(:css, '.add_question_link').click 
+      driver.find_element(:css, '.add_question_link').click
       question = find_with_jquery('.question_form:visible')
       replace_content(question.find_element(:css, "input[name='question_points']"), points)
       question.submit
@@ -647,7 +642,7 @@ describe "quizzes" do
       questions.length.should eql(@question_count)
       driver.find_element(:css, "#right-side .points_possible").text.should eql(@points_total.to_s)
     end
-   
+
     add_quiz_question('1')
     add_quiz_question('2')
     add_quiz_question('3')
@@ -678,23 +673,23 @@ describe "quizzes" do
     dialog = dialog.first
 
     dialog.
-      find_element(:css, 'select.message_types').
-      find_element(:css, 'option[value="0"]').click # Have taken the quiz
+        find_element(:css, 'select.message_types').
+        find_element(:css, 'option[value="0"]').click # Have taken the quiz
     students = find_all_with_jquery(".student_list > .student:visible")
 
     students.length.should eql(0)
 
     dialog.
-      find_element(:css, 'select.message_types').
-      find_element(:css, 'option[value="1"]').click # Have NOT taken the quiz
+        find_element(:css, 'select.message_types').
+        find_element(:css, 'option[value="1"]').click # Have NOT taken the quiz
     students = find_all_with_jquery(".student_list > .student:visible")
     students.length.should eql(1)
 
     dialog.find_element(:css, 'textarea#body').send_keys('This is a test message.')
-    
+
     button = dialog.find_element(:css, "button.send_button")
     button.click
-    keep_trying_until{ button.text != "Sending Message..." }
+    keep_trying_until { button.text != "Sending Message..." }
     button.text.should eql("Message Sent!")
 
     student.conversations.size.should eql(1)
@@ -841,7 +836,7 @@ describe "quizzes" do
     group_form.find_element(:name, 'quiz_group[question_points]').clear
     group_form.find_element(:name, 'quiz_group[question_points]').send_keys('2')
     group_form.submit
-    driver.find_element(:css, '#questions .group_top .group_display.name').should include_text('new group') 
+    driver.find_element(:css, '#questions .group_top .group_display.name').should include_text('new group')
 
   end
 
@@ -923,8 +918,8 @@ describe "quizzes" do
     bank.assessment_questions << a
     bank.assessment_questions << b
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
-    quest1 = q.quiz_questions.create!(:question_data => { :name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
-    quest2 = q.quiz_questions.create!(:question_data => { :name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+    quest1 = q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    quest2 = q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
 
     q.generate_quiz_data
     q.save!
@@ -960,8 +955,8 @@ describe "quizzes" do
     start_quiz_question
     question = find_with_jquery(".question:visible")
     question.
-      find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="numerical_question"]').click
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="numerical_question"]').click
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
 
@@ -1003,8 +998,8 @@ describe "quizzes" do
       q = quiz_model
       b = bank.assessment_questions.create!
       quest2 = q.quiz_questions.create!(:assessment_question => b)
-      quest2.write_attribute(:question_data, { :neutral_comments=>"", :question_text=>"<p>My hair is [x] and my wife's is [y].</p>", :points_possible=>1, :question_type=>"multiple_dropdowns_question", :answers=>[{:comments=>"", :weight=>100, :blank_id=>"x", :text=>"brown", :id=>2624}, {:comments=>"", :weight=>0, :blank_id=>"x", :text=>"black", :id=>3085}, {:comments=>"", :weight=>100, :blank_id=>"y", :text=>"brown", :id=>5780}, {:comments=>"", :weight=>0, :blank_id=>"y", :text=>"red", :id=>8840}], :correct_comments=>"", :name=>"Question", :question_name=>"Question", :incorrect_comments=>"", :assessment_question_id=>nil})
-  
+      quest2.write_attribute(:question_data, {:neutral_comments=>"", :question_text=>"<p>My hair is [x] and my wife's is [y].</p>", :points_possible=>1, :question_type=>"multiple_dropdowns_question", :answers=>[{:comments=>"", :weight=>100, :blank_id=>"x", :text=>"brown", :id=>2624}, {:comments=>"", :weight=>0, :blank_id=>"x", :text=>"black", :id=>3085}, {:comments=>"", :weight=>100, :blank_id=>"y", :text=>"brown", :id=>5780}, {:comments=>"", :weight=>0, :blank_id=>"y", :text=>"red", :id=>8840}], :correct_comments=>"", :name=>"Question", :question_name=>"Question", :incorrect_comments=>"", :assessment_question_id=>nil})
+
       q.generate_quiz_data
       q.save!
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"

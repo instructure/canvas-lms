@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "user_content tests" do
+describe "user_content" do
   it_should_behave_like "in-process server selenium tests"
 
   def message_body

@@ -26,7 +26,7 @@ shared_examples_for "file uploads selenium tests" do
   end
 
   it "should upload a file on the homework submissions page, even over quota" do
-    pending("failing on the last assertion")
+    pending("ajax error")
     a = @course.assignments.create!(:submission_types => "online_upload")
 
     login_as(@student.email, @password)
@@ -95,7 +95,6 @@ describe "file uploads local tests" do
   end
 
   it "should upload a file on the discussions page" do
-    pending("intermittent record not found error on last assertion")
     # set up basic user with enrollment
     login_as(@teacher.email, @password)
 

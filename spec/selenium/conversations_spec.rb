@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "conversations tests" do
+describe "conversations" do
   it_should_behave_like "in-process server selenium tests"
 
   prepend_before (:each) do
