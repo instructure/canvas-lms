@@ -48,8 +48,7 @@ shared_examples_for "file uploads selenium tests" do
       link = driver.find_element(:css, "div.details a.forward")
       link.text.should eql("Submission Details")
 
-      link.click
-      wait_for_dom_ready
+      expect_new_page_load { link.click }
       keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
       in_frame('preview_frame') do
         driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click

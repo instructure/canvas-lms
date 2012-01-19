@@ -9,8 +9,7 @@ describe "eportfolios" do
 
     driver.find_element(:css, ".add_eportfolio_link").click
     wait_for_animations
-    driver.find_element(:id, "eportfolio_submit").click
-    wait_for_dom_ready
+    expect_new_page_load { driver.find_element(:id, "eportfolio_submit").click }
     driver.find_element(:css, '#content h2').should include_text(I18n.t('headers.welcome', "Welcome to Your ePortfolio"))
   end
 

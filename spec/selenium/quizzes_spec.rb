@@ -942,7 +942,7 @@ shared_examples_for "quiz selenium tests" do
     }
 
     # sleep because display is updated on timer, not ajax callback
-    sleep(1)
+    sleep 1
     indicator = driver.find_element(:css, '#last_saved_indicator')
 
     indicator.text.should == 'Not saved'
@@ -957,8 +957,7 @@ shared_examples_for "quiz selenium tests" do
     #This step is to prevent selenium from freezing when the dialog appears when leaving the page
     driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
     confirm_dialog = driver.switch_to.alert
-    confirm_dialog.accept
-    wait_for_dom_ready
+    expect_new_page_load { confirm_dialog.accept }
   end
 
   it "should round numeric questions thes same when created and taking a quiz" do
@@ -1026,8 +1025,7 @@ shared_examples_for "quiz selenium tests" do
       #This step is to prevent selenium from freezing when the dialog appears when leaving the page
       driver.find_element(:link, 'Quizzes').click
       confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
-      wait_for_dom_ready
+      expect_new_page_load { confirm_dialog.accept }
     end
 
     # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
