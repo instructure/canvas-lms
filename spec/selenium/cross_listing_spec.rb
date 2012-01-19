@@ -1,15 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "cross-listing selenium tests" do
+describe "cross-listing" do
   it_should_behave_like "in-process server selenium tests"
-  
+
   it "should allow cross-listing a section" do
     # so, we have two courses with the teacher enrolled in both.
     course_with_teacher_logged_in
     course = @course
     other_course = course_with_teacher(:active_course => true,
-                            :user => @user,
-                            :active_enrollment => true).course
+                                       :user => @user,
+                                       :active_enrollment => true).course
     other_course.update_attribute(:name, "cool course")
     section = course.course_sections.first
 
@@ -26,7 +26,7 @@ shared_examples_for "cross-listing selenium tests" do
     form.find_element(:css, "#course_id").send_keys("-1\n")
     keep_trying_until { driver.find_element(:css, "#course_autocomplete_name").text != "Confirming Course ID \"-1\"..." }
     driver.find_element(:css, "#course_autocomplete_name").text.should eql("Course ID \"-1\" not authorized for cross-listing")
-    
+
     # k, let's crosslist to the other course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").clear
@@ -43,7 +43,7 @@ shared_examples_for "cross-listing selenium tests" do
     # uncrosslist.
     get "/courses/#{other_course.id}/sections/#{section.id}"
     driver.find_elements(:css, ".uncrosslist_link").length.should eql(0)
-    
+
     # enroll, and make sure the teacher can uncrosslist.
     course.enroll_teacher(@user).accept
     get "/courses/#{other_course.id}/sections/#{section.id}"
@@ -52,8 +52,4 @@ shared_examples_for "cross-listing selenium tests" do
     driver.find_element(:css, "#uncrosslist_form .submit_button").click
     keep_trying_until { driver.current_url.match(/courses\/#{course.id}/) }
   end
-end
-
-describe "cross-listing tests" do
-  it_should_behave_like "cross-listing selenium tests"
 end

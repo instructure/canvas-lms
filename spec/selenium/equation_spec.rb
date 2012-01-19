@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "equation editor selenium tests" do
+describe "equation editor" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should support multiple equation editors on the same page" do
@@ -8,7 +8,7 @@ shared_examples_for "equation editor selenium tests" do
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes"
-    driver.find_element(:css, '.new-quiz-link').click 
+    driver.find_element(:css, '.new-quiz-link').click
 
     def save_question_and_wait(question)
       question.find_element(:css, "button[type='submit']").click
@@ -41,8 +41,4 @@ shared_examples_for "equation editor selenium tests" do
       driver.find_element(:css, "#right-side .points_possible").text.should eql((time + 1).to_s)
     end
   end
-end
-
-describe "equation editor tests" do
-  it_should_behave_like "equation editor selenium tests"
 end

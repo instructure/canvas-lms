@@ -1,8 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "layout selenium tests" do
+describe "layout" do
   it_should_behave_like "in-process server selenium tests"
-
 
   it "should auto-scroll the sidebar when $.scrollSidebar is called" do
     course_with_student_logged_in

@@ -7,7 +7,7 @@ shared_examples_for "file uploads selenium tests" do
     Setting.remove("file_storage_test_override")
   end
 
-  before(:each) do
+  before (:each) do
     @password = "asdfasdf"
     @teacher = user_with_pseudonym :active_user => true,
                                    :username => "teacher@example.com",
@@ -73,7 +73,7 @@ shared_examples_for "file uploads selenium tests" do
     driver.find_element(:css, '#config_options').
         find_element(:css, '.submit_button').click
     wait_for_ajax_requests
-    keep_trying_until{ driver.find_element(:id, 'file_uploaded').should be_displayed }
+    keep_trying_until { driver.find_element(:id, 'file_uploaded').should be_displayed }
 
     ContentMigration.for_context(@course).count.should == 1
     cm = ContentMigration.for_context(@course).first
@@ -87,12 +87,12 @@ end
 
 describe "file uploads local tests" do
   it_should_behave_like "file uploads selenium tests"
-  prepend_before(:each) {
+  prepend_before (:each) do
     Setting.set("file_storage_test_override", "local")
-  }
-  prepend_before(:all) {
+  end
+  prepend_before (:all) do
     Setting.set("file_storage_test_override", "local")
-  }
+  end
 
   it "should upload a file on the discussions page" do
     pending("intermittent record not found error on last assertion")
@@ -153,10 +153,10 @@ end
 
 describe "file uploads S3 tests" do
   it_should_behave_like "file uploads selenium tests"
-  prepend_before(:each) {
+  prepend_before (:each) do
     Setting.set("file_storage_test_override", "s3")
-  }
-  prepend_before(:all) {
+  end
+  prepend_before (:all) do
     Setting.set("file_storage_test_override", "s3")
-  }
+  end
 end

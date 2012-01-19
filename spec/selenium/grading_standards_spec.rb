@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "grading standards selenium tests" do
+describe "grading standards" do
   it_should_behave_like "in-process server selenium tests"
   
   it "should allow creating/deleting grading standards" do
@@ -141,9 +141,5 @@ shared_examples_for "grading standards selenium tests" do
     wait_for_ajax_requests
     @standard.reload.data.length.should == 3
   end
-end
-
-describe "grading standards tests" do
-  it_should_behave_like "grading standards selenium tests"
 end
 

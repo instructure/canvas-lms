@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "profile tests" do
+describe "profile" do
   it_should_behave_like "in-process server selenium tests"
 
   def click_edit

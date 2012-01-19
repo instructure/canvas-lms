@@ -20,13 +20,13 @@ describe "collaborations" do
     driver.execute_script("return $('#{css_context} ul.collaborator_list input#user_#{user.id}').is(':checked');").should == checked
   end
 
-  describe "collaborations as a teacher" do
+  context "collaborations as a teacher" do
 
     [["EtherPad", "etherpad"], ["Google Docs", "google_docs"]].each do |collab_title, collab_type|
 
       context collab_title do
 
-        before(:each) do
+        before (:each) do
           if collab_type == "google_docs"
             CollaborationsController.any_instance.stubs(:google_docs_verify_access_token).returns(true)
           end
@@ -287,7 +287,8 @@ describe "collaborations" do
       end
     end
   end
-  describe "etherpad collaborations as a student" do
+
+  context "etherpad collaborations as a student" do
 
     before (:each) do
       course_with_teacher(:active_all => true, :name => 'teacher@example.com')

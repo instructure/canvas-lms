@@ -201,9 +201,7 @@ shared_examples_for "all selenium tests" do
   include SeleniumTestsHelperMethods
   include CustomSeleniumRspecMatchers
 
-  def selenium_driver;
-    $selenium_driver;
-  end
+  def selenium_driver; $selenium_driver; end
 
   alias_method :driver, :selenium_driver
 
@@ -507,16 +505,16 @@ shared_examples_for "all selenium tests" do
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stubs(:config).returns({
-                                                 'domain' => 'www.instructuremedia.com',
-                                                 'resource_domain' => 'www.instructuremedia.com',
-                                                 'partner_id' => '100',
-                                                 'subpartner_id' => '10000',
-                                                 'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-                                                 'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-                                                 'player_ui_conf' => '1',
-                                                 'kcw_ui_conf' => '1',
-                                                 'upload_ui_conf' => '1'
-                                             })
+      'domain' => 'www.instructuremedia.com',
+      'resource_domain' => 'www.instructuremedia.com',
+      'partner_id' => '100',
+      'subpartner_id' => '10000',
+      'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+      'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+      'player_ui_conf' => '1',
+      'kcw_ui_conf' => '1',
+      'upload_ui_conf' => '1'
+    })
     kal = mock('Kaltura::ClientV3')
     kal.stubs(:startSession).returns "new_session_id_here"
     Kaltura::ClientV3.stubs(:new).returns(kal)
@@ -628,16 +626,16 @@ shared_examples_for "all selenium tests" do
     ALL_MODELS.each { |m| truncate_table(m) }
   end
 
-  append_before(:each) do
+  append_before (:each) do
     driver.manage.timeouts.implicit_wait = 10
     driver.manage.timeouts.script_timeout = 60
   end
 
-  append_before(:all) do
+  append_before (:all) do
     $selenium_driver ||= setup_selenium
   end
 
-  append_before(:all) do
+  append_before (:all) do
     unless $check_screen_dimensions
       w, h = driver.execute_script <<-JS
         if (window.screen) {
@@ -650,7 +648,7 @@ shared_examples_for "all selenium tests" do
   end
 end
 
-TEST_FILE_UUIDS = {
+  TEST_FILE_UUIDS = {
     "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
     "testfile1copy.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
     "testfile2.txt" => "5d714eca-2cff-4737-8604-45ca098165cc",
@@ -658,54 +656,54 @@ TEST_FILE_UUIDS = {
     "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
     "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
     "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'
-    )}
+  )}
 
-def get_file(filename)
-  data = TEST_FILE_UUIDS[filename]
-  @file = Tempfile.new(filename.split(/(?=\.)/))
-  @file.write data
-  @file.close
-  fullpath = @file.path
-  filename = File.basename(@file.path)
-  if SELENIUM_CONFIG[:host_and_port]
-    driver.file_detector = proc do |args|
-      args.first if File.exist?(args.first.to_s)
+  def get_file(filename)
+    data = TEST_FILE_UUIDS[filename]
+    @file = Tempfile.new(filename.split(/(?=\.)/))
+    @file.write data
+    @file.close
+    fullpath = @file.path
+    filename = File.basename(@file.path)
+    if SELENIUM_CONFIG[:host_and_port]
+      driver.file_detector = proc do |args|
+        args.first if File.exist?(args.first.to_s)
+      end
+    end
+    [filename, fullpath, data, @file]
+  end
+
+  def validate_link(link_element, breadcrumb_text)
+    expect_new_page_load { link_element.click }
+    breadcrumb = driver.find_element(:id, 'breadcrumbs')
+    breadcrumb.should include_text(breadcrumb_text)
+    driver.execute_script("return INST.errorCount;").should == 0
+  end
+
+  def skip_if_ie(additional_error_text)
+    pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
+  end
+
+  shared_examples_for "in-process server selenium tests" do
+    it_should_behave_like "all selenium tests"
+    prepend_before (:all) do
+      $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
+    end
+    before do
+      HostUrl.default_host = $app_host_and_port
+      HostUrl.file_host = $app_host_and_port
     end
   end
-  [filename, fullpath, data, @file]
-end
 
-def validate_link(link_element, breadcrumb_text)
-  expect_new_page_load { link_element.click }
-  breadcrumb = driver.find_element(:id, 'breadcrumbs')
-  breadcrumb.should include_text(breadcrumb_text)
-  driver.execute_script("return INST.errorCount;").should == 0
-end
+  shared_examples_for "forked server selenium tests" do
+    it_should_behave_like "all selenium tests"
+    prepend_before (:all) do
+      $in_proc_webserver_shutdown.try(:call)
+      $in_proc_webserver_shutdown = nil
+      @forked_webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
+    end
 
-def skip_if_ie(additional_error_text)
-  pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
-end
-
-shared_examples_for "in-process server selenium tests" do
-  it_should_behave_like "all selenium tests"
-  prepend_before(:all) do
-    $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
+    append_after(:all) do
+      @forked_webserver_shutdown.call
+    end
   end
-  before do
-    HostUrl.default_host = $app_host_and_port
-    HostUrl.file_host = $app_host_and_port
-  end
-end
-
-shared_examples_for "forked server selenium tests" do
-  it_should_behave_like "all selenium tests"
-  prepend_before(:all) do
-    $in_proc_webserver_shutdown.try(:call)
-    $in_proc_webserver_shutdown = nil
-    @forked_webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
-  end
-
-  append_after(:all) do
-    @forked_webserver_shutdown.call
-  end
-end

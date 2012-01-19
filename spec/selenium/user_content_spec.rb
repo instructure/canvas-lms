@@ -1,16 +1,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "user_content selenium tests" do
+describe "user_content tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  before(:each) do
+  def message_body
+    <<-MESSAGE
+<p>flash:</p>
+<p><object width="425" height="350" data="/javascripts/swfobject/test.swf" type="application/x-shockwave-flash"><param name="wmode" value="transparent" /><param name="src" value="/javascripts/swfobject/test.swf" /></object></p>
+    MESSAGE
+  end
+
+  before (:each) do
     course_with_student_logged_in(:active_all => true)
   end
 
   it "should serve embed tags from a safefiles iframe" do
     factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => message_body)
     get "/"
-    uri = nil
     name = driver.find_elements(:class_name, "user_content_iframe").first.attribute('name')
     in_frame(name) {
       keep_trying_until {
@@ -42,15 +48,4 @@ shared_examples_for "user_content selenium tests" do
       obj['data'].should == '/javascripts/swfobject/test.swf'
     }
   end
-
-  def message_body
-    <<-MESSAGE
-<p>flash:</p>
-<p><object width="425" height="350" data="/javascripts/swfobject/test.swf" type="application/x-shockwave-flash"><param name="wmode" value="transparent" /><param name="src" value="/javascripts/swfobject/test.swf" /></object></p>
-MESSAGE
-  end
-end
-
-describe "user_content tests" do
-  it_should_behave_like "user_content selenium tests"
 end

@@ -1,13 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "speedgrader selenium tests" do
+describe "speedgrader" do
   it_should_behave_like "in-process server selenium tests"
 
   def student_submission(options = {})
     submission_model({ :assignment => @assignment, :body => "first student submission text" }.merge(options))
   end
 
-  before(:each) do
+  before (:each) do
     stub_kaltura
 
     course_with_teacher_logged_in
@@ -362,5 +362,4 @@ describe "speedgrader selenium tests" do
 
     driver.find_element(:id, 'this_student_does_not_have_a_submission').should be_displayed
   end
-
 end

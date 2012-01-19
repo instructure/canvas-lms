@@ -126,5 +126,4 @@ describe "learning outcome test" do
     find_with_jquery('#right-side a:last-child').click
     driver.find_element(:css, '#rubrics .details').should include_text('15')
   end
-
 end

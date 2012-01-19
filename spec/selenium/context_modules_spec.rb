@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "context_modules selenium tests" do
+describe "context_modules" do
   it_should_behave_like "in-process server selenium tests"
 
-  describe "context modules as a teacher" do
+  context "context modules as a teacher" do
 
     def select_module_item(select_element_css, item_text)
       click_option(select_element_css, item_text)
@@ -308,7 +308,7 @@ describe "context_modules selenium tests" do
     end
   end
 
-  describe "context modules as a student" do
+  context "context modules as a student" do
     LOCKED_TEXT = 'locked'
     COMPLETED_TEXT = 'completed'
     IN_PROGRESS_TEXT = 'in progress'

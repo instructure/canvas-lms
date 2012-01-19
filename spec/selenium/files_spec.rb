@@ -20,8 +20,8 @@ shared_examples_for "files selenium tests" do
         "pseudonym_session[unique_id]" => username,
         "pseudonym_session[password]" => password,
         "redirect_to_ssl" => "0",
-        "pseudonym_session[remember_me]" => "0" },
-        { "Cookie" => @cookie })
+        "pseudonym_session[remember_me]" => "0"},
+                                     {"Cookie" => @cookie})
     resp.code.should == "302"
     @cookie = resp.response['set-cookie']
     login_as username, password
@@ -29,7 +29,7 @@ shared_examples_for "files selenium tests" do
 
   def add_file(fixture, course, name)
     resp, body = SSLCommon.get "#{app_host}/courses/#{course.id}/files",
-        "Cookie" => @cookie
+                               "Cookie" => @cookie
     resp.code.should == "200"
     body.should =~ /<div id="ajax_authenticity_token">([^<]*)<\/div>/
     authenticity_token = $1
@@ -38,14 +38,14 @@ shared_examples_for "files selenium tests" do
         "attachment[filename]" => name,
         "attachment[context_code]" => "Course_#{course.id}",
         "authenticity_token" => authenticity_token,
-        "no_redirect" => true}, { "Cookie" => @cookie })
+        "no_redirect" => true}, {"Cookie" => @cookie})
     resp.code.should == "200"
     data = json_parse(body)
     data["upload_url"] = data["proxied_upload_url"] || data["upload_url"]
     data["upload_url"] = "#{app_host}#{data["upload_url"]}" if data["upload_url"] =~ /^\//
     data["success_url"] = "#{app_host}#{data["success_url"]}" if data["success_url"] =~ /^\//
     data["upload_params"]["file"] = fixture
-    resp, body = SSLCommon.post_multipart_form(data["upload_url"], data["upload_params"], { "Cookie" => @cookie }, ["bucket", "key", "acl"])
+    resp, body = SSLCommon.post_multipart_form(data["upload_url"], data["upload_params"], {"Cookie" => @cookie}, ["bucket", "key", "acl"])
     resp.code.should =~ /^20/
     if body =~ /<PostResponse>/
       resp, body = SSLCommon.get data["success_url"]
@@ -60,7 +60,7 @@ shared_examples_for "files selenium tests" do
     course_with_student_logged_in :user => @user
     login_as "nobody3@example.com", "asdfasdf3"
     get "/courses/#{@course.id}/files"
-    
+
     #link = keep_trying_until { driver.find_element(:css, "div.links a.download_zip_link") }
     link = keep_trying_until {
       link = driver.find_element(:css, "div.links a.download_zip_link")
@@ -96,11 +96,11 @@ describe "files without s3 and forked tests" do
     get "/dashboard/files"
     wait_for_ajaximations
 
-    keep_trying_until {
+    keep_trying_until do
       driver.find_element(:css, ".add_folder_link").click
       wait_for_animations
       driver.find_element(:css, "#files_content .add_folder_form #folder_name").should be_displayed
-    }
+    end
     driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
     wait_for_ajax_requests
     Folder.last.name.should == "my folder"
@@ -118,12 +118,9 @@ end
 
 describe "files local tests" do
   it_should_behave_like "files selenium tests"
-  prepend_before(:each) {
+  prepend_before(:each) do
     Setting.set("file_storage_test_override", "local")
-  }
-  prepend_before(:all) {
-    Setting.set("file_storage_test_override", "local")
-  }
+  end
 
   it "should allow you to edit html files" do
     skip_if_ie("IE hangs")
@@ -132,7 +129,7 @@ describe "files local tests" do
     course_with_teacher_logged_in :user => @user
     login "nobody2@example.com", "asdfasdf2"
     add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
-        @course, "html-editing-test.html")
+             @course, "html-editing-test.html")
     get "/courses/#{@course.id}/files"
     link = keep_trying_until { driver.find_element(:css, "li.editable_folder_item div.header a.download_url") }
     link.should be_displayed
@@ -145,12 +142,12 @@ describe "files local tests" do
       link.should be_displayed
       link.text.should == "edit content"
       link.click
-      keep_trying_until { driver.find_element(:css, "#edit_content_dialog").displayed?}
+      keep_trying_until { driver.find_element(:css, "#edit_content_dialog").displayed? }
       keep_trying_until(120) { driver.execute_script("return $('#edit_content_textarea')[0].value;") == current_content }
       driver.execute_script("$('#edit_content_textarea')[0].value = '#{new_content}';")
       current_content = new_content
       driver.find_element(:css, "#edit_content_dialog button.save_button").click
-      keep_trying_until { !driver.find_element(:css, "#edit_content_dialog").displayed?}
+      keep_trying_until { !driver.find_element(:css, "#edit_content_dialog").displayed? }
     end
   end
 end
@@ -167,13 +164,13 @@ end
 
 describe "collaborations folder in files menu" do
   it_should_behave_like "in-process server selenium tests"
-  
+
   before (:each) do
     course_with_teacher_logged_in
     group_category = @course.group_categories.create(:name => "groupage")
     @group = Group.create!(:name=>"group1", :group_category => group_category, :context => @course)
   end
-  
+
   def load_collab_folder
     get "/groups/#{@group.id}/files"
     message_node = keep_trying_until {
@@ -182,17 +179,16 @@ describe "collaborations folder in files menu" do
     }
     message_node.text
   end
-  
+
   it "should not show 'add collaboration' paragraph to teacher not participating in group" do
     message = load_collab_folder
     message.should_not =~ /click "New collaboration"/
   end
-  
+
   it "should show 'add collaboration' paragraph to participating user" do
     @group.participating_users << @user
     message = load_collab_folder
     message.should =~ /click "New collaboration"/
   end
-  
 end
 

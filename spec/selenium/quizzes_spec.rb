@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "quiz selenium tests" do
+describe "quizzes" do
   it_should_behave_like "in-process server selenium tests"
 
   def quiz_with_new_questions
@@ -273,7 +273,6 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
     
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
   end 
 
@@ -299,7 +298,6 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
     
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
 
@@ -343,7 +341,6 @@ shared_examples_for "quiz selenium tests" do
     
     driver.find_element(:id, 'show_question_details').click
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
@@ -377,7 +374,6 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
 
     driver.find_element(:id, 'show_question_details').click
-    question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
     finished_question.find_elements(:css, '.correct_answer').length.should == 2 
@@ -421,7 +417,6 @@ shared_examples_for "quiz selenium tests" do
     
     driver.find_element(:id, 'show_question_details').click
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
@@ -457,7 +452,6 @@ shared_examples_for "quiz selenium tests" do
 
     driver.find_element(:id, 'show_question_details').click
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
@@ -493,7 +487,6 @@ shared_examples_for "quiz selenium tests" do
 
     driver.find_element(:id, 'show_question_details').click
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
   end
@@ -529,7 +522,6 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
     
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
 
@@ -548,7 +540,6 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
 
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is an essay question.')
@@ -569,7 +560,6 @@ shared_examples_for "quiz selenium tests" do
     wait_for_ajax_requests
 
     quiz.reload
-    question_data = quiz.quiz_questions[0].question_data
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is a text question.')
@@ -963,7 +953,6 @@ shared_examples_for "quiz selenium tests" do
   it "should round numeric questions thes same when created and taking a quiz" do
     skip_if_ie('Out of memory')
     start_quiz_question
-    quiz = Quiz.last
     question = find_with_jquery(".question:visible")
     question.
       find_element(:css, 'select.question_type').
@@ -1002,7 +991,7 @@ shared_examples_for "quiz selenium tests" do
 
 
   context "select element behavior" do
-    before do
+    before (:each) do
       course_with_teacher_logged_in
       @context = @course
       bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
@@ -1068,8 +1057,4 @@ shared_examples_for "quiz selenium tests" do
 
     driver.find_element(:css, '#content .question_name').should include_text("Question 1")
   end
-end
-
-describe "quizzes" do
-  it_should_behave_like "quiz selenium tests"
 end

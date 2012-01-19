@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "course selenium tests" do
+describe "courses" do
   it_should_behave_like "in-process server selenium tests"
 
-  describe "course as a teacher" do
+  context "course as a teacher" do
 
     before (:each) do
       account = Account.default
@@ -295,7 +295,7 @@ describe "course selenium tests" do
     end
   end
 
-  describe "course as a student" do
+  context "course as a student" do
 
     def enroll_student(student, accept_invitation)
       if accept_invitation

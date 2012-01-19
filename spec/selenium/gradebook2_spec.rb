@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "gradebook2 selenium tests" do
+describe "gradebook2" do
   it_should_behave_like "in-process server selenium tests"
 
   ASSIGNMENT_1_POINTS = "10"
@@ -87,7 +87,7 @@ describe "gradebook2 selenium tests" do
     }
   end
 
-  before(:each) do
+  before (:each) do
     course_with_teacher_logged_in
 
     #add first student

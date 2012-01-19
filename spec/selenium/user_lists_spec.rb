@@ -1,11 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "user lists Windows-Firefox-Tests" do
+describe "user lists" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
     account = Account.default
-    account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
+    account.settings = {:open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true}
     account.save!
   end
 
@@ -27,9 +27,9 @@ eolist
     wait_for_animations
     enrollment = user.reload.enrollments.last
     extra_line = ""
-    extra_line = "\nlink to a student" if enrollment_type == 'ObserverEnrollment' 
-    keep_trying_until {driver.find_element(:css, "#enrollment_#{enrollment.id}").text.should == ("user, login_name" + (include_short_name ? "\nlogin_name user" : "") + "\nA124123" + extra_line) }
-    
+    extra_line = "\nlink to a student" if enrollment_type == 'ObserverEnrollment'
+    keep_trying_until { driver.find_element(:css, "#enrollment_#{enrollment.id}").text.should == ("user, login_name" + (include_short_name ? "\nlogin_name user" : "") + "\nA124123" + extra_line) }
+
     unique_ids = ["user1@example.com", "bob@thesagatfamily.name", "A124123"]
     browser_text = ["user1@example.com\nuser1@example.com\nuser1@example.com", "sagat, bob\nbob sagat\nbob@thesagatfamily.name", "user, login_name\nlogin_name user\nA124123"] if include_short_name
     browser_text = ["user1@example.com\nuser1@example.com", "sagat, bob\nbob@thesagatfamily.name", "user, login_name\nA124123"] unless include_short_name
@@ -67,5 +67,4 @@ eolist
     driver.find_element(:css, "div#tab-users a.add_users_link").click
     add_users_to_user_list
   end
-
 end

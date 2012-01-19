@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "assignment selenium tests" do
+describe "assignments" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should properly show rubric criterion details for learning outcomes" do
@@ -225,6 +225,24 @@ describe "assignment selenium tests" do
     end
   end
 
+  it "should allow creating a quiz assignment from 'more options'" do
+    skip_if_ie("Out of memory")
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/assignments"
+
+    driver.find_element(:css, ".assignment_group .add_assignment_link").click
+    form = driver.find_element(:css, "#add_assignment_form")
+    form.find_element(:css, ".assignment_submission_types option[value='online_quiz']").click
+    expect_new_page_load { form.find_element(:css, ".more_options_link").click }
+
+    driver.find_element(:css, ".submission_type_option option[value='none']").should be_selected
+    driver.find_element(:css, ".assignment_type option[value='assignment']").click
+    driver.find_element(:css, ".submission_type_option option[value='online']").click
+    driver.find_element(:css, ".assignment_type option[value='quiz']").click
+
+    expect_new_page_load {  driver.find_element(:id, 'edit_assignment_form').submit }
+  end
+
   it "should edit an assignment" do
     skip_if_ie('Out of memory')
     course_with_teacher_logged_in
@@ -271,7 +289,7 @@ describe "assignment selenium tests" do
   end
 
   describe "external tool assignments" do
-    before do
+    before (:each) do
       course_with_teacher_logged_in
       @t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool1", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
       @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
@@ -473,7 +491,7 @@ describe "assignment selenium tests" do
   end
 
   context "turnitin" do
-    before do
+    before (:each) do
       course_with_teacher_logged_in
       account = Account.default
       account.turnitin_account_id = 'asdf'
@@ -576,18 +594,19 @@ describe "assignment selenium tests" do
     end
   end
 
-  def build_assignment_with_type(text)
-    get "/courses/#{@course.id}/assignments"
-
-    driver.find_element(:css, ".header_content .add_assignment_link").click
-    wait_for_animations
-
-    click_option(".assignment_submission_types", text)
-    driver.find_element(:css, "#add_assignment_form").submit
-    wait_for_ajaximations
-  end
-
   context "discussions assignments" do
+
+    def build_assignment_with_type(text)
+      get "/courses/#{@course.id}/assignments"
+
+      driver.find_element(:css, ".header_content .add_assignment_link").click
+      wait_for_animations
+
+      click_option(".assignment_submission_types", text)
+      driver.find_element(:css, "#add_assignment_form").submit
+      wait_for_ajaximations
+    end
+
     it "should create a discussion topic when created" do
       course_with_teacher_logged_in
       build_assignment_with_type("Discussion")

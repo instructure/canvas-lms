@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "grades selenium tests" do
+describe "grades" do
   it_should_behave_like "in-process server selenium tests"
 
-  before(:each) do
+  before (:each) do
     course_with_student_logged_in
     #add teacher
     @teacher = User.create!
@@ -107,9 +107,9 @@ describe "grades selenium tests" do
     #click rubric
     driver.find_element(:css, '.toggle_rubric_assessments_link').click
     wait_for_animations
-    driver.find_element(:css, '#assessor .rubric_title').text.include?(@rubric.title).should be_true
+    driver.find_element(:css, '#assessor .rubric_title').should include_text(@rubric.title)
 
-    driver.find_element(:css, '#assessor .rubric_total').text.include?('2').should be_true
+    driver.find_element(:css, '#assessor .rubric_total').should include_text('2')
 
     #check rubric comment
     driver.find_element(:css, '.assessment-comments div').text.should == 'cool, yo'
@@ -130,5 +130,4 @@ describe "grades selenium tests" do
     #statistics_text.include?('Low: 3').should be_true
 
   end
-
 end

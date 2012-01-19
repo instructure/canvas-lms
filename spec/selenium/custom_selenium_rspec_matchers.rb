@@ -39,5 +39,4 @@ module CustomSeleniumRspecMatchers
   def include_text(text)
     IncludeText.new(text)
   end
-
 end

@@ -10,6 +10,5 @@ describe "chat" do
     get "/courses/#{@course.id}/chat"
     driver.find_element(:css, ".tinychat_embed iframe").should be_displayed
   end
-  
 end
 

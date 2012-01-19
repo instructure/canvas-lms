@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "announcements selenium tests" do
+describe "announcements" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should not show JSON when loading more announcements via pageless" do
@@ -88,5 +88,4 @@ describe "announcements selenium tests" do
     driver.find_element(:id,'add_external_feed_form').should_not be_displayed
 
   end
-
 end

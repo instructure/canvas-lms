@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "course wizard" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
+  before (:each) do
     setup_permissions(true, true, true)
   end
 

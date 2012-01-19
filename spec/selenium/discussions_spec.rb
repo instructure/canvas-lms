@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "discussions selenium tests" do
+describe "discussions" do
   it_should_behave_like "in-process server selenium tests"
 
-  describe "discussions as a teacher" do
+  context "discussions as a teacher" do
 
     before (:each) do
       course_with_teacher_logged_in
@@ -26,8 +26,6 @@ describe "discussions selenium tests" do
       end
 
       get "/courses/#{@course.id}/discussion_topics"
-      start_topics = driver.find_elements(:css, "#topic_list .topic").length
-      start_images = driver.find_elements(:css, ".image_list .img_holder").length
 
       # go to Images tab to trigger pageless for .image_list
       keep_trying_until {
@@ -113,7 +111,7 @@ describe "discussions selenium tests" do
     end
   end
 
-  describe "discussions as a student" do
+  context "discussions as a student" do
     before (:each) do
       course_with_teacher(:name => 'teacher@example.com')
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name=> 'student@example.com', :password => 'asdfasdf')

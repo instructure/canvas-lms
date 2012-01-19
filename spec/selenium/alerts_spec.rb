@@ -184,5 +184,4 @@ describe "Alerts" do
     driver.find_element(:id, 'new_alert').submit
     keep_trying_until { find_all_with_jquery('.error_box').length == 2 }
   end
-
 end
