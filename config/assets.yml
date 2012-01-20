@@ -178,6 +178,7 @@ javascripts:
     - public/javascripts/compiled/calendar/CommonEvent.CalendarEvent.js
     - public/javascripts/compiled/calendar/commonEventFactory.js
     - public/javascripts/compiled/calendar/EditCalendarEventDetails.js
+    - public/javascripts/compiled/calendar/EditApptCalendarEventDetails.js
     - public/javascripts/compiled/calendar/EditAssignmentDetails.js
     - public/javascripts/compiled/calendar/EditAppointmentGroupDetails.js
     - public/javascripts/compiled/calendar/EditEventDetailsDialog.js
@@ -191,6 +192,7 @@ javascripts:
     - public/javascripts/jst/calendar/eventDetails.js
     - public/javascripts/jst/calendar/editEvent.js
     - public/javascripts/jst/calendar/editCalendarEvent.js
+    - public/javascripts/jst/calendar/editApptCalendarEvent.js
     - public/javascripts/jst/calendar/editAssignment.js
     - public/javascripts/jst/calendar/editAppointmentGroup.js
     - public/javascripts/jst/calendar/deleteItem.js

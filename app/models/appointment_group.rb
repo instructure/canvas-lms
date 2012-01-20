@@ -49,7 +49,7 @@ class AppointmentGroup < ActiveRecord::Base
     next unless record.new_appointments.present? || record.validation_event_override
     appointments = value
     if record.validation_event_override
-      appointments = appointments.select{ |a| a.new_record? || a.id != record.validation_event_override.id} + record.validation_event_override
+      appointments = appointments.select{ |a| a.new_record? || a.id != record.validation_event_override.id} << record.validation_event_override
     end
     appointments.sort_by(&:start_at).inject(nil) do |prev, appointment|
       record.errors.add(attr, t('errors.invalid_end_at', "Appointment end time precedes start time")) if appointment.end_at < appointment.start_at
@@ -245,11 +245,22 @@ class AppointmentGroup < ActiveRecord::Base
       EVENT_ATTRIBUTES.select{ |attr| send("#{attr}_changed?") }.
       map{ |attr| [attr, attr == :description ? description_html : send(attr)] }
     ]
+
+    return unless changed.present?
+
+    desc = changed.delete :description
+
     if changed.present?
       appointments.update_all changed
       CalendarEvent.update_all changed, {:parent_calendar_event_id => appointments.map(&:id), :workflow_state => ['active', 'locked']}
-      @new_appointments.each(&:reload) if @new_appointments.present?
     end
+
+    if desc
+      appointments.update_all({:description => desc}, :description => description_was)
+      CalendarEvent.update_all({:description => desc}, :parent_calendar_event_id => appointments.map(&:id), :workflow_state => ['active', 'locked'], :description => description_was)
+    end
+
+    @new_appointments.each(&:reload) if @new_appointments.present?
   end
 
   def participant_type

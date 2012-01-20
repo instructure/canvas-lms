@@ -42,7 +42,7 @@ define 'compiled/calendar/EditAppointmentGroupDetails', [
       timeBlocks = []
       if @apptGroup.appointmentEvents
         for appt in @apptGroup.appointmentEvents
-          timeBlocks.push [appt.start, appt.end, !appt.can_edit]
+          timeBlocks.push [appt.start, appt.end, true]
       @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body-wrapper"), @form.find(".splitter"), timeBlocks)
 
       @form.find('[name="slot_duration"]').change (e) =>

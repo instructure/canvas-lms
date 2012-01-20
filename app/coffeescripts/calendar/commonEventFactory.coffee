@@ -51,9 +51,10 @@ define 'compiled/calendar/commonEventFactory', [
     # edited (but it could be deleted)
     if obj.object.workflow_state == 'locked'
       obj.can_edit = false
-    # Any scheduler events can't be edited currently (but can be deleted)
-    if obj.object.appointment_group_id
-      obj.can_edit = false
 
+    # Only the description can be edited on scheduler events,
+    # but that can always be changed whether locked or not
+    if obj.object.appointment_group_id && contextInfo.can_create_calendar_events
+      obj.can_edit = true
 
     obj
