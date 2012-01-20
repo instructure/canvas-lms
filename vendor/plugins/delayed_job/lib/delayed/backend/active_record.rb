@@ -190,6 +190,16 @@ module Delayed
           raise
         end
 
+        # hold/unhold jobs with a scope
+        def self.hold!
+          update_all({ :locked_by => ON_HOLD_LOCKED_BY, :locked_at => db_time_now, :attempts => ON_HOLD_COUNT })
+        end
+
+        def self.unhold!
+          now = db_time_now
+          update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
+        end
+
         # Get the current time (GMT or local depending on DB)
         # Note: This does not ping the DB to get the time, so all your clients
         # must have syncronized clocks.
