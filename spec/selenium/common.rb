@@ -443,12 +443,8 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
   end
 
-  def is_checked(selector)
-    if selector.is_a?(String)
-      return driver.execute_script('return $("'+selector+'").is(":checked")')
-    else
-      return selector.attribute(:checked) == 'checked'
-    end
+  def is_checked(css_selector)
+    driver.execute_script('return $("'+css_selector+'").prop("checked")')
   end
 
   def set_value(input, value)

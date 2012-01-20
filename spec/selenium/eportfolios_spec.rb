@@ -3,8 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "eportfolios" do
   it_should_behave_like "in-process server selenium tests"
 
-  it "should create an eportfolio" do
+  before (:each) do
     course_with_student_logged_in
+  end
+
+  it "should create an eportfolio" do
     get "/dashboard/eportfolios"
 
     driver.find_element(:css, ".add_eportfolio_link").click
@@ -14,7 +17,6 @@ describe "eportfolios" do
   end
 
   it "should display and hide eportfolio wizard" do
-    course_with_student_logged_in
     eportfolio_model({:user => @user})
     get "/eportfolios/#{@eportfolio.id}"
 
@@ -27,7 +29,6 @@ describe "eportfolios" do
   end
 
   it "should add a section" do
-    course_with_student_logged_in
     eportfolio_model({:user => @user})
     get "/eportfolios/#{@eportfolio.id}"
 
@@ -40,7 +41,6 @@ describe "eportfolios" do
   end
 
   it "should edit ePortfolio settings" do
-    course_with_student_logged_in
     eportfolio_model({:user => @user})
     get "/eportfolios/#{@eportfolio.id}"
 
@@ -56,7 +56,6 @@ describe "eportfolios" do
 
   it "should have a working flickr search dialog" do
     skip_if_ie("Out of memory / stack overflow")
-    course_with_student_logged_in
     eportfolio_model({:user => @user})
     get "/eportfolios/#{@eportfolio.id}"
 
@@ -72,7 +71,6 @@ describe "eportfolios" do
   end
 
   it "should create rich content for eportfolio" do
-    course_with_student_logged_in
     eportfolio_model({:user => @user})
     get "/eportfolios/#{@eportfolio.id}"
 

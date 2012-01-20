@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "course settings tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  before (:each) do
+    course_with_teacher_logged_in
+  end
+
   def add_section(section_name)
     @course.course_sections.create!(:name => section_name)
     @course.reload
@@ -24,10 +28,6 @@ describe "course settings tests" do
   end
 
   describe "course items" do
-
-    before (:each) do
-      course_with_teacher_logged_in
-    end
 
     it "should change course details" do
       course_name = 'new course name'
@@ -111,9 +111,6 @@ describe "course settings tests" do
   end
 
   describe "course users" do
-    before (:each) do
-      course_with_teacher_logged_in
-    end
 
     it "should add a user to a section" do
       user = user_with_pseudonym(:active_user => true, :username => 'user@example.com', :name=> 'user@example.com')

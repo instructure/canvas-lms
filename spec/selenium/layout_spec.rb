@@ -3,9 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "layout" do
   it_should_behave_like "in-process server selenium tests"
 
-  it "should auto-scroll the sidebar when $.scrollSidebar is called" do
+  before (:each) do
     course_with_student_logged_in
     get "/"
+  end
+
+  it "should auto-scroll the sidebar when $.scrollSidebar is called" do
     driver.execute_script('$("#not_right_side").height(10000)')
     driver.execute_script('$("#right-side-wrapper").height(5000)')
     driver.execute_script('$.scrollSidebar()')
@@ -34,8 +37,6 @@ describe "layout" do
   end
 
   it "should have ENV available to the JavaScript from js_env" do
-    course_with_student_logged_in
-    get "/"
     driver.execute_script("return ENV.current_user_id").should == @user.id
   end
 end

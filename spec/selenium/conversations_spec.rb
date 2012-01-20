@@ -703,14 +703,14 @@ describe "conversations" do
     it "should be an option, default false, for a single 'bulk' recipient" do
       choose_recipient("the course", "Everyone", "Select All")
       @checkbox.should be_displayed
-      is_checked(@checkbox).should be_false
+      is_checked("#group_conversation").should be_false
     end
 
     it "should be an option, default false, for multiple individual recipients" do
       choose_recipient("student 1")
       choose_recipient("student 2")
       @checkbox.should be_displayed
-      is_checked(@checkbox).should be_false
+      is_checked("#group_conversation").should be_false
     end
 
     it "should disappear when there are no longer multiple recipients" do
@@ -727,7 +727,7 @@ describe "conversations" do
       @input.send_keys([:backspace])
       choose_recipient("student 2")
       @checkbox.should be_displayed
-      is_checked(@checkbox).should be_false
+      is_checked("#group_conversation").should be_false
     end
   end
 

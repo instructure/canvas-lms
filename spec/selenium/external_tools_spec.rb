@@ -3,8 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "editing external tools" do
   it_should_behave_like "in-process server selenium tests"
 
-  it "should allow creating a new course external tool with custom fields" do
+  before (:each) do
     course_with_teacher_logged_in
+  end
+
+  it "should allow creating a new course external tool with custom fields" do
     get "/courses/#{@course.id}/settings"
 
     keep_trying_until do
@@ -46,7 +49,6 @@ describe "editing external tools" do
   end
 
   it "should allow creating a new course external tool with extensions" do
-    course_with_teacher_logged_in
     get "/courses/#{@course.id}/settings"
 
     keep_trying_until { driver.find_element(:css, "#tab-tools-link").displayed? }
@@ -145,7 +147,6 @@ describe "editing external tools" do
   end
 
   it "should allow editing an existing external tool with custom fields" do
-    course_with_teacher_logged_in
     tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     get "/courses/#{@course.id}/settings"
 
@@ -182,7 +183,6 @@ describe "editing external tools" do
   end
 
   it "should allow adding an external tool to a course module" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     get "/courses/#{@course.id}/modules"
 
@@ -206,7 +206,6 @@ describe "editing external tools" do
   end
 
   it "should allow adding an external tool with resource selection enabled to a course module" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
@@ -251,7 +250,6 @@ describe "editing external tools" do
 
   it "should alert when invalid url data is returned by a resource selection dialog" do
     skip_if_ie("Out of memory / Stack overflow")
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
@@ -314,7 +312,6 @@ describe "editing external tools" do
   end
 
   it "should use the tool name if no link text is returned" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
@@ -358,7 +355,6 @@ describe "editing external tools" do
   end
 
   it "should allow editing the settings for a tool in a module" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
                                 :type => 'context_external_tool',
@@ -388,7 +384,6 @@ describe "editing external tools" do
   end
 
   it "should launch assignment external tools when viewing assignment" do
-    course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     assignment_model(:course => @course, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
     tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
@@ -401,7 +396,6 @@ describe "editing external tools" do
   end
 
   it "should automatically load tools with default configuration" do
-    course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
@@ -417,7 +411,6 @@ describe "editing external tools" do
   end
 
   it "should not automatically load tools configured to load in a new tab" do
-    course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({

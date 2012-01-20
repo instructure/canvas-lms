@@ -4,6 +4,10 @@ require 'thread'
 describe "manage groups" do
   it_should_behave_like "in-process server selenium tests"
 
+  before (:each) do
+    course_with_teacher_logged_in
+  end
+
   def add_category(course, name, opts={})
     driver.find_element(:css, ".add_category_link").click
     form = driver.find_element(:css, "#add_category_form")
@@ -75,10 +79,7 @@ describe "manage groups" do
     keep_trying_until { driver.find_element(:css, '.right_side .group .user_count').text.should == '0 students' }
   end
 
-
   it "should show one div.group_category per category" do
-    course_with_teacher_logged_in
-
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
@@ -105,8 +106,6 @@ describe "manage groups" do
   end
 
   it "should flag div.group_category for student organized categories with student_organized class" do
-    course_with_teacher_logged_in
-
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
@@ -127,8 +126,6 @@ describe "manage groups" do
   end
 
   it "should show one li.category per category" do
-    course_with_teacher_logged_in
-
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
@@ -154,8 +151,6 @@ describe "manage groups" do
   end
 
   it "should flag li.category for student organized categories with student_organized class" do
-    course_with_teacher_logged_in
-
     @course.enroll_student(user_model(:name => "John Doe"))
     @course.enroll_student(user_model(:name => "Jane Doe"))
     @course.enroll_student(user_model(:name => "Spot the Dog"))
@@ -176,8 +171,6 @@ describe "manage groups" do
 
   context "dragging a user between groups" do
     it "should remove a user from the old group if the category is not student organized" do
-      course_with_teacher_logged_in
-
       @course.enroll_student(john = user_model(:name => "John Doe"))
 
       group_category = @course.group_categories.create(:name => "Other Groups")
@@ -226,8 +219,6 @@ describe "manage groups" do
     end
 
     it "should not remove a user from the old group if the category is student organized unless dragging to unassigned" do
-      course_with_teacher_logged_in
-
       @course.enroll_student(john = user_model(:name => "John Doe"))
 
       group_category = GroupCategory.student_organized_for(@course)
@@ -278,8 +269,6 @@ describe "manage groups" do
   end
 
   it "should add new categories at the end of the tabs" do
-    course_with_teacher_logged_in
-
     @course.enroll_student(user_model(:name => "John Doe"))
     group_category = @course.group_categories.create(:name => "Existing Category")
     @course.groups.create(:name => "Group 1", :group_category => group_category)
@@ -294,8 +283,6 @@ describe "manage groups" do
   end
 
   it "should keep the student organized category after any new categories" do
-    course_with_teacher_logged_in
-
     @course.enroll_student(user_model(:name => "John Doe"))
     group_category = GroupCategory.student_organized_for(@course)
     @course.groups.create(:name => "Group 1", :group_category => group_category)
@@ -312,7 +299,6 @@ describe "manage groups" do
 
   it "should move students from a deleted group back to unassigned" do
     skip_if_ie("Switch to alert and accept hangs in IE 257")
-    course_with_teacher_logged_in
 
     @course.enroll_student(john = user_model(:name => "John Doe"))
     group_category = @course.group_categories.create(:name => "Some Category")
@@ -336,8 +322,7 @@ describe "manage groups" do
   end
 
   it "should remove tab and sidebar entries for deleted category" do
-    course_with_teacher_logged_in
-    @course.enroll_student(john = user_model(:name => "John Doe"))
+    @course.enroll_student(user_model(:name => "John Doe"))
     group_category = @course.group_categories.create(:name => "Some Category")
 
     get "/courses/#{@course.id}/groups"
@@ -356,8 +341,7 @@ describe "manage groups" do
   end
 
   it "should populate sidebar with new category and groups when adding a category" do
-    course_with_teacher_logged_in
-    @course.enroll_student(john = user_model(:name => "John Doe"))
+    @course.enroll_student(user_model(:name => "John Doe"))
     group_category = @course.group_categories.create(:name => "Existing Category")
     group = @course.groups.create(:name => "Group 1", :group_category => group_category)
 
@@ -376,8 +360,7 @@ describe "manage groups" do
   end
 
   it "should honor enable_self_signup when adding a category" do
-    course_with_teacher_logged_in
-    @course.enroll_student(john = user_model(:name => "John Doe"))
+    @course.enroll_student(user_model(:name => "John Doe"))
 
     get "/courses/#{@course.id}/groups"
 
@@ -388,8 +371,7 @@ describe "manage groups" do
   end
 
   it "should honor restrict_self_signup when adding a self signup category" do
-    course_with_teacher_logged_in
-    @course.enroll_student(john = user_model(:name => "John Doe"))
+    @course.enroll_student(user_model(:name => "John Doe"))
 
     get "/courses/#{@course.id}/groups"
 
@@ -400,8 +382,7 @@ describe "manage groups" do
   end
 
   it "should honor create_group_count when adding a self signup category" do
-    course_with_teacher_logged_in
-    @course.enroll_student(john = user_model(:name => "John Doe"))
+    @course.enroll_student(user_model(:name => "John Doe"))
 
     get "/courses/#{@course.id}/groups"
 
@@ -411,8 +392,6 @@ describe "manage groups" do
   end
 
   it "should preserve group to category association when editing a group" do
-    course_with_teacher_logged_in
-
     @course.enroll_student(user_model(:name => "John Doe"))
     group_category = @course.group_categories.create(:name => "Existing Category")
     group = @course.groups.create(:name => "Group 1", :group_category => group_category)
@@ -435,7 +414,6 @@ describe "manage groups" do
 
   context "assign_students_link" do
     before (:each) do
-      course_with_teacher_logged_in
       @student = @course.enroll_student(user_model(:name => "John Doe")).user
       get "/courses/#{@course.id}/groups"
       @category = add_category(@course, "New Category", :enable_self_signup => true, :group_count => '2')

@@ -49,7 +49,7 @@ describe "courses" do
       course_with_teacher_logged_in
       get "/courses/#{@course.id}/content_exports"
       driver.find_element(:css, "button.submit_button").click
-      job = Delayed::Job.last(:conditions => {:tag => 'ContentExport#export_course_without_send_later'})
+      Delayed::Job.last(:conditions => {:tag => 'ContentExport#export_course_without_send_later'})
       export = keep_trying_until { ContentExport.last }
       export.export_course_without_send_later
       new_download_link = keep_trying_until { driver.find_element(:css, "div#exports a") }
