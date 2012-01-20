@@ -23,7 +23,7 @@ class ConversationsController < ApplicationController
   include ConversationsHelper
   include Api::V1::Submission
 
-  before_filter :require_user
+  before_filter :require_user, :except => [:public_feed]
   before_filter :set_avatar_size
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
@@ -555,6 +555,64 @@ class ConversationsController < ApplicationController
     render :json => recipients
   end
 
+  def public_feed
+    return unless get_feed_context(:only => [:user])
+    @current_user = @context
+    load_all_contexts
+    feed = Atom::Feed.new do |f|
+      f.title = t('titles.rss_feed', "Conversations Feed")
+      f.links << Atom::Link.new(:href => conversations_url)
+      f.updated = Time.now
+      f.id = conversations_url
+    end
+    @current_user.messageable_users
+    @entries = []
+    @conversation_contexts = {}
+    @current_user.conversations.each do |conversation|
+      @entries.concat(conversation.messages.human)
+      if @conversation_contexts[conversation.conversation.id].blank?
+        @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+      end
+    end
+    @entries = @entries.sort_by{|e| e.created_at}.reverse
+    @entries.each do |entry|
+      feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+    end
+    respond_to do |format|
+      format.atom { render :text => feed.to_xml }
+    end
+  end
+
+  def feed_context_content(conversation)
+    content = ""
+    audience = conversation.other_participants(:as_conversation_participants => true)
+    audience_names = audience.map(&:name)
+    audience_contexts = contexts_for(audience, conversation.context_tags) # will be 0, 1, or 2 contexts
+    audience_context_names = [:courses, :groups].inject([]) { |ary, context_key|
+      ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
+    }.reject(&:blank?)
+
+    content += "<hr />"
+    content += "<div>#{t('conversation_context', "From a conversation with")} "
+    participant_list_cutoff = 2
+    if audience_names.length <= participant_list_cutoff
+      content += "#{ERB::Util.h(audience_names.to_sentence)}"
+    else
+      others_string = t('other_recipients', {
+        :one => "and 1 other",
+        :other => "and %{count} others"
+      },
+        :count => audience_names.length - participant_list_cutoff)
+      content += "#{ERB::Util.h(audience_names[0...participant_list_cutoff].join(", "))} #{others_string}"
+    end
+
+    if !audience_context_names.empty?
+      content += " (#{ERB::Util.h(audience_context_names.to_sentence)})"
+    end
+    content += "</div>"
+    content
+  end
+
   def watched_intro
     unless @current_user.watched_conversations_intro?
       @current_user.watched_conversations_intro
@@ -784,7 +842,7 @@ class ConversationsController < ApplicationController
 
   def jsonify_conversation(conversation, options = {})
     result = conversation.as_json(options)
-    audience = conversation.participants.reject{ |u| u.id == conversation.user_id }
+    audience = conversation.other_participants(:as_conversation_participants => true)
     result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
     result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
     unless interleave_submissions

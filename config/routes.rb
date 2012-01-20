@@ -348,6 +348,8 @@ ActionController::Routing::Routes.draw do |map|
     feed.user_format "users/:feed_code.:format", :controller => "users", :action => "public_feed"
     feed.gradebook "gradebooks/:feed_code", :controller => "gradebooks", :action => "public_feed"
     feed.eportfolio "eportfolios/:eportfolio_id.:format", :controller => "eportfolios", :action => "public_feed"
+    feed.conversation "conversations/:feed_code", :controller => "conversations", :action => "public_feed"
+    feed.conversation_format "conversations/:feed_code.:format", :controller => "conversations", :action => "public_feed"
   end
 
   map.resources :assessment_questions do |question|

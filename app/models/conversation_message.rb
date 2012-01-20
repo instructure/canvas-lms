@@ -17,6 +17,7 @@
 #
 
 class ConversationMessage < ActiveRecord::Base
+  include ActionController::UrlWriter
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
 
@@ -175,6 +176,51 @@ class ConversationMessage < ActiveRecord::Base
       'attachments' => attachments,
       'media_comment' => media_comment
     })
+  end
+
+  def to_atom(opts={})
+    extend ApplicationHelper
+    extend ConversationsHelper
+
+    title = ERB::Util.h(truncate_text(self.body, :max_words => 8, :max_length => 80))
+
+    # build content, should be:
+    # message body
+    # [list of attachments]
+    # -----
+    # context
+    content = "<div>#{ERB::Util.h(self.body)}</div>"
+    if !self.attachments.empty?
+      content += "<ul>"
+      self.attachments.each do |attachment|
+      href = file_download_url(attachment, :verifier => attachment.uuid,
+                                             :download => '1',
+                                             :download_frd => '1',
+                                             :host => HostUrl.context_host(self.context))
+        content += "<li><a href='#{href}'>#{ERB::Util.h(attachment.display_name)}</a></li>"
+      end
+      content += "</ul>"
+    end
+
+    content += opts[:additional_content] if opts[:additional_content]
+
+    Atom::Entry.new do |entry|
+      entry.title     = title
+      entry.authors  << Atom::Person.new(:name => self.author.name)
+      entry.updated   = self.created_at.utc
+      entry.published = self.created_at.utc
+      entry.id        = "tag:#{HostUrl.context_host(self.context)},#{self.created_at.strftime("%Y-%m-%d")}:/conversations/#{self.feed_code}"
+      entry.links    << Atom::Link.new(:rel => 'alternate',
+                                       :href => "http://#{HostUrl.context_host(self.context)}/conversations/#/conversations/#{self.conversation.id}")
+      self.attachments.each do |attachment|
+        entry.links  << Atom::Link.new(:rel => 'enclosure',
+                                       :href => file_download_url(attachment, :verifier => attachment.uuid,
+                                                                              :download => '1',
+                                                                              :download_frd => '1',
+                                                                              :host => HostUrl.context_host(self.context)))
+      end
+      entry.content   = Atom::Content::Html.new(content)
+    end
   end
 
   class EventFormatter

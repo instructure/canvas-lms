@@ -1,4 +1,11 @@
 <% content_for :page_title, t(:page_title, "Conversations") %>
+
+<% content_for :auto_discovery do %>
+  <% if @current_user %>
+      <%= auto_discovery_link_tag(:atom, feeds_conversation_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.conversations', "Conversations Atom Feed")}) %>
+  <% end %>
+<% end %>
+
 <% add_crumb "", '#', :id => 'help_crumb' %>
 
 <% jammit_js :messages %>

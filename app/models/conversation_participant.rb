@@ -175,8 +175,16 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.participants.size == 2 && private?
   end
 
-  def other_participants
-    conversation.participants - [self.user]
+  def other_participants(options={})
+    if options[:as_conversation_participants]
+      # give the option to use our notion of participants, which populates
+      # extra column re: shared courses/groups
+      self.participants.reject { |u| u.id == self.user.id }
+    else
+      # by default, use the conversations notion of participants, which is
+      # lighter weight
+      conversation.participants - [self.user]
+    end
   end
 
   def other_participant
