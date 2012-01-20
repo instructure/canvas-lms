@@ -33,31 +33,13 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :unread, :conditions => "workflow_state = 'unread'"
   named_scope :archived, :conditions => "workflow_state = 'archived'"
   named_scope :starred, :conditions => "label = 'starred'"
-  named_scope :labeled, lambda { |label|
-    {:conditions => label ?
-      ["label = ?", label] :
-      ["label IS NOT NULL"]
-    }
-  }
   delegate :private?, :to => :conversation
 
   before_update :update_unread_count
 
-  attr_accessible :subscribed, :label, :workflow_state
+  attr_accessible :subscribed, :starred, :workflow_state
 
-  def self.labels
-    (@labels ||= {})[I18n.locale] ||= [
-      ['starred', I18n.t('labels.starred', "Starred")],
-      ['red', I18n.t('labels.red', "Red")],
-      ['orange', I18n.t('labels.orange', "Orange")],
-      ['yellow', I18n.t('labels.yellow', "Yellow")],
-      ['green', I18n.t('labels.green', "Green")],
-      ['blue', I18n.t('labels.blue', "Blue")],
-      ['purple', I18n.t('labels.purple', "Purple")],
-    ]
-  end
-
-  validates_inclusion_of :label, :in => labels.map(&:first), :allow_nil => true
+  validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
     latest = options[:last_message] || messages.human.first
@@ -70,8 +52,7 @@ class ConversationParticipant < ActiveRecord::Base
       :message_count => message_count,
       :subscribed => subscribed?,
       :private => private?,
-      :starred => label == 'starred',
-      :label => label != 'starred' ? label : nil,
+      :starred => starred,
       :properties => properties(latest)
     }.with_indifferent_access
   end
@@ -180,8 +161,16 @@ class ConversationParticipant < ActiveRecord::Base
     subscribed?
   end
 
-  def label=(label)
-    write_attribute(:label, label.present? ? label : nil)
+  def starred
+    read_attribute(:label) == 'starred'
+  end
+
+  def starred=(val)
+    # if starred were an actual boolean column, this is the method that would
+    # be used to convert strings to appropriate boolean values (e.g. 'true' =>
+    # true and 'false' => false)
+    val = ActiveRecord::ConnectionAdapters::Column.value_to_boolean(val)
+    write_attribute(:label, val ? 'starred' : nil)
   end
 
   def one_on_one?
@@ -226,7 +215,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.last_message_at = nil
       self.has_attachments = false
       self.has_media_objects = false
-      self.label = nil
+      self.starred = false
     end
     # note that last_authored_at doesn't know/care about messages you may
     # have deleted... this is because it is only used by other participants

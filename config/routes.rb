@@ -10,7 +10,6 @@ ActionController::Routing::Routes.draw do |map|
   map.discussion_replies 'conversations/discussion_replies', :controller => 'context', :action => 'discussion_replies'
   map.conversations_unread 'conversations/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
   map.conversations_starred 'conversations/starred', :controller => 'conversations', :action => 'index', :scope => 'starred'
-  map.conversations_labeled 'conversations/labeled', :controller => 'conversations', :action => 'index', :scope => 'labeled'
   map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
   map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
@@ -746,7 +745,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.get 'conversations/find_recipients', :action => :find_recipients
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/:id', :action => :show
-      conversations.put 'conversations/:id', :action => :update # stars, labels, subscribed-ness, workflow_state
+      conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
       conversations.delete 'conversations/:id', :action => :destroy
       conversations.post 'conversations/:id/add_message', :action => :add_message
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients

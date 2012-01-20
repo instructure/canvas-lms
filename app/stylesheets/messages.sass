@@ -122,27 +122,6 @@ body
         background-color: #05a5e9
         color: #fff
         text-shadow: 0px 1px 1px #0276aa
-    li.label_group
-      overflow: hidden
-      padding: 2px 22px 2px 22px
-      min-width: 110px
-      a.label_icon
-        overflow: hidden
-        text-indent: -9999em
-        float: left
-        padding: 0
-        margin: 2px
-        top: 4px
-        left: 24px
-        height: 11px
-        width: 11px
-        z-index: 4
-        background-color: #fff
-        background-repeat: no-repeat
-        border: 1px solid #aaa
-      a:hover, a.checked
-        border: 3px solid #05a5e9
-        margin: 0
 
 #conversation_actions
   font-size: 0.9em
@@ -161,8 +140,6 @@ body
     position: relative
     top: -1px
     left: 0
-    li.label_group
-      min-width: 120px
 
 ul.messages, ul.conversations
   overflow: auto
@@ -524,14 +501,10 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
       color: #636363
       .audience
         color: #222
-      .action_remove_label, .action_add_label
-        display: none
-      // .action_remove_label, .action_add_label,
       .action_mark_as_read, .action_mark_as_unread, .action_star, .action_unstar
         text-indent: -9999em
         overflow: hidden
         position: absolute
-      // .action_remove_label, .action_add_label,
       .action_star, .action_unstar
         top: -1px
         left: 0
@@ -544,7 +517,6 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
         background-image: url(/images/messages/star.png)
       .action_unstar
         background-image: url(/images/messages/star-lit.png)
-      // .action_remove_label,
       .action_unstar
         display: none
       .action_mark_as_read, .action_mark_as_unread
@@ -554,7 +526,6 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
         height: 24px
         margin-top: -12px
         background: transparent url(/images/messages/new-replied-icon_sprite.png) 1px 0 no-repeat
-      // .action_remove_label,
       .action_mark_as_read, .action_unstar
         display: none
       .action_mark_as_unread
@@ -586,12 +557,6 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
         right: 17px
       .date
         visibility: hidden
-    // > li.labeled
-      .action_add_label
-        display: none
-      .action_remove_label
-        background-position: 1px -24px
-        display: block
     > li.starred
       .action_star
         display: none
@@ -599,35 +564,6 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
         display: block
     > li.attachments .attachments, > li.media_objects .media_objects
       display: inline
-
-.label_icon
-  background-repeat: no-repeat
-  background-image: url(/images/messages/flag.png)
-  background-position: 0 24px
-ul.red li .label_icon:hover
-  background-position: 1px 1px
-li.red .label_icon, .red.label_icon
-  background-position: 1px -23px !important
-ul.orange li .label_icon:hover
-  background-position: 1px -47px
-li.orange .label_icon, .orange.label_icon
-  background-position: 1px -71px !important
-ul.yellow li .label_icon:hover
-  background-position: 1px -95px
-li.yellow .label_icon, .yellow.label_icon
-  background-position: 1px -119px !important
-ul.green li .label_icon:hover
-  background-position: 1px -143px
-li.green .label_icon, .green.label_icon
-  background-position: 1px -167px !important
-ul.blue li .label_icon:hover
-  background-position: 1px -191px
-li.blue .label_icon, .blue.label_icon
-  background-position: 1px -215px !important
-ul.purple li .label_icon:hover
-  background-position: 1px -239px
-li.purple .label_icon, .purple.label_icon
-  background-position: 1px -263px !important
 
 #message_blank
   display: none

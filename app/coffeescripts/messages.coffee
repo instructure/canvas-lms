@@ -4,7 +4,6 @@ $messages = []
 $message_list = []
 $form = []
 $selected_conversation = null
-$last_label = null
 page = {}
 MessageInbox = {}
 
@@ -1065,13 +1064,11 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation.find('span.date').text $.friendlyDatetime($.parseFromISO(data.last_message_at).datetime)
     move_direction = if $conversation.data('last_message_at') > data.last_message_at then 'down' else 'up'
     $conversation.data 'last_message_at', data.last_message_at
-    $conversation.data 'label', (if data.starred then null else data.label)
     $conversation.data 'starred', data.starred
     $p = $conversation.find('p')
     $p.text data.last_message
     ($conversation.addClass(property) for property in data.properties) if data.properties.length
     $conversation.addClass('private') if data['private']
-    $conversation.addClass('labeled').addClass(data.label) if data.label && !data.starred
     $conversation.addClass('starred') if data.starred
     $conversation.addClass('unsubscribed') unless data.subscribed
     set_conversation_state $conversation, data.workflow_state
@@ -1132,9 +1129,6 @@ I18n.scoped 'conversations', (I18n) ->
         unarchive    : $('#action_unarchive').parent()
         delete       : $('#action_delete').parent()
         deleteAll    : $('#action_delete_all').parent()
-      labels:
-        group: $('#conversation_actions .label_group')
-        icon: $('#conversation_actions .label_icon')
 
     page.activeActionMenu = elements.node
 
@@ -1159,10 +1153,6 @@ I18n.scoped 'conversations', (I18n) ->
       elements.actions.unstar.show()
     else
       elements.actions.star.show()
-
-    elements.labels.group.show()
-    elements.labels.icon.removeClass 'checked'
-    elements.container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked')
 
     if elements.conversation.hasClass('private')
       elements.actions.subscribe.hide()
@@ -1240,11 +1230,6 @@ I18n.scoped 'conversations', (I18n) ->
     if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
     $form[if state then 'addClass' else 'removeClass']('disabled')
 
-  set_last_label = (label) ->
-    $conversation_list.removeClass('red orange yellow green blue purple').addClass(label) # so that the label hover is correct
-    $.cookie('last_label', label)
-    $last_label = label
-
   set_hash = (hash) ->
     if hash isnt location.hash
       location.hash = hash
@@ -1256,7 +1241,6 @@ I18n.scoped 'conversations', (I18n) ->
   $(document).ready () ->
     $conversations = $('#conversations')
     $conversation_list = $conversations.find("ul.conversations")
-    set_last_label($.cookie('last_label') ? 'red')
     $messages = $('#messages')
     $message_list = $messages.find('ul.messages')
     $form = $('#create_message_form')
@@ -1404,66 +1388,17 @@ I18n.scoped 'conversations', (I18n) ->
       e.preventDefault()
       e.stopImmediatePropagation()
       starred = null
-      current_label = null
       inbox_action $(this),
         method: 'PUT'
         before: ($node, options) ->
-          current_label = $node.data('label')
           starred = $node.data('starred')
           if !starred
             $node.addClass('starred')
-            $node.removeClass('labeled ' + current_label) if current_label
           !starred
         success: ($node, data) ->
           update_conversation($node, data)
         error: ($node) ->
           $node.removeClass('starred')
-          $node.addClass('labeled ' + current_label) if current_label
-
-    $('.action_remove_label').click (e) ->
-      e.preventDefault()
-      e.stopImmediatePropagation()
-      current_label = null
-      inbox_action $(this),
-        method: 'PUT'
-        before: ($node) ->
-          current_label = $node.data('label')
-          $node.removeClass('labeled ' + current_label) if current_label
-          current_label
-        success: ($node, data) ->
-          update_conversation($node, data)
-          remove_conversation $node if MessageInbox.scope == 'labeled'
-        error: ($node) ->
-          $node.addClass('labeled ' + current_label)
-
-    $('.action_add_label').click (e) ->
-      e.preventDefault()
-      e.stopImmediatePropagation()
-      label = null
-      current_label = null
-      starred = null
-      inbox_action $(this),
-        method: 'PUT'
-        before: ($node, options) ->
-          current_label = $node.data('label')
-          label = options.url.match(/%5Blabel%5D=(.*)/)[1]
-          starred = $node.data('starred')
-          if label is 'last'
-            label = $last_label
-            options.url = options.url.replace(/%5Blabel%5D=last/, '%5Blabel%5D=' + label)
-          if label isnt current_label
-            $node.removeClass('labeled ' + current_label) if current_label
-            $node.removeClass('starred') if starred
-            $node.addClass('labeled').addClass(label)
-          label isnt current_label
-        success: ($node, data) ->
-          update_conversation($node, data)
-          set_last_label(label)
-          remove_conversation $node if MessageInbox.label_scope and MessageInbox.label_scope isnt label
-        error: ($node) ->
-          $node.removeClass('labeled ' + label)
-          $node.addClass('starred') if starred
-          $node.addClass('labeled ' + current_label) if current_label
 
     $('#action_add_recipients').click (e) ->
       e.preventDefault()

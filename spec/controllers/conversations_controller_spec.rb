@@ -157,12 +157,12 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation(2).update_attribute(:workflow_state, "unread")
 
-      post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :label => "red"}
+      post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :starred => "1"}
       response.should be_success
       @conversation.reload
       @conversation.subscribed?.should be_false
       @conversation.should be_archived
-      @conversation.label.should eql 'red'
+      @conversation.starred.should be_true
     end
   end
 

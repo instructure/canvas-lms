@@ -45,7 +45,7 @@ describe ConversationsController, :type => :integration do
 
   context "conversations" do
     it "should return the conversation list" do
-      @c1 = conversation(@bob, :workflow_state => 'read', :label => "blue")
+      @c1 = conversation(@bob, :workflow_state => 'read')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
       @c3 = conversation(@jane, :workflow_state => 'archived') # won't show up, since it's archived
 
@@ -61,7 +61,6 @@ describe ConversationsController, :type => :integration do
           "message_count" => 1,
           "subscribed" => false,
           "private" => false,
-          "label" => nil,
           "starred" => false,
           "properties" => ["last_author"],
           "audience" => [@billy.id, @bob.id],
@@ -83,7 +82,6 @@ describe ConversationsController, :type => :integration do
           "message_count" => 1,
           "subscribed" => true,
           "private" => true,
-          "label" => "blue",
           "starred" => false,
           "properties" => ["last_author"],
           "audience" => [@bob.id],
@@ -116,12 +114,12 @@ describe ConversationsController, :type => :integration do
     end
 
     it "should filter conversations by scope" do
-      @c1 = conversation(@bob, :workflow_state => 'read', :label => "blue")
-      @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false, :label => "green")
+      @c1 = conversation(@bob, :workflow_state => 'read')
+      @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
       @c3 = conversation(@jane, :workflow_state => 'read')
 
-      json = api_call(:get, "/api/v1/conversations.json?scope=labeled&label=green",
-              { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'labeled', :label => 'green' })
+      json = api_call(:get, "/api/v1/conversations.json?scope=unread",
+              { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'unread' })
       json.each { |c| c.delete("avatar_url") }
       json.should eql [
         {
@@ -132,7 +130,6 @@ describe ConversationsController, :type => :integration do
           "message_count" => 1,
           "subscribed" => false,
           "private" => false,
-          "label" => "green",
           "starred" => false,
           "properties" => ["last_author"],
           "audience" => [@billy.id, @bob.id],
@@ -150,9 +147,9 @@ describe ConversationsController, :type => :integration do
     end
 
     it "should include starred conversations in starred scope regardless of if read or archived" do
-      @c1 = conversation(@bob, :workflow_state => 'unread', :label => "starred")
-      @c2 = conversation(@billy, :workflow_state => 'read', :label => "starred")
-      @c3 = conversation(@jane, :workflow_state => 'archived', :label => "starred")
+      @c1 = conversation(@bob, :workflow_state => 'unread', :starred => true)
+      @c2 = conversation(@billy, :workflow_state => 'read', :starred => true)
+      @c3 = conversation(@jane, :workflow_state => 'archived', :starred => true)
 
       json = api_call(:get, "/api/v1/conversations.json?scope=starred",
               { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'starred' })
@@ -162,7 +159,7 @@ describe ConversationsController, :type => :integration do
 
     it "should not include unstarred conversations in starred scope regardless of if read or archived" do
       @c1 = conversation(@bob, :workflow_state => 'unread')
-      @c2 = conversation(@billy, :workflow_state => 'read', :label => "blue")
+      @c2 = conversation(@billy, :workflow_state => 'read')
       @c3 = conversation(@jane, :workflow_state => 'archived')
 
       json = api_call(:get, "/api/v1/conversations.json?scope=starred",
@@ -205,7 +202,6 @@ describe ConversationsController, :type => :integration do
             "message_count" => 1,
             "subscribed" => true,
             "private" => true,
-            "label" => nil,
             "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@bob.id],
@@ -244,7 +240,6 @@ describe ConversationsController, :type => :integration do
             "message_count" => 1,
             "subscribed" => true,
             "private" => false,
-            "label" => nil,
             "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@billy.id, @bob.id],
@@ -287,7 +282,6 @@ describe ConversationsController, :type => :integration do
             "message_count" => 2, # two messages total now, though we'll only get the latest one in the response
             "subscribed" => true,
             "private" => true,
-            "label" => nil,
             "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@bob.id],
@@ -346,7 +340,6 @@ describe ConversationsController, :type => :integration do
             "message_count" => 1,
             "subscribed" => true,
             "private" => true,
-            "label" => nil,
             "starred" => false,
             "properties" => ["last_author"],
             "audience" => [@billy.id],
@@ -624,7 +617,6 @@ describe ConversationsController, :type => :integration do
         "message_count" => 2,
         "subscribed" => true,
         "private" => true,
-        "label" => nil,
         "starred" => false,
         "properties" => ["last_author", "attachments", "media_objects"],
         "audience" => [@bob.id],
@@ -668,23 +660,15 @@ describe ConversationsController, :type => :integration do
 
     it "should properly flag if starred in the response" do
       conversation1 = conversation(@bob)
-      conversation2 = conversation(@billy, :label => "starred")
-      conversation3 = conversation(@jane, :label => "blue")
+      conversation2 = conversation(@billy, :starred => true)
 
       json = api_call(:get, "/api/v1/conversations/#{conversation1.conversation_id}",
               { :controller => 'conversations', :action => 'show', :id => conversation1.conversation_id.to_s, :format => 'json' })
-      json["label"].should be_nil
       json["starred"].should be_false
 
       json = api_call(:get, "/api/v1/conversations/#{conversation2.conversation_id}",
               { :controller => 'conversations', :action => 'show', :id => conversation2.conversation_id.to_s, :format => 'json' })
-      json["label"].should be_nil
       json["starred"].should be_true
-
-      json = api_call(:get, "/api/v1/conversations/#{conversation3.conversation_id}",
-              { :controller => 'conversations', :action => 'show', :id => conversation3.conversation_id.to_s, :format => 'json' })
-      json["label"].should == "blue"
-      json["starred"].should be_false
     end
 
     context "submission comments" do
@@ -766,7 +750,6 @@ describe ConversationsController, :type => :integration do
         "message_count" => 2, # two messages total now, though we'll only get the latest one in the response
         "subscribed" => true,
         "private" => true,
-        "label" => nil,
         "starred" => false,
         "properties" => ["last_author"],
         "audience" => [@bob.id],
@@ -803,7 +786,6 @@ describe ConversationsController, :type => :integration do
         "message_count" => 1,
         "subscribed" => true,
         "private" => false,
-        "label" => nil,
         "starred" => false,
         "properties" => ["last_author"],
         "audience" => [@billy.id, @bob.id, @jane.id, @joe.id, @tommy.id],
@@ -830,7 +812,7 @@ describe ConversationsController, :type => :integration do
 
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
               { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
-              { :conversation => {:subscribed => false, :workflow_state => 'archived', :label => 'red'} })
+              { :conversation => {:subscribed => false, :workflow_state => 'archived'} })
       conversation.reload
 
       json.should eql({
@@ -841,7 +823,6 @@ describe ConversationsController, :type => :integration do
         "message_count" => 1,
         "subscribed" => false,
         "private" => false,
-        "label" => 'red',
         "starred" => false,
         "properties" => ["last_author"]
       })
@@ -853,48 +834,25 @@ describe ConversationsController, :type => :integration do
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
               { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
               { :conversation => {:starred => true} })
-      json["label"].should be_nil
       json["starred"].should be_true
     end
 
     it "should be able to unstar the conversation via update" do
-      conversation = conversation(@bob, @billy, :label => "starred")
+      conversation = conversation(@bob, @billy, :starred => true)
 
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
               { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
               { :conversation => {:starred => false} })
-      json["label"].should be_nil
       json["starred"].should be_false
     end
 
-    it "should prefer stars over labels if both present in update" do
-      conversation = conversation(@bob, @billy)
+    it "should leave starryness alone when left out of update" do
+      conversation = conversation(@bob, @billy, :starred => true)
 
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
               { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
-              { :conversation => {:starred => true, :label => "red"} })
-      json["label"].should be_nil
+              { :conversation => {:workflow_state => 'read'} })
       json["starred"].should be_true
-    end
-
-    it "should use any provided label when unstarring via update" do
-      conversation = conversation(@bob, @billy, :label => "starred")
-
-      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
-              { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
-              { :conversation => {:starred => false, :label => "red"} })
-      json["label"].should == "red"
-      json["starred"].should be_false
-    end
-
-    it "should respect provided label when no starryness specified for update" do
-      conversation = conversation(@bob, @billy, :label => "starred")
-
-      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
-              { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
-              { :conversation => {:label => "red"} })
-      json["label"].should == "red"
-      json["starred"].should be_false
     end
 
     it "should delete messages from the conversation" do
@@ -913,7 +871,6 @@ describe ConversationsController, :type => :integration do
         "message_count" => 1,
         "subscribed" => true,
         "private" => true,
-        "label" => nil,
         "starred" => false,
         "properties" => ["last_author"]
       })
@@ -932,7 +889,6 @@ describe ConversationsController, :type => :integration do
         "message_count" => 0,
         "subscribed" => true,
         "private" => true,
-        "label" => nil,
         "starred" => false,
         "properties" => []
       })
