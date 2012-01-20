@@ -1248,4 +1248,9 @@ class ApplicationController < ActionController::Base
     @unauthorized_message ||= t('#application.errors.student_view_unauthorized', "You cannot access this functionality in student view.")
     render_unauthorized_action(@current_user)
   end
+
+  def set_site_admin_context
+    @context = Account.site_admin
+    add_crumb t('#crumbs.site_admin', "Site Admin"), url_for(Account.site_admin)
+  end
 end

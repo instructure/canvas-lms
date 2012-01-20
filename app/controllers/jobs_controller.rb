@@ -1,5 +1,6 @@
 class JobsController < ApplicationController
   before_filter :require_manage_jobs
+  before_filter :set_site_admin_context, :set_navigation, :only => [:index]
   POPULAR_TAG_COUNTS = 10
   LIMIT = 100
 
@@ -99,4 +100,8 @@ class JobsController < ApplicationController
     end
   end
 
+  def set_navigation
+    @active_tab = 'jobs'
+    add_crumb t('#crumbs.jobs', "Jobs")
+  end
 end

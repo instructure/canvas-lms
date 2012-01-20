@@ -17,12 +17,12 @@
 #
 
 class PluginsController < ApplicationController
-  before_filter :require_setting_site_admin
+  before_filter :require_setting_site_admin, :set_site_admin_context, :set_navigation
 
   def index
     @plugins = Canvas::Plugin.all
   end
-  
+
   def show
     if find_plugin_setting
       @plugin_setting.disabled = true if @plugin_setting.new_record?
@@ -65,5 +65,9 @@ class PluginsController < ApplicationController
 
   def require_setting_site_admin
     require_site_admin_with_permission(:manage_site_settings)
+  end
+
+  def set_navigation
+    @active_tab = 'plugins'
   end
 end
