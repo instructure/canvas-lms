@@ -121,8 +121,8 @@ describe "learning outcome test" do
     wait_for_ajaximations
     driver.find_element(:css, '#rubrics .edit_rubric_link img').should be_displayed
     find_all_with_jquery('#rubrics tr.criterion:visible').size.should == 4
-    driver.find_element(:css, '#left-side .outcomes').click
-    driver.find_element(:link, "Outcomes").click
+    expect_new_page_load { driver.find_element(:css, '#left-side .outcomes').click }
+    expect_new_page_load { driver.find_element(:link, "Outcomes").click }
     find_with_jquery('#right-side a:last-child').click
     driver.find_element(:css, '#rubrics .details').should include_text('15')
   end
