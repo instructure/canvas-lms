@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
   # this has to be before include COntext to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
     col = table ? "#{table}.sortable_name" : 'sortable_name'
-    connection_pool.spec.config[:adapter] == 'postgresql' ? "LOWER(#{col})" : col
+    ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql' ? "LOWER(#{col})" : col
   end
 
   include Context
