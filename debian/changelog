@@ -1,3 +1,155 @@
+canvas-lms (2012.01.21.07.01) stable; urgency=low
+
+  * Package ref: 06287386ee07f216b819b4fa08ee6d24d5703452
+  *
+  * [-83cf326] pin fssm gem
+  * [-920f7bc] Revert "add id to wiki page urls. fixes #2635."
+  * [+bb52e40] allow sending an expected status to api_call spec helper
+  * [+6ddcb22] updated stats lib to have histogram
+  * [+bc98116] fix main content scrolling on top of #right_side
+  * [+a9f4cff] update selenium-webdriver and parallel_tests gems
+  * [+83e66a4] sleep groups_controller to fix intermittently failing selenium test
+  * [+9253533] environment javascript module
+  * [+a5e32b9] initialize any_instantiation class variable
+  * [+fb6fcc9] fix intermittently failing selenium specs
+  * [+30906c5] remove section completed status from sis csv doc
+  * [+4ae0e78] ignore rb-fsevent in rake i18n:check
+  * [+acb7ee9] move Delayed::Job priorities into the plugin
+  * [+5bc5b76] scroll gradebook2 "section to show" if needed
+  * [+fa8497b] gitignore compiled handlebars and coffeescript
+  * [+15aa326] don't bother validating the length of Notification bodies
+  * [+452e04a] don't include the GA script until asked to
+  * [+7174981] add spec to ensure csv grading by percent is allowed
+  * [+d67246f] make it obvious if you forgot to add to assets.yml
+  * [+13e2aa9] @example_request API doc tag
+  * [+86580eb] add course creation to api. fixes #6539
+  * [+9ca61fc] fix worker_spec.rb when run alone
+  * [+7eaf2a3] added new test case for bug 6540
+  * [+31926d1] fix courses api specs for mysql.
+  * [+e98c505] fix infinite recursion in outcome groups
+  * [+f9f9f53] use the association for User#email=
+  * [+3ca0c20] fix spelling of "privileges" in enrollments.
+  * [+82ad7ee] add course enrollment creation api. fixes #6559.
+  * [+686d138] make task to just gen coffee script and handlebars
+  * [+399355c] replace usage of Date.today
+  * [+dc07470] Roles API; refs #6182
+  * [+4ad9929] only export active external tools
+  * [+30c2a77] fix speedGrader submissions showing for wrong student
+  * [+95235f3] fixes invalid url to api docs from access key gen
+  * [+3070f65] increase selenium script_timeout
+  * [+2918b9a] add url to todo item assignment objects. fixes #6635.
+  * [+7c01e34] latest es translations
+  * [+9d047b7] fix intermittently failing selenium spec
+  * [+46b392a] properly handle unicode filenames (fixes #6376)
+  * [+200ab29] api for external tools on courses and accounts
+  * [+ff2ecff] error on invalid as_user_id in API calls
+  * [+3827675] support authorization header for api access tokens
+  * [+908e406] don't show "infinity%" in gradebook2, fixes: #6571
+  * [+156d5f8] expose IE version to INST.browser
+  * [+b6127a2] upgrade slickgrid
+  * [+6e6eff6] show submission_type icons in gradebook2
+  * [+bad526a] fix url path to assignment groups
+  * [+21cbaf1] fix masquerading page error with no referer refs #6533
+  * [+3c4f81e] fix courses api spec
+  * [+cbbc1c5] more s/Account.first/Account.default/
+  * [+e0b58c2] add a rspec nested_instafail_formatter
+  * [+e9e5329] delegated_auth_redirect_uri for easier testing of delegated_auth_redirect
+  * [+e08b0d2] fix intermittent qti spec failure
+  * [+b02a09c] xml config for blti extensions
+  * [+b873a1e] add lti documentation to api docs
+  * [+ed6951f] reword quiz settings to be more clear
+  * [+4d70f07] rename doc/templates/rest to doc/api
+  * [+6ce92e5] remove basic auth from api documentation, fixes #6716
+  * [+926f391] selenium test for course wizard
+  * [+8536f19] selenium gradebook2 tests
+  * [+0d2026f] add link to api terms of service page
+  * [+d32988b] s/recieved/received/g
+  * [+1bca358] getting coffeescript and handlebars to work with plugins
+  * [+71cac7d] fix js files to not error when minified
+  * [+eddda7e] fix adding existing users as admins to sub accounts fixes #6533
+  * [+bdd79a4] add account user list to users api. fixes #6741.
+  * [+e280a30] don't use presence/absence of root_account(_id) to determine if an account is a root account
+  * [+de92da4] remove the account.root_account || account idiom
+  * [+cc8ef79] initial sharding stubs
+  * [+f9a8f32] api json conversion improvements
+  * [+3edc9dd] graphael amd module
+  * [+36cc02b] changing course api url to html_url
+  * [+ca26020] a little whitespace cleanup on quizzes.js
+  * [+08f11d1] changed emails used in course wizard to use @example.com
+  * [+08d6797] Clean up in selenium gradebook2 tests
+  * [+e2fba03] selenium syllabus tests
+  * [+22097f8] make selenium people_spec.rb more robust
+  * [+0c891b8] selenium login logout tests
+  * [+406ed4f] selenium course settings tests
+  * [+95ab7c7] fixing spec that is failing inconsistently
+  * [+9bb915f] build framework for api error responses
+  * [+b9fee70] use Pseudonym.custom_find_by_unique_id instead of find_by_unique_id
+  * [+47d0c0f] fixing inconsistently failing selenium courses spec
+  * [+2c160d7] don't send notifications to unconfirmed communication channels
+  * [+b158878] make the selenium profile_spec more robust
+  * [+a417559] help dialog overhaul fixes: #5784
+  * [+1065c8d] use close_visible_dialog in several selenium specs
+  * [+59edf79] fix collaborations on files page
+  * [+320a3ba] replace find_option_value with click_option in several selenium specs
+  * [+79075a7] fixing selenium spec in gradebook2 that keeps failing
+  * [+3a204ef] remove sis_name and sis_course_code from the API
+  * [+590ec29] drag and drop issues on quizzes fixes #6419
+  * [+057a8c8] remove sis_source_id from enrollments API
+  * [+28198d2] remove identity bar from cache when inbox count changes. fixes #6027.
+  * [+257a2f1] course name in conversations should be a link
+  * [+fefb814] migration to fix bad assessment question data
+  * [+80c9058] calendar and scheduler apis; refs #3395
+  * [+da63680] put 'active' tab indication back.
+  * [+cc9ce1d] validate UTF-8 in SIS CSVs fixes #6780
+  * [+6059b1c] calendar2 and scheduler front-end; refs #3395
+  * [+c2eca84] Use versions in Submission#quiz_submission_version
+  * [+640008a] calendar redirection, switcher link
+  * [+afa8220] selenium modules tests
+  * [+daf2a48] fix typo; fixes #6755
+  * [+1cb590e] make the migration only send later if production
+  * [+d9a23a9] improve communication channel uniqueness check
+  * [+7c4b96e] wrap opening dialog with keep_trying_until in gradebook2 selenium spec
+  * [+3f4adf0] fix changing default e-mail when editing username is disabled
+  * [+3686b2d] drop unused column accounts.type
+  * [+2a86f49] instructure_csv_zip is not a valid import type
+  * [+64d687e] handle decimal points in rubrics correctly
+  * [+cd723f0] return absolute uri for course copy api responses
+  * [+6b821e0] add api to list all enrollments in a course. fixes #6762
+  * [+23da7a4] a bunch of scheduler improvements
+  * [+51dd4d6] made the time block separator column a little wider
+  * [+47b13d1] add the current user to the course wizard cache key; fixes #6821
+  * [+81d0d75] add qti test case for metadata out of place
+  * [+3e6821d] fix breadcrumbs when viewing wiki pages in a group; fixes #6822
+  * [+b3a6dea] Revert "add id to wiki page urls."
+  * [+4f5607e] make saml entity use the account's domain
+  * [+0da76b8] fix time block bug
+  * [+0ea9ed8] highlight days with appointment slots available
+  * [+63a2c22] fix dashboard notifications for appointments
+  * [+9b139a9] fix showing the date range for a reserved appointment in scheduler
+  * [+e3cf28e] upgrade nokogiri to 1.4.7
+  * [+fff562b] clean up and expand sanitize specs
+  * [+4555a0d] upgrade nokogiri and sanitize gems
+  * [+e47d6c5] fix truncate_html for nokogiri 1.5.0
+  * [+4be8f8f] make conversation message "immediately" by default
+  * [+644185d] try harder not to create scribd jobs for non-scribdable files
+  * [+589acf5] use the first active email channel when using default notification policy
+  * [+cbef680] fix page errors related to submission versions in speedgrader; fixes #6869
+  * [+dc5a44c] improve errors on content migrations list
+  * [+db70439] reload enrollment association before caching
+  * [+8fa876b] show the default notification policies for users with no policies; fixes #6876
+  * [+fbc7a22] fix showing default notification preferences, again; refs #6876
+  * [+d3e6c6b] don't send files to users in public courses we shouldn't; fixes #6868
+  * [+867c8db] don't error on the comm prefs page; refs #6914
+  * [+f08ba68] moved rubric criterion comments fixes #6659
+  * [+56c44fe] handle Timeout::Error in redis caching
+  * [+3b6ab3e] only include submissions visible to a user in zip fixes #5998
+  * [+4a80014] only queue the process_attachment job when the attachment is created
+  * [+de9fe22] process page views from redis in transactional batches
+  * [+c466c12] conversations, fixes #6594
+  * [+0628738] fix conversation loading errors, closes #6812
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 21 Jan 2012 07:02:07 -0700
+
 canvas-lms (2012.01.05.10.54) stable; urgency=low
 
   * Package ref: 83cf3264fb5f833990e8a865d42fa8602cc6a7a7
