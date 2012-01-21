@@ -180,11 +180,13 @@ class ContentImportsController < ApplicationController
   #
   # @response_field id The unique identifier for the course copy.
   #
+  # @response_field created_at The time that the copy was initiated.
+  #
   # @response_field progress The progress of the copy as an integer. It is null before the copying starts, and 100 when finished.
   #
   # @response_field workflow_state The current status of the course copy. Possible values: "created", "started", "completed", "failed"
   #
-  # @response_field status_url The relative url for the course copy status API endpoint.
+  # @response_field status_url The url for the course copy status API endpoint.
   #
   # @example_response
   #   {'status':'completed', 'workflow_state':100, 'id':257, 'created_at':'2011-11-17T16:50:06Z', 'status_url':'/api/v1/courses/9457/course_copy/257'}
@@ -271,6 +273,27 @@ class ContentImportsController < ApplicationController
       @running = ContentMigration.running.find_all_by_context_id(@context.id)
       @waiting = ContentMigration.waiting.find_all_by_context_id(@context.id)
       @failed = ContentMigration.failed.find_all_by_context_id(@context.id)
+    end
+  end
+  
+  def download_archive
+    if authorized_action(@context, @current_user, :manage_content)
+      @migration = ContentMigration.for_context(@context).find(params[:id])
+      @attachment = @migration.attachment
+      
+      respond_to do |format|
+        if @attachment
+          if Attachment.s3_storage?
+            format.html { redirect_to @attachment.cacheable_s3_url }
+          else
+            cancel_cache_buster
+            format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'attachment') }
+          end
+        else
+          flash[:notice] = t('notices.no_archive', "There is no archive for this content migration")
+          format.html { redirect_to course_import_list(@context) }
+        end
+      end
     end
   end
 

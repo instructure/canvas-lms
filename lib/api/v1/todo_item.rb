@@ -26,6 +26,9 @@ module Api::V1::TodoItem
       :assignment => assignment_json(assignment, user, session),
       :ignore => api_v1_users_todo_ignore_url(assignment.asset_string, todo_type, :permanent => '0'),
       :ignore_permanently => api_v1_users_todo_ignore_url(assignment.asset_string, todo_type, :permanent => '1'),
+      :html_url => todo_type == 'grading' ?
+        speed_grader_course_gradebook_url(assignment.context_id, :assignment_id => assignment.id) :
+        "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"
     }).tap do |hash|
       if todo_type == 'grading'
         hash['needs_grading_count'] = assignment.needs_grading_count

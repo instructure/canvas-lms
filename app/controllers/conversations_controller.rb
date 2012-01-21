@@ -252,7 +252,7 @@ class ConversationsController < ApplicationController
   #   }
   def show
     return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" + (params[:message] ? '?message=' + URI.encode(params[:message], Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")) : '') unless request.xhr? || params[:format] == 'json'
-    
+
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread?
     submissions = []
     if @conversation.one_on_one?
@@ -576,6 +576,7 @@ class ConversationsController < ApplicationController
     @current_user.concluded_courses.each do |course|
       @contexts[:courses][course.id] = {
         :id => course.id,
+        :url => course_url(course),
         :name => course.name,
         :type => :course,
         :active => course.recently_ended?,
@@ -586,6 +587,7 @@ class ConversationsController < ApplicationController
     @current_user.courses.each do |course|
       @contexts[:courses][course.id] = {
         :id => course.id,
+        :url => course_url(course),
         :name => course.name,
         :type => :course,
         :active => true,

@@ -33,6 +33,7 @@ ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
         next unless model < ActiveRecord::Base
         model
       }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
+ALL_MODELS << Version
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -70,6 +71,18 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
   end
 end
 
+Spec::Matchers.define :encompass do |expected|
+  match do |actual|
+    if expected.is_a?(Array) && actual.is_a?(Array)
+      expected.size == actual.size && expected.zip(actual).all?{|e,a| a.slice(*e.keys) == e}
+    elsif expected.is_a?(Hash) && actual.is_a?(Hash)
+      actual.slice(*expected.keys) == expected
+    else
+      false
+    end
+  end
+end
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
@@ -102,7 +115,7 @@ Spec::Runner.configure do |config|
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb
+      Canvas.redis.flushdb rescue nil
     end
     Canvas.redis_used = false
   end
@@ -140,6 +153,7 @@ Spec::Runner.configure do |config|
       e = @course.enroll_teacher(u)
       e.workflow_state = 'active'
       e.save!
+      @teacher = u
     end
     @course
   end
@@ -155,7 +169,7 @@ Spec::Runner.configure do |config|
   end
 
   def account_admin_user(opts={})
-    user(opts)
+    @user = opts[:user] || user(opts)
     @admin = @user
     @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
     @user
@@ -329,6 +343,39 @@ Spec::Runner.configure do |config|
     @quiz_submission.grade_submission
   end
 
+  def rubric_for_course
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
+    @rubric.data = [
+      {
+        :points => 3,
+        :description => "First row",
+        :long_description => "The first row in the rubric",
+        :id => 1,
+        :ratings => [
+          {
+            :points => 3,
+            :description => "Rockin'",
+            :criterion_id => 1,
+            :id => 2
+          },
+          {
+            :points => 2,
+            :description => "Rockin'",
+            :criterion_id => 1,
+            :id => 3
+          },
+          {
+            :points => 0,
+            :description => "Lame",
+            :criterion_id => 1,
+            :id => 4
+          }
+        ]
+      }
+    ]
+    @rubric.save!
+  end
+
   def outcome_with_rubric(opts={})
     @outcome_group ||= LearningOutcomeGroup.default_for(@course)
     @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
@@ -485,9 +532,8 @@ Spec::Runner.configure do |config|
     importer.warnings.should == []
   end
 
-  def enable_cache
+  def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
     old_cache = RAILS_CACHE
-    new_cache = ActiveSupport::Cache::MemoryStore.new
     ActionController::Base.cache_store = new_cache
     silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
     old_perform_caching = ActionController::Base.perform_caching

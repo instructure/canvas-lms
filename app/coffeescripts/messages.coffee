@@ -624,7 +624,7 @@ I18n.scoped 'conversations', (I18n) ->
       $form.find('#action_add_recipients').hide()
       $form.attr action: '/conversations'
     else
-      $form.find('.audience').html $selected_conversation.find('.audience').html()
+      build_form_audience()
       $form.removeClass('new')
       $form.find('#action_add_recipients').showIf(!$selected_conversation.hasClass('private'))
       $form.attr action: $selected_conversation.find('a.details_link').attr('add_url')
@@ -634,12 +634,22 @@ I18n.scoped 'conversations', (I18n) ->
     $form.show().find(':input:visible:first').focus()
 
   reset_message_form = ->
-    $form.find('.audience').html $selected_conversation.find('.audience').html() if $selected_conversation?
+    build_form_audience() if $selected_conversation?
     $form.find('input[name!=authenticity_token], textarea').val('').change()
     $form.find(".attachment:visible").remove()
     $form.find(".media_comment").hide()
     $form.find("#action_media_comment").show()
     inbox_resize()
+
+  build_form_audience = ->
+    $form_audience = $form.find('.audience')
+    $form_audience.html $selected_conversation.find('.audience').html()
+    # replace each <span data-url='...'>...</span> with an <a href='...'>...</a>
+    $form_audience.find('em').attr('id', 'form_contexts')
+    $context = $form_audience.find('.context')
+    for elem in $context
+      $elem = $(elem)
+      $elem.replaceWith("<a href='#{$.h($elem.data('url'))}'>#{$.h($elem.html())}</a>")
 
   parse_query_string = (query_string = window.location.search.substr(1)) ->
     hash = {}
@@ -730,19 +740,23 @@ I18n.scoped 'conversations', (I18n) ->
       , ->
         $form.loadingImage('remove')
 
-  MessageInbox.context_list = (contexts, limit=2) ->
-    shared_contexts = (course.name for course_id, roles of contexts.courses when course = @contexts.courses[course_id]).
-                concat(group.name for group_id, roles of contexts.groups when group = @contexts.groups[group_id])
-    $.toSentence(shared_contexts.sort((a, b) ->
-      a = a.toLowerCase()
-      b = b.toLowerCase()
-      if a < b
-        -1
-      else if a > b
-        1
+  MessageInbox.context_list = (contexts, with_url=false, limit=2) ->
+    strcmp = (str_a, str_b) ->
+      if str_a < str_b then -1 else if str_a > str_b then 1 else 0
+
+    format_context = (context) ->
+      if with_url and context.type is "course"
+        return "<span class='context' data-url='#{$.h(context.url)}'>#{$.h(context.name)}</span>"
       else
-        0
-    )[0...limit])
+        return $.h(context.name)
+
+    shared_contexts = (course for course_id, roles of contexts.courses when course = @contexts.courses[course_id]).
+                concat(group for group_id, roles of contexts.groups when group = @contexts.groups[group_id]).
+                sort((context_a, context_b) ->
+                  strcmp(context_a.name.toLowerCase(), context_b.name.toLowerCase())
+                )[0...limit]
+
+    $.toSentence(format_context(context) for context in shared_contexts)
 
   html_name_for_user = (user, contexts = {courses: user.common_courses, groups: user.common_groups}) ->
     $.h(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + $.h(MessageInbox.context_list(contexts)) + "</em>" else ''
@@ -1010,7 +1024,7 @@ I18n.scoped 'conversations', (I18n) ->
     audience = conversation.audience
 
     return "<span>#{$.h(I18n.t('notes_to_self', 'Monologue'))}</span>" if audience.length == 0
-    context_info = "<em>#{$.h(MessageInbox.context_list(conversation.audience_contexts))}</em>"
+    context_info = "<em>#{MessageInbox.context_list(conversation.audience_contexts, true)}</em>"
     return "<span>#{$.h(MessageInbox.user_cache[audience[0]].name)}</span> #{context_info}" if audience.length == 1
 
     audience = audience[0...cutoff].concat([audience[cutoff...audience.length]]) if audience.length > cutoff
@@ -1266,7 +1280,11 @@ I18n.scoped 'conversations', (I18n) ->
         $(this).loadingImage()
       success: (data) ->
         $(this).loadingImage 'remove'
-        if data.length > 1 # e.g. we just sent bulk private messages
+        if data.length == 0
+          # this is the case if a bulk message is sent to recipients the sender
+          # has no conversations with
+          $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
+        else if data.length > 1 # e.g. we just sent bulk private messages
           for conversation in data
             $conversation = $('#conversation_' + conversation.id)
             update_conversation($conversation, conversation, 'immediate') if $conversation.length

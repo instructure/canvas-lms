@@ -62,6 +62,18 @@ shared_examples_for "conversations selenium tests" do
     message
   end
 
+  def get_messages
+    get "/conversations"
+    elements = nil
+    keep_trying_until {
+      elements = find_all_with_jquery("#conversations > ul > li:visible")
+      elements.size == 1
+    }
+    elements.first.click
+    wait_for_ajaximations
+    msgs = driver.find_elements(:css, "div#messages ul.messages > li")
+  end
+
   context "conversation loading" do
     it "should load all conversations" do
       @me = @user
@@ -71,8 +83,19 @@ shared_examples_for "conversations selenium tests" do
       keep_trying_until{
         elements = find_all_with_jquery("#conversations > ul > li:visible")
         elements.last.location_once_scrolled_into_view
-        elements.size == num  
+        elements.size == num
       }
+    end
+
+    it "should properly clear the identity header when conversations are read" do
+      enable_cache do
+        @me = @user
+        5.times { conversation(@me, user).update_attribute(:workflow_state, 'unread') }
+        get '/conversations'
+        driver.find_element(:css, '.conversations li:first-child').click
+        get '/conversations'
+        driver.find_element(:css, '.unread-messages-count').text.should eql '4'
+      end
     end
   end
 
@@ -449,19 +472,19 @@ shared_examples_for "conversations selenium tests" do
     end
   end
 
+  def add_recipient(search)
+    input = find_with_jquery("#create_message_form input:visible")
+    input.send_keys(search)
+    keep_trying_until{ driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
+    input.send_keys(:return)
+  end
+
   context "user notes" do
     before do
       @the_teacher = User.create(:name => "teacher bob")
       @course.enroll_teacher(@the_teacher)
       @the_student = User.create(:name => "student bob")
       @course.enroll_student(@the_student)
-    end
-
-    def add_recipient(search)
-      input = find_with_jquery("#create_message_form input:visible")
-      input.send_keys(search)
-      keep_trying_until{ driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
-      input.send_keys(:return)
     end
 
     it "should not allow user notes if not enabled" do
@@ -547,18 +570,6 @@ shared_examples_for "conversations selenium tests" do
       coms.first.find_element(:css, 'p').text.should == 'wut up teacher'
       coms.last.find_element(:css, '.audience').text.should == 'nobody@example.com'
       coms.last.find_element(:css, 'p').text.should == 'hey bob'
-    end
-
-    def get_messages
-      get "/conversations"
-      elements = nil
-      keep_trying_until {
-        elements = find_all_with_jquery("#conversations > ul > li:visible")
-        elements.size == 1
-      }
-      elements.first.click
-      wait_for_ajaximations
-      msgs = driver.find_elements(:css, "div#messages ul.messages > li")
     end
 
     it "should interleave submissions with messages based on comment time" do
@@ -670,7 +681,61 @@ shared_examples_for "conversations selenium tests" do
       @checkbox.should be_displayed
       is_checked(@checkbox).should be_false
     end
+  end
 
+  context "form audience" do
+    before do
+      # have @course, @teacher from before
+      # creates @student
+      student_in_course({:course => @course})
+
+      @course.update_attribute(:name, "the course")
+
+      @group = @course.groups.create(:name => "the group")
+      @group.participating_users << @student
+
+      conversation(@teacher, @student)
+    end
+
+    it "should link to the course page" do
+      get_messages
+
+      find_with_jquery("#create_message_form .audience a").click
+      driver.current_url.should match %r{/courses/#{@course.id}}
+    end
+
+    it "should not be a link in the left conversation list panel" do
+      new_conversation
+
+      find_all_with_jquery("#conversations .audience a").should be_empty
+    end
+  end
+
+  context "batch messages" do
+    it "shouldn't show anything in conversation list when sending batch messages to new recipients" do
+      @course.default_section.update_attribute(:name, "the section")
+
+      @s1 = User.create(:name => "student1")
+      @s2 = User.create(:name => "student2")
+      @course.enroll_user(@s1)
+      @course.enroll_user(@s2)
+
+      get "/conversations"
+
+      add_recipient("student1")
+      add_recipient("student2")
+      driver.find_element(:id, "body").send_keys "testing testing"
+      driver.find_element(:css, '#create_message_form button[type="submit"]').click
+
+      wait_for_ajaximations
+
+      driver.find_element(:id, "flash_notice_message").text.should =~ /Messages Sent/
+
+      # no conversations should show up in the conversation list
+      conversations = driver.find_elements(:css, "#conversations > ul > li")
+      conversations.size.should == 1
+      conversations.first["id"].should == "conversations_loader"
+    end
   end
 end
 

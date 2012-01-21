@@ -68,7 +68,7 @@ describe "Canvas Cartridge importing" do
     #compare settings
     @copy_to.conclude_at.to_i.should == @copy_from.conclude_at.to_i
     @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
-    @copy_to.syllabus_body.should == (body_with_link % @copy_to.id).gsub(/png">/, 'png" />')
+    @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
     @copy_to.storage_quota.should_not == @copy_from.storage_quota
     @copy_to.name.should_not == @copy_from.name
     @copy_to.course_code.should_not == @copy_from.course_code
@@ -132,7 +132,7 @@ describe "Canvas Cartridge importing" do
     a_2 = ag2_2.assignments.first 
     ag2_2.rules.should == "drop_lowest:2\ndrop_highest:5\nnever_drop:%s\n" % a_2.id
   end
-
+  
   it "should import external tools" do
     tool1 = @copy_from.context_external_tools.new
     tool1.url = 'http://instructure.com'
@@ -585,7 +585,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
     page_2.url.should == page.url
-    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png">/, 'png" />')
+    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png" \/>/, 'png">')
   end
   
   it "should import migrate inline external tool URLs in wiki pages" do
@@ -648,7 +648,7 @@ describe "Canvas Cartridge importing" do
     
     asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
     asmnt_2.title.should == asmnt.title
-    asmnt_2.description.should == (body_with_link % @copy_to.id).gsub(/png">/, 'png" />')
+    asmnt_2.description.should == (body_with_link % @copy_to.id)
     asmnt_2.points_possible.should == asmnt.points_possible
     asmnt_2.allowed_extensions.should == asmnt.allowed_extensions
     asmnt_2.submission_types.should == asmnt.submission_types

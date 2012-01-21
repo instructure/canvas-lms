@@ -700,8 +700,7 @@ class Submission < ActiveRecord::Base
   def quiz_submission_version
     return nil unless self.quiz_submission
     self.quiz_submission.versions.each do |version|
-      submission = version.model
-      return version.number if submission.finished_at && submission.finished_at <= self.submitted_at
+      return version.number if version.model.finished_at
     end
     nil
   end
@@ -735,7 +734,7 @@ class Submission < ActiveRecord::Base
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || t('no_comment', "no comment")))
+    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Time.zone.today.to_s) + (opts[:media_comment_id] || opts[:comment] || t('no_comment', "no comment")))
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden]
     comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?

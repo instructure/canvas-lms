@@ -34,7 +34,7 @@ $server_port = nil
 $app_host_and_port = nil
 
 at_exit do
-  [1,2,3].each do
+  [1, 2, 3].each do
     begin
       $selenium_driver.try(:quit)
       break
@@ -67,12 +67,12 @@ module SeleniumTestsHelperMethods
       end
 
       driver = nil
-      [1,2,3].each do |times|
+      [1, 2, 3].each do |times|
         begin
           driver = Selenium::WebDriver.for(
-            :remote,
-            :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
-            :desired_capabilities => caps
+              :remote,
+              :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
+              :desired_capabilities => caps
           )
           break
         rescue Exception => e
@@ -202,17 +202,20 @@ shared_examples_for "all selenium tests" do
   include CustomSeleniumRspecMatchers
 
   def selenium_driver; $selenium_driver; end
+
   alias_method :driver, :selenium_driver
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
 
-    driver.find_element(:css, '#pseudonym_session_unique_id').send_keys username
+    user_element = driver.find_element(:css, '#pseudonym_session_unique_id')
+    user_element.send_keys(username)
     password_element = driver.find_element(:css, '#pseudonym_session_password')
     password_element.send_keys(password)
     password_element.submit
   end
+
   alias_method :login, :login_as
 
   def create_session(pseudonym, real_login)
@@ -400,9 +403,9 @@ shared_examples_for "all selenium tests" do
         return true;
       }
     JS
-    
+
     yield
-    
+
     keep_trying_until {
       driver.execute_script(<<-JS)
         var value = window.canvasTestAlertFired;
@@ -410,7 +413,7 @@ shared_examples_for "all selenium tests" do
         return value;
       JS
     }
-    
+
     driver.execute_script(<<-JS)
       window.alert = window.canvasTestSavedAlert;
     JS
@@ -450,18 +453,16 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(input['onchange']) if input['onchange']
   end
 
-  def find_option_value(selector_type, selector_css, option_text)
-    select = driver.find_element(selector_type, selector_css)
-    select.click
-    options = select.find_elements(:css, 'option')
-    option_value = ''
-    for option in options
-      if option.text == option_text
-        option_value = option.attribute('value')
-        break
-      end
-    end
-    option_value
+  def click_option(select_css, option_text, select_by = :text)
+    element = find_with_jquery(select_css)
+    select = Selenium::WebDriver::Support::Select.new(element)
+    select.select_by(select_by, option_text)
+  end
+
+  def close_visible_dialog
+    visible_dialog_element = find_with_jquery('.ui-dialog:visible')
+    visible_dialog_element.find_element(:css, '.ui-dialog-titlebar-close').click
+    visible_dialog_element.should_not be_displayed
   end
 
   def element_exists(selector_type, selector)
@@ -472,6 +473,12 @@ shared_examples_for "all selenium tests" do
     rescue
     end
     exists
+  end
+
+  def first_selected_option(select_element)
+    select = Selenium::WebDriver::Support::Select.new(select_element)
+    option = select.first_selected_option
+    option
   end
 
   def datepicker_prev
@@ -491,15 +498,15 @@ shared_examples_for "all selenium tests" do
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stubs(:config).returns({
-          'domain' => 'www.instructuremedia.com',
-          'resource_domain' => 'www.instructuremedia.com',
-          'partner_id' => '100',
-          'subpartner_id' => '10000',
-          'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-          'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-          'player_ui_conf' => '1',
-          'kcw_ui_conf' => '1',
-          'upload_ui_conf' => '1'
+      'domain' => 'www.instructuremedia.com',
+      'resource_domain' => 'www.instructuremedia.com',
+      'partner_id' => '100',
+      'subpartner_id' => '10000',
+      'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+      'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+      'player_ui_conf' => '1',
+      'kcw_ui_conf' => '1',
+      'upload_ui_conf' => '1'
     })
     kal = mock('Kaltura::ClientV3')
     kal.stubs(:startSession).returns "new_session_id_here"
@@ -563,6 +570,12 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def load_simulate_js
+    # load the simulate plugin to simulate a drag event
+    js = File.read('spec/selenium/jquery.simulate.js')
+    driver.execute_script js
+  end
+
   self.use_transactional_fixtures = false
 
   append_after(:each) do
@@ -572,7 +585,7 @@ shared_examples_for "all selenium tests" do
 
   append_before(:each) do
     driver.manage.timeouts.implicit_wait = 1
-    driver.manage.timeouts.script_timeout = 5
+    driver.manage.timeouts.script_timeout = 60
   end
 
   append_before(:all) do
@@ -592,13 +605,16 @@ shared_examples_for "all selenium tests" do
   end
 end
 
-TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
-                "testfile1copy.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
-                    "testfile2.txt" => "5d714eca-2cff-4737-8604-45ca098165cc",
-                    "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
-                    "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
-                    "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
-                       "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png') }
+TEST_FILE_UUIDS = {
+    "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
+    "testfile1copy.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
+    "testfile2.txt" => "5d714eca-2cff-4737-8604-45ca098165cc",
+    "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
+    "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
+    "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
+    "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'
+    )}
+
 def get_file(filename)
   data = TEST_FILE_UUIDS[filename]
   @file = Tempfile.new(filename.split(/(?=\.)/))

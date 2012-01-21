@@ -132,6 +132,7 @@ class Account < ActiveRecord::Base
   add_setting :global_javascript, :condition => :global_includes, :root_only => true
   add_setting :global_stylesheet, :condition => :global_includes, :root_only => true
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
+  add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
@@ -145,13 +146,14 @@ class Account < ActiveRecord::Base
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true, :default => false, :condition => :non_delegated_authentication
+  add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
           opts = account_settings_options[key.to_sym]
-          if (opts[:root_only] && root_account_id) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
+          if (opts[:root_only] && !self.root_account?) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
             settings.delete key.to_sym
           elsif opts[:boolean]
             settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
@@ -253,11 +255,17 @@ class Account < ActiveRecord::Base
   def root_account?
     !self.root_account_id
   end
-  
+
+  def root_account_with_self
+    return self if self.root_account?
+    root_account_without_self
+  end
+  alias_method_chain :root_account, :self
+
   def sub_accounts_as_options(indent = 0, preloaded_accounts = nil)
     unless preloaded_accounts
       preloaded_accounts = {}
-      (self.root_account || self).all_accounts.active.each do |account|
+      self.root_account.all_accounts.active.each do |account|
         (preloaded_accounts[account.parent_account_id] ||= []) << account
       end
     end
@@ -327,8 +335,7 @@ class Account < ActiveRecord::Base
   end
 
   def file_namespace
-    root = self.root_account || self
-    "account_#{root.id}"
+    "account_#{self.root_account.id}"
   end
   
   def self.account_lookup_cache_key(id)
@@ -568,7 +575,7 @@ class Account < ActiveRecord::Base
     can :read and can :manage and can :update and can :delete
 
     given { |user|
-      root_account = self.root_account || self
+      root_account = self.root_account
       result = false
       site_admin = self.site_admin?
 
@@ -613,7 +620,7 @@ class Account < ActiveRecord::Base
   
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
-    unless self.root_account_id
+    if self.root_account?
       @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     end
   end
@@ -744,28 +751,18 @@ class Account < ActiveRecord::Base
   # points to the new root account as well.
   def consume_account(account)
     account.all_accounts.each do |sub_account|
-      sub_account.root_account = self.root_account || self
+      sub_account.root_account = self.root_account
       sub_account.save!
     end
     account.parent_account = self
-    account.root_account = self.root_account || self
+    account.root_account = self.root_account
     account.save!
     account.pseudonyms.each do |pseudonym|
-      pseudonym.account = self.root_account || self
+      pseudonym.account = self.root_account
       pseudonym.save!
     end
   end
-  
-  def self.root_account_id_for(obj)
-    res = nil
-    if obj.respond_to?(:root_account_id)
-      res = obj.root_account_id
-    elsif obj.respond_to?(:context)
-      res = obj.context.root_account_id rescue nil
-    end
-    raise "Root account ID is undiscoverable for #{obj.inspect}" unless res
-  end
-  
+
   def course_count
     self.child_courses.not_deleted.count('DISTINCT course_id')
   end
@@ -882,8 +879,8 @@ class Account < ActiveRecord::Base
     true
   end
   
-  def custom_feedback_links
-    []
+  def help_links
+    settings[:custom_help_links] || []
   end
   
   def self.allowable_services
@@ -1043,33 +1040,21 @@ class Account < ActiveRecord::Base
   end
 
   def manually_created_courses_account
-    (self.root_account || self).sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
+    self.root_account.sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
   end
 
   def open_registration_for?(user, session = nil)
-    root_account = self.root_account || self
+    root_account = self.root_account
     return true if root_account.open_registration?
     root_account.grants_right?(user, session, :manage_user_logins)
   end
 
-  named_scope :sis_sub_accounts, lambda{|account, *sub_account_source_ids|
-    {:conditions => {:root_account_id => account.id, :sis_source_id => sub_account_source_ids}, :order => :sis_source_id}
-  }
-  named_scope :root_accounts, lambda{
-    {:conditions => {:root_account_id => nil} }
-  }
-  named_scope :needs_parent_account, lambda{|account, limit|
-    {:conditions => {:parent_account_id => nil, :root_account_id => account.id}, :limit => limit }
-  }
-  named_scope :processing_sis_batch, lambda{ 
-    {:conditions => ['accounts.current_sis_batch_id IS NOT NULL'], :order => :updated_at}
-  }
+  named_scope :root_accounts, :conditions => {:root_account_id => nil}
+  named_scope :processing_sis_batch, :conditions => ['accounts.current_sis_batch_id IS NOT NULL'], :order => :updated_at
   named_scope :name_like, lambda { |name|
     { :conditions => wildcard('accounts.name', name) }
   }
-  named_scope :active, lambda {
-    { :conditions => ['accounts.workflow_state != ?', 'deleted'] }
-  }
+  named_scope :active, :conditions => ['accounts.workflow_state != ?', 'deleted']
   named_scope :limit, lambda {|limit|
     {:limit => limit}
   }

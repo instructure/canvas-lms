@@ -30,5 +30,27 @@ describe WikiPagesController do
     get course_wiki_page_url(@course, @wiki_page)
     response.body.should_not have_text @wiki_page.body
   end
+
+  it "should link correctly in the breadcrumbs for group wikis" do
+    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+    group_category = @course.group_categories.build(:name => "mygroup")
+    @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
+    @wiki_page = @group.wiki.wiki_pages.create :title => 'hello', :body => 'This is a wiki page.'
+
+    def test_page(url)
+      get url
+      response.should be_success
+
+      html = Nokogiri::HTML(response.body)
+      html.css('#breadcrumbs a').each do |link|
+        href = link.attr('href')
+        next if href == "/"
+        href.should =~ %r{^/groups/#{@group.id}}
+      end
+    end
+
+    test_page("/groups/#{@group.id}/wiki/hello")
+    test_page("/groups/#{@group.id}/wiki/hello/revisions")
+  end
 end
 

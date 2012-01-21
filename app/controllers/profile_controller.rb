@@ -66,12 +66,9 @@ class ProfileController < ApplicationController
         render :action => "profile"
       end
       format.json do
-        hash = user_json(@user, @current_user, session)
+        hash = user_json(@user, @current_user, session, 'avatar_url')
         hash[:primary_email] = @default_email_channel.try(:path)
         hash[:login_id] ||= @default_pseudonym.try(:unique_id)
-        if service_enabled?(:avatars)
-          hash[:avatar_url] = avatar_image_url(@user.id)
-        end
         if @user == @current_user
           hash[:calendar] = { :ics => "#{feeds_calendar_url(@user.feed_code)}.ics" }
         end
@@ -111,13 +108,20 @@ class ProfileController < ApplicationController
     @policies = @user.notification_policies
     @context = UserProfile.new(@user)
     @active_tab = "communication-preferences"
-    if @policies.empty?
-      @notification_categories.each do |category|
-        policy = @user.notification_policies.build
-        policy.notification = category
-        policy.communication_channel = @user.communication_channel
-      end
+
+    # build placeholder notification policies for categories the user does not have policies for already
+    # Note that currently a NotificationPolicy might not have a Notification attached to it.
+    # See the relevant spec in profile_controller_spec.rb for more details.
+    user_categories = @user.notification_policies.map {|np| np.notification.try(:category) }
+    @notification_categories.each do |category|
+      # category is actually a Notification
+      next if user_categories.include?(category.category)
+      policy = @user.notification_policies.build
+      policy.notification = category
+      policy.frequency = category.default_frequency
+      policy.communication_channel = @user.communication_channel
     end
+
     has_facebook_installed = !@current_user.user_services.for_service('facebook').empty?
     @policies = @policies.select{|p| (p.communication_channel && p.communication_channel.path_type != 'facebook') || has_facebook_installed }
     @email_channels = @channels.select{|c| c.path_type == "email"}
@@ -177,7 +181,7 @@ class ProfileController < ApplicationController
   def update
     @user = @current_user
     respond_to do |format|
-      unless @user.user_can_edit_name?
+      if !@user.user_can_edit_name? && params[:user]
         params[:user].delete(:name)
         params[:user].delete(:short_name)
         params[:user].delete(:sortable_name)
@@ -185,8 +189,7 @@ class ProfileController < ApplicationController
       if @user.update_attributes(params[:user])
         pseudonymed = false
         if params[:default_email_id].present?
-          @user.communication_channels.each_with_index{|cc, idx| cc.insert_at(idx + 1) }
-          @email_channel = @user.communication_channels.find_by_id(params[:default_email_id])
+          @email_channel = @user.communication_channels.email.find_by_id(params[:default_email_id])
           @email_channel.move_to_top if @email_channel
         end
         if params[:pseudonym]
@@ -210,11 +213,6 @@ class ProfileController < ApplicationController
             format.html { redirect_to profile_url }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
-        end
-        if params[:default_communication_channel_id].present?
-          cc = @user.communication_channels.each_with_index{|cc, idx| cc.insert_at(idx + 1) }
-          cc = @user.communication_channels.find_by_id_and_path_type(params[:default_communication_channel_id], 'email')
-          cc.insert_at(1) if cc
         end
         unless pseudonymed
           flash[:notice] = t('notices.updated_profile', "Profile successfully updated")

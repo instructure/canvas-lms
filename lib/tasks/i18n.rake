@@ -95,7 +95,7 @@ namespace :i18n do
 
     # Ruby
     files = Dir.glob('./**/*rb').
-      reject{ |file| file =~ /\A\.\/(vendor\/plugins\/rails_xss|db|spec)\// }
+      reject{ |file| file =~ /\A\.\/(rb-fsevent|vendor\/plugins\/rails_xss|db|spec)\// }
     files &= only if only
     file_count = files.size
     rb_extractor = I18nExtraction::RubyExtractor.new(:translations => @translations)

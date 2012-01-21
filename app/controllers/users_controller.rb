@@ -147,10 +147,18 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API
+  # Retrieve the list of users associated with this account.
+  #
+  # @example_response
+  # [
+  #   { "id": 1, "name": "Dwight Schrute", "sortable_name": "Schrute, Dwight", "short_name": "Dwight", "login_id": "dwight@example.com", "sis_user_id": "12345", "sis_login_id": null },
+  #   { "id": 2, "name": "Gob Bluth", "sortable_name": "Bluth, Gob", "short_name": "Gob Bluth", "login_id": "gob@example.com", "sis_user_id": "67890", "sis_login_id": null }
+  # ]
   def index
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      @root_account = @context.root_account || @account
+      @root_account = @context.root_account
       @users = []
       @query = (params[:user] && params[:user][:name]) || params[:term]
       if @context && @context.is_a?(Account) && @query
@@ -160,7 +168,10 @@ class UsersController < ApplicationController
       else
         @users = @context.fast_all_users
       end
-      @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+
+      @users = api_request? ?
+        Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name) :
+        @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
       respond_to do |format|
         if @users.length == 1 && params[:term]
           format.html {
@@ -176,7 +187,9 @@ class UsersController < ApplicationController
         format.json  {
           cancel_cache_buster
           expires_in 30.minutes
-          render :json => @users.map{ |u| {:label => u.name, :id => u.id} }
+          api_request? ?
+            render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
+            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
         }
       end
     end
@@ -193,7 +206,7 @@ class UsersController < ApplicationController
         end
         return_url = session[:masquerade_return_to]
         session[:masquerade_return_to] = nil
-        return return_to(return_url, request.referer)
+        return return_to(return_url, request.referer || dashboard_url)
       end
     end
   end
@@ -354,6 +367,7 @@ class UsersController < ApplicationController
   #       'assignment': { .. assignment object .. },
   #       'ignore': '.. url ..',
   #       'ignore_permanently': '.. url ..',
+  #       'html_url': '.. url ..',
   #       'needs_grading_count': 3, // number of submissions that need grading
   #       'context_type': 'course', // course|group
   #       'course_id': 1,
@@ -364,6 +378,7 @@ class UsersController < ApplicationController
   #       'assignment' => { .. assignment object .. },
   #       'ignore' => '.. url ..',
   #       'ignore_permanently' => '.. url ..',
+  #       'html_url': '.. url ..',
   #       'context_type': 'course',
   #       'course_id': 1,
   #     }
@@ -499,7 +514,7 @@ class UsersController < ApplicationController
   # @argument pseudonym[:send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
   def create
     # Look for an incomplete registration with this pseudonym
-    @pseudonym = @context.pseudonyms.find_by_unique_id_and_workflow_state(params[:pseudonym][:unique_id], 'active')
+    @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
     @pseudonym = nil if @pseudonym && !['creation_pending', 'pre_registered', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
@@ -525,7 +540,8 @@ class UsersController < ApplicationController
 
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'
-    @cc = @user.communication_channels.find_or_initialize_by_path_and_path_type(email, 'email')
+    @cc = @user.communication_channels.email.by_path(email).first
+    @cc ||= @user.communication_channels.build(:path => email)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
     @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
@@ -818,7 +834,7 @@ class UsersController < ApplicationController
   def require_open_registration
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
-    @context = @context.root_account || @context
+    @context = @context.root_account
     if !@context.grants_right?(@current_user, session, :manage_user_logins) && (!@context.open_registration? || !@context.no_enrollments_can_create_courses? || @context != Account.default)
       flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
       respond_to do |format|

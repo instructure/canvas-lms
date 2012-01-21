@@ -49,6 +49,7 @@ describe UsersController, :type => :integration do
         },
         'ignore' => api_v1_users_todo_ignore_url(@a.asset_string, 'submitting', :permanent => 0),
         'ignore_permanently' => api_v1_users_todo_ignore_url(@a.asset_string, 'submitting', :permanent => 1),
+        'html_url' => "#{course_assignment_url(@a.context_id, @a.id)}#submit",
         'context_type' => 'Course',
         'course_id' => @student_course.id,
       }
@@ -68,6 +69,7 @@ describe UsersController, :type => :integration do
         'needs_grading_count' => 1,
         'ignore' => api_v1_users_todo_ignore_url(@a2.asset_string, 'grading', :permanent => 0),
         'ignore_permanently' => api_v1_users_todo_ignore_url(@a2.asset_string, 'grading', :permanent => 1),
+        'html_url' => speed_grader_course_gradebook_url(@a2.context_id, :assignment_id => @a2.id),
         'context_type' => 'Course',
         'course_id' => @teacher_course.id,
       }
@@ -84,13 +86,13 @@ describe UsersController, :type => :integration do
   it "should check for auth" do
     get("/api/v1/users/self/todo")
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+    JSON.parse(response.body).should == {"message"=>"Invalid access token.", "status"=>"unauthorized"}
 
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     raw_api_call(:get, "/api/v1/courses/#{@course.id}/todo",
                 :controller => "courses", :action => "todo_items", :format => "json", :course_id => @course.to_param)
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+    JSON.parse(response.body).should == { 'status' => 'unauthorized', 'message' => 'You are not authorized to perform that action.' }
   end
 
   it "should return a global user todo list" do

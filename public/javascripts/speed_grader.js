@@ -804,6 +804,7 @@ I18n.scoped('gradebook', function(I18n) {
       $grade.change(EG.handleGradeSubmit);
 
       $submission_to_view.change(function(){
+        if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
         EG.currentStudent.submission.currentSelectedIndex = parseInt($(this).val(), 10);
         EG.handleSubmissionSelectionChange();
       });
@@ -950,12 +951,17 @@ I18n.scoped('gradebook', function(I18n) {
     handleSubmissionSelectionChange: function(){
       try {
         var submissionToViewVal = $submission_to_view.filter(":visible").val(),
-            currentSelectedIndex = Number(submissionToViewVal) || 
+            currentSelectedIndex = Number(submissionToViewVal) ||
                                   ( this.currentStudent &&
                                     this.currentStudent.submission &&
                                     this.currentStudent.submission.currentSelectedIndex ) 
                                   || 0,
-            submission  = this.currentStudent.submission.submission_history[currentSelectedIndex].submission,
+            submission  = this.currentStudent &&
+                          this.currentStudent.submission &&
+                          this.currentStudent.submission.submission_history &&
+                          this.currentStudent.submission.submission_history[currentSelectedIndex] &&
+                          this.currentStudent.submission.submission_history[currentSelectedIndex].submission
+                          || {},
             dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
             submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
             gradedAt    = submission.graded_at && $.parseFromISO(submission.graded_at),
@@ -976,7 +982,7 @@ I18n.scoped('gradebook', function(I18n) {
 
         //handle the files
         $submission_files_list.empty();
-        $.each(submission.versioned_attachments, function(i,a){
+        $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
           if (attachment.scribd_doc && attachment.scribd_doc.created) {
             scribdableAttachments.push(attachment);
@@ -1023,7 +1029,7 @@ I18n.scoped('gradebook', function(I18n) {
             .show();
         });
 
-        $submission_files_container.showIf(submission.versioned_attachments.length);
+        $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
 
         // load up a preview of one of the attachments if we can.
         // do it in this order:
@@ -1050,16 +1056,15 @@ I18n.scoped('gradebook', function(I18n) {
     refreshSubmissionsToView: function(){
       var dueAt = jsonData.due_at && $.parseFromISO(jsonData.due_at);
 
-      //if there are multiple submissions
-      if (this.currentStudent && this.currentStudent.submission && this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
-        var innerHTML = "",
-            submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
+      var innerHTML = "";
+      if (this.currentStudent.submission.submission_history.length > 0) {
+        submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
 
         $.each(this.currentStudent.submission.submission_history, function(i, s){
           s = s.submission;
           var submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
               late        = dueAt && submittedAt && submittedAt.timestamp > dueAt.timestamp;
-              
+
           innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
                         (s == submissionToSelect ? "selected='selected'" : "") + ">" +
                         (submittedAt ? submittedAt.datetime_formatted : I18n.t('no_submission_time', 'no submission time')) +
@@ -1067,7 +1072,11 @@ I18n.scoped('gradebook', function(I18n) {
                         (s.grade && s.grade_matches_current_submission ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
                        "</option>";
         });
-        $submission_to_view.html(innerHTML);
+      }
+      $submission_to_view.html(innerHTML);
+
+      //if there are multiple submissions
+      if (this.currentStudent && this.currentStudent.submission && this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
         $multiple_submissions.show();
         $single_submission.hide();
       }
@@ -1167,7 +1176,8 @@ I18n.scoped('gradebook', function(I18n) {
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
               this.currentStudent.submission &&
-              !isNaN(this.currentStudent.submission.currentSelectedIndex ) ?
+              !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
+              this.currentStudent.submission.currentSelectedIndex != null ?
               '&version=' + this.currentStudent.submission.currentSelectedIndex :
               ''
             ) +'" frameborder="0"></iframe>')
@@ -1325,6 +1335,15 @@ I18n.scoped('gradebook', function(I18n) {
       // find the student this submission belongs to and update their submission with this new one, if they dont have a submission, set this as their submission.
       var student =  $.grep(jsonData.studentsWithSubmissions, function(s){ return s.id === submission.user_id; })[0];
       student.submission = student.submission || {};
+
+      // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange
+      // depends on it being there. so mimic it.
+      if (typeof submission.submission_history === 'undefined') {
+        submission.submission_history = [{
+          submission: $.extend(true, {}, submission)
+        }];
+      }
+
       $.extend(true, student.submission, submission);
       return student;
     },

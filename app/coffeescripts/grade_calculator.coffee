@@ -73,7 +73,7 @@ class GradeCalculator
       possible_weight_from_submissions = 0.0
       total_possible_weight = 0.0
       for data in group_sums when data.group.group_weight > 0
-        if data[data_idx].submission_count > 0
+        if data[data_idx].submission_count > 0 and data[data_idx].possible > 0
           tally = data[data_idx].score / data[data_idx].possible
           score += data.group.group_weight * tally
           possible_weight_from_submissions += data.group.group_weight

@@ -649,7 +649,7 @@ describe User do
 
     it "should not include users from other sections if visibility is limited to sections" do
       set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       messageable_users = @student.messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
@@ -693,7 +693,7 @@ describe User do
 
     it "should respect section visibility when returning users for a specified group" do
       set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
 
@@ -828,7 +828,7 @@ describe User do
   
   context "tabs_available" do
     it "should not include unconfigured external tools" do
-      tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob')
+      tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       tool.has_user_navigation.should == false
@@ -838,7 +838,7 @@ describe User do
     end
     
     it "should include configured external tools" do
-      tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob')
+      tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       tool.has_user_navigation.should == true
@@ -1191,7 +1191,7 @@ describe User do
       admin.account.should == @account
     end
 
-    it "should default to the AccountAdmin membership type" do
+    it "should default to the AccountAdmin role" do
       @account = account_model
       u = User.create!
       u.flag_as_admin(@account)
@@ -1200,7 +1200,7 @@ describe User do
       admin.membership_type.should == 'AccountAdmin'
     end
 
-    it "should respect a provided membership type" do
+    it "should respect a provided role" do
       @account = account_model
       u = User.create!
       u.flag_as_admin(@account, "CustomAccountUser")
@@ -1222,6 +1222,48 @@ describe User do
       u = User.create!
       u.register
       u.flag_as_admin(@account)
+    end
+  end
+
+  describe "email=" do
+    it "should work" do
+      @user = User.create!
+      @user.email = 'john@example.com'
+      @user.communication_channels.map(&:path).should == ['john@example.com']
+      @user.email.should == 'john@example.com'
+    end
+  end
+
+  describe "event methods" do
+    describe "calendar_events_for_calendar" do
+      it "should include own scheduled appointments" do
+        course_with_student(:active_all => true)
+        ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour], [Time.now + 1.hour, Time.now + 2.hour]])
+        ag.appointments.first.reserve_for(@user, @user)
+        events = @user.calendar_events_for_calendar
+        events.size.should eql 1
+        events.first.title.should eql 'test appointment'
+      end
+
+      it "should include manageable appointments" do
+        course(:active_all => true)
+        @user = @course.admins.first
+        ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
+        events = @user.calendar_events_for_calendar
+        events.size.should eql 1
+        events.first.title.should eql 'test appointment'
+      end
+    end
+
+    describe "upcoming_events" do
+      it "should include manageable appointment groups" do
+        course(:active_all => true)
+        @user = @course.admins.first
+        ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
+        events = @user.upcoming_events
+        events.size.should eql 1
+        events.first.title.should eql 'test appointment'
+      end
     end
   end
 end

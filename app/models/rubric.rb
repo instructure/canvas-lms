@@ -215,7 +215,7 @@ class Rubric < ActiveRecord::Base
       criterion = {}
       criterion[:description] = (criterion_data[:description] || t('no_description', "No Description")).strip
       criterion[:long_description] = (criterion_data[:long_description] || "").strip
-      criterion[:points] = criterion_data[:points].to_i || 0
+      criterion[:points] = criterion_data[:points].to_f || 0
       criterion_data[:id].strip! if criterion_data[:id]
       criterion_data[:id] = nil if criterion_data[:id] && criterion_data[:id].empty?
       criterion[:id] = unique_item_id(criterion_data[:id])
@@ -234,7 +234,7 @@ class Rubric < ActiveRecord::Base
         rating = {}
         rating[:description] = (rating_data[:description] || t('no_description', "No Description")).strip
         rating[:long_description] = (rating_data[:long_description] || "").strip
-        rating[:points] = rating_data[:points].to_i || 0
+        rating[:points] = rating_data[:points].to_f || 0
         rating[:criterion_id] = criterion[:id]
         rating_data[:id].strip! if rating_data[:id]
         rating[:id] = unique_item_id(rating_data[:id])

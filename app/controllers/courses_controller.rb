@@ -95,23 +95,53 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API
+  # Create a new course
+  #
+  # @argument account_id [Integer] The unique ID of the account to create to course under.
+  # @argument course[name] [String] [optional] The name of the course. If omitted, the course will be named "Unnamed Course."
+  # @argument course[course_code] [String] [optional] The course code for the course.
+  # @argument course[start_at] [Datetime] [optional] Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  # @argument course[conclude_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
+  # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
+  # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
+  # @argument course[allow_student_assignment_edits] [optional] Set to true if students should be allowed to make modifications to assignments.
+  # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
+  # @argument course[allow_student_forum_attachments] [Boolean] [optional] If true, students can attach files to forum posts.
+  # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
+  # @argument course[self_enrollment] [Boolean] [optional] Set to true if the course is self enrollment.
+  # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
+  # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
+  #
   def create
     @account = Account.find(params[:account_id])
     if authorized_action(@account, @current_user, :manage_courses)
-
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
       end
 
       if enrollment_term_id = params[:course].delete(:enrollment_term_id)
-        params[:course][:enrollment_term] = (@account.root_account || @account).enrollment_terms.find(enrollment_term_id)
+        params[:course][:enrollment_term] = @account.root_account.enrollment_terms.find(enrollment_term_id)
       end
 
+      sis_course_id = params[:course].delete(:sis_course_id)
       @course = (@sub_account || @account).courses.build(params[:course])
+      @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
+      @course.offer if api_request? and params[:offer].present?
       respond_to do |format|
         if @course.save
           format.html
-          format.json { render :json => @course.to_json }
+          format.json { render :json => course_json(
+            @course,
+            @current_user,
+            session,
+            [:start_at, :conclude_at, :license, :publish_grades_immediately,
+             :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
+             :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
+             :root_account_id, :account_id],
+             nil)
+          }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
           format.html { redirect_to :root_url }
@@ -120,12 +150,12 @@ class CoursesController < ApplicationController
       end
     end
   end
-  
+
   def backup
     get_context
     if authorized_action(@context, @current_user, :update)
       backup_json = @context.backup_to_json
-      send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Date.today.to_s}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
+      send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Time.zone.today.to_s}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
       render :text => proc {|response, output|
         output.write backup_json
       }
@@ -232,6 +262,7 @@ class CoursesController < ApplicationController
     end
   end
 
+
   include Api::V1::StreamItem
   # @API
   # Returns the current user's course-specific activity stream.
@@ -295,7 +326,7 @@ class CoursesController < ApplicationController
       
       if params[:range] && params[:date]
         date = Date.parse(params[:date]) rescue nil
-        date ||= Date.today
+        date ||= Time.zone.today
         if params[:range] == 'week'
           @view_week = (date - 1) - (date - 1).wday + 1
           @range_start = @view_week
@@ -718,10 +749,10 @@ class CoursesController < ApplicationController
     @user = @context.users.find(params[:id])
     if authorized_action(@context, @current_user, :manage_admin_users)
       if params[:limit] == "1"
-        Enrollment.limit_priveleges_to_course_section!(@context, @user, true)
+        Enrollment.limit_privileges_to_course_section!(@context, @user, true)
         render :json => {:limited => true}.to_json
       else
-        Enrollment.limit_priveleges_to_course_section!(@context, @user, false)
+        Enrollment.limit_privileges_to_course_section!(@context, @user, false)
         render :json => {:limited => false}.to_json
       end
     else
@@ -753,10 +784,7 @@ class CoursesController < ApplicationController
     get_context
     params[:enrollment_type] ||= 'StudentEnrollment'
     params[:course_section_id] ||= @context.default_section.id
-    can_add = %w(StudentEnrollment ObserverEnrollment).include?(params[:enrollment_type]) && @context.grants_right?(@current_user, session, :manage_students)
-    can_add ||= params[:enrollment_type] == 'TeacherEnrollment' && @context.teacherless? && @context.grants_right?(@current_user, session, :manage_students)
-    can_add ||= @context.grants_right?(@current_user, session, :manage_admin_users)
-    if can_add
+    if @current_user && @current_user.can_create_enrollment_for?(@context, session, params[:enrollment_type])
       params[:user_list] ||= ""
       
       respond_to do |format|
@@ -764,7 +792,7 @@ class CoursesController < ApplicationController
         if params[:auto_accept] && @context.account.grants_right?(@current_user, session, :manage_admin_users)
           @enrollment_state = 'active'
         end
-        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session)), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
+        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session)), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_privileges_to_course_section => params[:limit_privileges_to_course_section] == '1', :enrollment_state => @enrollment_state))
           format.json do
             Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
             json = @enrollments.map { |e|
@@ -845,7 +873,7 @@ class CoursesController < ApplicationController
       account ||= @domain_root_account.manually_created_courses_account
       return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
       if account.grants_rights?(@current_user, session, :manage_courses)
-        root_account = account.root_account || account
+        root_account = account.root_account
         args[:enrollment_term] = if params[:course][:enrollment_term_id].present?
           root_account.enrollment_terms.find_by_id(params[:course][:enrollment_term_id])
         end

@@ -4,7 +4,7 @@ describe "speedgrader selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   def student_submission(options = {})
-    submission_model(options.merge(:assignment => @assignment, :body => "first student submission text"))
+    submission_model({ :assignment => @assignment, :body => "first student submission text" }.merge(options))
   end
 
   before(:each) do
@@ -66,6 +66,25 @@ describe "speedgrader selenium tests" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajax_requests
     driver.execute_script("return INST.errorCount").should == 0
+  end
+
+  it "should have a submission_history after a submitting a comment" do
+    # a student without a submission
+    @student_2 = User.create!(:name => 'student 2')
+    @student_2.register
+    @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+    @course.enroll_user(@student_2, "StudentEnrollment", :enrollment_state => 'active')
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajax_requests
+
+    #add comment
+    driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')
+    driver.find_element(:css, '#add_a_comment *[type="submit"]').click
+    keep_trying_until{ driver.find_element(:css, '#comments > .comment').displayed? }
+
+    # the ajax from that add comment form comes back without a submission_history, the js should mimic it.
+    driver.execute_script('return jsonData.studentsWithSubmissions[0].submission.submission_history.length').should == 1
   end
 
   it "should display submission late notice message" do
@@ -194,7 +213,7 @@ describe "speedgrader selenium tests" do
       driver.find_element(:id, "audio_record_option").should be_displayed
     }
     driver.find_element(:id, "video_record_option").should be_displayed
-    find_with_jquery('.ui-icon-closethick:visible').click
+    close_visible_dialog
     driver.find_element(:id, "audio_record_option").should_not be_displayed
 
     #check for file upload comment
@@ -216,7 +235,7 @@ describe "speedgrader selenium tests" do
   end
 
   it "should not show students in other sections if visibility is limited" do
-    @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+    @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -288,6 +307,60 @@ describe "speedgrader selenium tests" do
     driver.find_element(:id, 'rubric_full').should be_displayed
     driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
     driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
+  end
+
+  it "should handle versions correctly" do
+    submission1 = student_submission :username => "student1@example.com", :body => 'first student, first version'
+    submission2 = student_submission :username => "student2@example.com", :body => 'second student'
+    submission3 = student_submission :username => "student3@example.com", :body => 'third student'
+
+    # This is "no submissions" guy
+    submission3.delete
+
+    submission1.submitted_at = 10.minutes.from_now
+    submission1.body = 'first student, second version'
+    submission1.with_versioning(:explicit => true) { submission1.save }
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    # The first user shoud have multiple submissions. We want to make sure we go through the first student
+    # because the original bug was caused by a user with multiple versions putting data on the page that
+    # was carried through to other students, ones with only 1 version.
+    driver.find_element(:id, 'submission_to_view').find_elements(:css, 'option').length.should == 2
+
+    in_frame 'speedgrader_iframe' do
+      driver.find_element(:id, 'content').should include_text('first student, second version')
+    end
+
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, 'submission_to_view')).select_by(:value, '0')
+    wait_for_ajaximations
+
+    in_frame 'speedgrader_iframe' do
+      wait_for_ajaximations
+      driver.find_element(:id, 'content').should include_text('first student, first version')
+    end
+
+    driver.find_element(:css, '#gradebook_header .next').click
+    wait_for_ajaximations
+
+    # The second user just has one, and grading the user shouldn't trigger a page error.
+    # (In the original bug, it would trigger a change on the select box for choosing submission versions,
+    # which had another student's data in it, so it would try to load a version that didn't exist.)
+    driver.find_element(:id, 'submission_to_view').find_elements(:css, 'option').length.should == 1
+    driver.find_element(:id, 'grade_container').find_element(:css, 'input').send_keys("5\n")
+    wait_for_ajaximations
+
+    in_frame 'speedgrader_iframe' do
+      driver.find_element(:id, 'content').should include_text('second student')
+    end
+
+    submission2.reload.score.should == 5
+
+    driver.find_element(:css, '#gradebook_header .next').click
+    wait_for_ajaximations
+
+    driver.find_element(:id, 'this_student_does_not_have_a_submission').should be_displayed
   end
 
 end

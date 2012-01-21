@@ -22,7 +22,7 @@
 <% if @successful.length > 0 %>
   <h2><%= t 'titles.successful_migrations', "Successful Migrations" %></h2>
   <% @successful.each do |mig| %>
-    <div>
+    <div id="content_migration_<%= mig.id %>">
       <%= t :successful_migration, "%{plugin_type} migration - This migration was successfully imported.", :plugin_type => mig.plugin_type %>
       <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
     </div>

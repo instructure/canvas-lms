@@ -65,6 +65,31 @@ shared_examples_for "dashboard selenium tests" do
     messages[-2].text.should =~ /hey there/
   end
 
+  it "should show appointment stream items on the dashboard" do
+    Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")
+    Notification.create(:name => 'Appointment Group Updated', :category => "Appointment Availability")
+    Notification.create(:name => 'Appointment Reserved For User', :category => "Appointment Signups")
+    course_with_student_logged_in(:active_all => true)
+    @me = @user
+    student_in_course(:active_all => true, :course => @course)
+    @other_student = @user
+    @user = @me
+
+    @group = @course.group_categories.create.groups.create(:context => @course)
+    @group.users << @other_student << @user
+    # appointment group publish notification and signup notification
+    appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
+    # appointment group update notification
+    @appointment_group.update_attributes(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
+
+    get "/"
+    find_all_with_jquery(".topic_message div.communication_message.dashboard_notification").size.should == 3
+    # appointment group publish and update notifications
+    find_all_with_jquery("div.communication_message.message_appointment_group_#{@appointment_group.id}").size.should == 2
+    # signup notification
+    find_all_with_jquery("div.communication_message.message_calendar_event_#{@event.id}").size.should == 1
+  end
+
   it "should display assignment in to do list" do
     course_with_student_logged_in
 

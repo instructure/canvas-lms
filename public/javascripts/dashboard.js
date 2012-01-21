@@ -73,11 +73,13 @@ $(function initDashbardJs(){
   
   (function consolidateDuplicateDasboardNotifications() {
 
+    // TODO: i18n
     var notifications = {
       "New Assignments and Events": [],
       "Grading Notifications": [],
       "Group Membership Notifications": [],
-      "Date Changes": []
+      "Date Changes": [],
+      "Scheduling Notifications": []
     };
 
     $(".dashboard_notification").each(function() {
@@ -87,6 +89,7 @@ $(function initDashbardJs(){
         switch(notificationName) {
         case "New Event Created":
         case "Assignment Created":
+        case "Appointment Reserved For User":
           notifications["New Assignments and Events"].push(this);
           break;
         case "Assignment Grading Reminder":
@@ -107,6 +110,9 @@ $(function initDashbardJs(){
         case "Event Date Changed":
           notifications["Date Changes"].push(this);
           break;
+        case "Appointment Group Published":
+        case "Appointment Group Updated":
+          notifications["Scheduling Notifications"].push(this);
         }
       }
     });

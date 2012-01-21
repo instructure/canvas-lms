@@ -1,5 +1,0 @@
-:xss|htc|implementation|import
-<HTML xmlns:xss>
-  <?import namespace="xss" implementation="http://ha.ckers.org/xss.htc">
-  <xss:xss>XSS</xss:xss>
-</HTML>

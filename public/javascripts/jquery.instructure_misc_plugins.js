@@ -59,66 +59,89 @@ I18n.scoped('instructure', function(I18n){
   //    behaves as if the request were a success.  Useful for testing.
   //  message: Confirmation message
   //  cancelled: Function to handle cancel.
-  //  confirmed: Functiont to handle confirm, before submit.
+  //  confirmed: Function to handle confirm, before submit.
   //  success: What to do on success.  If none provided, fades
   //    out the element and removes it from the DOM.
   //  error: Error.
+  //  dialog: If present, do a jquery.ui.dialog instead of a confirm(). If an
+  //    object, it will be merged into the dialog options.
   $.fn.confirmDelete = function(options) {
     var options = $.extend({}, $.fn.confirmDelete.defaults, options);
     var $object = this;
+    var $dialog = null;
     var result = true;
     options.noMessage = options.noMessage || options.no_message;
-    if(options.message && !options.noMessage) {
-      if(!$.skipConfirmations) {
+    var onContinue = function() {
+      if (!result) {
+        if (options.cancelled && $.isFunction(options.cancelled)) {
+          options.cancelled.call($object);
+        }
+        return;
+      }
+      if (!options.confirmed) {
+        options.confirmed = function() {
+          $object.dim();
+        };
+      }
+      options.confirmed.call($object);
+      if (options.url) {
+        if (!options.success) {
+          options.success = function(data) {
+            $object.fadeOut('slow', function() {
+              $object.remove();
+            });
+          };
+        }
+        var data = options.prepareData ? options.prepareData.call($object, $dialog) : {};
+        if (options.token) {
+          data.authenticity_token = options.token;
+        }
+        if (!data.authenticity_token) {
+          data.authenticity_token = $("#ajax_authenticity_token").text();
+        }
+        $.ajaxJSON(options.url, "DELETE", data, function(data) {
+          options.success.call($object, data);
+        }, function(data, request, status, error) {
+          if (options.error && $.isFunction(options.error)) {
+            options.error.call($object, data, request, status, error);
+          } else {
+            $.ajaxJSON.unhandledXHRs.push(request);
+          }
+        });
+      } else {
+        if (!options.success) {
+          options.success = function() {
+            $object.fadeOut('slow', function() {
+              $object.remove();
+            });
+          };
+        }
+        options.success.call($object);
+      }
+    }
+    if (options.message && !options.noMessage && !$.skipConfirmations) {
+      if (options.dialog) {
+        result = false;
+        var dialog_options = typeof(options.dialog) == "object" ? options.dialog : {};
+        $dialog = $(options.message).dialog($.extend({}, {
+          modal: true,
+          close: onContinue,
+          buttons: [
+            {
+              text: I18n.t('#buttons.delete', 'Delete'),
+              click: function() { result = true; $(this).dialog('close'); }
+            }, {
+              text: I18n.t('#buttons.cancel', 'Cancel'),
+              click: function() { $(this).dialog('close'); } // ; onContinue();
+            }
+          ]
+        }, dialog_options));
+        return;
+      } else {
         result = confirm(options.message);
       }
     }
-    if(!result) {
-      if(options.cancelled && $.isFunction(options.cancelled)) {
-        options.cancelled.call($object);
-      }
-      return;
-    }
-    if(!options.confirmed) {
-      options.confirmed = function() {
-        $object.dim();
-      };
-    }
-    options.confirmed.call($object);
-    if(options.url) {
-      if(!options.success) {
-        options.success = function(data) {
-          $object.fadeOut('slow', function() {
-            $object.remove();
-          });
-        };
-      }
-      var data = {};
-      if(options.token) {
-        data.authenticity_token = options.token;
-      }
-      if(!data.authenticity_token) {
-        data.authenticity_token = $("#ajax_authenticity_token").text();
-      }
-      $.ajaxJSON(options.url, "DELETE", data, function(data) {
-        options.success.call($object, data);
-      }, function(data, request, status, error) {
-        if(options.error && $.isFunction(options.error)) {
-          options.error.call($object, data, request, status, error);
-        } else {
-          $.ajaxJSON.unhandledXHRs.push(request);
-        }
-      });
-    } else {
-      if(!options.success) {
-        options.success = function() {
-          $object.fadeOut('slow', function() {
-            $object.remove();
-          });
-        };
-      }
-      options.success.call($object);
-    }
+    onContinue();
   };
   $.fn.confirmDelete.defaults = {
     message: I18n.t('confirms.default_delete_thing', "Are you sure you want to delete this?")

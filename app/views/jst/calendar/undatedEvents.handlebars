@@ -1,0 +1,13 @@
+{{#if events}}
+  <b>Undated Events</b>
+  <ul>
+    {{#each events}}
+      <li class="undated_event event group_{{contextCode}} {{id}}" data-event-id="{{id}}">
+        {{title}}
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <div class="spin_holder"></div>
+  <a href="#" data-text-while-loading="Loading undated events..." class="undated-events-link">Show undated events</a>
+{{/if}}

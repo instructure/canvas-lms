@@ -17,9 +17,7 @@ I18n.scoped 'jobs', (I18n) ->
           @data.push item for item in data[@type_name]
           if data.total && data.total > @data.length
             @data.push({}) for i in [@data.length ... data.total]
-          @grid.removeAllRows()
-          @grid.updateRowCount()
-          @grid.render()
+          @grid.invalidate()
           cb?()
           @updated?()
           @$element.dequeue()
@@ -71,8 +69,7 @@ I18n.scoped 'jobs', (I18n) ->
         @loading[row] = true
         $.ajaxJSON @options.url, "GET", { flavor: @options.flavor, q: @query, offset: row }, (data) =>
           @data[row ... row + data.jobs.length] = data.jobs
-          @grid.removeAllRows()
-          @grid.render()
+          @grid.invalidate()
           @$element.dequeue()
 
     id_formatter: (r,c,d) =>
@@ -119,7 +116,8 @@ I18n.scoped 'jobs', (I18n) ->
 
     init: () ->
       super()
-      @grid.onSelectedRowsChanged = () =>
+      @grid.setSelectionModel(new Slick.RowSelectionModel())
+      @grid.onSelectedRowsChanged.subscribe =>
         rows = @grid.getSelectedRows()
         row = if rows?.length == 1 then rows[0] else -1
         job = @data[rows[0]] || {}
@@ -129,12 +127,12 @@ I18n.scoped 'jobs', (I18n) ->
         $('#job-id-link').attr('href', "/jobs?id=#{job.id}&flavor=#{@options.flavor}")
       if @data.length == 1 && @type_name == 'jobs'
         @grid.setSelectedRows [0]
-        @grid.onSelectedRowsChanged()
+        @grid.onSelectedRowsChanged.notify()
       this
 
     selectAll: () ->
       @grid.setSelectedRows([0...@data.length])
-      @grid.onSelectedRowsChanged()
+      @grid.onSelectedRowsChanged.notify()
 
     onSelected: (action) ->
       params =

@@ -86,6 +86,24 @@ module CC::Importer
       tool
     end
     
+    def convert_blti_xml(xml)
+      doc = Nokogiri::XML(xml)
+      begin
+        convert_blti_link(doc)
+      rescue Nokogiri::XML::XPath::SyntaxError
+        raise CCImportError.new(I18n.t(:invalid_xml_syntax, "invalid xml syntax"))
+      end
+    end
+    
+    def retrieve_and_convert_blti_url(url)
+      begin
+        config_xml = Net::HTTP.get(URI.parse(url))
+        convert_blti_xml(config_xml)
+      rescue Timeout::Error
+        raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))
+      end
+    end
+    
     def get_custom_properties(node)
       props = {}
       node.children.each do |property|
@@ -107,6 +125,6 @@ module CC::Importer
       end
       "blti"
     end
-    
+    class CCImportError < Exception; end
   end
 end

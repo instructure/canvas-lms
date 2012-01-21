@@ -18,6 +18,33 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+class TestCourseApi
+  include Api::V1::Course
+  def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
+  def course_url(course); return "course_url(Course.find(#{course.id}))"; end
+end
+
+describe Api::V1::Course do
+  before do
+    @test_api = TestCourseApi.new
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @me = @user
+    @course1 = @course
+    course_with_student(:user => @user, :active_all => true)
+    @course2 = @course
+    @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
+    @user.pseudonym.update_attribute(:sis_user_id, 'user1')
+  end
+
+  it 'should support optionally providing the url' do
+    @test_api.course_json(@course1, @me, {}, ['html_url'], []).should encompass({
+      "html_url" => "course_url(Course.find(#{@course1.id}))"
+    })
+    @test_api.course_json(@course1, @me, {}, [], []).has_key?("html_url").should be_false
+  end
+
+end
+
 describe CoursesController, :type => :integration do
   USER_API_FIELDS = %w(id name sortable_name short_name)
   before do
@@ -51,6 +78,88 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
       },
     ]
+  end
+
+  describe "course creation" do
+    context "an account admin" do
+      before do
+        @account = Account.default
+        account_admin_user
+        @resource_path = "/api/v1/accounts/#{@account.id}/courses"
+        @resource_params = { :controller => 'courses', :action => 'create', :format => 'json', :account_id => @account.id.to_s }
+      end
+
+      it "should create a new course" do
+        post_params = {
+          'account_id' => @account.id,
+          'offer'      => true,
+          'course'     => {
+            'name'                            => 'Test Course',
+            'course_code'                     => 'Test Course',
+            'start_at'                        => '2011-01-01T00:00:00-0700',
+            'conclude_at'                     => '2011-05-01T00:00:00-0700',
+            'publish_grades_immediately'      => true,
+            'is_public'                       => true,
+            'allow_student_assignment_edits'  => true,
+            'allow_wiki_comments'             => true,
+            'allow_student_forum_attachments' => true,
+            'open_enrollment'                 => true,
+            'self_enrollment'                 => true,
+            'license'                         => 'Creative Commons',
+            'sis_course_id'                   => '12345'
+          }
+        }
+        course_response = post_params['course'].merge({
+          'account_id' => @account.id,
+          'root_account_id' => @account.id,
+          'start_at' => '2011-01-01T07:00:00Z',
+          'conclude_at' => '2011-05-01T07:00:00Z'
+        })
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        new_course = Course.find(json['id'])
+        [:name, :course_code, :start_at, :conclude_at, :publish_grades_immediately,
+        :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
+        :open_enrollment, :self_enrollment, :license, :sis_course_id,
+        :allow_student_forum_attachments].each do |attr|
+          [:start_at, :conclude_at].include?(attr) ?
+            new_course.send(attr).should == Time.parse(post_params['course'][attr.to_s]) :
+            new_course.send(attr).should == post_params['course'][attr.to_s]
+        end
+        new_course.workflow_state.should eql 'available'
+        course_response.merge!(
+          'id' => new_course.id,
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" }
+        )
+        json.should eql course_response
+      end
+
+      it "should offer a course if passed the 'offer' parameter" do
+        json = api_call(:post, @resource_path,
+          @resource_params,
+          { :account_id => @account.id, :offer => true, :course => { :name => 'Test Course' } }
+        )
+        new_course = Course.find(json['id'])
+        new_course.should be_available
+      end
+    end
+
+    describe "a user without permissions" do
+      it "should return 401 Unauthorized if a user lacks permissions" do
+        course_with_student(:active_all => true)
+        account = Account.default
+        raw_api_call(:post, "/api/v1/accounts/#{account.id}/courses",
+          { :controller => 'courses', :action => 'create', :format => 'json', :account_id => account.id.to_s },
+          {
+            :account_id => account.id,
+            :course => {
+              :name => 'Test Course'
+            }
+          }
+        )
+
+        response.status.should eql '401 Unauthorized'
+      end
+    end
   end
 
   it "should include scores in course list if requested" do
@@ -350,14 +459,22 @@ describe ContentImportsController, :type => :integration do
   def run_copy(to_id=nil, from_id=nil, options={})
     to_id ||= @copy_to.to_param
     from_id ||= @copy_from.to_param
-    api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
+    data = api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
     {:source_course => from_id}.merge(options))
-    data = JSON.parse(response.body)
-    
+
+    import = CourseImport.last(:order => :id)
+    data.should == {
+      'id' => import.id,
+      'progress' => nil,
+      'status_url' => "http://www.example.com/api/v1/courses/#{@copy_to.to_param}/course_copy/#{import.id}",
+      'created_at' => import.created_at.as_json,
+      'workflow_state' => 'created',
+    }
+
     status_url = data['status_url']
     dj = Delayed::Job.last
-    
+
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
     (JSON.parse(response.body)).tap do |res|
       res['workflow_state'].should == 'created'

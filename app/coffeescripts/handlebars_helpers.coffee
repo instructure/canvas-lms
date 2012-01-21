@@ -35,6 +35,20 @@ define 'compiled/handlebars_helpers', [
     newlinesToBreak : (string) ->
       new Handlebars.SafeString $.htmlEscape(string).replace(/\n/g, "<br />")
 
+    # runs block if all arugments are === to each other
+    # usage:
+    # {{#ifEqual argument1 argument2 'a string argument' argument4}}
+    #   everything was equal
+    # {{else}}
+    #   everything was NOT equal
+    # {{/ifEqual}}
+    ifEqual: ->
+      [previousArg, args..., {fn, inverse}] = arguments
+      for arg in args
+        return inverse(this) if arg != previousArg
+        previousArg = arg
+      fn(this)
+
     eachWithIndex: (context, options) ->
       fn = options.fn
       inverse = options.inverse

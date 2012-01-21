@@ -80,6 +80,18 @@ class AccountsController < ApplicationController
   def update
     if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
+
+        custom_help_links = params[:account].delete :custom_help_links
+        if custom_help_links
+          @account.settings[:custom_help_links] = custom_help_links.sort.map do |index_with_hash|
+            hash = index_with_hash[1]
+            hash.assert_valid_keys ["text", "subtext", "url", "available_to"]
+            hash
+          end
+        elsif @account.settings[:custom_help_links].present?
+          @account.settings.delete :custom_help_links
+        end
+
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
         global_includes = !!params[:account][:settings].try(:delete, :global_includes)
@@ -99,7 +111,7 @@ class AccountsController < ApplicationController
           end
         end
         if sis_id = params[:account].delete(:sis_source_id)
-          if !@account.root_account? && sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
+          if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
               @account.sis_source_id = nil
             else
@@ -144,7 +156,7 @@ class AccountsController < ApplicationController
   end
 
   def confirm_delete_user
-    @root_account = @account.root_account || @account
+    @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)
       @context = @root_account
       @user = @root_account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
@@ -156,7 +168,7 @@ class AccountsController < ApplicationController
   end
   
   def remove_user
-    @root_account = @account.root_account || @account
+    @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)
       @user = UserAccountAssociation.find_by_account_id_and_user_id(@root_account.id, params[:user_id]).user rescue nil
       # if the user is in any account other then the
@@ -185,7 +197,7 @@ class AccountsController < ApplicationController
   end
   
   def load_course_right_side
-    @root_account = @account.root_account || @account
+    @root_account = @account.root_account
     @maximum_courses_im_gonna_show = 100
     @term = nil
     if params[:enrollment_term_id].present?
@@ -243,13 +255,15 @@ class AccountsController < ApplicationController
   
   def statistics_page_views
     if authorized_action(@account, @current_user, :view_statistics)
+      today = Time.zone.today
+
       start_at = Date.parse(params[:start_at]) rescue nil
       start_at ||= 1.month.ago.to_date
       end_at = Date.parse(params[:end_at]) rescue nil
-      end_at ||= Date.today
+      end_at ||= today
 
-      @end_at = [[start_at, end_at].max, Date.today].min
-      @start_at = [[start_at, end_at].min, Date.today].min
+      @end_at = [[start_at, end_at].max, today].min
+      @start_at = [[start_at, end_at].min, today].min
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
       add_crumb(t(:crumb_page_views, "Page Views"))
     end
@@ -373,19 +387,15 @@ class AccountsController < ApplicationController
     # This needs to be publicly available since external SAML
     # servers need to be able to access it without being authenticated.
     # It is used to disclose our SAML configuration settings.
-    if @domain_root_account.account_authorization_config and @domain_root_account.account_authorization_config.auth_type == 'saml'
-      settings = @domain_root_account.account_authorization_config.saml_settings(request.env['canvas.account_domain'])
-      render :xml => Onelogin::Saml::MetaData.create(settings)
-    else
-      render :xml => ""
-    end
+    settings = AccountAuthorizationConfig.saml_settings_for_account(@domain_root_account, request.env['canvas.account_domain'])
+    render :xml => Onelogin::Saml::MetaData.create(settings)
   end
   
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list], @context, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
+      list = UserList.new(params[:user_list], @context.root_account, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session))
       users = list.users
       account_users = users.map do |user|
         admin = user.flag_as_admin(@context, params[:membership_type])

@@ -24,9 +24,9 @@ module Api::V1::User
     :methods => %w(sortable_name short_name)
   }
 
-  def user_json(user, current_user, session)
+  def user_json(user, current_user, session, includes = [], context = @context)
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
-      if user_json_is_admin? && pseudonym = user.pseudonym
+      if user_json_is_admin?(context, current_user) && pseudonym = user.pseudonym
         # the sis fields on pseudonym are poorly named -- sis_user_id is
         # the id in the SIS import data, where on every other table
         # that's called sis_source_id.
@@ -35,26 +35,28 @@ module Api::V1::User
                     :sis_login_id => pseudonym.sis_user_id ? pseudonym.unique_id : nil,
                     :login_id => pseudonym.unique_id
       end
+      if service_enabled?(:avatars) && includes.include?('avatar_url')
+        json["avatar_url"] = avatar_image_url(user.id)
+      end
     end
   end
 
   # optimization hint, currently user only needs to pull pseudonym from the db
   # if a site admin is making the request or they can manage_students
-  def user_json_is_admin?
-    if @user_json_is_admin.nil?
-      if @context.is_a?(UserProfile)
+  def user_json_is_admin?(context = @context, current_user = @current_user)
+    @user_json_is_admin ||= {}
+    @user_json_is_admin[[context.id, current_user.id]] ||= (
+      if context.is_a?(UserProfile)
         permissions_context = permissions_account = @domain_root_account
       else
-        permissions_context = @context
-        permissions_account = @context.is_a?(Account) ? @context : @context.account
+        permissions_context = context
+        permissions_account = context.is_a?(Account) ? context : context.account
       end
-      @user_json_is_admin = !!(
-        permissions_context.grants_right?(@current_user, :manage_students) ||
-        permissions_account.membership_for_user(@current_user) || 
-        permissions_account.grants_right?(@current_user, :manage_sis)
+      !!(
+        permissions_context.grants_right?(current_user, :manage_students) ||
+        permissions_account.membership_for_user(current_user) ||
+        permissions_account.grants_right?(current_user, :manage_sis)
       )
-    end
-    @user_json_is_admin
+    )
   end
 end
-

@@ -84,9 +84,11 @@ javascripts:
     - public/javascripts/instructure.js
     - public/javascripts/ajax_errors.js
     - public/javascripts/page_views.js
-    - public/javascripts/feedback.js
     - public/javascripts/compiled/license_help.js
     - public/javascripts/wiki_sidebar.js
+    - public/javascripts/INST.js
+    - public/javascripts/jst/helpDialog.js
+    - public/javascripts/compiled/helpDialog.js
     - public/javascripts/translations/_core_en.js
     # CustomMenu
     - public/javascripts/compiled/util/objectCollection.js
@@ -151,9 +153,11 @@ javascripts:
     - public/javascripts/edit_rubric.js
     - public/javascripts/find_outcome.js
   slickgrid:
-    - public/javascripts/vendor/slickgrid-1.4.3/lib/jquery.event.drag-2.0.min.js
-    - public/javascripts/vendor/slickgrid-1.4.3/slick.grid.js
-    - public/javascripts/vendor/slickgrid-1.4.3/slick.editors.js
+    - public/javascripts/vendor/slickgrid/lib/jquery.event.drag-2.0.min.js
+    - public/javascripts/vendor/slickgrid/slick.core.js
+    - public/javascripts/vendor/slickgrid/plugins/slick.rowselectionmodel.js
+    - public/javascripts/vendor/slickgrid/slick.grid.js
+    - public/javascripts/vendor/slickgrid/slick.editors.js
   syllabus:
     - public/javascripts/calendar_move.js
     - public/javascripts/syllabus.js
@@ -163,6 +167,47 @@ javascripts:
     - public/javascripts/calendar.js
     - public/javascripts/calendar_move.js
     - public/javascripts/content_locks.js
+  calendar2:
+    - public/javascripts/compiled/util/Popover.js
+    - public/javascripts/compiled/util/semanticDateRange.js
+    - public/javascripts/compiled/util/hsvToRgb.js
+    - public/javascripts/vendor/fullcalendar.js
+    - public/javascripts/compiled/calendar/EventDataSource.js
+    - public/javascripts/compiled/calendar/CommonEvent.js
+    - public/javascripts/compiled/calendar/CommonEvent.Assignment.js
+    - public/javascripts/compiled/calendar/CommonEvent.CalendarEvent.js
+    - public/javascripts/compiled/calendar/commonEventFactory.js
+    - public/javascripts/compiled/calendar/EditCalendarEventDetails.js
+    - public/javascripts/compiled/calendar/EditAssignmentDetails.js
+    - public/javascripts/compiled/calendar/EditAppointmentGroupDetails.js
+    - public/javascripts/compiled/calendar/EditEventDetailsDialog.js
+    - public/javascripts/compiled/calendar/EditAppointmentGroupDialog.js
+    - public/javascripts/compiled/calendar/ShowEventDetailsDialog.js
+    - public/javascripts/compiled/calendar/TimeBlockList.js
+    - public/javascripts/compiled/calendar/TimeBlockListManager.js
+    - public/javascripts/compiled/calendar/UndatedEventsList.js
+    - public/javascripts/compiled/calendar/calendarApp.js
+    - public/javascripts/jst/calendar/calendarApp.js
+    - public/javascripts/jst/calendar/eventDetails.js
+    - public/javascripts/jst/calendar/editEvent.js
+    - public/javascripts/jst/calendar/editCalendarEvent.js
+    - public/javascripts/jst/calendar/editAssignment.js
+    - public/javascripts/jst/calendar/editAppointmentGroup.js
+    - public/javascripts/jst/calendar/deleteItem.js
+    - public/javascripts/jst/calendar/genericSelect.js
+    - public/javascripts/jst/calendar/undatedEvents.js
+    - public/javascripts/jst/calendar/timeBlockList.js
+    - public/javascripts/jst/calendar/_timeBlock.js
+    - public/javascripts/jst/calendar/appointmentGroupList.js
+    - public/javascripts/jst/calendar/schedulerRightSideAdminSection.js
+    - public/javascripts/compiled/calendar/Calendar.js
+    - public/javascripts/compiled/calendar/Scheduler.js
+    - public/javascripts/content_locks.js
+    - public/javascripts/compiled/calendar/MiniCalendar.js
+    - public/javascripts/jst/calendar/contextList.js
+    - public/javascripts/compiled/jquery.kylemenu.js
+    - public/javascripts/compiled/calendar/sidebar.js
+    - public/javascripts/compiled/calendar/calendarApp.js
   collaborations:
     - public/javascripts/collaborations.js
   discussion_replies:
@@ -221,6 +266,7 @@ javascripts:
     - public/javascripts/jst/_submission_detail.js
     - public/javascripts/jst/SubmissionDetailsDialog.js
     - public/javascripts/compiled/SubmissionDetailsDialog.js
+    - public/javascripts/jst/gradebook2/section_to_show_menu.js
     - public/javascripts/compiled/gradebook2/Gradebook.js
     - public/javascripts/compiled/gradebook2/SubmissionCell.js
   gradebooks:
@@ -373,6 +419,7 @@ stylesheets:
     - public/stylesheets/compiled/g_wiki_sidebar.css
     - public/stylesheets/compiled/g_syllabus.css
     - public/stylesheets/compiled/g_mini_calendar.css
+    - public/stylesheets/compiled/helpDialog.css
     - public/stylesheets/compiled/print.css
   profile:
     - public/stylesheets/compiled/profile.css
@@ -388,6 +435,12 @@ stylesheets:
     - public/stylesheets/compiled/gradebook_uploads.css
   calendar:
     - public/stylesheets/static/calendar.css
+  calendar2:
+    - public/stylesheets/compiled/fullcalendar.css
+    - public/stylesheets/compiled/Calendar.css
+    - public/stylesheets/compiled/mini_calendar.css
+    - public/stylesheets/compiled/calendar/sidebar.css
+    - public/stylesheets/compiled/calendar/scheduler.css
   course_settings:
     - public/stylesheets/compiled/course_settings.css
     - public/stylesheets/compiled/external_tools.css
@@ -435,7 +488,7 @@ stylesheets:
   statistics:
     - public/stylesheets/compiled/statistics.css
   slickgrid:
-    - public/javascripts/vendor/slickgrid-1.4.3/slick.grid.css
+    - public/javascripts/vendor/slickgrid/slick.grid.css
   sub_accounts:
     - public/stylesheets/compiled/sub_accounts.css
   user_logins:
