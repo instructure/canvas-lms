@@ -167,6 +167,8 @@ describe SubmissionsController do
       response.should be_success
 
       a = Attachment.last
+      a.user.should == @teacher
+      a.workflow_state.should == 'to_be_zipped'
       a.update_attribute('workflow_state', 'zipped')
       a.stubs('full_filename').returns(File.expand_path(__FILE__)) # just need a valid file
       a.stubs('content_type').returns('test/file')

@@ -25,7 +25,9 @@ require 'config/routes'
 # Extend YARD to generate our API documentation
 YARD::Tags::Library.define_tag("Is an API method", :API)
 YARD::Tags::Library.define_tag("API method argument", :argument)
+YARD::Tags::Library.define_tag("API response field", :request_field)
 YARD::Tags::Library.define_tag("API response field", :response_field)
+YARD::Tags::Library.define_tag("API example request", :example_request)
 YARD::Tags::Library.define_tag("API example response", :example_response)
 
 module YARD::Templates::Helpers

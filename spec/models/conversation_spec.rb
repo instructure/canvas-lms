@@ -72,6 +72,17 @@ describe Conversation do
       lambda{ root_convo.add_participants(sender, [recipient.id]) }.should_not raise_error
       root_convo.participants.size.should == 2
     end
+
+    it "should update the updated_at timestamp and clear the identity header cache of new participants" do
+      sender = user
+      root_convo = Conversation.initiate([sender.id, user.id], false)
+      root_convo.add_message(sender, 'test')
+
+      new_guy = user
+      old_updated_at = new_guy.updated_at
+      root_convo.add_participants(sender, [new_guy.id])
+      new_guy.reload.updated_at.should_not eql old_updated_at
+    end
   end
 
   context "message counts" do

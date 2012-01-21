@@ -14,7 +14,7 @@ table.rubric
   tr.criterion td.criterion_description
     // :max-width 150px
 
-    .container 
+    .container
       :position relative
       :font-size 0.9em
 
@@ -23,11 +23,11 @@ table.rubric
       :position absolute
       :bottom 0
       :right 0
-      
+
     .learning_outcome_flag,.threshold
       display: none
-    
-    .long_description_holder  
+
+    .long_description_holder
       font-size: 0.8em
       display: block
       &.empty
@@ -37,6 +37,12 @@ table.rubric
 
     &.editinghover .links 
       :display none
+
+    .assessment-comments
+      :font-size 10px
+      &h6
+        :margin-top 10px
+
   tr.criterion.learning_outcome_criterion 
     td.criterion_description
       .learning_outcome_flag
@@ -181,6 +187,8 @@ table.rubric
 
       td:hover .links
         :display block
+
+
 
 .rubric_summary
   margin-top: 0 !important

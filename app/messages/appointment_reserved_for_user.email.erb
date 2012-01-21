@@ -1,0 +1,24 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.appointment_group.context) %>/appointment_groups/<%= asset.appointment_group.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t('subject', 'You have been signed up for "%{appointment_name}"', :appointment_name => asset.title) %>
+<% end %>
+
+<%= t :message, '%{user} has signed you up for "%{appointment_name}".', :user => asset.updating_user.name, :appointment_name => asset.title %>
+
+<%= before_label :details, "Appointment details" %>
+<%= before_label :date_and_time, "Date/time" %> <%= datetime_string(asset.start_at, asset.end_at) %>
+<% if asset.appointment_group.participant_type == 'Group' -%>
+<%= before_label :attendees, "Attendees" %> <%= asset.participants.map(&:name).to_sentence %>
+<%= before_label :group, "Group" %> <%= asset.context.name %>
+<% else -%>
+<%= before_label :attendee, "Attendee" %> <%= asset.context.name %>
+<% end -%>
+<%= before_label :course, "Course" %> <%= asset.appointment_group.context.name %>
+<% if asset.appointment_group.available_slots -%>
+<%= before_label :slots_remaining, "Available time slots" %> <%= asset.appointment_group.available_slots %>
+<% end -%>
+
+<%= t :instructions, 'Sign up for a different time slot at the following link: %{link}', :link => content(:link) %>

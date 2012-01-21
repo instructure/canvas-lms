@@ -42,7 +42,7 @@ class Alert < ActiveRecord::Base
       :criteria => criteria.map { |c| c.as_json(:include_root => false) },
       :recipients => recipients.try(:map) { |r| (r.is_a?(Symbol) ? ":#{r}" : r) },
       :repetition => repetition
-    }
+    }.with_indifferent_access
   end
 
   def recipients=(recipients)
@@ -129,7 +129,7 @@ class Alert < ActiveRecord::Base
     return if teacher_ids.empty?
     section_ids_to_teachers_list = {}
     teacher_enrollments.each do |enrollment|
-      section_id = enrollment.limit_priveleges_to_course_section ? enrollment.course_section_id : nil
+      section_id = enrollment.limit_privileges_to_course_section ? enrollment.course_section_id : nil
       section_ids_to_teachers_list[section_id] ||= []
       section_ids_to_teachers_list[section_id] << enrollment.user_id
     end

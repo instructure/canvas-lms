@@ -21,7 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/calendars/_mini_calendar" do
   it "should render" do
-    render :partial => 'calendars/mini_calendar', :locals => {:current => Date.today, :first_day => Date.today - 3, :last_day => Date.today + 30}
+    today = Time.zone.today
+    render :partial => 'calendars/mini_calendar', :locals => {:current => today, :first_day => today - 3, :last_day => today + 30}
     response.should_not be_nil
   end
 end

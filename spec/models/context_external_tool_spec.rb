@@ -141,8 +141,12 @@ describe ContextExternalTool do
   end
   
   describe "infer_defaults" do
+    def new_external_tool
+      @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret', :domain => "google.com")
+    end
+    
     it "should require valid configuration for user navigation settings" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:user_navigation => {:bob => 'asfd'}}
       tool.save
       tool.settings[:user_navigation].should be_nil
@@ -152,7 +156,7 @@ describe ContextExternalTool do
     end
     
     it "should require valid configuration for course navigation settings" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:course_navigation => {:bob => 'asfd'}}
       tool.save
       tool.settings[:course_navigation].should be_nil
@@ -162,7 +166,7 @@ describe ContextExternalTool do
     end
     
     it "should require valid configuration for account navigation settings" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:account_navigation => {:bob => 'asfd'}}
       tool.save
       tool.settings[:account_navigation].should be_nil
@@ -172,7 +176,7 @@ describe ContextExternalTool do
     end
     
     it "should require valid configuration for resource selection settings" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:resource_selection => {:bob => 'asfd'}}
       tool.save
       tool.settings[:resource_selection].should be_nil
@@ -185,7 +189,7 @@ describe ContextExternalTool do
     end
     
     it "should require valid configuration for editor button settings" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:editor_button => {:bob => 'asfd'}}
       tool.save
       tool.settings[:editor_button].should be_nil
@@ -198,7 +202,7 @@ describe ContextExternalTool do
     end
     
     it "should set has_user_navigation if navigation configured" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:user_navigation => {:url => "http://www.example.com"}}
       tool.has_user_navigation.should be_false
       tool.save
@@ -206,7 +210,7 @@ describe ContextExternalTool do
     end
     
     it "should set has_course_navigation if navigation configured" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:course_navigation => {:url => "http://www.example.com"}}
       tool.has_course_navigation.should be_false
       tool.save
@@ -214,7 +218,7 @@ describe ContextExternalTool do
     end
 
     it "should set has_account_navigation if navigation configured" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:account_navigation => {:url => "http://www.example.com"}}
       tool.has_account_navigation.should be_false
       tool.save
@@ -222,7 +226,7 @@ describe ContextExternalTool do
     end
 
     it "should set has_resource_selection if selection configured" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:resource_selection => {:url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
       tool.has_resource_selection.should be_false
       tool.save
@@ -230,7 +234,7 @@ describe ContextExternalTool do
     end
 
     it "should set has_editor_button if button configured" do
-      tool = @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret')
+      tool = new_external_tool
       tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
       tool.has_editor_button.should be_false
       tool.save
@@ -248,10 +252,65 @@ describe ContextExternalTool do
     end
   end
   
+  describe "label_for" do
+    it "should return the tool name if nothing else is configured and no key is sent" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.save!
+      tool.label_for(nil).should == 'tool'
+    end
+    
+    it "should return the tool name if nothing is configured on the sent key" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:course_navigation => {:bob => 'asfd'}}
+      tool.save!
+      tool.label_for(:course_navigation).should == 'tool'
+    end
+    
+    it "should return the tool's 'text' value if no key is sent" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
+      tool.save!
+      tool.label_for(nil).should == 'tool label'
+    end
+    
+    it "should return the tool's 'text' value if no 'text' value is set for the sent key" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:bob => 'asdf'}}
+      tool.save!
+      tool.label_for(:course_navigation).should == 'tool label'
+    end
+    
+    it "should return the setting's 'text' value for the sent key if available" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
+      tool.save!
+      tool.label_for(:course_navigation).should == 'course nav'
+    end
+    
+    it "should return the locale-specific label if specified and matching exactly" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}}
+      tool.save!
+      tool.label_for(:course_navigation, 'en-US').should == 'english nav'
+      tool.label_for(:course_navigation, 'es').should == 'course nav'
+    end
+    
+    it "should return the locale-specific label if specified and matching based on general locale" do
+      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en' => 'english nav'}}}
+      tool.save!
+      tool.label_for(:course_navigation, 'en-US').should == 'english nav'
+    end
+  end
+  
   describe "find_for" do
+    def new_external_tool(context)
+      context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
+    end
+    
     it "should find the tool if it's attached to the course" do
       course_model
-      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = new_external_tool @course
       tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       ContextExternalTool.find_for(tool.id, @course, :course_navigation).should == tool
@@ -263,7 +322,7 @@ describe ContextExternalTool do
     
     it "should find the tool if it's attached to the course's account" do
       course_model
-      tool = @course.account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = new_external_tool @course.account
       tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       ContextExternalTool.find_for(tool.id, @course, :course_navigation).should == tool
@@ -272,7 +331,7 @@ describe ContextExternalTool do
     
     it "should find the tool if it's attached to the course's root account" do
       course_model
-      tool = @course.root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = new_external_tool @course.root_account
       tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       ContextExternalTool.find_for(tool.id, @course, :course_navigation).should == tool
@@ -282,7 +341,7 @@ describe ContextExternalTool do
     it "should not find the tool if it's attached to a sub-account" do
       course_model
       @account = @course.account.sub_accounts.create!(:name => "sub-account")
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = new_external_tool @account
       tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       (ContextExternalTool.find_for(tool.id, @course, :course_navigation) rescue nil).should be_nil
@@ -291,7 +350,7 @@ describe ContextExternalTool do
     it "should not find the tool if it's attached to another course" do
       @course2 = course_model
       @course = course_model
-      tool = @course2.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = new_external_tool @course2
       tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       (ContextExternalTool.find_for(tool.id, @course, :course_navigation) rescue nil).should be_nil
@@ -299,7 +358,7 @@ describe ContextExternalTool do
     
     it "should not find the tool if it's not enabled for the correct navigation type" do
       course_model
-      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool = new_external_tool @course
       tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       (ContextExternalTool.find_for(tool.id, @course, :user_navigation) rescue nil).should be_nil

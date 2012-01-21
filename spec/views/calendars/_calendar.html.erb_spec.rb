@@ -21,15 +21,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/calendars/_calendar" do
   it "should render" do
+    today = Time.zone.today
     course_with_student
     view_context(@course, @user)
     assigns[:contexts] = [@course]
-    assigns[:first_day] = Date.today
-    assigns[:last_day] = Date.today + 30
-    assigns[:current] = Date.today + 2
+    assigns[:first_day] = today
+    assigns[:last_day] = today + 30
+    assigns[:current] = today + 2
     assigns[:events] = [@course.calendar_events.create!(:title => "some event", :start_at => Time.now)]
     assigns[:assignment_groups_for] = {}
-    render :partial => 'calendars/calendar', :object => assigns[:events], :locals => {:current => Date.today, :first_day => Date.today - 3, :last_day => Date.today + 30, :request => OpenObject.new(:path_parameters => {:controller => 'calendars', :action => 'show'}, :query_parameters => {})}
+    render :partial => 'calendars/calendar', :object => assigns[:events], :locals => {:current => today, :first_day => today - 3, :last_day => today + 30, :request => OpenObject.new(:path_parameters => {:controller => 'calendars', :action => 'show'}, :query_parameters => {})}
   end
 end
 

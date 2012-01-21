@@ -1,12 +1,3 @@
-module Delayed
-  HIGH_PRIORITY = 0
-  NORMAL_PRIORITY = 10
-  LOW_PRIORITY = 20
-  LOWER_PRIORITY = 50
-end
-
-Delayed::Job.default_priority = Delayed::NORMAL_PRIORITY
-
 # If there is a sub-hash under the 'queue' key for the database config, use that
 # as the connection for the job queue. The migration that creates the
 # delayed_jobs table is smart enough to use this connection as well.

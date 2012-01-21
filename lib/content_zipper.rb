@@ -83,12 +83,17 @@ class ContentZipper
     zip_attachment.scribd_attempts += 1
     zip_attachment.save!
     filename = "#{assignment.context.short_name}-#{assignment.title} submissions".gsub(/ /, "_").gsub(/[^\w-]/, "")
+    submissions = assignment.submissions
+    if zip_attachment.user && assignment.context.enrollment_visibility_level_for(zip_attachment.user) != :full
+      visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).find(:all, :select => 'user_id').map(&:user_id)
+      submissions = submissions.scoped(:conditions => { :user_id => visible_student_ids})
+    end
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
       submissions_added = 0
       Zip::ZipFile.open(zip_name, Zip::ZipFile::CREATE) do |zipfile|
-        count = assignment.submissions.count
-        assignment.submissions.each_with_index do |submission, idx|
+        count = submissions.length
+        submissions.each_with_index do |submission, idx|
           submissions_added += 1
           @assignment = assignment
           @submission = submission
@@ -282,19 +287,21 @@ class ContentZipper
     if callback && (folder.hidden? || folder.locked)
       callback.call(folder, folder_names)
     end
-    attachments = if !@user || folder.context.grants_right?(@user, nil, :manage_files)
+    # @user = nil means that this is part of a public course, and is being downloaded by somebody
+    # not logged in.
+    attachments = if folder.context.grants_right?(@user, nil, :manage_files)
                 folder.active_file_attachments
               else
                 folder.visible_file_attachments
               end
-    attachments.select{|a| !@user || a.grants_right?(@user, nil, :download)}.each do |attachment|
+    attachments.select{|a| a.grants_right?(@user, nil, :download)}.each do |attachment|
       callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       path = folder_names.empty? ? attachment.filename : File.join(folder_names, attachment.unencoded_filename)
       @files_added = false unless add_attachment_to_zip(attachment, zipfile, path)
     end
-    folder.active_sub_folders.select{|f| !@user || f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|
+    folder.active_sub_folders.select{|f| f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
       if callback
         zip_folder(sub_folder, zipfile, new_names, &callback)

@@ -19,14 +19,14 @@
 class WikiPageRevisionsController < ApplicationController
   before_filter :require_context, :except => :latest_version_number
   before_filter :get_wiki_page, :except => :latest_version_number
-  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}, :except => [:latest_version_number]) { |c| c.send :course_wiki_pages_path, c.instance_variable_get("@context") }
+  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}, :except => [:latest_version_number]) { |c| c.send :named_context_url,  c.instance_variable_get("@context"), :context_wiki_pages_url }
   before_filter { |c| c.active_tab = "pages" }
   
   def index
     if authorized_action(@context, @current_user, :read)
       respond_to do |format|
         format.html {
-          add_crumb(@page.title, course_wiki_page_url( @context.id, @page))
+          add_crumb(@page.title, named_context_url(@context, :context_wiki_page_url, @page))
           add_crumb(t("#crumbs.revisions", "Revisions"))
           log_asset_access(@page, "wiki", @namespace)
         }
@@ -62,7 +62,7 @@ class WikiPageRevisionsController < ApplicationController
       end
       respond_to do |format|
         format.html {
-          add_crumb(@page.title, course_wiki_page_url( @context.id, @page))
+          add_crumb(@page.title, named_context_url(@context, :context_wiki_page_url, @page))
           log_asset_access(@page, "wiki", @namespace)
         }
         @model = @revision.model rescue nil

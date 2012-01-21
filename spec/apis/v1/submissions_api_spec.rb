@@ -397,7 +397,7 @@ describe SubmissionsApiController, :type => :integration do
                       :assignment_id => a1.id.to_s, :id => student1.id.to_s },
                     { :include => %w(submission_comments) })
     response.status.should =~ /401/
-    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+    JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
 
   it "should allow retrieving attachments without a session" do
@@ -1285,7 +1285,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should not allow accessing other sections when limited" do
     course_with_teacher(:active_all => true)
-    @enrollment.update_attribute(:limit_priveleges_to_course_section, true)
+    @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     @teacher = @user
     s1 = submission_model(:course => @course)
     section2 = @course.course_sections.create(:name => "another section")

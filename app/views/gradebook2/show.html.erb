@@ -22,11 +22,6 @@
 <div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
   <div id="gradebook-toolbar">
     <button style="display:none;" id="section_to_show">Showing: <span id="section_being_shown">All Sections</span></button>
-    <ul style="display: none; width: 200px;">
-      <li>Choose a section to show</li>
-      <li><a href="#"><label for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" checked /></a></li>
-      <li id="course_section_template"><a href="#"><label class="section_name" for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" /></a></li>
-    </ul>
     <button id="gradebook_settings">&nbsp;</button>
     <ul style="display: none;">
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
@@ -57,10 +52,20 @@
     GRADEBOOK_TRANSLATIONS = <%= {
       :submission_tooltip_dropped => t('dropped_for_grading', 'Dropped for grading purposes'),
       :submission_tooltip_late => t('submitted_late', 'Submitted late'),
-      :submission_tooltip_muted => t('muted_students_wont_see', 'This assignment is muted, students will not see changes'),
+      :submission_tooltip_muted => t('assignment_muted', 'Assignment muted'),
       :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
       :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading'),
+      :submission_tooltip_online_url => t('titles.url', "URL Submission"),
+      :submission_tooltip_discussion_topic => t('titles.discussion', "Discussion Submission"),
+      :submission_tooltip_online_upload => t('titles.upload', "File Upload Submission"),
+      :submission_tooltip_online_text_entry => t('titles.text', "Text Entry Submission"),
+      :submission_tooltip_pending_review => t('titles.quiz_review', "This quiz needs review"),
+      :submission_tooltip_media_comment => t('titles.media', "Media Comment Submission"),
+      :submission_tooltip_quiz => t('title.quiz', "Quiz Submission")
     }.to_json.html_safe %>;
-    var gradebook = new Gradebook(<%= options.to_json.html_safe %>);
+    require(['compiled/Gradebook'], function(Gradebook){
+      new Gradebook(<%= options.to_json.html_safe %>);
+    });
+
   </script>
 <% end %>

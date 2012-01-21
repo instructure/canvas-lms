@@ -12,7 +12,7 @@
   <div style="display: none;">
     <span class="month_number"><%= current.month %></span>
   </div>
-  <% today = Date.today %>
+  <% today = Time.zone.today %>
   <table class="mini_calendar" cellspacing="0">
     <% day = first_day %>
     <% 6.times do %>

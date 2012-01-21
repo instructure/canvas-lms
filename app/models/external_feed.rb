@@ -94,7 +94,7 @@ class ExternalFeed < ActiveRecord::Base
         )
         return entry
       end
-      date = (item.respond_to?(:date) && item.date) || Date.today
+      date = (item.respond_to?(:date) && item.date) || Time.zone.today
       return nil if self.header_match && !item.title.match(Regexp.new(self.header_match, true))
       return nil if self.body_match && !item.description.match(Regexp.new(self.body_match, true))
       return nil if (date && self.created_at > date rescue false)

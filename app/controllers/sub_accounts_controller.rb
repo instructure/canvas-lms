@@ -90,7 +90,7 @@ class SubAccountsController < ApplicationController
   def create
     @parent_account = subaccount_or_self(params[:account].delete(:parent_account_id))
     @sub_account = @parent_account.sub_accounts.build(params[:account])
-    @sub_account.root_account = @context.root_account || @context
+    @sub_account.root_account = @context.root_account
     if @sub_account.save
       render :json => @sub_account.to_json
     else

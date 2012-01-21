@@ -1014,7 +1014,15 @@ namespace :db do
 
       ==============================================================================
     }
-    
+
+    create_notification '', 'Student Appointment Signups', 0, '', 'Appointment Canceled By User'
+    create_notification '', 'Appointment Cancelations', 0, '', 'Appointment Deleted For User'
+    create_notification '', 'Appointment Cancelations', 0, '', 'Appointment Group Deleted'
+    create_notification '', 'Appointment Availability', 0, '', 'Appointment Group Published'
+    create_notification '', 'Appointment Availability', 0, '', 'Appointment Group Updated'
+    create_notification '', 'Student Appointment Signups', 0, '', 'Appointment Reserved By User'
+    create_notification '', 'Appointment Signups', 0, '', 'Appointment Reserved For User'
+
     puts "\nNotifications Loaded"
   end
   
@@ -1023,8 +1031,8 @@ namespace :db do
 
     def create_admin(email, password)
       begin
-        pseudonym = Account.site_admin.pseudonyms.active.find_by_unique_id(email)
-        pseudonym ||= Account.default.pseudonyms.active.find_by_unique_id(email)
+        pseudonym = Account.site_admin.pseudonyms.active.custom_find_by_unique_id(email)
+        pseudonym ||= Account.default.pseudonyms.active.custom_find_by_unique_id(email)
         user = pseudonym ? pseudonym.user : User.create!
         user.register! unless user.registered?
         unless pseudonym

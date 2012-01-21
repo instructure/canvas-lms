@@ -292,7 +292,7 @@ I18n.scoped('instructure', function(I18n) {
     // <a class="dialog_opener" aria-controls="foobar" role="button" href="#">
     // opens the dialog with id="foobar"
     //
-    // <a class="dialog_opener" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
+    // <a class="dialog_opener" aria-controls="my_dialog" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
     // opens the .my_dialog dialog and passes the options {resizable:false, width: 300}
 
     // the :not clause is to not allow users access to this functionality in their content.

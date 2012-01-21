@@ -18,6 +18,110 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+class TestUserApi
+  include Api::V1::User
+  attr_accessor :services_enabled, :context, :current_user
+  def service_enabled?(service); @services_enabled.include? service; end
+  def avatar_image_url(user_id); "avatar_image_url(#{user_id})"; end
+end
+
+describe Api::V1::User do
+  before do
+    @test_api = TestUserApi.new
+    @test_api.services_enabled = []
+    @admin = account_admin_user
+    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
+    @student = @user
+    @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
+    @user = @admin
+    Account.default.tap { |a| a.enable_service(:avatars) }.save
+    user_with_pseudonym(:user => @user)
+  end
+
+  context 'user_json' do
+    it 'should support optionally providing the avatar if avatars are enabled' do
+      @test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url").should be_false
+      @test_api.services_enabled = [:avatars]
+      @test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url").should be_false
+      @test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).should encompass({
+        "avatar_url" => "avatar_image_url(#{@student.id})"
+      })
+    end
+
+    def test_context(mock_context, context_to_pass)
+      mock_context.expects(:account).returns(mock_context)
+      mock_context.expects(:id).returns(42)
+      mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      if context_to_pass
+        @test_api.user_json(@student, @admin, {}, [], context_to_pass)
+      else
+        @test_api.user_json(@student, @admin, {}, [])
+      end.should == { "name"=>"Student",
+                      "sortable_name"=>"Student",
+                      "sis_user_id"=>"sis-user-id",
+                      "id"=>@student.id,
+                      "short_name"=>"Student",
+                      "login_id"=>"pvuser@example.com",
+                      "sis_login_id"=>"pvuser@example.com"}
+    end
+
+    it 'should support manually passing the context' do
+      mock_context = mock()
+      test_context(mock_context, mock_context)
+    end
+
+    it 'should support loading the context as a member var' do
+      @test_api.context = mock()
+      test_context(@test_api.context, nil)
+    end
+  end
+
+  context 'user_json_is_admin?' do
+
+    it 'should support manually passing the current user' do
+      @test_api.context = mock()
+      @test_api.context.expects(:id).returns(42)
+      @test_api.context.expects(:account).returns(@test_api.context)
+      @test_api.context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      @test_api.current_user = @admin
+      @test_api.user_json_is_admin?.should == true
+    end
+
+    it 'should support loading the current user as a member var' do
+      mock_context = mock()
+      mock_context.expects(:id).returns(42)
+      mock_context.expects(:account).returns(mock_context)
+      mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      @test_api.current_user = @admin
+      @test_api.user_json_is_admin?(mock_context, @admin).should == true
+    end
+
+    it 'should support loading multiple different things (via args)' do
+      @test_api.user_json_is_admin?(@admin, @student).should be_false
+      @test_api.user_json_is_admin?(@student, @admin).should be_true
+      @test_api.user_json_is_admin?(@student, @admin).should be_true
+      @test_api.user_json_is_admin?(@admin, @student).should be_false
+      @test_api.user_json_is_admin?(@admin, @student).should be_false
+    end
+
+    it 'should support loading multiple different things (via member vars)' do
+      @test_api.current_user = @student
+      @test_api.context = @admin
+      @test_api.user_json_is_admin?.should be_false
+      @test_api.current_user = @admin
+      @test_api.context = @student
+      @test_api.user_json_is_admin?.should be_true
+      @test_api.user_json_is_admin?.should be_true
+      @test_api.current_user = @student
+      @test_api.context = @admin
+      @test_api.user_json_is_admin?.should be_false
+      @test_api.user_json_is_admin?.should be_false
+    end
+
+  end
+
+end
+
 describe "Users API", :type => :integration do
   before do
     @admin = account_admin_user
@@ -104,7 +208,7 @@ describe "Users API", :type => :integration do
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
              :controller => "profile", :action => "show", :user_id => @admin.to_param, :format => 'json')
     response.status.should == "401 Unauthorized"
-    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+    JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
 
   it "should return page view history" do
@@ -142,6 +246,51 @@ describe "Users API", :type => :integration do
     json = api_call(:get, "/api/v1/users/self/page_views?per_page=1000",
                        { :controller => "page_views", :action => "index", :user_id => 'self', :format => 'json', :per_page => '1000' })
     json.size.should == 1
+  end
+
+  describe "user account listing" do
+    it "should return users for an account" do
+      @account = @user.account
+      users = []
+      [['Test User1', 'test@example.com'], ['Test User2', 'test2@example.com'], ['Test User3', 'test3@example.com']].each_with_index do |u, i|
+        users << User.create(:name => u[0])
+        users[i].pseudonyms.create(:unique_id => u[1], :password => '123456', :password_confirmation => '123456')
+        users[i].pseudonym.update_attribute(:sis_user_id, (i + 1) * 100)
+        users[i].pseudonym.update_attribute(:account_id, @account.id)
+      end
+      @account.all_users.scoped(:order => :sortable_name).each_with_index do |user, i|
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+               { :controller => 'users', :action => 'index', :account_id => @account.id.to_param, :format => 'json' },
+               { :per_page => 1, :page => i + 1 })
+        json.should == [{
+          'name' => user.name,
+          'sortable_name' => user.sortable_name,
+          'sis_user_id' => user.sis_user_id,
+          'id' => user.id,
+          'short_name' => user.short_name,
+          'login_id' => user.pseudonym.unique_id,
+          'sis_login_id' => user.pseudonym.sis_user_id ? user.pseudonym.unique_id : nil
+        }]
+      end
+    end
+
+    it "should limit the maximum number of users returned" do
+      @account = @user.account
+      15.times do |n|
+        user = User.create(:name => "u#{n}")
+        user.pseudonyms.create!(:unique_id => "u#{n}@example.com", :account => @account)
+      end
+      api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=12", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '12').size.should == 12
+      Setting.set('api_max_per_page', '5')
+      api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=12", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '12').size.should == 5
+    end
+
+    it "should return unauthorized for users without permissions" do
+      @account = @student.account
+      @user    = @student
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => "json")
+      response.code.should eql "401"
+    end
   end
 
   describe "user account creation" do
@@ -231,4 +380,3 @@ describe "Users API", :type => :integration do
     end
   end
 end
-

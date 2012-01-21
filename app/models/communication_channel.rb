@@ -31,7 +31,8 @@ class CommunicationChannel < ActiveRecord::Base
   
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
-  validates_uniqueness_of :path, :case_sensitive => false, :scope => [:path_type, :user_id], :if => lambda { |cc| cc.user_id && !cc.retired? }
+  validates_presence_of :path
+  validate :uniqueness_of_path
 
   acts_as_list :scope => :user_id
   
@@ -89,6 +90,20 @@ class CommunicationChannel < ActiveRecord::Base
     self.user.pseudonyms.active
   end
   memoize :active_pseudonyms
+
+  def uniqueness_of_path
+    return if path.nil?
+    return if retired?
+    return unless user_id
+    conditions = ["LOWER(path)=? AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path.mb_chars.downcase, user_id, path_type]
+    unless new_record?
+      conditions.first << " AND id<>?"
+      conditions << id
+    end
+    if self.class.exists?(conditions)
+      self.errors.add(:path, :taken, :value => path)
+    end
+  end
   
   def path_description
     if self.path_type == 'facebook'
@@ -151,7 +166,7 @@ class CommunicationChannel < ActiveRecord::Base
     if connection_pool.spec.config[:adapter] == 'mysql'
       { :conditions => {:path => path } }
     else
-      { :conditions => ["LOWER(communication_channels.path)=?", path.downcase]}
+      { :conditions => ["LOWER(communication_channels.path)=?", path.try(:downcase)]}
     end
   }
 
@@ -191,16 +206,16 @@ class CommunicationChannel < ActiveRecord::Base
       policy_for_channel[policy.communication_channel_id] = true
       can_notify[policy.communication_channel_id] = false if policy.frequency == 'never'
     end
-    all_channels = user.communication_channels.unretired
+    all_channels = user.communication_channels.active
     communication_channels = all_channels.select{|cc| policy_matches_frequency[cc.id] }
-    all_channels = all_channels.select{|cc| cc.active? && policy_for_channel[cc.id] }
-    
+    all_channels = all_channels.select{|cc| policy_for_channel[cc.id] }
+
     # The trick here is that if the user has ANY policies defined for this notification
     # then we shouldn't overwrite it with the default channel -- but we only want to
-    # return the list of channels for immediate dispatch
-    communication_channels = [user.communication_channels.first] if all_channels.empty? && notification.default_frequency == 'immediately'
+    # return the list of channels for immediate dispatch.
+    communication_channels = [user.email_channel] if all_channels.empty? && notification.default_frequency == 'immediately'
     communication_channels.compact!
-    
+
     # Remove ALL channels if one is 'never'?  No, I think we should just remove any paths that are set to 'never'
     # User can say NEVER email me, but SMS me right away.
     communication_channels.reject!{|cc| can_notify[cc] == false}

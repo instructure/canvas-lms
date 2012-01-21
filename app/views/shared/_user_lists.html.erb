@@ -1,4 +1,4 @@
-<% root_account = @context.root_account || @context %>
+<% root_account = @context.root_account %>
 <% account = @context.respond_to?(:account) ? @context.account : @context %>
 <div id="user_list_boxes">
   <a id="user_lists_path" style="display:none;" href="<%= polymorphic_path([@context, :user_lists], :format => :json) %>"></a>

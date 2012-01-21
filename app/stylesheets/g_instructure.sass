@@ -1073,80 +1073,6 @@ html > body .new_activity_message form textarea
     &.message
       :background-image url(/images/message_icon.png)
 
-#feedback_dialog
-  .feedback-type-holder
-    font-size: 1.3em
-    margin-bottom: 5px
-  .feedback-text
-    :float left
-    :font-size 1.3em
-    :margin-right 8px
-  .feedback-option
-    :float left
-    :padding 2px 5px
-    :margin-right 8px
-    :margin-bottom 1px
-    :border 1px solid #ccc
-    :cursor pointer
-    &:hover
-      :background-color #def
-      :border-color #bbb
-    &.feedback-option-selected
-      :border-color #aaa
-      :background-color #cdf
-      :font-weight bold
-#help_dialog
-  padding: 0
-  ul
-    list-style: none
-    padding: 0
-    margin: 0
-    overflow: auto
-    li
-      display: none
-      position: relative
-      overflow: hidden
-      border-top: 1px solid #fafafa
-      border-bottom: 1px solid #d4d5d7
-      background: #e6e7e9
-      height: 49px
-      a
-        display: block
-        padding: 10px 25px
-        text-decoration: none
-        span.text
-          color: #1e7eca
-          font-size: 1.1em
-        span.subtext
-          color: #a2a2a3
-          font-style: italic
-          display: block
-          font-size: 0.9em
-          line-height: 1.1em
-      &:hover
-        border-top-color: #d7eefb
-        border-bottom-color: #297fd1
-        background: #2da5f0 url(/images/feedback/feedback-active.png) repeat-x 0 0
-        a
-          text-decoration: none
-          span.text
-            color: #ffffff
-          span.subtext
-            color: #015f99
-    &.user
-      li.user
-        display: block
-    &.student
-      li.student
-        display: block
-    &.teacher
-      li.teacher
-        display: block
-    &.admin
-      li.admin
-        display: block
-    
-
 .module_legend
   :float right
   :clear right
@@ -1497,7 +1423,7 @@ h2.h-margin-top,h3.h-margin-top
 form.user_content_post_form
   display: none
 
-#change_gradebook_version_link_holder
+#change_gradebook_version_link_holder, #change_calendar_version_link_holder
   float: right !important
   background: none !important
   a

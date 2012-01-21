@@ -117,12 +117,13 @@ class PageView < ActiveRecord::Base
     when :log
       Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
     when :cache
-      begin
-        json = self.attributes.as_json
-        json['is_update'] = true if self.is_update
-        Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
-      rescue Exception
-        # we're going to ignore the error for now, if redis is unavailable
+      json = self.attributes.as_json
+      json['is_update'] = true if self.is_update
+      if Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
+        true
+      else
+        # redis failed, push right to the db
+        self.save
       end
     when :db
       self.save
@@ -164,23 +165,33 @@ class PageView < ActiveRecord::Base
 
     begin
       # process as many items as were in the queue when we started.
-      qlen = redis.llen(self.cache_queue_name)
-      qlen.times do
-        json = redis.lpop(self.cache_queue_name)
-        break unless json
-        attrs = JSON.parse(json)
-        if attrs['is_update']
-          page_view = self.find_by_request_id(attrs['request_id'])
-          next unless page_view
-          page_view.do_update(attrs)
-          page_view.save
-        else
-          # bypass mass assignment protection
-          self.create { |p| p.send(:attributes=, attrs, false) }
+      todo = redis.llen(self.cache_queue_name)
+      while todo > 0
+        batch_size = [Setting.get_cached('page_view_queue_batch_size', '1000').to_i, todo].min
+        transaction do
+          process_cache_queue_batch(batch_size, redis)
         end
+        todo -= batch_size
       end
     ensure
       redis.del lock_key
+    end
+  end
+
+  def self.process_cache_queue_batch(batch_size, redis = Canvas.redis)
+    batch_size.times do
+      json = redis.lpop(self.cache_queue_name)
+      break unless json
+      attrs = JSON.parse(json)
+      if attrs['is_update']
+        page_view = self.find_by_request_id(attrs['request_id'])
+        next unless page_view
+        page_view.do_update(attrs)
+        page_view.save
+      else
+        # bypass mass assignment protection
+        self.create { |p| p.send(:attributes=, attrs, false) }
+      end
     end
   end
 end

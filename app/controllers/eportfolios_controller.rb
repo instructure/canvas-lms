@@ -151,14 +151,12 @@ class EportfoliosController < ApplicationController
         @attachment.destroy!
         @attachment = nil
       end
-      
+
       if !@attachment
         @attachment = @portfolio.attachments.build(:display_name => zip_filename)
         @attachment.workflow_state = 'to_be_zipped'
         @attachment.file_state = '0'
         @attachment.save!
-      end
-      if params[:compile] && @attachment.to_be_zipped?
         ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
         render :json => @attachment.to_json
       else

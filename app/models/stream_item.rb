@@ -145,7 +145,7 @@ class StreamItem < ActiveRecord::Base
       res = prepare_conversation(object)
     when Message
       res = object.attributes
-      res['notification_category'] = object.notification_category
+      res['notification_category'] = object.notification_display_category
       if object.asset_context_type
         self.context_code = "#{object.asset_context_type.underscore}_#{object.asset_context_id}"
       end

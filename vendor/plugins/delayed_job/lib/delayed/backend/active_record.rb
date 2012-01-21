@@ -64,7 +64,7 @@ module Delayed
         end
 
         cattr_accessor :default_priority
-        self.default_priority = 0
+        self.default_priority = Delayed::NORMAL_PRIORITY
 
         named_scope :current, lambda {
           { :conditions => ["run_at <= ?", db_time_now] }

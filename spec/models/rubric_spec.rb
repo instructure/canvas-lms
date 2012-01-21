@@ -238,4 +238,36 @@ describe Rubric do
       @result.mastery.should eql(true)
     end
   end
+
+  context "fractional_points" do
+    it "should allow fractional points" do
+      @rubric = Rubric.new(:context => @course)
+      @rubric.data = [
+        {
+          :points => 0.5,
+          :description => "Fraction row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 0.5,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ]
+        }
+      ]
+      @rubric.save!
+
+      @rubric2 = Rubric.find(@rubric.id)
+      @rubric2.data.first[:points].should eql(0.5)
+      @rubric2.data.first[:ratings].first[:points].should eql(0.5)
+    end
+  end
 end

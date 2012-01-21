@@ -132,14 +132,14 @@ describe AccountsController do
     it "should set batch mode and term if given" do
       account_with_admin_logged_in
       @account.update_attribute(:allow_sis_import, true)
-      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1'
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv', :batch_mode => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.batch_mode.should be_true
       batch.batch_mode_term.should be_nil
       batch.destroy
 
-      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1', :batch_mode_term_id => @account.enrollment_terms.first.id
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv', :batch_mode => '1', :batch_mode_term_id => @account.enrollment_terms.first.id
       batch = SisBatch.last
       batch.should_not be_nil
       batch.batch_mode.should be_true
@@ -151,21 +151,21 @@ describe AccountsController do
       @account.update_attribute(:allow_sis_import, true)
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip'
+          :import_type => 'instructure_csv'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == {}
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1'
+          :import_type => 'instructure_csv', :override_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == { :override_sis_stickiness => true }
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1',
+          :import_type => 'instructure_csv', :override_sis_stickiness => '1',
           :add_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
@@ -173,7 +173,7 @@ describe AccountsController do
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :override_sis_stickiness => '1',
+          :import_type => 'instructure_csv', :override_sis_stickiness => '1',
           :clear_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
@@ -181,14 +181,14 @@ describe AccountsController do
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :clear_sis_stickiness => '1'
+          :import_type => 'instructure_csv', :clear_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == {}
       batch.destroy
 
       post 'sis_import_submit', :account_id => @account.id,
-          :import_type => 'instructure_csv_zip', :add_sis_stickiness => '1'
+          :import_type => 'instructure_csv', :add_sis_stickiness => '1'
       batch = SisBatch.last
       batch.should_not be_nil
       batch.options.should == {}
@@ -196,7 +196,7 @@ describe AccountsController do
     end
   end
 
-  describe "managing admins" do
+  describe "add_account_user" do
     it "should allow adding a new account admin" do
       account_with_admin_logged_in
 
@@ -208,6 +208,15 @@ describe AccountsController do
       @account.reload
       @account.account_users.map(&:user).should be_include(new_admin)
     end
+
+    it "should allow adding an existing user to a sub account" do
+      account_with_admin_logged_in(:active_all => 1)
+      @subaccount = @account.sub_accounts.create!
+      @munda = user_with_pseudonym(:account => @account, :active_all => 1, :username => 'munda@instructure.com')
+      post 'add_account_user', :account_id => @subaccount.id, :membership_type => 'AccountAdmin', :user_list => 'munda@instructure.com', :only_search_existing_users => 1
+      response.should be_success
+      @subaccount.account_users.map(&:user).should == [@munda]
+    end
   end
 
   it "should redirect to CAS if CAS is enabled" do
@@ -215,7 +224,7 @@ describe AccountsController do
     config = { :cas_base_url => account.account_authorization_config.auth_base }
     cas_client = CASClient::Client.new(config)
     get 'show', :id => account.id
-    response.should redirect_to(cas_client.add_service_to_login_url(login_url))
+    response.should redirect_to(@controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(login_url)))
   end
 
   it "should count total courses correctly" do

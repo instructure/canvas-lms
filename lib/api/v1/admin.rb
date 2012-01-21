@@ -24,7 +24,7 @@ module Api::V1::Admin
     # admin is an AccountUser
     {
       :id => admin.id,
-      :membership_type => admin.membership_type,
+      :role => admin.membership_type,
       :user => user_json(admin.user, current_user, session)
     }
   end

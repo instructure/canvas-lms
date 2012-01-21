@@ -74,7 +74,7 @@ class Conversation < ActiveRecord::Base
       raise "can't add participants if there are no messages" unless last_message_at
       num_messages = conversation_messages.human.size
 
-      User.update_all('unread_conversations_count = unread_conversations_count + 1', :id => user_ids)
+      User.update_all("unread_conversations_count = unread_conversations_count + 1, updated_at = '#{Time.now.to_s(:db)}'", :id => user_ids)
       user_ids.each do |user_id|
         participant = conversation_participants.build
         participant.user_id = user_id

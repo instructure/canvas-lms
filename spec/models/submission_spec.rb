@@ -361,6 +361,54 @@ describe Submission do
       @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
     end
   end
+
+  it "should return the correct quiz_submission_version" do
+    # see redmine #6048
+
+    # set up the data to have a submission with a quiz submission with multiple versions
+    course
+    quiz = @course.quizzes.create!
+    quiz_submission = quiz.generate_submission @user, false
+    quiz_submission.save
+
+    submission = Submission.create!({
+      :assignment_id => @assignment.id,
+      :user_id => @user.id,
+      :quiz_submission_id => quiz_submission.id
+    })
+
+    submission = @assignment.submit_homework @user, :submission_type => 'online_quiz'
+    submission.quiz_submission_id = quiz_submission.id
+
+    # set the microseconds of the submission.submitted_at to be less than the
+    # quiz_submission.finished_at.
+
+    # first set them to be exactly the same (with microseconds)
+    time_to_i = submission.submitted_at.to_i
+    usec = submission.submitted_at.usec
+    timestamp = "#{time_to_i}.#{usec}".to_f
+
+    quiz_submission.finished_at = Time.at(timestamp)
+    quiz_submission.save
+
+    # get the data in a strange state where the quiz_submission.finished_at is
+    # microseconds older than the submission (caused the bug in #6048)
+    quiz_submission.finished_at = Time.at(timestamp + 0.00001)
+    quiz_submission.save
+
+    # verify the data is weird, to_i says they are equal, but the usecs are off
+    quiz_submission.finished_at.to_i.should == submission.submitted_at.to_i
+    quiz_submission.finished_at.usec.should > submission.submitted_at.usec
+
+    # create the versions that Submission#quiz_submission_version uses
+    quiz_submission.with_versioning do
+      quiz_submission.save
+      quiz_submission.save
+    end
+
+    # the real test, quiz_submission_version shouldn't care about usecs
+    submission.quiz_submission_version.should == 2
+  end
 end
 
 def submission_spec_model(opts={})

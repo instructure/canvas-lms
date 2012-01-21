@@ -27,7 +27,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
                   :certificate_fingerprint, :entity_id, :change_password_url,
                   :login_handle_name, :ldap_filter, :auth_filter
 
+  before_validation :set_saml_entity_id, :if => Proc.new { |aac| aac.saml_authentication? }
   validates_presence_of :account_id
+  validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
   after_save :disable_open_registration_if_delegated
 
   def ldap_connection
@@ -39,6 +41,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     ldap.base = self.auth_base
     ldap.auth self.auth_username, self.auth_decrypted_password
     ldap
+  end
+  
+  def set_saml_entity_id
+    self.entity_id ||= saml_default_entity_id
   end
   
   def sanitized_ldap_login(login)
@@ -79,56 +85,75 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     return nil unless self.auth_password_salt && self.auth_crypted_password
     Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
   end
+  
+  def self.saml_default_entity_id_for_account(account)
+    "http://#{HostUrl.context_host(account)}/saml2"
+  end
+  
+  def saml_default_entity_id
+    AccountAuthorizationConfig.saml_default_entity_id_for_account(self.account)
+  end
 
   def saml_settings(preferred_account_domain=nil)
     return nil unless self.auth_type == 'saml'
-    app_config = Setting.from_config('saml')
-    raise "This Canvas instance isn't configured for SAML" unless app_config
 
     unless @saml_settings
-      domain = HostUrl.context_host(self.account, preferred_account_domain)
-      @saml_settings = Onelogin::Saml::Settings.new
+      @saml_settings = AccountAuthorizationConfig.saml_settings_for_account(self.account, preferred_account_domain)
 
-      @saml_settings.issuer = self.entity_id || app_config[:entity_id]
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
       @saml_settings.idp_cert_fingerprint = self.certificate_fingerprint
       @saml_settings.name_identifier_format = self.identifier_format
-      if ENV['RAILS_ENV'] == 'development'
-        # if you set the domain to go to your local box in /etc/hosts you can test saml
-        @saml_settings.assertion_consumer_service_url = "http://#{domain}/saml_consume"
-        @saml_settings.sp_slo_url = "http://#{domain}/saml_logout"
-      else
-        @saml_settings.assertion_consumer_service_url = "https://#{domain}/saml_consume"
-        @saml_settings.sp_slo_url = "https://#{domain}/saml_logout"
-      end
-      @saml_settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
-      @saml_settings.tech_contact_email = app_config[:tech_contact_email]
-
-      encryption = app_config[:encryption]
-      if encryption.is_a?(Hash) && File.exists?(encryption[:xmlsec_binary])
-        resolve_path = lambda {|path|
-          if path.nil?
-            nil
-          elsif path[0,1] == '/'
-            path
-          else
-            File.join(Rails.root, 'config', path)
-          end
-        }
-
-        private_key_path = resolve_path.call(encryption[:private_key])
-        certificate_path = resolve_path.call(encryption[:certificate])
-
-        if File.exists?(private_key_path) && File.exists?(certificate_path)
-          @saml_settings.xmlsec1_path = encryption[:xmlsec_binary]
-          @saml_settings.xmlsec_certificate = certificate_path
-          @saml_settings.xmlsec_privatekey = private_key_path
-        end
-      end
     end
     
     @saml_settings
+  end
+  
+  def self.saml_settings_for_account(account, preferred_account_domain=nil)
+    app_config = Setting.from_config('saml') || {}
+    domain = HostUrl.context_host(account, preferred_account_domain)
+    
+    settings = Onelogin::Saml::Settings.new
+    if ENV['RAILS_ENV'] == 'development'
+      # if you set the domain to go to your local box in /etc/hosts you can test saml
+      settings.assertion_consumer_service_url = "http://#{domain}/saml_consume"
+      settings.sp_slo_url = "http://#{domain}/saml_logout"
+    else
+      settings.assertion_consumer_service_url = "https://#{domain}/saml_consume"
+      settings.sp_slo_url = "https://#{domain}/saml_logout"
+    end
+    settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
+    settings.tech_contact_email = app_config[:tech_contact_email] || ''
+    
+    if account.saml_authentication?
+      settings.issuer = account.account_authorization_config.entity_id 
+    else
+      settings.issuer = saml_default_entity_id_for_account(account)
+    end
+    
+    encryption = app_config[:encryption]
+    if encryption.is_a?(Hash) && File.exists?(encryption[:xmlsec_binary])
+      resolve_path = lambda { |path|
+        if path.nil?
+          nil
+        elsif path[0, 1] == '/'
+          path
+        else
+          File.join(Rails.root, 'config', path)
+        end
+      }
+
+      private_key_path = resolve_path.call(encryption[:private_key])
+      certificate_path = resolve_path.call(encryption[:certificate])
+
+      if File.exists?(private_key_path) && File.exists?(certificate_path)
+        settings.xmlsec1_path = encryption[:xmlsec_binary]
+        settings.xmlsec_certificate = certificate_path
+        settings.xmlsec_privatekey = private_key_path
+      end
+    end
+    
+    settings
   end
   
   def email_identifier?

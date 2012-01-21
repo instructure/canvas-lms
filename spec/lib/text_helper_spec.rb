@@ -127,6 +127,17 @@ describe TextHelper do
       th.date_string(nextyear).split[2].to_i.should == nextyear.year
     end
 
+    it "should ignore the end date if it matches the start date" do
+      start_date = Time.parse("2012-01-01 12:00:00")
+      end_date = Time.parse("2012-01-01 13:00:00")
+      th.date_string(start_date, end_date).should == th.date_string(start_date)
+    end
+
+    it "should do date ranges if the end date differs from the start date" do
+      start_date = Time.parse("2012-01-01 12:00:00")
+      end_date = Time.parse("2012-01-08 12:00:00")
+      th.date_string(start_date, end_date).should == "#{th.date_string(start_date)} to #{th.date_string(end_date)}"
+    end
   end
 
   context "format_message" do
@@ -182,6 +193,23 @@ describe TextHelper do
     end
   end
 
+  context "truncate_html" do
+    it "should truncate in the middle of an element" do
+      str = "<div>a b c d e</div>"
+      th.truncate_html(str, :num_words => 3).should == "<div>a b c<span>...</span>\n</div>"
+    end
+
+    it "should truncate at the end of an element" do
+      str = "<div><div>a b c</div>d e</div>"
+      th.truncate_html(str, :num_words => 3).should == "<div><div>a b c<span>...</span>\n</div></div>"
+    end
+
+    it "should truncate at the beginning of an element" do
+      str = "<div>a b c<div>d e</div></div>"
+      th.truncate_html(str, :num_words => 3).should == "<div>a b c<span>...</span>\n</div>"
+    end
+  end
+
   it "should insert reply to into subject" do
     TextHelper.make_subject_reply_to('ohai').should == 'Re: ohai'
     TextHelper.make_subject_reply_to('Re: ohai').should == 'Re: ohai'
@@ -201,7 +229,7 @@ describe TextHelper do
         th.mt(:foo, "We **don't** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h").
           should == "We <strong>don't</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
       end
-  
+
       it "should not escape MarkdownSafeBuffers" do
         th.mt(:foo, "We **do** trust the following input: %{input}", :input => th.markdown_safe("`a` **b** _c_ ![d](e)\n# f\n + g\n - h")).
           should == <<-HTML.strip
@@ -223,7 +251,7 @@ describe TextHelper do
         th.mt(:foo, "**this** is another test\n\nwhat will happen?").
           should == "<p><strong>this</strong> is another test</p>\n\n<p>what will happen?</p>"
       end
-  
+
       it "should not inlinify single paragraphs if :inlinify => :never" do
         th.mt(:foo, "**one** more test", :inlinify => :never).
           should == "<p><strong>one</strong> more test</p>"

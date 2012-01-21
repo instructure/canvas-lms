@@ -19,7 +19,7 @@
 class WikiPageCommentsController < ApplicationController
   before_filter :require_context
   before_filter :get_wiki_page, :except => :latest_version_number
-  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}, :except => [:latest_version_number]) { |c| c.send :course_wiki_pages_path, c.instance_variable_get("@context") }
+  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}, :except => [:latest_version_number]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url }
   before_filter { |c| c.active_tab = "pages" }
   
   def create
