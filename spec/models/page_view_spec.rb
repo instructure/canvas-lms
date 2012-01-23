@@ -76,6 +76,11 @@ describe PageView do
         Canvas.redis.smembers(PageView.user_count_bucket_for_time(Time.now)).should == []
       end
 
+      it "should store if enabled" do
+        Setting.set('page_views_store_active_user_counts', 'redis')
+        @page_view.store.should be_true
+      end
+
       it "should store user ids in the set for page views" do
         Setting.set('page_views_store_active_user_counts', 'redis')
         store_time = Time.zone.parse('2012-01-13T15:43:21Z')
