@@ -225,6 +225,20 @@ describe "profile tests" do
       driver.find_element(:id, 'unregistered_services').should include_text("Skype")
     end
 
+    it "should toggle service visibility" do
+      get "/profile"
+      add_skype_service
+      initial_state = @user.show_user_services
+
+      driver.find_element(:id, 'show_user_services').click
+      wait_for_ajaximations
+      @user.reload.show_user_services.should_not eql initial_state
+
+      driver.find_element(:id, 'show_user_services').click
+      wait_for_ajaximations
+      @user.reload.show_user_services.should eql initial_state
+    end
+
     it "should generate a new access token" do
       get "/profile"
       generate_access_token
