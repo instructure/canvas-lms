@@ -863,6 +863,10 @@ describe ConversationsController, :type => :integration do
               { :controller => 'conversations', :action => 'remove_messages', :id => conversation.conversation_id.to_s, :format => 'json' },
               { :remove => [message.id] })
       conversation.reload
+      json.delete("avatar_url")
+      json["participants"].each{ |p|
+        p.delete("avatar_url")
+      }
       json.should eql({
         "id" => conversation.conversation_id,
         "workflow_state" => "read",
@@ -872,7 +876,16 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => true,
         "starred" => false,
-        "properties" => ["last_author"]
+        "properties" => ["last_author"],
+        "audience" => [@bob.id],
+        "audience_contexts" => {
+          "groups" => {},
+          "courses" => {@course.id.to_s => ["StudentEnrollment"]}
+        },
+        "participants" => [
+          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        ]
       })
     end
 

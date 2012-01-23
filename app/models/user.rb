@@ -1732,6 +1732,15 @@ class User < ActiveRecord::Base
   end
   memoize :manageable_appointment_context_codes
 
+  def conversation_context_codes
+    e = enrollment_visibility
+    (e[:full_course_ids] + e[:section_id_hash].keys + e[:restricted_course_hash].keys).uniq.
+      map{ |id| "course_#{id}" } +
+    current_groups.
+      map{ |g| "group_#{g.id}"}
+  end
+  memoize :conversation_context_codes
+
   def manageable_courses
     Course.manageable_by_user(self.id).not_deleted
   end

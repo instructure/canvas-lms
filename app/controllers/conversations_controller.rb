@@ -28,6 +28,7 @@ class ConversationsController < ApplicationController
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
+  before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
   add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   # @API
@@ -112,6 +113,13 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
     @scope ||= params[:scope].to_sym
+    if params[:filter] && params[:filter] =~ /\Acourse_(\d+)\z/
+      if course = @contexts[:courses][$1.to_i]
+        conversations_scope = conversations_scope.tagged(params[:filter])
+        @filter = {:id => params[:filter], :name => course[:name]}
+        @no_messages += " (#{course[:name]})"
+      end
+    end
     @conversations_count = conversations_scope.count
     conversations = Api.paginate(conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
     # optimize loading the most recent messages for each conversation into a single query
@@ -369,7 +377,7 @@ class ConversationsController < ApplicationController
   #
   def add_recipients
     if @recipient_ids.present?
-      @conversation.add_participants(@recipient_ids)
+      @conversation.add_participants(@recipient_ids, :tags => @tags)
       render :json => jsonify_conversation(@conversation.reload, :messages => [@conversation.messages.first])
     else
       render :json => {}, :status => :bad_request
@@ -448,7 +456,7 @@ class ConversationsController < ApplicationController
         to_delete << message if params[:remove].include?(message.id.to_s)
       end
       @conversation.remove_messages(*to_delete)
-      render :json => @conversation
+      render :json => jsonify_conversation(@conversation)
     end
   end
 
@@ -490,9 +498,10 @@ class ConversationsController < ApplicationController
   # @response_field common_groups Only set for users. Hash of group ids and
   #   enrollment types for each group to show what they share with this user
   def find_recipients
+    @blank_fallback = !api_request?
     max_results = [params[:per_page].try(:to_i) || 10, 50].min
     if max_results < 1
-      if params[:type] == 'context' || params[:context]
+      if context_types.include?(params[:type]) || params[:context]
         max_results = nil # i.e. all results
       else
         max_results = params[:per_page] = 10
@@ -506,11 +515,11 @@ class ConversationsController < ApplicationController
     recipients = []
     if params[:user_id]
       recipients = matching_participants(:ids => [params[:user_id]], :conversation_id => params[:from_conversation_id])
-    elsif (params[:context] || params[:search]) && ['user', 'context', nil].include?(params[:type])
+    elsif (params[:context] || params[:search]) && (context_types + ['user', nil]).include?(params[:type])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
-      contexts = params[:type] == 'user' ? [] : matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX)))
-      participants = params[:type] == 'context' || @skip_users ? [] : matching_participants(options.merge(:exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
+      contexts = params[:type] == 'user' ? [] : matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :type => params[:type]))
+      participants = context_types.include?(params[:type]) || @skip_users ? [] : matching_participants(options.merge(:exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
       if max_results
         if params[:type]
           recipients = contexts + participants
@@ -562,13 +571,20 @@ class ConversationsController < ApplicationController
     if params[:recipients]
       recipient_ids = params[:recipients]
       if recipient_ids.is_a?(String)
-        recipient_ids = recipient_ids.split(/,/)
+        params[:recipients] = recipient_ids = recipient_ids.split(/,/)
       end
       @recipient_ids = (
         matching_participants(:ids => recipient_ids.grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id]).map{ |p| p[:id] } +
         recipient_ids.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX).map{ |context| matching_participants(:context => context)}.flatten.map{ |p| p[:id] }
       ).uniq
     end
+  end
+
+  def infer_tags
+    tags = Array(params[:tags] || []).concat(params[:recipients] || [])
+    tags = SimpleTags.normalize_tags(tags)
+    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.find_by_id($1.to_i) and g.context.asset_string }.compact
+    @tags = tags.uniq
   end
 
   def load_all_contexts
@@ -626,7 +642,7 @@ class ConversationsController < ApplicationController
 
   def matching_contexts(options)
     context_name = options[:context]
-    avatar_url = avatar_url_for_group(params[:blank_avatar_fallback])
+    avatar_url = avatar_url_for_group(blank_fallback)
     user_counts = {
       :course => @current_user.enrollment_visibility[:user_counts],
       :group => @current_user.group_membership_visibility[:user_counts],
@@ -637,7 +653,9 @@ class ConversationsController < ApplicationController
 
     result = []
     if context_name.nil?
-      result = if params[:search].blank?
+      result = if options[:type] == 'course'
+                 @contexts[:courses].values
+               elsif params[:search].blank?
                  courses = @contexts[:courses].values
                  group_ids = @current_user.current_groups.map(&:id)
                  groups = @contexts[:groups].slice(*group_ids).values
@@ -710,7 +728,7 @@ class ConversationsController < ApplicationController
         enrollment_counts[role] += 1
       end
     end
-    avatar_url = avatar_url_for_group(params[:blank_avatar_fallback])
+    avatar_url = avatar_url_for_group(blank_fallback)
     result = []
     result << {:id => "#{context}_teachers", :name => t(:enrollments_teachers, "Teachers"), :user_count => enrollment_counts['TeacherEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['TeacherEnrollment'].to_i > 0
     result << {:id => "#{context}_tas", :name => t(:enrollments_tas, "Teaching Assistants"), :user_count => enrollment_counts['TaEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['TaEnrollment'].to_i > 0
@@ -720,7 +738,7 @@ class ConversationsController < ApplicationController
   end
 
   def matching_participants(options)
-    jsonify_users(@current_user.messageable_users(options), options.merge(:blank_avatar_fallback => params[:blank_avatar_fallback]))
+    jsonify_users(@current_user.messageable_users(options), options)
   end
 
   def get_conversation(allow_deleted = false)
@@ -729,7 +747,7 @@ class ConversationsController < ApplicationController
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
-    message = conversation.add_message(params[:body], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :context => @domain_root_account) do |m|
+    message = conversation.add_message(params[:body], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :context => @domain_root_account, :tags => @tags) do |m|
       if params[:attachments]
         params[:attachments].sort_by{ |k,v| k.to_i }.each do |k,v|
           m.attachments.create(:uploaded_data => v) if v.present?
@@ -763,7 +781,7 @@ class ConversationsController < ApplicationController
         conversation.messages.human.scoped(:conditions => "asset_id IS NULL").size
     end
     result[:audience] = audience.map(&:id)
-    result[:audience_contexts] = contexts_for(audience)
+    result[:audience_contexts] = contexts_for(audience, conversation.context_tags)
     result[:avatar_url] = avatar_url_for(conversation)
     result[:participants] = jsonify_users(conversation.participants(options), options)
     result
@@ -783,7 +801,6 @@ class ConversationsController < ApplicationController
   def jsonify_users(users, options = {})
     options = {
       :include_participant_avatars => true,
-      :blank_avatar_fallback => false,
       :include_participant_contexts => users.first.respond_to?(:common_courses)
     }.merge(options)
     users.map { |user|
@@ -795,12 +812,20 @@ class ConversationsController < ApplicationController
         hash[:common_courses] = user.common_courses
         hash[:common_groups] = user.common_groups
       end
-      hash[:avatar_url] = avatar_url_for_user(user, options[:blank_avatar_fallback]) if options[:include_participant_avatars]
+      hash[:avatar_url] = avatar_url_for_user(user, blank_fallback) if options[:include_participant_avatars]
       hash
     }
   end
 
   def interleave_submissions
     params[:interleave_submissions] || !api_request?
+  end
+
+  def blank_fallback
+    params[:blank_avatar_fallback] || @blank_fallback
+  end
+  
+  def context_types
+    ['context', 'course']
   end
 end

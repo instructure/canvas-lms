@@ -123,6 +123,24 @@ body
         color: #fff
         text-shadow: 0px 1px 1px #0276aa
 
+#context_tags_filter
+  float: right
+  margin: 10px 16px 0 0
+  label
+    color: #525252
+    font-size: 12px
+    font-weight: bold
+    text-shadow: 0px 1px 1px #fff
+    padding: 2px 8px 0 0
+    float: left
+  #context_tags
+    visibility: hidden
+    min-width: 250px
+  .token_input
+    min-width: 260px
+    padding: 1px 6px 0
+    +border-radius(11px)
+
 #conversation_actions
   font-size: 0.9em
   display: none
@@ -576,6 +594,7 @@ button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-
   border: 1px solid #999999
   border-top-color: #737373
   padding: 0
+  background: #fff
   box-sizing: border-box
   -webkit-box-sizing: border-box
   -moz-box-sizing: border-box
