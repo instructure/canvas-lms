@@ -718,6 +718,7 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
       pseudonyms.get 'accounts/:account_id/logins', :action => :index, :path_name => 'pseudonyms'
       pseudonyms.post 'accounts/:account_id/logins', :action => :create
+      pseudonyms.put 'accounts/:account_id/logins/:id', :action => :update
     end
 
     api.with_options(:controller => :accounts) do |accounts|

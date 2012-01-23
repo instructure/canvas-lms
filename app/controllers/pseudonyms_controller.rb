@@ -198,12 +198,26 @@ class PseudonymsController < ApplicationController
     true
   end
   protected :get_user
-  
+
+  # @API
+  # Update an existing login for a user in the given account.
+  #
+  # @argument login[unique_id] The new unique ID for the login.
+  # @argument login[password] The new password for the login. Can only be set by an admin user if admins are allowed to change passwords for the account.
+  # @arugment login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def update
-    return unless get_user
+    if api_request?
+      @pseudonym = Pseudonym.find(params[:id])
+      return unless @user = @pseudonym.user
+    else
+      return unless get_user
+      @pseudonym = @user.pseudonyms.find(params[:id])
+    end
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
-    @pseudonym = @user.pseudonyms.find(params[:id])
+    params[:pseudonym] = params[:login] if api_request?
+    return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
     params[:pseudonym].delete :account_id
+    params[:pseudonym].delete :unique_id unless @user.grants_right?(@current_user, nil, :manage_logins)
     unless @pseudonym.account.grants_right?(@current_user, session, :manage_user_logins)
       params[:pseudonym].delete :unique_id
       params[:pseudonym].delete :password
@@ -214,29 +228,29 @@ class PseudonymsController < ApplicationController
       params[:pseudonym].delete :password_confirmation
     end
     if sis_id = params[:pseudonym].delete(:sis_user_id)
-      if sis_id != @pseudonym.sis_user_id && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
-        if sis_id == ''
-          @pseudonym.sis_user_id = nil
-        else
-          @pseudonym.sis_user_id = sis_id
-        end
+      changed_sis_id = sis_id != @pseudonym.sis_user_id
+      if changed_sis_id && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
+        @pseudonym.sis_user_id = sis_id.blank? ? nil : sis_id
       end
     end
-    
+    # silently delete unallowed attributes
+    params[:pseudonym].delete_if { |k, v| ![:unique_id, :password, :sis_user_id].include?(k.to_sym) }
+    # return 401 if psuedonyms is empty here, because it means that the user doesn't have permissions to do anything.
+    return render(:json => nil, :status => :unauthorized) if params[:pseudonym].blank? && changed_sis_id
     if @pseudonym.update_attributes(params[:pseudonym])
       flash[:notice] = t 'notices.account_updated', "Account updated!"
       respond_to do |format|
         format.html { redirect_to profile_url }
-        format.json { render :json => @pseudonym.to_json }
+        format.json { render :json => pseudonym_json(@pseudonym, @current_user, session) }
       end
     else
       respond_to do |format|
         format.html { render :action => :edit }
-        format.json { render :json => @pseudonym.errors.to_json }
+        format.json { render :json => @pseudonym.errors.to_json, :status => :bad_request }
       end
     end
   end
-  
+
   def destroy
     return unless get_user
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
