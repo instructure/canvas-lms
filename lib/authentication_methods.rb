@@ -146,7 +146,7 @@ module AuthenticationMethods
       end
     end
 
-    as_user_id = api_request? && params[:as_user_id]
+    as_user_id = api_request? && params[:as_user_id].presence
     as_user_id ||= session[:become_user_id]
     if as_user_id
       begin

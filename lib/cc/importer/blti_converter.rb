@@ -97,7 +97,15 @@ module CC::Importer
     
     def retrieve_and_convert_blti_url(url)
       begin
-        config_xml = Net::HTTP.get(URI.parse(url))
+        uri = URI.parse(url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = uri.scheme == 'https'
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        
+        request = Net::HTTP::Get.new(uri.request_uri)
+        response = http.request(request)
+        config_xml = response.body
+
         convert_blti_xml(config_xml)
       rescue Timeout::Error
         raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))
