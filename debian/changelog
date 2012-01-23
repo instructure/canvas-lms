@@ -1,3 +1,13 @@
+canvas-lms (2012.01.23.12.50) stable; urgency=low
+
+  * Package ref: dfe5e4b6ddb4b51d6f79a0362f1601a9d9d80a56
+  *
+  * [+d0017ae] support https for retrieving lti xml configs
+  * [+79784c5] account-level tools couldn't be configured by url
+  * [+dfe5e4b] ignore blank as_user_id
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 23 Jan 2012 12:51:03 -0700
+
 canvas-lms (2012.01.21.07.01) stable; urgency=low
 
   * Package ref: 06287386ee07f216b819b4fa08ee6d24d5703452
