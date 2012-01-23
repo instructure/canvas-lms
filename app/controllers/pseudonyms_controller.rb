@@ -132,7 +132,7 @@ class PseudonymsController < ApplicationController
   # @argument user[id] The ID of the user to create the login for.
   # @argument login[unique_id] The unique ID for the new login.
   # @argument login[password] The new login's password.
-  # @arugment login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
+  # @argument login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def create
     return unless get_user
 
