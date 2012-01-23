@@ -95,6 +95,7 @@ describe "file uploads local tests" do
   end
 
   it "should upload a file on the discussions page" do
+    pending("intermittently fails")
     # set up basic user with enrollment
     login_as(@teacher.email, @password)
 
