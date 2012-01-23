@@ -416,6 +416,21 @@ describe "API Authentication", :type => :integration do
         'login_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
+
+      # as_user_id is ignored if it's blank
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=",
+               :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => '')
+      assigns['current_user'].should == @student
+      assigns['real_current_user'].should be_nil
+      json.should == {
+        'id' => @student.id,
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'short_name' => 'User',
+        'primary_email' => nil,
+        'login_id' => nil,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+      }
     end
 
     it "should allow sis_user_id as an as_user_id" do
