@@ -18,6 +18,7 @@
 
 class ConversationMessage < ActiveRecord::Base
   include SendToStream
+  include SimpleTags::ReaderInstanceMethods
 
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'

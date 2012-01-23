@@ -3,19 +3,108 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "conversations" do
   it_should_behave_like "in-process server selenium tests"
 
-  prepend_before (:each) do
+  prepend_before(:each) do
     Setting.set("file_storage_test_override", "local")
   end
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @user.watched_conversations_intro
     @user.save
   end
 
-  def new_conversation
-    get "/conversations"
-    keep_trying_until { driver.find_element(:id, "create_message_form") }
+  def new_conversation(reload=true)
+    if reload
+      get "/conversations"
+      keep_trying_until { driver.find_element(:id, "create_message_form") }
+    else
+      driver.find_element(:id, "action_compose_message").click
+    end
+
+    @input = find_with_jquery("#create_message_form input:visible")
+    @browser = find_with_jquery("#create_message_form .browser:visible")
+    @level = 1
+    @elements = nil
+  end
+
+  def browse_menu
+    @browser.click
+    keep_trying_until {
+      find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
+    }
+    wait_for_animations
+  end
+
+  def browse(*names)
+    name = names.shift
+    @level += 1
+    prev_elements = elements
+    element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
+
+    element.first.click
+    wait_for_ajaximations(150)
+    keep_trying_until {
+      find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
+    }
+
+    @elements = nil
+    elements
+
+    if names.present?
+      browse(*names, &Proc.new)
+    else
+      yield
+    end
+
+    @elements = prev_elements
+    @level -= 1
+    @input.send_keys(:arrow_left)
+    wait_for_animations
+  end
+
+  def elements
+    @elements ||= driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
+      [e, (e.find_element(:tag_name, :b).text rescue e.text)]
+    }
+  end
+
+  def menu
+    elements.map(&:last)
+  end
+
+  def toggled
+    elements.select { |e| e.first.attribute('class') =~ /(^| )on($| )/ }.map(&:last)
+  end
+
+  def click(name)
+    element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
+    element.first.click
+  end
+
+  def toggle(name)
+    element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
+    element.first.find_element(:class, 'toggle').click
+  end
+
+  def tokens
+    find_all_with_jquery("#create_message_form .token_input li div").map(&:text)
+  end
+
+  def search(text, input_id="recipients")
+    @input.send_keys(text)
+    keep_trying_until do
+      driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == text
+    end
+    @elements = nil
+    yield
+    @elements = nil
+    if input_id == "recipients"
+      @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
+      keep_trying_until do
+        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 ||
+          driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == ''
+      end
+    end
   end
 
   def submit_message_form(opts={})
@@ -118,83 +207,6 @@ describe "conversations" do
       @group.users << @s1 << @user
 
       new_conversation
-      @input = find_with_jquery("#create_message_form input:visible")
-      @browser = find_with_jquery("#create_message_form .browser:visible")
-      @level = 1
-    end
-
-    def browse_menu
-      @browser.click
-      keep_trying_until {
-        find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
-      }
-      wait_for_animations
-    end
-
-    def browse(name)
-      @level += 1
-      prev_elements = elements
-      element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
-
-      element.first.click
-      wait_for_ajaximations(150)
-      keep_trying_until {
-        find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
-      }
-
-      @elements = nil
-      elements
-
-      yield
-
-      @elements = prev_elements
-      @level -= 1
-      @input.send_keys(:arrow_left)
-      wait_for_animations
-    end
-
-    def elements
-      @elements ||= driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
-        [e, (e.find_element(:tag_name, :b).text rescue e.text)]
-      }
-    end
-
-    def menu
-      elements.map(&:last)
-    end
-
-    def toggled
-      elements.select { |e| e.first.attribute('class') =~ /(^| )on($| )/ }.map(&:last)
-    end
-
-    def click(name)
-      element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
-      element.first.click
-    end
-
-    def toggle(name)
-      element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
-      element.first.find_element(:class, 'toggle').click
-    end
-
-    def tokens
-      find_all_with_jquery("#create_message_form .token_input li div").map(&:text)
-    end
-
-    def search(text)
-      @input.send_keys(text)
-      keep_trying_until do
-        driver.
-            execute_script("return $('#recipients').data('token_input').selector.last_search") == text
-      end
-      @elements = nil
-      yield
-      @elements = nil
-      @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
-      keep_trying_until do
-        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 ||
-            driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == ''
-      end
     end
 
     it "should allow browsing" do
@@ -723,7 +735,7 @@ describe "conversations" do
     before (:each) do
       # have @course, @teacher from before
       # creates @student
-      student_in_course({:course => @course})
+      student_in_course(:course => @course, :active_all => true)
 
       @course.update_attribute(:name, "the course")
 
@@ -771,6 +783,71 @@ describe "conversations" do
       conversations = driver.find_elements(:css, "#conversations > ul > li")
       conversations.size.should == 1
       conversations.first["id"].should == "conversations_loader"
+    end
+  end
+
+  context "context filtering" do
+    before do
+      @course.update_attribute(:name, "the course")
+      @course1 = @course
+      @s1 = User.create(:name => "student1")
+      @s2 = User.create(:name => "student2")
+      @course1.enroll_user(@s1)
+      @course1.enroll_user(@s2)
+      @group = @course1.groups.create(:name => "the group")
+      @group.users << @user << @s1 << @s2
+
+      @course2 = course(:active_all => true, :course_name => "that course")
+      @course2.enroll_teacher(@user).accept
+      @course2.enroll_user(@s1)
+    end
+
+    it "should capture the course when sending a message to a group" do
+      new_conversation
+      browse_menu
+
+      browse("the course", "Student Groups", "the group"){ click "Select All" }
+      submit_message_form(:add_recipient => false)
+
+      audience = find_with_jquery("#create_message_form ul.conversations .audience")
+      audience.text.should include @course1.name
+      audience.text.should_not include @course2.name
+      audience.text.should include @group.name
+    end
+
+    it "should capture the course when sending a message to a user under a course" do
+      new_conversation
+      browse_menu
+
+      browse("the course"){ search("stu"){ click "student1" } }
+      submit_message_form(:add_recipient => false)
+
+      audience = find_with_jquery("#create_message_form ul.conversations .audience")
+      audience.text.should include @course1.name
+      audience.text.should_not include @course2.name
+      audience.text.should_not include @group.name
+    end
+
+    it "should let you filter by a course" do
+      new_conversation
+      browse_menu
+      browse("the course", "Everyone"){ click "Select All" }
+      submit_message_form(:add_recipient => false, :message => "asdf")
+
+      new_conversation(false)
+      browse_menu
+      browse("that course", "Everyone"){ click "Select All" }
+      submit_message_form(:add_recipient => false, :message => "qwerty")
+
+      find_all_with_jquery('#conversations > ul > li:visible').size.should eql 2
+
+      @input = find_with_jquery("#context_tags_filter input:visible")
+      search("the course", "context_tags"){ click("the course") }
+
+      keep_trying_until { driver.find_element(:id, "create_message_form") }
+      conversations = find_all_with_jquery('#conversations > ul > li:visible')
+      conversations.size.should eql 1
+      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
     end
   end
 end

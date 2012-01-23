@@ -186,4 +186,19 @@ describe ActiveRecord::Base do
       end
     end
   end
+
+  context "bulk_insert" do
+    it "should work" do
+      Course.connection.bulk_insert "courses", [
+        {:name => "foo"},
+        {:name => "bar"}
+      ]
+      Course.all.map(&:name).sort.should eql ["bar", "foo"]
+    end
+
+    it "should not raise an error if there are no records" do
+      lambda { Course.connection.bulk_insert "courses", [] }.should_not raise_error
+      Course.all.size.should eql 0
+    end
+  end
 end

@@ -17,6 +17,8 @@
 #
 
 class Conversation < ActiveRecord::Base
+  include SimpleTags
+
   has_many :conversation_participants
   has_many :subscribed_conversation_participants,
            :conditions => "subscribed",
@@ -47,6 +49,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.initiate(user_ids, private)
+    user_ids = user_ids.map(&:to_i).uniq
     private_hash = private ? private_hash_for(user_ids) : nil
     transaction do
       unless private_hash && conversation = find_by_private_hash(private_hash)
@@ -55,12 +58,15 @@ class Conversation < ActiveRecord::Base
         conversation.has_attachments = false
         conversation.has_media_objects = false
         conversation.save!
-        user_ids.each do |user_id|
-          participant = conversation.conversation_participants.build
-          participant.user_id = user_id
-          participant.workflow_state = 'read'
-          participant.save!
-        end
+        connection.bulk_insert('conversation_participants', user_ids.map{ |user_id|
+          {
+            :conversation_id => conversation.id,
+            :user_id => user_id,
+            :workflow_state => 'read',
+            :has_attachments => false,
+            :has_media_objects => false
+          }
+        })
       end
       conversation
     end
@@ -115,8 +121,8 @@ class Conversation < ActiveRecord::Base
     message
   end
 
-  def add_participants(current_user, user_ids)
-    user_ids.map!(&:to_i)
+  def add_participants(current_user, user_ids, options={})
+    user_ids = user_ids.map(&:to_i).uniq
     raise "can't add participants to a private conversation" if private?
     transaction do
       lock!
@@ -127,33 +133,38 @@ class Conversation < ActiveRecord::Base
       raise "can't add participants if there are no messages" unless last_message_at
       num_messages = conversation_messages.human.size
 
-      User.update_all("unread_conversations_count = unread_conversations_count + 1, updated_at = '#{Time.now.to_s(:db)}'", :id => user_ids)
-      user_ids.each do |user_id|
-        participant = conversation_participants.build
-        participant.user_id = user_id
-        participant.workflow_state = 'unread'
-        participant.last_message_at = last_message_at
-        participant.message_count = num_messages
-        participant.save!
-      end
+      User.update_all(["unread_conversations_count = unread_conversations_count + 1, updated_at = ?", Time.now.utc], :id => user_ids)
+
+      connection.bulk_insert('conversation_participants', user_ids.map{ |user_id|
+        {
+          :conversation_id => id,
+          :user_id => user_id,
+          :workflow_state => 'unread',
+          :has_attachments => has_attachments?,
+          :has_media_objects => has_media_objects?,
+          :last_message_at => last_message_at,
+          :message_count => num_messages
+        }
+      })
 
       # give them all messages
-      connection.execute(<<-SQL)
+      # NOTE: individual messages in group conversations don't have tags
+      connection.execute(sanitize_sql([<<-SQL, self.id, user_ids]))
         INSERT INTO conversation_message_participants(conversation_message_id, conversation_participant_id)
         SELECT conversation_messages.id, conversation_participants.id
         FROM conversation_messages, conversation_participants
-        WHERE conversation_messages.conversation_id = #{self.id}
+        WHERE conversation_messages.conversation_id = ?
           AND conversation_messages.conversation_id = conversation_participants.conversation_id
-          AND conversation_participants.user_id IN (#{user_ids.join(', ')})
+          AND conversation_participants.user_id IN (?)
       SQL
 
       # announce their arrival
-      add_event_message(current_user, :event_type => :users_added, :user_ids => user_ids)
+      add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
     end
   end
 
-  def add_event_message(current_user, event_data={})
-    add_message(current_user, event_data.to_yaml, :generated => true)
+  def add_event_message(current_user, event_data={}, options={})
+    add_message(current_user, event_data.to_yaml, options.merge(:generated => true))
   end
 
   def add_message(current_user, body, options = {})
@@ -166,6 +177,11 @@ class Conversation < ActiveRecord::Base
       options[:update_participants] = !options[:generated]         unless options.has_key?(:update_participants)
       options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
       options[:skip_ids]          ||= [current_user.id]
+
+      # all specified (or implicit) tags, regardless of visibility to individual participants
+      new_tags = options[:tags]
+      new_tags = current_context_strings if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
+      update_attribute :tags, tags | new_tags if new_tags.present?
 
       message = conversation_messages.build
       message.author_id = current_user.id
@@ -185,7 +201,7 @@ class Conversation < ActiveRecord::Base
 
       yield message if block_given?
 
-      add_message_to_participants(message, options)
+      add_message_to_participants(message, options.merge(:tags => new_tags, :new_message => true))
       if options[:update_participants]
         update_participants(message, options)
       end
@@ -194,23 +210,56 @@ class Conversation < ActiveRecord::Base
   end
 
   def add_message_to_participants(message, options = {})
-    skip_ids = [0]
-    if !message.just_created
-      skip_ids += ConversationMessageParticipant.for_conversation_and_message(id, message.id).
-                  map(&:conversation_participant_id)
-    end
-    skip_ids |= conversation_participants.deleted.map(&:id) if options[:only_existing]
+    cps = options[:only_existing] ?
+      conversation_participants.visible :
+      conversation_participants
 
-    conditions = self.class.send(:sanitize_sql_array, ["conversation_id = ? AND id NOT IN (?)", id, skip_ids])
-
-    unless options[:generated]
-      connection.execute("UPDATE conversation_participants SET message_count = message_count + 1 WHERE #{conditions}")
+    unless options[:new_message]
+      skip_ids = ConversationMessageParticipant.for_conversation_and_message(id, message.id).map(&:conversation_participant_id)
+      cps = cps.scoped(:conditions => ["id NOT IN (?)", skip_ids]) if skip_ids.present?
     end
 
-    connection.execute(<<-SQL)
-      INSERT INTO conversation_message_participants(conversation_message_id, conversation_participant_id)
-      SELECT #{message.id}, id FROM conversation_participants WHERE #{conditions}
-    SQL
+    cps.update_all("message_count = message_count + 1") unless options[:generated]
+
+    all_new_tags = options[:tags] || []
+    message_data = []
+    cps.all(:include => [:user]).each do |cp|
+      new_tags, message_tags = infer_new_tags_for(cp, all_new_tags)
+      cp.update_attribute :tags, cp.tags | new_tags if new_tags.present?
+      message_data << {
+        :conversation_message_id => message.id,
+        :conversation_participant_id => cp.id,
+        :tags => serialized_tags(message_tags)
+      }
+    end
+
+    connection.bulk_insert "conversation_message_participants", message_data
+  end
+
+  def infer_new_tags_for(cp, all_new_tags)
+    new_tags = []
+    if all_new_tags.present?
+      # limit it to what they can see
+      new_tags = all_new_tags & cp.user.conversation_context_codes
+    end
+    # if they don't have any tags yet (e.g. this is the first message) and
+    # there are no new tags, just get the best possible match(es)
+    if new_tags.empty? && cp.tags.empty?
+      new_tags = current_context_strings & cp.user.conversation_context_codes
+    end
+
+    # see ConversationParticipant#update_cached_data ... tags are only
+    # recomputed for private conversations, so for group ones we don't bother
+    # tracking at the message level
+    message_tags = if private?
+      if new_tags.present?
+        new_tags
+      elsif last_message = cp.messages.human.first
+        last_message.tags
+      end
+    end
+
+    [new_tags, message_tags]
   end
 
   def update_participants(message, options = {})
@@ -219,11 +268,11 @@ class Conversation < ActiveRecord::Base
     update_for_skips = options[:update_for_skips] != false
 
     # make sure this jumps to the top of the inbox and is marked as unread for anyone who's subscribed
-    cp_conditions = self.class.send :sanitize_sql_array, [
+    cp_conditions = sanitize_sql([
       "cp.conversation_id = ? AND cp.workflow_state <> 'unread' AND (cp.last_message_at IS NULL OR cp.subscribed) AND cp.user_id NOT IN (?)",
       self.id,
       skip_ids
-    ]
+    ])
     if connection.adapter_name =~ /mysql/i
       connection.execute <<-SQL
         UPDATE users, conversation_participants cp
@@ -241,8 +290,7 @@ class Conversation < ActiveRecord::Base
 
     # for the sender (or override(s)), we just update the timestamps
     # for the sake of overrides, we need to ensure that the message.created_at
-    # is newer than last_message_at (e.g. for the submission comment migration)
-    # once that code is removed, we can simplify this.
+    # is newer than last_message_at
     conversation_participants.update_all(
       ["last_message_at = CASE WHEN last_message_at IS NULL OR last_message_at < ? THEN ? ELSE last_message_at END,
         last_authored_at = CASE WHEN user_id = ? AND (last_authored_at IS NULL OR last_authored_at < ?) THEN ? ELSE last_authored_at END", message.created_at, message.created_at, message.author_id, message.created_at, message.created_at],
@@ -276,4 +324,36 @@ class Conversation < ActiveRecord::Base
       add_message(user, message, opts)
     end
   end
+
+  def migrate_context_tags!
+    return unless tags.empty?
+    transaction do
+      lock!
+      cps = conversation_participants(:include => :user).all
+      update_attribute :tags, current_context_strings
+      cps.each do |cp|
+        cp.update_attribute :tags, current_context_strings & cp.user.conversation_context_codes
+        cp.conversation_message_participants.update_all ["tags = ?", serialized_tags(cp.tags)] if private?
+      end
+    end
+  end
+
+  protected
+
+  # contexts currently shared by > 50% of participants
+  # note that these may not all be relevant for a specific participant, so
+  # they should be and-ed with User#conversation_context_codes
+  # returns best matches first
+  def current_context_strings
+    return [] if private? && conversation_participants.all.size == 1
+    conversation_participants.inject([]){ |ary, cp|
+      ary.concat(cp.user.conversation_context_codes)
+    }.sort.inject({}){ |hash, str|
+      hash[str] = (hash[str] || 0) + 1
+      hash
+    }.select{ |key, value|
+      value > conversation_participants.size / 2
+    }.sort_by(&:last).map(&:first).reverse
+  end
+  memoize :current_context_strings
 end

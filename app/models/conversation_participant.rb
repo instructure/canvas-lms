@@ -19,16 +19,19 @@
 class ConversationParticipant < ActiveRecord::Base
   include Workflow
   include TextHelper
+  include SimpleTags
 
   belongs_to :conversation
   belongs_to :user
   has_many :conversation_message_participants
-  has_many :messages, :source => :conversation_message, :through => :conversation_message_participants,
-           :order => "created_at DESC, id DESC", :conditions => 'conversation_id = #{conversation_id}'
+  has_many :messages, :source => :conversation_message,
+           :through => :conversation_message_participants,
+           :select => "conversation_messages.*, conversation_message_participants.tags",
+           :order => "created_at DESC, id DESC",
+           :conditions => 'conversation_id = #{conversation_id}'
            # conditions are redundant, but they let us use the best index
 
   named_scope :visible, :conditions => "last_message_at IS NOT NULL"
-  named_scope :deleted, :conditions => "last_message_at IS NULL"
   named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
   named_scope :unread, :conditions => "workflow_state = 'unread'"
   named_scope :archived, :conditions => "workflow_state = 'archived'"
@@ -101,11 +104,6 @@ class ConversationParticipant < ActiveRecord::Base
   end
   memoize :participants
 
-  def infer_defaults
-    self.has_attachments = conversation.has_attachments?
-    self.has_media_objects = conversation.has_media_objects?
-  end
-
   def properties(latest = nil)
     latest ||= messages.human.first
     properties = []
@@ -115,8 +113,8 @@ class ConversationParticipant < ActiveRecord::Base
     properties
   end
 
-  def add_participants(user_ids)
-    conversation.add_participants(user, user_ids)
+  def add_participants(user_ids, options={})
+    conversation.add_participants(user, user_ids, options)
   end
 
   def add_message(body, options={}, &blk)
@@ -152,7 +150,7 @@ class ConversationParticipant < ActiveRecord::Base
     super unless private?
     if subscribed_changed?
       if subscribed?
-        update_cached_data(:recalculate_count => false, :set_last_message_at => false)
+        update_cached_data(:recalculate_count => false, :set_last_message_at => false, :regenerate_tags => false)
         self.workflow_state = 'unread' if last_message_at_changed? && last_message_at > last_message_at_was
       else
         self.workflow_state = 'read' if unread?
@@ -192,8 +190,9 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def update_cached_data(options = {})
-    options = {:recalculate_count => true, :set_last_message_at => true}.update(options)
+    options = {:recalculate_count => true, :set_last_message_at => true, :regenerate_tags => true}.update(options)
     if latest = messages.human.first
+      self.tags = message_tags if options[:regenerate_tags] && private?
       self.message_count = messages.human.size if options[:recalculate_count]
       self.last_message_at = if last_message_at.nil?
         options[:set_last_message_at] ? latest.created_at : nil
@@ -210,6 +209,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.has_attachments = attachments.size > 0
       self.has_media_objects = messages.with_media_comments.size > 0
     else
+      self.tags = nil
       self.workflow_state = 'read' if unread?
       self.message_count = 0
       self.last_message_at = nil
@@ -230,6 +230,11 @@ class ConversationParticipant < ActiveRecord::Base
   def update_cached_data!(*args)
     update_cached_data(*args)
     save!
+  end
+
+  protected
+  def message_tags
+    messages.map(&:tags).inject([], &:concat).uniq
   end
 
   private

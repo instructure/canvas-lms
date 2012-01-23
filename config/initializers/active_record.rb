@@ -201,8 +201,8 @@ class ActiveRecord::Base
     self.class.to_s
   end
 
-  def self.execute_with_sanitize(array)
-    self.connection.execute(__send__(:sanitize_sql_array, array))
+  def sanitize_sql(*args)
+    self.class.send :sanitize_sql_for_conditions, *args
   end
 
   def self.base_ar_class
@@ -218,6 +218,14 @@ class ActiveRecord::Base
     options[:type] ||= :full
 
     value = args.pop
+    if options[:delimiter]
+      options[:type] = :full
+      value = options[:delimiter] + value + options[:delimiter]
+      delimiter = connection.quote(options[:delimiter])
+      column_str = "#{delimiter} || %s || #{delimiter}"
+      args = args.map{ |a| column_str % a.to_s }
+    end
+
     value = value.to_s.downcase.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
     value = '%' + value unless options[:type] == :right
     value += '%' unless options[:type] == :left
@@ -368,6 +376,63 @@ class ActiveRecord::Base
         transaction(:requires_new => true) { yield }
         break
       rescue UniqueConstraintViolation
+      end
+    end
+  end
+end
+
+ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
+  def bulk_insert(table_name, records)
+    return if records.empty?
+    transaction do
+      keys = records.first.keys
+      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+      records.each do |record|
+        execute <<-SQL
+          INSERT INTO #{quote_table_name(table_name)}
+            (#{quoted_keys})
+          VALUES
+            (#{keys.map{ |k| quote(record[k]) }.join(', ')})
+        SQL
+      end
+    end
+  end
+end
+
+if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
+  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
+    def bulk_insert(table_name, records)
+      return if records.empty?
+      transaction do
+        keys = records.first.keys
+        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+        execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
+          records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
+      end
+    end
+  end
+end
+if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    def bulk_insert(table_name, records)
+      return if records.empty?
+      transaction do
+        keys = records.first.keys
+        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+        execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
+        raw_connection.put_copy_data records.inject(''){ |result, record|
+          result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
+        }
+        raw_connection.put_copy_end
+      end
+    end
+
+    def quote_text(value)
+      if value.nil?
+        "\\N"
+      else
+        hash = {"\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\"}
+        value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }
       end
     end
   end

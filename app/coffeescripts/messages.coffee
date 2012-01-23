@@ -36,7 +36,7 @@ class TokenInput
           @change?(@token_values())
 
     @tokens.maxTokenWidth = =>
-      (parseInt(@tokens.css('width').replace('px', '')) - 150) + 'px'
+      (parseInt(@tokens.css('width').replace('px', '')) - (@options.tokenWrapBuffer ? 150)) + 'px'
     @tokens.resizeTokens = (tokens) =>
       tokens.find('div.ellipsis').css('max-width', @tokens.maxTokenWidth())
     $(window).resize =>
@@ -553,13 +553,14 @@ class TokenSelector
     $body = $uls.last()
     if data.length
       parent = if @stack.length then @stack[@stack.length - 1][0] else null
+      ancestors = if @stack.length then (ancestor[0].data('id') for ancestor in @stack) else []
       unless data.prepared
         @options.preparer?(post_data, data, parent)
         data.prepared = true
 
       for row, i in data
         $li = $('<li />').addClass('selectable')
-        @populate_row($li, row, level: @stack.length, first: (i is 0), last: (i is data.length - 1), parent: parent)
+        @populate_row($li, row, level: @stack.length, first: (i is 0), last: (i is data.length - 1), parent: parent, ancestors: ancestors)
         $list.select_all = $li if row.select_all
         $li.addClass('on') if $li.hasClass('toggleable') and @input.has_token($li.data('id'))
         $body.append($li)
@@ -1049,6 +1050,7 @@ I18n.scoped 'conversations', (I18n) ->
     if data.audience
       $conversation.data('audience', data.audience.concat([MessageInbox.user_id]))
       $conversation.find('.audience').html html_audience_for_conversation(data)
+      build_form_audience() if is_selected($conversation)
     $conversation.find('.actions a').click (e) ->
       e.preventDefault()
       e.stopImmediatePropagation()
@@ -1578,6 +1580,8 @@ I18n.scoped 'conversations', (I18n) ->
     $('.recipients').tokenInput
       placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
       added: (data, $token, new_token) ->
+        if new_token and data.root_id
+          $token.append("<input type='hidden' name='tags[]' value='#{data.root_id}'>")
         if new_token and data.type
           $token.addClass(data.type)
           if data.user_count?
@@ -1624,6 +1628,7 @@ I18n.scoped 'conversations', (I18n) ->
               text = I18n.beforeLabel(options.parent.data('text')) + " " + text
           $node.data('text', text)
           $node.data('id', data.id)
+          data.root_id = options.ancestors[0]
           $node.data('user_data', data)
           $node.addClass(if data.type then data.type else 'user')
           if options.level > 0
@@ -1676,6 +1681,46 @@ I18n.scoped 'conversations', (I18n) ->
         $form.find('#group_conversation_info').hide()
         $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) and can_add_notes_for(user))
       inbox_resize()
+
+    $('#context_tags').tokenInput
+      placeholder: I18n.t('course_filter_placeholder', "Enter a course name")
+      added: (data, $token, new_token) ->
+        $token.prevAll().remove()
+      tokenWrapBuffer: 80
+      selector:
+        messages: {no_results: I18n.t('no_results', 'No results found')}
+        populator: ($node, data, options={}) ->
+          if data.avatar_url
+            $img = $('<img class="avatar" />')
+            $img.attr('src', data.avatar_url)
+            $node.append($img)
+          $b = $('<b />')
+          $b.text(data.name)
+          $name = $('<span />', class: 'name')
+          $name.append($b)
+          $span = $('<span />', class: 'details')
+          $node.append($name, $span)
+          $node.attr('title', data.name)
+          text = data.name
+          $node.data('text', text)
+          $node.data('id', data.id)
+          $node.data('user_data', data)
+          $node.addClass(data.type)
+          $node.addClass('toggleable')
+        limiter: (options) -> 5
+    filter_input = $('#context_tags').data('token_input')
+    filter_input.change = (token_values) ->
+      if MessageInbox.current_filter isnt token_values[0]
+        # TODO: fragment hash fu + ajax
+        new_url = location.href.replace(/[\?#].*|/g, '')
+        new_url += '?filter=' + token_values[0] if token_values[0]
+        location.href = new_url
+    if filter = MessageInbox.initial_filter
+      MessageInbox.current_filter = filter.id
+      filter_input.add_token
+        value: filter.id
+        text: filter.name
+        data: $.extend(true, {}, filter)
 
     $(window).resize inbox_resize
     setTimeout inbox_resize
