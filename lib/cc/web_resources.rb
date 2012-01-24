@@ -24,7 +24,7 @@ module CC
       files_with_metadata = { :folders => [], :files => [] }
       @added_attachment_ids = Set.new
 
-      zipper = ContentZipper.new
+      zipper = ContentZipper.new(:check_user => false)
       zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER]) do |file, folder_names|
         begin
           if file.is_a? Folder
