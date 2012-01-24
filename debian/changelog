@@ -1,3 +1,14 @@
+canvas-lms (2012.01.24.09.56) stable; urgency=low
+
+  * Package ref: 0e5a61096c970aba0f8ef7215465d3adc1d0147d
+  *
+  * [+ec532a1] optionally store active user counts in redis
+  * [+390ef5a] make sure the page view has created_at set for the bucketing
+  * [+23bb29b] fix service visibility updating, closes #6675
+  * [+0e5a610] fix course export regression, closes #6992
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 24 Jan 2012 09:56:55 -0700
+
 canvas-lms (2012.01.23.12.50) stable; urgency=low
 
   * Package ref: dfe5e4b6ddb4b51d6f79a0362f1601a9d9d80a56
