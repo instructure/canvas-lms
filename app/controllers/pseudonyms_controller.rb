@@ -204,7 +204,11 @@ class PseudonymsController < ApplicationController
     return unless get_user
     @pseudonym = @user.pseudonyms.find(params[:id])
     params[:pseudonym].delete :account_id
-    params[:pseudonym].delete :unique_id unless @user.grants_rights?(@current_user, nil, :manage_logins)
+    unless @pseudonym.account.grants_right?(@current_user, session, :manage_user_logins)
+      params[:pseudonym].delete :unique_id
+      params[:pseudonym].delete :password
+      params[:pseudonym].delete :password_confirmation
+    end
     unless @pseudonym.account && @pseudonym.account.settings[:admins_can_change_passwords]
       params[:pseudonym].delete :password
       params[:pseudonym].delete :password_confirmation

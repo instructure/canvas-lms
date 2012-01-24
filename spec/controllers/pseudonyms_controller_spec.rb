@@ -190,4 +190,28 @@ describe PseudonymsController do
       response.should be_success
     end
   end
+
+  describe "update" do
+    it "should not change a password if not authorized" do
+      account1 = Account.new
+      account1.settings[:admins_can_change_passwords] = true
+      account1.save!
+      user_with_pseudonym(:active_all => 1, :username => 'user@example.com', :password => 'qwerty1', :account => account1)
+      @user1 = @user
+      @pseudonym1 = @pseudonym
+      # need to get the user associated with the default account as well
+      @user.pseudonyms.create!(:unique_id => 'user1@example.com', :account => Account.default)
+
+      user_with_pseudonym(:active_all => 1, :username => 'user2@example.com', :password => 'qwerty2')
+      Account.default.add_user(@user)
+      user_session(@user, @pseudonym)
+      # not logged in!
+
+      post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :password => 'bobbob', :password_confirmation => 'bobbob' }
+      response.should be_success
+      @pseudonym1.reload
+      @pseudonym1.valid_password?('qwerty1').should be_true
+      @pseudonym1.valid_password?('bobob').should be_false
+    end
+  end
 end
