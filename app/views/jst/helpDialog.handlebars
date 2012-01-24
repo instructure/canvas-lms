@@ -56,10 +56,10 @@
       <option value="blocks_what_i_need_to_do">{{#t "i_cant_get_things_done_until_i_hear_back_from_you"}}I can't get things done until I hear back from you{{/t}}</option>
       <option value="extreme_critical_emergency">{{#t "extreme_critical_emergency"}}EXTREME CRITICAL EMERGENCY!!{{/t}}</option>
     </select>
-    {{#if showEmail}}
+    <div style="{{hiddenUnless showEmail}}">
       <label for="error-email">{{#t "your_email_address"}}Your email address{{/t}}</label>
       <input type="email" name="error[email]" id="error-email">
-    {{/if}}
+    </div>
     <div class="button-container">
       <button type="submit" data-text-while-loading="{{#t "Submitting_Ticket"}}Submitting Ticket...{{/t}}" class="button submit_button"><img src="/images/email.png" alt=""/>{{#t "submit_this_support_request"}}Submit Ticket{{/t}}</button>
     </div>
