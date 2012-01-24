@@ -394,7 +394,7 @@ Spec::Runner.configure do |config|
     @outcome_group.add_item(@outcome)
     @outcome_group.save!
 
-    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course, :points_possible => 8, :hide_score_total => false)
     @rubric.data = [
       {
         :points => 3,

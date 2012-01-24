@@ -81,13 +81,6 @@
             <%= t :points, "%{points} pts", :points => rating_points %>
         <% end %>
       </span><br />
-      <% if !rubric || !rubric.free_form_criterion_comments %>
-        <a href="#" class="no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>"><%= image_tag "rubric_comment.png" %></a>
-        <div class="custom_rating" style="display: none;"><%= assessment_rating ? assessment_rating[:comments] : '' %></div>
-      <% end %>
-      <div style="font-size: 0.6em; <%= hidden unless assessing && criterion && criterion.ignore_for_scoring %>">
-        <%= t :ignored_in_total, "ignored in total" %>
-      </div>
     </div>
     <div class="displaying">
       <span style="white-space: nowrap;">
@@ -99,6 +92,12 @@
     </div>
     <div class="ignoring">
       <span> -- </span>
+    </div>
+    <div class="criterion_comments">
+      <% if !rubric || !rubric.free_form_criterion_comments %>
+        <a href="#" class="no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>"><%= image_tag "rubric_comment.png" %></a>
+        <div class="custom_rating" style="display: none;"><%= assessment_rating ? assessment_rating[:comments] : '' %></div>
+      <% end %>
     </div>
   </td>
   <td class="editing">

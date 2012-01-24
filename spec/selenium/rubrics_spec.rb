@@ -78,6 +78,30 @@ describe "rubrics" do
     find_all_with_jquery(".rubric .criterion:visible .rating .points")[1].text.should == '0'
   end
 
+  it "should ignore outcome rubric lines when calculating total" do
+    outcome_with_rubric
+    @assignment = @course.assignments.create(:name => 'assignment with rubric')
+    @association = @rubric.associate_with(@assignment, @course, :use_for_grading => true, :purpose => 'grading')
+    @rubric.data[0][:ignore_for_scoring] = '1'
+    @rubric.points_possible = 5
+    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.save!
+
+    get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+    driver.find_element(:css, '.rubric_total').should include_text "5"
+
+    driver.find_element(:css, '.edit_rubric_link').click
+    find_with_jquery(".criterion_points:visible").send_key :backspace
+    find_with_jquery(".criterion_points:visible").send_key "10"
+    driver.find_element(:css, "#edit_rubric_form .save_button").click
+    wait_for_ajaximations
+    driver.find_element(:css, '.rubric_total').should include_text "10"
+
+    # check again after reload
+    get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+    driver.find_element(:css, '.rubric_total').should include_text "10"
+  end
+
   context "importing" do
     it "should create a allow immediate editing when adding an imported rubric to a new assignment" do
       rubric_association_model(:user => @user, :context => @course, :purpose => "grading")

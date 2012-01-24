@@ -638,4 +638,96 @@ describe "assignments" do
       driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
     end
   end
+
+  context "discussions assignments" do
+
+    def build_assignment_with_type(text)
+      get "/courses/#{@course.id}/assignments"
+
+      driver.find_element(:css, ".header_content .add_assignment_link").click
+      wait_for_animations
+
+      click_option(".assignment_submission_types", text)
+      driver.find_element(:css, "#add_assignment_form").submit
+      wait_for_ajaximations
+    end
+
+    it "should create a discussion topic when created" do
+      course_with_teacher_logged_in
+      build_assignment_with_type("Discussion")
+
+      expect_new_page_load { driver.find_element(:css, "#left-side .discussions").click }
+      driver.find_elements(:css, "#topic_list .discussion_topic").should_not be_empty
+    end
+
+    it "should redirect to the discussion topic" do
+      course_with_teacher_logged_in
+      build_assignment_with_type("Discussion")
+
+      expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
+      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
+    end
+
+    it "should create a discussion topic when edited from a regular assignment" do
+      course_with_teacher_logged_in
+      build_assignment_with_type("Assignment")
+
+      expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
+      driver.find_element(:css, ".edit_full_assignment_link").click
+      wait_for_animations
+      click_option(".assignment_type", "Discussion")
+      driver.find_element(:css, "#edit_assignment_form").submit
+      wait_for_ajaximations
+      expect_new_page_load { driver.find_element(:css, ".assignment_topic_link").click }
+      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
+    end
+
+    it "should create a discussion topic with requires peer reviews" do
+      assignment_title = 'discussion assignment peer reviews'
+      course_with_teacher_logged_in
+      get "/courses/#{@course.id}/assignments"
+
+      driver.find_element(:css, ".header_content .add_assignment_link").click
+      wait_for_animations
+      click_option(".assignment_submission_types", 'Discussion')
+      expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
+      edit_form = driver.find_element(:id, 'edit_assignment_form')
+      edit_form.should be_displayed
+      replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
+      edit_form.find_element(:id, 'assignment_peer_reviews').click
+      edit_form.submit
+      wait_for_ajaximations
+      expect_new_page_load { driver.find_element(:link, assignment_title).click }
+      driver.find_element(:css, '.for_assignment').should include_text('Grading will be based on posts submitted to this topic')
+    end
+  end
+
+  context "rubric" do
+    before (:each) do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course(:active_all => true)
+      outcome_with_rubric
+      @assignment = @course.assignments.create(:name => 'assignment with rubric')
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+      @submission = @assignment.submit_homework(@student, { :url => "http://www.instructure.com/" })
+    end
+
+    it "should follow learning outcome ignore_for_scoring" do
+      @rubric.data[0][:ignore_for_scoring] = '1'
+      @rubric.points_possible = 5
+      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.save!
+      @assignment.points_possible = 5
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      driver.find_element(:css, '.assess_submission_link').click
+      driver.find_element(:css, '.total_points_holder .assessing').should include_text "out of 5"
+      driver.find_element(:css, "#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
+      driver.find_element(:css, '.rubric_total').should include_text "5"
+      driver.find_element(:css, '.save_rubric_button').click
+      wait_for_ajaximations
+      driver.find_element(:css, '.grading_value').attribute(:value).should == "5"
+    end
+  end
 end

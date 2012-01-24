@@ -13,7 +13,7 @@ describe "speedgrader" do
     course_with_teacher_logged_in
     outcome_with_rubric
     @assignment = @course.assignments.create(:name => 'assignment with rubric')
-    @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
   end
 
   it "should display submission of first student and then second student" do
@@ -172,6 +172,9 @@ describe "speedgrader" do
 
   it "should grade assignment using rubric" do
     student_submission
+    @association.use_for_grading = true
+    @association.save!
+
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_animations
 
@@ -199,7 +202,8 @@ describe "speedgrader" do
     keep_trying_until{ driver.find_element(:css, '#rubric_summary_container > table').displayed? }
     driver.find_element(:css, '#rubric_summary_container').should include_text(@rubric.title)
     driver.find_element(:css, '#rubric_summary_container .rubric_total').should include_text('8')
-
+    wait_for_ajaximations
+    driver.find_element(:css, '#grade_container input').attribute(:value).should == "8"
   end
 
   it "should create a comment on assignment" do
@@ -361,5 +365,59 @@ describe "speedgrader" do
     wait_for_ajaximations
 
     driver.find_element(:id, 'this_student_does_not_have_a_submission').should be_displayed
+  end
+
+  it "should ignore rubric lines for grading" do
+    student_submission
+    @association.use_for_grading = true
+    @association.save!
+    @ignored = @course.learning_outcomes.create!(:description => 'just for reference')
+    @rubric.data = @rubric.data + [{
+      :points => 3,
+      :description => "just for reference",
+      :id => 3,
+      :ratings => [
+        {
+          :points => 3,
+          :description => "You Learned",
+          :criterion_id => 3,
+          :id => 6,
+        },
+        {
+          :points => 0,
+          :description => "No-learn-y",
+          :criterion_id => 3,
+          :id => 7,
+        },
+      ],
+      :learning_outcome_id => @ignored.id,
+      :ignore_for_scoring => '1',
+    }]
+    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.save!
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    driver.find_element(:css, 'button.toggle_full_rubric').click
+    driver.find_element(:css, "table.rubric.assessing tr:nth-child(1) table.ratings td:nth-child(1)").click
+    driver.find_element(:css, "table.rubric.assessing tr:nth-child(3) table.ratings td:nth-child(1)").click
+    driver.find_element(:css, "#rubric_holder button.save_rubric_button").click
+    wait_for_ajaximations
+
+    @submission.reload.score.should == 3
+    driver.find_element(:css, "#grade_container input[type=text]").attribute(:value).should == '3'
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .editing").should be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .ignoring").should_not be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(3) .editing").should_not be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(3) .ignoring").should be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr.summary .rubric_total").text.should == '3'
+
+    # check again that initial page load has the same data.
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    driver.find_element(:css, "#grade_container input[type=text]").attribute(:value).should == '3'
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .editing").should be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .ignoring").should_not be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(3) .editing").should_not be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr:nth-child(3) .ignoring").should be_displayed
+    driver.find_element(:css, "#rubric_summary_container tr.summary .rubric_total").text.should == '3'
   end
 end
