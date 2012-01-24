@@ -178,7 +178,7 @@ require(['compiled/util/BackoffPoller', 'i18n'], function(BackoffPoller, I18n) {
     $(this).removeClass('service-hover');
   });
   $("#show_user_services").change(function() {
-    $.ajaxJSON($("#update_profile_form").attr('action'), 'PUT', {'user[show_user_services]': $(this).attr('checked')}, function(data) {
+    $.ajaxJSON($("#update_profile_form").attr('action'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, function(data) {
     }, function(data) {
     });
   });

@@ -124,7 +124,7 @@
 <script>
 $(document).ready(function() {
   $(".show_user_services_checkbox").change(function() {
-    $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).attr('checked')}, function(data) {
+    $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, function(data) {
     }, function(data) {
     });
   });
