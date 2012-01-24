@@ -96,10 +96,10 @@ describe ContentZipper do
         @attachment.context = folder
       end
 
-      def zipped_files_for_user(user)
+      def zipped_files_for_user(user=nil, check_user=true)
         @attachment.user_id = user.id if user
         @attachment.save!
-        ContentZipper.process_attachment(@attachment, user)
+        ContentZipper.process_attachment(@attachment, user, :check_user => check_user)
         names = []
         @attachment.reload
         Zip::ZipFile.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
@@ -117,6 +117,10 @@ describe ContentZipper do
 
         it "should give logged out people no files" do
           zipped_files_for_user(nil).should == []
+        end
+        
+        it "should give all files if check_user=false" do
+          zipped_files_for_user(nil, false).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
         end
       end
 
@@ -136,6 +140,10 @@ describe ContentZipper do
 
         it "should give logged out people the same thing as students" do
           zipped_files_for_user(nil).should == ['visible.png', 'visible/sub-vis.png']
+        end
+
+        it "should give all files if check_user=false" do
+          zipped_files_for_user(nil, false).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
         end
       end
     end

@@ -23,7 +23,8 @@ require 'set'
 
 class ContentZipper
 
-  def initialize
+  def initialize(options={})
+    @check_user = options.has_key?(:check_user) ? options[:check_user] : true
     @logger = Rails.logger
   end
   
@@ -50,7 +51,8 @@ class ContentZipper
   end
 
   def self.process_attachment(*args)
-    ContentZipper.new.process_attachment(*args)
+    options = args.last.is_a?(Hash) ? args.pop : {} 
+    ContentZipper.new(options).process_attachment(*args)
   end
   
   def process_attachment(attachment, user = nil)
@@ -287,21 +289,24 @@ class ContentZipper
     if callback && (folder.hidden? || folder.locked)
       callback.call(folder, folder_names)
     end
-    # @user = nil means that this is part of a public course, and is being downloaded by somebody
-    # not logged in.
-    attachments = if folder.context.grants_right?(@user, nil, :manage_files)
+    # @user = nil either means that 
+    # 1. this is part of a public course, and is being downloaded by somebody
+    # not logged in - OR -
+    # 2. we're doing this inside a course context export, and are bypassing
+    # the user check (@check_user == false)
+    attachments = if !@check_user || folder.context.grants_right?(@user, nil, :manage_files)
                 folder.active_file_attachments
               else
                 folder.visible_file_attachments
               end
-    attachments.select{|a| a.grants_right?(@user, nil, :download)}.each do |attachment|
+    attachments.select{|a| !@check_user || a.grants_right?(@user, nil, :download)}.each do |attachment|
       callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       path = folder_names.empty? ? attachment.filename : File.join(folder_names, attachment.unencoded_filename)
       @files_added = false unless add_attachment_to_zip(attachment, zipfile, path)
     end
-    folder.active_sub_folders.select{|f| f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|
+    folder.active_sub_folders.select{|f| !@check_user || f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
       if callback
         zip_folder(sub_folder, zipfile, new_names, &callback)
