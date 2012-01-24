@@ -23,32 +23,30 @@
             <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account_id : "{{ account_id }}"), :class => 'account_name') %>
           </td>
           <td class='details'>
-            <% if pseudonym %>
-              <table>
-                <tr>
-                  <th><%= before_label('last_request', 'Last request') %></th>
-                  <td><%= datetime_string(pseudonym.last_request_at) || t('never', "never") %></td>
-                </tr>
-                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
-                  <th><%= before_label('current_login', 'Current login') %></th>
-                  <td><%= datetime_string(pseudonym.current_login_at) || t('never', "never") %></td>
-                </tr>
-                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
-                  <th><%= before_label('current_ip', 'Current login IP') %></th>
-                  <td><%= pseudonym.current_login_ip || t('none', "none") %></td>
-                </tr>
-                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
-                  <th><%= before_label('last_login', 'Last login') %></th>
-                  <td><%= datetime_string(pseudonym.last_login_at) || t('never', "never") %></td>
-                </tr>
-                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
-                  <th><%= before_label('last_ip', 'Last login IP') %></th>
-                  <td><%= pseudonym.last_login_ip || t('none', "none") %></td>
-                </tr>
-              </table>
-              <% if pseudonyms.length > 1 %>
-                <a href="#" class="login_details_link"><%= t('more', 'more...') %></a>
-              <% end %>
+            <table>
+              <tr>
+                <th><%= before_label('last_request', 'Last request') %></th>
+                <td><%= datetime_string(pseudonym.try(:last_request_at)) || t('never', "never") %></td>
+              </tr>
+              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <th><%= before_label('current_login', 'Current login') %></th>
+                <td><%= datetime_string(pseudonym.try(:current_login_at)) || t('never', "never") %></td>
+              </tr>
+              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <th><%= before_label('current_ip', 'Current login IP') %></th>
+                <td><%= pseudonym.try(:current_login_ip) || t('none', "none") %></td>
+              </tr>
+              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <th><%= before_label('last_login', 'Last login') %></th>
+                <td><%= datetime_string(pseudonym.try(:last_login_at)) || t('never', "never") %></td>
+              </tr>
+              <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
+                <th><%= before_label('last_ip', 'Last login IP') %></th>
+                <td><%= pseudonym.try(:last_login_ip) || t('none', "none") %></td>
+              </tr>
+            </table>
+            <% if pseudonyms.length > 1 || !pseudonym %>
+              <a href="#" class="login_details_link"><%= t('more', 'more...') %></a>
             <% end %>
           </td>
           <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
@@ -89,6 +87,10 @@
               <span class="default_account_name" style="display: none;"><%= @domain_root_account.name %></span>
               <span id="passwordable_account_ids" style="display: none;"><%= Account.root_accounts.select{|a| a.settings && a.settings[:admins_can_change_passwords]}.map(&:id).join(',') %></span>
             </td>
+        </tr>
+      <% else %>
+        <tr style="display: none;">
+          <td class="default_account_name"><%= @domain_root_account.name %></td>
         </tr>
       <% end %>
       <tr class="password">

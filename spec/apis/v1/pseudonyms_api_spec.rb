@@ -87,6 +87,7 @@ describe PseudonymsController, :type => :integration do
       @path = "/api/v1/accounts/#{@account.id}/logins"
       @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :account_id => @account.id.to_param }
     end
+
     context "an authorized user" do
       it "should create a new pseudonym" do
         json = api_call(:post, @path, @path_options, {
@@ -105,6 +106,22 @@ describe PseudonymsController, :type => :integration do
           'user_id'     => @student.id
         }
       end
+
+      it "should return 400 if account_id is not a root account" do
+        @subaccount = Account.create!(:parent_account => @account)
+        @path = "/api/v1/accounts/#{@subaccount.id}/logins"
+        @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :account_id => @subaccount.id.to_param }
+        raw_api_call(:post, @path, @path_options, {
+          :user  => { :id => @student.id },
+          :login => {
+            :password => 'abc123',
+            :sis_user_id => '12345',
+            :unique_id => 'duplicate@example.com'
+          }
+        })
+        response.code.should eql '400'
+      end
+
       it "should return 400 on duplicate pseudonyms" do
         @student.pseudonyms.create(:unique_id => 'duplicate@example.com')
         raw_api_call(:post, @path, @path_options, {

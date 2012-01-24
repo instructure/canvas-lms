@@ -494,7 +494,7 @@ ActionController::Routing::Routes.draw do |map|
       association.invite_assessor "invite", :controller => "rubric_assessments", :action => "invite"
       association.resources :rubric_assessments, :as => 'assessments'
     end
-    user.resources :pseudonyms
+    user.resources :pseudonyms, :except => %w(index)
     user.resources :question_banks, :only => [:index]
     user.assignments_needing_grading 'assignments_needing_grading', :controller => 'users', :action => 'assignments_needing_grading'
     user.assignments_needing_submitting 'assignments_needing_submitting', :controller => 'users', :action => 'assignments_needing_submitting'
