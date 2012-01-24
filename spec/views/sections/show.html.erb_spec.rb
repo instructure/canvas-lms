@@ -27,10 +27,9 @@ describe "sections/show.html.erb" do
       @section.sis_source_id = "section_sissy_id"
       assigns[:context] = @course
       assigns[:section] = @section
-      assigns[:current_enrollments] = []
-      assigns[:completed_enrollments] = []
-      assigns[:student_enrollments] = []
-      assigns[:enrollments] = []
+      assigns[:student_enrollments] = 1
+      assigns[:enrollments] = 1
+      assigns[:permission_classes] = 'manage-permissions'
     end
 
     it "should not show to teacher" do

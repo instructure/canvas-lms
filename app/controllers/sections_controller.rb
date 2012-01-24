@@ -105,18 +105,20 @@ class SectionsController < ApplicationController
       end
     end
   end
-  
+
   def show
     @section = @context.course_sections.find(params[:id])
-    if authorized_action(@section, @current_user, :read)
-      add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
-      @enrollments = @section.enrollments.sort_by{|e| e.user.sortable_name.downcase }
-      @student_enrollments = @enrollments.select{|e| e.student? }
-      @current_enrollments = @enrollments.select{|e| !e.completed? }
-      @completed_enrollments = @enrollments.select{|e| e.completed? }
-    end
+    return unless authorized_action(@section, @current_user, :read)
+    add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
+    @enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => %w{active completed} }).count
+    @student_enrollments = @section.enrollments.scoped(:conditions => { :type => 'StudentEnrollment' }).count
+    js_env(
+      :PERMISSIONS => {
+        :manage_students => @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users),
+        :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
+      })
   end
-  
+
   def destroy
     @section = @context.course_sections.find(params[:id])
     if authorized_action(@section, @current_user, :delete)
@@ -134,6 +136,4 @@ class SectionsController < ApplicationController
       end
     end
   end
-  
-  
 end

@@ -6,6 +6,7 @@ require([
   'specs/userNamePartsSpec',
   'specs/objectCollectionSpec',
   'specs/helpDialogSpec',
+  'specs/paginatedListSpec',
   'specs/util/BackoffPollerSpec',
   'specs/jQuery.instructureJqueryPatchesSpec',
   'specs/ENVSpec',

@@ -259,6 +259,12 @@ describe EnrollmentsApiController, :type => :integration do
         }
       end
 
+      it "should filter by enrollment workflow_state" do
+        @teacher.enrollments.first.update_attribute(:workflow_state, 'completed')
+        json = api_call(:get, "#{@path}?state[]=completed", @params.merge(:state => %w{completed}))
+        json.each { |e| e['enrollment_state'].should eql 'completed' }
+      end
+
       it "should not include the users' sis and login ids" do
         json = api_call(:get, @path, @params)
         json.each do |res|
