@@ -48,13 +48,13 @@ $(document).ready(function() {
       } else {
         var $login = $("#login_information .login.blank").clone(true);
         $("#login_information .add_holder").before($login.show());
-        data.pseudonym.account_name = $(this).data('account_name') || $(this).find(".default_account_name").text();
+        data.account_name = $(this).data('account_name') || $(this).find(".default_account_name").text();
       }
       $login.fillTemplateData({
-        data: data.pseudonym,
+        data: data,
         hrefValues: ['id', 'account_id']
       });
-      if($.inArray(data.pseudonym.account_id.toString(), passwordable_account_ids) != -1) {
+      if($.inArray(data.account_id.toString(), passwordable_account_ids) != -1) {
         $login.find(".links").addClass('passwordable');
       }
       $("#login_information .login .delete_pseudonym_link").show();

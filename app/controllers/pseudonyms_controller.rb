@@ -30,8 +30,8 @@ class PseudonymsController < ApplicationController
   #
   # @argument user[id] The ID of the user to search on.
   def index
-    @user = api_find(User, params[:user][:id])
-    return unless context_is_root_account?(@context) && authorized_action(@user, @current_user, :read)
+    return unless get_user && authorized_action(@user, @current_user, :read)
+    return unless context_is_root_account?
     @pseudonyms = Api.paginate(
       @user.pseudonyms.scoped(:conditions => { :account_id => @context.id }),
       self, api_v1_pseudonyms_path)
@@ -135,23 +135,25 @@ class PseudonymsController < ApplicationController
   # @arugment login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def create
     return unless get_user
+    return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
 
     if api_request?
-      params[:pseudonym] = params[:login]
-      params[:pseudonym][:password_confirmation] = params[:pseudonym][:password]
+      return unless context_is_root_account?
+      params[:pseudonym] = params[:login].merge(
+        :password_confirmation => params[:login][:password],
+        :account => @context
+      )
+    else
+      account_id = params[:pseudonym].delete(:account_id)
+      if current_user_is_site_admin?(:manage_user_logins)
+        params[:pseudonym][:account] = Account.root_accounts.find(account_id)
+      else
+        params[:pseudonym][:account] = @domain_root_account
+      end
     end
+
     if !params[:pseudonym][:password]
       @existing_pseudonym = @user.pseudonyms.active.select{|p| p.account == Account.default }.first
-    end
-    account_id = api_request? ? params.delete(:account_id) : params[:pseudonym].delete(:account_id)
-
-    if current_user_is_site_admin?(:manage_user_logins)
-      params[:pseudonym][:account] = Account.root_accounts.find(account_id)
-    elsif @context.is_a?(Account) && @context.root_account?
-      params[:pseudonym][:account] = @context
-    else
-      render(:json => { 'message' => 'Must create login on a root account.' }.to_json, :status => :bad_request)
-      return
     end
 
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
@@ -189,10 +191,7 @@ class PseudonymsController < ApplicationController
   
   def get_user
     if params[:user_id] || api_request?
-      @user = api_request? ? api_find(User, params[:user][:id]) : User.find(params[:user_id])
-      if @user != @current_user && !authorized_action(@user, @current_user, :manage_logins)
-        return false
-      end
+      @user = api_request? ? api_find(User, params[:user] && params[:user][:id]) : User.find(params[:user_id])
     else
       @user = @current_user
     end
@@ -202,6 +201,7 @@ class PseudonymsController < ApplicationController
   
   def update
     return unless get_user
+    return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     @pseudonym = @user.pseudonyms.find(params[:id])
     params[:pseudonym].delete :account_id
     unless @pseudonym.account.grants_right?(@current_user, session, :manage_user_logins)
@@ -239,6 +239,7 @@ class PseudonymsController < ApplicationController
   
   def destroy
     return unless get_user
+    return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     @pseudonym = @user.pseudonyms.find(params[:id])
     if @user.pseudonyms.active.length < 2
       @pseudonym.errors.add_to_base(t('errors.login_required', "Users must have at least one login"))
@@ -253,8 +254,8 @@ class PseudonymsController < ApplicationController
   end
 
   protected
-  def context_is_root_account?(context)
-    if context.root_account?
+  def context_is_root_account?
+    if @context.root_account?
       true
     else
       render(:json => { 'message' => 'Action must be called on a root account.' }.to_json, :status => :bad_request)
