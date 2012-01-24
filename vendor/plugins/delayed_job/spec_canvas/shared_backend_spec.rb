@@ -430,6 +430,26 @@ shared_examples_for 'a backend' do
     it "should reject duplicate named jobs" do
       proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
     end
+
+    it "should allow overriding schedules using periodic_jobs.yml" do
+      Setting.set_config('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * *' })
+      Delayed::Periodic.scheduled = {}
+      Delayed::Periodic.cron('my ChangedJob', '*/5 * * * * *') do
+        @backend.enqueue(SimpleJob.new)
+      end
+      Delayed::Periodic.scheduled['my ChangedJob'].cron.original.should == '*/10 * * * * *'
+      Delayed::Periodic.audit_overrides!
+    end
+
+    it "should fail if the override cron line is invalid" do
+      Setting.set_config('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * * *' }) # extra asterisk
+      Delayed::Periodic.scheduled = {}
+      expect { Delayed::Periodic.cron('my ChangedJob', '*/5 * * * * *') do
+        @backend.enqueue(SimpleJob.new)
+      end }.to raise_error
+
+      expect { Delayed::Periodic.audit_overrides! }.to raise_error
+    end
   end
 
   module InDelayedJobTest

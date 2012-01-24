@@ -70,8 +70,8 @@ class Pool
     say "Started job master", :info
     $0 = "delayed_jobs_pool"
     read_config(options[:config_file])
-    spawn_all_workers
     spawn_periodic_auditor
+    spawn_all_workers
     say "Workers spawned"
     join
     say "Shutting down"
@@ -125,6 +125,10 @@ class Pool
 
   def spawn_periodic_auditor
     return if @config[:disable_periodic_jobs]
+
+    # audit any periodic job overrides for invalid cron lines
+    # we do this here to fail as early as possible
+    Delayed::Periodic.audit_overrides!
 
     @periodic_thread = Thread.new do
       # schedule the initial audit immediately on startup
