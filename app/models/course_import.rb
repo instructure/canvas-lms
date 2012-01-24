@@ -60,7 +60,7 @@ class CourseImport < ActiveRecord::Base
   def perform_later
     self.perform
   end
-  handle_asynchronously :perform_later, :max_attempts => 1
+  handle_asynchronously :perform_later, :max_attempts => 1, :priority => Delayed::LOW_PRIORITY
   
   named_scope :for_course, lambda{|course, type|
     {:conditions => ['course_imports.course_id = ? AND course_imports.import_type = ?', course.id, type], :order => 'course_imports.created_at DESC' }
