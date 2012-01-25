@@ -105,7 +105,7 @@ describe "dashboard" do
     student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
     @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
     assignment.reload
-    assignment.submit_homework(student, {:submission_type => 'online_text_entry'})
+    assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
     assignment.reload
     get "/"
 

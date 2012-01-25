@@ -216,6 +216,13 @@ describe Assignment do
     s2[0].state.should eql(:graded)
   end
 
+  it "should not mark as submitted if no submission" do
+    setup_assignment_without_submission
+
+    s = @a.submit_homework(@user)
+    s.workflow_state.should == "unsubmitted"
+  end
+
   describe  "interpret_grade" do
     it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
       Assignment.interpret_grade("", 20, GradingStandard.default_grading_standard).should be_nil
@@ -319,29 +326,19 @@ describe Assignment do
       assignment_model
 
       @submissions = []
-      # log = Logger.new(STDOUT)
-      # n = Time.now
-      # log.info('adding students')
       users = []
       10.times do |i|
         users << User.create(:name => "user #{i}")
       end
-      # log.info("enrolling #{Time.now - n}")
-      # n = Time.now
       users.each do |u|
         @c.enroll_user(u)
       end
-      # log.info("adding submissions #{Time.now - n}")
-      # n = Time.now
       @a.reload
       users.each do |u|
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
-      # log.info("assigning peer reviews #{Time.now - n}")
-      # n = Time.now
       @a.peer_review_count = 1
       res = @a.assign_peer_reviews
-      # log.info("done assigning peer reviews #{Time.now - n}")
       res.length.should eql(@submissions.length)
       @submissions.each do |s|
         res.map{|a| a.asset}.should be_include(s)
@@ -1471,7 +1468,7 @@ end
 
 def setup_assignment_with_homework
   setup_assignment_without_submission
-  res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry'})
+  res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
   res.should_not be_nil
   res.should be_is_a(Submission)
   @assignment.reload

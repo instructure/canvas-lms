@@ -958,6 +958,16 @@ class Assignment < ActiveRecord::Base
     homeworks = []
     primary_homework = nil
     ts = Time.now.to_s
+    submitted = case opts[:submission_type]
+                when "online_text_entry"
+                  opts[:body].present?
+                when "online_url"
+                  opts[:url].present?
+                when "online_upload"
+                  opts[:attachments].size > 0
+                else
+                  true
+                end
     transaction do
       students.each do |student|
         homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
@@ -966,7 +976,7 @@ class Assignment < ActiveRecord::Base
           :attachment => nil,
           :processed => false,
           :process_attempts => 0,
-          :workflow_state => "submitted",
+          :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
         homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
