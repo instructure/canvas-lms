@@ -66,7 +66,9 @@ describe "editing external tools" do
     driver.find_element(:css, "#external_tool_form .config_type.manual").should_not be_displayed
     driver.find_element(:css, "#external_tool_config_url").should_not be_displayed
     driver.find_element(:css, "#external_tool_config_xml").should be_displayed
-    xml = <<-XML
+
+    #XML must be broken up to avoid intermittent selenium failures
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
     xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
@@ -77,6 +79,8 @@ describe "editing external tools" do
     http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
     http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
     http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+    XML
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
     <blti:title>Other Name</blti:title>
     <blti:description>Description</blti:description>
     <blti:launch_url>http://example.com/other_url</blti:launch_url>
@@ -89,6 +93,8 @@ describe "editing external tools" do
         <lticm:property name="selection_width">500</lticm:property>
         <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
+    XML
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="resource_selection">
         <lticm:property name="url">https://example.com/wiki</lticm:property>
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
@@ -99,6 +105,8 @@ describe "editing external tools" do
         <lticm:property name="url">https://example.com/attendance</lticm:property>
         <lticm:property name="text">Attendance</lticm:property>
       </lticm:options>
+    XML
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="user_navigation">
         <lticm:property name="url">https://example.com/attendance</lticm:property>
         <lticm:property name="text">Attendance</lticm:property>
@@ -112,7 +120,7 @@ describe "editing external tools" do
     <cartridge_icon identifierref="BLTI001_Icon"/>
 </cartridge_basiclti_link>  
     XML
-    driver.find_element(:css, "#external_tool_config_xml").send_keys xml
+
     driver.find_element(:css, "#external_tools_dialog .save_button").click
 
     keep_trying_until { !driver.find_element(:css, "#external_tools_dialog").displayed? }
