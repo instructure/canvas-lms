@@ -350,6 +350,51 @@ describe Attachment do
     end
   end
   
+  context "build_media_object" do
+    before :each do
+      @course = course
+      @attachment = @course.attachments.build(:filename => 'foo.mp4')
+      @attachment.content_type = 'video'
+      @attachment.stubs(:downloadable?).returns(true)
+    end
+
+    it "should be called automatically upon creation" do
+      @attachment.expects(:build_media_object).once
+      @attachment.save!
+    end
+
+    it "should create a media object for videos" do
+      MediaObject.expects(:send_later_enqueue_args).once
+      @attachment.save!
+    end
+
+    it "should delay the creation of the media object by attachment_build_media_object_delay_seconds" do
+      now = Time.now
+      Time.stubs(:now).returns(now)
+      Setting.expects(:get).with('attachment_build_media_object_delay_seconds', '10').once.returns('25')
+      @attachment.save!
+
+      MediaObject.count.should == 0
+      Delayed::Job.count.should == 1
+      Delayed::Job.first.run_at.should == now + 25.seconds
+    end
+
+    it "should not create a media object in a skip_media_object_creation block" do
+      Attachment.skip_media_object_creation do
+        MediaObject.expects(:send_later_enqueue_args).times(0)
+        @attachment.save!
+      end
+    end
+
+    it "should not create a media object for images" do
+      @attachment.filename = 'foo.png'
+      @attachment.content_type = 'image/png'
+      @attachment.expects(:build_media_object).once
+      MediaObject.expects(:send_later_enqueue_args).times(0)
+      @attachment.save!
+    end
+  end
+
   context "destroy" do
     it "should not actually destroy" do
       a = attachment_model(:uploaded_data => default_uploaded_data)
