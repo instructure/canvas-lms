@@ -76,6 +76,7 @@ var rubricEditing = {
         total += points;
       }
     });
+    total = round(total, 2);
     $rubric.find(".rubric_total").text(total);
   },
   updateCriterionPoints: function($criterion, baseOnRatings) {
@@ -85,16 +86,20 @@ var rubricEditing = {
     var points = parseFloat($criterion.find(".criterion_points").val());
     if(isNaN(points)) {
       points = 5;
+    } else {
+      points = round(points, 2);
     }
     $criterion.find(".rating:first .points").text(points);
-    // From right to left, make sure points always increase by at least one
+    // From right to left, make sure points never decrease
+    // and round to 2 decimal places.
     $.each(ratings, function(i, rating) {
       var $rating = $(rating);
       var data = $rating.getTemplateData({textValues: ['points']});
       if(data.points < rating_points) {
-        data.points = rating_points + 1;
-        $rating.fillTemplateData({data: data});
+        data.points = rating_points;
       }
+      data.points = round(data.points, 2);
+      $rating.fillTemplateData({data: data});
       rating_points = parseFloat(data.points);
     });
     if(baseOnRatings && rating_points > points) { points = rating_points; }
@@ -107,24 +112,26 @@ var rubricEditing = {
       }
       var oldMax = parseFloat($criterion.data('criterion_points'));
       var newMax = points;
-      var $ratingList = $criterion.find(".rating");
-      $($ratingList[0]).find(".points").text(points);
-      var lastPts = points;
-      // From left to right, scale points proportionally to new range.
-      // So if originally they were 3,2,1 and now we increased the
-      // total possible to 9, they'd be 9,6,3
-      for(var i = 1; i < $ratingList.length - 1; i++) {
-        var pts = parseFloat($($ratingList[i]).find(".points").text());
-        var newPts = Math.round((pts / oldMax) * newMax);
-        if(isNaN(pts) || (pts == 0 && lastPts > 0)) {
-          newPts = lastPts - Math.round(lastPts / ($ratingList.length - i));
+      if (oldMax !== newMax) {
+        var $ratingList = $criterion.find(".rating");
+        $($ratingList[0]).find(".points").text(points);
+        var lastPts = points;
+        // From left to right, scale points proportionally to new range.
+        // So if originally they were 3,2,1 and now we increased the
+        // total possible to 9, they'd be 9,6,3
+        for(var i = 1; i < $ratingList.length - 1; i++) {
+          var pts = parseFloat($($ratingList[i]).find(".points").text());
+          var newPts = Math.round((pts / oldMax) * newMax);
+          if(isNaN(pts) || (pts == 0 && lastPts > 0)) {
+            newPts = lastPts - Math.round(lastPts / ($ratingList.length - i));
+          }
+          if(newPts >= lastPts) {
+            newPts = lastPts - 1;
+          }
+          newPts = Math.max(0, newPts);
+          lastPts = newPts;
+          $($ratingList[i]).find(".points").text(newPts);
         }
-        if(newPts >= lastPts) {
-          newPts = lastPts - 1;
-        }
-        newPts = Math.max(0, newPts);
-        lastPts = newPts;
-        $($ratingList[i]).find(".points").text(newPts);
       }
       $criterion.data('criterion_points', points);
     }
@@ -346,6 +353,11 @@ var rubricEditing = {
   }
 };
 rubricEditing.sizeRatings = $.debounce(10, rubricEditing.originalSizeRatings);
+
+var round = function(number, precision) {
+  precision = Math.pow(10, precision || 0).toFixed(precision < 0 ? -precision : 0);
+  return Math.round(number * precision) / precision;
+}
 
 I18n.scoped('edit_rubric', function(I18n) {
 $(document).ready(function() {
@@ -788,15 +800,13 @@ $(document).ready(function() {
         var more_points = parseFloat($this.prev(".rating").find(".points").text());
         data.points = Math.round((pts + more_points) / 2);
         if(data.points == pts || data.points == more_points) {
-          data.points = more_points;
-          $criterion.find(".criterion_points").val(criterion_total + 1);
+          data.points = pts;
         }
       } else {
         var less_points = parseFloat($this.next(".rating").find(".points").text());
         data.points = Math.round((pts + less_points) / 2);
         if(data.points == pts || data.points == less_points) {
-          data.points = pts;
-          $criterionPoints.val(criterion_total + 1);
+          data.points = less_points;
         }
       }
       $td.fillTemplateData({data: data});

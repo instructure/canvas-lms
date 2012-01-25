@@ -49,6 +49,9 @@ class Notification < ActiveRecord::Base
     "Show In Feed",
     "Migration Import Finished",
     "Migration Import Failed",
+    "Appointment Group Published",
+    "Appointment Group Updated",
+    "Appointment Reserved For User",
   ].freeze
   
   has_many :messages
@@ -95,7 +98,7 @@ class Notification < ActiveRecord::Base
 
     policies = user.notification_policies.select{|p| p.notification_id == self.id && p.communication_channel_id}
     policies << NotificationPolicy.create(:notification => self, :user => user, :communication_channel => cc, :frequency => self.default_frequency) if policies.empty? && cc && cc.active?
-    policies = policies.select{|p| [:daily,:weekly].include?(p.frequency.to_sym) } #NotificationPolicy.for(self).for(user).by([:daily, :weekly])
+    policies = policies.select{|p| [:daily,:weekly].include?(p.frequency.to_sym) }
     
     # If we pass in a fallback_channel, that means this message has been
     # throttled, so it definitely needs to go to at least one communication
@@ -175,7 +178,7 @@ class Notification < ActiveRecord::Base
         user = cc.user
       elsif recipient.is_a?(User)
         user = recipient
-        cc = user.communication_channels.first
+        cc = user.email_channel
       end
       I18n.locale = infer_locale(:user => user)
       
@@ -382,6 +385,14 @@ class Notification < ActiveRecord::Base
       'immediately'
     when 'Calendar'
       'never'
+    when 'Student Appointment Signups'
+      'never'
+    when 'Appointment Availability'
+      'immediately'
+    when 'Appointment Signups'
+      'immediately'
+    when 'Appointment Cancelations'
+      'immediately'
     when 'Course Content'
       'never'
     when 'Files'
@@ -422,6 +433,10 @@ class Notification < ActiveRecord::Base
       'weekly'
     when 'TestNever'
       'never'
+    when 'Conversation Message'
+      'immediately'
+    when 'Added To Conversation'
+      'immediately'
     else
       'daily'
     end
@@ -491,6 +506,13 @@ class Notification < ActiveRecord::Base
     t 'names.updated_wiki_page', 'Updated Wiki Page'
     t 'names.web_conference_invitation', 'Web Conference Invitation'
     t 'names.alert', 'Alert'
+    t 'names.appointment_canceled_by_user', 'Appointment Canceled By User'
+    t 'names.appointment_deleted_for_user', 'Appointment Deleted For User'
+    t 'names.appointment_group_deleted', 'Appointment Group Deleted'
+    t 'names.appointment_group_published', 'Appointment Group Published'
+    t 'names.appointment_group_updated', 'Appointment Group Updated'
+    t 'names.appointment_reserved_by_user', 'Appointment Reserved By User'
+    t 'names.appointment_reserved_for_user', 'Appointment Reserved For User'
   end
 
   # TODO: i18n ... show these anywhere we show the category today
@@ -498,6 +520,10 @@ class Notification < ActiveRecord::Base
     t 'categories.all_submissions', 'All Submissions'
     t 'categories.announcement', 'Announcement'
     t 'categories.calendar', 'Calendar'
+    t 'categories.student_appointment_signups', 'Student Appointment Signups'
+    t 'categories.appointment_availability', 'Appointment Availability'
+    t 'categories.appointment_signups', 'Appointment Signups'
+    t 'categories.appointment_cancelations', 'Appointment Cancelations'
     t 'categories.course_content', 'Course Content'
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
@@ -546,6 +572,14 @@ class Notification < ActiveRecord::Base
       t(:other_description, "For any other notifications")
     when 'Calendar'
       t(:calendar_description, "For calendar changes")
+    when 'Student Appointment Signups'
+      t(:student_appointment_description, "For student appointment signups and cancelations")
+    when 'Appointment Availability'
+      t(:appointment_availability_description, "For changes to appointment time slots")
+    when 'Appointment Signups'
+      t(:appointment_signups_description, "For appointments you get signed up for")
+    when 'Appointment Cancelations'
+      t(:appointment_cancelations_description, "For your appointments that get canceled")
     when 'Message'
       t(:message_description, "For new email messages")
     when 'Student Message'
@@ -558,7 +592,17 @@ class Notification < ActiveRecord::Base
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end
   end
-  
+
+  def display_category
+    case category
+      when 'Student Appointment Signups', 'Appointment Availability',
+           'Appointment Signups', 'Appointment Cancelations'
+        'Calendar'
+      else
+        category
+    end
+  end
+
   def type_name
     return category
   end

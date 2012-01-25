@@ -31,12 +31,12 @@ class Handlebars
       path     = "#{compiled_path}/#{id}.js"
       dir      = File.dirname(path)
       source   = File.read(file)
-      js       = compile_template(source, id)
+      js       = compile_template(source, id, compiled_path =~ /vendor\/plugins\/([^\/]*)\// ? $1 : nil)
       FileUtils.mkdir_p(dir) unless File.exists?(dir)
       File.open(path, 'w') { |file| file.write(js) }
     end
 
-    def compile_template(source, id)
+    def compile_template(source, id, plugin=nil)
       require 'execjs'
       # if the first letter of the template name is "_", register it as a partial
       # ex: _foobar.handlebars or subfolder/_something.handlebars
@@ -52,7 +52,7 @@ class Handlebars
 !(function(){
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['#{id}'] = template(#{template});#{partial_registration}
-  define('jst/#{id}', ['compiled/handlebars_helpers'], function (Handlebars) {
+  define('#{plugin ? plugin + "/" : ""}jst/#{id}', ['compiled/handlebars_helpers'], function (Handlebars) {
     return templates['#{id}'];
   });
 })();

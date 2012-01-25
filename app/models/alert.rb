@@ -42,7 +42,7 @@ class Alert < ActiveRecord::Base
       :criteria => criteria.map { |c| c.as_json(:include_root => false) },
       :recipients => recipients.try(:map) { |r| (r.is_a?(Symbol) ? ":#{r}" : r) },
       :repetition => repetition
-    }
+    }.with_indifferent_access
   end
 
   def recipients=(recipients)

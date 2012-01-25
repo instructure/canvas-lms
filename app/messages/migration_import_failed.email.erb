@@ -1,11 +1,13 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/imports/list
 <% end %>
 
 <% define_content :subject do %>
   <%= t :subject, "Content Import Failed: %{course_name}", :course_name => asset.context.name %>
 <% end %>
 
-<%= t :body, "There was a problem importing %{source} into %{destination}.  Only some of the content could be successfully imported.  Please notify your system administrator, and give them the following error code: \"%{error_code}\".", :source => asset.migration_settings[:course_name], :destination => asset.context.name, :error_code => "ContentMigration:#{asset.id}:#{asset.progress}" %>
-
-<%= content :link %>
+<%= t :body, <<-BODY, :destination => asset.context.name, :error_url => content(:link)
+    There was a problem importing some content into your course "%{destination}". 
+    Please notify your system administrator, and point them to your import's info page: %{error_url}
+    BODY
+%>

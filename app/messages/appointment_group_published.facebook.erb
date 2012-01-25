@@ -1,0 +1,18 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/appointment_groups/<%= asset.id %>
+<% end %>
+
+<%= t :message, 'Time slots for "%{appointment_name}" are now available for signup.', :appointment_name => asset.title %><br>
+<br>
+<b><%= before_label :details, "Appointment details" %></b><br>
+<%= before_label :dates, "Date(s)" %> <%= date_string(asset.start_at, asset.end_at, :no_words) %><br>
+<%= before_label :signup_type, "Signup Type" %> <%=
+  asset.participant_type == 'Group' ?
+    t(:group_signup, "Group (%{group_category})", :group_category => asset.sub_context.name) :
+    t(:individual_signup, "Individual") %><br>
+<%= before_label :course, "Course" %> <%= asset.context.name %><br>
+<% if asset.available_slots -%>
+<%= before_label :slots_remaining, "Available time slots" %> <%= asset.available_slots %><br>
+<% end -%>
+<br>
+<a href="<%= content(:link) %>"><%= t :instructions, "Sign up for a time slot" %></a>

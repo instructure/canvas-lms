@@ -206,16 +206,16 @@ class CommunicationChannel < ActiveRecord::Base
       policy_for_channel[policy.communication_channel_id] = true
       can_notify[policy.communication_channel_id] = false if policy.frequency == 'never'
     end
-    all_channels = user.communication_channels.unretired
+    all_channels = user.communication_channels.active
     communication_channels = all_channels.select{|cc| policy_matches_frequency[cc.id] }
-    all_channels = all_channels.select{|cc| cc.active? && policy_for_channel[cc.id] }
-    
+    all_channels = all_channels.select{|cc| policy_for_channel[cc.id] }
+
     # The trick here is that if the user has ANY policies defined for this notification
     # then we shouldn't overwrite it with the default channel -- but we only want to
-    # return the list of channels for immediate dispatch
-    communication_channels = [user.communication_channels.first] if all_channels.empty? && notification.default_frequency == 'immediately'
+    # return the list of channels for immediate dispatch.
+    communication_channels = [user.email_channel] if all_channels.empty? && notification.default_frequency == 'immediately'
     communication_channels.compact!
-    
+
     # Remove ALL channels if one is 'never'?  No, I think we should just remove any paths that are set to 'never'
     # User can say NEVER email me, but SMS me right away.
     communication_channels.reject!{|cc| can_notify[cc] == false}

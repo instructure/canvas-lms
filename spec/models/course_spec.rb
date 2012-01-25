@@ -2482,6 +2482,28 @@ describe Course, "conclusions" do
 
     @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
   end
+
+  context "appointment cancellation" do
+    before do
+      course_with_student(:active_all => true)
+      @ag = @course.appointment_groups.create(:title => "test", :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag.appointments.each do |a|
+        a.reserve_for(@user, @user)
+      end
+    end
+
+    it "should cancel all future appointments when concluding an enrollment" do
+      @enrollment.conclude
+      @ag.appointments_participants.size.should eql 1
+      @ag.appointments_participants.current.size.should eql 0
+    end
+
+    it "should cancel all future appointments when concluding all enrollments" do
+      @course.complete!
+      @ag.appointments_participants.size.should eql 1
+      @ag.appointments_participants.current.size.should eql 0
+    end
+  end
 end
 
 describe Course, "inherited_assessment_question_banks" do

@@ -120,17 +120,30 @@ describe "account authentication configs" do
     dialog = driver.find_element(:id, "add_user_dialog")
     dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:"
   end
-  
+
+  it "should be able to create a new course" do
+    course_with_admin_logged_in
+    get "/accounts/#{Account.default.id}"
+    driver.find_element(:css, '.add_course_link').click
+    driver.find_element(:css, '#add_course_form input[type=text]:first-child').send_keys('Test Course')
+    driver.find_element(:id, 'course_course_code').send_keys('TEST001')
+    driver.find_element(:css, '#add_course_form .submit_button').click
+
+    wait_for_ajaximations
+    driver.find_element(:id, 'add_course_dialog').should_not be_displayed
+    driver.find_element(:id, 'flash_notice_message').text.should match 'Test Course successfully added!'
+  end
+
   it "should be able to update term dates" do
     course_with_admin_logged_in
-    
+
     def verify_displayed_term_dates(term, dates)
       dates.each do |en_type, dates|
         term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text.should match /#{dates[0]}/
         term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text.should match /#{dates[1]}/
       end
     end
-    
+
     get "/accounts/#{Account.default.id}/terms"
     term = driver.find_element(:css, "tr.term")
     term.find_element(:css, ".edit_term_link").click

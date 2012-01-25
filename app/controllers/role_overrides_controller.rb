@@ -144,7 +144,7 @@ class RoleOverridesController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/accounts/<account_id>/roles.json' \ 
-  #        -u '<username>:<password>' \ 
+  #        -H "Authorization: Bearer <token>" \ 
   #        -F 'role=New Role' \ 
   #        -F 'permissions[read_course_content][explicit]=1' \ 
   #        -F 'permissions[read_course_content][enabled]=1' \ 

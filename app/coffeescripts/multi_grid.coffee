@@ -15,15 +15,14 @@ this.MultiGrid = class MultiGrid
       else
         grid_opts.$viewport.css('overflow-y', 'hidden')
       grid
-    @parent_grid.onViewportChanged = () =>
-      for grid in @grids
-        if grid != @parent_grid
-          grid.multiview_grid_opts.$viewport[0].scrollTop =
-            @parent_grid.multiview_grid_opts.$viewport[0].scrollTop
-          grid.multiview_grid_opts.$viewport.trigger('scroll.slickgrid')
+    @parent_grid.onViewportChanged.subscribe =>
+      for grid in @grids when grid != @parent_grid
+        grid.multiview_grid_opts.$viewport[0].scrollTop =
+          @parent_grid.multiview_grid_opts.$viewport[0].scrollTop
+        grid.multiview_grid_opts.$viewport.trigger('scroll.slickgrid')
 
 # simple delegation
-for method in ['render', 'removeRow', 'removeAllRows', 'updateRowCount', 'autosizeColumns', 'resizeCanvas', 'invalidate']
+for method in ['render', 'invalidateRow', 'updateRowCount', 'autosizeColumns', 'resizeCanvas', 'invalidate']
   do (method) ->
     MultiGrid::[method] = () ->
       grid[method].apply(grid, arguments) for grid in @grids

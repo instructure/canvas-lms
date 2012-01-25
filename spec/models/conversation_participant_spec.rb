@@ -51,4 +51,13 @@ describe ConversationParticipant do
     rconvo.reload
     rconvo.messages.size.should == 2
   end
+
+  it "should update the updated_at stamp of its user on workflow_state change" do
+    sender       = user
+    recipient    = user
+    updated_at   = sender.updated_at
+    conversation = sender.initiate_conversation([recipient.id])
+    conversation.update_attribute(:workflow_state, 'unread')
+    sender.reload.updated_at.should_not eql updated_at
+  end
 end

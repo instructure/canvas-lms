@@ -31,7 +31,7 @@ gem 'mime-types',     '1.16',   :require => 'mime/types'
 # with mini_magick 3.1
 gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
-gem 'nokogiri',       '1.4.1'
+gem 'nokogiri',       '1.5.0'
 gem 'oauth',          '0.4.5'
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'rake',           '< 0.10'
@@ -44,7 +44,7 @@ gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
 gem 'ruby-saml-mod',  '0.1.4'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
-gem 'sanitize',       '1.2.1'
+gem 'sanitize',       '2.0.3'
 gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
@@ -70,7 +70,6 @@ group :test do
   gem 'mocha',        '0.10.0'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
-  gem 'rspec-instafail', '0.1.9'
   gem 'rspec-rails',  '1.3.4'
   gem 'selenium-webdriver', '2.14.0'
   gem 'webrat',       '0.7.3'
@@ -85,7 +84,6 @@ group :development do
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
   gem 'guard'
-  gem 'guard-coffeescript'
 end
 
 group :redis do

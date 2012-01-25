@@ -1,0 +1,9 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.appointment_group.context) %>/appointment_groups/<%= asset.appointment_group.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t('subject', 'You have been signed up for "%{appointment_name}" (%{course})', :appointment_name => asset.title, :course => asset.appointment_group.context.name) %>
+<% end %>
+
+<%= t :message, '%{user} has signed you up for "%{appointment_name}" (%{date_and_time}).', :user => asset.updating_user.name, :appointment_name => asset.title, :date_and_time => datetime_string(asset.start_at, asset.end_at) %>

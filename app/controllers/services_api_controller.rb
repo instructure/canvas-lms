@@ -28,21 +28,20 @@ class ServicesApiController < ApplicationController
   # @response_field rtmp_domain Hostname to be used for RTMP recording
   # @response_field partner_id Partner ID used for communicating with the Kaltura instance
   #
-  # Example responses:
+  # @example_response
+  #     # For an enabled Kaltura plugin:
+  #     {
+  #       'domain': 'kaltura.example.com',
+  #       'enabled': true,
+  #       'partner_id': '123456',
+  #       'resource_domain': 'cdn.kaltura.example.com',
+  #       'rtmp_domain': 'rtmp.example.com'
+  #     }
   #
-  # For an enabled Kaltura plugin:
-  # {
-  #   'domain': 'kaltura.example.com',
-  #   'enabled': true,
-  #   'partner_id': '123456',
-  #   'resource_domain': 'cdn.kaltura.example.com',
-  #   'rtmp_domain': 'rtmp.example.com'
-  # }
-  #
-  # For a disabled or unconfigured Kaltura plugin:
-  # {
-  #   'enabled': false,
-  # }
+  #     # For a disabled or unconfigured Kaltura plugin:
+  #     {
+  #       'enabled': false
+  #     }
   def show_kaltura_config
     if @current_user
       @kal = Kaltura::ClientV3.config
@@ -70,10 +69,9 @@ class ServicesApiController < ApplicationController
   #     media file into kaltura.
   #
   # @example_response
-  #
-  # {
-  #   'ks': '1e39ad505f30c4fa1af5752b51bd69fe'
-  # }
+  #     {
+  #       'ks': '1e39ad505f30c4fa1af5752b51bd69fe'
+  #     }
   def start_kaltura_session
     @user = @current_user
     if !@current_user

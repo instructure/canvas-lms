@@ -154,9 +154,23 @@ module TextHelper
     (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time
   end
 
-  def self.date_string(start_date, style=:normal)
+  def self.date_string(start_date, *args)
     return nil unless start_date
     start_date = start_date.in_time_zone.to_date rescue start_date.to_date
+    style = args.last.is_a?(Symbol) ? args.pop : :normal
+    end_date = args.pop
+    end_date = end_date.in_time_zone.to_date rescue end_date.to_date if end_date
+    if end_date.nil? || start_date == end_date
+      date_component(start_date, style)
+    else
+      I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}",
+        :start_date_and_time => date_component(start_date, style),
+        :end_date_and_time => date_component(end_date, style)
+      )
+    end
+  end
+
+  def self.date_component(start_date, style=:normal)
     today = Time.zone.today
     if style != :long
       if style != :no_words
@@ -170,6 +184,7 @@ module TextHelper
     end
     return I18n.l(start_date, :format => :medium)
   end
+
   def date_string(*args)
     TextHelper.date_string(*args)
   end
@@ -328,13 +343,13 @@ module TextHelper
           current.add_previous_sibling(truncate_elem)
           new_node = Nokogiri::XML::Text.new(new_content.join(' '), doc)
           truncate_elem.add_previous_sibling(new_node)
-          current = current.previous
+          current = truncate_elem
         else
           current = previous
           # why would we do this next line? it just ends up xml escaping stuff
           #current.content = current.content
           current.add_next_sibling(truncate_elem)
-          current = current.next
+          current = truncate_elem
         end
       end
    

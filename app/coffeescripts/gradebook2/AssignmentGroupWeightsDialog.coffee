@@ -56,7 +56,7 @@ class @AssignmentGroupWeightsDialog
       group = $(row).data('assignment_group')
       newWeight = Number($(row).find('input').val())
       if newWeight != group.group_weight
-        requests.push $.ajaxJSON "#{courseUrl}/assignments/#{group.id}", 'PUT', {'assignment_group[group_weight]' : newWeight}, (data) ->
+        requests.push $.ajaxJSON "#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'assignment_group[group_weight]' : newWeight}, (data) ->
           $.extend(group, data.assignment_group)
           
     # when all the requests come back, call @afterSave

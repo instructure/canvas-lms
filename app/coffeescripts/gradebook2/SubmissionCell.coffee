@@ -44,8 +44,6 @@ class @SubmissionCell
 
   @formatter: (row, col, submission, assignment) ->
     this.prototype.cellWrapper(submission.grade, {submission: submission, assignment: assignment, editable: false})
-    # classes = []
-    # "<div class='cell-content gradebook-cell #{classes.join(' ')}'>#{submission.grade}</div>"
 
   cellWrapper: (innerContents, options = {}) ->
     opts = $.extend({}, {
@@ -57,6 +55,9 @@ class @SubmissionCell
     opts.assignment ||= @opts.column.object
     specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
     tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
+
+    opts.classes += ' no_grade_yet ' unless opts.submission.grade
+    innerContents ?= if opts.submission?.submission_type then '<span class="submission_type_icon" />' else '-'
 
     """
     #{ if tooltipText then '<div class="gradebook-tooltip">'+ tooltipText + '</div>' else ''}
@@ -73,6 +74,7 @@ class @SubmissionCell
     classes.push('dropped') if submission.drop
     classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
     classes.push('muted') if assignment.muted
+    classes.push(submission.submission_type) if submission.submission_type
     classes
 
 class SubmissionCell.out_of extends SubmissionCell
@@ -108,8 +110,8 @@ class SubmissionCell.pass_fail extends SubmissionCell
   #   </div>
   #   """
   @formatter: (row, col, submission, assignment) ->
+    return SubmissionCell.formatter.apply(this, arguments) unless submission.grade?
     pass_fail::htmlFromSubmission({ submission, assignment, editable: false})
-
 
   init: () ->
     @$wrapper = $(@cellWrapper())

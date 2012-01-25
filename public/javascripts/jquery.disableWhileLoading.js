@@ -21,9 +21,12 @@ I18n.scoped('instructure', function(I18n) {
           $this            = $(this),
           dataKey          = 'disabled_' + $.guid++,
           $disabledArea    = $this.add($this.next('.ui-dialog-buttonpane')),
-          $inputsToDisable = $disabledArea.find('*').andSelf().filter(':input').not(':disabled').prop('disabled', true);
+          $inputsToDisable = $disabledArea.find('*').andSelf().filter(':input').not(':disabled').prop('disabled', true),
+          $foundSpinHolder = $this.find('.spin_holder'),
+          $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this,
+          previousSpinHolderDisplay = $spinHolder.css('display');
 
-      $this.spin(options);
+      $spinHolder.show().spin(options);
       $disabledArea.css('opacity', function(i, currentOpacity){
         $(this).data(dataKey+'opacityBefore', this.style.opacity);
         return opts.opacity;
@@ -43,7 +46,7 @@ I18n.scoped('instructure', function(I18n) {
       });
     
       $.when(deferred).always(function(){
-        $this.spin(false); // stop spinner
+        $spinHolder.css('display', previousSpinHolderDisplay).spin(false); // stop spinner
         $disabledArea.css('opacity', function(){ return $(this).data(dataKey+'opacityBefore') });
         $inputsToDisable.prop('disabled', false);
         $.each(opts.buttons, function() {

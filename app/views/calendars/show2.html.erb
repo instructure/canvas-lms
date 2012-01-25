@@ -1,0 +1,45 @@
+<%
+  content_for :page_title, "Calendar"
+  jammit_js :jquery_ui_menu
+  jammit_js :calendar2
+  jammit_css :calendar2
+  add_crumb t('crumbs.my_calendar', "My Calendar"), calendar_url
+%>
+
+<% content_for :auto_discovery do %>
+  <%= auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")}) %>
+<% end %>
+
+<% content_for :right_side do %>
+  <div class="rs-section">
+    <div id="minical"></div>
+  </div>
+  <div class="rs-section" id="context-list-holder"></div>
+  <div class="rs-section" id="undated-events"></div>
+  <div class="rs-section" id="calendar-feed">
+    <a class="dialog_opener small-calendar" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
+      <%= t :calendar_feed, "Calendar Feed" %>
+    </a>
+  </div>
+<% end %>
+<div style="display: none" id="calendar_feed_box" title="<%= t('feed_dialog_title', 'Calendar Feed') %>">
+  <p id="calendar-feed-message">
+    Copy the link below and paste it into any calendar app that takes
+    iCal feeds (Google Calendar, iCal, Outlook, etc.)
+  </p>
+  <p id="calendar-feed-box-lower">
+    <input value="<%= @feed_url%>.ics"><br>
+    <a href="<%= @feed_url%>.ics"><%= t "links.feed", 'click here to view the feed' %></a>
+  </p>
+</div>
+
+<div id="calendar-app"></div>
+
+<% js_block do %>
+  <script>
+    require(["compiled/calendar/calendarApp"], function(calendarApp) {
+      calendarApp.init(<%= raw @contexts_json.to_json %>, <%= raw @manage_contexts.to_json %> );
+    });
+  </script>
+<% end %>
+

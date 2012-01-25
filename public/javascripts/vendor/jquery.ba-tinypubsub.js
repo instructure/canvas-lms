@@ -19,7 +19,11 @@
   // will only complicate things in the future should the user decide to move
   // to a non-$.event-based pub/sub implementation.
   $.subscribe = function( topic, fn ) {
-
+    if ($.isPlainObject(topic)) {
+      return $.each(topic, function(topic, fn) {
+        $.subscribe(topic, fn);
+      });
+    }
     // Call fn, stripping out the 1st argument (the event object).
     function wrapper() {
       return fn.apply( this, Array.prototype.slice.call( arguments, 1 ) );

@@ -47,6 +47,19 @@ describe CommunicationChannel do
       channels.should include(c)
       channels.should_not include(d)
     end
+
+    it "should exclude inactive channels, even if a notification policy exists" do
+      user_model(:workflow_state => 'registered')
+      a = communication_channel_model(:user_id => @user.id, :workflow_state => 'active')
+      d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
+      notification_model
+      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id, :user_id => @user.id )
+      notification_policy_model(:communication_channel_id => d.id, :notification_id => @notification.id, :user_id => @user.id )
+      @user.reload
+      channels = CommunicationChannel.find_all_for(@user, @notification)
+      channels.should include(a)
+      channels.should_not include(d)
+    end
     
     it "should find the default channel if a user has notification policies but none match" do
       @u = user_model(:workflow_state => 'registered')
@@ -62,8 +75,12 @@ describe CommunicationChannel do
       channels.should eql([@u.communication_channel])
     end
     
-    it "should find a default channel if no policies are specified" do
+    it "should find a default email (and active) channel if no policies are specified" do
       @u = user_model(:workflow_state => 'registered')
+      x = @u.communication_channels.create(:path => "notme@example.com")
+      x.retire!
+      sms = @u.communication_channels.create(:path => "123456@example.com", :path_type => "sms")
+      sms.confirm!
       a = @u.communication_channels.create(:path => "a@example.com")
       a.confirm!
       b = @u.communication_channels.create(:path => "b@example.com")
@@ -71,6 +88,7 @@ describe CommunicationChannel do
       @n = Notification.create(:name => "New Notification", :category => 'TestImmediately')
       @u.reload
       channels = CommunicationChannel.find_all_for(@u, @n)
+      channels.should_not include(x)
       channels.should include(a)
       channels.should_not include(b)
       channels.should_not include(c)
