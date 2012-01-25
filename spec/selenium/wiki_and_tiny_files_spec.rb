@@ -7,7 +7,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     wiki_page_tools_file_tree_setup
     wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
     driver.find_element(:css, '.wiki_switch_views_link').click
-    wiki_page_body = clear_rce
+    wiki_page_body = clear_wiki_rce
     driver.find_element(:css, '.wiki_switch_views_link').click
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     root_folders = @tree1.find_elements(:css, 'li.folder')
@@ -98,7 +98,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         wiki_page_tools_file_tree_setup
         keep_trying_until { driver.find_element(:css, "form#new_wiki_page").should be_displayed }
         driver.find_element(:css, '.wiki_switch_views_link').click
-        clear_rce
+        clear_wiki_rce
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
         first_folder = @tree1.find_elements(:css, 'li.folder').first
         first_folder.find_element(:css, '.sign.plus').click
@@ -129,7 +129,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         wiki_page_tools_file_tree_setup
         wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
         driver.find_element(:css, '.wiki_switch_views_link').click
-        clear_rce
+        clear_wiki_rce
         driver.find_element(:css, '.wiki_switch_views_link').click
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
         driver.find_element(:css, '.upload_new_file_link').click
@@ -162,7 +162,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
         driver.find_element(:css, '.upload_new_image_link').click
         driver.find_element(:css, '.wiki_switch_views_link').click
-        wiki_page_body = clear_rce
+        wiki_page_body = clear_wiki_rce
         wait_for_ajaximations
         keep_trying_until { @image_list.find_elements(:css, 'img.img').length.should == 2 }
 
@@ -190,7 +190,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
         driver.find_element(:css, '.upload_new_image_link').click
         driver.find_element(:css, '.wiki_switch_views_link').click
-        wiki_page_body = clear_rce
+        wiki_page_body = clear_wiki_rce
         wait_for_ajaximations
         keep_trying_until { @image_list.find_elements(:css, 'img.img').length.should == 2 }
 

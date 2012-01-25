@@ -67,7 +67,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     get "/courses/#{@course.id}/wiki"
 
     driver.find_element(:css, '.wiki_switch_views_link').click
-    clear_rce
+    clear_wiki_rce
     driver.find_element(:css, '.wiki_switch_views_link').click
     #check assigment accordion
     accordion = driver.find_element(:css, '#editor_tabs #pages_accordion')

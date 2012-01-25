@@ -431,7 +431,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(scr)
   end
 
-  def clear_rce
+  def clear_wiki_rce
     wiki_page_body = driver.find_element(:id, :wiki_page_body)
     wiki_page_body.clear
     wiki_page_body[:value].should be_empty
