@@ -719,7 +719,7 @@ class ContextModule < ActiveRecord::Base
   
   def add_item_from_migration(hash, level, context, item_map)
     hash = hash.with_indifferent_access
-    hash[:migration_id] ||= hash[:linked_resource_id] 
+    hash[:migration_id] ||= hash[:item_migration_id]
     hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
     item = nil
     existing_item = content_tags.find_by_id(hash[:id]) if hash[:id].present?
@@ -729,7 +729,7 @@ class ContextModule < ActiveRecord::Base
     existing_item.migration_id = hash[:migration_id]
     hash[:indent] = [hash[:indent] || 0, level].max
     if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
-      wiki = self.context.wiki.wiki_pages.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      wiki = self.context.wiki.wiki_pages.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
       if wiki
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title],
@@ -740,7 +740,7 @@ class ContextModule < ActiveRecord::Base
       end
     elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
       # this is a file of some kind
-      file = self.context.attachments.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      file = self.context.attachments.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
       if file
         title = hash[:title] || hash[:linked_resource_title]
         item = self.add_item({
@@ -752,7 +752,7 @@ class ContextModule < ActiveRecord::Base
       end
     elsif hash[:linked_resource_type] =~ /assignment|project/i
       # this is a file of some kind
-      ass = self.context.assignments.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      ass = self.context.assignments.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
       if ass
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title],
@@ -789,7 +789,7 @@ class ContextModule < ActiveRecord::Base
         }, existing_item, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /assessment|quiz/i
-      quiz = self.context.quizzes.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      quiz = self.context.quizzes.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
       if quiz
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title],
@@ -799,7 +799,7 @@ class ContextModule < ActiveRecord::Base
         }, existing_item, :quiz => quiz, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /discussion|topic/i
-      topic = self.context.discussion_topics.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      topic = self.context.discussion_topics.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
       if topic
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title],
@@ -814,7 +814,7 @@ class ContextModule < ActiveRecord::Base
       # We don't know what this is
     end
     if item
-      item_map[hash[:item_migration_id]] = item if hash[:item_migration_id]
+      item_map[hash[:migration_id]] = item if hash[:migration_id]
       item.migration_id = hash[:migration_id]
       item.position = (@item_migration_position ||= self.content_tags.active.map(&:position).compact.max || 0)
       item.workflow_state = 'active'
