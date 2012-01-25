@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -534,6 +534,53 @@ describe Course, "gradebook_to_csv" do
     rows = FasterCSV.parse(csv)
     rows.length.should == 4
   end
+
+  it "should include muted if any assignments are muted" do
+      course(:active_all => true)
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+      student_in_course(:user => @user1)
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
+      student_in_course(:user => @user2)
+      @user3 = user(:active_all => true, :name => 'JT')
+      student_in_course(:user => @user3)
+      @user1.pseudonym.sis_user_id = "SISUSERID"
+      @user1.pseudonym.save!
+      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @assignment.muted = true
+      @assignment.save!
+      @assignment.grade_student(@user1, :grade => "10")
+      @assignment.grade_student(@user2, :grade => "9")
+      @assignment.grade_student(@user3, :grade => "9")
+      @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @course.recompute_student_scores
+      @course.reload
+
+      csv = @course.gradebook_to_csv(:include_sis_id => true)
+      csv.should_not be_nil
+      rows = FasterCSV.parse(csv)
+      rows.length.should == 6
+      rows[0][1].should == 'ID'
+      rows[0][2].should == 'SIS User ID'
+      rows[0][3].should == 'SIS Login ID'
+      rows[0][4].should == 'Section'
+      rows[1][0].should == 'Muted assignments do not impact Current and Final score columns'
+      rows[1][5].should == 'Muted'
+      rows[1][6].should == ''
+      rows[2][2].should == ''
+      rows[2][3].should == ''
+      rows[2][4].should == ''
+      rows[2][-1].should == '(read only)'
+      rows[3][1].should == @user1.id.to_s
+      rows[3][2].should == 'SISUSERID'
+      rows[3][3].should == @user1.pseudonym.unique_id
+      rows[4][1].should == @user2.id.to_s
+      rows[4][2].should be_nil
+      rows[4][3].should == @user2.pseudonym.unique_id
+      rows[5][1].should == @user3.id.to_s
+      rows[5][2].should be_nil
+      rows[5][3].should be_nil
+    end
 end
 
 describe Course, "merge_into" do

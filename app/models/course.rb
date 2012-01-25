@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1215,6 +1215,17 @@ class Course < ActiveRecord::Base
       row.concat(["Current Score", "Final Score"])
       row.concat(["Final Grade"]) if self.grading_standard_enabled?
       csv << row.flatten
+
+      #Possible muted row
+      if assignments.any?(&:muted)
+        #This is is not translated since we look for this exact string when we upload to gradebook.
+        row = ['Muted assignments do not impact Current and Final score columns', '', '']
+        row.concat(['', '']) if options[:include_sis_id]
+        row.concat(assignments.map{|a| single ? [(a.muted ? 'Muted': ''), ''] : (a.muted ? 'Muted' : '')})
+        row.concat(['', ''])
+        row.concat(['']) if self.grading_standard_enabled?
+        csv << row.flatten
+      end
 
       #Second Row
       row = ["    Points Possible", "", ""]
