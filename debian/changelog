@@ -1,3 +1,13 @@
+canvas-lms (2012.01.25.12.15) stable; urgency=low
+
+  * Package ref: 8db10c76120e7a0a62221664b732e27f8881e7ab
+  *
+  * [+c841a25] fix zendesk not getting the right user on new tickets
+  * [+f368ba7] fix admins being able to change passwords of other accounts
+  * [+8db10c7] fix course creation message. fixes #6854
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 25 Jan 2012 12:16:23 -0700
+
 canvas-lms (2012.01.24.09.56) stable; urgency=low
 
   * Package ref: 0e5a61096c970aba0f8ef7215465d3adc1d0147d
