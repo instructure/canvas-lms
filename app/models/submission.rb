@@ -771,6 +771,12 @@ class Submission < ActiveRecord::Base
     Conversation.update_all_for_asset(self, options)
   end
 
+  def self.batch_migrate_conversations!(ids)
+    find_all_by_id(ids).each do |sub|
+      sub.create_or_update_conversations!(:migrate)
+    end
+  end
+
   def limit_comments(user, session=nil)
     @comment_limiting_user = user
     @comment_limiting_session = session

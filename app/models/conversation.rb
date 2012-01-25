@@ -338,6 +338,10 @@ class Conversation < ActiveRecord::Base
     end
   end
 
+  def self.batch_migrate_context_tags!(ids)
+    find_all_by_id(ids).each(&:migrate_context_tags!)
+  end
+
   protected
 
   # contexts currently shared by > 50% of participants
