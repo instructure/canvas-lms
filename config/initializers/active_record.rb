@@ -317,6 +317,32 @@ class ActiveRecord::Base
     result
   end
 
+  def self.distinct(column, options={})
+    column = column.to_s
+    options = {:include_nil => false}.merge(options)
+
+    result = if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+      sql = ''
+      sql << "SELECT NULL AS #{column} WHERE EXISTS(SELECT * FROM #{table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
+      sql << <<-SQL
+        WITH RECURSIVE t AS (
+          SELECT MIN(#{column}) AS #{column} FROM #{table_name}
+          UNION ALL
+          SELECT (SELECT MIN(#{column}) FROM #{table_name} WHERE #{column} > t.#{column})
+          FROM t
+          WHERE t.#{column} IS NOT NULL
+        )
+        SELECT #{column} FROM t WHERE #{column} IS NOT NULL
+      SQL
+      sql << ")" if options[:include_nil]
+      find_by_sql(sql)
+    else
+      conditions = "#{column} IS NOT NULL" unless options[:include_nil]
+      find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
+    end
+    result.map(&column.to_sym)
+  end
+
   named_scope :order, lambda { |order_by|
     {:order => order_by}
   }
