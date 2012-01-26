@@ -468,6 +468,31 @@ describe Conversation do
         u2.conversations.first.tags.sort.should eql [@course1.asset_string, @course2.asset_string].sort
         u3.conversations.first.tags.should eql [@course2.asset_string]
       end
+
+      it "should ignore conversation_participants without a valid user" do
+        u1 = student_in_course(:active_all => true).user
+        u2 = student_in_course(:active_all => true, :course => @course).user
+        @course1 = @course
+        @course2 = course(:active_all => true)
+        e = @course2.enroll_student(u2)
+        e.workflow_state = 'active'
+        e.save!
+        u3 = student_in_course(:active_all => true, :course => @course2).user
+        conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
+        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        u1.conversations.first.tags.should eql [@course1.asset_string]
+        u2.conversations.first.tags.should eql [@course1.asset_string]
+        u3.conversations.first.tags.should eql [@course2.asset_string]
+        broken_one = u3.conversations.first
+        broken_one.user_id = nil
+        broken_one.tags = []
+        broken_one.save!
+
+        conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
+        u1.conversations.first.tags.should eql [@course1.asset_string]
+        u2.conversations.first.tags.sort.should eql [@course1.asset_string, @course2.asset_string].sort
+        broken_one.reload.tags.should eql []
+      end
     end
 
     context "private conversations" do
@@ -585,6 +610,52 @@ describe Conversation do
         u2.conversations.first.tags.sort.should eql [@course1.asset_string, @course2.asset_string].sort
         u3.conversations.first.tags.should eql [@course2.asset_string]
         u4.conversations.first.tags.should eql [@course2.asset_string]
+      end
+    end
+
+    context "migration" do
+      before do
+        @u1 = student_in_course(:active_all => true).user
+        @u2 = student_in_course(:active_all => true, :course => @course).user
+        @course1 = @course
+        @course2 = course(:active_all => true)
+        e = @course2.enroll_student(@u2)
+        e.workflow_state = 'active'
+        e.save!
+        @u3 = student_in_course(:active_all => true, :course => @course2).user
+        @conversation = Conversation.initiate([@u1.id, @u2.id, @u3.id], false)
+        @conversation.add_message(@u1, 'test', :tags => [@course1.asset_string])
+        Conversation.update_all "tags = NULL"
+        ConversationParticipant.update_all "tags = NULL"
+        ConversationMessageParticipant.update_all "tags = NULL"
+
+        @conversation = Conversation.find(@conversation.id)
+        @conversation.tags.should eql []
+        @u1.conversations.first.tags.should eql []
+        @u2.conversations.first.tags.should eql []
+        @u3.conversations.first.tags.should eql []
+      end
+
+      it "should set the default tags when migrating" do
+        @conversation.migrate_context_tags!
+
+        @conversation.tags.sort.should eql [@course1.asset_string, @course2.asset_string].sort
+        @u1.conversations.first.tags.should eql [@course1.asset_string]
+        @u2.conversations.first.tags.sort.should eql [@course1.asset_string, @course2.asset_string].sort
+        @u3.conversations.first.tags.should eql [@course2.asset_string]
+      end
+
+      it "should ignore conversation_participants without a user" do
+        broken_one = @u3.conversations.first
+        broken_one.user_id = nil
+        broken_one.save!
+
+        @conversation.migrate_context_tags!
+
+        @conversation.tags.should eql [@course1.asset_string] # no course2 since participant is broken
+        @u1.conversations.first.tags.should eql [@course1.asset_string]
+        @u2.conversations.first.tags.should eql [@course1.asset_string]
+        broken_one.reload.tags.should eql [] # skipped
       end
     end
   end
