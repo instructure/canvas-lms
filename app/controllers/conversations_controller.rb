@@ -113,6 +113,7 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
     @scope ||= params[:scope].to_sym
+    base_scope = conversations_scope
     if params[:filter] && params[:filter] =~ /\Acourse_(\d+)\z/
       if course = @contexts[:courses][$1.to_i]
         conversations_scope = conversations_scope.tagged(params[:filter])
@@ -133,7 +134,11 @@ class ConversationsController < ApplicationController
     @conversations_json = conversations.each{|c| c.instance_variable_set(:@user, @current_user)}.map{ |c| jsonify_conversation(c, :last_message => last_messages[c.conversation_id], :include_participant_avatars => false, :include_participant_contexts => false) }
     @user_cache = Hash[*jsonify_users([@current_user]).map{|u| [u[:id], u] }.flatten]
     respond_to do |format|
-      format.html
+      format.html {
+        # TODO: remove this in a subsequent release, since everything will be
+        # filterable once the data migration has run
+        @filterable = (base_scope.scoped(:conditions => "conversations.tags IS NULL").size == 0)
+      }
       format.json { render :json => @conversations_json }
     end
   end

@@ -33,7 +33,7 @@
           </div>
         </li>
       </ul>
-      <div id="context_tags_filter">
+      <div id="context_tags_filter" style="<%= hidden unless @filterable %>">
         <label for="context_tags">
           <%= before_label :course_filter, "Course Filter" %>
         </label>
