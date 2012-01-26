@@ -232,6 +232,14 @@ class ConversationParticipant < ActiveRecord::Base
     save!
   end
 
+  def context_tags
+    read_attribute(:tags) ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
+  end
+
+  def infer_tags
+    conversation.infer_new_tags_for(self, []).first
+  end
+
   protected
   def message_tags
     messages.map(&:tags).inject([], &:concat).uniq

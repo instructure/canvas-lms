@@ -49,6 +49,7 @@ describe ConversationsController do
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
       assigns[:contexts][:courses].to_a.map{|p|p[1]}.
         reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
+      assigns[:filterable].should be_true
     end
 
     it "should work for an admin as well" do
@@ -76,6 +77,22 @@ describe ConversationsController do
       response.should be_success
       assigns[:conversations_json].size.should eql 1
       assigns[:conversations_json][0][:id].should == @c2.conversation_id
+    end
+
+    it "should hide the filter UI if some conversations have not been tagged yet" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      Conversation.update_all "tags = NULL"
+      ConversationParticipant.update_all "tags = NULL"
+      ConversationMessageParticipant.update_all "tags = NULL"
+
+      # create some more that are tagged
+      conversation
+      conversation
+
+      get 'index'
+      response.should be_success
+      assigns[:filterable].should be_false
     end
   end
 

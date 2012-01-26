@@ -146,6 +146,22 @@ describe ConversationsController, :type => :integration do
       ]
     end
 
+    it "should show the calculated audience_contexts if the tags have not been migrated yet" do
+      @c1 = conversation(@bob, @billy)
+      Conversation.update_all "tags = NULL"
+      ConversationParticipant.update_all "tags = NULL"
+      ConversationMessageParticipant.update_all "tags = NULL"
+
+      @c1.reload.tags.should be_empty
+      @c1.context_tags.should eql [@course.asset_string]
+
+      json = api_call(:get, "/api/v1/conversations.json",
+              { :controller => 'conversations', :action => 'index', :format => 'json' })
+      json.size.should eql 1
+      json.first["id"].should eql @c1.conversation_id
+      json.first["audience_contexts"].should eql({"groups" => {}, "courses" => {@course.id.to_s => []}})
+    end
+
     it "should include starred conversations in starred scope regardless of if read or archived" do
       @c1 = conversation(@bob, :workflow_state => 'unread', :starred => true)
       @c2 = conversation(@billy, :workflow_state => 'read', :starred => true)

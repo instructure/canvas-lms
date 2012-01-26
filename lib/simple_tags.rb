@@ -8,12 +8,7 @@ module SimpleTags
       end
     end
 
-    def context_tags
-      tags.grep(/\A(course|group)_\d+\z/)
-    end
-
     def serialized_tags(tags=self.tags)
-      return nil unless tags.present?
       SimpleTags.normalize_tags(tags).join(',')
     end
 

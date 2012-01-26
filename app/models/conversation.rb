@@ -230,7 +230,7 @@ class Conversation < ActiveRecord::Base
       message_data << {
         :conversation_message_id => message.id,
         :conversation_participant_id => cp.id,
-        :tags => serialized_tags(message_tags)
+        :tags => message_tags ? serialized_tags(message_tags) : nil
       }
     end
 
