@@ -97,6 +97,8 @@ describe "dashboard" do
     @assignment = assignment_model({:due_at => due_date, :course => @course})
     get "/"
     driver.find_element(:css, '.events_list .event a').should include_text(@assignment.title)
+    # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
+    driver.execute_script("return $('.event a .tooltip_text').text()").should match(@course.short_name)
   end
 
   it "should display assignment to grade in to do list and assignments menu for a teacher" do
