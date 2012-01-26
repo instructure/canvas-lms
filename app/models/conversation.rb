@@ -224,6 +224,7 @@ class Conversation < ActiveRecord::Base
     all_new_tags = options[:tags] || []
     message_data = []
     cps.all(:include => [:user]).each do |cp|
+      next unless cp.user
       new_tags, message_tags = infer_new_tags_for(cp, all_new_tags)
       cp.update_attribute :tags, cp.tags | new_tags if new_tags.present?
       message_data << {
@@ -332,6 +333,7 @@ class Conversation < ActiveRecord::Base
       cps = conversation_participants(:include => :user).all
       update_attribute :tags, current_context_strings
       cps.each do |cp|
+        next unless cp.user
         cp.update_attribute :tags, current_context_strings & cp.user.conversation_context_codes
         cp.conversation_message_participants.update_all ["tags = ?", serialized_tags(cp.tags)] if private?
       end
@@ -351,7 +353,7 @@ class Conversation < ActiveRecord::Base
   def current_context_strings
     return [] if private? && conversation_participants.all.size == 1
     conversation_participants.inject([]){ |ary, cp|
-      ary.concat(cp.user.conversation_context_codes)
+      cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
     }.sort.inject({}){ |hash, str|
       hash[str] = (hash[str] || 0) + 1
       hash
