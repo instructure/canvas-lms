@@ -783,4 +783,22 @@ class Enrollment < ActiveRecord::Base
     end
     return deleted
   end
+
+  def effective_start_at
+    [ start_at,
+      course_section && course_section.start_at,
+      course.start_at,
+      course.enrollment_term && course.enrollment_term.start_at,
+      course_section && course_section.created_at,
+      course.created_at
+    ].compact.first
+  end
+
+  def effective_end_at
+    [ end_at,
+      course_section && course_section.end_at,
+      course.conclude_at,
+      course.enrollment_term && course.enrollment_term.end_at
+    ].compact.first
+  end
 end
