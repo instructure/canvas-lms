@@ -290,8 +290,15 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API
+  # Delete or conclude an existing course
+  #
+  # @argument event [String] ["delete"|"conclude"] The action to take on the course. available options are 'delete' and 'conclude.'
   def destroy
-    @context = Course.find(params[:id])
+    @context = api_request? ? api_find(Course, params[:id]) : Course.find(params[:id])
+    if api_request? && !['delete', 'conclude'].include?(params[:event])
+      return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }.to_json, :status => :bad_request)
+    end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, :delete)
       @context.workflow_state = 'deleted'
@@ -305,11 +312,13 @@ class CoursesController < ApplicationController
     end
     @current_user.touch
     respond_to do |format|
-      format.html {redirect_to dashboard_url}
-      format.json {render :json => {:deleted => true}.to_json}
+      format.html { redirect_to dashboard_url }
+      format.json {
+        render :json => { params[:event] => true }.to_json
+      }
     end
   end
-  
+
   def statistics
     get_context
     if authorized_action(@context, @current_user, :read_reports)
