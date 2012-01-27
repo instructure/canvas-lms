@@ -859,15 +859,22 @@ class CoursesController < ApplicationController
     @enrollment = @context.enrollments.find(params[:id])
     can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
     can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    can_move &&= @context.grants_right?(@current_user, session, :manage_account_settings) if @enrollment.defined_by_sis?
     if can_move
       respond_to do |format|
-        if @enrollment.defined_by_sis? &&! @context.grants_right?(@current_user, session, :manage_account_settings)
-          return format.json { render :json => @enrollment.to_json, :status => :bad_request }
-        end
-        @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
-        @enrollment.save!
+        # ensure user_id,section_id,type,associated_user_id is unique (this
+        # will become a DB constraint eventually)
+        @possible_dup = @context.enrollments.find(:first, :conditions =>
+          ["id <> ? AND user_id = ? AND course_section_id = ? AND type = ? AND (associated_user_id IS NULL OR associated_user_id = ?)",
+          @enrollment.id, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id])
+        if @possible_dup.present?
+          format.json { render :json => @enrollment.to_json, :status => :forbidden }
+        else
+          @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
+          @enrollment.save!
 
-        format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment.to_json }
+        end
       end
     else
       authorized_action(@context, @current_user, :permission_fail)

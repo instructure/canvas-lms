@@ -239,8 +239,8 @@ describe "courses" do
 
             enrollment = user[:enrollment]
             enrollment_element = driver.find_element(:css, "#enrollment_#{enrollment.id}")
-            section_label = enrollment_element.find_element(:css, ".section") rescue nil
-            section_dropdown = enrollment_element.find_element(:css, ".enrollment_course_section_form #course_section_id") rescue nil
+            section_label = enrollment_element.find_element(:css, ".section_name") rescue nil
+            section_dropdown = enrollment_element.find_element(:css, ".enrollment_course_section_form .course_section_id") rescue nil
             edit_section_link = enrollment_element.find_element(:css, ".edit_section_link") rescue nil
             unenroll_user_link = enrollment_element.find_element(:css, ".unenroll_user_link") rescue nil
 

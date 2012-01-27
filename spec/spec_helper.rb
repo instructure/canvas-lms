@@ -281,6 +281,17 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
+  def student_in_course_section(opts={})
+    @course ||= opts[:course] || course(opts)
+    @course_section = opts[:course_section] || @course.course_sections.create!
+    @user = opts[:user] || user(opts)
+    @user.register!
+    @enrollment = @course.enroll_user(@user, 'StudentEnrollment', :section => @course_section)
+    @enrollment.workflow_state = 'active'
+    @enrollment.save!
+    @course.reload
+  end
+
   def course_with_teacher(opts={})
     course_with_user('TeacherEnrollment', opts)
     @teacher = @user

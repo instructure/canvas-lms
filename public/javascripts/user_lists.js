@@ -70,10 +70,16 @@ require([
           $form.find(".user_list").val("");
           UL.showTextarea();
           if (!enrollments || !enrollments.length) { return false; }
+          var already_existed = 0;
           $.each( enrollments, function(){
-            UL.addUserToList(this.enrollment);
+            already_existed += UL.addUserToList(this.enrollment);
           });
-          $.flashMessage(I18n.t("users_added", { one: "1 user added", other: "%{count} users added" }, { count: enrollments.length }));
+
+          var addedMsg = I18n.t("users_added", { one: "1 user added", other: "%{count} users added" }, { count: enrollments.length - already_existed });
+          if (already_existed > 0) {
+            addedMsg += " " + I18n.t("users_existed", { one: "(1 user already existed)", other: "(%{count} users already existed)" }, { count: already_existed });
+          }
+          $.flashMessage(addedMsg);
         }, function(data) {
           $.flashError(I18n.t("users_adding_failed", "Failed to enroll users"));
         });
@@ -88,7 +94,14 @@ require([
         if($(this).hasClass('cant_unenroll')) {
           alert(I18n.t("cant_unenroll", "This user was automatically enrolled using the campus enrollment system, so they can't be manually removed.  Please contact your system administrator if you have questions."));
         } else {
-          $(this).parents(".user").confirmDelete({
+          $user = $(this).parents('.user')
+          $sections = $(this).parents('.sections')
+          $section = $(this).parents('.section')
+          var $toDelete = $user;
+          if ($sections.find('.section:visible').size() > 1) {
+            $toDelete = $section;
+          }
+          $toDelete.confirmDelete({
             message: I18n.t("delete_confirm", "Are you sure you want to remove this user?"),
             url: $(this).attr('href'),
             success: function() {
@@ -175,7 +188,10 @@ require([
           return false;
         }
       });
+
+      var already_existed = true;
       if(!$("#enrollment_" + enrollment.id).length) {
+        already_existed = false;
         var $enrollment = $enrollment_blank
           .clone(true)
           .fillTemplateData({
@@ -200,6 +216,7 @@ require([
           .scrollToVisible($enrollment);
       }
       UL.updateCounts();
+      return already_existed ? 1 : 0;
     }
 
   };

@@ -439,19 +439,24 @@ require([
     $('.user_list .edit_section_link').click(function(event) {
       event.preventDefault();
       var $this = $(this);
-      $user = $this.closest('.user');
-      $user.find('.section').toggle();
-      $user.find('.enrollment_course_section_form').toggle();
+      var $user = $this.parents('.user');
+      var $sections = $user.find('.sections');
+      $sections.find('.section_name').toggle();
+      $sections.find('.enrollment_course_section_form').toggle();
     });
-    $('.user_list .enrollment_course_section_form #course_section_id').change(function (event) {
-      var form = $(this).parent('form');
-      var $this = $(this)
-      var section = form.prev('.section')
-      $.ajaxJSON(form.attr('action'), 'POST', form.getFormData(), function(data) {
-        section.html($this.find('option[value="' + $this.val() + '"]').html());
-        section.toggle();
-        form.toggle();
+    $('.user_list .enrollment_course_section_form .course_section_id').change(function (event) {
+      var $this = $(this);
+      var $sections = $this.parents('.sections');
+      var $form = $this.parent('form');
+      var $section_name = $form.prev('.section_name');
+      $.ajaxJSON($form.attr('action'), 'POST', $form.getFormData(), function(data) {
+        $section_name.html($this.find('option[value="' + $this.val() + '"]').html());
+        $sections.find('.section_name').toggle();
+        $sections.find('.enrollment_course_section_form').toggle();
       }, function(data) {
+        if (data && data.enrollment) {
+          $this.val(data.enrollment.course_section_id);
+        }
         $.flashError(I18n.t('errors.move_user', "Something went wrong moving the user to the new section. Please try again later."));
       });
     });
