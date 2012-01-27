@@ -247,6 +247,10 @@ class PseudonymSessionsController < ApplicationController
           logger.warn "Failed SAML login attempt."
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
           redirect_to login_url(:no_auto=>'true')
+        elsif response.no_authn_context?
+          logger.warn "Attempted SAML login for unsupported authn_context at IdP."
+          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
+          redirect_to login_url(:no_auto=>'true')
         else
           logger.warn "Unexpected SAML status code - status code: #{response.status_code rescue ""}"
           logger.warn "Status Message: #{response.status_message rescue ""}"
