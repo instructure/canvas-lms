@@ -176,16 +176,6 @@ describe "dashboard" do
   end
 
   context "course menu customization" do
-    it "should not allow customization if there are insufficient courses" do
-      course_with_teacher_logged_in
-
-      get "/"
-
-      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
-      driver.action.move_to(course_menu).perform
-      course_menu.should include_text('My Courses')
-      course_menu.should_not include_text('Customize')
-    end
 
     it "should allow customization if there are sufficient courses" do
       course_with_teacher_logged_in
