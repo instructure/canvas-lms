@@ -44,11 +44,17 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation
 
+      term = EnrollmentTerm.create! :name => "Fall"
+      term.root_account_id = @course.root_account_id
+      term.save!
+      @course.update_attributes! :enrollment_term => term
+
       get 'index'
       response.should be_success
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
       assigns[:contexts][:courses].to_a.map{|p|p[1]}.
         reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
+      assigns[:contexts][:courses][@course.id][:term].should == "Fall"
       assigns[:filterable].should be_true
     end
 

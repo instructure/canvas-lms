@@ -1601,13 +1601,24 @@ I18n.scoped 'conversations', (I18n) ->
             $img = $('<img class="avatar" />')
             $img.attr('src', data.avatar_url)
             $node.append($img)
-          context_name  = if data.context_name then data.context_name else ''
-          context_name  = if context_name.length < 40 then context_name else context_name.substr(0, 40) + '...'
-          $context_name = if data.context_name then $('<span />', class: 'context_name').text("(#{context_name})") else ''
+
+          unless options.parent
+            match = /^(course|section)_(\d+)$/.exec(data.id)
+            termInfo = MessageInbox.contexts["#{match[1]}s"][match[2]] if match
+
+            context_info  = data.context_name or ''
+            context_info  = if context_info.length < 40 then context_info else context_info.substr(0, 40) + '...'
+            context_info  = if context_info and termInfo?.term
+                              "#{context_info} - #{termInfo.term}"
+                            else if termInfo?.term
+                              termInfo.term
+                            else
+                              null
+          $context_info = if context_info then $('<span />', class: 'context_info').text("(#{context_info})") else ''
           $b = $('<b />')
           $b.text(data.name)
           $name = $('<span />', class: 'name')
-          $name.append($b, $context_name)
+          $name.append($b, $context_info)
           $span = $('<span />', class: 'details')
           if data.common_courses?
             $span.text(MessageInbox.context_list(courses: data.common_courses, groups: data.common_groups))
@@ -1698,6 +1709,11 @@ I18n.scoped 'conversations', (I18n) ->
           $b.text(data.name)
           $name = $('<span />', class: 'name')
           $name.append($b)
+
+          courseId = /^course_(\d+)$/.exec(data.id)[1]
+          term = MessageInbox.contexts.courses[courseId].term
+          if term
+            $name.append $('<span/>', class: 'context_info').text("(#{term})")
           $span = $('<span />', class: 'details')
           $node.append($name, $span)
           $node.attr('title', data.name)

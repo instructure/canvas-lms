@@ -595,12 +595,17 @@ class ConversationsController < ApplicationController
   def load_all_contexts
     @contexts = {:courses => {}, :groups => {}, :sections => {}}
 
+    term_for_course = lambda do |course|
+      course.enrollment_term.default_term? ? nil : course.enrollment_term.name
+    end
+
     @current_user.concluded_courses.each do |course|
       @contexts[:courses][course.id] = {
         :id => course.id,
         :url => course_url(course),
         :name => course.name,
         :type => :course,
+        :term => term_for_course.call(course),
         :active => course.recently_ended?,
         :can_add_notes => can_add_notes_to?(course)
       }
@@ -612,6 +617,7 @@ class ConversationsController < ApplicationController
         :url => course_url(course),
         :name => course.name,
         :type => :course,
+        :term => term_for_course.call(course),
         :active => true,
         :can_add_notes => can_add_notes_to?(course)
       }
@@ -623,6 +629,7 @@ class ConversationsController < ApplicationController
         :id => section.id,
         :name => section.name,
         :type => :section,
+        :term => @contexts[:courses][section.course_id][:term],
         :active => @contexts[:courses][section.course_id][:active],
         :parent => {:course => section.course_id},
         :context_name =>  @contexts[:courses][section.course_id][:name]

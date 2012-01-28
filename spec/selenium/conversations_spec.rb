@@ -9,6 +9,13 @@ describe "conversations" do
 
   before(:each) do
     course_with_teacher_logged_in
+
+    term = EnrollmentTerm.new :name => "Super Term"
+    term.root_account_id = @course.root_account_id
+    term.save!
+
+    @course.update_attributes! :enrollment_term => term
+
     @user.watched_conversations_intro
     @user.save
   end
@@ -329,6 +336,25 @@ describe "conversations" do
       tokens.should eql ["student 1"]
       search("stu") do
         menu.should eql ["student 2"]
+      end
+    end
+
+    it "should show the term next to courses and sections" do
+      search("course") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name .context_info')
+        term_info.text.should == "(#{@course.enrollment_term.name})"
+      end
+
+      search("section") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name .context_info')
+        term_info.text.should == "(#{@course.name} - #{@course.enrollment_term.name})"
+      end
+
+      # doesn't show term for sections when browsing
+      browse_menu
+      browse "the course", "Course Sections" do
+        menu_items = driver.find_elements(:css, ".autocomplete_menu .name")
+        menu_items.last.text.should == "the section"
       end
     end
 
@@ -848,6 +874,34 @@ describe "conversations" do
       conversations = find_all_with_jquery('#conversations > ul > li:visible')
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    end
+
+    it "should show the term name by the course" do
+      new_conversation
+      browse_menu
+
+      browse("the course"){ search("stu"){ click "student1" } }
+      submit_message_form(:add_recipient => false)
+
+      @input = find_with_jquery("#context_tags_filter input:visible")
+      search("the course", "context_tags") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name .context_info')
+        term_info.text.should == "(#{@course1.enrollment_term.name})"
+      end
+    end
+
+    it "should not show the default term name" do
+      new_conversation
+      browse_menu
+
+      browse("the course"){ search("stu"){ click "student1" } }
+      submit_message_form(:add_recipient => false)
+
+      @input = find_with_jquery("#context_tags_filter input:visible")
+      search("that course", "context_tags") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name')
+        term_info.text.should == "that course"
+      end
     end
   end
 end
