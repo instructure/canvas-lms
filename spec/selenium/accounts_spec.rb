@@ -198,4 +198,43 @@ describe "account authentication configs" do
         :ta_enrollment => ["Jul 4", "Jul 28"]
     })
   end
+  
+  it "should load/refresh SAML debug info" do
+    enable_cache do
+      aac = Account.default.account_authorization_configs.create!(:auth_type => 'saml')
+      get "/accounts/#{Account.default.id}/account_authorization_configs"
+      
+      start = driver.find_element(:id, "start_saml_debugging")
+      refresh = driver.find_element(:id, "refresh_saml_debugging")
+      stop = driver.find_element(:id, "stop_saml_debugging")
+      debug_info = driver.find_element(:id, "saml_debug_info")
+      
+      start.click
+      wait_for_ajax_requests
+      
+      debug_info.text.should =~ /Waiting for attempted login/
+      
+      aac.debugging_keys.each_with_index do |key, i|
+        aac.debug_set(key, "testvalue#{i}")
+      end
+  
+      refresh.click
+      wait_for_ajax_requests
+
+      debug_info = driver.find_element(:id, "saml_debug_info")
+  
+      aac.debugging_keys.each_with_index do |key, i|
+        debug_info.text.should =~ /testvalue#{i}/
+      end
+      
+      stop.click
+      wait_for_ajax_requests
+      aac.debugging?.should == false
+  
+      aac.debugging_keys.each do |key|
+        aac.debug_get(key).should == nil
+      end
+    end
+  end
+  
 end

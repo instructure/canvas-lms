@@ -266,4 +266,43 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       @account.save!
     end
   end
+  
+  def debugging?
+    !!Rails.cache.fetch(debug_key(:debugging))
+  end
+  
+  def debugging_keys
+    [:debugging, :request_id, :to_idp_url, :to_idp_xml, :idp_response_encoded, 
+     :idp_in_response_to, :fingerprint_from_idp, :idp_response_xml_encrypted,
+     :idp_response_xml_decrypted, :idp_login_destination, :is_valid_login_response,
+     :login_response_validation_error, :login_to_canvas_success, :canvas_login_fail_message, 
+     :logged_in_user_id, :logout_request_id, :logout_to_idp_url, :logout_to_idp_xml, 
+     :idp_logout_response_encoded, :idp_logout_in_response_to, 
+     :idp_logout_response_xml_encrypted, :idp_logout_destination]
+  end
+  
+  def finish_debugging
+    debugging_keys.each { |key| Rails.cache.delete(debug_key(key)) }
+  end
+  
+  def start_debugging
+    finish_debugging # clear old data
+    debug_set(:debugging, t('debug.wait_for_login', "Waiting for attempted login"))
+  end
+  
+  def debug_get(key)
+    Rails.cache.fetch(debug_key(key))
+  end
+  
+  def debug_set(key, value)
+    Rails.cache.write(debug_key(key), value, :expires_in => debug_expire)
+  end
+  
+  def debug_key(key)
+    ['aac_debugging', self.id, key.to_s].cache_key
+  end
+  
+  def debug_expire
+    Setting.get('aac_debug_expire_minutes', 30).minutes
+  end
 end

@@ -251,9 +251,17 @@ module AuthenticationMethods
 
   def initiate_saml_login(preferred_account_domain=nil)
     reset_session_for_login
-    settings = @domain_root_account.account_authorization_config.saml_settings(preferred_account_domain)
-    request = Onelogin::Saml::AuthRequest.create(settings)
-    delegated_auth_redirect(request)
+    aac = @domain_root_account.account_authorization_config
+    settings = aac.saml_settings(preferred_account_domain)
+    request = Onelogin::Saml::AuthRequest.new(settings)
+    forward_url = request.generate_request
+    if aac.debugging? && !aac.debug_get(:request_id)
+      aac.debug_set(:request_id, request.id)
+      aac.debug_set(:to_idp_url, forward_url)
+      aac.debug_set(:to_idp_xml, request.request_xml)
+      aac.debug_set(:debugging, "Forwarding user to IdP for authentication")
+    end
+    delegated_auth_redirect(forward_url)
   end
 
   def delegated_auth_redirect(uri)

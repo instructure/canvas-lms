@@ -1,6 +1,7 @@
 <% @account_config = @account_configs.first %>
 <% form_id = @account_config.saml_authentication? ? 'auth_form' : 'saml_form' %>
 <% active = @account_config.saml_authentication? ? 'class="active"' : '' %>
+<% debugging = @account_config && @account_config.debugging? %>
 <div id="saml_div" <%= raw active %>>
 <% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class => "auth_type saml_form") do %>
   <% fields_for @account_config, :index => 0 do |f| %>
@@ -84,6 +85,33 @@
         </td>
       </tr>
     </table>
+      
+    <div class="debugging">
+      <h3 style="margin-top: 10px"><%= t(:saml_debugging, "Debugging") %></h3>
+      
+      <div id="saml_debug_console">
+        <p>
+          <%= t 'saml_debug_instructions', <<-TEXT
+              Once you start debugging all info about the next attempted SAML login attempt
+              will be collected. Click "Refresh" to see if more data has been collected or
+              "Stop Debugging" to clear the collected data and stop the current debug attempt.
+              TEXT
+           %>
+        </p>
+        <p>
+          <a href="<%= account_saml_testing_url(@account) %>" id="start_saml_debugging" class="button" style="<%= hidden(!debugging) %>"><%= t('start_debugging', 'Start Debugging') %></a>
+          <a href="<%= account_saml_testing_url(@account) %>" id="refresh_saml_debugging" class="button" style="<%= hidden(debugging) %>"><%= t('refresh_debugging', 'Refresh') %></a>
+          <a href="<%= account_saml_testing_stop_url(@account) %>" id="stop_saml_debugging" class="button" style="<%= hidden(debugging) %>"><%= t('stop_debugging', 'Stop Debugging') %></a>
+        </p>
+        
+        <div id="saml_debug_info" style="<%= hidden(debugging) %>">
+          <% if @account_config && @account_config.debugging? %>
+            <%= render :partial => 'saml_testing.html' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+      
   <% end %>
 <% end %>
 </div>
