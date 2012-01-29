@@ -350,7 +350,6 @@ describe "calendar2" do
         replace_content(end_time, '11111')
         title.click
         edit_form.find_element(:css, '.start_time').should have_class('error')
-        edit_form.find_element(:css, '.end_time').should have_class('error')
         driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
         driver.switch_to.alert.dismiss
         edit_form.should be_displayed

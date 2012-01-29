@@ -1,6 +1,6 @@
 define ['jquery'], ($) ->
 
-  class
+  class TimeBlockListManager
     # takes an optional array of Date pairs
     constructor: (blocks) ->
       @blocks = []

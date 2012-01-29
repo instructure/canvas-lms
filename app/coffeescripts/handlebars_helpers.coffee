@@ -31,6 +31,10 @@ define [
       isoString = $.parseFromISO(isoString) unless isoString.datetime
       isoString.datetime_formatted
 
+    # helper for using date.js's custom toString method on Date objects
+    dateToString : (date = '', format) ->
+      date.toString(format)
+
     mimeClass: (contentType) -> $.mimeClass(contentType)
 
     newlinesToBreak : (string) ->

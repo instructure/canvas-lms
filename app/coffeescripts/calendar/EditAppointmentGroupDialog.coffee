@@ -12,7 +12,7 @@ define [
     resizable: false
     title: I18n.t('titles.edit_appointment_group', "Edit Appointment Group")
 
-  class
+  class EditAppointmentGroupDialog
     constructor: (@apptGroup, @parentCloseCB) ->
       @currentContextInfo = null
 
