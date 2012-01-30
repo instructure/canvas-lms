@@ -37,6 +37,18 @@ module I18nExtraction
       end
     end
 
+    def infer_pluralization_hash(default)
+      {:one => "1 #{default}", :other => "%{count} #{default.pluralize}"}
+    end
+
+    def allowed_pluralization_keys
+      [:zero, :one, :few, :many, :other]
+    end
+
+    def required_pluralization_keys
+      [:one, :other]
+    end
+
     def self.included(base)
       base.instance_eval do
         attr_reader :translations, :total, :total_unique

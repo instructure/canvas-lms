@@ -85,6 +85,10 @@ describe I18nExtraction::RubyExtractor do
       extract("t 'foo', {:one => 'a foo', :other => 'some foos'}, :count => 1").should == {'foo' => {'one' => 'a foo', 'other' => 'some foos'}}
     end
 
+    it "should complain if not all required pluralization sub-keys are provided" do
+      lambda{ extract("t 'foo', {:other => 'some foos'}, :count => 1") }.should raise_error(/not all required :count sub-key\(s\) provided/)
+    end
+
     it "should reject invalid pluralization sub-keys" do
       lambda{ extract "t 'foo', {:invalid => '%{count} Foo'}, :count => 1" }.should raise_error(/invalid :count sub-key\(s\)/)
     end
