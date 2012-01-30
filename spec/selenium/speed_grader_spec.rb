@@ -251,6 +251,40 @@ describe "speedgrader" do
     find_with_jquery('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
   end
 
+  context "multiple enrollments" do
+    before(:each) do
+      student_in_course
+      @course_section = @course.course_sections.create!(:name => "Other Section")
+      @enrollment = @course.student_enrollments.build(:user => @student, :workflow_state => "active", :course_section => @course_section)
+      @enrollment.save!
+    end
+
+    def goto_section(menu_index)
+      driver.find_element(:css, "#combo_box_container .ui-selectmenu-icon").click
+      driver.execute_script("$('#section-menu-link').trigger('mouseenter')")
+      driver.find_element(:css, "#ui-menu-0-#{menu_index}").click
+      wait_for_dom_ready
+      wait_for_ajaximations
+    end
+
+    it "should not duplicate students" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      driver.find_elements(:css, "#students_selectmenu option").length.should == 1
+    end
+
+    it "should filter by section properly" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      goto_section(1)
+      driver.find_elements(:css, "#students_selectmenu option").length.should == 1
+      goto_section(2)
+      driver.find_elements(:css, "#students_selectmenu option").length.should == 1
+    end
+  end
+
   it "should be able to change sorting and hide student names" do
     student_submission
 

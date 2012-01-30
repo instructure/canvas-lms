@@ -1028,7 +1028,7 @@ class Assignment < ActiveRecord::Base
       },
       :include_root => false
     )
-    visible_students = context.students_visible_to(user)
+    visible_students = context.students_visible_to(user).uniq
     res[:context][:students] = visible_students.
       map{|u| u.as_json(:include_root => false)}
     res[:context][:active_course_sections] = context.sections_visible_to(user).
