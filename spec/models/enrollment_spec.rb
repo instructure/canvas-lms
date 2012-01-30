@@ -261,7 +261,7 @@ describe Enrollment do
     it "should be able to read grades if the course grants management rights to the enrollment" do
       @new_user = user_model
       @enrollment.grants_rights?(@new_user, nil, :read_grades)[:read_grades].should be_false
-      @course.admins << @new_user
+      @course.instructors << @new_user
       @course.save!
       @enrollment.grants_rights?(@user, nil, :read_grades).should be_true
     end

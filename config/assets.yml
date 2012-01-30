@@ -214,6 +214,12 @@ javascripts:
     - public/javascripts/context_inbox.js
   context_modules:
     - public/javascripts/context_modules.js
+  copy_course:
+    - public/javascripts/compiled/util/processItemSelections.js
+    - public/javascripts/copy_course.js
+  content_imports:
+    - public/javascripts/compiled/util/processMigrationItemSelections.js
+    - public/javascripts/content_imports.js
   course_settings:
     - public/javascripts/vendor/jquery.cookie.js
     - public/javascripts/user_lists.js
@@ -267,6 +273,7 @@ javascripts:
     - public/javascripts/jst/SubmissionDetailsDialog.js
     - public/javascripts/compiled/SubmissionDetailsDialog.js
     - public/javascripts/jst/gradebook2/section_to_show_menu.js
+    - public/javascripts/jst/gradebook2/column_header.js
     - public/javascripts/compiled/gradebook2/Gradebook.js
     - public/javascripts/compiled/gradebook2/SubmissionCell.js
   gradebooks:
@@ -501,7 +508,5 @@ stylesheets:
   messages:
     - public/stylesheets/compiled/messages.css
     - public/stylesheets/compiled/slideshow.css
-  dashboard:
-    - public/stylesheets/compiled/g_dashboard_conversations.css
   alerts:
     - public/stylesheets/compiled/alerts.css

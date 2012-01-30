@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe PseudonymSessionsController do
 
@@ -71,12 +71,9 @@ describe PseudonymSessionsController do
   end
 
   context "trusted logins" do
-    before do
-      Pseudonym.stubs(:trusted_by).with(Account.default).returns(Pseudonym.scoped({}))
-    end
-
     it "should login for a pseudonym from a different account" do
       account = Account.create!
+      Account.any_instance.stubs(:trusted_account_ids).returns([account.id])
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
       response.should redirect_to(dashboard_url(:login_success => 1))
@@ -95,11 +92,27 @@ describe PseudonymSessionsController do
     it "should not login for multiple users with identical pseudonyms" do
       account1 = Account.create!
       account2 = Account.create!
+      Account.any_instance.stubs(:trusted_account_ids).returns([account1.id, account2.id])
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account1)
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account2)
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
       response.should_not be_success
       response.should render_template('pseudonym_sessions/new')
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should login for a user from a different shard" do
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => Account.site_admin)
+        @shard1.activate do
+          account = Account.create!
+          HostUrl.stubs(:default_domain_root_account).returns(account)
+          post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty' }
+          response.should redirect_to(dashboard_url(:login_success => 1))
+          assigns[:pseudonym].should == @pseudonym
+        end
+      end
     end
   end
 

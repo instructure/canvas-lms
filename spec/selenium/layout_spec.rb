@@ -1,8 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "layout selenium tests" do
+describe "layout" do
   it_should_behave_like "in-process server selenium tests"
-
 
   it "should auto-scroll the sidebar when $.scrollSidebar is called" do
     course_with_student_logged_in
@@ -32,5 +31,11 @@ describe "layout selenium tests" do
     sleep 0.1
     body.attribute(:class).should_not match /with-scrolling-right-side/
     body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
+  end
+
+  it "should have ENV available to the JavaScript from js_env" do
+    course_with_student_logged_in
+    get "/"
+    driver.execute_script("return ENV.current_user_id").should == @user.id
   end
 end

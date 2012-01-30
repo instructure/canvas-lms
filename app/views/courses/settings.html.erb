@@ -5,7 +5,7 @@
   @active_tab = "settings"
 
   enrollment_hashes  = {} 
-  ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment'].each do |type|
+  ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].each do |type|
     enrollment_hashes[type] = {} 
     list = @context.detailed_enrollments.select{|e| e.type == type && e.active_or_pending?}.sort_by{|e| e.user.sortable_name.downcase rescue 'a' }
     if type == 'StudentEnrollment' && @context.visibility_limited_to_course_sections?(@current_user)
@@ -19,6 +19,7 @@
   teachers = enrollment_hashes['TeacherEnrollment'].map{|k, v| v[0]}
   tas = enrollment_hashes['TaEnrollment'].map{|k, v| v[0]}
   observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]}
+  designers = enrollment_hashes['DesignerEnrollment'].map{|k, v| v[0]}
   has_multiple_sections = @context.course_sections.active.count > 1
 
   publishing_enabled = @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades)
@@ -89,6 +90,10 @@
       <tr>
         <td><%= before_label('observers', %{Observers}) %></td>
         <td class="observer_count"><%= observers.empty? ? t('none', "None") : observers.length %></td>
+      </tr>
+      <tr>
+        <td><%= before_label('designers', %{Designers}) %></td>
+        <td class="designer_count"><%= designers.empty? ? t('none', "None") : designers.length %></td>
       </tr>
     </table>
   </div>
@@ -499,6 +504,14 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
               <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TeacherEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
             <% end %>
           </ul>
+          <h3><%= t('headings.designers', %{Designers}) %> <span class="tally">(<span class="designer_count"><%= designers.length %></span>)</span></h3>
+          <ul class="user_list designer_enrollments">
+            <% if designers.empty? %>
+              <li class="none"><%= t('no_designers', %{No Designers Assigned}) %></li>
+            <% else %>
+              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['DesignerEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
+            <% end %>
+          </ul>
           <h3><%= t('headings.tas', %{TAs}) %> <span class="tally">(<span class="ta_count"><%= tas.length %></span>)</span></h3>
           <ul class="user_list ta_enrollments">
             <% if tas.empty? %>
@@ -529,6 +542,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <option value="TeacherEnrollment" class="teacherless_invite"><%= t('option.teachers', %{Teachers}) %></option>
           <% end %>
           <option value="ObserverEnrollment"><%= t('option.observers', %{Observers}) %></option>
+          <option value="DesignerEnrollment"><%= t('option.designers', %{Designers}) %></option>
         </select>
       </div>
       <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">

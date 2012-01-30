@@ -51,4 +51,16 @@ describe ErrorReport do
   it "should not fail with invalid UTF-8" do
     ErrorReport.log_error('my error', :message => "he\xffllo")
   end
+
+  it "should return categories" do
+    ErrorReport.categories.should == []
+    ErrorReport.create! { |r| r.category = 'bob' }
+    ErrorReport.categories.should == ['bob']
+    ErrorReport.create! { |r| r.category = 'bob' }
+    ErrorReport.categories.should == ['bob']
+    ErrorReport.create! { |r| r.category = 'george' }
+    ErrorReport.categories.should == ['bob', 'george']
+    ErrorReport.create! { |r| r.category = 'fred' }
+    ErrorReport.categories.should == ['bob', 'fred', 'george']
+  end
 end

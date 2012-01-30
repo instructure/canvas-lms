@@ -888,10 +888,10 @@ class Assignment < ActiveRecord::Base
 
   def self.find_or_create_submission(assignment_id, user_id)
     s = nil
-    attempts = 0
-    s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-    s.created_correctly_from_assignment_rb = true
-    s.save_without_broadcast if s.new_record?
+    unique_constraint_retry do
+      s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
+      s.save_without_broadcast if s.new_record?
+    end
     raise "bad" if s.new_record?
     s
   end
@@ -1312,7 +1312,7 @@ class Assignment < ActiveRecord::Base
         r.update_for(self)
       end
     end
-    admins = self.context.admins
+    admins = self.context.instructors
     needed_ids = admins.map{|a| a.id} - grading_user_ids
     admins.select{|a| needed_ids.include?(a.id)}.each do |a|
       r = assignment_reminders.build(:user => a, :reminder_type => 'grading')

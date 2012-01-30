@@ -379,4 +379,44 @@ describe Group do
       group.should have_common_section_with_user(user2)
     end
   end
+
+  context "tabs_available" do
+    before do
+      course_with_teacher
+      @teacher = @user
+      @group = group(:group_context => @course)
+      @group.users << @student = student_in_course(:course => @course).user
+    end
+
+    it "should let members see everything" do
+      @group.tabs_available(@student).map{|t|t[:id]}.should eql [
+        Group::TAB_HOME,
+        Group::TAB_ANNOUNCEMENTS,
+        Group::TAB_PAGES,
+        Group::TAB_PEOPLE,
+        Group::TAB_DISCUSSIONS,
+        Group::TAB_CHAT,
+        Group::TAB_FILES,
+        Group::TAB_CONFERENCES
+      ]
+    end
+
+    it "should let admins see everything" do
+      @group.tabs_available(@teacher).map{|t|t[:id]}.should eql [
+        Group::TAB_HOME,
+        Group::TAB_ANNOUNCEMENTS,
+        Group::TAB_PAGES,
+        Group::TAB_PEOPLE,
+        Group::TAB_DISCUSSIONS,
+        Group::TAB_CHAT,
+        Group::TAB_FILES,
+        Group::TAB_CONFERENCES
+      ]
+    end
+
+    it "should not let nobodies see conferences" do
+      @group.tabs_available(nil).map{|t|t[:id]}.should_not include Group::TAB_CONFERENCES
+    end
+  end
+  
 end

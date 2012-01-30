@@ -34,7 +34,6 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      User.update_all({:creation_sis_batch_id => @batch_id}, {:id => importer.users_to_set_sis_batch_ids}) if @batch_id && !importer.users_to_set_sis_batch_ids.empty?
       Pseudonym.update_all({:sis_batch_id => @batch_id}, {:id => importer.pseudos_to_set_sis_batch_ids}) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
@@ -88,9 +87,9 @@ module SIS
             user_id, login_id, status, first_name, last_name, email, password, ssha_password = user_row
 
             pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id)
-            pseudo_by_login = @root_account.pseudonyms.by_unique_id(login_id).first
+            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
             pseudo ||= pseudo_by_login
-            pseudo ||= @root_account.pseudonyms.by_unique_id(email).first if email.present?
+            pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
 
             if pseudo
               if pseudo.sis_user_id.present? && pseudo.sis_user_id != user_id
@@ -159,7 +158,6 @@ module SIS
             begin
               User.transaction(:requires_new => true) do
                 if user.changed?
-                  user.creation_sis_batch_id = @batch_id if @batch_id
                   raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
                 elsif @batch_id
                   @users_to_set_sis_batch_ids << user.id

@@ -106,10 +106,19 @@ module SIS
         @files = nil
 
         IMPORTERS.each do |importer|
-          @csvs[importer].each do |csv|
-            rows = (%x{wc -l '#{csv[:fullpath]}'}.split.first.to_i rescue 0)
-            @rows[importer] += rows
-            @total_rows += rows
+          @csvs[importer].reject! do |csv|
+            begin
+              rows = 0
+              FasterCSV.open(csv[:fullpath], "rb", BaseImporter::PARSE_ARGS) do |csv|
+                rows += 1 while csv.shift
+              end
+              @rows[importer] += rows
+              @total_rows += rows
+              false
+            rescue FasterCSV::MalformedCSVError
+              add_error(csv, "Malformed CSV")
+              true
+            end
           end
         end
         @parallelism = 1 if @total_rows <= @minimum_rows_for_parallel
@@ -378,18 +387,22 @@ module SIS
             add_error(csv, "Invalid UTF-8")
             return
           end
-          FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS) do |row|
-            importer = IMPORTERS.index do |importer|
-              if SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
-                @csvs[importer] << csv
-                @headers[importer].merge(row.headers)
-                true
-              else
-                false
+          begin
+            FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS) do |row|
+              importer = IMPORTERS.index do |importer|
+                if SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
+                  @csvs[importer] << csv
+                  @headers[importer].merge(row.headers)
+                  true
+                else
+                  false
+                end
               end
+              add_error(csv, "Couldn't find Canvas CSV import headers") if importer.nil?
+              break
             end
-            add_error(csv, "Couldn't find Canvas CSV import headers") if importer.nil?
-            break
+          rescue FasterCSV::MalformedCSVError
+            add_error(csv, "Malformed CSV")
           end
         elsif !File.directory?(csv[:fullpath]) && !(csv[:fullpath] =~ IGNORE_FILES)
           add_warning(csv, "Skipping unknown file type")

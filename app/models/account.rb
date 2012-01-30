@@ -406,6 +406,10 @@ class Account < ActiveRecord::Base
     res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     res.compact
   end
+
+  def associated_accounts
+    self.account_chain
+  end
   
   def account_chain_ids(opts={})
     account_chain(opts).map(&:id)
@@ -1047,6 +1051,11 @@ class Account < ActiveRecord::Base
     root_account = self.root_account
     return true if root_account.open_registration?
     root_account.grants_right?(user, session, :manage_user_logins)
+  end
+
+  def trusted_account_ids
+    return [] if !root_account? || self == Account.site_admin
+    [ Account.site_admin.id ]
   end
 
   named_scope :root_accounts, :conditions => {:root_account_id => nil}

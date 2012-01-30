@@ -133,6 +133,35 @@ describe Quiz do
     Assignment.count.should eql(a_count + 1)
   end
 
+  it "should not send a message if notify_of_update is blank" do
+    Notification.create!(:name => 'Assignment Changed')
+    @course.offer
+    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a.points_possible.should eql(5.0)
+    a.submission_types.should_not eql("online_quiz")
+    a.update_attribute(:created_at, Time.now - (40 * 60))
+    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
+    q.workflow_state = 'available'
+    q.assignment.expects(:save_without_broadcasting!).at_least_once
+    q.save
+    q.assignment.messages_sent.should be_empty
+  end
+
+  it "should send a message if notify_of_update is set" do
+    Notification.create!(:name => 'Assignment Changed')
+    @course.offer
+    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a.points_possible.should eql(5.0)
+    a.submission_types.should_not eql("online_quiz")
+    a.update_attribute(:created_at, Time.now - (40 * 60))
+    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
+    q.workflow_state = 'available'
+    q.notify_of_update = 1
+    q.assignment.expects(:save_without_broadcasting!).never
+    q.save
+    q.assignment.messages_sent.should include('Assignment Changed')
+  end
+
   it "should delete the assignment if the quiz is no longer graded" do
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
     a.points_possible.should eql(5.0)

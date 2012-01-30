@@ -9,5 +9,7 @@ require([
   'specs/util/BackoffPollerSpec',
   'specs/jQuery.instructureJqueryPatches',
   'specs/ENVSpec',
-  'specs/calendar/TimeBlockListManagerSpec'
+  'specs/calendar/TimeBlockListManagerSpec',
+  'specs/util/processMigrationItemSelectionsSpec',
+  'specs/util/processItemSelectionsSpec'
 ]);

@@ -18,15 +18,17 @@
 
 class ActiveRecord::Base
   DROPPED_COLUMNS = {
-    'accounts' => %w(type),
+    'abstract_courses' => %w(sis_name sis_course_code),
+    'accounts' => %w(type sis_name),
     'attachments' => %w(enrollment_id),
-    'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist),
-    'courses' => %w(section hidden_tabs),
-    'users' => %w(type),
-    'role_overrides' => %w(context_code),
-    'enrollment_terms' => %w(sis_data),
-    'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id),
+    'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name),
+    'courses' => %w(section hidden_tabs sis_name sis_course_code),
+    'enrollment_terms' => %w(sis_data sis_name),
     'enrollments' => %w(invitation_email),
+    'groups' => %w(sis_name),
+    'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id),
+    'role_overrides' => %w(context_code),
+    'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name),
   }.freeze
 
   def self.columns_with_remove_dropped_columns

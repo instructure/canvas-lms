@@ -64,8 +64,12 @@ module CC::Importer::Standard
         attrs.each do |attr|
           if node[attr]
             val = URI.unescape(node[attr])
-            if ImportedHtmlConverter.relative_url?(val)
-              node[attr] = URI::escape(get_canvas_att_replacement_url(val))
+            begin
+              if ImportedHtmlConverter.relative_url?(val)
+                node[attr] = URI::escape(get_canvas_att_replacement_url(val))
+              end
+            rescue URI::InvalidURIError
+              Rails.logger.warn "attempting to translate invalid url: #{val}"
             end
           end
         end

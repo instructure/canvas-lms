@@ -216,6 +216,10 @@
         <div>
             <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post do %><%= t('links.preview_quiz', "Preview the Quiz") %><% end %>
         </div>
+        <div>
+          <input type="checkbox" name="quiz[notify_of_update]" id="quiz_notify_of_update" value="1" checked="checked" />
+          <label for="quiz_notify_of_update"><%= t('labels.quiz_notify', 'Notify users this quiz has changed') %>
+        </div>
         <button type="submit" class="save_quiz_button button"><%= t('buttons.save_settings', "Save Settings") %></button>
         <button type="submit" class="publish_quiz_button button button-default"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
         <div style="display: none;">

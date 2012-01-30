@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "web conference selenium tests" do
+describe "web conference" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
+  before (:each) do
     PluginSetting.create!(:name => "dim_dim", :settings =>
         {"domain" => "dimdim.instructure.com"})
   end
@@ -36,5 +36,4 @@ describe "web conference selenium tests" do
     wait_for_animations
     driver.find_element(:css, '#add_conference_form div.header').text.include?('Start').should be_false
   end
-
 end

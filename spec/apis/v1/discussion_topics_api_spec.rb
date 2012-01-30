@@ -18,6 +18,31 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+class TestCourseApi
+  include Api
+  include Api::V1::DiscussionTopics
+  def feeds_topic_format_path(topic_id, code, format); "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"; end
+  def named_context_url(*args); "named_context_url(#{args.inspect[1..-2]})"; end
+end
+
+describe Api::V1::DiscussionTopics do
+  before do
+    @test_api = TestCourseApi.new
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @me = @user
+    @topic = @course.discussion_topics.create
+  end
+
+  it 'should render a podcast_url using the discussion topic\'s context if there is no @context_enrollment/@context' do
+    @topic.update_attribute :podcast_enabled, true
+    data = nil
+    lambda {
+      data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, {})
+    }.should_not raise_error
+    data[:podcast_url].should match /feeds_topic_format_path/
+  end
+end
+
 describe DiscussionTopicsController, :type => :integration do
   before(:each) do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)

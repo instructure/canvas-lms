@@ -430,7 +430,7 @@ class ContextExternalTool < ActiveRecord::Base
     end
     
     item.save!
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+    context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items && item.new_record?
     item
   end
 

@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "enhanceable_content selenium tests" do
+describe "enhanceable_content" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should automatically enhance content using jQuery UI" do
@@ -68,8 +68,11 @@ describe "enhanceable_content selenium tests" do
     
     get "/courses/#{@course.id}/wiki/#{page.url}"
     dialog = driver.find_element(:css, ".enhanceable_content.dialog")
+
     # need to wait for the content to get enhanced
-    keep_trying_until { dialog.should_not(be_displayed) == false }
+    driver.execute_script "window.jsParsed = false; setTimeout(function(){ jsParsed = true })"
+    keep_trying_until { driver.execute_script("return window.jsParsed").should == true }
+
     driver.find_element(:css, "#link1").click
     dialog.should be_displayed
     dialog.should have_class('ui-dialog')

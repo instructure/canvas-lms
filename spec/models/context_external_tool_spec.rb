@@ -364,4 +364,20 @@ describe ContextExternalTool do
       (ContextExternalTool.find_for(tool.id, @course, :user_navigation) rescue nil).should be_nil
     end
   end
+  
+  describe "import_from_migration" do
+    it "should work for course-level tools" do
+      course_model
+      tool = ContextExternalTool.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course)
+      tool.should_not be_nil
+      tool.context.should == @course
+    end
+    
+    it "should work for account-level tools" do
+      course_model
+      tool = ContextExternalTool.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course.account)
+      tool.should_not be_nil
+      tool.context.should == @course.account
+    end
+  end
 end

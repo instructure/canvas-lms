@@ -167,6 +167,20 @@ describe ConversationMessage do
       stream_item.item_asset_string.should eql(message.conversation.asset_string)
     end
 
+    it "should not create a conversation stream item for a submission comment" do
+      old_count = StreamItem.count
+
+      course_with_teacher
+      student_in_course.user
+      assignment_model(:course => @course)
+      @assignment.workflow_state = 'published'
+      @assignment.save
+      @submission = @assignment.submit_homework(@user, :body => 'some message')
+      @submission.add_comment(:author => @user, :comment => "hello")
+
+      StreamItem.all.select{ |i| i.asset_string =~ /conversation_/ }.should be_empty
+    end
+
     it "should not create additional stream_items for additional messages in the same conversation" do
       old_count = StreamItem.count
 
@@ -192,7 +206,7 @@ describe ConversationMessage do
       message = conversation.add_message("second message")
 
       stream_item = StreamItem.last
-      
+
       message.destroy
       StreamItem.count.should eql(old_count + 1)
     end

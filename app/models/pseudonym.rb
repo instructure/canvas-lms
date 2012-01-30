@@ -30,6 +30,7 @@ class Pseudonym < ActiveRecord::Base
   has_many :groups, :through => :group_memberships
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   validates_length_of :unique_id, :maximum => maximum_string_length
+  validates_presence_of :account_id, :user_id
   before_validation :validate_unique_id
   before_destroy :retire_channels
   
@@ -170,7 +171,7 @@ class Pseudonym < ActiveRecord::Base
     :email_login
   end
 
-  def works_for_account?(account)
+  def works_for_account?(account, allow_implicit = false)
     true
   end
 

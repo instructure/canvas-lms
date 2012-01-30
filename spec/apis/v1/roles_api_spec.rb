@@ -149,9 +149,10 @@ describe "Roles API", :type => :integration do
           "manage_role_overrides", "manage_sections", "manage_sis",
           "manage_students", "manage_user_logins", "manage_user_notes",
           "manage_wiki", "moderate_forum", "post_to_forum",
-          "read_course_content", "read_course_list", "read_question_banks",
-          "read_reports", "read_roster", "send_messages", "view_all_grades",
-          "view_group_pages", "view_statistics"
+          "read_course_content", "read_course_list", "read_forum",
+          "read_question_banks", "read_reports", "read_roster",
+          "send_messages", "view_all_grades", "view_group_pages",
+          "view_statistics"
         ]
 
         json["permissions"][@permission].should == {

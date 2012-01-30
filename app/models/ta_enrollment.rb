@@ -17,7 +17,7 @@
 #
 
 class TaEnrollment < Enrollment
-  def admin?
+  def ta?
     true
   end
 end

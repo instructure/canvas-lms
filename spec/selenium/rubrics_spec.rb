@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "rubric selenium tests" do
+describe "rubrics" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
+  before (:each) do
     course_with_teacher_logged_in
   end
 

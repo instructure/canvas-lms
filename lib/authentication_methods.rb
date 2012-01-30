@@ -68,7 +68,7 @@ module AuthenticationMethods
         raise AccessTokenError
       end
       @current_user = @access_token.user
-      @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account)
+      @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
@@ -146,7 +146,7 @@ module AuthenticationMethods
       end
     end
 
-    as_user_id = api_request? && params[:as_user_id]
+    as_user_id = api_request? && params[:as_user_id].presence
     as_user_id ||= session[:become_user_id]
     if as_user_id
       begin

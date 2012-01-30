@@ -24,6 +24,23 @@ describe "API Error Handling", :type => :integration do
     @token = @user.access_tokens.create!
   end
 
+  describe "ActiveRecord Error JSON override" do
+    it "should not return the base object in ActiveRecord::Error.to_json" do
+      err = ActiveRecord::Error.new(@user, :name, :invalid, :message => 'invalid name')
+      JSON.parse(err.to_json).should == { 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name' }
+    end
+
+    it "should not return the base object in ActiveRecord::Errors.to_json" do
+      page = WikiPage.new(:body => 'blah blah', :title => 'blah blah')
+      page.valid?.should be_false
+      errors = page.errors.to_json
+      parsed = JSON.parse(errors)['errors']
+      parsed.size.should > 0
+      errors.should_not match(/blah blah/)
+      parsed.each { |k,v| v.each { |i| i.keys.sort.should == ['attribute', 'message', 'type'] } }
+    end
+  end
+
   it "should respond not_found for 404 errors" do
     get "/api/v1/courses/54321", nil, { 'Authorization' => "Bearer #{@token.token}" }
     response.response_code.should == 404

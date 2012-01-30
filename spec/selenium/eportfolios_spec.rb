@@ -8,9 +8,8 @@ describe "eportfolios" do
     get "/dashboard/eportfolios"
 
     driver.find_element(:css, ".add_eportfolio_link").click
-    wait_for_animations 
-    driver.find_element(:id, "eportfolio_submit").click
-    wait_for_dom_ready
+    wait_for_animations
+    expect_new_page_load { driver.find_element(:id, "eportfolio_submit").click }
     driver.find_element(:css, '#content h2').should include_text(I18n.t('headers.welcome', "Welcome to Your ePortfolio"))
   end
 
@@ -56,11 +55,12 @@ describe "eportfolios" do
   end
 
   it "should have a working flickr search dialog" do
+    skip_if_ie("Out of memory / stack overflow")
     course_with_student_logged_in
     eportfolio_model({:user => @user})
     get "/eportfolios/#{@eportfolio.id}"
-    
-    keep_trying_until { 
+
+    keep_trying_until {
       driver.find_element(:css, "#page_list a.page_url").click
       driver.find_element(:css, "#page_sidebar .edit_content_link")
     }.click
@@ -72,12 +72,11 @@ describe "eportfolios" do
   end
 
   it "should create rich content for eportfolio" do
-
     course_with_student_logged_in
     eportfolio_model({:user => @user})
     get "/eportfolios/#{@eportfolio.id}"
-    
-    keep_trying_until { 
+
+    keep_trying_until {
       driver.find_element(:css, "#page_list a.page_url").click
       driver.find_element(:css, "#page_sidebar .edit_content_link")
     }.click
@@ -85,11 +84,9 @@ describe "eportfolios" do
 
     #send text to tiny
     first_text = 'This is my eportfolio'
-    type_in_tiny  'textarea.edit_section', first_text
+    type_in_tiny 'textarea.edit_section', first_text
 
     driver.find_element(:id, 'edit_page_form').submit
     driver.find_element(:css, '#page_content .section_content').should include_text(first_text)
-
   end
-
 end

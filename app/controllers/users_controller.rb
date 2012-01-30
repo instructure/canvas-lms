@@ -62,7 +62,7 @@ class UsersController < ApplicationController
       end
       Enrollment.send(:preload_associations, @observed_enrollments, :course)
 
-      @teacher_enrollments = @current_enrollments.select{|e| e.admin? }
+      @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
       #Enrollment.send(:preload_associations, @prior_enrollments, :course)
       @course_grade_summaries = {}
       @teacher_enrollments.each do |enrollment|
@@ -196,7 +196,7 @@ class UsersController < ApplicationController
   end
 
   def masquerade
-    @user = User.find_by_id(params[:user_id])
+    @user = User.find(:first, :conditions => {:id => params[:user_id]})
     if (authorized_action(@user, @real_current_user || @current_user, :become_user))
       if request.post?
         if @user == @real_current_user
@@ -529,6 +529,8 @@ class UsersController < ApplicationController
     @user ||= User.new
     @user.attributes = params[:user]
     @user.name ||= params[:pseudonym][:unique_id]
+    @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
+    @user.save!
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
     # pre-populate the reverse association
@@ -544,10 +546,8 @@ class UsersController < ApplicationController
     @cc ||= @user.communication_channels.build(:path => email)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
-    @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
     if @pseudonym.valid?
       @pseudonym.save_without_session_maintenance
-      @user.save!
       @cc.save!
       message_sent = false
       if notify == :self_registration

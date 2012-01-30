@@ -60,4 +60,36 @@ describe ConversationParticipant do
     conversation.update_attribute(:workflow_state, 'unread')
     sender.reload.updated_at.should_not eql updated_at
   end
+
+  it "should support starred/starred=" do
+    sender       = user
+    recipient    = user
+    conversation = sender.initiate_conversation([recipient.id])
+
+    conversation.starred = true
+    conversation.save
+    conversation.reload
+    conversation.starred.should be_true
+
+    conversation.starred = false
+    conversation.save
+    conversation.reload
+    conversation.starred.should be_false
+  end
+
+  it "should support :starred in update_attributes" do
+    sender       = user
+    recipient    = user
+    conversation = sender.initiate_conversation([recipient.id])
+
+    conversation.update_attributes(:starred => true)
+    conversation.save
+    conversation.reload
+    conversation.starred.should be_true
+
+    conversation.update_attributes(:starred => false)
+    conversation.save
+    conversation.reload
+    conversation.starred.should be_false
+  end
 end

@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "course syllabus selenium tests" do
+describe "course syllabus" do
   it_should_behave_like "in-process server selenium tests"
 
   def add_assignment(title, points)

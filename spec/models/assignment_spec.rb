@@ -36,15 +36,15 @@ describe Assignment do
     @assignment.save!
     @assignment.assignment_group.should_not be_nil
   end
-  
+
   it "should touch assignment group on create/save" do
     course
     group = @course.assignment_groups.create!(:name => "Assignments")
     AssignmentGroup.update_all({ :updated_at => 1.hour.ago }, { :id => group.id })
     orig_time = group.reload.updated_at.to_i
     a = @course.assignments.build(
-                                          "title"=>"test", 
-                                          "external_tool_tag_attributes"=>{"url"=>"", "new_tab"=>""} 
+                                          "title"=>"test",
+                                          "external_tool_tag_attributes"=>{"url"=>"", "new_tab"=>""}
                                   )
     a.assignment_group = group
     a.save!
@@ -282,6 +282,35 @@ describe Assignment do
     @assignment.all_day.should eql(false)
     @assignment.due_at.strftime("%H:%M").should eql("23:58")
     @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
+  end
+
+  context "find_or_create_submission" do
+    it "should not raise an error if another insert wins" do
+      assignment_model
+      user_model
+
+      dummy_sub = Submission.new
+      dummy_sub.assignment_id = @assignment.id
+      dummy_sub.user_id = @user.id
+
+      real_sub = Submission.new
+      real_sub.assignment_id = @assignment.id
+      real_sub.user_id = @user.id
+      real_sub.save!
+
+      Submission.expects(:find_or_initialize_by_assignment_id_and_user_id).
+        twice.
+        returns(dummy_sub).
+        returns(real_sub)
+
+      sub = nil
+      lambda {
+        sub = Assignment.find_or_create_submission(@assignment.id, @user.id)
+      }.should_not raise_error
+      sub.should_not be_new_record
+      sub.should_not eql dummy_sub
+      sub.should eql real_sub
+    end
   end
 
   context "peer reviews" do
@@ -950,18 +979,7 @@ describe Assignment do
       @a.should be_respond_to(:to)
     end
 
-    it "should have policies defined" do
-      assignment_model
-      @a.broadcast_policy_list.should_not be_empty
-    end
-
-
     context "due date changed" do
-      it "should have an 'Assignment Due Date Changed' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Due Date Changed')
-      end
-
       it "should create a message when an assignment due date has changed" do
         Notification.create(:name => 'Assignment Due Date Changed')
         assignment_model(:title => 'Assignment with unstable due date')
@@ -1094,11 +1112,6 @@ describe Assignment do
     end
 
     context "assignment changed" do
-      it "should have an 'Assignment Changed' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Changed')
-      end
-
       it "should create a message when an assigment changes after it's been published" do
         Notification.create(:name => 'Assignment Changed')
         assignment_model
@@ -1141,11 +1154,6 @@ describe Assignment do
     end
 
     context "assignment created" do
-      it "should have an 'Assignment Created' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Created')
-      end
-
       # it "should create a message when an assigment is added to a course in process" do
       #   Notification.create(:name => 'Assignment Created')
       #   @course = Course.create
@@ -1159,11 +1167,6 @@ describe Assignment do
     end
 
     context "assignment graded" do
-      it "should have an 'Assignment Graded' policy" do
-        assignment_model
-        @a.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Graded')
-      end
-
       it "should create a message when an assignment is published" do
         setup_assignment
         Notification.create(:name => 'Assignment Graded')
