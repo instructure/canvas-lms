@@ -1,17 +1,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "calendar2 selenium tests" do
+describe "calendar2" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
-    Account.default.update_attribute(:settings, {:enable_scheduler => true})
+  before (:each) do
+    Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
+    course_with_teacher_logged_in
   end
 
   def make_event(params = {})
     opts = {
-      :context     => @user,
-      :start       => Time.now,
-      :description => "Test event"
+        :context => @user,
+        :start => Time.now,
+        :description => "Test event"
     }.with_indifferent_access.merge(params)
     c = CalendarEvent.new :description => opts[:description],
                           :start_at => opts[:start]
@@ -20,24 +21,53 @@ describe "calendar2 selenium tests" do
     c
   end
 
+  def create_assignment_event(assignment_title)
+    edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+    edit_event_dialog.should be_displayed
+    edit_event_dialog.find_element(:css, '.edit_assignment_option').click
+    edit_assignment_form = edit_event_dialog.find_element(:id, 'edit_assignment_form')
+    title = edit_assignment_form.find_element(:id, 'assignment_title')
+    replace_content(title, assignment_title)
+    find_with_jquery('.ui-datepicker-trigger:visible').click
+    datepicker_next
+    edit_assignment_form.submit
+    wait_for_ajax_requests
+    driver.find_element(:css, '.fc-button-next').click
+    find_with_jquery('.fc-day-number:contains(15)').click
+    keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(assignment_title) }
+  end
+
+  def create_calendar_event(event_title)
+    edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+    edit_event_dialog.should be_displayed
+    edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
+    title = edit_event_form.find_element(:id, 'calendar_event_title')
+    replace_content(title, event_title)
+    find_with_jquery('.ui-datepicker-trigger:visible').click
+    datepicker_next
+    edit_event_form.submit
+    wait_for_ajax_requests
+    driver.find_element(:css, '.fc-button-next').click
+    find_with_jquery('.fc-day-number:contains(15)').click
+    keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(event_title) }
+  end
+
   describe "sidebar" do
-    before do
-      course_with_teacher_logged_in
-    end
 
     describe "mini calendar" do
+
       it "should add the event class to days with events" do
         c = make_event
-
         get "/calendar2"
+        wait_for_ajax_requests
+
         events = driver.find_elements(:css, "#minical .event")
         events.size.should == 1
         events.first.text.strip.should == c.start_at.day.to_s
       end
 
       it "should change the main calendar's month on click" do
-        title_selector =  "#calendar-app .fc-header-title"
-
+        title_selector = "#calendar-app .fc-header-title"
         get "/calendar2"
 
         orig_title = driver.find_element(:css, title_selector).text
@@ -48,26 +78,9 @@ describe "calendar2 selenium tests" do
     end
 
     describe "contexts list" do
-      it "should toggle event display when context is clicked" do
-        c1 = make_event :context => @user, :start => Time.now
-        c2 = make_event :context => @course, :start => Time.now - 1.day
-
-        assert_calendars_event_count = lambda do |n|
-          driver.find_elements(:css, "#calendar-app .fc-event").size.should == n
-          driver.find_elements(:css, "#minical .event").size.should == n
-        end
-
-        get "/calendar2"
-        contexts = driver.find_elements(:css, "#context-list > li")
-        contexts.each { |c| c["class"].should =~ /\bchecked\b/ }
-        assert_calendars_event_count.call 2
-
-        contexts.first.click
-        contexts.first["class"].should =~ /\bnot-checked\b/
-        assert_calendars_event_count.call 1
-      end
-
       it "should have a menu for adding stuff" do
+        get "/calendar2"
+
         contexts = driver.find_elements(:css, "#context-list > li")
 
         # first context is the user
@@ -82,12 +95,57 @@ describe "calendar2 selenium tests" do
         actions.second["data-action"].should == "add_assignment"
       end
 
-      it "should allow creating undated calendar events"
+      it "should create an event through the context list drop down" do
+        pending("Course in context list being disabled bug - On Trello board")
+        event_title = 'new event'
+        get "/calendar2"
+        wait_for_ajaximations
 
-      it "should allow creating undated assignments"
+        driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
+        find_with_jquery('ul#context-list li:nth-child(2) button').click
+        driver.find_element(:id, "ui-menu-1-0").click
+        edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+        edit_event_dialog.should be_displayed
+        create_calendar_event(event_title)
+      end
+
+      it "should create an assignment through the context list drop down" do
+        pending("Course in context list being disabled bug - On Trello board")
+        assignment_title = 'new assignment'
+        get "/calendar2"
+        wait_for_ajaximations
+
+        driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
+        find_with_jquery('ul#context-list li:nth-child(2) button').click
+        driver.find_element(:id, "ui-menu-1-1").click
+        edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+        edit_event_dialog.should be_displayed
+        create_assignment_event(assignment_title)
+      end
+
+      it "should toggle event display when context is clicked" do
+        make_event :context => @course, :start => Time.now
+        get "/calendar2"
+
+        driver.find_element(:css, '.context_list_context').click
+        context_course_item = find_with_jquery('.context_list_context:nth-child(2)')
+        context_course_item.should have_class('checked')
+        driver.find_element(:css, '.fc-event').should be_displayed
+
+        context_course_item.click
+        context_course_item.should have_class('not-checked')
+        element_exists(:css, '.fc_event').should be_false
+      end
+
+      it "should validate calendar feed display" do
+        get "/calendar2"
+
+        driver.find_element(:link, 'Calendar Feed').click
+        driver.find_element(:id, 'calendar_feed_box').should be_displayed
+      end
     end
 
-    describe "undated events" do
+    describe "undated calendar items" do
       it "should show undated events after clicking link" do
         e = make_event :start => nil, :title => "pizza party"
         get "/calendar2"
@@ -98,6 +156,212 @@ describe "calendar2 selenium tests" do
         undated_events.size.should == 1
         undated_events.first.text.should =~ /#{e.title}/
       end
+    end
+  end
+
+  describe "main calendar" do
+
+    before (:each) do
+      get "/calendar2"
+    end
+
+    def change_calendar(css_selector = '.fc-button-next')
+      driver.find_element(:css, '.calendar .fc-header-left ' + css_selector).click
+      wait_for_ajax_requests
+    end
+
+    def get_header_text
+      header = driver.find_element(:css, '.calendar .fc-header .fc-header-title')
+      header.text
+    end
+
+    it "should create an event through clicking on a calendar day" do
+      driver.find_element(:css, '.calendar .fc-today').click
+      create_calendar_event('new event')
+    end
+
+    it "should create an assignment by clicking on a calendar day" do
+      driver.find_element(:css, '.calendar .fc-today').click
+      create_assignment_event('new assignment')
+    end
+
+    it "should change the month" do
+      old_header_title = get_header_text
+      change_calendar
+      old_header_title.should_not == get_header_text
+    end
+
+    it "should change the week" do
+      header_buttons = driver.find_elements(:css, '.ui-buttonset > label')
+      header_buttons[0].click
+      wait_for_ajaximations
+      old_header_title = get_header_text
+      change_calendar('.fc-button-prev')
+      old_header_title.should_not == get_header_text
+    end
+
+    it "should test the today button" do
+      current_month_num = Time.now.month
+      current_month = Date::MONTHNAMES[current_month_num]
+
+      change_calendar
+      get_header_text.should_not == current_month
+      driver.find_element(:css, '.fc-button-today').click
+      get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
+    end
+  end
+
+  describe "scheduler" do
+
+    EDIT_NAME = 'edited appointment'
+    EDIT_LOCATION = 'edited location'
+
+    def create_appointment_group_api
+      ag = @course.appointment_groups.create(:title => "new appointment group")
+      ag.publish!
+      ag.title
+    end
+
+    def create_appointment_group_manual
+      new_appointment_text = 'new appointment group'
+      expect {
+        driver.find_element(:css, '.create_link').click
+        edit_form = driver.find_element(:id, 'edit_appointment_form')
+        keep_trying_until { edit_form.should be_displayed }
+        replace_content(find_with_jquery('input[name="title"]'), new_appointment_text)
+        date_field = edit_form.find_element(:css, '.date_field')
+        date_field.click
+        find_with_jquery('.ui-datepicker-trigger:visible').click
+        datepicker_next
+        replace_content(edit_form.find_element(:css, '.start_time'), '1')
+        replace_content(edit_form.find_element(:css, '.end_time'), '3')
+        driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+        wait_for_ajaximations
+        driver.find_element(:css, '.view_calendar_link').text.should == new_appointment_text
+      }.to change(AppointmentGroup, :count).by(1)
+    end
+
+    def click_scheduler_link
+      header_buttons = driver.find_elements(:css, '.ui-buttonset > label')
+      header_buttons[2].click
+      wait_for_ajaximations
+    end
+
+    def click_appointment_link
+      driver.find_element(:css, '.view_calendar_link').click
+      driver.find_element(:css, '.scheduler-mode').should be_displayed
+    end
+
+    def click_al_option(option_selector)
+      driver.find_element(:css, '.al-trigger').click
+      options = driver.find_element(:css, '.al-options')
+      options.should be_displayed
+      options.find_element(:css, option_selector).click
+    end
+
+    def delete_appointment_group
+      delete_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Delete")')
+      delete_button.click
+      wait_for_ajaximations
+    end
+
+    def edit_appointment_group(appointment_name = EDIT_NAME, location_name = EDIT_LOCATION)
+      driver.find_element(:id, 'edit_appointment_form').should be_displayed
+      replace_content(find_with_jquery('input[name="title"]'), appointment_name)
+      replace_content(find_with_jquery('input[name="location"]'), location_name)
+      driver.find_element(:css, '.ui-dialog-buttonset .ui-button').click
+      wait_for_ajaximations
+      driver.find_element(:css, '.view_calendar_link').text.should == appointment_name
+      driver.find_element(:css, '.ag-location').should include_text(location_name)
+    end
+
+    it "should create a new appointment group" do
+      get "/calendar2"
+      click_scheduler_link
+
+      create_appointment_group_manual
+    end
+
+    it "should test bad data errors in date while creating a new appointment group" do
+      get "/calendar2"
+      click_scheduler_link
+      driver.find_element(:css, '.create_link').click
+      edit_form = driver.find_element(:id, 'edit_appointment_form')
+      start_time = edit_form.find_element(:css, '.start_time')
+      end_time = edit_form.find_element(:css, '.end_time')
+      title = find_with_jquery('input[name="title"]')
+      replace_content(start_time, '11111')
+      end_time.click
+      title.click
+      edit_form.find_element(:css, '.start_time').should have_class('error')
+      edit_form.find_element(:css, '.end_time').should have_class('error')
+      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      driver.switch_to.alert.dismiss
+      edit_form.should be_displayed
+    end
+
+    it "should delete an appointment group" do
+      create_appointment_group_api
+      get "/calendar2"
+      click_scheduler_link
+
+      appointment_group = driver.find_element(:css, '.appointment-group-item')
+      driver.action.move_to(appointment_group).perform
+      click_al_option('.delete_link')
+      delete_appointment_group
+      driver.find_element(:css, '.list-wrapper').should include_text('You have not created any appointment groups')
+    end
+
+    it "should edit an appointment group" do
+      create_appointment_group_api
+      get "/calendar2"
+      click_scheduler_link
+
+      appointment_group = driver.find_element(:css, '.appointment-group-item')
+      driver.action.move_to(appointment_group).perform
+      click_al_option('.edit_link')
+      edit_appointment_group
+    end
+
+    it "should edit an appointment group after clicking appointment group link" do
+      create_appointment_group_api
+      get "/calendar2"
+      click_scheduler_link
+      click_appointment_link
+      click_al_option('.edit_link')
+      edit_appointment_group
+    end
+
+    it "should delete an appointment group after clicking appointment group link" do
+      create_appointment_group_api
+      get "/calendar2"
+      click_scheduler_link
+      click_appointment_link
+
+      click_al_option('.delete_link')
+      delete_appointment_group
+      driver.find_element(:css, '.list-wrapper').should include_text('You have not created any appointment groups')
+    end
+
+    it "should validate the appointment group shows up on the calendar" do
+      get "/calendar2"
+      click_scheduler_link
+      create_appointment_group_manual
+      click_appointment_link
+      element_exists(:css, '.fc-event-bg').should be_true
+    end
+
+    it "should delete the appointment group from the calendar" do
+      get "/calendar2"
+      click_scheduler_link
+      create_appointment_group_manual
+      click_appointment_link
+      calendar_event = driver.find_element(:css, '.fc-event-bg')
+      calendar_event.click
+      popup = driver.find_element(:css, '.event-details')
+      popup.find_element(:css, '.delete_event_link').click
+      delete_appointment_group
+      keep_trying_until { element_exists(:css, '.fc-event-bg').should be_false }
     end
   end
 end

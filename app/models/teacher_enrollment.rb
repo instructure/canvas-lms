@@ -17,7 +17,7 @@
 #
 
 class TeacherEnrollment < Enrollment
-  def admin?
+  def teacher?
     true
   end
 end

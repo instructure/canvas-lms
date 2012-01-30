@@ -32,9 +32,25 @@ describe Pseudonym do
     @pseudonym.save!
   end
 
+  it "should validate the presence of user and account ids" do
+    p = Pseudonym.new(:unique_id => 'cody@instructure.com')
+    p.save.should be_false
+
+    p.account_id = 1
+    p.save.should be_false
+
+    p.user_id = 1
+    p.account_id = nil
+    p.save.should be_false
+
+    p.account_id = 1
+    p.save.should be_true
+  end
+
   it "should not allow active duplicates" do
-    p1 = Pseudonym.create!(:unique_id => 'cody@instructure.com')
-    p2 = Pseudonym.create(:unique_id => 'cody@instructure.com')
+    u = User.create!
+    p1 = Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
+    p2 = Pseudonym.create(:unique_id => 'cody@instructure.com', :user => u)
     # Failed; p1 is still active
     p2.should be_new_record
     p2.workflow_state = 'deleted'
@@ -43,7 +59,7 @@ describe Pseudonym do
     p1.workflow_state = 'deleted'
     p1.save!
     # Should allow creating a new active one if the others are deleted
-    Pseudonym.create!(:unique_id => 'cody@instructure.com')
+    Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
   end
   
   it "should find the correct pseudonym for logins" do
@@ -201,7 +217,8 @@ describe Pseudonym do
   end
   
   it "should determine if the password is managed" do
-    p = Pseudonym.create!(:unique_id => 'jt@instructure.com')
+    u = User.create!
+    p = Pseudonym.create!(:unique_id => 'jt@instructure.com', :user => u)
     p.sis_user_id = 'jt'
     p.should_not be_managed_password
     p.account.account_authorization_configs.create!(:auth_type => 'ldap')

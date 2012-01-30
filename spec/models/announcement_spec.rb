@@ -30,17 +30,7 @@ describe Announcement do
       @a.should be_respond_to(:dispatch)
       @a.should be_respond_to(:to)
     end
-    
-    it "should have a single policy" do
-      announcement_model
-      @a.broadcast_policy_list.size.should eql(1)
-    end
-    
-    it "should have a policy for 'New Announcement'" do
-      announcement_model
-      @a.broadcast_policy_list.first.dispatch.should eql('New Announcement')
-    end
-    
+
     it "should sanitize message" do
       announcement_model
       @a.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"

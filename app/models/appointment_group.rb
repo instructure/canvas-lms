@@ -177,10 +177,10 @@ class AppointmentGroup < ActiveRecord::Base
       possible_participants.map(&:participants).flatten.uniq
   end
 
-  def admins
+  def instructors
     sub_context_type == 'CourseSection' ?
-      context.participating_admins.for_course_section(sub_context_id).uniq :
-      context.participating_admins.uniq
+      context.participating_instructors.for_course_section(sub_context_id).uniq :
+      context.participating_instructors.uniq
   end
 
   def possible_participants
@@ -205,7 +205,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   # TODO: create a scope that does this
   # students would generally call this with the user as the argument
-  # admins would call it with the user or group (depending on participant_type)
+  # instructors would call it with the user or group (depending on participant_type)
   def requiring_action?(user_or_participant)
     participant = user_or_participant
     participant = participant_for(user_or_participant) if participant_type == 'Group' && participant.is_a?(User)

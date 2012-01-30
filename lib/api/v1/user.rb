@@ -26,14 +26,18 @@ module Api::V1::User
 
   def user_json(user, current_user, session, includes = [], context = @context)
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
-      if user_json_is_admin?(context, current_user) && pseudonym = user.pseudonym
-        # the sis fields on pseudonym are poorly named -- sis_user_id is
-        # the id in the SIS import data, where on every other table
-        # that's called sis_source_id.
-        json.merge! :sis_user_id => pseudonym.sis_user_id,
-            # TODO: don't send sis_login_id; it's garbage data
-                    :sis_login_id => pseudonym.sis_user_id ? pseudonym.unique_id : nil,
-                    :login_id => pseudonym.unique_id
+      if user_json_is_admin?(context, current_user)
+        if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account)
+          # the sis fields on pseudonym are poorly named -- sis_user_id is
+          # the id in the SIS import data, where on every other table
+          # that's called sis_source_id.
+          json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
+                      # TODO: don't send sis_login_id; it's garbage data
+                      :sis_login_id => sis_pseudonym.unique_id
+        end
+        if pseudonym = sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account)
+          json[:login_id] = pseudonym.unique_id
+        end
       end
       if service_enabled?(:avatars) && includes.include?('avatar_url')
         json["avatar_url"] = avatar_image_url(user.id)
@@ -41,7 +45,7 @@ module Api::V1::User
     end
   end
 
-  # optimization hint, currently user only needs to pull pseudonym from the db
+  # optimization hint, currently user only needs to pull pseudonyms from the db
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?(context = @context, current_user = @current_user)
     @user_json_is_admin ||= {}

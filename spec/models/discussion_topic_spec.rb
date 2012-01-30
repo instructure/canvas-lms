@@ -84,6 +84,31 @@ describe DiscussionTopic do
     (@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
+
+  it "should grant observers read permission by default" do
+    course_with_teacher(:active_all => true)
+    course_with_observer(:course => @course, :active_all => true)
+    relevant_permissions = [:read, :reply, :update, :delete]
+
+    @topic = @course.discussion_topics.create!(:user => @teacher)
+    (@topic.check_policy(@observer) & relevant_permissions).map(&:to_s).sort.should == ['read'].sort
+    @entry = @topic.discussion_entries.create!(:user => @teacher)
+    (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).sort.should == ['read'].sort
+  end
+
+  it "should not grant observers read permission when read_forum override is false" do
+    course_with_teacher(:active_all => true)
+    course_with_observer(:course => @course, :active_all => true)
+
+    RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
+                         :enrollment_type => "ObserverEnrollment", :enabled => false)
+
+    relevant_permissions = [:read, :reply, :update, :delete]
+    @topic = @course.discussion_topics.create!(:user => @teacher)
+    (@topic.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
+    @entry = @topic.discussion_entries.create!(:user => @teacher)
+    (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
+  end
   
   context "delayed posting" do
     def delayed_discussion_topic(opts = {})

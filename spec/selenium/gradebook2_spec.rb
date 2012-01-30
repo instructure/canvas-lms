@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "gradebook2 selenium tests" do
+describe "gradebook2" do
   it_should_behave_like "in-process server selenium tests"
 
   ASSIGNMENT_1_POINTS = "10"
@@ -8,11 +8,13 @@ describe "gradebook2 selenium tests" do
   ASSIGNMENT_3_POINTS = "50"
   ATTENDANCE_POINTS = "15"
 
-  EXPECTED_ASSIGN_1_TOTAL = "100%"
-  EXPECTED_ASSIGN_2_TOTAL = "67%"
 
   STUDENT_NAME_1 = "nobody1@example.com"
   STUDENT_NAME_2 = "nobody2@example.com"
+  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
+  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
+  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
+  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
   DEFAULT_PASSWORD = "qwerty"
 
   def find_slick_cells(row_index, element)
@@ -23,8 +25,10 @@ describe "gradebook2 selenium tests" do
   end
 
   def edit_grade(cell, grade)
-    cell.click
-    grade_input = cell.find_element(:css, '.grade')
+    grade_input = keep_trying_until do
+      cell.click
+      cell.find_element(:css, '.grade')
+    end
     grade_input.clear
     grade_input.send_keys(grade)
     grade_input.send_keys(:return)
@@ -36,26 +40,20 @@ describe "gradebook2 selenium tests" do
     cell.text
   end
 
-  def open_gradebook_settings(element_to_click)
+  def open_gradebook_settings(element_to_click = nil)
     driver.find_element(:css, '#gradebook_settings').click
     driver.find_element(:css, '#ui-menu-0').should be_displayed
     element_to_click.click if element_to_click != nil
   end
 
-  def open_comment_dialog(jquery_selector = "first")
-    driver.execute_script("$('.gradebook-cell:"+jquery_selector+"').mouseenter()") #move_to occasionally breaks in the hudson build
-    comment = keep_trying_until do
-      comment = find_with_jquery('.gradebook-cell-comment:visible')
-      comment.should be_displayed
-      comment
-    end
-    keep_trying_until do
-      comment.click
-      wait_for_ajax_requests
-      find_with_jquery("#add_a_comment").should be_displayed
-    end
-      details_dialog = find_with_jquery('.ui-dialog:visible')
-    details_dialog
+  def open_comment_dialog
+    #move_to occasionally breaks in the hudson build
+    cell = driver.execute_script "return $('#gradebook_grid .slick-row:first .slick-cell:first').addClass('hover')[0]"
+    cell.find_element(:css, '.gradebook-cell-comment').click
+    # the dialog fetches the comments async after it displays and then innerHTMLs the whole
+    # thing again once it has fetched them from the server, completely replacing it
+    wait_for_ajax_requests
+    find_with_jquery '.submission_details_dialog:visible'
   end
 
   def open_assignment_options(cell_index)
@@ -65,7 +63,31 @@ describe "gradebook2 selenium tests" do
     driver.find_element(:css, '#ui-menu-1').should be_displayed
   end
 
-  before(:each) do
+  def final_score_for_row(row)
+    grade_grid = driver.find_element(:css, '#gradebook_grid')
+    cells = find_slick_cells(row, grade_grid)
+    cells[4].text
+  end
+
+  # `students` should be a hash of student_id, expected total pairs, like:
+  # {
+  #   1 => '12%',
+  #   3 => '86.7%',
+  # }
+  def check_gradebook_1_totals(students)
+    get "/courses/#{@course.id}/gradebook"
+    # this keep_trying_untill is there because gradebook1 loads it's cells in a bunch of setTimeouts
+    keep_trying_until {
+      students.each do |student_id, expected_score|
+        row_total = driver.find_element(:css, ".final_grade .student_#{student_id}").text
+        # gradebook1 has a space between number and % like: "33.3 %"
+        row_total = row_total.sub ' ', ''
+        row_total.should eql expected_score
+      end
+    }
+  end
+
+  before (:each) do
     course_with_teacher_logged_in
 
     #add first student
@@ -78,11 +100,12 @@ describe "gradebook2 selenium tests" do
     e1.save!
     @course.reload
     #add second student
+    @other_section = @course.course_sections.create(:name => "the other section")
     @student_2 = User.create!(:name => STUDENT_NAME_2)
     @student_2.register!
     @student_2.pseudonyms.create!(:unique_id => STUDENT_NAME_2, :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+    e2 = @course.enroll_student(@student_2, :section => @other_section)
 
-    e2 = @course.enroll_student(@student_2)
     e2.workflow_state = 'active'
     e2.save!
     @course.reload
@@ -155,59 +178,123 @@ describe "gradebook2 selenium tests" do
                                                   :assignment_group => @group,
                                               })
 
+    @ungraded_assignment = @course.assignments.create! :title => 'not-graded assignment',
+                                                       :submission_types => 'not_graded'
+
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
+  end
+
+  it "should not show 'not-graded' assignments" do
+    driver.find_element(:css, '#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
   end
 
   it "should validate correct number of students showing up in gradebook" do
     driver.find_elements(:css, '.student-name').count.should == @course.students.count
   end
 
+  it "should allow showing only a certain section" do
+    button = driver.find_element(:id, 'section_to_show')
+    button.should include_text "All Sections"
+    button.click
+    sleep 1 #TODO find a better way to wait for css3 anmation to end
+    driver.find_element(:id, 'section-to-show-menu').should be_displayed
+    driver.find_element(:css, "label[for='section_option_#{@other_section.id}']").click
+    button.should include_text @other_section.name
+
+    # verify that it remembers the section to show across page loads
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    button = driver.find_element(:id, 'section_to_show')
+    button.should include_text @other_section.name
+
+    # now verify that you can set it back
+    button.click
+    sleep 1 #TODO find a better way to wait for css3 anmation to end
+    driver.find_element(:id, 'section-to-show-menu').should be_displayed
+    driver.find_element(:css, "label[for='section_option_']").click
+    button.should include_text "All Sections"
+  end
+
   it "should validate initial grade totals are correct" do
-    grade_grid = driver.find_element(:css, '#gradebook_grid')
-    first_row_cells = find_slick_cells(0, grade_grid)
-    second_row_cells = find_slick_cells(1, grade_grid)
+    final_score_for_row(0).should eql STUDENT_1_TOTAL_IGNORING_UNGRADED
+    final_score_for_row(1).should eql STUDENT_2_TOTAL_IGNORING_UNGRADED
+  end
 
-    #validating first student initial total
-    validate_cell_text(first_row_cells[4], EXPECTED_ASSIGN_1_TOTAL)
+  def toggle_muting(assignment)
+    find_with_jquery(".gradebook-header-drop[data-assignment-id='#{assignment.id}']").click
+    find_with_jquery('[data-action="toggleMuting"]').click
+    find_with_jquery('.ui-dialog-buttonpane .ui-button:visible').click
+    wait_for_ajaximations
+  end
 
-    #validating second student initial total
-    validate_cell_text(second_row_cells[4], EXPECTED_ASSIGN_2_TOTAL)
+  it "should handle muting/unmuting correctly" do
+    toggle_muting(@second_assignment)
+    find_with_jquery(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+    @second_assignment.reload.should be_muted
+
+    # reload the page and make sure it remembered the setting
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    find_with_jquery(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+
+    # make sure you can un-mute
+    toggle_muting(@second_assignment)
+    find_with_jquery(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
+    @second_assignment.reload.should_not be_muted
+  end
+
+  it "should treat ungraded as 0's when asked, and ignore when not" do
+    # make sure it shows like it is not treating ungraded as 0's by default
+    is_checked('#include_ungraded_assignments').should be_false
+    final_score_for_row(0).should eql STUDENT_1_TOTAL_IGNORING_UNGRADED
+    final_score_for_row(1).should eql STUDENT_2_TOTAL_IGNORING_UNGRADED
+
+    # set the "treat ungraded as 0's" option in the header
+    open_gradebook_settings(driver.find_element(:css, 'label[for="include_ungraded_assignments"]'))
+
+    # now make sure that the grades show as if those ungraded assignments had a '0'
+    is_checked('#include_ungraded_assignments').should be_true
+    final_score_for_row(0).should eql STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    final_score_for_row(1).should eql STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+
+    # reload the page and make sure it remembered the setting
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    is_checked('#include_ungraded_assignments').should be_true
+    final_score_for_row(0).should eql STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    final_score_for_row(1).should eql STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+
+    # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
+
+    # clear our saved settings
+    driver.execute_script '$.store.clear();'
   end
 
   it "should change grades and validate course total is correct" do
-    pending("Bug in gradebook2 with grade rounding, gradebook1 shows 33.3% gradebook2 shows 33%")
     expected_edited_total = "33.3%"
-    grade_grid = driver.find_element(:css, '#gradebook_grid')
-    first_row_cells = find_slick_cells(0, grade_grid)
-    second_row_cells = find_slick_cells(1, grade_grid)
 
     #editing grade for first row, first cell
-    edit_grade(first_row_cells[0], 0)
+    edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l0'), 0)
 
     #editing grade for second row, first cell
-    edit_grade(second_row_cells[0], 0)
+    edit_grade(driver.find_element(:css, '#gradebook_grid [row="1"] .l0'), 0)
 
-    #page refresh
+    #refresh page and make sure the grade sticks
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
+    final_score_for_row(0).should eql expected_edited_total
+    final_score_for_row(1).should eql expected_edited_total
 
-    #total validation after page refresh
-    grade_grid = driver.find_element(:css, '#gradebook_grid')
-    first_row_cells = find_slick_cells(0, grade_grid)
-    second_row_cells = find_slick_cells(1, grade_grid)
-    first_row_total = validate_cell_text(first_row_cells[4], expected_edited_total)
-    second_row_total = validate_cell_text(second_row_cells[4], expected_edited_total)
-
-    #go back to grade book one get those total values and compare to make sure they match
-    expect_new_page_load { driver.find_element(:css, '#change_gradebook_version_link_holder > a').click }
-    wait_for_ajax_requests
-    first_row_total.should == find_with_jquery(".assignment_final-grade > span:nth-child(1)").text
-    second_row_total.should == find_with_jquery(".assignment_final-grade > span:nth-child(2)").text
+    #go back to gradebook1 and compare to make sure they match
+    check_gradebook_1_totals({
+      @student_1.id => expected_edited_total,
+      @student_2.id => expected_edited_total
+    })
   end
 
   it "should validate that gradebook settings is displayed when button is clicked" do
-    open_gradebook_settings(nil)
+    open_gradebook_settings
   end
 
   it "should validate row sorting works when first column is clicked" do
@@ -219,9 +306,9 @@ describe "gradebook2 selenium tests" do
     grade_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
 
     #filter validation
-    validate_cell_text(meta_cells[0], STUDENT_NAME_2)
+    validate_cell_text(meta_cells[0], STUDENT_NAME_2 + "\n" + @other_section.name)
     validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(grade_cells[4], EXPECTED_ASSIGN_2_TOTAL)
+    validate_cell_text(grade_cells[4], STUDENT_2_TOTAL_IGNORING_UNGRADED)
   end
 
   it "should validate setting group weights" do
@@ -270,36 +357,21 @@ describe "gradebook2 selenium tests" do
     open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-6'))
   end
 
-  it "should validate include ungraded assignments option" do
-    pending("new changes broke this link, clicking include ungraded assignments doesn't make grade totals change anymore'")
-    expected_total_row_1 = "19%"
-    expected_total_row_2 = "13%"
-    open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-7'))
-    grade_grid = driver.find_element(:css, '#gradebook_grid')
-    first_row_cells = find_slick_cells(0, grade_grid)
-    second_row_cells = find_slick_cells(1, grade_grid)
-
-    #validating first student total after ungraded option click
-    validate_cell_text(first_row_cells[4], expected_total_row_1)
-
-    #validating second student total after ungraded option click
-    validate_cell_text(second_row_cells[4], expected_total_row_2)
-  end
-
   it "should validate posting a comment to a graded assignment" do
+    pending("opening the comment dialog frequently fails")
     comment_text = "This is a new comment!"
 
-    open_comment_dialog
-    comment_box = find_with_jquery("#add_a_comment")
-    comment_box.clear
-    comment_box.send_keys(comment_text)
+    dialog = open_comment_dialog
+    set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     driver.find_element(:css, "form.submission_details_add_comment_form.clearfix > button.button").click
     wait_for_ajaximations
-    #have to refresh the page in order to get open_comment_dialog to work again
+
+    #make sure it is still there if you reload the page
     refresh_page
     wait_for_ajaximations
-    dialog = open_comment_dialog
-    keep_trying_until { dialog.find_element(:css, '.comment').should include_text(comment_text) }
+
+    comment = open_comment_dialog.find_element(:css, '.comment')
+    comment.should include_text(comment_text)
   end
 
   it "should validate assignment details" do
@@ -353,7 +425,7 @@ describe "gradebook2 selenium tests" do
     open_assignment_options(2)
     driver.find_element(:css, '#ui-menu-1-4').click
     curve_form = driver.find_element(:css, '#curve_grade_dialog')
-    curve_form.find_element(:css, '#middle_score').send_keys(curved_grade_text)
+    set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
     curve_form.submit
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil

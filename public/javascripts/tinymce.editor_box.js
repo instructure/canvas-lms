@@ -127,7 +127,7 @@
     var ckStyle = true;
     var editor_css = "/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css";
     if(ckStyle) {
-      editor_css += ",/stylesheets/compiled/tiny_like_ck.css";
+      editor_css += ",/stylesheets/compiled/tiny_like_ck_with_external_tools.css";
     }
     tinyMCE.init({
       mode : "exact",

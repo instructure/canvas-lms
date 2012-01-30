@@ -286,7 +286,7 @@ class SubmissionsController < ApplicationController
   protected
 
   def submission_zip
-    @attachments = @assignment.attachments.find_all_by_display_name("submissions.zip").select{|a| ['to_be_zipped', 'zipping', 'zipped', 'errored'].include?(a.workflow_state) }.sort_by{|a| a.created_at }
+    @attachments = @assignment.attachments.find(:all, :conditions => ["display_name='submissions.zip' AND workflow_state IN ('to_be_zipped', 'zipping', 'zipped', 'errored') AND user_id=?", @current_user.id], :order => :created_at)
     @attachment = @attachments.pop
     @attachments.each{|a| a.destroy! }
     if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))
@@ -297,9 +297,8 @@ class SubmissionsController < ApplicationController
       @attachment = @assignment.attachments.build(:display_name => 'submissions.zip')
       @attachment.workflow_state = 'to_be_zipped'
       @attachment.file_state = '0'
+      @attachment.user = @current_user
       @attachment.save!
-    end
-    if params[:compile] && @attachment.to_be_zipped?
       ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
       render :json => @attachment.to_json
     else

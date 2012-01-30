@@ -346,7 +346,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && !self.locked? && !self.root_topic_id }
     can :delete
     
-    given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :read) }#
+    given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :read_forum) }#
     can :read
     
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }

@@ -32,12 +32,11 @@ module CustomSeleniumRspecMatchers
       "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element.text}"
     end
     def negative_failure_message
-      "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element.text}"
+      "expected #{@element.inspect} text to NOT include #{@text}, actual text was: #{@element.text}"
     end
   end
 
   def include_text(text)
     IncludeText.new(text)
   end
-
 end

@@ -17,4 +17,7 @@
 #
 
 class ObserverEnrollment < Enrollment
+  def observer?
+    true
+  end
 end

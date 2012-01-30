@@ -462,6 +462,11 @@ I18n.scoped('instructure', function(I18n) {
       $(this).parents(".subcontent").find(".communication_sub_message.toggled_communication_sub_message").removeClass('toggled_communication_sub_message');
       $(this).parents(".communication_sub_message").remove();
     });
+    $(".show_comments_link").click(function(event) {
+      event.preventDefault();
+      $(this).closest("ul").find("li").show();
+      $(this).closest("li").remove();
+    });
     $(".communication_message .message_short .read_more_link").click(function(event) {
       event.preventDefault();
       $(this).parents(".communication_message").find(".message_short").hide().end()

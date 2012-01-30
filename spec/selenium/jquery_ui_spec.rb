@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "jquery ui selenium tests" do
+describe "jquery ui" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
+  before (:each) do
     course_with_teacher_logged_in
     get "/"
   end
@@ -105,6 +105,7 @@ describe "jquery ui selenium tests" do
     end
 
     it "should accept jquery object dialog titles" do
+      skip_if_ie("expected: <i>i want formatting <b>for realz</b></i>,got: <I>i want formatting <B>for realz</B></I> (using ==)")
       title = "<i>i want formatting <b>for realz</b></i>"
       driver.execute_script(<<-JS).should == title
         return $('<div id="jqueryui_test">here we go</div>')
@@ -123,7 +124,5 @@ describe "jquery ui selenium tests" do
           .html();
       JS
     end
-
   end
-
 end

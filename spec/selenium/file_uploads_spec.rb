@@ -2,21 +2,21 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 
 shared_examples_for "file uploads selenium tests" do
   it_should_behave_like "forked server selenium tests"
-  
+
   append_after(:all) do
     Setting.remove("file_storage_test_override")
   end
 
-  before(:each) do
+  before (:each) do
     @password = "asdfasdf"
     @teacher = user_with_pseudonym :active_user => true,
-                                      :username => "teacher@example.com",
-                                      :password => @password
+                                   :username => "teacher@example.com",
+                                   :password => @password
     @teacher.save!
 
     @student = user_with_pseudonym :active_user => true,
-                                      :username => "student@example.com",
-                                      :password => @password
+                                   :username => "student@example.com",
+                                   :password => @password
     @student.save!
 
     @course = course :active_course => true
@@ -26,7 +26,7 @@ shared_examples_for "file uploads selenium tests" do
   end
 
   it "should upload a file on the homework submissions page, even over quota" do
-    pending("failing on the last assertion")
+    pending("ajax error")
     a = @course.assignments.create!(:submission_types => "online_upload")
 
     login_as(@student.email, @password)
@@ -48,8 +48,7 @@ shared_examples_for "file uploads selenium tests" do
       link = driver.find_element(:css, "div.details a.forward")
       link.text.should eql("Submission Details")
 
-      link.click
-      wait_for_dom_ready
+      expect_new_page_load { link.click }
       keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
       in_frame('preview_frame') do
         driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
@@ -60,6 +59,7 @@ shared_examples_for "file uploads selenium tests" do
   end
 
   it "should upload a file on the content import page" do
+    skip_if_ie("s3 test failes due to javascript error")
     login_as(@teacher.email, @password)
 
     get "/courses/#{@course.id}/imports/migrate"
@@ -67,12 +67,13 @@ shared_examples_for "file uploads selenium tests" do
     filename, fullpath, data = get_file("testfile5.zip")
 
     driver.find_element(:css, '#choose_migration_system').
-      find_element(:css, 'option[value="common_cartridge_importer"]').click
+        find_element(:css, 'option[value="common_cartridge_importer"]').click
     driver.find_element(:css, '#config_options').
-      find_element(:name, 'export_file').send_keys(fullpath)
+        find_element(:name, 'export_file').send_keys(fullpath)
     driver.find_element(:css, '#config_options').
-      find_element(:css, '.submit_button').click
-    keep_trying_until { driver.find_element(:css, '#file_uploaded').displayed? }
+        find_element(:css, '.submit_button').click
+    wait_for_ajax_requests
+    keep_trying_until { driver.find_element(:id, 'file_uploaded').should be_displayed }
 
     ContentMigration.for_context(@course).count.should == 1
     cm = ContentMigration.for_context(@course).first
@@ -84,17 +85,17 @@ shared_examples_for "file uploads selenium tests" do
 
 end
 
-describe "file uploads Windows-Firefox-Local-Tests" do
+describe "file uploads local tests" do
   it_should_behave_like "file uploads selenium tests"
-  prepend_before(:each) {
+  prepend_before (:each) do
     Setting.set("file_storage_test_override", "local")
-  }
-  prepend_before(:all) {
+  end
+  prepend_before (:all) do
     Setting.set("file_storage_test_override", "local")
-  }
+  end
 
   it "should upload a file on the discussions page" do
-    pending("intermittent record not found error on last assertion")
+    pending("intermittently fails")
     # set up basic user with enrollment
     login_as(@teacher.email, @password)
 
@@ -112,7 +113,7 @@ describe "file uploads Windows-Firefox-Local-Tests" do
         $('#editor_tabs ul li:eq(1) a').click();
       JS
       wait_for_ajax_requests
-      
+
       driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
       driver.find_element(:css, '#tree1 .folder .sign').click
       # work around bizarre bug where the click above doesn't register the first time
@@ -136,11 +137,11 @@ describe "file uploads Windows-Firefox-Local-Tests" do
       driver.find_element(:css, '#sidebar_upload_file_form button').click
       wait_for_ajax_requests
       keep_trying_until { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
-      
+
       # let's go check out if the file is in the files controller
       get "/courses/#{@course.id}/files"
       keep_trying_until { driver.execute_script("return $('a:contains(#{filename})')[0]") }
-      
+
       # check out the file content, make sure it's good
       get "/courses/#{@course.id}/files/#{Attachment.last.id}/download?wrap=1"
       in_frame('file_content') do
@@ -150,12 +151,12 @@ describe "file uploads Windows-Firefox-Local-Tests" do
   end
 end
 
-describe "file uploads Windows-Firefox-S3-Tests" do
+describe "file uploads S3 tests" do
   it_should_behave_like "file uploads selenium tests"
-  prepend_before(:each) {
+  prepend_before (:each) do
     Setting.set("file_storage_test_override", "s3")
-  }
-  prepend_before(:all) {
+  end
+  prepend_before (:all) do
     Setting.set("file_storage_test_override", "s3")
-  }
+  end
 end

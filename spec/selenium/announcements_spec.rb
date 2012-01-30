@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "announcements selenium tests" do
+describe "announcements" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should not show JSON when loading more announcements via pageless" do
@@ -72,7 +72,7 @@ describe "announcements selenium tests" do
 
     #delete external feed
     driver.find_element(:link, feed_name).should be_displayed
-    driver.find_element(:css, '#external_feeds li:nth-child(2) .delete_feed_link').click
+    find_with_jquery('#external_feeds li:nth-child(2) .delete_feed_link').click
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.accept
     wait_for_ajaximations
@@ -88,5 +88,4 @@ describe "announcements selenium tests" do
     driver.find_element(:id,'add_external_feed_form').should_not be_displayed
 
   end
-
 end

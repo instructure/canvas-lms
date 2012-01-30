@@ -5,7 +5,7 @@ describe "HTML Sanitization of" do
     it "should sanitize qti v2p1 escaped html" do
       manifest_node=get_manifest_node('multiple_answer')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
-      hash[:question_text].should == "The Media Wizard also allows you to embed images, audio and video from popular websites, such as YouTube and Picasa. You can also link to an image or audio or video file stored on another server. The advantage to linking to a file is that you don't have to copy the original media content to your online course &ndash; you just add a link to it. <br>\n<br>\n<b>Question: </b>Respondus can embed video, audio and images from which two popular websites mentioned above? alert('test')"
+      hash[:question_text].should == "The Media Wizard also allows you to embed images, audio and video from popular websites, such as YouTube and Picasa. You can also link to an image or audio or video file stored on another server. The advantage to linking to a file is that you don't have to copy the original media content to your online course – you just add a link to it. <br><br><b>Question: </b>Respondus can embed video, audio and images from which two popular websites mentioned above? alert('test')"
     end
     it "should sanitize qti v2p1 html nodes" do
       manifest_node=get_manifest_node('essay')
@@ -24,7 +24,7 @@ describe "HTML Sanitization of" do
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
       hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
       hash[:answers].should == [
-        {:html=>"&nbsp;<img src=\"image0014c114649.jpg\" alt=\"\">",
+        {:html=>"\302\240<img src=\"image0014c114649.jpg\" alt=\"\">",
          :text=>"No answer text provided."},
         {:html=>nil, # script tag removed
          :text=>"No answer text provided."},
@@ -50,9 +50,9 @@ describe "HTML Sanitization of" do
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>html_sanitization_question_dir('escaped'))
       hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
       hash[:answers].should == [
-        {:html=>"YouTube <br>\n<object height=\"344\" width=\"425\"><param name=\"movie\" value=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\">\n<embed src=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\" type=\"application/x-shockwave-flash\" height=\"344\" width=\"425\"></embed></object>",
+        {:html=>"YouTube <br><object width=\"425\" height=\"344\"><param name=\"movie\" value=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\">\n<embed src=\"http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0\" type=\"application/x-shockwave-flash\" width=\"425\" height=\"344\"></embed></object>",
          :text=>"YouTube"},
-        {:html=>"Google Picasa<br>\n<span style=\"color: #000000;\"><img src=\"http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg\" height=\"59\" width=\"150\"></span>&nbsp;",
+        {:html=>"Google Picasa<br><span style=\"color: #000000;\"><img src=\"http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg\" width=\"150\" height=\"59\"></span>\302\240",
          :text=>"Google Picasa"},
         {:text=>"Facebook alert('0xFACE')", # no script tags
          :html=>nil}, # sanitized html == text, so we exclude it

@@ -18,7 +18,15 @@
 
 class ConversationMessageParticipant < ActiveRecord::Base
   belongs_to :conversation_message
+  belongs_to :conversation_participant
   delegate :author, :author_id, :generated, :body, :to => :conversation_message
 
   attr_accessible
+
+  named_scope :for_conversation_and_message, lambda { |conversation_id, message_id|
+    {
+      :joins => "INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id",
+      :conditions => ["conversation_id = ? AND conversation_message_id = ?", conversation_id, message_id]
+    }
+  }
 end

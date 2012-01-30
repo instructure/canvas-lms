@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "student interactions report" do
   it_should_behave_like "in-process server selenium tests"
   
-  before(:each) do
+  before (:each) do
     username = "nobody@example.com"
     password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,

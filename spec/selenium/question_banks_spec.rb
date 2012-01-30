@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "question bank selenium tests" do
+describe "question bank" do
   it_should_behave_like "in-process server selenium tests"
 
   it "deleting AJAX-loaded questions should work" do
@@ -17,8 +17,4 @@ shared_examples_for "question bank selenium tests" do
     @bank.reload
     @bank.assessment_questions.select { |aq| !aq.deleted? }.length.should == 59
   end
-end
-
-describe "question bank Windows-Firefox-Tests" do
-  it_should_behave_like "question bank selenium tests"
 end

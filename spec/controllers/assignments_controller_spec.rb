@@ -118,6 +118,30 @@ describe AssignmentsController do
       response.should be_success
       assigns[:current_user_submission].should_not be_nil
     end
+
+    it "should redirect to discussion if assignment is linked to discussion" do
+      course_with_student_logged_in(:active_all => true)
+      course_assignment
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+      response.should be_redirect
+    end
+
+    it "should not redirect to discussion for observer if assignment is linked to discussion but read_forum is false" do
+      course_with_observer_logged_in(:active_all => true)
+      course_assignment
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+
+      RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
+                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+      response.should_not be_redirect
+      response.should be_success
+    end
   end
   
   describe "GET 'syllabus'" do

@@ -93,7 +93,7 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz && !@editing
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id) }
-        elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic && !@editing
+        elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic && !@editing && @assignment.discussion_topic.grants_right?(@current_user, session, :read)
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id) }
         elsif @assignment.submission_types == 'attendance' && !@editing
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }

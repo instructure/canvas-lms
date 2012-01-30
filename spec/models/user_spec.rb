@@ -791,13 +791,16 @@ describe User do
       course_model
       @course.offer
       teacher = user_model
+      designer = user_model
       student = user_model
       nobody = user_model
       admin = user_model
       @course.root_account.add_user(admin)
       @course.enroll_teacher(teacher).accept
+      @course.enroll_designer(designer).accept
       @course.enroll_student(student).accept
       teacher.lti_role_types(@course).should == ['Instructor']
+      designer.lti_role_types(@course).should == ['ContentDeveloper']
       student.lti_role_types(@course).should == ['Learner']
       nobody.lti_role_types(@course).should == ['urn:lti:sysrole:ims/lis/None']
       admin.lti_role_types(@course).should == ['urn:lti:instrole:ims/lis/Administrator']
@@ -1001,7 +1004,7 @@ describe User do
       @account2 = Account.create!
       @account3 = Account.create!
       Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
-      Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default).returns(true)
+      Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default, false).returns(true)
     end
 
     it "should return an active pseudonym" do
@@ -1053,7 +1056,8 @@ describe User do
       new_pseudonym.unique_id.should == 'preferred@example.com'
 
       # from unrelated account, if other options are not viable
-      @account1.pseudonyms.create!(:unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
+      user2 = User.create!
+      @account1.pseudonyms.create!(:user => user2, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.detect { |p| p.account == Account.site_admin }.update_attribute(:password_auto_generated, true)
       Account.default.account_authorization_configs.create!(:auth_type => 'cas')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
@@ -1135,6 +1139,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@course).should == 42
@@ -1147,6 +1152,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@group).should == 42
@@ -1158,6 +1164,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@root_account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@account).should == 42
@@ -1168,6 +1175,7 @@ describe User do
       u = User.create!
       pseudonyms = mock()
       u.stubs(:pseudonyms).returns(pseudonyms)
+      pseudonyms.stubs(:loaded?).returns(false)
       pseudonyms.stubs(:active).returns(pseudonyms)
       pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
       u.sis_pseudonym_for(@account).should == 42
@@ -1247,7 +1255,7 @@ describe User do
 
       it "should include manageable appointments" do
         course(:active_all => true)
-        @user = @course.admins.first
+        @user = @course.instructors.first
         ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
         events = @user.calendar_events_for_calendar
         events.size.should eql 1
@@ -1258,7 +1266,7 @@ describe User do
     describe "upcoming_events" do
       it "should include manageable appointment groups" do
         course(:active_all => true)
-        @user = @course.admins.first
+        @user = @course.instructors.first
         ag = @course.appointment_groups.create(:title => 'test appointment', :new_appointments => [[Time.now, Time.now + 1.hour]])
         events = @user.upcoming_events
         events.size.should eql 1

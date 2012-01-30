@@ -8,6 +8,9 @@ describe "section tabs on the left side" do
     %w{assignments quizzes settings}.each do |feature|
       get "/courses/#{@course.id}/#{feature}"
       js = "return $('#section-tabs .#{feature}').css('background-color')"
+      element_that_is_not_left_side = driver.find_element(:id, 'content')
+      # make sure to mouse off the link so the :hover and :focus styles do not apply
+      driver.action.move_to(element_that_is_not_left_side).perform
       driver.execute_script(js).should eql('rgb(255, 255, 255)')
     end
   end

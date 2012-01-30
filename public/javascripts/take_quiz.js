@@ -290,7 +290,12 @@ require(['i18n'], function(I18n) {
         }
       })
       .delegate(".numerical_question_input", {
-        keypress: function(event) {
+        keyup: function(event) {
+          if (event.which == 13) {
+            // don't do anything special if user hits enter
+            return;
+          }
+
           var string = String.fromCharCode(event.charCode || event.keyCode);
           if(event.charCode == 0 || string == "-" || string == "." || string == "0" || parseInt(string, 10)) {
             $(this).triggerHandler('focus');

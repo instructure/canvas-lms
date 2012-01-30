@@ -201,8 +201,8 @@ class ActiveRecord::Base
     self.class.to_s
   end
 
-  def self.execute_with_sanitize(array)
-    self.connection.execute(__send__(:sanitize_sql_array, array))
+  def sanitize_sql(*args)
+    self.class.send :sanitize_sql_for_conditions, *args
   end
 
   def self.base_ar_class
@@ -218,6 +218,14 @@ class ActiveRecord::Base
     options[:type] ||= :full
 
     value = args.pop
+    if options[:delimiter]
+      options[:type] = :full
+      value = options[:delimiter] + value + options[:delimiter]
+      delimiter = connection.quote(options[:delimiter])
+      column_str = "#{delimiter} || %s || #{delimiter}"
+      args = args.map{ |a| column_str % a.to_s }
+    end
+
     value = value.to_s.downcase.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
     value = '%' + value unless options[:type] == :right
     value += '%' unless options[:type] == :left
@@ -312,6 +320,122 @@ class ActiveRecord::Base
   named_scope :order, lambda { |order_by|
     {:order => order_by}
   }
+
+  # set up class-specific getters/setters for a polymorphic association, e.g.
+  #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
+  def self.belongs_to(name, options={})
+    if types = options.delete(:types)
+      add_polymorph_methods(name, Array(types))
+    end
+    super
+  end
+
+  def self.add_polymorph_methods(generic, specifics)
+    specifics.each do |specific|
+      next if instance_methods.include?(specific.to_s)
+      class_name = specific.to_s.classify
+      correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
+
+      class_eval <<-CODE
+      def #{specific}
+        #{generic} if #{correct_type}
+      end
+
+      def #{specific}=(val)
+        if val.nil?
+          # we don't want to unset it if it's currently some other type, i.e.
+          # foo.bar = Bar.new
+          # foo.baz = nil
+          # foo.bar.should_not be_nil
+          self.#{generic} = nil if #{correct_type}
+        elsif val.is_a?(#{class_name})
+          self.#{generic} = val
+        else
+          raise ArgumentError, "argument is not a #{class_name}"
+        end
+      end
+      CODE
+    end
+  end
+
+  module UniqueConstraintViolation
+    def self.===(error)
+      ActiveRecord::StatementInvalid === error &&
+      error.message.match(/PGError: ERROR: +duplicate key value violates unique constraint|Mysql::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
+    end
+  end
+
+  def self.unique_constraint_retry
+    # runs the block in a (possibly nested) transaction. if a unique constraint
+    # violation occurs, it will run it a second time. the nested transaction
+    # (savepoint) ensures we don't mess up things for the outer transaction.
+    # useful for possible race conditions where we don't want to take a lock
+    # (e.g. when we create a submission).
+    2.times do
+      begin
+        transaction(:requires_new => true) { yield }
+        break
+      rescue UniqueConstraintViolation
+      end
+    end
+  end
+end
+
+ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
+  def bulk_insert(table_name, records)
+    return if records.empty?
+    transaction do
+      keys = records.first.keys
+      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+      records.each do |record|
+        execute <<-SQL
+          INSERT INTO #{quote_table_name(table_name)}
+            (#{quoted_keys})
+          VALUES
+            (#{keys.map{ |k| quote(record[k]) }.join(', ')})
+        SQL
+      end
+    end
+  end
+end
+
+if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
+  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
+    def bulk_insert(table_name, records)
+      return if records.empty?
+      transaction do
+        keys = records.first.keys
+        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+        execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
+          records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
+      end
+    end
+  end
+end
+if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    def bulk_insert(table_name, records)
+      return if records.empty?
+      transaction do
+        keys = records.first.keys
+        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+        execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
+        raw_connection.put_copy_data records.inject(''){ |result, record|
+          result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
+        }
+        raw_connection.put_copy_end
+      end
+    end
+
+    def quote_text(value)
+      if value.nil?
+        "\\N"
+      else
+        hash = {"\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\"}
+        value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }
+      end
+    end
+  end
 end
 
 class ActiveRecord::Serialization::Serializer
@@ -343,8 +467,25 @@ class ActiveRecord::Serialization::Serializer
 end
 
 class ActiveRecord::Errors
-  def to_json
-    {:errors => @errors}.to_json
+  def as_json(*a)
+    {:errors => @errors}.as_json(*a)
+  end
+end
+
+# We are currently using the ActiveRecord::Errors modification above to return
+# the errors to our javascript in a specific expected format. however, this
+# format was returning the @base attribute of each ActiveRecord::Error, which
+# is a data leakage issue since that's the full json representation of the AR object.
+#
+# This modification removes the @base attribute from the json, which
+# fortunately wasn't being used by our javascript.
+# further development will eventually remove these two modifications
+# completely, and switch our javascript to use the default json formatting of
+# ActiveRecord::Errors
+# See #6733
+class ActiveRecord::Error
+  def as_json(*a)
+    super.slice('attribute', 'type', 'message')
   end
 end
 
