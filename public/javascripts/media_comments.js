@@ -26,6 +26,7 @@ I18n.scoped('media_comments', function(I18n) {
     }
     var flashRequiredMessage = "<div>" + $.h(I18n.t('messages.flash_required', "This video requires Flash version 9 or higher (you have %{version} installed).", { version: yourVersion })) +
             "<br/><a target='_blank' href='http://get.adobe.com/flashplayer/'>" + $.h(I18n.t('links.upgrade_flash', "Click here to upgrade")) +"</a></div>";
+
     $.fn.mediaComment = function(command, arg1, arg2, arg3, arg4, arg5) {
       var id = arg1, mediaType = arg2, downloadUrl = arg3;
       if(!INST.kalturaSettings) { console.log('Kaltura has not been enabled for this account'); return; }
@@ -37,9 +38,9 @@ I18n.scoped('media_comments', function(I18n) {
         var defaultTitle = arg5;
         $("#media_recorder_container").removeAttr('id').addClass('old_recorder_container');
         this.attr('id', 'media_recorder_container').removeClass('old_recorder_container');
-        this.unbind('media_comment_created');
+        $(document).unbind('media_comment_created');
         var $comment = this;
-        this.bind('media_comment_created', function(event, data) {
+        $(document).bind('media_comment_created', function(event, data) {
           callback.call(this, data.id, data.mediaType);
         });
         $.mediaComment.init(mediaType, {
@@ -273,7 +274,7 @@ I18n.scoped('media_comments', function(I18n) {
             $(document).triggerHandler('media_object_created', data);
           }, function(data) {});
         }
-        $("#media_recorder_container").triggerHandler('media_comment_created', {id: entry.entryId, mediaType: mediaType});
+        $(document).triggerHandler('media_comment_created', {id: entry.entryId, mediaType: mediaType});
       }
     };
     $.mediaComment.audio_delegate = {
@@ -719,7 +720,7 @@ I18n.scoped('media_comments', function(I18n) {
             $(document).triggerHandler('media_object_created', data);
           }, function(data) {});
         }
-        $("#media_recorder_container").triggerHandler('media_comment_created', {id: entry.entryId, mediaType: mediaType});
+        $(document).triggerHandler('media_comment_created', {id: entry.entryId, mediaType: mediaType});
       }
     }
     $("#media_comment_create_dialog").empty().dialog('close');
