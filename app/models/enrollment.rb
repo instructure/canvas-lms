@@ -423,7 +423,9 @@ class Enrollment < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.save
+    result = self.save
+    self.user.try(:update_account_associations) if result
+    result
   end
 
   def restore

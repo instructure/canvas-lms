@@ -1022,4 +1022,13 @@ describe Enrollment do
       end
     end
   end
+
+  describe "destroy" do
+    it "should update user_account_associations" do
+      course_with_teacher(:active_all => 1)
+      @user.associated_accounts.should == [Account.default]
+      @enrollment.destroy
+      @user.associated_accounts(true).should == []
+    end
+  end
 end
