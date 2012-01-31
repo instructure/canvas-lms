@@ -420,6 +420,31 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def active?
+    state_based_on_date == :active
+  end
+
+  def inactive?
+    state_based_on_date == :inactive
+  end
+
+  def completed?
+    state_based_on_date == :completed
+  end
+
+  def explicitly_completed?
+    state == :completed
+  end
+
+  def soft_completed_at
+    enrollment_dates.map(&:last).compact.min
+  end
+  protected :soft_completed_at
+
+  def completed_at
+    read_attribute(:completed_at) || (completed? ? soft_completed_at : nil)
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'

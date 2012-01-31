@@ -779,6 +779,82 @@ describe Enrollment do
       @student_enrollment.state_based_on_date.should == :completed
 
     end
+
+    it "should affect the active?/inactive?/completed? predicates" do
+      course_with_student(:active_all => true)
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 2.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+      @enrollment.active?.should be_true
+      @enrollment.inactive?.should be_false
+      @enrollment.completed?.should be_false
+
+      sleep 1
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.save!
+      @enrollment.active?.should be_false
+      @enrollment.inactive?.should be_false
+      @enrollment.completed?.should be_true
+
+      sleep 1
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.save!
+      @enrollment.active?.should be_false
+      @enrollment.inactive?.should be_true
+      @enrollment.completed?.should be_false
+    end
+
+    it "should not affect the explicitly_completed? predicate" do
+      course_with_student(:active_all => true)
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 2.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+      @enrollment.explicitly_completed?.should be_false
+
+      sleep 1
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.save!
+      @enrollment.explicitly_completed?.should be_false
+
+      sleep 1
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.save!
+      @enrollment.explicitly_completed?.should be_false
+
+      @enrollment.workflow_state = 'completed'
+      @enrollment.explicitly_completed?.should be_true
+    end
+
+    it "should affect the completed_at" do
+      yesterday = 1.day.ago
+
+      course_with_student(:active_all => true)
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 2.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.completed_at = nil
+      @enrollment.save!
+
+      @enrollment.completed_at.should be_nil
+      @enrollment.completed_at = yesterday
+      @enrollment.completed_at.should == yesterday
+
+      sleep 1
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.completed_at = nil
+      @enrollment.save!
+
+      @enrollment.completed_at.should == @enrollment.end_at
+      @enrollment.completed_at = yesterday
+      @enrollment.completed_at.should == yesterday
+    end
   end
 
   context "audit_groups_for_deleted_enrollments" do
