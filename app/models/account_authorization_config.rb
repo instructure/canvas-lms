@@ -30,7 +30,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
   validates_presence_of :account_id
   validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
-  after_save :disable_open_registration_if_delegated
+  after_create :disable_open_registration_if_delegated
 
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'

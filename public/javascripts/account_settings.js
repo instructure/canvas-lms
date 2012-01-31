@@ -68,6 +68,14 @@ $(document).ready(function() {
       width: 400
     }).dialog('open');
   });
+  $(".open_registration_delegated_warning_link").click(function(event) {
+    event.preventDefault();
+    $("#open_registration_delegated_warning_dialog").dialog('close').dialog({
+      autoOpen: false,
+      title: I18n.t('titles.open_registration_delegated_warning_dialog', "An External Identity Provider is Enabled"),
+      width: 400
+    }).dialog('open');
+  });
 
   var $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank'),
       uniqueCounter = 1000;
