@@ -225,11 +225,11 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     it "should add an image to the page and validate a student can see it" do
       login_as(@teacher.name)
       get "/courses/#{@course.id}/wiki"
-
       add_image_to_rce
+
       login_as(@student.name)
       get "/courses/#{@course.id}/wiki"
-      find_with_jquery('img[src="/courses/1/files/1/preview"]').should be_displayed
+      find_with_jquery("img[src='/courses/#{@course.id}/files/#{@course.attachments.last.id}/preview']").should be_displayed
       #check_image would be good to do here but the src on the image in the wiki body is messed up
     end
   end

@@ -297,7 +297,7 @@ describe "collaborations" do
       user_session(@student)
       get "/courses/#{@course.id}/collaborations"
       wait_for_ajaximations
-      collaboration = driver.find_element(:css, '.collaboration_1')
+      collaboration = driver.find_element(:css, ".collaboration_#{@collaboration.id}")
       collaboration.should be_displayed
       collaboration.find_element(:css, '.toggle_collaborators_link').click
       wait_for_animations

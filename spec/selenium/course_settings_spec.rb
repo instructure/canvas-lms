@@ -141,7 +141,7 @@ describe "course settings tests" do
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
-      driver.execute_script("$('li#enrollment_2 .unenroll_user_link').click()")
+      driver.execute_script("$('li.student_enrollment .unenroll_user_link').click()")
       driver.switch_to.alert.accept
       keep_trying_until do
         driver.find_element(:id, 'tab-users').should_not include_text(username)
@@ -155,10 +155,10 @@ describe "course settings tests" do
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
-      driver.execute_script("$('li#enrollment_2 .edit_section_link').click()")
+      driver.execute_script("$('li.student_enrollment .edit_section_link').click()")
       click_option('#course_section_id', section_name)
       wait_for_ajaximations
-      driver.find_element(:css, 'li#enrollment_2 .section').should include_text(section_name)
+      driver.find_element(:css, 'li.student_enrollment .section').should include_text(section_name)
     end
 
     it "should view the users enrollment details" do
@@ -166,7 +166,7 @@ describe "course settings tests" do
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
-      driver.execute_script("$('li#enrollment_2 .user_information_link').click()")
+      driver.execute_script("$('li.student_enrollment .user_information_link').click()")
       enrollment_dialog = driver.find_element(:id, 'enrollment_dialog')
       enrollment_dialog.should be_displayed
       enrollment_dialog.should include_text(username + ' has already received and accepted the invitation')

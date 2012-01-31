@@ -69,7 +69,7 @@ describe "learning outcome test" do
     #create rubric
     find_with_jquery('#right-side a:last-child').click
     driver.find_element(:css, '.add_rubric_link').click
-    driver.find_element(:css, '#rubric_new input[name="title"]').send_keys('New Rubric')
+    driver.find_element(:css, '#rubrics input[name="title"]').send_keys('New Rubric')
 
     #edit first criterion
     driver.execute_script('$(".links").show();') #couldn't get mouseover to work

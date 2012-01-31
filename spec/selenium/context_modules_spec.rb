@@ -399,7 +399,7 @@ describe "context_modules" do
 
     it "should validate that a student can't get to a locked context module" do
       #sequential error validation
-      get "/courses/#{@course.id}/modules/items/#{@assignment_2.id}"
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
       driver.find_element(:id, 'module_prerequisites_list').should be_displayed
     end
