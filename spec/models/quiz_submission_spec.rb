@@ -383,4 +383,16 @@ describe QuizSubmission do
       }.should_not raise_error
     end
   end
+
+  context "permissions" do
+    it "should allow read to observers" do
+      course_with_student(:active_all => true)
+      @observer = user
+      oe = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
+      oe.update_attribute(:associated_user, @user)
+      @quiz = @course.quizzes.create!
+      qs = @quiz.generate_submission(@user)
+      qs.grants_right?(@observer, nil, :read).should be_true
+    end
+  end
 end

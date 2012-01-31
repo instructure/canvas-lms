@@ -35,6 +35,11 @@ class SubmissionsController < ApplicationController
   
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
+    if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
+      id = @context_enrollment.associated_user_id
+    else
+      id = @current_user.id
+    end
     @user = @context.all_students.find(params[:id]) rescue nil
     if !@user
       flash[:error] = t('errors.student_not_enrolled', "The specified user is not a student in this course")
