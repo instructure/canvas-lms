@@ -67,12 +67,14 @@ describe "accounts/settings.html.erb" do
     it "should show by default" do
       render
       response.should have_tag("input#account_settings_open_registration")
+      response.should_not have_tag("div#open_registration_delegated_warning_dialog")
     end
 
-    it "should not show when a delegated auth config is around" do
+    it "should show warning dialog when a delegated auth config is around" do
       @account.account_authorization_configs.create!(:auth_type => 'cas')
       render
-      response.should_not have_tag("input#account_settings_open_registration")
+      response.should have_tag("input#account_settings_open_registration")
+      response.should have_tag("div#open_registration_delegated_warning_dialog")
     end
   end
 end
