@@ -924,7 +924,7 @@ describe "quizzes" do
     #This step is to prevent selenium from freezing when the dialog appears when leaving the page
     driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
     confirm_dialog = driver.switch_to.alert
-    expect_new_page_load { confirm_dialog.accept }
+    confirm_dialog.accept
   end
 
   it "should round numeric questions the same when created and taking a quiz" do
@@ -990,7 +990,7 @@ describe "quizzes" do
       #This step is to prevent selenium from freezing when the dialog appears when leaving the page
       driver.find_element(:link, 'Quizzes').click
       confirm_dialog = driver.switch_to.alert
-      expect_new_page_load { confirm_dialog.accept }
+      confirm_dialog.accept
     end
 
     # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
