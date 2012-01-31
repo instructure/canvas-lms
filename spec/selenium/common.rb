@@ -82,7 +82,7 @@ module SeleniumTestsHelperMethods
       end
 
     end
-    driver.manage.timeouts.implicit_wait = 10
+    driver.manage.timeouts.implicit_wait = 3
     driver
   end
 
@@ -636,7 +636,7 @@ shared_examples_for "all selenium tests" do
   end
 
   append_before (:each) do
-    driver.manage.timeouts.implicit_wait = 10
+    driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
   end
 
