@@ -28,8 +28,8 @@ class Submission < ActiveRecord::Base
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
   has_many :submission_comments, :order => 'created_at', :dependent => :destroy
-  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at', :conditions => { :hidden => false }
-  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at', :conditions => { :hidden => true }
+  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => false }
+  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   belongs_to :quiz_submission

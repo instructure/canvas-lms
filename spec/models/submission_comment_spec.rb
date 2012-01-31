@@ -202,7 +202,7 @@ This text has a http://www.google.com link in it...
       it "should set the most recent comment as the message data" do
         SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
         c1 = @submission1.add_comment(:author => @student1, :comment => "hello")
-        c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!")
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!").reload
         @teacher1.conversations.size.should eql 1
         tc1 = @teacher1.conversations.first
         tc1.last_message_at.should eql c2.created_at
@@ -267,7 +267,7 @@ This text has a http://www.google.com link in it...
       it "should not set an older created_at/message" do
         SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
         c1 = @submission1.add_comment(:author => @teacher1, :comment => "!", :hidden => true)
-        c2 = @submission1.add_comment(:author => @student1, :comment => "a new comment")
+        c2 = @submission1.add_comment(:author => @student1, :comment => "a new comment").reload
         @teacher1.conversations.size.should eql 1
         @teacher1.conversations.first.messages.last.created_at.should eql c2.created_at
         @teacher1.conversations.first.messages.last.body.should eql c2.comment
@@ -307,7 +307,7 @@ This text has a http://www.google.com link in it...
     context "deletion" do
       it "should update the message correctly if the most recent comment is deleted" do
         SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
-        c1 = @submission1.add_comment(:author => @student1, :comment => "hello")
+        c1 = @submission1.add_comment(:author => @student1, :comment => "hello").reload
         c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!")
         c2.destroy
         @teacher1.conversations.size.should eql 1
