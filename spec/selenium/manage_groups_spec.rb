@@ -435,7 +435,10 @@ describe "manage groups" do
     end
 
     it "should assign students in DB and in UI" do
-      find_with_jquery("#category_#{@category.id} .group_blank .user_id_#{@student.id}").should_not be_nil
+      keep_trying_until do
+        find_with_jquery("#category_#{@category.id} .group_blank .user_id_#{@student.id}").should_not be_nil
+        true
+      end
       @student.groups.should be_empty
 
       assign_students(@category)

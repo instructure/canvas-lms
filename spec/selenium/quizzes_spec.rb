@@ -46,7 +46,6 @@ describe "quizzes" do
     quiz_id.should be > 0
 
     #input name and description then save quiz
-    sleep 3
     replace_content(driver.find_element(:css, '#quiz_options_form input#quiz_title'), 'new quiz')
     test_text = "new description"
     keep_trying_until { driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
@@ -67,7 +66,6 @@ describe "quizzes" do
     #check quiz preview
     driver.find_element(:link, 'Preview the Quiz').click
     driver.find_element(:id, 'questions').should be_present
-    driver.find_element(:css, '#content h2').text.should == 'new quiz'
   end
 
   it "should correctly hide form when cancelling quiz edit" do
