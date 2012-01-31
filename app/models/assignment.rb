@@ -1046,6 +1046,7 @@ class Assignment < ActiveRecord::Base
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = context.enrollments_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
+    res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
     res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
       s.as_json(:include_root => false,
         :include => {

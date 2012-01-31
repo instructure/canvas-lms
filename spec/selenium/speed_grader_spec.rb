@@ -108,6 +108,21 @@ describe "speedgrader" do
     keep_trying_until {
       driver.find_element(:id, 'submissions_container').should
         include_text(I18n.t('headers.no_submission', "This student does not have a submission for this assignment"))
+      find_with_jquery('#this_student_does_not_have_a_submission').should be_displayed
+    }
+  end
+
+  it "should hide answers of anonymous graded quizzes" do
+    @assignment.points_possible = 10
+    @assignment.submission_types = 'online_quiz'
+    @assignment.title = 'Anonymous Graded Quiz'
+    @assignment.save!
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz.update_attribute(:anonymous_submissions, true)
+    student_submission
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    keep_trying_until {
+      find_with_jquery('#this_student_has_a_submission').should be_displayed
     }
   end
 

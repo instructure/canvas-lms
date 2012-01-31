@@ -65,7 +65,7 @@ class QuizzesController < ApplicationController
         format.csv {
           cancel_cache_buster
           send_data(
-            @quiz.statistics_csv(:include_all_versions => params[:all_versions] == '1', :anonymous => !@quiz.graded? && @quiz.anonymous_submissions),
+            @quiz.statistics_csv(:include_all_versions => params[:all_versions] == '1', :anonymous => @quiz.anonymous_submissions),
             :type => "text/csv",
             :filename => t(:statistics_filename, "%{title} %{type} Report", :title => @quiz.title, :type => @quiz.readable_type) + ".csv",
             :disposition => "attachment"

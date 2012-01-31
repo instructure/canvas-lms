@@ -88,6 +88,7 @@ require([
       $grded_so_far = $("#x_of_x_graded span:first"),
       $average_score = $("#average_score"),
       $this_student_does_not_have_a_submission = $("#this_student_does_not_have_a_submission").hide(),
+      $this_student_has_a_submission = $('#this_student_has_a_submission').hide(),
       $rubric_assessments_select = $("#rubric_assessments_select"),
       $rubric_summary_container = $("#rubric_summary_container"),
       $rubric_holder = $("#rubric_holder"),
@@ -1109,7 +1110,7 @@ require([
         $single_submission.show();
       }
     },
-    
+
     showSubmissionDetails: function(){
       //if there is a submission
       if (this.currentStudent.submission && this.currentStudent.submission.submitted_at) {
@@ -1145,9 +1146,9 @@ require([
           return sum / arr.length;
         }
         function roundWithPrecision(number, precision) {
-        	precision = Math.abs(parseInt(precision, 10)) || 0;
-        	var coefficient = Math.pow(10, precision);
-        	return Math.round(number*coefficient)/coefficient;
+          precision = Math.abs(parseInt(precision, 10)) || 0;
+          var coefficient = Math.pow(10, precision);
+          return Math.round(number*coefficient)/coefficient;
         }
         var outOf = jsonData.points_possible ? ([" / ", jsonData.points_possible, " (", Math.round( 100 * (avg(scores) / jsonData.points_possible)), "%)"].join("")) : "";
         $average_score.html( [roundWithPrecision(avg(scores), 2) + outOf].join("") );
@@ -1161,15 +1162,16 @@ require([
     loadAttachmentInline: function(attachment){
       $submissions_container.children().hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
-  	    $this_student_does_not_have_a_submission.show();
-  	  }
-  	  else {
+          $this_student_does_not_have_a_submission.show();
+      } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
+          $this_student_has_a_submission.show()
+      } else {
         $iframe_holder.empty();
-        
+
         //if it's a scribd doc load it.
         var scribdDocAvailable = attachment && attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
-  	    if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) { 
-  	      var options = {
+        if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) { 
+          var options = {
               height: '100%',
               mimeType: attachment.content_type,
               attachment_id: attachment.id,
