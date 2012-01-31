@@ -223,7 +223,7 @@ require([
             id     = $group.children('.header').getTemplateData({ textValues: [ 'asset_string', 'id' ] }).id,
             data   = {},
             url    = $.replaceTags($("#outcome_links .reorder_items_url").attr('href'), 'id', id),
-            assets = $group.find('.child_outcomes').children('.learning_outcome, .outcome_group').map(function(i, el){
+            assets = $group.children('.child_outcomes').children('.learning_outcome, .outcome_group').map(function(i, el){
               return $(el).children('.header').getTemplateData({ textValues: [ 'asset_string', 'id' ] }).asset_string;
             });
         for (var _i = 0, _max = assets.length; _i < _max; _i++){

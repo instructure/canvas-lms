@@ -661,6 +661,13 @@ shared_examples_for "all selenium tests" do
     driver.execute_script js
   end
 
+  # when selenium fails you, reach for .simulate
+  # takes a CSS selector for jQuery to find the element you want to drag
+  # and then the change in x and y you want to drag
+  def drag_with_js(selector, x, y)
+    driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
+  end
+
   self.use_transactional_fixtures = false
 
   append_after(:each) do
