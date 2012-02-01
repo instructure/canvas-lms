@@ -26,6 +26,9 @@ define 'compiled/calendar/EventDataSource', [
       #   appointmentGroups: {
       #     "1": <object>
       #   },
+      #   participants: {
+      #     "1_unregistered": [ users or groups ]
+      #   }
       #   fetchedAppointmentGroups: { manageable: true/false }
       # }
       #
@@ -55,6 +58,7 @@ define 'compiled/calendar/EventDataSource', [
       @cache = {
         contexts: {}
         appointmentGroups: {}
+        participants: {}
         fetchedAppointmentGroups: null
       }
       for contextInfo in @contexts
@@ -256,6 +260,31 @@ define 'compiled/calendar/EventDataSource', [
         [ '/api/v1/calendar_events', $.extend({type: 'assignment'}, params) ]
       ], dataCB, doneCB
 
+    getParticipants: (appointmentGroup, registrationStatus, cb) =>
+      if @inFlightRequest
+        @pendingRequests.push([@getParticipants, arguments])
+        return
+
+      key = "#{appointmentGroup.id}_#{registrationStatus}"
+
+      if @cache.participants[key]
+        cb @cache.participants[key]
+        @processNextRequest()
+        return
+
+      @cache.participants[key] = []
+
+      dataCB = (data, url, params) =>
+        if data
+          @cache.participants[key].push.apply(@cache.participants[key], data)
+
+      doneCB = () => cb @cache.participants[key]
+
+      type = if appointmentGroup.participant_type is "Group" then 'groups' else 'users'
+      @startFetch [
+        ["/api/v1/appointment_groups/#{appointmentGroup.id}/#{type}", {registration_status: registrationStatus}]
+      ], dataCB, doneCB
+    
     # Starts a paginated fetch of the url/param combinations in the array. This makes
     # situations where you need to do paginated fetches of data from N different endpoints
     # a little simpler. dataCB(data, url, params) is called on every request with the data,

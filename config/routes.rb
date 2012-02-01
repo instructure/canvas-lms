@@ -773,6 +773,8 @@ ActionController::Routing::Routes.draw do |map|
       groups.get 'appointment_groups/:id', :action => :show, :path_name => 'appointment_group'
       groups.put 'appointment_groups/:id', :action => :update
       groups.delete 'appointment_groups/:id', :action => :destroy
+      groups.get 'appointment_groups/:id/users', :action => :users, :path_name => 'appointment_group_users'
+      groups.get 'appointment_groups/:id/groups', :action => :groups, :path_name => 'appointment_group_groups'
     end
   end
 

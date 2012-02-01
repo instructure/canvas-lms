@@ -1,0 +1,15 @@
+{{#ifEqual recipientType "Group"}}
+  {{#each recipients}}
+    <li>
+      <span>{{name}}</span>
+      <input name="recipients[]" type="hidden" value="group_{{id}}" />
+    </li>
+  {{/each}}
+{{else}}
+  {{#each recipients}}
+    <li>
+      <span>{{name}}</span>
+      <input name="recipients[]" type="hidden" value="{{id}}" />
+    </li>
+  {{/each}}
+{{/ifEqual}}

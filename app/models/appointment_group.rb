@@ -183,8 +183,24 @@ class AppointmentGroup < ActiveRecord::Base
       context.participating_instructors.uniq
   end
 
-  def possible_participants
-    AppointmentGroup.possible_participants(participant_type, context)
+  def possible_participants(registration_status=nil)
+    participants = AppointmentGroup.possible_participants(participant_type, context)
+    participants = case registration_status
+      when 'registered';   participants.scoped(:conditions => ["#{participant_table}.id IN (?)", participant_ids + [0]])
+      when 'unregistered'; participants.scoped(:conditions => ["#{participant_table}.id NOT IN (?)", participant_ids + [0]])
+      else                 participants
+    end
+    participants.order((participant_type == 'User' ? User.sortable_name_order_by_clause("users") : Group.case_insensitive("groups.name")) + ", #{participant_table}.id")
+  end
+
+  def participant_ids
+    appointments_participants.
+      scoped(:select => 'context_id', :conditions => ["calendar_events.context_type = ?", participant_type]).
+      map(&:context_id)
+  end
+
+  def participant_table
+    Kernel.const_get(participant_type).table_name
   end
 
   def self.possible_participants(participant_type, context)

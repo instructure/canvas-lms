@@ -17,10 +17,10 @@
 #
 
 class User < ActiveRecord::Base
-  # this has to be before include COntext to prevent a circular dependency in Course
+  # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
     col = table ? "#{table}.sortable_name" : 'sortable_name'
-    ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql' ? "LOWER(#{col})" : col
+    case_insensitive(col)
   end
 
   include Context
