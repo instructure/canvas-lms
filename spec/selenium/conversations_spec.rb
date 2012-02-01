@@ -174,6 +174,22 @@ describe "conversations" do
     driver.find_elements(:css, "div#messages ul.messages > li")
   end
 
+  def delete_selected_messages(confirm_conversation_deleted = true)
+    orig_size = find_all_with_jquery("#conversations > ul > li:visible").size
+
+    wait_for_animations
+    delete = driver.find_element(:id, 'action_delete')
+    delete.should be_displayed
+    delete.click
+    driver.switch_to.alert.accept
+
+    if confirm_conversation_deleted
+      keep_trying_until {
+        find_all_with_jquery("#conversations > ul > li:visible").size.should eql(orig_size - 1)
+      }
+    end
+  end
+
   context "conversation loading" do
     it "should load all conversations" do
       @me = @user
@@ -662,16 +678,9 @@ describe "conversations" do
       msgs = get_messages
       msgs.size.should == 1
       msgs.first.click
-      wait_for_animations
-      delete = driver.find_element(:id, 'action_delete')
-      delete.should be_displayed
-      delete.click
-      driver.switch_to.alert.accept
 
-      keep_trying_until {
-        elements = find_all_with_jquery("#conversations > ul > li:visible")
-        elements.size == 0
-      }
+      delete_selected_messages
+
       @conversation.reload
       @conversation.last_message_at.should be_nil
     end
@@ -809,6 +818,55 @@ describe "conversations" do
       conversations = driver.find_elements(:css, "#conversations > ul > li")
       conversations.size.should == 1
       conversations.first["id"].should == "conversations_loader"
+    end
+  end
+
+  context "sent filter" do
+    before do
+      @course.update_attribute(:name, "the course")
+      @course1 = @course
+      @s1 = User.create(:name => "student1")
+      @s2 = User.create(:name => "student2")
+      @course1.enroll_user(@s1)
+      @course1.enroll_user(@s2)
+
+      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(*100.times.to_a.reverse.map{ |h| Time.now.utc - h.hours })
+
+      @c1 = conversation(@user, @s1)
+      @c2 = conversation(@user, @s2)
+      @c1.add_message('yay i sent this')
+      @c2.conversation.add_message(@s2, "ohai im not u so this wont show up on the left")
+
+      get "/conversations/sent"
+
+      conversations = find_all_with_jquery("#conversations > ul > li:visible")
+      conversations.first.attribute('id').should eql("conversation_#{@c1.conversation_id}")
+      conversations.first.text.should match(/yay i sent this/)
+      conversations.last.attribute('id').should eql("conversation_#{@c2.conversation_id}")
+      conversations.last.text.should match(/test/)
+    end
+
+    it "should reorder based on last authored message" do
+      driver.find_element(:id, "conversation_#{@c2.conversation_id}").click
+      wait_for_ajaximations
+
+      submit_message_form(:message => "qwerty")
+
+      conversations = find_all_with_jquery("#conversations > ul > li:visible")
+      conversations.size.should eql 2
+      conversations.first.text.should match(/qwerty/)
+      conversations.last.text.should match(/yay i sent this/)
+    end
+
+    it "should remove the conversation when the last message by the author is deleted" do
+      driver.find_element(:id, "conversation_#{@c2.conversation_id}").click
+      wait_for_ajaximations
+
+      msgs = driver.find_elements(:css, "div#messages ul.messages > li")
+      msgs.size.should == 2
+      msgs.last.click
+
+      delete_selected_messages
     end
   end
 

@@ -110,15 +110,16 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
-  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
+  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 
-  def conversations
-    all_conversations.visible # i.e. exclude any where the user has deleted all the messages
+  def conversations(order=true)
+    ret = all_conversations.visible # i.e. exclude any where the user has deleted all the messages
+    order ? ret.scoped(:order => "last_message_at DESC, conversation_id DESC") : ret
   end
 
   named_scope :of_account, lambda { |account|

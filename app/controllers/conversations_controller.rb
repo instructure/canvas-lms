@@ -101,6 +101,10 @@ class ConversationsController < ApplicationController
         @view_name = I18n.t('index.inbox_views.starred', 'Starred')
         @no_messages = I18n.t('no_starred_messages', 'You have no starred messages')
         @current_user.conversations.starred
+      when 'sent'
+        @view_name = I18n.t('index.inbox_views.sent', 'Sent')
+        @no_messages = I18n.t('no_sent_messages', 'You have no sent messages')
+        @current_user.conversations(false).default.sent
       when 'archived'
         @view_name = I18n.t('index.inbox_views.archived', 'Archived')
         @no_messages = I18n.t('no_archived_messages', 'You have no archived messages')
@@ -124,14 +128,9 @@ class ConversationsController < ApplicationController
     @conversations_count = conversations_scope.count
     conversations = Api.paginate(conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
     # optimize loading the most recent messages for each conversation into a single query
-    last_messages = ConversationMessage.latest_for_conversations(conversations).human.
-                      inject({}) { |hash, message|
-                        if !hash[message.conversation_id] || hash[message.conversation_id].id < message.id
-                          hash[message.conversation_id] = message
-                        end
-                        hash
-                      }
-    @conversations_json = conversations.each{|c| c.instance_variable_set(:@user, @current_user)}.map{ |c| jsonify_conversation(c, :last_message => last_messages[c.conversation_id], :include_participant_avatars => false, :include_participant_contexts => false) }
+    last_messages = ConversationMessage.latest_for_conversations(conversations)
+    last_authored_messages = ConversationMessage.latest_for_conversations(conversations, @current_user.id)
+    @conversations_json = conversations.map{ |c| jsonify_conversation(c, :last_message => last_messages[c.conversation_id], :last_authored_message => last_authored_messages[c.conversation_id], :include_participant_avatars => false, :include_participant_contexts => false) }
     @user_cache = Hash[*jsonify_users([@current_user]).map{|u| [u[:id], u] }.flatten]
     respond_to do |format|
       format.html {
@@ -836,7 +835,7 @@ class ConversationsController < ApplicationController
   def blank_fallback
     params[:blank_avatar_fallback] || @blank_fallback
   end
-  
+
   def context_types
     ['context', 'course']
   end

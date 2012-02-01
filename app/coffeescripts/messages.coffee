@@ -663,7 +663,7 @@ I18n.scoped 'conversations', (I18n) ->
 
   select_unloaded_conversation = (conversation_id, params) ->
     $.ajaxJSON '/conversations/' + conversation_id, 'GET', {}, (data) ->
-      add_conversation data.conversation, true
+      add_conversation data, true
       $("#conversation_" + conversation_id).hide()
       select_conversation $("#conversation_" + conversation_id), $.extend(params, {data: data})
 
@@ -1037,7 +1037,22 @@ I18n.scoped 'conversations', (I18n) ->
         """
     ) + " " + context_info
 
+  last_message_key = ->
+    if MessageInbox.scope is 'sent'
+      'last_authored_message'
+    else
+      'last_message'
+
+  last_message_at_key = ->
+    "#{last_message_key()}_at"
+
   update_conversation = ($conversation, data, move_mode='slide') ->
+    timestamp_key = last_message_at_key()
+    # just in case the conversation changed underneath us (e.g. someone sent
+    # a message to an archived conversation, thus un-archiving it)
+    if not data[timestamp_key]
+      return remove_conversation($conversation)
+
     toggle_message_actions(off)
 
     $a = $conversation.find('a.details_link')
@@ -1063,12 +1078,12 @@ I18n.scoped 'conversations', (I18n) ->
     if data.message_count?
       $conversation.find('.count').text data.message_count
       $conversation.find('.count').showIf data.message_count > 1
-    $conversation.find('span.date').text $.friendlyDatetime($.parseFromISO(data.last_message_at).datetime)
-    move_direction = if $conversation.data('last_message_at') > data.last_message_at then 'down' else 'up'
-    $conversation.data 'last_message_at', data.last_message_at
+    $conversation.find('span.date').text $.friendlyDatetime($.parseFromISO(data[timestamp_key]).datetime)
+    move_direction = if $conversation.data(timestamp_key) > data[timestamp_key] then 'down' else 'up'
+    $conversation.data timestamp_key, data[timestamp_key]
     $conversation.data 'starred', data.starred
     $p = $conversation.find('p')
-    $p.text data.last_message
+    $p.text data[last_message_key()]
     ($conversation.addClass(property) for property in data.properties) if data.properties.length
     $conversation.addClass('private') if data['private']
     $conversation.addClass('starred') if data.starred
@@ -1078,12 +1093,13 @@ I18n.scoped 'conversations', (I18n) ->
 
   reposition_conversation = ($conversation, move_direction, move_mode) ->
     $conversation.show()
-    last_message = $conversation.data('last_message_at')
+    timestamp_key = last_message_at_key()
+    last_message_at = $conversation.data(timestamp_key)
     $n = $conversation
     if move_direction == 'up'
-      $n = $n.prev() while $n.prev() && $n.prev().data('last_message_at') < last_message
+      $n = $n.prev() while $n.prev() && $n.prev().data(timestamp_key) < last_message_at
     else
-      $n = $n.next() while $n.next() && $n.next().data('last_message_at') > last_message
+      $n = $n.next() while $n.next() && $n.next().data(timestamp_key) > last_message_at
     return if $n == $conversation
     if move_mode is 'immediate'
       $conversation.detach()[if move_direction == 'up' then 'insertBefore' else 'insertAfter']($n).scrollIntoView()
@@ -1463,7 +1479,9 @@ I18n.scoped 'conversations', (I18n) ->
             # have the response tell us the number of messages still in
             # the conversation, and key off of that to know if we should
             # delete the conversation (or possibly reload its messages)
-            if $message_list.find('> li').not('.selected, .generated').length
+            ignore_list = '.selected, .generated'
+            ignore_list += ', .other' if MessageInbox.scope is 'sent' # once there are no more messages by self, hide the conversation
+            if $message_list.find('> li').not(ignore_list).length
               $selected_messages.remove()
               update_conversation($node, data)
             else
@@ -1769,7 +1787,7 @@ I18n.scoped 'conversations', (I18n) ->
           select_conversation($c, params)
         else
           select_unloaded_conversation(match[1], params)
-      else if $('#action_compose_message').length
+      else
         params = {}
         if match = hash.match(/^#\/conversations\?(.*)$/)
           params = parse_query_string(match[1])
