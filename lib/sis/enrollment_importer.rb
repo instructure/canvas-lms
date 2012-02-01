@@ -147,32 +147,34 @@ module SIS
             # commit pending incremental account associations
             incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
 
-            enrollment = @section.all_enrollments.find_by_user_id(user.id)
+            type = if role =~ /\Ateacher\z/i
+                'TeacherEnrollment'
+              elsif role =~ /student/i
+                'StudentEnrollment'
+              elsif role =~ /\Ata\z|assistant/i
+                'TaEnrollment'
+              elsif role =~ /\Aobserver\z/i
+                if associated_user_id
+                  pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, associated_user_id)
+                  associated_enrollment = pseudo && @course.student_enrollments.find_by_user_id(pseudo.user_id)
+                end
+                'ObserverEnrollment'
+              elsif role =~ /\Adesigner\z/i
+                'DesignerEnrollment'
+              end
+
+            enrollment = @section.all_enrollments.find(:first, :conditions => { :user_id => user.id, :type => type, :associated_user_id => associated_enrollment.try(:user_id) })
             unless enrollment
               enrollment = Enrollment.new
               enrollment.root_account = @root_account
             end
             enrollment.user = user
             enrollment.sis_source_id = [course_id, user_id, role, @section.name].compact.join(":")
+            enrollment.type = type
+            enrollment.associated_user_id = associated_enrollment.try(:user_id)
 
             enrollment.course = @course
             enrollment.course_section = @section
-            if role =~ /\Ateacher\z/i
-              enrollment.type = 'TeacherEnrollment'
-            elsif role =~ /student/i
-              enrollment.type = 'StudentEnrollment'
-            elsif role =~ /\Ata\z|assistant/i
-              enrollment.type = 'TaEnrollment'
-            elsif role =~ /\Aobserver\z/i
-              enrollment.type = 'ObserverEnrollment'
-              if associated_user_id
-                pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, associated_user_id)
-                associated_enrollment = pseudo && @course.student_enrollments.find_by_user_id(pseudo.user_id)
-                enrollment.associated_user_id = associated_enrollment && associated_enrollment.user_id
-              end
-            elsif role =~ /\Adesigner\z/i
-              enrollment.type = 'DesignerEnrollment'
-            end
 
             if status =~ /\Aactive/i
               if user.workflow_state != 'deleted'
