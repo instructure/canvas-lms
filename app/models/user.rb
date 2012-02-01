@@ -2174,9 +2174,8 @@ class User < ActiveRecord::Base
     associated_root_accounts.any? { |a| a.settings[:users_can_edit_name] != false } || associated_root_accounts.empty?
   end
 
-  def section_for_course(course)
-    enrollment = course.student_enrollments.active.for_user(self).first
-    enrollment && enrollment.course_section
+  def sections_for_course(course)
+    course.student_enrollments.active.for_user(self).map { |e| e.course_section }
   end
 
   def can_create_enrollment_for?(course, session, type)
@@ -2189,8 +2188,11 @@ class User < ActiveRecord::Base
 
   def group_member_json(context)
     h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
-    if context && context.is_a?(Course) && (section = self.section_for_course(context))
-      h = h.merge(:section_id => section.id, :section_code => section.section_code)
+    if context && context.is_a?(Course)
+      self.sections_for_course(context).each do |section|
+        h[:sections] ||= []
+        h[:sections] << { :section_id => section.id, :section_code => section.section_code }
+      end
     end
     h
   end

@@ -471,7 +471,7 @@ class Course < ActiveRecord::Base
   end
 
   def users_not_in_groups_sql(groups, opts={})
-    ["SELECT u.id, u.name
+    ["SELECT DISTINCT u.id, u.name#{", #{opts[:order_by]}" if opts[:order_by].present?}
         FROM users u
        INNER JOIN enrollments e ON e.user_id = u.id
        WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
@@ -479,7 +479,8 @@ class Course < ActiveRecord::Base
                                   FROM group_memberships gm
                                  WHERE gm.user_id = u.id AND
                                        gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
+       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}
+       #{"#{opts[:order_by_dir]}" if opts[:order_by_dir]}", self.id]
   end
 
   def users_not_in_groups(groups)
@@ -487,7 +488,7 @@ class Course < ActiveRecord::Base
   end
 
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')} ASC"),
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')}", :order_by_dir => "ASC"),
                          :page => page, :per_page => per_page)
   end
 
