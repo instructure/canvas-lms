@@ -1,0 +1,181 @@
+shared_examples_for "conversations selenium tests" do
+  it_should_behave_like "in-process server selenium tests"
+
+  prepend_before(:each) do
+    Setting.set("file_storage_test_override", "local")
+  end
+
+  before(:each) do
+    course_with_teacher_logged_in
+
+    term = EnrollmentTerm.new :name => "Super Term"
+    term.root_account_id = @course.root_account_id
+    term.save!
+
+    @course.update_attributes! :enrollment_term => term
+
+    @user.watched_conversations_intro
+    @user.save
+  end
+
+  def new_conversation(reload=true)
+    if reload
+      get "/conversations"
+      keep_trying_until { driver.find_element(:id, "create_message_form") }
+    else
+      driver.find_element(:id, "action_compose_message").click
+    end
+
+    @input = find_with_jquery("#create_message_form input:visible")
+    @browser = find_with_jquery("#create_message_form .browser:visible")
+    @level = 1
+    @elements = nil
+  end
+
+  def add_recipient(search)
+    input = find_with_jquery("#create_message_form input:visible")
+    input.send_keys(search)
+    keep_trying_until { driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
+    input.send_keys(:return)
+  end
+
+  def browse_menu
+    @browser.click
+    keep_trying_until {
+      find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
+    }
+    wait_for_animations
+  end
+
+  def browse(*names)
+    name = names.shift
+    @level += 1
+    prev_elements = elements
+    element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
+
+    element.first.click
+    wait_for_ajaximations(150)
+    keep_trying_until {
+      find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
+    }
+
+    @elements = nil
+    elements
+
+    if names.present?
+      browse(*names, &Proc.new)
+    else
+      yield
+    end
+
+    @elements = prev_elements
+    @level -= 1
+    @input.send_keys(:arrow_left)
+    wait_for_animations
+  end
+
+  def elements
+    @elements ||= driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
+      [e, (e.find_element(:tag_name, :b).text rescue e.text)]
+    }
+  end
+
+  def menu
+    elements.map(&:last)
+  end
+
+  def toggled
+    elements.select { |e| e.first.attribute('class') =~ /(^| )on($| )/ }.map(&:last)
+  end
+
+  def click(name)
+    element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
+    element.first.click
+  end
+
+  def toggle(name)
+    element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
+    element.first.find_element(:class, 'toggle').click
+  end
+
+  def tokens
+    find_all_with_jquery("#create_message_form .token_input li div").map(&:text)
+  end
+
+  def search(text, input_id="recipients")
+    @input.send_keys(text)
+    keep_trying_until do
+      driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == text
+    end
+    @elements = nil
+    yield
+    @elements = nil
+    if input_id == "recipients"
+      @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
+      keep_trying_until do
+        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 ||
+            driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == ''
+      end
+    end
+  end
+
+  def submit_message_form(opts={})
+    opts[:message] ||= "Test Message"
+    opts[:attachments] ||= []
+    opts[:add_recipient] = true unless opts.has_key?(:add_recipient)
+
+    if opts[:add_recipient] && browser = find_with_jquery("#create_message_form .browser:visible")
+      browser.click
+      wait_for_ajaximations(150)
+      find_with_jquery('.selectable:visible').click
+      wait_for_ajaximations(150)
+      find_with_jquery('.toggleable:visible .toggle').click
+      wait_for_ajaximations
+      driver.find_elements(:css, '.token_input ul li').length.should > 0
+      find_with_jquery("#create_message_form input:visible").send_keys("\t")
+    end
+
+    find_with_jquery("#create_message_form textarea").send_keys(opts[:message])
+
+    opts[:attachments].each_with_index do |fullpath, i|
+      driver.find_element(:id, "action_add_attachment").click
+
+      keep_trying_until {
+        find_all_with_jquery("#create_message_form .file_input:visible")[i]
+      }.send_keys(fullpath)
+    end
+
+    if opts[:media_comment]
+      driver.execute_script <<-JS
+        $("#media_comment_id").val(#{opts[:media_comment].first.inspect})
+        $("#media_comment_type").val(#{opts[:media_comment].last.inspect})
+        $("#create_message_form .media_comment").show()
+        $("#action_media_comment").hide()
+      JS
+    end
+
+    group_conversation_link = driver.find_element(:id, "group_conversation")
+    group_conversation_link.click if group_conversation_link.displayed?
+
+    expect {
+      driver.find_element(:id, "create_message_form").submit
+      wait_for_ajaximations
+    }.to change(ConversationMessage, :count).by(1)
+
+    message = ConversationMessage.last
+    driver.find_element(:id, "message_#{message.id}").should_not be_nil
+    message
+  end
+
+  def get_messages
+    get "/conversations"
+    elements = nil
+    keep_trying_until {
+      elements = find_all_with_jquery("#conversations > ul > li:visible")
+      elements.size == 1
+    }
+    elements.first.click
+    wait_for_ajaximations
+    driver.find_elements(:css, "div#messages ul.messages > li")
+  end
+end
