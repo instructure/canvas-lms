@@ -380,8 +380,26 @@ class Attachment < ActiveRecord::Base
     end
   end
   protected :default_values
-  
+
+  def root_account_id
+    # see note in infer_namespace below
+    splits = namespace.try(:split, /_/)
+    return nil if splits.blank?
+    if splits[1] == "localstorage"
+      splits[3].to_i
+    else
+      splits[1].to_i
+    end
+  end
+
   def infer_namespace
+    # If you are thinking about changing the format of this, take note: some
+    # code relies on the namespace as a hacky way to efficiently get the
+    # attachment's account id. Look for anybody who is accessing namespace and
+    # splitting the string, etc.
+    #
+    # I've added the root_account_id accessor above, but I didn't verify there
+    # isn't any code still accessing the namespace for the account id directly.
     ns = Attachment.domain_namespace
     ns ||= self.context.root_account.file_namespace rescue nil
     ns ||= self.context.account.file_namespace rescue nil

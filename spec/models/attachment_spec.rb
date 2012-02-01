@@ -642,6 +642,24 @@ describe Attachment do
       a.cacheable_s3_inline_url
     end
   end
+
+  context "root_account_id" do
+    before do
+      account_model
+      course_model(:account => @account)
+      @a = attachment_with_context(@course)
+    end
+
+    it "should return account id for normal namespaces" do
+      @a.namespace = "account_#{@account.id}"
+      @a.root_account_id.should == @account.id
+    end
+
+    it "should return account id for localstorage namespaces" do
+      @a.namespace = "_localstorage_/#{@account.file_namespace}"
+      @a.root_account_id.should == @account.id
+    end
+  end
 end
 
 def processing_model

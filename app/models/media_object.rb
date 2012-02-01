@@ -57,7 +57,7 @@ class MediaObject < ActiveRecord::Base
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
     files = []
-    root_account_id = attachments.map{|a| a.namespace.split(/_/)[1] }.compact.first
+    root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
       files << {
                   :name       => attachment.display_name,
