@@ -178,4 +178,20 @@ shared_examples_for "conversations selenium tests" do
     wait_for_ajaximations
     driver.find_elements(:css, "div#messages ul.messages > li")
   end
+
+  def delete_selected_messages(confirm_conversation_deleted = true)
+    orig_size = find_all_with_jquery("#conversations > ul > li:visible").size
+
+    wait_for_animations
+    delete = driver.find_element(:id, 'action_delete')
+    delete.should be_displayed
+    delete.click
+    driver.switch_to.alert.accept
+
+    if confirm_conversation_deleted
+      keep_trying_until {
+        find_all_with_jquery("#conversations > ul > li:visible").size.should eql(orig_size - 1)
+      }
+    end
+  end
 end

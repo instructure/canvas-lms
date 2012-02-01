@@ -82,16 +82,7 @@ describe "conversations submissions" do
     msgs = get_messages
     msgs.size.should == 1
     msgs.first.click
-    wait_for_animations
-    delete = driver.find_element(:id, 'action_delete')
-    delete.should be_displayed
-    delete.click
-    driver.switch_to.alert.accept
-
-    keep_trying_until {
-      elements = find_all_with_jquery("#conversations > ul > li:visible")
-      elements.size == 0
-    }
+    delete_selected_messages
     @conversation.reload
     @conversation.last_message_at.should be_nil
   end
