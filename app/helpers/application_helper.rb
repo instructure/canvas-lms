@@ -660,4 +660,15 @@ module ApplicationHelper
       ENDSCRIPT
     end
   end
+
+  require 'digest'
+
+  # create a checksum of an array of objects' cache_key values.
+  # useful if we have a whole collection of objects that we want to turn into a
+  # cache key, so that we don't make an overly-long cache key.
+  # if you can avoid loading the list at all, that's even better, of course.
+  def collection_cache_key(collection)
+    keys = collection.map { |element| element.cache_key }
+    Digest::MD5.hexdigest(keys.join('/'))
+  end
 end

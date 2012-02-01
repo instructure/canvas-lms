@@ -142,4 +142,20 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "collection_cache_key" do
+    it "should generate a cache key, changing when an element cache_key changes" do
+      collection = [user, user, user]
+      key1 = collection_cache_key(collection)
+      key2 = collection_cache_key(collection)
+      key1.should == key2
+      # verify it's not overly long
+      key1.length.should <= 40
+
+      User.update_all({ :updated_at => 1.hour.ago }, { :id => collection[1].id })
+      collection[1].reload
+      key3 = collection_cache_key(collection)
+      key1.should_not == key3
+    end
+  end
 end
