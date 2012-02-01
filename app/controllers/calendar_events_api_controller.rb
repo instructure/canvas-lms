@@ -98,6 +98,7 @@ class CalendarEventsApiController < ApplicationController
   def destroy
     get_event
     if authorized_action(@event, @current_user, :delete)
+      @event.updating_user = @current_user
       if @event.destroy
         render :json => event_json(@event, @current_user, session)
       else
