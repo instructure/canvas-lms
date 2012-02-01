@@ -1,0 +1,23 @@
+<form action='#' id='message_participants_form'>
+  <h2>{{#t "send_message_to"}}Send a message to...{{/t}}</h2>
+  <div>
+    <select class="message_groups">
+      {{#ifEqual participant_type "Group"}}
+      <option value="all">{{#t "all_groups"}}All groups{{/t}}</option>
+      <option value="unregistered">{{#t "unregistered_groups"}}Groups who haven't signed up yet{{/t}}</option>
+      <option value="registered">{{#t "registered_groups"}}Groups who have already signed up{{/t}}</option>
+      {{else}}
+      <option value="all">{{#t "all_users"}}All users{{/t}}</option>
+      <option value="unregistered">{{#t "unregistered_users"}}Users who haven't signed up yet{{/t}}</option>
+      <option value="registered">{{#t "registered_users"}}Users who have already signed up{{/t}}</option>
+      {{/ifEqual}}
+    </select>
+  </div>
+  <ul class="participant_list"></ul>
+  <div class="clear"></div>
+  <div>
+    <label for="body">{{#t "message_label"}}Message:{{/t}}</label><br />
+    <textarea id="body" name="body"></textarea>
+  </div>
+  <div class="error"></div>
+</form>

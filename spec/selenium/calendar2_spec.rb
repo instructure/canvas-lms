@@ -265,9 +265,9 @@ describe "calendar2" do
       driver.find_element(:css, '.scheduler-mode').should be_displayed
     end
 
-    def click_al_option(option_selector)
-      driver.find_element(:css, '.al-trigger').click
-      options = driver.find_element(:css, '.al-options')
+    def click_al_option(option_selector, offset=0)
+      find_all_with_jquery('.al-trigger')[offset].click
+      options = find_all_with_jquery('.al-options')[offset]
       options.should be_displayed
       options.find_element(:css, option_selector).click
     end
@@ -354,6 +354,55 @@ describe "calendar2" do
       click_al_option('.delete_link')
       delete_appointment_group
       driver.find_element(:css, '.list-wrapper').should include_text('You have not created any appointment groups')
+    end
+
+    it "should send messages to appropriate participants" do
+      gc = @course.group_categories.create!
+      ug1 = @course.groups.create!(:group_category => gc)
+      ug1.users << student1 = student_in_course(:course => @course, :active_all => true).user
+      ug1.users << student2 = student_in_course(:course => @course, :active_all => true).user
+
+      ug2 = @course.groups.create!(:group_category => gc)
+      ug2.users << student3 = student_in_course(:course => @course, :active_all => true).user
+      
+      student4 = student_in_course(:course => @course, :active_all => true).user
+
+      other_section = @course.course_sections.create!
+      @course.enroll_user(student5 = user(:active_all => true), 'StudentEnrollment', :section => other_section).accept!
+
+      # create some appointment groups and sign up a participant in each one 
+      appointment_participant_model(:course => @course, :participant => student1)
+      appointment_participant_model(:course => @course, :participant => ug1)
+      appointment_participant_model(:course => @course, :sub_context => @course.default_section, :participant => student1)
+      
+      get "/calendar2"
+      click_scheduler_link
+      
+      appointment_groups = find_all_with_jquery('.appointment-group-item')
+      appointment_groups.each_with_index do |ag, i|
+        driver.action.move_to(ag).perform
+        ["all", "registered", "unregistered"].each do |registration_status|
+          click_al_option('.message_link', i)
+          form = keep_trying_until{ find_with_jquery('.ui-dialog form:visible') }
+          wait_for_ajaximations
+
+          set_value form.find_element(:css, 'select'), registration_status
+          wait_for_ajaximations
+
+          form.find_elements(:css, 'li input').should_not be_empty
+          set_value form.find_element(:css, 'textarea'), 'hello'
+          form.submit
+
+          assert_flash_notice_message /Messages Sent/
+          keep_trying_until{ !form.displayed? }
+        end
+      end
+
+      student1.conversations.first.messages.size.should eql 6 # registered/all * 3
+      student2.conversations.first.messages.size.should eql 6 # unregistered/all * 2 + registered/all (ug1)
+      student3.conversations.first.messages.size.should eql 6 # unregistered/all * 3
+      student4.conversations.first.messages.size.should eql 4 # unregistered/all * 2 (not in any group)
+      student5.conversations.first.messages.size.should eql 4 # unregistered/all * 2 (not in default section)
     end
 
     it "should validate the appointment group shows up on the calendar" do

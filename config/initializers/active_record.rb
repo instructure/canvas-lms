@@ -241,6 +241,10 @@ class ActiveRecord::Base
     sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
   end
 
+  def self.case_insensitive(col)
+    ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql' ? "LOWER(#{col})" : col
+  end
+
   class DynamicFinderTypeError < Exception; end
   class << self
     def construct_attributes_from_arguments_with_type_cast(attribute_names, arguments)
