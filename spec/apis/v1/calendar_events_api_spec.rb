@@ -272,10 +272,15 @@ describe CalendarEventsApiController, :type => :integration do
 
       context "reservations" do
         def prepare(as_student = false)
+          Notification.create! :name => 'Appointment Canceled By User', :category => "TestImmediately"
+
           if as_student
             course(:active_all => true)
             @teacher = @course.admins.first
             student_in_course :course => @course, :user => @me, :active_all => true
+
+            channel = @teacher.communication_channels.create! :path => "test_channel_email_#{@teacher.id}", :path_type => "email"
+            channel.confirm
           end
 
           student_in_course(:course => @course, :user => (@other_guy = user), :active_all => true)
@@ -353,6 +358,21 @@ describe CalendarEventsApiController, :type => :integration do
           raw_api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations/#{@me.id}", {
                         :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :participant_id => @me.id.to_s})
           JSON.parse(response.body).should eql [["reservation", "invalid participant"]]
+        end
+
+        it "should notify the teacher when appointment is cancelled" do
+          prepare(true)
+          json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
+                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s})
+
+          reservation = CalendarEvent.find(json["id"])
+
+          raw_api_call(:delete, "/api/v1/calendar_events/#{reservation.id}", {
+                       :controller => 'calendar_events_api', :action => 'destroy', :format => 'json', :id => reservation.id.to_s})
+
+          message = Message.last
+          message.notification_name.should == 'Appointment Canceled By User'
+          message.to.should == "test_channel_email_#{@teacher.id}"
         end
       end
     end
