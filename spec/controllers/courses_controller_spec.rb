@@ -356,6 +356,20 @@ describe CoursesController do
         assigns[:pending_enrollment].should == @enrollment2
         session[:enrollment_uuid].should == @enrollment2.uuid
       end
+
+      it "should find temporary enrollments that match the logged in user" do
+        course(:active_course => 1)
+        @temporary = User.create! { |u| u.workflow_state = 'creation_pending' }
+        @temporary.communication_channels.create!(:path => 'user@example.com')
+        @enrollment = @course.enroll_student(@temporary)
+        @user = user_with_pseudonym(:active_all => 1, :username => 'user@example.com')
+        @enrollment.should be_invited
+        user_session(@user)
+
+        get 'show', :id => @course.id
+        response.should be_success
+        assigns[:pending_enrollment].should == @enrollment
+      end
     end
 
     it "should redirect html to settings page when user can :read_as_admin, but not :read" do
