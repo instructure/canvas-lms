@@ -258,7 +258,8 @@ describe "context_modules" do
     end
 
     it "should add 2 modules with the first one as a prerequisite" do
-      pending("bug 6711 - test is finished just waiting on bug fix")
+       #Bug - 6711
+      pending("Prerequisite module doesn't save when creating and saving module in one step")
       first_module_name = 'First Module'
       second_module_name = 'Second Module'
 
