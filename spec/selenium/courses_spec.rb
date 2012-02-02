@@ -30,19 +30,20 @@ describe "courses" do
       course_with_teacher_logged_in
 
       get "/getting_started?fresh=1"
-      driver.find_element(:css, ".save_button").click
+      expect_new_page_load { driver.find_element(:css, ".save_button").click }
 
       checklist_button = driver.find_element(:css, '#course_show_secondary .wizard_popup_link')
-      checklist_button.click
-      wizard_box = driver.find_element(:id, "wizard_box")
-      wait_for_animations
+      if checklist_button.displayed?
+        checklist_button.click
+        wait_for_animations
+      end
+      wizard_box = driver.find_element(:css, ".wizard_content")
       wizard_box.should be_displayed
       checklist_button.should_not be_displayed
       wizard_box.find_element(:css, ".close_wizard_link").click
       wait_for_animations
       wizard_box.should_not be_displayed
       checklist_button.should be_displayed
-
     end
 
     it "should allow content export downloads" do
@@ -91,7 +92,7 @@ describe "courses" do
 
       click_option('#copy_from_course', 'second course')
       driver.find_element(:css, '#content form').submit
-      
+
       driver.find_element(:id, 'copy_everything').click
 
       #modify course dates
