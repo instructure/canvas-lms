@@ -142,7 +142,21 @@ namespace :db do
   task :pending_migrations => :environment do
     pending_migrations = ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations
     pending_migrations.each do |pending_migration|
-      puts '  %4d %s' % [pending_migration.version, pending_migration.name]
+      tags = pending_migration.tags
+      tags = " (#{tags.join(', ')})" unless tags.empty?
+      puts '  %4d %s%s' % [pending_migration.version, pending_migration.name, tags]
+    end
+  end
+
+  namespace :migrate do
+    desc "Run all pending predeploy migrations"
+    task :predeploy => [:environment, :load_config] do
+      ActiveRecord::Migrator.new(:up, "db/migrate/", nil).migrate(:predeploy)
+    end
+
+    desc "Run all pending postdeploy migrations"
+    task :postdeploy => [:environment, :load_config] do
+      ActiveRecord::Migrator.new(:up, "db/migrate/", nil).migrate(:postdeploy)
     end
   end
 

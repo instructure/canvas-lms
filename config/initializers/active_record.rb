@@ -686,15 +686,35 @@ class ActiveRecord::Migration
     def transactional=(value)
       @transactional = !!value
     end
+
+    def tag(*tags)
+      raise "invalid tags #{tags.inspect}" unless tags - [:predeploy, :postdeploy] == []
+      (@tags ||= []).concat(tags).uniq!
+    end
+
+    def tags
+      @tags ||= []
+    end
   end
 
   def transactional?
     connection.supports_ddl_transactions? && self.class.transactional?
   end
+
+  def tags
+    self.class.tags
+  end
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :transactional?, :to => :migration
+  delegate :connection, :transactional?, :tags, :to => :migration
+
+  def load_migration
+    load(filename)
+    @migration = name.constantize
+    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if @migration.tags.empty? && self.version > 20120217214153
+    @migration
+  end
 end
 
 class ActiveRecord::Migrator
@@ -732,8 +752,7 @@ class ActiveRecord::Migrator
     end
   end
 
-  # unfortunately we have to copy this whole method to change one little thing
-  def migrate
+  def migrate(tag = nil)
     current = migrations.detect { |m| m.version == current_version }
     target = migrations.detect { |m| m.version == @target_version }
 
@@ -760,10 +779,12 @@ class ActiveRecord::Migrator
         next
       end
 
+      next if !tag.nil? && !migration.tags.include?(tag)
+
       begin
         ddl_transaction(migration) do
           migration.migrate(@direction)
-          record_version_state_after_migrating(migration.version)
+          record_version_state_after_migrating(migration.version) unless tag == :predeploy && migration.tags.include?(:postdeploy)
         end
       rescue => e
         canceled_msg = migration.transactional? ? "this and " : ""
