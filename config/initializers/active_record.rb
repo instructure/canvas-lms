@@ -678,6 +678,25 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   end
 end
 
+class ActiveRecord::Migration
+  class << self
+    def transactional?
+      @transactional != false
+    end
+    def transactional=(value)
+      @transactional = !!value
+    end
+  end
+
+  def transactional?
+    connection.supports_ddl_transactions? && self.class.transactional?
+  end
+end
+
+class ActiveRecord::MigrationProxy
+  delegate :connection, :transactional?, :to => :migration
+end
+
 class ActiveRecord::Migrator
   def self.migrations_paths
     @@migration_paths ||= [migrations_path]
@@ -710,6 +729,54 @@ class ActiveRecord::Migrator
 
       migrations = migrations.sort_by(&:version)
       down? ? migrations.reverse : migrations
+    end
+  end
+
+  # unfortunately we have to copy this whole method to change one little thing
+  def migrate
+    current = migrations.detect { |m| m.version == current_version }
+    target = migrations.detect { |m| m.version == @target_version }
+
+    if target.nil? && !@target_version.nil? && @target_version > 0
+      raise UnknownMigrationVersionError.new(@target_version)
+    end
+
+    start = up? ? 0 : (migrations.index(current) || 0)
+    finish = migrations.index(target) || migrations.size - 1
+    runnable = migrations[start..finish]
+
+    # skip the last migration if we're headed down, but not ALL the way down
+    runnable.pop if down? && !target.nil?
+
+    runnable.each do |migration|
+      ActiveRecord::Base.logger.info "Migrating to #{migration.name} (#{migration.version})"
+
+      # On our way up, we skip migrating the ones we've already migrated
+      next if up? && migrated.include?(migration.version.to_i)
+
+      # On our way down, we skip reverting the ones we've never migrated
+      if down? && !migrated.include?(migration.version.to_i)
+        migration.announce 'never migrated, skipping'; migration.write
+        next
+      end
+
+      begin
+        ddl_transaction(migration) do
+          migration.migrate(@direction)
+          record_version_state_after_migrating(migration.version)
+        end
+      rescue => e
+        canceled_msg = migration.transactional? ? "this and " : ""
+        raise StandardError, "An error has occurred, #{canceled_msg}all later migrations canceled:\n\n#{e}", e.backtrace
+      end
+    end
+  end
+
+  def ddl_transaction(migration)
+    if migration.transactional?
+      migration.connection.transaction { yield }
+    else
+      yield
     end
   end
 end
