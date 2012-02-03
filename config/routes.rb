@@ -648,7 +648,8 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
-      enrollments.get  'courses/:course_id/enrollments', :action => :index, :path_name => 'enrollments'
+      enrollments.get  'courses/:course_id/enrollments', :action => :index, :path_name => 'course_enrollments'
+      enrollments.get  'users/:user_id/enrollments', :action => :index, :path_name => 'user_enrollments'
       enrollments.post 'courses/:course_id/enrollments', :action => :create
     end
 

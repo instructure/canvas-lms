@@ -1,5 +1,4 @@
 #
-#
 # Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -230,7 +229,50 @@ describe EnrollmentsApiController, :type => :integration do
       @course.enroll_teacher(@teacher)
       User.all.each { |u| u.destroy unless u.pseudonym.present? }
       @path = "/api/v1/courses/#{@course.id}/enrollments"
+      @user_path = "/api/v1/users/#{@user.id}/enrollments"
       @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json" }
+      @user_params = { :controller => "enrollments_api", :action => "index", :user_id => @user.id.to_param, :format => "json" }
+    end
+
+    context "an account admin" do
+      before do
+        @user = user_with_pseudonym(:username => 'admin@example.com')
+        Account.default.add_user(@user)
+      end
+
+      it "should list all of a user's enrollments in an account" do
+        json = api_call(:get, @user_path, @user_params)
+        enrollments = @student.current_enrollments.scoped(:include => :user, :order => 'users.sortable_name ASC')
+        json.should == enrollments.map { |e|
+          {
+            'root_account_id' => e.root_account_id,
+            'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
+            'enrollment_state' => e.workflow_state,
+            'id' => e.id,
+            'user_id' => e.user_id,
+            'type' => e.type,
+            'course_section_id' => e.course_section_id,
+            'course_id' => e.course_id,
+            'user' => {
+              'name' => e.user.name,
+              'sortable_name' => e.user.sortable_name,
+              'short_name' => e.user.short_name,
+              'id' => e.user.id,
+              'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
+            }
+          }
+        }
+      end
+
+      it "should not return enrollments from other accounts" do
+        # enroll the user in a course in another account
+        account = Account.create!(:name => 'Account Two')
+        course = course(:account => account, :course_name => 'Account Two Course', :active_course => true)
+        course.enroll_user(@student).accept!
+
+        json = api_call(:get, @user_path, @user_params)
+        json.length.should eql 1
+      end
     end
 
     context "a student" do
@@ -265,6 +307,29 @@ describe EnrollmentsApiController, :type => :integration do
         json.each { |e| e['enrollment_state'].should eql 'completed' }
       end
 
+      it "should list its own enrollments" do
+        json = api_call(:get, @user_path, @user_params)
+        enrollments = @user.current_enrollments.scoped(:include => :user, :order => 'users.sortable_name ASC')
+        json.should == enrollments.map { |e|
+          {
+            'root_account_id' => e.root_account_id,
+            'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
+            'enrollment_state' => e.workflow_state,
+            'id' => e.id,
+            'user_id' => e.user_id,
+            'type' => e.type,
+            'course_section_id' => e.course_section_id,
+            'course_id' => e.course_id,
+            'user' => {
+              'name' => e.user.name,
+              'sortable_name' => e.user.sortable_name,
+              'short_name' => e.user.short_name,
+              'id' => e.user.id
+            }
+          }
+        }
+      end
+
       it "should not include the users' sis and login ids" do
         json = api_call(:get, @path, @params)
         json.each do |res|
@@ -274,9 +339,11 @@ describe EnrollmentsApiController, :type => :integration do
     end
 
     context "a teacher" do
-      it "should include users' sis and login ids" do
+      before do
         @user = @teacher
+      end
 
+      it "should include users' sis and login ids" do
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
           res = res + @course.send("#{type}_enrollments").scoped(:include => :user)
@@ -308,10 +375,18 @@ describe EnrollmentsApiController, :type => :integration do
       end
     end
 
-    context "a user without roster permissions" do
-      it "should return 401 unauthorized" do
+    context "a user without permissions" do
+      before do
         @user = user_with_pseudonym(:name => 'Don Draper', :username => 'ddraper@sterling-cooper.com')
+      end
+
+      it "should return 401 unauthorized for a course listing" do
         raw_api_call(:get, "/api/v1/courses/#{@course.id}/enrollments", @params.merge(:course_id => @course.id.to_param))
+        response.code.should eql "401"
+      end
+
+      it "should return 401 unauthorized for a user listing" do
+        raw_api_call(:get, @user_path, @user_params)
         response.code.should eql "401"
       end
     end

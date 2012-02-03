@@ -1092,7 +1092,6 @@ class ApplicationController < ActionController::Base
   def require_site_admin
     require_site_admin_with_permission(:site_admin)
   end
-  helper_method :current_user_is_site_admin?
 
   def require_site_admin_with_permission(permission)
     unless current_user_is_site_admin?(permission)
