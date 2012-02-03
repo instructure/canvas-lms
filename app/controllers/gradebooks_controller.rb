@@ -19,7 +19,7 @@
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
 
-  before_filter :require_user_for_context, :except => :public_feed
+  before_filter :require_context, :except => :public_feed
 
   add_crumb("Grades", :except => :public_feed) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
   before_filter { |c| c.active_tab = "grades" }

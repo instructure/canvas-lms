@@ -23,7 +23,7 @@ require 'set'
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_user_for_context, :only => [:roster, :locks, :switch_role]
+  before_filter :require_context, :only => [:roster, :locks, :switch_role]
 
   include Api::V1::Course
 
@@ -370,7 +370,6 @@ class CoursesController < ApplicationController
   end
   
   def roster
-    get_context
     if authorized_action(@context, @current_user, :read_roster)
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       @students = @context.participating_students.find(:all, :order => User.sortable_name_order_by_clause)

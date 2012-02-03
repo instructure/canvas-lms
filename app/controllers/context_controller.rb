@@ -17,7 +17,7 @@
 #
 
 class ContextController < ApplicationController
-  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
+  before_filter :require_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
@@ -278,8 +278,6 @@ class ContextController < ApplicationController
   end
   
   def roster
-    get_context
-
     if authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       if @context.is_a?(Course)
@@ -306,14 +304,12 @@ class ContextController < ApplicationController
   end
   
   def prior_users
-    get_context
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
       @prior_memberships = @context.enrollments.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name.downcase] }
     end
   end
 
   def roster_user_services
-    get_context
     if authorized_action(@context, @current_user, :read_roster)
       @users = @context.users.order_by_sortable_name
       @users_hash = {}
@@ -330,7 +326,6 @@ class ContextController < ApplicationController
   end
   
   def roster_user_usage
-    get_context
     if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
       @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent.paginate(:page => params[:page], :per_page => 50)
@@ -342,7 +337,6 @@ class ContextController < ApplicationController
   end
   
   def roster_user
-    get_context
     if authorized_action(@context, @current_user, :read_roster)
       if @context.is_a?(Course)
         @membership = @context.enrollments.find_by_user_id(params[:id])
