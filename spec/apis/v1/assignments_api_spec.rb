@@ -72,6 +72,7 @@ describe AssignmentsApiController, :type => :integration do
       json.should == [
         {
           'id' => @assignment.id,
+          'assignment_group_id' => @assignment.assignment_group_id,
           'name' => 'some assignment',
           'course_id' => @course.id,
           'description' => nil,
@@ -143,8 +144,10 @@ describe AssignmentsApiController, :type => :integration do
               'due_at' => '2011-01-01',
               'grading_type' => 'points', 'set_custom_field_values' => { 'test_custom' => { 'value' => '1' } } } })
 
+    assignment = Assignment.first
     json.should == {
-      'id' => Assignment.first.id,
+      'id' => assignment.id,
+      'assignment_group_id' => assignment.assignment_group_id,
       'name' => 'some assignment',
       'course_id' => @course.id,
       'description' => nil,
@@ -185,6 +188,7 @@ describe AssignmentsApiController, :type => :integration do
 
     json.should == {
       'id' => @assignment.id,
+      'assignment_group_id' => @assignment.assignment_group_id,
       'name' => 'some assignment again',
       'course_id' => @course.id,
       'description' => nil,

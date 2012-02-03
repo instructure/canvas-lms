@@ -196,6 +196,40 @@ describe "calendar2" do
       link["href"].should =~ %r{calendar_events/\d+/edit$}
     end
 
+    it "editing an existing assignment should select the correct assignment group" do
+      group1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
+      group2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
+      assignment1 = @course.active_assignments.create(:name => "Assignment 1", :assignment_group => group1, :due_at => Time.zone.now)
+      assignment2 = @course.active_assignments.create(:name => "Assignment 2", :assignment_group => group2, :due_at => Time.zone.now)
+
+      get "/calendar2"
+
+      events = driver.find_elements(:css, '.fc-event')
+      event1 = events.detect{ |e| e.text =~ /Assignment 1/ }
+      event2 = events.detect{ |e| e.text =~ /Assignment 2/ }
+      event1.should_not be_nil
+      event2.should_not be_nil
+      event1.should_not == event2
+
+      event1.click
+      driver.find_element(:css, '.popover-links-holder .edit_event_link').click
+      select = driver.find_element(:css, '#edit_assignment_form .assignment_group')
+      select = Selenium::WebDriver::Support::Select.new(select)
+      select.first_selected_option.attribute(:value).to_i.should == group1.id
+      driver.find_element(:css, 'div.ui-dialog a.ui-dialog-titlebar-close').click
+
+      event2.click
+      driver.find_element(:css, '.popover-links-holder .edit_event_link').click
+      select = driver.find_element(:css, '#edit_assignment_form .assignment_group')
+      select = Selenium::WebDriver::Support::Select.new(select)
+      select.first_selected_option.attribute(:value).to_i.should == group2.id
+      driver.find_element(:css, 'div.ui-dialog #assignment_title').tap { |tf| tf.clear; tf.send_keys("Assignment 2!") }
+      driver.find_element(:css, 'div.ui-dialog button[type=submit]').click
+      wait_for_ajax_requests
+      assignment2.reload.title.should == "Assignment 2!"
+      assignment2.assignment_group.should == group2
+    end
+
     it "should change the month" do
       old_header_title = get_header_text
       change_calendar
