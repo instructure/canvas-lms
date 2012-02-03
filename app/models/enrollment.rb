@@ -164,6 +164,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_user_account_associations_if_necessary
     if self.new_record?
+      return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
     elsif should_update_user_account_association?
