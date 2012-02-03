@@ -384,6 +384,11 @@ require([
       $("tr.rubric_assessments").show();
     });
     $.scrollSidebar();
+    $("#observer_user_url").change(function() {
+      if(location.href != $(this).val()) {
+        location.href = $(this).val();
+      }
+    });
   });
 
 });

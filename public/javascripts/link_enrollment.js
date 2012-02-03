@@ -16,8 +16,10 @@ define([
         var user_data = {};
         user_data.short_name = user_name;
         $dialog.fillTemplateData({data: user_data});
+        $dialog.data('callback', callback);
         if(!$dialog.data('loaded')) {
           $dialog.find(".loading_message").text(I18n.t('messages.loading_students', "Loading Students..."));
+          $dialog.find(".student_options option:not(.blank)").remove();
           var url = $dialog.find(".student_url").attr('href');
           $.ajaxJSON(url, 'GET', {}, function(data) {
             for(var idx in data) {
@@ -30,30 +32,21 @@ define([
             }
             var $option = $("<option/>");
             $option.val("none").text(I18n.t('options.no_link', "[ No Link ]"));
-            $dialog.data('loaded', true);
             $dialog.find(".student_options").append($option);
 
-            $dialog.find(".enrollment_id").val(enrollment_id);
-            $dialog.find(".student_options").val("none").val(current_user_id);
             $dialog.find(".loading_message").hide().end()
               .find(".students_link").show();
-            $dialog.find(".existing_user").showIf(current_user_id);
-            $dialog.data('callback', callback);
-            user_data.existing_user_name = $dialog.find(".student_options option[value='" + current_user_id + "']").text();
-            $dialog.fillTemplateData({data: user_data});
+
+            link_enrollment.updateDialog($dialog, enrollment_id, current_user_id)
+
+            $dialog.data('loaded', true);
           }, function() {
             $dialog.find(".loading_message").text(I18n.t('errors.load_failed', "Loading Students Failed, please try again"));
-            $dialog.data('callback', callback);
           });
         } else {
-          $dialog.find(".enrollment_id").val(enrollment_id);
-          $dialog.find(".existing_user").showIf(current_user_id);
-          $dialog.find(".student_options").val("none").val(current_user_id);
-          user_data.existing_user_name = $dialog.find(".student_options option[value='" + current_user_id + "']").text();
-          $dialog.fillTemplateData({data: user_data});
+          link_enrollment.updateDialog($dialog, enrollment_id, current_user_id)
         }
         $dialog.find(".existing_user").showIf(current_user_id);
-        $dialog.find(".student_options option:not(.blank)").remove();
 
         $dialog
           .dialog('close').dialog({
@@ -61,6 +54,15 @@ define([
             title: I18n.t('titles.link_to_student', "Link to Student"),
             width: 400
           }).dialog('open');
+      },
+      updateDialog: function($dialog, enrollment_id, current_user_id) {
+        $dialog.find(".enrollment_id").val(enrollment_id);
+        $dialog.find(".existing_user").showIf(current_user_id);
+        $dialog.find(".student_options").val("none").val(current_user_id);
+
+        var user_data = {};
+        user_data.existing_user_name = $dialog.find(".student_options option[value='" + current_user_id + "']").first().text();
+        $dialog.fillTemplateData({data: user_data});
       }
     };
   })();

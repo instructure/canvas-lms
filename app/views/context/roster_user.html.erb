@@ -1,4 +1,4 @@
-<% 
+<%
   add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
   add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
   @active_tab="people"
@@ -84,15 +84,19 @@
   <% if @context.is_a?(Course) %>
     <fieldset>
       <legend><%= t('legends.memberships', %{Membership(s)}) %></legend>
-      <table>  
-        <% @enrollments.each do |enrollment| %>
+      <table>
+        <% @enrollments.sort_by(&:id).each do |enrollment| %>
           <tr class="enrollment">
             <td style="vertical-align: top; padding: 5px 50px 5px 5px;">
               <b><a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a></b>
               <div style="font-size: 0.8em; padding-left: 20px;"><%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %></div>
               <div style="font-size: 0.8em; padding-left: 20px;">created <%= datetime_string(enrollment.created_at) %></div>
-              <% if enrollment.associated_user && enrollment.is_a?(ObserverEnrollment) %>
-                <div style="font-size: 0.8em; padding-left: 20px;"><%= t 'enrollment_linked_to', "linked to %{linked_user}", :linked_user => enrollment.associated_user.name %></div>
+              <% if enrollment.is_a?(ObserverEnrollment) %>
+                <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.associated_user %>" class="associated_user" >
+                  <%= t 'enrollment_linked_to', "linked to *%{linked_user}*",
+                      :linked_user => context_user_name(@context, enrollment.associated_user),
+                      :wrapper => '<span class="associated_user_name">\1</span>' %>
+                </div>
               <% end %>
               <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder"><%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %></div>
             </td>
@@ -108,7 +112,6 @@
                   <div class="link_enrollment_link_holder" style="margin-bottom: 5px;">
                     <a class="link_enrollment_link" href="#" data-id="<%= enrollment.id %>" data-associated-id="<%= enrollment.associated_user_id %>"><%= t('links.link_enrollment', %{Link this Enrollment}) %></a>
                   </div>
-                  <%= render :partial => 'courses/link_enrollment' %>
                 <% end %>
                 <div><% if enrollment.defined_by_sis? %>
                   <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
@@ -141,6 +144,7 @@
         <% end %>
       </table>
     </fieldset>
+    <%= render :partial => 'courses/link_enrollment' %>
   <% end %>
   <%= render :partial => 'users/logins' %>
 </div>
@@ -187,8 +191,11 @@ $(document).ready(function() {
     var name = $("#name_and_email .name").text();
     var id = $link.attr('data-id');
     var associated_id = $link.attr('data-associated-id');
-    link_enrollment.choose(name, id, associated_id, function() {
-      location.reload();
+    link_enrollment.choose(name, id, associated_id, function(enrollment) {
+      $link.attr('data-id', enrollment.id);
+      $link.attr('data-associated-id', enrollment.associated_user_id);
+      $link.parents('.enrollment').find('.associated_user_name').text(enrollment.associated_user_name);
+      $link.parents('.enrollment').find('.associated_user').showIf(enrollment.associated_user_id);
     });
   });
   $(".unconclude_enrollment_link").click(function(event) {

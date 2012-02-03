@@ -171,5 +171,62 @@ describe "course settings tests" do
       enrollment_dialog.should be_displayed
       enrollment_dialog.should include_text(username + ' has already received and accepted the invitation')
     end
+
+    def link_to_student(link, student)
+      assoc_links = link.find_elements(:css, ".associated_user_link")
+      if assoc_links[0].displayed? then assoc_links[0].click else assoc_links[1].click end
+      wait_for_ajax_requests
+      click_option("#student_enrollment_link_option", student.try(:name) || "[ No Link ]")
+      driver.find_element(:css, "#link_student_dialog_form").submit
+      wait_for_ajax_requests
+    end
+
+    it "should deal with observers linked to multiple students" do
+      @students = []
+      @obs = user_model(:name => "The Observer")
+      2.times do |i|
+        student_in_course(:name => "Student #{i}")
+        @students << @student
+        e = @course.observer_enrollments.create!(:user => @obs, :workflow_state => 'active')
+        e.associated_user_id = @student.id
+        e.save!
+      end
+
+      2.times do |i|
+        student_in_course(:name => "Student #{i+2}")
+        @students << @student
+      end
+
+      get "/courses/#{@course.id}/settings#tab-users"
+
+      links = driver.find_elements(:css, ".user_#{@obs.id} .enrollment_link")
+      links.length.should == 2
+      links[0].find_element(:css, ".associated_user_name").should include_text @students[0].name
+      links[1].find_element(:css, ".associated_user_name").should include_text @students[1].name
+
+      link_to_student(links[0], @students[2])
+      links[0].find_element(:css, ".associated_user_name").should include_text @students[2].name
+      links[1].find_element(:css, ".associated_user_name").should include_text @students[1].name
+
+      link_to_student(links[1], @students[3])
+      links[0].find_element(:css, ".associated_user_name").should include_text @students[2].name
+      links[1].find_element(:css, ".associated_user_name").should include_text @students[3].name
+
+      @obs.reload
+      @obs.enrollments.map {|e| e.associated_user_id}.sort.should == [@students[2].id, @students[3].id]
+
+      link_to_student(links[0], nil)
+      link_to_student(links[1], nil)
+      links[0].find_element(:css, ".unassociated").should include_text "link to"
+      links[1].find_element(:css, ".unassociated").should include_text "link to"
+
+      link_to_student(links[0], @students[0])
+      link_to_student(links[1], @students[1])
+      links[0].find_element(:css, ".associated_user_name").should include_text @students[0].name
+      links[1].find_element(:css, ".associated_user_name").should include_text @students[1].name
+
+      @obs.reload
+      @obs.enrollments.map {|e| e.associated_user_id}.sort.should == [@students[0].id, @students[1].id]
+    end
   end
 end

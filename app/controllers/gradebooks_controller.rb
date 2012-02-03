@@ -31,16 +31,20 @@ class GradebooksController < ApplicationController
       return
     end
 
-    id = params[:id]
-    if !id
-      if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
-        id = @context_enrollment.associated_user_id
-      else
-        id = @current_user.id
-      end
+    @observed_students = ObserverEnrollment.observed_students(@context, @current_user)
+
+    # always use id if given
+    if params[:id]
+      @student_enrollment = @context.all_student_enrollments.find_by_user_id(params[:id])
+    # otherwise try to find an observed student
+    elsif @observed_students.present?
+      # be consistent about which student we return by default
+      @student_enrollment = (@observed_students.to_a.sort_by {|e| e[0].sortable_name}.first)[1].first
+    # or just fall back to @current_user
+    else
+      @student_enrollment = @context.all_student_enrollments.find_by_user_id(@current_user.id)
     end
 
-    @student_enrollment = @context.all_student_enrollments.find_by_user_id(id)
     @student = @student_enrollment && @student_enrollment.user
     if !@student || !@student_enrollment
       authorized_action(nil, @current_user, :permission_fail)
