@@ -1,3 +1,7 @@
+$canvas_tasks_loaded ||= false
+unless $canvas_tasks_loaded
+$canvas_tasks_loaded = true
+
 def check_syntax(files)
   quick = ENV["quick"] && ENV["quick"] == "true"
 
@@ -156,4 +160,6 @@ namespace :db do
       end
     end
   end
+end
+
 end
