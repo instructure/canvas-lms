@@ -30,7 +30,9 @@ describe "courses" do
       course_with_teacher_logged_in
 
       get "/getting_started?fresh=1"
+
       expect_new_page_load { driver.find_element(:css, ".save_button").click }
+      wait_for_animations
 
       checklist_button = driver.find_element(:css, '#course_show_secondary .wizard_popup_link')
       if checklist_button.displayed?
