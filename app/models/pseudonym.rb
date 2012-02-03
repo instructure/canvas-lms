@@ -36,7 +36,6 @@ class Pseudonym < ActiveRecord::Base
   
   before_save :set_password_changed
   before_validation :infer_defaults, :verify_unique_sis_user_id
-  before_save :set_update_account_associations_if_account_changed
   after_save :update_passwords_on_related_pseudonyms
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
@@ -77,18 +76,13 @@ class Pseudonym < ActiveRecord::Base
     }
   end
   
-  def set_update_account_associations_if_account_changed
-    @should_update_user_account_associations = self.account_id_changed?
-    @should_update_account_associations_immediately = self.new_record?
-    true
-  end
-  
   def update_account_associations_if_account_changed
     return unless self.user && !User.skip_updating_account_associations?
-    if @should_update_account_associations_immediately
+    if self.new_record?
+      return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => {self.account_id => 0})
-    else
-      self.user.update_account_associations_later if self.user && @should_update_user_account_associations
+    elsif self.account_id_changed?
+      self.user.update_account_associations_later
     end
   end
   

@@ -189,6 +189,7 @@ class User < ActiveRecord::Base
   before_save :assign_uuid
   before_save :update_avatar_image
   after_save :generate_reminders_if_changed
+  after_save :update_account_associations_if_necessary
 
   def page_views_by_day(options={})
     conditions = {}
@@ -221,6 +222,10 @@ class User < ActiveRecord::Base
 
   def update_account_associations_later
     self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_account_associations?
+  end
+
+  def update_account_associations_if_necessary
+    update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed?
   end
 
   def update_account_associations(opts = {})
@@ -275,6 +280,8 @@ class User < ActiveRecord::Base
   #   Through account_users
   #      User -> AccountUser -> Account
   def calculate_account_associations(account_chain_cache = {})
+    return [] if %w{creation_pending deleted}.include?(self.workflow_state)
+
     # Hopefully these have all been pre-loaded
     starting_account_ids = self.enrollments.map { |e| e.workflow_state != 'deleted' ? [e.course_section.course.account_id, e.course_section.nonxlist_course.try(:account_id)] : nil }.flatten.compact
     starting_account_ids += self.pseudonyms.map { |p| p.active? ? p.account_id : nil }.compact
@@ -856,7 +863,6 @@ class User < ActiveRecord::Base
     Enrollment.send_later(:recompute_final_scores, new_user.id)
     new_user.update_account_associations
     new_user.touch
-    self.user_account_associations.delete_all
     self.destroy
   end
 

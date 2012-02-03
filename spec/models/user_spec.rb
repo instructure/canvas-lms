@@ -272,6 +272,26 @@ describe User do
     user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 0}, {3 => 1}].sort(&sort_account_associations)
   end
 
+  it "should not have account associations for creation_pending or deleted" do
+    user = User.create! { |u| u.workflow_state = 'creation_pending' }
+    user.should be_creation_pending
+    course = Course.create!
+    course.offer!
+    enrollment = course.enroll_student(user)
+    enrollment.should be_invited
+    user.user_account_associations.should == []
+    Account.default.add_user(user)
+    user.user_account_associations(true).should == []
+    user.pseudonyms.create!(:unique_id => 'test@example.com')
+    user.user_account_associations(true).should == []
+    user.update_account_associations
+    user.user_account_associations(true).should == []
+    user.register!
+    user.user_account_associations(true).map(&:account).should == [Account.default]
+    user.destroy
+    user.user_account_associations(true).should == []
+  end
+
   def create_course_with_student_and_assignment
     @course = course_model
     @course.offer!
