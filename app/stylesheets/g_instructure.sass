@@ -906,6 +906,22 @@ ul.group_list
       :display inline
     .header_icon.discussion_topic_header_icon
       :display none
+.communication_message.conversation
+  .submission
+    ul
+      margin: 0 10px 10px 0
+      padding: 0
+    li
+      padding 2px 5px
+      margin: 0 0 2px 0
+      list-style: none
+      background: #e8e8e8
+    .user_name
+      font-size: 0.8em
+      padding: 0
+    .score
+      float: right
+      padding-right: 10px
 
 .communication_sub_message
   :margin 0 2.5em 2px 0em
@@ -917,7 +933,7 @@ ul.group_list
   :background-color #f2f2f2
 
   div
-    &.header
+    &.header, li
       :padding 0 5px
       :border-width 0px
       :color #999

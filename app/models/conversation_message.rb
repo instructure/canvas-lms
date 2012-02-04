@@ -18,12 +18,14 @@
 
 class ConversationMessage < ActiveRecord::Base
   include SendToStream
+  include SimpleTags::ReaderInstanceMethods
 
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
   belongs_to :context, :polymorphic => true
   has_many :conversation_message_participants
   has_many :attachments, :as => :context, :order => 'created_at, id'
+  belongs_to :asset, :polymorphic => true, :types => :submission # TODO: move media comments into this
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
@@ -45,7 +47,7 @@ class ConversationMessage < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :conversation_message
     p.to { self.recipients }
-    p.whenever {|record| (record.just_created || @re_send_message) && !record.generated}
+    p.whenever {|record| (record.just_created || @re_send_message) && !record.generated && !record.submission}
 
     p.dispatch :added_to_conversation
     p.to { self.new_recipients }
@@ -53,11 +55,12 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    self.recipients
+    self.recipients unless submission # we still render them w/ the conversation in the stream item, we just don't cause it to jump to the top
   end
-  
+
   before_save :infer_values
-  
+  before_destroy :delete_from_participants
+
   def infer_values
     self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?
     if self.media_comment_id && self.media_comment_id_changed?
@@ -66,6 +69,12 @@ class ConversationMessage < ActiveRecord::Base
       self.media_comment_type = @media_comment.media_type if @media_comment
     end
     self.media_comment_type = nil unless self.media_comment_id
+  end
+
+  def delete_from_participants
+    conversation.conversation_participants.each do |p|
+      p.remove_messages(self) # ensures cached stuff gets updated, etc.
+    end
   end
 
   def has_media_comment?
@@ -133,7 +142,7 @@ class ConversationMessage < ActiveRecord::Base
     note = format_message(body).first
     recipient.user_notes.create(:creator => author, :title => title, :note => note)
   end
-  
+
   def formatted_body(truncate=nil)
     self.extend TextHelper
     res = format_message(body).first
@@ -147,6 +156,17 @@ class ConversationMessage < ActiveRecord::Base
 
   def forwarded_messages
     @forwarded_messages ||= forwarded_message_ids && self.class.find_all_by_id(forwarded_message_ids.split(','), :order => 'created_at DESC') || []
+  end
+
+  def all_forwarded_messages
+    forwarded_messages.inject([]) { |result, message|
+      result << message
+      result.concat(message.all_forwarded_messages)
+    }
+  end
+
+  def forwardable?
+    submission.nil?
   end
 
   def as_json(options = {})

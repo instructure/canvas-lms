@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "dashboard selenium tests" do
+describe "dashboard" do
   it_should_behave_like "in-process server selenium tests"
 
   def test_hiding(url)
@@ -268,17 +268,17 @@ shared_examples_for "dashboard selenium tests" do
 
     get "/"
 
-    driver.find_element(:css, '#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
+    find_with_jquery('#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
   end
 
   it "should display calendar events in the coming up list" do
     course_with_student_logged_in(:active_all => true)
     calendar_event_model({
-      :title => "super fun party",
-      :description => 'celebrating stuff',
-      :start_at => 5.minutes.from_now,
-      :end_at => 10.minutes.from_now
-    })
+                             :title => "super fun party",
+                             :description => 'celebrating stuff',
+                             :start_at => 5.minutes.from_now,
+                             :end_at => 10.minutes.from_now
+                         })
     get "/"
     driver.find_element(:css, 'div.events_list .event a').should include_text(@event.title)
   end
@@ -286,7 +286,7 @@ shared_examples_for "dashboard selenium tests" do
   it "should add comment to announcement" do
     course_with_student_logged_in(:active_all => true)
     @context = @course
-    announcement_model({ :title => "hey all read this k", :message => "announcement" })
+    announcement_model({:title => "hey all read this k", :message => "announcement"})
     get "/"
     driver.find_element(:css, '.topic_message .add_entry_link').click
     driver.find_element(:name, 'discussion_entry[plaintext_message]').send_keys('first comment')
@@ -299,7 +299,7 @@ shared_examples_for "dashboard selenium tests" do
   it "should create an announcement for the first course that is not visible in the second course" do
     course_with_student_logged_in(:active_all => true)
     @context = @course
-    announcement_model({ :title => "hey all read this k", :message => "announcement" })
+    announcement_model({:title => "hey all read this k", :message => "announcement"})
     @second_course = Course.create!(:name => 'second course')
     @second_course.offer!
     #add teacher as a user
@@ -323,9 +323,5 @@ shared_examples_for "dashboard selenium tests" do
     driver.find_element(:id, 'no_topics_message').should include_text('No Recent Messages')
 
   end
-
 end
 
-describe "dashboard Windows-Firefox-Tests" do
-  it_should_behave_like "dashboard selenium tests"
-end

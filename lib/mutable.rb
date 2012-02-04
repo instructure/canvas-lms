@@ -56,14 +56,23 @@ module Mutable
 
   def show_stream_items
     if self.respond_to? :submissions
-      submission_ids     = submissions.map(&:id)
-      item_asset_strings = submissions.map { |s| "submission_#{s.id}" }
-      stream_item_ids   = StreamItem.all(
+      submissions        = submissions(:include => {:hidden_submission_comments => :author})
+      stream_item_ids    = StreamItem.all(
         :select => "id",
-        :conditions => { :item_asset_string => item_asset_strings }
+        :conditions => { :item_asset_string => submissions.map(&:asset_string) }
       ).map(&:id)
-      StreamItemInstance.update_all({ :hidden => false }, { :stream_item_id => stream_item_ids })
-      SubmissionComment.update_all({ :hidden => false }, { :submission_id => submission_ids })
+      StreamItemInstance.update_all({ :hidden => false }, { :hidden => true, :stream_item_id => stream_item_ids })
+
+      outstanding = submissions.map{ |submission|
+        comments = submission.hidden_submission_comments.all
+        next if comments.empty?
+        [submission, comments.map(&:author_id).uniq.size == 1 ? [comments.last.author_id] : []]
+      }.compact
+      SubmissionComment.update_all({ :hidden => false }, { :hidden => true, :submission_id => submissions.map(&:id) })
+      Submission.send(:preload_associations, outstanding.map(&:first), :visible_submission_comments)
+      outstanding.each do |submission, skip_ids|
+        submission.create_or_update_conversations!(:create, :skip_ids => skip_ids)
+      end
     end
   end
 end

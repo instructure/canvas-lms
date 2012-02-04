@@ -3,9 +3,10 @@ define 'compiled/calendar/EditEventDetailsDialog', [
   'compiled/calendar/CommonEvent'
   'compiled/calendar/EditCalendarEventDetails'
   'compiled/calendar/EditAssignmentDetails'
+  'compiled/calendar/EditApptCalendarEventDetails'
   'compiled/calendar/EditAppointmentGroupDetails'
   'jst/calendar/editEvent'
-], (I18n, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditAppointmentGroupDetails, editEventTemplate) ->
+], (I18n, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDetails, EditAppointmentGroupDetails, editEventTemplate) ->
 
   I18n = I18n.scoped 'calendar'
 
@@ -28,6 +29,12 @@ define 'compiled/calendar/EditEventDetailsDialog', [
     setupTabs: =>
       # Set up the tabbed view of the dialog
       tabs = dialog.find("#edit_event_tabs")
+
+      # don't need tabs at all for the appt group calendar events
+      if @event.isAppointmentGroupEvent()
+        tabs.find('.tab_list').hide()
+        return
+
       tabs.tabs().bind 'tabsselect', (event, ui) ->
         $(ui.panel).closest(".tab_holder").data('form-widget').activate()
 
@@ -57,11 +64,18 @@ define 'compiled/calendar/EditEventDetailsDialog', [
       dialog.children().replaceWith(html)
 
       if @event.isNewEvent() || @event.eventType == 'calendar_event'
-        @calendarEventForm = new EditCalendarEventDetails(dialog.find("#edit_calendar_event_form_holder"), @event, @contextChange, @closeCB)
-        dialog.find("#edit_calendar_event_form_holder").data('form-widget', @calendarEventForm)
+
+        formHolder = dialog.find('#edit_calendar_event_form_holder')
+        ## special case: appointment groups
+        if @event.isAppointmentGroupEvent()
+          @apptGroupEventForm = new EditApptCalendarEventDetails(formHolder, @event, @contextChange, @closeCB)
+          formHolder.data('form-widget', @apptGroupEventForm)
+        else
+          @calendarEventForm = new EditCalendarEventDetails(formHolder, @event, @contextChange, @closeCB)
+          formHolder.data('form-widget', @calendarEventForm)
 
       if @event.isNewEvent() || @event.eventType == 'assignment'
-        @assignmentDetailsForm = new EditAssignmentDetails(dialog.find("#edit_assignment_form_holder"), @event, @contextChange, @closeCB)
+        @assignmentDetailsForm = new EditAssignmentDetails($('#edit_assignment_form_holder'), @event, @contextChange, @closeCB)
         dialog.find("#edit_assignment_form_holder").data('form-widget', @assignmentDetailsForm)
 
       @setupTabs()

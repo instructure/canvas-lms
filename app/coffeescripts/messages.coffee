@@ -4,7 +4,6 @@ $messages = []
 $message_list = []
 $form = []
 $selected_conversation = null
-$last_label = null
 page = {}
 MessageInbox = {}
 
@@ -37,7 +36,7 @@ class TokenInput
           @change?(@token_values())
 
     @tokens.maxTokenWidth = =>
-      (parseInt(@tokens.css('width').replace('px', '')) - 150) + 'px'
+      (parseInt(@tokens.css('width').replace('px', '')) - (@options.tokenWrapBuffer ? 150)) + 'px'
     @tokens.resizeTokens = (tokens) =>
       tokens.find('div.ellipsis').css('max-width', @tokens.maxTokenWidth())
     $(window).resize =>
@@ -554,13 +553,14 @@ class TokenSelector
     $body = $uls.last()
     if data.length
       parent = if @stack.length then @stack[@stack.length - 1][0] else null
+      ancestors = if @stack.length then (ancestor[0].data('id') for ancestor in @stack) else []
       unless data.prepared
         @options.preparer?(post_data, data, parent)
         data.prepared = true
 
       for row, i in data
         $li = $('<li />').addClass('selectable')
-        @populate_row($li, row, level: @stack.length, first: (i is 0), last: (i is data.length - 1), parent: parent)
+        @populate_row($li, row, level: @stack.length, first: (i is 0), last: (i is data.length - 1), parent: parent, ancestors: ancestors)
         $list.select_all = $li if row.select_all
         $li.addClass('on') if $li.hasClass('toggleable') and @input.has_token($li.data('id'))
         $body.append($li)
@@ -715,17 +715,7 @@ I18n.scoped 'conversations', (I18n) ->
       inbox_resize()
       $messages.show()
       i = j = 0
-      message = data.messages[0]
-      submission = data.submissions[0]
-      while message || submission
-        if message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.submission_comments[submission.submission_comments.length - 1]?.created_at).datetime)
-          # there's another message, and the next submission (if any) is not newer than it
-          $message_list.append build_message(message)
-          message = data.messages[++i]
-        else
-          # no more messages, or the next submission is newer than the next message
-          $message_list.append build_submission(submission)
-          submission = data.submissions[++j]
+      $message_list.append build_message(message) for message in data.messages
       $form.loadingImage 'remove'
       $message_list.hide().slideDown 'fast'
       if $selected_conversation.hasClass 'unread'
@@ -843,6 +833,7 @@ I18n.scoped 'conversations', (I18n) ->
     message = processed_lines.join "\n"
 
   build_message = (data) ->
+    return build_submission(data) if data.submission
     $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id)
     $message.data('id', data.id)
     $message.addClass(if data.generated
@@ -852,6 +843,7 @@ I18n.scoped 'conversations', (I18n) ->
     else
       'other'
     )
+    $message.addClass('forwardable')
     user = MessageInbox.user_cache[data.author_id]
     if avatar = user?.avatar_url
       $message.prepend $('<img />').attr('src', avatar).addClass('avatar')
@@ -909,12 +901,10 @@ I18n.scoped 'conversations', (I18n) ->
       e.stopPropagation()
     $attachment
 
-  submission_id = (data) ->
-    "submission_#{data.assignment_id}_#{data.user_id}"
-
   build_submission = (data) ->
-    $submission = $("#submission_blank").clone(true).attr('id', submission_id(data))
-    $submission.data('id', submission_id(data))
+    $submission = $("#submission_blank").clone(true).attr('id', data.id)
+    $submission.data('id', data.id)
+    data = data.submission
     $ul = $submission.find('ul')
     $header = $ul.find('li.header')
     href = $.replaceTags($header.find('a').attr('href'), course_id: data.assignment.course_id, assignment_id: data.assignment_id, id: data.user_id)
@@ -923,8 +913,11 @@ I18n.scoped 'conversations', (I18n) ->
     user.html_name ?= html_name_for_user(user) if user
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
     $header.find('.title').html $.h(data.assignment.name)
-    if data.submitted_at
-      $header.find('span.date').text $.parseFromISO(data.submitted_at).datetime_formatted
+    $header.find('span.date').text(if data.submitted_at
+      $.parseFromISO(data.submitted_at).datetime_formatted
+    else
+      I18n.t('not_applicable', 'N/A')
+    )
     $header.find('.audience').html user?.html_name || $.h(user_name)
     if data.score && data.assignment.points_possible
       score = "#{data.score} / #{data.assignment.points_possible}"
@@ -1057,6 +1050,7 @@ I18n.scoped 'conversations', (I18n) ->
     if data.audience
       $conversation.data('audience', data.audience.concat([MessageInbox.user_id]))
       $conversation.find('.audience').html html_audience_for_conversation(data)
+      build_form_audience() if is_selected($conversation)
     $conversation.find('.actions a').click (e) ->
       e.preventDefault()
       e.stopImmediatePropagation()
@@ -1072,12 +1066,12 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation.find('span.date').text $.friendlyDatetime($.parseFromISO(data.last_message_at).datetime)
     move_direction = if $conversation.data('last_message_at') > data.last_message_at then 'down' else 'up'
     $conversation.data 'last_message_at', data.last_message_at
-    $conversation.data 'label', data.label
+    $conversation.data 'starred', data.starred
     $p = $conversation.find('p')
     $p.text data.last_message
     ($conversation.addClass(property) for property in data.properties) if data.properties.length
     $conversation.addClass('private') if data['private']
-    $conversation.addClass('labeled').addClass(data['label']) if data['label']
+    $conversation.addClass('starred') if data.starred
     $conversation.addClass('unsubscribed') unless data.subscribed
     set_conversation_state $conversation, data.workflow_state
     reposition_conversation($conversation, move_direction, move_mode) if move_mode
@@ -1128,6 +1122,8 @@ I18n.scoped 'conversations', (I18n) ->
       actions      :
         markAsRead   : $('#action_mark_as_read').parent()
         markAsUnread : $('#action_mark_as_unread').parent()
+        unstar       : $('#action_unstar').parent()
+        star         : $('#action_star').parent()
         unsubscribe  : $('#action_unsubscribe').parent()
         subscribe    : $('#action_subscribe').parent()
         forward      : $('#action_forward').parent()
@@ -1135,9 +1131,6 @@ I18n.scoped 'conversations', (I18n) ->
         unarchive    : $('#action_unarchive').parent()
         delete       : $('#action_delete').parent()
         deleteAll    : $('#action_delete_all').parent()
-      labels:
-        group: $('#conversation_actions .label_group')
-        icon: $('#conversation_actions .label_icon')
 
     page.activeActionMenu = elements.node
 
@@ -1158,9 +1151,10 @@ I18n.scoped 'conversations', (I18n) ->
     elements.actions.markAsRead.show() if elements.conversation.hasClass 'unread'
     elements.actions.markAsUnread.show() if elements.conversation.hasClass 'read'
 
-    elements.labels.group.show()
-    elements.labels.icon.removeClass 'checked'
-    elements.container.find('.label_icon.' + ($conversation.data('label') || 'none')).addClass('checked')
+    if elements.conversation.hasClass 'starred'
+      elements.actions.unstar.show()
+    else
+      elements.actions.star.show()
 
     if elements.conversation.hasClass('private')
       elements.actions.subscribe.hide()
@@ -1234,13 +1228,9 @@ I18n.scoped 'conversations', (I18n) ->
       $message_list.find('> li :checkbox').attr('checked', false)
     else
       state = !!$message_list.find('li.selected').length
+    $('#action_forward').parent().showIf(state and $message_list.find('li.selected.forwardable').length)
     if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
     $form[if state then 'addClass' else 'removeClass']('disabled')
-
-  set_last_label = (label) ->
-    $conversation_list.removeClass('red orange yellow green blue purple').addClass(label) # so that the label hover is correct
-    $.cookie('last_label', label)
-    $last_label = label
 
   set_hash = (hash) ->
     if hash isnt location.hash
@@ -1253,7 +1243,6 @@ I18n.scoped 'conversations', (I18n) ->
   $(document).ready () ->
     $conversations = $('#conversations')
     $conversation_list = $conversations.find("ul.conversations")
-    set_last_label($.cookie('last_label') ? 'red')
     $messages = $('#messages')
     $message_list = $messages.find('ul.messages')
     $form = $('#create_message_form')
@@ -1332,7 +1321,7 @@ I18n.scoped 'conversations', (I18n) ->
         # intended for us, just let it go
       else
         $message = $(e.target).closest('#messages > ul > li')
-        unless $message.hasClass('generated') or $message.hasClass('submission')
+        unless $message.hasClass('generated')
           $selected_conversation?.addClass('inactive')
           $message.toggleClass('selected')
           $message.find('> :checkbox').attr('checked', $message.hasClass('selected'))
@@ -1381,44 +1370,37 @@ I18n.scoped 'conversations', (I18n) ->
         before: ($node) -> set_conversation_state $node, 'unread'
         error: ($node) -> set_conversation_state $node, 'read'
 
-    $('.action_remove_label').click (e) ->
+    $('.action_unstar').click (e) ->
       e.preventDefault()
       e.stopImmediatePropagation()
-      current_label = null
+      starred = null
       inbox_action $(this),
         method: 'PUT'
         before: ($node) ->
-          current_label = $node.data('label')
-          $node.removeClass('labeled ' + current_label) if current_label
-          current_label
+          starred = $node.data('starred')
+          $node.removeClass('starred') if starred
+          starred
         success: ($node, data) ->
           update_conversation($node, data)
-          remove_conversation $node if MessageInbox.scope == 'labeled'
+          remove_conversation $node if MessageInbox.scope == 'starred'
         error: ($node) ->
-          $node.addClass('labeled ' + current_label)
+          $node.addClass('starred')
 
-    $('.action_add_label').click (e) ->
+    $('.action_star').click (e) ->
       e.preventDefault()
       e.stopImmediatePropagation()
-      label = null
-      current_label = null
+      starred = null
       inbox_action $(this),
         method: 'PUT'
         before: ($node, options) ->
-          current_label = $node.data('label')
-          label = options.url.match(/%5Blabel%5D=(.*)/)[1]
-          if label is 'last'
-            label = $last_label
-            options.url = options.url.replace(/%5Blabel%5D=last/, '%5Blabel%5D=' + label)
-          $node.removeClass('red orange yellow green blue purple').addClass('labeled').addClass(label)
-          label isnt current_label
+          starred = $node.data('starred')
+          if !starred
+            $node.addClass('starred')
+          !starred
         success: ($node, data) ->
           update_conversation($node, data)
-          set_last_label(label)
-          remove_conversation $node if MessageInbox.label_scope and MessageInbox.label_scope isnt label
         error: ($node) ->
-          $node.removeClass('labeled ' + label)
-          $node.addClass('labeled ' + current_label) if current_label
+          $node.removeClass('starred')
 
     $('#action_add_recipients').click (e) ->
       e.preventDefault()
@@ -1475,13 +1457,13 @@ I18n.scoped 'conversations', (I18n) ->
         $selected_messages.fadeOut 'fast'
         inbox_action $(this),
           loading_node: $selected_conversation
-          data: {remove: (parseInt message.id.replace(/message_/, '') for message in $selected_messages)}
+          data: {remove: ($(message).data('id') for message in $selected_messages)}
           success: ($node, data) ->
             # TODO: once we've got infinite scroll hooked up, we should
             # have the response tell us the number of messages still in
             # the conversation, and key off of that to know if we should
             # delete the conversation (or possibly reload its messages)
-            if $message_list.find('> li').not('.selected, .generated, .submission').length
+            if $message_list.find('> li').not('.selected, .generated').length
               $selected_messages.remove()
               update_conversation($node, data)
             else
@@ -1493,7 +1475,7 @@ I18n.scoped 'conversations', (I18n) ->
       $forward_form.find("input[name!=authenticity_token], textarea").val('').change()
       $preview = $forward_form.find('ul.messages').first()
       $preview.html('')
-      $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'))
+      $preview.html($message_list.find('> li.selected.forwardable').clone(true).removeAttr('id').removeClass('self'))
       $preview.find('> li')
         .removeClass('selected odd')
         .find('> :checkbox')
@@ -1598,6 +1580,8 @@ I18n.scoped 'conversations', (I18n) ->
     $('.recipients').tokenInput
       placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
       added: (data, $token, new_token) ->
+        if new_token and data.root_id
+          $token.append("<input type='hidden' name='tags[]' value='#{data.root_id}'>")
         if new_token and data.type
           $token.addClass(data.type)
           if data.user_count?
@@ -1644,6 +1628,7 @@ I18n.scoped 'conversations', (I18n) ->
               text = I18n.beforeLabel(options.parent.data('text')) + " " + text
           $node.data('text', text)
           $node.data('id', data.id)
+          data.root_id = options.ancestors[0]
           $node.data('user_data', data)
           $node.addClass(if data.type then data.type else 'user')
           if options.level > 0
@@ -1696,6 +1681,46 @@ I18n.scoped 'conversations', (I18n) ->
         $form.find('#group_conversation_info').hide()
         $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) and can_add_notes_for(user))
       inbox_resize()
+
+    $('#context_tags').tokenInput
+      placeholder: I18n.t('course_filter_placeholder', "Enter a course name")
+      added: (data, $token, new_token) ->
+        $token.prevAll().remove()
+      tokenWrapBuffer: 80
+      selector:
+        messages: {no_results: I18n.t('no_results', 'No results found')}
+        populator: ($node, data, options={}) ->
+          if data.avatar_url
+            $img = $('<img class="avatar" />')
+            $img.attr('src', data.avatar_url)
+            $node.append($img)
+          $b = $('<b />')
+          $b.text(data.name)
+          $name = $('<span />', class: 'name')
+          $name.append($b)
+          $span = $('<span />', class: 'details')
+          $node.append($name, $span)
+          $node.attr('title', data.name)
+          text = data.name
+          $node.data('text', text)
+          $node.data('id', data.id)
+          $node.data('user_data', data)
+          $node.addClass(data.type)
+          $node.addClass('toggleable')
+        limiter: (options) -> 5
+    filter_input = $('#context_tags').data('token_input')
+    filter_input.change = (token_values) ->
+      if MessageInbox.current_filter isnt token_values[0]
+        # TODO: fragment hash fu + ajax
+        new_url = location.href.replace(/[\?#].*|/g, '')
+        new_url += '?filter=' + token_values[0] if token_values[0]
+        location.href = new_url
+    if filter = MessageInbox.initial_filter
+      MessageInbox.current_filter = filter.id
+      filter_input.add_token
+        value: filter.id
+        text: filter.name
+        data: $.extend(true, {}, filter)
 
     $(window).resize inbox_resize
     setTimeout inbox_resize

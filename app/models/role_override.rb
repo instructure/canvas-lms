@@ -81,6 +81,26 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :read_forum => {
+        :label => lambda { t('permissions.read_forum', "View discussions") },
+        :available_to => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'ObserverEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      },
       :post_to_forum => {
         :label => lambda { t('permissions.post_to_forum', "Post to discussions") },
         :available_to => [
@@ -229,7 +249,6 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'TaEnrollment',
-          'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
         ]

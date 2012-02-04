@@ -88,7 +88,7 @@ describe "help dialog" do
     wait_for_ajaximations
     feedback_form.should_not be_displayed
     cm = ConversationMessage.last
-    cm.recipients.should == @course.admins
+    cm.recipients.should == @course.instructors
     cm.body.should match(/test message/)
   end
 

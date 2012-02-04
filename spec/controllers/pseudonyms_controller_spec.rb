@@ -48,28 +48,37 @@ describe PseudonymsController do
       @cc.should_not be_active
     end
 
-    it "should send password-change email for a registered user" do
-      user_with_pseudonym
-      get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
-      response.should be_redirect
-      assigns[:ccs].should include(@cc)
-      assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
-    end
+    describe "forgot password" do
+      before :each do
+        Notification.create(:name => 'Forgot Password')
+      end
 
-    it "should send password-change email case insensitively" do
-      user_with_pseudonym(:username => 'user1@example.com')
-      get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'USER1@EXAMPLE.COM'}
-      response.should be_redirect
-      assigns[:ccs].should include(@cc)
-      assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
-    end
+      it "should send password-change email for a registered user" do
+        user_with_pseudonym
+        get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
+        response.should be_redirect
+        assigns[:ccs].should include(@cc)
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
+      end
 
-    it "should send password-change email for users with pseudonyms in a different account" do
-      user_with_pseudonym(:account => Account.site_admin)
-      get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
-      response.should be_redirect
-      assigns[:ccs].should include(@cc)
-      assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+      it "should send password-change email case insensitively" do
+        user_with_pseudonym(:username => 'user1@example.com')
+        get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'USER1@EXAMPLE.COM'}
+        response.should be_redirect
+        assigns[:ccs].should include(@cc)
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
+      end
+
+      it "should send password-change email for users with pseudonyms in a different account" do
+        user_with_pseudonym(:account => Account.site_admin)
+        get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
+        response.should be_redirect
+        assigns[:ccs].should include(@cc)
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
+      end
     end
 
     it "should render confirm change password view for registered user's email" do
@@ -169,17 +178,44 @@ describe PseudonymsController do
     end
   end
 
-
   describe "create" do
-    before :each do
-      user_with_pseudonym(:active_all => true)
-      Account.site_admin.add_user(@user)
-      user_session(@user, @pseudonym)
+    # these specs only test the non-api version of the calls
+    context "with site admin permissions" do
+      before :each do
+        user_with_pseudonym(:active_all => true)
+        Account.site_admin.add_user(@user)
+        user_session(@user, @pseudonym)
+      end
+
+      it "should use the account id from params" do
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'unique1' }
+        response.should be_success
+      end
     end
 
-    it "should work with a user as context and account in params" do
-      post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'unique1' }
-      response.should be_success
+    context "without site admin permissions" do
+      before :each do
+        @account = Account.create!
+        user_with_pseudonym(:active_all => true, :account => @account)
+        LoadAccount.stubs(:default_domain_root_account).returns(@account)
+        @account.add_user(@user)
+        user_session(@user, @pseudonym)
+      end
+
+      it "should ignore use the domain_root_account" do
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :unique_id => 'unique1' }
+        response.should be_success
+        @user.pseudonyms.size.should == 2
+        (@user.pseudonyms - [@pseudonym]).last.account.should == @account
+      end
+
+      it "should ignore account id in params and use the domain_root_account" do
+        @account2 = Account.create!
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => @account2.id, :unique_id => 'unique1' }
+        response.should be_success
+        @user.pseudonyms.size.should == 2
+        (@user.pseudonyms - [@pseudonym]).last.account.should == @account
+      end
     end
   end
 

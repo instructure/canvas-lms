@@ -888,10 +888,10 @@ class Assignment < ActiveRecord::Base
 
   def self.find_or_create_submission(assignment_id, user_id)
     s = nil
-    attempts = 0
-    s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-    s.created_correctly_from_assignment_rb = true
-    s.save_without_broadcast if s.new_record?
+    unique_constraint_retry do
+      s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
+      s.save_without_broadcast if s.new_record?
+    end
     raise "bad" if s.new_record?
     s
   end
@@ -1312,7 +1312,7 @@ class Assignment < ActiveRecord::Base
         r.update_for(self)
       end
     end
-    admins = self.context.admins
+    admins = self.context.instructors
     needed_ids = admins.map{|a| a.id} - grading_user_ids
     admins.select{|a| needed_ids.include?(a.id)}.each do |a|
       r = assignment_reminders.build(:user => a, :reminder_type => 'grading')
@@ -1606,7 +1606,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  protected
 
     # Takes an array of hashes and groups them by their :user entry.  All
     # hashes must have a user entry.
@@ -1620,25 +1619,36 @@ class Assignment < ActiveRecord::Base
         [found] + partition_for_user(remainder)
       end
     end
+    protected :partition_for_user
 
-    # Infers the user, submission, and attachment from a filename
-    def infer_comment_context_from_filename(filename)
-      split_filename = filename.split('_')
-      # If the filename is like Richards_David_2_link.html, then there is no
-      # useful attachment here.  The assignment was submitted as a URL and the
-      # teacher commented directly with the gradebook.  Otherwise, grab that
-      # last value and strip off everything after the first period.
-      attachment_id = (split_filename[-1] =~ /\Alink/) ? nil : split_filename[-1].split('.')[0].to_i
-      attachment_id = nil if filename.match(/\A\._/)
-      user_id = split_filename[-2].to_i
+  # Infers the user, submission, and attachment from a filename
+  def infer_comment_context_from_filename(filename)
+    split_filename = filename.split('_')
+    # If the filename is like Richards_David_2_link.html, then there is no
+    # useful attachment here.  The assignment was submitted as a URL and the
+    # teacher commented directly with the gradebook.  Otherwise, grab that
+    # last value and strip off everything after the first period.
+    user_id, attachment_id = split_filename.grep(/^\d+$/).last(2)
+    attachment_id = nil if split_filename.last =~ /^link/ || filename =~ /^\._/
+
+    if user_id
       user = User.find_by_id(user_id)
-      attachment = attachment_id && Attachment.find_by_id(attachment_id)
       submission = Submission.find_by_user_id_and_assignment_id(user_id, self.id)
-      if !attachment || !submission
-        @ignored_files << filename
-        return nil
-      end
-      return {:user => user, :submission => submission, :filename => filename, :display_name => attachment.display_name}
     end
+    attachment = Attachment.find_by_id(attachment_id) if attachment_id
+
+    if !attachment || !submission
+      @ignored_files << filename
+      return nil
+    end
+
+    {
+      :user => user,
+      :submission => submission,
+      :filename => filename,
+      :display_name => attachment.display_name
+    }
+  end
+  protected :infer_comment_context_from_filename
 
 end

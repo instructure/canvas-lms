@@ -218,6 +218,18 @@ module Turnitin
       sendRequest(:list_papers, 2, :assignment => assignment, :course => course, :user => course, :utp => '1', :tem => email(course))
     end
     
+    # From the turnitin api docs: To calculate the MD5, concatenate the data
+    # values associated with the URL variables of ALL variables being sent, in
+    # alphabetical order according to variable name, being sure to include at
+    # least the following:
+    #
+    # aid + diagnostic + encrypt + fcmd + fid + gmtime + uem + ufn + uln + utp + shared secret key 
+    #
+    # The shared secret key is added to the end of the parameters.
+    #
+    # From our testing, turnitin appears to be unescaping parameters and then
+    # calculating MD5, so our MD5 should be calculated before parameters are
+    # escaped
     def request_md5(params)
       keys_used = []
       str = ""
@@ -229,8 +241,21 @@ module Turnitin
       str += @shared_secret
       Digest::MD5.hexdigest(str)
     end
-    
-    def sendRequest(command, fcmd, args)
+
+    def escape_params(params)
+      escaped_params = {}
+      params.each do |key, value|
+        if value.is_a?(String)
+          escaped_params[key] = CGI.escape(value).gsub("+", "%20")
+          # turnitin uses %20 to encode spaces (instead of +)
+        else
+          escaped_params[key] = value
+        end
+      end
+      return escaped_params
+    end
+
+    def prepare_params(command, fcmd, args)
       user = args.delete :user
       course = args.delete :course
       assignment = args.delete :assignment
@@ -265,11 +290,18 @@ module Turnitin
       end
       params[:diagnostic] = "1" if @testing
       
-      md5 = request_md5(params)
+      params[:md5] = request_md5(params)
+      params = escape_params(params) if post
+      return params
+    end
+    
+    def sendRequest(command, fcmd, args)
       require 'net/http'
+
+      post = args[:post] # gets deleted in prepare_params
+      params = prepare_params(command, fcmd, args)
       
       if post
-        params[:md5] = md5
         mp = Multipart::MultipartPost.new
         query, headers = mp.prepare_query(params)
         puts query if @testing
@@ -286,7 +318,7 @@ module Turnitin
           end
         }
       else
-        requestParams = "md5=#{md5}"
+        requestParams = ""
         params.each do |key, value|
           next if value.nil?
           requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"

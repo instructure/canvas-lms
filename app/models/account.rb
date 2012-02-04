@@ -145,7 +145,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
-  add_setting :open_registration, :boolean => true, :root_only => true, :default => false, :condition => :non_delegated_authentication
+  add_setting :open_registration, :boolean => true, :root_only => true, :default => false
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
@@ -406,6 +406,10 @@ class Account < ActiveRecord::Base
     res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     res.compact
   end
+
+  def associated_accounts
+    self.account_chain
+  end
   
   def account_chain_ids(opts={})
     account_chain(opts).map(&:id)
@@ -650,10 +654,6 @@ class Account < ActiveRecord::Base
 
   def delegated_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
-  end
-
-  def non_delegated_authentication?
-    !delegated_authentication?
   end
 
   def forgot_password_external_url
@@ -1047,6 +1047,11 @@ class Account < ActiveRecord::Base
     root_account = self.root_account
     return true if root_account.open_registration?
     root_account.grants_right?(user, session, :manage_user_logins)
+  end
+
+  def trusted_account_ids
+    return [] if !root_account? || self == Account.site_admin
+    [ Account.site_admin.id ]
   end
 
   named_scope :root_accounts, :conditions => {:root_account_id => nil}

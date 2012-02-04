@@ -93,7 +93,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def validate_context!
     @validate_context = true
-    context.validation_event_overrides = [self]
+    context.validation_event_override = self
   end
   attr_reader :validate_context
 
@@ -131,7 +131,8 @@ class CalendarEvent < ActiveRecord::Base
           self.end_at = end_at_was if !new_record? && end_at_changed?
         end
       else
-        AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
+        # we only allow changing the description
+        (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
       end
     end
   end
@@ -147,7 +148,6 @@ class CalendarEvent < ActiveRecord::Base
   ]
 
   def update_locked_children
-    return if locked?
     changed = LOCKED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
     child_events.locked.update_all Hash[changed.map{ |attr| [attr, send(attr)] }] if changed.present?
   end
@@ -210,7 +210,7 @@ class CalendarEvent < ActiveRecord::Base
     }
 
     dispatch :appointment_reserved_by_user
-    to { appointment_group.admins }
+    to { appointment_group.instructors }
     whenever {
       appointment_group && parent_event &&
       just_created &&
@@ -218,7 +218,7 @@ class CalendarEvent < ActiveRecord::Base
     }
 
     dispatch :appointment_canceled_by_user
-    to { appointment_group.admins }
+    to { appointment_group.instructors }
     whenever {
       appointment_group && parent_event &&
       deleted? &&
@@ -480,7 +480,7 @@ class CalendarEvent < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
     can :read and can :create
 
-    given { |user, session| !locked? && !deleted? && self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
+    given { |user, session| (!locked? || context.is_a?(AppointmentGroup)) && !deleted? && self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
     can :update and can :update_content
 
     given { |user, session| !deleted? && self.cached_context_grants_right?(user, session, :manage_calendar) }

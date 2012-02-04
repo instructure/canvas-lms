@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "concluded/unconcluded" do
   it_should_behave_like "in-process server selenium tests"
   
-  before(:each) do
+  before (:each) do
     username = "nobody@example.com"
     password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,
@@ -82,5 +82,4 @@ describe "concluded/unconcluded" do
     driver.find_element(:css, "#submission_information .add_comment").should_not be_displayed
     driver.find_element(:css, "#submission_information .save_buttons").should_not be_displayed
   end
-  
 end

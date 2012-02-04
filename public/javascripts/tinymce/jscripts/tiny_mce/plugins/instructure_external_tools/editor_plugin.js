@@ -134,7 +134,8 @@
             ed.addButton('instructure_external_button_' + button.id, {
               title: button.name,
               cmd: 'instructureExternalButton' + button.id,
-              image: button.icon_url
+              image: button.icon_url,
+              'class': 'instructure_external_tool_button'
             });
           })(current_button)
 		    }

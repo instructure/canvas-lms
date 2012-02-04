@@ -54,6 +54,29 @@ describe DiscussionTopicsController do
       assigns[:topics][0].should eql(@topic)
     end
     
+    it "should allow observer by default" do
+      course_with_teacher
+      course_with_observer_logged_in(:course => @course)
+      @user = @teacher
+      course_topic
+      get 'index', :course_id => @course.id
+      assigns[:topics].should_not be_nil
+      assigns[:topics].should_not be_empty
+      assigns[:topics][0].should eql(@topic)
+    end
+
+    it "should reject observer if read_forum role is false" do
+      course_with_teacher
+      course_with_observer_logged_in(:course => @course)
+      RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
+                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+      @user = @teacher
+      course_topic
+      get 'index', :course_id => @course.id
+      assigns[:topics].should_not be_nil
+      assigns[:topics].should_not be_empty
+      assigns[:topics][0].should eql(@topic)
+    end
   end
   
   describe "GET 'show'" do

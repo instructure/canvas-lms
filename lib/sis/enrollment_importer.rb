@@ -147,7 +147,7 @@ module SIS
             # commit pending incremental account associations
             incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
 
-            enrollment = @section.enrollments.find_by_user_id(user.id)
+            enrollment = @section.all_enrollments.find_by_user_id(user.id)
             unless enrollment
               enrollment = Enrollment.new
               enrollment.root_account = @root_account

@@ -138,6 +138,18 @@ class ContentImportsController < ApplicationController
       @content_migration = ContentMigration.find_by_context_id_and_context_type_and_id(@context.id, @context.class.to_s, migration_id) if migration_id.present?
       @content_migration ||= ContentMigration.find_by_context_id_and_context_type(@context.id, @context.class.to_s, :order => "id DESC")
       if request.method == :post
+        if params[:items_to_copy]
+          params[:copy] ||= {}
+          params[:items_to_copy].each_pair do |key, vals|
+            params[:copy][key] ||= {}
+            if vals && ! vals.empty?
+              vals.each do |val|
+                params[:copy][key][val] = true
+              end
+            end
+          end
+          params.delete :items_to_copy
+        end
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save
         @content_migration.import_content
@@ -241,6 +253,12 @@ class ContentImportsController < ApplicationController
           copy_params[:everything] = true
         end
       else
+        if params[:copy] && params[:items_to_copy]
+          params[:items_to_copy].each do |item|
+            params[:copy][item] = true
+          end
+          params.delete :items_to_copy
+        end
         @copy_context = Course.find(params[:copy][:course_id])
         copy_params = params[:copy]
       end

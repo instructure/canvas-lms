@@ -131,3 +131,43 @@ button.single_item_done_button
 .details-wrapper
   clear: both
 
+#message_participants_form
+  padding: 10px
+  textarea
+    width: 98%
+    height: 100px
+  label
+    font-weight: bold
+  .error
+    font-weight: bold
+    color: #a00
+  ul
+    font-size: 0.8em
+    list-style: none
+    padding: 5px 0
+    margin: 0
+    min-height: 60px
+    max-height: 100px
+    overflow: auto
+    li
+      overflow: hidden
+      white-space: nowrap
+      float: left
+      margin: 1px 2px 1px 4px
+      padding: 0 14px 0 11px
+      color: #000
+      background-color: #dee7fa
+      border: 1px solid #a5bcf0
+      +border-radius(10px)
+      cursor: default
+      &.status
+        text-align: center
+        float: none
+        padding: 0
+        margin: 0
+        height: 50px
+        position: relative
+        background: transparent
+        border: 0
+        +border-radius(0px)
+

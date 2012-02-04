@@ -158,4 +158,275 @@ This text has a http://www.google.com link in it...
     @item.data.submission_comments[0].id.should eql(@comment.id)
     @item.data.submission_comments[0].formatted_body.should eql(@comment.formatted_body(250))
   end
+
+  context "conversations" do
+    before do
+      assignment_model
+      @assignment.workflow_state = 'published'
+      @assignment.save
+      @course.offer
+      @course.enroll_teacher(user)
+      @teacher1 = @user
+      @course.enroll_teacher(user)
+      @teacher2 = @user
+      @assignment.reload
+      @course.enroll_student(user)
+      @student1 = @user
+      @course.enroll_student(user)
+      @submission1 = @assignment.submit_homework(@student1, :body => 'some message')
+    end
+
+    context "creation" do
+      it "should send comments to all instructors if no instructors have commented" do
+        @submission1.add_comment(:author => @student1, :comment => "hello")
+        @teacher1.conversations.size.should eql 1
+        tc1 = @teacher1.conversations.first
+        tc1.messages.size.should eql 1
+        tc1.messages.first.asset.should eql @submission1
+        @teacher2.conversations.size.should eql 1
+        tc2 = @teacher2.conversations.first
+        tc2.messages.size.should eql 1
+        tc2.messages.first.asset.should eql @submission1
+      end
+
+      it "should just create a single message for all comments" do
+        @submission1.add_comment(:author => @student1, :comment => "hello")
+        @submission1.add_comment(:author => @student1, :comment => "hello again!")
+        @submission1.add_comment(:author => @student1, :comment => "hello hello hello!")
+        @teacher1.conversations.size.should eql 1
+        tc1 = @teacher1.conversations.first
+        tc1.messages.size.should eql 1
+        tc1.messages.first.asset.should eql @submission1
+      end
+
+      it "should set the most recent comment as the message data" do
+        SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
+        c1 = @submission1.add_comment(:author => @student1, :comment => "hello")
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!")
+        @teacher1.conversations.size.should eql 1
+        tc1 = @teacher1.conversations.first
+        tc1.last_message_at.should eql c2.created_at
+        tc1.messages.last.body.should eql c2.comment
+        tc1.messages.last.author.should eql @teacher1
+      end
+
+      it "should not be visible to the student until an instructor comments" do
+        @submission1.add_comment(:author => @student1, :comment => "hello")
+        @student1.conversations.size.should eql 0
+
+        @submission1.add_comment(:author => @teacher1, :comment => "sup")
+        @student1.conversations.reload.size.should eql 1
+      end
+
+      it "should not be visible to other instructors once the first instructor comments" do
+        @submission1.add_comment(:author => @student1, :comment => "hello")
+        @teacher1.conversations.size.should eql 1
+        @teacher2.conversations.size.should eql 1
+        @submission1.add_comment(:author => @teacher1, :comment => "hello")
+        @teacher2.reload.conversations.size.should eql 0
+        @teacher2.all_conversations.size.should eql 1 # still there, the message was just deleted
+      end
+
+      it "should set the unread count/status for everyone but the author" do
+        @submission1.add_comment(:author => @student1, :comment => "hello")
+        tconvo = @teacher1.conversations.first
+        tconvo.should be_unread
+        @submission1.add_comment(:author => @teacher1, :comment => "hi")
+        sconvo = @student1.conversations.first
+        sconvo.should be_unread
+
+        tconvo.remove_messages(:all)
+        sconvo.workflow_state = :read
+        sconvo.save!
+
+        @submission1.add_comment(:author => user, :comment => "hey im in ur group")
+        sconvo.reload.should be_unread
+        @student1.reload.unread_conversations_count.should eql 1
+        tconvo.reload.should be_unread
+        tconvo.messages.size.should eql 1
+        @teacher1.reload.unread_conversations_count.should eql 1
+      end
+    end
+
+    context "unmuting" do
+      before do
+        @assignment.mute!
+      end
+
+      it "should update conversations when assignments are unmuted" do
+        @submission1.add_comment(:author => @teacher1, :comment => "!", :hidden => true)
+        @teacher1.conversations.size.should eql 0
+        @student1.conversations.size.should eql 0
+        @assignment.unmute!
+        @teacher1.reload.conversations.size.should eql 1
+        @teacher1.conversations.first.should be_read
+        @student1.reload.conversations.size.should eql 1
+        @student1.conversations.first.should be_unread
+      end
+
+      it "should not set an older created_at/message" do
+        SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
+        c1 = @submission1.add_comment(:author => @teacher1, :comment => "!", :hidden => true)
+        c2 = @submission1.add_comment(:author => @student1, :comment => "a new comment")
+        @teacher1.conversations.size.should eql 1
+        @teacher1.conversations.first.messages.last.created_at.should eql c2.created_at
+        @teacher1.conversations.first.messages.last.body.should eql c2.comment
+        @teacher2.conversations.size.should eql 1
+        @student1.conversations.size.should eql 0
+        @assignment.unmute!
+        @teacher1.reload.conversations.size.should eql 1
+        @teacher1.conversations.first.messages.last.created_at.should eql c2.created_at
+        @teacher1.conversations.first.messages.last.body.should eql c2.comment
+        @teacher2.reload.conversations.size.should eql 0
+        @student1.reload.conversations.size.should eql 1
+        @student1.conversations.first.should be_unread
+      end
+
+      it "should mark-as-unread for everyone if there are multiple authors of hidden comments" do
+        c1 = @submission1.add_comment(:author => @student1, :comment => "help!")
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "ok", :hidden => true)
+        c3 = @submission1.add_comment(:author => @teacher2, :comment => "no", :hidden => true)
+        @student1.conversations.size.should eql 0
+        t1convo = @teacher1.conversations.first
+        t1convo.workflow_state = :read
+        t1convo.save!
+        t2convo = @teacher2.conversations.first
+        t2convo.workflow_state = :read
+        t2convo.save!
+
+        @assignment.unmute!
+
+        t1convo.reload.should be_unread
+        t2convo.reload.should be_unread
+        @student1.reload.conversations.size.should eql 2
+        @student1.conversations.first.should be_unread
+        @student1.conversations.last.should be_unread
+      end
+    end
+
+    context "deletion" do
+      it "should update the message correctly if the most recent comment is deleted" do
+        SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
+        c1 = @submission1.add_comment(:author => @student1, :comment => "hello")
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!")
+        c2.destroy
+        @teacher1.conversations.size.should eql 1
+        tc1 = @teacher1.conversations.first
+        tc1.last_message_at.should eql c1.created_at
+        tc1.messages.last.body.should eql c1.comment
+        tc1.messages.last.author.should eql @student1
+
+        # it won't reappear in the other teacher's conversation until another
+        # non-instructor comment is added, since we don't know if it was
+        # deleted automatically or explicitly by the teacher
+        @teacher2.conversations.size.should eql 0
+      end
+
+      it "should not re-add the message to users who have deleted it" do
+        c1 = @submission1.add_comment(:author => @student1, :comment => "hello")
+        c2 = @submission1.add_comment(:author => @student1, :comment => "hello again!")
+        @teacher1.conversations.size.should eql 1
+        tc1 = @teacher1.conversations.first
+        tc1.remove_messages(:all)
+        @teacher1.conversations.should be_empty
+        c2.destroy
+
+        @teacher1.conversations.reload.should be_empty
+      end
+
+      it "should remove the message from conversations when the last comment is deleted" do
+        c1 = @submission1.add_comment(:author => @student1, :comment => "hello")
+        @teacher1.conversations.size.should eql 1
+        c1.destroy
+        @teacher1.reload.conversations.size.should eql 0
+      end
+    end
+
+    context "migration" do
+      def raw_comment(submission, author, comment, time=Time.now.utc)
+        c = Submission.connection
+        c.execute <<-SQL
+          INSERT INTO submission_comments(submission_id, author_id, created_at, comment)
+          VALUES(#{c.quote(submission.id)}, #{c.quote(author.id)}, #{c.quote(time)}, #{c.quote(comment)})
+        SQL
+      end
+
+      before do
+        @course.enroll_student(user)
+        @student2 = @user
+        @submission2 = @assignment.submit_homework(@student2, :body => 'some message')
+      end
+
+      it "should only create messages where conversations already exist" do
+        convo1 = @student1.initiate_conversation([@teacher1.id])
+        convo1.add_message('ohai')
+        convo2 = @student1.initiate_conversation([@teacher2.id])
+        convo2.add_message('hey', :update_for_sender => false) # like if the student did a bulk private message
+        @student1.conversations.size.should eql 1 # second one is not visible to student
+        @student1.conversations.first.messages.size.should eql 1
+        @student2.conversations.size.should eql 0
+        @teacher1.conversations.size.should eql 1
+        @teacher1.conversations.first.messages.size.should eql 1
+        @teacher2.conversations.size.should eql 1
+        @teacher2.conversations.first.messages.size.should eql 1
+
+        raw_comment(@submission1, @student1, "hello")
+        @submission1.create_or_update_conversations!(:migrate)
+        raw_comment(@submission2, @student2, "yo")
+        @submission2.create_or_update_conversations!(:migrate)
+
+        # same number of conversations, but existing ones got the new message
+        @student1.conversations.size.should eql 1 # second one is still not visible to student
+        @student1.conversations.first.messages.size.should eql 2
+        @student2.conversations.size.should eql 0
+        @teacher1.conversations.size.should eql 1
+        @teacher1.conversations.first.messages.size.should eql 2
+        @teacher2.conversations.size.should eql 1
+        @teacher2.conversations.first.messages.size.should eql 2
+      end
+
+      it "should not change any unread count/status" do
+        convo = @student1.initiate_conversation([@teacher1.id])
+        convo.add_message('ohai')
+        @student1.conversations.size.should eql 1
+        convo.messages.size.should eql 1
+        @teacher1.conversations.size.should eql 1
+        tconvo = @teacher1.conversations.first
+        tconvo.messages.size.should eql 1
+        tconvo.workflow_state = :read
+        tconvo.save!
+        @teacher1.reload.unread_conversations_count.should eql 0
+
+        raw_comment(@submission1, @student1, "hello")
+        @submission1.create_or_update_conversations!(:migrate)
+
+        convo.reload.messages.size.should eql 2
+        convo.should be_read
+        @student1.reload.unread_conversations_count.should eql 0
+        tconvo.reload.messages.size.should eql 2
+        tconvo.should be_read
+        @teacher1.reload.unread_conversations_count.should eql 0
+      end
+
+      it "should update last_message_at, message_count and last_authored_at" do
+        convo = @student1.initiate_conversation([@teacher1.id])
+        convo.add_message('ohai')
+        tconvo = @teacher1.conversations.first
+        raw_comment(@submission1, @student1, "hello", Time.now.utc + 1.day)
+        raw_comment(@submission1, @student1, "hello!", Time.now.utc + 2.day)
+        @submission1.create_or_update_conversations!(:migrate)
+        comments = @submission1.submission_comments
+
+        convo.reload.messages.size.should eql 2
+        convo.last_message_at.should eql comments.last.created_at
+        convo.last_authored_at.should eql comments.last.created_at
+        convo.messages.first.created_at.should eql comments.last.created_at
+
+        tconvo.reload.messages.size.should eql 2
+        tconvo.last_message_at.should eql comments.last.created_at
+        tconvo.last_authored_at.should be_nil
+        tconvo.messages.first.created_at.should eql comments.last.created_at
+      end
+    end
+  end
 end

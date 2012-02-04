@@ -253,28 +253,40 @@ class Enrollment < ActiveRecord::Base
     !!self.sis_source_id
   end
 
-  def participating?
-    !self.is_a?(CourseDesignerEnrollment) && self.state_based_on_date == :active
-  end
-
-  def student?
-    self.is_a?(StudentEnrollment)
-  end
-
   def assigned_observer?
-    self.is_a?(ObserverEnrollment) && self.associated_user_id
+    self.observer? && self.associated_user_id
+  end
+
+  def participating?
+    self.state_based_on_date == :active
   end
 
   def participating_student?
-    self.is_a?(StudentEnrollment) && self.state_based_on_date == :active
+    self.student? && self.participating?
   end
 
   def participating_observer?
-    self.is_a?(ObserverEnrollment) && self.state_based_on_date == :active
+    self.observer? && self.participating?
+  end
+
+  def participating_teacher?
+    self.teacher? && self.participating?
+  end
+
+  def participating_ta?
+    self.ta? && self.participating?
+  end
+
+  def participating_instructor?
+    self.instructor? && self.participating?
+  end
+
+  def participating_designer?
+    self.designer? && self.participating?
   end
 
   def participating_admin?
-    (self.is_a?(TeacherEnrollment) || self.is_a?(TaEnrollment)) && self.state_based_on_date == :active
+    self.admin? && self.participating?
   end
 
   def associated_user_name
@@ -568,8 +580,33 @@ class Enrollment < ActiveRecord::Base
     type.constantize
   end
 
-  def admin?
+  # overridden to return true in appropriate subclasses
+  def student?
     false
+  end
+
+  def observer?
+    false
+  end
+
+  def teacher?
+    false
+  end
+
+  def ta?
+    false
+  end
+
+  def designer?
+    false
+  end
+
+  def instructor?
+    teacher? || ta?
+  end
+
+  def admin?
+    instructor? || designer?
   end
 
   def to_atom
@@ -671,7 +708,8 @@ class Enrollment < ActiveRecord::Base
       if enrollment
         {
           :enrollment_state => enrollment.workflow_state,
-          :user_state => enrollment.user.state
+          :user_state => enrollment.user.state,
+          :is_admin => enrollment.admin?
         }
       else
         nil

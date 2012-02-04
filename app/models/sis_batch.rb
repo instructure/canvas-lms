@@ -147,19 +147,19 @@ class SisBatch < ActiveRecord::Base
 
     # delete courses that weren't in this batch, in the selected term
     scope = Course.active.for_term(self.batch_mode_term).scoped(:conditions => ["courses.root_account_id = ?", self.account.id])
-    scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id.to_s]).find_each do |course|
+    scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id]).find_each do |course|
       course.destroy
     end
 
     # delete sections who weren't in this batch, whose course was in the selected term
-    scope = CourseSection.scoped(:conditions => ["course_sections.workflow_state = ? and course_sections.root_account_id = ? and course_sections.sis_batch_id is not null and course_sections.sis_batch_id <> ?", 'active', self.account.id, self.id.to_s])
+    scope = CourseSection.scoped(:conditions => ["course_sections.workflow_state = ? and course_sections.root_account_id = ? and course_sections.sis_batch_id is not null and course_sections.sis_batch_id <> ?", 'active', self.account.id, self.id])
     scope = scope.scoped(:include => :course, :select => "course_sections.*", :conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
     scope.find_each do |section|
       section.destroy
     end
 
     # delete enrollments for courses that weren't in this batch, in the selected term
-    scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.root_account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id.to_s])
+    scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.root_account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id])
     scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
     scope.find_each do |enrollment|
       enrollment.destroy

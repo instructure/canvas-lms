@@ -303,7 +303,7 @@ class Group < ActiveRecord::Base
     can :create
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
-    can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum and can :manage_wiki and can :manage_files
+    can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum and can :manage_wiki and can :manage_files and can :create_conferences
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
@@ -354,7 +354,7 @@ class Group < ActiveRecord::Base
       { :id => TAB_CHAT,          :label => t("#group.tabs.chat", "Chat"), :css_class => 'chat', :href => :group_chat_path },
       { :id => TAB_FILES,         :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path }
     ]
-    available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :create_conferences)
+    available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :read)
     available_tabs
   end
 

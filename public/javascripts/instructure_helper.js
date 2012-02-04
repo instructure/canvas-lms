@@ -88,7 +88,10 @@ I18n.scoped('instructure', function(I18n) {
                 }
                 var afterTransition = function(event){
                   // !event means we got here from the setTimout
-                  if (!event || event.originalEvent.propertyName === 'opacity') {
+                  // firefox actually pases a value to the function from setTimeout
+                  // so also have to check for .originalEvent to make sure that it was passed a
+                  // jQuery Event object.
+                  if (!event || !event.originalEvent || event.originalEvent.propertyName === 'opacity') {
                     previousFn.apply($this); //change to display:none when we are hiding.
                     $this[0].style.opacity = oldOpacityCssAttribute;
                     clearTimeout(timeoutToRunIfTransitionEndNeverFires);

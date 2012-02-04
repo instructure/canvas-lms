@@ -9,7 +9,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.discussion_replies 'conversations/discussion_replies', :controller => 'context', :action => 'discussion_replies'
   map.conversations_unread 'conversations/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
-  map.conversations_labeled 'conversations/labeled', :controller => 'conversations', :action => 'index', :scope => 'labeled'
+  map.conversations_starred 'conversations/starred', :controller => 'conversations', :action => 'index', :scope => 'starred'
   map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
   map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
@@ -43,13 +43,90 @@ ActionController::Routing::Routes.draw do |map|
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
   map.help_links 'help_links', :controller => 'info', :action => 'help_links'
 
-  question_bank_resources = lambda do |bank|
-    bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
-    bank.reorder 'reorder', :controller => 'question_banks', :action => 'reorder'
-    bank.questions 'questions', :controller => 'question_banks', :action => 'questions'
-    bank.move_questions 'move_questions', :controller => 'question_banks', :action => 'move_questions'
-    bank.resources :assessment_questions do |question|
-      question.move_question 'move', :controller => 'assessment_questions', :action => 'move'
+  def add_question_banks(context)
+    context.resources :question_banks do |bank|
+      bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
+      bank.reorder 'reorder', :controller => 'question_banks', :action => 'reorder'
+      bank.questions 'questions', :controller => 'question_banks', :action => 'questions'
+      bank.move_questions 'move_questions', :controller => 'question_banks', :action => 'move_questions'
+      bank.resources :assessment_questions do |question|
+        question.move_question 'move', :controller => 'assessment_questions', :action => 'move'
+      end
+    end
+  end
+
+  def add_groups(context)
+    context.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
+    context.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
+    context.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
+    context.group_assign_unassigned_members 'group_assign_unassigned_members', :controller => 'groups', :action => 'assign_unassigned_members', :conditions => { :method => :post }
+  end
+
+  def add_files(context, options={})
+    context.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
+      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
+      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
+      file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
+      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
+      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
+      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
+      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
+    end
+    context.images 'images', :controller => 'files', :action => 'images' if options[:images]
+    context.relative_file_path "file_contents/:file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative' if options[:relative]
+    if options[:folders]
+      context.resources :folders do |folder|
+        folder.download 'download', :controller => 'folders', :action => 'download'
+      end
+    end
+  end
+
+  def add_media(context)
+    context.media_download 'media_download', :controller => 'users', :action => 'media_download'
+    context.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
+  end
+
+  def add_users(context)
+    context.users 'users', :controller => 'context', :action => 'roster'
+    context.user_services 'user_services', :controller => 'context', :action => 'roster_user_services'
+    context.user_usage 'users/:user_id/usage', :controller => 'context', :action => 'roster_user_usage'
+    yield if block_given?
+    context.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
+  end
+
+  def add_announcements(context)
+    context.resources :announcements
+    context.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
+    context.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
+  end
+
+  def add_chat(context)
+    context.resources :chats
+    context.chat 'chat', :controller => 'context', :action => 'chat'
+    context.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
+  end
+
+  def add_discussions(context)
+    context.resources :discussion_topics, :collection => {:reorder => :post} do |topic|
+      topic.permissions 'permissions', :controller => 'discussion_topics', :action => 'permissions'
+    end
+    context.resources :discussion_entries
+  end
+
+  def add_wiki(context)
+    context.resources :wiki_pages, :as => 'wiki' do |wiki_page|
+      wiki_page.latest_version_number 'revisions/latest', :controller => 'wiki_page_revisions', :action => 'latest_version_number'
+      wiki_page.resources :wiki_page_revisions, :as => "revisions"
+      wiki_page.resources :wiki_page_comments, :as => "comments"
+    end
+    context.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
+  end
+
+  def add_conferences(context)
+    context.resources :conferences do |conference|
+      conference.join "join", :controller => "conferences", :action => "join"
+      conference.close "close", :controller => "conferences", :action => "close"
+      conference.settings "settings", :controller => "conferences", :action => "settings"
     end
   end
 
@@ -68,12 +145,10 @@ ActionController::Routing::Routes.draw do |map|
     course.unconclude 'unconclude', :controller => 'courses', :action => 'unconclude'
     course.students 'students', :controller => 'courses', :action => 'students'
     course.enrollment_invitation 'enrollment_invitation', :controller => 'courses', :action => 'enrollment_invitation'
-    course.users 'users', :controller => 'context', :action => 'roster'
-    course.user_services 'user_services', :controller => 'context', :action => 'roster_user_services'
-    course.user_usage 'users/:user_id/usage', :controller => 'context', :action => 'roster_user_usage'
+    add_users(course) do
+      course.prior_users 'users/prior', :controller => 'context', :action => 'prior_users'
+    end
     course.statistics 'statistics', :controller => 'courses', :action => 'statistics'
-    course.prior_users 'users/prior', :controller => 'context', :action => 'prior_users'
-    course.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
     course.unenroll 'unenroll/:id', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
     course.move_enrollment 'move_enrollment/:id', :controller => 'courses', :action => 'move_enrollment', :conditions => {:method => :post}
     course.formatted_unenroll 'unenroll/:id.:format', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
@@ -127,17 +202,11 @@ ActionController::Routing::Routes.draw do |map|
     course.grades "grades", :controller => 'gradebooks', :action => 'grade_summary', :id => nil
     course.grading_rubrics "grading_rubrics", :controller => 'gradebooks', :action => 'grading_rubrics'
     course.student_grades "grades/:id", :controller => 'gradebooks', :action => 'grade_summary'
-    course.resources :announcements
-    course.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
-    course.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
-    course.chat 'chat', :controller => 'context', :action => 'chat'
-    course.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
+    add_announcements(course)
+    add_chat(course)
     course.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     course.locks 'locks', :controller => 'courses', :action => 'locks'
-    course.resources :discussion_topics, :collection => {:reorder => :post} do |topic|
-      topic.permissions 'permissions', :controller => 'discussion_topics', :action => 'permissions'
-    end
-    course.resources :discussion_entries
+    add_discussions(course)
     course.resources :assignments, :collection => {:syllabus => :get, :submissions => :get}, :member => {:update_submission => :any} do |assignment|
       assignment.resources :submissions do |submission|
         submission.turnitin_report 'turnitin/:asset_string', :controller => 'submissions', :action => 'turnitin_report'
@@ -163,36 +232,11 @@ ActionController::Routing::Routes.draw do |map|
     end
     course.resources :submissions
     course.resources :calendar_events
-    course.resources :chats
-    course.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
-      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-      file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
-      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
-      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
-      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
-      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    end
-    course.images 'images', :controller => 'files', :action => 'images'
-    course.relative_file_path "file_contents/:file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    course.resources :folders do |folder|
-      folder.download 'download', :controller => 'folders', :action => 'download'
-    end
-    course.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
-    course.resources :wiki_pages, :as => 'wiki' do |wiki_page|
-      wiki_page.latest_version_number 'revisions/latest', :controller => 'wiki_page_revisions', :action => 'latest_version_number'
-      wiki_page.resources :wiki_page_revisions, :as => "revisions"
-      wiki_page.resources :wiki_page_comments, :as => "comments"
-    end
-    course.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
-    course.resources :conferences do |conference|
-      conference.join "join", :controller => "conferences", :action => "join"
-      conference.close "close", :controller => "conferences", :action => "close"
-      conference.settings "settings", :controller => "conferences", :action => "settings"
-    end
-
-    course.resources :question_banks, &question_bank_resources
-
+    add_files(course, :relative => true, :images => true, :folders => true)
+    add_groups(course)
+    add_wiki(course)
+    add_conferences(course)
+    add_question_banks(course)
     course.quizzes_publish 'quizzes/publish', :controller => 'quizzes', :action => 'publish'
     course.resources :quizzes do |quiz|
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
@@ -255,11 +299,7 @@ ActionController::Routing::Routes.draw do |map|
     course.confirm_action 'confirm_action', :controller => 'courses', :action => 'confirm_action'
     course.start_copy 'copy', :controller => 'courses', :action => 'copy', :conditions => {:method => :get}
     course.copy_course 'copy', :controller => 'courses', :action => 'copy_course', :conditions => {:method => :post}
-    course.media_download 'media_download', :controller => 'users', :action => 'media_download'
-    course.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
-    course.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
-    course.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
-    course.group_assign_unassigned_members 'group_assign_unassigned_members', :controller => 'groups', :action => 'assign_unassigned_members', :conditions => { :method => :post }
+    add_media(course)
     course.user_notes 'user_notes', :controller => 'user_notes', :action => 'user_notes'
     course.switch_role 'switch_role/:role', :controller => 'courses', :action => 'switch_role'
     course.sis_publish_status 'details/sis_publish', :controller => 'courses', :action => 'sis_publish_status', :conditions => {:method => :get}
@@ -332,54 +372,21 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :groups do |group|
-    group.users 'users', :controller => 'context', :action => 'roster'
-    group.user_services 'user_services', :controller => 'context', :action => 'roster_user_services'
-    group.user_usage 'users/:user_id/usage', :controller => 'context', :action => 'roster_user_usage'
-    group.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
+    add_users(group)
     group.remove_user 'remove_user/:id', :controller => 'groups', :action => 'remove_user', :conditions => {:method => :delete}
     group.add_user 'add_user', :controller => 'groups', :action => 'add_user'
     group.members 'members.:format', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
     group.members 'members', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
-    group.resources :announcements
-    group.resources :discussion_topics, :collection => {:reorder => :post} do |topic|
-      topic.permissions 'permissions', :controller => 'discussion_topics', :action => 'permissions'
-    end
-    group.resources :discussion_entries
+    add_announcements(group)
+    add_discussions(group)
     group.resources :calendar_events
-    group.resources :chats
-    group.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
-    group.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
+    add_chat(group)
     group.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    group.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
-      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-      file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
-      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
-      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
-      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
-      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    end
+    add_files(group, :images => true, :folders => true)
     group.resources :external_tools, :only => [:show], :collection => {:retrieve => :get}
-    group.images 'images', :controller => 'files', :action => 'images'
-    group.resources :folders do |folder|
-      folder.download 'download', :controller => 'folders', :action => 'download'
-    end
-    group.resources :wiki_pages, :as => 'wiki' do |wiki_page|
-      wiki_page.latest_version_number 'revisions/latest', :controller => 'wiki_page_revisions', :action => 'latest_version_number'
-      wiki_page.resources :wiki_page_revisions, :as => "revisions"
-      wiki_page.resources :wiki_page_comments, :as => "comments"
-    end
-    group.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
-    group.resources :conferences do |conference|
-      conference.join "join", :controller => "conferences", :action => "join"
-      conference.close "close", :controller => "conferences", :action => "close"
-      conference.settings "settings", :controller => "conferences", :action => "settings"
-    end
-    group.chat 'chat', :controller => 'context', :action => 'chat'
-    group.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
-
-    group.media_download 'media_download', :controller => 'users', :action => 'media_download'
-    group.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
+    add_wiki(group)
+    add_conferences(group)
+    add_media(group)
     group.resources :collaborations
     group.resources :short_messages
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
@@ -409,7 +416,7 @@ ActionController::Routing::Routes.draw do |map|
     account.delete_user 'users/:user_id', :controller => 'accounts', :action => 'remove_user', :conditions => {:method => :delete}
     account.resources :users
     account.resources :account_notifications, :only => [:create, :destroy]
-    account.resources :announcements
+    add_announcements(account)
     account.resources :assignments
     account.resources :submissions
     account.resources :account_authorization_configs
@@ -422,7 +429,7 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :external_tools do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
-    account.resources :chats
+    add_chat(account)
     account.user_outcomes_results 'outcomes/users/:user_id', :controller => 'outcomes', :action => 'user_outcome_results'
     account.resources :outcomes, :collection => {:list => :get, :add_outcome => :post} do |outcome|
       outcome.results 'results', :controller => 'outcomes', :action => 'outcome_results'
@@ -437,33 +444,17 @@ ActionController::Routing::Routes.draw do |map|
       association.resources :rubric_assessments, :as => 'assessments'
     end
     account.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    account.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
-      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-      file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
-      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
-      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
-      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
-      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    end
-    account.relative_file_path "file_contents/:file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    account.resources :folders do |folder|
-      folder.download 'download', :controller => 'folders', :action => 'download'
-    end
-    account.media_download 'media_download', :controller => 'users', :action => 'media_download'
-    account.typed_media_download 'media_download.:type', :controller => 'users', :action => 'media_download'
-    account.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
+    add_files(account, :relative => true, :images => true, :folders => true)
+    add_media(account)
+    add_groups(account)
     account.resources :outcomes
-    account.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
-    account.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
-    account.group_assign_unassigned_members 'group_assign_unassigned_members', :controller => 'groups', :action => 'assign_unassigned_members', :conditions => { :method => :post }
     account.courses 'courses', :controller => 'accounts', :action => 'courses'
     account.courses_formatted 'courses.:format', :controller => 'accounts', :action => 'courses'
     account.courses_redirect 'courses/:id', :controller => 'accounts', :action => 'courses_redirect'
     account.user_notes 'user_notes', :controller => 'user_notes', :action => 'user_notes'
     account.run_report 'run_report', :controller => 'accounts', :action => 'run_report'
     account.resources :alerts
-    account.resources :question_banks, &question_bank_resources
+    add_question_banks(account)
     account.resources :user_lists, :only => :create
   end
   map.avatar_image 'images/users/:user_id', :controller => 'info', :action => 'avatar_image_url', :conditions => {:method => :get}
@@ -491,16 +482,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users do |user|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
-    user.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
-      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-      file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
-      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
-      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
-      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
-      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    end
-    user.images 'images', :controller => 'files', :action => 'images'
+    add_files(user, :images => true)
     user.resources :page_views, :only => [:index]
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -512,7 +494,7 @@ ActionController::Routing::Routes.draw do |map|
       association.invite_assessor "invite", :controller => "rubric_assessments", :action => "invite"
       association.resources :rubric_assessments, :as => 'assessments'
     end
-    user.resources :pseudonyms
+    user.resources :pseudonyms, :except => %w(index)
     user.resources :question_banks, :only => [:index]
     user.assignments_needing_grading 'assignments_needing_grading', :controller => 'users', :action => 'assignments_needing_grading'
     user.assignments_needing_submitting 'assignments_needing_submitting', :controller => 'users', :action => 'assignments_needing_submitting'
@@ -547,15 +529,7 @@ ActionController::Routing::Routes.draw do |map|
   # Thought this idea of having dashboard-scoped urls was a good idea at the
   # time... now I'm not as big a fan.
   map.resource :dashboard, :only => [] do |dashboard|
-    dashboard.resources :files, :only => [:index,:show], :collection => {:quota => :get} do |file|
-      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-      file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
-      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
-      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
-      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
-      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    end
+    add_files(dashboard)
     dashboard.close_notification 'account_notifications/:id', :controller => 'users', :action => 'close_notification', :conditions => {:method => :delete}
     dashboard.eportfolios "eportfolios", :controller => "eportfolios", :action => "user_index"
     dashboard.grades "grades", :controller => "users", :action => "grades"
@@ -739,6 +713,11 @@ ActionController::Routing::Routes.draw do |map|
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
     end
 
+    api.with_options(:controller => :pseudonyms) do |pseudonyms|
+      pseudonyms.get 'accounts/:account_id/logins', :action => :index, :path_name => 'pseudonyms'
+      pseudonyms.post 'accounts/:account_id/logins', :action => :create
+    end
+
     api.with_options(:controller => :accounts) do |accounts|
       accounts.get 'accounts', :action => :index, :path_name => :accounts
       accounts.get 'accounts/:id', :action => :show
@@ -766,7 +745,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.get 'conversations/find_recipients', :action => :find_recipients
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/:id', :action => :show
-      conversations.put 'conversations/:id', :action => :update # labels, subscribed-ness, workflow_state
+      conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
       conversations.delete 'conversations/:id', :action => :destroy
       conversations.post 'conversations/:id/add_message', :action => :add_message
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
@@ -794,6 +773,8 @@ ActionController::Routing::Routes.draw do |map|
       groups.get 'appointment_groups/:id', :action => :show, :path_name => 'appointment_group'
       groups.put 'appointment_groups/:id', :action => :update
       groups.delete 'appointment_groups/:id', :action => :destroy
+      groups.get 'appointment_groups/:id/users', :action => :users, :path_name => 'appointment_group_users'
+      groups.get 'appointment_groups/:id/groups', :action => :groups, :path_name => 'appointment_group_groups'
     end
   end
 

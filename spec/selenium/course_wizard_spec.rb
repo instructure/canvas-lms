@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "course wizard" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
+  before (:each) do
     setup_permissions(true, true, true)
   end
 
@@ -19,13 +19,9 @@ describe "course wizard" do
   end
 
   def start_course
-    expected_text = 'Unnamed'
+    expected_text = 'Course-101'
     course_with_teacher_logged_in
     get "/getting_started?fresh=1"
-    course_name = driver.find_element(:css, '#course_name')
-    short_course_name = driver.find_element(:css, '#course_course_code')
-    course_name.clear
-    short_course_name.clear
     expected_text
   end
 
@@ -57,13 +53,20 @@ describe "course wizard" do
     wait_for_ajax_requests
   end
 
-  def add_students
+  def add_students(students = VALID_EMAILS)
     expect {
-      fill_out_add_students_text(VALID_EMAILS)
+      fill_out_add_students_text(students)
       driver.find_element(:css, '.add_users_button').click
       wait_for_ajax_requests
-    }.to change(User, :count).by(VALID_EMAILS.size)
-    VALID_EMAILS.size
+    }.to change(User, :count).by(students.size)
+    students.size
+  end
+
+  def quick_create
+    expected_text = start_course
+    get "/getting_started/setup"
+    expect_new_page_load { driver.find_element(:css, '#publish_course_url').submit }
+    driver.find_element(:css, '#section-tabs-header').text.should == expected_text
   end
 
   it "should add an assignment to the course" do
@@ -138,6 +141,17 @@ describe "course wizard" do
     add_students
   end
 
+  it "should add students using valid user names" do
+    usernames = ['"Jones, Bob M." <bob@example.com>', '"Sorce, Jake M." <jake@example.com>', '"Groog, James S." <james@example.com>']
+
+    start_course
+    get "/getting_started/students"
+
+    #user name add
+    add_students(usernames)
+  end
+
+
   it "should add students and verify the removal a student" do
     start_course
     get "/getting_started/students"
@@ -166,11 +180,18 @@ describe "course wizard" do
   end
 
   it "should navigate directly to the last page, save course, and verify course creation" do
-    expected_text = 'Course-101'
-    start_course
-    get "/getting_started/setup"
-    expect_new_page_load { driver.find_element(:css, '#publish_course_url').submit }
-    driver.find_element(:css, '#section-tabs-header').text.should == expected_text
+    quick_create
+  end
+
+  it "should publish a course" do
+    quick_create
+    driver.find_element(:css, '.publish_course_in_wizard_link').click
+    wait_for_animations
+    driver.find_element(:css, '.wizard_options_list .publish_step').click
+    expect_new_page_load { driver.find_element(:css, '.details .edit_course').submit }
+    wizard_link = driver.find_element(:css, '.wizard_popup_link')
+    wizard_link.click if wizard_link.displayed?
+    driver.find_element(:css, '.wizard_content').should_not include_text('Publish')
   end
 
   it "should click the save and skip on the first page and verify course creation" do
