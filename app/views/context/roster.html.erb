@@ -37,6 +37,10 @@
   margin-left: 10px;
   font-size: 0.85em;
 }
+.roster div.avatar {
+  float: left; 
+  padding-right: 5px;
+}
 .fill_height_div {
   overflow: auto;
 }
@@ -51,8 +55,13 @@
       <table>
       <% @primary_users[@primary_users.keys.first].each do |student| %>
         <tr class="user" id="user_<%= student.id %>">
+          <td style="vertical-align: top;">
+            <% if service_enabled?(:avatars) %>
+              <div class="avatar"><%= avatar(student.id, @context.asset_string, 30) %></div>
+            <% end %>
+          </td>
           <td>
-            <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a>
+            <div><a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a></div>
             <% if can_do(@context, @current_user, :manage_students) %>
               <div class="more_info">
                 <div class="short_name"><%= student.short_name %></div>
@@ -64,6 +73,7 @@
                 <% end %>
               </div>
             <% end %>
+            <div style="clear: left;"></div>
           </td>
         </tr>
       <% end %>
@@ -77,8 +87,13 @@
       <table>
       <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
         <tr class="user" id="user_<%= teacher.id %>">
+          <td style="vertical-align: top;">
+            <% if service_enabled?(:avatars) %>
+              <div class="avatar"><%= avatar(teacher.id, @context.asset_string, 30) %></div>
+            <% end %>
+          </td>
           <td>
-            <a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a>
+            <div><a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a></div>
             <% if can_do(@context, @current_user, :manage_admin_users) %>
               <div class="more_info">
                 <div class="short_name"><%= teacher.short_name %></div>
@@ -90,6 +105,7 @@
                 <% end %>
               </div>
             <% end %>
+            <div style="clear: left;"></div>
           </td>
         </tr>
       <% end %>
