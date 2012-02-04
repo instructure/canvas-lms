@@ -1187,6 +1187,20 @@ class User < ActiveRecord::Base
   def avatar_approved?
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
+  
+  def self.avatar_key(user_id)
+    user_id = user_id.to_s
+    if !user_id.blank? && user_id != '0'
+      "#{user_id}-#{Canvas::Security.hmac_sha1(user_id)[0, 10]}"
+    else
+      "0"
+    end
+  end
+  
+  def self.user_id_from_avatar_key(key)
+    user_id, sig = key.to_s.split(/-/, 2)
+    (Canvas::Security.hmac_sha1(user_id.to_s)[0, 10] == sig) ? user_id : nil
+  end
 
   # Returns the LTI membership based on the LTI specs here: http://www.imsglobal.org/LTI/v1p1pd/ltiIMGv1p1pd.html#_Toc309649701
   def lti_role_types(context=nil)
@@ -1228,7 +1242,11 @@ class User < ActiveRecord::Base
     @avatar_url ||= gravatar_url(size, fallback) if avatar_setting == 'enabled'
     @avatar_url ||= fallback
   end
-
+  
+  def avatar_path
+    "/images/users/#{User.avatar_key(self.id)}"
+  end
+  
   named_scope :with_avatar_state, lambda{|state|
     if state == 'any'
       {

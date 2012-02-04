@@ -34,18 +34,6 @@ class InfoController < ApplicationController
     render :json => @domain_root_account && @domain_root_account.help_links
   end
 
-  def avatar_image_url
-    cancel_cache_buster
-    url = Rails.cache.fetch(Cacher.avatar_cache_key(params[:user_id])) do
-      user = User.find_by_id(params[:user_id]) if params[:user_id].present?
-      if user && service_enabled?(:avatars)
-        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback])
-      end
-      url ||= params[:fallback] || '/images/no_pic.gif'
-    end
-    redirect_to url
-  end
-
   def record_error
     error = params[:error] || {}
     error[:user_agent] = request.headers['User-Agent']

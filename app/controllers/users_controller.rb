@@ -900,6 +900,26 @@ class UsersController < ApplicationController
     end
   end
 
+  def avatar_image_url
+    cancel_cache_buster
+    # TODO: remove support for specifying user ids by id, require using
+    # the encrypted version. We can't do it right away because there are
+    # a bunch of places that will have cached fragments using the old
+    # style.
+    user_id = params[:user_id].to_i
+    if params[:user_id].present? && params[:user_id].match(/-/)
+      user_id = User.user_id_from_avatar_key(params[:user_id])
+    end
+    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id)) do
+      user = User.find_by_id(user_id) if user_id.present?
+      if user && service_enabled?(:avatars)
+        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback])
+      end
+      url ||= params[:fallback] || '/images/no_pic.gif'
+    end
+    redirect_to url
+  end
+
   protected
 
   def teacher_activity_report(teacher, course, student_enrollments)
@@ -950,5 +970,6 @@ class UsersController < ApplicationController
 
     data.values.sort_by { |e| e[:enrollment].user.sortable_name.downcase }
   end
+  
 
 end

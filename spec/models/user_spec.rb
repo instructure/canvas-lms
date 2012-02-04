@@ -1338,4 +1338,34 @@ describe User do
       end
     end
   end
+  describe "avatar_key" do
+    it "should return a valid avatar key for a valid user id" do
+      User.avatar_key(1).should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
+      User.avatar_key("1").should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
+      User.avatar_key("2").should == "2-#{Canvas::Security.hmac_sha1('2')[0,10]}"
+      User.avatar_key("161612461246").should == "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0,10]}"
+    end
+    it" should return '0' for an invalid user id" do
+      User.avatar_key(nil).should == "0"
+      User.avatar_key("").should == "0"
+      User.avatar_key(0).should == "0"
+    end
+  end
+  describe "user_id_from_avatar_key" do
+    it "should return a valid user id for a valid avatar key" do
+      User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')[0,10]}").should == '1'
+      User.user_id_from_avatar_key("2-#{Canvas::Security.hmac_sha1('2')[0,10]}").should == '2'
+      User.user_id_from_avatar_key("1536394658-#{Canvas::Security.hmac_sha1('1536394658')[0,10]}").should == '1536394658'
+    end
+    it "should return nil for an invalid avatar key" do
+      User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')}").should == nil
+      User.user_id_from_avatar_key("1").should == nil
+      User.user_id_from_avatar_key("2-123456").should == nil
+      User.user_id_from_avatar_key("a").should == nil
+      User.user_id_from_avatar_key(nil).should == nil
+      User.user_id_from_avatar_key("").should == nil
+      User.user_id_from_avatar_key("-").should == nil
+      User.user_id_from_avatar_key("-159135").should == nil
+    end
+  end
 end

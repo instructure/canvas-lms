@@ -40,7 +40,7 @@ module Api::V1::User
         end
       end
       if service_enabled?(:avatars) && includes.include?('avatar_url')
-        json["avatar_url"] = avatar_image_url(user.id)
+        json["avatar_url"] = avatar_image_url(User.avatar_key(user.id))
       end
     end
   end

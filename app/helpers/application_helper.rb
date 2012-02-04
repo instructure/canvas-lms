@@ -153,7 +153,7 @@ module ApplicationHelper
     if session["reported_#{user_id}"]
       image_tag "no_pic.gif"
     else
-      image_tag(avatar_image_url(user_id || 0), :style => "height: #{height}px;", :alt => '')
+      image_tag(avatar_image_url(User.avatar_key(user_id || 0)), :style => "height: #{height}px;", :alt => '')
     end
   end
 
