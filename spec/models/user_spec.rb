@@ -1059,7 +1059,7 @@ describe User do
 
     it "should return a useful avatar_fallback_url" do
       User.avatar_fallback_url.should ==
-        "https://#{HostUrl.default_host}/images/no_pic.gif"
+        "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath").should ==
         "https://#{HostUrl.default_host}/somepath"
       User.avatar_fallback_url("//somedomain/path").should ==
@@ -1067,7 +1067,7 @@ describe User do
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
       User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :scheme => "http")).should ==
-        "http://foo/images/no_pic.gif"
+        "http://foo/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :scheme => "https")).should ==
         "https://bar/somepath"
       User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==

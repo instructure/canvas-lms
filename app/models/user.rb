@@ -1195,15 +1195,20 @@ class User < ActiveRecord::Base
   end
   
   def self.default_avatar_fallback
-    "/images/no_pic.gif"
+    "/images/messages/avatar-50.png"
   end
 
   def self.avatar_fallback_url(fallback=nil, request=nil)
     return fallback if fallback == '%{fallback}'
     if fallback and uri = URI.parse(fallback) rescue nil
       uri.scheme ||= request ? request.scheme : "https"
-      uri.host ||= request ? request.host : HostUrl.default_host.split(/:/)[0]
-      uri.port ||= request.port if request && ![80, 443].include?(request.port)
+      if request && !uri.host
+        uri.host = request.host
+        uri.port = request.port if ![80, 443].include?(request.port)
+      elsif !uri.host
+        uri.host = HostUrl.default_host.split(/:/)[0]
+        uri.port = HostUrl.default_host.split(/:/)[1]
+      end
       uri.to_s
     else
       avatar_fallback_url(default_avatar_fallback, request)

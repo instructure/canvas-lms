@@ -950,6 +950,7 @@ class UsersController < ApplicationController
     # the encrypted version. We can't do it right away because there are
     # a bunch of places that will have cached fragments using the old
     # style.
+    return redirect_to(params[:fallback] || '/images/no_pic.gif') unless service_enabled?(:avatars)
     user_id = params[:user_id].to_i
     if params[:user_id].present? && params[:user_id].match(/-/)
       user_id = User.user_id_from_avatar_key(params[:user_id])
@@ -964,7 +965,7 @@ class UsersController < ApplicationController
       end
     end
     fallback = User.avatar_fallback_url(params[:fallback], request)
-    redirect_to url.blank? ?
+    redirect_to (url.blank? || url == "%{fallback}") ?
       fallback :
       url.sub(CGI.escape("%{fallback}"), CGI.escape(fallback))
   end
