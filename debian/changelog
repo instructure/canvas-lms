@@ -1,3 +1,116 @@
+canvas-lms (2012.02.04.08.17) stable; urgency=low
+
+  * Package ref: 4e5da67039c4bba95bcc5104a8d6937e11462399
+  *
+  * [+f491308] drop unused user.creation_* columns
+  * [+c2ffd6e] drop unused sis sticky columns
+  * [+c0c1234] modify keep_trying_until application in gradebook2 selenium test
+  * [+a88e568] fix spec
+  * [+cc06e7e] add option to send notifications for quizzes. fixes #2416.
+  * [+c2d5813] generated en.yml for translation
+  * [+770f916] DRYed common routes
+  * [+22306b5] more efficient User#messageable_users
+  * [+3cbedb6] gradebook2 selenium fix
+  * [+c82a68a] fix spec to make sure not still hovering tab
+  * [+64d5f57] adding more selenium course specs
+  * [+f48f3d1] selenium main links and course links tests
+  * [+7e97621] store sis_batch_id as an integer, not a string
+  * [+eb744ac] include site admin css and js in all sub-accounts. fixes #6760
+  * [+66dbd5e] adding to the context modules spec
+  * [+9f291a2] fix css3 transitions in firefox
+  * [+9cc4b29] update qti specs for the nokogiri update
+  * [+7027820] fix masquerading with shard-global ids refs #3520
+  * [+7f9e251] add domain to course_json html_url option. fixes #6768
+  * [+f49f2f0] only search active pseudonyms when finding an implicit sis pseudonym
+  * [+628e32b] don't flag urls starting with '/' as not relative
+  * [+7ccb815] get rid of a debugger
+  * [+28d57eb] don't do extra redirect in LDB popup window
+  * [+c1fe22a] adding student tests to the selenium courses spec
+  * [+4230e7d] adding student specs to discussion selenium spec
+  * [+453e7f6] return account_id from course api. fixes #6853
+  * [+857b767] adding student specs to the wiki and tiny selenium file
+  * [+89a1e42] don't redirect to /courses/X xhr to settings
+  * [+0399355] add pseudonym creation api. fixes #6841
+  * [+26df737] fix rounding issue in gradebook2, fixes: #6802
+  * [+208a24a] make section-to-show menu in gradebook2 update
+  * [+9e573d5] added user tests to selenium course settings spec
+  * [+887fea5] add pseudonym index api. fixes #6842
+  * [+ce95195] escape post values to turnitin
+  * [+bc37642] tests for discussion created with assignment
+  * [+3388429] don't show assignment's course name if you are there
+  * [+b8a56c6] added student test into courses selenium spec
+  * [+94bb1ef] add comments to crosslisting selenium spec to explain what's going on
+  * [+e39f4d7] adding more tests to the calendar2 selenium spec
+  * [+0c9121c] don't break the enter key on numerical quiz answers
+  * [+a81a4ea] add data model validation that a pseudonym has an account and user
+  * [+5f1ab7a] adding student tests to the collaboration selenium spec
+  * [+f15899d] adding to the assignments selenium spec
+  * [+317378f] straighten out course designer permissions
+  * [+39b5821] fix adding logins from user-in-account page
+  * [+d3afd88] remove base object from json error responses
+  * [+31f9b3f] explicitly use memoizeable in communication_channel
+  * [+c57a56a] don't store broadcast policy procs on AR objects
+  * [+4e3bec9] prevent duplicate key errors, fixes #6379
+  * [+d102d75] stubs for sharding specs
+  * [+6d54e83] populate middle_score of curveGradesDialog on open
+  * [+52d33b9] add ability to add designers on course settings page
+  * [+9f57359] fix gradebook2 "add a comment" spec
+  * [+e8c05e6] fix returning the correct pseudonym in the API
+  * [+b9b8381] fix intermittently failing selenium specs
+  * [+ea97390] fix include_ungraded_assignments behavior of gradebook2
+  * [+7acc8b9] make group conferences available to course admins, fixes #6681
+  * [+bf80ea4] handle MalformedCSV errors gracefully fixes #6814
+  * [+df391f3] i18n:check skip vendor/ except for vendor/plugins/
+  * [+7463327] upgrading selenium webdriver to 2.15.0
+  * [+1ecfa15] course_navigation typo in stylesheet
+  * [+db37920] hide discussions from observers; closes #6825
+  * [+8c95f27] flag selenium gradebook2 comment spec as pending
+  * [+4e95a0f] modified selenium specs for IE
+  * [+5ec76f2] fix sizing on external tool buttons
+  * [+95d9002] breaking up selenium wiki_spec
+  * [+d29b88b] updated selenium specs to use assert_flash_error and assert_flash_notice
+  * [+2bc8ebd] show muted assignment indicator in gradebook2
+  * [+5b67d4d] show outcomes from all associated accounts; fixes #6800
+  * [+929fea1] added js_env view/controller helper
+  * [+5adfc22] clean up wait_for_dom_ready in selenium files
+  * [+187b26b] selenium file cleanup
+  * [+3fa57b3] fix invitees visiting unpublished courses
+  * [+7edc8c7] unpublished quiz preview fixes #6528
+  * [+947e651] added resize_screen_to_default to wiki_and_tiny selenium spec
+  * [+d58dfaa] improve error reports categories query on postgres
+  * [+7179d02] cleaning up sleeps in manage_groups selenium  spec
+  * [+edf2e0a] clean up some unused and inefficient indexes
+  * [+0b1655e] conversation messages for submission comments, fixes #5443
+  * [+7215d2e] fixing some pending selenium tests
+  * [+c10b404] upgrade to selenium 2.17 webdriver
+  * [+7dac720] fix cross-shard-trusted-logins refs #6883
+  * [+bacc7a1] allow special account ids for contexts
+  * [+4a51ad5] add an extra implicit param to User#find_pseudonym_for_account and Pseudonym#works_for_account?
+  * [+d3bbb21] change error text on migration page to be more useful
+  * [+6ff8c1a] conversation stars; refs #6829
+  * [+756315b] remove freeform label support; fixes #6829
+  * [+c26d166] marking spec in file uploads as pending
+  * [+f26cafb] don't fail when copying/importing large courses
+  * [+8e199a1] conversation course filters, fixes #6827
+  * [+67a2a4e] true data migration for conversation tags and submission messages
+  * [+b6fcc6d] better error handling of bad conversation data
+  * [+5edd97a] migrate labels to stars
+  * [+ecf30f3] don't show the filter until everything in the scope is filterable
+  * [+ecf4669] fix up adding logins through the UI
+  * [+6ae971e] delay MediaObject creation from uploaded files
+  * [+1116e15] don't duplicate enrollments on sis import if all enrollments are deleted
+  * [+b29486d] fix uploading zipped assignment submissions
+  * [+a7e9826] temporarily keep track of users that choose to create an account
+  * [+b6f682f] allow open registration for delegated authentication fixes #6673
+  * [+9b785bf] find temporary invitations when visiting course pages fixes #7126
+  * [+c72af91] messaging from scheduler, fixes #6830
+  * [+5fa6070] allow description to be set on appointment group calendar events
+  * [+097d44a] don't create a new event when editing an existing event
+  * [+7dbafc7] notify teacher when appointment is cancelled
+  * [+4e5da67] include assignment_group_id in assignment_json
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 04 Feb 2012 08:17:27 -0700
+
 canvas-lms (2012.01.30.12.09) stable; urgency=low
 
   * Package ref: 7668e5b80ab8613e2dd7c193d5d2d8cf44f273ce
