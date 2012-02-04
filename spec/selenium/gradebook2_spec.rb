@@ -299,6 +299,24 @@ describe "gradebook2" do
       dom_names = driver.find_elements(:css, '.student-name').map(&:text)
       dom_names.should == [STUDENT_NAME_1, STUDENT_NAME_2]
     end
+  
+    it "should not show student avatars until they are enabled" do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      driver.find_elements(:css, '.student-name').length.should == 2
+      driver.find_elements(:css, '.avatar img').length.should == 0
+  
+      @account = Account.default
+      @account.enable_service(:avatars)
+      @account.save!
+      @account.service_enabled?(:avatars).should be_true
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      
+      driver.find_elements(:css, '.student-name').length.should == 2
+      driver.find_elements(:css, '.avatar img').length.should == 2
+    end
 
     it "should link to a student's grades page" do
       get "/courses/#{@course.id}/gradebook2"

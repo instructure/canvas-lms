@@ -211,6 +211,7 @@ class CoursesController < ApplicationController
   # Returns the list of sections for this course.
   #
   # @argument include[] [optional, "students"] Associations to include with the group.
+  # @argument include[] [optional, "avatar_url"] Include the avatar URLs for students returned.
   #
   # @response_field id The unique identifier for the course section.
   # @response_field name The name of the section.
@@ -237,6 +238,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       includes = Array(params[:include])
       include_students = includes.include?('students')
+      include_avatar_urls = includes.include?('avatar_url') || nil
 
       result = @context.active_course_sections.map do |section|
         res = section.as_json(:include_root => false,
@@ -250,7 +252,7 @@ class CoursesController < ApplicationController
             proxy = proxy.scoped(:include => :user)
           end
           res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
-            map { |e| user_json(e.user, @current_user, session) }
+            map { |e| user_json(e.user, @current_user, session, include_avatar_urls && ['avatar_url']) }
         end
         res
       end
@@ -482,7 +484,7 @@ class CoursesController < ApplicationController
     enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
     # Overwrite with the session enrollment, if one exists, and it's different than the current user's
     enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] && params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
-    # Look for enrollments to matching temporary users
+    # Look for enrollments to matching temporary users		
     enrollment ||= @current_user.temporary_invitations.find { |i| i.course_id == @context.id } if @current_user
     # Look up the explicitly provided invitation
     enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]]) unless params[:invitation].blank?
