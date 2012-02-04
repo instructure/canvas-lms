@@ -940,9 +940,13 @@ class Submission < ActiveRecord::Base
   
   def self.json_serialization_full_parameters(additional_parameters={})
     additional_parameters[:comments] ||= :submission_comments
+    includes = {:attachments => {}, :quiz_submission => {}}
+    if additional_parameters[:comments]
+      includes[additional_parameters[:comments]] = additional_parameters[:avatars] ? {:methods => [:avatar_path]} : {}
+    end
     res = {
-      :methods => [:scribdable?,:conversion_status,:scribd_doc,:formatted_body,:submission_history], 
-      :include => [:attachments,additional_parameters[:comments],:quiz_submission],
+      :methods => [:scribdable?,:conversion_status,:scribd_doc,:formatted_body,:submission_history],
+      :include => includes
     }.merge(additional_parameters || {})
     if additional_parameters[:except]
       additional_parameters[:except].each do |key|

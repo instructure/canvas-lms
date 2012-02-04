@@ -931,6 +931,7 @@ class UsersController < ApplicationController
 
   def avatar_image_url
     cancel_cache_buster
+    return redirect_to(params[:fallback] || '/images/no_pic.gif') unless service_enabled?(:avatars)
     # TODO: remove support for specifying user ids by id, require using
     # the encrypted version. We can't do it right away because there are
     # a bunch of places that will have cached fragments using the old

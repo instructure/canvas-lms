@@ -1045,7 +1045,7 @@ class Assignment < ActiveRecord::Base
     json
   end
 
-  def speed_grader_json(user)
+  def speed_grader_json(user, avatars=false)
     Attachment.skip_thumbnails = true
     res = as_json(
       :include => {
@@ -1054,9 +1054,10 @@ class Assignment < ActiveRecord::Base
       },
       :include_root => false
     )
+    avatar_methods = avatars ? [:avatar_path] : []
     visible_students = context.students_visible_to(user).uniq
     res[:context][:students] = visible_students.
-      map{|u| u.as_json(:include_root => false)}
+      map{|u| u.as_json(:include_root => false, :methods => avatar_methods)}
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = context.enrollments_visible_to(user).
@@ -1065,7 +1066,7 @@ class Assignment < ActiveRecord::Base
     res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
       s.as_json(:include_root => false,
         :include => {
-          :submission_comments => {},
+          :submission_comments => {:methods => avatar_methods},
           :attachments => {:except => :thumbnail_url},
           :rubric_assessment => {},
         },

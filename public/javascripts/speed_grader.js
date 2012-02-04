@@ -84,6 +84,7 @@ define([
       minimumWindowHeight = 500,
       $submissions_container = $("#submissions_container"),
       $iframe_holder = $("#iframe_holder"),
+      $avatar_image = $("#avatar_image"),
       $x_of_x_students = $("#x_of_x_students span"),
       $grded_so_far = $("#x_of_x_graded span:first"),
       $average_score = $("#average_score"),
@@ -947,6 +948,13 @@ define([
         if (!this.currentStudent || (this.currentStudent.id != student.id)) {
           $selectmenu.change();
         }
+        if(student.avatar_path) { 
+          // If there's any kind of delay in loading the user's avatar, it's
+          // better to show a blank image than the previous student's image.
+          $new_image = $avatar_image.clone();
+          $avatar_image.after($new_image.attr('src', student.avatar_path)).remove();
+          $avatar_image = $new_image;
+        }
       }
     },
 
@@ -1264,6 +1272,9 @@ define([
           // if(comment.anonymous) { comment.author_name = "Anonymous"; }
           var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
           $comment.find('span.comment').html(htmlEscape(comment.comment).replace(/\n/g, "<br />"));
+          if(comment.avatar_path) {
+            $comment.find(".avatar").attr('src', comment.avatar_path).show();
+          } 
           // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
           // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
           var commentIsDeleteableByMe = ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" || 

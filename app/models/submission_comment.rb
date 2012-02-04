@@ -183,6 +183,10 @@ class SubmissionComment < ActiveRecord::Base
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
   end
+  
+  def avatar_path
+    "/images/users/#{User.avatar_key(self.author_id)}"
+  end
 
   def send_to_conversations?
     !hidden? && submission.possible_participants_ids.include?(author_id)

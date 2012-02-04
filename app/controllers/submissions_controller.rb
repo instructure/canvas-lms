@@ -384,10 +384,10 @@ class SubmissionsController < ApplicationController
           excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
           comments_type = @context_enrollment.admin? ? :submission_comments : :visible_submission_comments
           format.json { 
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type).merge(:permissions => {:user => @current_user, :session => session, :include_permissions => false})), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type, :avatars => service_enabled?(:avatars)).merge(:permissions => {:user => @current_user, :session => session, :include_permissions => false})), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
           format.text { 
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type).merge(:permissions => {:user => @current_user, :session => session, :include_permissions => false})), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history], :comments => comments_type, :avatars => service_enabled?(:avatars)).merge(:permissions => {:user => @current_user, :session => session, :include_permissions => false})), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
         else
           @error_message = t('errors_update_failed', "Update Failed")
