@@ -246,21 +246,11 @@ Spec::Runner.configure do |config|
     user
   end
 
-  def course_with_student(opts={})
-    course(opts)
-    student_in_course(opts)
-  end
-
-  def course_with_student_logged_in(opts={})
-    course_with_student(opts)
-    user_session(@user)
-  end
-
-  def student_in_course(opts={})
-    @course ||= opts[:course] || course(opts)
-    @student = @user = opts[:user] || user(opts)
-    @enrollment = @course.enroll_student(@user)
-    @enrollment.course = @course
+  def course_with_user(enrollment_type, opts={})
+    @course = opts[:course] || course(opts)
+    @user = opts[:user] || user(opts)
+    @enrollment = @course.enroll_user(@user, enrollment_type)
+    @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
       @enrollment.save!
@@ -269,19 +259,41 @@ Spec::Runner.configure do |config|
     @enrollment
   end
 
+  def course_with_student(opts={})
+    course_with_user('StudentEnrollment', opts)
+    @student = @user
+    @enrollment
+  end
+
+  def course_with_student_logged_in(opts={})
+    course_with_student(opts)
+    user_session(@user)
+  end
+
+  def student_in_course(opts={})
+    opts[:course] = @course if @course && !opts[:course]
+    course_with_student(opts)
+  end
+
   def course_with_teacher(opts={})
-    @course = opts[:course] || course(opts)
-    @user = opts[:user] || user(opts)
+    course_with_user('TeacherEnrollment', opts)
     @teacher = @user
-    @enrollment = @course.enroll_teacher(@user)
-    # set the reverse association
-    @enrollment.course = @course
-    @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
     @enrollment
   end
 
   def course_with_teacher_logged_in(opts={})
     course_with_teacher(opts)
+    user_session(@user)
+  end
+
+  def course_with_observer(opts={})
+    course_with_user('ObserverEnrollment', opts)
+    @observer = @user
+    @enrollment
+  end
+
+  def course_with_observer_logged_in(opts={})
+    course_with_observer(opts)
     user_session(@user)
   end
 

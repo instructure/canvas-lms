@@ -38,6 +38,21 @@ describe SIS::CSV::Import do
     importer.errors.first.last.should == "Invalid UTF-8"
   end
 
+  it "should error files with invalid CSV headers " do
+    importer = process_csv_data(
+      "xlist_course_id,\"section_id,status"
+    )
+    importer.errors.first.last.should == "Malformed CSV"
+  end
+
+  it "should error files with invalid CSV" do
+    importer = process_csv_data(
+      "xlist_course_id,section_id,status",
+      "ABC2119_ccutrer_2012201_xlist,\"26076.20122"
+    )
+    importer.errors.first.last.should == "Malformed CSV"
+  end
+
   it "should work for a mass import" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",

@@ -15,7 +15,7 @@
     </div>
     <div class="data assignment_title ellipsis">
       <a href="<%= assignment_url %>" class="title" title="<%= assignment.try_rescue(:title) %>"><%= assignment.try_rescue(:title) %> <%= image_tag("sound_mute.png", :title => t(:student_mute_notification, "Instructor is working on grades")) if assignment && assignment.muted? %></a>
-      <div class="context_name"><a href="<%= url_for(context) %>" class="course_name <%= dom_id(context) %>"><%= context.name %></a></div>
+      <div class="context_name" style="<%= hidden if @just_viewing_one_course %>"><a href="<%= url_for(context) %>" class="course_name <%= dom_id(context) %>"><%= context.name %></a></div>
     </div>
     <div class="data assignment_due">
       <div class="date_text" style="<%= hidden unless assignment && assignment.due_at %>">

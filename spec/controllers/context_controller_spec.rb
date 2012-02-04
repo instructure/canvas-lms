@@ -48,6 +48,14 @@ describe ContextController do
       assigns[:teachers].should_not be_empty
       assigns[:teachers].should be_include(@teacher) #[0].should eql(@teacher)
     end
+
+    it "should not include designers as teachers" do
+      course_with_student_logged_in(:active_all => true)
+      @designer = user(:active_all => true)
+      @course.enroll_designer(@designer).accept!
+      get 'roster', :course_id => @course.id
+      assigns[:teachers].should_not be_include(@designer)
+    end
   end
   
   describe "GET 'roster_user'" do

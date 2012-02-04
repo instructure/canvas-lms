@@ -150,6 +150,9 @@ class CommunicationChannelsController < ApplicationController
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
+          if Canvas.redis_enabled? && @merge_opportunities.length == 1
+            Canvas.redis.rpush('single_user_registered_new_account_stats', {:user_id => @user.id, :registered_at => Time.now.utc }.to_json)
+          end
           @user.attributes = params[:user]
           @pseudonym.attributes = params[:pseudonym]
           @pseudonym.communication_channel = cc

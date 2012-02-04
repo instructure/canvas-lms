@@ -222,7 +222,7 @@ describe CalendarEvent do
       it "should notify admins when a user reserves" do
         reservation = @appointment.reserve_for(@user, @user)
         reservation.messages_sent.should be_include("Appointment Reserved By User")
-        reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
+        reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq.should eql @course.instructors.map(&:id).sort
       end
 
       it "should notify admins when a user cancels" do
@@ -230,7 +230,7 @@ describe CalendarEvent do
         reservation.updating_user = @student1
         reservation.destroy
         reservation.messages_sent.should be_include("Appointment Canceled By User")
-        reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq.should eql @course.admins.map(&:id).sort
+        reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq.should eql @course.instructors.map(&:id).sort
       end
     end
 
@@ -348,6 +348,17 @@ describe CalendarEvent do
       e.description.should eql "test<br/>\r\n123"
     end
 
+    it "should not copy group description if appointment is overridden" do
+      @appointment.description = "pizza party"
+      @appointment.save!
+
+      @ag.description = "boring meeting"
+      @ag.save!
+
+      @appointment.description.should == "pizza party"
+      @ag.description.should == "boring meeting"
+    end
+
     it "should copy the group attributes to subsequent appointments" do
       ag = AppointmentGroup.create(:title => "test", :context => @course)
       ag.update_attributes(
@@ -376,6 +387,13 @@ describe CalendarEvent do
       ag.reload.available_slots.should eql 1
       lambda { appointment.reserve_for(@student1, @student1) }.should_not raise_error
       ag.reload.available_slots.should eql 0
+    end
+
+    it "should always allow editing the description on an appointment" do
+      @appointment.update_attribute :workflow_state, "locked"
+      @appointment.description = "bacon"
+      @appointment.save!
+      @appointment.description.should == "bacon"
     end
   end
 

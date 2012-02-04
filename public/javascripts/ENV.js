@@ -16,19 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This module is the recommended way for providing contextual environment data
-// from a view to the browser environment.
-// Usage like:
-// <% js_block do %>
-//   require(['ENV'], function(ENV) {
-//     ENV.<controllerView> = {
-//       contextId: <%= @context.id %>
-//     };
-//   });
-// <% end %>
 define('ENV', function() {
-  if (typeof(ENV) === "undefined") {
-    ENV = {};
-  }
   return ENV;
 });

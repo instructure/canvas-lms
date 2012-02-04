@@ -19,42 +19,30 @@
 class ConversationParticipant < ActiveRecord::Base
   include Workflow
   include TextHelper
+  include SimpleTags
 
   belongs_to :conversation
   belongs_to :user
   has_many :conversation_message_participants
-  has_many :messages, :source => :conversation_message, :through => :conversation_message_participants,
-           :order => "created_at DESC, id DESC", :conditions => 'conversation_id = #{conversation_id}'
+  has_many :messages, :source => :conversation_message,
+           :through => :conversation_message_participants,
+           :select => "conversation_messages.*, conversation_message_participants.tags",
+           :order => "created_at DESC, id DESC",
+           :conditions => 'conversation_id = #{conversation_id}'
            # conditions are redundant, but they let us use the best index
 
   named_scope :visible, :conditions => "last_message_at IS NOT NULL"
   named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
   named_scope :unread, :conditions => "workflow_state = 'unread'"
   named_scope :archived, :conditions => "workflow_state = 'archived'"
-  named_scope :labeled, lambda { |label|
-    {:conditions => label ?
-      ["label = ?", label] :
-      ["label IS NOT NULL"]
-    }
-  }
+  named_scope :starred, :conditions => "label = 'starred'"
   delegate :private?, :to => :conversation
 
   before_update :update_unread_count
 
-  attr_accessible :subscribed, :label, :workflow_state
+  attr_accessible :subscribed, :starred, :workflow_state
 
-  def self.labels
-    (@labels ||= {})[I18n.locale] ||= [
-      ['red', I18n.t('labels.red', "Red")],
-      ['orange', I18n.t('labels.orange', "Orange")],
-      ['yellow', I18n.t('labels.yellow', "Yellow")],
-      ['green', I18n.t('labels.green', "Green")],
-      ['blue', I18n.t('labels.blue', "Blue")],
-      ['purple', I18n.t('labels.purple', "Purple")],
-    ]
-  end
-
-  validates_inclusion_of :label, :in => labels.map(&:first), :allow_nil => true
+  validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
     latest = options[:last_message] || messages.human.first
@@ -67,7 +55,7 @@ class ConversationParticipant < ActiveRecord::Base
       :message_count => message_count,
       :subscribed => subscribed?,
       :private => private?,
-      :label => label,
+      :starred => starred,
       :properties => properties(latest)
     }.with_indifferent_access
   end
@@ -90,17 +78,18 @@ class ConversationParticipant < ActiveRecord::Base
   def participants(options = {})
     options = {
       :include_context_info => true,
-      :include_forwarded_participants => false
+      :include_indirect_participants => false
     }.merge(options)
 
     context_info = {}
     participants = conversation.participants
-    if options[:include_forwarded_participants]
-      user_ids = messages.select{ |m|
-        m.forwarded_messages
-      }.map{ |m|
-        m.forwarded_messages.map(&:author_id)
-      }.flatten.uniq - participants.map(&:id)
+    if options[:include_indirect_participants]
+      user_ids =
+        messages.map(&:all_forwarded_messages).flatten.map(&:author_id) |
+        messages.map{
+          |m| m.submission.submission_comments.map(&:author_id) if m.submission
+        }.compact.flatten
+      user_ids -= participants.map(&:id)
       participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
     end
     return participants unless options[:include_context_info]
@@ -115,11 +104,6 @@ class ConversationParticipant < ActiveRecord::Base
   end
   memoize :participants
 
-  def infer_defaults
-    self.has_attachments = conversation.has_attachments?
-    self.has_media_objects = conversation.has_media_objects?
-  end
-
   def properties(latest = nil)
     latest ||= messages.human.first
     properties = []
@@ -129,12 +113,12 @@ class ConversationParticipant < ActiveRecord::Base
     properties
   end
 
-  def add_participants(user_ids)
-    conversation.add_participants(user, user_ids)
+  def add_participants(user_ids, options={})
+    conversation.add_participants(user, user_ids, options)
   end
 
   def add_message(body, options={}, &blk)
-    conversation.add_message(user, body, options.update(:generated => false), &blk)
+    conversation.add_message(user, body, options.merge(:generated => false), &blk)
   end
 
   def remove_messages(*to_delete)
@@ -166,7 +150,7 @@ class ConversationParticipant < ActiveRecord::Base
     super unless private?
     if subscribed_changed?
       if subscribed?
-        update_cached_data(false)
+        update_cached_data(:recalculate_count => false, :set_last_message_at => false, :regenerate_tags => false)
         self.workflow_state = 'unread' if last_message_at_changed? && last_message_at > last_message_at_was
       else
         self.workflow_state = 'read' if unread?
@@ -175,8 +159,16 @@ class ConversationParticipant < ActiveRecord::Base
     subscribed?
   end
 
-  def label=(label)
-    write_attribute(:label, label.present? ? label : nil)
+  def starred
+    read_attribute(:label) == 'starred'
+  end
+
+  def starred=(val)
+    # if starred were an actual boolean column, this is the method that would
+    # be used to convert strings to appropriate boolean values (e.g. 'true' =>
+    # true and 'false' => false)
+    val = ActiveRecord::ConnectionAdapters::Column.value_to_boolean(val)
+    write_attribute(:label, val ? 'starred' : nil)
   end
 
   def one_on_one?
@@ -197,23 +189,63 @@ class ConversationParticipant < ActiveRecord::Base
     state :archived
   end
 
-  private
-  def update_cached_data(recalculate_count=true)
+  def update_cached_data(options = {})
+    options = {:recalculate_count => true, :set_last_message_at => true, :regenerate_tags => true}.update(options)
     if latest = messages.human.first
-      self.message_count = messages.human.size if recalculate_count
-      self.last_message_at = latest.created_at
+      self.tags = message_tags if options[:regenerate_tags] && private?
+      self.message_count = messages.human.size if options[:recalculate_count]
+      self.last_message_at = if last_message_at.nil?
+        options[:set_last_message_at] ? latest.created_at : nil
+      elsif subscribed?
+        latest.created_at
+      else
+        # not subscribed, so set last_message_at to itself (or if that message
+        # was just removed to the closest one before it, or if none, the
+        # closest one after it)
+        times = messages.map(&:created_at)
+        older = times.reject!{ |t| t <= last_message_at} || []
+        older.first || times.reverse.first
+      end
       self.has_attachments = attachments.size > 0
       self.has_media_objects = messages.with_media_comments.size > 0
     else
+      self.tags = nil
       self.workflow_state = 'read' if unread?
       self.message_count = 0
       self.last_message_at = nil
       self.has_attachments = false
       self.has_media_objects = false
-      self.label = nil
+      self.starred = false
+    end
+    # note that last_authored_at doesn't know/care about messages you may
+    # have deleted... this is because it is only used by other participants
+    # when displaying the most active participants in the conversation.
+    # TODO: track visible_last_authored_at (from user's POV) for "By Me" filter
+    if options[:recalculate_last_authored_at]
+      my_latest = conversation.conversation_messages.human.first(:conditions => {:author_id => user_id})
+      self.last_authored_at = my_latest ? my_latest.created_at : nil
     end
   end
 
+  def update_cached_data!(*args)
+    update_cached_data(*args)
+    save!
+  end
+
+  def context_tags
+    read_attribute(:tags) ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
+  end
+
+  def infer_tags
+    conversation.infer_new_tags_for(self, []).first
+  end
+
+  protected
+  def message_tags
+    messages.map(&:tags).inject([], &:concat).uniq
+  end
+
+  private
   def update_unread_count
     if workflow_state_changed? && [workflow_state, workflow_state_was].include?('unread')
       User.update_all "unread_conversations_count = unread_conversations_count #{workflow_state == 'unread' ? '+' : '-'} 1, updated_at = '#{Time.now.to_s(:db)}'",

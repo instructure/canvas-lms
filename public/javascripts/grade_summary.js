@@ -246,12 +246,12 @@ I18n.scoped('gradebook', function(I18n) {
     });
     $("#grade_entry").keydown(function(event) {
       if(event.keyCode == 13) {
-        $(this).blur();
+        $(this)[0].blur();
       } else if(event.keyCode == 27) {
         var val = $(this).parents(".student_assignment")
           .addClass('dont_update')
           .find(".original_score").text();
-        $(this).val(val || "").blur();
+        $(this).val(val || "")[0].blur();
       }
     });
     $("#grades_summary .student_assignment").bind('score_change', function(event, update) {

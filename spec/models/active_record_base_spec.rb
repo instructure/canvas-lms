@@ -72,4 +72,133 @@ describe ActiveRecord::Base do
       User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM users) u GROUP BY #{conn.group_by('id', 'name')}"
     }.should_not raise_error
   end
+
+  context "unique_constraint_retry" do
+    before do
+      @user = user_model
+      @assignment = assignment_model
+      @orig_user_count = User.count
+    end
+
+    it "should normally run once" do
+      User.unique_constraint_retry do
+        User.create!
+      end
+      User.count.should eql @orig_user_count + 1
+    end
+
+    it "should run twice if it gets a UniqueConstraintViolation" do
+      Submission.create!(:user => @user, :assignment => @assignment)
+      tries = 0
+      User.unique_constraint_retry do
+        tries += 1
+        User.create!
+        Submission.create!(:user => @user, :assignment => @assignment)
+      end
+      Submission.count.should eql 1
+      tries.should eql 2
+      User.count.should eql @orig_user_count
+    end
+
+    it "should not cause outer transactions to roll back" do
+      Submission.create!(:user => @user, :assignment => @assignment)
+      User.transaction do
+        User.create!
+        User.unique_constraint_retry do
+          User.create!
+          Submission.create!(:user => @user, :assignment => @assignment)
+        end
+        User.create!
+      end
+      Submission.count.should eql 1
+      User.count.should eql @orig_user_count + 2
+    end
+
+    it "should not eat other ActiveRecord::StatementInvalid exceptions" do
+      lambda { User.unique_constraint_retry { User.connection.execute "this is not valid sql" } }.should raise_error(ActiveRecord::StatementInvalid)
+    end
+
+    it "should not eat any other exceptions" do
+      lambda { User.unique_constraint_retry { raise "oh crap" } }.should raise_error
+    end
+  end
+
+  context "add_polymorphs" do
+    class OtherPolymorphyThing; end
+    before :all do
+      # it already has :submission
+      ConversationMessage.add_polymorph_methods :asset, [:other_polymorphy_thing]
+    end
+    
+    before do
+      @conversation = Conversation.create
+      @user = user_model
+      @assignment = assignment_model
+    end
+
+    context "getter" do
+      it "should return the polymorph" do
+        sub = @user.submissions.create!(:assignment => @assignment)
+        m = @conversation.conversation_messages.build
+        m.asset = sub
+
+        m.submission.should be_an_instance_of(Submission)
+      end
+
+      it "should not return the polymorph if the type is wrong" do
+        m = @conversation.conversation_messages.build
+        m.asset = @user.submissions.create!(:assignment => @assignment)
+
+        m.other_polymorphy_thing.should be_nil
+      end
+    end
+
+    context "setter" do
+      it "should set the underlying association" do
+        m = @conversation.conversation_messages.build
+        s = @user.submissions.create!(:assignment => @assignment)
+        m.submission = s
+        
+        m.asset_type.should eql 'Submission'
+        m.asset_id.should eql s.id
+        m.asset.should eql s
+        m.submission.should eql s
+        
+        m.submission = nil
+
+        m.asset_type.should be_nil
+        m.asset_id.should be_nil
+        m.asset.should be_nil
+        m.submission.should be_nil
+      end
+
+      it "should not change the underlying association if it's another object and we're setting nil" do
+        m = @conversation.conversation_messages.build
+        s =  @user.submissions.create!(:assignment => @assignment)
+        m.submission = s
+        m.other_polymorphy_thing = nil
+
+        m.asset_type.should eql 'Submission'
+        m.asset_id.should eql s.id
+        m.asset.should eql s
+        m.submission.should eql s
+        m.other_polymorphy_thing.should be_nil
+      end
+    end
+  end
+
+  context "bulk_insert" do
+    it "should work" do
+      Course.connection.bulk_insert "courses", [
+        {:name => "foo"},
+        {:name => "bar"}
+      ]
+      Course.all.map(&:name).sort.should eql ["bar", "foo"]
+    end
+
+    it "should not raise an error if there are no records" do
+      lambda { Course.connection.bulk_insert "courses", [] }.should_not raise_error
+      Course.all.size.should eql 0
+    end
+  end
 end

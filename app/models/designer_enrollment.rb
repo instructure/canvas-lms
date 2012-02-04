@@ -17,7 +17,7 @@
 #
 
 class DesignerEnrollment < Enrollment
-  def admin?
+  def designer?
     true
   end
 end

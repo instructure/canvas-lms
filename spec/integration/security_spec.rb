@@ -910,6 +910,7 @@ describe "security" do
 
         add_permission :read_course_content
         add_permission :read_roster
+        add_permission :read_forum
 
         get "/courses/#{@course.id}"
         response.should be_success

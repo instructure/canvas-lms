@@ -28,9 +28,10 @@ class Quiz < ActiveRecord::Base
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :context
+    :require_lockdown_browser_for_results, :context, :notify_of_update
 
   attr_readonly :context_id, :context_type
+  attr_accessor :notify_of_update
   
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
   has_many :quiz_submissions, :dependent => :destroy
@@ -242,8 +243,9 @@ class Quiz < ActiveRecord::Base
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
         a.workflow_state = 'available' if a.deleted?
+        a.notify_of_update = @notify_of_update
         a.with_versioning(false) do
-          a.save
+          @notify_of_update ? a.save : a.save_without_broadcasting!
         end
         self.assignment_id = a.id
         Quiz.update_all({:assignment_id => a.id}, {:id => self.id})

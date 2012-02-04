@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "grading standards selenium tests" do
+describe "grading standards" do
   it_should_behave_like "in-process server selenium tests"
   
   it "should allow creating/deleting grading standards" do
@@ -32,6 +32,7 @@ shared_examples_for "grading standards selenium tests" do
   end
   
   it "should allow setting a grading standard for an assignment" do
+    skip_if_ie("Out of memory")
     course_with_teacher_logged_in
     
     @assignment = @course.assignments.create!(:title => "new assignment")
@@ -140,9 +141,5 @@ shared_examples_for "grading standards selenium tests" do
     wait_for_ajax_requests
     @standard.reload.data.length.should == 3
   end
-end
-
-describe "grading standards Windows-Firefox-Tests" do
-  it_should_behave_like "grading standards selenium tests"
 end
 

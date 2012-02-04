@@ -240,6 +240,29 @@ describe AccountsController do
     assigns[:associated_courses_count].should == 1
   end
 
+  context "special account ids" do
+    before do
+      account_with_admin_logged_in(:account => Account.site_admin)
+      @account = Account.create!
+      LoadAccount.stubs(:default_domain_root_account).returns(@account)
+    end
+
+    it "should allow self" do
+      get 'show', :id => 'self', :format => 'html'
+      assigns[:account].should == @account
+    end
+
+    it "should allow default" do
+      get 'show', :id => 'default', :format => 'html'
+      assigns[:account].should == Account.default
+    end
+
+    it "should allow site_admin" do
+      get 'show', :id => 'site_admin', :format => 'html'
+      assigns[:account].should == Account.site_admin
+    end
+  end
+
   describe "update" do
     it "should allow admins to set the sis_source_id on sub accounts" do
       account_with_admin_logged_in

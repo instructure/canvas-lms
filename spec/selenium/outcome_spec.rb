@@ -4,6 +4,7 @@ describe "learning outcome test" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should create a learning outcome with a new rating" do
+    skip_if_ie("Out of memory / Stack overflow")
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/outcomes"
 
@@ -18,7 +19,7 @@ describe "learning outcome test" do
     #add a new rating
     driver.find_element(:css, '#edit_outcome_form .add_rating_link').click
     rating_table = driver.find_element(:css, '#edit_outcome_form .rubric_criterion')
-    new_rating_row = rating_table.find_element(:css, 'tr:nth-child(6)')
+    new_rating_row = find_with_jquery('#edit_outcome_form .rubric_criterion tr:nth-child(6)')
     new_rating_row.find_element(:css, 'input.outcome_rating_description').clear
     new_rating_row.find_element(:css, 'input.outcome_rating_description').send_keys('New Expectation')
     new_rating_points = new_rating_row.find_element(:name, 'learning_outcome[rubric_criterion][ratings][5][description]')
@@ -65,7 +66,7 @@ describe "learning outcome test" do
     get "/courses/#{@course.id}/outcomes"
 
     #create rubric
-    driver.find_element(:css, '#right-side a:last-child').click
+    find_with_jquery('#right-side a:last-child').click
     driver.find_element(:css, '.add_rubric_link').click
     driver.find_element(:css, '#rubric_new input[name="title"]').send_keys('New Rubric')
 
@@ -76,7 +77,7 @@ describe "learning outcome test" do
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').clear
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').send_keys('important criterion')
     driver.find_element(:id, 'edit_criterion_form').submit
-    rating_row = driver.find_element(:css, '#criterion_1 td:nth-child(2) table tr')
+    rating_row = find_with_jquery('#criterion_1 td:nth-child(2) table tr')
     first_rating = rating_row.find_element(:css, '.edit_rating_link img').click
     rating_row.find_element(:css, '#edit_rating_form input[name="description"]').clear
     rating_row.find_element(:css, '#edit_rating_form input[name="description"]').send_keys('really good')
@@ -108,8 +109,8 @@ describe "learning outcome test" do
 
     #add second outcome
     driver.find_element(:css, '#rubric_new .find_outcome_link').click
-    driver.find_element(:css, '#find_outcome_criterion_dialog .outcomes_select:last-child').click
-    outcome_div = driver.find_element(:css, '#find_outcome_criterion_dialog table tr td.right .outcome_' + @second_outcome.id.to_s)
+    find_with_jquery('#find_outcome_criterion_dialog .outcomes_select:last-child').click
+    outcome_div = find_with_jquery('#find_outcome_criterion_dialog table tr td.right .outcome_' + @second_outcome.id.to_s)
     outcome_div.find_element(:css, '.select_outcome_link').click
     driver.find_element(:id, 'find_outcome_criterion_dialog').should_not be_displayed
     driver.find_element(:css, '#criterion_4 .learning_outcome_flag').should be_displayed
@@ -120,10 +121,9 @@ describe "learning outcome test" do
     wait_for_ajaximations
     driver.find_element(:css, '#rubrics .edit_rubric_link img').should be_displayed
     find_all_with_jquery('#rubrics tr.criterion:visible').size.should == 4
-    driver.find_element(:css, '#left-side .outcomes').click
-    driver.find_element(:link, "Outcomes").click
-    driver.find_element(:css, '#right-side a:last-child').click
+    expect_new_page_load { driver.find_element(:css, '#left-side .outcomes').click }
+    expect_new_page_load { driver.find_element(:link, "Outcomes").click }
+    find_with_jquery('#right-side a:last-child').click
     driver.find_element(:css, '#rubrics .details').should include_text('15')
   end
-
 end

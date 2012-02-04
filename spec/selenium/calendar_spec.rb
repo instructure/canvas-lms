@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "calendar selenium tests" do
+describe "calendar" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should not show students the description of an assignment that is locked" do
@@ -81,5 +81,4 @@ describe "calendar selenium tests" do
     wait_for_ajax_requests
     driver.find_element(:css, ".calendar_month .month_name").text.should_not == month_name
   end
-
 end
