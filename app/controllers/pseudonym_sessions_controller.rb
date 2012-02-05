@@ -125,11 +125,9 @@ class PseudonymSessionsController < ApplicationController
     end
 
     if !found && params[:pseudonym_session]
-      valid_alternatives = Shard.partition_by_shard(@domain_root_account.trusted_account_ids) do |account_ids|
-        Pseudonym.active.by_unique_id(params[:pseudonym_session][:unique_id]).find(:all, :conditions => { :account_id => account_ids }).select {|p|
-          p.valid_arbitrary_credentials?(params[:pseudonym_session][:password])
-        }
-      end
+      valid_alternatives = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).select {|p|
+        p.valid_arbitrary_credentials?(params[:pseudonym_session][:password])
+      }
       # only log them in if these credentials match a single user
       if valid_alternatives.map(&:user).uniq.length == 1
         # prefer a pseudonym from Site Admin if possible, otherwise just choose one
