@@ -724,4 +724,28 @@ class Enrollment < ActiveRecord::Base
   def enrollment_term
     self.course.enrollment_term
   end
+
+  def self.remove_duplicate_enrollments_from_sections
+    # clean up for enrollments that aren't unique on (user_id,
+    # course_section_id, type, associated_user_id)
+    #
+    # eventually we'll make this a db constraint, and we can drop this method,
+    # but that'll require some more code changes
+    deleted = 0
+    while true
+      pairs = self.connection.select_rows("
+          SELECT user_id, course_section_id, type, associated_user_id
+          FROM enrollments
+          WHERE sis_source_id IS NOT NULL
+          GROUP BY user_id, course_section_id, type, associated_user_id
+          HAVING count(*) > 1 LIMIT 50000")
+      break if pairs.empty?
+      pairs.each do |(user_id, course_section_id, type, associated_user_id)|
+        scope = self.scoped(:conditions => { :user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id })
+        keeper = scope.first(:select => "id, workflow_state", :order => 'sis_batch_id desc')
+        deleted += scope.delete_all(["id<>?", keeper.id]) if keeper
+      end
+    end
+    return deleted
+  end
 end
