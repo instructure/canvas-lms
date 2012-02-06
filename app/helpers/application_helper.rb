@@ -648,7 +648,7 @@ module ApplicationHelper
   end
 
   def include_account_js
-    includes = [Account.site_admin, @domain_root_account].inject([]) do |js_includes, account|
+    includes = [Account.site_admin, @domain_root_account].uniq.inject([]) do |js_includes, account|
       if account && account.settings[:global_includes] && account.settings[:global_javascript].present?
         js_includes << "'#{account.settings[:global_javascript]}'"
       end
