@@ -65,6 +65,7 @@ $(document).ready(function() {
       });
       $login.find(".links").addClass('passwordable');
       $("#login_information .login .delete_pseudonym_link").show();
+			$.flashMessage(I18n.t('save_succeeded', 'Save successful'));
     },
     error: function(data) {
       $(this).find("button").attr('disabled', false)

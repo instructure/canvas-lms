@@ -197,14 +197,14 @@ class PseudonymsController < ApplicationController
   # @arugment login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def update
     if api_request?
-      @pseudonym = Pseudonym.find(params[:id])
+      @pseudonym          = Pseudonym.find(params[:id])
       return unless @user = @pseudonym.user
+      params[:pseudonym]  = params[:login]
     else
       return unless get_user
       @pseudonym = @user.pseudonyms.find(params[:id])
     end
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
-    params[:pseudonym] = params[:login] if api_request?
     return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
     params[:pseudonym].delete :account_id
     params[:pseudonym].delete :unique_id unless @user.grants_right?(@current_user, nil, :manage_logins)
@@ -224,7 +224,7 @@ class PseudonymsController < ApplicationController
       end
     end
     # silently delete unallowed attributes
-    params[:pseudonym].delete_if { |k, v| ![:unique_id, :password, :sis_user_id].include?(k.to_sym) }
+    params[:pseudonym].delete_if { |k, v| ![:unique_id, :password, :password_confirmation, :sis_user_id].include?(k.to_sym) }
     # return 401 if psuedonyms is empty here, because it means that the user doesn't have permissions to do anything.
     return render(:json => nil, :status => :unauthorized) if params[:pseudonym].blank? && changed_sis_id
     if @pseudonym.update_attributes(params[:pseudonym])
