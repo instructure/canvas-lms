@@ -1656,13 +1656,14 @@ class Assignment < ActiveRecord::Base
     protected :partition_for_user
 
   # Infers the user, submission, and attachment from a filename
-  def infer_comment_context_from_filename(filename)
+  def infer_comment_context_from_filename(fullpath)
+    filename = File.basename(fullpath)
     split_filename = filename.split('_')
     # If the filename is like Richards_David_2_link.html, then there is no
     # useful attachment here.  The assignment was submitted as a URL and the
     # teacher commented directly with the gradebook.  Otherwise, grab that
     # last value and strip off everything after the first period.
-    user_id, attachment_id = split_filename.grep(/^\d+$/).last(2)
+    user_id, attachment_id = split_filename.grep(/^\d+$/).take(2)
     attachment_id = nil if split_filename.last =~ /^link/ || filename =~ /^\._/
 
     if user_id
@@ -1672,14 +1673,14 @@ class Assignment < ActiveRecord::Base
     attachment = Attachment.find_by_id(attachment_id) if attachment_id
 
     if !attachment || !submission
-      @ignored_files << filename
+      @ignored_files << fullpath
       return nil
     end
 
     {
       :user => user,
       :submission => submission,
-      :filename => filename,
+      :filename => fullpath,
       :display_name => attachment.display_name
     }
   end

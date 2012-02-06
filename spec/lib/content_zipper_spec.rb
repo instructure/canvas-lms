@@ -22,7 +22,8 @@ describe ContentZipper do
   describe "zip_assignment" do
     it "should zip up online_url submissions" do
       course_with_student(:active_all => true)
-      submission_model
+      @user.update_attributes!(:sortable_name => 'some_999_, _1234_guy')
+      submission_model :user => @user
       attachment = Attachment.new(:display_name => 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
@@ -33,6 +34,7 @@ describe ContentZipper do
       attachment.workflow_state.should == 'zipped'
       Zip::ZipFile.foreach(attachment.full_filename) do |f|
         if f.file?
+          f.name.should =~ /some-999-_-1234-guy/
           f.get_input_stream.read.should match(%r{This submission was a url, we're taking you to the url link now.})
           f.get_input_stream.read.should be_include("http://www.instructure.com/")
         end

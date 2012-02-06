@@ -1508,9 +1508,10 @@ describe Assignment do
 
       submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [attachment]
 
+      ignore_file = "/tmp/._why_macos_why.txt"
       @assignment.instance_variable_set :@ignored_files, []
-      @assignment.send(:infer_comment_context_from_filename, "grocery_list.txt").should be_nil
-      @assignment.instance_variable_get(:@ignored_files).should == ["grocery_list.txt"]
+      @assignment.send(:infer_comment_context_from_filename, ignore_file).should be_nil
+      @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
 
       filename = [@user.last_name_first, @user.id, attachment.id, attachment.display_name].join("_")
 
@@ -1520,7 +1521,7 @@ describe Assignment do
         :filename => filename,
         :display_name => attachment.display_name
       })
-      @assignment.instance_variable_get(:@ignored_files).should == ["grocery_list.txt"]
+      @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
     end
   end
 end
