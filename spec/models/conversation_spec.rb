@@ -383,6 +383,18 @@ describe Conversation do
         conversation.tags.should eql [@course.asset_string]
       end
 
+      it "should set initial empty tags on the conversation and conversation_participant" do
+        u1 = student_in_course.user
+        u2 = student_in_course(:course => @course).user
+        conversation = Conversation.initiate([u1.id, u2.id], true)
+        conversation.read_attribute(:tags).should_not be_nil
+        conversation.tags.should eql []
+        u1.all_conversations.first.read_attribute(:tags).should_not be_nil
+        u1.all_conversations.first.tags.should eql []
+        u2.all_conversations.first.read_attribute(:tags).should_not be_nil
+        u2.all_conversations.first.tags.should eql []
+      end
+
       it "should save all visible tags on the conversation_participant" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
