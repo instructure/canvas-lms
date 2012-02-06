@@ -25,39 +25,6 @@ shared_examples_for "file uploads selenium tests" do
     @course.reload
   end
 
-  it "should upload a file on the homework submissions page, even over quota" do
-    pending("ajax error")
-    a = @course.assignments.create!(:submission_types => "online_upload")
-
-    login_as(@student.email, @password)
-    @student.storage_quota = 1
-    @student.save
-
-    # and attempt some assignment submissions
-    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|
-      filename, fullpath, data = get_file(orig_filename)
-
-      # go to our new assignment page
-      get "/courses/#{@course.id}/assignments/#{a.id}"
-
-      driver.execute_script("$('.submit_assignment_link').click();")
-      keep_trying_until { driver.execute_script("return $('div#submit_assignment')[0].style.display") != "none" }
-      driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys(fullpath)
-      driver.find_element(:css, '#submit_online_upload_form #submit_file_button').click
-      keep_trying_until { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
-      link = driver.find_element(:css, "div.details a.forward")
-      link.text.should eql("Submission Details")
-
-      expect_new_page_load { link.click }
-      keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
-      in_frame('preview_frame') do
-        driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
-        wait_for_ajax_requests
-        keep_trying_until { driver.page_source =~ /#{Regexp.quote(data)}/ }
-      end
-    end
-  end
-
   it "should upload a file on the content import page" do
     skip_if_ie("s3 test fails due to javascript error")
     login_as(@teacher.email, @password)
@@ -92,6 +59,38 @@ describe "file uploads local tests" do
   end
   prepend_before (:all) do
     Setting.set("file_storage_test_override", "local")
+  end
+
+  it "should upload a file on the homework submissions page, even over quota" do
+    a = @course.assignments.create!(:submission_types => "online_upload")
+
+    login_as(@student.email, @password)
+    @student.storage_quota = 1
+    @student.save
+
+    # and attempt some assignment submissions
+    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|
+      filename, fullpath, data = get_file(orig_filename)
+
+      # go to our new assignment page
+      get "/courses/#{@course.id}/assignments/#{a.id}"
+
+      driver.execute_script("$('.submit_assignment_link').click();")
+      keep_trying_until { driver.execute_script("return $('div#submit_assignment')[0].style.display") != "none" }
+      driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys(fullpath)
+      driver.find_element(:css, '#submit_online_upload_form #submit_file_button').click
+      keep_trying_until { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
+      link = driver.find_element(:css, "div.details a.forward")
+      link.text.should eql("Submission Details")
+
+      expect_new_page_load { link.click }
+      keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
+      in_frame('preview_frame') do
+        driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
+        wait_for_ajax_requests
+        keep_trying_until { driver.page_source =~ /#{Regexp.quote(data)}/ }
+      end
+    end
   end
 
   it "should upload a file on the discussions page" do
