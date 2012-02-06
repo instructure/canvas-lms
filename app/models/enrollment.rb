@@ -775,7 +775,7 @@ class Enrollment < ActiveRecord::Base
           HAVING count(*) > 1 LIMIT 50000")
       break if pairs.empty?
       pairs.each do |(user_id, course_section_id, type, associated_user_id)|
-        scope = self.scoped(:conditions => { :user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id })
+        scope = self.scoped(:conditions => { :user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id }).scoped(:conditions => "sis_source_id IS NOT NULL")
         keeper = scope.first(:select => "id, workflow_state", :order => 'sis_batch_id desc')
         deleted += scope.delete_all(["id<>?", keeper.id]) if keeper
       end
