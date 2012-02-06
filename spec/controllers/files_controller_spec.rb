@@ -268,7 +268,7 @@ describe FilesController do
       @file.save!
       
       # turn off google docs previews for this acccount so we can isolate testing just scribd.
-      account = @module.context.account
+      account = Account.default
       account.disable_service(:google_docs_previews)
       account.save!
       

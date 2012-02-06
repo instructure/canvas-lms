@@ -690,37 +690,35 @@ class Account < ActiveRecord::Base
   end
 
   def self.site_admin
-    get_special_account('site_admin', 'Site Admin')
+    get_special_account(:site_admin, 'Site Admin')
   end
 
   def self.default
-    get_special_account('default', 'Default Account')
+    get_special_account(:default, 'Default Account')
+  end
+
+  def self.clear_special_account_cache!
+    @special_accounts = {}
   end
 
   def self.get_special_account(special_account_type, default_account_name)
+    @special_account_ids ||= {}
     @special_accounts ||= {}
 
-    if Rails.env.test?
-      # TODO: we have to do this because tests run in transactions. maybe it'd
-      # be good to create some sort of of memoize_if_safe method, that only
-      # memoizes when we're caching classes and not in test mode? I dunno. But
-      # this stinks.
-      @special_accounts[special_account_type] = Account.find_by_parent_account_id_and_name(nil, default_account_name)
-      return @special_accounts[special_account_type] ||= Account.create(:parent_account => nil, :name => default_account_name)
-    end
-
     account = @special_accounts[special_account_type]
-    return account if account
-    if (account_id = Setting.get("#{special_account_type}_account_id", nil)) && account_id.present?
-      account = Account.find_by_id(account_id)
+    unless account
+      special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
+      account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id) if special_account_id
     end
-    return @special_accounts[special_account_type] = account if account
-    # TODO i18n
-    t '#account.default_site_administrator_account_name', 'Site Admin'
-    t '#account.default_account_name', 'Default Account'
-    account = Account.create!(:name => default_account_name)
-    Setting.set("#{special_account_type}_account_id", account.id)
-    return @special_accounts[special_account_type] = account
+    unless account
+      # TODO i18n
+      t '#account.default_site_administrator_account_name', 'Site Admin'
+      t '#account.default_account_name', 'Default Account'
+      account = @special_accounts[special_account_type] = Account.create!(:name => default_account_name)
+      Setting.set("#{special_account_type}_account_id", account.id)
+      @special_account_ids[special_account_type] = account.id
+    end
+    account
   end
 
   def site_admin?

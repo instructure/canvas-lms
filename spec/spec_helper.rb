@@ -94,8 +94,14 @@ Spec::Runner.configure do |config|
 
   config.include Webrat::Matchers, :type => :views
 
+  config.before :all do
+    # so before(:all)'s don't get confused
+    Account.clear_special_account_cache!
+  end
+
   config.before :each do
     Time.zone = 'UTC'
+    Account.clear_special_account_cache!
     Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
     HostUrl.reset_cache!
