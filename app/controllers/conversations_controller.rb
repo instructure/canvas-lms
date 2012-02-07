@@ -523,13 +523,15 @@ class ConversationsController < ApplicationController
     elsif (params[:context] || params[:search]) && (context_types + ['user', nil]).include?(params[:type])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
+      rank_results = params[:search].present?
       contexts = params[:type] == 'user' ? [] : matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :type => params[:type]))
-      participants = context_types.include?(params[:type]) || @skip_users ? [] : matching_participants(options.merge(:exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
+      participants = context_types.include?(params[:type]) || @skip_users ? [] : matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
       if max_results
+        has_next_page = participants.size + contexts.size > max_results
+        contexts = contexts[0, max_results]
+        participants = participants[0, max_results].sort_by{ |u| u[:name].downcase } # can't sort until we lop off the extra one at the end
         if params[:type]
           recipients = contexts + participants
-          has_next_page = recipients.size > max_results
-          recipients = recipients[0, max_results]
           recipients.instance_eval <<-CODE
             def paginate(*args); self; end
             def next_page; #{has_next_page ? page + 1 : 'nil'}; end

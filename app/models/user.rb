@@ -2060,7 +2060,9 @@ class User < ActiveRecord::Base
         #{user_sql.join(' UNION ')}
       ) users
       GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
-      ORDER BY LOWER(COALESCE(short_name, name))
+      ORDER BY #{options[:rank_results] ? "(COUNT(course_id) + COUNT(group_id)) DESC," : ""}
+        LOWER(COALESCE(short_name, name)),
+        id
       #{options[:limit] && options[:limit] > 0 ? "LIMIT #{options[:limit].to_i}" : ""}
       #{options[:offset] && options[:offset] > 0 ? "OFFSET #{options[:offset].to_i}" : ""}
     SQL
