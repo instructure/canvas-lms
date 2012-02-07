@@ -57,6 +57,7 @@ class Conversation < ActiveRecord::Base
         conversation.private_hash = private_hash
         conversation.has_attachments = false
         conversation.has_media_objects = false
+        conversation.tags = []
         conversation.save!
         connection.bulk_insert('conversation_participants', user_ids.map{ |user_id|
           {
@@ -64,7 +65,8 @@ class Conversation < ActiveRecord::Base
             :user_id => user_id,
             :workflow_state => 'read',
             :has_attachments => false,
-            :has_media_objects => false
+            :has_media_objects => false,
+            :tags => ''
           }
         })
       end

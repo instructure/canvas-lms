@@ -26,7 +26,7 @@ describe "/profile/_notification_preference" do
     assigns[:user] = @user
     n = Notification.create!
     cc = @user.communication_channels.create!(:path => 'user@example.com')
-    pref = @user.notification_policies.create!(:notification => n, :communication_channel => cc)
+    pref = cc.notification_policies.create!(:notification => n)
     assigns[:notification_preference] = pref
     assigns[:email_channels] = []
     assigns[:other_channels] = []
