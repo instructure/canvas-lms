@@ -27,21 +27,30 @@ describe "courses" do
     end
 
     it "should open and close wizard after initial close" do
-      course_with_teacher_logged_in
+      def find_wizard_box
+        wizard_box = keep_trying_until do
+          wizard_box = driver.find_element(:id, "wizard_box")
+          wizard_box.should be_displayed
+          wizard_box
+        end
+        wizard_box
+      end
 
-      get "/getting_started?fresh=1"
+      course_with_teacher_logged_in
+      get "/getting_started"
 
       expect_new_page_load { driver.find_element(:css, ".save_button").click }
       wait_for_animations
-
-      checklist_button = driver.find_element(:css, '#course_show_secondary .wizard_popup_link')
-      if checklist_button.displayed?
-        checklist_button.click
-      end
+      wizard_box = find_wizard_box
+      wizard_box.find_element(:css, ".close_wizard_link").click
       wait_for_animations
-      wizard_box = driver.find_element(:css, ".wizard_content")
-      wizard_box.should be_displayed
+      wizard_box.should_not be_displayed
+      checklist_button = driver.find_element(:css, '.wizard_popup_link')
+      checklist_button.should be_displayed
+      checklist_button.click
+      wait_for_animations
       checklist_button.should_not be_displayed
+      wizard_box = find_wizard_box
       wizard_box.find_element(:css, ".close_wizard_link").click
       wait_for_animations
       wizard_box.should_not be_displayed
