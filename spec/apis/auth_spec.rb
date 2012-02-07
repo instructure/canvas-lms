@@ -379,6 +379,8 @@ describe "API Authentication", :type => :integration do
       course_with_teacher(:active_all => true)
       @course1 = @course
       course_with_student(:user => @user, :active_all => true)
+      user_with_pseudonym(:user => @student, :username => "blah@example.com")
+      @student_pseudonym = @pseudonym
       @course2 = @course
     end
 
@@ -390,14 +392,16 @@ describe "API Authentication", :type => :integration do
       json = api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@student.id}",
                :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => @student.id.to_param)
       assigns['current_user'].should == @student
+      assigns['current_pseudonym'].should == @student_pseudonym
       assigns['real_current_user'].should == @user
+      assigns['real_current_pseudonym'].should == @pseudonym
       json.should == {
         'id' => @student.id,
         'name' => 'User',
         'sortable_name' => 'User',
         'short_name' => 'User',
-        'primary_email' => nil,
-        'login_id' => 'student',
+        'primary_email' => "blah@example.com",
+        'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
 
@@ -413,8 +417,8 @@ describe "API Authentication", :type => :integration do
         'name' => 'User',
         'sortable_name' => 'User',
         'short_name' => 'User',
-        'primary_email' => nil,
-        'login_id' => 'student',
+        'primary_email' => "blah@example.com",
+        'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
 
@@ -428,8 +432,8 @@ describe "API Authentication", :type => :integration do
         'name' => 'User',
         'sortable_name' => 'User',
         'short_name' => 'User',
-        'primary_email' => nil,
-        'login_id' => 'student',
+        'primary_email' => "blah@example.com",
+        'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end
@@ -437,22 +441,22 @@ describe "API Authentication", :type => :integration do
     it "should allow sis_user_id as an as_user_id" do
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
-      @student.pseudonyms.create!(:account => Account.default, :unique_id => "nobody_sis@example.com", :password => "secret", :password_confirmation => "secret")
-      @student.pseudonym.update_attribute(:sis_user_id, "1234")
+      @student_pseudonym.update_attribute(:sis_user_id, "1234")
 
       json = api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:#{@student.pseudonym.sis_user_id}",
                :controller => "profile", :action => "show", :user_id => 'self', :format => 'json', :as_user_id => "sis_user_id:#{@student.pseudonym.sis_user_id.to_param}")
       assigns['current_user'].should == @student
+      assigns['real_current_pseudonym'].should == @pseudonym
       assigns['real_current_user'].should == @user
       json.should == {
         'id' => @student.id,
         'name' => 'User',
         'sortable_name' => 'User',
         'short_name' => 'User',
-        'primary_email' => nil,
-        'login_id' => 'nobody_sis@example.com',
         'sis_user_id' => '1234',
-        'sis_login_id' => 'nobody_sis@example.com',
+        'sis_login_id' => 'blah@example.com',
+        'primary_email' => "blah@example.com",
+        'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end

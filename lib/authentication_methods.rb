@@ -156,6 +156,8 @@ module AuthenticationMethods
       if user && user.can_masquerade?(@current_user, @domain_root_account)
         @real_current_user = @current_user
         @current_user = user
+        @real_current_pseudonym = @current_pseudonym
+        @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       elsif api_request?
         # fail silently for UI, but not for API
