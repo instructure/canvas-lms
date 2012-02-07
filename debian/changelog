@@ -1,3 +1,16 @@
+canvas-lms (2012.02.07.11.00) stable; urgency=low
+
+  * Package ref: a6af9e48789ba0b63a804a0e009db98bf623ec6d
+  *
+  * [+8bf11fd] Revert "fix cross-shard-trusted-logins refs #6883"
+  * [+32057f2] fix filter overlap issue, fixes #7177
+  * [+f84f714] always set conversation tags, even if empty, fixes #7178
+  * [+34856bb] remove duplicate sis imported enrollments
+  * [+5b69496] add missing sis_source_id not null scope
+  * [+a6af9e4] normalize user_id out of notification_policies
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 07 Feb 2012 11:01:20 -0700
+
 canvas-lms (2012.02.04.08.17) stable; urgency=low
 
   * Package ref: 4e5da67039c4bba95bcc5104a8d6937e11462399
