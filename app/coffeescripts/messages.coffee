@@ -914,6 +914,7 @@ define [
       $media_object = blank.clone(true).attr('id', 'media_comment_' + data.media_id)
       $media_object.find('span.title').html htmlEscape(data.display_name)
       $media_object.find('span.media_comment_id').html htmlEscape(data.media_id)
+      $media_object.find('.instructure_inline_media_comment').data('media_comment_type', data.media_type)
       $media_object
 
     build_attachment = (blank, data) ->
@@ -1603,7 +1604,7 @@ define [
 
       $('#action_media_comment').click (e) ->
         e.preventDefault()
-        $("#create_message_form .media_comment").mediaComment 'create', 'audio', (id, type) ->
+        $("#create_message_form .media_comment").mediaComment 'create', 'any', (id, type) ->
           $("#media_comment_id").val(id)
           $("#media_comment_type").val(type)
           $("#create_message_form .media_comment").show()

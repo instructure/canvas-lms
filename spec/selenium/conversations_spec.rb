@@ -30,24 +30,27 @@ describe "conversations" do
   end
 
   context "media comments" do
-    it "should add a media comment to the message form" do
+    it "should add audio and video comments to the message form" do
       # don't have a good way to test kaltura here, so we just fake it up
       Kaltura::ClientV3.expects(:config).at_least(1).returns({})
-      mo = MediaObject.new
-      mo.media_id = '0_12345678'
-      mo.media_type = 'audio'
-      mo.context = @user
-      mo.user = @user
-      mo.title = "test title"
-      mo.save!
 
-      new_conversation
+      ['audio', 'video'].each_with_index do |media_comment_type, index|
+        mo = MediaObject.new
+        mo.media_id = "0_12345678#{index}"
+        mo.media_type = media_comment_type
+        mo.context = @user
+        mo.user = @user
+        mo.title = "test title"
+        mo.save!
 
-      message = submit_message_form(:media_comment => [mo.media_id, mo.media_type])
-      message = "#message_#{message.id}"
+        new_conversation
 
-      find_all_with_jquery("#{message} .message_attachments li").size.should == 1
-      find_with_jquery("#{message} .message_attachments li a .title").text.should == mo.title
+        message = submit_message_form(:media_comment => [mo.media_id, mo.media_type])
+        message = "#message_#{message.id}"
+
+        find_all_with_jquery("#{message} .message_attachments li").size.should == 1
+        find_with_jquery("#{message} .message_attachments li a .title").text.should == mo.title
+      end
     end
   end
 

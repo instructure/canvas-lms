@@ -161,8 +161,14 @@ shared_examples_for "conversations selenium tests" do
       driver.find_element(:id, "create_message_form").submit
       wait_for_ajaximations
     }.to change(ConversationMessage, :count).by(1)
-
     message = ConversationMessage.last
+
+    # explicitly click on that conversation so it show's up,
+    # this is to compensate for a bug where creating a new message
+    # does not automatically show this conversation
+    driver.find_element(:id, "conversation_#{message.conversation_id}").click
+    wait_for_ajaximations
+
     driver.find_element(:id, "message_#{message.id}").should_not be_nil
     message
   end
