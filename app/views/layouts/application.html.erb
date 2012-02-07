@@ -8,7 +8,7 @@
     left_side_custom = yield :left_side_custom
     @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length)) 
   end
-  right_side = yield :right_side 
+  right_side = yield :right_side
   wizard = yield :wizard_box
   top_nav = yield :top_nav
   keyboard_navigation = yield :keyboard_navigation
@@ -26,9 +26,9 @@
 <head>
   <meta charset="utf-8">
   <title><%= yield :page_title || t('missing_page_title', "Add a page title here.") %></title>
-  <noscript> <meta http-equiv=refresh content="0; URL=/javascript-is-required.html" /> </noscript> 
+  <noscript> <meta http-equiv=refresh content="0; URL=/javascript-is-required.html" /> </noscript>
   <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
-  
+
   <%= yield :auto_discovery %>
   <% if @active_tab %>
     <style>
@@ -201,7 +201,7 @@
       <a href="http://www.instructure.com"><%= image_tag 'footer-logo.png', :alt => t('instructure_description', "Instructure, makers of the open source learning management system Canvas") %></a>
       <span id="footer-links">
         <% if Setting.get_cached("show_opensource_linkback", "false") == "true" %>
-          <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>      
+          <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>
         <% end %>
         <%= help_link %>
         <%= render :partial => 'shared/footer_links' %>
@@ -261,7 +261,7 @@
   ENV = <%= raw js_env.to_json %>;
 
   require = {
-    translate: true,
+    translate: <%= use_optimized_js? %>,
     baseUrl: '<%= js_base_url %>',
     paths: {
       common: 'compiled/bundles/common',

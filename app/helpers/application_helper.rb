@@ -300,6 +300,17 @@ module ApplicationHelper
     end
   end
 
+  # See `js_base_url`
+  def use_optimized_js?
+    if ENV['USE_OPTIMIZED_JS'] == 'true'
+      # allows overriding by adding ?debug_assets=1 to the url
+      !params[:debug_assets]
+    else
+      # allows overriding by adding ?optimized_js=1 to the url
+      params[:optimized_js]
+    end
+  end
+
   # Determines the location from which to load JavaScript assets
   #
   # uses optimized:
@@ -311,9 +322,7 @@ module ApplicationHelper
   #   * when ENV['USE_OPTIMIZED_JS'] is false
   #   * or when ?debug_assets=true is present in the url
   def js_base_url
-    # this is a pretty horrible one-liner to facilitate the url params
-    use_non_optimized = !ENV['USE_OPTIMIZED_JS'] ? !params[:optimized_js] : params[:debug_assets]
-    use_non_optimized ? '/javascripts' : '/optimized'
+    use_optimized_js? ? '/optimized' : '/javascripts'
   end
 
   def js_bundles; @js_bundles ||= []; end
