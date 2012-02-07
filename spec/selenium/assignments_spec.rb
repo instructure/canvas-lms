@@ -209,33 +209,4 @@ describe "assignments" do
       driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
     end
   end
-
-  context "rubric" do
-    before (:each) do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_all => true)
-      outcome_with_rubric
-      @assignment = @course.assignments.create(:name => 'assignment with rubric')
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-      @submission = @assignment.submit_homework(@student, {:url => "http://www.instructure.com/"})
-    end
-
-    it "should follow learning outcome ignore_for_scoring" do
-      @rubric.data[0][:ignore_for_scoring] = '1'
-      @rubric.points_possible = 5
-      @rubric.instance_variable_set('@outcomes_changed', true)
-      @rubric.save!
-      @assignment.points_possible = 5
-      @assignment.save!
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-      driver.find_element(:css, '.assess_submission_link').click
-      driver.find_element(:css, '.total_points_holder .assessing').should include_text "out of 5"
-      driver.find_element(:css, "#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
-      driver.find_element(:css, '.rubric_total').should include_text "5"
-      driver.find_element(:css, '.save_rubric_button').click
-      wait_for_ajaximations
-      driver.find_element(:css, '.grading_value').attribute(:value).should == "5"
-    end
-  end
 end

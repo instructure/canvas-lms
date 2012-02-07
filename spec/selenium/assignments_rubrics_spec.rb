@@ -20,17 +20,26 @@ describe "assignment rubrics" do
       )
     end
 
-    it "should add a new rubric to assignment" do
-      create_assignment_with_points(2)
-
+    it "should add a new rubric to assignment and verify assignment points" do
+      initial_points = 9
+      rubric_name = 'new rubric'
+      create_assignment_with_points(initial_points)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:css, '.rubric_title input[name="title"]').clear
-      driver.find_element(:css, '.rubric_title input[name="title"]').send_keys('new rubric')
-      driver.find_element(:id, 'edit_rubric_form').submit
-      wait_for_animations
-      driver.find_element(:css, '#rubrics .rubric .rubric_title .displaying .title').should include_text('new rubric')
+      replace_content(driver.find_element(:css, '.rubric_title input[name="title"]'), rubric_name)
+      driver.find_element(:css, '.add_criterion_link').click
+      driver.find_element(:id, 'grading_rubric').click
+      driver.find_element(:css, '#edit_rubric_form').submit
+      dialog_buttons = find_all_with_jquery('.ui-dialog:visible .ui-button')
+      dialog_buttons[0].click
+      wait_for_ajaximations
+      driver.find_element(:css, '#rubrics .rubric .rubric_title .displaying .title').should include_text(rubric_name)
+
+      #Commented out because we still want this test to run but this is the part where the bug is
+      #BUG 7193 - Rubric total overwrites assignment total despite choosing to leave them different
+        #get "/courses/#{@course.id}/assignments"
+        #driver.find_element(:css, '.points_text').should include_text(initial_points.to_s)
     end
 
     it "should import rubric to assignment" do
@@ -156,6 +165,29 @@ describe "assignment rubrics" do
       keep_trying_until { driver.find_element(:id, 'rubric_long_description_dialog').should be_displayed }
       driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
           text.should == "<b>This text should not be bold</b>"
+    end
+
+    it "should follow learning outcome ignore_for_scoring" do
+      student_in_course(:active_all => true)
+      outcome_with_rubric
+      @assignment = @course.assignments.create(:name => 'assignment with rubric')
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+      @submission = @assignment.submit_homework(@student, {:url => "http://www.instructure.com/"})
+      @rubric.data[0][:ignore_for_scoring] = '1'
+      @rubric.points_possible = 5
+      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.save!
+      @assignment.points_possible = 5
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      driver.find_element(:css, '.assess_submission_link').click
+      driver.find_element(:css, '.total_points_holder .assessing').should include_text "out of 5"
+      driver.find_element(:css, "#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
+      driver.find_element(:css, '.rubric_total').should include_text "5"
+      driver.find_element(:css, '.save_rubric_button').click
+      wait_for_ajaximations
+      driver.find_element(:css, '.grading_value').attribute(:value).should == "5"
     end
   end
 
