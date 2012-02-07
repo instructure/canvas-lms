@@ -54,7 +54,7 @@ describe "discussion assignments" do
     click_option(".assignment_submission_types", 'Discussion')
     expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
     edit_form = driver.find_element(:id, 'edit_assignment_form')
-    edit_form.should be_displayed
+    keep_trying_until { edit_form.should be_displayed }
     replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
     edit_form.find_element(:id, 'assignment_peer_reviews').click
     edit_form.submit
