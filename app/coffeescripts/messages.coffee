@@ -9,7 +9,6 @@ define [
   'jquery.instructure_jquery_patches'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-  'jquery.loadingImg'
   'jquery.disableWhileLoading'
   'jquery.rails_flash_notifications'
   'media_comments'
@@ -219,6 +218,7 @@ define [
 
     constructor: (@input, @url, @options={}) ->
       @stack = []
+      @fetchListAjaxRequests = []
       @query_cache = {}
       @container = $('<div />').addClass('autocomplete_menu')
       @menu = $('<div />').append(@list = @new_list())
@@ -233,6 +233,10 @@ define [
         @container.css('left', offset.left)
       $(window).resize @reposition
       @close()
+
+    abortRunningRequests: ->
+      req.abort() for req in @fetchListAjaxRequests
+      @fetchListAjaxRequests = []
 
     browse: (data) ->
       unless @ui_locked
@@ -350,9 +354,8 @@ define [
       false
 
     fetch_list: (options={}, @ui_locked=false) ->
-      clearTimeout @timeout if @timeout?
+      clearTimeout @timeout
       @timeout = setTimeout =>
-        delete @timeout
         post_data = @prepare_post(options.data ? {})
         this_query = JSON.stringify(post_data)
         if post_data.search is '' and not @list_expanded() and not options.data
@@ -365,15 +368,13 @@ define [
         else if @query_cache[this_query]
           @last_applied_query = this_query
           @last_search = post_data.search
-          @clear_loading()
+          @abortRunningRequests()
           @render_list(@query_cache[this_query], options, post_data)
           return
 
-        @set_loading()
-        $.ajaxJSON @url, 'POST', $.extend({}, post_data),
+        @fetchListAjaxRequests.push @load $.ajaxJSON @url, 'POST', $.extend({}, post_data),
           (data) =>
             @query_cache[this_query] = data
-            @clear_loading()
             if JSON.stringify(@prepare_post(options.data ? {})) is this_query # i.e. only if it hasn't subsequently changed (and thus triggered another call)
               @last_applied_query = this_query
               @last_search = post_data.search
@@ -383,31 +384,25 @@ define [
           ,
           (data) =>
             @ui_locked=false
-            @clear_loading()
       , 100
 
     add_by_user_id: (user_id, from_conversation_id) ->
-      @set_loading()
-      $.ajaxJSON @url, 'POST', { user_id: user_id, from_conversation_id: from_conversation_id },
-        (data) =>
-          @clear_loading()
-          @close()
-          user = data[0]
-          if user
-            @input.add_token
-              value: user.id
-              text: user.name
-              data: user
-        ,
-        (data) =>
-          @clear_loading()
-          @close()
+      success = (data) =>
+        @close()
+        user = data[0]
+        if user
+          @input.add_token
+            value: user.id
+            text: user.name
+            data: user
+
+      @load $.ajaxJSON( @url, 'POST', { user_id, from_conversation_id}, success, @close )
 
     open: ->
       @container.show()
       @reposition()
 
-    close: ->
+    close: =>
       @ui_locked = false
       @container.hide()
       delete @last_applied_query
@@ -554,14 +549,12 @@ define [
       $node.addClass('first') if options.first
       $node.addClass('last') if options.last
 
-    set_loading: ->
+    load: (deferred) ->
       unless @menu.is(":visible")
         @open()
         @list.find('ul').last().append($('<li class="message first last"></li>'))
-      @list.find('li').first().loadingImage()
-
-    clear_loading: ->
-      @list.find('li').first().loadingImage('remove')
+      @list.disableWhileLoading(deferred)
+      deferred
 
     render_list: (data, options={}, post_data={}) ->
       @open()
@@ -728,7 +721,6 @@ define [
           $('#recipients').data('token_input').selector.add_by_user_id(params.user_id, params.from_conversation_id)
         return
 
-      $form.loadingImage()
       $c = $selected_conversation
 
       completion = (data) ->
@@ -742,8 +734,7 @@ define [
         $messages.show()
         i = j = 0
         $message_list.append build_message(message) for message in data.messages
-        $form.loadingImage 'remove'
-        $message_list.hide().slideDown 'fast'
+        $message_list.show()
         if $selected_conversation.hasClass 'unread'
           # we've already done this server-side
           set_conversation_state $selected_conversation, 'read'
@@ -751,10 +742,8 @@ define [
       if params.data
         completion params.data
       else
-        $.ajaxJSON $selected_conversation.find('a.details_link').attr('href'), 'GET', {}, (data) ->
-          completion(data)
-        , ->
-          $form.loadingImage('remove')
+        url = $selected_conversation.find('a.details_link').attr('href')
+        $message_list.show().disableWhileLoading $.ajaxJSON(url, 'GET', {}, completion)
 
     MessageInbox.context_list = (contexts, with_url=false, limit=2) ->
       strcmp = (str_a, str_b) ->
@@ -1011,16 +1000,12 @@ define [
       options = $.extend(defaults, options)
 
       return unless options.before?(options.loading_node, options) ? true
-      options.loading_node?.loadingImage()
-      $.ajaxJSON options.url,
-        options.method,
-        options.data,
-        (data) ->
-          options.loading_node?.loadingImage 'remove'
+      ajaxRequest = $.ajaxJSON options.url, options.method, options.data
+        , (data) ->
           options.success?(options.loading_node, data)
         , (data) ->
-          options.loading_node?.loadingImage 'remove'
           options.error?(options.loading_node, data)
+      options.loading_node?.disableWhileLoading(ajaxRequest)
 
     add_conversation = (data, append) ->
       $('#no_messages').hide()
@@ -1308,11 +1293,9 @@ define [
       $form.formSubmit
         fileUpload: ->
           return $(this).find(".file_input:visible").length > 0
-        beforeSubmit: ->
-          $(this).loadingImage()
+        disableWhileLoading: true,
         success: (data) ->
           data = [data] unless data.length?
-          $(this).loadingImage 'remove'
           for conversation in data
             $conversation = $('#conversation_' + conversation.id)
             if $conversation.length
@@ -1326,7 +1309,6 @@ define [
         error: (data) ->
           $form.find('.token_input').errorBox(I18n.t('recipient_error', 'The course or group you have selected has no valid recipients'))
           $('.error_box').filter(':visible').css('z-index', 10) # TODO: figure out why this is necessary
-          $(this).loadingImage 'remove'
       $form.click ->
         toggle_message_actions off
 
@@ -1335,16 +1317,13 @@ define [
         e.stopImmediatePropagation() unless valid
         valid
       $add_form.formSubmit
-        beforeSubmit: ->
-          $(this).loadingImage()
+        disableWhileLoading: true,
         success: (data) ->
-          $(this).loadingImage 'remove'
           build_message(data.messages[0]).prependTo($message_list).slideDown 'fast'
           update_conversation($selected_conversation, data)
           reset_message_form()
           $(this).dialog('close')
         error: (data) ->
-          $(this).loadingImage 'remove'
           $(this).dialog('close')
 
 
@@ -1545,11 +1524,9 @@ define [
         e.stopImmediatePropagation() unless valid
         valid
       $forward_form.formSubmit
-        beforeSubmit: ->
-          $(this).loadingImage()
+        disableWhileLoading: true,
         success: (data) ->
           conversation = data[0]
-          $(this).loadingImage 'remove'
           $conversation = $('#conversation_' + conversation.id)
           if $conversation.length
             build_message(conversation.messages[0]).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
@@ -1560,7 +1537,6 @@ define [
           reset_message_form()
           $(this).dialog('close')
         error: (data) ->
-          $(this).loadingImage 'remove'
           $(this).dialog('close')
 
 
@@ -1618,7 +1594,7 @@ define [
       build_context_info = (data) ->
         match = data.id.match(/^(course|section)_(\d+)$/)
         termInfo = MessageInbox.contexts["#{match[1]}s"][match[2]] if match
-  
+
         context_info = data.context_name or ''
         context_info = if context_info.length < 40 then context_info else context_info.substr(0, 40) + '...'
         if termInfo?.term
@@ -1626,12 +1602,12 @@ define [
             "#{context_info} - #{termInfo.term}"
           else
             termInfo.term
-  
+
         if context_info
           $('<span />', class: 'context_info').text("(#{context_info})")
         else
           ''
-      
+
       # a little gimmick until we implement real ajax loading for filters. we
       # disable the inbox when a filter is changed (via dropdown or search).
       # that way it's more obvious stuff is loading and the user doesn't try
