@@ -804,6 +804,25 @@ describe User do
       @student.shared_contexts(@unrelated_user).should eql []
       @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
     end
+
+    it "should not rank results by default" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      # ordered by name (all the same), then id
+      @student.messageable_users.map(&:id).
+        should eql [@student.id, @this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
+    end
+
+    it "should rank results if requested" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      # ordered by rank, then name (all the same), then id
+      @student.messageable_users(:rank_results => true).map(&:id).
+        should eql [@this_section_user.id] + # two contexts (course and group)
+                   [@student.id, @this_section_teacher.id, @other_section_user.id, @other_section_teacher.id] # just the course
+    end
   end
   
   context "lti_role_types" do
