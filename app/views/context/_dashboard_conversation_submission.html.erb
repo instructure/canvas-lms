@@ -5,6 +5,7 @@
 <% comment_count = comments.size %>
 <% hide_message ||= false %>
 <% score = (submission.score && assignment.points_possible ? "#{submission.score} / #{submission.assignment.points_possible}" : submission.score) || t('not_scored', 'no score') %>
+<% if comment_count > 0 %>
 <div id="dashboard_conversation_message_<%= message.id %>" class="communication_sub_message submission <%= 'toggled_communication_sub_message' if hide_message %>">
   <div class="header">
     <div class="header_title">
@@ -39,3 +40,4 @@
   </div>
   <div class="clear"></div>
 </div>
+<% end %>
