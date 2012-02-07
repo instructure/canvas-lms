@@ -430,7 +430,7 @@ class DiscussionTopic < ActiveRecord::Base
   def set_assignment=(val); end
   
   def participants
-    ([self.user] + context.participants).uniq.select{|u| u}
+    ([self.user] + context.participants).compact.uniq
   end
   
   def active_participants
