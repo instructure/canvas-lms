@@ -738,7 +738,7 @@ class Submission < ActiveRecord::Base
   memoize :commenting_instructors
 
   def participating_instructors
-    commenting_instructors.present? ? commenting_instructors : context.instructors
+    commenting_instructors.present? ? commenting_instructors : context.participating_instructors.uniq
   end
 
   # ensure that conversations/messages are created/updated for all relevant
