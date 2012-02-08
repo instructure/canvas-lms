@@ -1,3 +1,11 @@
+canvas-lms (2012.02.08.15.05) stable; urgency=low
+
+  * Package ref: 4d11813d3d49e107b5a736a43f6a33d3da0e4fd0
+  *
+  * [+4d11813] always make submission comments as the current user
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 08 Feb 2012 15:05:41 -0700
+
 canvas-lms (2012.02.07.11.00) stable; urgency=low
 
   * Package ref: a6af9e48789ba0b63a804a0e009db98bf623ec6d
