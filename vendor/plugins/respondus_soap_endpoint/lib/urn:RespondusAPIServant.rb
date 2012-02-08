@@ -517,6 +517,7 @@ Implemented for: Canvas LMS}]
       :skip_import_notification => true,
       :files_import_allow_rename => true,
       :files_import_root_path => ATTACHMENT_FOLDER_NAME,
+      :flavor => Qti::Flavors::RESPONDUS
     }
 
     if item
