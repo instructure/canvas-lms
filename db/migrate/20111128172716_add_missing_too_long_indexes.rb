@@ -14,7 +14,7 @@ class AddMissingTooLongIndexes < ActiveRecord::Migration
     # migrations and because some adapters don't enforce the same index length,
     # so they may have created some/all of these already.
     add_index_with_check :custom_fields, %w(scoper_type scoper_id target_type name), :name => "custom_field_lookup"
-    add_index_with_check :learning_outcome_results, [:user_id, :content_tag_id, :associated_asset_id, :associated_asset_type], :unique => true, :name => "index_learning_outcome_results_association"
+    add_index_with_check :learning_outcome_results, [:user_id, :content_tag_id, :associated_asset_id, :associated_asset_type], :name => "index_learning_outcome_results_association"
     add_index_with_check :context_external_tools, [:context_id, :context_type, :has_user_navigation], :name => "external_tools_user_navigation"
     add_index_with_check :context_external_tools, [:context_id, :context_type, :has_course_navigation], :name => "external_tools_course_navigation"
     add_index_with_check :context_external_tools, [:context_id, :context_type, :has_account_navigation], :name => "external_tools_account_navigation"
