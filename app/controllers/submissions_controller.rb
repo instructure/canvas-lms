@@ -236,6 +236,7 @@ class SubmissionsController < ApplicationController
       return
     end
     if authorized_action(@submission, @current_user, :comment)
+      params[:submission][:commenter] = @current_user
       if params[:attachments]
         attachments = []
         params[:attachments].each do |idx, attachment|
@@ -251,8 +252,8 @@ class SubmissionsController < ApplicationController
           :comment_attachments => params[:submission][:comment_attachments],
           :media_comment_id => params[:submission][:media_comment_id],
           :media_comment_type => params[:submission][:media_comment_type],
-          :assessment_request => @request,
           :commenter => @current_user,
+          :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
           :hidden => @assignment.muted? && @context_enrollment.admin?
         }
