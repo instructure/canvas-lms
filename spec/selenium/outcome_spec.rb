@@ -94,6 +94,7 @@ describe "learning outcome test" do
       # o1
       # o2->
       driver.action.drag_and_drop(@oh2, @gh1).perform
+      wait_for_js
       wait_for_ajax_requests
       get "/courses/#{@course.id}/outcomes"
 
