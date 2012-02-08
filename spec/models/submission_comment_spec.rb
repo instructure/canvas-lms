@@ -165,14 +165,14 @@ This text has a http://www.google.com link in it...
       @assignment.workflow_state = 'published'
       @assignment.save
       @course.offer
-      @course.enroll_teacher(user)
+      @course.enroll_teacher(user).accept
       @teacher1 = @user
-      @course.enroll_teacher(user)
+      @course.enroll_teacher(user).accept
       @teacher2 = @user
       @assignment.reload
       @course.enroll_student(user)
       @student1 = @user
-      @course.enroll_student(user)
+      @assignment.context.reload
       @submission1 = @assignment.submit_homework(@student1, :body => 'some message')
     end
 

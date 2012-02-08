@@ -87,6 +87,23 @@ describe Submission do
     }.should_not change(@submission.versions, :count)
   end
 
+  it "should not return duplicate conversation groups" do
+    assignment_model
+    @assignment.workflow_state = 'published'
+    @assignment.save!
+    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
+    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
+    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
+    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'invited')
+    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'completed')
+    @course.offer!
+    @course.enroll_student(@student = user)
+    @assignment.context.reload
+
+    @submission = @assignment.submit_homework(@student, :body => 'some message')
+    @submission.conversation_groups.should eql @submission.conversation_groups.uniq
+  end
+
   context "Discussion Topic" do
     it "should use its created_at date for its submitted_at value" do
       submission_spec_model(:submission_type => "discussion_topic")
