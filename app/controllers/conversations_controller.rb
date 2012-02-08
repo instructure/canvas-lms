@@ -148,9 +148,9 @@ class ConversationsController < ApplicationController
   # an existing private conversation with the given recipients, it will be
   # reused.
   #
-  # @argument recipients An array of recipient ids. These may be user ids
+  # @argument recipients[] An array of recipient ids. These may be user ids
   #   or course/group ids prefixed with "course_" or "group_" respectively,
-  #   e.g. [1, 2, "course_3"].
+  #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
   # @argument body The message to be sent
   # @argument group_conversation [true|false] Ignored if there is just one
   #   recipient. If true, this will be a group conversation (i.e. all
@@ -346,9 +346,9 @@ class ConversationsController < ApplicationController
   # the GET/show action, except that omits submissions and only includes the
   # latest message (e.g. "joe was added to the conversation by bob")
   #
-  # @argument recipients An array of recipient ids. These may be user ids
+  # @argument recipients[] An array of recipient ids. These may be user ids
   #   or course/group ids prefixed with "course_" or "group_" respectively,
-  #   e.g. [1, 2, "course_3"].
+  #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
   #
   # @example_response
   #   {
@@ -478,9 +478,9 @@ class ConversationsController < ApplicationController
   #   only results matching all terms will be returned.
   # @argument context Limit the search to a particular course/group (e.g.
   #   "course_3" or "group_4").
-  # @argument exclude Array of ids to exclude from the search. These may be
-  #   user ids or course/group ids prefixed with "course_" or "group_"
-  #   respectively, e.g. [1, 2, "course_3"].
+  # @argument exclude[] Array of ids to exclude from the search. These may be
+  #   user ids or course/group ids prefixed with "course_" or "group_" respectively,
+  #   e.g. exclude[]=1&exclude[]=2&exclude[]=course_3
   # @argument type ["user"|"context"] Limit the search just to users or contexts (groups/courses).
   # @argument user_id [Integer] Search for a specific user id. This ignores the other above parameters, and will never return more than one result.
   # @argument from_conversation_id [Integer] When searching by user_id, only users that could be normally messaged by this user will be returned. This parameter allows you to specify a conversation that will be referenced for a shared context -- if both the current user and the searched user are in the conversation, the user will be returned. This is used to start new side conversations.
