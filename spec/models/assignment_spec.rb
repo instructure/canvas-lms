@@ -291,10 +291,12 @@ describe Assignment do
     @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
   end
 
-  context "find_or_create_submission" do
-    it "should not raise an error if another insert wins" do
+  context "concurrent inserts" do
+    def concurrent_inserts
       assignment_model
       user_model
+      @course.enroll_student(@user).update_attribute(:workflow_state, 'accepted')
+      @assignment.context.reload
 
       dummy_sub = Submission.new
       dummy_sub.assignment_id = @assignment.id
@@ -312,11 +314,23 @@ describe Assignment do
 
       sub = nil
       lambda {
-        sub = Assignment.find_or_create_submission(@assignment.id, @user.id)
+        sub = yield(@assignment, @user)
       }.should_not raise_error
       sub.should_not be_new_record
       sub.should_not eql dummy_sub
       sub.should eql real_sub
+    end
+
+    it "should handle them gracefully in find_or_create_submission" do
+      concurrent_inserts do |assignment, user|
+        Assignment.find_or_create_submission(assignment.id, user.id)
+      end
+    end
+
+    it "should handle them gracefully in submit_homework" do
+      concurrent_inserts do |assignment, user|
+        assignment.submit_homework(user, :body => "test")
+      end
     end
   end
 

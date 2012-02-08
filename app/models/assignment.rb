@@ -979,22 +979,24 @@ class Assignment < ActiveRecord::Base
                 end
     transaction do
       students.each do |student|
-        homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
-        homework.grade_matches_current_submission = homework.score ? false : true
-        homework.attributes = opts.merge({
-          :attachment => nil,
-          :processed => false,
-          :process_attempts => 0,
-          :workflow_state => submitted ? "submitted" : "unsubmitted",
-          :group => group
-        })
-        homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
-
-        homework.with_versioning(:explicit => true) do
-          group ? homework.save_without_broadcast : homework.save!
+        Assignment.unique_constraint_retry do
+          homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
+          homework.grade_matches_current_submission = homework.score ? false : true
+          homework.attributes = opts.merge({
+            :attachment => nil,
+            :processed => false,
+            :process_attempts => 0,
+            :workflow_state => submitted ? "submitted" : "unsubmitted",
+            :group => group
+          })
+          homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
+  
+          homework.with_versioning(:explicit => true) do
+            group ? homework.save_without_broadcast : homework.save!
+          end
+          homeworks << homework
+          primary_homework = homework if student == original_student
         end
-        homeworks << homework
-        primary_homework = homework if student == original_student
       end
     end
     primary_homework.broadcast_group_submission if group
