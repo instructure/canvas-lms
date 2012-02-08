@@ -149,6 +149,7 @@ describe Qti::Converter do
                                      :user => @user)
     @migration.update_migration_settings({
       :migration_type => 'qti_converter',
+      :flavor => Qti::Flavors::RESPONDUS
     })
     @migration.save!
 

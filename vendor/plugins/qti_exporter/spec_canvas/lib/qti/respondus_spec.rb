@@ -7,6 +7,12 @@ describe "Converting respondus QTI" do
     hash[:answers].each { |a| a.delete(:id) }
     hash.should == RespondusExpected::MULTIPLE_CHOICE
   end
+  
+  it "should find correct answer for multiple choice with zero point weights" do
+    hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', false, :flavor => Qti::Flavors::RESPONDUS)
+    hash[:import_error].should == nil
+    hash[:answers].first[:weight].should == 100
+  end
 
   it "should convert algorithm question as multiple choice question" do
     manifest_node=get_manifest_node('algorithm_question')
