@@ -9,14 +9,14 @@ describe "conversations context filtering" do
     @course1 = @course
     @s1 = User.create(:name => "student1")
     @s2 = User.create(:name => "student2")
-    @course1.enroll_user(@s1)
-    @course1.enroll_user(@s2)
+    @course1.enroll_user(@s1).update_attribute(:workflow_state, 'active')
+    @course1.enroll_user(@s2).update_attribute(:workflow_state, 'active')
     @group = @course1.groups.create(:name => "the group")
     @group.users << @user << @s1 << @s2
 
     @course2 = course(:active_all => true, :course_name => "that course")
     @course2.enroll_teacher(@user).accept
-    @course2.enroll_user(@s1)
+    @course2.enroll_user(@s1).update_attribute(:workflow_state, 'active')
   end
 
   it "should capture the course when sending a message to a group" do

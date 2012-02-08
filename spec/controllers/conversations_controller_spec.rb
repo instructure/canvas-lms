@@ -195,6 +195,8 @@ describe ConversationsController do
     it "should correctly infer context tags" do
       course_with_teacher_logged_in(:active_all => true)
       @course1 = @course
+      @course2 = course(:active_all => true)
+      @course2.enroll_teacher(@user).accept
       @group1 = @course1.groups.create!
       @group2 = @course1.groups.create!
       @group1.users << @user
@@ -214,10 +216,10 @@ describe ConversationsController do
       @group1.users << new_user2
       @group2.users << new_user2
 
-      @course2 = course(:active_all => true)
-      enrollment3 = @course2.enroll_student(@user)
-      enrollment2.workflow_state = 'active'
-      enrollment2.save
+      new_user3 = User.create
+      enrollment3 = @course2.enroll_student(new_user3)
+      enrollment3.workflow_state = 'active'
+      enrollment3.save
 
       post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true
       response.should be_success
