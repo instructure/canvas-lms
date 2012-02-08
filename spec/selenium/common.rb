@@ -50,11 +50,17 @@ module SeleniumTestsHelperMethods
     if SELENIUM_CONFIG[:host] && SELENIUM_CONFIG[:port] && !SELENIUM_CONFIG[:host_and_port]
       SELENIUM_CONFIG[:host_and_port] = "#{SELENIUM_CONFIG[:host]}:#{SELENIUM_CONFIG[:port]}"
     end
+    native = SELENIUM_CONFIG[:native_events] || false
+    browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
     if !SELENIUM_CONFIG[:host_and_port]
-      browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       options = {}
-      if SELENIUM_CONFIG[:firefox_profile].present? && browser == :firefox
-        options[:profile] = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
+      if browser == :firefox
+        profile = Selenium::WebDriver::Firefox::Profile.new
+        if SELENIUM_CONFIG[:firefox_profile].present?
+          profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
+        end
+        profile.native_events = native
+        options[:profile] = profile
       end
       if path = SELENIUM_CONFIG[:paths].try(:[], browser)
         Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
@@ -62,9 +68,13 @@ module SeleniumTestsHelperMethods
       driver = Selenium::WebDriver.for(browser, options)
     else
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
-      if caps == :firefox && SELENIUM_CONFIG[:firefox_profile]
-        profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
-        caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+      if caps == :firefox
+        profile = Selenium::WebDriver::Firefox::Profile.new
+        if SELENIUM_CONFIG[:firefox_profile].present?
+          profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
+        end
+      caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+      caps.native_events = native
       end
 
       driver = nil
