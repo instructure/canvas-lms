@@ -259,7 +259,7 @@ require([
           
           
       $menu.find('ul').append($.map(jsonData.context.active_course_sections, function(section, i){
-        return '<li><a data-section-id="'+ section.id +'" href="#">'+ section.name  +'</a></li>';
+        return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ section.name  +'</a></li>';
       }).join(''));
             
       $menu.insertBefore($selectmenu_list).bind('mouseenter mouseleave', function(event){

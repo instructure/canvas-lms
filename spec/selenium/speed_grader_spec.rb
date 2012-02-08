@@ -259,10 +259,10 @@ describe "speedgrader" do
       @enrollment.save!
     end
 
-    def goto_section(menu_index)
+    def goto_section(section_id)
       driver.find_element(:css, "#combo_box_container .ui-selectmenu-icon").click
       driver.execute_script("$('#section-menu-link').trigger('mouseenter')")
-      driver.find_element(:css, "#ui-menu-0-#{menu_index}").click
+      driver.find_element(:css, "#section-menu .section_#{section_id}").click
       wait_for_dom_ready
       wait_for_ajaximations
     end
@@ -278,9 +278,10 @@ describe "speedgrader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
-      goto_section(1)
+      sections = @course.course_sections
+      goto_section(sections[0].id)
       driver.find_elements(:css, "#students_selectmenu option").length.should == 1
-      goto_section(2)
+      goto_section(sections[1].id)
       driver.find_elements(:css, "#students_selectmenu option").length.should == 1
     end
   end
