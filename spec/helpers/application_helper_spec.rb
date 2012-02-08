@@ -97,4 +97,49 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "include account js" do
+    before do
+      @domain_root_account = Account.default
+      @site_admin = Account.site_admin
+      Account.stubs(:site_admin).returns(@site_admin)
+      @settings = { :global_includes => true, :global_javascript => '/path/to/js' }
+    end
+
+    context "with no custom js" do
+      it "should be empty" do
+        include_account_js.should be_nil
+      end
+    end
+
+    context "with custom js" do
+      it "should include account javascript" do
+        @domain_root_account.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.should have_tag 'script'
+        output.should match %r{/path/to/js}
+      end
+
+      it "should include site admin javascript" do
+        @site_admin.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.should have_tag 'script'
+        output.should match %r{/path/to/js}
+      end
+
+      it "should include both site admin and account javascript" do
+        Account.any_instance.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.should have_tag 'script'
+        output.scan(%r{/path/to/js}).length.should eql 2
+      end
+
+      it "should include site admin javascript first" do
+        @site_admin.stubs(:settings).returns({ :global_includes => true, :global_javascript => '/path/to/admin/js' })
+        @domain_root_account.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.scan(%r{/path/to/(admin/)?js})[0].should eql ['admin/']
+      end
+    end
+  end
 end

@@ -261,7 +261,6 @@
   ENV = <%= raw js_env.to_json %>;
 
   require = {
-    //urlArgs: "bust=" + +new Date(),
     translate: true,
     baseUrl: '<%= js_base_url %>',
     paths: {
@@ -274,15 +273,9 @@
 </script>
 
 <%= javascript_include_tag "#{js_base_url}/vendor/require.js" %>
-
-<%= javascript_include_tag(Account.site_admin.settings[:global_javascript]) if Account.site_admin.settings[:global_javascript].present? %>
-
-<% if @domain_root_account && @domain_root_account.settings[:global_includes] && !@domain_root_account.settings[:global_javascript].try(:strip).blank? %>
-  <script src="<%= @domain_root_account.settings[:global_javascript] %>"></script>
-<% end %>
-
 <%= javascript_include_tag "#{js_base_url}/compiled/bundles/common" %>
 <%= include_js_bundles %>
+<%= include_account_js %>
 <%= render_js_blocks %>
 </body>
 </html>

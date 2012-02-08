@@ -638,4 +638,17 @@ module ApplicationHelper
     end
   end
 
+  def include_account_js
+    includes = [Account.site_admin, @domain_root_account].inject([]) do |js_includes, account|
+      if account && account.settings[:global_includes] && account.settings[:global_javascript].present?
+        js_includes << "'#{account.settings[:global_javascript]}'"
+      end
+      js_includes
+    end
+    if includes.length > 0
+      content_tag :script, <<-ENDSCRIPT
+        require([#{includes.join(', ')}]);
+      ENDSCRIPT
+    end
+  end
 end
