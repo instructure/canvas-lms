@@ -1,6 +1,7 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
   'i18n!gradebook2'
+  'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'compiled/grade_calculator'
   'vendor/spin'
@@ -25,7 +26,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (I18n, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate) ->
 
   class Gradebook
     minimumAssignmentColumWidth = 10

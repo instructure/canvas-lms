@@ -1,7 +1,8 @@
 define [
+  'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'jquery.ajaxJSON'
-], ($) ->
+], (GRADEBOOK_TRANSLATIONS, $) ->
 
   class SubmissionCell
 
