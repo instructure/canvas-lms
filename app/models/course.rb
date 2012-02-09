@@ -2517,4 +2517,10 @@ class Course < ActiveRecord::Base
   def open_registration_for?(user, session = nil)
     root_account.open_registration_for?(user, session)
   end
+
+  def has_open_course_imports?
+    self.course_imports.scoped(:conditions => {
+      :workflow_state => ['created', 'started']
+    }).count > 0
+  end
 end

@@ -2741,6 +2741,27 @@ describe Course, ".import_from_migration" do
     MediaObject.expects(:add_media_files).with([@attachment], false)
     @course.import_media_objects([@attachment], migration)
   end
+
+  it "should know when it has open course imports" do
+    # no course imports
+    @course.should_not have_open_course_imports
+
+    # created course import
+    @course.course_imports.create!
+    @course.should have_open_course_imports
+
+    # started course import
+    @course.course_imports.first.update_attribute(:workflow_state, 'started')
+    @course.should have_open_course_imports
+
+    # completed course import
+    @course.course_imports.first.update_attribute(:workflow_state, 'completed')
+    @course.should_not have_open_course_imports
+
+    # failed course import
+    @course.course_imports.first.update_attribute(:workflow_state, 'failed')
+    @course.should_not have_open_course_imports
+  end
 end
 
 describe Course, "enrollments" do
