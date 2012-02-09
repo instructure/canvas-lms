@@ -120,3 +120,9 @@ stylesheets:
     - public/stylesheets/compiled/slideshow.css
   alerts:
     - public/stylesheets/compiled/alerts.css
+  tinymce:
+    - public/stylesheets/static/mathquill.css
+    - public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css
+    - public/stylesheets/compiled/tiny_like_ck_with_external_tools.css
+    - public/javascripts/tinymce/jscripts/tiny_mce/plugins/inlinepopups/skins/clearlooks2/window.css
+

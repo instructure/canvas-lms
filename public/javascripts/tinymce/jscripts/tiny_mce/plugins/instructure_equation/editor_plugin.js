@@ -16,27 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// tinymce doesn't like its plugins being async,
-// all dependencies must export to window
-
-/*
-require([
+define([
+  'compiled/editor/stocktiny',
   'jquery',
   'jquery.instructure_jquery_patches',
   'mathquill'
-], function($) {
-*/
+], function(tinymce, $) {
 
-(function() {
-  $("<link/>", {
-     rel: "stylesheet",
-     type: "text/css",
-     href: location.protocol + "//" + location.host + "/stylesheets/static/mathquill.css"
-  }).appendTo("head");
-
-  require(['mathquill'], function() {
-    $("<span class='mathquill-embedded-latex' style='position: absolute; z-index: -1; top: 0; left: 0; width: 0; height: 0; overflow: hidden;'>a</span>").appendTo("body").mathquill();
-  });
+  $("<span class='mathquill-embedded-latex' style='position: absolute; z-index: -1; top: 0; left: 0; width: 0; height: 0; overflow: hidden;'>a</span>").appendTo("body").mathquill();
 
   // like $.text() / Sizzle.getText(elems), except it also gets alt attributes
   // from images
@@ -139,8 +126,8 @@ require([
       };
     }
   });
-  
+
   // Register plugin
   tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation);
-})();
+});
 

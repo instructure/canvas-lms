@@ -16,17 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// tinymce doesn't like its plugins being async,
-// all dependencies must export to window
-
-/*
-require([
+define([
+  'compiled/editor/stocktiny',
   'jquery',
   'jquery.instructure_jquery_patches'
-], function($) {
-*/
+], function(tinymce, $) {
 
-(function() {
   tinymce.create('tinymce.plugins.InstructureEquella', {
     init : function(ed, url) {
       ed.addCommand('instructureEquella', function() {
@@ -122,5 +117,5 @@ require([
 
   // Register plugin
   tinymce.PluginManager.add('instructure_equella', tinymce.plugins.InstructureEquella);
-})();
+});
 

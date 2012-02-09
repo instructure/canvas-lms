@@ -35,33 +35,14 @@ define([
   'INST' /* INST */,
   'i18nObj',
   'jquery' /* jQuery, $ */,
+  'compiled/tinymce',
   'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
   'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
   'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/scribd.view' /* scribd */,
-
-  // editor_plugin dependencies all need to be loaded before
-  // tinymce tries to fetch the resources itself
-  'jquery.instructure_jquery_patches',
-  'jquery.instructure_misc_helpers',
-  'jquery.instructure_misc_plugins',
-  'str/htmlEscape',
-  'i18n!editor',
-
-  // instructure_external_tools
-  'jquery.dropdownList',
-
-  // instructure_links
-  'vendor/scribd.view',
-
-  // instructure_equation
-  // 'mathquill', // required dynamically in plugin
-
-  // instructure_record
-  'media_comments'
-], function(INST, I18nObj, $) {
+  'vendor/scribd.view' /* scribd */
+], function(INST, I18nObj, $, tinyMCE) {
 
   var enableBookmarking = $("body").hasClass('ie');
   $(document).ready(function() {
@@ -166,6 +147,7 @@ define([
       theme : "advanced",
       plugins: "instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
       dialog_type: 'modal',
+      language_load: false,
       relative_urls: false,
       remove_script_host: true,
       theme_advanced_buttons1: buttons1,
@@ -180,7 +162,7 @@ define([
       theme_advanced_more_colors: false,
       extended_valid_elements : "iframe[src|width|height|name|align|style|class]",
       content_css: "/stylesheets/compiled/instructure_style.css,/stylesheets/compiled/tinymce.editor_box.css",
-      editor_css:editor_css,
+      editor_css: editor_css,
       handle_event_callback: function(e) {
         if(e.type.indexOf('keydown') === 0 || e.type.indexOf('keypress') === 0) {
           if(e.keyCode === 9) {
@@ -200,7 +182,7 @@ define([
           }
         }
       },
-      onchange_callback: function(e) {
+        onchange_callback: function(e) {
         $("#" + id).trigger('change');
       },
       setup : function(ed) {

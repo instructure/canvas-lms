@@ -16,17 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// tinymce doesn't like its plugins being async,
-// all dependencies must export to window
-
-/*
-require([
+define([
   'jquery',
   'media_comments'
-], function(require, $) {
-*/
+], function($) {
 
-(function() {
   tinymce.create('tinymce.plugins.InstructureRecord', {
     init : function(ed, url) {
       ed.addCommand('instructureRecord', function() {
@@ -57,6 +51,5 @@ require([
 
   // Register plugin
   tinymce.PluginManager.add('instructure_record', tinymce.plugins.InstructureRecord);
-})();
-
+});
 

@@ -16,21 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// tinymce doesn't like it's plugins being async,
-// all dependencies must export to window
-
-/*
-require([
+define([
+  'require',
+  'compiled/editor/stocktiny',
   'jquery',
   'vendor/scribd.view',
   'jquery.instructure_jquery_patches',
   'jquery.instructure_misc_helpers',
   'jquery.instructure_misc_plugins',
-  'tinymce.editor_box'
-], function($, scribd) {
-*/
+], function(require, tinymce, $, scribd) {
 
-(function() {
   var lastLookup = null;
 
   // circular dependency
@@ -397,5 +392,5 @@ require([
     // Register plugin
     tinymce.PluginManager.add('instructure_links', tinymce.plugins.InstructureLinks);
   });
-})();
+});
 

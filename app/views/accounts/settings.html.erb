@@ -2,10 +2,9 @@
   @active_tab = "settings"
   add_crumb t(:settings_crumb, "Settings")
   js_bundle :account_settings
-  jammit_css :account_settings, :reports
+  jammit_css :account_settings, :reports, :tinymce
   content_for :page_title, t(:page_title, "Account Settings")
 %>
-<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
 
 <% content_for :right_side do %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>

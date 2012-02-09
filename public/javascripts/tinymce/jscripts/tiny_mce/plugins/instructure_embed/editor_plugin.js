@@ -19,18 +19,15 @@
 // tinymce doesn't like its plugins being async,
 // all dependencies must export to window
 
-/*
-require([
-  'require',
+define([
+  'compiled/editor/stocktiny',
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
   'jquery.instructure_jquery_patches',
   'jquery.instructure_misc_helpers'
-], function(require, I18n, $, htmlEscape) {
-*/
+], function(tinymce, I18n, $, htmlEscape) {
 
-(function(I18n) {
   var $box, $editor, $userURL, $altText, $actions, $flickrLink;
 
   var initted = false;
@@ -159,5 +156,5 @@ require([
   });
 
   tinymce.PluginManager.add('instructure_embed', tinymce.plugins.InstructureEmbed);
-})( I18n.scoped('editor') );
+});
 

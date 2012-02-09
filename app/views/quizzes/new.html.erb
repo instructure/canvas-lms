@@ -1,5 +1,5 @@
 <%
-  jammit_css :quizzes
+  jammit_css :quizzes, :tinymce
   js_bundle :quizzes_bundle
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
@@ -267,7 +267,6 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
 
 <h2><%= @quiz && !@quiz.new_record? ? t('headers.edit_quiz', "Edit Quiz") : t('headers.create_new_quiz', "Create a New Quiz") %></h2>
 <div style="display: none;" id="quiz_urls">

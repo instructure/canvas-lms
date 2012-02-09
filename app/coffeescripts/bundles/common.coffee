@@ -12,7 +12,6 @@ require [
   'vendor/swfobject/swfobject'
   'reminders'
   'jquery.instructure_forms'
-  'tinymce.editor_box'
   'instructure'
   'ajax_errors'
   'page_views'

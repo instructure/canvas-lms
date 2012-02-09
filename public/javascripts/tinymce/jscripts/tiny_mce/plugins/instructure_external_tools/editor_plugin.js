@@ -19,19 +19,16 @@
 // tinymce doesn't like its plugins being async,
 // all dependencies must export to window
 
-/*
-require([
+define([
+  'compiled/editor/stocktiny',
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
   'jquery.dropdownList',
   'jquery.instructure_jquery_patches',
   'jquery.instructure_misc_helpers',
-  'jquery.instructure_misc_plugins,
-], function(require, I18n, $, htmlEscape) {
-*/
-
-(function(I18n) {
+  'jquery.instructure_misc_plugins',
+], function(tinymce, I18n, $, htmlEscape) {
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
@@ -191,5 +188,5 @@ require([
 
   // Register plugin
   tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools);
-})(I18n.scoped('editor'));
+});
 
