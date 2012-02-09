@@ -275,6 +275,7 @@ describe "speedgrader" do
     end
 
     it "should filter by section properly" do
+      pending('selector error')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
