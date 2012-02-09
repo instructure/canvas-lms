@@ -87,4 +87,23 @@ describe "eportfolios" do
     driver.find_element(:id, 'edit_page_form').submit
     driver.find_element(:css, '#page_content .section_content').should include_text(first_text)
   end
+
+  it "should add a submission to a new section" do
+    pending "BUG 6345 - Eportfolio Error When Adding New Section" do
+      eportfolio_model({:user => @user})
+      @assignment = @course.assignments.create!(:title => "hardest assignment ever", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@student)
+      @submission.submission_type = "online_url"
+      @submission.save!
+
+      get "/eportfolios/#{@eportfolio.id}"
+      driver.find_element(:css, '.submission').click
+      submission_form = driver.find_element(:id, 'add_submission_form')
+      submission_form.should be_displayed
+      click_option('#add_submission_form #category_select', 'New Category')
+      submission_form.submit
+      driver.find_element(:css, '.error_text').should_not be_displayed
+      EportfolioEntry.count.should == 1
+    end
+  end
 end
