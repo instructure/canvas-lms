@@ -208,5 +208,23 @@ describe "assignments" do
       driver.find_element(:css, ".details").text.should =~ /comment before muting/
       driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
     end
+
+    it "should submit an assignment and validate confirmation information" do
+      pending "BUG 6783 - Coming Up assignments update error" do
+        due_date = Time.now.utc + 2.days
+        @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date, :submission_types => 'online_url')
+        @submission = @assignment.submit_homework(@student)
+        @submission.submission_type = "online_url"
+        @submission.save!
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        driver.find_element(:css, '.details .header').should include_text('Turned In!')
+        get "/courses/#{@course.id}"
+        driver.execute_script("$('.tooltip_text').css('visibility', 'visible')")
+        tooltip_text_elements = driver.find_elements(:css, '.tooltip_text > span')
+        driver.find_element(:css, '.tooltip_text').should be_displayed
+        tooltip_text_elements[1].text.should == 'submitted'
+      end
+    end
   end
 end
