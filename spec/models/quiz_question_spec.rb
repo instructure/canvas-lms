@@ -26,6 +26,7 @@ describe QuizQuestion do
     a = AssessmentQuestion.create!
     q = QuizQuestion.create(:question_data => qd, :assessment_question => a)
     q.question_data.should_not be_nil
+    q.question_data.class.should == HashWithIndifferentAccess
     q.assessment_question_id.should eql(a.id)
     q.question_data == qd
 
@@ -67,6 +68,7 @@ describe QuizQuestion do
       @quiz_question = @quiz.quiz_questions.build
       @quiz_question.write_attribute(:question_data, data)
       @quiz_question.save!
+      @quiz_question.question_data.class.should == HashWithIndifferentAccess
     end
 
     def confirm_all_migrations(result)
