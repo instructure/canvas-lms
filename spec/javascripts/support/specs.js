@@ -7,7 +7,7 @@ require([
   'specs/objectCollectionSpec',
   'specs/helpDialogSpec',
   'specs/util/BackoffPollerSpec',
-  'specs/jQuery.instructureJqueryPatches',
+  'specs/jQuery.instructureJqueryPatchesSpec',
   'specs/ENVSpec',
   'specs/calendar/TimeBlockListManagerSpec',
   'specs/util/processMigrationItemSelectionsSpec',
