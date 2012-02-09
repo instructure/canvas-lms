@@ -133,6 +133,11 @@ describe "quizzes" do
     answers = question.find_elements(:css, "div.form_answers > div.answer")
     answers.length.should eql(3)
 
+    # check that the wiki sidebar shows up
+    driver.find_element(:css, '#quiz_options_holder .link_to_content_link').click
+    driver.find_element(:css, '#editor_tabs h4').text.should =~ /Insert Content into the Page/
+    driver.find_element(:css, '#quiz_content_links .quiz_options_link').click
+
     driver.find_element(:css, '.question_form').submit
     question = driver.find_element(:css, "#question_#{quest1.id}")
     question.find_element(:css, ".question_name").text.should == 'edited question'

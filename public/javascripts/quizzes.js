@@ -2364,7 +2364,7 @@ require([
       }
     });
 
-    if (window.wikiSidebar) {
+    if (wikiSidebar) {
       wikiSidebar.init();
       wikiSidebar.attachToEditor($("#quiz_description"));
     }
@@ -2396,11 +2396,11 @@ require([
       event.preventDefault();
       $("#quiz_content_links,#quiz_options_holder").toggle();
       if ($("#quiz_content_links:visible").length > 0) {
-        if (window.wikiSidebar) {
+        if (wikiSidebar) {
           wikiSidebar.show();
         }
       } else {
-        if (window.wikiSidebar) {
+        if (wikiSidebar) {
           wikiSidebar.hide();
         }
       }
