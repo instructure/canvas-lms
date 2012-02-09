@@ -188,7 +188,19 @@ describe "gradebook2" do
   it "should not show 'not-graded' assignments" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
+  end
 
+  it "should handle a ton of assignments without wrapping the slick-header" do
+    100.times do
+      @course.assignments.create! :title => 'a really long assignment name, o look how long I am this is so cool'
+    end
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    # being 38px high means it did not wrap
+    driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should eql 38
+  end
+
+  it "should not show 'not-graded' assignments" do
     driver.find_element(:css, '#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
   end
 

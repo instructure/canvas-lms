@@ -356,6 +356,14 @@ define [
         else
           $tooltip.remove()
 
+    # this is because of a limitation with SlickGrid,
+    # when it makes the header row it does this:
+    # $("<div class='slick-header-columns' style='width:10000px; left:-1000px' />")
+    # if a course has a ton of assignments then it will not be wide enough to
+    # contain them all
+    fixMaxHeaderWidth: ->
+      @$grid.find('.slick-header-columns').width(1000000)
+
     onGridInit: () ->
       @fixColumnReordering()
       tooltipTexts = {}
@@ -381,6 +389,7 @@ define [
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
 
+      @fixMaxHeaderWidth()
       $('#gradebook_grid .slick-resizable-handle').live 'drag', (e,dd) =>
         @$grid.find('.slick-header-column').each (i, elem) =>
           $columnHeader = $(elem)

@@ -57,3 +57,4 @@ spec/javascripts/*/*Spec.js
 spec/javascripts/helpers/*
 public/optimized
 !node_modules
+chromedriver.log
