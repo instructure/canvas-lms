@@ -51,7 +51,7 @@ class SubmissionsApiController < ApplicationController
   # submitted_at:: Timestamp when the submission was made.
   # url:: If the submission was made as a URL.
   def index
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submissions = @assignment.submissions.all(
         :conditions => { :user_id => visible_user_ids })
@@ -94,7 +94,7 @@ class SubmissionsApiController < ApplicationController
   def for_students
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       raise ActiveRecord::RecordNotFound if params[:student_ids].blank?
-      student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids
+      student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids(:include_priors => true)
       return render(:json => []) if student_ids.blank?
 
       includes = Array(params[:include])
@@ -112,7 +112,7 @@ class SubmissionsApiController < ApplicationController
       Api.assignment_ids_for_students_api = assignments.map(&:id)
       sql_includes = { :user => [] }
       sql_includes[:user] << :submissions_for_given_assignments unless assignments.empty?
-      scope = (@section || @context).student_enrollments.scoped(
+      scope = (@section || @context).all_student_enrollments.scoped(
         :include => sql_includes,
         :conditions => { 'users.id' => student_ids })
 
@@ -316,12 +316,11 @@ class SubmissionsApiController < ApplicationController
     api_find(scope, user_id)
   end
 
-  def visible_user_ids
-    scope = if @section
-      @context.enrollments_visible_to(@current_user, :section_ids => [@section.id])
-    else
-      @context.enrollments_visible_to(@current_user)
+  def visible_user_ids(opts = {})
+    if @section
+      opts[:section_ids] = [@section.id]
     end
+    scope = @context.enrollments_visible_to(@current_user, opts)
     scope.all(:select => :user_id).map(&:user_id)
   end
 end

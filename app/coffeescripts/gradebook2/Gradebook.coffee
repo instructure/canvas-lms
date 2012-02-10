@@ -56,12 +56,20 @@ define [
       @show_attendance = userSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = userSettings.contextGet 'include_ungraded_assignments'
       @userFilterRemovedRows = []
+      @show_concluded_enrollments = userSettings.contextGet 'show_concluded_enrollments'
+      @show_concluded_enrollments = true if @options.course_is_concluded
+
       $.subscribe 'assignment_group_weights_changed', @buildRows
       $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
 
+      enrollmentsUrl = if @show_concluded_enrollments
+        'students_url_with_concluded_enrollments'
+      else
+        'students_url'
+
       promise = $.when(
-        $.ajaxJSON( @options.students_url, "GET"),
+        $.ajaxJSON( @options[enrollmentsUrl], "GET"),
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
         $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
       ).then ([students, status, xhr]) =>
@@ -454,6 +462,8 @@ define [
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
 
+      @$grid.addClass('editable') if @options.gradebook_is_editable
+
       @fixMaxHeaderWidth()
       $('#gradebook_grid .slick-resizable-handle').live 'drag', (e,dd) =>
         @$grid.find('.slick-header-column').each (colIndex, elem) =>
@@ -488,10 +498,15 @@ define [
           @buildRows()
 
       $settingsMenu = $('#gradebook_settings').next()
-      $.each ['show_attendance', 'include_ungraded_assignments'], (i, setting) =>
-        $settingsMenu.find("##{setting}").prop('checked', @[setting]).change (event) =>
+      $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (i, setting) =>
+        $settingsMenu.find("##{setting}").prop('checked', !!@[setting]).change (event) =>
+          if setting is 'show_concluded_enrollments' and @options.course_is_concluded and @show_concluded_enrollments
+            $("##{setting}").prop('checked', true)
+            $settingsMenu.menu("refresh")
+            return alert(I18n.t 'concluded_course_error_message', 'This is a concluded course, so only concluded enrollments are available.')
           @[setting] = $(event.target).is(':checked')
           userSettings.contextSet setting, @[setting]
+          window.location.reload() if setting is 'show_concluded_enrollments'
           @gradeGrid.setColumns @getVisibleGradeGridColumns() if setting is 'show_attendance'
           @buildRows()
 
@@ -707,7 +722,7 @@ define [
         columns:  @getVisibleGradeGridColumns()
         options:
           enableCellNavigation: true
-          editable: true
+          editable: @options.gradebook_is_editable
           syncColumnCellResize: true
           enableColumnReorder: true
       }]

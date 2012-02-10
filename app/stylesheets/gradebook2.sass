@@ -252,8 +252,8 @@ $cell_height: 33px
   z-index: 2 //needs to be above "normal but below tooltips"
   overflow: hidden
 
-  &:hover,
-  &:focus
+  #gradebook_grid.editable &:hover,
+  #gradebook_grid.editable &:focus
     visibility: visible
     background-position: 100% -88px !important
     width: 17px
@@ -261,8 +261,8 @@ $cell_height: 33px
 
   .slick-cell.with-comments &
     visibility: visible
-  .slick-cell.focus &,
-  .slick-cell.hover &
+  #gradebook_grid.editable .slick-cell.focus &,
+  #gradebook_grid.editable .slick-cell.hover &
     visibility: visible
     background-position: 100% -41px
     width: 25px

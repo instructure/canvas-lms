@@ -894,6 +894,18 @@ describe 'Submissions API', :type => :integration do
 
     json.size.should == 2
     json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
+
+    # concluded enrollments!
+    student2.enrollments.first.conclude
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, "sis_login_id:#{student2.pseudonym.unique_id}"],
+            :assignment_ids => [a1.to_param] })
+
+    json.size.should == 2
+    json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
   end
 
   it "should return student submissions grouped by student" do

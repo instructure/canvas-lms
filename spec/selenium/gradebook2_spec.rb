@@ -73,12 +73,37 @@ describe "gradebook2" do
     ff('.student-name').count.should == @course.students.count
   end
 
-  it "should not show concluded enrollments" do
-    conclude_and_unconclude_course
+  it "should not show concluded enrollments in active courses by default" do
+    @student_1.enrollments.find_by_course_id(@course.id).conclude
+
+    @course.students.count.should == 1
+    @course.all_students.count.should == 2
+
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
     ff('.student-name').count.should == @course.students.count
+
+    # select the option and we'll now show concluded
+    expect_new_page_load { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+    wait_for_ajaximations
+
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+  end
+
+  it "should show concluded enrollments in concluded courses by default" do
+    @course.complete!
+
+    @course.students.count.should == 0
+    @course.all_students.count.should == 2
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+
+    # the checkbox should fire an alert rather than changing to not showing concluded
+    expect_fired_alert { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
   end
 
   it "should show students sorted by their sortable_name" do
@@ -154,6 +179,29 @@ describe "gradebook2" do
     toggle_muting(@second_assignment)
     fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
     @second_assignment.reload.should_not be_muted
+  end
+
+  context "concluded course" do
+    before do
+      @course.complete!
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+    end
+
+    it "should not allow editing grades" do
+      cell = driver.find_element(:css, '#gradebook_grid [row="0"] .l0')
+      cell.text.should == '10'
+      cell.click
+      ff('.grade', cell).should be_blank
+    end
+
+    it "should hide mutable actions from the menu" do
+      open_gradebook_settings do |menu|
+        ff("a.gradebook_upload_link", menu).should be_blank
+        ff("a.set_group_weights", menu).should be_blank
+      end
+    end
   end
 
   it "should validate that gradebook settings is displayed when button is clicked" do
