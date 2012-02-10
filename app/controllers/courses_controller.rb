@@ -191,29 +191,28 @@ class CoursesController < ApplicationController
   # @API
   # Returns the list of sections for this course.
   #
-  # @argument include[] ["students"] Associations to include with the group.
+  # @argument include[] [optional, "students"] Associations to include with the group.
   #
   # @response_field id The unique identifier for the course section.
   # @response_field name The name of the section.
   # @response_field sis_section_id The sis id of the section.
   #
   # @example_response
-  #   ?include[]=students
   #
-  # [
-  #   {
-  #     "id": 1,
-  #     "name": "Section A",
-  #     "sis_section_id": null,
-  #     "students": [...]
-  #   },
-  #   {
-  #     "id": 2,
-  #     "name": "Section B",
-  #     "sis_section_id": "section-b",
-  #     "students": [...]
-  #   }
-  # ]
+  #   [
+  #     {
+  #       "id": 1,
+  #       "name": "Section A",
+  #       "sis_section_id": null,
+  #       "students": [...]
+  #     },
+  #     {
+  #       "id": 2,
+  #       "name": "Section B",
+  #       "sis_section_id": "section-b",
+  #       "students": [...]
+  #     }
+  #   ]
   def sections
     get_context
     if authorized_action(@context, @current_user, :read_roster)

@@ -29,6 +29,17 @@ class PseudonymsController < ApplicationController
   # Given a user ID, return that user's logins for the given account.
   #
   # @argument user[id] The ID of the user to search on.
+  #
+  # @response_field account_id The ID of the login's account.
+  # @response_field id The unique, numeric ID for the login.
+  # @response_field sis_user_id The login's unique SIS id.
+  # @response_field unique_id The unique ID for the login.
+  # @response_field user_id The unique ID of the login's user.
+  #
+  # @example_response
+  #   [
+  #      { "account_id": 1, "id" 2, "sis_user_id": null, "unique_id": "belieber@example.com", "user_id": 2 }
+  #   ]
   def index
     return unless get_user && authorized_action(@user, @current_user, :read)
     return unless context_is_root_account?
@@ -194,7 +205,7 @@ class PseudonymsController < ApplicationController
   #
   # @argument login[unique_id] The new unique ID for the login.
   # @argument login[password] The new password for the login. Can only be set by an admin user if admins are allowed to change passwords for the account.
-  # @arugment login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
+  # @argument login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def update
     if api_request?
       @pseudonym          = Pseudonym.find(params[:id])
