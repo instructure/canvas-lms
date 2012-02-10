@@ -1,3 +1,14 @@
+canvas-lms (2012.02.10.11.09) stable; urgency=low
+
+  * Package ref: b34a5858797e9eeb40f7985502d50fae36da4a26
+  *
+  * [+b1b87e7] fix submission comment migration, clean up data. fixes #7203
+  * [+412c7eb] handle zero point multiple choice questions in qti
+  * [+a57414e] fix the weird border fragments on tinymce boxes
+  * [+b34a585] make question data always a HashWithIndifferentAccess
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 10 Feb 2012 11:10:23 -0700
+
 canvas-lms (2012.02.08.15.05) stable; urgency=low
 
   * Package ref: 4d11813d3d49e107b5a736a43f6a33d3da0e4fd0
