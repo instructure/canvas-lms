@@ -41,6 +41,7 @@ define [
 
       group = {
         contexts: @calendar.contexts
+        sub_context_codes: []
       }
 
       @createDialog = new EditAppointmentGroupDialog(group, @dialogCloseCB)

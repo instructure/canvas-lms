@@ -163,7 +163,7 @@ describe CalendarEvent do
       g1 = @course.appointment_groups.create(:title => "foo")
       g1.publish!
       a1 = g1.appointments.create.reserve_for(@student, @student)
-      g2 = @course.appointment_groups.create(:title => "foo", :sub_context_code => @course.default_section.asset_string)
+      g2 = @course.appointment_groups.create(:title => "foo", :sub_context_codes => [@course.default_section.asset_string])
       g2.publish!
       a2 = g2.appointments.create.reserve_for(@student, @student)
       pe = @course.calendar_events.create!
@@ -280,7 +280,7 @@ describe CalendarEvent do
         @group = c1.groups.create(:context => @course)
         @group.users << @student1 << @student2
 
-        @ag2 = AppointmentGroup.create!(:title => "test", :context => @course, :sub_context_code => c1.asset_string)
+        @ag2 = AppointmentGroup.create!(:title => "test", :context => @course, :sub_context_codes => [c1.asset_string])
         @ag2.publish!
         @appointment2 = @ag2.appointments.create(:start_at => '2012-01-01 12:00:00', :end_at => '2012-01-01 13:00:00')
 
@@ -445,7 +445,7 @@ describe CalendarEvent do
       c2 = @course.group_categories.create
       g2 = c2.groups.create(:context => @course)
 
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_code => c1.asset_string,
+      ag = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_codes => [c1.asset_string],
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
       appointment = ag.appointments.first

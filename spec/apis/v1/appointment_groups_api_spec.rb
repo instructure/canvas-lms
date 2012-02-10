@@ -30,13 +30,13 @@ describe AppointmentGroupsController, :type => :integration do
     'max_appointments_per_participant', 'min_appointments_per_participant',
     'participant_type', 'participant_visibility',
     'participants_per_appointment', 'requiring_action', 'start_at',
-    'sub_context_code', 'title', 'updated_at', 'url', 'workflow_state'
+    'sub_context_codes', 'title', 'updated_at', 'url', 'workflow_state'
   ]
 
   it 'should return manageable appointment groups' do
     ag1 = @course.appointment_groups.create(:title => "something")
     cat = @course.group_categories.create
-    ag2 = @course.appointment_groups.create(:title => "another", :sub_context_code => cat.asset_string)
+    ag2 = @course.appointment_groups.create(:title => "another", :sub_context_codes => [cat.asset_string])
     ag3 = Course.create.appointment_groups.create(:title => "inaccessible")
     ag4 = @course.appointment_groups.create(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
 
@@ -76,7 +76,7 @@ describe AppointmentGroupsController, :type => :integration do
     mygroup = cat.groups.create(:context => @course)
     mygroup.users << @me
     @me.reload
-    ag7 = @course.appointment_groups.create(:title => "double yay", :sub_context_code => cat.asset_string, :new_appointments => [["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+    ag7 = @course.appointment_groups.create(:title => "double yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
     ag7.publish!
     ag8 = @course.appointment_groups.create(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
     ag8.publish!
@@ -224,10 +224,10 @@ describe AppointmentGroupsController, :type => :integration do
   it 'should create a new appointment group with a sub_context' do
     json = api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_code => @course.asset_string, :sub_context_code => @course.default_section.asset_string, :title => "ohai"} })
+                      {:appointment_group => {:context_code => @course.asset_string, :sub_context_codes => [@course.default_section.asset_string], :title => "ohai"} })
     json.keys.sort.should eql expected_fields
     json['workflow_state'].should eql 'pending'
-    json['sub_context_code'].should eql @course.default_section.asset_string
+    json['sub_context_codes'].should eql [@course.default_section.asset_string]
   end
 
   it 'should enforce update permissions' do
@@ -253,10 +253,10 @@ describe AppointmentGroupsController, :type => :integration do
     ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
     json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
-                      {:appointment_group => {:title => "lol", :sub_context_code => @course.default_section.asset_string} })
+                      {:appointment_group => {:title => "lol", :sub_context_codes => [@course.default_section.asset_string]} })
     json.keys.sort.should eql expected_fields
     json['title'].should eql 'lol'
-    json['sub_context_code'].should be_nil
+    json['sub_context_codes'].should eql []
   end
 
   it 'should publish an appointment group in an update through the api' do
@@ -305,7 +305,7 @@ describe AppointmentGroupsController, :type => :integration do
     },
     'groups' => proc {
       cat = @course.group_categories.create
-      @ag = @course.appointment_groups.create(:title => "yay", :sub_context_code => cat.asset_string, :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag = @course.appointment_groups.create(:title => "yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
       @ag.publish!
       group1 = cat.groups.create(:context => @course)
       group1.users << student_in_course(:course => @course, :active_all => true).user

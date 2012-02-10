@@ -348,10 +348,11 @@ Spec::Runner.configure do |config|
   end
 
   def group(opts={})
+    opts.delete(:active_all)
     if opts[:group_context]
-      @group = opts[:group_context].groups.create!
+      @group = opts.delete(:group_context).groups.create! opts
     else
-      @group = Group.create!
+      @group = Group.create! opts
     end
   end
 
