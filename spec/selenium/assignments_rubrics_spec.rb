@@ -98,8 +98,7 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:css, '#criterion_1 .criterion_points').send_key :backspace
-      driver.find_element(:css, '#criterion_1 .criterion_points').send_key "2.5"
+      replace_content(driver.find_element(:css, '#criterion_1 .criterion_points'), '2.5')
       driver.find_element(:id, 'grading_rubric').click
       driver.find_element(:id, 'edit_rubric_form').submit
       wait_for_ajaximations
@@ -107,6 +106,7 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       wait_for_ajaximations
+      wait_for_js
       driver.find_element(:css, '.toggle_full_rubric').click
       find_with_jquery('#rubric_holder .criterion:visible .rating').click
       driver.find_element(:css, '#rubric_holder .save_rubric_button').click

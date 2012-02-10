@@ -269,7 +269,8 @@ describe "calendar2" do
       EDIT_LOCATION = 'edited location'
 
       def create_appointment_group_api
-        ag = @course.appointment_groups.create(:title => "new appointment group")
+        current_date = Date.today.to_s
+        ag = @course.appointment_groups.create(:title => "new appointment group", :context => @course, :new_appointments => [[current_date + ' 12:00:00', current_date + ' 13:00:00']])
         ag.publish!
         ag.title
       end
@@ -283,6 +284,7 @@ describe "calendar2" do
           replace_content(find_with_jquery('input[name="title"]'), new_appointment_text)
           date_field = edit_form.find_element(:css, '.date_field')
           date_field.click
+          wait_for_animations
           find_with_jquery('.ui-datepicker-trigger:visible').click
           datepicker_next
           replace_content(edit_form.find_element(:css, '.start_time'), '1')
@@ -343,7 +345,7 @@ describe "calendar2" do
         end_time = edit_form.find_element(:css, '.end_time')
         title = find_with_jquery('input[name="title"]')
         replace_content(start_time, '11111')
-        end_time.click
+        replace_content(end_time, '11111')
         title.click
         edit_form.find_element(:css, '.start_time').should have_class('error')
         edit_form.find_element(:css, '.end_time').should have_class('error')
@@ -445,17 +447,17 @@ describe "calendar2" do
       end
 
       it "should validate the appointment group shows up on the calendar" do
+        create_appointment_group_api
         get "/calendar2"
         click_scheduler_link
-        create_appointment_group_manual
         click_appointment_link
         element_exists(:css, '.fc-event-bg').should be_true
       end
 
       it "should delete the appointment group from the calendar" do
+        create_appointment_group_api
         get "/calendar2"
         click_scheduler_link
-        create_appointment_group_manual
         click_appointment_link
         calendar_event = driver.find_element(:css, '.fc-event-bg')
         calendar_event.click
