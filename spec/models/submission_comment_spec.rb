@@ -177,7 +177,7 @@ This text has a http://www.google.com link in it...
     end
 
     context "creation" do
-      it "should send comments to all instructors if no instructors have commented" do
+      it "should send submitter comments to all instructors if no instructors have commented" do
         @submission1.add_comment(:author => @student1, :comment => "hello")
         @teacher1.conversations.size.should eql 1
         tc1 = @teacher1.conversations.first
@@ -187,6 +187,12 @@ This text has a http://www.google.com link in it...
         tc2 = @teacher2.conversations.first
         tc2.messages.size.should eql 1
         tc2.messages.first.asset.should eql @submission1
+      end
+
+      it "should not send non-participant comments to anyone" do
+        @submission1.add_comment(:author => user, :comment => "ohai im in ur group")
+        @teacher1.conversations.size.should eql 0 # if we actually set up a group assignment and had this comment on all submissions, the teacher would have one conversation with that commenter
+        @student1.conversations.size.should eql 0
       end
 
       it "should just create a single message for all comments" do
@@ -238,13 +244,6 @@ This text has a http://www.google.com link in it...
         tconvo.remove_messages(:all)
         sconvo.workflow_state = :read
         sconvo.save!
-
-        @submission1.add_comment(:author => user, :comment => "hey im in ur group")
-        sconvo.reload.should be_unread
-        @student1.reload.unread_conversations_count.should eql 1
-        tconvo.reload.should be_unread
-        tconvo.messages.size.should eql 1
-        @teacher1.reload.unread_conversations_count.should eql 1
       end
     end
 
@@ -320,6 +319,24 @@ This text has a http://www.google.com link in it...
         # non-instructor comment is added, since we don't know if it was
         # deleted automatically or explicitly by the teacher
         @teacher2.conversations.size.should eql 0
+      end
+
+      it "should not change the message preview/timestamp if the deleted message was by a non-participant" do
+        SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
+        c1 = @submission1.add_comment(:author => @student1, :comment => "hello").reload
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!")
+        c3 = @submission1.add_comment(:author => user, :comment => "ohai im in ur group")
+        tc1 = @teacher1.conversations.first
+        tc1.last_message_at.should eql c2.created_at
+        tc1.messages.last.body.should eql c2.comment
+        tc1.messages.last.author.should eql @teacher1
+
+        c3.destroy
+
+        tc1.reload
+        tc1.last_message_at.should eql c2.created_at
+        tc1.messages.last.body.should eql c2.comment
+        tc1.messages.last.author.should eql @teacher1
       end
 
       it "should not re-add the message to users who have deleted it" do
@@ -426,6 +443,26 @@ This text has a http://www.google.com link in it...
         tconvo.last_message_at.should eql comments.last.created_at
         tconvo.last_authored_at.should be_nil
         tconvo.messages.first.created_at.should eql comments.last.created_at
+      end
+
+      it "should skip submissions with no participant comments" do
+        convo = @student1.initiate_conversation([@teacher1.id])
+        message = convo.add_message('ohai').reload
+        tconvo = @teacher1.conversations.first
+        raw_comment(@submission1, user, "ohai im in ur group", Time.now.utc + 1.day)
+
+        # should not add a submission message
+        @submission1.create_or_update_conversations!(:migrate)
+
+        convo.reload.messages.size.should eql 1
+        convo.last_message_at.should eql message.created_at
+        convo.last_authored_at.should eql message.created_at
+        convo.messages.first.created_at.should eql message.created_at
+
+        tconvo.reload.messages.size.should eql 1
+        tconvo.last_message_at.should eql message.created_at
+        tconvo.last_authored_at.should be_nil
+        tconvo.messages.first.created_at.should eql message.created_at
       end
     end
   end

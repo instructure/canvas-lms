@@ -344,6 +344,7 @@ describe Conversation do
       asset.expects(:conversation_groups).returns([[u1.id, u2.id]])
       asset.expects(:lock!).returns(true)
       asset.expects(:conversation_messages).at_least_once.returns([])
+      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author_id => u1.id, :body => "asdf"})
       Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
       conversation.conversation_messages.size.should eql 1
     end
