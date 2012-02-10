@@ -472,14 +472,6 @@ var I18n = I18n || {};
     end
   end
 
-  def env
-    {
-      :current_user_id => @current_user.try(:id),
-      :current_user_roles => @current_user.try(:roles),
-      :context_asset_string => @context.try(:asset_string)
-    }
-  end
-
   def nbsp
     raw("&nbsp;")
   end

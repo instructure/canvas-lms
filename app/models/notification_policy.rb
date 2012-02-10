@@ -19,25 +19,23 @@
 class NotificationPolicy < ActiveRecord::Base
   
   belongs_to :notification
-  belongs_to :user
   belongs_to :communication_channel
   
   before_save :infer_frequency
 
-  attr_accessible :notification, :user, :communication_channel, :frequency, :notification_id, :user_id, :communication_channel_id
+  attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
+
+  validates_presence_of :communication_channel_id
   
   # This is for choosing a policy for another context, so:
-  # user.notification_policies.for(notification) or
-  # user.notification_policies.for(communication_channel) or
+  # NotificationPolicy.for(notification) or
   # communication_channel.notification_policies.for(notification)
   named_scope :for, lambda { |context| 
     case context
     when User
-      { :conditions => ['notification_policies.user_id = ?', context.id] }
+      { :joins => :communication_channel, :conditions => { 'communication_channels.user_id' => context.id } }
     when Notification
       { :conditions => ['notification_policies.notification_id = ?', context.id] }
-    when CommunicationChannel
-      { :conditions => ['notification_policies.communication_channel_id = ?', context.id] }
     else
       {}
     end
@@ -57,8 +55,7 @@ class NotificationPolicy < ActiveRecord::Base
   
   named_scope :where, lambda { |where| { :include => [:communication_channel], :conditions => where } }
   named_scope :in_state, lambda { |state| { :conditions => ["notification_policies.workflow_state = ?", state.to_s] } }
-  named_scope :for_channel, lambda { |channel| { :conditions => ['notification_policies.communication_channel_id = ?', channel.id] } }
-  
+
   def infer_frequency
     self.frequency ||= "immediately"
   end
@@ -70,14 +67,14 @@ class NotificationPolicy < ActiveRecord::Base
   end
   
   def self.spam_blocked_by(user)
-    NotificationPolicy.delete_all({:user_id => user.id})
+    NotificationPolicy.delete_all({:communication_channel_id => user.communication_channels.map(&:id)})
     cc = user.communication_channel
     cc.confirm
     Notification.all.each do |notification|
       if notification.category == "Message"
-        NotificationPolicy.create(:notification => notification, :user => user, :communication_channel => cc, :frequency => 'immediately')
+        NotificationPolicy.create(:notification => notification, :communication_channel => cc, :frequency => 'immediately')
       else
-        NotificationPolicy.create(:notification => notification, :user => user, :communication_channel => cc, :frequency => 'never')
+        NotificationPolicy.create(:notification => notification, :communication_channel => cc, :frequency => 'never')
       end
     end
     true
@@ -88,7 +85,7 @@ class NotificationPolicy < ActiveRecord::Base
 
   def self.refresh_for(user)
     categories = Notification.dashboard_categories
-    policies = user.notification_policies.to_a
+    policies = NotificationPolicy.for(user).to_a
     params = {}
     categories.each do |category|
       ps = policies.select{|p| p.notification_id == category.id }
@@ -107,7 +104,6 @@ class NotificationPolicy < ActiveRecord::Base
         params[:user] && params[:user][:send_scores_in_emails] == '1'
     params[:user].try(:delete, :send_scores_in_emails)
     @user.update_attributes(params[:user])
-    @old_policies = @user.notification_policies
     @channels = @user.communication_channels
     categories = Notification.dashboard_categories
     prefs_to_save = []
@@ -134,22 +130,21 @@ class NotificationPolicy < ActiveRecord::Base
           end
           channels.uniq.each do |channel|
             frequency = category_data["channel_#{channel.id}".to_sym] || 'never'
-            pref = @user.notification_policies.new
+            pref = channel.notification_policies.new
             pref.notification_id = notification.id
             pref.frequency = frequency
-            pref.communication_channel_id = channel.id
             prefs_to_save << pref
           end
         end
       end
     end
-    NotificationPolicy.transaction do 
-      NotificationPolicy.connection.execute("DELETE FROM notification_policies WHERE id IN (#{@old_policies.map(&:id).join(',')})") unless @old_policies.empty?
+    NotificationPolicy.transaction do
+      NotificationPolicy.delete_all({:communication_channel_id => user.communication_channels.map(&:id)})
       prefs_to_save.each{|p| p.save! }
     end
     categories = Notification.dashboard_categories
     @user.reload
-    @policies = @user.notification_policies.select{|p| categories.include?(p.notification)}
+    @policies = NotificationPolicy.for(@user).scoped(:conditions => { :notification_id => categories.map(&:id)})
     @policies
   end
 end

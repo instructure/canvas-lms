@@ -228,7 +228,7 @@ describe Notification do
     it "should not use notification policies for unconfirmed communication channels" do
       notification_set
       cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'unconfirmed', :path => "nope")
-      notification_policy_model(:communication_channel_id => cc.id, :notification_id => @notification.id, :user_id => @user.id )
+      notification_policy_model(:communication_channel_id => cc.id, :notification_id => @notification.id)
       messages = @notification.create_message(@assignment, @user)
       messages.size.should == 2
       messages.map(&:to).sort.should == ['dashboard', 'value for path']
@@ -242,7 +242,9 @@ describe Notification do
       @cc.confirm
       notification_model
       # Universal context
+      old_user = @user
       assignment_model
+      @user = old_user
       @valid_record_delayed_messages_opts = {
         :user => @user,
         :communication_channel => @cc,
@@ -276,8 +278,7 @@ describe Notification do
         NotificationPolicy.delete_all
 
         @trifecta_opts = {
-          :user_id => @user.id, 
-          :communication_channel_id => @communication_channel.id, 
+          :communication_channel_id => @communication_channel.id,
           :notification_id => @notification.id
         }
       end
@@ -352,7 +353,6 @@ def notification_set(opts={})
   communication_channel_model(:user_id => @user).confirm!
   notification_policy_model(
     :notification_id => @notification.id, 
-    :user_id => @user.id,
     :communication_channel_id => @communication_channel.id
   )
   @notification.reload

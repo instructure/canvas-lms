@@ -105,18 +105,8 @@ describe Submission do
       @submission.should be_respond_to(:dispatch)
       @submission.should be_respond_to(:to)
     end
-    
-    it "should have 6 policies defined" do
-      submission_spec_model
-      @submission.broadcast_policy_list.size.should eql(6)
-    end
 
     context "Assignment Submitted Late" do
-      it "should have a 'Assignment Submitted Late' policy" do
-        submission_spec_model
-        @submission.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Assignment Submitted Late')
-      end
-      
       it "should create a message when the assignment is turned in late" do
         Notification.create(:name => 'Assignment Submitted Late')
         t = User.create(:name => "some teacher")
@@ -136,11 +126,6 @@ describe Submission do
     end
     
     context "Submission Graded" do
-      it "should have a 'Submission Graded' policy" do
-        submission_spec_model
-        @submission.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Submission Graded')
-      end
-      
       it "should create a message when the assignment has been graded and published" do
         Notification.create(:name => 'Submission Graded')
         submission_spec_model
@@ -215,11 +200,6 @@ describe Submission do
 
         
     context "Submission Grade Changed" do
-      it "should have a 'Submission Grade Changed' policy" do
-        submission_spec_model
-        @submission.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Submission Grade Changed')
-      end
-      
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.stubs(:score_to_grade).returns(10.0)

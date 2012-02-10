@@ -66,8 +66,8 @@ describe "Alerts" do
     wait_for_animations
     alert.find_element(:css, '.delete_link img').click
 
-    wait_for_animations
-    keep_trying_until{ find_with_jquery('.alert:visible').should be_blank }
+    wait_for_ajaximations
+    driver.find_element(:css, '.alert').should_not be_displayed
 
     keep_trying_until{
       @alerts.reload
@@ -91,6 +91,7 @@ describe "Alerts" do
     get "/accounts/#{@context.id}/settings"
 
     driver.find_element(:css, '#tab-alerts-link').click
+    wait_for_ajax_requests
     driver.find_element(:css, '.add_alert_link').click
     wait_for_animations
     driver.find_element(:css, '.alert.new .delete_link').click
@@ -109,7 +110,6 @@ describe "Alerts" do
     driver.find_element(:css, '.alert.new .cancel_button').click
     wait_for_animations
     keep_trying_until { find_all_with_jquery(".alert.new").should be_empty }
-
     @alerts.should be_empty
   end
 
@@ -124,10 +124,10 @@ describe "Alerts" do
 
       keep_trying_until { find_all_with_jquery('.alert.new .add_recipients_line select option').length > 1 }
       for i in 1..alert.find_elements(:css, '.add_recipients_line select option').length do
-        sleep 0.5
         link.click
+        wait_for_animations
       end
-      keep_trying_until { find_with_jquery('.alert.new .add_recipient_link:visible').blank? }
+      driver.find_element(:css, '.alert.new .add_recipient_link').should_not be_displayed
     end
 
     it "should not show the add link when all recipients are already there" do
@@ -141,13 +141,14 @@ describe "Alerts" do
 
       # Deleting a recipient should add it to the dropdown (which is now visible)
       alertElement.find_element(:css, '.recipients .delete_item_link').click
-      find_with_jquery("#edit_alert_#{alert.id} .add_recipient_link:visible").should_not be_blank
+      wait_for_animations
+      find_with_jquery("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
       alertElement.find_elements(:css, '.add_recipients_line select option').length.should == 1
       keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 2 }
 
       # Do it again, with the same results
       alertElement.find_element(:css, '.recipients .delete_item_link').click
-      find_with_jquery("#edit_alert_#{alert.id} .add_recipient_link:visible").should_not be_blank
+      find_with_jquery("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
       alertElement.find_elements(:css, '.add_recipients_line select option').length.should == 2
       keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 1 }
 
@@ -164,8 +165,8 @@ describe "Alerts" do
     alert = driver.find_element(:css, '.alert.new')
     alert.find_element(:css, 'input[name="repetition"][value="value"]').click
     sleep 2 #need to wait for javascript to process
-    find_with_jquery('.alert.new .submit_button').click
     keep_trying_until do
+      driver.find_element(:id, 'new_alert').submit
       wait_for_animations
       find_all_with_jquery('.error_box').length == 4
     end
@@ -180,8 +181,7 @@ describe "Alerts" do
     keep_trying_until { find_all_with_jquery('.error_box').length == 1 }
 
     alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
-    alert.find_element(:css, '.submit_button').click
+    driver.find_element(:id, 'new_alert').submit
     keep_trying_until { find_all_with_jquery('.error_box').length == 2 }
   end
-
 end

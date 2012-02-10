@@ -32,7 +32,7 @@ describe QuizQuestionDataFixer do
                     [{:migration_id=>"QUE_1016_A1", :text=>"True", :weight=>nil, :id=>nil},
                      {:migration_id=>"QUE_1017_A2", :text=>"False", :weight=>nil, :id=>nil}],
             :question_text=>
-                    "Image yo: <img src=\"/assessment_questions/9270/files/6163/download?verifier=Cu96fSJHUJgVPNHEfoqLomZT64gkEzNP6Rphfl0y\" align=\"bottom\" alt=\"image.png\">"}
+                    "Image yo: <img src=\"/assessment_questions/9270/files/6163/download?verifier=Cu96fSJHUJgVPNHEfoqLomZT64gkEzNP6Rphfl0y\" align=\"bottom\" alt=\"image.png\">"}.with_indifferent_access
 
     @good = {:correct_comments=>"",
              :question_type=>"multiple_choice_question",
@@ -47,7 +47,7 @@ describe QuizQuestionDataFixer do
                      "Image yo: <img src=\"/courses/117/files/6158/preview\" align=\"bottom\" alt=\"image.png\">",
              :answers=>
                      [{:migration_id=>"QUE_1016_A1", :text=>"True", :weight=>100, :id=>8080},
-                      {:migration_id=>"QUE_1017_A2", :text=>"False", :weight=>0, :id=>2279}]}
+                      {:migration_id=>"QUE_1017_A2", :text=>"False", :weight=>0, :id=>2279}]}.with_indifferent_access
   end
 
   it "should fix questions from old version on assessment question" do

@@ -227,7 +227,7 @@ class CoursesController < ApplicationController
         if include_students
           proxy = section.enrollments
           if user_json_is_admin?
-            proxy = proxy.scoped(:include => { :user => :pseudonym })
+            proxy = proxy.scoped(:include => { :user => :pseudonyms })
           else
             proxy = proxy.scoped(:include => :user)
           end
@@ -256,7 +256,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       proxy = @context.students
       if user_json_is_admin?
-        proxy = proxy.scoped(:include => :pseudonym)
+        proxy = proxy.scoped(:include => :pseudonyms)
       end
       render :json => proxy.map { |u| user_json(u, @current_user, session) }
     end
@@ -374,7 +374,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       @students = @context.participating_students.find(:all, :order => User.sortable_name_order_by_clause)
-      @teachers = @context.admins.find(:all, :order => User.sortable_name_order_by_clause)
+      @teachers = @context.instructors.find(:all, :order => User.sortable_name_order_by_clause)
       @groups = @context.groups.active
     end
   end
@@ -400,9 +400,11 @@ class CoursesController < ApplicationController
       return true
     end
     if params[:reject]
-      @pending_enrollment.reject!
+      if @pending_enrollment.invited?
+        @pending_enrollment.reject!
+        flash[:notice] = t('notices.invitation_cancelled', "Invitation cancelled.")
+      end
       session[:enrollment_uuid] = nil
-      flash[:notice] = t('notices.invitation_cancelled', "Invitation cancelled.")
       if @current_user
         redirect_to dashboard_url
       else
@@ -410,9 +412,11 @@ class CoursesController < ApplicationController
       end
     elsif params[:accept]
       if @current_user && @pending_enrollment.user == @current_user
-        @pending_enrollment.accept!
+        if @pending_enrollment.invited?
+          @pending_enrollment.accept!
+          flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
+        end
         session[:accepted_enrollment_uuid] = @pending_enrollment.uuid
-        flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
         if params[:action] != 'show'
           redirect_to course_url(@context.id)
         else
@@ -452,6 +456,8 @@ class CoursesController < ApplicationController
     enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
     # Overwrite with the session enrollment, if one exists, and it's different than the current user's
     enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] && params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
+    # Look for enrollments to matching temporary users
+    enrollment ||= @current_user.temporary_invitations.find { |i| i.course_id == @context.id } if @current_user
     # Look up the explicitly provided invitation
     enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]]) unless params[:invitation].blank?
     if enrollment && enrollment.state_based_on_date == :inactive
@@ -484,12 +490,15 @@ class CoursesController < ApplicationController
       end
     end
     if session[:accepted_enrollment_uuid] && (e = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid]))
-      e.accept! if e.invited?
-      flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
+      if e.invited?
+        e.accept!
+        flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
+      end
       session[:accepted_enrollment_uuid] = nil
       session[:enrollment_uuid_course_id] = nil
       session[:enrollment_uuid] = nil if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
     end
+    false
   end
   protected :check_enrollment
   
@@ -611,30 +620,43 @@ class CoursesController < ApplicationController
     end
 
     @context = Course.find(params[:id])
+    if request.xhr?
+      if authorized_action(@context, @current_user, [:read, :read_as_admin])
+        if is_authorized_action?(@context, @current_user, [:manage_students, :manage_admin_users])
+          render :json => @context.to_json(:include => {:current_enrollments => {:methods => :email}})
+        else
+          render :json => @context.to_json
+        end
+      end
+      return
+    end
+
     @context_enrollment = @context.enrollments.find_by_user_id(@current_user.id) if @context && @current_user
     @unauthorized_message = t('unauthorized.invalid_link', "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.") if params[:invitation]
-    claim_course if session[:claim_course_uuid] || params[:verification] 
+    claim_course if session[:claim_course_uuid] || params[:verification]
     @context.claim if @context.created?
     return if check_enrollment
     check_pending_teacher
     check_unknown_user
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
+
     if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
       return redirect_to course_settings_path(@context.id)
     end
 
-    start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment && @context_enrollment.state_based_on_date == :inactive
-    @unauthorized_message = t('unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context_enrollment && @context.claimed?
+    enrollment = @context_enrollment || @pending_enrollment
+    start_date = enrollment.enrollment_dates.map(&:first).compact.min if enrollment && enrollment.state_based_on_date == :inactive
+    @unauthorized_message = t('unauthorized.unpublished', "This course has not been published by the instructor yet.") if enrollment && @context.claimed?
     @unauthorized_message = t('unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now
-    if authorized_action(@context, @current_user, :read)
+    if is_authorized_action?(@context, @current_user, :read)
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
         @assignments_needing_publishing = @context.assignments.active.need_publishing || []
       end
-      
+
       add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
-      
+
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
-      
+
       @contexts = [@context]
       case @course_home_view
       when "wiki"
@@ -663,19 +685,15 @@ class CoursesController < ApplicationController
         end
         @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
       end
-      
+
       if @current_user and (@show_recent_feedback = (@current_user.student_enrollments.active.count > 0))
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
-
-      respond_to do |format|
-        format.html
-        if @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users)
-          format.json { render :json => @context.to_json(:include => {:current_enrollments => {:methods => :email}}) }
-        else
-          format.json { render :json => @context.to_json }
-        end
-      end
+    else
+      # clear notices that would have been displayed as a result of processing
+      # an enrollment invitation, since we're giving an error
+      flash[:notice] = nil
+      render_unauthorized_action(@context)
     end
   end
   

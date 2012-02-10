@@ -16,5 +16,4 @@ describe "jQuery.store" do
     get '/'
     driver.execute_script("return $.store.get('somethingIWantToStore');").should be_true
   end
-  
 end

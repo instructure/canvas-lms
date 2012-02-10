@@ -28,6 +28,7 @@ class AssignmentsApiController < ApplicationController
   # Returns the list of assignments for the current context.
   #
   # @response_field id The unique identifier for the assignment.
+  # @response_field assignment_group_id The unique identifier of the assignment's group.
   # @response_field name The name of the assignment.
   # @response_field needs_grading_count [Integer] If the requesting user has grading rights, the number of submissions that need grading.
   # @response_field position [Integer] The sorting order of this assignment in
@@ -46,6 +47,7 @@ class AssignmentsApiController < ApplicationController
   #   [
   #     {
   #       "id": 4,
+  #       "assignment_group_id": 2,
   #       "name": "some assignment",
   #       "points_possible": 12,
   #       "grading_type": "points",

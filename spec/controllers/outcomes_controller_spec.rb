@@ -135,4 +135,43 @@ describe OutcomesController do
       get 'details', :account_id => @account.id, :outcome_id => @outcome.id
     end
   end
+
+  describe "GET 'list'" do
+    it "should list account outcomes for an account context" do
+      @account = Account.default
+      account_admin_user
+      account_outcome
+
+      user_session(@user)
+      get 'list', :account_id => @account.id
+      response.should be_success
+      data = json_parse
+      data.should_not be_empty
+    end
+
+    it "should list account outcomes for a subaccount context" do
+      @account = Account.default
+      account_admin_user
+      account_outcome
+      sub_account_1 = @account.sub_accounts.create!
+
+      user_session(@user)
+      get 'list', :account_id => sub_account_1.id
+      response.should be_success
+      data = json_parse
+      data.should_not be_empty
+    end
+
+    it "should list account outcomes for a course context" do
+      @account = Account.default
+      account_admin_user
+      account_outcome
+
+      course_with_teacher_logged_in
+      get 'list', :course_id => @course.id
+      response.should be_success
+      data = json_parse
+      data.should_not be_empty
+    end
+  end
 end

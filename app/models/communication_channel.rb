@@ -17,6 +17,8 @@
 #
 
 class CommunicationChannel < ActiveRecord::Base
+  extend ActiveSupport::Memoizable
+
   # You should start thinking about communication channels
   # as independent of pseudonyms
   include Workflow
@@ -201,7 +203,7 @@ class CommunicationChannel < ActiveRecord::Base
     policy_matches_frequency = {}
     policy_for_channel = {}
     can_notify = {}
-    user.notification_policies.select{|p| p.notification_id == notification.id}.each do |policy|
+    NotificationPolicy.for(user).for(notification).each do |policy|
       policy_matches_frequency[policy.communication_channel_id] = true if policy.frequency == frequency
       policy_for_channel[policy.communication_channel_id] = true
       can_notify[policy.communication_channel_id] = false if policy.frequency == 'never'

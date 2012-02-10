@@ -62,10 +62,15 @@ define 'compiled/calendar/EditCalendarEventDetails', [
       if propagate != false
         @contextChangeCB(context)
 
-      # Update the edit and more options links with the new context
-      @form.attr('action', @currentContextInfo.create_calendar_event_url)
-      @form.find(".more_options_link").attr('href', @currentContextInfo.new_calendar_event_url)
-
+      # Update the edit and more option urls
+      moreOptionsHref = null
+      if @event.isNewEvent()
+        @form.attr('action', @currentContextInfo.create_calendar_event_url)
+        moreOptionsHref = @currentContextInfo.new_calendar_event_url
+      else
+        moreOptionsHref  = $.replaceTags(@currentContextInfo.calendar_event_url, 'id', @event.object.id)
+        moreOptionsHref += '/edit'
+      @form.find(".more_options_link").attr 'href', moreOptionsHref
 
     setupTimeAndDatePickers: () =>
       @form.find(".date_field").date_field()
@@ -79,7 +84,7 @@ define 'compiled/calendar/EditCalendarEventDetails', [
           end_time = @form.find(".time_field.end_time").next(".datetime_suggest").text()
           if @form.find(".time_field.end_time").next(".datetime_suggest").hasClass('invalid_datetime')
             end_time = null
-          end_time ?= @form.find(".time_field.end_time").val();
+          end_time ?= @form.find(".time_field.end_time").val()
 
           startDate = Date.parse(start_time)
           endDate = Date.parse(end_time)

@@ -60,6 +60,7 @@
       <label for="error-email">{{#t "your_email_address"}}Your email address{{/t}}</label>
       <input type="email" name="error[email]" id="error-email">
     </div>
+    <input type="hidden" name="error[url]" value="{{url}}">
     <div class="button-container">
       <button type="submit" data-text-while-loading="{{#t "Submitting_Ticket"}}Submitting Ticket...{{/t}}" class="button submit_button"><img src="/images/email.png" alt=""/>{{#t "submit_this_support_request"}}Submit Ticket{{/t}}</button>
     </div>

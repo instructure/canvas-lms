@@ -57,6 +57,7 @@ define 'compiled/helpDialog', [
           helpLinks: links
           showBadBrowserMessage: INST.browser.ie
           browserVersion: INST.browser.version
+          url: window.location
 
         @$dialog.html(helpDialogTemplate locals)
         @initTicketForm()

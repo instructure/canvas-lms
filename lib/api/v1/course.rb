@@ -25,7 +25,7 @@ module Api::V1::Course
     include_total_scores = includes.include?('total_scores') && !course.settings[:hide_final_grade]
     include_url = includes.include?('html_url')
 
-    base_attributes = %w(id name course_code)
+    base_attributes = %w(id name course_code account_id)
     allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes
     hash = api_json(course, user, session, :only => allowed_attributes)
     hash['sis_course_id'] = course.sis_source_id
@@ -42,13 +42,13 @@ module Api::V1::Course
       end
     end
     hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
-    if include_grading && enrollments && enrollments.any? { |e| e.participating_admin? }
+    if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
       hash['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
     end
     if include_syllabus
       hash['syllabus_body'] = course.syllabus_body
     end
-    hash['html_url'] = course_url(course) if include_url
+    hash['html_url'] = course_url(course, :host => HostUrl.context_host(course)) if include_url
     hash
   end
 

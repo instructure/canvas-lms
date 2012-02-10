@@ -88,7 +88,7 @@ describe "help dialog" do
     wait_for_ajaximations
     feedback_form.should_not be_displayed
     cm = ConversationMessage.last
-    cm.recipients.should == @course.admins
+    cm.recipients.should == @course.instructors
     cm.body.should match(/test message/)
   end
 
@@ -96,7 +96,7 @@ describe "help dialog" do
     course_with_student_logged_in(:active_all => true)
 
     Setting.set('show_feedback_link', 'true')
-    get "/dashboard"
+    get "/courses"
     driver.find_element(:css, '.help_dialog_trigger').click
     wait_for_ajaximations
     create_ticket_link = driver.find_element(:css, "#help-dialog a[href='#create_ticket']")
@@ -113,7 +113,8 @@ describe "help dialog" do
     er = ErrorReport.last
     er.subject.should == 'test subject'
     er.comments.should == 'test comments'
-    er.data['user_perceived_severity'].should == severity
+    er.data['user_perceived_severity'].should eql severity
+    er.url.should match /\/courses$/
     er.guess_email.should eql @user.email
   end
 

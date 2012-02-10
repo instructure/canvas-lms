@@ -1,10 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 require 'lib/handlebars/handlebars'
 
-describe "handlebars selenium tests" do
+describe "handlebars" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
+  before (:each) do
     course_with_teacher_logged_in
     get "/"
   end
@@ -34,5 +34,4 @@ describe "handlebars selenium tests" do
       welp, see you l8r! dont forget 2 <a href="http://foo.bar">like us</a> on facebook lol
     RESULT
   end
-
 end

@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "jquery selenium tests" do
+describe "jquery" do
   it_should_behave_like "in-process server selenium tests"
 
 
@@ -30,5 +30,4 @@ describe "jquery selenium tests" do
     driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase.should  eql("post")
     driver.execute_script("return $('form input[name=_method]').val()").should eql("delete")
   end
-  
 end

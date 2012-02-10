@@ -2,7 +2,8 @@
 define 'compiled/Gradebook', [
   'i18n'
   'jst/gradebook2/section_to_show_menu'
-], (I18n, sectionToShowMenuTemplate) ->
+  'jst/gradebook2/column_header'
+], (I18n, sectionToShowMenuTemplate, columnHeaderTemplate) ->
   I18n = I18n.scoped 'gradebook2'
 
   class Gradebook
@@ -18,7 +19,7 @@ define 'compiled/Gradebook', [
       @show_attendance = $.store.userGet("show_attendance_#{@options.context_code}") == 'true'
       @include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_#{@options.context_code}") == 'true'
       $.subscribe 'assignment_group_weights_changed', @buildRows
-      $.subscribe 'assignment_muting_toggled', @buildRows
+      $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
       promise = $.when(
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
@@ -115,6 +116,14 @@ define 'compiled/Gradebook', [
     rowFilter: (student) =>
       !@sectionToShow || (student.section.id == @sectionToShow)
 
+    handleAssignmentMutingChange: (assignment) =>
+      idx = @gradeGrid.getColumnIndex("assignment_#{assignment.id}")
+      colDef = @gradeGrid.getColumns()[idx]
+      colDef.name = @assignmentHeaderHtml(assignment)
+      @gradeGrid.setColumns(@gradeGrid.getColumns())
+      @fixColumnReordering()
+      @buildRows()
+
     # filter, sort, and build the dataset for slickgrid to read from, then force
     # a full redraw
     buildRows: =>
@@ -202,7 +211,8 @@ define 'compiled/Gradebook', [
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
       gradeToShow = val
-      percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 100)
+      # rounds percentage to one decimal place
+      percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 1000) / 10
       percentage = 0 if isNaN(percentage)
       if !gradeToShow.possible then percentage = '-' else percentage += "%"
       """
@@ -363,7 +373,6 @@ define 'compiled/Gradebook', [
 
     initHeader: =>
       if @sections_enabled
-        $section_being_shown = $('#section_being_shown')
         allSectionsText = I18n.t('all_sections', 'All Sections')
         sections = [{ name: allSectionsText, checked: !@sectionToShow}]
         for id, s of @sections
@@ -374,7 +383,7 @@ define 'compiled/Gradebook', [
 
         $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections, scrolling: sections.length > 15))
         (updateSectionBeingShownText = =>
-          $section_being_shown.text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
+          $('#section_being_shown').text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
         )()
         $('#section_to_show').after($sectionToShowMenu).show().kyleMenu
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
@@ -389,8 +398,8 @@ define 'compiled/Gradebook', [
         $settingsMenu.find("##{setting}").prop('checked', @[setting]).change (event) =>
           @[setting] = $(event.target).is(':checked')
           $.store.userSet "#{setting}_#{@options.context_code}", (''+@[setting])
-          @gradeGrid.setColumns @getVisibleGradeGridColumns()
-          @gradeGrid.invalidate()
+          @gradeGrid.setColumns @getVisibleGradeGridColumns() if setting is 'show_attendance'
+          @buildRows()
 
       # don't show the "show attendance" link in the dropdown if there's no attendance assignments
       unless ($.detect @gradeGrid.getColumns(), -> this.object?.submission_types == "attendance")
@@ -430,9 +439,15 @@ define 'compiled/Gradebook', [
       res = []
       for column in @allAssignmentColumns
         submissionType = ''+ column.object.submission_types
-        res.push(column) unless submissionType is "not_graded" and !@include_ungraded_assignments or
+        res.push(column) unless submissionType is "not_graded" or
                                 submissionType is "attendance" and !@show_attendance
       res.concat(@aggregateColumns)
+
+    assignmentHeaderHtml: (assignment) ->
+      columnHeaderTemplate
+        assignment: assignment
+        href: "#{@options.context_url}/assignments/#{assignment.id}"
+        showPointsPossible: assignment.points_possible?
 
     initGrid: =>
       #this is used to figure out how wide to make each column
@@ -459,10 +474,6 @@ define 'compiled/Gradebook', [
       }]
 
       @allAssignmentColumns = for id, assignment of @assignments
-        href = "#{@options.context_url}/assignments/#{assignment.id}"
-        html = "<a class='assignment-name' href='#{href}'>#{assignment.name}</a>
-                <a class='gradebook-header-drop' data-assignment-id='#{assignment.id}' href='#' role='button'>#{I18n.t 'assignment_options', 'Assignment Options'}</a>"
-        html += "<div class='assignment-points-possible'>#{I18n.t 'points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible}</div>" if assignment.points_possible?
         outOfFormatter = assignment &&
                          assignment.grading_type == 'points' &&
                          assignment.points_possible? &&
@@ -472,7 +483,7 @@ define 'compiled/Gradebook', [
         columnDef =
           id: fieldName
           field: fieldName
-          name: html
+          name: @assignmentHeaderHtml(assignment)
           object: assignment
           formatter: this.cellFormatter
           editor: outOfFormatter ||
@@ -484,9 +495,6 @@ define 'compiled/Gradebook', [
           sortable: true
           toolTip: true
           type: 'assignment'
-
-        if ''+assignment.submission_types is "not_graded"
-          columnDef.cssClass = (columnDef.cssClass || '') + ' ungraded'
 
         if fieldName in @assignmentsToHide
           columnDef.width = 10
@@ -562,8 +570,7 @@ define 'compiled/Gradebook', [
       @gradeGrid = @multiGrid.grids[1]
       @gradeGrid.onCellChange.subscribe (event, data) =>
         @calculateStudentGrade(data.item)
-        @gradeGrid.invalidate
-      @gradeGrid.onBeforeCellEditorDestroy.subscribe (event,data) -> debugger
+        @gradeGrid.invalidate()
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
         student.row = i for student, i in @rows

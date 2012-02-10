@@ -46,7 +46,7 @@ module Delayed
             # this funky sub-sub-select is to force mysql to create a temporary
             # table, otherwise it fails complaining that you can't select from
             # the same table you are updating
-            self.class.execute_with_sanitize(["UPDATE delayed_jobs SET next_in_strand = 1 WHERE id = (SELECT _id.id FROM (SELECT id FROM delayed_jobs j2 WHERE j2.strand = ? ORDER BY j2.strand, j2.id ASC LIMIT 1) AS _id)", strand])
+            connection.execute(sanitize_sql(["UPDATE delayed_jobs SET next_in_strand = 1 WHERE id = (SELECT _id.id FROM (SELECT id FROM delayed_jobs j2 WHERE j2.strand = ? ORDER BY j2.strand, j2.id ASC LIMIT 1) AS _id)", strand]))
           end
         end
 

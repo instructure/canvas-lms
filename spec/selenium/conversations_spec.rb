@@ -1,17 +1,110 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-shared_examples_for "conversations selenium tests" do
+describe "conversations" do
   it_should_behave_like "in-process server selenium tests"
 
-  before do
+  prepend_before(:each) do
+    Setting.set("file_storage_test_override", "local")
+  end
+
+  before(:each) do
     course_with_teacher_logged_in
     @user.watched_conversations_intro
     @user.save
   end
 
-  def new_conversation
-    get "/conversations"
-    keep_trying_until{ driver.find_element(:id, "create_message_form") }
+  def new_conversation(reload=true)
+    if reload
+      get "/conversations"
+      keep_trying_until { driver.find_element(:id, "create_message_form") }
+    else
+      driver.find_element(:id, "action_compose_message").click
+    end
+
+    @input = find_with_jquery("#create_message_form input:visible")
+    @browser = find_with_jquery("#create_message_form .browser:visible")
+    @level = 1
+    @elements = nil
+  end
+
+  def browse_menu
+    @browser.click
+    keep_trying_until {
+      find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
+    }
+    wait_for_animations
+  end
+
+  def browse(*names)
+    name = names.shift
+    @level += 1
+    prev_elements = elements
+    element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
+
+    element.first.click
+    wait_for_ajaximations(150)
+    keep_trying_until {
+      find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
+    }
+
+    @elements = nil
+    elements
+
+    if names.present?
+      browse(*names, &Proc.new)
+    else
+      yield
+    end
+
+    @elements = prev_elements
+    @level -= 1
+    @input.send_keys(:arrow_left)
+    wait_for_animations
+  end
+
+  def elements
+    @elements ||= driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
+      [e, (e.find_element(:tag_name, :b).text rescue e.text)]
+    }
+  end
+
+  def menu
+    elements.map(&:last)
+  end
+
+  def toggled
+    elements.select { |e| e.first.attribute('class') =~ /(^| )on($| )/ }.map(&:last)
+  end
+
+  def click(name)
+    element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
+    element.first.click
+  end
+
+  def toggle(name)
+    element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
+    element.first.find_element(:class, 'toggle').click
+  end
+
+  def tokens
+    find_all_with_jquery("#create_message_form .token_input li div").map(&:text)
+  end
+
+  def search(text, input_id="recipients")
+    @input.send_keys(text)
+    keep_trying_until do
+      driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == text
+    end
+    @elements = nil
+    yield
+    @elements = nil
+    if input_id == "recipients"
+      @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
+      keep_trying_until do
+        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 ||
+          driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == ''
+      end
+    end
   end
 
   def submit_message_form(opts={})
@@ -34,7 +127,7 @@ shared_examples_for "conversations selenium tests" do
 
     opts[:attachments].each_with_index do |fullpath, i|
       driver.find_element(:id, "action_add_attachment").click
-      
+
       keep_trying_until {
         find_all_with_jquery("#create_message_form .file_input:visible")[i]
       }.send_keys(fullpath)
@@ -71,7 +164,7 @@ shared_examples_for "conversations selenium tests" do
     }
     elements.first.click
     wait_for_ajaximations
-    msgs = driver.find_elements(:css, "div#messages ul.messages > li")
+    driver.find_elements(:css, "div#messages ul.messages > li")
   end
 
   context "conversation loading" do
@@ -80,11 +173,11 @@ shared_examples_for "conversations selenium tests" do
       num = 51
       num.times { conversation(@me, user) }
       get "/conversations"
-      keep_trying_until{
+      keep_trying_until do
         elements = find_all_with_jquery("#conversations > ul > li:visible")
         elements.last.location_once_scrolled_into_view
-        elements.size == num
-      }
+        elements.size.should == num
+      end
     end
 
     it "should properly clear the identity header when conversations are read" do
@@ -100,7 +193,7 @@ shared_examples_for "conversations selenium tests" do
   end
 
   context "recipient finder" do
-    before do
+    before (:each) do
       @course.update_attribute(:name, "the course")
       @course.default_section.update_attribute(:name, "the section")
       @other_section = @course.course_sections.create(:name => "the other section")
@@ -114,80 +207,6 @@ shared_examples_for "conversations selenium tests" do
       @group.users << @s1 << @user
 
       new_conversation
-      @input = find_with_jquery("#create_message_form input:visible")
-      @browser = find_with_jquery("#create_message_form .browser:visible")
-      @level = 1
-    end
-
-    def browse_menu
-      @browser.click
-      keep_trying_until{
-        find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
-      }
-      wait_for_animations
-    end
-
-    def browse(name)
-      @level += 1
-      prev_elements = elements
-      element = prev_elements.detect{ |e| e.last == name } or raise "menu item does not exist"
-
-      element.first.click
-      wait_for_ajaximations(150)
-      keep_trying_until{
-        find_all_with_jquery('.autocomplete_menu:visible .list').size.should eql(@level)
-      }
-
-      @elements = nil
-      elements
-
-      yield
-
-      @elements = prev_elements
-      @level -= 1
-      @input.send_keys(:arrow_left)
-      wait_for_animations
-    end
-
-    def elements
-      @elements ||= driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
-        [e, (e.find_element(:tag_name, :b).text rescue e.text)]
-      }
-    end
-
-    def menu
-      elements.map(&:last)
-    end
-
-    def toggled
-      elements.select{|e| e.first.attribute('class') =~ /(^| )on($| )/ }.map(&:last)
-    end
-
-    def click(name)
-      element = elements.detect{ |e| e.last == name } or raise "menu item does not exist"
-      element.first.click
-    end
-
-    def toggle(name)
-      element = elements.detect{ |e| e.last == name } or raise "menu item does not exist"
-      element.first.find_element(:class, 'toggle').click
-    end
-
-    def tokens
-      find_all_with_jquery("#create_message_form .token_input li div").map(&:text)
-    end
-
-    def search(text)
-      @input.send_keys(text)
-      keep_trying_until{ driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == text }
-      @elements = nil
-      yield
-      @elements = nil
-      @input.send_keys(*@input.attribute('value').size.times.map{:backspace})
-      keep_trying_until{
-        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 ||
-        driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == ''
-      }
     end
 
     it "should allow browsing" do
@@ -251,7 +270,7 @@ shared_examples_for "conversations selenium tests" do
         toggle "Students"
         toggled.should eql ["Students"]
         tokens.should eql ["the course: Students"]
-        
+
         toggle "Teachers"
         toggled.should eql ["Everyone", "Teachers", "Students"]
         tokens.should eql ["the course: Everyone"]
@@ -259,7 +278,7 @@ shared_examples_for "conversations selenium tests" do
         toggle "Teachers"
         toggled.should eql ["Students"]
         tokens.should eql ["the course: Students"]
-        
+
         browse "Teachers" do
           toggle "nobody@example.com"
           toggled.should eql ["nobody@example.com"]
@@ -342,6 +361,7 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should allow a user id in the url hash to add recipient" do
+      skip_if_ie("Java crashes")
       # check without any user_name
       get "/conversations#/conversations?user_id=#{@s1.id}"
       wait_for_ajaximations
@@ -354,6 +374,7 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should reject a non-contactable user id in the url hash" do
+      skip_if_ie("Java crashes")
       other = User.create(:name => "other guy")
       get "/conversations#/conversations?user_id=#{other.id}"
       wait_for_ajaximations
@@ -361,6 +382,7 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should allow a non-contactable user in the hash if a shared conversation exists" do
+      skip_if_ie("Java crashes")
       other = User.create(:name => "other guy")
       # if the users have a conversation in common already, then the recipient can be added
       c = Conversation.initiate([@user.id, other.id], true)
@@ -400,7 +422,7 @@ shared_examples_for "conversations selenium tests" do
       add_attachment_link.should_not be_nil
       find_all_with_jquery("#attachment_list > .attachment:visible").should be_empty
       add_attachment_link.click
-      keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible").should be_present }
+      keep_trying_until { find_all_with_jquery("#attachment_list > .attachment:visible").should be_present }
     end
 
     it "should be able to add multiple attachments to the message form" do
@@ -475,12 +497,12 @@ shared_examples_for "conversations selenium tests" do
   def add_recipient(search)
     input = find_with_jquery("#create_message_form input:visible")
     input.send_keys(search)
-    keep_trying_until{ driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
+    keep_trying_until { driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
     input.send_keys(:return)
   end
 
   context "user notes" do
-    before do
+    before (:each) do
       @the_teacher = User.create(:name => "teacher bob")
       @course.enroll_teacher(@the_teacher)
       @the_student = User.create(:name => "student bob")
@@ -544,7 +566,7 @@ shared_examples_for "conversations selenium tests" do
       submission1.add_comment(:comment => "hey bob", :author => @me)
       submission1.add_comment(:comment => "wut up teacher", :author => @bob)
       submission2.add_comment(:comment => "my name is bob", :author => @bob)
-      submission2.assignment.grade_student(@bob, { :grade => 0.9 })
+      submission2.assignment.grade_student(@bob, {:grade => 0.9})
       conversation(@bob)
       get "/conversations"
       elements = nil
@@ -573,12 +595,13 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should interleave submissions with messages based on comment time" do
+      SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(10.minutes.ago, 8.minutes.ago)
       @me = @user
       @bob = student_in_course(:name => "bob", :active_all => true).user
       @conversation = conversation(@bob).conversation
-      submission1 = submission_model(:course => @course, :user => @bob)
-      submission1.add_comment(:comment => "hey bob", :author => @me).update_attribute(:created_at, 10.minutes.ago)
       @conversation.conversation_messages.first.update_attribute(:created_at, 9.minutes.ago)
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission1.add_comment(:comment => "hey bob", :author => @me)
 
       # message comes first, then submission, due to creation times
       msgs = get_messages
@@ -587,7 +610,7 @@ shared_examples_for "conversations selenium tests" do
       msgs[1].should have_class('submission')
 
       # now new submission comment bumps it up
-      submission1.add_comment(:comment => "hey teach", :author => @bob).update_attribute(:created_at, 8.minutes.ago)
+      submission1.add_comment(:comment => "hey teach", :author => @bob)
       msgs = get_messages
       msgs.size.should == 2
       msgs[0].should have_class('submission')
@@ -601,10 +624,35 @@ shared_examples_for "conversations selenium tests" do
       msgs[1].should have_class('submission')
       msgs[2].should have_class('message')
     end
+
+    it "should allow deleting submission messages from the conversation" do
+      @me = @user
+      @bob = student_in_course(:name => "bob", :active_all => true).user
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission1.add_comment(:comment => "hey teach", :author => @bob)
+      @conversation = @me.conversations.first
+      @conversation.should be_present
+
+      msgs = get_messages
+      msgs.size.should == 1
+      msgs.first.click
+      wait_for_animations
+      delete = driver.find_element(:id, 'action_delete')
+      delete.should be_displayed
+      delete.click
+      driver.switch_to.alert.accept
+
+      keep_trying_until {
+        elements = find_all_with_jquery("#conversations > ul > li:visible")
+        elements.size == 0
+      }
+      @conversation.reload
+      @conversation.last_message_at.should be_nil
+    end
   end
 
   context "group conversations" do
-    before do
+    before (:each) do
       @course.update_attribute(:name, "the course")
       @course.default_section.update_attribute(:name, "the section")
       @other_section = @course.course_sections.create(:name => "the other section")
@@ -629,7 +677,7 @@ shared_examples_for "conversations selenium tests" do
       @input.send_keys(name)
       wait_for_ajaximations(150)
       loop do
-        keep_trying_until{ find_all_with_jquery('.autocomplete_menu:visible .list').size == level }
+        keep_trying_until { find_all_with_jquery('.autocomplete_menu:visible .list').size == level }
         driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").detect { |e|
           (e.find_element(:tag_name, :b).text rescue e.text) == name
         }.click
@@ -640,7 +688,7 @@ shared_examples_for "conversations selenium tests" do
         level += 1
         name = names.shift
       end
-      keep_trying_until{ find_with_jquery('.autocomplete_menu:visible').nil? }
+      keep_trying_until { find_with_jquery('.autocomplete_menu:visible').nil? }
     end
 
     it "should not be an option with no recipients" do
@@ -684,10 +732,10 @@ shared_examples_for "conversations selenium tests" do
   end
 
   context "form audience" do
-    before do
+    before (:each) do
       # have @course, @teacher from before
       # creates @student
-      student_in_course({:course => @course})
+      student_in_course(:course => @course, :active_all => true)
 
       @course.update_attribute(:name, "the course")
 
@@ -729,7 +777,7 @@ shared_examples_for "conversations selenium tests" do
 
       wait_for_ajaximations
 
-      driver.find_element(:id, "flash_notice_message").text.should =~ /Messages Sent/
+      assert_flash_notice_message /Messages Sent/
 
       # no conversations should show up in the conversation list
       conversations = driver.find_elements(:css, "#conversations > ul > li")
@@ -737,14 +785,69 @@ shared_examples_for "conversations selenium tests" do
       conversations.first["id"].should == "conversations_loader"
     end
   end
-end
 
-describe "conversations Windows-Firefox-Tests" do
-  it_should_behave_like "conversations selenium tests"
-  prepend_before(:each) {
-    Setting.set("file_storage_test_override", "local")
-  }
-  prepend_before(:all) {
-    Setting.set("file_storage_test_override", "local")
-  }
+  context "context filtering" do
+    before do
+      @course.update_attribute(:name, "the course")
+      @course1 = @course
+      @s1 = User.create(:name => "student1")
+      @s2 = User.create(:name => "student2")
+      @course1.enroll_user(@s1)
+      @course1.enroll_user(@s2)
+      @group = @course1.groups.create(:name => "the group")
+      @group.users << @user << @s1 << @s2
+
+      @course2 = course(:active_all => true, :course_name => "that course")
+      @course2.enroll_teacher(@user).accept
+      @course2.enroll_user(@s1)
+    end
+
+    it "should capture the course when sending a message to a group" do
+      new_conversation
+      browse_menu
+
+      browse("the course", "Student Groups", "the group"){ click "Select All" }
+      submit_message_form(:add_recipient => false)
+
+      audience = find_with_jquery("#create_message_form ul.conversations .audience")
+      audience.text.should include @course1.name
+      audience.text.should_not include @course2.name
+      audience.text.should include @group.name
+    end
+
+    it "should capture the course when sending a message to a user under a course" do
+      new_conversation
+      browse_menu
+
+      browse("the course"){ search("stu"){ click "student1" } }
+      submit_message_form(:add_recipient => false)
+
+      audience = find_with_jquery("#create_message_form ul.conversations .audience")
+      audience.text.should include @course1.name
+      audience.text.should_not include @course2.name
+      audience.text.should_not include @group.name
+    end
+
+    it "should let you filter by a course" do
+      new_conversation
+      browse_menu
+      browse("the course", "Everyone"){ click "Select All" }
+      submit_message_form(:add_recipient => false, :message => "asdf")
+
+      new_conversation(false)
+      browse_menu
+      browse("that course", "Everyone"){ click "Select All" }
+      submit_message_form(:add_recipient => false, :message => "qwerty")
+
+      find_all_with_jquery('#conversations > ul > li:visible').size.should eql 2
+
+      @input = find_with_jquery("#context_tags_filter input:visible")
+      search("the course", "context_tags"){ click("the course") }
+
+      keep_trying_until { driver.find_element(:id, "create_message_form") }
+      conversations = find_all_with_jquery('#conversations > ul > li:visible')
+      conversations.size.should eql 1
+      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    end
+  end
 end

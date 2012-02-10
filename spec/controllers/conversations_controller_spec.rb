@@ -19,10 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConversationsController do
-  def conversation(num_other_users = 1)
+  def conversation(num_other_users = 1, course = @course)
     user_ids = num_other_users.times.map{
       u = User.create
-      enrollment = @course.enroll_student(u)
+      enrollment = course.enroll_student(u)
       enrollment.workflow_state = 'active'
       enrollment.save
       u.associated_accounts << Account.default
@@ -49,6 +49,7 @@ describe ConversationsController do
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
       assigns[:contexts][:courses].to_a.map{|p|p[1]}.
         reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
+      assigns[:filterable].should be_true
     end
 
     it "should work for an admin as well" do
@@ -60,6 +61,38 @@ describe ConversationsController do
       get 'index'
       response.should be_success
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
+    end
+
+    it "should return conversations matching the specified filter" do
+      course_with_student_logged_in(:active_all => true)
+      @c1 = conversation
+      @other_course = course(:active_all => true)
+      enrollment = @other_course.enroll_student(@user)
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @user.reload
+      @c2 = conversation(1, @other_course)
+
+      get 'index', :filter => @other_course.asset_string
+      response.should be_success
+      assigns[:conversations_json].size.should eql 1
+      assigns[:conversations_json][0][:id].should == @c2.conversation_id
+    end
+
+    it "should hide the filter UI if some conversations have not been tagged yet" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      Conversation.update_all "tags = NULL"
+      ConversationParticipant.update_all "tags = NULL"
+      ConversationMessageParticipant.update_all "tags = NULL"
+
+      # create some more that are tagged
+      conversation
+      conversation
+
+      get 'index'
+      response.should be_success
+      assigns[:filterable].should be_false
     end
   end
 
@@ -150,6 +183,42 @@ describe ConversationsController do
 
       Conversation.count.should eql(old_count + 2)
     end
+
+    it "should correctly infer context tags" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course1 = @course
+      @group1 = @course1.groups.create!
+      @group2 = @course1.groups.create!
+      @group1.users << @user
+      @group2.users << @user
+
+      new_user1 = User.create
+      enrollment1 = @course1.enroll_student(new_user1)
+      enrollment1.workflow_state = 'active'
+      enrollment1.save
+      @group1.users << new_user1
+      @group2.users << new_user1
+
+      new_user2 = User.create
+      enrollment2 = @course1.enroll_student(new_user2)
+      enrollment2.workflow_state = 'active'
+      enrollment2.save
+      @group1.users << new_user2
+      @group2.users << new_user2
+
+      @course2 = course(:active_all => true)
+      enrollment3 = @course2.enroll_student(@user)
+      enrollment2.workflow_state = 'active'
+      enrollment2.save
+
+      post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true
+      response.should be_success
+
+      c = Conversation.first
+      c.tags.sort.should eql [@course1.asset_string, @course2.asset_string, @group1.asset_string].sort
+      # course1 inferred from group1, course2 inferred from synthetic context,
+      # group1 explicit, group2 not present (even though it's shared by everyone)
+    end
   end
 
   describe "POST 'update'" do
@@ -157,12 +226,12 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation(2).update_attribute(:workflow_state, "unread")
 
-      post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :label => "red"}
+      post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :starred => "1"}
       response.should be_success
       @conversation.reload
       @conversation.subscribed?.should be_false
       @conversation.should be_archived
-      @conversation.label.should eql 'red'
+      @conversation.starred.should be_true
     end
   end
 
@@ -207,7 +276,23 @@ describe ConversationsController do
       enrollment.save
       post 'add_recipients', :conversation_id => @conversation.conversation_id, :recipients => [new_user.id.to_s]
       response.should be_success
-      @conversation.participants.size.should == 4 # includes @user
+      @conversation.reload.participants.size.should == 4 # includes @user
+    end
+
+    it "should correctly infer context tags" do
+      course_with_student_logged_in(:active_all => true)
+      conversation(2)
+
+      @group = @course.groups.create!
+      @conversation.participants.each{ |user| @group.users << user }
+      2.times{ @group.users << User.create }
+
+      post 'add_recipients', :conversation_id => @conversation.conversation_id, :recipients => [@group.asset_string]
+      response.should be_success
+
+      c = Conversation.first
+      c.tags.sort.should eql [@course.asset_string, @group.asset_string]
+      # course inferred (when created), group explicit
     end
   end
 

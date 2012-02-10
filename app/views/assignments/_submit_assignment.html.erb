@@ -482,7 +482,7 @@ window.submissionAttachmentIndex = -1;
           <script>
             $(document).ready(function() {
               $("#submit_media_recording_form .submit_button").attr('disabled', true).text("<%= t 'messages.record_before_submitting', "Record Before Submitting" %>");
-              $("#media_media_recording_submission_holder .record_media_comment_link").click(function(event) {
+              $("#media_media_recording_submission_holder .record_media_comment_link").bind('click', function(event) {
                 event.preventDefault();
                 $("#media_media_recording_submission").mediaComment('create', 'any', function(id, type) {
                   $("#submit_media_recording_form .submit_button").attr('disabled', false).text("<%= t 'buttons.submit_assignment', "Submit Assignment" %>");
@@ -491,7 +491,6 @@ window.submissionAttachmentIndex = -1;
                   $("#media_media_recording_submission_holder").children().hide();
                   $("#media_media_recording_ready").show();
                   $("#media_media_recording_thumbnail").attr('id', 'media_comment_' + id);
-                }, function() {
                 });
               });
             });

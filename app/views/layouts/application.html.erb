@@ -17,6 +17,7 @@
   @body_classes << "with-right-side" if right_side and not right_side.strip.empty? 
   @body_classes << "padless-content" if @padless
   @body_classes << "context-#{@context.asset_string}" if @context
+
 -%><!DOCTYPE html>
 <!--[if IE 7 ]>    <html class="ie ie7" lang=<%= @locale %>> <![endif]-->
 <!--[if IE 8 ]>    <html class="ie ie8" lang=<%= @locale %>> <![endif]-->
@@ -48,6 +49,7 @@
   <%= include_stylesheets(*jammit_css_bundles) unless jammit_css_bundles.empty?  %>
   <!--[if lte IE 8]> <%= javascript_include_tag "vendor/html5.js" %> <![endif]-->
   <%= yield :stylesheets %>
+  <%= stylesheet_link_tag(Account.site_admin.settings[:global_stylesheet]) if Account.site_admin.settings[:global_stylesheet].present? %>
   <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] && !@domain_root_account.settings[:global_stylesheet].try(:strip).empty?  %>
     <link href="<%= @domain_root_account.settings[:global_stylesheet] %>" media="all" rel="stylesheet" type="text/css" />
   <% end %>
@@ -255,7 +257,7 @@
 <script>
   window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>');
   var INST = <%= raw(inst_env.to_json) %>;
-  var ENV = <%= raw env.to_json %>;
+  var ENV = <%= raw js_env.to_json %>;
 </script>
 
 <%= include_javascripts :common %>
@@ -266,6 +268,7 @@
 
 <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
 <%= render_js_blocks %>
+<%= javascript_include_tag(Account.site_admin.settings[:global_javascript]) if Account.site_admin.settings[:global_javascript].present? %>
 <% if @domain_root_account && @domain_root_account.settings[:global_includes] && !@domain_root_account.settings[:global_javascript].try(:strip).blank? %>
   <script src="<%= @domain_root_account.settings[:global_javascript] %>"></script>
 <% end %>

@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "grades selenium tests" do
+describe "grades" do
   it_should_behave_like "in-process server selenium tests"
 
-  before(:each) do
+  before (:each) do
     course_with_student_logged_in
     #add teacher
     @teacher = User.create!
@@ -36,7 +36,7 @@ describe "grades selenium tests" do
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
     @assignment.reload
-    @submission = @assignment.submit_homework(@user, :body => 'student first submission') 
+    @submission = @assignment.submit_homework(@user, :body => 'student first submission')
     @assignment.grade_student(@user, :grade => 2)
     @assessment = @association.assess({
       :user => @user,
@@ -79,33 +79,37 @@ describe "grades selenium tests" do
     #third assignment data
     due_date = due_date + 1.days
     @third_assignment = assignment_model({ :name => 'third assignment', :due_at => due_date, :course => @course })
-   
+
     get "/courses/#{@course.id}/grades"
     @grade_tbody = driver.find_element(:css, '#grades_summary > tbody')
   end
 
   it "should allow student to test modifying grades" do
+    # just one ajax request
+    Assignment.expects(:find_or_create_submission).once.returns(@submission)
 
     #check initial total
     final_row = driver.find_element(:css, '#submission_final-grade')
     final_row.find_element(:css, '.assignment_score .grade').text.should == '33.3'
-    
+
     #test changing existing scores
     first_row_grade = driver.find_element(:css, "#submission_#{@submission.assignment_id} .assignment_score .grade")
     first_row_grade.click
     first_row_grade.find_element(:css, 'input').clear
-    first_row_grade.find_element(:css, 'input').send_keys('4')
-    driver.execute_script('$("#grade_entry").blur();')
+    first_row_grade.find_element(:css, 'input').send_keys("4")
+    first_row_grade.find_element(:css, 'input').send_keys Selenium::WebDriver::Keys[:return]
     final_row.find_element(:css, '.assignment_score .grade').text.should == '40'
+
+    wait_for_ajax_requests
   end
 
   it "should display rubric on assignment" do
     #click rubric
     driver.find_element(:css, '.toggle_rubric_assessments_link').click
-    wait_for_animations 
-    driver.find_element(:css, '#assessor .rubric_title').text.include?(@rubric.title).should be_true
+    wait_for_animations
+    driver.find_element(:css, '#assessor .rubric_title').should include_text(@rubric.title)
 
-    driver.find_element(:css, '#assessor .rubric_total').text.include?('2').should be_true
+    driver.find_element(:css, '#assessor .rubric_total').should include_text('2')
 
     #check rubric comment
     driver.find_element(:css, '.assessment-comments div').text.should == 'cool, yo'
@@ -126,5 +130,4 @@ describe "grades selenium tests" do
     #statistics_text.include?('Low: 3').should be_true
 
   end
-
 end

@@ -17,10 +17,10 @@
 #
 
 class User < ActiveRecord::Base
-  # this has to be before include COntext to prevent a circular dependency in Course
+  # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
     col = table ? "#{table}.sortable_name" : 'sortable_name'
-    connection_pool.spec.config[:adapter] == 'postgresql' ? "LOWER(#{col})" : col
+    case_insensitive(col)
   end
 
   include Context
@@ -36,12 +36,12 @@ class User < ActiveRecord::Base
   has_one :communication_channel, :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
-  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment'or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment')))", :order => 'enrollments.created_at'
+  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
+  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')))", :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
+           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
                            OR
-                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment'or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment'))) )"
+                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment'))) )"
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments
@@ -77,10 +77,8 @@ class User < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :calendar_events, :as => 'context', :dependent => :destroy, :include => [:parent_event]
   has_many :eportfolios, :dependent => :destroy
-  has_many :notifications, :through => :notification_policies
   has_many :quiz_submissions, :dependent => :destroy
   has_many :dashboard_messages, :class_name => 'Message', :conditions => {:to => "dashboard", :workflow_state => 'dashboard'}, :order => 'created_at DESC', :dependent => :destroy
-  has_many :notification_policies, :include => :communication_channel, :dependent => :destroy
   has_many :collaborations, :order => 'created_at DESC'
   has_many :user_services, :order => 'created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
@@ -680,9 +678,6 @@ class User < ActiveRecord::Base
     return unless new_user
     return if new_user == self
     max_position = (new_user.pseudonyms.last.position || 0) rescue 0
-    new_user.creation_email ||= self.creation_email
-    new_user.creation_unique_id ||= self.creation_unique_id
-    new_user.creation_sis_batch_id ||= self.creation_sis_batch_id
     new_user.save
     updates = []
     self.pseudonyms.each do |p|
@@ -917,7 +912,11 @@ class User < ActiveRecord::Base
   def sis_pseudonym_for(context)
     root_account = context.root_account
     raise "could not resolve root account" unless root_account.is_a?(Account)
-    self.pseudonyms.active.find_by_account_id(root_account.id, :conditions => ["sis_user_id IS NOT NULL"])
+    if self.pseudonyms.loaded?
+      self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
+    else
+      self.pseudonyms.active.find_by_account_id(root_account.id, :conditions => ["sis_user_id IS NOT NULL"])
+    end
   end
 
   set_policy do
@@ -956,7 +955,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_students) })
       )
     end
-    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics
+    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :read
 
     given do |user|
       user && (
@@ -964,7 +963,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) })
       )
     end
-    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics
+    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :read
 
     given do |user|
       user && ((
@@ -1176,6 +1175,7 @@ class User < ActiveRecord::Base
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
 
+  # Returns the LTI membership based on the LTI specs here: http://www.imsglobal.org/LTI/v1p1pd/ltiIMGv1p1pd.html#_Toc309649701
   def lti_role_types(context=nil)
     memberships = []
     if context.is_a?(Course)
@@ -1193,6 +1193,8 @@ class User < ActiveRecord::Base
         'Instructor'
       when TaEnrollment
         'Instructor'
+      when DesignerEnrollment
+        'ContentDeveloper'
       when ObserverEnrollment
         'urn:lti:instrole:ims/lis/Observer'
       when AccountUser
@@ -1349,7 +1351,7 @@ class User < ActiveRecord::Base
     read_attribute(:uuid)
   end
 
-  def self.serialization_excludes; [:uuid,:phone,:creation_unique_id,:creation_email,:features_used]; end
+  def self.serialization_excludes; [:uuid,:phone,:features_used]; end
 
   def migrate_content_links(html, from_course)
     Course.migrate_content_links(html, from_course, self)
@@ -1405,7 +1407,7 @@ class User < ActiveRecord::Base
 
   def generate_reminders!
     enrollments = self.current_enrollments
-    mgmt_course_ids = enrollments.select{|e| e.admin? }.map(&:course_id).uniq
+    mgmt_course_ids = enrollments.select{|e| e.instructor? }.map(&:course_id).uniq
     student_course_ids = enrollments.select{|e| !e.admin? }.map(&:course_id).uniq
     assignments = Assignment.for_courses(mgmt_course_ids + student_course_ids).active.due_after(Time.now)
     student_assignments = assignments.select{|a| student_course_ids.include?(a.context_id) }
@@ -1728,6 +1730,15 @@ class User < ActiveRecord::Base
   end
   memoize :manageable_appointment_context_codes
 
+  def conversation_context_codes
+    e = enrollment_visibility
+    (e[:full_course_ids] + e[:section_id_hash].keys + e[:restricted_course_hash].keys).uniq.
+      map{ |id| "course_#{id}" } +
+    current_groups.
+      map{ |g| "group_#{g.id}"}
+  end
+  memoize :conversation_context_codes
+
   def manageable_courses
     Course.manageable_by_user(self.id).not_deleted
   end
@@ -1959,6 +1970,11 @@ class User < ActiveRecord::Base
     user_condition_sql = user_conditions.present? ? "AND " + user_conditions.join(" AND ") : ""
     user_sql = []
 
+    # this is redundant (and potentially less restrictive than course_sql),
+    # but it allows the planner to initially limit enrollments to relevant
+    # courses much more efficiently than the OR'ed course_sql does
+    all_course_ids = (course_hash[:full_course_ids] + course_hash[:section_id_hash].keys + restricted_course_hash.keys).compact
+
     course_sql = []
     course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
     course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
@@ -1967,7 +1983,8 @@ class User < ActiveRecord::Base
     user_sql << <<-SQL if course_sql.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
       FROM users, enrollments, courses
-      WHERE (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
+      WHERE course_id IN (#{all_course_ids.join(', ')})
+        AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
@@ -2169,8 +2186,8 @@ class User < ActiveRecord::Base
     h
   end
 
-  def find_pseudonym_for_account(account)
-    self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account) }
+  def find_pseudonym_for_account(account, allow_implicit = false)
+    self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
   end
 
   # account = the account that you want a pseudonym for

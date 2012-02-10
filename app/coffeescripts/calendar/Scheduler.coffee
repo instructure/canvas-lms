@@ -3,8 +3,9 @@ define 'compiled/calendar/Scheduler', [
   'jst/calendar/appointmentGroupList'
   'jst/calendar/schedulerRightSideAdminSection'
   'compiled/calendar/EditAppointmentGroupDialog'
+  'compiled/calendar/MessageParticipantsDialog'
   'jst/calendar/deleteItem'
-], (I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, deleteItemTemplate) ->
+], (I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate) ->
 
   I18n = I18n.scoped 'calendar'
 
@@ -19,6 +20,7 @@ define 'compiled/calendar/Scheduler', [
 
       @div.delegate('.view_calendar_link', 'click', @viewCalendarLinkClick)
       @listDiv.delegate('.edit_link', 'click', @editLinkClick)
+      @listDiv.delegate('.message_link', 'click', @messageLinkClick)
       @listDiv.delegate('.delete_link', 'click', @deleteLinkClick)
       @listDiv.delegate('.show_event_link', 'click', @showEventLinkClick)
 
@@ -235,3 +237,8 @@ define 'compiled/calendar/Scheduler', [
           @calendar.dataSource.clearCache()
           @loadData()
 
+    messageLinkClick: (jsEvent) =>
+      jsEvent.preventDefault()
+      group = @groups?[$(jsEvent.target).closest(".appointment-group-item").data('appointment-group-id')]
+      @messageDialog = new MessageParticipantsDialog(group, @calendar.dataSource)
+      @messageDialog.show()

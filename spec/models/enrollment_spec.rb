@@ -261,7 +261,7 @@ describe Enrollment do
     it "should be able to read grades if the course grants management rights to the enrollment" do
       @new_user = user_model
       @enrollment.grants_rights?(@new_user, nil, :read_grades)[:read_grades].should be_false
-      @course.admins << @new_user
+      @course.instructors << @new_user
       @course.save!
       @enrollment.grants_rights?(@user, nil, :read_grades).should be_true
     end
@@ -1020,6 +1020,67 @@ describe Enrollment do
         @enrollment.update_attribute(:workflow_state, 'rejected')
         Enrollment.ended.should == [@enrollment]
       end
+    end
+  end
+
+  describe "destroy" do
+    it "should update user_account_associations" do
+      course_with_teacher(:active_all => 1)
+      @user.associated_accounts.should == [Account.default]
+      @enrollment.destroy
+      @user.associated_accounts(true).should == []
+    end
+  end
+
+  describe ".remove_duplicate_enrollments_from_sections" do
+    before do
+      course_with_student(:active_all => true)
+      @e1 = @enrollment
+      @e1.sis_batch_id = 2
+      @e1.sis_source_id = 'ohai'
+      @e1.save!
+    end
+
+    it "should leave single enrollments alone" do
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+      @e1.reload.should be_active
+    end
+
+    it "should remove duplicates" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :workflow_state => 'active', :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
+    end
+
+    it "should prefer the highest sis_batch_id" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment", :sis_batch_id => 1)
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
+      @e1.reload.state.should == :active
+    end
+
+    it "should group by user_id" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => user, :sis_source_id => 'ohai2', :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should group by type" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "TeacherEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should group by section" do
+      enrollment_model(:course_section => @course.course_sections.create!(:name => 's2'), :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should group by associated_user_id" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :associated_user_id => user.id, :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should ignore non-sis enrollments" do
+      @e1.update_attribute('sis_source_id', nil)
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
     end
   end
 end

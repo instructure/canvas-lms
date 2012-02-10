@@ -178,7 +178,6 @@ describe "people" do
   end
 
   it "should randomly assign students" do
-    expected_message = "Students assigned to groups."
     expected_student_count = "0 students"
 
     enroll_more_students
@@ -201,7 +200,7 @@ describe "people" do
       true
     end
     wait_for_ajax_requests
-    driver.find_element(:css, '#flash_notice_message').should include_text(expected_message)
+    assert_flash_notice_message /Students assigned to groups/
     driver.find_element(:css, '.right_side .user_count').text.should == expected_student_count
   end
 

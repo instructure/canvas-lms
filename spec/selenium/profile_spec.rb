@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "profile tests" do
+describe "profile" do
   it_should_behave_like "in-process server selenium tests"
 
   def click_edit
@@ -98,16 +98,15 @@ describe "profile tests" do
       content_tbody.find_element(:css, '.add_notification_link').click
       wait_for_animations
       email_select_css = '#content > table > tbody > tr:nth-child(3) > td > span > select'
-
       click_option(email_select_css, second_email)
       #change notification setting for first notification
       daily_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(3) > div')
       daily_select.click
       daily_select.find_element(:xpath, '..').should have_class('selected_pending')
       #change notification setting for second notification
-      never_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(5) > div')
-      never_select.click
-      never_select.find_element(:xpath, '..').should have_class('selected_pending')
+      weekly_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(4) > div')
+      weekly_select.click
+      weekly_select.find_element(:xpath, '..').should have_class('selected_pending')
       driver.find_element(:css, '#content .save_preferences_button').click
       wait_for_ajax_requests
       refresh_page
@@ -119,7 +118,7 @@ describe "profile tests" do
           # the daily
           row.find_element(:css, 'td > span > select > option:checked').text.should == @user.email
         else
-          # the never
+          # the weekly
           row.find_element(:css, 'td > span > select > option:checked').text.should == second_email
         end
       end
@@ -133,7 +132,7 @@ describe "profile tests" do
       get "/profile"
       keep_trying_until { driver.find_element(:css, ".profile_pic_link.none") }.click
       dialog = driver.find_element(:id, "profile_pic_dialog")
-      dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img").length.should == 2
+      dialog.find_elements(:css, ".profile_pic_list span.img").length.should == 2
       dialog.find_element(:css, ".add_pic_link").click
       filename, fullpath, data = get_file("graded.png")
       dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
@@ -142,10 +141,10 @@ describe "profile tests" do
       FilesController.before_filter { sleep 5; true }
 
       dialog.find_element(:css, 'button[type="submit"]').click
-      spans = dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img")
-      spans.length.should == 3
+      spans = dialog.find_elements(:css, ".profile_pic_list span.img")
       new_image = spans.last.find_element(:css, 'img')
       new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+      spans.length.should == 3
 
       FilesController.filter_chain.pop
 
@@ -161,8 +160,7 @@ describe "profile tests" do
 
     it "should display file uploader link on files page" do
       get "/profile"
-      driver.find_element(:css, '#left-side .files').click
-      wait_for_dom_ready
+      expect_new_page_load { driver.find_element(:css, '#left-side .files').click }
       driver.find_element(:id, 'file_swfUploader').should be_displayed
     end
 
@@ -292,8 +290,8 @@ describe "profile tests" do
     end
 
     it "should show the correct defaults for the rest of the policies when at least one is set" do
-      @user.notification_policies.create!(:notification => @immediate, :communication_channel => @user.email_channel, :frequency => "immediately")
-      @user.notification_policies.create!(:notification => @daily, :communication_channel => @user.email_channel, :frequency => "immediately")
+      @user.email_channel.notification_policies.create!(:notification => @immediate, :frequency => "immediately")
+      @user.email_channel.notification_policies.create!(:notification => @daily, :frequency => "immediately")
 
       get "/profile/communication"
 

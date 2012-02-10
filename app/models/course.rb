@@ -86,9 +86,12 @@ class Course < ActiveRecord::Base
   has_many :designer_enrollments, :class_name => 'DesignerEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :observers, :through => :observer_enrollments, :source => :user
   has_many :observer_enrollments, :class_name => 'ObserverEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
-  has_many :admins, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
-  has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
-  has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment') and enrollments.workflow_state = 'active'"
+  has_many :instructors, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
+  has_many :instructor_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
+  has_many :participating_instructors, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment') and enrollments.workflow_state = 'active'"
+  has_many :admins, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment'"
+  has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment')"
+  has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment') and enrollments.workflow_state = 'active'"
 
   has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
   has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
@@ -434,7 +437,7 @@ class Course < ActiveRecord::Base
          INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
        UNION SELECT courses.id AS course_id, e.user_id FROM courses
          INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
-           AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment')
+           AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
          WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id"
     }
@@ -488,12 +491,12 @@ class Course < ActiveRecord::Base
                          :page => page, :per_page => per_page)
   end
 
-  def admins_in_charge_of(user_id)
+  def instructors_in_charge_of(user_id)
     section_ids = current_enrollments.find(:all, :select => 'course_section_id, course_id, user_id, limit_privileges_to_course_section', :conditions => {:course_id => self.id, :user_id => user_id}).map(&:course_section_id).compact.uniq
     if section_ids.empty?
-      participating_admins
+      participating_instructors
     else
-      participating_admins.for_course_section(section_ids)
+      participating_instructors.for_course_section(section_ids)
     end
   end
 
@@ -502,7 +505,7 @@ class Course < ActiveRecord::Base
     cache_key = [self, user, "course_user_is_teacher"].cache_key
     res = Rails.cache.read(cache_key)
     if res.nil?
-      res = user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_admin? }
+      res = user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
       Rails.cache.write(cache_key, res)
     end
     res
@@ -831,7 +834,7 @@ class Course < ActiveRecord::Base
       can permission
     end
 
-    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered") }
+    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
     can :read
 
     given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
@@ -859,14 +862,17 @@ class Course < ActiveRecord::Base
 
     # Teacher of a concluded course
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? }) }
-    can :read_as_admin and can :read_user_notes and can :read_roster and can :view_all_grades and can :read_prior_roster
+    can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum
+
+    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? }) }
+    can :read_user_notes and can :view_all_grades
 
     given { |user| !self.deleted? && !self.sis_source_id && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.state_based_on_date == :completed })}
     can :delete
 
     # Student of a concluded course
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
-    can :read and can :read_grades
+    can :read and can :read_grades and can :read_forum
 
     # Viewing as different role type
     given { |user, session| session && session["role_course_#{self.id}"] }
@@ -1268,7 +1274,7 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
-    enrollment_state = 'invited' if enrollment_state == 'creation_pending' && (type == 'TeacherEnrollment' || type == 'TaEnrollment')
+    enrollment_state = 'invited' if enrollment_state == 'creation_pending' && (type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment')
     e = self.enrollments.find_by_user_id_and_type(user.id, type) if user
     e.attributes = { :workflow_state => 'invited', :course_section => section, :limit_privileges_to_course_section => limit_privileges_to_course_section } if e && (e.completed? || e.rejected?)
     e ||= self.send(type.underscore.pluralize).build(:user => user, :workflow_state => enrollment_state, :course_section => section, :limit_privileges_to_course_section => limit_privileges_to_course_section)
@@ -1293,12 +1299,16 @@ class Course < ActiveRecord::Base
     enroll_user(user, 'TaEnrollment')
   end
 
+  def enroll_designer(user)
+    enroll_user(user, 'DesignerEnrollment')
+  end
+
   def enroll_teacher(user)
     enroll_user(user, 'TeacherEnrollment')
   end
 
   def resubmission_for(asset_string)
-    admins.each{|u| u.ignored_item_changed!(asset_string, 'grading') }
+    instructors.each{|u| u.ignored_item_changed!(asset_string, 'grading') }
   end
 
   def grading_standard_enabled
@@ -2376,7 +2386,7 @@ class Course < ActiveRecord::Base
       tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_rights?(user, opts[:session], :manage_students, :manage_admin_users).values.any?
       tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
       tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :managed_files)
-      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read, :moderate_forum, :post_to_forum).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read_forum, :moderate_forum, :post_to_forum).values.any?
       tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
 
