@@ -178,10 +178,12 @@ javascripts:
     - public/javascripts/compiled/calendar/CommonEvent.CalendarEvent.js
     - public/javascripts/compiled/calendar/commonEventFactory.js
     - public/javascripts/compiled/calendar/EditCalendarEventDetails.js
+    - public/javascripts/compiled/calendar/EditApptCalendarEventDetails.js
     - public/javascripts/compiled/calendar/EditAssignmentDetails.js
     - public/javascripts/compiled/calendar/EditAppointmentGroupDetails.js
     - public/javascripts/compiled/calendar/EditEventDetailsDialog.js
     - public/javascripts/compiled/calendar/EditAppointmentGroupDialog.js
+    - public/javascripts/compiled/calendar/MessageParticipantsDialog.js
     - public/javascripts/compiled/calendar/ShowEventDetailsDialog.js
     - public/javascripts/compiled/calendar/TimeBlockList.js
     - public/javascripts/compiled/calendar/TimeBlockListManager.js
@@ -191,10 +193,13 @@ javascripts:
     - public/javascripts/jst/calendar/eventDetails.js
     - public/javascripts/jst/calendar/editEvent.js
     - public/javascripts/jst/calendar/editCalendarEvent.js
+    - public/javascripts/jst/calendar/editApptCalendarEvent.js
     - public/javascripts/jst/calendar/editAssignment.js
     - public/javascripts/jst/calendar/editAppointmentGroup.js
     - public/javascripts/jst/calendar/deleteItem.js
     - public/javascripts/jst/calendar/genericSelect.js
+    - public/javascripts/jst/calendar/messageParticipants.js
+    - public/javascripts/jst/calendar/recipientList.js
     - public/javascripts/jst/calendar/undatedEvents.js
     - public/javascripts/jst/calendar/timeBlockList.js
     - public/javascripts/jst/calendar/_timeBlock.js

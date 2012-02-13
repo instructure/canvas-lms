@@ -234,6 +234,44 @@ describe "Canvas Cartridge importing" do
     t2.settings[:custom_fields].should == {}
   end
   
+  it "should import multiple module links to same external tool" do
+    tool_from = @copy_from.context_external_tools.create!(:url => "http://example.com.ims/lti", :name => "test", :consumer_key => "key", :shared_secret => "secret")
+    tool_mig_id = CC::CCHelper.create_key(tool_from)
+    tool_to = @copy_to.context_external_tools.create(:url => "http://example.com.ims/lti", :name => "test", :consumer_key => "key", :shared_secret => "secret")
+    tool_to.migration_id = tool_mig_id
+    tool_to.save!
+
+    mod1 = @copy_from.context_modules.create!(:name => "some module")
+
+    tag = mod1.add_item({:title => "test", :type => 'context_external_tool', :url => "http://example.com.ims/lti"})
+    tag = mod1.add_item({:title => "test2", :type => 'context_external_tool', :url => "http://example.com.ims/lti"})
+    mod1.save!
+    
+    mod1.content_tags.count.should == 2
+
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_module_meta(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_modules(doc)
+    #import json into new course
+    hash[0] = hash[0].with_indifferent_access
+    ContextModule.process_migration({'modules'=>hash}, @migration)
+    @copy_to.save!
+
+    mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
+    mod1_2.content_tags.count.should == mod1.content_tags.count
+    tag = mod1_2.content_tags.first
+    tag.content_id.should == tool_to.id
+    tag.content_type.should == 'ContextExternalTool'
+    tag.url.should == "http://example.com.ims/lti"
+    tag = mod1_2.content_tags.last
+    tag.content_id.should == tool_to.id
+    tag.content_type.should == 'ContextExternalTool'
+    tag.url.should == "http://example.com.ims/lti"
+  end
+  
   it "should import external feeds" do
     ef = @copy_from.external_feeds.new
     ef.url = "http://search.twitter.com/search.atom?q=instructure"

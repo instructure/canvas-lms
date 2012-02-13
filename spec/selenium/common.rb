@@ -82,7 +82,7 @@ module SeleniumTestsHelperMethods
       end
 
     end
-    driver.manage.timeouts.implicit_wait = 10
+    driver.manage.timeouts.implicit_wait = 3
     driver
   end
 
@@ -431,7 +431,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(scr)
   end
 
-  def clear_rce
+  def clear_wiki_rce
     wiki_page_body = driver.find_element(:id, :wiki_page_body)
     wiki_page_body.clear
     wiki_page_body[:value].should be_empty
@@ -443,12 +443,8 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
   end
 
-  def is_checked(selector)
-    if selector.is_a?(String)
-      return driver.execute_script('return $("'+selector+'").is(":checked")')
-    else
-      return selector.attribute(:checked) == 'checked'
-    end
+  def is_checked(css_selector)
+    driver.execute_script('return $("'+css_selector+'").prop("checked")')
   end
 
   def set_value(input, value)
@@ -640,7 +636,7 @@ shared_examples_for "all selenium tests" do
   end
 
   append_before (:each) do
-    driver.manage.timeouts.implicit_wait = 10
+    driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
   end
 

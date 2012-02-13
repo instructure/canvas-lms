@@ -49,7 +49,7 @@ class AppointmentGroup < ActiveRecord::Base
     next unless record.new_appointments.present? || record.validation_event_override
     appointments = value
     if record.validation_event_override
-      appointments = appointments.select{ |a| a.new_record? || a.id != record.validation_event_override.id} + record.validation_event_override
+      appointments = appointments.select{ |a| a.new_record? || a.id != record.validation_event_override.id} << record.validation_event_override
     end
     appointments.sort_by(&:start_at).inject(nil) do |prev, appointment|
       record.errors.add(attr, t('errors.invalid_end_at', "Appointment end time precedes start time")) if appointment.end_at < appointment.start_at
@@ -183,8 +183,24 @@ class AppointmentGroup < ActiveRecord::Base
       context.participating_instructors.uniq
   end
 
-  def possible_participants
-    AppointmentGroup.possible_participants(participant_type, context)
+  def possible_participants(registration_status=nil)
+    participants = AppointmentGroup.possible_participants(participant_type, context)
+    participants = case registration_status
+      when 'registered';   participants.scoped(:conditions => ["#{participant_table}.id IN (?)", participant_ids + [0]])
+      when 'unregistered'; participants.scoped(:conditions => ["#{participant_table}.id NOT IN (?)", participant_ids + [0]])
+      else                 participants
+    end
+    participants.order((participant_type == 'User' ? User.sortable_name_order_by_clause("users") : Group.case_insensitive("groups.name")) + ", #{participant_table}.id")
+  end
+
+  def participant_ids
+    appointments_participants.
+      scoped(:select => 'context_id', :conditions => ["calendar_events.context_type = ?", participant_type]).
+      map(&:context_id)
+  end
+
+  def participant_table
+    Kernel.const_get(participant_type).table_name
   end
 
   def self.possible_participants(participant_type, context)
@@ -245,11 +261,22 @@ class AppointmentGroup < ActiveRecord::Base
       EVENT_ATTRIBUTES.select{ |attr| send("#{attr}_changed?") }.
       map{ |attr| [attr, attr == :description ? description_html : send(attr)] }
     ]
+
+    return unless changed.present?
+
+    desc = changed.delete :description
+
     if changed.present?
       appointments.update_all changed
       CalendarEvent.update_all changed, {:parent_calendar_event_id => appointments.map(&:id), :workflow_state => ['active', 'locked']}
-      @new_appointments.each(&:reload) if @new_appointments.present?
     end
+
+    if desc
+      appointments.update_all({:description => desc}, :description => description_was)
+      CalendarEvent.update_all({:description => desc}, :parent_calendar_event_id => appointments.map(&:id), :workflow_state => ['active', 'locked'], :description => description_was)
+    end
+
+    @new_appointments.each(&:reload) if @new_appointments.present?
   end
 
   def participant_type

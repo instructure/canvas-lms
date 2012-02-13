@@ -179,19 +179,74 @@ describe PseudonymsController do
   end
 
   describe "create" do
-    before :each do
-      user_with_pseudonym(:active_all => true)
-      Account.site_admin.add_user(@user)
-      user_session(@user, @pseudonym)
+    # these specs only test the non-api version of the calls
+    context "with site admin permissions" do
+      before :each do
+        user_with_pseudonym(:active_all => true)
+        Account.site_admin.add_user(@user)
+        user_session(@user, @pseudonym)
+      end
+
+      it "should use the account id from params" do
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'unique1' }
+        response.should be_success
+      end
     end
 
-    it "should work with a user as context and account in params" do
-      post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'unique1' }
-      response.should be_success
+    context "without site admin permissions" do
+      before :each do
+        @account = Account.create!
+        user_with_pseudonym(:active_all => true, :account => @account)
+        LoadAccount.stubs(:default_domain_root_account).returns(@account)
+        @account.add_user(@user)
+        user_session(@user, @pseudonym)
+      end
+
+      it "should ignore use the domain_root_account" do
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :unique_id => 'unique1' }
+        response.should be_success
+        @user.pseudonyms.size.should == 2
+        (@user.pseudonyms - [@pseudonym]).last.account.should == @account
+      end
+
+      it "should ignore account id in params and use the domain_root_account" do
+        @account2 = Account.create!
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => @account2.id, :unique_id => 'unique1' }
+        response.should be_success
+        @user.pseudonyms.size.should == 2
+        (@user.pseudonyms - [@pseudonym]).last.account.should == @account
+      end
     end
   end
 
   describe "update" do
+    it "should change a password if authorized" do
+      account = Account.default
+      user_with_pseudonym(
+        :username => 'test2@example.com',
+        :password => 'old_password',
+        :account  => account)
+      @test_user = @user
+      user_with_pseudonym(
+        :username => 'admin@example.com',
+        :password => 'admin-password',
+        :account  => account)
+      account.settings[:admins_can_change_passwords] = true
+      account.save!
+      Account.site_admin.add_user(@user)
+      user_session(@user, @pseudonym)
+      put 'update', {
+        :id        => @test_user.pseudonym.id,
+        :user_id   => @test_user.id,
+        :pseudonym => {
+          :password              => 'new_password',
+          :password_confirmation => 'new_password'
+        }}
+      response.should be_redirect
+      @test_user.pseudonym.reload
+      @test_user.pseudonym.valid_password?('new_password').should be_true
+    end
+
     it "should not change a password if not authorized" do
       account1 = Account.new
       account1.settings[:admins_can_change_passwords] = true

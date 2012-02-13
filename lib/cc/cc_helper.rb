@@ -184,6 +184,7 @@ module CCHelper
       # and translated back into media comments
       doc = Nokogiri::HTML::DocumentFragment.parse(html)
       doc.css('a.instructure_inline_media_comment').each do |anchor|
+        next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
         obj = course.media_objects.by_media_id(media_id).first
         if obj && obj.context == course && migration_id = CCHelper.create_key(obj)

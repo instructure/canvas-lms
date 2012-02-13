@@ -377,6 +377,25 @@ describe QuizzesController do
       assigns[:submission].should eql(@submission)
     end
 
+    it "should find the observed submissions" do
+      course_with_student(:active_all => true)
+      course_quiz
+      @submission = @quiz.generate_submission(@student)
+      @observer = user
+      @enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
+      @enrollment.update_attribute(:associated_user, @student)
+      user_session(@observer)
+      get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id
+
+      response.should be_success
+      assigns[:user].should_not be_nil
+      assigns[:user].should eql(@student)
+      assigns[:quiz].should_not be_nil
+      assigns[:quiz].should eql(@quiz)
+      assigns[:submission].should_not be_nil
+      assigns[:submission].should eql(@submission)
+    end
+
     it "should not allow viewing other submissions if not a teacher" do
       u = user(:active_all => true)
       course_with_student_logged_in(:active_all => true)
@@ -384,13 +403,7 @@ describe QuizzesController do
       s = @quiz.generate_submission(u)
       @submission = @quiz.generate_submission(@user)
       get 'history', :course_id => @course.id, :quiz_id => @quiz.id, :user_id => u.id
-      response.should be_success
-      assigns[:user].should_not be_nil
-      assigns[:user].should eql(@user)
-      assigns[:quiz].should_not be_nil
-      assigns[:quiz].should eql(@quiz)
-      assigns[:submission].should_not be_nil
-      assigns[:submission].should eql(@submission)
+      response.should_not be_success
     end
 
     it "should allow viewing other submissions if a teacher" do

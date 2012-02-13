@@ -123,22 +123,23 @@ describe "discussions" do
     it "should create a discussion and validate that a student can see it and reply to it" do
       new_student_entry_text = 'new student entry'
       user_session(@student)
-      get "/courses/#{@course.id}/discussion_topics/1"
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
 
       driver.find_element(:id, 'topic_list').should include_text('new topic from teacher')
+      driver.find_element(:id, 'content').should_not include_text(new_student_entry_text)
       driver.find_element(:id, 'add_entry_bottom').click
       type_in_tiny('textarea.entry_content_new', new_student_entry_text)
       driver.find_element(:id, 'add_entry_form_entry_new').submit
       wait_for_ajaximations
-      driver.find_element(:id, 'entry_2').should include_text(new_student_entry_text)
+      driver.find_element(:id, 'content').should include_text(new_student_entry_text)
     end
 
     it "should reply as a student and validate teacher can see reply" do
       user_session(@teacher)
-      @topic.discussion_entries.create!(:user => @student, :message => 'new entry from student')
-      get "/courses/#{@course.id}/discussion_topics/1"
+      entry = @topic.discussion_entries.create!(:user => @student, :message => 'new entry from student')
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
 
-      driver.find_element(:id, 'entry_2').should include_text('new entry from student')
+      driver.find_element(:id, "entry_#{entry.id}").should include_text('new entry from student')
     end
   end
 end

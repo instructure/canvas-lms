@@ -49,13 +49,13 @@ describe CoursesHelper do
 
       it "should return a needs grading tooltip if assignments have been submitted that aren't graded" do
         expects(:t).with('#courses.recent_event.needs_grading', 'needs grading').returns('needs grading')
-        @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry" })
+        @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "..." })
         call_set_icon_data("needs grading", "icon-grading-gray")
       end
 
       it "should return a no new submissions tooltip if some assignments have been submitted and graded" do
         expects(:t).with('#courses.recent_event.no_new_submissions', 'no new submissions').returns('no new submissions')
-        @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry" })
+        @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "xyz" })
         @assignment.grade_student(@student_one, :grade => 5)
         call_set_icon_data("no new submissions", "icon-grading-gray")
       end
@@ -63,7 +63,7 @@ describe CoursesHelper do
       it "should return an all graded tooltip if all assignments are submitted and graded" do
         expects(:t).with('#courses.recent_event.all_graded', 'all graded').returns('all graded')
         [@student_one, @student_two].each do |student|
-          @assignment.submit_homework(student, { :submission_type => "online_text_entry" })
+          @assignment.submit_homework(student, { :submission_type => "online_text_entry", :body => "bod" })
           @assignment.grade_student(student, :grade => 5)
         end
         call_set_icon_data("all graded", "icon-grading")

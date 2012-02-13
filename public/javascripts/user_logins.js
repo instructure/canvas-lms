@@ -47,25 +47,23 @@ $(document).ready(function() {
         var $login = $(this).data('unique_id_text').parents(".login");
       } else {
         var $login = $("#login_information .login.blank").clone(true);
-        $("#login_information .add_holder").before($login.show());
-        data.pseudonym.account_name = $(this).data('account_name') || $(this).find(".default_account_name").text();
+        $("#login_information .add_holder").before($login);
+        $login.removeClass('blank');
+        $login.show();
+        data.account_name = $(this).data('account_name');
       }
       $login.fillTemplateData({
-        data: data.pseudonym,
+        data: data,
         hrefValues: ['id', 'account_id']
       });
-      if($.inArray(data.pseudonym.account_id.toString(), passwordable_account_ids) != -1) {
-        $login.find(".links").addClass('passwordable');
-      }
+      $login.find(".links").addClass('passwordable');
       $("#login_information .login .delete_pseudonym_link").show();
+			$.flashMessage(I18n.t('save_succeeded', 'Save successful'));
     },
     error: function(data) {
       $(this).find("button").attr('disabled', false)
         .filter(".submit_button").text(I18n.t('errors.save_failed', "Save Failed"));
     }
-  });
-  $("#edit_pseudonym_form .account_id_select").change(function() {
-    $("#edit_pseudonym_form").find("tr.password").showIf($.inArray($(this).val(), passwordable_account_ids) != -1);
   });
   $("#edit_pseudonym_form .cancel_button").click(function() {
     $form.dialog('close');
@@ -132,6 +130,8 @@ $(document).ready(function() {
     $form.fillFormData({'pseudonym[unique_id]': ''});
     $form.dialog('option', 'title', I18n.t('titles.add_login', 'Add Login'))
       .find(".submit_button").text(I18n.t('buttons.add_login', "Add Login"));
+    $form.addClass('passwordable');
+    $form.find("tr.password").show();
     $form.find(".account_id").show();
     $form.find(".account_id_select").change();
     $form.data('unique_id_text', null);

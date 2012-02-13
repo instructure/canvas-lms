@@ -52,6 +52,13 @@
         </td>
       </tr>
       <tr>
+        <td><%= f.blabel :requested_authn_context, :en => "Authentication Context" %></td>
+        <td class="nobr">
+          <%= f.select :requested_authn_context, @saml_authn_contexts, {}, {:class => "auth_form"} %>
+          <span class="auth_info requested_authn_context"><%= @account_config.requested_authn_context %></span>
+        </td>
+      </tr>
+      <tr>
         <td style="vertical-align: top; width: 200px;"><%= f.blabel :login_handle_name, :en => "Login Label" %></td>
         <td style="vertical-align: top;" class="nobr">
           <%= f.text_field :login_handle_name, :class => "auth_form", :style => "width: 300px;", :placeholder => AccountAuthorizationConfig.default_delegated_login_handle_name %>

@@ -4,14 +4,13 @@ describe "web conference" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
+    course_with_teacher_logged_in
     PluginSetting.create!(:name => "dim_dim", :settings =>
         {"domain" => "dimdim.instructure.com"})
+    get "/courses/#{@course.id}/conferences"
   end
 
   it "should create a web conference" do
-    course_with_teacher_logged_in
-    get "/courses/#{@course.id}/conferences"
-
     conference_title = 'new conference'
     driver.find_element(:link, 'Make a New Conference').click
 
@@ -25,9 +24,6 @@ describe "web conference" do
   end
 
   it "should cancel creating a web conference" do
-    course_with_teacher_logged_in
-    get "/courses/#{@course.id}/conferences"
-
     conference_title = 'new conference'
     driver.find_element(:link, 'Make a New Conference').click
     driver.find_element(:id, 'web_conference_title').clear

@@ -294,4 +294,75 @@ describe AppointmentGroupsController, :type => :integration do
     json['workflow_state'].should eql 'deleted'
     ag.reload.should be_deleted
   end
+
+  types = {
+    'users' => proc {
+      @ag = @course.appointment_groups.create(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag.publish!
+      student1 = student_in_course(:course => @course, :active_all => true).user
+      @ag.appointments.first.reserve_for student1, @me
+      student2 = student_in_course(:course => @course, :active_all => true).user
+    },
+    'groups' => proc {
+      cat = @course.group_categories.create
+      @ag = @course.appointment_groups.create(:title => "yay", :sub_context_code => cat.asset_string, :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag.publish!
+      group1 = cat.groups.create(:context => @course)
+      group1.users << student_in_course(:course => @course, :active_all => true).user
+      @ag.appointments.first.reserve_for group1, @me
+      group2 = cat.groups.create(:context => @course)
+      group2.users << student_in_course(:course => @course, :active_all => true).user
+    }
+  }
+  types.each do |type, block|
+    context "#{type.singularize}-level appointment groups" do
+      before &block
+
+      it "should return all #{type}" do
+        json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}", {
+                          :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
+                          :format => 'json'})
+        json.size.should eql 2
+        json.map{ |j| j['id'] }.should eql @ag.possible_participants.map(&:id)
+      end
+
+      it "should paginate #{type}" do
+        json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1", {
+                          :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
+                          :format => 'json', :per_page => '1'})
+        json.size.should eql 1
+        response.headers['Link'].should match(%r{</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="next",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
+
+        json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1&page=2", {
+                          :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
+                          :format => 'json', :per_page => '1', :page => '2'})
+        json.size.should eql 1
+        response.headers['Link'].should match(%r{</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="prev",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
+      end
+
+      it "should return registered #{type}" do
+        json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=registered", {
+                          :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
+                          :registration_status => 'registered', :format => 'json'})
+        json.size.should eql 1
+        json.map{ |j| j['id'] }.should eql @ag.possible_participants('registered').map(&:id)
+      end
+
+      it "should return unregistered #{type}" do
+        json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=unregistered", {
+                          :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
+                          :registration_status => 'unregistered', :format => 'json'})
+        json.size.should eql 1
+        json.map{ |j| j['id'] }.should eql @ag.possible_participants('unregistered').map(&:id)
+      end
+
+      it "should not return non-#{type.singularize} participants" do
+        (types.keys - [type]).each do |other_type|
+          json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{other_type}", {
+                            :controller => 'appointment_groups', :id => @ag.id.to_s, :action => other_type, :format => 'json'})
+          json.should be_empty
+        end
+      end
+    end
+  end
 end

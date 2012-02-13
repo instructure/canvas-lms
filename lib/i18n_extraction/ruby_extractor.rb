@@ -87,7 +87,7 @@ module I18nExtraction
 
       # single word count/pluralization fu
       if default.is_a?(String) && default =~ /\A[\w\-]+\z/ && options.include?(:count)
-        default = {:one => "1 #{default}", :other => "%{count} #{default.pluralize}"}
+        default = infer_pluralization_hash(default)
       end
 
       (default.is_a?(String) ? {nil => default} : default).each_pair do |k, str|
@@ -170,8 +170,11 @@ module I18nExtraction
       if exp.sexp_type == :hash
         exp.shift
         hash = Hash[*exp.map{ |e| process_possible_string_concat(e, :allow_symbols => true) }]
-        if (hash.keys - [:one, :other, :zero]).size > 0
+        pluralization_keys = hash.keys
+        if (pluralization_keys - allowed_pluralization_keys).size > 0
           raise "invalid :count sub-key(s) #{exp.inspect} on line #{exp.line}"
+        elsif required_pluralization_keys & pluralization_keys != required_pluralization_keys
+          raise "not all required :count sub-key(s) provided on line #{exp.line} (expected #{required_pluralization_keys.join(', ')})"
         elsif hash.values.any?{ |v| !v.is_a?(String) }
           raise "invalid en count default(s) #{exp.inspect} on line #{exp.line}"
         end

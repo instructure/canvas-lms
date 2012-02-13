@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -41,13 +41,13 @@ class CutyCapt
     :allowed_schemes => [ 'http', 'https' ]
   }
   
-  cattr_accessor :config
+  cattr_writer :config
   
   def self.config
-    return @@config if defined?(@@config)
-    @@config ||= CUTYCAPT_DEFAULTS.merge(YAML.load_file(RAILS_ROOT + "/config/cutycapt.yml")[RAILS_ENV]).with_indifferent_access rescue nil
+    return @@config if defined?(@@config) && @@config
+    @@config = CUTYCAPT_DEFAULTS.merge(Setting.from_config('cutycapt') || {}).with_indifferent_access
     self.process_config
-    @@config = nil unless @@config['path']
+    @@config = nil unless @@config[:path]
     @@config
   end
   

@@ -305,6 +305,42 @@ describe Conversation do
       convo.reload.archived?.should be_true
     end
 
+    it "should not set last_message_at or visible_last_authored_at for the sender if the conversation is deleted and update_for_sender=false" do
+      sender = user
+      rconvo = Conversation.initiate([sender.id, user.id], true)
+      message = rconvo.add_message(sender, 'test')
+      convo = sender.conversations.first
+      convo.last_message_at.should_not be_nil
+      convo.visible_last_authored_at.should_not be_nil
+
+      convo.remove_messages([message])
+      convo.last_message_at.should be_nil
+      convo.visible_last_authored_at.should be_nil
+
+      convo.add_message('bulk message', :update_for_sender => false)
+      convo.reload
+      convo.last_message_at.should be_nil
+      convo.visible_last_authored_at.should be_nil
+    end
+
+    it "should set last_authored_at on deleted conversations even if update_for_sender=false" do
+      expected_times = [Time.now.utc - 1.hours, Time.now.utc].map{ |t| Time.parse(t.to_s) }
+      ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).twice.returns(*expected_times)
+
+      sender = user
+      rconvo = Conversation.initiate([sender.id, user.id], true)
+      message = rconvo.add_message(sender, 'test')
+      convo = sender.conversations.first
+      convo.last_authored_at.should eql expected_times.first
+
+      convo.remove_messages([message])
+      convo.last_authored_at.should eql expected_times.first
+
+      convo.add_message('bulk message', :update_for_sender => false)
+      convo.reload
+      convo.last_authored_at.should eql expected_times.last
+    end
+
     it "should deliver the message to unsubscribed participants but not alert them" do
       sender = user
       recipients = 5.times.map{ user }
@@ -381,6 +417,18 @@ describe Conversation do
         conversation = Conversation.initiate([u1.id, u2.id], true)
         conversation.add_message(u1, 'test', :tags => [@course.asset_string, "asdf", "lol"])
         conversation.tags.should eql [@course.asset_string]
+      end
+
+      it "should set initial empty tags on the conversation and conversation_participant" do
+        u1 = student_in_course.user
+        u2 = student_in_course(:course => @course).user
+        conversation = Conversation.initiate([u1.id, u2.id], true)
+        conversation.read_attribute(:tags).should_not be_nil
+        conversation.tags.should eql []
+        u1.all_conversations.first.read_attribute(:tags).should_not be_nil
+        u1.all_conversations.first.tags.should eql []
+        u2.all_conversations.first.read_attribute(:tags).should_not be_nil
+        u2.all_conversations.first.tags.should eql []
       end
 
       it "should save all visible tags on the conversation_participant" do

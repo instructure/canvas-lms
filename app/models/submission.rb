@@ -28,8 +28,8 @@ class Submission < ActiveRecord::Base
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
   has_many :submission_comments, :order => 'created_at', :dependent => :destroy
-  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at', :conditions => { :hidden => false }
-  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at', :conditions => { :hidden => true }
+  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => false }
+  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   belongs_to :quiz_submission
@@ -77,11 +77,10 @@ class Submission < ActiveRecord::Base
   }
 
   named_scope :needs_grading, :conditions => <<-SQL
-    submissions.submission_type IS NOT NULL
-    AND (
-      submissions.score IS NULL
-      OR NOT submissions.grade_matches_current_submission
-      OR submissions.workflow_state IN ('submitted', 'pending_review')
+    submissions.submission_type IS NOT NULL AND
+    submissions.workflow_state IN ('submitted', 'pending_review') AND (
+      submissions.score IS NULL OR
+      NOT submissions.grade_matches_current_submission
     )
     SQL
   def self.needs_grading_conditions(prefix = nil)
@@ -600,7 +599,7 @@ class Submission < ActiveRecord::Base
     {:conditions => ['submissions.grade IS NULL'], :include => :assignment}
   }
   named_scope :having_submission, lambda {
-    {:conditions => ['submissions.submission_type IS NOT NULL'] }
+    {:conditions => ["submissions.submission_type IS NOT NULL AND submissions.workflow_state = 'submitted'"] }
   }
   named_scope :include_user, lambda {
     {:include => [:user] }

@@ -19,6 +19,7 @@ class Converter < Canvas::Migration::Migrator
     @converted = false
     @dest_dir_2_1 = nil
     @course[:hidden_folders] = [MigratorHelper::QUIZ_FILE_DIRECTORY]
+    @flavor = settings[:flavor]
   end
 
   def export
@@ -33,7 +34,7 @@ class Converter < Canvas::Migration::Migrator
 
     convert_files
     path_map = @course[:file_map].values.inject({}){|h, v| h[v[:path_name]] = v[:migration_id]; h }
-    @course[:assessment_questions] = convert_questions(:file_path_map => path_map)
+    @course[:assessment_questions] = convert_questions(:file_path_map => path_map, :flavor => @flavor)
     @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
     @course[:files_import_root_path] = unique_quiz_dir
 

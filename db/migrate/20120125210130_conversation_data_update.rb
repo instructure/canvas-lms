@@ -1,6 +1,6 @@
 class ConversationDataUpdate < ActiveRecord::Migration
   def self.up
-    SubmissionComment.connection.select_all("SELECT DISTINCT submission_id AS id FROM submission_comments").
+    SubmissionComment.connection.select_all("SELECT DISTINCT submission_id AS id FROM submission_comments WHERE NOT hidden").
     map{ |r| r["id"] }.each_slice(1000) do |ids|
       Submission.send_later_if_production_enqueue_args(:batch_migrate_conversations!, {
         :priority => Delayed::LOWER_PRIORITY,

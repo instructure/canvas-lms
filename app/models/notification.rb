@@ -56,7 +56,6 @@ class Notification < ActiveRecord::Base
   
   has_many :messages
   has_many :notification_policies, :dependent => :destroy
-  has_many :users, :through => :notification_policies
   before_save :infer_default_content
 
   attr_accessible  :name, :subject, :body, :sms_body, :main_link, :delay_for, :category
@@ -96,15 +95,15 @@ class Notification < ActiveRecord::Base
 
     asset = opts[:asset] || raise(ArgumentError, "Must provide an asset")
 
-    policies = user.notification_policies.select{|p| p.notification_id == self.id && p.communication_channel_id}
-    policies << NotificationPolicy.create(:notification => self, :user => user, :communication_channel => cc, :frequency => self.default_frequency) if policies.empty? && cc && cc.active?
+    policies = NotificationPolicy.for(user).for(self).to_a
+    policies << NotificationPolicy.create(:notification => self, :communication_channel => cc, :frequency => self.default_frequency) if policies.empty? && cc && cc.active?
     policies = policies.select{|p| [:daily,:weekly].include?(p.frequency.to_sym) }
-    
+
     # If we pass in a fallback_channel, that means this message has been
     # throttled, so it definitely needs to go to at least one communication
     # channel with 'daily' as the frequency.
     if !policies.any?{|p| p.frequency == 'daily'} && opts[:fallback_channel]
-      policies << NotificationPolicy.new(:user => user, :communication_channel => opts[:fallback_channel], :frequency => 'daily')
+      policies << NotificationPolicy.new(:communication_channel => opts[:fallback_channel], :frequency => 'daily')
     end
 
     return false if (!opts[:fallback_channel] && cc && !cc.active?) || policies.empty? || self.registration?
@@ -162,11 +161,7 @@ class Notification < ActiveRecord::Base
       end
     end
     
-    recipients += User.find(:all, :conditions => {:id => recipient_ids}, :include => [:communication_channels, :notification_policies])
-    
-    # Cancel any that haven't been sent out for the same purpose
-    all_matching_messages = self.messages.for(asset).by_name(name).for_user(recipients).in_state([:created,:staged,:sending,:dashboard])
-    Message.update_all("workflow_state='cancelled'", "id IN (#{all_matching_messages.map(&:id).join(',')})") unless all_matching_messages.empty?
+    recipients += User.find(:all, :conditions => {:id => recipient_ids}, :include => { :communication_channels => :notification_policies})
     
     messages = []
     @user_counts = {}
@@ -234,7 +229,12 @@ class Notification < ActiveRecord::Base
       end
     end
 
-    dispatch_messages.each { |m| m.stage_without_dispatch!; m.save! }
+    Message.transaction do
+      # Cancel any that haven't been sent out for the same purpose
+      all_matching_messages = self.messages.for(asset).by_name(name).for_user(recipients).in_state([:created,:staged,:sending,:dashboard])
+      all_matching_messages.update_all(:workflow_state => 'cancelled')
+      dispatch_messages.each { |m| m.stage_without_dispatch!; m.save! }
+    end
     MessageDispatcher.batch_dispatch(dispatch_messages)
 
     # re-set cached values

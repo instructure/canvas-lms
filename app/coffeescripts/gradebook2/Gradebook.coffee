@@ -13,7 +13,7 @@ define 'compiled/Gradebook', [
       @chunk_start = 0
       @students    = {}
       @rows        = []
-      @sortFn      = (student) -> student.display_name
+      @sortFn      = (student) -> student.sortable_name
       @assignmentsToHide = ($.store.userGet("hidden_columns_#{@options.context_code}") || '').split(',')
       @sectionToShow = Number($.store.userGet("grading_show_only_section#{@options.context_id}")) || undefined
       @show_attendance = $.store.userGet("show_attendance_#{@options.context_code}") == 'true'

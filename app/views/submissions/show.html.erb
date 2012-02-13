@@ -62,10 +62,7 @@
       }
       $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
       if(submission) {
-        $(".grading_value").val(submission.grade);
-        if($(".grading_value").hasClass('score_value')) {
-          $(".grading_value").val(submission.score);
-        }
+        showGrade(submission);
         $(".submission_details").fillTemplateData({
           data: submission
         });
@@ -74,6 +71,11 @@
       }
     }
     $(".submission_header").loadingImage('remove');
+  }
+  var showGrade = function(submission) {
+    $(".grading_box").val(submission.grade != undefined && submission.grade !== null ? submission.grade : "");
+    $(".score").text(submission.score != undefined && submission.score !== null ? submission.score : "");
+    $(".published_score").text(submission.published_score != undefined && submission.published_score !== null ? submission.published_score : "");
   }
   $(document).ready(function() {
     $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
@@ -180,6 +182,11 @@
         $("#new_rubric_assessment_option").remove();
         $("#rubric_assessments_list").show();
         rubricAssessment.populateRubric($rubric, assessment);
+        submission = assessment.artifact;
+        if (submission) {
+          showGrade(submission);
+        }
+        $("#rubric_holder").fadeOut();
       });
     });
     $("#rubric_holder .rubric").css('width', 'auto').css('marginTop', 0);
@@ -245,6 +252,8 @@
         e.stopPropagation();
       });
 
+      // don't leak grades if assignment is muted
+      showGrade(<%= if @assignment.muted? then "{submission: {}}" else raw @submission.to_json end %>.submission);
   });
   $(document).fragmentChange(function(event, hash) {
     if(hash == '#rubric') {

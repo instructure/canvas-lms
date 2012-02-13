@@ -73,7 +73,7 @@ class RubricsController < ApplicationController
       skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
       params[:rubric_association][:skip_updating_points_possible] = skip_points_update
       @rubric = @association.rubric if params[:id] && @association && (@association.rubric_id == params[:id].to_i || (@association.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))
-      @rubric ||= @context.rubrics.find(params[:id]) if params[:id]
+      @rubric ||= @context.rubrics.find_by_id(params[:id]) if params[:id]
       @association = nil unless @association && @rubric && @association.rubric_id == @rubric.id
       params[:rubric_association][:id] = @association.id if @association
       # Update the rubric if you can

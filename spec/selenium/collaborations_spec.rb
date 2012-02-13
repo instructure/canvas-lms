@@ -17,7 +17,7 @@ describe "collaborations" do
   end
 
   def test_checkbox(css_context, user, checked)
-    driver.execute_script("return $('#{css_context} ul.collaborator_list input#user_#{user.id}').is(':checked');").should == checked
+    is_checked("#{css_context} ul.collaborator_list input#user_#{user.id}").should == checked
   end
 
   context "collaborations as a teacher" do
@@ -27,6 +27,7 @@ describe "collaborations" do
       context collab_title do
 
         before (:each) do
+          course_with_teacher_logged_in
           if collab_type == "google_docs"
             CollaborationsController.any_instance.stubs(:google_docs_verify_access_token).returns(true)
           end
@@ -34,7 +35,6 @@ describe "collaborations" do
 
         it 'should automatically start the new collaboration wizard in the absence of collaborations' do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
 
           get "/courses/#{@course.id}/collaborations"
           wait_for_ajaximations
@@ -43,7 +43,6 @@ describe "collaborations" do
 
         it 'should not automatically start the new collaboration wizard in the presence of collaborations' do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration.context = @course
           @collaboration.attributes = {:title => "My Collab"}
@@ -57,7 +56,6 @@ describe "collaborations" do
         it 'should leave the collaboration wizard open when someone navigates to the add_collaboration fragment and there is no collaborations' do
           skip_if_ie('Java crashes')
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
 
           get "/courses/#{@course.id}/collaborations/"
           get "/courses/#{@course.id}/collaborations/#add_collaboration"
@@ -68,7 +66,6 @@ describe "collaborations" do
         it 'should leave the collaboration wizard open when someone navigates to the add_collaboration fragment and there is some collaborations' do
           skip_if_ie('Java crashes')
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration.context = @course
           @collaboration.attributes = {:title => "My Collab"}
@@ -82,7 +79,6 @@ describe "collaborations" do
 
         it 'should leave the collaboration wizard open when a script clicks the add collaboration wizard button twice' do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration.context = @course
           @collaboration.attributes = {:title => "My Collab"}
@@ -99,7 +95,6 @@ describe "collaborations" do
 
         it 'should open the collaboration wizard when the last collaboration is deleted' do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration.context = @course
           @collaboration.attributes = {:title => "My Collab"}
@@ -116,7 +111,6 @@ describe "collaborations" do
 
         it 'should not open the collaboration wizard when the penultimate collaboration is deleted' do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @collaboration1 = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration1.context = @course
           @collaboration1.attributes = {:title => "My Collab 1"}
@@ -140,7 +134,6 @@ describe "collaborations" do
         it 'should leave the collaboration wizard open when the last collaboration is deleted' do
           skip_if_ie('Java crashes')
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration.context = @course
           @collaboration.attributes = {:title => "My Collab"}
@@ -158,7 +151,6 @@ describe "collaborations" do
 
         it "should not show collaborator selection menus if there aren't any collaborators" do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration.context = @course
           @collaboration.attributes = {:title => "My Collab"}
@@ -174,7 +166,6 @@ describe "collaborations" do
 
         it "should show collaborator selection menus if there are any collaborators" do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           student_in_course :course => @course
           @student.name = "test student 1"
           @student.save!
@@ -193,7 +184,6 @@ describe "collaborations" do
 
         it "should show collaborator selection menus if there are any collaborators" do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           student_in_course :course => @course, :name => "test student 1"
           @collaboration = Collaboration.typed_collaboration_instance(collab_title)
           @collaboration.context = @course
@@ -210,7 +200,6 @@ describe "collaborations" do
 
         it "should distinguish checkbox lists when someone clicks (de)select all" do
           PluginSetting.create!(:name => collab_type, :settings => {})
-          course_with_teacher_logged_in
           @students = [student_in_course(:course => @course, :name => "test student 1").user,
                        student_in_course(:course => @course, :name => "test student 2").user,
                        student_in_course(:course => @course, :name => "test student 3").user,
@@ -308,7 +297,7 @@ describe "collaborations" do
       user_session(@student)
       get "/courses/#{@course.id}/collaborations"
       wait_for_ajaximations
-      collaboration = driver.find_element(:css, '.collaboration_1')
+      collaboration = driver.find_element(:css, ".collaboration_#{@collaboration.id}")
       collaboration.should be_displayed
       collaboration.find_element(:css, '.toggle_collaborators_link').click
       wait_for_animations

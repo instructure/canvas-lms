@@ -97,6 +97,8 @@ describe "dashboard" do
     @assignment = assignment_model({:due_at => due_date, :course => @course})
     get "/"
     driver.find_element(:css, '.events_list .event a').should include_text(@assignment.title)
+    # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
+    driver.execute_script("return $('.event a .tooltip_text').text()").should match(@course.short_name)
   end
 
   it "should display assignment to grade in to do list and assignments menu for a teacher" do
@@ -105,7 +107,7 @@ describe "dashboard" do
     student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
     @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
     assignment.reload
-    assignment.submit_homework(student, {:submission_type => 'online_text_entry'})
+    assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
     assignment.reload
     get "/"
 
@@ -174,16 +176,6 @@ describe "dashboard" do
   end
 
   context "course menu customization" do
-    it "should not allow customization if there are insufficient courses" do
-      course_with_teacher_logged_in
-
-      get "/"
-
-      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
-      driver.action.move_to(course_menu).perform
-      course_menu.should include_text('My Courses')
-      course_menu.should_not include_text('Customize')
-    end
 
     it "should allow customization if there are sufficient courses" do
       course_with_teacher_logged_in

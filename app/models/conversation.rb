@@ -57,6 +57,7 @@ class Conversation < ActiveRecord::Base
         conversation.private_hash = private_hash
         conversation.has_attachments = false
         conversation.has_media_objects = false
+        conversation.tags = []
         conversation.save!
         connection.bulk_insert('conversation_participants', user_ids.map{ |user_id|
           {
@@ -64,7 +65,8 @@ class Conversation < ActiveRecord::Base
             :user_id => user_id,
             :workflow_state => 'read',
             :has_attachments => false,
-            :has_media_objects => false
+            :has_media_objects => false,
+            :tags => ''
           }
         })
       end
@@ -289,14 +291,16 @@ class Conversation < ActiveRecord::Base
       ["(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids]
     )
 
-    # for the sender (or override(s)), we just update the timestamps
-    # for the sake of overrides, we need to ensure that the message.created_at
-    # is newer than last_message_at
-    conversation_participants.update_all(
-      ["last_message_at = CASE WHEN last_message_at IS NULL OR last_message_at < ? THEN ? ELSE last_message_at END,
-        last_authored_at = CASE WHEN user_id = ? AND (last_authored_at IS NULL OR last_authored_at < ?) THEN ? ELSE last_authored_at END", message.created_at, message.created_at, message.author_id, message.created_at, message.created_at],
-      ["user_id IN (?)" + (update_for_skips ? "" : " AND last_message_at IS NOT NULL"), skip_ids]
-    )
+    # for the sender (or override(s)), we just update the timestamps (if
+    # needed). for last_authored_at, we ignore update_for_skips, since the
+    # column is only viewed by the other participants and doesn't care about
+    # what messages the author may have deleted
+    updates = [
+      maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL"]),
+      maybe_update_timestamp('last_authored_at', message.created_at, ["user_id = ?", message.author_id]),
+      maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?" + (update_for_skips ? "" : " AND last_message_at IS NOT NULL"), message.author_id])
+    ]
+    conversation_participants.update_all(updates.join(", "), ["user_id IN (?)", skip_ids])
     return if options[:skip_attachments_and_media_comments]
 
     updated = false
@@ -362,4 +366,9 @@ class Conversation < ActiveRecord::Base
     }.sort_by(&:last).map(&:first).reverse
   end
   memoize :current_context_strings
+
+  def maybe_update_timestamp(col, val, additional_conditions=[])
+    condition = self.class.merge_conditions(["(#{col} IS NULL OR #{col} < ?)", val], additional_conditions)
+    sanitize_sql ["#{col} = CASE WHEN #{condition} THEN ? ELSE #{col} END", val]
+  end
 end

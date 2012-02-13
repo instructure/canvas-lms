@@ -350,6 +350,51 @@ describe Attachment do
     end
   end
   
+  context "build_media_object" do
+    before :each do
+      @course = course
+      @attachment = @course.attachments.build(:filename => 'foo.mp4')
+      @attachment.content_type = 'video'
+      @attachment.stubs(:downloadable?).returns(true)
+    end
+
+    it "should be called automatically upon creation" do
+      @attachment.expects(:build_media_object).once
+      @attachment.save!
+    end
+
+    it "should create a media object for videos" do
+      MediaObject.expects(:send_later_enqueue_args).once
+      @attachment.save!
+    end
+
+    it "should delay the creation of the media object by attachment_build_media_object_delay_seconds" do
+      now = Time.now
+      Time.stubs(:now).returns(now)
+      Setting.expects(:get).with('attachment_build_media_object_delay_seconds', '10').once.returns('25')
+      @attachment.save!
+
+      MediaObject.count.should == 0
+      Delayed::Job.count.should == 1
+      Delayed::Job.first.run_at.should == now + 25.seconds
+    end
+
+    it "should not create a media object in a skip_media_object_creation block" do
+      Attachment.skip_media_object_creation do
+        MediaObject.expects(:send_later_enqueue_args).times(0)
+        @attachment.save!
+      end
+    end
+
+    it "should not create a media object for images" do
+      @attachment.filename = 'foo.png'
+      @attachment.content_type = 'image/png'
+      @attachment.expects(:build_media_object).once
+      MediaObject.expects(:send_later_enqueue_args).times(0)
+      @attachment.save!
+    end
+  end
+
   context "destroy" do
     it "should not actually destroy" do
       a = attachment_model(:uploaded_data => default_uploaded_data)
@@ -561,7 +606,7 @@ describe Attachment do
     end
   end
 
-  context "cacheable_s3_url" do
+  context "cacheable s3 urls" do
     before(:each) do
       course_model
     end
@@ -570,21 +615,23 @@ describe Attachment do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
       attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
-      attachment.cacheable_s3_url
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(inline; filename="foo"; filename*=UTF-8''foo)))
+      attachment.cacheable_s3_inline_url
+      attachment.cacheable_s3_download_url
     end
 
     it "should use the display_name, not filename, in the response-content-disposition" do
       attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
       attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
-      attachment.cacheable_s3_url
+      attachment.cacheable_s3_inline_url
     end
 
     it "should http quote the filename in the response-content-disposition if necessary" do
       attachment = attachment_with_context(@course, :display_name => 'fo"o')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
       attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="fo\\"o"; filename*=UTF-8''fo%22o)))
-      attachment.cacheable_s3_url
+      attachment.cacheable_s3_inline_url
     end
 
     it "should sanitize filename with iconv" do
@@ -592,7 +639,25 @@ describe Attachment do
       sanitized_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", a.display_name)
       a.expects(:authenticated_s3_url).at_least(0)
       a.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
-      a.cacheable_s3_url
+      a.cacheable_s3_inline_url
+    end
+  end
+
+  context "root_account_id" do
+    before do
+      account_model
+      course_model(:account => @account)
+      @a = attachment_with_context(@course)
+    end
+
+    it "should return account id for normal namespaces" do
+      @a.namespace = "account_#{@account.id}"
+      @a.root_account_id.should == @account.id
+    end
+
+    it "should return account id for localstorage namespaces" do
+      @a.namespace = "_localstorage_/#{@account.file_namespace}"
+      @a.root_account_id.should == @account.id
     end
   end
 end

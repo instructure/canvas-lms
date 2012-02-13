@@ -336,6 +336,27 @@ shared_examples_for 'a backend' do
       job1.unhold!
       @backend.get_and_lock_next_available('w1', 60).should == job1
     end
+
+    it "should hold a scope of jobs" do
+      create_job().update_attributes(:attempts => 2)
+      3.times { create_job() }
+      create_job().update_attributes(:attempts => 1)
+      scope = Delayed::Job.scoped(:conditions => { :attempts => 0 })
+      scope.hold!.should == 3
+      Delayed::Job.count.should == 5
+      Delayed::Job.count(:conditions => { :locked_by => 'on hold' }).should == 3
+    end
+
+    it "should un-hold a scope of jobs" do
+      3.times { create_job() }
+      Delayed::Job.hold!
+      scope = Delayed::Job.scoped(:limit => 2)
+      scope.last.update_attribute(:run_at, 5.hours.from_now)
+      scope.unhold!.should == 2
+      jobs = scope.sort_by { |j| j.run_at }
+      jobs.first.run_at.should <= Time.now
+      jobs.last.run_at.should > 4.hours.from_now
+    end
   end
 
   context "periodic jobs" do
@@ -408,6 +429,26 @@ shared_examples_for 'a backend' do
 
     it "should reject duplicate named jobs" do
       proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
+    end
+
+    it "should allow overriding schedules using periodic_jobs.yml" do
+      Setting.set_config('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * *' })
+      Delayed::Periodic.scheduled = {}
+      Delayed::Periodic.cron('my ChangedJob', '*/5 * * * * *') do
+        @backend.enqueue(SimpleJob.new)
+      end
+      Delayed::Periodic.scheduled['my ChangedJob'].cron.original.should == '*/10 * * * * *'
+      Delayed::Periodic.audit_overrides!
+    end
+
+    it "should fail if the override cron line is invalid" do
+      Setting.set_config('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * * *' }) # extra asterisk
+      Delayed::Periodic.scheduled = {}
+      expect { Delayed::Periodic.cron('my ChangedJob', '*/5 * * * * *') do
+        @backend.enqueue(SimpleJob.new)
+      end }.to raise_error
+
+      expect { Delayed::Periodic.audit_overrides! }.to raise_error
     end
   end
 

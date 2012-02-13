@@ -29,7 +29,7 @@ describe "/profile/profile" do
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
     assigns[:notification_categories] = Notification.dashboard_categories
-    assigns[:policies] = @user.notification_policies
+    assigns[:policies] = NotificationPolicy.for(@user)
     assigns[:default_pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaa", :password_confirmation => "asdfaa")
     assigns[:pseudonyms] = @user.pseudonyms
     assigns[:password_pseudonyms] = []
@@ -46,7 +46,7 @@ describe "/profile/profile" do
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
     assigns[:notification_categories] = Notification.dashboard_categories
-    assigns[:policies] = @user.notification_policies
+    assigns[:policies] = NotificationPolicy.for(@user)
     default_pseudonym = assigns[:default_pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaa", :password_confirmation => "asdfaa")
     sis_pseudonym = @user.pseudonyms.create!(:unique_id => 'sis_unique@example.com') { |p| p.sis_user_id = 'sis_id' }
     assigns[:pseudonyms] = @user.pseudonyms

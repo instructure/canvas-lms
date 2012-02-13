@@ -1,0 +1,15 @@
+{{#with apptEvent}}
+<form action="{{calendarEvent.appointment_group_url}}" id="edit_appt_calendar_event_form">
+  <p>
+    <strong>{{#t "title"}}Title:{{/t}}</strong><br>
+    {{title}}
+  </p>
+  <p>
+    <strong>{{#t "description"}}Description:{{/t}}</strong><br>
+    <textarea name="description" style="width 175px; height: 75px;">{{description}}</textarea>
+  </p>
+  <p>
+    <input type="submit" val="{{#t "#buttons.submit"}}Submit{{/t}}">
+  </p>
+</form>
+{{/with}}

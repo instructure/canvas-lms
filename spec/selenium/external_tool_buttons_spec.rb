@@ -3,8 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "external tool buttons" do
   it_should_behave_like "in-process server selenium tests"
 
-  def load_selection_test_tool(&block)
+  before (:each) do
     course_with_teacher_logged_in
+  end
+
+  def load_selection_test_tool(&block)
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:editor_button] = {
       :url => "http://#{HostUrl.default_host}/selection_test",
@@ -21,8 +24,6 @@ describe "external tool buttons" do
     html.should == ""
 
     keep_trying_until { driver.find_elements(:css, "#external_tool_button_dialog iframe").detect(&:displayed?) }
-
-    frame = driver.find_element(:css, "#external_tool_button_dialog iframe")
 
     in_frame('external_tool_button_frame') do
       keep_trying_until { driver.find_elements(:css, ".link").detect(&:displayed?) }
@@ -75,7 +76,6 @@ describe "external tool buttons" do
   end
 
   it "should show limited number of external tool buttons" do
-    course_with_teacher_logged_in
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
@@ -102,7 +102,6 @@ describe "external tool buttons" do
   end
 
   it "should load external tool if selected from the dropdown" do
-    course_with_teacher_logged_in
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
