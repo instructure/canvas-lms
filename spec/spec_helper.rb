@@ -265,6 +265,12 @@ Spec::Runner.configure do |config|
     @enrollment
   end
 
+  def course_with_ta(opts={})
+    course_with_user("TAEnrollment", opts)
+    @ta = @user
+    @enrollment
+  end
+
   def course_with_student_logged_in(opts={})
     course_with_student(opts)
     user_session(@user)
