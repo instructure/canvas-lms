@@ -67,6 +67,50 @@ describe "conversations context filtering" do
     conversations.first.find_element(:css, 'p').text.should eql 'asdf'
   end
 
+  it "should let you filter by a user" do
+    new_conversation
+    browse_menu
+    browse("the course", "Everyone") { click "Select All" }
+    submit_message_form(:add_recipient => false, :message => "asdf")
+
+    new_conversation(false)
+    browse_menu
+    browse("that course", "Everyone") { click "Select All" }
+    submit_message_form(:add_recipient => false, :message => "qwerty")
+
+    @input = find_with_jquery("#context_tags_filter input:visible")
+    search("student2", "context_tags") { click("student2") }
+
+    keep_trying_until { driver.find_element(:id, "create_message_form") }
+    conversations = find_all_with_jquery('#conversations > ul > li:visible')
+    conversations.size.should eql 1
+    conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+  end
+
+  it "should let you filter by a group" do
+    new_conversation
+    browse_menu
+    browse("the course", "Everyone") { click "Select All" }
+    submit_message_form(:add_recipient => false, :message => "asdf")
+
+    new_conversation(false)
+    browse_menu
+    browse("the group") { click "Select All" }
+    submit_message_form(:add_recipient => false, :message => "qwerty")
+
+    @input = find_with_jquery("#context_tags_filter input:visible")
+    search("the group", "context_tags") {
+      menu.should eql ["the group"]
+      elements.first.first.text.should include "the course" # make sure the group context is shown
+      click("the group")
+    }
+
+    keep_trying_until { driver.find_element(:id, "create_message_form") }
+    conversations = find_all_with_jquery('#conversations > ul > li:visible')
+    conversations.size.should eql 1
+    conversations.first.find_element(:css, 'p').text.should eql 'qwerty'
+  end
+
   it "should show the term name by the course" do
     new_conversation
     browse_menu

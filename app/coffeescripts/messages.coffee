@@ -10,6 +10,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'jquery.loadingImg'
+  'jquery.disableWhileLoading'
   'jquery.rails_flash_notifications'
   'media_comments'
   'vendor/jquery.ba-hashchange'
@@ -614,7 +615,7 @@ define [
         @ui_locked = false
 
     prepare_post: (data) ->
-      post_data = $.extend(data, {search: @input.val()}, @options.base_data ? {})
+      post_data = $.extend(data, {search: @input.val().replace(/^\s+|\s+$/g, "")}, @options.base_data ? {})
       post_data.exclude = @input.base_exclude.concat(if @stack.length then [] else @input.token_values())
       post_data.context = @stack[@stack.length - 1][0].data('id') if @list_expanded()
       post_data.per_page ?= @options.limiter?(level: @stack.length)
@@ -1373,6 +1374,7 @@ define [
 
       $('#menu_views').parent().find('li a').click (e) ->
         close_menus()
+        lock_until_user_input()
         $('#menu_views').text $(this).text()
 
       $('#message_actions').find('a').click (e) ->
@@ -1612,9 +1614,42 @@ define [
         add_conversation conversation, true
       $('#no_messages').showIf !$conversation_list.find('li:not([id=conversations_loader])').length
 
+
+      build_context_info = (data) ->
+        match = data.id.match(/^(course|section)_(\d+)$/)
+        termInfo = MessageInbox.contexts["#{match[1]}s"][match[2]] if match
+  
+        context_info = data.context_name or ''
+        context_info = if context_info.length < 40 then context_info else context_info.substr(0, 40) + '...'
+        if termInfo?.term
+          context_info = if context_info
+            "#{context_info} - #{termInfo.term}"
+          else
+            termInfo.term
+  
+        if context_info
+          $('<span />', class: 'context_info').text("(#{context_info})")
+        else
+          ''
+      
+      # a little gimmick until we implement real ajax loading for filters. we
+      # disable the inbox when a filter is changed (via dropdown or search).
+      # that way it's more obvious stuff is loading and the user doesn't try
+      # to do something else only to have the page change underneath them
+      lock_until_user_input = ->
+        setTimeout ->
+          $('#inbox').disableWhileLoading until_user_input()
+
+      until_user_input = ->
+        d = $.Deferred()
+        $('body').one 'keydown click', d.resolve
+        d.promise()
+
+
       $('.recipients').tokenInput
         placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
         added: (data, $token, new_token) ->
+          data.id = "#{data.id}"
           if new_token and data.root_id
             $token.append("<input type='hidden' name='tags[]' value='#{data.root_id}'>")
           if new_token and data.type
@@ -1624,7 +1659,7 @@ define [
               $details = $('<span />')
               $details.text(I18n.t('people_count', 'person', {count: data.user_count}))
               $token.append($details)
-          unless data.id and "#{data.id}".match(/^(course|group)_/)
+          unless data.id.match(/^(course|group)_/)
             data = $.extend({}, data)
             delete data.avatar_url # since it's the wrong size and possibly a blank image
             current_data = MessageInbox.user_cache[data.id] ? {}
@@ -1632,27 +1667,15 @@ define [
         selector:
           messages: {no_results: I18n.t('no_results', 'No results found')}
           populator: ($node, data, options={}) ->
+            data.id = "#{data.id}"
             if data.avatar_url
               $img = $('<img class="avatar" />')
               $img.attr('src', data.avatar_url)
               $node.append($img)
-
-            unless options.parent
-              match = /^(course|section)_(\d+)$/.exec(data.id)
-              termInfo = MessageInbox.contexts["#{match[1]}s"][match[2]] if match
-
-              context_info  = data.context_name or ''
-              context_info  = if context_info.length < 40 then context_info else context_info.substr(0, 40) + '...'
-              context_info  = if context_info and termInfo?.term
-                                "#{context_info} - #{termInfo.term}"
-                              else if termInfo?.term
-                                termInfo.term
-                              else
-                                null
-            $context_info = if context_info then $('<span />', class: 'context_info').text("(#{context_info})") else ''
             $b = $('<b />')
             $b.text(data.name)
             $name = $('<span />', class: 'name')
+            $context_info = build_context_info(data) unless options.parent
             $name.append($b, $context_info)
             $span = $('<span />', class: 'details')
             if data.common_courses?
@@ -1670,7 +1693,7 @@ define [
             if options.parent
               if data.select_all and data.no_expand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"
                 text = options.parent.data('text')
-              else if (data.id + '').match(/_\d+_/) # e.g. course_123_teachers -> "Spanish 101: Teachers"
+              else if data.id.match(/_\d+_/) # e.g. course_123_teachers -> "Spanish 101: Teachers"
                 text = I18n.beforeLabel(options.parent.data('text')) + " " + text
             $node.data('text', text)
             $node.data('id', data.id)
@@ -1729,13 +1752,14 @@ define [
         inbox_resize()
 
       $('#context_tags').tokenInput
-        placeholder: I18n.t('course_filter_placeholder', "Enter a course name")
+        placeholder: I18n.t('filter_placeholder', "Enter a name, course, or group")
         added: (data, $token, new_token) ->
           $token.prevAll().remove()
         tokenWrapBuffer: 80
         selector:
           messages: {no_results: I18n.t('no_results', 'No results found')}
           populator: ($node, data, options={}) ->
+            data.id = "#{data.id}"
             if data.avatar_url
               $img = $('<img class="avatar" />')
               $img.attr('src', data.avatar_url)
@@ -1743,18 +1767,16 @@ define [
             $b = $('<b />')
             $b.text(data.name)
             $name = $('<span />', class: 'name')
-            $name.append($b)
-
-            courseId = /^course_(\d+)$/.exec(data.id)[1]
-            term = MessageInbox.contexts.courses[courseId].term
-            if term
-              $name.append $('<span/>', class: 'context_info').text("(#{term})")
+            $context_info = build_context_info(data) unless options.parent
+            $name.append($b, $context_info)
             $span = $('<span />', class: 'details')
+            if data.common_courses?
+              $span.text(MessageInbox.context_list(courses: data.common_courses, groups: data.common_groups))
             $node.append($name, $span)
             $node.attr('title', data.name)
             text = data.name
             $node.data('text', text)
-            $node.data('id', data.id)
+            $node.data('id', if data.type is 'context' then data.id else "user_#{data.id}")
             $node.data('user_data', data)
             $node.addClass(data.type)
             $node.addClass('toggleable')
@@ -1765,6 +1787,8 @@ define [
           # TODO: fragment hash fu + ajax
           new_url = location.href.replace(/[\?#].*|/g, '')
           new_url += '?filter=' + token_values[0] if token_values[0]
+          filter_input.input.blur()
+          lock_until_user_input()
           location.href = new_url
       if filter = MessageInbox.initial_filter
         MessageInbox.current_filter = filter.id

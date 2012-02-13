@@ -37,6 +37,31 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :archived, :conditions => "workflow_state = 'archived'"
   named_scope :starred, :conditions => "label = 'starred'"
   named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
+
+  tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
+    user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
+    conditions = if options[:mode] == :or || tags.size == 1
+      [<<-SQL, user_ids]
+      EXISTS (
+        SELECT *
+        FROM conversation_participants cp
+        WHERE cp.conversation_id = conversation_participants.conversation_id
+        AND user_id IN (?)
+      )
+      SQL
+    else
+      [<<-SQL, user_ids, user_ids.size]
+      (
+        SELECT COUNT(*)
+        FROM conversation_participants cp
+        WHERE cp.conversation_id = conversation_participants.conversation_id
+        AND user_id IN (?)
+      ) = ?
+      SQL
+    end
+    sanitize_sql conditions
+  end
+
   delegate :private?, :to => :conversation
 
   before_update :update_unread_count

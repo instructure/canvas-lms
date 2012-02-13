@@ -118,13 +118,22 @@ class ConversationsController < ApplicationController
     end
     @scope ||= params[:scope].to_sym
     base_scope = conversations_scope
-    if params[:filter] && params[:filter] =~ /\Acourse_(\d+)\z/
-      if course = @contexts[:courses][$1.to_i]
+    if params[:filter]
+      if params[:filter] =~ /\A(course|group)_(\d+)\z/
+        if context = @contexts[$1.pluralize.to_sym][$2.to_i]
+          @filter = {:id => params[:filter], :name => context[:name]}
+        end
+      elsif params[:filter] =~ /\Auser_(\d+)\z/
+        if user = matching_participants(:ids => [$1]).first
+          @filter = {:id => params[:filter], :name => user[:name]}
+        end
+      end
+      if @filter
         conversations_scope = conversations_scope.tagged(params[:filter])
-        @filter = {:id => params[:filter], :name => course[:name]}
-        @no_messages += " (#{course[:name]})"
+        @no_messages += " (#{@filter[:name]})"
       end
     end
+
     @conversations_count = conversations_scope.count
     conversations = Api.paginate(conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
     # optimize loading the most recent messages for each conversation into a single query
@@ -494,7 +503,11 @@ class ConversationsController < ApplicationController
   #   groups/courses, the id is prefixed by "group_"/"course_" respectively.
   # @response_field name The name of the user/context
   # @response_field avatar_url Avatar image url for the user/context
-  # @response_field type ["context"|null] Not set for users, implicitly "user"
+  # @response_field type ["context"|"course"|"section"|"group"|"user"|null]
+  #   Type of recipients to return, defaults to null (all). "context"
+  #   encompasses "course", "section" and "group"
+  # @response_field types[] Array of recipient types to return (see type
+  #   above), e.g. types[]=user&types[]=course
   # @response_field user_count Only set for contexts, indicates number of
   #   messageable users
   # @response_field common_courses Only set for users. Hash of course ids and
@@ -502,10 +515,18 @@ class ConversationsController < ApplicationController
   # @response_field common_groups Only set for users. Hash of group ids and
   #   enrollment types for each group to show what they share with this user
   def find_recipients
+    types = (params[:types] || [] + [params[:type]]).compact
+    types |= [:course, :section, :group] if types.delete('context')
+    types = if types.present?
+      {:user => types.delete('user').present?, :context => types.present? && types.map(&:to_sym)}
+    else
+      {:user => true, :context => [:course, :section, :group]}
+    end
+
     @blank_fallback = !api_request?
     max_results = [params[:per_page].try(:to_i) || 10, 50].min
     if max_results < 1
-      if context_types.include?(params[:type]) || params[:context]
+      if !types[:user] || params[:context]
         max_results = nil # i.e. all results
       else
         max_results = params[:per_page] = 10
@@ -519,17 +540,17 @@ class ConversationsController < ApplicationController
     recipients = []
     if params[:user_id]
       recipients = matching_participants(:ids => [params[:user_id]], :conversation_id => params[:from_conversation_id])
-    elsif (params[:context] || params[:search]) && (context_types + ['user', nil]).include?(params[:type])
+    elsif (params[:context] || params[:search])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
       rank_results = params[:search].present?
-      contexts = params[:type] == 'user' ? [] : matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :type => params[:type]))
-      participants = context_types.include?(params[:type]) || @skip_users ? [] : matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
+      contexts = types[:context] ? matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :types => types[:context])) : []
+      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))) : []
       if max_results
         has_next_page = participants.size + contexts.size > max_results
         contexts = contexts[0, max_results]
         participants = participants[0, max_results].sort_by{ |u| u[:name].downcase } # can't sort until we lop off the extra one at the end
-        if params[:type]
+        if types[:user] ^ types[:context]
           recipients = contexts + participants
           recipients.instance_eval <<-CODE
             def paginate(*args); self; end
@@ -723,15 +744,13 @@ class ConversationsController < ApplicationController
 
     result = []
     if context_name.nil?
-      result = if options[:type] == 'course'
-                 @contexts[:courses].values
-               elsif params[:search].blank?
+      result = if terms.blank?
                  courses = @contexts[:courses].values
                  group_ids = @current_user.current_groups.map(&:id)
                  groups = @contexts[:groups].slice(*group_ids).values
                  courses + groups
                else
-                 @contexts.values.map(&:values).flatten
+                 @contexts.values_at(*options[:types].map{|t|t.to_s.pluralize.to_sym}).compact.map(&:values).flatten
                end
     elsif options[:synthetic_contexts]
       if context_name =~ /\Acourse_(\d+)(_(groups|sections))?\z/ && (course = @contexts[:courses][$1.to_i]) && course[:active]
@@ -895,9 +914,5 @@ class ConversationsController < ApplicationController
 
   def blank_fallback
     params[:blank_avatar_fallback] || @blank_fallback
-  end
-
-  def context_types
-    ['context', 'course']
   end
 end

@@ -132,6 +132,13 @@ describe "conversations recipient finder" do
     end
   end
 
+  it "should show the group context when searching at the top level" do
+    search("the group") do
+      menu.first.should eql "the group"
+      elements.first.first.text.should include "the course"
+    end
+  end
+
   it "should omit already-added tokens when searching" do
     search("student") do
       menu.should eql ["student 1", "student 2"]
