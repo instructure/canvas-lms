@@ -40,7 +40,7 @@ define([
     } while (prefix && $('#' + id).length);
     return id;
   };
-  
+
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {
     var result;
@@ -52,7 +52,7 @@ define([
     });
     return result;
   };
-  
+
   $.mimeClass = function(contentType){
     return {
       "video/mp4": "video",
@@ -103,7 +103,7 @@ define([
       "text/x-csharp": "code"
     }[contentType] || 'file'
   }
-  
+
   $.encodeToHex = function(str) {
     var hex = "";
     var e = str.length;
@@ -136,7 +136,7 @@ define([
     str.htmlSafe = true;
     return str;
   }
-  
+
   $.replaceOneTag = function(text, name, value) {
     if(!text) { return text; }
     name = (name || "").toString();
@@ -155,7 +155,7 @@ define([
       return $.replaceOneTag(text, mapping_or_name, maybe_value)
     }
   }
-  
+
   var scrollSideBarIsBound = false;
   $.scrollSidebar = function(){
     if(!scrollSideBarIsBound){
@@ -166,7 +166,7 @@ define([
           $window = $(window),
           headerHeight = $right_side.offset().top,
           rightSideMarginBottom = $("#right-side-wrapper").height() - $right_side.outerHeight();
-          
+
       function onScroll(){
         var windowScrollTop = $window.scrollTop(),
             windowScrollIsBelowHeader = (windowScrollTop > headerHeight);
@@ -200,11 +200,11 @@ define([
       results.push(property);
     return results;
   };
-  
+
   $.underscore = function(string) {
     return (string || "").replace(/([A-Z])/g, "_$1").replace(/^_/, "").toLowerCase();
   };
-  
+
   $.titleize = function(string) {
     var res = (string || "").replace(/([A-Z])/g, " $1").replace(/_/g, " ").replace(/\s+/, " ").replace(/^\s/, "");
     return $.map(res.split(/\s/), function(word) { return (word[0] || "").toUpperCase() + word.substring(1); }).join(" ");
@@ -246,7 +246,7 @@ define([
     }
     return browser;
   };
-  
+
   $.fileSize = function(bytes) {
     var factor = 1024;
     if(bytes < factor) {
@@ -257,7 +257,7 @@ define([
       return (Math.round(10.0 * bytes / factor / factor) / 10.0) + "MB";
     }
   };
-  
+
   $.uniq = function(array) {
     var result = [];
     var hash = {};
@@ -279,7 +279,7 @@ define([
       if(error) { error(data); }
     });
   };
-  
+
   var lastLookup; //used to keep track of diigo requests
   $.findLinkForService = function(service_type, callback) {
     var $dialog = $("#instructure_bookmark_search");
@@ -359,7 +359,7 @@ define([
       width: 400
     }).dialog('open');
   };
-  
+
   $.findImageForService = function(service_type, callback) {
     var $dialog = $("#instructure_image_search");
     $dialog.find("button").attr('disabled', false);
@@ -372,7 +372,7 @@ define([
                             "<button class='button' type='submit'>" +
                             htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>")
                   .append("<div class='results' style='max-height: 240px; overflow: auto;'/>");
-      
+
       $dialog.find("form .query").formSuggestion();
       $dialog.find("form").submit(function(event) {
         event.preventDefault();
@@ -446,7 +446,7 @@ define([
       var split  = (string || "").split(/\s/),
           result = "",
           done   = false;
-          
+
       for(var idx in split) {
         var val = split[idx];
         if ( done ) {
@@ -464,7 +464,7 @@ define([
       return result;
     }
   };
-  
+
   $.toSentence = function(array, options) {
     if (typeof options == 'undefined') {
       options = {};
@@ -504,7 +504,7 @@ define([
     else
       return decodeURIComponent(results[1].replace(/\+/g, " "));
   };
-  
+
   // tells you how many keys are in an object, 
   // so: $.size({})  === 0  and $.size({foo: "bar"}) === 1
   $.size = function(object) {
@@ -512,11 +512,11 @@ define([
     $.each(object,function(){ keyCount++; });
     return keyCount;
   };
-  
+
   $.capitalize = function(string) {
     return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
   };
-  
+
   var storage_user_id;
   function getUser() {
     if ( !storage_user_id ) {
@@ -524,19 +524,19 @@ define([
     }
     return storage_user_id;
   };
-  
+
   $.store.userGet = function(key) {
     return $.store.get("_" + getUser() + "_" + key);
   };
-  
+
   $.store.userSet = function(key, value) {
     return $.store.set("_" + getUser() + "_" + key, value);
   };
-  
+
   $.store.userRemove = function(key, value) {
     return $.store.remove("_" + getUser() + "_" + key, value);
   };
-  
+
   INST.youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/;
   $.youTubeID = function(path) {
     var match = path.match(INST.youTubeRegEx);
@@ -545,6 +545,4 @@ define([
     }
     return null;
   };
-  
-
 });

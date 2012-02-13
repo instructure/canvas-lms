@@ -22,7 +22,6 @@ define([
   'str/htmlEscape',
   'jquery.ajaxJSON', // ajaxJSON
   'jquery.instructure_forms', // defaultAjaxError
-  'jquery.instructure_misc_helpers', // htmlEscape, /\$\.h/
   'jquery.rails_flash_notifications', // flashError
   'jqueryui/effects/drop'
 ], function(INST, I18n, $, htmlEscape) {

@@ -111,12 +111,12 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
+  'str/htmlEscape' /* htmlEscape, /\$\.h/ */,
   'jquery.instructure_forms' /* formSubmit */,
   'jquery.instructure_jquery_patches' /* /\.dialog/ */,
-  'jquery.instructure_misc_helpers' /* htmlEscape, /\$\.h/ */,
   'jquery.rails_flash_notifications' /* flashMessage */,
   'jquery.templateData' /* fillTemplateData */
-], function(I18n, $) {
+], function(I18n, $, htmlEscape) {
 
   $(document).ready(function() {
     $(".add_user_link").click(function(event) {
@@ -139,7 +139,7 @@ require([
         $(this).find("button").attr('disabled', false)
           .filter(".submit_button").text(<%= jt('#accounts.add_user_button', "Add User") %>);
         var user = data.user.user || data.user;
-        var link = "<a href='/users/" + user.id + "'>" + $.htmlEscape(user.name) + "</a>"
+        var link = "<a href='/users/" + user.id + "'>" + htmlEscape(user.name) + "</a>"
         var message = '';
         if(data.message_sent) {
             message = <%= jt('#accounts.user_added_message_sent_message', '%{user} successfully added! They should receive an email confirmation shortly.', '{user: link}') %>;
