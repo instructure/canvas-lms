@@ -102,7 +102,7 @@ class CoursesController < ApplicationController
   # @argument course[name] [String] [optional] The name of the course. If omitted, the course will be named "Unnamed Course."
   # @argument course[course_code] [String] [optional] The course code for the course.
   # @argument course[start_at] [Datetime] [optional] Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
-  # @argument course[conclude_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  # @argument course[end_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
   # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
   # @argument course[public_description] [String] [optional] A publicly visible description of the course.
@@ -128,6 +128,17 @@ class CoursesController < ApplicationController
       end
 
       sis_course_id = params[:course].delete(:sis_course_id)
+
+      # accept end_at as an alias for conclude_at. continue to accept
+      # conclude_at for legacy support, and return conclude_at only if
+      # the user uses that name.
+      course_end = if params[:course][:end_at].present?
+                     params[:course][:conclude_at] = params[:course].delete(:end_at)
+                     :end_at
+                   else
+                     :conclude_at
+                   end
+
       @course = (@sub_account || @account).courses.build(params[:course])
       @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
       @course.offer if api_request? and params[:offer].present?
@@ -138,7 +149,7 @@ class CoursesController < ApplicationController
             @course,
             @current_user,
             session,
-            [:start_at, :conclude_at, :license, :publish_grades_immediately,
+            [:start_at, course_end, :license, :publish_grades_immediately,
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
