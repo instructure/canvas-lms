@@ -1709,9 +1709,6 @@ class InitCanvasDb < ActiveRecord::Migration
       t.string  "context_code"
     end
 
-    add_index "stream_item_instances", ["user_id", "context_code", "id", "stream_item_id"], :name => "index_stream_item_instances_with_context_code"
-    add_index "stream_item_instances", ["user_id", "id", "stream_item_id"], :name => "index_stream_item_instances_on_user_id_and_id_and_stream_item_id"
-
     create_table "stream_items", :force => true do |t|
       t.integer  "user_id", :limit => 8
       t.string   "context_code"

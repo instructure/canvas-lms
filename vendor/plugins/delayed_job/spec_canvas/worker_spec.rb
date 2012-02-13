@@ -14,13 +14,14 @@ describe Delayed::Worker do
     Delayed::Job::Failed.delete_all
     SimpleJob.runs = 0
     Delayed::Worker.on_max_failures = nil
+    Setting.set('delayed_jobs_sleep_delay', '0.01')
   end
 
   describe "running a job" do
     it "should fail after Worker.max_run_time" do
       begin
         old_max_run_time = Delayed::Worker.max_run_time
-        Delayed::Worker.max_run_time = 1.second
+        Delayed::Worker.max_run_time = 0.01
         @job = Delayed::Job.create :payload_object => LongRunningJob.new
         @worker.perform(@job)
         @job.reload.last_error.should =~ /expired/

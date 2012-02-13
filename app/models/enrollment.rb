@@ -128,6 +128,13 @@ class Enrollment < ActiveRecord::Base
                               AND enrollments.workflow_state = 'active'
                               AND courses.workflow_state = 'available'"
 
+  named_scope :student_in_claimed_or_available,
+              :select => 'course_id',
+              :joins => :course,
+              :conditions => "enrollments.type = 'StudentEnrollment'
+                              AND enrollments.workflow_state = 'active'
+                              AND courses.workflow_state IN ('available', 'claimed')"
+
   named_scope :all_student,
               :include => :course,
               :conditions => "enrollments.type = 'StudentEnrollment'
@@ -157,6 +164,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_user_account_associations_if_necessary
     if self.new_record?
+      return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
     elsif should_update_user_account_association?
@@ -420,10 +428,37 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def active?
+    state_based_on_date == :active
+  end
+
+  def inactive?
+    state_based_on_date == :inactive
+  end
+
+  def completed?
+    state_based_on_date == :completed
+  end
+
+  def explicitly_completed?
+    state == :completed
+  end
+
+  def soft_completed_at
+    enrollment_dates.map(&:last).compact.min
+  end
+  protected :soft_completed_at
+
+  def completed_at
+    read_attribute(:completed_at) || (completed? ? soft_completed_at : nil)
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.save
+    result = self.save
+    self.user.try(:update_account_associations) if result
+    result
   end
 
   def restore
@@ -723,5 +758,29 @@ class Enrollment < ActiveRecord::Base
   # course it is currently tied to
   def enrollment_term
     self.course.enrollment_term
+  end
+
+  def self.remove_duplicate_enrollments_from_sections
+    # clean up for enrollments that aren't unique on (user_id,
+    # course_section_id, type, associated_user_id)
+    #
+    # eventually we'll make this a db constraint, and we can drop this method,
+    # but that'll require some more code changes
+    deleted = 0
+    while true
+      pairs = self.connection.select_rows("
+          SELECT user_id, course_section_id, type, associated_user_id
+          FROM enrollments
+          WHERE sis_source_id IS NOT NULL
+          GROUP BY user_id, course_section_id, type, associated_user_id
+          HAVING count(*) > 1 LIMIT 50000")
+      break if pairs.empty?
+      pairs.each do |(user_id, course_section_id, type, associated_user_id)|
+        scope = self.scoped(:conditions => { :user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id }).scoped(:conditions => "sis_source_id IS NOT NULL")
+        keeper = scope.first(:select => "id, workflow_state", :order => 'sis_batch_id desc')
+        deleted += scope.delete_all(["id<>?", keeper.id]) if keeper
+      end
+    end
+    return deleted
   end
 end

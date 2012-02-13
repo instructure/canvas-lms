@@ -21,7 +21,7 @@ class AppointmentGroupsController < ApplicationController
 
   before_filter :require_user
   before_filter :get_context, :only => :create
-  before_filter :get_appointment_group, :only => [:show, :update, :destroy]
+  before_filter :get_appointment_group, :only => [:show, :update, :destroy, :users, :groups]
 
   def calendar_fragment(opts)
     opts.to_json.unpack('H*')
@@ -97,8 +97,27 @@ class AppointmentGroupsController < ApplicationController
     end
   end
 
+  def users
+    participants('User'){ |u| user_json(u, @current_user, session) }
+  end
+
+  def groups
+    participants('Group'){ |g| group_json(g, @current_user, session) }
+  end
+
 
   protected
+
+  def participants(type, &formatter)
+    if authorized_action(@group, @current_user, :read)
+      return render :json => [] unless @group.participant_type == type
+      render :json => Api.paginate(
+        @group.possible_participants(params[:registration_status]),
+        self,
+        send("api_v1_appointment_group_#{params[:action]}_path", @group)
+      ).map(&formatter)
+    end
+  end
 
   def get_context
     @context = Context.find_by_asset_string(params[:appointment_group].delete(:context_code)) if params[:appointment_group] && params[:appointment_group][:context_code]

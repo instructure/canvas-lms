@@ -958,6 +958,16 @@ class Assignment < ActiveRecord::Base
     homeworks = []
     primary_homework = nil
     ts = Time.now.to_s
+    submitted = case opts[:submission_type]
+                when "online_text_entry"
+                  opts[:body].present?
+                when "online_url"
+                  opts[:url].present?
+                when "online_upload"
+                  opts[:attachments].size > 0
+                else
+                  true
+                end
     transaction do
       students.each do |student|
         homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
@@ -966,7 +976,7 @@ class Assignment < ActiveRecord::Base
           :attachment => nil,
           :processed => false,
           :process_attempts => 0,
-          :workflow_state => "submitted",
+          :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
         homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
@@ -1606,7 +1616,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  protected
 
     # Takes an array of hashes and groups them by their :user entry.  All
     # hashes must have a user entry.
@@ -1620,25 +1629,36 @@ class Assignment < ActiveRecord::Base
         [found] + partition_for_user(remainder)
       end
     end
+    protected :partition_for_user
 
-    # Infers the user, submission, and attachment from a filename
-    def infer_comment_context_from_filename(filename)
-      split_filename = filename.split('_')
-      # If the filename is like Richards_David_2_link.html, then there is no
-      # useful attachment here.  The assignment was submitted as a URL and the
-      # teacher commented directly with the gradebook.  Otherwise, grab that
-      # last value and strip off everything after the first period.
-      attachment_id = (split_filename[-1] =~ /\Alink/) ? nil : split_filename[-1].split('.')[0].to_i
-      attachment_id = nil if filename.match(/\A\._/)
-      user_id = split_filename[-2].to_i
+  # Infers the user, submission, and attachment from a filename
+  def infer_comment_context_from_filename(filename)
+    split_filename = filename.split('_')
+    # If the filename is like Richards_David_2_link.html, then there is no
+    # useful attachment here.  The assignment was submitted as a URL and the
+    # teacher commented directly with the gradebook.  Otherwise, grab that
+    # last value and strip off everything after the first period.
+    user_id, attachment_id = split_filename.grep(/^\d+$/).last(2)
+    attachment_id = nil if split_filename.last =~ /^link/ || filename =~ /^\._/
+
+    if user_id
       user = User.find_by_id(user_id)
-      attachment = attachment_id && Attachment.find_by_id(attachment_id)
       submission = Submission.find_by_user_id_and_assignment_id(user_id, self.id)
-      if !attachment || !submission
-        @ignored_files << filename
-        return nil
-      end
-      return {:user => user, :submission => submission, :filename => filename, :display_name => attachment.display_name}
     end
+    attachment = Attachment.find_by_id(attachment_id) if attachment_id
+
+    if !attachment || !submission
+      @ignored_files << filename
+      return nil
+    end
+
+    {
+      :user => user,
+      :submission => submission,
+      :filename => filename,
+      :display_name => attachment.display_name
+    }
+  end
+  protected :infer_comment_context_from_filename
 
 end

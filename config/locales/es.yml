@@ -170,6 +170,7 @@ es:
     adding_user_message: "Agregando Usuario..."
     avatars: 
       all_link: 
+        one: "Todo %{count}"
         other: "Todo %{count}"
         zero: Todo
       approve_link: aprobar
@@ -180,13 +181,16 @@ es:
       no_avatars_message: "No hay una foto de perfil que mostrar"
       page_title: "Fotos de perfil"
       re_reported_link: 
+        one: "Aprobado, Reportado otra vez %{count}"
         other: "Aprobado, Reportado otra vez %{count}"
         zero: "Aprobado, Reportado otra vez"
       reported_link: 
+        one: "Reportado %{count}"
         other: "Reportado %{count}"
         zero: Reportado
       saving: Guardando...
       submitted_link: 
+        one: "Presentado %{count}"
         other: "Presentado %{count}"
         zero: Presentado
       title: "Fotos de perfil"
@@ -203,7 +207,8 @@ es:
       course_unpublished_tooltip: "Sin publicar"
       homepage_link: "Página de Inicio"
       more_count: 
-        other: "%{count}"
+        one: "%{count} más"
+        other: "%{count} más"
       none: ninguno
       settings_link: Configuraciones
       sis_id_label: "ID de SIS"
@@ -359,8 +364,7 @@ es:
       no_courses_term_message: "No hay cursos en este término"
       subtitle_term: "Para el término **%{term}**"
       title: "Cursos en esta Cuenta"
-      too_many_courses_message: 
-        other: "Hay demasiados cursos que mostrar (%{count}). Por favor use el buscador en la derecha para encontrar un curso específico."
+      too_many_courses_message: "Hay demasiados cursos que mostrar (%{count}). Por favor use el buscador en la derecha para encontrar un curso específico."
     sis_batch_counts: 
       accounts_label: Cuentas
       courses_label: Cursos

@@ -58,6 +58,8 @@ describe ConversationsController, :type => :integration do
           "workflow_state" => "unread",
           "last_message" => "test",
           "last_message_at" => @c2.last_message_at.to_json[1, 20],
+          "last_authored_message" => "test",
+          "last_authored_message_at" => @c2.last_message_at.to_json[1, 20],
           "message_count" => 1,
           "subscribed" => false,
           "private" => false,
@@ -79,6 +81,8 @@ describe ConversationsController, :type => :integration do
           "workflow_state" => "read",
           "last_message" => "test",
           "last_message_at" => @c1.last_message_at.to_json[1, 20],
+          "last_authored_message" => "test",
+          "last_authored_message_at" => @c1.last_message_at.to_json[1, 20],
           "message_count" => 1,
           "subscribed" => true,
           "private" => true,
@@ -127,6 +131,8 @@ describe ConversationsController, :type => :integration do
           "workflow_state" => "unread",
           "last_message" => "test",
           "last_message_at" => @c2.last_message_at.to_json[1, 20],
+          "last_authored_message" => "test",
+          "last_authored_message_at" => @c2.last_message_at.to_json[1, 20],
           "message_count" => 1,
           "subscribed" => false,
           "private" => false,
@@ -144,6 +150,53 @@ describe ConversationsController, :type => :integration do
           ]
         }
       ]
+    end
+
+    context "sent scope" do
+      it "should sort by last authored date" do
+        expected_times = 5.times.to_a.reverse.map{ |h| Time.parse((Time.now.utc - h.hours).to_s) }
+        ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).times(5).returns(*expected_times)
+        @c1 = conversation(@bob)
+        @c2 = conversation(@bob, @billy)
+        @c3 = conversation(@jane)
+
+        @m1 = @c1.conversation.add_message(@bob, 'ohai')
+        @m2 = @c2.conversation.add_message(@bob, 'ohai')
+
+        json = api_call(:get, "/api/v1/conversations.json?scope=sent",
+                { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'sent' })
+        json.size.should eql 3
+        json[0]['id'].should eql @c3.conversation_id
+        json[0]['last_message_at'].should eql expected_times[2].to_json[1, 20]
+        json[0]['last_message'].should eql 'test'
+        json[0]['last_authored_message_at'].should eql expected_times[2].to_json[1, 20]
+        json[0]['last_authored_message'].should eql 'test'
+
+        json[1]['id'].should eql @c2.conversation_id
+        json[1]['last_message_at'].should eql expected_times[4].to_json[1, 20]
+        json[1]['last_message'].should eql 'ohai'
+        json[1]['last_authored_message_at'].should eql expected_times[1].to_json[1, 20]
+        json[1]['last_authored_message'].should eql 'test'
+
+        json[2]['id'].should eql @c1.conversation_id
+        json[2]['last_message_at'].should eql expected_times[3].to_json[1, 20]
+        json[2]['last_message'].should eql 'ohai'
+        json[2]['last_authored_message_at'].should eql expected_times[0].to_json[1, 20]
+        json[2]['last_authored_message'].should eql 'test'
+      end
+
+      it "should only include non-archived conversations with at least one message by the author" do
+        @c1 = conversation(@bob)
+        @c2 = conversation(@bob, @billy)
+        @c2.conversation.add_message(@bob, 'ohai')
+        @c2.remove_messages([@message]) # delete my original message
+        @c3 = conversation(@jane, :workflow_state => 'archived')
+
+        json = api_call(:get, "/api/v1/conversations.json?scope=sent",
+                { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'sent' })
+        json.size.should eql 1
+        json[0]['id'].should eql @c1.conversation_id
+      end
     end
 
     it "should show the calculated audience_contexts if the tags have not been migrated yet" do
@@ -215,6 +268,8 @@ describe ConversationsController, :type => :integration do
             "workflow_state" => "read",
             "last_message" => "test",
             "last_message_at" => conversation.last_message_at.to_json[1, 20],
+            "last_authored_message" => "test",
+            "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
             "message_count" => 1,
             "subscribed" => true,
             "private" => true,
@@ -253,6 +308,8 @@ describe ConversationsController, :type => :integration do
             "workflow_state" => "read",
             "last_message" => "test",
             "last_message_at" => conversation.last_message_at.to_json[1, 20],
+            "last_authored_message" => "test",
+            "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
             "message_count" => 1,
             "subscribed" => true,
             "private" => false,
@@ -295,6 +352,8 @@ describe ConversationsController, :type => :integration do
             "workflow_state" => "read",
             "last_message" => "test",
             "last_message_at" => conversation.last_message_at.to_json[1, 20],
+            "last_authored_message" => "test",
+            "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
             "message_count" => 2, # two messages total now, though we'll only get the latest one in the response
             "subscribed" => true,
             "private" => true,
@@ -353,6 +412,8 @@ describe ConversationsController, :type => :integration do
             "workflow_state" => "read",
             "last_message" => "test",
             "last_message_at" => conversation.last_message_at.to_json[1, 20],
+            "last_authored_message" => "test",
+            "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
             "message_count" => 1,
             "subscribed" => true,
             "private" => true,
@@ -630,6 +691,8 @@ describe ConversationsController, :type => :integration do
         "workflow_state" => "read",
         "last_message" => "another",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "another",
+        "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
         "message_count" => 2,
         "subscribed" => true,
         "private" => true,
@@ -763,6 +826,8 @@ describe ConversationsController, :type => :integration do
         "workflow_state" => "read",
         "last_message" => "another",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "another",
+        "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
         "message_count" => 2, # two messages total now, though we'll only get the latest one in the response
         "subscribed" => true,
         "private" => true,
@@ -799,6 +864,8 @@ describe ConversationsController, :type => :integration do
         "workflow_state" => "read",
         "last_message" => "test",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "test",
+        "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
         "message_count" => 1,
         "subscribed" => true,
         "private" => false,
@@ -836,6 +903,8 @@ describe ConversationsController, :type => :integration do
         "workflow_state" => "archived",
         "last_message" => "test",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "test",
+        "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
         "message_count" => 1,
         "subscribed" => false,
         "private" => false,
@@ -888,6 +957,8 @@ describe ConversationsController, :type => :integration do
         "workflow_state" => "read",
         "last_message" => "test",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "test",
+        "last_authored_message_at" => conversation.last_message_at.to_json[1, 20],
         "message_count" => 1,
         "subscribed" => true,
         "private" => true,
@@ -915,6 +986,8 @@ describe ConversationsController, :type => :integration do
         "workflow_state" => "read",
         "last_message" => nil,
         "last_message_at" => nil,
+        "last_authored_message" => nil,
+        "last_authored_message_at" => nil,
         "message_count" => 0,
         "subscribed" => true,
         "private" => true,

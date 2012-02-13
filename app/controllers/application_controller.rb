@@ -990,9 +990,21 @@ class ApplicationController < ActionController::Base
     # of content.
     opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
     opts[:verifier] = verifier if verifier.present?
-    opts[:download_frd] = 1 if download
+
+    if download
+      # download "for realz, dude" (see later comments about :download)
+      opts[:download_frd] = 1
+    else
+      # don't set :download here, because file_download_url won't like it. see
+      # comment below for why we'd want to set :download
+      opts[:inline] = 1
+    end
 
     if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
+      # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
+      # it, so we're setting :download=>1 *because* we want to display inline.
+      opts[:download] = 1 unless download
+
       # if the context is one that supports relative paths (which requires extra
       # routes and stuff), then we'll build an actual named_context_url with the
       # params for show_relative

@@ -85,7 +85,7 @@ if Qti.migration_executable
 
   QTI_EXPORT_ASSESSMENT = {
           :assessments=>
-                  [{:migration_id=>"prepend_test_quiz",
+                  [{:migration_id=>"prepend_test_A1001",
                     :questions=>
                             [{:migration_id=>"prepend_test_QUE_1003", :question_type=>"question_reference"},
                              {:migration_id=>"prepend_test_QUE_1007", :question_type=>"question_reference"},

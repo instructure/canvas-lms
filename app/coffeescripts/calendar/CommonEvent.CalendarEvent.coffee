@@ -67,5 +67,8 @@ define 'compiled/calendar/CommonEvent.CalendarEvent', [
         url = @contextInfo.create_calendar_event_url
       else
         method = 'PUT'
-        url = $.replaceTags(@contextInfo.calendar_event_url, 'id', @object.id)
+        url = if @isAppointmentGroupEvent()
+                $.replaceTags @calendarEvent.url, 'id', @calendarEvent.id
+              else
+                $.replaceTags @contextInfo.calendar_event_url, 'id', @object.id
       [ method, url ]

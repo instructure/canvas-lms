@@ -22,7 +22,7 @@ module Api::V1::Assignment
 
   def assignment_json(assignment, user, session, includes = [], show_admin_fields = false)
     # no includes supported right now
-    hash = api_json(assignment, user, session, :only => %w(id grading_type points_possible position due_at description))
+    hash = api_json(assignment, user, session, :only => %w(id grading_type points_possible position due_at description assignment_group_id))
 
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title

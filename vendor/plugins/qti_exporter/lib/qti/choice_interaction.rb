@@ -7,6 +7,7 @@ class ChoiceInteraction < AssessmentItemConverter
   def initialize(opts)
     super(opts)
     @is_really_stupid_likert = opts[:interaction_type] == 'stupid_likert_scale_question'
+    @use_set_var_set_as_correct = @flavor == Qti::Flavors::RESPONDUS
   end
 
   def parse_question_data
@@ -40,6 +41,20 @@ class ChoiceInteraction < AssessmentItemConverter
     @question[:answers].each do |ans|
       correct_answers += 1 if ans[:weight] and ans[:weight] > 0
     end
+    
+    # If the question is worth zero points its correct answer's weight might
+    # be zero even though it's correct. The convention is that the score is set
+    # instead of added to. So set that answer to correct in that case.
+    if correct_answers == 0 && @use_set_var_set_as_correct
+      @question[:answers].each do |ans|
+        if ans[:zero_weight_set_not_summed]
+          ans.delete :zero_weight_set_not_summed
+          ans[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+          correct_answers += 1
+        end
+      end
+    end
+    
     if correct_answers == 0
       @question[:import_error] = "The importer couldn't determine the correct answers for this question."
     end
@@ -143,6 +158,14 @@ class ChoiceInteraction < AssessmentItemConverter
             if answer = answers_hash[migration_id]
               answer[:weight] = get_response_weight(r_if)
               answer[:feedback_id] ||= get_feedback_id(r_if)
+              
+              #flag whether this answer was set or added to
+              if @use_set_var_set_as_correct
+                if answer[:weight] == 0 && r_if.at_css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
+                  answer[:zero_weight_set_not_summed] = true
+                end
+              end
+              
             end
           end
         end

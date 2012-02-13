@@ -138,17 +138,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def self.categories
-    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
-      categories = []
-      category = ErrorReport.minimum(:category)
-      while category
-        categories << category
-        category = ErrorReport.minimum(:category, :conditions => [ 'category>?', category ])
-      end
-      categories
-    else
-      ErrorReport.find(:all, :select => 'DISTINCT category', :conditions => 'category IS NOT NULL', :order => 'category').map(&:category)
-    end
+    distinct('category')
   end
 
   on_send_to_external do |error_report|

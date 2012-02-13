@@ -45,7 +45,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
   
   def infer_defaults
-    self.question_data ||= {}
+    self.question_data ||= HashWithIndifferentAccess.new
     if self.question_data.is_a?(Hash)
       if self.question_data[:question_name].try(:strip).blank?
         self.question_data[:question_name] = t :default_question_name, "Question"
@@ -75,18 +75,26 @@ class AssessmentQuestion < ActiveRecord::Base
     # we can't translate links unless this question has a context (through a bank)
     return unless assessment_question_bank && assessment_question_bank.context
     
-    regex = Regexp.new("/#{context_type.downcase.pluralize}/#{context_id}/files/(\\d+)/(download|preview)")
+    # This either matches the id from a url like: /courses/15395/files/11454/download
+    # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
+    regex = Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"]*))})
     file_substitutions = {}
     
     deep_translate = lambda do |obj|
       if obj.is_a?(Hash)
-        obj.inject({}) {|h,(k,v)| h[k] = deep_translate.call(v); h}
+        obj.inject(HashWithIndifferentAccess.new) {|h,(k,v)| h[k] = deep_translate.call(v); h}
       elsif obj.is_a?(Array)
         obj.map {|v| deep_translate.call(v) }
       elsif obj.is_a?(String)
         obj.gsub(regex) do |match|
-          if !file_substitutions[$1]
-            file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
+          id_or_path = $1 || $2
+          if !file_substitutions[id_or_path]
+            if $1
+              file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, id_or_path)
+            elsif $2
+              path = URI.unescape(id_or_path)
+              file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
+            end
             begin
               new_file = file.clone_for(self)
             rescue => e
@@ -95,10 +103,10 @@ class AssessmentQuestion < ActiveRecord::Base
               logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{self.id} error_report: #{er.id}")
             end
             new_file.save if new_file
-            file_substitutions[$1] = new_file
+            file_substitutions[id_or_path] = new_file
           end
-          if file_substitutions[$1]
-            "/assessment_questions/#{self.id}/files/#{file_substitutions[$1].id}/download?verifier=#{file_substitutions[$1].uuid}"
+          if sub = file_substitutions[id_or_path]
+            "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}"
           else
             match
           end
@@ -117,7 +125,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
   
   def data
-    res = self.question_data || {}
+    res = self.question_data || HashWithIndifferentAccess.new
     res[:assessment_question_id] = self.id
     res[:question_name] = t :default_question_name, "Question" if res[:question_name].blank?
     # TODO: there's a potential id conflict here, where if a quiz
@@ -149,6 +157,16 @@ class AssessmentQuestion < ActiveRecord::Base
     # force AR to think this attribute has changed
     self.question_data_will_change!
     write_attribute(:question_data, data)
+  end
+  
+  def question_data
+    if data = read_attribute(:question_data)
+      if data.class == Hash
+        data = write_attribute(:question_data, data.with_indifferent_access)
+      end
+    end
+    
+    data
   end
   
   def edited_independent_of_quiz_question
@@ -205,7 +223,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
   
   def self.parse_question(qdata, assessment_question=nil)
-    question = {}
+    question = HashWithIndifferentAccess.new
     qdata = qdata.with_indifferent_access
     previous_data = assessment_question.question_data rescue {}
     question[:points_possible] = (qdata[:points_possible] || previous_data[:points_possible] || 0.0).to_f
@@ -286,7 +304,7 @@ class AssessmentQuestion < ActiveRecord::Base
       question[:answers][0][:weight] = 100 unless found_correct
       question[:text_after_answers] = sanitize(check_length(qdata[:text_after_answers] || previous_data[:text_after_answers] || "", 'text after answers', 16.kilobytes))
     elsif question[:question_type] == "multiple_dropdowns_question"
-      variables = {}
+      variables = HashWithIndifferentAccess.new
       answers.each_with_index do |arr, idx| 
         key, answer = arr
         answers[idx][1][:blank_id] = check_length(answers[idx][1][:blank_id], 'blank id', min_size)

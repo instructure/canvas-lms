@@ -169,6 +169,7 @@ describe "course wizard" do
   end
 
   it "should add students go to the next page and go back to add more students" do
+    #Bug - 4389
     pending("Bug where students are deleted from student list when going back to the add students page")
     start_course
     get "/getting_started/students"

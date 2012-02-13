@@ -394,7 +394,7 @@ Spec::Runner.configure do |config|
     @outcome_group.add_item(@outcome)
     @outcome_group.save!
 
-    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course, :points_possible => 8, :hide_score_total => false)
     @rubric.data = [
       {
         :points => 3,
@@ -464,7 +464,7 @@ Spec::Runner.configure do |config|
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
     @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users.map(&:id))
-    @conversation.add_message('test')
+    @message = @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload
   end

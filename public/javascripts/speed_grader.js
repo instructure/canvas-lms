@@ -1136,7 +1136,7 @@ I18n.scoped('gradebook', function(I18n) {
 
     loadAttachmentInline: function(attachment){
       $submissions_container.children().hide();
-      if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type) {
+      if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
   	    $this_student_does_not_have_a_submission.show();
   	  }
   	  else {

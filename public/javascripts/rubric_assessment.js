@@ -255,7 +255,7 @@ rubricAssessment = {
           .find(".custom_rating").text(comments).end()
           .find(".criterion_comments").toggleClass('empty', !comments).end()
           .find(".save_custom_rating").attr('checked', false);
-        if(rating.points) {
+        if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;
         }
       }
@@ -276,12 +276,13 @@ rubricAssessment = {
           .find(".rating").hide().end()
           .find(".rating.description").showIf(!$rubricSummary.hasClass('free_form')).text(rating.description).end()
           .find(".rating_" + rating.id).show().end()
-          .find(".criterion_points").text(rating.points);
+          .find(".criterion_points").text(rating.points).end()
+          .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
         if(rating.comments_enabled && rating.comments) {
           var abbrev = $.truncateText(rating.comments, 50);
           $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(abbrev);
         }
-        if(rating.points) {
+        if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;
         }
       }

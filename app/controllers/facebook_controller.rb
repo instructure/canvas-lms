@@ -25,15 +25,14 @@ class FacebookController < ApplicationController
   def notification_preferences
     @cc = @user.communication_channels.find_by_path_type('facebook')
     if @cc
-      @old_policies = @user.notification_policies.for_channel(@cc)
+      @old_policies = @cc.notification_policies
       @policies = []
       params[:types].each do |type, frequency|
         notifications = Notification.find_all_by_category(type)
         notifications.each do |notification|
-          pref = @user.notification_policies.new
+          pref = @cc.notification_policies.new
           pref.notification_id = notification.id
           pref.frequency = frequency
-          pref.communication_channel_id = @cc.id
           @policies << pref unless frequency == 'never'
         end
       end
@@ -44,7 +43,7 @@ class FacebookController < ApplicationController
     end
     # TODO: i18n... see notification.rb
     @notification_categories = Notification.dashboard_categories.reject{|c| c.category == "Summaries"}
-    @policies = @user.notification_policies.for_channel(@cc)
+    @policies = @cc.notification_policies
     redirect_to facebook_settings_url
   end
   
@@ -74,7 +73,7 @@ class FacebookController < ApplicationController
   def settings
     @notification_categories = Notification.dashboard_categories
     @cc = @user && @user.communication_channels.find_by_path_type('facebook')
-    @policies = @user && @user.notification_policies.for_channel(@cc)
+    @policies = @cc.try(:notification_policies)
     respond_to do |format|
       format.html { render :action => 'settings', :layout => 'facebook' }
     end

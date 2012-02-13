@@ -17,10 +17,10 @@
 #
 
 class User < ActiveRecord::Base
-  # this has to be before include COntext to prevent a circular dependency in Course
+  # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
     col = table ? "#{table}.sortable_name" : 'sortable_name'
-    ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql' ? "LOWER(#{col})" : col
+    case_insensitive(col)
   end
 
   include Context
@@ -77,10 +77,8 @@ class User < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :calendar_events, :as => 'context', :dependent => :destroy, :include => [:parent_event]
   has_many :eportfolios, :dependent => :destroy
-  has_many :notifications, :through => :notification_policies
   has_many :quiz_submissions, :dependent => :destroy
   has_many :dashboard_messages, :class_name => 'Message', :conditions => {:to => "dashboard", :workflow_state => 'dashboard'}, :order => 'created_at DESC', :dependent => :destroy
-  has_many :notification_policies, :include => :communication_channel, :dependent => :destroy
   has_many :collaborations, :order => 'created_at DESC'
   has_many :user_services, :order => 'created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
@@ -112,15 +110,16 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
-  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC, conversation_id DESC"
+  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 
-  def conversations
-    all_conversations.visible # i.e. exclude any where the user has deleted all the messages
+  def conversations(order=true)
+    ret = all_conversations.visible # i.e. exclude any where the user has deleted all the messages
+    order ? ret.scoped(:order => "last_message_at DESC, conversation_id DESC") : ret
   end
 
   named_scope :of_account, lambda { |account|
@@ -191,6 +190,7 @@ class User < ActiveRecord::Base
   before_save :assign_uuid
   before_save :update_avatar_image
   after_save :generate_reminders_if_changed
+  after_save :update_account_associations_if_necessary
 
   def page_views_by_day(options={})
     conditions = {}
@@ -223,6 +223,10 @@ class User < ActiveRecord::Base
 
   def update_account_associations_later
     self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_account_associations?
+  end
+
+  def update_account_associations_if_necessary
+    update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed?
   end
 
   def update_account_associations(opts = {})
@@ -277,6 +281,8 @@ class User < ActiveRecord::Base
   #   Through account_users
   #      User -> AccountUser -> Account
   def calculate_account_associations(account_chain_cache = {})
+    return [] if %w{creation_pending deleted}.include?(self.workflow_state)
+
     # Hopefully these have all been pre-loaded
     starting_account_ids = self.enrollments.map { |e| e.workflow_state != 'deleted' ? [e.course_section.course.account_id, e.course_section.nonxlist_course.try(:account_id)] : nil }.flatten.compact
     starting_account_ids += self.pseudonyms.map { |p| p.active? ? p.account_id : nil }.compact
@@ -858,7 +864,6 @@ class User < ActiveRecord::Base
     Enrollment.send_later(:recompute_final_scores, new_user.id)
     new_user.update_account_associations
     new_user.touch
-    self.user_account_associations.delete_all
     self.destroy
   end
 
@@ -2056,7 +2061,9 @@ class User < ActiveRecord::Base
         #{user_sql.join(' UNION ')}
       ) users
       GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
-      ORDER BY LOWER(COALESCE(short_name, name))
+      ORDER BY #{options[:rank_results] ? "(COUNT(course_id) + COUNT(group_id)) DESC," : ""}
+        LOWER(COALESCE(short_name, name)),
+        id
       #{options[:limit] && options[:limit] > 0 ? "LIMIT #{options[:limit].to_i}" : ""}
       #{options[:offset] && options[:offset] > 0 ? "OFFSET #{options[:offset].to_i}" : ""}
     SQL

@@ -65,7 +65,7 @@ module Qti
     assessments = nil
     questions = nil
     Dir.mktmpdir do |dirname|
-      xml_file = File.join(dirname, 'qti.xml')
+      xml_file = File.join(dirname, opts[:file_name] || 'qti.xml')
       File.open(xml_file, 'w'){|f| f << xml }
       
       # convert to 2.1

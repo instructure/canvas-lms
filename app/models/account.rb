@@ -145,7 +145,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
-  add_setting :open_registration, :boolean => true, :root_only => true, :default => false, :condition => :non_delegated_authentication
+  add_setting :open_registration, :boolean => true, :root_only => true, :default => false
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
@@ -656,10 +656,6 @@ class Account < ActiveRecord::Base
     !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
   end
 
-  def non_delegated_authentication?
-    !delegated_authentication?
-  end
-
   def forgot_password_external_url
     account_authorization_config.try(:change_password_url)
   end
@@ -837,7 +833,7 @@ class Account < ActiveRecord::Base
   TAB_QUESTION_BANKS = 13
 
   def external_tool_tabs(opts)
-    tools = ContextExternalTool.find_all_for(self, :account_navigation)
+    tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,
@@ -1051,11 +1047,6 @@ class Account < ActiveRecord::Base
     root_account = self.root_account
     return true if root_account.open_registration?
     root_account.grants_right?(user, session, :manage_user_logins)
-  end
-
-  def trusted_account_ids
-    return [] if !root_account? || self == Account.site_admin
-    [ Account.site_admin.id ]
   end
 
   named_scope :root_accounts, :conditions => {:root_account_id => nil}

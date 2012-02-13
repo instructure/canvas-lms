@@ -30,6 +30,7 @@ module Canvas::Migration
           
           converter_class = Worker::get_converter(settings)
           converter = converter_class.new(settings)
+
           course = converter.export
           export_folder_path = course[:export_folder_path]
           overview_file_path = course[:overview_file_path]
@@ -43,6 +44,7 @@ module Canvas::Migration
             Canvas::Migration::Worker::clear_exported_data(export_folder_path)
           end
 
+          cm.migration_settings[:worker_class] = converter_class.name
           cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}
           cm.workflow_state = :exported
           cm.progress = 0

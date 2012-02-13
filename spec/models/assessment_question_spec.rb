@@ -38,6 +38,37 @@ describe AssessmentQuestion do
     @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
 
+  it "should translate links relative path url" do
+    course
+    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+
+    @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+    data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+    @question = @bank.assessment_questions.create!(:question_data => data)
+
+    @attachment.reload.cloned_item.attachments.length.should == 2
+    @clone = @attachment.cloned_item.attachments.last
+
+    @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
+  end
+
+  it "should translate multiple links in same body" do
+    course
+    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+
+    @attachment = attachment_with_context(@course)
+    @attachment2 = @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+    data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+    @question = @bank.assessment_questions.create!(:question_data => data)
+
+    @attachment.reload.cloned_item.attachments.length.should == 2
+    @clone = @attachment.cloned_item.attachments.last
+    @attachment2.reload.cloned_item.attachments.length.should == 2
+    @clone2 = @attachment2.cloned_item.attachments.last
+
+    @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone2.id}/download?verifier=#{@clone2.uuid}'>"
+  end
+
   it "should translate links to be readable w/ verifier" do
     course
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
@@ -116,9 +147,38 @@ describe AssessmentQuestion do
     data[:points_possible] = "50"
     question.form_question_data = data
     question.save
+    question.question_data.class.should == HashWithIndifferentAccess
     question.question_data[:points_possible].should == 50
     question.question_data[:answers][0][:weight].should == 100
     question.question_data[:answers][0][:id].should_not be_nil
     question.question_data[:assessment_question_id].should == question.id
   end
+  
+  it "should always return a HashWithIndifferentAccess and allow editing" do
+    course
+    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    
+    data = {
+            :name => 'mc question',
+            :question_type => 'multiple_choice_question',
+            :question_text => "text text text",
+            :points_possible => "10",
+            :answers => {
+                    "answer_0" => {:answer_weight => 100, :answer_text => "1", :id => "0", :answer_comments => "hi there"}
+            }
+    }
+
+    question = bank.assessment_questions.create!(:question_data => data)
+    question.question_data.class.should == HashWithIndifferentAccess
+    
+    question.question_data = data
+    question.question_data.class.should == HashWithIndifferentAccess
+    
+    data = question.question_data
+    data[:name] = "new name"
+    
+    question.question_data[:name].should == "new name"
+    data.object_id.should == question.question_data.object_id
+  end
+  
 end

@@ -101,6 +101,10 @@ class ConversationsController < ApplicationController
         @view_name = I18n.t('index.inbox_views.starred', 'Starred')
         @no_messages = I18n.t('no_starred_messages', 'You have no starred messages')
         @current_user.conversations.starred
+      when 'sent'
+        @view_name = I18n.t('index.inbox_views.sent', 'Sent')
+        @no_messages = I18n.t('no_sent_messages', 'You have no sent messages')
+        @current_user.conversations(false).default.sent
       when 'archived'
         @view_name = I18n.t('index.inbox_views.archived', 'Archived')
         @no_messages = I18n.t('no_archived_messages', 'You have no archived messages')
@@ -124,14 +128,9 @@ class ConversationsController < ApplicationController
     @conversations_count = conversations_scope.count
     conversations = Api.paginate(conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
     # optimize loading the most recent messages for each conversation into a single query
-    last_messages = ConversationMessage.latest_for_conversations(conversations).human.
-                      inject({}) { |hash, message|
-                        if !hash[message.conversation_id] || hash[message.conversation_id].id < message.id
-                          hash[message.conversation_id] = message
-                        end
-                        hash
-                      }
-    @conversations_json = conversations.each{|c| c.instance_variable_set(:@user, @current_user)}.map{ |c| jsonify_conversation(c, :last_message => last_messages[c.conversation_id], :include_participant_avatars => false, :include_participant_contexts => false) }
+    last_messages = ConversationMessage.latest_for_conversations(conversations)
+    last_authored_messages = ConversationMessage.latest_for_conversations(conversations, @current_user.id)
+    @conversations_json = conversations.map{ |c| jsonify_conversation(c, :last_message => last_messages[c.conversation_id], :last_authored_message => last_authored_messages[c.conversation_id], :include_participant_avatars => false, :include_participant_contexts => false) }
     @user_cache = Hash[*jsonify_users([@current_user]).map{|u| [u[:id], u] }.flatten]
     respond_to do |format|
       format.html {
@@ -523,13 +522,15 @@ class ConversationsController < ApplicationController
     elsif (params[:context] || params[:search]) && (context_types + ['user', nil]).include?(params[:type])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
+      rank_results = params[:search].present?
       contexts = params[:type] == 'user' ? [] : matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :type => params[:type]))
-      participants = context_types.include?(params[:type]) || @skip_users ? [] : matching_participants(options.merge(:exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
+      participants = context_types.include?(params[:type]) || @skip_users ? [] : matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
       if max_results
+        has_next_page = participants.size + contexts.size > max_results
+        contexts = contexts[0, max_results]
+        participants = participants[0, max_results].sort_by{ |u| u[:name].downcase } # can't sort until we lop off the extra one at the end
         if params[:type]
           recipients = contexts + participants
-          has_next_page = recipients.size > max_results
-          recipients = recipients[0, max_results]
           recipients.instance_eval <<-CODE
             def paginate(*args); self; end
             def next_page; #{has_next_page ? page + 1 : 'nil'}; end
@@ -595,12 +596,17 @@ class ConversationsController < ApplicationController
   def load_all_contexts
     @contexts = {:courses => {}, :groups => {}, :sections => {}}
 
+    term_for_course = lambda do |course|
+      course.enrollment_term.default_term? ? nil : course.enrollment_term.name
+    end
+
     @current_user.concluded_courses.each do |course|
       @contexts[:courses][course.id] = {
         :id => course.id,
         :url => course_url(course),
         :name => course.name,
         :type => :course,
+        :term => term_for_course.call(course),
         :active => course.recently_ended?,
         :can_add_notes => can_add_notes_to?(course)
       }
@@ -612,6 +618,7 @@ class ConversationsController < ApplicationController
         :url => course_url(course),
         :name => course.name,
         :type => :course,
+        :term => term_for_course.call(course),
         :active => true,
         :can_add_notes => can_add_notes_to?(course)
       }
@@ -623,6 +630,7 @@ class ConversationsController < ApplicationController
         :id => section.id,
         :name => section.name,
         :type => :section,
+        :term => @contexts[:courses][section.course_id][:term],
         :active => @contexts[:courses][section.course_id][:active],
         :parent => {:course => section.course_id},
         :context_name =>  @contexts[:courses][section.course_id][:name]
@@ -829,7 +837,7 @@ class ConversationsController < ApplicationController
   def blank_fallback
     params[:blank_avatar_fallback] || @blank_fallback
   end
-  
+
   def context_types
     ['context', 'course']
   end

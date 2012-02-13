@@ -78,7 +78,7 @@ describe "grading standards" do
     driver.find_element(:css, ".edit_course_link").click
     form = driver.find_element(:css, "#course_form")
     form.find_element(:css, "#course_grading_standard_enabled").click
-    form.find_element(:css, "#course_grading_standard_enabled").attribute(:checked).should eql('true')
+    is_checked('#course_form #course_grading_standard_enabled').should be_true
     
     form.find_element(:css, ".edit_letter_grades_link").displayed?.should be_true
     form.find_element(:css, ".edit_letter_grades_link").click
@@ -111,7 +111,7 @@ describe "grading standards" do
     driver.switch_to.default_content
     keep_trying_until { !dialog.displayed? }
     
-    form.find_element(:css, "#course_grading_standard_enabled").attribute(:checked).should be_nil
+    is_checked('#course_form #course_grading_standard_enabled').should be_false
   end
 
   it "should extend ranges to fractional values at the boundary with the next range" do

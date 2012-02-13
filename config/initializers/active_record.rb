@@ -241,6 +241,10 @@ class ActiveRecord::Base
     sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
   end
 
+  def self.case_insensitive(col)
+    ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql' ? "LOWER(#{col})" : col
+  end
+
   class DynamicFinderTypeError < Exception; end
   class << self
     def construct_attributes_from_arguments_with_type_cast(attribute_names, arguments)
@@ -315,6 +319,32 @@ class ActiveRecord::Base
     end
 
     result
+  end
+
+  def self.distinct(column, options={})
+    column = column.to_s
+    options = {:include_nil => false}.merge(options)
+
+    result = if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+      sql = ''
+      sql << "SELECT NULL AS #{column} WHERE EXISTS(SELECT * FROM #{table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
+      sql << <<-SQL
+        WITH RECURSIVE t AS (
+          SELECT MIN(#{column}) AS #{column} FROM #{table_name}
+          UNION ALL
+          SELECT (SELECT MIN(#{column}) FROM #{table_name} WHERE #{column} > t.#{column})
+          FROM t
+          WHERE t.#{column} IS NOT NULL
+        )
+        SELECT #{column} FROM t WHERE #{column} IS NOT NULL
+      SQL
+      sql << ")" if options[:include_nil]
+      find_by_sql(sql)
+    else
+      conditions = "#{column} IS NOT NULL" unless options[:include_nil]
+      find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
+    end
+    result.map(&column.to_sym)
   end
 
   named_scope :order, lambda { |order_by|
@@ -685,3 +715,20 @@ class ActiveRecord::Migrator
 end
 
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]
+ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
+  def add_index_with_length_raise(table_name, column_name, options = {})
+    unless options[:name].to_s =~ /^temp_/
+      column_names = Array(column_name)
+      index_name = index_name(table_name, :column => column_names)
+      index_name = options[:name].to_s if options[:name]
+      if index_name.length > index_name_length
+        raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters.")
+      end
+      if index_exists?(table_name, index_name, false)
+        raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists.")
+      end
+    end
+    add_index_without_length_raise(table_name, column_name, options)
+  end
+  alias_method_chain :add_index, :length_raise
+end

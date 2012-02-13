@@ -779,6 +779,82 @@ describe Enrollment do
       @student_enrollment.state_based_on_date.should == :completed
 
     end
+
+    it "should affect the active?/inactive?/completed? predicates" do
+      course_with_student(:active_all => true)
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 2.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+      @enrollment.active?.should be_true
+      @enrollment.inactive?.should be_false
+      @enrollment.completed?.should be_false
+
+      sleep 1
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.save!
+      @enrollment.active?.should be_false
+      @enrollment.inactive?.should be_false
+      @enrollment.completed?.should be_true
+
+      sleep 1
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.save!
+      @enrollment.active?.should be_false
+      @enrollment.inactive?.should be_true
+      @enrollment.completed?.should be_false
+    end
+
+    it "should not affect the explicitly_completed? predicate" do
+      course_with_student(:active_all => true)
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 2.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+      @enrollment.explicitly_completed?.should be_false
+
+      sleep 1
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.save!
+      @enrollment.explicitly_completed?.should be_false
+
+      sleep 1
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.save!
+      @enrollment.explicitly_completed?.should be_false
+
+      @enrollment.workflow_state = 'completed'
+      @enrollment.explicitly_completed?.should be_true
+    end
+
+    it "should affect the completed_at" do
+      yesterday = 1.day.ago
+
+      course_with_student(:active_all => true)
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 2.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.completed_at = nil
+      @enrollment.save!
+
+      @enrollment.completed_at.should be_nil
+      @enrollment.completed_at = yesterday
+      @enrollment.completed_at.should == yesterday
+
+      sleep 1
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.completed_at = nil
+      @enrollment.save!
+
+      @enrollment.completed_at.should == @enrollment.end_at
+      @enrollment.completed_at = yesterday
+      @enrollment.completed_at.should == yesterday
+    end
   end
 
   context "audit_groups_for_deleted_enrollments" do
@@ -1020,6 +1096,67 @@ describe Enrollment do
         @enrollment.update_attribute(:workflow_state, 'rejected')
         Enrollment.ended.should == [@enrollment]
       end
+    end
+  end
+
+  describe "destroy" do
+    it "should update user_account_associations" do
+      course_with_teacher(:active_all => 1)
+      @user.associated_accounts.should == [Account.default]
+      @enrollment.destroy
+      @user.associated_accounts(true).should == []
+    end
+  end
+
+  describe ".remove_duplicate_enrollments_from_sections" do
+    before do
+      course_with_student(:active_all => true)
+      @e1 = @enrollment
+      @e1.sis_batch_id = 2
+      @e1.sis_source_id = 'ohai'
+      @e1.save!
+    end
+
+    it "should leave single enrollments alone" do
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+      @e1.reload.should be_active
+    end
+
+    it "should remove duplicates" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :workflow_state => 'active', :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
+    end
+
+    it "should prefer the highest sis_batch_id" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment", :sis_batch_id => 1)
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
+      @e1.reload.state.should == :active
+    end
+
+    it "should group by user_id" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => user, :sis_source_id => 'ohai2', :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should group by type" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "TeacherEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should group by section" do
+      enrollment_model(:course_section => @course.course_sections.create!(:name => 's2'), :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should group by associated_user_id" do
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :associated_user_id => user.id, :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+
+    it "should ignore non-sis enrollments" do
+      @e1.update_attribute('sis_source_id', nil)
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :type => "StudentEnrollment")
+      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
     end
   end
 end

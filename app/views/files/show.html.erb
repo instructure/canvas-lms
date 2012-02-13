@@ -24,7 +24,7 @@
       </object>
       <!--<![endif]-->
     </object>
-    <a style="display:block;" href="<%= safe_domain_file_url(@attachment) %>">Download <%= @attachment.display_name %></a>
+    <a style="display:block;" href="<%= safe_domain_file_url(@attachment, nil, nil, true) %>">Download <%= @attachment.display_name %></a>
   <% elsif @attachment.inline_content? %>
     <% jammit_js :file_inline %>
     <iframe id="file_content" src="<%= safe_domain_file_url(@attachment) %>" style="width: 100%; height: 400px;"></iframe>

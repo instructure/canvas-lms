@@ -334,7 +334,4 @@ class ExternalToolsController < ApplicationController
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
   end
-  
-  
-  
 end

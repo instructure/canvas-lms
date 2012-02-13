@@ -22,7 +22,7 @@ describe WikiPage do
   it "should send page updated notifications" do
     course_with_teacher(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
-    NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :user => @user, :frequency => "immediately")
+    NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
     p = @course.wiki.wiki_pages.create(:title => "some page")
     p.created_at = 3.days.ago
     p.notify_of_update = true

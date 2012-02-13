@@ -104,9 +104,9 @@ describe "profile" do
       daily_select.click
       daily_select.find_element(:xpath, '..').should have_class('selected_pending')
       #change notification setting for second notification
-      never_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(5) > div')
-      never_select.click
-      never_select.find_element(:xpath, '..').should have_class('selected_pending')
+      weekly_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(4) > div')
+      weekly_select.click
+      weekly_select.find_element(:xpath, '..').should have_class('selected_pending')
       driver.find_element(:css, '#content .save_preferences_button').click
       wait_for_ajax_requests
       refresh_page
@@ -118,7 +118,7 @@ describe "profile" do
           # the daily
           row.find_element(:css, 'td > span > select > option:checked').text.should == @user.email
         else
-          # the never
+          # the weekly
           row.find_element(:css, 'td > span > select > option:checked').text.should == second_email
         end
       end
@@ -290,8 +290,8 @@ describe "profile" do
     end
 
     it "should show the correct defaults for the rest of the policies when at least one is set" do
-      @user.notification_policies.create!(:notification => @immediate, :communication_channel => @user.email_channel, :frequency => "immediately")
-      @user.notification_policies.create!(:notification => @daily, :communication_channel => @user.email_channel, :frequency => "immediately")
+      @user.email_channel.notification_policies.create!(:notification => @immediate, :frequency => "immediately")
+      @user.email_channel.notification_policies.create!(:notification => @daily, :frequency => "immediately")
 
       get "/profile/communication"
 

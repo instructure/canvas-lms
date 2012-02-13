@@ -59,7 +59,7 @@ shared_examples_for "file uploads selenium tests" do
   end
 
   it "should upload a file on the content import page" do
-    skip_if_ie("s3 test failes due to javascript error")
+    skip_if_ie("s3 test fails due to javascript error")
     login_as(@teacher.email, @password)
 
     get "/courses/#{@course.id}/imports/migrate"

@@ -34,7 +34,7 @@ $(document).ready(function() {
     success: function(data) {
       $(this).find("button").attr('disabled', false)
         .filter(".submit_button").text(I18n.t('buttons.update_user', "Update User"));
-      $("#name_and_email .user_details").fillTemplateData({data: data && data.user});
+      $("#name_and_email .user_details").fillTemplateData({data: data });
       $("#edit_student_dialog").dialog('close');
     },
     error: function(data) {

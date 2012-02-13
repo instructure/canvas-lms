@@ -9,6 +9,13 @@ describe "conversations" do
 
   before(:each) do
     course_with_teacher_logged_in
+
+    term = EnrollmentTerm.new :name => "Super Term"
+    term.root_account_id = @course.root_account_id
+    term.save!
+
+    @course.update_attributes! :enrollment_term => term
+
     @user.watched_conversations_intro
     @user.save
   end
@@ -165,6 +172,22 @@ describe "conversations" do
     elements.first.click
     wait_for_ajaximations
     driver.find_elements(:css, "div#messages ul.messages > li")
+  end
+
+  def delete_selected_messages(confirm_conversation_deleted = true)
+    orig_size = find_all_with_jquery("#conversations > ul > li:visible").size
+
+    wait_for_animations
+    delete = driver.find_element(:id, 'action_delete')
+    delete.should be_displayed
+    delete.click
+    driver.switch_to.alert.accept
+
+    if confirm_conversation_deleted
+      keep_trying_until {
+        find_all_with_jquery("#conversations > ul > li:visible").size.should eql(orig_size - 1)
+      }
+    end
   end
 
   context "conversation loading" do
@@ -329,6 +352,25 @@ describe "conversations" do
       tokens.should eql ["student 1"]
       search("stu") do
         menu.should eql ["student 2"]
+      end
+    end
+
+    it "should show the term next to courses and sections" do
+      search("course") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name .context_info')
+        term_info.text.should == "(#{@course.enrollment_term.name})"
+      end
+
+      search("section") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name .context_info')
+        term_info.text.should == "(#{@course.name} - #{@course.enrollment_term.name})"
+      end
+
+      # doesn't show term for sections when browsing
+      browse_menu
+      browse "the course", "Course Sections" do
+        menu_items = driver.find_elements(:css, ".autocomplete_menu .name")
+        menu_items.last.text.should == "the section"
       end
     end
 
@@ -636,16 +678,9 @@ describe "conversations" do
       msgs = get_messages
       msgs.size.should == 1
       msgs.first.click
-      wait_for_animations
-      delete = driver.find_element(:id, 'action_delete')
-      delete.should be_displayed
-      delete.click
-      driver.switch_to.alert.accept
 
-      keep_trying_until {
-        elements = find_all_with_jquery("#conversations > ul > li:visible")
-        elements.size == 0
-      }
+      delete_selected_messages
+
       @conversation.reload
       @conversation.last_message_at.should be_nil
     end
@@ -703,14 +738,14 @@ describe "conversations" do
     it "should be an option, default false, for a single 'bulk' recipient" do
       choose_recipient("the course", "Everyone", "Select All")
       @checkbox.should be_displayed
-      is_checked(@checkbox).should be_false
+      is_checked("#group_conversation").should be_false
     end
 
     it "should be an option, default false, for multiple individual recipients" do
       choose_recipient("student 1")
       choose_recipient("student 2")
       @checkbox.should be_displayed
-      is_checked(@checkbox).should be_false
+      is_checked("#group_conversation").should be_false
     end
 
     it "should disappear when there are no longer multiple recipients" do
@@ -727,7 +762,7 @@ describe "conversations" do
       @input.send_keys([:backspace])
       choose_recipient("student 2")
       @checkbox.should be_displayed
-      is_checked(@checkbox).should be_false
+      is_checked("#group_conversation").should be_false
     end
   end
 
@@ -783,6 +818,55 @@ describe "conversations" do
       conversations = driver.find_elements(:css, "#conversations > ul > li")
       conversations.size.should == 1
       conversations.first["id"].should == "conversations_loader"
+    end
+  end
+
+  context "sent filter" do
+    before do
+      @course.update_attribute(:name, "the course")
+      @course1 = @course
+      @s1 = User.create(:name => "student1")
+      @s2 = User.create(:name => "student2")
+      @course1.enroll_user(@s1)
+      @course1.enroll_user(@s2)
+
+      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(*100.times.to_a.reverse.map{ |h| Time.now.utc - h.hours })
+
+      @c1 = conversation(@user, @s1)
+      @c2 = conversation(@user, @s2)
+      @c1.add_message('yay i sent this')
+      @c2.conversation.add_message(@s2, "ohai im not u so this wont show up on the left")
+
+      get "/conversations/sent"
+
+      conversations = find_all_with_jquery("#conversations > ul > li:visible")
+      conversations.first.attribute('id').should eql("conversation_#{@c1.conversation_id}")
+      conversations.first.text.should match(/yay i sent this/)
+      conversations.last.attribute('id').should eql("conversation_#{@c2.conversation_id}")
+      conversations.last.text.should match(/test/)
+    end
+
+    it "should reorder based on last authored message" do
+      driver.find_element(:id, "conversation_#{@c2.conversation_id}").click
+      wait_for_ajaximations
+
+      submit_message_form(:message => "qwerty")
+
+      conversations = find_all_with_jquery("#conversations > ul > li:visible")
+      conversations.size.should eql 2
+      conversations.first.text.should match(/qwerty/)
+      conversations.last.text.should match(/yay i sent this/)
+    end
+
+    it "should remove the conversation when the last message by the author is deleted" do
+      driver.find_element(:id, "conversation_#{@c2.conversation_id}").click
+      wait_for_ajaximations
+
+      msgs = driver.find_elements(:css, "div#messages ul.messages > li")
+      msgs.size.should == 2
+      msgs.last.click
+
+      delete_selected_messages
     end
   end
 
@@ -848,6 +932,34 @@ describe "conversations" do
       conversations = find_all_with_jquery('#conversations > ul > li:visible')
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    end
+
+    it "should show the term name by the course" do
+      new_conversation
+      browse_menu
+
+      browse("the course"){ search("stu"){ click "student1" } }
+      submit_message_form(:add_recipient => false)
+
+      @input = find_with_jquery("#context_tags_filter input:visible")
+      search("the course", "context_tags") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name .context_info')
+        term_info.text.should == "(#{@course1.enrollment_term.name})"
+      end
+    end
+
+    it "should not show the default term name" do
+      new_conversation
+      browse_menu
+
+      browse("the course"){ search("stu"){ click "student1" } }
+      submit_message_form(:add_recipient => false)
+
+      @input = find_with_jquery("#context_tags_filter input:visible")
+      search("that course", "context_tags") do
+        term_info = driver.find_element(:css, '.autocomplete_menu .name')
+        term_info.text.should == "that course"
+      end
     end
   end
 end

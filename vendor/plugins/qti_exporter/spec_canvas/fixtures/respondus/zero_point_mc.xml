@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<questestinterop>
+<assessment title="Instructure Question Types" ident="A1001">
+
+<item title="MC Question 1" ident="QUE_1006_zero_weight">
+<itemmetadata>
+<qtimetadata>
+<vocabulary>respondusapi_qtype,respondusapi_qpoints</vocabulary>
+<qti_metadatafield>
+<fieldlabel>respondusapi_qtype</fieldlabel>
+<fieldentry>multipleChoice</fieldentry>
+</qti_metadatafield>
+<qti_metadatafield>
+<fieldlabel>respondusapi_qpoints</fieldlabel>
+<fieldentry>0</fieldentry>
+</qti_metadatafield>
+</qtimetadata>
+</itemmetadata>
+<presentation>
+<material>
+<mattext texttype="text/html"><![CDATA[This question is worth 0 points and the resprocessing sets score to 0 ]]></mattext>
+</material>
+<response_lid ident="QUE_1007_RL" rcardinality="Single" rtiming="No">
+<render_choice>
+<response_label ident="QUE_1008_A1">
+<material>
+<mattext texttype="text/html"><![CDATA[Answer choice 1 (correct)]]></mattext>
+</material>
+</response_label>
+<response_label ident="QUE_1009_A2">
+<material>
+<mattext texttype="text/html"><![CDATA[Answer choice 2]]></mattext>
+</material>
+</response_label>
+<response_label ident="QUE_1010_A3">
+<material>
+<mattext texttype="text/html"><![CDATA[Answer choice 3]]></mattext>
+</material>
+</response_label>
+<response_label ident="QUE_1011_A4">
+<material>
+<mattext texttype="text/html"><![CDATA[Answer choice 4]]></mattext>
+</material>
+</response_label>
+</render_choice>
+</response_lid>
+</presentation>
+<resprocessing>
+<outcomes>
+  <decvar vartype="Integer" defaultval="0" varname="que_score"/>
+</outcomes>
+<respcondition>
+<conditionvar>
+  <varequal respident="QUE_1007_RL">QUE_1008_A1</varequal>
+</conditionvar>
+<setvar varname="que_score" action="Set">0</setvar>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1012_AC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1004_C"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1003_ALL"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+  <varequal respident="QUE_1007_RL">QUE_1009_A2</varequal>
+</conditionvar>
+<setvar varname="que_score" action="Add">0</setvar>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1013_AIC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1005_IC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1003_ALL"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+  <varequal respident="QUE_1007_RL">QUE_1010_A3</varequal>
+</conditionvar>
+<setvar varname="que_score" action="Add">0</setvar>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1014_AIC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1005_IC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1003_ALL"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+  <varequal respident="QUE_1007_RL">QUE_1011_A4</varequal>
+</conditionvar>
+<setvar varname="que_score" action="Add">0</setvar>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1015_AIC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1005_IC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1003_ALL"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+  <other/>
+</conditionvar>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1005_IC"/>
+<displayfeedback feedbacktype="Response" linkrefid="QUE_1003_ALL"/>
+</respcondition>
+</resprocessing>
+<itemfeedback ident="QUE_1012_AC" view="Candidate">
+<material>
+<mattext texttype="text/html"><![CDATA[choice 1 feedback]]></mattext>
+</material>
+</itemfeedback>
+<itemfeedback ident="QUE_1013_AIC" view="Candidate">
+<material>
+<mattext texttype="text/html"><![CDATA[choice 2 feedback]]></mattext>
+</material>
+</itemfeedback>
+<itemfeedback ident="QUE_1014_AIC" view="Candidate">
+<material>
+<mattext texttype="text/html"><![CDATA[choice 3 feedback]]></mattext>
+</material>
+</itemfeedback>
+<itemfeedback ident="QUE_1015_AIC" view="Candidate">
+<material>
+<mattext texttype="text/html"><![CDATA[choice 4 feedback]]></mattext>
+</material>
+</itemfeedback>
+<itemfeedback ident="QUE_1003_ALL" view="All">
+<material>
+<mattext texttype="text/html"><![CDATA[This is some general feedback. ]]></mattext>
+</material>
+</itemfeedback>
+<itemfeedback ident="QUE_1004_C" view="Candidate">
+<material>
+<mattext texttype="text/html"><![CDATA[This is the correct answer feedback ]]></mattext>
+</material>
+</itemfeedback>
+<itemfeedback ident="QUE_1005_IC" view="Candidate">
+<material>
+<mattext texttype="text/html"><![CDATA[This is the incorrect answer feedback ]]></mattext>
+</material>
+</itemfeedback>
+</item>
+  
+</assessment>
+</questestinterop>

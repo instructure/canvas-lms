@@ -35,6 +35,11 @@ class SubmissionsController < ApplicationController
   
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
+    if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
+      id = @context_enrollment.associated_user_id
+    else
+      id = @current_user.id
+    end
     @user = @context.all_students.find(params[:id]) rescue nil
     if !@user
       flash[:error] = t('errors.student_not_enrolled', "The specified user is not a student in this course")
@@ -231,6 +236,7 @@ class SubmissionsController < ApplicationController
       return
     end
     if authorized_action(@submission, @current_user, :comment)
+      params[:submission][:commenter] = @current_user
       if params[:attachments]
         attachments = []
         params[:attachments].each do |idx, attachment|
@@ -246,8 +252,8 @@ class SubmissionsController < ApplicationController
           :comment_attachments => params[:submission][:comment_attachments],
           :media_comment_id => params[:submission][:media_comment_id],
           :media_comment_type => params[:submission][:media_comment_type],
-          :assessment_request => @request,
           :commenter => @current_user,
+          :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
           :hidden => @assignment.muted? && @context_enrollment.admin?
         }
@@ -305,8 +311,8 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         if @attachment.zipped?
           if Attachment.s3_storage?
-            format.html { redirect_to @attachment.cacheable_s3_url }
-            format.zip { redirect_to @attachment.cacheable_s3_url }
+            format.html { redirect_to @attachment.cacheable_s3_inline_url }
+            format.zip { redirect_to @attachment.cacheable_s3_inline_url }
           else
             cancel_cache_buster
             format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }

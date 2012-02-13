@@ -32,4 +32,22 @@ describe MediaObject do
       lambda { MediaObject.find_by_media_id('fjdksl') }.should raise_error
     end
   end
+
+  describe ".build_media_objects" do
+    it "should delete attachments created temporarily for import" do
+      course
+      folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
+      @a1 = attachment_model(:folder => folder, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
+      @a2 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
+      data = {
+        :entries => [
+          { :originalId => @a1.id, },
+          { :originalId => @a2.id, },
+        ],
+      }
+      MediaObject.build_media_objects(data, Account.default.id)
+      @a1.reload.file_state.should == 'deleted'
+      @a2.reload.file_state.should == 'available'
+    end
+  end
 end

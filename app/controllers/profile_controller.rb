@@ -105,28 +105,31 @@ class ProfileController < ApplicationController
     @channels = @user.communication_channels.unretired
     @current_user.used_feature(:cc_prefs)
     @notification_categories = Notification.dashboard_categories(@user)
-    @policies = @user.notification_policies
+    @policies = NotificationPolicy.for(@user).scoped(:include => [:communication_channel, :notification]).to_a
     @context = UserProfile.new(@user)
     @active_tab = "communication-preferences"
 
     # build placeholder notification policies for categories the user does not have policies for already
     # Note that currently a NotificationPolicy might not have a Notification attached to it.
     # See the relevant spec in profile_controller_spec.rb for more details.
-    user_categories = @user.notification_policies.map {|np| np.notification.try(:category) }
+    user_categories = @policies.map {|np| np.notification.try(:category) }
     @notification_categories.each do |category|
       # category is actually a Notification
       next if user_categories.include?(category.category)
-      policy = @user.notification_policies.build
+      policy = @user.communication_channel.notification_policies.build
       policy.notification = category
       policy.frequency = category.default_frequency
-      policy.communication_channel = @user.communication_channel
+      policy.save!
+      @policies << policy
     end
 
     has_facebook_installed = !@current_user.user_services.for_service('facebook').empty?
-    @policies = @policies.select{|p| (p.communication_channel && p.communication_channel.path_type != 'facebook') || has_facebook_installed }
+    has_twitter_installed = !@current_user.user_services.for_service('twitter').empty?
     @email_channels = @channels.select{|c| c.path_type == "email"}
     @sms_channels = @channels.select{|c| c.path_type == 'sms'}
     @other_channels = @channels.select{|c| c.path_type != "email"}
+    @other_channels.reject! { |c| c.path_type == 'facebook' } unless has_facebook_installed
+    @other_channels.reject! { |c| c.path_type == 'twitter' } unless has_twitter_installed
   end
   
   def profile_pics
