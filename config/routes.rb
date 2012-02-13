@@ -666,8 +666,11 @@ ActionController::Routing::Routes.draw do |map|
       submissions.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
       submissions.get 'sections/:section_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'section_student_submissions'
 
-      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show
-      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :show
+      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "course_assignment_submission"
+      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "section_assignment_submission"
+
+      submissions.post 'courses/:course_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
+      submissions.post 'sections/:section_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
 
       submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'course_assignment_submission'
       submissions.put 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'section_assignment_submission'

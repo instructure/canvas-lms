@@ -40,6 +40,10 @@ module Api::V1::Assignment
 
     hash['muted'] = assignment.muted?
 
+    if assignment.allowed_extensions.present?
+      hash['allowed_extensions'] = assignment.allowed_extensions
+    end
+
     if assignment.rubric_association
       hash['use_rubric_for_grading'] =
         !!assignment.rubric_association.use_for_grading

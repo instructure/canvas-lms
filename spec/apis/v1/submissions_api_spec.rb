@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SubmissionsApiController, :type => :integration do
+describe 'Submissions API', :type => :integration do
 
   def submit_homework(assignment, student, opts = {:body => "test!"})
     @submit_homework_time ||= Time.zone.at(0)
@@ -1423,6 +1423,116 @@ describe SubmissionsApiController, :type => :integration do
       user5 = user :account => account1
       user6 = user :account => account2
       @controller.map_user_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id]).sort.should == [user1.id, user3.id, user5.id, user6.id].sort
+    end
+  end
+
+  context "create" do
+    before do
+      course_with_student(:active_all => true)
+      assignment_model(:course => @course, :submission_types => "online_url", :points_possible => 12)
+      @url = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+      @args = { :controller => "submissions", :action => "create", :format => "json", :course_id => @course.id.to_s, :assignment_id => @assignment.id.to_s }
+    end
+
+    it "should reject a submission by a non-student" do
+      @user = course_with_teacher(:course => @course).user
+      json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "www.example.com" } }, {}, :expected_status => 401)
+    end
+
+    it "should reject a request with an invalid submission_type" do
+      json = api_call(:post, @url, @args, { :submission => { :submission_type => "blergh" } }, {}, :expected_status => 400)
+      json['message'].should == "Invalid submission[submission_type] given"
+    end
+
+    it "should reject a submission_type not allowed by the assignment" do
+      json = api_call(:post, @url, @args, { :submission => { :submission_type => "media_recording" } }, {}, :expected_status => 400)
+      json['message'].should == "Invalid submission[submission_type] given"
+    end
+
+    it "should reject mismatched submission_type and params" do
+      json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :body => "some html text" } }, {}, :expected_status => 400)
+      json['message'].should == "Invalid parameters for submission_type online_url. Required: submission[url]"
+    end
+
+    it "should work with section ids" do
+      @section = @course.default_section
+      json = api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { :controller => "submissions", :action => "create", :format => "json", :section_id => @section.id.to_s, :assignment_id => @assignment.id.to_s }, { :submission => { :submission_type => "online_url", :url => "www.example.com/a/b?q=1" } })
+      @submission = @assignment.submissions.find_by_user_id(@user.id)
+      @submission.should be_present
+      @submission.url.should == 'http://www.example.com/a/b?q=1'
+    end
+
+    describe "valid submissions" do
+      def do_submit(opts)
+        json = api_call(:post, @url, @args, { :submission => opts })
+        response['Location'].should == "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}"
+        @submission = @assignment.submissions.find_by_user_id(@user.id)
+        @submission.should be_present
+        json.slice('user_id', 'assignment_id', 'score', 'grade').should == {
+          'user_id' => @user.id,
+          'assignment_id' => @assignment.id,
+          'score' => nil,
+          'grade' => nil,
+        }
+        json
+      end
+
+      it "should create a url submission" do
+        json = do_submit(:submission_type => "online_url", :url => "www.example.com/a/b?q=1")
+        @submission.url.should == 'http://www.example.com/a/b?q=1'
+        json['url'].should == @submission.url
+      end
+
+      it "should create with an initial comment" do
+        json = api_call(:post, @url, @args, { :comment => { :text_comment => "ohai teacher" }, :submission => { :submission_type => "online_url", :url => "http://www.example.com/a/b" } })
+        @submission = @assignment.submissions.find_by_user_id(@user.id)
+        @submission.submission_comments.size.should == 1
+        @submission.submission_comments.first.attributes.slice('author_id', 'comment').should == {
+          'author_id' => @user.id,
+          'comment' => 'ohai teacher',
+        }
+        json['url'].should == "http://www.example.com/a/b"
+      end
+
+      it "should create a online text submission" do
+        @assignment.update_attributes(:submission_types => 'online_text_entry')
+        json = do_submit(:submission_type => 'online_text_entry', :body => %{<p>
+          This is <i>some</i> text. The <script src='evil.com'></script> sanitization will take effect.
+        </p>})
+        json['body'].should == %{<p>
+          This is <i>some</i> text. The  sanitization will take effect.
+        </p>}
+        json['body'].should == @submission.body
+      end
+
+      it "should create a file upload submission" do
+        @assignment.update_attributes(:submission_types => 'online_upload')
+        a1 = attachment_model(:context => @user)
+        a2 = attachment_model(:context => @user)
+        json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
+        json['attachments'].map { |a| a['url'] }.should == [ file_download_url(a1, :verifier => a1.uuid, :download => '1', :download_frd => '1'), file_download_url(a2, :verifier => a2.uuid, :download => '1', :download_frd => '1') ]
+      end
+
+      it "should create a media comment submission" do
+        @assignment.update_attributes(:submission_types => "media_recording")
+        media_object(:media_id => "3232", :media_type => "audio")
+        json = do_submit(:submission_type => "media_recording", :media_comment_id => "3232", :media_comment_type => "audio")
+        json['media_comment'].slice('media_id', 'media_type').should == {
+          'media_id' => '3232',
+          'media_type' => 'audio',
+        }
+      end
+    end
+
+    it "should reject invalid urls" do
+      json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "ftp://ftp.example.com/a/b" } }, {}, :expected_status => 400)
+    end
+
+    it "should reject attachment ids not belonging to the user" do
+      @assignment.update_attributes(:submission_types => 'online_upload')
+      a1 = attachment_model(:context => @course)
+      json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_upload", :file_ids => [a1.id] } }, {}, :expected_status => 400)
+      json['message'].should == 'No valid file ids given'
     end
   end
 

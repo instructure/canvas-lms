@@ -699,6 +699,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def submission_types_array
+    (self.submission_types || "").split(",")
+  end
+
   def submittable_type?
     submission_types && self.submission_types != "" && self.submission_types != "none" && self.submission_types != 'not_graded' && self.submission_types != "online_quiz" && self.submission_types != 'discussion_topic' && self.submission_types != 'attendance' && self.submission_types != "external_tool"
   end

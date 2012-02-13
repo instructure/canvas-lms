@@ -270,13 +270,6 @@ class SubmissionsApiController < ApplicationController
     Api.map_ids(user_ids, User, @domain_root_account)
   end
 
-  def get_course_from_section
-    if params[:section_id]
-      @section = api_find(CourseSection, params.delete(:section_id))
-      params[:course_id] = @section.course_id
-    end
-  end
-
   def get_user_considering_section(user_id)
     scope = @context.students_visible_to(@current_user)
     if @section
