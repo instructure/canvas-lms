@@ -61,9 +61,10 @@ describe "assignments turn it in" do
 
     driver.find_element(:id, 'edit_assignment_form').submit
     wait_for_ajaximations
-
-    assignment = Assignment.last
-    assignment.turnitin_settings.should eql(expected_settings)
+    keep_trying_until do
+      assignment = Assignment.last
+      assignment.turnitin_settings.should eql(expected_settings)
+    end
   end
 
   it "should edit turnitin settings" do
