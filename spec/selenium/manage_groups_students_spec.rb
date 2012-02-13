@@ -258,7 +258,8 @@ describe "manage groups students" do
     end
 
     it "should assign students in DB and in UI" do
-      find_with_jquery("#category_#{@category.id} .group_blank .user_id_#{@student.id}").should_not be_nil
+      expected_display_name = 'Doe, John'
+      keep_trying_until { driver.find_element(:css, '.right_side .student_list .student .name').should include_text(expected_display_name) }
       @student.groups.should be_empty
 
       assign_students(@category)
@@ -267,8 +268,10 @@ describe "manage groups students" do
       keep_trying_until { @student.groups.size.should == 1 }
       group = @student.groups.first
 
-      find_with_jquery("#category_#{@category.id} .group_blank .user_id_#{@student.id}").should be_nil
-      find_with_jquery("#category_#{@category.id} #group_#{group.id} .user_id_#{@student.id}").should_not be_nil
+      driver.find_element(:css, '.right_side .student_list').should_not include_text(expected_display_name)
+      group_element = find_with_jquery("#category_#{@category.id} #group_#{group.id} .user_id_#{@student.id}")
+      group_element.should_not be_nil
+      group_element.should include_text(expected_display_name)
     end
 
     it "should give 'Assigning Students...' visual feedback" do
