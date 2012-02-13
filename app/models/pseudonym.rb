@@ -133,6 +133,7 @@ class Pseudonym < ActiveRecord::Base
     if !crypted_password || crypted_password == ""
       self.generate_temporary_password
     end
+    self.sis_user_id = nil if self.sis_user_id.blank?
   end
   
   def update_passwords_on_related_pseudonyms
