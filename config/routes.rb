@@ -689,6 +689,19 @@ ActionController::Routing::Routes.draw do |map|
       topics.post 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :add_reply, :path_name => 'group_discussion_add_reply'
       topics.get 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'course_discussion_replies'
       topics.get 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'group_discussion_replies'
+
+      topics.put 'courses/:course_id/discussion_topics/:topic_id/read', :action => :mark_topic_read, :path_name => 'course_discussion_topic_mark_read'
+      topics.put 'groups/:group_id/discussion_topics/:topic_id/read', :action => :mark_topic_read, :path_name => 'group_discussion_topic_mark_read'
+      topics.delete 'courses/:course_id/discussion_topics/:topic_id/read', :action => :mark_topic_unread, :path_name => 'course_discussion_topic_mark_unread'
+      topics.delete 'groups/:group_id/discussion_topics/:topic_id/read', :action => :mark_topic_unread, :path_name => 'group_discussion_topic_mark_unread'
+      topics.put 'courses/:course_id/discussion_topics/:topic_id/read_all', :action => :mark_all_read, :path_name => 'course_discussion_topic_mark_all_read'
+      topics.put 'groups/:group_id/discussion_topics/:topic_id/read_all', :action => :mark_all_read, :path_name => 'group_discussion_topic_mark_all_read'
+      topics.delete 'courses/:course_id/discussion_topics/:topic_id/read_all', :action => :mark_all_unread, :path_name => 'course_discussion_topic_mark_all_unread'
+      topics.delete 'groups/:group_id/discussion_topics/:topic_id/read_all', :action => :mark_all_unread, :path_name => 'group_discussion_topic_mark_all_unread'
+      topics.put 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_read, :path_name => 'course_discussion_topic_discussion_entry_mark_read'
+      topics.put 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_read, :path_name => 'group_discussion_topic_discussion_entry_mark_read'
+      topics.delete 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_unread, :path_name => 'course_discussion_topic_discussion_entry_mark_unread'
+      topics.delete 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_unread, :path_name => 'group_discussion_topic_discussion_entry_mark_unread'
     end
 
     api.with_options(:controller => :external_tools) do |tools|

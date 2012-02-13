@@ -20,40 +20,42 @@ class DiscussionEntry < ActiveRecord::Base
   include Workflow
   include SendToInbox
   include SendToStream
-  
+
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
   has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
+  has_many :discussion_entry_participants, :dependent => :destroy
   belongs_to :discussion_topic, :touch => true
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   belongs_to :user
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
   has_one :external_feed_entry, :as => :asset
-  
+
   before_create :infer_parent_id
   before_save :infer_defaults
   after_save :touch_parent
   after_save :context_module_action_later
+  after_create :create_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
-  
+
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
-  
+
   has_a_broadcast_policy
   attr_accessor :new_record_header
-  
+
   workflow do
     state :active
     state :deleted
   end
-  
+
   def infer_defaults
     @message_changed = self.message_changed?
     true
   end
-  
+
   on_create_send_to_inboxes do
     if self.context && self.context.available?
       user_id = nil
@@ -72,15 +74,15 @@ class DiscussionEntry < ActiveRecord::Base
       end
     end
   end
-  
+
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
     p.to { posters - [user] }
-    p.whenever { |record| 
+    p.whenever { |record|
       record.just_created && record.active?
     }
   end
-  
+
   on_create_send_to_streams do
     if self.parent_id == 0
       recent_entries = DiscussionEntry.active.find(:all, :select => 'user_id', :conditions => ['discussion_entries.discussion_topic_id=? AND discussion_entries.created_at > ?', self.discussion_topic_id, 2.weeks.ago])
@@ -99,19 +101,19 @@ class DiscussionEntry < ActiveRecord::Base
       []
     end
   end
-  
+
   on_update_send_to_streams do
     if @message_changed
       []
     end
   end
-  
+
   def touch_parent
     if self.parent_id && self.parent_id != 0
       self.discussion_topic.discussion_entries.find_by_id(self.parent_id).touch rescue nil
     end
   end
-  
+
   def reply_from(opts)
     user = opts[:user]
     message = opts[:html].strip
@@ -129,25 +131,25 @@ class DiscussionEntry < ActiveRecord::Base
       entry
     end
   end
-  
+
   def posters
     self.discussion_topic.posters rescue [self.user]
   end
-  
+
   def plaintext_message=(val)
     self.extend TextHelper
     self.message = format_message(val).first
   end
-  
+
   def truncated_message(length=nil)
     plaintext_message(length)
   end
-  
+
   def plaintext_message(length=250)
     self.extend TextHelper
     truncate_html(self.message, :max_length => length)
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     discussion_subentries.each &:destroy
@@ -155,13 +157,13 @@ class DiscussionEntry < ActiveRecord::Base
     self.deleted_at = Time.now
     save!
   end
-  
+
   named_scope :active, :conditions => ['discussion_entries.workflow_state != ?', 'deleted']
-  
+
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
   end
-  
+
   def infer_parent_id
     parent = self.discussion_topic.discussion_entries.active.find_by_id(self.parent_id) if self.parent_id
     if parent && parent.parent_id == 0
@@ -173,14 +175,14 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
   protected :infer_parent_id
-  
+
   def update_topic
     if self.discussion_topic
       last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].max
       DiscussionTopic.update_all({:last_reply_at => last_reply_at, :updated_at => Time.now.utc}, {:id => self.discussion_topic_id})
     end
   end
-  
+
   set_policy do
     given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
     can :update and can :reply and can :read
@@ -190,10 +192,10 @@ class DiscussionEntry < ActiveRecord::Base
 
     given { |user| self.user && self.user == user and self.discussion_subentries.empty? && !self.discussion_topic.locked? }
     can :delete
-    
+
     given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }#
     can :read
-    
+
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }# students.find_by_id(user) }
     can :reply and can :create and can :read
 
@@ -202,7 +204,7 @@ class DiscussionEntry < ActiveRecord::Base
 
     given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked?  }# students.find_by_id(user) }
     can :attach
-    
+
     given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }#admins.find_by_id(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
@@ -215,7 +217,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }#admins.find_by_id(user) }
     can :update and can :delete and can :read
   end
-  
+
   named_scope :for_user, lambda{|user|
     {:conditions => ['discussion_entries.user_id = ?', (user.is_a?(User) ? user.id : user)], :order => 'discussion_entries.created_at'}
   }
@@ -247,12 +249,12 @@ class DiscussionEntry < ActiveRecord::Base
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{self.feed_code}"
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "http://#{HostUrl.context_host(self.discussion_topic.context)}/#{self.discussion_topic.context_prefix}/discussion_topics/#{self.discussion_topic_id}")
       entry.content   = Atom::Content::Html.new(self.message)
     end
   end
-  
+
   def clone_for(context, dup=nil, options={})
     options[:migrate] = true if options[:migrate] == nil
     dup ||= DiscussionEntry.new
@@ -295,27 +297,89 @@ class DiscussionEntry < ActiveRecord::Base
   def context
     self.discussion_topic.context
   end
-  
+
   def context_id
     self.discussion_topic.context_id
   end
-  
+
   def context_type
     self.discussion_topic.context_type
   end
-  
+
   def title
     self.discussion_topic.title
   end
-  
+
   def context_module_action_later
     self.send_later(:context_module_action)
   end
   protected :context_module_action_later
-  
+
   def context_module_action
     if self.discussion_topic && self.user
       self.discussion_topic.context_module_action(user, :contributed)
     end
+  end
+
+  def create_participants
+    transaction do
+      dtp_conditions = sanitize_sql(["discussion_topic_id = ?", self.discussion_topic_id])
+      dtp_conditions = sanitize_sql(["discussion_topic_id = ? AND user_id <> ?", self.discussion_topic_id, self.user_id]) if self.user
+      DiscussionTopicParticipant.update_all("unread_entry_count = unread_entry_count + 1", dtp_conditions)
+
+      if self.user
+        my_entry_participant = self.discussion_entry_participants.create(:user => self.user, :workflow_state => "read")
+
+        topic_participant = self.discussion_topic.discussion_topic_participants.find_by_user_id(self.user.id)
+        if topic_participant.blank?
+          new_count = self.discussion_topic.unread_count(self.user) - 1
+          topic_participant = self.discussion_topic.discussion_topic_participants.create(:user => self.user,
+                                                                                         :unread_entry_count => new_count,
+                                                                                         :workflow_state => "unread")
+        end
+      end
+    end
+  end
+
+  attr_accessor :current_user
+  def read_state(current_user = nil)
+    current_user ||= self.current_user
+    return "read" unless current_user # default for logged out users
+    uid = current_user.is_a?(User) ? current_user.id : current_user
+    discussion_entry_participants.find_by_user_id(uid).try(:workflow_state) || "unread"
+  end
+
+  def read?(current_user = nil)
+    read_state(current_user) == "read"
+  end
+
+  def unread?(current_user = nil)
+    !read?(current_user)
+  end
+
+  def change_read_state(new_state, current_user = nil)
+    current_user ||= self.current_user
+    return nil unless current_user
+
+    if new_state != self.read_state(current_user)
+      entry_participant = self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
+      if entry_participant.present? && entry_participant.valid?
+        self.discussion_topic.update_or_create_participant(:current_user => current_user, :offset => (new_state == "unread" ? 1 : -1))
+      end
+      entry_participant
+    else
+      true
+    end
+  end
+
+  def update_or_create_participant(opts={})
+    current_user = opts[:current_user] || self.current_user
+    return nil unless current_user
+
+    entry_participant = self.discussion_entry_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
+    entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
+    entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
+    entry_participant.save
+    entry_participant
   end
 end

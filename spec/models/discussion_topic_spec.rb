@@ -470,4 +470,52 @@ describe DiscussionTopic do
       @student.submissions.first.id.should == @existing_submission_id
     end
   end
+
+  context "read/unread state" do
+    before(:each) do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
+    end
+
+    it "should mark a topic you created as read" do
+      @topic.read?(@teacher).should be_true
+      @topic.unread_count(@teacher).should == 0
+    end
+
+    it "should be unread by default" do
+      @topic.read?(@student).should be_false
+      @topic.unread_count(@student).should == 0
+    end
+
+    it "should allow being marked unread" do
+      @topic.change_read_state("unread", @teacher)
+      @topic.read?(@teacher).should be_false
+      @topic.unread_count(@teacher).should == 0
+    end
+
+    it "should allow being marked read" do
+      @topic.change_read_state("read", @student)
+      @topic.read?(@student).should be_true
+      @topic.unread_count(@student).should == 0
+    end
+
+    it "should allow mark all as unread" do
+      @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
+      @topic.change_all_read_state("unread", @teacher)
+
+      @topic.read?(@student).should be_false
+      @entry.read?(@student).should be_false
+      @topic.unread_count(@student).should == 1
+    end
+
+    it "should allow mark all as read" do
+      @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
+      @topic.change_all_read_state("read", @student)
+
+      @topic.read?(@student).should be_true
+      @entry.read?(@student).should be_true
+      @topic.unread_count(@student).should == 0
+    end
+  end
 end
