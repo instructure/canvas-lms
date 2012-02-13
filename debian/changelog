@@ -1,3 +1,11 @@
+canvas-lms (2012.02.13.13.30) testing; urgency=low
+
+  * Package ref: 8cbb8470fd31ee7d1b2dffe3e18e2934280111d0
+  *
+  * [+8cbb847] follow redirects in the kaltura bulk upload response
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 13 Feb 2012 13:30:10 -0700
+
 canvas-lms (2012.02.13.09.04) testing; urgency=low
 
   * Package ref: 7c984728eadd90ee1dec636aa6c3b9aeaddbb6d6
