@@ -1,5 +1,10 @@
 class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration
   def self.up
+    if supports_ddl_transactions?
+      commit_db_transaction
+      decrement_open_transactions while open_transactions > 0
+    end
+
     # destroy any submission messages where none of the commenters are
     # participants in the conversation. in production, this will remove about
     # 7k rows
@@ -16,6 +21,11 @@ class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration
           AND sc.author_id = cp.user_id
       )
     CONDITIONS
+
+    if supports_ddl_transactions?
+      increment_open_transactions
+      begin_db_transaction
+    end
   end
 
   def self.down
