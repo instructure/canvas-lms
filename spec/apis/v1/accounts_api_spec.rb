@@ -82,61 +82,73 @@ describe "Accounts API", :type => :integration do
   end
 
   it "should return courses for an account" do
-    @me = @user
-    @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
-    @c1.enrollments.delete_all
-    @c2 = course_model(:name => 'c2', :account => @a2, :root_account => @a1, :sis_source_id => 'sis2')
-    @c2.course_sections.create!
-    @c2.course_sections.create!
-    @user = @me
-    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
-                    { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
-    json.should == [
-      {
-        'id' => @c1.id,
-        'name' => 'c1',
-        'account_id' => @c1.account_id,
-        'course_code' => 'c1',
-        'sis_course_id' => nil,
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c1.uuid}.ics" },
-      },
-      {
-        'id' => @c2.id,
-        'name' => 'c2',
-        'account_id' => @c2.account_id,
-        'course_code' => 'c2',
-        'sis_course_id' => 'sis2',
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
-      },
-    ]
+    Time.use_zone(@user.time_zone) do
+      @me = @user
+      @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+      @c1.enrollments.delete_all
+      @c2 = course_model(:name => 'c2', :account => @a2, :root_account => @a1, :sis_source_id => 'sis2')
+      @c2.course_sections.create!
+      @c2.course_sections.create!
+      @user = @me
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                      { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
 
-    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
-                    { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
-                      { :hide_enrollmentless_courses => '1' })
-    json.should == [
-      {
-        'id' => @c2.id,
-        'name' => 'c2',
-        'account_id' => @c2.account_id,
-        'course_code' => 'c2',
-        'sis_course_id' => 'sis2',
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
-      },
-    ]
+      [@c1, @c2].each { |c| c.reload }
+      json.should == [
+        {
+          'id' => @c1.id,
+          'name' => 'c1',
+          'account_id' => @c1.account_id,
+          'course_code' => 'c1',
+          'sis_course_id' => nil,
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c1.uuid}.ics" },
+          'start_at' => @c1.start_at.as_json,
+          'end_at' => @c1.end_at.as_json
+        },
+        {
+          'id' => @c2.id,
+          'name' => 'c2',
+          'account_id' => @c2.account_id,
+          'course_code' => 'c2',
+          'sis_course_id' => 'sis2',
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
+          'start_at' => @c2.start_at.as_json,
+          'end_at' => @c2.end_at.as_json
+        }
+      ]
 
-    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
-                    { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
-                      { :per_page => 1, :page => 2 })
-    json.should == [
-      {
-        'id' => @c2.id,
-        'name' => 'c2',
-        'account_id' => @c2.account_id,
-        'course_code' => 'c2',
-        'sis_course_id' => 'sis2',
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
-      },
-    ]
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                      { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
+                        { :hide_enrollmentless_courses => '1' })
+      json.should == [
+        {
+          'id' => @c2.id,
+          'name' => 'c2',
+          'account_id' => @c2.account_id,
+          'course_code' => 'c2',
+          'sis_course_id' => 'sis2',
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
+          'start_at' => @c2.start_at.as_json,
+          'end_at' => @c2.end_at.as_json
+        }
+      ]
+
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                      { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
+                        { :per_page => 1, :page => 2 })
+      json.should == [
+        {
+          'id' => @c2.id,
+          'name' => 'c2',
+          'account_id' => @c2.account_id,
+          'course_code' => 'c2',
+          'sis_course_id' => 'sis2',
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
+          'start_at' => @c2.start_at.as_json,
+          'end_at' => @c2.end_at.as_json
+        }
+      ]
+    end
   end
 
   it "should limit the maximum per-page returned" do

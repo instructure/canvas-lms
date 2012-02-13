@@ -26,9 +26,9 @@ module Api::V1::Course
     include_url = includes.include?('html_url')
     include_description = includes.include?('public_description')
 
-    base_attributes = %w(id name course_code account_id)
+    base_attributes = %w(id name course_code account_id start_at)
     allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes
-    hash = api_json(course, user, session, :only => allowed_attributes)
+    hash = api_json(course, user, session, :only => allowed_attributes, :methods => 'end_at')
     hash['sis_course_id'] = course.sis_source_id if course.root_account.grants_rights?(user, :read_sis, :manage_sis).values.any?
     if enrollments
       hash['enrollments'] = enrollments.map do |e|
