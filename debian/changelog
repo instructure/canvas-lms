@@ -1,3 +1,96 @@
+canvas-lms (2012.02.13.09.04) testing; urgency=low
+
+  * Package ref: 7c984728eadd90ee1dec636aa6c3b9aeaddbb6d6
+  *
+  * [+c28280c] update documentation for course enrollments list. fixes #6999
+  * [+ead438c] make course copy have lower priority
+  * [+911070b] problem editing imported rubric; fixes #6754
+  * [+74e82ff] Properly add/remove external tool tabs from nav
+  * [+cf47d06] break up xml in selenium external tools spec
+  * [+9112bd3] job ui hold/unhold improvements
+  * [+110ea7c] better ignore pattern for vim swap files
+  * [+775488d] added specs to the announcements selenium file
+  * [+7159762] fixed spec to work with postgres
+  * [+b97f204] variable content-disposition in s3 urls
+  * [+ce63808] be explicit about inline vs. download in safe files redirect
+  * [+1b42bcd] Fix "needs grading" count for assignments
+  * [+4c3602c] updated stats lib to include quartiles method
+  * [+990e490] use parallel_tests-instructure and remove custom loggers
+  * [+94eb14e] fix up adding logins through the UI
+  * [+cf67f3f] delay MediaObject creation from uploaded files
+  * [+4e24561] more selenium file cleanup
+  * [+fe98679] update parallel_tests-instructure to 0.6.18
+  * [+8521d02] add user update api. fixes #6863
+  * [+27f4d24] allow importing of multiple module links to same external tool
+  * [+574a56f] show correct context in "coming up" list fixes #6333
+  * [+ed73654] allow observers to see the observed quiz submissions fixes #6300
+  * [+355dbf9] find relative pathed files when translating links on assessment questions
+  * [+da0858a] changed selenium implicit wait time to 3 from 10
+  * [+1ba6e37] add pseudonym update api. fixes #6866.
+  * [+b630029] don't duplicate enrollments on sis import if all enrollments are deleted
+  * [+1d533ef] don't wait on media object processing when importing a course
+  * [+5194271] fix messaging for group assignment submissions. fixes #6178
+  * [+e1d734f] fix for intermittently failing selenium specs
+  * [+9096efc] fixed multiple selenium files to work with postgres
+  * [+bc48b1e] normalize user_id out of notification_policies
+  * [+a737df9] allow ignoring learning outcomes for grading; fixes #5271
+  * [+f436c8f] add indexes that weren't created because of too-long names
+  * [+51f1d92] allow overriding periodic jobs schedules
+  * [+6dd5a15] don't fail restarting delayed jobs if the pid file is orphaned
+  * [+d2891cf] add Attachment#root_account_id
+  * [+99b3da3] more general (and slightly faster) fast distinct for postgres
+  * [+bbbbf18] fix spec timing issues, ensure consistent ordering of comments
+  * [+f61312f] update account associations when deleting an enrollment
+  * [+5f63a17] address race condition cancelling similar messages fixes #6366
+  * [+c442687] can add images from flickr to questions in a bank
+  * [+b4d15a8] remove limit on custom course list fixes #6904
+  * [+47ece9b] date-sensitize enrollment state predicates and completed_at
+  * [+dc4555f] added bug numbers to all relevant pending selenium specs
+  * [+2893d5c] fix uploading zipped assignment submissions
+  * [+b48f662] update qti specs for changes in qti migration tool
+  * [+c7969a2] allow requested_authn_context to be configured on saml auth
+  * [+4540b03] upgrading selenium webdriver to version 2.18
+  * [+4d32ee0] fix courses selenium spec that is occasionally failing
+  * [+39fe4a4] fix a couple i18n pluralization issues
+  * [+e28b126] fixes "close for comments" button in discussions past due
+  * [+2308e8c] temporarily keep track of users that choose to create an account
+  * [+777f8b2] allow open registration for delegated authentication fixes #6673
+  * [+aede43d] find temporary invitations when visiting course pages fixes #7126
+  * [+09a0c3a] gradebook2: sort users by last name  (fixes #7022)
+  * [+e848087] show student count for unpublished courses
+  * [+e16054e] don't create a new event when editing an existing event
+  * [+0eba4e9] allow description to be set on appointment group calendar events
+  * [+c483ed3] temporarily remove the account statistics_page_views page
+  * [+a411f71] add the wiziq web conference plugin
+  * [+705937d] messaging from scheduler, fixes #6830
+  * [+73e2878] notify teacher when appointment is cancelled
+  * [+0d5f659] fix cutycapt save png fixes #6544
+  * [+dce431b] include assignment_group_id in assignment_json
+  * [+fe7f845] fix intermittently failing selenium courses_spec
+  * [+28958a1] Show term name by course in conversations dropdowns
+  * [+1a979ac] Revert "fix cross-shard-trusted-logins refs #6883"
+  * [+767451b] ignore non-kaltura media comments when exporting html
+  * [+c2264b1] fix uppercase latex command buttons, fixes #4929
+  * [+c503bca] fix filter overlap issue, fixes #7177
+  * [+023627f] always set conversation tags, even if empty, fixes #7178
+  * [+283b085] remove duplicate sis imported enrollments
+  * [+7a066c0] add missing sis_source_id not null scope
+  * [+7486c0e] fix site admin pseudonym creation with passwords fixes #5231
+  * [+e5d6349] temporary and deleted users have no account associations
+  * [+1c221ae] always make submission comments as the current user
+  * [+bbaaf51] remove the unique constraint for a skipped index
+  * [+5f531eb] sent filter for conversations, fixes #7012
+  * [+c3e057e] smarter sorting in recipient finder, fixes #7044
+  * [+288edbd] fix submission comment migration, clean up data. fixes #7203
+  * [+c688ad1] handle zero point multiple choice questions in qti
+  * [+0387cf6] fix the weird border fragments on tinymce boxes
+  * [+46b3c5c] make question data always a HashWithIndifferentAccess
+  * [+4b2d329] fix pseudonym password updates in the app.
+  * [+60b215d] optimization to Course#gradebook_json
+  * [+7c98472] remove "auto-accept" feature closes #7160
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 13 Feb 2012 09:05:18 -0700
+
 canvas-lms (2012.01.30.10.46) testing; urgency=low
 
   * Package ref: c3c21109b4448fc52f19c27225629edb7a8b0e30
