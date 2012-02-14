@@ -13,5 +13,3 @@
       t :body_course, %{A new student organized group named "%{group_name}" was created for the course %{course}. The first member is %{user}.}, :group_name => asset.group.name, :course => asset.group.context.name, :user => asset.user.name
     end
 %>
-
-A new student organized group named "<%= asset.group.name %>" was created for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %>. The first member is <%= asset.user.name %>.
