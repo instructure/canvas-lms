@@ -307,7 +307,7 @@ module ApplicationHelper
       !params[:debug_assets]
     else
       # allows overriding by adding ?optimized_js=1 to the url
-      params[:optimized_js]
+      params[:optimized_js] || false
     end
   end
 
