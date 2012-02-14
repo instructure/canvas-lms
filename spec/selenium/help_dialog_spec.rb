@@ -3,6 +3,16 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "help dialog" do
   it_should_behave_like "in-process server selenium tests"
 
+  context "no user logged in" do
+    it "should work with no logged in user" do
+      Setting.set('show_feedback_link', 'true')
+      get "/logout"
+      driver.find_element(:css, '#footer .help_dialog_trigger').click
+      wait_for_ajaximations
+      driver.find_element(:css, "#help-dialog-options").should be_displayed
+    end
+  end
+
   context "help as a student" do
     before (:each) do
       course_with_student_logged_in(:active_all => true)
