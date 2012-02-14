@@ -57,6 +57,21 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
 
+    it "should allow viewing an unenrolled calendar via include_contexts" do
+      # also make sure the redirect from calendar -> calendar2 keeps the param
+      unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
+      # make the user an admin so they can view the course's calendar without an enrollment
+      Account.default.add_user(@user)
+      CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
+      get "/courses/#{unrelated_course.id}/settings"
+      expect_new_page_load { driver.find_element(:css, "#course_calendar_link").click() }
+      wait_for_ajax_requests
+      # only the explicit context should be selected
+      driver.find_element(:css, "#context-list li[data-context=course_#{unrelated_course.id}]").should have_class('checked')
+      driver.find_element(:css, "#context-list li[data-context=course_#{@course.id}]").should have_class('not-checked')
+      driver.find_element(:css, "#context-list li[data-context=user_#{@user.id}]").should have_class('not-checked')
+    end
+
     describe "sidebar" do
 
       describe "mini calendar" do

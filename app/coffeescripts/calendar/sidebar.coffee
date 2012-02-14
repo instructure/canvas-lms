@@ -12,7 +12,7 @@ define [
 ], ($, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
 
   class VisibleContextManager
-    constructor: (contexts, @$holder) ->
+    constructor: (contexts, selectedContexts, @$holder) ->
       fragmentData = try
                $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
              catch e
@@ -20,6 +20,7 @@ define [
       savedContexts = $.store.userGet('checked_calendar_codes')
 
       @contexts   = fragmentData.show.split(',') if fragmentData.show
+      @contexts or= selectedContexts if selectedContexts
       @contexts or= savedContexts.split(',') if savedContexts
       @contexts or= (c.asset_string for c in contexts[0...10])
 
@@ -57,7 +58,7 @@ define [
         visible = $li.data('context') in @contexts
         $li.toggleClass('checked', visible).toggleClass('not-checked', !visible)
 
-  return sidebar = (contexts, dataSource) ->
+  return sidebar = (contexts, selectedContexts, dataSource) ->
     for c in contexts
       c.can_create_stuff = c.can_create_calendar_events || c.can_create_assignments
 
@@ -65,7 +66,7 @@ define [
 
     $holder.html contextListTemplate(contexts: contexts)
 
-    visibleContexts = new VisibleContextManager(contexts, $holder)
+    visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
     $holder.find('.settings').kyleMenu(buttonOpts: {icons: { primary:'ui-icon-cog-with-droparrow', secondary: null}})
 

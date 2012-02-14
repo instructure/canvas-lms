@@ -2,7 +2,8 @@
   content_for :page_title, "Calendar"
   js_env :CALENDAR => {
     :CONTEXTS => @contexts_json,
-    :MANAGE_CONTEXTS => @manage_contexts
+    :MANAGE_CONTEXTS => @manage_contexts,
+    :SELECTED_CONTEXTS => @selected_contexts,
   }
   js_bundle :calendar2
   jammit_css :calendar2

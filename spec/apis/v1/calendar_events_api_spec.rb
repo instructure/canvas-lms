@@ -94,6 +94,18 @@ describe CalendarEventsApiController, :type => :integration do
       json.size.should eql 0 # first context has no events
     end
 
+    it "should allow specifying an unenrolled but accessible context" do
+      unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
+      Account.default.add_user(@user)
+      CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
+
+      json = api_call(:get, "/api/v1/calendar_events",
+                      { :controller => "calendar_events_api", :action => "index", :format => "json", },
+                        { :start_date => 2.days.ago.strftime("%Y-%m-%d"), :end_date => 2.days.from_now.strftime("%Y-%m-%d"), :context_codes => ["course_#{unrelated_course.id}"] })
+      json.size.should == 1
+      json.first['title'].should == "from unrelated one"
+    end
+
     it 'should return undated events' do
       @course.calendar_events.create(:title => 'undated')
       @course.calendar_events.create(:title => "dated", :start_at => '2012-01-08 12:00:00')

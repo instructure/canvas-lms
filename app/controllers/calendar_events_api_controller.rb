@@ -150,9 +150,14 @@ class CalendarEventsApiController < ApplicationController
     @type = params[:type] == 'assignment' ? :assignment : :event
 
     @context = @current_user
+    codes = (params[:context_codes] || [])[0, 10]
+    # refactor opportunity: get_all_pertinent_contexts expects the list of
+    # unenrolled contexts to be in the include_contexts parameter, rather than
+    # a function parameter
+    params[:include_contexts] = codes.join(",")
+
     get_all_pertinent_contexts(true)
 
-    codes = (params[:context_codes] || [])[0, 10]
     selected_contexts = @contexts.select{ |c| codes.include?(c.asset_string) }
     @context_codes = selected_contexts.map(&:asset_string)
 

@@ -13,4 +13,4 @@ require [
   @calendar = new Calendar("#calendar-app", ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, @eventDataSource)
   new MiniCalendar("#minical", @calendar)
   new UndatedEventsList("#undated-events", @eventDataSource)
-  drawSidebar(ENV.CALENDAR.CONTEXTS, @eventDataSource)
+  drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, @eventDataSource)
