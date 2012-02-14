@@ -5,6 +5,7 @@ define([
 
   // requires INST global
   var _gaq = window._gaq = window._gaq || [];
+  var asyncScriptInserted = false;
 
   /**
    * Enables Google Analytics tracking on the page from which it's called.
