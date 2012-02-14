@@ -168,10 +168,6 @@ describe "calendar2" do
 
     describe "main calendar" do
 
-      before (:each) do
-        get "/calendar2"
-      end
-
       def change_calendar(css_selector = '.fc-button-next')
         driver.find_element(:css, '.calendar .fc-header-left ' + css_selector).click
         wait_for_ajax_requests
@@ -183,16 +179,19 @@ describe "calendar2" do
       end
 
       it "should create an event through clicking on a calendar day" do
+        get "/calendar2"
         driver.find_element(:css, '.calendar .fc-today').click
         create_calendar_event('new event')
       end
 
       it "should create an assignment by clicking on a calendar day" do
+        get "/calendar2"
         driver.find_element(:css, '.calendar .fc-today').click
         create_assignment_event('new assignment')
       end
 
       it "more options link should go to calendar_event edit page" do
+        get "/calendar2"
         driver.find_element(:css, '.calendar .fc-today').click
         create_calendar_event('new event')
 
@@ -238,12 +237,14 @@ describe "calendar2" do
       end
 
       it "should change the month" do
+        get "/calendar2"
         old_header_title = get_header_text
         change_calendar
         old_header_title.should_not == get_header_text
       end
 
       it "should change the week" do
+        get "/calendar2"
         header_buttons = driver.find_elements(:css, '.ui-buttonset > label')
         header_buttons[0].click
         wait_for_ajaximations
@@ -253,6 +254,7 @@ describe "calendar2" do
       end
 
       it "should test the today button" do
+        get "/calendar2"
         current_month_num = Time.now.month
         current_month = Date::MONTHNAMES[current_month_num]
 
@@ -475,24 +477,39 @@ describe "calendar2" do
       course_with_student_logged_in
     end
 
-    describe "contexts list"
+    describe "contexts list" do
 
-    it "should not allow a student to create an assignment through the context list" do
-      pending "BUG 7033 - Create Assignment should not be an option for a student in New calendar" do
+      it "should not allow a student to create an assignment through the context list" do
+        pending "BUG 7033 - Create Assignment should not be an option for a student in New calendar" do
 
+          get "/calendar2"
+          wait_for_ajaximations
+
+          keep_trying_until do
+            driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
+            find_with_jquery('ul#context-list li:nth-child(1) button').click
+            driver.find_element(:id, "ui-menu-0-0").click
+            edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+            edit_event_dialog.should be_displayed
+          end
+          tabs = find_all_with_jquery('.tab_list > li')
+          tabs.count.should == 1
+          tabs[0].should include_text('Event')
+        end
+      end
+    end
+
+    describe "main calendar" do
+
+      it "should validate that a student cannot edit an assignment" do
+        @course.active_assignments.create(:name => "Assignment 1", :due_at => Time.zone.now)
         get "/calendar2"
         wait_for_ajaximations
 
-        keep_trying_until do
-          driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
-          find_with_jquery('ul#context-list li:nth-child(1) button').click
-          driver.find_element(:id, "ui-menu-0-0").click
-          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
-          edit_event_dialog.should be_displayed
-        end
-        tabs = find_all_with_jquery('.tab_list > li')
-        tabs.count.should == 1
-        tabs[0].should include_text('Event')
+        driver.find_element(:css, '.fc-event-title').click
+        driver.find_element(:id, "popover-0").should be_displayed
+        element_exists(:css, '.edit_event_link').should be_false
+        element_exists(:css, '.delete_event_link').should be_false
       end
     end
   end
