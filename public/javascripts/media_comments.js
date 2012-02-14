@@ -16,7 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 define([
-  'INST' /* INST */,
   'i18n!media_comments',
   'jquery' /* $ */,
   'str/htmlEscape',
@@ -26,7 +25,7 @@ define([
   'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(INST, I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape) {
 
   (function($, INST){
     var yourVersion = null;

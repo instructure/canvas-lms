@@ -231,12 +231,13 @@ define([
       event.preventDefault();
       $("#add_comment_form").hide();
       $("#media_media_recording").show();
-      $("#media_media_recording").find(".media_recording").mediaComment('create', 'any', function(id, type) {
+      $recording = $("#media_media_recording").find(".media_recording");
+      $recording.mediaComment('create', 'any', function(id, type) {
         $("#media_media_recording").data('comment_id', id).data('comment_type', type);
         $(document).triggerHandler('grading_change');
         $("#add_comment_form").show();
         $("#media_media_recording").hide();
-        $(this).empty();
+        $recording.empty();
       }, function() {
         $("#add_comment_form").show();
         $("#media_media_recording").hide();
