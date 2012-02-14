@@ -185,6 +185,15 @@ describe "gradebook2" do
                                                        :submission_types => 'not_graded'
   end
 
+  it "should minimize a column and remember it" do
+    pending("draginging and droping these dont actually work in selenium")
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    first_dragger, second_dragger = driver.find_elements(:css, '#gradebook_grid .slick-resizable-handle')
+    driver.action.drag_and_drop(second_dragger, first_dragger).perform
+    # driver.action.drag_and_drop_by(second_dragger, -200, 0).perform
+  end
+
   it "should not show 'not-graded' assignments" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations

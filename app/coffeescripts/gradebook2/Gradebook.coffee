@@ -303,8 +303,8 @@ define [
       columnDef.unselectable = true
       columnDef.unminimizedName = columnDef.name
       columnDef.name = ''
-      @$grid.find(".c#{colIndex}").add($columnHeader).addClass('minimized')
-      $columnHeader.data('minimized', true)
+      columnDef.minimized = true
+      @$grid.find(".l#{colIndex}").add($columnHeader).addClass('minimized')
       @assignmentsToHide.push(columnDef.id)
       $.store.userSet("hidden_columns_#{@options.context_code}", $.uniq(@assignmentsToHide).join(','))
 
@@ -314,8 +314,9 @@ define [
       columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '')
       columnDef.unselectable = false
       columnDef.name = columnDef.unminimizedName
-      @$grid.find(".c#{colIndex}").add($columnHeader).removeClass('minimized')
-      $columnHeader.removeData('minimized')
+      columnDef.minimized = false
+      @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
+      $columnHeader.find('.slick-column-name').html(columnDef.name)
       @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
       $.store.userSet("hidden_columns_#{@options.context_code}", $.uniq(@assignmentsToHide).join(','))
 
@@ -391,12 +392,12 @@ define [
 
       @fixMaxHeaderWidth()
       $('#gradebook_grid .slick-resizable-handle').live 'drag', (e,dd) =>
-        @$grid.find('.slick-header-column').each (i, elem) =>
+        @$grid.find('.slick-header-column').each (colIndex, elem) =>
           $columnHeader = $(elem)
-          isMinimized = $columnHeader.data('minimized')
+          columnDef = @gradeGrid.getColumns()[colIndex]
           if $columnHeader.outerWidth() <= minimumAssignmentColumWidth
-            @minimizeColumn($columnHeader) unless isMinimized
-          else if isMinimized
+            @minimizeColumn($columnHeader) unless columnDef.minimized
+          else if columnDef.minimized
             @unminimizeColumn($columnHeader)
       $(document).trigger('gridready')
 
@@ -531,7 +532,7 @@ define [
             $(document)
               .bind('gridready', => @minimizeColumn(@$grid.find("[id*='#{fieldName}']")))
               .unbind('gridready.render')
-              .bind('gridready.render', @gradeGrid.invalidate)
+              .bind('gridready.render', => @gradeGrid.invalidate() )
         columnDef
 
       @aggregateColumns = for id, group of @assignmentGroups
