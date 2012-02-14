@@ -239,7 +239,7 @@ class ConversationMessage < ActiveRecord::Base
       entry.published = self.created_at.utc
       entry.id        = "tag:#{HostUrl.context_host(self.context)},#{self.created_at.strftime("%Y-%m-%d")}:/conversations/#{self.feed_code}"
       entry.links    << Atom::Link.new(:rel => 'alternate',
-                                       :href => "http://#{HostUrl.context_host(self.context)}/conversations/#/conversations/#{self.conversation.id}")
+                                       :href => "http://#{HostUrl.context_host(self.context)}/conversations/#{self.conversation.id}")
       self.attachments.each do |attachment|
         entry.links  << Atom::Link.new(:rel => 'enclosure',
                                        :href => file_download_url(attachment, :verifier => attachment.uuid,

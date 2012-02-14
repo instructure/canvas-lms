@@ -566,7 +566,6 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    @current_user.messageable_users
     @entries = []
     @conversation_contexts = {}
     @current_user.conversations.each do |conversation|
