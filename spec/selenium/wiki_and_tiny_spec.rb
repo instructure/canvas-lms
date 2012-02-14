@@ -112,13 +112,13 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     driver.find_element(:css, '#wiki_body').find_element(:link, assignment_name).should be_displayed
   end
 
-  it "should add an equation to the rce" do
+  it "should add an equation to the rce by using equation buttons" do
     skip_if_ie('Out of memory')
     get "/courses/#{@course.id}/wiki"
 
-    driver.find_element(:css, '.mce_instructure_equation').click
+    driver.find_element(:id, 'wiki_page_body_instructure_equation').click
     wait_for_animations
-    driver.find_element(:id, 'instructure_equation_prompt')
+    driver.find_element(:id, 'instructure_equation_prompt').should be_displayed
     misc_tab = driver.find_element(:css, '.mathquill-tab-bar > li:last-child a')
     driver.action.move_to(misc_tab).perform
     driver.find_element(:css, '#Misc_tab li:nth-child(35) a').click
@@ -136,6 +136,24 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     wait_for_ajax_requests
 
     check_image(driver.find_element(:css, '#wiki_body img'))
+  end
+
+  it "should add an equation to the rce by typing into the equation editor" do
+    equation_text = '5 + 5 + 10 ='
+    get "/courses/#{@course.id}/wiki"
+
+    driver.find_element(:id, 'wiki_page_body_instructure_equation').click
+    wait_for_animations
+    driver.find_element(:id, 'instructure_equation_prompt').should be_displayed
+    3.times do
+      driver.find_element(:css, '.mathquill-editor .textarea textarea').send_keys(:backspace)
+    end
+    driver.find_element(:css, '.mathquill-editor .textarea textarea').send_keys(equation_text)
+    driver.find_element(:id, 'instructure_equation_prompt_form').submit
+    wait_for_ajax_requests
+    in_frame "wiki_page_body_ifr" do
+      keep_trying_until { driver.find_element(:css, '.equation_image').attribute('title').should == equation_text }
+    end
   end
 
   it "should display record video dialog" do
