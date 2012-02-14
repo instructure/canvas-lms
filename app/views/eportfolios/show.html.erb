@@ -161,10 +161,12 @@
             <% @portfolio.eportfolio_categories.each do |category| %>
               <option value="<%= category.id %>" id="category_select_<%= category.id %>"><%= category.name %></option>
             <% end %>
-            <option value="new" id="category_select_blank" style="display: none;">
+          </select>
+          <div style="display: none;">
+            <option value="new" id="category_select_blank">
               <%= t(:new_section, "New Section") %>
             </option>
-          </select>
+          </div>
         </td>
       </tr><tr>
         <td><%= before_label(:page_name, "Page Name") %></td>

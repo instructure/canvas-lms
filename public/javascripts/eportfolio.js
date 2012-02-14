@@ -502,7 +502,9 @@ require([
     }
   }
   function saveObject($obj, type) {
-    if($obj.length === 0) { return; }
+    var isSaving = $obj.data('event_pending');
+    if(isSaving || $obj.length === 0) { return; }
+    $obj.data('event_pending', true);
     var method = "PUT";
     var url = $obj.find(".rename_" + type + "_url").attr('href');
     if($obj.attr('id') == type + '_new') {
@@ -543,6 +545,7 @@ require([
         id: type + '_' + obj.id,
         hrefValues: ['id', 'slug']
       });
+      $obj.data('event_pending', false);
       countObjects(type);
     });
     return true;
@@ -727,7 +730,7 @@ require([
       var $category_select = $("#category_select_" + category.id);
       if($category_select.length === 0) {
         $category_select = $("#category_select_blank").clone(true).removeAttr('id');
-        $("#category_select_blank").before($category_select.show());
+        $("#category_select").append($category_select.show());
       }
       $category_select.attr('id', 'category_select_' + category.id)
         .val(category.id).text(category.name);
