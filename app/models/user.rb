@@ -177,7 +177,6 @@ class User < ActiveRecord::Base
   }
   named_scope :recently_logged_in, lambda{
     {
-      :joins => :pseudonym,
       :include => :pseudonyms,
       :conditions => ['pseudonyms.current_login_at > ?', 1.month.ago],
       :order => 'pseudonyms.current_login_at DESC',
@@ -213,6 +212,24 @@ class User < ActiveRecord::Base
     {
       :joins => :enrollments,
       :conditions => ["enrollments.course_id in (#{ids_string}) AND enrollments.created_at > ? AND enrollments.created_at < ?", start_at, end_at]
+    }
+  }
+
+  named_scope :for_course_with_last_login, lambda {|course, root_account_id, enrollment_type|
+    course_id = course.is_a?(Course) ? course.id : course
+    enrollment_conditions = sanitize_sql(['enrollments.course_id = ? AND enrollments.workflow_state != ?', course_id, 'deleted'])
+    enrollment_conditions += sanitize_sql(['AND enrollments.type = ?', enrollment_type]) if enrollment_type
+    {
+      # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
+      :select => 'users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists',
+      # left outer join ensures we get the user even if they don't have a pseudonym
+      :joins => sanitize_sql([<<-SQL, root_account_id]),
+        LEFT OUTER JOIN "pseudonyms" ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
+        INNER JOIN "enrollments" ON enrollments.user_id = users.id
+      SQL
+      :conditions => enrollment_conditions,
+      # the trick to get unique users
+      :group => 'users.id'
     }
   }
 

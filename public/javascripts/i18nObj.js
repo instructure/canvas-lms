@@ -153,10 +153,10 @@ I18n.applyWrappers = function(string, wrappers) {
       var escapedKey = escapeRegex(key);
       this.wrapperRegexes[key] = new RegExp(escapedKey + "([^" + escapedKey + "]*)" + escapedKey, "g");
     }
-    string = string.replace(this.wrapperRegexes[key], wrappers[key])
+    string = string.replace(this.wrapperRegexes[key], wrappers[key]);
   }
   return string;
-}
+};
 
 I18n.translate = function(scope, options) {
   options = this.prepareOptions(options);
@@ -301,7 +301,7 @@ I18n.strftime = function(date, format) {
       R: '%H:%M',
       T: '%H:%M:%S',
       v: '%e-%b-%Y'
-    }[p1]
+    }[p1];
   }).replace(/%(%|\-?[a-zA-Z]|3N)/g, function(str, p1) {
     switch (p1) {
       case 'a':  return options.abbr_day_names[weekDay];
@@ -545,9 +545,9 @@ I18n.scope.prototype = {
   },
   beforeLabel: function(textOrKey, defaultValue) {
     if (typeof defaultValue != "undefined") {
-      textOrKey = this.t('labels.' + textOrKey, defaultValue)
+      textOrKey = this.t('labels.' + textOrKey, defaultValue);
     }
-    return this.t("#before_label_wrapper", "%{text}:", {'text': textOrKey})
+    return this.t("#before_label_wrapper", "%{text}:", {'text': textOrKey});
   },
   toTime: function(scope, d) {
     return I18n.toTime(scope, d);

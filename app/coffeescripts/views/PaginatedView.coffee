@@ -54,5 +54,5 @@ define [
       unless @collection.nextPageUrl
         @stopPaginationListener() if @collection.length
         return
-      if @distanceToBottom() < @distanceTillFetchNextPage
+      if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
         @collection.fetchNextPage @fetchOptions

@@ -24,11 +24,11 @@
   rubric_associations = @context.rubric_associations.bookmarked.before(@range_end)
   rubric_associations = rubric_associations.select(&:rubric_id).once_per(&:rubric_id)
 %>
-<div id="reports-tabs">
+<div id="reports-tabs" style="display:none;">
   <ul>
     <li><a href="#tab-totals"><%= t('tabs.totals', %{Totals}) %></a></li>
     <li><a href="#tab-assignments"><%= t('tabs.assignments', %{Assignments}) %></a></li>
-    <li><a href="#tab-students"><%= t('tabs.students', %{Students}) %></a></li>
+    <li><a href="#tab-students" id="students_stats_tab"><%= t('tabs.students', %{Students}) %></a></li>
     <li><a href="#tab-files"><%= t('tabs.files', %{File Storage}) %></a></li>
   </ul>
   <div class="stats" id="tab-totals">
@@ -122,17 +122,7 @@
   </div>
   <div id="tab-students">
     <h3><%= t('headings.students', %{Recently Logged-In Users}) %></h3>
-    <ul class="item_list">
-      <% @recently_logged_students.each do |user| %>
-        <li>
-          <a href="<%= user_path(user.id) %>" class="header"><%= user.name %></a>
-          <div class="sub_header"><%= t 'student_last_logged_in', "last logged in %{time}", :time => datetime_string(user.pseudonyms.map{|p| [p.current_login_at, p.last_login_at]}.flatten.compact.max) %></div>
-        </li>
-      <% end %>
-      <% if @recently_logged_students.empty? %>
-        <li><%= t('none_to_show', %{None to show}) %></li>
-      <% end %>
-    </ul>
+    <ul class="item_list"></ul>
   </div>
   <div class="stats" id="tab-files">
     <h3><%= t('headings.files', %{File Storage}) %></h3>
@@ -155,13 +145,4 @@
     </table>
   </div>
 </div>
-
-<% js_block do -%>
-  <script>
-  require(['jquery'], function() {
-  $(document).ready(function() {
-    $("#reports-tabs").tabs().show();
-  });
-  });
-  </script>
-<% end %>
+<% js_bundle :course_statistics %>
