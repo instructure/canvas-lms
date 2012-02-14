@@ -50,7 +50,7 @@ require([
       data.addColumn('number', axis || I18n.t('columns.value', "Value"));
       data.addColumn('string', 'title1');
       data.addColumn('string', 'text1');
-      
+
       var rows = []
       $.each(data_points, function() {
         var date = new Date();
@@ -60,12 +60,12 @@ require([
           [date, this[1], undefined, undefined]
         )
       });
-      
+
       data.addRows(rows);
 
       var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('over_time'));
       chart.draw(data, {displayAnnotations: false});
     }
   });
-  google.load('visualization', '1', {'packages':['annotatedtimeline']});
 });
+
