@@ -107,6 +107,7 @@ describe "assignment rubrics" do
 
       wait_for_ajaximations
       wait_for_js
+      keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').should be_displayed }
       driver.find_element(:css, '.toggle_full_rubric').click
       find_with_jquery('#rubric_holder .criterion:visible .rating').click
       driver.find_element(:css, '#rubric_holder .save_rubric_button').click
