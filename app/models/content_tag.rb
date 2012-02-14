@@ -318,7 +318,16 @@ class ContentTag < ActiveRecord::Base
     options[:migrate] = true if options[:migrate] == nil
     if !self.cloned_item && !self.new_record?
       self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save! 
+      begin
+        self.save! 
+      rescue ActiveRecord::RecordInvalid => e
+        if e.message =~ /Url is not a valid URL/
+          self.url = URI::escape(self.url)
+          self.save!
+        else
+          raise e
+        end
+      end
     end
     existing = ContentTag.active.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, self.id)
     existing ||= ContentTag.active.find_by_context_type_and_context_id_and_cloned_item_id(context.class.to_s, context.id, self.cloned_item_id)

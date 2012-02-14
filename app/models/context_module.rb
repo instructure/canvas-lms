@@ -691,7 +691,12 @@ class ContextModule < ActiveRecord::Base
     item_map = {}
     @item_migration_position = item.content_tags.active.map(&:position).compact.max || 0
     (hash[:items] || []).each do |tag_hash|
-      item.add_item_from_migration(tag_hash, 0, context, item_map)
+      begin
+        item.add_item_from_migration(tag_hash, 0, context, item_map)
+      rescue
+        message =t('broken_item', %{Couldn't import the module item "%{item_title}" in the module "%{module_title}"}, :item_title =>tag_hash[:title], :module_title => hash[:title] )
+        context.add_migration_warning(message, $!)
+      end
     end
     
     if hash[:completion_requirements]

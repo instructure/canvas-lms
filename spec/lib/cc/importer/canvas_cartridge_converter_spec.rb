@@ -474,6 +474,8 @@ describe "Canvas Cartridge importing" do
     
     mod3.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
     mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
+    ct = mod3.add_item({ :title => 'Example 3', :type => 'external_url', :url => 'http://b.example.com/with%20space' })
+    ContentTag.update_all({:url => "http://b.example.com/with space"}, "id=#{ct.id}")
     
     # attachments are migrated with just their filename as display_name, 
     # if a content tag has a different title the display_name should not update
@@ -534,6 +536,7 @@ describe "Canvas Cartridge importing" do
     mod3_2.content_tags.length.should == 2
     mod3_2.content_tags[0].url.should == "http://a.example.com/"
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
+    @migration.migration_settings[:warnings].first.first.should == %{Couldn't import the module item "Example 3" in the module "url module"}
     
     mod4_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod4))
     mod4_2.content_tags.first.title.should == att_tag.title
