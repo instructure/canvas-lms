@@ -842,10 +842,11 @@ class User < ActiveRecord::Base
         logger.error "migrating #{table} column user_id failed: #{e.to_s}"
       end
     end
+    all_conversations.find_each{ |c| c.move_to_user(new_user) }
     updates = {}
     ['account_users','asset_user_accesses',
       'assignment_reminders','attachments',
-      'calendar_events','collaborations','conversation_participants',
+      'calendar_events','collaborations',
       'context_module_progressions','discussion_entries','discussion_topics',
       'enrollments','group_memberships','page_comments','page_views',
       'rubric_assessments','short_messages',
