@@ -50,8 +50,9 @@ class User < ActiveRecord::Base
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
-  has_many :current_group_memberships, :include => :group, :class_name => 'GroupMembership', :conditions => "group_memberships.workflow_state = 'accepted'"
-  has_many :current_groups, :through => :current_group_memberships, :source => :group, :conditions => "groups.workflow_state != 'deleted'"
+
+  has_many :current_group_memberships, :include => :group, :class_name => 'GroupMembership', :conditions => "group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'"
+  has_many :current_groups, :through => :current_group_memberships, :source => :group
   has_many :user_account_associations
   has_many :associated_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth'
   has_many :associated_root_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth', :conditions => 'accounts.parent_account_id IS NULL'
@@ -431,7 +432,7 @@ class User < ActiveRecord::Base
       m.group.context_id == context.id &&
       m.group.context_type == context.class.to_s &&
       !m.group.deleted? &&
-      !m.deleted?
+      m.accepted?
     end.map(&:group)
   end
 
@@ -1539,7 +1540,9 @@ class User < ActiveRecord::Base
   end
 
   def cached_current_group_memberships
-    self.group_memberships.active.select{|gm| gm.group.active? }
+    @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships'].cache_key) do
+      self.current_group_memberships.to_a
+    end
   end
 
   def current_student_enrollment_course_codes
@@ -2154,6 +2157,7 @@ class User < ActiveRecord::Base
     end
     coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
     active_enrollments = coalesced_enrollments.map{ |e| e[:enrollment] }
+
     cached_group_memberships = self.cached_current_group_memberships
     coalesced_group_memberships = cached_group_memberships.
       select{ |gm| gm.active_given_enrollments?(active_enrollments) }.

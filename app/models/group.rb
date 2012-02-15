@@ -332,6 +332,10 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def participating_users_count
+    self.participating_users.count
+  end
+
   def quota
     self.storage_quota || Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
   end
