@@ -169,15 +169,15 @@ describe "course wizard" do
   end
 
   it "should add students go to the next page and go back to add more students" do
-    #Bug - 4389
-    pending("Bug where students are deleted from student list when going back to the add students page")
-    start_course
-    get "/getting_started/students"
-    num_students_added = add_students
-    expect_new_page_load { driver.find_element(:css, '.next_step_button').click }
-    expect_new_page_load { driver.find_element(:css, '.previous_step_button').click }
-    student_count = driver.find_element(:css, '.student_count').text
-    student_count.to_i.should == num_students_added
+    pending("Bug 4389 - Students are deleted from student list when going back to the add students page") do
+      start_course
+      get "/getting_started/students"
+      num_students_added = add_students
+      expect_new_page_load { driver.find_element(:css, '.next_step_button').click }
+      expect_new_page_load { driver.find_element(:css, '.previous_step_button').click }
+      student_count = driver.find_element(:css, '.student_count').text
+      student_count.to_i.should == num_students_added
+    end
   end
 
   it "should navigate directly to the last page, save course, and verify course creation" do

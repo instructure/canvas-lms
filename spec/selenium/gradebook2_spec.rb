@@ -445,7 +445,6 @@ describe "gradebook2" do
   end
 
   it "should validate posting a comment to a graded assignment" do
-    pending("opening the comment dialog frequently fails")
     comment_text = "This is a new comment!"
 
     get "/courses/#{@course.id}/gradebook2"

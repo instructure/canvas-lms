@@ -258,30 +258,30 @@ describe "context_modules" do
     end
 
     it "should add 2 modules with the first one as a prerequisite" do
-       #Bug - 6711
-      pending("Prerequisite module doesn't save when creating and saving module in one step")
-      first_module_name = 'First Module'
-      second_module_name = 'Second Module'
+      pending("Bug 6711 - Prerequisite module doesn't save when creating and saving module in one step") do
+        first_module_name = 'First Module'
+        second_module_name = 'Second Module'
 
-      add_module(first_module_name)
-      #adding second module - can't use add_module method because a prerequisite needs to be added to this module
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), second_module_name)
-      driver.find_element(:css, '.ui-dialog .add_prerequisite_link').click
-      wait_for_animations
-      #have to do it this way because the select has no css attributes on it
-      click_option(':input:visible.eq(3)', first_module_name)
-      add_form.submit
-      wait_for_ajaximations
-      db_module = ContextModule.last
-      context_module = driver.find_element(:id, "context_module_#{db_module.id}")
-      driver.action.move_to(context_module).perform
-      driver.find_element(:css, "#context_module_#{db_module.id} .edit_module_link").click
-      driver.find_element(:css, '.ui-dialog').should be_displayed
-      wait_for_ajaximations
-      prereq_select = find_all_with_jquery(':input:visible')[3]
-      option = first_selected_option(prereq_select)
-      option.text.should == 'the module, ' + first_module_name
+        add_module(first_module_name)
+        #adding second module - can't use add_module method because a prerequisite needs to be added to this module
+        add_form = new_module_form
+        replace_content(add_form.find_element(:id, 'context_module_name'), second_module_name)
+        driver.find_element(:css, '.ui-dialog .add_prerequisite_link').click
+        wait_for_animations
+        #have to do it this way because the select has no css attributes on it
+        click_option(':input:visible.eq(3)', first_module_name)
+        add_form.submit
+        wait_for_ajaximations
+        db_module = ContextModule.last
+        context_module = driver.find_element(:id, "context_module_#{db_module.id}")
+        driver.action.move_to(context_module).perform
+        driver.find_element(:css, "#context_module_#{db_module.id} .edit_module_link").click
+        driver.find_element(:css, '.ui-dialog').should be_displayed
+        wait_for_ajaximations
+        prereq_select = find_all_with_jquery(':input:visible')[3]
+        option = first_selected_option(prereq_select)
+        option.text.should == 'the module, ' + first_module_name
+      end
     end
 
     it "should rearrange modules" do
