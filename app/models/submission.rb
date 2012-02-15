@@ -721,7 +721,7 @@ class Submission < ActiveRecord::Base
   end
 
   def conversation_message_data
-    latest = visible_submission_comments.last or return
+    latest = visible_submission_comments.scoped(:conditions => ["author_id IN (?)", possible_participants_ids]).last or return
     {
       :created_at => latest.created_at,
       :author_id => latest.author_id,
@@ -739,7 +739,11 @@ class Submission < ActiveRecord::Base
   memoize :commenting_instructors
 
   def participating_instructors
-    commenting_instructors.present? ? commenting_instructors : context.instructors
+    commenting_instructors.present? ? commenting_instructors : context.participating_instructors.uniq
+  end
+
+  def possible_participants_ids
+    [user_id] + context.participating_instructors.uniq.map(&:id)
   end
 
   # ensure that conversations/messages are created/updated for all relevant
@@ -763,6 +767,7 @@ class Submission < ActiveRecord::Base
       options[:delete_all] = visible_submission_comments.empty?
       options[:only_existing] = true
     when :migrate # don't mark-as-unread for anybody or add to empty conversations
+      return unless conversation_message_data
       options[:recalculate_count] = true
       options[:recalculate_last_authored_at] = true
       options[:only_existing] = true

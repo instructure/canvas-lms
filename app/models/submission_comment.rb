@@ -39,8 +39,8 @@ class SubmissionComment < ActiveRecord::Base
   after_save :update_submission
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
-  after_create { |c| c.submission.create_or_update_conversations!(:create) unless c.hidden? }
-  after_destroy { |c| c.submission.create_or_update_conversations!(:destroy) unless c.hidden? }
+  after_create { |c| c.submission.create_or_update_conversations!(:create) if c.send_to_conversations? }
+  after_destroy { |c| c.submission.create_or_update_conversations!(:destroy) if c.send_to_conversations? }
 
   serialize :cached_attachments
 
@@ -182,6 +182,10 @@ class SubmissionComment < ActiveRecord::Base
 
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
+  end
+
+  def send_to_conversations?
+    !hidden? && submission.possible_participants_ids.include?(author_id)
   end
 
   named_scope :visible, :conditions => { :hidden => false }
