@@ -236,10 +236,9 @@ class Assignment < ActiveRecord::Base
         self.all_day = false
       end
     end
-    if self.assignment_group && self.assignment_group.deleted? && !self.deleted?
-      self.assignment_group_id = nil
+    if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
+      self.assignment_group = self.context.assignment_groups.active.first || self.context.assignment_groups.create!
     end
-    self.assignment_group_id ||= self.context.assignment_groups.active.first.id rescue nil
     self.mastery_score = [self.mastery_score, self.points_possible].min if self.mastery_score && self.points_possible
     self.all_day_date = (zoned_due_at.to_date rescue nil) if !self.all_day_date || self.due_at_changed? || self.all_day_date_changed?
     self.submission_types ||= "none"
