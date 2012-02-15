@@ -37,6 +37,16 @@ describe Assignment do
     @assignment.assignment_group.should_not be_nil
   end
 
+  it "should be associated with a group when the course has no active groups" do
+    course_model
+    @course.require_assignment_group
+    @course.assignment_groups.first.destroy
+    @course.assignment_groups.size.should == 1
+    @course.assignment_groups.active.size.should == 0
+    @assignment = assignment_model(:course => @course)
+    @assignment.assignment_group.should_not be_nil
+  end
+
   it "should touch assignment group on create/save" do
     course
     group = @course.assignment_groups.create!(:name => "Assignments")
