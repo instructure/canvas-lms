@@ -1,3 +1,16 @@
+canvas-lms (2012.02.15.13.31) stable; urgency=low
+
+  * Package ref: 89139e47220b4280427280d765f61717a440f6b1
+  *
+  * [+26f60e8] prevent duplicate messages for submissions, fixes #7221
+  * [+5a517e2] refine conversation creation for group submissions, fixes #7212
+  * [+f50f00d] optimization to Course#gradebook_json
+  * [+ce7ecec] send notifications for discussion comments; fixes #6953
+  * [+b041876] do data migrations outside of a transaction
+  * [+89139e4] fix assigning of assignment group when no active groups exist
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 15 Feb 2012 13:33:56 -0700
+
 canvas-lms (2012.02.10.11.09) stable; urgency=low
 
   * Package ref: b34a5858797e9eeb40f7985502d50fae36da4a26
