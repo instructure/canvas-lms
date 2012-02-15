@@ -179,6 +179,69 @@ describe "quizzes" do
     el.find_element(:css, "textarea").send_keys(text)
   end
 
+  def create_multiple_choice_question
+    question = find_with_jquery(".question_form:visible")
+    question.
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="multiple_choice_question"]').click
+
+    type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
+
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers.length.should eql(4)
+    replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
+    set_feedback_content(answers[0].find_element(:css, ".answer_comments"), "Good job!")
+    replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
+    set_feedback_content(answers[1].find_element(:css, ".answer_comments"), "Bad job :(")
+    replace_content(answers[2].find_element(:css, ".select_answer input"), "Second Wrong Answer")
+    replace_content(answers[3].find_element(:css, ".select_answer input"), "Wrongest Answer")
+
+    set_feedback_content(question.find_element(:css, "div.text .question_correct_comment"), "Good job on the question!")
+    set_feedback_content(question.find_element(:css, "div.text .question_incorrect_comment"), "You know what they say - study long study wrong.")
+    set_feedback_content(question.find_element(:css, "div.text .question_neutral_comment"), "Pass or fail, you're a winner!")
+
+    question.submit
+    wait_for_ajaximations
+  end
+
+  def create_true_false_question
+    question = find_with_jquery(".question_form:visible")
+    question.
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="true_false_question"]').click
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    type_in_tiny '.question:visible textarea.question_content', 'This is not a true/false question.'
+
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers.length.should eql(2)
+    answers[1].find_element(:css, ".select_answer_link").click # false - get it?
+    answers[1].find_element(:css, ".comment_focus").click
+    answers[1].find_element(:css, ".answer_comments textarea").send_keys("Good job!")
+
+    question.submit
+    wait_for_ajaximations
+  end
+
+  def create_fill_in_the_blank_question
+    question = find_with_jquery(".question_form:visible")
+    question.
+        find_element(:css, 'select.question_type').
+        find_element(:css, 'option[value="short_answer_question"]').click
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    type_in_tiny '.question_form:visible textarea.question_content', 'This is a fill in the _________ question.'
+
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
+    replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
+
+    question.submit
+    wait_for_ajaximations
+  end
+
   it "should reorder questions with drag and drop" do
     quiz_with_new_questions
 
@@ -204,33 +267,9 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-
-    question = find_with_jquery(".question_form:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="multiple_choice_question"]').click
-
-    type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
-
-    answers = question.find_elements(:css, ".form_answers > .answer")
-    answers.length.should eql(4)
-    replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
-    set_feedback_content(answers[0].find_element(:css, ".answer_comments"), "Good job!")
-    replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
-    set_feedback_content(answers[1].find_element(:css, ".answer_comments"), "Bad job :(")
-    replace_content(answers[2].find_element(:css, ".select_answer input"), "Second Wrong Answer")
-    replace_content(answers[3].find_element(:css, ".select_answer input"), "Wrongest Answer")
-
-    set_feedback_content(question.find_element(:css, "div.text .question_correct_comment"), "Good job on the question!")
-    set_feedback_content(question.find_element(:css, "div.text .question_incorrect_comment"), "You know what they say - study long study wrong.")
-    set_feedback_content(question.find_element(:css, "div.text .question_neutral_comment"), "Pass or fail, you're a winner!")
-
-    question.submit
-    wait_for_ajax_requests
-
+    create_multiple_choice_question
     quiz.reload
     question_data = quiz.quiz_questions[0].question_data
-
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
 
     question_data[:answers].length.should == 4
@@ -254,25 +293,7 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="true_false_question"]').click
-
-    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
-
-    type_in_tiny '.question:visible textarea.question_content', 'This is not a true/false question.'
-
-    answers = question.find_elements(:css, ".form_answers > .answer")
-    answers.length.should eql(2)
-    answers[1].find_element(:css, ".select_answer_link").click # false - get it?
-    answers[1].find_element(:css, ".comment_focus").click
-    answers[1].find_element(:css, ".answer_comments textarea").send_keys("Good job!")
-
-    question.submit
-    wait_for_ajax_requests
-
+    create_true_false_question
     quiz.reload
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
@@ -281,23 +302,7 @@ describe "quizzes" do
     skip_if_ie('Out of memory')
     start_quiz_question
     quiz = Quiz.last
-
-    question = find_with_jquery(".question_form:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="short_answer_question"]').click
-
-    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
-
-    type_in_tiny '.question_form:visible textarea.question_content', 'This is a fill in the _________ question.'
-
-    answers = question.find_elements(:css, ".form_answers > .answer")
-    replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
-    replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
-
-    question.submit
-    wait_for_ajax_requests
-
+    create_fill_in_the_blank_question
     quiz.reload
     driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
@@ -559,6 +564,27 @@ describe "quizzes" do
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is a text question.')
+  end
+
+  it "should create a quiz with a variety of quiz questions" do
+    start_quiz_question
+    quiz = Quiz.last
+
+    create_multiple_choice_question
+    driver.find_element(:css, '.add_question_link').click
+    create_true_false_question
+    driver.find_element(:css, '.add_question_link').click
+    create_fill_in_the_blank_question
+
+    quiz.reload
+    refresh_page #making sure the quizzes load up from the database
+    3.times do |i|
+      driver.find_element(:id, "question_#{quiz.quiz_questions[i].id}").should be_displayed
+    end
+    questions = driver.find_elements(:css, '.question')
+    questions[0].should have_class("multiple_choice_question")
+    questions[1].should have_class("true_false_question")
+    questions[2].should have_class("short_answer_question")
   end
 
   it "should not show the display details for text questions" do
