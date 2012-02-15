@@ -376,7 +376,7 @@ describe Attachment do
 
       MediaObject.count.should == 0
       Delayed::Job.count.should == 1
-      Delayed::Job.first.run_at.should == now + 25.seconds
+      Delayed::Job.first.run_at.to_i.should == (now + 25.seconds).to_i
     end
 
     it "should not create a media object in a skip_media_object_creation block" do
