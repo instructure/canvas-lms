@@ -38,8 +38,8 @@ describe "assignment rubrics" do
 
       #Commented out because we still want this test to run but this is the part where the bug is
       #BUG 7193 - Rubric total overwrites assignment total despite choosing to leave them different
-        #get "/courses/#{@course.id}/assignments"
-        #driver.find_element(:css, '.points_text').should include_text(initial_points.to_s)
+      #get "/courses/#{@course.id}/assignments"
+      #driver.find_element(:css, '.points_text').should include_text(initial_points.to_s)
     end
 
     it "should import rubric to assignment" do
@@ -105,8 +105,6 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      wait_for_ajaximations
-      wait_for_js
       keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').should be_displayed }
       driver.find_element(:css, '.toggle_full_rubric').click
       find_with_jquery('#rubric_holder .criterion:visible .rating').click
@@ -208,6 +206,28 @@ describe "assignment rubrics" do
       driver.find_element(:css, "#rubrics .rubric_title").text.should == "My Rubric"
       driver.find_element(:css, ".criterion_description .long_description_link").click
       driver.find_element(:css, ".ui-dialog div.long_description").text.should == "This is awesome."
+    end
+  end
+
+  context "assignment rubrics as an designer" do
+    before (:each) do
+      course_with_designer_logged_in
+    end
+
+    it "should allow an designer to create a course rubric" do
+      pending "Bug #7136 - Rubrics cannot be created by designers" do
+        rubric_name = 'this is a new rubric'
+        get "/courses/#{@course.id}/rubrics"
+
+        expect {
+          driver.find_element(:css, '.add_rubric_link').click
+          replace_content(driver.find_element(:css, '.rubric_title input'), rubric_name)
+          driver.find_element(:id, 'edit_rubric_form').submit
+          wait_for_ajaximations
+        }.to change(Rubric, :count).by(1)
+        refresh_page
+        driver.find_element(:css, '#rubrics .title').text.should == rubric_name
+      end
     end
   end
 end

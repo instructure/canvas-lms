@@ -287,6 +287,12 @@ Spec::Runner.configure do |config|
     @enrollment
   end
 
+  def course_with_designer(opts={})
+    course_with_user('DesignerEnrollment', opts)
+    @designer = @user
+    @enrollment
+  end
+
   def course_with_teacher_logged_in(opts={})
     course_with_teacher(opts)
     user_session(@user)
