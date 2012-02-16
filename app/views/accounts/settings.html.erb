@@ -518,6 +518,8 @@
            last_complete = @last_complete_reports[report]
            last_report = @last_reports[report]
            in_progress = last_report && last_report.in_progress?
+           #the extra text is added so that you can give more than the date for the last run report
+           extra_text = last_complete.try(:parameters).try(:[], "extra_text")
         %>
           <tr id="<%= report %>" class="reports">
             <td class="title reports">
@@ -532,6 +534,10 @@
             <td class="last-run reports">
               <% if last_complete %>
                 <%= datetime_string(last_complete.created_at) %>
+                <%#the extra text is added so that you can give more than the date for the last run report %>
+                <% if extra_text %>
+                  (<%= extra_text %>)
+                <% end %>
                 <%= link_to image_tag("download.png"), context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>
