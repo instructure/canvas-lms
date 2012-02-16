@@ -60,3 +60,7 @@ define ['compiled/util/objectCollection'], (objectCollection) ->
     equal @collection[2].id, 3
     equal @collection[3].id, 4
 
+    # case where length is zero
+    @collection.length = 0
+    ok @collection.sortBy 'id'
+

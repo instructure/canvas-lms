@@ -48,6 +48,7 @@ define ->
           a - b
 
       (prop) ->
+        return array if array.length is 0
         type = typeof array[0][prop] or 'string'
         array.sort (a, b) ->
           return sorters[type](a[prop], b[prop])
