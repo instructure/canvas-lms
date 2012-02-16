@@ -226,7 +226,6 @@ class UsersController < ApplicationController
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
     @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
-    @is_default_account = @current_user.pseudonyms.active.map(&:account_id).include?(Account.default.id)
   end
 
   include Api::V1::StreamItem
