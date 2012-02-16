@@ -224,7 +224,7 @@ describe "speedgrader" do
     driver.find_element(:css, '#add_attachment img').click
     driver.find_element(:css, '#comment_attachments input').should be_displayed
     driver.find_element(:css, '#comment_attachments a').click
-    element_exists(:css, '#comment_attachments input').should be_false
+    element_exists('#comment_attachments input').should be_false
 
     #add comment
     driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')

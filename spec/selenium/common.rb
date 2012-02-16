@@ -548,14 +548,8 @@ shared_examples_for "all selenium tests" do
     visible_dialog_element.should_not be_displayed
   end
 
-  def element_exists(selector_type, selector)
-    exists = false
-    begin
-      driver.find_element(selector_type, selector)
-      exists = true
-    rescue
-    end
-    exists
+  def element_exists(css_selector)
+    !find_all_with_jquery(css_selector).empty?
   end
 
   def first_selected_option(select_element)

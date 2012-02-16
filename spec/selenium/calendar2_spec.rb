@@ -141,7 +141,7 @@ describe "calendar2" do
 
           context_course_item.click
           context_course_item.should have_class('not-checked')
-          element_exists(:css, '.fc_event').should be_false
+          element_exists('.fc_event').should be_false
         end
 
         it "should validate calendar feed display" do
@@ -455,7 +455,7 @@ describe "calendar2" do
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
-        element_exists(:css, '.fc-event-bg').should be_true
+        element_exists('.fc-event-bg').should be_true
       end
 
       it "should delete the appointment group from the calendar" do
@@ -468,7 +468,7 @@ describe "calendar2" do
         popup = driver.find_element(:css, '.event-details')
         popup.find_element(:css, '.delete_event_link').click
         delete_appointment_group
-        keep_trying_until { element_exists(:css, '.fc-event-bg').should be_false }
+        keep_trying_until { element_exists('.fc-event-bg').should be_false }
       end
     end
   end
@@ -510,8 +510,8 @@ describe "calendar2" do
 
         driver.find_element(:css, '.fc-event-title').click
         driver.find_element(:id, "popover-0").should be_displayed
-        element_exists(:css, '.edit_event_link').should be_false
-        element_exists(:css, '.delete_event_link').should be_false
+        element_exists('.edit_event_link').should be_false
+        element_exists('.delete_event_link').should be_false
       end
     end
   end
