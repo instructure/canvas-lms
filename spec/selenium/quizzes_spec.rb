@@ -117,11 +117,8 @@ describe "quizzes" do
     hover_and_click(".edit_question_link")
     wait_for_animations
     question = find_with_jquery(".question_form:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="multiple_choice_question"]').click
-    question.find_element(:css, 'input[name="question_name"]').clear
-    question.find_element(:css, 'input[name="question_name"]').send_keys('edited question')
+    click_option('.question_form:visible .question_type', 'Multiple Choice')
+    replace_content(question.find_element(:css, 'input[name="question_name"]'), 'edited question')
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(2)
@@ -135,7 +132,7 @@ describe "quizzes" do
 
     # check that the wiki sidebar shows up
     driver.find_element(:css, '#quiz_options_holder .link_to_content_link').click
-    driver.find_element(:css, '#editor_tabs h4').text.should =~ /Insert Content into the Page/
+    driver.find_element(:css, '#editor_tabs h4').should include_text("Insert Content into the Page")
     driver.find_element(:css, '#quiz_content_links .quiz_options_link').click
 
     driver.find_element(:css, '.question_form').submit
@@ -168,11 +165,6 @@ describe "quizzes" do
     driver.find_element(:css, '.add_question_link').click
   end
 
-  def replace_content(el, value)
-    el.clear
-    el.send_keys(value)
-  end
-
   def set_feedback_content(el, text)
     el.find_element(:css, ".comment_focus").click
     el.find_element(:css, "textarea").should be_displayed
@@ -181,9 +173,7 @@ describe "quizzes" do
 
   def create_multiple_choice_question
     question = find_with_jquery(".question_form:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="multiple_choice_question"]').click
+    click_option('.question_form:visible .question_type', 'Multiple Choice')
 
     type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
 
@@ -206,9 +196,7 @@ describe "quizzes" do
 
   def create_true_false_question
     question = find_with_jquery(".question_form:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="true_false_question"]').click
+    click_option('.question_form:visible .question_type', 'True/False')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
 
@@ -226,9 +214,7 @@ describe "quizzes" do
 
   def create_fill_in_the_blank_question
     question = find_with_jquery(".question_form:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="short_answer_question"]').click
+    click_option('.question_form:visible .question_type', 'Fill In the Blank')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
 
@@ -312,10 +298,8 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="fill_in_multiple_blanks_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Fill In Multiple Blanks')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
 
@@ -363,10 +347,8 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="multiple_answers_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Multiple Answers')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a multiple answer question.'
 
@@ -390,10 +372,8 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="multiple_dropdowns_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Multiple Dropdowns')
 
     type_in_tiny '.question:visible textarea.question_content', 'Roses are [color1], violets are [color2]'
 
@@ -439,10 +419,8 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="matching_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Matching')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
 
@@ -472,7 +450,7 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    click_option('select.question_type', 'Numerical Answer')
+    click_option('.question_form:visible .question_type', 'Numerical Answer')
     type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
 
     quiz_form = driver.find_element(:css, '.question_form')
@@ -498,9 +476,7 @@ describe "quizzes" do
     quiz = Quiz.last
 
     question = find_with_jquery(".question_form:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="calculated_question"]').click
+    click_option('.question_form:visible .question_type', 'Formula Question')
 
     type_in_tiny '.question_form:visible textarea.question_content', 'If [x] + [y] is a whole number, then this is a formula question.'
 
@@ -531,10 +507,8 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="essay_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Essay Question')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is an essay question.'
     question.submit
@@ -551,12 +525,10 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="text_only_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Text (no question)')
 
-    type_in_tiny '.question:visible textarea.question_content', 'This is a text question.'
+    type_in_tiny '.question_form:visible textarea.question_content', 'This is a text question.'
     question.submit
     wait_for_ajax_requests
 
@@ -581,7 +553,7 @@ describe "quizzes" do
     3.times do |i|
       driver.find_element(:id, "question_#{quiz.quiz_questions[i].id}").should be_displayed
     end
-    questions = driver.find_elements(:css, '.question')
+    questions = driver.find_elements(:css, '.display_question')
     questions[0].should have_class("multiple_choice_question")
     questions[1].should have_class("true_false_question")
     questions[2].should have_class("short_answer_question")
@@ -592,10 +564,8 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="text_only_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Text (no question)')
     question.submit
     wait_for_ajax_requests
 
@@ -610,10 +580,8 @@ describe "quizzes" do
     start_quiz_question
     quiz = Quiz.last
 
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="essay_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Essay Question')
     question.submit
     wait_for_ajax_requests
 
@@ -632,9 +600,7 @@ describe "quizzes" do
 
     show_el.should_not be_displayed
 
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="multiple_choice_question"]').click
+    click_option('.question_form:visible .question_type', 'Multiple Choice')
     question.submit
     wait_for_ajax_requests
     quiz.reload
@@ -669,7 +635,7 @@ describe "quizzes" do
     add_quiz_question('3')
     add_quiz_question('4')
 
-    driver.find_element(:css, '.save_quiz_button').click
+    driver.find_element(:id, 'quiz_options_form').submit
     wait_for_ajax_requests
     quiz = Quiz.last
     quiz.reload
@@ -692,16 +658,12 @@ describe "quizzes" do
     dialog.length.should eql(1)
     dialog = dialog.first
 
-    dialog.
-        find_element(:css, 'select.message_types').
-        find_element(:css, 'option[value="0"]').click # Have taken the quiz
+    click_option('.message_types', 'Have taken the quiz')
     students = find_all_with_jquery(".student_list > .student:visible")
 
     students.length.should eql(0)
 
-    dialog.
-        find_element(:css, 'select.message_types').
-        find_element(:css, 'option[value="1"]').click # Have NOT taken the quiz
+    click_option('.message_types', 'Have NOT taken the quiz')
     students = find_all_with_jquery(".student_list > .student:visible")
     students.length.should eql(1)
 
@@ -723,10 +685,10 @@ describe "quizzes" do
     harder.question_data[:points_possible] = 15
     harder.save!
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
-    find_questions_link = driver.find_element(:link, "Find Questions")
+    find_questions_link = driver.find_element(:css, '.find_question_link')
     keep_trying_until {
       find_questions_link.click
-      driver.find_element(:link, "Select All")
+      driver.find_element(:css, ".select_all_link")
     }.click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
@@ -746,19 +708,19 @@ describe "quizzes" do
       driver.find_element(:css, '.find_question_link').click
       driver.find_element(:id, 'find_question_dialog').should be_displayed
       wait_for_ajaximations
-      driver.find_element(:link, "Select All").should be_displayed
+      driver.find_element(:css, ".select_all_link").should be_displayed
     }
-    driver.find_element(:link, "Select All").click
+    driver.find_element(:css, ".select_all_link").click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
 
-    driver.find_element(:link, "New Question Group").click
-    driver.find_element(:link, "Link to a Question Bank").click
+    driver.find_element(:css, ".add_question_group_link").click
+    driver.find_element(:css, '.find_bank_link').click
     keep_trying_until {
       find_with_jquery("#find_bank_dialog .bank:visible")
     }.click
-    find_with_jquery("#find_bank_dialog .submit_button").click
-    find_with_jquery("#group_top_new button[type=submit]").click
+    driver.find_element(:css, "#find_bank_dialog .submit_button").click
+    driver.find_element(:css, ".quiz_group_form").submit
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
@@ -777,19 +739,19 @@ describe "quizzes" do
       driver.find_element(:css, '.find_question_link').click
       driver.find_element(:id, 'find_question_dialog').should be_displayed
       wait_for_ajaximations
-      driver.find_element(:link, "Select All").should be_displayed
+      driver.find_element(:css, ".select_all_link").should be_displayed
     }
-    driver.find_element(:link, "Select All").click
+    driver.find_element(:css, ".select_all_link").click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
 
-    driver.find_element(:link, "New Question Group").click
-    driver.find_element(:link, "Link to a Question Bank").click
+    driver.find_element(:css, ".add_question_group_link").click
+    driver.find_element(:css, ".find_bank_link").click
     keep_trying_until {
       find_with_jquery("#find_bank_dialog .bank:visible")
     }.click
-    find_with_jquery("#find_bank_dialog .submit_button").click
-    find_with_jquery("#group_top_new button[type=submit]").click
+    driver.find_element(:css, "#find_bank_dialog .submit_button").click
+    driver.find_element(:css, ".quiz_group_form").submit
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
@@ -812,7 +774,7 @@ describe "quizzes" do
       driver.find_element(:css, '.find_question_link').click
       driver.find_element(:id, 'find_question_dialog').should be_displayed
       wait_for_ajaximations
-      driver.find_element(:link, "Select All").should be_displayed
+      driver.find_element(:css, ".select_all_link").should be_displayed
     }
     find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
 
@@ -821,7 +783,7 @@ describe "quizzes" do
       driver.find_element(:css, '.add_question_group_link').click
       driver.find_element(:css, '.find_bank_link').should be_displayed
     }
-    driver.find_element(:link, "Link to a Question Bank").click
+    driver.find_element(:css, ".find_bank_link").click
     wait_for_ajaximations
     find_all_with_jquery("#find_bank_dialog .bank:visible").size.should eql 1
   end
@@ -847,8 +809,7 @@ describe "quizzes" do
     driver.find_element(:css, '.add_question_group_link').click
     group_form = driver.find_element(:css, '#group_top_new .quiz_group_form')
     group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
-    group_form.find_element(:name, 'quiz_group[question_points]').clear
-    group_form.find_element(:name, 'quiz_group[question_points]').send_keys('2')
+    replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
     group_form.submit
     driver.find_element(:css, '#questions .group_top .group_display.name').should include_text('new group')
   end
@@ -862,8 +823,7 @@ describe "quizzes" do
     driver.find_element(:css, '.add_question_group_link').click
     group_form = driver.find_element(:css, '#questions .quiz_group_form')
     group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
-    group_form.find_element(:name, 'quiz_group[question_points]').clear
-    group_form.find_element(:name, 'quiz_group[question_points]').send_keys('3')
+    replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
     group_form.submit
     group_form.find_element(:css, '.group_display.name').should include_text('new group')
 
@@ -927,8 +887,8 @@ describe "quizzes" do
     bank.assessment_questions << a
     bank.assessment_questions << b
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
-    quest1 = q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
-    quest2 = q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+    q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
 
     q.generate_quiz_data
     q.save!
@@ -962,10 +922,8 @@ describe "quizzes" do
   it "should round numeric questions the same when created and taking a quiz" do
     skip_if_ie('Out of memory')
     start_quiz_question
-    question = find_with_jquery(".question:visible")
-    question.
-        find_element(:css, 'select.question_type').
-        find_element(:css, 'option[value="numerical_question"]').click
+    question = find_with_jquery(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Numerical Answer')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
 
@@ -1020,9 +978,12 @@ describe "quizzes" do
 
     after do
       #This step is to prevent selenium from freezing when the dialog appears when leaving the page
-      driver.find_element(:link, 'Quizzes').click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
+      keep_trying_until do
+        driver.find_element(:css, '#left-side .quizzes').click
+        confirm_dialog = driver.switch_to.alert
+        confirm_dialog.accept
+        true
+      end
     end
 
     # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
@@ -1052,7 +1013,6 @@ describe "quizzes" do
       is_prevented = driver.execute_script('return window.mousewheelprevented')
       is_prevented.should be_true
     end
-
   end
 
   it "should display quiz statistics" do
