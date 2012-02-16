@@ -349,7 +349,10 @@ describe "calendar2" do
         replace_content(start_time, '11111')
         replace_content(end_time, '11111')
         title.click
-        edit_form.find_element(:css, '.start_time').should have_class('error')
+        keep_trying_until do
+          start_time.should have_class('error')
+          end_time.should have_class('error')
+        end
         driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
         driver.switch_to.alert.dismiss
         edit_form.should be_displayed
