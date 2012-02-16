@@ -183,12 +183,11 @@ describe "context_modules" do
       end
     end
 
-    it "should edit a module item" do
+    it "should edit a module item and validate the changes stick" do
       item_edit_text = "Assignment Edit 1"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       tag = ContentTag.last
-      context_module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
-      driver.action.move_to(context_module_item).perform
+      driver.execute_script("$('#context_module_item_#{tag.id}').addClass('context_module_item_hover')")
       module_item.find_element(:css, '.edit_item_link').click
       edit_form = driver.find_element(:id, 'edit_item_form')
       replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
@@ -196,6 +195,12 @@ describe "context_modules" do
       wait_for_ajaximations
       module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(item_edit_text)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      driver.find_element(:css, 'h2.title').text.should == item_edit_text
+
+      expect_new_page_load { driver.find_element(:css, '.modules').click }
+      driver.find_element(:css, "#context_module_item_#{tag.id} .title").text.should == item_edit_text
     end
 
     it "should add an assignment to a module" do
