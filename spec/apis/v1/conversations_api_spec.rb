@@ -382,8 +382,8 @@ describe ConversationsController, :type => :integration do
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
                 { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test" })
-        json.size.should eql 1
-        json[0]["id"].should eql @me.conversations.first.conversation_id
+        json.size.should eql 3
+        json.map{ |c| c['id'] }.sort.should eql @me.all_conversations.map(&:conversation_id).sort
 
         @me.all_conversations.size.should eql(3)
         @me.conversations.size.should eql(1) # just the initial conversation with bob is visible to @me

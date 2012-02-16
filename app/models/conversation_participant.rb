@@ -46,8 +46,8 @@ class ConversationParticipant < ActiveRecord::Base
   validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
-    latest = options[:last_message] || messages.human.first
-    latest_authored = options[:last_authored_message] || messages.human.by_user(user_id).first
+    latest = options[:last_message] || last_message_at && messages.human.first
+    latest_authored = options[:last_authored_message] || visible_last_authored_at && messages.human.by_user(user_id).first
     options[:include_context_info] ||= private?
     {
       :id => conversation_id,

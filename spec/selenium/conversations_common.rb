@@ -123,6 +123,7 @@ shared_examples_for "conversations selenium tests" do
     opts[:message] ||= "Test Message"
     opts[:attachments] ||= []
     opts[:add_recipient] = true unless opts.has_key?(:add_recipient)
+    opts[:group_conversation] = true unless opts.has_key?(:group_conversation)
 
     if opts[:add_recipient] && browser = find_with_jquery("#create_message_form .browser:visible")
       browser.click
@@ -155,22 +156,18 @@ shared_examples_for "conversations selenium tests" do
     end
 
     group_conversation_link = driver.find_element(:id, "group_conversation")
-    group_conversation_link.click if group_conversation_link.displayed?
+    group_conversation_link.click if group_conversation_link.displayed? && opts[:group_conversation]
 
     expect {
       driver.find_element(:id, "create_message_form").submit
       wait_for_ajaximations
-    }.to change(ConversationMessage, :count).by(1)
-    message = ConversationMessage.last
+    }.to change(ConversationMessage, :count).by(opts[:group_conversation] ? 1 : find_all_with_jquery('.token_input li').size)
 
-    # explicitly click on that conversation so it show's up,
-    # this is to compensate for a bug where creating a new message
-    # does not automatically show this conversation
-    driver.find_element(:id, "conversation_#{message.conversation_id}").click
-    wait_for_ajaximations
-
-    driver.find_element(:id, "message_#{message.id}").should_not be_nil
-    message
+    if opts[:group_conversation]
+      message = ConversationMessage.last
+      driver.find_element(:id, "message_#{message.id}").should_not be_nil
+      message
+    end
   end
 
   def get_messages

@@ -82,6 +82,36 @@ describe "conversations" do
     end
   end
 
+  context "private messages" do
+    before do
+      @course.update_attribute(:name, "the course")
+      @course1 = @course
+      @s1 = User.create(:name => "student1")
+      @s2 = User.create(:name => "student2")
+      @course1.enroll_user(@s1)
+      @course1.enroll_user(@s2)
+
+      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(*100.times.to_a.reverse.map{ |h| Time.now.utc - h.hours })
+
+      @c1 = conversation(@user, @s1)
+      @c1.add_message('yay i sent this')
+    end
+
+    it "should select the new conversation" do
+      new_conversation
+      add_recipient("student2")
+
+      submit_message_form(:message => "ohai", :add_recipient => false).should_not be_nil
+    end
+
+    it "should select the existing conversation" do
+      new_conversation
+      add_recipient("student1")
+
+      submit_message_form(:message => "ohai", :add_recipient => false).should_not be_nil
+    end
+  end
+
   context "batch messages" do
     it "shouldn't show anything in conversation list when sending batch messages to new recipients" do
       @course.default_section.update_attribute(:name, "the section")

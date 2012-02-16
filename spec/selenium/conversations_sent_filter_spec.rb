@@ -50,4 +50,22 @@ describe "conversations sent filter" do
 
     delete_selected_messages
   end
+
+  it "should show/update all conversations when sending a bulk private message" do
+    @s3 = User.create(:name => "student3")
+    @course1.enroll_user(@s3)
+
+    new_conversation(false)
+    add_recipient("student1")
+    add_recipient("student2")
+    add_recipient("student3")
+
+    submit_message_form(:message => "ohai guys", :add_recipient => false, :group_conversation => false)
+
+    conversations = find_all_with_jquery("#conversations > ul > li:visible")
+    conversations.size.should eql 3
+    conversations.each do |conversation|
+      conversation.text.should match(/ohai guys/)
+    end
+  end
 end

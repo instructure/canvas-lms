@@ -305,25 +305,22 @@ describe Conversation do
       convo.reload.archived?.should be_true
     end
 
-    it "should not set last_message_at or visible_last_authored_at for the sender if the conversation is deleted and update_for_sender=false" do
+    it "should not set last_message_at for the sender if the conversation is deleted and update_for_sender=false" do
       sender = user
       rconvo = Conversation.initiate([sender.id, user.id], true)
       message = rconvo.add_message(sender, 'test')
       convo = sender.conversations.first
       convo.last_message_at.should_not be_nil
-      convo.visible_last_authored_at.should_not be_nil
 
       convo.remove_messages([message])
       convo.last_message_at.should be_nil
-      convo.visible_last_authored_at.should be_nil
 
       convo.add_message('bulk message', :update_for_sender => false)
       convo.reload
       convo.last_message_at.should be_nil
-      convo.visible_last_authored_at.should be_nil
     end
 
-    it "should set last_authored_at on deleted conversations even if update_for_sender=false" do
+    it "should set last_authored_at and visible_last_authored_at on deleted conversations even if update_for_sender=false" do
       expected_times = [Time.now.utc - 1.hours, Time.now.utc].map{ |t| Time.parse(t.to_s) }
       ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).twice.returns(*expected_times)
 
@@ -332,13 +329,16 @@ describe Conversation do
       message = rconvo.add_message(sender, 'test')
       convo = sender.conversations.first
       convo.last_authored_at.should eql expected_times.first
+      convo.visible_last_authored_at.should eql expected_times.first
 
       convo.remove_messages([message])
       convo.last_authored_at.should eql expected_times.first
+      convo.visible_last_authored_at.should be_nil
 
       convo.add_message('bulk message', :update_for_sender => false)
       convo.reload
       convo.last_authored_at.should eql expected_times.last
+      convo.visible_last_authored_at.should eql expected_times.last
     end
 
     it "should deliver the message to unsubscribed participants but not alert them" do

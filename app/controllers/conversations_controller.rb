@@ -104,7 +104,7 @@ class ConversationsController < ApplicationController
       when 'sent'
         @view_name = I18n.t('index.inbox_views.sent', 'Sent')
         @no_messages = I18n.t('no_sent_messages', 'You have no sent messages')
-        @current_user.conversations(false).default.sent
+        @current_user.all_conversations.default.sent
       when 'archived'
         @view_name = I18n.t('index.inbox_views.archived', 'Archived')
         @no_messages = I18n.t('no_archived_messages', 'You have no archived messages')
@@ -165,7 +165,7 @@ class ConversationsController < ApplicationController
         @conversation
       end
       if batch_private_messages
-        render :json => conversations.each(&:reload).select{|c|c.last_message_at}.map{|c|jsonify_conversation(c)}
+        render :json => conversations.each(&:reload).map{|c|jsonify_conversation(c)}
       else
         render :json => [jsonify_conversation(@conversation.reload,
                                              :include_context_info => true,
@@ -812,7 +812,9 @@ class ConversationsController < ApplicationController
   end
 
   def get_conversation(allow_deleted = false)
-    @conversation = (allow_deleted ? @current_user.all_conversations : @current_user.conversations).find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
+    scope = @current_user.all_conversations
+    scope = scope.scoped(:conditions => "message_count > 0") unless allow_deleted
+    @conversation = scope.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
     raise ActiveRecord::RecordNotFound unless @conversation
   end
 

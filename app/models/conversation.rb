@@ -298,7 +298,7 @@ class Conversation < ActiveRecord::Base
     updates = [
       maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL"]),
       maybe_update_timestamp('last_authored_at', message.created_at, ["user_id = ?", message.author_id]),
-      maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?" + (update_for_skips ? "" : " AND last_message_at IS NOT NULL"), message.author_id])
+      maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
     ]
     conversation_participants.update_all(updates.join(", "), ["user_id IN (?)", skip_ids])
     return if options[:skip_attachments_and_media_comments]
