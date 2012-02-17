@@ -360,7 +360,7 @@ class QuizSubmission < ActiveRecord::Base
     if self.quiz && self.user
       if self.score
         self.quiz.context_module_action(self.user, :scored, self.kept_score)
-      elsif self.submitted_at
+      elsif self.finished_at
         self.quiz.context_module_action(self.user, :submitted)
       end
     end
@@ -416,15 +416,14 @@ class QuizSubmission < ActiveRecord::Base
     self.submission_data = res
 
     update_submission_version(version)
-    if version == versions.current
+    if version.model.attempt == self.attempt
       self.with_versioning(false) do |s|
         s.save
       end
     elsif (self.quiz && self.quiz.scoring_policy == 'keep_highest' && self.score > self.kept_score)
-      # Force a save on the latest version so kept_score gets updated correctly
-      old_state = self.workflow_state
+      score = self.score
       self.reload
-      self.workflow_state = old_state
+      self.kept_score = score
       self.without_versioning(&:save)
     end
     self.context_module_action

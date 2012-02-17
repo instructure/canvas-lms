@@ -48,15 +48,40 @@ describe QuizSubmission do
     course_with_student(:active_all => true)
     @quiz = @course.quizzes.create!
     qs = @quiz.generate_submission(@user)
-    qs.workflow_state = 'complete'
-    qs.submission_data = [{ :points => 0, :text => "", :correct => "undefined", :question_id => -1 }]
-    qs.with_versioning(true, &:save)
+    qs.submission_data = { "foo" => "bar1" }
+    qs.grade_submission
 
     qs = @quiz.generate_submission(@user)
-    qs.submission_data = { "foo" => "bar" } # simulate k/v pairs we store for quizzes in progress
-    qs.save
+    qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
+    qs.reload.attempt.should == 2
     lambda {qs.update_scores}.should raise_error
     lambda {qs.update_scores(:submission_version_number => 1) }.should_not raise_error
+
+    qs.reload
+    qs.should be_untaken
+    qs.score.should be_nil
+  end
+
+  it "should keep kept_score up-to-date when score changes while quiz is being re-taken" do
+    course_with_student(:active_all => true)
+    @quiz = @course.quizzes.create!(:scoring_policy => 'keep_highest')
+    qs = @quiz.generate_submission(@user)
+    qs.submission_data = { "foo" => "bar1" }
+    qs.grade_submission
+    qs.kept_score.should == 0
+
+    qs = @quiz.generate_submission(@user)
+    qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
+    qs.reload
+
+    qs.update_scores(:submission_version_number => 1, :fudge_points => 3)
+    qs.reload
+
+    qs.should be_untaken
+    # score is nil because the current attempt is still in progress
+    # but kept_score is 3 because that's the higher score of the previous attempt
+    qs.score.should be_nil
+    qs.kept_score.should == 3
   end
 
   it "should not allowed grading on an already-graded submission" do
