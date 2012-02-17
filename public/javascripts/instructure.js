@@ -37,6 +37,7 @@ define([
   'jquery.loadingImg' /* loadingImage */,
   'jquery.rails_flash_notifications' /* flashMessage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'compiled/jquery/fixDialogButtons',
   'media_comments' /* mediaComment, mediaCommentThumbnail */,
   'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
@@ -339,6 +340,7 @@ define([
             autoOpen: false,
             modal: true
           }, $(link).data('dialogOpts')));
+          $dialog.fixDialogButtons();
         }
 
         $dialog.dialog('open');
