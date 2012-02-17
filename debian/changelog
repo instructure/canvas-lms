@@ -1,3 +1,19 @@
+canvas-lms (2012.02.17.14.59) testing; urgency=low
+
+  * Package ref: b22bae1ceec7e14af03b117ea795ed8fa12dc70e
+  *
+  * [+038355d] prevent duplicate messages for submissions, fixes #7221
+  * [+eb11fc1] refine conversation creation for group submissions, fixes #7212
+  * [+ae37522] fix for zero-point pass/fail assignments
+  * [+124107e] send notifications for discussion comments; fixes #6953
+  * [+04ea1d5] ensure context tags are shared by 2+ participants, fixes #7231
+  * [+c6eef31] do data migrations outside of a transaction
+  * [+7a7e91e] fix assigning of assignment group when no active groups exist
+  * [+25c6cdc] pre-amd hotfix for #7188
+  * [+b22bae1] ensure bulk private messages appear under sent filter, fixes #7298, #5370
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 17 Feb 2012 14:59:44 -0700
+
 canvas-lms (2012.02.13.13.30) testing; urgency=low
 
   * Package ref: 8cbb8470fd31ee7d1b2dffe3e18e2934280111d0
