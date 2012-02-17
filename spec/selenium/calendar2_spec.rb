@@ -343,15 +343,12 @@ describe "calendar2" do
         click_scheduler_link
         driver.find_element(:css, '.create_link').click
         edit_form = driver.find_element(:id, 'edit_appointment_form')
-        start_time = edit_form.find_element(:css, '.start_time')
-        end_time = edit_form.find_element(:css, '.end_time')
-        title = find_with_jquery('input[name="title"]')
-        replace_content(start_time, '11111')
-        replace_content(end_time, '11111')
-        title.click
+        replace_content(edit_form.find_element(:css, '.start_time'), '11111')
+        replace_content(edit_form.find_element(:css, '.end_time'), '11111')
         keep_trying_until do
-          start_time.should have_class('error')
-          end_time.should have_class('error')
+          driver.find_element(:css, 'input[name="location"]').click
+          driver.find_element(:css, '.start_time').should have_class('error')
+          driver.find_element(:css, '.end_time').should have_class('error')
         end
         driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
         driver.switch_to.alert.dismiss
