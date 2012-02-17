@@ -24,6 +24,7 @@ define [
   'jqueryui/position'
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
+  'compiled/jquery/fixDialogButtons'
 ], (I18n, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate) ->
 
   class Gradebook
