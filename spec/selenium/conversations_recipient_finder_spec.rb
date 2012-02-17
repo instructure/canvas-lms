@@ -50,6 +50,29 @@ describe "conversations recipient finder" do
     browse("the group") { menu.should eql ["Select All", "nobody@example.com", "student 1"] }
   end
 
+  it "should return recently concluded courses" do
+    @course.complete!
+
+    browse_menu
+    menu.should eql ["the course", "the group"]
+
+    search("course") do
+      menu.should eql ["the course"]
+    end
+  end
+
+  it "should not return courses concluded a long time ago" do
+    @course.complete!
+    @course.update_attribute :conclude_at, 1.year.ago
+
+    browse_menu
+    menu.should eql ["the group"]
+
+    search("course") do
+      menu.should eql ["No results found"]
+    end
+  end
+
   it "should check already-added tokens when browsing" do
     browse_menu
 
@@ -128,7 +151,7 @@ describe "conversations recipient finder" do
 
   it "should allow searching" do
     search("t") do
-      menu.should eql ["the course", "the group", "the other section", "student 1", "student 2"]
+      menu.should eql ["the course", "the other section", "the section", "student 1", "student 2"]
     end
   end
 
@@ -153,7 +176,7 @@ describe "conversations recipient finder" do
   it "should allow searching under supported contexts" do
     browse_menu
     browse "the course" do
-      search("t") { menu.should eql ["the group", "the other section", "the section", "student 1", "student 2"] }
+      search("t") { menu.should eql ["the other section", "the section", "the group", "student 1", "student 2"] }
       browse "Everyone" do
         # only returns users
         search("T") { menu.should eql ["student 1", "student 2"] }

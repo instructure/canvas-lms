@@ -544,14 +544,13 @@ class ConversationsController < ApplicationController
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
       rank_results = params[:search].present?
-      contexts = types[:context] ? matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :types => types[:context])) : []
+      contexts = types[:context] ? matching_contexts(options.merge(:rank_results => rank_results, :include_inactive => params[:include_inactive], :exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :types => types[:context])) : []
       participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))) : []
       if max_results
-        has_next_page = participants.size + contexts.size > max_results
-        contexts = contexts[0, max_results]
-        participants = participants[0, max_results].sort_by{ |u| u[:name].downcase } # can't sort until we lop off the extra one at the end
         if types[:user] ^ types[:context]
           recipients = contexts + participants
+          has_next_page = recipients.size > max_results
+          recipients = recipients[0, max_results]
           recipients.instance_eval <<-CODE
             def paginate(*args); self; end
             def next_page; #{has_next_page ? page + 1 : 'nil'}; end
@@ -685,7 +684,7 @@ class ConversationsController < ApplicationController
         :name => course.name,
         :type => :course,
         :term => term_for_course.call(course),
-        :active => course.recently_ended?,
+        :state => course.recently_ended? ? :recently_active : :inactive,
         :can_add_notes => can_add_notes_to?(course)
       }
     end
@@ -697,7 +696,7 @@ class ConversationsController < ApplicationController
         :name => course.name,
         :type => :course,
         :term => term_for_course.call(course),
-        :active => true,
+        :state => :active,
         :can_add_notes => can_add_notes_to?(course)
       }
     end
@@ -709,7 +708,7 @@ class ConversationsController < ApplicationController
         :name => section.name,
         :type => :section,
         :term => @contexts[:courses][section.course_id][:term],
-        :active => @contexts[:courses][section.course_id][:active],
+        :state => @contexts[:courses][section.course_id][:state],
         :parent => {:course => section.course_id},
         :context_name =>  @contexts[:courses][section.course_id][:name]
       }
@@ -720,11 +719,23 @@ class ConversationsController < ApplicationController
         :id => group.id,
         :name => group.name,
         :type => :group,
-        :active => group.active?,
+        :state => group.active? ? :active : :inactive,
         :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
         :context_name => group.context.name
       }
     end
+  end
+
+  def messageable_context_states
+    {:active => true, :recently_active => true, :inactive => false}
+  end
+
+  def context_state_ranks
+    {:active => 0, :recently_active => 1, :inactive => 2}
+  end
+
+  def context_type_ranks
+    {:course => 0, :section => 1, :group => 2}
   end
 
   def can_add_notes_to?(course)
@@ -753,7 +764,7 @@ class ConversationsController < ApplicationController
                  @contexts.values_at(*options[:types].map{|t|t.to_s.pluralize.to_sym}).compact.map(&:values).flatten
                end
     elsif options[:synthetic_contexts]
-      if context_name =~ /\Acourse_(\d+)(_(groups|sections))?\z/ && (course = @contexts[:courses][$1.to_i]) && course[:active]
+      if context_name =~ /\Acourse_(\d+)(_(groups|sections))?\z/ && (course = @contexts[:courses][$1.to_i]) && messageable_context_states[course[:state]]
         course = Course.find_by_id(course[:id])
         sections = @contexts[:sections].values.select{ |section| section[:parent] == {:course => course.id} }
         groups = @contexts[:groups].values.select{ |group| group[:parent] == {:course => course.id} }
@@ -774,7 +785,7 @@ class ConversationsController < ApplicationController
             @skip_users = true # ditto
             result = sections
         end
-      elsif context_name =~ /\Asection_(\d+)\z/ && (section = @contexts[:sections][$1.to_i]) && section[:active]
+      elsif context_name =~ /\Asection_(\d+)\z/ && (section = @contexts[:sections][$1.to_i]) && messageable_context_states[section[:state]]
         if terms.present? # we'll just search the users
           result = []
         else
@@ -784,9 +795,19 @@ class ConversationsController < ApplicationController
       end
     end
 
-    result = result.sort_by{ |context| context[:name] }.
-    select{ |context| context[:active] }.
-    map{ |context|
+    result = if options[:rank_results]
+      result.sort_by{ |context|
+        [
+          context_state_ranks[context[:state]],
+          context_type_ranks[context[:type]],
+          context[:name].downcase
+        ]
+      }
+    else
+      result.sort_by{ |context| context[:name].downcase }
+    end
+    result = result.reject{ |context| context[:state] == :inactive } unless options[:include_inactive]
+    result = result.map{ |context|
       ret = {
         :id => "#{context[:type]}_#{context[:id]}",
         :name => context[:name],
