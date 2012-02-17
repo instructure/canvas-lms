@@ -358,16 +358,11 @@ describe "calendar2" do
         click_scheduler_link
         driver.find_element(:css, '.create_link').click
         edit_form = driver.find_element(:id, 'edit_appointment_form')
-        replace_content(edit_form.find_element(:css, '.start_time'), '11111')
-        replace_content(edit_form.find_element(:css, '.end_time'), '11111')
-        keep_trying_until do
-          driver.find_element(:css, 'input[name="location"]').click
-          driver.find_element(:css, '.start_time').should have_class('error')
-          driver.find_element(:css, '.end_time').should have_class('error')
-        end
+        ['start', 'end'].each { |field| set_value(edit_form.find_element(:css, ".#{field}_time"), '11111') }
         driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
         driver.switch_to.alert.dismiss
         edit_form.should be_displayed
+        ['start', 'end'].each { |field| edit_form.find_element(:css, ".#{field}_time").should have_class('error') }
       end
 
       it "should delete an appointment group" do
