@@ -58,7 +58,6 @@
     { name: "compiled/bundles/gradebook_uploads", exclude: ['common'] },
     { name: "compiled/bundles/gradebooks", exclude: ['common'] },
     { name: "compiled/bundles/grading_standards", exclude: ['common'] },
-    { name: "compiled/bundles/graphael", exclude: ['common'] },
     { name: "compiled/bundles/groups", exclude: ['common'] },
     { name: "compiled/bundles/jobs", exclude: ['common'] },
     { name: "compiled/bundles/jquery_ui_menu", exclude: ['common'] },
