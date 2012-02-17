@@ -1284,26 +1284,17 @@ I18n.scoped 'conversations', (I18n) ->
       beforeSubmit: ->
         $(this).loadingImage()
       success: (data) ->
+        data = [data] unless data.length?
         $(this).loadingImage 'remove'
-        if data.length == 0
-          # this is the case if a bulk message is sent to recipients the sender
-          # has no conversations with
-          $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
-        else if data.length > 1 # e.g. we just sent bulk private messages
-          for conversation in data
-            $conversation = $('#conversation_' + conversation.id)
-            update_conversation($conversation, conversation, 'immediate') if $conversation.length
-          $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
-        else
-          conversation = data[0] ? data
+        for conversation in data
           $conversation = $('#conversation_' + conversation.id)
           if $conversation.length
             build_message(conversation.messages[0]).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
             update_conversation($conversation, conversation)
-          else
+          else if conversation[last_message_at_key()]
             add_conversation(conversation)
-            set_hash '#/conversations/' + conversation.id
-          $.flashMessage(I18n.t('message_sent', 'Message Sent'))
+          set_hash '#/conversations/' + conversation.id if data.length == 1
+        $.flashMessage(if data.length > 1 then I18n.t('messages_sent', 'Messages Sent') else I18n.t('message_sent', 'Message Sent'))
         reset_message_form()
       error: (data) ->
         $form.find('.token_input').errorBox(I18n.t('recipient_error', 'The course or group you have selected has no valid recipients'))
