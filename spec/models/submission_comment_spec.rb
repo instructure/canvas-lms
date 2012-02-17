@@ -323,8 +323,8 @@ This text has a http://www.google.com link in it...
 
       it "should not change the message preview/timestamp if the deleted message was by a non-participant" do
         SubmissionComment.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.now.utc, Time.now.utc + 1.hour)
-        c1 = @submission1.add_comment(:author => @student1, :comment => "hello").reload
-        c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!")
+        c1 = @submission1.add_comment(:author => @student1, :comment => "hello")
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!").reload
         c3 = @submission1.add_comment(:author => user, :comment => "ohai im in ur group")
         tc1 = @teacher1.conversations.first
         tc1.last_message_at.should eql c2.created_at
