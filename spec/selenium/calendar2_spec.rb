@@ -434,9 +434,10 @@ describe "calendar2" do
             form.find_elements(:css, 'li input').should_not be_empty
             set_value form.find_element(:css, 'textarea'), 'hello'
             form.submit
-
+            
+            wait_for_ajaximations
             assert_flash_notice_message /Messages Sent/
-            keep_trying_until { !form.displayed? }
+            find_with_jquery('.ui-dialog:visible').should be_nil
           end
         end
 
