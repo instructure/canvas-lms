@@ -37,6 +37,16 @@ describe Assignment do
     @assignment.assignment_group.should_not be_nil
   end
 
+  it "should be associated with a group when the course has no active groups" do
+    course_model
+    @course.require_assignment_group
+    @course.assignment_groups.first.destroy
+    @course.assignment_groups.size.should == 1
+    @course.assignment_groups.active.size.should == 0
+    @assignment = assignment_model(:course => @course)
+    @assignment.assignment_group.should_not be_nil
+  end
+
   it "should touch assignment group on create/save" do
     course
     group = @course.assignment_groups.create!(:name => "Assignments")
@@ -141,7 +151,7 @@ describe Assignment do
     @submission.state.should eql(:graded)
     @submission.should eql(s[0])
     @submission.score.should eql(0.0)
-    @submission.grade.should eql('pass')
+    @submission.grade.should eql('complete')
     @submission.user_id.should eql(@user.id)
 
     @assignment.grade_student(@user, :grade => 'fail')
@@ -151,7 +161,7 @@ describe Assignment do
     @submission.state.should eql(:graded)
     @submission.should eql(s[0])
     @submission.score.should eql(0.0)
-    @submission.grade.should eql('fail')
+    @submission.grade.should eql('incomplete')
     @submission.user_id.should eql(@user.id)
   end
 
@@ -168,7 +178,7 @@ describe Assignment do
     @submission.state.should eql(:graded)
     @submission.should eql(s[0])
     @submission.score.should eql(0.0)
-    @submission.grade.should eql('pass')
+    @submission.grade.should eql('complete')
     @submission.user_id.should eql(@user.id)
 
     @assignment.grade_student(@user, :grade => 'fail')
@@ -178,7 +188,7 @@ describe Assignment do
     @submission.state.should eql(:graded)
     @submission.should eql(s[0])
     @submission.score.should eql(0.0)
-    @submission.grade.should eql('fail')
+    @submission.grade.should eql('incomplete')
     @submission.user_id.should eql(@user.id)
   end
 

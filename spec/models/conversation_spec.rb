@@ -305,25 +305,22 @@ describe Conversation do
       convo.reload.archived?.should be_true
     end
 
-    it "should not set last_message_at or visible_last_authored_at for the sender if the conversation is deleted and update_for_sender=false" do
+    it "should not set last_message_at for the sender if the conversation is deleted and update_for_sender=false" do
       sender = user
       rconvo = Conversation.initiate([sender.id, user.id], true)
       message = rconvo.add_message(sender, 'test')
       convo = sender.conversations.first
       convo.last_message_at.should_not be_nil
-      convo.visible_last_authored_at.should_not be_nil
 
       convo.remove_messages([message])
       convo.last_message_at.should be_nil
-      convo.visible_last_authored_at.should be_nil
 
       convo.add_message('bulk message', :update_for_sender => false)
       convo.reload
       convo.last_message_at.should be_nil
-      convo.visible_last_authored_at.should be_nil
     end
 
-    it "should set last_authored_at on deleted conversations even if update_for_sender=false" do
+    it "should set last_authored_at and visible_last_authored_at on deleted conversations even if update_for_sender=false" do
       expected_times = [Time.now.utc - 1.hours, Time.now.utc].map{ |t| Time.parse(t.to_s) }
       ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).twice.returns(*expected_times)
 
@@ -332,13 +329,16 @@ describe Conversation do
       message = rconvo.add_message(sender, 'test')
       convo = sender.conversations.first
       convo.last_authored_at.should eql expected_times.first
+      convo.visible_last_authored_at.should eql expected_times.first
 
       convo.remove_messages([message])
       convo.last_authored_at.should eql expected_times.first
+      convo.visible_last_authored_at.should be_nil
 
       convo.add_message('bulk message', :update_for_sender => false)
       convo.reload
       convo.last_authored_at.should eql expected_times.last
+      convo.visible_last_authored_at.should eql expected_times.last
     end
 
     it "should deliver the message to unsubscribed participants but not alert them" do
@@ -380,6 +380,7 @@ describe Conversation do
       asset.expects(:conversation_groups).returns([[u1.id, u2.id]])
       asset.expects(:lock!).returns(true)
       asset.expects(:conversation_messages).at_least_once.returns([])
+      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author_id => u1.id, :body => "asdf"})
       Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
       conversation.conversation_messages.size.should eql 1
     end
@@ -412,8 +413,8 @@ describe Conversation do
   context "context tags" do
     context "initial tags" do
       it "should save all valid tags on the conversation" do # NOTE: this will change if/when we allow arbitrary tags
-        u1 = student_in_course.user
-        u2 = student_in_course(:course => @course).user
+        u1 = student_in_course(:active_all => true).user
+        u2 = student_in_course(:active_all => true, :course => @course).user
         conversation = Conversation.initiate([u1.id, u2.id], true)
         conversation.add_message(u1, 'test', :tags => [@course.asset_string, "asdf", "lol"])
         conversation.tags.should eql [@course.asset_string]
@@ -429,6 +430,18 @@ describe Conversation do
         u1.all_conversations.first.tags.should eql []
         u2.all_conversations.first.read_attribute(:tags).should_not be_nil
         u2.all_conversations.first.tags.should eql []
+      end
+
+      it "should ignore explicit context tags not shared by at least two participants" do
+        u1 = student_in_course(:active_all => true).user
+        u2 = student_in_course(:active_all => true, :course => @course).user
+        u3 = user
+        @course1 = @course
+        @course2 = course(:active_all => true)
+        @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
+        conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
+        conversation.add_message(u1, 'test', :tags => [@course1.asset_string, @course2.asset_string])
+        conversation.tags.should eql [@course1.asset_string]
       end
 
       it "should save all visible tags on the conversation_participant" do
@@ -448,9 +461,7 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
         conversation.add_message(u1, 'test')
@@ -465,9 +476,7 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
@@ -478,15 +487,34 @@ describe Conversation do
       end
     end
 
+    context "deletion" do
+      it "should remove tags when all messages are deleted" do
+        u1 = student_in_course(:active_all => true).user
+        u2 = student_in_course(:active_all => true, :course => @course).user
+        conversation = Conversation.initiate([u1.id, u2.id], true)
+        conversation.add_message(u1, 'test')
+        conversation.tags.should eql [@course.asset_string]
+        cp1 = u1.conversations.first
+        cp1.tags.should eql [@course.asset_string]
+        cp2 = u2.conversations.first
+        cp2.tags.should eql [@course.asset_string]
+
+        cp2.remove_messages(:all)
+        cp2.tags.should eql []
+        
+        # no change here
+        cp1.reload.tags.should eql [@course.asset_string]
+        conversation.reload.tags.should eql [@course.asset_string]
+      end
+    end
+
     context "subsequent tags" do
       it "should add new tags to the conversation" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
@@ -501,9 +529,7 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
@@ -522,9 +548,7 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
@@ -549,9 +573,8 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1.id, u2.id], true)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
         cp = u2.conversations.first
@@ -564,18 +587,13 @@ describe Conversation do
       it "should save the previous message tags on the conversation_message_participant if there are no new visible ones" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
-        @course1 = @course
-        @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
         conversation = Conversation.initiate([u1.id, u2.id], true)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', :tags => [@course.asset_string])
         cp = u2.conversations.first
-        cp.messages.human.first.tags.should eql [@course1.asset_string]
+        cp.messages.human.first.tags.should eql [@course.asset_string]
 
         conversation.add_message(u1, 'another', :tags => ["course_0"])
-        cp.messages.human.first.tags.should eql [@course1.asset_string]
+        cp.messages.human.first.tags.should eql [@course.asset_string]
       end
 
       it "should recompute the conversation_participant's tags when removing messages" do
@@ -583,9 +601,8 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1.id, u2.id], true)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
         cp = u2.conversations.first
@@ -619,9 +636,7 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
@@ -640,9 +655,7 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         u4 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1.id, u2.id, u3.id], false)
@@ -667,9 +680,7 @@ describe Conversation do
         @u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
         @course2 = course(:active_all => true)
-        e = @course2.enroll_student(@u2)
-        e.workflow_state = 'active'
-        e.save!
+        @course2.enroll_student(@u2).update_attribute(:workflow_state, 'active')
         @u3 = student_in_course(:active_all => true, :course => @course2).user
         @conversation = Conversation.initiate([@u1.id, @u2.id, @u3.id], false)
         @conversation.add_message(@u1, 'test', :tags => [@course1.asset_string])
@@ -704,6 +715,49 @@ describe Conversation do
         @u1.conversations.first.tags.should eql [@course1.asset_string]
         @u2.conversations.first.tags.should eql [@course1.asset_string]
         broken_one.reload.tags.should eql [] # skipped
+      end
+    end
+
+    context "sanitization" do
+      it "should remove tags not shared by at least two participants" do
+        u1 = student_in_course(:active_all => true).user
+        u2 = student_in_course(:active_all => true, :course => @course).user
+        course1 = @course
+        course2 = course(:active_all => true)
+        course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
+        conversation = Conversation.initiate([u1.id, u2.id], true)
+        conversation.add_message(u1, 'test', :tags => [course1.asset_string])
+        message = conversation.add_message(u1, 'test')
+        # fake up the bad data
+        conversation.update_attribute :tags, [course1.asset_string, course2.asset_string]
+        cp1 = u1.conversations.first
+        cp1.update_attribute :tags, [course1.asset_string, course2.asset_string]
+        cmp1 = cp1.conversation_message_participants.find(:first, :conditions => ["conversation_message_id = ?", message.id])
+        cmp1.update_attribute :tags, [course2.asset_string]
+
+        conversation.sanitize_context_tags!.should_not be_nil
+        
+        conversation.reload.tags.should eql [course1.asset_string]
+        cp1.reload.tags.should eql [course1.asset_string]
+        cmp1.reload.tags.should eql [course1.asset_string]
+      end
+
+      it "should do nothing if the tags are already correct" do
+        u1 = student_in_course(:active_all => true).user
+        u2 = student_in_course(:active_all => true, :course => @course).user
+        course1 = @course
+        course2 = course(:active_all => true)
+        course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
+        conversation = Conversation.initiate([u1.id, u2.id], true)
+        conversation.add_message(u1, 'test', :tags => [course1.asset_string])
+        message = conversation.add_message(u1, 'test')
+        cp1 = u1.conversations.first
+        cp2 = u2.conversations.first
+        cp2.remove_messages :all
+
+        conversation.sanitize_context_tags!.should be_nil
+        cp1.reload.tags.should eql [course1.asset_string]
+        cp2.reload.tags.should eql []
       end
     end
   end

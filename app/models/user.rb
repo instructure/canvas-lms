@@ -117,9 +117,9 @@ class User < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 
-  def conversations(order=true)
-    ret = all_conversations.visible # i.e. exclude any where the user has deleted all the messages
-    order ? ret.scoped(:order => "last_message_at DESC, conversation_id DESC") : ret
+  def conversations
+    # i.e. exclude any where the user has deleted all the messages
+    all_conversations.visible.scoped(:order => "last_message_at DESC, conversation_id DESC")
   end
 
   named_scope :of_account, lambda { |account|

@@ -181,7 +181,7 @@ class Conversation < ActiveRecord::Base
       options[:skip_ids]          ||= [current_user.id]
 
       # all specified (or implicit) tags, regardless of visibility to individual participants
-      new_tags = options[:tags]
+      new_tags = options[:tags] ? options[:tags] & current_context_strings(1) : []
       new_tags = current_context_strings if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
       update_attribute :tags, tags | new_tags if new_tags.present?
 
@@ -298,7 +298,7 @@ class Conversation < ActiveRecord::Base
     updates = [
       maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL"]),
       maybe_update_timestamp('last_authored_at', message.created_at, ["user_id = ?", message.author_id]),
-      maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?" + (update_for_skips ? "" : " AND last_message_at IS NOT NULL"), message.author_id])
+      maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
     ]
     conversation_participants.update_all(updates.join(", "), ["user_id IN (?)", skip_ids])
     return if options[:skip_attachments_and_media_comments]
@@ -348,21 +348,46 @@ class Conversation < ActiveRecord::Base
     find_all_by_id(ids).each(&:migrate_context_tags!)
   end
 
+  def sanitize_context_tags!
+    return if tags.empty?
+    allowed_tags = current_context_strings(1)
+    tags_to_remove = tags - allowed_tags
+    return if tags_to_remove.empty?
+    transaction do
+      lock!
+      update_attribute :tags, tags & allowed_tags
+      conversation_participants(:include => :user).tagged(*tags_to_remove).each do |cp|
+        next unless cp.user
+        cp.update_attribute :tags, cp.tags & tags
+        next unless private?
+        cp.conversation_message_participants.tagged(*tags_to_remove).each do |cmp|
+          new_tags = cmp.tags & tags
+          new_tags = cp.tags if new_tags.empty?
+          cmp.update_attribute :tags, new_tags
+        end
+      end
+    end
+  end
+
+  def self.batch_sanitize_context_tags!(ids)
+    find_all_by_id(ids).each(&:sanitize_context_tags!)
+  end
+
   protected
 
   # contexts currently shared by > 50% of participants
   # note that these may not all be relevant for a specific participant, so
   # they should be and-ed with User#conversation_context_codes
   # returns best matches first
-  def current_context_strings
-    return [] if private? && conversation_participants.all.size == 1
+  def current_context_strings(threshold = conversation_participants.all.size / 2)
+    return [] if private? && conversation_participants.size == 1
     conversation_participants.inject([]){ |ary, cp|
       cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
     }.sort.inject({}){ |hash, str|
       hash[str] = (hash[str] || 0) + 1
       hash
     }.select{ |key, value|
-      value > conversation_participants.size / 2
+      value > threshold
     }.sort_by(&:last).map(&:first).reverse
   end
   memoize :current_context_strings
