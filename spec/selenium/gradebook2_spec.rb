@@ -39,7 +39,6 @@ describe "gradebook2" do
     ASSIGNMENT_3_POINTS = "50"
     ATTENDANCE_POINTS = "15"
 
-
     STUDENT_NAME_1 = "Zoey Anteater"
     STUDENT_NAME_2 = "Arnold Zebra"
     STUDENT_SORTABLE_NAME_1 = "Anteater, Zoey"
@@ -157,7 +156,7 @@ describe "gradebook2" do
       @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
       @first_assignment = assignment_model({
         :course => @course,
-        :name => 'first assignment',
+        :name => 'A name that would not reasonably fit in the header cell which should have some limit set',
         :due_at => nil,
         :points_possible => ASSIGNMENT_1_POINTS,
         :submission_types => 'online_text_entry',
@@ -227,13 +226,92 @@ describe "gradebook2" do
         :assignment_group => @group)
     end
 
-    it "should minimize a column and remember it" do
-      pending("draginging and droping these dont actually work in selenium")
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      first_dragger, second_dragger = driver.find_elements(:css, '#gradebook_grid .slick-resizable-handle')
-      driver.action.drag_and_drop(second_dragger, first_dragger).perform
-      # driver.action.drag_and_drop_by(second_dragger, -200, 0).perform
+    describe "assignment column headers" do
+      before do
+        @assignment = @course.assignments.first
+        @header_selector = %([id$="assignment_#{@assignment.id}"])
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+      end
+
+      it "should minimize a column and remember it" do
+        pending("dragging and dropping these dont actually work in selenium")
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        first_dragger, second_dragger = driver.find_elements(:css, '#gradebook_grid .slick-resizable-handle')
+        driver.action.drag_and_drop(second_dragger, first_dragger).perform
+      end
+
+      it "should have a tooltip with the assignment name" do
+        f(@header_selector)["title"].should eql @assignment.title
+      end
+
+      it "should handle a ton of assignments without wrapping the slick-header" do
+        100.times do
+          @course.assignments.create! :title => 'a really long assignment name, o look how long I am this is so cool'
+        end
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        # being 38px high means it did not wrap
+        driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should eql 38
+      end
+
+      it "should validate row sorting works when first column is clicked" do
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        first_column = driver.find_elements(:css, '.slick-column-name')[0]
+        2.times do
+          first_column.click
+        end
+        meta_cells = find_slick_cells(0, driver.find_element(:css, '.grid-canvas'))
+        grade_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
+
+        #filter validation
+        validate_cell_text(meta_cells[0], STUDENT_NAME_2 + "\n" + @other_section.name)
+        validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
+        validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_2_TOTAL_IGNORING_UNGRADED)
+      end
+
+      it "should validate arrange columns by due date option" do
+        expected_text = "-"
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-4'))
+        first_row_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
+        validate_cell_text(first_row_cells[0], expected_text)
+      end
+
+      it "should validate arrange columns by assignment group option" do
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-4'))
+        open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-5'))
+        first_row_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
+        validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
+      end
+
+      it "should validate show attendance columns option" do
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-6'))
+        headers = driver.find_elements(:css, '.slick-header')
+        headers[1].should include_text(@attendance_assignment.title)
+        open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-6'))
+      end
+
+      it "show letter grade in total column" do
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        driver.find_element(:css, '#gradebook_grid [row="0"] .total-cell .letter-grade-points').should include_text("A")
+        edit_grade(driver.find_element(:css, '#gradebook_grid [row="1"] .l2'), '50')
+        wait_for_ajax_requests
+        driver.find_element(:css, '#gradebook_grid [row="1"] .total-cell .letter-grade-points').should include_text("A")
+      end
     end
 
     it "should not show 'not-graded' assignments" do
@@ -241,16 +319,6 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       driver.find_element(:css, '.slick-header-columns').should_not include_text(@ungraded_assignment.title)
-    end
-
-    it "should handle a ton of assignments without wrapping the slick-header" do
-      100.times do
-        @course.assignments.create! :title => 'a really long assignment name, o look how long I am this is so cool'
-      end
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      # being 38px high means it did not wrap
-      driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should eql 38
     end
 
     it "should not show 'not-graded' assignments" do
@@ -300,21 +368,21 @@ describe "gradebook2" do
       dom_names = driver.find_elements(:css, '.student-name').map(&:text)
       dom_names.should == [STUDENT_NAME_1, STUDENT_NAME_2]
     end
-  
+
     it "should not show student avatars until they are enabled" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
       driver.find_elements(:css, '.student-name').length.should == 2
       driver.find_elements(:css, '.avatar img').length.should == 0
-  
+
       @account = Account.default
       @account.enable_service(:avatars)
       @account.save!
       @account.service_enabled?(:avatars).should be_true
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      
+
       driver.find_elements(:css, '.student-name').length.should == 2
       driver.find_elements(:css, '.avatar img').length.should == 2
     end
@@ -443,15 +511,6 @@ describe "gradebook2" do
       sub.score.should == 0.0
     end
 
-    it "show letter grade in total column" do
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      driver.find_element(:css, '#gradebook_grid [row="0"] .total-cell .letter-grade-points').should include_text("A")
-      edit_grade(driver.find_element(:css, '#gradebook_grid [row="1"] .l2'), '50')
-      wait_for_ajax_requests
-      driver.find_element(:css, '#gradebook_grid [row="1"] .total-cell .letter-grade-points').should include_text("A")
-    end
-
     it "should change grades and validate course total is correct" do
       expected_edited_total = "33.3%"
 
@@ -499,54 +558,6 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       open_gradebook_settings
-    end
-
-    it "should validate row sorting works when first column is clicked" do
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
-      first_column = driver.find_elements(:css, '.slick-column-name')[0]
-      2.times do
-        first_column.click
-      end
-      meta_cells = find_slick_cells(0, driver.find_element(:css, '.grid-canvas'))
-      grade_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
-
-      #filter validation
-      validate_cell_text(meta_cells[0], STUDENT_NAME_2 + "\n" + @other_section.name)
-      validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-      validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_2_TOTAL_IGNORING_UNGRADED)
-    end
-
-    it "should validate arrange columns by due date option" do
-      expected_text = "-"
-
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
-      open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-4'))
-      first_row_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
-      validate_cell_text(first_row_cells[0], expected_text)
-    end
-
-    it "should validate arrange columns by assignment group option" do
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
-      open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-4'))
-      open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-5'))
-      first_row_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
-      validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
-    end
-
-    it "should validate show attendance columns option" do
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
-      open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-6'))
-      headers = driver.find_elements(:css, '.slick-header')
-      headers[1].should include_text(@attendance_assignment.title)
-      open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-6'))
     end
 
     it "should validate posting a comment to a graded assignment" do
@@ -664,7 +675,7 @@ describe "gradebook2" do
         # select option
         select = driver.find_element(:css, '#message_assignment_recipients select.message_types')
         select.click
-        select.all(:tag_name => 'option').find {|o| o.text == "Haven't been graded"}.click
+        select.all(:tag_name => 'option').find { |o| o.text == "Haven't been graded" }.click
         find_all_with_jquery('.student_list li:visible').size.should eql 1
       end
     end
@@ -883,4 +894,3 @@ describe "gradebook2" do
     end
   end
 end
-

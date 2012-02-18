@@ -32,7 +32,16 @@ define [
 ], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
-    minimumAssignmentColumWidth = 10
+    columnWidths =
+      assignment:
+        min: 10
+        max: 200
+      assignmentGroup:
+        min: 35
+        max: 200
+      total:
+        min: 85
+        max: 100
 
     constructor: (@options) ->
       @chunk_start = 0
@@ -513,7 +522,9 @@ define [
     initGrid: =>
       #this is used to figure out how wide to make each column
       $widthTester = $('<span style="padding:10px" />').appendTo('#content')
-      testWidth = (text, minWidth) -> Math.max($widthTester.text(text).outerWidth(), minWidth)
+      testWidth = (text, minWidth, maxWidth) ->
+        width = Math.max($widthTester.text(text).outerWidth(), minWidth)
+        Math.min width, maxWidth
 
       # I would like to make this width a little larger, but there's a dependency somewhere else that
       # I can't find and if I change it, the layout gets messed up.
@@ -552,11 +563,11 @@ define [
           editor: outOfFormatter ||
                   SubmissionCell[assignment.grading_type] ||
                   SubmissionCell
-          minWidth: minimumAssignmentColumWidth,
-          maxWidth:200,
-          width: testWidth(assignment.name, minWidth),
+          minWidth: columnWidths.assignment.min,
+          maxWidth: columnWidths.assignment.max,
+          width: testWidth(assignment.name, minWidth, columnWidths.assignment.max),
           sortable: true
-          toolTip: true
+          toolTip: assignment.name
           type: 'assignment'
 
         if fieldName in @assignmentsToHide
@@ -582,10 +593,11 @@ define [
           field: "assignment_group_#{id}"
           formatter: @groupTotalFormatter
           name: html
+          toolTip: group.name
           object: group
-          minWidth: 35,
-          maxWidth:200,
-          width: testWidth(group.name, 35)
+          minWidth: columnWidths.assignmentGroup.min,
+          maxWidth: columnWidths.assignmentGroup.max,
+          width: testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.max)
           cssClass: "meta-cell assignment-group-cell",
           sortable: true
           type: 'assignment_group'
@@ -596,10 +608,10 @@ define [
         field: "total_grade"
         formatter: @groupTotalFormatter
         name: "Total"
-        minWidth: 85,
-        maxWidth: 100,
-        width: testWidth("Total", 85)
-        cssClass: "total-cell",
+        minWidth: columnWidths.total.min
+        maxWidth: columnWidths.total.max
+        width: testWidth("Total", columnWidths.total.min, columnWidths.total.max)
+        cssClass: "total-cell"
         sortable: true
         type: 'total_grade'
 
