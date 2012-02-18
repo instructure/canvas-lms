@@ -7,7 +7,7 @@
 
 <% content_for :right_side do %>
   <h2><%= context_user_name(@context, @user) %></h2>
-  <div class="rs-margin-rl">
+  <div class="rs-margin-rl" id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
       <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
