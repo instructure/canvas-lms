@@ -1,11 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "announcements" do
+
   it_should_behave_like "in-process server selenium tests"
 
   def create_announcement(message = 'announcement message')
     @context = @course
-    announcement_model(:title => 'new announcement', :message => message)
+    @announcement = announcement_model(:title => 'new announcement', :message => message)
   end
 
   def create_announcement_manual(css_checkbox)
@@ -51,7 +52,7 @@ describe "announcements" do
     it "should create an announcement" do
       first_text = 'Hi, this is my first announcement'
 
-      get "/courses/#{@course.id}/announcements"
+      get course_announcements_path(@course)
       create_announcement_manual(nil).submit
       wait_for_ajaximations
       announcement = driver.find_element(:css, '#topic_list .topic')
@@ -64,7 +65,7 @@ describe "announcements" do
       edit_message = 'edited '
 
       create_announcement
-      get "/courses/#{@course.id}/announcements"
+      get course_announcements_path(@course)
       driver.execute_script("$('.communication_message').addClass('communication_message_hover')")
       driver.find_element(:css, '.edit_topic_link').click
       edit_form = driver.find_element(:css, '.add_topic_form_new')
@@ -81,7 +82,7 @@ describe "announcements" do
 
     it "should delete an announcement" do
       create_announcement
-      get "/courses/#{@course.id}/announcements"
+      get course_announcements_path(@course)
       driver.execute_script("$('.communication_message').addClass('communication_message_hover')")
       driver.find_element(:css, '.delete_topic_link').click
       driver.switch_to.alert.should_not be_nil
@@ -90,7 +91,7 @@ describe "announcements" do
     end
 
     it "should create an announcement for grading" do
-      get "/courses/#{@course.id}/announcements"
+      get course_announcements_path(@course)
       add_form = create_announcement_manual('#discussion_topic_assignment_set_assignment')
       replace_content(add_form.find_element(:id, 'discussion_topic_assignment_points_possible'), "25")
       add_form.submit
@@ -99,14 +100,14 @@ describe "announcements" do
     end
 
     it "should crate an announcement with a podcast feed" do
-      get "/courses/#{@course.id}/announcements"
+      get course_announcements_path(@course)
       create_announcement_manual('#discussion_topic_podcast_enabled').submit
       wait_for_ajaximations
       find_with_jquery('img[title="This topic has a podcast feed."]').should be_displayed
     end
 
     it "should create a delayed announcement" do
-      get "/courses/#{@course.id}/announcements"
+      get course_announcements_path(@course)
       add_form = create_announcement_manual('#discussion_topic_delay_posting')
       driver.find_element(:css, '.ui-datepicker-trigger').click
       datepicker_next
@@ -117,9 +118,8 @@ describe "announcements" do
 
     it "should have a teacher add a new entry to its own announcement" do
       create_announcement
-      get "/courses/#{@course.id}/announcements"
+      get [@course, @announcement]
 
-      expect_new_page_load { driver.find_element(:css, '.replies').click }
       driver.find_element(:css, ' #content .add_entry_link').click
       entry_text = 'new entry text'
       type_in_tiny('textarea.entry_content:first', entry_text)
@@ -127,11 +127,11 @@ describe "announcements" do
       wait_for_ajaximations
       driver.find_element(:css, '#entry_list .discussion_entry .content').should include_text(entry_text)
       driver.find_element(:css, '#left-side .announcements').click
-      driver.find_element(:css, '#topic_list .replies').should include_text('1')
+      driver.find_element(:css, '.topic_reply_count').text.should eql('1')
     end
 
     it "should add an external feed to announcements" do
-      get "/courses/#{@course.id}/announcements"
+      get course_announcements_path(@course)
 
       #add external feed to announcements
       feed_name = 'http://www.google.com'

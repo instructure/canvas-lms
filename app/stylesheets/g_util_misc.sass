@@ -9,10 +9,10 @@
   :padding 0
   :height 0px
   :font-size 0px
-  
+
 // Clearing floats without extra markup (from blueprint)
    Based on How To Clear Floats Without Structural Markup by PiE
-   [http://www.positioniseverything.net/easyclearing.html]  
+   [http://www.positioniseverything.net/easyclearing.html]
 .clearfix:after
   content: "\0020"
   display: block
@@ -24,7 +24,7 @@
   display: block
 
 
-.ui-icon-inline 
+.ui-icon-inline
   display: inline
   padding-left: 16px
 
@@ -39,9 +39,60 @@
   :list-style none
   &.wide_spacing
     :line-height 1.7em
-    
 
-// 
+//
+  makes a counter for a new and a total count, like the one used on discussion topics,
+  could also be used for inbox and other places.
+  if the .new-items or .total-items is blank it will just not show up at all so you dont
+  need a conditional to hide/show it
+
+  sample markup:
+
+    <div class="new-and-total-badge">
+      <span class="new-items">3</span>
+      <span class="total-items">10</span>
+    </div>
+
+  you can combine it with tooltips like this:
+
+    <div class="new-and-total-badge">
+      <span class="tooltip new-items">
+        <span class="tooltip_wrap">
+          <span class="tooltip_text">3 new messages</span>
+        </span>
+        3
+      </span>
+      <span class="tooltip total-items">
+        <span class="tooltip_wrap">
+          <span class="tooltip_text">
+            15 messages in this thread
+          </span>
+        </span>
+        15
+      </span>
+    </div>
+
+
+$new-total-padding: 5px
+$new-total-border-radius: 3px
+.new-and-total-badge
+  .new-items, .total-items
+    color: white
+    border-radius: $new-total-border-radius
+    padding: 0 $new-total-padding
+    font-weight: bold
+    font-size: 11px
+    float: left
+    color: white
+  .new-items
+    background-color: $highlight-color
+    margin-right: -$new-total-border-radius
+    padding-right: $new-total-padding + $new-total-border-radius
+  .total-items
+    background-color: $diminutive-color
+
+
+//
   code to make tooltips.
   here is some sample html to use this:
 
@@ -60,7 +111,7 @@
     :outline none
     :text-decoration none
     .tooltip_wrap, .tooltip_text
-      :visibility visible    
+      :visibility visible
   .tooltip_wrap, .tooltip_text
     :display block
     :visibility hidden
@@ -71,7 +122,7 @@
     :position absolute
     +opacity(0.9)
     // ie puts the tooltips too low.
-    .ie & 
+    .ie &
       :bottom 25px
   .tooltip_text
     :background-color #444
@@ -82,8 +133,8 @@
     :padding 2px 7px 2px
     :white-space nowrap
     +border-radius(5px)
-    // font-weight: bold
-    
+    font-weight: normal
+
   .right
     :right 0px
     :background-position right bottom
@@ -114,7 +165,7 @@
   background-position: 0 0px
 .six-checkbox-unchecked
   background-position: 0 -53px
-  
+
 table.zebra-stripes
   tbody
     th, td
@@ -135,9 +186,9 @@ table.zebra-stripes
   overflow: hidden
   &:hover, &:focus
     background-position: -16px -16px
-    
+
 // this allows you to have a block-level element that does not have a defined with be horizontalally centered.
-// usage:    
+// usage:
 //     <div class="centered-block">
 //       <div class="centered-block-wrap">
 //         <div class="centered-block-inner">

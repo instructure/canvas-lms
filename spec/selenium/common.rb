@@ -262,6 +262,9 @@ shared_examples_for "all selenium tests" do
   include SeleniumTestsHelperMethods
   include CustomSeleniumRspecMatchers
 
+  # set up so you can use rails urls helpers in your selenium tests
+  include ActionController::UrlWriter
+
   def selenium_driver; $selenium_driver; end
 
   alias_method :driver, :selenium_driver
@@ -590,9 +593,12 @@ shared_examples_for "all selenium tests" do
     Kaltura::ClientV3.stubs(:new).returns(kal)
   end
 
-  def get(link)
+  # you can pass an array to use the rails polymorphic_path helper, example:
+  # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
+  def get(link, wait_for_dom = true)
+    link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
-    wait_for_dom_ready
+    wait_for_dom_ready if wait_for_dom
   end
 
   def refresh_page
@@ -696,6 +702,7 @@ shared_examples_for "all selenium tests" do
 
   append_before (:all) do
     $selenium_driver ||= setup_selenium
+    default_url_options[:host] = $app_host_and_port
   end
 
   append_before (:all) do
