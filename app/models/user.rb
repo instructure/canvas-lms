@@ -140,9 +140,13 @@ class User < ActiveRecord::Base
   named_scope :include_pseudonym, lambda{
     {:include => :pseudonym }
   }
-  named_scope :for_course_section, lambda{|sections|
+  named_scope :restrict_to_sections, lambda{|sections|
     section_ids = Array(sections).map{|s| s.is_a?(Fixnum) ? s : s.id }
-    {:conditions => "enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section != #{User.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
+    if section_ids.empty?
+      {:conditions => {}}
+    else
+      {:conditions => ["enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section != ? OR enrollments.course_section_id IN (?)", true, section_ids]}
+    end
   }
   named_scope :name_like, lambda { |name|
     { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", User.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }

@@ -494,11 +494,7 @@ class Course < ActiveRecord::Base
 
   def instructors_in_charge_of(user_id)
     section_ids = current_enrollments.find(:all, :select => 'course_section_id, course_id, user_id, limit_privileges_to_course_section', :conditions => {:course_id => self.id, :user_id => user_id}).map(&:course_section_id).compact.uniq
-    if section_ids.empty?
-      participating_instructors
-    else
-      participating_instructors.for_course_section(section_ids)
-    end
+    participating_instructors.restrict_to_sections(section_ids)
   end
 
   def user_is_teacher?(user)
