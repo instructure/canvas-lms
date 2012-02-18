@@ -1,3 +1,77 @@
+canvas-lms (2012.02.18.07.02) stable; urgency=low
+
+  * Package ref: b22bae1ceec7e14af03b117ea795ed8fa12dc70e
+  *
+  * [+c28280c] update documentation for course enrollments list. fixes #6999
+  * [+ead438c] make course copy have lower priority
+  * [+911070b] problem editing imported rubric; fixes #6754
+  * [+74e82ff] Properly add/remove external tool tabs from nav
+  * [+cf47d06] break up xml in selenium external tools spec
+  * [+9112bd3] job ui hold/unhold improvements
+  * [+110ea7c] better ignore pattern for vim swap files
+  * [+775488d] added specs to the announcements selenium file
+  * [+7159762] fixed spec to work with postgres
+  * [+b97f204] variable content-disposition in s3 urls
+  * [+ce63808] be explicit about inline vs. download in safe files redirect
+  * [+1b42bcd] Fix "needs grading" count for assignments
+  * [+4c3602c] updated stats lib to include quartiles method
+  * [+990e490] use parallel_tests-instructure and remove custom loggers
+  * [+4e24561] more selenium file cleanup
+  * [+fe98679] update parallel_tests-instructure to 0.6.18
+  * [+8521d02] add user update api. fixes #6863
+  * [+27f4d24] allow importing of multiple module links to same external tool
+  * [+574a56f] show correct context in "coming up" list fixes #6333
+  * [+ed73654] allow observers to see the observed quiz submissions fixes #6300
+  * [+355dbf9] find relative pathed files when translating links on assessment questions
+  * [+da0858a] changed selenium implicit wait time to 3 from 10
+  * [+1ba6e37] add pseudonym update api. fixes #6866.
+  * [+1d533ef] don't wait on media object processing when importing a course
+  * [+5194271] fix messaging for group assignment submissions. fixes #6178
+  * [+e1d734f] fix for intermittently failing selenium specs
+  * [+9096efc] fixed multiple selenium files to work with postgres
+  * [+a737df9] allow ignoring learning outcomes for grading; fixes #5271
+  * [+f436c8f] add indexes that weren't created because of too-long names
+  * [+51f1d92] allow overriding periodic jobs schedules
+  * [+6dd5a15] don't fail restarting delayed jobs if the pid file is orphaned
+  * [+d2891cf] add Attachment#root_account_id
+  * [+99b3da3] more general (and slightly faster) fast distinct for postgres
+  * [+bbbbf18] fix spec timing issues, ensure consistent ordering of comments
+  * [+f61312f] update account associations when deleting an enrollment
+  * [+5f63a17] address race condition cancelling similar messages fixes #6366
+  * [+c442687] can add images from flickr to questions in a bank
+  * [+b4d15a8] remove limit on custom course list fixes #6904
+  * [+47ece9b] date-sensitize enrollment state predicates and completed_at
+  * [+dc4555f] added bug numbers to all relevant pending selenium specs
+  * [+b48f662] update qti specs for changes in qti migration tool
+  * [+c7969a2] allow requested_authn_context to be configured on saml auth
+  * [+4540b03] upgrading selenium webdriver to version 2.18
+  * [+4d32ee0] fix courses selenium spec that is occasionally failing
+  * [+39fe4a4] fix a couple i18n pluralization issues
+  * [+e28b126] fixes "close for comments" button in discussions past due
+  * [+09a0c3a] gradebook2: sort users by last name  (fixes #7022)
+  * [+e848087] show student count for unpublished courses
+  * [+c483ed3] temporarily remove the account statistics_page_views page
+  * [+a411f71] add the wiziq web conference plugin
+  * [+0d5f659] fix cutycapt save png fixes #6544
+  * [+fe7f845] fix intermittently failing selenium courses_spec
+  * [+28958a1] Show term name by course in conversations dropdowns
+  * [+767451b] ignore non-kaltura media comments when exporting html
+  * [+c2264b1] fix uppercase latex command buttons, fixes #4929
+  * [+7486c0e] fix site admin pseudonym creation with passwords fixes #5231
+  * [+e5d6349] temporary and deleted users have no account associations
+  * [+bbaaf51] remove the unique constraint for a skipped index
+  * [+5f531eb] sent filter for conversations, fixes #7012
+  * [+c3e057e] smarter sorting in recipient finder, fixes #7044
+  * [+4b2d329] fix pseudonym password updates in the app.
+  * [+7c98472] remove "auto-accept" feature closes #7160
+  * [+8cbb847] follow redirects in the kaltura bulk upload response
+  * [+ae37522] fix for zero-point pass/fail assignments
+  * [+04ea1d5] ensure context tags are shared by 2+ participants, fixes #7231
+  * [+25c6cdc] pre-amd hotfix for #7188
+  * [+b22bae1] ensure bulk private messages appear under sent filter, fixes #7298, #5370
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 18 Feb 2012 07:03:04 -0700
+
 canvas-lms (2012.02.15.13.31) stable; urgency=low
 
   * Package ref: 89139e47220b4280427280d765f61717a440f6b1
