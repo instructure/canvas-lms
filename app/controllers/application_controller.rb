@@ -1185,4 +1185,36 @@ class ApplicationController < ActionController::Base
     end
     super
   end
+
+  def js_bundles; @js_bundles ||= []; end
+  helper_method :js_bundles
+
+  # Use this method to place a bundle on the page, note that the end goal here
+  # is to only ever include one bundle per page load, so use this with care and
+  # ensure that the bundle you are requiring isn't simply a dependency of some
+  # other bundle.
+  #
+  # Bundles are defined in app/coffeescripts/bundles/<bundle>.coffee
+  #
+  # usage: js_bundle :gradebook2
+  #
+  # Only allows multiple arguments to support old usage of jammit_js
+  #
+  # Optional :plugin named parameter allows you to specify a plugin which
+  # contains the bundle. Example:
+  #
+  # js_bundle :gradebook2, :plugin => :my_feature
+  #
+  # will look for the bundle in
+  # /plugins/my_feature/(optimized|javascripts)/compiled/bundles/ rather than
+  # /(optimized|javascripts)/compiled/bundles/
+  def js_bundle(*args)
+    opts = (args.last.is_a?(Hash) ? args.pop : {})
+    Array(args).flatten.each do |bundle|
+      js_bundles << [bundle, opts[:plugin]] unless js_bundles.include? [bundle, opts[:plugin]]
+    end
+    nil
+  end
+  helper_method :js_bundle
+
 end

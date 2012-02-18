@@ -325,28 +325,13 @@ module ApplicationHelper
     use_optimized_js? ? '/optimized' : '/javascripts'
   end
 
-  def js_bundles; @js_bundles ||= []; end
-
-  # Use this method to place a bundle on the page, note that the end goal here
-  # is to only ever include one bundle per page load, so use this with care and
-  # ensure that the bundle you are requiring isn't simply a dependency of some
-  # other bundle.
-  #
-  # Bundles are defined in app/coffeescripts/bundles/<bundle>.coffee
-  #
-  # usage: js_bundle :gradebook2
-  #
-  # Only allows multiple arguments to support old usage of jammit_js
-  def js_bundle(*args)
-    output = Array(args).flatten.each do |bundle|
-      js_bundles << bundle unless js_bundles.include? bundle
-    end
-    raw output
-  end
-
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    paths = js_bundles.map { |bundle| "#{js_base_url}/compiled/bundles/#{bundle}.js" }
+    paths = js_bundles.map do |(bundle,plugin)|
+      base_url = js_base_url
+      base_url = "/plugins/#{plugin}#{base_url}" if plugin
+      "#{base_url}/compiled/bundles/#{bundle}.js"
+    end
     javascript_include_tag *paths
   end
 
