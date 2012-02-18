@@ -3,8 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "quizzes" do
   it_should_behave_like "in-process server selenium tests"
 
-  def quiz_with_new_questions
+  before (:each) do
     course_with_teacher_logged_in
+  end
+
+  def quiz_with_new_questions
     @context = @course
     bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
     @q = quiz_model
@@ -23,7 +26,6 @@ describe "quizzes" do
 
   it "should allow a teacher to create a quiz from the quizzes tab directly" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load { driver.find_element(:css, ".new-quiz-link").click }
     driver.find_element(:css, ".save_quiz_button").click
@@ -33,7 +35,6 @@ describe "quizzes" do
 
   it "should create and preview a new quiz" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
       driver.find_element(:css, '.new-quiz-link').click
@@ -45,8 +46,7 @@ describe "quizzes" do
     quiz_id.should be > 0
 
     #input name and description then save quiz
-    driver.find_element(:css, '#quiz_options_form input#quiz_title').clear
-    driver.find_element(:css, '#quiz_options_form input#quiz_title').send_keys('new quiz')
+    replace_content(driver.find_element(:css, '#quiz_options_form input#quiz_title'), 'new quiz')
     test_text = "new description"
     keep_trying_until { driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
     type_in_tiny '#quiz_description', test_text
@@ -56,7 +56,7 @@ describe "quizzes" do
 
     #add a question
     driver.find_element(:css, '.add_question_link').click
-    question = find_with_jquery('.question_form:visible').submit
+    find_with_jquery('.question_form:visible').submit
     wait_for_ajax_requests
 
     #save the quiz
@@ -66,28 +66,21 @@ describe "quizzes" do
     #check quiz preview
     driver.find_element(:link, 'Preview the Quiz').click
     driver.find_element(:id, 'questions').should be_present
-    keep_trying_until { driver.find_element(:css, '#content h2').text.should == 'new quiz' }
   end
 
   it "should correctly hide form when cancelling quiz edit" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes/new"
 
-    keep_trying_until {
-      driver.find_element(:css, ".add_question .add_question_link").click
-      driver.find_elements(:css, "#questions .question_holder").length > 0
-    }
-    holder = driver.find_element(:css, "#questions .question_holder")
-    holder.should be_displayed
-    holder.find_element(:css, ".cancel_link").click
-    driver.find_elements(:css, "#questions .question_holder").length.should == 0
+    driver.find_element(:css, ".add_question .add_question_link").click
+    driver.find_element(:css, '.form_answers').should be_displayed
+    driver.find_element(:css, ".question_form .cancel_link").click
+    driver.find_element(:css, '.form_answers').should_not be_displayed
   end
 
   it "should edit a quiz" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     @context = @course
     q = quiz_model
     q.generate_quiz_data
@@ -112,7 +105,6 @@ describe "quizzes" do
 
   it "should edit a quiz question" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     @context = @course
     q = quiz_model
     quest1 = q.quiz_questions.create!(:question_data => {:name => "first question"})
@@ -149,7 +141,6 @@ describe "quizzes" do
 
   it "should not show 'Missing Word' option in question types dropdown" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes/new"
 
@@ -163,8 +154,6 @@ describe "quizzes" do
   end
 
   def start_quiz_question
-    course_with_teacher_logged_in
-
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
       driver.find_element(:css, '.new-quiz-link').click
@@ -489,6 +478,7 @@ describe "quizzes" do
     quiz.reload
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
+
   end
 
   it "should create a quiz question with a formula question" do
@@ -622,7 +612,6 @@ describe "quizzes" do
 
   it "should calculate correct quiz question points total" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
       driver.find_element(:css, '.new-quiz-link').click
@@ -656,7 +645,6 @@ describe "quizzes" do
   end
 
   it "message students who... should do something" do
-    course_with_teacher_logged_in
     @context = @course
     q = quiz_model
     q.generate_quiz_data
@@ -696,7 +684,6 @@ describe "quizzes" do
   end
 
   it "should tally up question bank question points" do
-    course_with_teacher_logged_in
     quiz = @course.quizzes.create!(:title => "My Quiz")
     bank = AssessmentQuestionBank.create!(:context => @course)
     3.times { bank.assessment_questions << assessment_question_model }
@@ -715,7 +702,6 @@ describe "quizzes" do
 
   it "should allow you to use inherited question banks" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     @course.account = Account.default
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
@@ -746,7 +732,6 @@ describe "quizzes" do
 
   it "should allow you to use bookmarked question banks" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     @course.account = Account.default
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
@@ -778,7 +763,6 @@ describe "quizzes" do
 
   it "should check permissions when retrieving question banks" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     @course.account = Account.default
     @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
     @course.save
@@ -811,7 +795,6 @@ describe "quizzes" do
   end
 
   it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
-    course_with_teacher_logged_in
     5.times { @course.quizzes.create!(:title => "My Quiz") }
     get "/courses/#{@course.id}/quizzes"
     publish_multiple = driver.find_element(:css, '.publish_multiple_quizzes_link')
@@ -826,7 +809,6 @@ describe "quizzes" do
 
   it "should import questions from a question bank" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes/new"
 
@@ -837,13 +819,11 @@ describe "quizzes" do
     group_form.find_element(:name, 'quiz_group[question_points]').send_keys('2')
     group_form.submit
     driver.find_element(:css, '#questions .group_top .group_display.name').should include_text('new group')
-
   end
 
 
   it "should create a new question group" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes/new"
 
@@ -858,8 +838,6 @@ describe "quizzes" do
   end
 
   it "should moderate quiz" do
-    course_with_teacher_logged_in
-    teacher = @user
     student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
     @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
     @context = @course
@@ -909,7 +887,6 @@ describe "quizzes" do
 
   it "should indicate when it was last saved" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     @context = @course
     bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
     q = quiz_model
@@ -947,10 +924,10 @@ describe "quizzes" do
     #This step is to prevent selenium from freezing when the dialog appears when leaving the page
     driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
     confirm_dialog = driver.switch_to.alert
-    expect_new_page_load { confirm_dialog.accept }
+    confirm_dialog.accept
   end
 
-  it "should round numeric questions thes same when created and taking a quiz" do
+  it "should round numeric questions the same when created and taking a quiz" do
     skip_if_ie('Out of memory')
     start_quiz_question
     question = find_with_jquery(".question:visible")
@@ -992,7 +969,6 @@ describe "quizzes" do
 
   context "select element behavior" do
     before (:each) do
-      course_with_teacher_logged_in
       @context = @course
       bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
       q = quiz_model
@@ -1014,7 +990,7 @@ describe "quizzes" do
       #This step is to prevent selenium from freezing when the dialog appears when leaving the page
       driver.find_element(:link, 'Quizzes').click
       confirm_dialog = driver.switch_to.alert
-      expect_new_page_load { confirm_dialog.accept }
+      confirm_dialog.accept
     end
 
     # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch 
@@ -1049,7 +1025,6 @@ describe "quizzes" do
 
   it "should display quiz statistics" do
     skip_if_ie('Out of memory')
-    course_with_teacher_logged_in
     quiz_with_submission
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 

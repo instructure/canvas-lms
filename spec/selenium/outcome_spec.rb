@@ -3,9 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "learning outcome test" do
   it_should_behave_like "in-process server selenium tests"
 
+  before (:each) do
+    course_with_teacher_logged_in
+  end
+
   it "should create a learning outcome with a new rating" do
     skip_if_ie("Out of memory / Stack overflow")
-    course_with_teacher_logged_in
     get "/courses/#{@course.id}/outcomes"
 
     #create learning outcome
@@ -39,7 +42,6 @@ describe "learning outcome test" do
   end
 
   it "should allow dragging and dropping outside of the outcomes list without throwing an error" do
-    course_with_teacher_logged_in
     @context = @course
 
     get "/courses/#{@course.id}/outcomes"
@@ -51,34 +53,32 @@ describe "learning outcome test" do
     end
 
     draggable = driver.find_element(:css, '.outcome_group .reorder_link')
-    drag_to   = driver.find_element(:css, '#section-tabs')
+    drag_to = driver.find_element(:css, '#section-tabs')
     driver.action.drag_and_drop(draggable, drag_to).perform
 
     driver.execute_script('return INST.errorCount;').should eql 0
   end
 
   it "should create a rubric" do
-    course_with_teacher_logged_in
     @context = @course
     @first_outcome = outcome_model
     @second_outcome = outcome_model({:short_description => 'second outcome'})
- 
+
     get "/courses/#{@course.id}/outcomes"
 
     #create rubric
     find_with_jquery('#right-side a:last-child').click
     driver.find_element(:css, '.add_rubric_link').click
-    driver.find_element(:css, '#rubric_new input[name="title"]').send_keys('New Rubric')
+    driver.find_element(:css, '#rubrics input[name="title"]').send_keys('New Rubric')
 
     #edit first criterion
-    driver.execute_script('$(".links").show();')#couldn't get mouseover to work
-    edit_desc_img = driver.
-      find_element(:css, '#criterion_1 .criterion_description .edit_criterion_link img').click
+    driver.execute_script('$(".links").show();') #couldn't get mouseover to work
+    driver.find_element(:css, '#criterion_1 .criterion_description .edit_criterion_link img').click
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').clear
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').send_keys('important criterion')
     driver.find_element(:id, 'edit_criterion_form').submit
     rating_row = find_with_jquery('#criterion_1 td:nth-child(2) table tr')
-    first_rating = rating_row.find_element(:css, '.edit_rating_link img').click
+    rating_row.find_element(:css, '.edit_rating_link img').click
     rating_row.find_element(:css, '#edit_rating_form input[name="description"]').clear
     rating_row.find_element(:css, '#edit_rating_form input[name="description"]').send_keys('really good')
     rating_row.find_element(:css, '#edit_rating_form input[name="points"]').clear

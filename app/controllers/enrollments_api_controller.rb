@@ -35,25 +35,82 @@ class EnrollmentsApiController < ApplicationController
   # teachers, TAs, and observers. Any enrollment types without members
   # are omitted.
   #
-  # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are retuurned.
+  # If a user has multiple enrollments in the course (e.g. as a teacher
+  # and a student or in multiple sections), each enrollment will be
+  # listed separately.
   #
-  # @response_field id The unique identifier for the course member.
-  # @response_field name The full course member name.
-  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
+  # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are returned.
+  #
+  # @response_field course_id The unique id of the course.
+  # @response_field course_section_id The unique id of the user's section.
+  # @response_field enrollment_state The state of the user's enrollment in the course.
+  # @response_field limit_privileges_to_course_section User can only access his or her own course section.
+  # @response_field root_account_id The unique id of the user's account.
+  # @response_field type The type of the enrollment.
+  # @response_field user_id The unique id of the user.
+  # @response_field user[id] The unique id of the user.
+  # @response_field user[login_id] The unique login of the user.
+  # @response_field user[name] The name of the user.
+  # @response_field user[short_name] The short name of the user.
+  # @response_field user[sortable_name] The sortable name of the user.
   #
   # @example_response
-  # {
-  #   "students": [ { "id": 1, "name": "Justin Bieber", "sortable_name": "Bieber, Justin", "short_name": "Justin B.", "login_id": "jbieber@example.com", "sis_user_id": null, "sis_login_id": null },
-  #                 { "id": 2, "name": "Selena Gomez", "sortable_name": "Gomez, Selena", "short_name": "Selena G.", "login_id": "sgomez@example.com", "sis_user_id": "from-sis", "sis_login_id": "login-from-sis" }
-  #               ],
-  #   "teachers": [ { "id": 3, "name": "Señor Chang", "sortable_name": "Chang, Señor", "short_name": "S. Chang", "login_id": "changyourmind@example.com", "sis_user_id": null, "sis_login_id": null } ]
-  # }
+  #   [
+  #     {
+  #       "course_id": 1,
+  #       "course_section_id": 1,
+  #       "enrollment_state": "active",
+  #       "limit_privileges_to_course_section": true,
+  #       "root_account_id": 1,
+  #       "type": "StudentEnrollment",
+  #       "user_id": 1,
+  #       "user": {
+  #         "id": 1,
+  #         "login_id": "bieberfever@example.com",
+  #         "name": "Justin Bieber",
+  #         "short_name": "Justin B.",
+  #         "sortable_name": "Bieber, Justin"
+  #       }
+  #     },
+  #     {
+  #       "course_id": 1,
+  #       "course_section_id": 2,
+  #       "enrollment_state": "active",
+  #       "limit_privileges_to_course_section": false,
+  #       "root_account_id": 1,
+  #       "type": "TeacherEnrollment",
+  #       "user_id": 2,
+  #       "user": {
+  #         "id": 2,
+  #         "login_id": "changyourmind@example.com",
+  #         "name": "Señor Chang",
+  #         "short_name": "S. Chang",
+  #         "sortable_name": "Chang, Señor"
+  #       }
+  #     },
+  #     {
+  #       "course_id": 1,
+  #       "course_section_id": 2,
+  #       "enrollment_state": "active",
+  #       "limit_privileges_to_course_section": false,
+  #       "root_account_id": 1,
+  #       "type": "StudentEnrollment",
+  #       "user_id": 2,
+  #       "user": {
+  #         "id": 2,
+  #         "login_id": "changyourmind@example.com",
+  #         "name": "Señor Chang",
+  #         "short_name": "S. Chang",
+  #         "sortable_name": "Chang, Señor"
+  #       }
+  #     }
+  #   ]
   def index
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
     conditions = {}.tap { |c| c[:type] = params[:type] if params[:type].present? }
     enrollments = Api.paginate(
-      @context.current_enrollments.scoped(:include => :user, :conditions => conditions, :order => 'enrollments.type ASC, users.sortable_name ASC'),
+      @context.current_enrollments.scoped(:conditions => conditions, :order => 'enrollments.type ASC, users.sortable_name ASC'),
       self, api_v1_enrollments_path)
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, [:user]) }
   end
@@ -79,7 +136,7 @@ class EnrollmentsApiController < ApplicationController
       render(:json => { :message => errors.join(', ') }, :status => 403) && return
     end
 
-    # creat enrollment
+    # create enrollment
     type = params[:enrollment].delete(:type)
     type = 'StudentEnrollment' unless @@valid_types.include?(type)
     unless @current_user.can_create_enrollment_for?(@context, session, type)

@@ -68,6 +68,16 @@ describe AccountAuthorizationConfig do
       @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :entity_id => "http://wtb.instructure.com/saml2")
       @aac.entity_id.should == "http://wtb.instructure.com/saml2"
     end
+    
+    it "should set requested_authn_context to nil if empty string" do
+      @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :requested_authn_context => "")
+      @aac.requested_authn_context.should == nil
+    end
+    
+    it "should allow requested_authn_context to be set to anything" do
+      @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :requested_authn_context => "anything")
+      @aac.requested_authn_context.should == "anything"
+    end
   end
   
   context "password" do

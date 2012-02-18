@@ -47,7 +47,7 @@ class MediaObject < ActiveRecord::Base
     end
     super
   end
-  
+
   # if wait_for_completion is true, this will wait SYNCHRONOUSLY for the bulk
   # upload to complete. Wrap it in a timeout if you ever want it to give up
   # waiting.
@@ -57,11 +57,11 @@ class MediaObject < ActiveRecord::Base
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
     files = []
-    root_account_id = attachments.map{|a| a.namespace.split(/_/)[1] }.compact.first
+    root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
       files << {
                   :name       => attachment.display_name,
-                  :url        => attachment.cacheable_s3_url,
+                  :url        => attachment.cacheable_s3_download_url,
                   :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
                   :id         => attachment.id
                }
@@ -115,7 +115,7 @@ class MediaObject < ActiveRecord::Base
       end
     end
   end
-  
+
   def self.build_media_objects(data, root_account_id)
     root_account = Account.find_by_id(root_account_id)
     data[:entries].each do |entry|
@@ -128,19 +128,24 @@ class MediaObject < ActiveRecord::Base
         mo.context = attachment.context
         mo.attachment_id = attachment.id
         attachment.update_attribute(:media_entry_id, entry[:entryId])
+        # check for attachments that were created temporarily, just to import a media object
+        if attachment.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/')
+          attachment.destroy(false)
+        end
       end
       mo.context ||= mo.root_account
       mo.save
     end
   end
-  
+
   def self.refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt=0)
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
     res = client.bulkUploadGet(bulk_upload_id)
     if !res[:ready]
-      if attempt < 5
-        MediaObject.send_at(10.minute.from_now, :refresh_media_files, bulk_upload_id, attachment_ids, root_account_id, attempt + 1) 
+      if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
+        wait_period = Setting.get('media_object_bulk_refresh_wait_period', '30').to_i
+        MediaObject.send_at(wait_period.minutes.from_now, :refresh_media_files, bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
         Attachment.update_all({:media_entry_id => nil}, "id IN (#{attachment_ids.join(",")}) OR root_attachment_id IN (#{attachment_ids.join(",")})") unless attachment_ids.empty?

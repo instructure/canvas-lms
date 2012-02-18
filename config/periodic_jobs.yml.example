@@ -1,0 +1,15 @@
+# you can override the cron schedule for periodic jobs using this configuration file
+#
+# the default schedules are in config/periodic_jobs.rb
+#
+# shifting the time to a different hour is typically fine. changing the
+# frequency of the job is more dangerous -- make sure you understand the
+# consequences.
+
+development:
+  # the key is the name of the job, the value is the new cron line
+  # Reporting::CountsReport.process: "0 6 * * *"
+
+test:
+
+production:

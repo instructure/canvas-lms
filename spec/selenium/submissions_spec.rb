@@ -3,13 +3,18 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "submissions" do
   it_should_behave_like "in-process server selenium tests"
 
-  def create_media_assignment_and_go_to_page
+  def create_assignment(type = 'online_text_entry')
     assignment = @course.assignments.build({
       :name => 'media assignment',
-      :submission_types => 'media_recording'
+      :submission_types => type
     })
     assignment.workflow_state = 'published'
     assignment.save!
+    assignment
+  end
+
+  def create_assignment_and_go_to_page(type = 'online_text_entry')
+    assignment = create_assignment type
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
     assignment
   end
@@ -21,7 +26,7 @@ describe "submissions" do
   it "should not break when you open and close the media comment dialog" do
     stub_kaltura
     course_with_student_logged_in
-    create_media_assignment_and_go_to_page
+    create_assignment_and_go_to_page 'media_recording'
 
     driver.find_element(:css, ".submit_assignment_link").click
     open_button = driver.find_element(:css, ".record_media_comment_link")
@@ -44,5 +49,28 @@ describe "submissions" do
     # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
     driver.find_element(:css, '#submit_media_recording_form button[type=submit]').click
   end
+
+
+  it "should allow media comments without making the page go blank" do
+    stub_kaltura
+    course_with_teacher_logged_in
+    student_in_course
+    assignment = create_assignment
+    assignment.submissions.create :user => @student
+    get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+    driver.find_element(:css, '.media_comment_link').click
+    # swf and stuff loads, give it a sec before we go polling for the dialog
+    sleep 0.5
+    close_dialog
+
+    # manually trigger the line of code that previously made the page go blank
+    driver.execute_script "$(document).triggerHandler('media_comment_created', {id: 1, mediaType: 1});"
+    find_with_jquery('body').should be_displayed
+  end
+
+  it "should allow media comments" do
+    pending
+  end
+
 end
 

@@ -36,6 +36,7 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :unread, :conditions => "workflow_state = 'unread'"
   named_scope :archived, :conditions => "workflow_state = 'archived'"
   named_scope :starred, :conditions => "label = 'starred'"
+  named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
   delegate :private?, :to => :conversation
 
   before_update :update_unread_count
@@ -45,13 +46,16 @@ class ConversationParticipant < ActiveRecord::Base
   validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
-    latest = options[:last_message] || messages.human.first
+    latest = options[:last_message] || last_message_at && messages.human.first
+    latest_authored = options[:last_authored_message] || visible_last_authored_at && messages.human.by_user(user_id).first
     options[:include_context_info] ||= private?
     {
       :id => conversation_id,
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
       :last_message_at => latest ? latest.created_at : last_message_at,
+      :last_authored_message => latest_authored ? truncate_text(latest_authored.body, :max_length => 100) : nil,
+      :last_authored_message_at => latest_authored ? latest_authored.created_at : visible_last_authored_at,
       :message_count => message_count,
       :subscribed => subscribed?,
       :private => private?,
@@ -208,6 +212,11 @@ class ConversationParticipant < ActiveRecord::Base
       end
       self.has_attachments = attachments.size > 0
       self.has_media_objects = messages.with_media_comments.size > 0
+      self.visible_last_authored_at = if latest.author_id == user_id
+        latest.created_at
+      elsif latest_authored = messages.human.by_user(user_id).first
+        latest_authored.created_at
+      end
     else
       self.tags = nil
       self.workflow_state = 'read' if unread?
@@ -216,13 +225,15 @@ class ConversationParticipant < ActiveRecord::Base
       self.has_attachments = false
       self.has_media_objects = false
       self.starred = false
+      self.visible_last_authored_at = nil
     end
     # note that last_authored_at doesn't know/care about messages you may
     # have deleted... this is because it is only used by other participants
     # when displaying the most active participants in the conversation.
-    # TODO: track visible_last_authored_at (from user's POV) for "By Me" filter
+    # visible_last_authored_at, otoh, takes into account ones you've deleted
+    # (see above)
     if options[:recalculate_last_authored_at]
-      my_latest = conversation.conversation_messages.human.first(:conditions => {:author_id => user_id})
+      my_latest = conversation.conversation_messages.human.by_user(user_id).first
       self.last_authored_at = my_latest ? my_latest.created_at : nil
     end
   end

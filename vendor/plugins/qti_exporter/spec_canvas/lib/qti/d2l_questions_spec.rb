@@ -113,7 +113,7 @@ module D2LExpected
            :migration_id=>"OBJ_3503037",
            :correct_comments=>""}
 
-  ASSESSMENT = {:migration_id=>"qti",
+  ASSESSMENT = {:migration_id=>"res_quiz_90521",
                 :question_count=>1,
                 :title=>"01 Early Bird Storybook Week 2",
                 :quiz_name=>"01 Early Bird Storybook Week 2",
@@ -127,7 +127,7 @@ module D2LExpected
   ASSESSMENT_REFS = {:title=>"Quiz 2",
                      :allowed_attempts=>3,
                      :quiz_name=>"Quiz 2",
-                     :migration_id=>"qti",
+                     :migration_id=>"res_quiz_39018",
                      :quiz_type=>nil,
                      :questions=>
                              [{:points_possible=>1,

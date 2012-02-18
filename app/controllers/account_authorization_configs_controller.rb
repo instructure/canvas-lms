@@ -26,6 +26,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       @account_configs << @account.account_authorization_configs.new
     end
     @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
+    @saml_authn_contexts = [["No Value", nil]] + Onelogin::Saml::AuthnContexts::ALL_CONTEXTS.sort
   end
 
   # @API
@@ -84,6 +85,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   - urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
   #   - urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName
   #   - urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName
+  #
+  # - requested_authn_context
+  #
+  #   The SAML AuthnContext
   #
   # For LDAP authentication services, the additional recognized parameters are:
   #
@@ -282,7 +287,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         :auth_filter, :auth_username, :auth_password, :change_password_url,
         :login_handle_name ]
     when 'saml'
-      [ :auth_type, :log_in_url, :log_out_url, :change_password_url,
+      [ :auth_type, :log_in_url, :log_out_url, :change_password_url, :requested_authn_context,
         :certificate_fingerprint, :identifier_format, :login_handle_name ]
     else
       []

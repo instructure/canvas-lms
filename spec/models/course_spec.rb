@@ -724,6 +724,34 @@ describe Course, "tabs_available" do
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should_not be_include(Course::TAB_DISCUSSIONS)
   end
+
+  it "should include tabs for active external tools" do
+    course_with_student(:active_all => true)
+
+    tools = []
+    2.times do |n|
+      tools << @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tool #{n+1}",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+    end
+    t1, t2 = tools
+
+    t2.workflow_state = "deleted"
+    t2.save!
+
+    tabs = @course.tabs_available.map { |tab| tab[:id] }
+
+    tabs.should be_include(t1.asset_string)
+    tabs.should_not be_include(t2.asset_string)
+  end
 end
 
 describe Course, "backup" do
@@ -2693,6 +2721,25 @@ describe Course, "section_visibility" do
     Marshal.dump(c)
     c.save!
     Marshal.dump(c)
+  end
+end
+
+describe Course, ".import_from_migration" do
+  before do
+    attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+    course_with_teacher
+  end
+
+  it "should wait for media objects on canvas cartridge import" do
+    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Canvas::Converter' }.with_indifferent_access)
+    MediaObject.expects(:add_media_files).with([@attachment], true)
+    @course.import_media_objects([@attachment], migration)
+  end
+
+  it "should not wait for media objects on other import" do
+    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Standard::Converter' }.with_indifferent_access)
+    MediaObject.expects(:add_media_files).with([@attachment], false)
+    @course.import_media_objects([@attachment], migration)
   end
 end
 

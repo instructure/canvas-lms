@@ -15,8 +15,8 @@
   <% end %>
   <% if @associated_courses_count > @maximum_courses_im_gonna_show %>
     <p class='ui-state-highlight' style='padding:0.7em;'>
-      <%= t(:too_many_courses_message, { :other => "There are too many courses to show (%{count}). " +
-      "Please use the finder on the right to find a specific course." }, :count => @associated_courses_count) %>
+      <%= t(:too_many_courses_message, "There are too many courses to show (%{count}). " +
+      "Please use the finder on the right to find a specific course.", :count => @associated_courses_count) %>
     </p>
   <% end %>
 

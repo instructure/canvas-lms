@@ -2,13 +2,15 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "account authentication configs" do
   it_should_behave_like "in-process server selenium tests"
-  
-  it "should allow setting up a secondary ldap server" do
-    course_with_admin_logged_in
 
+  before (:each) do
+    course_with_admin_logged_in
+  end
+
+  it "should allow setting up a secondary ldap server" do
     get "/accounts/#{Account.default.id}/account_authorization_configs"
     driver.find_element(:id, 'add_auth_select').
-      find_element(:css, 'option[value="ldap"]').click
+        find_element(:css, 'option[value="ldap"]').click
     ldap_div = driver.find_element(:id, 'ldap_div')
     ldap_form = driver.find_element(:css, 'form.ldap_form')
     ldap_div.should be_displayed
@@ -77,18 +79,16 @@ describe "account authentication configs" do
     Account.default.account_authorization_configs.length.should == 1
 
     # test removing the entire config
-    expect_new_page_load { 
+    expect_new_page_load do
       driver.find_element(:css, '.delete_auth_link').click
       driver.switch_to.alert.accept
       driver.switch_to.default_content
-    }
+    end
 
     Account.default.account_authorization_configs.length.should == 0
   end
-  
-  it "should show Login and Email fields in add user dialog for delegated auth accounts" do
-    course_with_admin_logged_in
 
+  it "should show Login and Email fields in add user dialog for delegated auth accounts" do
     get "/accounts/#{Account.default.id}/users"
     driver.find_element(:css, ".add_user_link").click
     dialog = driver.find_element(:id, "add_user_dialog")
@@ -102,19 +102,17 @@ describe "account authentication configs" do
     dialog.find_element(:id, "pseudonym_path").should be_displayed
     dialog.find_element(:id, "pseudonym_unique_id").should be_displayed
   end
-  
-  it "should be able to set login labels for delegated auth accounts" do
-    course_with_admin_logged_in
 
+  it "should be able to set login labels for delegated auth accounts" do
     get "/accounts/#{Account.default.id}/account_authorization_configs"
     driver.find_element(:id, 'add_auth_select').
-      find_element(:css, 'option[value="cas"]').click
+        find_element(:css, 'option[value="cas"]').click
     driver.find_element(:id, "account_authorization_config_0_login_handle_name").should be_displayed
-    
+
     driver.find_element(:id, "account_authorization_config_0_auth_base").send_keys("cas.example.com")
     driver.find_element(:id, "account_authorization_config_0_login_handle_name").send_keys("CAS Username")
     expect_new_page_load { driver.find_element(:css, '#cas_div button[type="submit"]').click }
-    
+
     get "/accounts/#{Account.default.id}/users"
     driver.find_element(:css, ".add_user_link").click
     dialog = driver.find_element(:id, "add_user_dialog")
@@ -122,7 +120,6 @@ describe "account authentication configs" do
   end
 
   it "should be able to create a new course" do
-    course_with_admin_logged_in
     get "/accounts/#{Account.default.id}"
     driver.find_element(:css, '.add_course_link').click
     driver.find_element(:css, '#add_course_form input[type=text]:first-child').send_keys('Test Course')
@@ -135,7 +132,6 @@ describe "account authentication configs" do
   end
 
   it "should be able to update term dates" do
-    course_with_admin_logged_in
 
     def verify_displayed_term_dates(term, dates)
       dates.each do |en_type, dates|
@@ -152,12 +148,12 @@ describe "account authentication configs" do
     term.find_element(:css, ".enrollment_term_form .submit_button").click
     keep_trying_until { term.attribute(:class) !~ /editing_term/ }
     verify_displayed_term_dates(term, {
-      :general => [ "Jul 1", "Jul 31" ],
-      :student_enrollment => [ "term start", "term end" ],
-      :teacher_enrollment => [ "term start", "term end" ],
-      :ta_enrollment => [ "term start", "term end" ]
+        :general => ["Jul 1", "Jul 31"],
+        :student_enrollment => ["term start", "term end"],
+        :teacher_enrollment => ["term start", "term end"],
+        :ta_enrollment => ["term start", "term end"]
     })
-    
+
     get "/accounts/#{Account.default.id}/terms"
     term = driver.find_element(:css, "tr.term")
     term.find_element(:css, ".edit_term_link").click
@@ -166,12 +162,12 @@ describe "account authentication configs" do
     term.find_element(:css, ".enrollment_term_form .submit_button").click
     keep_trying_until { term.attribute(:class) !~ /editing_term/ }
     verify_displayed_term_dates(term, {
-      :general => [ "Jul 1", "Jul 31" ],
-      :student_enrollment => [ "Jul 2", "Jul 30" ],
-      :teacher_enrollment => [ "term start", "term end" ],
-      :ta_enrollment => [ "term start", "term end" ]
+        :general => ["Jul 1", "Jul 31"],
+        :student_enrollment => ["Jul 2", "Jul 30"],
+        :teacher_enrollment => ["term start", "term end"],
+        :ta_enrollment => ["term start", "term end"]
     })
-    
+
     get "/accounts/#{Account.default.id}/terms"
     term = driver.find_element(:css, "tr.term")
     term.find_element(:css, ".edit_term_link").click
@@ -182,12 +178,12 @@ describe "account authentication configs" do
     term.find_element(:css, ".enrollment_term_form .submit_button").click
     keep_trying_until { term.attribute(:class) !~ /editing_term/ }
     verify_displayed_term_dates(term, {
-      :general => [ "Jul 1", "Jul 31" ],
-      :student_enrollment => [ "Jul 2", "Jul 30" ],
-      :teacher_enrollment => [ "Jul 3", "Jul 29" ],
-      :ta_enrollment => [ "Jul 4", "Jul 28" ]
+        :general => ["Jul 1", "Jul 31"],
+        :student_enrollment => ["Jul 2", "Jul 30"],
+        :teacher_enrollment => ["Jul 3", "Jul 29"],
+        :ta_enrollment => ["Jul 4", "Jul 28"]
     })
-    
+
     get "/accounts/#{Account.default.id}/terms"
     term = driver.find_element(:css, "tr.term")
     term.find_element(:css, ".edit_term_link").click
@@ -196,10 +192,10 @@ describe "account authentication configs" do
     term.find_element(:css, ".enrollment_term_form .submit_button").click
     keep_trying_until { term.attribute(:class) !~ /editing_term/ }
     verify_displayed_term_dates(term, {
-      :general => [ "Jul 1", "Jul 31" ],
-      :student_enrollment => [ "Jul 2", "Jul 30" ],
-      :teacher_enrollment => [ "term start", "term end" ],
-      :ta_enrollment => [ "Jul 4", "Jul 28" ]
+        :general => ["Jul 1", "Jul 31"],
+        :student_enrollment => ["Jul 2", "Jul 30"],
+        :teacher_enrollment => ["term start", "term end"],
+        :ta_enrollment => ["Jul 4", "Jul 28"]
     })
   end
 end

@@ -515,14 +515,23 @@ class Assignment < ActiveRecord::Base
     result = (result * 1000.0).round / 10.0
   end
 
-  def score_to_grade(score=0.0)
+  def score_to_grade(score=0.0, given_grade=nil)
     result = score.to_f
     if self.grading_type == "percent"
       result = score_to_grade_percent(score)
       result = "#{result}%"
     elsif self.grading_type == "pass_fail"
-      result = score.to_f == self.points_possible ? "complete" : "incomplete"
-      result = "complete" if !self.points_possible && score.to_f > 0.0
+      if self.points_possible.to_f > 0.0
+        passed = score.to_f == self.points_possible
+      elsif given_grade
+        # the score for a zero-point pass/fail assignment could be considered
+        # either pass *or* fail, so look at what the current given grade is
+        # instead
+        passed = ["complete", "pass"].include?(given_grade)
+      else
+        passed = score.to_f > 0.0
+      end
+      result = passed ? "complete" : "incomplete"
     elsif self.grading_type == "letter_grade"
       score = score.to_f / self.points_possible
       result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
@@ -856,9 +865,9 @@ class Assignment < ActiveRecord::Base
           did_grade = true
           submission.score = self.grade_to_score(submission.grade)
         end
-        if submission.score && (self.points_possible.to_f > 0.0 || grading_type != 'pass_fail')
+        if submission.score
           did_grade = true
-          submission.grade = self.score_to_grade(submission.score)
+          submission.grade = self.score_to_grade(submission.score, submission.grade)
         end
         submission.grade_matches_current_submission = true if did_grade
         submission_updated = true if submission.changed?
@@ -957,6 +966,16 @@ class Assignment < ActiveRecord::Base
     homeworks = []
     primary_homework = nil
     ts = Time.now.to_s
+    submitted = case opts[:submission_type]
+                when "online_text_entry"
+                  opts[:body].present?
+                when "online_url"
+                  opts[:url].present?
+                when "online_upload"
+                  opts[:attachments].size > 0
+                else
+                  true
+                end
     transaction do
       students.each do |student|
         homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
@@ -965,7 +984,7 @@ class Assignment < ActiveRecord::Base
           :attachment => nil,
           :processed => false,
           :process_attempts => 0,
-          :workflow_state => "submitted",
+          :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
         homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"

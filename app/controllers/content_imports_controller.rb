@@ -302,7 +302,7 @@ class ContentImportsController < ApplicationController
       respond_to do |format|
         if @attachment
           if Attachment.s3_storage?
-            format.html { redirect_to @attachment.cacheable_s3_url }
+            format.html { redirect_to @attachment.cacheable_s3_download_url }
           else
             cancel_cache_buster
             format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'attachment') }

@@ -220,6 +220,33 @@ describe PseudonymsController do
   end
 
   describe "update" do
+    it "should change a password if authorized" do
+      account = Account.default
+      user_with_pseudonym(
+        :username => 'test2@example.com',
+        :password => 'old_password',
+        :account  => account)
+      @test_user = @user
+      user_with_pseudonym(
+        :username => 'admin@example.com',
+        :password => 'admin-password',
+        :account  => account)
+      account.settings[:admins_can_change_passwords] = true
+      account.save!
+      Account.site_admin.add_user(@user)
+      user_session(@user, @pseudonym)
+      put 'update', {
+        :id        => @test_user.pseudonym.id,
+        :user_id   => @test_user.id,
+        :pseudonym => {
+          :password              => 'new_password',
+          :password_confirmation => 'new_password'
+        }}
+      response.should be_redirect
+      @test_user.pseudonym.reload
+      @test_user.pseudonym.valid_password?('new_password').should be_true
+    end
+
     it "should not change a password if not authorized" do
       account1 = Account.new
       account1.settings[:admins_can_change_passwords] = true

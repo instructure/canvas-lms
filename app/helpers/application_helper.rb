@@ -568,17 +568,13 @@ var I18n = I18n || {};
   def menu_courses_locals
     courses = @current_user.menu_courses
     all_courses_count = @current_user.courses_with_primary_enrollment.size
-    too_many_courses = all_courses_count > courses.length
-    customizable = too_many_courses || @current_user.favorite_courses.first.present?
-
     {
       :collection             => map_courses_for_menu(courses),
       :collection_size        => all_courses_count,
       :more_link_for_over_max => courses_path,
       :title                  => t('#menu.my_courses', "My Courses"),
       :link_text              => raw(t('#layouts.menu.view_all_enrollments', 'View all courses')),
-      :too_many_courses       => too_many_courses,
-      :edit                   => customizable && t("#menu.customize", "Customize")
+      :edit                   => t("#menu.customize", "Customize")
     }
   end
 

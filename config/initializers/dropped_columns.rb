@@ -20,7 +20,7 @@ class ActiveRecord::Base
   DROPPED_COLUMNS = {
     'abstract_courses' => %w(sis_name sis_course_code),
     'accounts' => %w(type sis_name),
-    'attachments' => %w(enrollment_id),
+    'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at),
     'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name),
     'courses' => %w(section hidden_tabs sis_name sis_course_code),
     'enrollment_terms' => %w(sis_data sis_name),

@@ -10,6 +10,7 @@ ActionController::Routing::Routes.draw do |map|
   map.discussion_replies 'conversations/discussion_replies', :controller => 'context', :action => 'discussion_replies'
   map.conversations_unread 'conversations/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
   map.conversations_starred 'conversations/starred', :controller => 'conversations', :action => 'index', :scope => 'starred'
+  map.conversations_sent 'conversations/sent', :controller => 'conversations', :action => 'index', :scope => 'sent'
   map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
   map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
@@ -400,7 +401,6 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :grading_standards, :only => %w(index create update destroy)
 
     account.statistics 'statistics', :controller => 'accounts', :action => 'statistics'
-    account.statistics_page_views 'statistics/page_views', :controller => 'accounts', :action => 'statistics_page_views'
     account.statistics_graph 'statistics/over_time/:attribute', :controller => 'accounts', :action => 'statistics_graph'
     account.formatted_statistics_graph 'statistics/over_time/:attribute.:format', :controller => 'accounts', :action => 'statistics_graph'
     account.turnitin_confirmation 'turnitin/:id/:shared_secret', :controller => 'accounts', :action => 'turnitin_confirmation'
@@ -711,11 +711,14 @@ ActionController::Routing::Routes.draw do |map|
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
+
+      users.put 'users/:id', :action => :update
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
       pseudonyms.get 'accounts/:account_id/logins', :action => :index, :path_name => 'pseudonyms'
       pseudonyms.post 'accounts/:account_id/logins', :action => :create
+      pseudonyms.put 'accounts/:account_id/logins/:id', :action => :update
     end
 
     api.with_options(:controller => :accounts) do |accounts|

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -285,10 +285,10 @@ class DiscussionTopicsController < ApplicationController
       @topic.delayed_post_at = @topic.post_delayed? ? delayed_post_at : nil
 
       return if params[:attachment] && params[:attachment][:uploaded_data] &&
-            params[:attachment][:uploaded_data].size > 1.kilobytes && 
+            params[:attachment][:uploaded_data].size > 1.kilobytes &&
             @topic.grants_right?(@current_user, session, :attach) &&
             quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
-      @topic.process_event(params[:discussion_topic].delete(:event)) if params[:discussion_topic][:event]
+        @topic.process_event(params[:discussion_topic].delete(:event)) if params[:discussion_topic][:event]
       respond_to do |format|
         @topic.content_being_saved_by(@current_user)
         @topic.editor = @current_user
