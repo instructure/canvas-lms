@@ -22,32 +22,24 @@ class AccountUser < ActiveRecord::Base
   has_many :role_overrides, :as => :context
   has_a_broadcast_policy
   before_save :infer_defaults
-  before_save :set_update_account_associations_if_changed
   after_save :touch_user
   after_save :update_account_associations_if_changed
   attr_accessible :account, :user, :membership_type
 
-  def set_update_account_associations_if_changed
-    @should_update_account_associations = (self.account_id_changed? || self.user_id_changed?) && !self.user_id.nil?
-    @should_update_account_associations_immediately = self.new_record?
-    true
-  end
+  validates_presence_of :account_id, :user_id
 
   def update_account_associations_if_changed
-    if @should_update_account_associations
-      if @should_update_account_associations_immediately
+    if (self.account_id_changed? || self.user_id_changed?)
+      if self.new_record?
+        return if %w{creation_pending deleted}.include?(self.user.workflow_state)
         account_chain = self.account.account_chain
         associations = {}
         account_chain.each_with_index { |account, idx| associations[account.id] = idx }
         self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
       else
-        self.update_account_associations
+        self.user.update_account_associations_later
       end
     end
-  end
-
-  def update_account_associations
-    self.user.update_account_associations_later if self.user
   end
 
   def infer_defaults

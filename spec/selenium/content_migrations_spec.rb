@@ -42,12 +42,9 @@ describe "external migrations" do
 
     filename, fullpath, data = get_file("cc_full_test.zip")
 
-    driver.find_element(:css, '#choose_migration_system').
-            find_element(:css, 'option[value="common_cartridge_importer"]').click
-    driver.find_element(:css, '#config_options').
-            find_element(:name, 'export_file').send_keys(fullpath)
-    driver.find_element(:css, '#config_options').
-            find_element(:css, '.submit_button').click
+    click_option('#choose_migration_system', 'Common Cartridge 1.0/1.1/1.2 Package')
+    driver.find_element(:css, '#config_options').find_element(:name, 'export_file').send_keys(fullpath)
+    driver.find_element(:css, '#config_options').find_element(:css, '.submit_button').click
     keep_trying_until { driver.find_element(:css, '#file_uploaded').displayed? }
 
     ContentMigration.for_context(@course).count.should == 1

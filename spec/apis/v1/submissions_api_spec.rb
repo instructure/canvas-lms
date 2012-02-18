@@ -1065,6 +1065,10 @@ describe SubmissionsApiController, :type => :integration do
     submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 12 }, '50%', nil, nil)
   end
 
+  it "should set complete for zero point assignments" do
+    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 0 }, 'pass', 0, 'complete')
+  end
+
   def submit_with_grade(assignment_opts, param, score, grade)
     student = user(:active_all => true)
     course_with_teacher(:active_all => true)

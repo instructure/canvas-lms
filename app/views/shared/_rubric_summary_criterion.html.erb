@@ -1,8 +1,17 @@
 <% criterion = rubric_summary_criterion || nil; assessing ||= false; brief ||= false; assessment_rating ||= nil %>
 <% @empty_rating ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
-<tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> criterion_<%= criterion ? criterion.id : "blank" %>">
-  <td class="criterion_description"><%= criterion ? truncate_text(criterion.description, :max_length => 50) : t('defaults.description', "Description of criterion") %></td>
-  <td>
+<tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> criterion_<%= criterion ? criterion.id : "blank" %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if criterion && criterion.learning_outcome_id %>">
+  <td class="criterion_description">
+    <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
+    <%= criterion ? truncate_text(criterion.description, :max_length => 50) : t('defaults.description', "Description of criterion") %>
+    <span class="learning_outcome_id" style="display: none;"><%= criterion.learning_outcome_id rescue nbsp %></span>
+    <span class="criterion_id" style="display: none;"><%= criterion && criterion.id %></span>
+    <div class="long_description_holder editing <%= 'empty' if !criterion || !criterion.long_description || criterion.long_description.empty? %>">
+      <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
+      <textarea class="long_description" style="display: none;"><%= h((criterion.long_description rescue '')) %></textarea>
+    </div>
+  </td>
+  <td class="points_form">
       <div class="ratings">
       <% ratings = criterion ? criterion.ratings : @empty_rating %>
       <% ratings.each_index do |idx| %>
@@ -15,10 +24,15 @@
         <% comments = assessment_rating.comments if assessment_rating && assessment_rating.comments_enabled %>
         <div class="rating rating_custom"><%= comments || "" %></div>
       </div>
-      <span class="nobr x_out_of_x">
-        <% ot(:out_of_points, "%{points}/%{total} pts", :points => capture { %>
-          <span class="criterion_points" style="<%= hidden if brief %>"><%= assessing ? (assessment_rating ? assessment_rating.points : "") : (criterion ? criterion.points : 5) %></span><% }, :total => capture { %>
-          <span class="criterion_points_possible"><%= criterion ? criterion.points : 5 %></span><% }) %>
-      </span>
+      <div class="displaying">
+        <span class="nobr x_out_of_x">
+          <% ot(:out_of_points, "%{points}/%{total} pts", :points => capture { %>
+            <span class="criterion_points" style="<%= hidden if brief %>"><%= assessing ? (assessment_rating ? assessment_rating.points : "") : (criterion ? criterion.points : 5) %></span><% }, :total => capture { %>
+            <span class="criterion_points_possible"><%= criterion ? criterion.points : 5 %></span><% }) %>
+        </span>
+      </div>
+      <div class="ignoring">
+        <span class="x_out_of_x"> -- </span>
+      </div>
   </td>
 </tr>

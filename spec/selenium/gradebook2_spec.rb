@@ -9,8 +9,10 @@ describe "gradebook2" do
   ATTENDANCE_POINTS = "15"
 
 
-  STUDENT_NAME_1 = "nobody1@example.com"
-  STUDENT_NAME_2 = "nobody2@example.com"
+  STUDENT_NAME_1 = "Zoey Anteater"
+  STUDENT_NAME_2 = "Arnold Zebra"
+  STUDENT_SORTABLE_NAME_1 = "Anteater, Zoey"
+  STUDENT_SORTABLE_NAME_2 = "Zebra, Arnold"
   STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
   STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
   STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
@@ -92,8 +94,9 @@ describe "gradebook2" do
 
     #add first student
     @student_1 = User.create!(:name => STUDENT_NAME_1)
+
     @student_1.register!
-    @student_1.pseudonyms.create!(:unique_id => STUDENT_NAME_1, :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+    @student_1.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
 
     e1 = @course.enroll_student(@student_1)
     e1.workflow_state = 'active'
@@ -103,7 +106,7 @@ describe "gradebook2" do
     @other_section = @course.course_sections.create(:name => "the other section")
     @student_2 = User.create!(:name => STUDENT_NAME_2)
     @student_2.register!
-    @student_2.pseudonyms.create!(:unique_id => STUDENT_NAME_2, :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+    @student_2.pseudonyms.create!(:unique_id => "nobody2@example.com", :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
     e2 = @course.enroll_student(@student_2, :section => @other_section)
 
     e2.workflow_state = 'active'
@@ -191,6 +194,11 @@ describe "gradebook2" do
 
   it "should validate correct number of students showing up in gradebook" do
     driver.find_elements(:css, '.student-name').count.should == @course.students.count
+  end
+
+  it "should show students sorted by their sortable_name" do
+    dom_names = driver.find_elements(:css, '.student-name').map(&:text)
+    dom_names.should == [STUDENT_NAME_1, STUDENT_NAME_2]
   end
 
   it "should allow showing only a certain section" do

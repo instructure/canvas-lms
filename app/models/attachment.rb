@@ -35,7 +35,6 @@ class Attachment < ActiveRecord::Base
   belongs_to :scribd_account
   has_one :sis_batch
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
-  validates_length_of :cached_s3_url, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   before_save :infer_display_name
   before_save :default_values
@@ -381,8 +380,26 @@ class Attachment < ActiveRecord::Base
     end
   end
   protected :default_values
-  
+
+  def root_account_id
+    # see note in infer_namespace below
+    splits = namespace.try(:split, /_/)
+    return nil if splits.blank?
+    if splits[1] == "localstorage"
+      splits[3].to_i
+    else
+      splits[1].to_i
+    end
+  end
+
   def infer_namespace
+    # If you are thinking about changing the format of this, take note: some
+    # code relies on the namespace as a hacky way to efficiently get the
+    # attachment's account id. Look for anybody who is accessing namespace and
+    # splitting the string, etc.
+    #
+    # I've added the root_account_id accessor above, but I didn't verify there
+    # isn't any code still accessing the namespace for the account id directly.
     ns = Attachment.domain_namespace
     ns ||= self.context.root_account.file_namespace rescue nil
     ns ||= self.context.account.file_namespace rescue nil
@@ -737,14 +754,20 @@ class Attachment < ActiveRecord::Base
   end
   
   def clear_cached_urls
-    self.cached_s3_url = nil
-    self.s3_url_cached_at = nil
+    Rails.cache.delete(['cacheable_s3_urls', self].cache_key)
     self.cached_scribd_thumbnail = nil
   end
   
-  def cacheable_s3_url
-    cached = cached_s3_url && s3_url_cached_at && s3_url_cached_at >= (Time.now - 24.hours.to_i)
-    if !cached
+  def cacheable_s3_download_url
+    cacheable_s3_urls['attachment']
+  end
+
+  def cacheable_s3_inline_url
+    cacheable_s3_urls['inline']
+  end
+
+  def cacheable_s3_urls
+    Rails.cache.fetch(['cacheable_s3_urls', self].cache_key, :expires_in => 24.hours) do
       ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
 
       # response-content-disposition will be url encoded in the depths of
@@ -752,19 +775,19 @@ class Attachment < ActiveRecord::Base
       # quote the filename string, though.
       quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
 
+      # awesome browsers will use the filename* and get the proper unicode filename,
+      # everyone else will get the sanitized ascii version of the filename
       quoted_unicode = "UTF-8''#{URI.escape(display_name)}"
+      filename = %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
 
-      self.cached_s3_url = authenticated_s3_url(
-        :expires_in => 144.hours,
-        # awesome browsers will use the filename* and get the proper unicode filename,
-        # everyone else will get the sanitized ascii version of the filename
-        "response-content-disposition" => %(attachment; filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
-      )
-      self.s3_url_cached_at = Time.now
-      save
+      # we need to have versions of the url for each content-disposition
+      {
+        'inline' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "inline; " + filename),
+        'attachment' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "attachment; " + filename)
+      }
     end
-    cached_s3_url
   end
+  protected :cacheable_s3_urls
   
   def attachment_path_id
     a = (self.respond_to?(:root_attachment) && self.root_attachment) || self
@@ -1236,7 +1259,7 @@ class Attachment < ActiveRecord::Base
   named_scope :uploadable, :conditions => ['workflow_state = ?', 'pending_upload']
   named_scope :active, :conditions => ['file_state = ?', 'available']
   named_scope :thumbnailable?, :conditions => {:content_type => Technoweenie::AttachmentFu.content_types}  
-  def self.serialization_excludes; [:uuid, :cached_s3_url, :namespace]; end
+  def self.serialization_excludes; [:uuid, :namespace]; end
   def set_serialization_options
     if self.scribd_doc
       @scribd_password = self.scribd_doc.secret_password

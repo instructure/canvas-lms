@@ -558,12 +558,6 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <input type="checkbox" id="limit_privileges_to_course_section" name="limit_privileges_to_course_section" value="1"/>
           <%= label_tag :limit_privileges_to_course_section, :en => 'these admins can only grade students in their section' %>
         </span>
-        <% if can_do(@context.account, @current_user, :manage_admin_users) %>
-          <div style="white-space: nowrap;">
-            <input type="checkbox" id="auto_accept_enrollment" name="auto_accept" value="1"/>
-            <%= label_tag :auto_accept_enrollment, :en => "don't send invite, just auto-accept these users" %>
-          </div>
-        <% end %>
       </div>
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
         <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative privileges for this course.}) %>

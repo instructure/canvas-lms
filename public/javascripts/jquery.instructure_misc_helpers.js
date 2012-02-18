@@ -442,7 +442,7 @@ I18n.scoped('instructure', function(I18n) {
                   image_url = "http://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_s.jpg",
                   big_image_url = "http://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg",
                   source_url = "http://www.flickr.com/photos/" + photo.owner + "/" + photo.id;
-                  
+
               $dialog.find(".results").append(
                 $('<div class="image" style="float: left; padding: 2px; cursor: pointer;"/>')
                 .append($('<img/>', {
@@ -453,7 +453,7 @@ I18n.scoped('instructure', function(I18n) {
                   'class': "image_link",
                   src: image_url,
                   title: "embed " + (photo.title || ""),
-                  alt: photo.title || ""  
+                  alt: photo.title || ""
                 }))
               );
             }
@@ -478,23 +478,19 @@ I18n.scoped('instructure', function(I18n) {
     $dialog.find("form img").attr('src', '/images/' + service_type + '_small_icon.png');
     var url = $("#editor_tabs .bookmark_search_url").attr('href');
     url = $.replaceTags(url, 'service_type', service_type);
-    $dialog
-      .data('reference_url', url)
-      .find(".results").empty().end()
-      .find(".query").val("").end()
-      .dialog('close')
-      .dialog({
-        autoOpen: false,
-        title: I18n.t('titles.image_search', "Image Search: %{service_name}", {service_name: $.titleize(service_type)}),
-        width: 440,
-        open: function() {
-          $dialog.find("input:visible:first").focus().select();
-        },
-        height: 320
-      })
-      .dialog('open');
+    $dialog.data('reference_url', url || '')
+    $dialog.find(".results").empty();
+    $dialog.find(".query").val("");
+    $dialog.dialog({
+      title: I18n.t('titles.image_search', "Image Search: %{service_name}", {service_name: $.titleize(service_type)}),
+      width: 440,
+      open: function() {
+        $dialog.find("input:visible:first").focus().select();
+      },
+      height: 320
+    });
   };
-  
+
   $.truncateText = function(string, max) {
     max = max || 30;
     if ( !string ) { 

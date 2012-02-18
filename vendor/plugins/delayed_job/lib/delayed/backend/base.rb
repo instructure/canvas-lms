@@ -7,6 +7,7 @@ module Delayed
     end
 
     module Base
+      ON_HOLD_LOCKED_BY = 'on hold'
       ON_HOLD_COUNT = 50
 
       def self.included(base)
@@ -121,7 +122,7 @@ module Delayed
       end
 
       def hold!
-        self.locked_by = 'on hold'
+        self.locked_by = ON_HOLD_LOCKED_BY
         self.locked_at = self.class.db_time_now
         self.attempts = ON_HOLD_COUNT
         self.save!

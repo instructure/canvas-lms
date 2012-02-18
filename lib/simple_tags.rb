@@ -13,15 +13,20 @@ module SimpleTags
     end
 
     def self.included(klass)
-      klass.named_scope :tagged, lambda { |tag|
-        {:conditions => klass.wildcard(klass.quoted_table_name + '.tags', tag, :delimiter => ',')}
+      klass.named_scope :tagged, lambda { |*tags|
+        options = tags.last.is_a?(Hash) ? tags.pop : {}
+        options[:mode] ||= :or
+        conditions = tags.map{ |tag|
+          klass.wildcard(klass.quoted_table_name + '.tags', tag, :delimiter => ',')
+        }
+        {:conditions => conditions.join(options[:mode] == :or ? " OR " : " AND ")}
       }
     end
   end
 
   module WriterInstanceMethods
     def tags=(new_tags)
-      @tag_array = new_tags
+      @tag_array = new_tags || []
     end
 
     def reload(*args)

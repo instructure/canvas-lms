@@ -23,6 +23,7 @@
               <li class="<%= 'checked' if @scope == :inbox %>"><%= link_to t('inbox_views.inbox', "Inbox"), conversations_url(:filter => params[:filter]) %></li>
               <li class="<%= 'checked' if @scope == :unread %>"><%= link_to t('inbox_views.unread_messages', "Unread"), conversations_unread_url(:filter => params[:filter]) %></li>
               <li class="<%= 'checked' if @scope == :starred %>"><%= link_to t('inbox_views.starred_messages', "Starred"), conversations_starred_url(:filter => params[:filter]) %></li>
+              <li class="<%= 'checked' if @scope == :sent %>"><%= link_to t('inbox_views.sent_messages', "Sent"), conversations_sent_url(:filter => params[:filter]) %></li>
             </ul>
             <ul>
               <li class="<%= 'checked' if @scope == :archived %>"><%= link_to t('inbox_views.archived_messages', "Archived"), conversations_archived_url(:filter => params[:filter]) %></li>

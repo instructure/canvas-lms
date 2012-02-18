@@ -1604,6 +1604,13 @@ class Course < ActiveRecord::Base
   end
   private :process_migration_files
 
+  def import_media_objects(mo_attachments, migration)
+    wait_for_completion = (migration && migration.migration_settings[:worker_class] == CC::Importer::Canvas::Converter.name)
+    unless mo_attachments.blank?
+      MediaObject.add_media_files(mo_attachments, wait_for_completion)
+    end
+  end
+
   def import_from_migration(data, params, migration)
     params ||= {:copy=>{}}
     logger.debug "starting import"
@@ -1622,11 +1629,7 @@ class Course < ActiveRecord::Base
       process_migration_files(data, migration); migration.fast_update_progress(18)
       Attachment.process_migration(data, migration); migration.fast_update_progress(20)
       mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
-      # we'll wait synchronously for the media objects to be uploaded, so that
-      # we have the media_ids that we need later.
-      unless mo_attachments.blank?
-        import_media_objects_and_attachments(mo_attachments)
-      end
+      import_media_objects(mo_attachments, migration)
     end
 
     # needs to happen after the files are processed, so that they are available in the syllabus
@@ -1711,29 +1714,6 @@ class Course < ActiveRecord::Base
     settings.slice(*atts.map(&:to_s)).each do |key, val|
       self.send("#{key}=", val)
     end
-  end
-
-  def import_media_objects_and_attachments(mo_attachments)
-    MediaObject.add_media_files(mo_attachments, true)
-    # attachments in /media_objects were created on export, soley to
-    # download and include a media object in the export. now that they've
-    # been sent to kaltura, we can remove them.
-    failed_uploads, mo_attachments = mo_attachments.partition { |a| a.media_object.nil? }
-
-    unless failed_uploads.empty?
-      add_migration_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), failed_uploads.map(&:id).join(','))
-    end
-
-    to_remove = mo_attachments.find_all { |a| a.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/') }
-    to_remove.each do |a|
-      a.destroy(false)
-    end
-    folder = to_remove.last.folder if to_remove.last
-    if folder && folder.file_attachments.active.count == 0 && folder.active_sub_folders.count == 0
-      folder.destroy
-    end
-  rescue Exception => e
-    add_migration_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), e)
   end
 
   def add_migration_warning(message, exception='')
@@ -2297,9 +2277,9 @@ class Course < ActiveRecord::Base
   end
 
   def external_tool_tabs(opts)
-    tools = self.context_external_tools.having_setting('course_navigation')
+    tools = self.context_external_tools.active.having_setting('course_navigation')
     account_ids = self.account_chain_ids
-    tools += ContextExternalTool.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
+    tools += ContextExternalTool.active.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,

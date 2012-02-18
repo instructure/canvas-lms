@@ -256,8 +256,7 @@ class QuizzesController < ApplicationController
       if params[:quiz_submission_id]
         @submission = @quiz.quiz_submissions.find(params[:quiz_submission_id])
       else
-        user_id = @current_user.id
-        user_id = params[:user_id] if params[:user_id] && @quiz.grants_right?(@current_user, session, :grade)
+        user_id = params[:user_id].presence || @current_user.id
         @submission = @quiz.quiz_submissions.find_by_user_id(user_id, :order => 'created_at') rescue nil
       end
       @submission = nil if @submission && @submission.settings_only?

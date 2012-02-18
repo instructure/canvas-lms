@@ -32,14 +32,42 @@ class ConversationMessage < ActiveRecord::Base
 
   named_scope :human, :conditions => "NOT generated"
   named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL"
-  named_scope :latest_for_conversations, lambda{ |conversation_participants| {
-    :select => 'conversation_messages.*',
-    :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
-    :conditions => [
-        "conversation_participant_id in (?) AND conversation_messages.created_at = (SELECT MAX(created_at) FROM conversation_messages cm2 WHERE cm2.conversation_id = conversation_messages.conversation_id)",
-        conversation_participants.map(&:id)
-      ]
-  }}
+  named_scope :by_user, lambda { |user_or_id|
+    user_or_id = user_or_id.id if user_or_id.is_a?(User)
+    {:conditions => {:author_id => user_or_id}}
+  }
+  def self.latest_for_conversations(conversation_participants, author_id=nil)
+    return {} unless conversation_participants.present?
+    base_conditions = sanitize_sql([
+      "conversation_id IN (?) AND conversation_participant_id in (?) AND NOT generated",
+      conversation_participants.map(&:conversation_id),
+      conversation_participants.map(&:id)
+    ])
+    base_conditions << sanitize_sql([" AND author_id = ?", author_id]) if author_id
+
+    # limit it for non-postgres so we can reduce the amount of extra data we
+    # crunch in ruby (generally none, unless a conversation has multiple
+    # most-recent messages, i.e. same created_at)
+    unless connection.adapter_name == 'PostgreSQL'
+      base_conditions << <<-SQL
+        AND conversation_messages.created_at = (
+          SELECT MAX(created_at)
+          FROM conversation_messages cm2
+          JOIN conversation_message_participants cmp2 ON cm2.id = conversation_message_id
+          WHERE cm2.conversation_id = conversation_messages.conversation_id
+            AND #{base_conditions}
+        )
+      SQL
+    end
+
+    ret = distinct_on('conversation_participant_id',
+      :select => "conversation_messages.*",
+      :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
+      :conditions => base_conditions,
+      :order => 'conversation_participant_id, created_at DESC'
+    )
+    Hash[ret.map{ |m| [m.conversation_id, m]}]
+  end
 
   validates_length_of :body, :maximum => maximum_text_length
 

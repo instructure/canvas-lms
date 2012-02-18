@@ -27,6 +27,7 @@ describe "account_authorization_configs/index" do
                                   Account.default.account_authorization_configs.build ]
     assigns[:current_user] = user_model
     assigns[:saml_identifiers] = []
+    assigns[:saml_authn_contexts] = []
     render 'account_authorization_configs/index'
     response.body.should match("192.168.0.1\n192.168.0.2")
   end

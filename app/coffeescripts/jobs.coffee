@@ -40,6 +40,8 @@ I18n.scoped 'jobs', (I18n) ->
     constructor: (options, type_name = 'jobs', grid_name = '#jobs-grid') ->
       Jobs.max_attempts = options.max_attempts if options.max_attempts
       super(options, type_name, grid_name)
+      if options.starting_query
+        @query = options.starting_query
 
     search: (query) ->
       @query = query
@@ -144,10 +146,10 @@ I18n.scoped 'jobs', (I18n) ->
         alert('No jobs are selected')
         return
 
-      all_jobs = @grid.getSelectedRows().length == @data.length
+      all_jobs = @grid.getSelectedRows().length > 1 && @grid.getSelectedRows().length == @data.length
 
-      if all_jobs && action == 'destroy'
-        return unless confirm(I18n.t('confirm.delete_all', "Are you sure you want to delete *all* jobs of this type and matching this query?"))
+      if all_jobs
+        return unless confirm(I18n.t('confirm.delete_all', "Are you sure you want to #{action} *all* jobs of this type and matching this query?"))
 
       # special case -- if they've selected all, then don't send the ids so that
       # we can operate on jobs that match the query but haven't even been loaded

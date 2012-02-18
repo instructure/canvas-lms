@@ -70,6 +70,45 @@ module Stats
     def stddev; @items.empty? ? nil : Math::sqrt(variance); end
     alias :standard_deviation :stddev
     
+    def quartiles
+      # returns the 1st quartile, 2nd quartile (median),
+      # and 3rd quartile for the data
+      
+      # note that methodology for determining quartiles
+      # is not universally agreed upon (oddly enough)
+      # this method picks medians and gets 
+      # results that are universally agreed upon.
+      # the method also give good results for quartiles
+      # when the sample size is small.  When it is large
+      # then any old method will be close enough, but 
+      # this one is very good
+      # method is summarized well here:
+      # http://www.stat.yale.edu/Courses/1997-98/101/numsum.htm
+      sorted_items = @items.sort
+      vals = []
+      
+      # 1st Q
+      n = (sorted_items.length+1)/4.0 -1
+      weight = 1.0 -(n - n.to_i)
+      n = n.to_i
+      vals<<get_weighted_nth(sorted_items, n, weight)
+      
+      # 2nd Q
+      n = (sorted_items.length+1)/2.0 -1
+      weight = 1.0 -(n - n.to_i)
+      n = n.to_i
+      vals<<get_weighted_nth(sorted_items, n, weight)
+      
+      # 3rd Q
+      n = (sorted_items.length+1)*3.0/4.0 -1
+      weight = 1.0 -(n - n.to_i)
+      n = n.to_i
+      vals<<get_weighted_nth(sorted_items, n, weight)
+      
+      vals
+    end
+    
+    
     def histogram(bin_width=1.0,bin_base=0.0)
       # returns a hash representing a histogram
       # divides @items into bin_width sized bins
@@ -92,6 +131,16 @@ module Stats
       end
       ret_val[:data] = bins
       ret_val
-    end  
+    end 
+    
+    private
+    
+    def get_weighted_nth(sorted_items, n, weight)
+      n1 = sorted_items[n].to_f
+      n2 = sorted_items[n+1].to_f
+      val = n1*weight + n2*(1.0-weight)
+      val
+    end
+    
   end
 end

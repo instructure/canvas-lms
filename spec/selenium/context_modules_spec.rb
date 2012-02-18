@@ -34,7 +34,8 @@ describe "context_modules" do
       select_module_item(item_select_selector + ' .module_item_select', item_name)
       driver.find_element(:css, '.add_item_button').click
       wait_for_ajaximations
-      module_item = driver.find_element(:id, 'context_module_item_1')
+      tag = ContentTag.last
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(item_name)
       module_item
     end
@@ -52,7 +53,8 @@ describe "context_modules" do
       replace_content(item_title, item_title_text)
       driver.find_element(:css, '.add_item_button').click
       wait_for_ajaximations
-      module_item = driver.find_element(:id, 'context_module_item_1')
+      tag = ContentTag.last
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(item_title_text)
     end
 
@@ -69,7 +71,8 @@ describe "context_modules" do
 
       driver.find_element(:css, '.add_item_button').click
       wait_for_ajaximations
-      module_item = driver.find_element(:id, 'context_module_item_1')
+      tag = ContentTag.last
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(page_name_text)
     end
 
@@ -183,14 +186,15 @@ describe "context_modules" do
     it "should edit a module item" do
       item_edit_text = "Assignment Edit 1"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      context_module_item = driver.find_element(:id, 'context_module_item_1')
+      tag = ContentTag.last
+      context_module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       driver.action.move_to(context_module_item).perform
       module_item.find_element(:css, '.edit_item_link').click
       edit_form = driver.find_element(:id, 'edit_item_form')
       replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
       edit_form.submit
       wait_for_ajaximations
-      module_item = driver.find_element(:id, 'context_module_item_1')
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(item_edit_text)
     end
 
@@ -233,7 +237,8 @@ describe "context_modules" do
       end
       driver.find_element(:css, '.add_item_button').click
       wait_for_ajaximations
-      module_item = driver.find_element(:id, 'context_module_item_1')
+      tag = ContentTag.last
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(header_text)
     end
 
@@ -253,7 +258,8 @@ describe "context_modules" do
     end
 
     it "should add 2 modules with the first one as a prerequisite" do
-      pending("bug 6711 - test is finished just waiting on bug fix")
+       #Bug - 6711
+      pending("Prerequisite module doesn't save when creating and saving module in one step")
       first_module_name = 'First Module'
       second_module_name = 'Second Module'
 
@@ -267,9 +273,10 @@ describe "context_modules" do
       click_option(':input:visible.eq(3)', first_module_name)
       add_form.submit
       wait_for_ajaximations
-      context_module = driver.find_element(:id, 'context_module_2')
+      db_module = ContextModule.last
+      context_module = driver.find_element(:id, "context_module_#{db_module.id}")
       driver.action.move_to(context_module).perform
-      driver.find_element(:css, '#context_module_2 .edit_module_link').click
+      driver.find_element(:css, "#context_module_#{db_module.id} .edit_module_link").click
       driver.find_element(:css, '.ui-dialog').should be_displayed
       wait_for_ajaximations
       prereq_select = find_all_with_jquery(':input:visible')[3]
@@ -393,7 +400,7 @@ describe "context_modules" do
 
     it "should validate that a student can't get to a locked context module" do
       #sequential error validation
-      get "/courses/#{@course.id}/modules/items/#{@assignment_2.id}"
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
       driver.find_element(:id, 'module_prerequisites_list').should be_displayed
     end

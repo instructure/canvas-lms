@@ -173,7 +173,7 @@ module I18nExtraction
 
       # single word count/pluralization fu
       if default.is_a?(String) && default =~ /\A[\w\-]+\z/ && call_options && call_options.include?(:count)
-        default = {:one => "1 #{default}", :other => "%{count} #{default.pluralize}"}
+        default = infer_pluralization_hash(default)
       end
 
       (default.is_a?(String) ? {nil => default} : default).each_pair do |k, str|
@@ -212,8 +212,11 @@ module I18nExtraction
         process_literal(default) rescue (raise "unable to \"parse\" default for #{key.inspect} on line #{line_offset}: #{$!}")
       else
         hash = JSON.parse(sanitize_json_hash(default)) rescue (raise "unable to \"parse\" default for #{key.inspect} on line #{line_offset}: #{$!}")
-        if (invalid_keys = (hash.keys.map(&:to_sym) - [:one, :other, :zero])).size > 0
+        pluralization_keys = hash.keys.map(&:to_sym)
+        if (invalid_keys = (pluralization_keys - allowed_pluralization_keys)).size > 0
           raise "invalid :count sub-key(s): #{invalid_keys.inspect} on line #{line_offset}"
+        elsif required_pluralization_keys & pluralization_keys != required_pluralization_keys
+          raise "not all required :count sub-key(s) provided on line #{line_offset} (expected #{required_pluralization_keys.join(', ')})"
         end
         hash
       end
