@@ -410,4 +410,27 @@ describe "context_modules" do
       driver.find_element(:id, 'module_prerequisites_list').should be_displayed
     end
   end
+
+  describe "sequence footer" do
+    it "should show module navigation for group assignment discussions" do
+      course_with_student_logged_in
+      group_assignment_discussion(:course => @course)
+      @group.users << @student
+      assignment_model(:course => @course)
+      @module = ContextModule.create!(:context => @course)
+      @page = wiki_page_model(:course => @course)
+      i1 = @module.content_tags.create!(:context => @course, :content => @assignment, :tag_type => 'context_module')
+      i2 = @module.content_tags.create!(:context => @course, :content => @root_topic, :tag_type => 'context_module')
+      i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
+      @module2 = ContextModule.create!(:context => @course, :name => 'second module')
+      get "/courses/#{@course.id}/modules/items/#{i2.id}"
+      wait_for_ajaximations
+
+      prev = driver.find_element(:css, '#sequence_footer a.prev')
+      URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i1.id}"
+
+      nxt = driver.find_element(:css, '#sequence_footer a.next')
+      URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i3.id}"
+    end
+  end
 end
