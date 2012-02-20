@@ -71,6 +71,16 @@ describe "gradebook2" do
     cells[4].text
   end
 
+  def switch_to_section(section=nil)
+    section = section.id if section.is_a?(CourseSection)
+    section ||= ""
+    button = driver.find_element(:id, 'section_to_show')
+    button.click
+    sleep 1 #TODO find a better way to wait for css3 anmation to end
+    driver.find_element(:id, 'section-to-show-menu').should be_displayed
+    driver.find_element(:css, "label[for='section_option_#{section}']").click
+  end
+
   # `students` should be a hash of student_id, expected total pairs, like:
   # {
   #   1 => '12%',
@@ -253,10 +263,7 @@ describe "gradebook2" do
 
     button = driver.find_element(:id, 'section_to_show')
     button.should include_text "All Sections"
-    button.click
-    sleep 1 #TODO find a better way to wait for css3 anmation to end
-    driver.find_element(:id, 'section-to-show-menu').should be_displayed
-    driver.find_element(:css, "label[for='section_option_#{@other_section.id}']").click
+    switch_to_section(@other_section)
     button.should include_text @other_section.name
 
     # verify that it remembers the section to show across page loads
@@ -266,10 +273,7 @@ describe "gradebook2" do
     button.should include_text @other_section.name
 
     # now verify that you can set it back
-    button.click
-    sleep 1 #TODO find a better way to wait for css3 anmation to end
-    driver.find_element(:id, 'section-to-show-menu').should be_displayed
-    driver.find_element(:css, "label[for='section_option_']").click
+    switch_to_section()
     button.should include_text "All Sections"
   end
 
@@ -535,5 +539,24 @@ describe "gradebook2" do
     end
     driver.switch_to.default_content
     find_slick_cells(1, driver.find_element(:css, '#gradebook_grid'))[0].text.should == curved_grade_text
+  end
+
+  it "should handle multiple enrollments correctly" do
+    @course.student_enrollments.create!(:user => @student_1, :course_section => @other_section)
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    meta_cells = find_slick_cells(0, driver.find_element(:css, '.grid-canvas'))
+    meta_cells[0].should include_text @course.default_section.display_name
+    meta_cells[0].should include_text @other_section.display_name
+
+    switch_to_section(@course.default_section)
+    meta_cells = find_slick_cells(0, driver.find_element(:css, '.grid-canvas'))
+    meta_cells[0].should include_text STUDENT_NAME_1
+
+    switch_to_section(@other_section)
+    meta_cells = find_slick_cells(0, driver.find_element(:css, '.grid-canvas'))
+    meta_cells[0].should include_text STUDENT_NAME_1
   end
 end

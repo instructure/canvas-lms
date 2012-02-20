@@ -76,21 +76,24 @@ define [
         htmlEscape(section)
         @sections[section.id] = section
         for student in section.students
-          htmlEscape(student)
-          student.computed_current_score ||= 0
-          student.computed_final_score ||= 0
-          student.secondary_identifier = student.sis_login_id || student.login_id
-          @students[student.id] = student
-          student.section = section
-          # fill in dummy submissions, so there's something there even if the
-          # student didn't submit anything for that assignment
-          for id, assignment of @assignments
-            student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
-          @rows.push(student)
+          @students[student.id] ||= htmlEscape(student)
+          @students[student.id].sections ||= []
+          @students[student.id].sections.push(section.id)
       @sections_enabled = sections.length > 1
       for id, student of @students
+        student.computed_current_score ||= 0
+        student.computed_final_score ||= 0
+        student.secondary_identifier = student.sis_login_id || student.login_id
         student.display_name = "<div class='student-name'>#{student.name}</div>"
-        student.display_name += "<div class='student-section'>#{student.section.name}</div>" if @sections_enabled
+        if @sections_enabled
+          sectionNames = (@sections[section_id].name for section_id in student.sections)
+          sectionNames.sort()
+          student.display_name += "<div class='student-section'>" + $.toSentence(sectionNames) + "</div>"
+        # fill in dummy submissions, so there's something there even if the
+        # student didn't submit anything for that assignment
+        for id, assignment of @assignments
+          student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
+        @rows.push(student)
       @initGrid()
       @buildRows()
       @getSubmissionsChunks()
@@ -134,7 +137,7 @@ define [
       throw "unhandled column sort condition"
 
     rowFilter: (student) =>
-      !@sectionToShow || (student.section.id == @sectionToShow)
+      !@sectionToShow || (@sectionToShow in student.sections)
 
     handleAssignmentMutingChange: (assignment) =>
       idx = @gradeGrid.getColumnIndex("assignment_#{assignment.id}")

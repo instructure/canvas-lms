@@ -160,7 +160,10 @@ class GradebooksController < ApplicationController
         @new_submissions = @submissions.select{|s| s.updated_at > d}
       end
       @enrollments_hash = {}
-      @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
+      @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e|
+        @enrollments_hash[e.user_id] ||= []
+        @enrollments_hash[e.user_id] << e
+      }
       @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name.downcase }.uniq
 
       log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")

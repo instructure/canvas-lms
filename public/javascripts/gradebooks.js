@@ -84,8 +84,9 @@ require([
       }
     });
     
-    $courseSections.add('.gradebook_table .course_section').each(function() {
-      if ($(this).data('course_section_id') != sectionToShow){
+    $('.outer_student_name .course_sections, .gradebook_table .course_sections').each(function() {
+      var section_ids = $(this).data('course_section_ids').toString().split(",");
+      if (section_ids.indexOf(sectionToShow) == -1) {
         $(this).closest('tr').remove();
       } else {
         var studentId = $(this).closest('.student_header').attr('id');
