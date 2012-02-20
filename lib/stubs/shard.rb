@@ -29,8 +29,8 @@ class Shard
     default
   end
 
-  def self.partition_by_shard(array)
-    yield array
+  def self.partition_by_shard(array, partition_proc = nil)
+    Array(yield array)
   end
 
   def activate
