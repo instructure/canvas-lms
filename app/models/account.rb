@@ -564,7 +564,9 @@ class Account < ActiveRecord::Base
   def account_users_for(user)
     @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
     @account_users_cache ||= {}
-    @account_users_cache[user] ||= AccountUser.find(:all, :conditions => { :account_id => @account_chain_ids, :user_id => user.id }) if user
+    @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
+      AccountUser.find(:all, :conditions => { :account_id => account_chain_ids, :user_id => user.id })
+    end if user
     @account_users_cache[user] ||= []
     @account_users_cache[user]
   end

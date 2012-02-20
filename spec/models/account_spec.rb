@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Account do
 
@@ -650,6 +650,21 @@ describe Account do
         account.settings = { :global_javascript => 'bob' }
         account.settings[:global_javascript].should == 'bob'
       end
+    end
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should properly return site admin permissions regardless of active shard" do
+      user
+      site_admin = Account.site_admin
+      site_admin.add_user(@user)
+
+      @shard1.activate do
+        site_admin.grants_right?(@user, nil, :site_admin).should be_true
+      end
+      site_admin.grants_right?(@user, nil, :site_admin).should be_true
     end
   end
 end
