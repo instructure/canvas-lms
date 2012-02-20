@@ -30,6 +30,7 @@ describe "quizzes questions" do
     question.find_element(:css, ".add_answer_link").click
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(4)
+    driver.action.move_to(answers[3]).perform
     answers[3].find_element(:css, ".delete_answer_link").click
     answers = question.find_elements(:css, "div.form_answers > div.answer")
     answers.length.should eql(3)

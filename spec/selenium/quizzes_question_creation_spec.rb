@@ -306,4 +306,124 @@ describe "quizzes question creation" do
     questions[1].should have_class("true_false_question")
     questions[2].should have_class("short_answer_question")
   end
+
+  context "html answers" do
+
+    def edit_first_html_answer(question_type=nil)
+      edit_first_question
+      click_option('.question_form:visible .question_type', question_type) if question_type
+      driver.execute_script "$('.answer').addClass('hover');"
+      find_with_jquery('.edit_html:visible').click
+    end
+
+    def close_first_html_answer
+      driver.find_element(:css, '.edit-html-done').click
+    end
+
+    it "should allow HTML answers for multiple choice" do
+      skip_if_ie 'Out of memory'
+      quiz_with_new_questions
+      edit_first_html_answer
+      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      close_first_html_answer
+      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html.should == '<p>HTML</p>'
+      find_with_jquery('.question_form:visible').submit
+      refresh_page
+      edit_first_question
+      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html.should == '<p>HTML</p>'
+    end
+
+    it "should allow HTML answers for multiple answers" do
+      skip_if_ie 'Out of memory'
+      quiz_with_new_questions
+      edit_first_html_answer 'Multiple Answers'
+      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      close_first_html_answer
+      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html.should == '<p>HTML</p>'
+      find_with_jquery('.question_form:visible').submit
+      refresh_page
+      edit_first_question
+      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html.should == '<p>HTML</p>'
+    end
+
+    def check_for_no_edit_button(option)
+      click_option('.question_form:visible .question_type', option)
+      driver.execute_script "$('.answer').addClass('hover');"
+      find_with_jquery('.edit_html:visible').should be_nil
+    end
+
+    it "should not show the edit html button for question types besides multiple choice and multiple answers" do
+      quiz_with_new_questions
+      edit_first_question
+
+      check_for_no_edit_button 'True/False'
+      check_for_no_edit_button 'Fill In the Blank'
+      check_for_no_edit_button 'Fill In Multiple Blanks'
+      check_for_no_edit_button 'Multiple Dropdowns'
+      check_for_no_edit_button 'Matching'
+      check_for_no_edit_button 'Numerical Answer'
+    end
+
+    it "should restore normal input when html answer is empty" do
+      quiz_with_new_questions
+      edit_first_html_answer
+      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+
+      # clear tiny
+      driver.execute_script "$('.answer:eq(2) textarea')._setContentCode('')"
+      close_first_html_answer
+      input_length = driver.execute_script "return $('.answer:eq(2) input[name=answer_text]:visible').length"
+      input_length.should == 1
+    end
+
+    it "should populate the editor and input elements properly" do
+      quiz_with_new_questions
+
+      # add text to regular input
+      edit_first_question
+      input = find_with_jquery 'input[name=answer_text]:visible'
+      input.click
+      input.send_keys 'ohai'
+      find_with_jquery('.question_form:visible').submit
+      wait_for_ajax_requests
+
+      # open it up in the editor, make sure the text matches the input
+      edit_first_html_answer
+      content = driver.execute_script "return $('.answer:eq(2) textarea')._justGetCode()"
+      content.should == '<p>ohai</p>'
+
+      # clear it out, make sure the original input is empty also
+      driver.execute_script "$('.answer:eq(2) textarea')._setContentCode('')"
+      close_first_html_answer
+      value = driver.execute_script "return $('input[name=answer_text]:visible')[0].value"
+      value.should == ''
+    end
+
+    it "should save open html answers when the question is submitted for multiple choice" do
+      quiz_with_new_questions
+      edit_first_html_answer
+      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      find_with_jquery('.question_form:visible').submit
+      refresh_page
+      edit_first_question
+      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html.should == '<p>HTML</p>'
+    end
+
+    it "should save open html answers when the question is submitted for multiple answers" do
+      quiz_with_new_questions
+      edit_first_html_answer 'Multiple Answers'
+      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      find_with_jquery('.question_form:visible').submit
+      refresh_page
+      edit_first_question
+      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html.should == '<p>HTML</p>'
+    end
+ end
 end
+

@@ -250,3 +250,4 @@ describe "quizzes" do
     driver.find_element(:css, '#content .question_name').should include_text("Question 1")
   end
 end
+

@@ -558,12 +558,10 @@ form.question_form
       :-moz-border-radius 5px
     .answer.hover
       :border 1px solid #ddd
-    .answer .delete_answer_link
-      :display block
-    .answer.hover .delete_answer_link
-      :background url(/images/delete_circle.png) no-repeat center center
-    .answer .delete_answer_link:focus
-      :background url(/images/delete_circle.png) no-repeat center center
+    .answer .question_actions
+      display: none
+    .answer.hover .question_actions
+      display: block
     .answer_comments
       :-moz-border-radius 5px
       :border 2px solid #faa
@@ -879,3 +877,14 @@ ul#quiz_versions
 
 .question select
   max-width: 100%
+
+.edit-html-done
+  float: right
+
+.question_actions .atr-edit
+  display: none
+
+.multiple_choice_question .question_actions .atr-edit,
+.multiple_answers_question .question_actions .atr-edit
+  display: inline-block
+

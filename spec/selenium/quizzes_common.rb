@@ -104,4 +104,12 @@ shared_examples_for "quizzes selenium tests" do
     el.find_element(:css, "textarea").should be_displayed
     el.find_element(:css, "textarea").send_keys(text)
   end
+
+  def edit_first_question
+    question = driver.find_element :css, '.display_question'
+    driver.action.move_to(question).perform
+    driver.find_element(:css, '.edit_question_link').click
+    wait_for_animations
+  end
 end
+
