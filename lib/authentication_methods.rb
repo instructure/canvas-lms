@@ -137,7 +137,7 @@ module AuthenticationMethods
         end
       end
 
-      if request_become_user && request_become_user.id != session[:become_user_id].to_i && request_become_user.grants_right?(@current_user, session, :become_user)
+      if request_become_user && request_become_user.id != session[:become_user_id].to_i && request_become_user.can_masquerade?(@current_user, @domain_root_account)
         params_without_become = params.dup
         params_without_become.delete_if {|k,v| [ 'become_user_id', 'become_teacher', 'become_student', 'me' ].include? k }
         params_without_become[:only_path] = true
@@ -153,7 +153,7 @@ module AuthenticationMethods
         user = api_find(User, as_user_id)
       rescue ActiveRecord::RecordNotFound
       end
-      if user && user.grants_right?(@current_user, session, :become_user)
+      if user && user.can_masquerade?(@current_user, @domain_root_account)
         @real_current_user = @current_user
         @current_user = user
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"

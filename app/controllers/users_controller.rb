@@ -197,17 +197,16 @@ class UsersController < ApplicationController
 
   def masquerade
     @user = User.find(:first, :conditions => {:id => params[:user_id]})
-    if (authorized_action(@user, @real_current_user || @current_user, :become_user))
-      if request.post?
-        if @user == @real_current_user
-          session[:become_user_id] = nil
-        else
-          session[:become_user_id] = params[:user_id]
-        end
-        return_url = session[:masquerade_return_to]
-        session[:masquerade_return_to] = nil
-        return return_to(return_url, request.referer || dashboard_url)
+    return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
+    if request.post?
+      if @user == @real_current_user
+        session[:become_user_id] = nil
+      else
+        session[:become_user_id] = params[:user_id]
       end
+      return_url = session[:masquerade_return_to]
+      session[:masquerade_return_to] = nil
+      return return_to(return_url, request.referer || dashboard_url)
     end
   end
 

@@ -558,60 +558,48 @@ describe User do
     end
   end
 
-  context "permissions" do
-    it "should grant become_user to self" do
+  describe "can_masquerade?" do
+    it "should allow self" do
       @user = user_with_pseudonym(:username => 'nobody1@example.com')
-      @user.grants_right?(@user, nil, :become_user).should be_true
+      @user.can_masquerade?(@user, Account.default).should be_true
     end
 
-    it "should not grant become_user to other users" do
+    it "should not allow other users" do
       @user1 = user_with_pseudonym(:username => 'nobody1@example.com')
       @user2 = user_with_pseudonym(:username => 'nobody2@example.com')
-      @user1.grants_right?(@user2, nil, :become_user).should be_false
-      @user2.grants_right?(@user1, nil, :become_user).should be_false
+
+      @user1.can_masquerade?(@user2, Account.default).should be_false
+      @user2.can_masquerade?(@user1, Account.default).should be_false
     end
 
-    it "should grant become_user to site and account admins" do
+    it "should allow site and account admins" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
-      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
+      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
       Account.site_admin.add_user(@site_admin)
       Account.default.add_user(@admin)
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
-      @admin.grants_right?(@site_admin, nil, :become_user).should be_true
-      user.grants_right?(@admin, nil, :become_user).should be_true
-      @admin.grants_right?(@admin, nil, :become_user).should be_true
-      @admin.grants_right?(user, nil, :become_user).should be_false
-      @site_admin.grants_right?(@site_admin, nil, :become_user).should be_true
-      @site_admin.grants_right?(user, nil, :become_user).should be_false
-      @site_admin.grants_right?(@admin, nil, :become_user).should be_false
+      user.can_masquerade?(@site_admin, Account.default).should be_true
+      @admin.can_masquerade?(@site_admin, Account.default).should be_true
+      user.can_masquerade?(@admin, Account.default).should be_true
+      @admin.can_masquerade?(@admin, Account.default).should be_true
+      @admin.can_masquerade?(user, Account.default).should be_false
+      @site_admin.can_masquerade?(@site_admin, Account.default).should be_true
+      @site_admin.can_masquerade?(user, Account.default).should be_false
+      @site_admin.can_masquerade?(@admin, Account.default).should be_false
     end
 
-    it "should not grant become_user to other site admins" do
-      @site_admin1 = user_with_pseudonym(:username => 'nobody1@example.com')
-      @site_admin2 = user_with_pseudonym(:username => 'nobody2@example.com')
-      Account.site_admin.add_user(@site_admin1)
-      Account.site_admin.add_user(@site_admin2)
-      @site_admin1.grants_right?(@site_admin2, nil, :become_user).should be_false
-      @site_admin2.grants_right?(@site_admin1, nil, :become_user).should be_false
+    it "should not allow restricted admins to become full admins" do
+      user = user_with_pseudonym(:username => 'nobody1@example.com')
+      @restricted_admin = user_with_pseudonym(:username => 'nobody3@example.com')
+      account_admin_user_with_role_changes(:user => @restricted_admin, :membership_type => 'Restricted', :role_changes => { :become_user => true })
+      @admin = user_with_pseudonym(:username => 'nobody2@example.com')
+      Account.default.add_user(@admin)
+      user.can_masquerade?(@restricted_admin, Account.default).should be_true
+      @admin.can_masquerade?(@restricted_admin, Account.default).should be_false
+      @restricted_admin.can_masquerade?(@admin, Account.default).should be_true
     end
 
-    it "should not grant become_user to other account admins" do
-      @admin1 = user_with_pseudonym(:username => 'nobody1@example.com')
-      @admin2 = user_with_pseudonym(:username => 'nobody2@example.com')
-      Account.default.add_user(@admin1)
-      Account.default.add_user(@admin2)
-      @admin1.grants_right?(@admin2, nil, :become_user).should be_false
-      @admin2.grants_right?(@admin1, nil, :become_user).should be_false
-    end
-
-    it "should not allow account admin to modify admin privileges of other account admins" do
-      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
-    end
-
-    it "should grant become_user for users in multiple accounts to site admins but not account admins" do
+    it "should allow to admin even if user is in multiple accounts" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @account2 = Account.create!
       user.pseudonyms.create!(:unique_id => 'nobodyelse@example.com', :account => @account2)
@@ -619,26 +607,19 @@ describe User do
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
       Account.default.add_user(@admin)
       Account.site_admin.add_user(@site_admin)
-      user.grants_right?(@admin, nil, :become_user).should be_false
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
+      user.can_masquerade?(@admin, Account.default).should be_true
+      user.can_masquerade?(@admin, @account2).should be_false
+      user.can_masquerade?(@site_admin, Account.default).should be_true
+      user.can_masquerade?(@site_admin, @account2).should be_true
       @account2.add_user(@admin)
-      user.grants_right?(@admin, nil, :become_user).should be_false
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
     end
+  end
 
-    it "should not grant become_user for dis-associated users" do
-      @user1 = user_model
-      @user2 = user_model
-      @user1.grants_right?(@user2, nil, :become_user).should be_false
-      @user2.grants_right?(@user1, nil, :become_user).should be_false
-    end
-
-    it "should grant become_user for dis-associated users to site admins" do
-      user = user_model
-      @site_admin = user_model
-      Account.site_admin.add_user(@site_admin)
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
-      @site_admin.grants_right?(user, nil, :become_user).should be_false
+  context "permissions" do
+    it "should not allow account admin to modify admin privileges of other account admins" do
+      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
     end
   end
 

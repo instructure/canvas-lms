@@ -570,7 +570,16 @@ class Account < ActiveRecord::Base
     @account_users_cache[user] ||= []
     @account_users_cache[user]
   end
-  
+
+  # returns all account users for this entire account tree
+  def all_account_users_for(user)
+    raise "must be a root account" unless self.root_account?
+    Shard.partition_by_shard([self, Account.site_admin].uniq) do |accounts|
+      ids = accounts.map(&:id)
+      AccountUser.find(:all, :include => :account, :joins => :account, :conditions => ["user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user.id, ids, ids])
+    end
+  end
+
   set_policy do
     enrollment_types = RoleOverride.enrollment_types.map { |role| role[:name] }
     RoleOverride.permissions.each do |permission, details|

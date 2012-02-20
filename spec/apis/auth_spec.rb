@@ -383,6 +383,7 @@ describe "API Authentication", :type => :integration do
     end
 
     it "should allow as_user_id" do
+      @student.pseudonyms.create!(:unique_id => 'student', :account => Account.default)
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
 
@@ -396,7 +397,7 @@ describe "API Authentication", :type => :integration do
         'sortable_name' => 'User',
         'short_name' => 'User',
         'primary_email' => nil,
-        'login_id' => nil,
+        'login_id' => 'student',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
 
@@ -413,7 +414,7 @@ describe "API Authentication", :type => :integration do
         'sortable_name' => 'User',
         'short_name' => 'User',
         'primary_email' => nil,
-        'login_id' => nil,
+        'login_id' => 'student',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
 
@@ -428,7 +429,7 @@ describe "API Authentication", :type => :integration do
         'sortable_name' => 'User',
         'short_name' => 'User',
         'primary_email' => nil,
-        'login_id' => nil,
+        'login_id' => 'student',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end

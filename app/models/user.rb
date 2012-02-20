@@ -935,7 +935,7 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :become_user
+    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
@@ -978,26 +978,18 @@ class User < ActiveRecord::Base
       )
     end
     can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :read
+  end
 
-    given do |user|
-      user && ((
-        # or, if the user we are given can masquerade in *all* of this user's accounts
-        # (to prevent an account admin from masquerading and gaining access to another root account)
-        (self.associated_accounts.all?{|a| a.grants_right?(user, nil, :become_user) } && !self.associated_accounts.empty?)
-      ) && (
-        # account admins can't masquerade as other account admins
-        self.account_users.empty? || (
-          # unless they're a site admin
-          Account.site_admin.grants_right?(user, nil, :become_user) &&
-          # and not wanting to become a site admin
-          !Account.site_admin_user?(self)
-        )
-      ) || (
-        # only site admins can masquerade as users that don't belong to any account
-        self.associated_accounts.empty? && Account.site_admin.grants_right?(user, nil, :become_user)
-      ))
+  def can_masquerade?(masquerader, account)
+    return true if self == masquerader
+    return false unless
+        account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
+    account_users = account.all_account_users_for(self)
+    return true if account_users.empty?
+    account_users.map(&:account).uniq.all? do |account|
+      needed_rights = account.check_policy(self)
+      account.grants_rights?(masquerader, nil, *needed_rights).values.all?
     end
-    can :become_user
   end
 
   def self.infer_id(obj)
