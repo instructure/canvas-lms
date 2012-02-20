@@ -196,7 +196,7 @@ class Notification < ActiveRecord::Base
           :subject => self.subject, 
           :to => to_path
         )
-        
+
         message.body = self.body
         message.body = self.sms_body if c.respond_to?("path_type") && c.path_type == "sms"
         message.notification_name = self.name

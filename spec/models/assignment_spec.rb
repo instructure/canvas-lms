@@ -1028,12 +1028,6 @@ describe Assignment do
   end
 
   context "broadcast policy" do
-    it "should have a broadcast policy" do
-      assignment_model
-      @a.should be_respond_to(:dispatch)
-      @a.should be_respond_to(:to)
-    end
-
     context "due date changed" do
       it "should create a message when an assignment due date has changed" do
         Notification.create(:name => 'Assignment Due Date Changed')

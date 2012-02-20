@@ -37,7 +37,7 @@ class CommunicationChannelsController < ApplicationController
     @cc.workflow_state = 'unconfirmed'
     @cc.build_pseudonym_on_confirm = params[:build_pseudonym] == '1'
     if @cc.save
-      @cc.send_confirmation!
+      @cc.send_confirmation!(@domain_root_account)
       flash[:notice] = "Contact method registered!"
       render :json => @cc.to_json(:only => [:id, :user_id, :path, :path_type])
     else
@@ -172,7 +172,7 @@ class CommunicationChannelsController < ApplicationController
             new_cc ||= @user.communication_channels.build(:path => @pseudonym.unique_id)
             new_cc.user = @user
             new_cc.workflow_state = 'unconfirmed' if new_cc.retired?
-            new_cc.send_confirmation! if new_cc.unconfirmed?
+            new_cc.send_confirmation!(@root_account) if new_cc.unconfirmed?
             new_cc.save! if new_cc.changed?
             @pseudonym.communication_channel = new_cc
           end
@@ -220,7 +220,7 @@ class CommunicationChannelsController < ApplicationController
       @enrollment.re_send_confirmation!
     else
       @cc = @user.communication_channels.find(params[:id])
-      @cc.send_confirmation!
+      @cc.send_confirmation!(@domain_root_account)
     end
     render :json => {:re_sent => true}
   end

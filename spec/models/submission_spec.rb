@@ -117,12 +117,6 @@ describe Submission do
   end
 
   context "broadcast policy" do
-    it "should have a broadcast policy" do
-      submission_spec_model
-      @submission.should be_respond_to(:dispatch)
-      @submission.should be_respond_to(:to)
-    end
-
     context "Assignment Submitted Late" do
       it "should create a message when the assignment is turned in late" do
         Notification.create(:name => 'Assignment Submitted Late')

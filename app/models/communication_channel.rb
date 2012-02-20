@@ -70,6 +70,7 @@ class CommunicationChannel < ActiveRecord::Base
       record.workflow_state == 'unconfirmed' and self.user.registered? and
       self.path_type == 'email'
     }
+    p.context { @root_account }
     
     p.dispatch :merge_email_communication_channel
     p.to { self }
@@ -86,8 +87,9 @@ class CommunicationChannel < ActiveRecord::Base
       self.path_type == 'sms' and
       !self.user.creation_pending?
     }
+    p.context { @root_account }
   end
-  
+
   def active_pseudonyms
     self.user.pseudonyms.active
   end
@@ -128,9 +130,11 @@ class CommunicationChannel < ActiveRecord::Base
     @request_password = false
   end
   
-  def send_confirmation!
+  def send_confirmation!(root_account)
     @send_confirmation = true
+    @root_account = root_account
     self.save!
+    @root_account = nil
     @send_confirmation = false
   end
   
