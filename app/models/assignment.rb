@@ -745,7 +745,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    if lock_info = self.locked_for?(user)
+    if lock_info = self.locked_for?(user, :check_policies => true)
       hash.delete('description')
       hash['lock_info'] = lock_info
     end

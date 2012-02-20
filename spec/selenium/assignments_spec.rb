@@ -109,7 +109,8 @@ describe "assignments" do
       @course.assignments.create!(
           :name => assignment_name,
           :due_at => due_date,
-          :assignment_group => group
+          :assignment_group => group,
+          :unlock_at => due_date - 1.day
       )
 
       get "/courses/#{@course.id}/assignments"
@@ -141,6 +142,7 @@ describe "assignments" do
       #save changes
       driver.find_element(:id, 'edit_assignment_form').submit
       wait_for_ajaximations
+      driver.find_elements(:css, '.loading_image_holder').length.should eql 0
       driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
     end
 
