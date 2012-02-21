@@ -65,7 +65,7 @@ end
 group :test do
   gem 'barista',        '1.2.1'
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallel_tests-instructure', '0.6.18'
+  gem 'parallel_tests-instructure', '0.6.19'
   gem 'mocha',        '0.10.0'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
