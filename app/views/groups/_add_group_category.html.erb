@@ -1,10 +1,15 @@
-<% js_block :i18n_scope => 'groups' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+], function(I18n, $) {
   window.addGroupCategory = function(callback) {
     $("#add_category_form").dialog('close').dialog({
       autoOpen: false,
       width: "auto",
-      title: I18n.t('titles.add_group_category', 'Add Set of Groups'),
+      title: <%= jt('#groups.titles.add_group_category', 'Add Set of Groups') %>,
       modal: true,
       overlay: {
         backgroundColor: "#000",
@@ -15,6 +20,7 @@
     callbacks.push(callback);
     $("#add_category_form").data('callbacks', callbacks);
   }
+});
 </script>
 <% end %>
 <% form_tag context_url(@context, :create_category_context_groups_url), {:id => "add_category_form", :style => "display: none;"} do %>

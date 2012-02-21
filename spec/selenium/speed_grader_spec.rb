@@ -108,6 +108,21 @@ describe "speedgrader" do
     keep_trying_until {
       driver.find_element(:id, 'submissions_container').should
         include_text(I18n.t('headers.no_submission', "This student does not have a submission for this assignment"))
+      find_with_jquery('#this_student_does_not_have_a_submission').should be_displayed
+    }
+  end
+
+  it "should hide answers of anonymous graded quizzes" do
+    @assignment.points_possible = 10
+    @assignment.submission_types = 'online_quiz'
+    @assignment.title = 'Anonymous Graded Quiz'
+    @assignment.save!
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz.update_attribute(:anonymous_submissions, true)
+    student_submission
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    keep_trying_until {
+      find_with_jquery('#this_student_has_a_submission').should be_displayed
     }
   end
 
@@ -224,7 +239,7 @@ describe "speedgrader" do
     driver.find_element(:css, '#add_attachment img').click
     driver.find_element(:css, '#comment_attachments input').should be_displayed
     driver.find_element(:css, '#comment_attachments a').click
-    element_exists(:css, '#comment_attachments input').should be_false
+    element_exists('#comment_attachments input').should be_false
 
     #add comment
     driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')
@@ -249,6 +264,41 @@ describe "speedgrader" do
     find_all_with_jquery('#students_selectmenu option').size.should eql(1) # just the one student
     find_all_with_jquery('#section-menu ul li').size.should eql(1) # "Show all sections"
     find_with_jquery('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
+  end
+
+  context "multiple enrollments" do
+    before(:each) do
+      student_in_course
+      @course_section = @course.course_sections.create!(:name => "Other Section")
+      @enrollment = @course.student_enrollments.build(:user => @student, :workflow_state => "active", :course_section => @course_section)
+      @enrollment.save!
+    end
+
+    def goto_section(section_id)
+      driver.find_element(:css, "#combo_box_container .ui-selectmenu-icon").click
+      driver.execute_script("$('#section-menu-link').trigger('mouseenter')")
+      driver.find_element(:css, "#section-menu .section_#{section_id}").click
+      wait_for_dom_ready
+      wait_for_ajaximations
+    end
+
+    it "should not duplicate students" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      driver.find_elements(:css, "#students_selectmenu option").length.should == 1
+    end
+
+    it "should filter by section properly" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      sections = @course.course_sections
+      goto_section(sections[0].id)
+      driver.find_elements(:css, "#students_selectmenu option").length.should == 1
+      goto_section(sections[1].id)
+      driver.find_elements(:css, "#students_selectmenu option").length.should == 1
+    end
   end
 
   it "should be able to change sorting and hide student names" do

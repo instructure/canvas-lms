@@ -39,8 +39,16 @@
 </p>
 <% end %>
 
-<% js_block :i18n_scope => 'shared/turnitin_settings' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* showIf */
+], function(I18n, $) {
+
 $(document).ready(function() {
   var noSubmit = <%= assignment.new_record? ? 'true' : 'false' %>;
   $('#settings_exclude_small_matches').change(function() {
@@ -85,21 +93,22 @@ $(document).ready(function() {
       return new_data;
     },
     beforeSubmit: function(data) {
-      $(this).find('button').attr('disabled', true).filter('.update_button').text(I18n.t('messages.updating_settings', 'Updating Settings...'));
+      $(this).find('button').attr('disabled', true).filter('.update_button').text(<%= jt('messages.updating_settings', 'Updating Settings...') %>);
     },
     success: function(data) {
-      $(this).find('button').attr('disabled', false).filter('.update_button').text(I18n.t('buttons.update_settings', 'Update Settings'));
+      $(this).find('button').attr('disabled', false).filter('.update_button').text(<%= jt('buttons.update_settings', 'Update Settings') %>);
       $(this).dialog('close');
     },
     error: function(data) {
       $(this).formErrors(data);
-      $(this).find('button').attr('disabled', false).filter('.update_button').text(I18n.t('errors.error_updating_settings', 'Error Updating Settings'));
+      $(this).find('button').attr('disabled', false).filter('.update_button').text(<%= jt('errors.error_updating_settings', 'Error Updating Settings') %>);
     },
     noSubmit: noSubmit
   });
   $form.find('.cancel_button').click(function(event) {
     $form.dialog('close');
   });
+});
 });
 </script>
 <% end %>

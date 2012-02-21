@@ -24,26 +24,22 @@ describe "rubrics" do
 
   # should be in editing mode before calling
   def split_ratings(idx, split_left)
-    load_simulate_js
-
     rating = find_all_with_jquery(".rubric .criterion:visible .rating")[idx]
     driver.action.move_to(rating).perform
 
     if split_left
       driver.execute_script <<-JS
-        $ratings = $('.rubric .criterion:visible .rating');
-        $($ratings[#{idx}]).addClass('add_column');
-        $($ratings[#{idx}]).addClass('add_right');
-        $($ratings[#{idx - 1}]).addClass('add_left');
-        $($ratings[#{idx}]).simulate("click", {});
+        var $rating = $('.rubric .criterion:visible .rating:eq(#{idx})');
+        $rating.addClass('add_column add_right');
+        $rating.prev().addClass('add_left');
+        $rating.click();
       JS
     else
       driver.execute_script <<-JS
-        $ratings = $('.rubric .criterion:visible .rating');
-        $($ratings[#{idx}]).addClass('add_column');
-        $($ratings[#{idx+1}]).addClass('add_right');
-        $($ratings[#{idx}]).addClass('add_left');
-        $($ratings[#{idx}]).simulate("click", {});
+        var $rating = $('.rubric .criterion:visible .rating:eq(#{idx})');
+        $rating.addClass('add_column add_left');
+        $rating.next().addClass('add_right');
+        $rating.click();
       JS
     end
   end

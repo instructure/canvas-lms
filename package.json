@@ -1,0 +1,8 @@
+{
+  "name": "canvas-lms",
+  "version": "0.0.0",
+  "devDependencies": {
+    "requirejs": "*"
+  }
+}
+

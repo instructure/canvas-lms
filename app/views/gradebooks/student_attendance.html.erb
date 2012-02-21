@@ -57,6 +57,12 @@
   </table>
   <% js_block do %>
   <script>
+  require([
+    'jquery' /* $ */,
+    'jquery.instructure_misc_helpers' /* /\.detect/ */,
+    'jquery.instructure_misc_plugins' /* fragmentChange */,
+    'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+  ], function($) {
     $(document).ready(function() {
       $(document).fragmentChange(function(event, hash) {
         $("#student_attendance tr.highlighted").removeClass('highlighted');
@@ -67,6 +73,7 @@
         }
       });
     });
+  });
   </script>
   <% end %>
   <% jammit_css :attendance %>

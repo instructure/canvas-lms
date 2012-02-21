@@ -1,6 +1,6 @@
 <%
   jammit_css :login
-  jammit_js :user_sortable_name
+  js_bundle :user_sortable_name
   @headers = false
   @body_classes << "modal"
   content_for :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
@@ -9,29 +9,6 @@
 <div id="modal-box-top"></div>
 <div id="modal-box-arbitrary-size">
   <h2><%= t 'titles.welcome_aboard', "Welcome aboard!" %></h2>
-  <% js_block do %>
-    <script>
-      $(function() {
-        var $registration_form = $('#registration_confirmation_form');
-        var $disambiguation_box = $('.disambiguation_box');
-        $('.button#back').click(function(event) {
-          $disambiguation_box.slideDown();
-          $registration_form.slideUp();
-          event.preventDefault();
-        });
-        $('.button#register').click(function(event) {
-          $disambiguation_box.slideUp();
-          $registration_form.slideDown();
-          event.preventDefault();
-        });
-
-        var $merge_link = $('.button#merge');
-        $('input:radio[name="pseudonym_select"]').change(function() {
-          $merge_link.attr('href', $('input:radio[name="pseudonym_select"]:checked').attr('value'));
-        });
-      });
-    </script>
-  <% end %>
   <% if @current_user && @current_user != @user && @user.registered? && @enrollment %>
     <p><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
     <div class="button_box">
@@ -177,41 +154,70 @@
 </div>
 <div id="modal-box-bottom"></div>
 
-<% js_block :i18n_scope => 'pseudonyms.regisration_confirmation' do %>
-<script type="text/javascript">
-$(document).ready(function() {
-  $("#registration_confirmation_form :text:first").focus().select();
-  $("#registration_confirmation_form").submit(function(event) {
-    var data = $(this).getFormData();
-    success = true;
-    if(!data['user[name]']) {
-      $(this).formErrors({
-        'user[name]': I18n.t('errors.user_name_required', "User name is required")
+<% js_block do %>
+  <script>
+  require([
+    'i18nObj' /* I18n.t */,
+    'jquery' /* $ */,
+    'jquery.instructure_forms' /* getFormData, formErrors */,
+    'jqueryui/sortable' /* /\.sortable/ */
+  ], function(I18n, $) {
+
+    $(function() {
+      var $registration_form = $('#registration_confirmation_form');
+      var $disambiguation_box = $('.disambiguation_box');
+      $('.button#back').click(function(event) {
+        $disambiguation_box.slideDown();
+        $registration_form.slideUp();
+        event.preventDefault();
       });
-      success = false;
-    } else if(!data['user[short_name]']) {
-      $(this).formErrors({
-        unique_id: I18n.t('errors.short_name_required', "Short name is required")
+      $('.button#register').click(function(event) {
+        $disambiguation_box.slideUp();
+        $registration_form.slideDown();
+        event.preventDefault();
       });
-      success = false;
-    } else if(!data["pseudonym[password]"] || !data["pseudonym[password]"].length) {
-      $(this).formErrors({
-        "pseudonym[password]": I18n.t('errors.password_required', "Password required")
+
+      var $merge_link = $('.button#merge');
+      $('input:radio[name="pseudonym_select"]').change(function() {
+        $merge_link.attr('href', $('input:radio[name="pseudonym_select"]:checked').attr('value'));
       });
-      success = false;
-    } else if(data["pseudonym[password]"].length < 6) {
-      $(this).formErrors({
-        "pseudonym[password]": I18n.t('errors.password_too_short', "Password too short")
-      });
-      success = false;
-    } else if(data["pseudonym[password]"] != data["pseudonym[password_confirmation]"]) {
-      $(this).formErrors({
-        "pseudonym[password_confirmation]": I18n.t('errors.passwords_dont_match', "Passwords don't match")
-      });
-      success = false;
-    }
-    return success;
+    });
   });
-});
-</script>
+
+  $(document).ready(function() {
+    $("#registration_confirmation_form :text:first").focus().select();
+    $("#registration_confirmation_form").submit(function(event) {
+      var data = $(this).getFormData();
+      success = true;
+      if(!data['user[name]']) {
+        $(this).formErrors({
+          'user[name]': <%= jt('#pseudonyms.registration_confirmation_form.errors.user_name_required', "User name is required") %>
+        });
+        success = false;
+      } else if(!data['user[short_name]']) {
+        $(this).formErrors({
+          unique_id: <%= jt('#pseudonyms.registration_confirmation_form.errors.short_name_required', "Short name is required") %>
+        });
+        success = false;
+      } else if(!data["pseudonym[password]"] || !data["pseudonym[password]"].length) {
+        $(this).formErrors({
+          "pseudonym[password]": <%= jt('#pseudonyms.registration_confirmation_form.errors.password_required', "Password required") %>
+        });
+        success = false;
+      } else if(data["pseudonym[password]"].length < 6) {
+        $(this).formErrors({
+          "pseudonym[password]": <%= jt('#pseudonyms.registration_confirmation_form.errors.password_too_short', "Password too short") %>
+        });
+        success = false;
+      } else if(data["pseudonym[password]"] != data["pseudonym[password_confirmation]"]) {
+        $(this).formErrors({
+          "pseudonym[password_confirmation]": <%= jt('#pseudonyms.registration_confirmation_form.errors.passwords_dont_match', "Passwords don't match") %>
+        });
+        success = false;
+      }
+      return success;
+    });
+  });
+  </script>
 <% end %>
+

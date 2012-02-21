@@ -1,0 +1,2 @@
+require ['compiled/AssignmentMuter']
+

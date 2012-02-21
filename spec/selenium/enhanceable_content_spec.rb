@@ -5,21 +5,21 @@ describe "enhanceable_content" do
 
   it "should automatically enhance content using jQuery UI" do
     course_with_teacher_logged_in
-    
+
     page = @course.wiki.wiki_page
     page.body = %{
       <div id="dialog_for_link1" class="enhanceable_content dialog">dialog for link 1</div>
       <a href="#dialog_for_link1" id="link1">link 1</a>
-      
+
       <div class="enhanceable_content draggable" style="width: 100px;">draggable</div>
-      
+
       <div class="enhanceable_content resizable" style="width: 100px;">resizable</div>
-      
+
       <ul class="enhanceable_content sortable" style="display: none;">
         <li>item 1</li>
         <li>item 2</li>
       </ul>
-      
+
       <div class="enhanceable_content accordion">
         <h3><a href="#">Section 1</a></h3>
         <div>
@@ -45,7 +45,7 @@ describe "enhanceable_content" do
           </ul>
         </div>
       </div>
-      
+
       <div class="enhanceable_content tabs">
         <ul>
             <li><a href="#fragment-1"><span>One</span></a></li>
@@ -65,27 +65,27 @@ describe "enhanceable_content" do
       </div>
     }
     page.save!
-    
+
     get "/courses/#{@course.id}/wiki/#{page.url}"
+
     dialog = driver.find_element(:css, ".enhanceable_content.dialog")
 
-    # need to wait for the content to get enhanced
-    driver.execute_script "window.jsParsed = false; setTimeout(function(){ jsParsed = true })"
-    keep_trying_until { driver.execute_script("return window.jsParsed").should == true }
-
-    driver.find_element(:css, "#link1").click
-    dialog.should be_displayed
-    dialog.should have_class('ui-dialog')
+    # need to wait for the content to get enhanced (it happens in instructure.js in a setTimeout of 1000 ms)
+    keep_trying_until {
+      driver.find_element(:css, "#link1").click
+      dialog.should be_displayed
+      dialog.should have_class('ui-dialog')
+    }
     driver.find_element(:css, ".ui-dialog .ui-dialog-titlebar-close").click
     dialog.should_not be_displayed
-    
+
     driver.find_element(:css, ".enhanceable_content.draggable").should have_class('ui-draggable')
     driver.find_element(:css, ".enhanceable_content.resizable").should have_class('ui-resizable')
-    
+
     ul = driver.find_element(:css, ".enhanceable_content.sortable")
     ul.should be_displayed
     ul.should have_class('ui-sortable')
-    
+
     accordion = driver.find_element(:css, ".enhanceable_content.accordion")
     accordion.should have_class('ui-accordion')
     headers = accordion.find_elements(:css, ".ui-accordion-header")
@@ -101,8 +101,8 @@ describe "enhanceable_content" do
     headers[1].should have_class('ui-state-active')
     divs[0].should_not be_displayed
     divs[1].should be_displayed
-    
-    
+
+
     tabs = driver.find_element(:css, ".enhanceable_content.tabs")
     tabs.should have_class('ui-tabs')
     headers = tabs.find_elements(:css, ".ui-tabs-nav li")

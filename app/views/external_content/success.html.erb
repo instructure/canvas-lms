@@ -2,7 +2,12 @@
 <a href="<%= external_content_oembed_retrieve_url(:url => "{{ url }}", :endpoint => "{{ endpoint }}") %>" id="oembed_retrieve_url" style="display: none;">&nbsp;</a>
 <% js_block do %>
 <script>
-(function() {
+require([
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_misc_helpers' /* replaceTags */
+], function($) {
+
   var data = <%= raw((@retrieved_data || {}).to_json) %>;
   var callback = '<%= params[:service] %>';
   var parentWindow = window.parent;
@@ -29,6 +34,7 @@
   } else {
     dataReady(data);
   }
-})();
+
+});
 </script>
 <% end %>

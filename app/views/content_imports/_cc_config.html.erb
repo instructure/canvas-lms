@@ -2,6 +2,11 @@
 
 <% js_block do %>
   <script>
+  require([
+    'jquery' /* $ */,
+    'content_migration' /* enableFileUpload */
+  ], function($) {
+
     $(function() {
 
       $("#plugin_common_cartridge_importer").bind("pluginShown", function(event, enableFileUpload) {
@@ -14,5 +19,6 @@
       });
 
     });
+  });
   </script>
 <% end %>

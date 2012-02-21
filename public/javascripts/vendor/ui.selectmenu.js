@@ -8,7 +8,12 @@
  * http://docs.jquery.com/UI
  */
 
-(function($) {
+require([
+  'jquery' /* jQuery, $ */,
+  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/widget' /* /\.widget/ */
+], function($) {
 
 $.widget("ui.selectmenu", {
 	_init: function() {
@@ -525,4 +530,4 @@ $.extend($.ui.selectmenu, {
 	}
 });
 
-})(jQuery);
+});

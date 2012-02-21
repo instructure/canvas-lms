@@ -38,7 +38,7 @@ describe CalendarsController do
       course_with_student_logged_in(:active_all => true)
       get 'show', :user_id => @user.id
       response.should be_redirect
-      response.redirected_to.should == {:action => 'show2'}
+      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
     end
 
     it "should assign variables" do
@@ -84,7 +84,7 @@ describe CalendarsController do
       course_with_student_logged_in(:active_all => true)
       get 'show2', :user_id => @user.id
       response.should be_redirect
-      response.redirected_to.should == {:action => 'show'}
+      response.redirected_to.should == {:action => 'show', :anchor => ' '}
     end
 
     it "should assign variables" do
@@ -138,7 +138,7 @@ describe CalendarsController do
 
       post 'switch_calendar', {:preferred_calendar => '1'}
       response.should be_redirect
-      response.redirected_to.should == {:action => 'show'}
+      response.redirected_to.should == {:action => 'show', :anchor => ' '}
       @user.reload.preferences[:use_calendar1].should be_true
     end
 
@@ -148,7 +148,7 @@ describe CalendarsController do
 
       post 'switch_calendar', {:preferred_calendar => '2'}
       response.should be_redirect
-      response.redirected_to.should == {:action => 'show'}
+      response.redirected_to.should == {:action => 'show', :anchor => ' '}
       @user.reload.preferences[:use_calendar1].should be_nil
     end
 
@@ -159,7 +159,7 @@ describe CalendarsController do
 
       post 'switch_calendar', {:preferred_calendar => '2'}
       response.should be_redirect
-      response.redirected_to.should == {:action => 'show2'}
+      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
       @user.reload.preferences[:use_calendar1].should be_nil
     end
   end

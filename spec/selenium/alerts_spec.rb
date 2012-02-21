@@ -13,7 +13,6 @@ describe "Alerts" do
 
   it "should be able to create, then update, then delete" do
     get "/accounts/#{@context.id}/settings"
-
     @alerts.length.should == 0
 
     driver.find_element(:css, '#tab-alerts-link').click

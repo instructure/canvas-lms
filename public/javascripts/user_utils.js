@@ -1,13 +1,15 @@
+define(['jquery'], function($) {
+
 // see also User.name_parts in user.rb
-var userUtils = {
+return {
   nameParts: function(name, prior_surname) {
     var SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
     var surname, given, suffix, given_parts, prior_surname_parts, name_parts;
-    if (!name || jQuery.trim(name) === '') {
+    if (!name || $.trim(name) === '') {
       return [null, null, null];
     }
-    name_parts = jQuery.map(name.split(','), function(str) {
-      return jQuery.trim(str);
+    name_parts = $.map(name.split(','), function(str) {
+      return $.trim(str);
     });
     surname = name_parts[0];
     given = name_parts[1];
@@ -30,7 +32,7 @@ var userUtils = {
       }
     } else {
       // John Doe
-      given = jQuery.trim(name);
+      given = $.trim(name);
       surname = null;
     }
 
@@ -59,11 +61,12 @@ var userUtils = {
     return [ given_parts.length === 0 ? null : given_parts.join(' '), surname, suffix ];
   },
   lastNameFirst: function(parts) {
-    var given = jQuery.trim([parts[0], parts[2]].join(' '));
-    return jQuery.trim((parts[1] ? parts[1] + ', ' + given : given));
+    var given = $.trim([parts[0], parts[2]].join(' '));
+    return $.trim((parts[1] ? parts[1] + ', ' + given : given));
   },
   firstNameFirst: function(parts) {
-    return jQuery.trim(parts.join(' ').replace(/\s+/, ' '));
+    return $.trim(parts.join(' ').replace(/\s+/, ' '));
   }
 };
+});
 

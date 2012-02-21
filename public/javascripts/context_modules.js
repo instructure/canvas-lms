@@ -16,9 +16,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var INST, modules;
-I18n.scoped('context_modules', function(I18n) {
-  modules = (function() {
+require([
+  'INST' /* INST */,
+  'i18n!context_modules',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
+  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/date' /* Date.parse */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(INST, I18n, $) {
+
+  // TODO: AMD don't export global, use as module
+  window.modules = (function() {
     return {
       updateTaggedItems: function() {
       },
@@ -1133,4 +1150,6 @@ I18n.scoped('context_modules', function(I18n) {
       modules.refreshed = true;
     }, 1000);
   }
+
+  return modules;
 });

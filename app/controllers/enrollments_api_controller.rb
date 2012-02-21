@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -32,14 +32,14 @@ class EnrollmentsApiController < ApplicationController
   #
   # @API
   # Return a list of all enrolled users in a course. Includes students,
-  # teachers, TAs, and observers. Any enrollment types without members
-  # are omitted.
+  # teachers, TAs, and observers.
   #
   # If a user has multiple enrollments in the course (e.g. as a teacher
   # and a student or in multiple sections), each enrollment will be
   # listed separately.
   #
   # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are returned.
+  # @argument state[] Filter by enrollment state. Accepted values are 'active', 'invited', and 'creation_pending', 'deleted', 'rejected', 'completed', and 'inactive'. If omitted, 'active,' 'invited,' and 'creation_pending' enrollments are returned.
   #
   # @response_field course_id The unique id of the course.
   # @response_field course_section_id The unique id of the user's section.
@@ -108,9 +108,14 @@ class EnrollmentsApiController < ApplicationController
   def index
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
-    conditions = {}.tap { |c| c[:type] = params[:type] if params[:type].present? }
+    conditions = {}.tap { |c|
+      c[:type] = params[:type] if params[:type].present?
+      c[:workflow_state] = params[:state] if params[:state].present?
+    }
     enrollments = Api.paginate(
-      @context.current_enrollments.scoped(:conditions => conditions, :order => 'enrollments.type ASC, users.sortable_name ASC'),
+      @context.
+        send(conditions[:workflow_state].present? ? :enrollments : :current_enrollments).
+        scoped(:conditions => conditions, :order => 'enrollments.type ASC, users.sortable_name ASC'),
       self, api_v1_enrollments_path)
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, [:user]) }
   end

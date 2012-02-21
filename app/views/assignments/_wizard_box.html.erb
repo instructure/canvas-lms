@@ -86,6 +86,12 @@
   <div class="clear"></div>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_misc_plugins' /* /\.indicate/ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function($) {
+
 $(document).ready(function() {
   $(document).bind('add_assignment', function() {
     if($("#wizard_box .option.create_assignment_option.selected").length > 0) {
@@ -117,6 +123,8 @@ $(document).ready(function() {
     $("html,body").scrollTo($item);
     $item.indicate();
   }, function() {});
+});
+
 });
 </script>
 <% end %>

@@ -1,4 +1,4 @@
-define 'compiled/util/invoker', ->
+define ->
   (obj) ->
     obj.invoke = (method) ->
       args = [].splice.call arguments, 0, 1
@@ -8,3 +8,4 @@ define 'compiled/util/invoker', ->
       obj.noMethod = ->
 
     obj
+

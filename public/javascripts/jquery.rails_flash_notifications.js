@@ -17,7 +17,7 @@
  */
 
 // does Rails-style flash message/error boxes that drop down from the top of the scren
-(function(){
+define(['jquery', 'jqueryui/effects/drop'], function($){
   var already_listening_for_close_link_clicks = false;
   $._flashBox = function(type, content, timeout) {
     if(!already_listening_for_close_link_clicks) {
@@ -49,4 +49,5 @@
     $._flashBox("error", content, timeout);
   };
   
-})(jQuery);
+});
+

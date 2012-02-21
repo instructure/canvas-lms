@@ -15,14 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-var GradebookUploader;
+define([
+  'i18n!gradebook',
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'vendor/slickgrid-googlecode/slick.grid',
+  'vendor/slickgrid-googlecode/slick.editors',
+  'jquery.instructure_forms' /* errorBox */,
+  'jquery.instructure_misc_helpers' /* /\.detect/ */,
+  'jquery.templateData' /* fillTemplateData */,
+  'vendor/underscore' /* /_\./ */
+], function(I18n, $, htmlEscape, SlickGrid) {
 
-I18n.scoped('gradebook', function(I18n) {
-
-  GradebookUploader = {
+  var GradebookUploader = {
     init:function(){
       var gradebookGrid,
-          mergedGradebook = $.extend(true, {}, originalGradebook),
+          mergedGradebook = $.extend(true, {}, originalGradebook), // originalGradebook is set in the view
           $gradebook_grid = $("#gradebook_grid"),
           gridData = {
             columns: [
@@ -48,7 +56,7 @@ I18n.scoped('gradebook', function(I18n) {
       $.each(mergedGradebook.assignments, function(){
         gridData.columns.push({
           id: this.id,
-          name: $.htmlEscape(this.title),
+          name: htmlEscape(this.title),
           field: this.id,
           width:200,
           editor: NullGradeEditor,
@@ -82,7 +90,7 @@ I18n.scoped('gradebook', function(I18n) {
         else {
           col = {
             id: assignment.id,
-            name: $.htmlEscape(assignment.title),
+            name: htmlEscape(assignment.title),
             field: assignment.id,
             formatter: simpleGradeCellFormatter,
             cssClass: "active new"
@@ -227,7 +235,7 @@ I18n.scoped('gradebook', function(I18n) {
           });
 
           $.each(possibilitiesToMergeWith[thing], function() {
-            $('<option value="' + this.id + '" >' + $.htmlEscape(this.name || this.title) + '</option>').appendTo($select);
+            $('<option value="' + this.id + '" >' + htmlEscape(this.name || this.title) + '</option>').appendTo($select);
           });
 
           $.each(needingReview[thing], function(i, record){
@@ -308,5 +316,5 @@ I18n.scoped('gradebook', function(I18n) {
       }
     }
   };
-
-})
+  return GradebookUploader;
+});

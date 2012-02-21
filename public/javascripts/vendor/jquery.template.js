@@ -23,7 +23,7 @@
 // 
 
 
-(function($) {
+define(['jquery'], function($) {
   $.extend({
     template : function(template, values) {
       // handle a blank template or replacement value object correctly
@@ -38,4 +38,4 @@
 			return template.replace(regexMatchingPattern, replacementFunction);
 		}
 	});
-})(jQuery);
+});

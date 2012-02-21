@@ -1,13 +1,11 @@
-define 'compiled/Template',
-# ['compiled/handlebars_helpers'],
-->
+define ['compiled/handlebars_helpers', 'jquery'], (Handlebars, jQuery) ->
 
   # A client-side templating wrapper.  Templates are compiled with the rake task
   # `$ rake jst:compile` or automatically using the guard gem `$ guard`.
   # Don't call the templating object directly (like Handlebars), use this class.
 
   # export to window until we convert new stuff to modules
-  class @Template
+  class Template
 
     # If called w/o `new`, it will return the HTML string immediately.
     # i.e. `Template(test, {foo: 'bar'})` => '<div>bar</div>'

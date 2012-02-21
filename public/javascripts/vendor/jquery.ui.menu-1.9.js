@@ -11,7 +11,19 @@
  *	jquery.ui.core.js
  *	jquery.ui.widget.js
  */
-(function($) {
+define([
+  'jquery',
+
+  // this is kindof hacky because this doesn't really depend on 1.8.16's version of ui.menu
+  // but it is here so that we make sure that this gets loaded AFTER it.  so that _we_ override _it_
+  // and not vise-versa.
+  // Oh, and it is jqueryui/autocomplete because there is not actually a seperate file for menu
+  // juqueryui/autocomplete just has it inline in it's own file
+  'jqueryui/autocomplete',
+
+  'vendor/jquery.ui.core-1.9',
+  'vendor/jquery.ui.widget-1.9'
+], function($) {
 
 var idIncrement = 0;
 
@@ -511,4 +523,4 @@ $.widget( "ui.menu", {
 	}
 });
 
-}( jQuery ));
+});

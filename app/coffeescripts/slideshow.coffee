@@ -1,4 +1,11 @@
-I18n.scoped 'slideshow', (I18n) ->
+define [
+  'i18n!slideshow'
+  'jquery'
+  'str/htmlEscape'
+  'jquery.instructure_jquery_patches'
+  'jquery.instructure_misc_helpers'
+], (I18n, $, htmlEscape) ->
+
   class Slide
     constructor: (title, slideshow) ->
       @title = title
@@ -10,7 +17,7 @@ I18n.scoped 'slideshow', (I18n) ->
       @prevSlide?.nextSlide = this
       @nextSlide = null
 
-      @indicator = $("<a/>").addClass('slide').attr('href', '#').attr('title', $.h(@title)).html('&nbsp;')
+      @indicator = $("<a/>").addClass('slide').attr('href', '#').attr('title', htmlEscape(@title)).html('&nbsp;')
       @indicator.data('slide', this)
       @slideshow.navigation.append(@indicator)
       slide = this
@@ -23,7 +30,7 @@ I18n.scoped 'slideshow', (I18n) ->
     addParagraph: (text, klass) ->
       paragraph = $("<p/>")
       paragraph.addClass(klass) if klass?
-      paragraph.html($.h(text))
+      paragraph.html(htmlEscape(text))
       @body.append(paragraph)
 
     addImage: (src, klass, url) ->
@@ -60,7 +67,7 @@ I18n.scoped 'slideshow', (I18n) ->
 
       @backButton = $("<a/>").addClass('back').
         attr('href', '#').
-        attr('title', $.h(I18n.t('titles.back', 'Back'))).
+        attr('title', htmlEscape(I18n.t('titles.back', 'Back'))).
         html('&nbsp;')
       @navigation.append(@backButton)
       @backButton.click ->
@@ -69,7 +76,7 @@ I18n.scoped 'slideshow', (I18n) ->
 
       @forwardButton = $("<a/>").addClass('forward').
         attr('href', '#').
-        attr('title', $.h(I18n.t('titles.forward', 'Forward'))).
+        attr('title', htmlEscape(I18n.t('titles.forward', 'Forward'))).
         html('&nbsp;')
       @navigation.append(@forwardButton)
       @forwardButton.click ->
@@ -78,7 +85,7 @@ I18n.scoped 'slideshow', (I18n) ->
 
       @closeButton = $("<a/>").addClass('close').
         attr('href', '#').
-        attr('title', $.h(I18n.t('titles.close', 'Close'))).
+        attr('title', htmlEscape(I18n.t('titles.close', 'Close'))).
         html('&nbsp;')
       @navigation.append(@closeButton)
       @closeButton.click ->
@@ -130,4 +137,5 @@ I18n.scoped 'slideshow', (I18n) ->
       @slideShown?.hide()
       @slideShown = null
 
-  window.Slideshow = Slideshow
+  Slideshow
+

@@ -2,7 +2,7 @@
   content_for :page_title, @tag.title
   add_crumb @tag.context_module.name, context_url(@context, :context_context_modules_url)
   add_crumb @tag.title
-  jammit_js :file_inline
+  js_bundle :file_inline
 %>
 
 <ul style="margin-top:0" class="ui-listview ui-listview-no-rounded-bottom">

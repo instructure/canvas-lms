@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -49,6 +49,19 @@ describe GradebookImporter do
         '"Blend, Bill",6,My Course,-,',
         'Points Possible,,,10,',
         '"Farner, Todd",4,My Course,-,')
+      @gi.assignments.length.should == 1
+      @gi.assignments.first.points_possible.should == 10
+      @gi.students.length.should == 2
+    end
+
+    it "should handle muted line and being sorted in weird places" do
+      course_model
+      importer_with_rows(
+          'Student,ID,Section,Assignment 1,Final Score',
+          '"Blend, Bill",6,My Course,-,',
+          'Points Possible,,,10,',
+          'Muted assignments do not impact Current and Final score columns,,,Muted,',
+          '"Farner, Todd",4,My Course,-,')
       @gi.assignments.length.should == 1
       @gi.assignments.first.points_possible.should == 10
       @gi.students.length.should == 2

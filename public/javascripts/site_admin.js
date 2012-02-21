@@ -15,8 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!site_admin',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */
+], function(I18n, $) {
 
-I18n.scoped('site_admin', function(I18n) {
   $(document).ready(function() {
     $(".over_time_link").live('click', function(event) {
       event.preventDefault();
@@ -44,7 +50,7 @@ I18n.scoped('site_admin', function(I18n) {
       data.addColumn('number', axis || I18n.t('columns.value', "Value"));
       data.addColumn('string', 'title1');
       data.addColumn('string', 'text1');
-      
+
       var rows = []
       $.each(data_points, function() {
         var date = new Date();
@@ -54,12 +60,12 @@ I18n.scoped('site_admin', function(I18n) {
           [date, this[1], undefined, undefined]
         )
       });
-      
+
       data.addRows(rows);
 
       var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('over_time'));
       chart.draw(data, {displayAnnotations: false});
     }
   });
-  google.load('visualization', '1', {'packages':['annotatedtimeline']});
 });
+

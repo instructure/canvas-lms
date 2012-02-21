@@ -52,9 +52,13 @@
 
 <% js_block do %>
   <script>
+  require([
+    'jquery' /* $ */
+  ], function($) {
     $(".warnings_link").click(function(event) {
       event.preventDefault();
       $(this).parent().find("div.migration_warnings").toggle();
     });
+  });
   </script>
 <% end %>

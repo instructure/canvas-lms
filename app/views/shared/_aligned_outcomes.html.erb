@@ -1,6 +1,6 @@
 <% 
   asset ||= nil
-  jammit_js :aligned_outcomes 
+  js_bundle :aligned_outcomes 
 %>
 <% if LearningOutcome.non_rubric_outcomes? && asset && @context && @context.has_outcomes %>
   <% assignment = asset if asset.is_a?(Assignment)

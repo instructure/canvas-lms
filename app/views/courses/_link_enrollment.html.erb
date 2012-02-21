@@ -1,4 +1,4 @@
-<% jammit_js :link_enrollment %>
+<% js_bundle :link_enrollment %>
 <div id="link_student_dialog" style="display: none;">
   <a href="<%= context_url(@context, :context_students_url) %>" class="student_url" style="display: none;">&nbsp;</a>
   <% form_tag context_url(@context, :context_link_enrollment_url), {:id => "link_student_dialog_form"} do %>

@@ -16,7 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('sub_accounts', function(I18n) {
+require([
+  'i18n!sub_accounts',
+  'jquery' /* jQuery, $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */
+], function(I18n, jQuery) {
+
 jQuery(function($){
   
   $(".add_sub_account_link").click(function() {

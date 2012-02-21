@@ -255,7 +255,7 @@ class SubmissionList
         # Remove the old submission so that it doesn't show up twice in the
         # grade history.
         elsif prior_score != h[:score]
-          l.pop if prior_graded_at.to_date == h[:graded_at].to_date && prior_grader == h[:grader]
+          l.pop if prior_graded_at.try(:to_date) == h[:graded_at].try(:to_date) && prior_grader == h[:grader]
           h[:previous_grade] = prior_grade
           h[:previous_graded_at] = prior_graded_at
           h[:previous_grader] = prior_grader

@@ -1,10 +1,8 @@
 define [
-  'jquery.ajaxJSON' #move to CustomList.coffee when ajaxJSON
-  'i18n'
   'compiled/widget/CustomList'
   'helpers/simulateClick'
   'helpers/loadFixture'
-], (_, I18n, CustomList, simulateClick, loadFixture)->
+], (CustomList, simulateClick, loadFixture)->
   module 'CustomList',
     setup: ->
       @fixture = loadFixture 'CustomList'

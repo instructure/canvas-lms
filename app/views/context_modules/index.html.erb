@@ -1,5 +1,5 @@
 <% content_for :page_title, join_title(t('titles.course_modules', "Course Modules"), @context.name) %>
-<% jammit_js :context_modules %>
+<% js_bundle :context_modules %>
 <% if can_do(@context, @current_user, :manage_content) %>
   <% content_for :right_side do %>
     <%= render :partial => 'context_modules/context_module_right_side' %>

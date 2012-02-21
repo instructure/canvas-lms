@@ -24,7 +24,7 @@
 <% else %>
   <% 
     jammit_css :gradebooks, :datagrid
-    jammit_js :datagrid, :gradebooks
+    js_bundle :datagrid, :gradebooks
     @show_left_side = false
     add_crumb t(:try_out_the_new_gradebook, "Try out the new gradebook"), context_url(@context, :change_gradebook_version_context_gradebook_url), :id => 'change_gradebook_version_link_holder'
   %>

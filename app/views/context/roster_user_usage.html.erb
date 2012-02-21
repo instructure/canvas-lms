@@ -93,6 +93,14 @@
 <%= will_paginate(@accesses) %>
 <% js_block do %>
   <script type="text/javascript">
+  require([
+    'jquery' /* $ */,
+    'jquery.instructure_date_and_time' /* parseFromISO */,
+    'jquery.templateData' /* fillTemplateData */,
+    'vendor/jquery.pageless' /* pageless */
+  ], function($) {
+
+
     $(function(){
       var url = "<%= context_url(@context, :context_user_usage_url, @user, :format => :json) %>";
       $('#usage_report').pageless({
@@ -120,6 +128,7 @@
         }
       });
     });
+  });
   </script>
 <% end %>
 

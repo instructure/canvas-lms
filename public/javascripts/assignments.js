@@ -16,7 +16,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('assignments', function(I18n) {
+require([
+  'INST' /* INST */,
+  'i18n!assignments',
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO, dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formSuggestion */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.disabled/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImg, loadingImage */,
+  'jquery.scrollToVisible' /* scrollToVisible */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/date' /* Date.parse, Date.UTC */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/datepicker' /* /\.datepicker/ */,
+  'jqueryui/droppable' /* /\.droppable/ */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(INST, I18n, $, htmlEscape) {
+
   var defaultShowDateOptions = false;
   function hideAssignmentForm() {
     var $form = $("#add_assignment_form");
@@ -538,12 +559,12 @@ I18n.scoped('assignments', function(I18n) {
           var rule_type = parts[0];
           var value = parts[1];
           if(rule_type == "drop_lowest") {
-            rules += $.htmlEscape(I18n.t('drop_lowest_scores', "Drop the Lowest %{number} Scores", {number: value})) + "<br/>";
+            rules += htmlEscape(I18n.t('drop_lowest_scores', "Drop the Lowest %{number} Scores", {number: value})) + "<br/>";
           } else if(rule_type == "drop_highest") {
-            rules += $.htmlEscape(I18n.t('drop_highest_scores', "Drop the Highest %{number} Scores", {number: value})) + "<br/>";
+            rules += htmlEscape(I18n.t('drop_highest_scores', "Drop the Highest %{number} Scores", {number: value})) + "<br/>";
           } else if(rule_type == "never_drop") {
             var title = $("#assignment_" + value).find(".title").text();
-            rules += $.htmlEscape(I18n.t('never_drop_scores', "Never Drop %{assignment_name}", {assignment_name: title})) + "<br/>";
+            rules += htmlEscape(I18n.t('never_drop_scores', "Never Drop %{assignment_name}", {assignment_name: title})) + "<br/>";
           }
         }
       });

@@ -95,13 +95,20 @@ ldap_tests << OpenStruct.new(
   </div>
 </div>
 
-<% js_block :i18n_scope => "accounts" do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* getJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+], function(I18n, $) {
+
   function testLDAP() {
     clearTestLDAP();
     $("#test_ldap_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: I18n.t('test_ldap_dialog_title', "Test LDAP Settings"),
+      title: <%= jt('#accounts.test_ldap_dialog_title', "Test LDAP Settings") %>,
       width: 500
     }).dialog('open');
     <%= ldap_tests.first.js_function %>();
@@ -125,7 +132,7 @@ ldap_tests << OpenStruct.new(
           }
         });
         if (status == "true") {
-          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:green'>" + I18n.t('test_ldap_result_ok', 'OK') + "</h4>");
+          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:green'>" + <%= jt('#accounts.test_ldap_result_ok', 'OK') %> + "</h4>");
           <% if next_test = ldap_tests[i+1] %>
             // proceed to the next test
             <%= next_test.js_function %>();
@@ -134,12 +141,12 @@ ldap_tests << OpenStruct.new(
             $("#ldap_login_form").show('blind');
           <% end %>
         } else {
-          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_failed', 'Failed') + "</h4>");
+          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_failed', 'Failed') %> + "</h4>");
           $("#ldap_<%= test.test_type %>_help").show();
           <% ldap_tests[i+1..-1].each do |next_test| %>
-            $("#ldap_<%= next_test.test_type %>_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_canceled', 'Canceled') + "</h4>");
+            $("#ldap_<%= next_test.test_type %>_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_canceled', 'Canceled') %> + "</h4>");
           <% end %>
-          $("#ldap_login_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_canceled', 'Canceled') + "</h4>");
+          $("#ldap_login_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_canceled', 'Canceled') %> + "</h4>");
         }
       });
     }
@@ -167,10 +174,10 @@ ldap_tests << OpenStruct.new(
       });
       if (status == "true") {
         $("#ldap_login_help_error").hide();
-        $("#ldap_login_result").html("<h4 style='color:green'>" + I18n.t('test_ldap_result_ok', 'OK') + "</h4>");
+        $("#ldap_login_result").html("<h4 style='color:green'>" + <%= jt('#accounts.test_ldap_result_ok', 'OK') %> + "</h4>");
         $("#ldap_test_login").attr('disabled', '').attr('value', 'Test Login');
       } else {
-        $("#ldap_login_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_failed', 'Failed') + "</h4>");
+        $("#ldap_login_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_failed', 'Failed') %> + "</h4>");
         $("#ldap_login_help").show();
         $("#ldap_test_login").attr('disabled', '').attr('value', 'Retry Login');
         $("#ldap_login_help_error").html(message);
@@ -193,5 +200,6 @@ ldap_tests << OpenStruct.new(
       testLDAPLogin();
     });
   });
+});
 </script>
 <% end %>

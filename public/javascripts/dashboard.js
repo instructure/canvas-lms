@@ -15,9 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!dashboard',
+  'jquery' /* $ */,
+  'jquery.instructure_jquery_patches' /* windowScrollTop */,
+  'jquery.instructure_misc_plugins' /* showIf */
+], function(I18n, $) {
 
-I18n.scoped('dashboard', function(I18n) {
-$(function initDashbardJs(){
+  $(function initDashbardJs(){
 
   var afterTopicListTop = null,
       lastElementRetrievalCount = null,

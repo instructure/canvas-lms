@@ -24,6 +24,21 @@ describe ContextModule do
     @module = @course.context_modules.create!(:name => "some module")
   end
 
+  it "should clear the page cache on individual tag change" do
+    enable_cache do
+      course_with_teacher_logged_in(:active_all => true)
+      context_module = @course.context_modules.create!
+      content_tag = context_module.add_item :type => 'context_module_sub_header', :title => "My Sub Header Title"
+      ContextModule.update_all({ :updated_at => 1.hour.ago }, { :id => context_module.id })
+      get "/courses/#{@course.id}/modules"
+      response.body.should match(/My Sub Header Title/)
+
+      content_tag.update_attributes(:title => "My New Title")
+      get "/courses/#{@course.id}/modules"
+      response.body.should match(/My New Title/)
+    end
+  end
+
   describe "must_contribute" do
     before do
       course_module

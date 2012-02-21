@@ -1,7 +1,14 @@
 <% content_for :page_title, t(:page_title, "Conversations") %>
+
+<% content_for :auto_discovery do %>
+  <% if @current_user %>
+      <%= auto_discovery_link_tag(:atom, feeds_conversation_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.conversations', "Conversations Atom Feed")}) %>
+  <% end %>
+<% end %>
+
 <% add_crumb "", '#', :id => 'help_crumb' %>
 
-<% jammit_js :messages %>
+<% js_bundle :messages %>
 <% jammit_css :messages %>
 
 <div id="inbox">
@@ -36,9 +43,9 @@
       </ul>
       <div id="context_tags_filter" style="<%= hidden unless @filterable %>">
         <label for="context_tags">
-          <%= before_label :course_filter, "Course Filter" %>
+          <%= before_label :filter, "Filter" %>
         </label>
-        <%= text_field_tag :context_tags, nil, :finder_url => conversations_find_recipients_url(:type => 'course') %>
+        <%= text_field_tag :context_tags, nil, :finder_url => conversations_find_recipients_url(:types => ['course', 'user', 'group']) %>
       </div>
       <div class="clear"></div>
     </div>
@@ -75,10 +82,10 @@
           <th>&nbsp;</th>
           <td>
             <% if feature_enabled?(:kaltura) %>
-              <div class="media_comment" style="display: none;" title="<%= t('titles.audio_comment', "Recorded audio comment") %>">
-                <%= image_tag "messages/audio-gray.png" %>
-                <%= t('audio_comment', %{Audio Comment}) %>
-                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_audio_comment', "Remove audio comment") %>"><%= image_tag "delete_circle.png" %></a>
+              <div class="media_comment" style="display: none;" title="<%= t('titles.media_comment', "Recorded media comment") %>">
+                <%= image_tag "messages/media-gray.png" %>
+                <%= t('media_comment', %{Media Comment}) %>
+                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_media_comment', "Remove media comment") %>"><%= image_tag "delete_circle.png" %></a>
                 <div class="clear"></div>
               </div>
               <input type="hidden" name="media_comment_id" id="media_comment_id">
@@ -94,7 +101,7 @@
             </ul>
             <a id="action_add_attachment" href="#" title="<%= t('titles.add_attachment', "Add an attachment") %>"><%= image_tag "messages/attach-blue.png" %> <%= t('links.add_attachment', %{Attach}) %></a>
             <% if feature_enabled?(:kaltura) %>
-              <a id="action_media_comment" href="#" title="<%= t('titles.record_audio_comment', "Record an audio comment") %>"><%= image_tag "messages/audio-blue.png" %> <%= t('links.audio_comment', %{Record}) %></a>
+              <a id="action_media_comment" href="#" title="<%= t('titles.record_media_comment', "Record an audio or video comment") %>"><%= image_tag "messages/media-blue.png" %> <%= t('links.media_comment', %{Record}) %></a>
             <% end %>
             <div style="float: right">
               <input type="hidden" name="from_conversation_id" id="from_conversation_id">
@@ -107,6 +114,7 @@
     <ul class="messages">
     </ul>
   </div>
+  <div class="spin_holder"></div>
 </div>
 <ul style="display:none">
   <li id="conversation_blank">
@@ -116,7 +124,7 @@
     <%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :title => t('inbox_actions.unstar', "Unstar"), :class => :action_unstar %>
     <span class="date"></span>
     <img class="attachments" src="/images/messages/attach-gray.png" title="<%= t('has_attachments', 'This conversation has one or more attachments') %>">
-    <img class="media_objects" src="/images/messages/audio-gray.png" title="<%= t('has_audio', 'This conversation has one or more audio comments') %>">
+    <img class="media_objects" src="/images/messages/media-gray.png" title="<%= t('has_media', 'This conversation has one or more media comments') %>">
     <span class="audience"></span>
     <span class="count"></span>
     <p></p>
@@ -131,8 +139,8 @@
     <input type="checkbox" />
     <ul class='message_attachments'>
       <li class='media_object_blank'>
-        <a href="#" class="instructure_inline_media_comment audio_comment no-underline" title="<%= t('titles.play_audio_comment', "Play audio comment") %>">
-          <%= image_tag "messages/audio-gray.png" %> 
+        <a href="#" class="instructure_inline_media_comment media_comment no-underline" title="<%= t('titles.play_media_comment', "Play media comment") %>">
+          <%= image_tag "messages/media-gray.png" %>
           <span class="media_comment_id" style="display: none;"></span>
           <span class='title'></span>
         </a>
@@ -213,20 +221,26 @@
 
 <% js_block do %>
   <script type="text/javascript">
-    MessageInbox.user_id = <%= @current_user.id %>;
-    MessageInbox.user_cache = <%= raw @user_cache.to_json %>;
-    MessageInbox.contexts = <%= raw @contexts.to_json %>;
-    MessageInbox.initial_conversations = <%= raw @conversations_json.to_json %>;
-    MessageInbox.conversation_page_size = <%= @page_max %>;
-    MessageInbox.initial_conversations_count = <%= @conversations_count %>;
-    MessageInbox.scope = <%= raw @scope.to_json %>;
-    <% # TODO: get note-enabled-ness per account, and cross reference with the recipient's associated account ids. this is already enforced in the model %>
-    MessageInbox.notes_enabled = <%= raw @current_user.associated_accounts.any?{|a| a.enable_user_notes } %>;
-    MessageInbox.can_add_notes_for_account = MessageInbox.notes_enabled && <%= raw @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) } %>;
-    MessageInbox.conversations_per_page = <%= @page_max.to_i %>;
-    MessageInbox.initial_filter = <%= raw @filter.to_json %>;
+    // TODO: use js_env for all this stuff
+    require(['compiled/messages'], function (MessageInbox) {
+      MessageInbox.user_id = <%= @current_user.id %>;
+      MessageInbox.user_cache = <%= raw @user_cache.to_json %>;
+      MessageInbox.contexts = <%= raw @contexts.to_json %>;
+      MessageInbox.initial_conversations = <%= raw @conversations_json.to_json %>;
+      MessageInbox.conversation_page_size = <%= @page_max %>;
+      MessageInbox.initial_conversations_count = <%= @conversations_count %>;
+      MessageInbox.scope = <%= raw @scope.to_json %>;
+      <% # TODO: get note-enabled-ness per account, and cross reference with the recipient's associated account ids. this is already enforced in the model %>
+      MessageInbox.notes_enabled = <%= raw @current_user.associated_accounts.any?{|a| a.enable_user_notes } %>;
+      MessageInbox.can_add_notes_for_account = MessageInbox.notes_enabled && <%= raw @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) } %>;
+      MessageInbox.conversations_per_page = <%= @page_max.to_i %>;
+      MessageInbox.initial_filter = <%= raw @filter.to_json %>;
+      $(MessageInbox.init);
+    });
     <% unless @current_user.watched_conversations_intro? %>
-    $.conversationsIntroSlideshow()
+    require(['compiled/conversations_intro'], function (conversationsIntro) {
+      conversationsIntro();
+    });
     <% end %>
   </script>
 <% end %>

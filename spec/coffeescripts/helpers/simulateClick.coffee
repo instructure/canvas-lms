@@ -1,4 +1,4 @@
-define "helpers/simulateClick", [ "vendor/jquery-1.6.4" ], (_) ->
+define ->
   (element) ->
     unless document.createEvent
       element.click()

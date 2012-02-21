@@ -1,6 +1,6 @@
 <% content_for :page_title do %><%= t('inbox.discussion_replies', "Discussion Replies") %><% end %>
 
-<% jammit_js :discussion_replies %>
+<% js_bundle :discussion_replies %>
 
 <% content_for :right_side do %>
   <% if @current_user && @current_user.unread_inbox_items_count && @current_user.unread_inbox_items_count > 0 %>

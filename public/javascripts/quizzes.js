@@ -15,18 +15,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-// defined in the view
-var maxCombinations;
-
 require([
-  'i18n'
-], function(I18n) {
+  'i18n!quizzes',
+  'jquery' /* $ */,
+  'calcCmd',
+  'str/htmlEscape',
+  'str/pluralize',
+  'wikiSidebar',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar, /\$\.underscore/, truncateText */,
+  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashMessage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'supercalc' /* superCalc */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.placeholder' /* /\.placeholder/ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'jqueryui/tabs' /* /\.tabs/ */
+], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar) {
 
-  I18n = I18n.scoped('quizzes');
-
-  // global on purpose, used somewhere else
+  // TODO: refactor this... it's not going to be horrible, but it will
+  // take a little bit of work.  I just wrapped it in a closure for now
+  // to not pollute the global namespace, but it could use more.
+  var quiz = window.quiz = {};
   quiz = {
     uniqueLocalIDStore: {},
 
@@ -434,8 +451,8 @@ require([
         }
         var code = "";
         for(var cdx in split) {
-          if (split[cdx]) {
-            code = code + "<li>" + $.htmlEscape(split[cdx]) + "</li>";
+          if(split[cdx]) {
+            code = code + "<li>" + htmlEscape(split[cdx]) + "</li>";
           }
         }
         if (code) {
@@ -2126,7 +2143,7 @@ require([
         } else if ($bank.data('bank_data')) {
           var bank = $bank.data('bank_data');
           bank.bank_id = bank.id;
-          bank.context_type_string = $.pluralize($.underscore(bank.context_type));
+          bank.context_type_string = pluralize($.underscore(bank.context_type));
           $group.next(".assessment_question_bank").fillTemplateData({data: bank, hrefValues: ['bank_id', 'context_type_string', 'context_id']})
             .find(".bank_name").hide().filter(".bank_name_link").show();
         }
@@ -2347,7 +2364,7 @@ require([
       }
     });
 
-    if (window.wikiSidebar) {
+    if (wikiSidebar) {
       wikiSidebar.init();
       wikiSidebar.attachToEditor($("#quiz_description"));
     }
@@ -2379,11 +2396,11 @@ require([
       event.preventDefault();
       $("#quiz_content_links,#quiz_options_holder").toggle();
       if ($("#quiz_content_links:visible").length > 0) {
-        if (window.wikiSidebar) {
+        if (wikiSidebar) {
           wikiSidebar.show();
         }
       } else {
-        if (window.wikiSidebar) {
+        if (wikiSidebar) {
           wikiSidebar.hide();
         }
       }

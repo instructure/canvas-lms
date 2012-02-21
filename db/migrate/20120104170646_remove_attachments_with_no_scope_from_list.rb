@@ -1,10 +1,7 @@
 class RemoveAttachmentsWithNoScopeFromList < ActiveRecord::Migration
-  def self.up
-    if supports_ddl_transactions?
-      commit_db_transaction
-      decrement_open_transactions while open_transactions > 0
-    end
+  self.transactional = false
 
+  def self.up
     if Attachment.maximum(:id)
       i = 0
       # we do one extra loop to avoid race conditions
@@ -13,11 +10,6 @@ class RemoveAttachmentsWithNoScopeFromList < ActiveRecord::Migration
         sleep 1
         i = i + 10000
       end
-    end
-
-    if supports_ddl_transactions?
-      increment_open_transactions
-      begin_db_transaction
     end
   end
 

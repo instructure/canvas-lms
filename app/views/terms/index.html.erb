@@ -40,8 +40,18 @@
 }
 </style>
 
-<% js_block :i18n_scope => 'terms.index' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */,
+  'jquery.templateData' /* fillTemplateData */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $(".edit_term_link").click(function(event) {
     event.preventDefault();
@@ -57,14 +67,14 @@ $(document).ready(function() {
   });
   $(".cant_delete_term_link").click(function(event) {
     event.preventDefault();
-    alert(I18n.t('messages.classes_in_term', "You can't delete a term that still has classes in it."));
+    alert(<%= jt('messages.classes_in_term', "You can't delete a term that still has classes in it.") %>);
   });
   $(".delete_term_link").click(function(event) {
     event.preventDefault();
     var url = $(this).parents(".term").find(".enrollment_term_form").attr('action');
     $(this).parents(".term").confirmDelete({
       url: url,
-      message: I18n.t('prompts.delete', "Are you sure you want to delete this term?"),
+      message: <%= jt('prompts.delete', "Are you sure you want to delete this term?") %>,
       success: function() {
         $(this).fadeOut(function() {
           $(this).remove();
@@ -79,7 +89,7 @@ $(document).ready(function() {
     },
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true);
-      $(this).find(".submit_button").text(I18n.t('messages.submitting', "Submitting..."));
+      $(this).find(".submit_button").text(<%= jt('messages.submitting', "Submitting...") %>);
     },
     success: function(data) {
       var term = data.enrollment_term;
@@ -92,13 +102,13 @@ $(document).ready(function() {
       for(var idx in term.enrollment_dates_overrides) {
         var override = term.enrollment_dates_overrides[idx].enrollment_dates_override;
         var type_string = $.underscore(override.enrollment_type)
-        term[type_string + "_start_at"] = $.parseFromISO(override.start_at).date_formatted || I18n.t('date.term_start', "term start");
-        term[type_string + "_end_at"] = $.parseFromISO(override.end_at).date_formatted || I18n.t('date.term_end', "term end");
+        term[type_string + "_start_at"] = $.parseFromISO(override.start_at).date_formatted || <%= jt('date.term_start', "term start") %>;
+        term[type_string + "_end_at"] = $.parseFromISO(override.end_at).date_formatted || <%= jt('date.term_end', "term end") %>;
         term['enrollment_term[overrides][' + type_string + '][start_at]'] = $.parseFromISO(override.start_at).date_formatted;
         term['enrollment_term[overrides][' + type_string + '][end_at]'] = $.parseFromISO(override.end_at).date_formatted;
       }
-      term.start_at = $.parseFromISO(term.start_at).date_formatted || I18n.t('date.unspecified', "whenever");
-      term.end_at = $.parseFromISO(term.end_at).date_formatted || I18n.t('date.unspecified', "whenever");
+      term.start_at = $.parseFromISO(term.start_at).date_formatted || <%= jt('date.unspecified', "whenever") %>;
+      term.end_at = $.parseFromISO(term.end_at).date_formatted || <%= jt('date.unspecified', "whenever") %>;
       $tr.fillTemplateData({
         data: term
       });
@@ -109,7 +119,7 @@ $(document).ready(function() {
     error: function(data) {
       $(this).find("button").attr('disabled', false);
       $(this).formErrors(data);
-      $(this).find(".submit_button").text(I18n.t('errors.submit', "Error Submitting"))
+      $(this).find(".submit_button").text(<%= jt('errors.submit', "Error Submitting") %>)
     }
   });
   $(".add_term_link").click(function(event) {
@@ -119,6 +129,7 @@ $(document).ready(function() {
     $("#terms").prepend($term.show());
     $term.find(".edit_term_link").click();
   });
+});
 });
 </script>
 <% end %>

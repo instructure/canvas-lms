@@ -263,6 +263,19 @@ describe CalendarEvent do
       lambda { appointment2.reserve_for(@student1, @student1) }.should raise_error
     end
 
+    it "should cancel existing reservations if cancel_existing = true" do
+      ag = AppointmentGroup.create(:title => "test", :context => @course, :max_appointments_per_participant => 1,
+        :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'], ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
+      )
+      ag.publish!
+      appointment = ag.appointments.first
+      appointment2 = ag.appointments.last
+
+      r1 = appointment.reserve_for(@student1, @student1)
+      lambda { appointment2.reserve_for(@student1, @student1, :cancel_existing => true) }.should_not raise_error
+      r1.reload.should be_deleted
+    end
+
     it "should enforce the section" do
       ag = AppointmentGroup.create(:title => "test", :context => @course.course_sections.create,
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]

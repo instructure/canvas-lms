@@ -16,6 +16,10 @@
 </div>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */
+], function($) {
+
 $(document).ready(function() {
   $(".settings_link,.cancel_button").click(function(event) {
     event.preventDefault();
@@ -24,6 +28,7 @@ $(document).ready(function() {
   $("#notification_types_form").submit(function() {
     $(this).find("button").attr('disabled', true).text("<%= t :updating_preferences, "Updating Preferences..." %>");
   });
+});
 });
 </script>
 <% end %>

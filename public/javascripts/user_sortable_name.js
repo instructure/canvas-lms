@@ -1,3 +1,8 @@
+require([
+  'jquery' /* jQuery, $ */,
+  'user_utils' /* userUtils */
+], function($, userUtils) {
+
 $(function () {
   var $short_name = $('input[name="user[short_name]"]')
   // Sometimes user[name] is used for search forms on the same page as edit forms;
@@ -20,3 +25,5 @@ $(function () {
     prior_name = $(this).attr('value');
   });
 });
+});
+

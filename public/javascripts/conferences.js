@@ -1,5 +1,19 @@
-$(document).ready(function() {
-  I18n.scoped('conferences', function(I18n) {
+require([
+  'INST' /* INST */,
+  'i18n!conferences',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashError */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */
+], function(INST, I18n, $) {
+
+  $(document).ready(function() {
     $("#add_conference_form .cancel_button").click(function() {
       if($("#add_conference_form").prev(".conference").length > 0) {
         $("#add_conference_form").hide();
@@ -206,3 +220,4 @@ $(document).ready(function() {
     });
   });
 });
+

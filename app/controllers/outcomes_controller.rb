@@ -17,7 +17,7 @@
 #
 
 class OutcomesController < ApplicationController
-  before_filter :require_user_for_context, :except => [:build_outcomes]
+  before_filter :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_filter { |c| c.active_tab = "outcomes" }
   

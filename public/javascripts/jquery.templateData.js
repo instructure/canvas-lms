@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+define([
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'jquery.instructure_misc_helpers' /* replaceTags */
+], function($, htmlEscape) {
 
-(function($){
-  
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
   //  data: data used to fill template.
   //  id: set the id attribute of the template object
@@ -71,7 +74,7 @@
               } else {
                 try {
                   var str = options.data[item].toString();
-                  $found.html($.htmlEscape(str));
+                  $found.html(htmlEscape(str));
                 } catch(e) { }
               }
             }
@@ -159,4 +162,4 @@
     return this.getTemplateData(opts)[value];
   };
 
-})(jQuery);
+});

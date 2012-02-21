@@ -8,58 +8,6 @@ describe "assignments" do
       course_with_teacher_logged_in
     end
 
-    it "should not allow XSS attacks through rubric descriptions" do
-      skip_if_ie('Unexpected page behavior')
-
-      student = user_with_pseudonym :active_user => true,
-                                    :username => "student@example.com",
-                                    :password => "password"
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
-
-      @assignment = @course.assignments.create(:name => 'assignment with rubric')
-      @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
-      @rubric.data = [
-          {
-              :points => 3,
-              :description => "XSS Attack!",
-              :long_description => "<b>This text should not be bold</b>",
-              :id => 1,
-              :ratings => [
-                  {
-                      :points => 3,
-                      :description => "Rockin'",
-                      :criterion_id => 1,
-                      :id => 2
-                  },
-                  {
-                      :points => 0,
-                      :description => "Lame",
-                      :criterion_id => 1,
-                      :id => 3
-                  }
-              ]
-          }
-      ]
-      @rubric.save!
-      @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
-      driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
-          text.should == "<b>This text should not be bold</b>"
-      close_visible_dialog
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-      driver.find_element(:css, ".toggle_full_rubric").click
-      wait_for_animations
-      driver.find_element(:css, '#criterion_1 .long_description_link').click
-      keep_trying_until { driver.find_element(:id, 'rubric_long_description_dialog').should be_displayed }
-      driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
-          text.should == "<b>This text should not be bold</b>"
-    end
-
     it "should display assignment on calendar and link to assignment" do
       assignment_name = 'first assignment'
       current_date = Time.now.utc
@@ -86,66 +34,6 @@ describe "assignments" do
       details_dialog.find_element(:css, '#edit_assignment_form .more_options_link').click
       #make sure user is taken to assignment details
       driver.find_element(:css, 'h2.title').should include_text(assignment_name)
-
-    end
-
-    it "should create an assignment group" do
-      get "/courses/#{@course.id}/assignments"
-
-      wait_for_animations
-      driver.find_element(:css, '#right-side .add_group_link').click
-      driver.find_element(:id, 'assignment_group_name').send_keys('test group')
-      driver.find_element(:id, 'add_group_form').submit
-      wait_for_animations
-      driver.find_element(:id, 'add_group_form').should_not be_displayed
-      driver.find_element(:css, '#groups .assignment_group').should include_text('test group')
-    end
-
-
-    it "should edit group details" do
-      assignment_group = @course.assignment_groups.create!(:name => "first test group")
-      assignment = @course.assignments.create(:title => 'assignment with rubric', :assignment_group => assignment_group)
-      get "/courses/#{@course.id}/assignments"
-
-      #edit group grading rules
-      driver.find_element(:css, '.edit_group_link img').click
-      #set number of lowest scores to drop
-      driver.find_element(:css, '.add_rule_link').click
-      driver.find_element(:css, 'input.drop_count').send_keys('2')
-      #set number of highest scores to drop
-      driver.find_element(:css, '.add_rule_link').click
-      click_option('.form_rules div:nth-child(2) select', 'Drop the Highest')
-      driver.find_element(:css, '.form_rules div:nth-child(2) input').send_keys('3')
-      #set assignment to never drop
-      driver.find_element(:css, '.add_rule_link').click
-      never_drop_css = '.form_rules div:nth-child(3) select'
-      click_option(never_drop_css, 'Never Drop')
-      wait_for_animations
-      assignment_css = '.form_rules div:nth-child(3) .never_drop_assignment select'
-      keep_trying_until { driver.find_element(:css, assignment_css).displayed? }
-      click_option(assignment_css, assignment.title)
-      #delete second grading rule and save
-      driver.find_element(:css, '.form_rules div:nth-child(2) a img').click
-      driver.find_element(:css, '#add_group_form button[type="submit"]').click
-
-      #verify grading rules
-      driver.find_element(:css, '.more_info_link').click
-      driver.find_element(:css, '.assignment_group .rule_details').should include_text('2')
-      driver.find_element(:css, '.assignment_group .rule_details').should include_text('assignment with rubric')
-    end
-
-    it "should edit assignment group's grade weights" do
-      @course.assignment_groups.create!(:name => "first group")
-      @course.assignment_groups.create!(:name => "second group")
-      get "/courses/#{@course.id}/assignments"
-
-      driver.find_element(:id, 'class_weighting_policy').click
-      #wanted to change number but can only use clear because of the auto insert of 0 after clearing
-      # the input
-      driver.find_element(:css, 'input.weight').clear
-      #need to wait for the total to update
-      wait_for_animations
-      keep_trying_until { find_with_jquery('#group_weight_total').text.should == '50%' }
     end
 
     it "should create an assignment" do
@@ -218,7 +106,7 @@ describe "assignments" do
       due_date = Time.now.utc + 2.days
       group = @course.assignment_groups.create!(:name => "default")
       second_group = @course.assignment_groups.create!(:name => "second default")
-      assignment = @course.assignments.create!(
+      @course.assignments.create!(
           :name => assignment_name,
           :due_at => due_date,
           :assignment_group => group
@@ -256,171 +144,6 @@ describe "assignments" do
       driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
     end
 
-    describe "external tool assignments" do
-      before (:each) do
-        @t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool1", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
-        @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
-      end
-
-      it "should allow creating" do
-        skip_if_ie('Out of memory')
-        get "/courses/#{@course.id}/assignments"
-
-        #create assignment
-        click_option('#right-side select.assignment_groups_select', 'Assignments')
-        driver.find_element(:css, '.add_assignment_link').click
-        driver.find_element(:id, 'assignment_title').send_keys('test1')
-        driver.find_element(:css, '.ui-datepicker-trigger').click
-        datepicker = datepicker_next
-        datepicker.find_element(:css, '.ui-datepicker-ok').click
-        driver.find_element(:id, 'assignment_points_possible').clear
-        driver.find_element(:id, 'assignment_points_possible').send_keys('5')
-        click_option('.assignment_submission_types', 'External Tool')
-        expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
-        keep_trying_until do
-          find_with_jquery('#context_external_tools_select td.tools .tool:first-child:visible').click
-          sleep 2 # wait for javascript to execute
-          driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
-        end
-        keep_trying_until do
-          driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[1].click
-          driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
-        end
-        driver.find_element(:css, '#select_context_content_dialog .add_item_button').click
-        driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t2.url
-        driver.find_element(:css, 'form.new_assignment').submit
-
-        wait_for_ajax_requests
-        a = @course.assignments(true).last
-        a.should be_present
-        a.submission_types.should == 'external_tool'
-        a.external_tool_tag.should be_present
-        a.external_tool_tag.url.should == @t2.url
-        a.external_tool_tag.new_tab.should be_false
-      end
-
-      it "should allow editing" do
-        skip_if_ie('Out of memory')
-        a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
-        a.create_external_tool_tag(:url => @t1.url)
-        a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
-
-        get "/courses/#{@course.id}/assignments/#{a.id}/edit"
-        # don't display dialog on page load, since url isn't blank
-        driver.find_element(:css, '#context_external_tools_select').should_not be_displayed
-        driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').click
-        driver.find_elements(:css, '#context_external_tools_select td.tools .tool')[0].click
-        driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
-        driver.find_element(:css, '#select_context_content_dialog .add_item_button').click
-        driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t1.url
-        driver.find_element(:css, 'form.edit_assignment').submit
-
-        wait_for_ajax_requests
-        a.reload
-        a.submission_types.should == 'external_tool'
-        a.external_tool_tag.should be_present
-        a.external_tool_tag.url.should == @t1.url
-      end
-    end
-
-    def create_assignment_with_points(points)
-      assignment_name = 'first test assignment'
-      due_date = Time.now.utc + 2.days
-      @group = @course.assignment_groups.create!(:name => "default")
-      @assignment = @course.assignments.create(
-          :name => assignment_name,
-          :due_at => due_date,
-          :points_possible => points,
-          :assignment_group => @group
-      )
-    end
-
-    it "should add a new rubric to assignment" do
-      create_assignment_with_points(2)
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:css, '.rubric_title input[name="title"]').clear
-      driver.find_element(:css, '.rubric_title input[name="title"]').send_keys('new rubric')
-      driver.find_element(:id, 'edit_rubric_form').submit
-      wait_for_animations
-      driver.find_element(:css, '#rubrics .rubric .rubric_title .displaying .title').should include_text('new rubric')
-    end
-
-    it "should import rubric to assignment" do
-      create_assignment_with_points(2)
-
-      outcome_with_rubric
-      @rubric.associate_with(@course, @course, :purpose => 'grading')
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:css, '#rubric_new .editing .find_rubric_link').click
-      wait_for_ajax_requests
-      driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
-      driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
-      wait_for_ajaximations
-      driver.find_element(:css, '#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
-
-    end
-
-    it "should not adjust assignment points possible for grading rubric" do
-      create_assignment_with_points(2)
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
-
-      driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:id, 'grading_rubric').click
-      driver.find_element(:id, 'edit_rubric_form').submit
-      find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
-      wait_for_ajaximations
-      driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
-    end
-
-    it "should adjust assignment points possible for grading rubric" do
-      create_assignment_with_points(2)
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
-
-      driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:id, 'grading_rubric').click
-      driver.find_element(:id, 'edit_rubric_form').submit
-      find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Change")').click
-      wait_for_ajaximations
-
-      driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '5'
-    end
-
-    it "should carry decimal values through rubric to grading" do
-      student_in_course
-      create_assignment_with_points(2.5)
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:css, '#criterion_1 .criterion_points').send_key :backspace
-      driver.find_element(:css, '#criterion_1 .criterion_points').send_key "2.5"
-      driver.find_element(:id, 'grading_rubric').click
-      driver.find_element(:id, 'edit_rubric_form').submit
-      wait_for_ajaximations
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-      wait_for_ajaximations
-      driver.find_element(:css, '.toggle_full_rubric').click
-      find_with_jquery('#rubric_holder .criterion:visible .rating').click
-      driver.find_element(:css, '#rubric_holder .save_rubric_button').click
-      wait_for_ajaximations
-
-      driver.find_element(:css, '#rubric_summary_container .rubric_total').text.should == '2.5'
-    end
-
     it "should show a \"more errors\" errorBox if any invalid fields are hidden" do
       assignment_name = 'first test assignment'
       @group = @course.assignment_groups.create!(:name => "default")
@@ -450,163 +173,11 @@ describe "assignments" do
       errorBoxes.first.text.should eql "The assignment shouldn't be locked again until after the due date"
       errorBoxes.first.should be_displayed
     end
-
-    context "turnitin" do
-      before (:each) do
-        account = Account.default
-        account.turnitin_account_id = 'asdf'
-        account.turnitin_shared_secret = 'asdf'
-        account.save
-        @course.account = account
-        @course.save
-      end
-
-      def change_turnitin_settings
-        keep_trying_until { driver.find_element(:css, '.submission_type_option').should be_displayed }
-        driver.find_element(:css, '.submission_type_option > option[value="online"]').click
-        driver.find_element(:id, 'assignment_online_text_entry').click
-        driver.find_element(:id, 'assignment_turnitin_settings').should_not be_displayed
-        driver.find_element(:id, 'assignment_turnitin_enabled').click
-        driver.find_element(:id, 'assignment_turnitin_settings').should be_displayed
-        driver.find_element(:css, '.show_turnitin_settings').click
-        wait_for_animations
-        driver.find_element(:id, 'turnitin_settings_form').should be_displayed
-
-        driver.find_element(:css, '#settings_originality_report_visibility > option[value="after_due_date"]').click # immediate -> after_due_date
-        driver.find_element(:id, 'settings_student_paper_check').click # 1 -> 0
-        driver.find_element(:id, 'settings_internet_check').click # 1 -> 0
-        driver.find_element(:id, 'settings_journal_check').click # 1 -> 0
-        driver.find_element(:id, 'settings_exclude_biblio').click # 1 -> 0
-        driver.find_element(:id, 'settings_exclude_quoted').click # 1 -> 0
-        driver.find_element(:id, 'settings_exclude_small_matches').click # 0 -> 1
-        driver.find_element(:id, 'settings_exclude_fewer_than_count').click # 0 -> 1
-        driver.find_element(:id, 'settings_exclude_value_count').send_keys("5") # '' -> 5
-        driver.find_element(:id, 'turnitin_settings_form').submit
-        wait_for_ajaximations
-      end
-
-      def expected_settings
-        {
-            'originality_report_visibility' => 'after_due_date',
-            's_paper_check' => '0',
-            'internet_check' => '0',
-            'journal_check' => '0',
-            'exclude_biblio' => '0',
-            'exclude_quoted' => '0',
-            'exclude_type' => '1',
-            'exclude_value' => '5'
-        }
-      end
-
-      it "should create turnitin settings" do
-        skip_if_ie('Out of memory')
-        expect {
-          get "/courses/#{@course.id}/assignments/new"
-
-          driver.find_element(:id, 'assignment_title').send_keys('test assignment')
-          change_turnitin_settings
-        }.to_not change { Assignment.count } # although we "saved" the dialog, we haven't actually posted anything yet
-
-        driver.find_element(:id, 'edit_assignment_form').submit
-        wait_for_ajaximations
-
-        assignment = Assignment.first(:order => "id desc")
-        assignment.turnitin_settings.should eql(expected_settings)
-      end
-
-      it "should edit turnitin settings" do
-        skip_if_ie('Out of memory')
-        assignment = @course.assignments.create!(
-            :name => 'test assignment',
-            :due_at => (Time.now.utc + 2.days),
-            :assignment_group => @course.assignment_groups.create!(:name => "default")
-        )
-
-        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
-
-        change_turnitin_settings
-
-        assignment.reload
-        assignment.turnitin_settings.should eql(expected_settings)
-      end
-    end
-
-    context "discussions assignments" do
-
-      def build_assignment_with_type(text)
-        get "/courses/#{@course.id}/assignments"
-
-        driver.find_element(:css, ".header_content .add_assignment_link").click
-        wait_for_animations
-
-        click_option(".assignment_submission_types", text)
-        driver.find_element(:css, "#add_assignment_form").submit
-        wait_for_ajaximations
-      end
-
-      it "should create a discussion topic when created" do
-        build_assignment_with_type("Discussion")
-
-        expect_new_page_load { driver.find_element(:css, "#left-side .discussions").click }
-        driver.find_elements(:css, "#topic_list .discussion_topic").should_not be_empty
-      end
-
-      it "should redirect to the discussion topic" do
-        build_assignment_with_type("Discussion")
-
-        expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
-        driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-      end
-
-      it "should create a discussion topic when edited from a regular assignment" do
-        build_assignment_with_type("Assignment")
-
-        expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
-        driver.find_element(:css, ".edit_full_assignment_link").click
-        wait_for_animations
-        click_option(".assignment_type", "Discussion")
-        driver.find_element(:css, "#edit_assignment_form").submit
-        wait_for_ajaximations
-        expect_new_page_load { driver.find_element(:css, ".assignment_topic_link").click }
-        driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-      end
-
-      it "should create a discussion topic with requires peer reviews" do
-        assignment_title = 'discussion assignment peer reviews'
-        get "/courses/#{@course.id}/assignments"
-
-        driver.find_element(:css, ".header_content .add_assignment_link").click
-        wait_for_animations
-        click_option(".assignment_submission_types", 'Discussion')
-        expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
-        edit_form = driver.find_element(:id, 'edit_assignment_form')
-        edit_form.should be_displayed
-        replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
-        edit_form.find_element(:id, 'assignment_peer_reviews').click
-        edit_form.submit
-        wait_for_ajaximations
-        expect_new_page_load { driver.find_element(:link, assignment_title).click }
-        driver.find_element(:css, '.for_assignment').should include_text('Grading will be based on posts submitted to this topic')
-      end
-    end
   end
 
   context "student view" do
     before (:each) do
       course_with_student_logged_in
-    end
-
-    it "should properly show rubric criterion details for learning outcomes" do
-      @assignment = @course.assignments.create(:name => 'assignment with rubric')
-      outcome_with_rubric
-
-      @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      driver.find_element(:css, "#rubrics .rubric_title").text.should == "My Rubric"
-      driver.find_element(:css, ".criterion_description .long_description_link").click
-      driver.find_element(:css, ".ui-dialog div.long_description").text.should == "This is awesome."
     end
 
     it "should highlight mini-calendar dates where stuff is due" do
@@ -637,97 +208,23 @@ describe "assignments" do
       driver.find_element(:css, ".details").text.should =~ /comment before muting/
       driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
     end
-  end
 
-  context "discussions assignments" do
+    it "should submit an assignment and validate confirmation information" do
+      pending "BUG 6783 - Coming Up assignments update error" do
+        due_date = Time.now.utc + 2.days
+        @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date, :submission_types => 'online_url')
+        @submission = @assignment.submit_homework(@student)
+        @submission.submission_type = "online_url"
+        @submission.save!
 
-    def build_assignment_with_type(text)
-      get "/courses/#{@course.id}/assignments"
-
-      driver.find_element(:css, ".header_content .add_assignment_link").click
-      wait_for_animations
-
-      click_option(".assignment_submission_types", text)
-      driver.find_element(:css, "#add_assignment_form").submit
-      wait_for_ajaximations
-    end
-
-    it "should create a discussion topic when created" do
-      course_with_teacher_logged_in
-      build_assignment_with_type("Discussion")
-
-      expect_new_page_load { driver.find_element(:css, "#left-side .discussions").click }
-      driver.find_elements(:css, "#topic_list .discussion_topic").should_not be_empty
-    end
-
-    it "should redirect to the discussion topic" do
-      course_with_teacher_logged_in
-      build_assignment_with_type("Discussion")
-
-      expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
-      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-    end
-
-    it "should create a discussion topic when edited from a regular assignment" do
-      course_with_teacher_logged_in
-      build_assignment_with_type("Assignment")
-
-      expect_new_page_load { driver.find_element(:css, ".assignment_list .group_assignment .assignment_title a").click }
-      driver.find_element(:css, ".edit_full_assignment_link").click
-      wait_for_animations
-      click_option(".assignment_type", "Discussion")
-      driver.find_element(:css, "#edit_assignment_form").submit
-      wait_for_ajaximations
-      expect_new_page_load { driver.find_element(:css, ".assignment_topic_link").click }
-      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-    end
-
-    it "should create a discussion topic with requires peer reviews" do
-      assignment_title = 'discussion assignment peer reviews'
-      course_with_teacher_logged_in
-      get "/courses/#{@course.id}/assignments"
-
-      driver.find_element(:css, ".header_content .add_assignment_link").click
-      wait_for_animations
-      click_option(".assignment_submission_types", 'Discussion')
-      expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
-      edit_form = driver.find_element(:id, 'edit_assignment_form')
-      edit_form.should be_displayed
-      replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
-      edit_form.find_element(:id, 'assignment_peer_reviews').click
-      edit_form.submit
-      wait_for_ajaximations
-      expect_new_page_load { driver.find_element(:link, assignment_title).click }
-      driver.find_element(:css, '.for_assignment').should include_text('Grading will be based on posts submitted to this topic')
-    end
-  end
-
-  context "rubric" do
-    before (:each) do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_all => true)
-      outcome_with_rubric
-      @assignment = @course.assignments.create(:name => 'assignment with rubric')
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-      @submission = @assignment.submit_homework(@student, { :url => "http://www.instructure.com/" })
-    end
-
-    it "should follow learning outcome ignore_for_scoring" do
-      @rubric.data[0][:ignore_for_scoring] = '1'
-      @rubric.points_possible = 5
-      @rubric.instance_variable_set('@outcomes_changed', true)
-      @rubric.save!
-      @assignment.points_possible = 5
-      @assignment.save!
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-      driver.find_element(:css, '.assess_submission_link').click
-      driver.find_element(:css, '.total_points_holder .assessing').should include_text "out of 5"
-      driver.find_element(:css, "#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
-      driver.find_element(:css, '.rubric_total').should include_text "5"
-      driver.find_element(:css, '.save_rubric_button').click
-      wait_for_ajaximations
-      driver.find_element(:css, '.grading_value').attribute(:value).should == "5"
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        driver.find_element(:css, '.details .header').should include_text('Turned In!')
+        get "/courses/#{@course.id}"
+        driver.execute_script("$('.tooltip_text').css('visibility', 'visible')")
+        tooltip_text_elements = driver.find_elements(:css, '.tooltip_text > span')
+        driver.find_element(:css, '.tooltip_text').should be_displayed
+        tooltip_text_elements[1].text.should == 'submitted'
+      end
     end
   end
 end

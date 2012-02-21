@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+define([
+  'jquery' /* $ */,
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */
+], function($) {
 
 $(document).ready(function() {
   $("#floating_reminders").draggable();
@@ -91,4 +96,4 @@ $(document).ready(function() {
   
 });
 
-
+});
