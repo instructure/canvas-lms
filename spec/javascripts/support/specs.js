@@ -2,6 +2,8 @@ require([
   'specs/TemplateSpec',
   'specs/CustomListSpec',
   'specs/invokerSpec',
+  'specs/class/cacheSpec',
+  'specs/xhr/remoteSelectSpec',
   'specs/jQuery.instructureMiscPluginsSpec',
   'specs/userNamePartsSpec',
   'specs/objectCollectionSpec',

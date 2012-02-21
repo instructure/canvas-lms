@@ -1767,14 +1767,13 @@ class User < ActiveRecord::Base
   end
   memoize :conversation_context_codes
 
-  def manageable_courses
-    Course.manageable_by_user(self.id).not_deleted
+  def manageable_courses(include_concluded = false)
+    Course.manageable_by_user(self.id, include_concluded).not_deleted
   end
 
-  def manageable_courses_name_like(query="")
-    self.manageable_courses.not_deleted.name_like(query).limit(50)
+  def manageable_courses_name_like(query = '', include_concluded = false)
+    self.manageable_courses(include_concluded).not_deleted.name_like(query).limit(50)
   end
-  memoize :manageable_courses_name_like
 
   def last_completed_module
     self.context_module_progressions.select{|p| p.completed? }.sort_by{|p| p.completed_at || p.created_at }.last.context_module rescue nil
