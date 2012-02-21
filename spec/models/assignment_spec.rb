@@ -192,6 +192,40 @@ describe Assignment do
     @submission.user_id.should eql(@user.id)
   end
 
+  it "should preserve letter grades with zero points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'letter_grade'
+    @assignment.points_possible = 0.0
+    @assignment.save!
+
+    s = @assignment.grade_student(@user, :grade => 'C')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('C')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should preserve letter grades with no points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'letter_grade'
+    @assignment.points_possible = nil
+    @assignment.save!
+
+    s = @assignment.grade_student(@user, :grade => 'C')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('C')
+    @submission.user_id.should eql(@user.id)
+  end
+
   it "should give a grade to extra credit assignments" do
     setup_assignment_without_submission
     @assignment.grading_type = 'points'

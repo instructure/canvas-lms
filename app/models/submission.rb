@@ -369,7 +369,7 @@ class Submission < ActiveRecord::Base
     if self.score_changed?
       @score_changed = true
       if self.assignment
-        self.grade = self.assignment.score_to_grade(self.score) if self.assignment.points_possible.to_f > 0.0 || self.assignment.grading_type != 'pass_fail'
+        self.grade = self.assignment.score_to_grade(self.score, self.grade)
       else
         self.grade = self.score.to_s
       end

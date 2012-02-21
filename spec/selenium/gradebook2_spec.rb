@@ -341,6 +341,23 @@ describe "gradebook2" do
     driver.execute_script '$.store.clear();'
   end
 
+  it "should allow setting a letter grade on a no-points assignment" do
+    assignment_model(:course => @course, :grading_type => 'letter_grade', :points_possible => nil, :title => 'no-points')
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l3'), 'A-')
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    driver.find_element(:css, '#gradebook_grid [row="0"] .l3').text.should == 'A-'
+    @assignment.submissions.size.should == 1
+    sub = @assignment.submissions.first
+    sub.grade.should == 'A-'
+    sub.score.should == 0.0
+  end
+
   it "should change grades and validate course total is correct" do
     expected_edited_total = "33.3%"
 

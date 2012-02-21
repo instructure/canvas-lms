@@ -523,7 +523,7 @@ class Assignment < ActiveRecord::Base
       result = "#{result}%"
     elsif self.grading_type == "pass_fail"
       if self.points_possible.to_f > 0.0
-        passed = score.to_f == self.points_possible
+        passed = score.to_f == self.points_possible.to_f
       elsif given_grade
         # the score for a zero-point pass/fail assignment could be considered
         # either pass *or* fail, so look at what the current given grade is
@@ -534,8 +534,20 @@ class Assignment < ActiveRecord::Base
       end
       result = passed ? "complete" : "incomplete"
     elsif self.grading_type == "letter_grade"
-      score = score.to_f / self.points_possible
-      result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
+      if self.points_possible.to_f > 0.0
+        score = score.to_f / self.points_possible.to_f
+        result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
+      elsif given_grade
+        # the score for a zero-point letter_grade assignment could be considered
+        # to be *any* grade, so look at what the current given grade is
+        # instead of trying to calculate it
+        result = given_grade
+      else
+        # there's not really any reasonable value we can set here -- if the
+        # assignment is worth no points, and the grader didn't enter an
+        # explicit letter grade, any letter grade is as valid as any other.
+        result = GradingStandard.score_to_grade(self.grading_scheme, score.to_f)
+      end
     end
     result.to_s
   end
@@ -556,7 +568,7 @@ class Assignment < ActiveRecord::Base
     else
       # try to treat it as a letter grade
       if grading_scheme && standard_based_score = GradingStandard.grade_to_score(grading_scheme, grade)
-        (points_possible * standard_based_score).round / 100.0
+        ((points_possible || 0.0) * standard_based_score).round / 100.0
       else
         nil
       end
