@@ -1,4 +1,8 @@
-<form action='#' id='message_participants_form'>
+<form title="{{#ifEqual participant_type "Group"}}
+  {{#t "message_groups"}}Message Groups{{/t}}
+{{else}}
+  {{#t "message_students"}}Message Students{{/t}}
+{{/ifEqual}}" action='#' id='message_participants_form'>
   <h2>{{#t "send_message_to"}}Send a message to...{{/t}}</h2>
   <div>
     <select class="message_groups">

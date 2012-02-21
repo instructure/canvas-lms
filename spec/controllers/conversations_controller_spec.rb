@@ -19,7 +19,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConversationsController do
-  def conversation(num_other_users = 1, course = @course)
+  def conversation(opts = {})
+    num_other_users = opts[:num_other_users] || 1
+    course = opts[:course] || @course
     user_ids = num_other_users.times.map{
       u = User.create
       enrollment = course.enroll_student(u)
@@ -29,7 +31,7 @@ describe ConversationsController do
       u.id
     }
     @conversation = @user.initiate_conversation(user_ids)
-    @conversation.add_message('test')
+    @conversation.add_message(opts[:message] || 'test')
     @conversation
   end
 
@@ -77,7 +79,7 @@ describe ConversationsController do
       enrollment.workflow_state = 'active'
       enrollment.save!
       @user.reload
-      @c2 = conversation(1, @other_course)
+      @c2 = conversation(:num_other_users => 1, :course => @other_course)
 
       get 'index', :filter => @other_course.asset_string
       response.should be_success
@@ -232,7 +234,7 @@ describe ConversationsController do
   describe "POST 'update'" do
     it "should update the conversation" do
       course_with_student_logged_in(:active_all => true)
-      conversation(2).update_attribute(:workflow_state, "unread")
+      conversation(:num_other_users => 2).update_attribute(:workflow_state, "unread")
 
       post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :starred => "1"}
       response.should be_success
@@ -276,7 +278,7 @@ describe ConversationsController do
   describe "POST 'add_recipients'" do
     it "should add recipients" do
       course_with_student_logged_in(:active_all => true)
-      conversation(2)
+      conversation(:num_other_users => 2)
 
       new_user = User.create
       enrollment = @course.enroll_student(new_user)
@@ -289,7 +291,7 @@ describe ConversationsController do
 
     it "should correctly infer context tags" do
       course_with_student_logged_in(:active_all => true)
-      conversation(2)
+      conversation(:num_other_users => 2)
 
       @group = @course.groups.create!
       @conversation.participants.each{ |user| @group.users << user }
@@ -375,6 +377,100 @@ describe ConversationsController do
       response.should be_success
       response.body.should include('bob')
       response.body.should_not include('billy')
+    end
+  end
+
+  describe "GET 'public_feed.atom'" do
+    it "should require authorization" do
+      course_with_student
+      conversation
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code + "x"
+      assigns[:problem].should eql("The verification code is invalid.")
+    end
+
+    it "should return basic feed attributes" do
+      course_with_student
+      conversation
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.title.should == "Conversations Feed"
+      feed.links.first.href.should match(/conversations/)
+    end
+
+    it "should include message entries" do
+      course_with_student
+      conversation
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      assigns[:entries].length.should == 1
+      response.should be_success
+    end
+
+    it "should not include messages the user is not a part of" do
+      course_with_student
+      conversation
+      student_in_course
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      assigns[:entries].should be_empty
+    end
+
+    it "should include part the message text in the title" do
+      course_with_student
+      message = "Sending a test message to some random users, in the hopes that it really works."
+      conversation(:message => message)
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.first.title.should match(/Sending a test/)
+      feed.entries.first.title.should_not match(message)
+    end
+
+    it "should include the message in the content" do
+      course_with_student
+      message = "Sending a test message to some random users, in the hopes that it really works."
+      conversation(:message => message)
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.first.content.should match(message)
+    end
+
+    it "should include context about the conversation" do
+      course_with_student(:course_name => "Message Course", :active_all => true)
+      message = "Sending a test message to some random users, in the hopes that it really works."
+      conversation(:num_other_users => 4, :message => message)
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.first.content.should match(/Message Course/)
+      feed.entries.first.content.should match(/User/)
+      feed.entries.first.content.should match(/others/)
+    end
+
+    it "should include an attachment if one exists" do
+      course_with_student
+      conversation
+      @conversation.add_message('test attachment') do |message|
+        attachment_model(:filename => "somefile.doc")
+        @attachment.context = message
+        @attachment.save
+      end
+      HostUrl.stubs(:context_host).returns("test.host")
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.first.content.should match(/somefile\.doc/)
+    end
+
+    it "should not include deleted messages" do
+      course_with_student
+      conversation
+      @conversation.add_message('second message')
+      @conversation.remove_messages(@conversation.messages.first)
+      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.length.should == 1
     end
   end
 end

@@ -17,6 +17,13 @@
 
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashMessage */
+], function($) {
+
 $(document).ready(function() {
   $(".submit_error_link").click(function(event) {
     event.preventDefault();
@@ -39,6 +46,7 @@ $(document).ready(function() {
       $(this).errorBox(<%= raw t('message_failed', "Report didn't send.  Please try again.").to_json %>);
     }
   });
+});
 });
 </script>
 <% end %>

@@ -9,6 +9,7 @@ module I18nExtraction
     I18N_WRAPPER = /((<([a-zA-Z]+)[^>]*>)+)([^<]+)((<\/\3>)+(<\/[^>]+>)*)/
 
     def process(source, scope)
+      @scope = scope
       scan(source, :scope => scope, :strict => true) do |data|
         add_translation data[:key], data[:value]
       end
@@ -21,7 +22,7 @@ module I18nExtraction
 
       method = options[:method]
       scope = options[:scope] ? options[:scope] + "." : ""
-      
+
       block_line_numbers = []
       source.lines.each_with_index do |line, line_number|
         line.scan(/#{I18N_CALL_START}.*(\}|$)/) do
@@ -75,7 +76,7 @@ module I18nExtraction
       source.lines.each_with_index do |line, line_number|
         if line =~ /<[^>]+>/
           raise "translation contains un-wrapper-ed markup (line #{base_line_number + line_number}). hint: use a placeholder"
-        end 
+        end
       end
     end
   end

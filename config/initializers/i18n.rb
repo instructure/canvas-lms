@@ -155,9 +155,13 @@ I18n.class_eval do
 end
 
 ActionView::Base.class_eval do
+  def i18n_scope
+    "#{template.base_path}.#{template.name.sub(/\A_/, '')}"
+  end
+
   def translate(key, default, options = {})
     key = key.to_s
-    key = "#{template.base_path}.#{template.name.sub(/\A_/, '')}.#{key}" unless key.sub!(/\A#/, '')
+    key = "#{i18n_scope}.#{key}" unless key.sub!(/\A#/, '')
     I18n.translate(key, default, options)
   end
   alias :t :translate

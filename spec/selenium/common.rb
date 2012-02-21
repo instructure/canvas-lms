@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
 require "timeout"
+require 'coffee-script'
 require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 include I18nUtilities
@@ -49,11 +50,17 @@ module SeleniumTestsHelperMethods
     if SELENIUM_CONFIG[:host] && SELENIUM_CONFIG[:port] && !SELENIUM_CONFIG[:host_and_port]
       SELENIUM_CONFIG[:host_and_port] = "#{SELENIUM_CONFIG[:host]}:#{SELENIUM_CONFIG[:port]}"
     end
+    native = SELENIUM_CONFIG[:native_events] || false
+    browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
     if !SELENIUM_CONFIG[:host_and_port]
-      browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       options = {}
-      if SELENIUM_CONFIG[:firefox_profile].present? && browser == :firefox
-        options[:profile] = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
+      if browser == :firefox
+        profile = Selenium::WebDriver::Firefox::Profile.new
+        if SELENIUM_CONFIG[:firefox_profile].present?
+          profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
+        end
+        profile.native_events = native
+        options[:profile] = profile
       end
       if path = SELENIUM_CONFIG[:paths].try(:[], browser)
         Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
@@ -61,9 +68,13 @@ module SeleniumTestsHelperMethods
       driver = Selenium::WebDriver.for(browser, options)
     else
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
-      if caps == :firefox && SELENIUM_CONFIG[:firefox_profile]
-        profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
-        caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+      if caps == :firefox
+        profile = Selenium::WebDriver::Firefox::Profile.new
+        if SELENIUM_CONFIG[:firefox_profile].present?
+          profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
+        end
+      caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+      caps.native_events = native
       end
 
       driver = nil
@@ -146,6 +157,56 @@ module SeleniumTestsHelperMethods
     end
     at_exit { shutdown.call }
     return shutdown
+  end
+
+  def exec_cs(script, *args)
+    driver.execute_script(CoffeeScript.compile(script), *args)
+  end
+
+  # a varable named `callback` is injected into your function for you, just call it to signal you are done.
+  def exec_async_cs(script, *args)
+    to_compile = "var callback = arguments[arguments.length - 1]; #{CoffeeScript.compile(script)}"
+    driver.execute_async_script(script, *args)
+  end
+
+  # usage
+  # require_exec 'compiled/util/foo', 'bar', <<-CS
+  #   foo('something')
+  #   # optionally I should be able to do
+  #   bar 'something else', ->
+  #     "stuff"
+  #     callback('i made it')
+  #
+  # CS
+  #
+  # simple usage
+  # require_exec 'i18n!messages', 'i18n.t("foobar")'
+  def require_exec(*args)
+    code = args.last
+    things_to_require = {}
+    args[0...-1].each do |file_path|
+      things_to_require[file_path] = file_path.split('/').last.split('!').first
+    end
+
+    # make sure the code you pass is at least as intented as it should be
+    code = code.gsub(/^/, '          ')
+    coffee_source = <<-CS
+      _callback = arguments[arguments.length - 1];
+      cancelCallback = false
+
+      callback = ->
+        _callback.apply(this, arguments)
+        cancelCallback = true
+
+      require #{things_to_require.keys.to_json}, (#{things_to_require.values.join(', ')}) ->
+        res = do ->
+#{code}
+        _callback(res) unless cancelCallback
+    CS
+    # make it `bare` because selenium already wraps it in a function and we need to get
+    # the arguments for our callback
+    js = CoffeeScript.compile(coffee_source, :bare => true)
+    driver.execute_async_script(js)
   end
 
   def self.start_forked_webrick_server
@@ -244,6 +305,16 @@ shared_examples_for "all selenium tests" do
     course_with_student({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
   end
 
+  def course_with_ta_logged_in(opts={})
+    user_logged_in(opts)
+    course_with_ta({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  end
+
+  def course_with_designer_logged_in(opts={})
+    user_logged_in(opts)
+    course_with_designer({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  end
+
   def course_with_admin_logged_in(opts={})
     account_admin_user({:active_user => true}.merge(opts))
     user_logged_in({:user => @user}.merge(opts))
@@ -267,22 +338,38 @@ shared_examples_for "all selenium tests" do
     wait_for_dom_ready
   end
 
-  def wait_for_dom_ready
-    keep_trying_until(120) { driver.execute_script("return $") != nil }
-    driver.execute_script <<-JS
-      window.seleniumDOMIsReady = false;
-      $(function(){
-        window.setTimeout(function(){
-          //by doing a setTimeout, we ensure that the execution of all js completes. then we run selenium.
-          window.seleniumDOMIsReady = true;
-        }, 1);
-      });
-    JS
+  def check_domready
     dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-    until (dom_is_ready) do
-      sleep 0.1
-      dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-    end
+    requirejs_resources_loaded = driver.execute_script "return require.resourcesDone"
+    dom_is_ready and requirejs_resources_loaded
+  end
+
+  ##
+  # waits for JavaScript to evaluate, occasionally when you click an element
+  # a bunch of JS needs to run, this basically puts the rest of your test later
+  # in the JS thread
+  def wait_for_js
+    driver.execute_script <<-JS
+      window.selenium_wait_for_js = false;
+      setTimeout(function() { window.selenium_wait_for_js = true; });
+    JS
+    keep_trying_until { driver.execute_script('return window.selenium_wait_for_js') == true }
+  end
+
+  def wait_for_dom_ready
+    driver.execute_async_script(<<-JS)
+     var callback = arguments[arguments.length - 1];
+     var pollForJqueryAndRequire = function(){
+        if (window.jQuery && window.require && window.require.resourcesDone) {
+          jQuery(function(){
+            setTimeout(callback, 1);
+          });
+        } else {
+          setTimeout(pollForJqueryAndRequire, 1);
+        }
+      }
+      pollForJqueryAndRequire();
+    JS
   end
 
   def wait_for_ajax_requests(wait_start = 0)
@@ -431,13 +518,6 @@ shared_examples_for "all selenium tests" do
     driver.execute_script(scr)
   end
 
-  def clear_wiki_rce
-    wiki_page_body = driver.find_element(:id, :wiki_page_body)
-    wiki_page_body.clear
-    wiki_page_body[:value].should be_empty
-    wiki_page_body
-  end
-
   def hover_and_click(element_jquery_finder)
     find_with_jquery(element_jquery_finder.to_s).should be_present
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
@@ -468,14 +548,8 @@ shared_examples_for "all selenium tests" do
     visible_dialog_element.should_not be_displayed
   end
 
-  def element_exists(selector_type, selector)
-    exists = false
-    begin
-      driver.find_element(selector_type, selector)
-      exists = true
-    rescue
-    end
-    exists
+  def element_exists(css_selector)
+    !find_all_with_jquery(css_selector).empty?
   end
 
   def first_selected_option(select_element)
@@ -579,33 +653,6 @@ shared_examples_for "all selenium tests" do
     temp_file
   end
 
-  def wiki_page_tools_upload_file(form, type)
-    name, path, data = get_file({:text => 'testfile1.txt', :image => 'graded.png'}[type])
-
-    driver.find_element(:css, "#{form} .file_name").send_keys(path)
-    driver.find_element(:css, "#{form} button").click
-    keep_trying_until { find_all_with_jquery("#{form}:visible").empty? }
-  end
-
-  def wiki_page_tools_file_tree_setup
-    @root_folder = Folder.root_folders(@course).first
-    @sub_folder = @root_folder.sub_folders.create!(:name => 'subfolder', :context => @course);
-    @sub_sub_folder = @sub_folder.sub_folders.create!(:name => 'subsubfolder', :context => @course);
-    @text_file = @root_folder.attachments.create!(:filename => 'text_file.txt', :context => @course) { |a| a.content_type = 'text/plain' }
-    @image1 = @root_folder.attachments.build(:context => @course)
-    path = File.expand_path(File.dirname(__FILE__) + '/../../public/images/email.png')
-    @image1.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
-    @image1.save!
-    @image2 = @root_folder.attachments.build(:context => @course)
-    path = File.expand_path(File.dirname(__FILE__) + '/../../public/images/graded.png')
-    @image2.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
-    @image2.save!
-    get "/courses/#{@course.id}/wiki"
-
-    @tree1 = driver.find_element(:id, :tree1)
-    @image_list = driver.find_element(:css, '#editor_tabs_3 .image_list')
-  end
-
   def assert_flash_notice_message(okay_message_regex)
     keep_trying_until do
       text = driver.find_element(:id, "flash_notice_message").text
@@ -626,6 +673,13 @@ shared_examples_for "all selenium tests" do
     # load the simulate plugin to simulate a drag event
     js = File.read('spec/selenium/jquery.simulate.js')
     driver.execute_script js
+  end
+
+  # when selenium fails you, reach for .simulate
+  # takes a CSS selector for jQuery to find the element you want to drag
+  # and then the change in x and y you want to drag
+  def drag_with_js(selector, x, y)
+    driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
   end
 
   self.use_transactional_fixtures = false

@@ -1,0 +1,2 @@
+require ['learning_outcomes']
+

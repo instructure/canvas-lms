@@ -151,7 +151,7 @@ a.load_members_link, .loading_members {
 </style>
 <% end %>
 
-<% jammit_js :manage_groups %>
+<% js_bundle :manage_groups %>
 
 <% if @context.is_a?(Course) && @context.students.empty? %>
   <div style="text-align: center;" id="no_students_message">

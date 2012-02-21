@@ -1,5 +1,5 @@
-<% 
-  jammit_js :calendar
+<% js_bundle :calendar %>
+<%
   jammit_css :calendar
   params = request.path_parameters.merge(request.query_parameters).merge({"month" => "%m", "year" => "%y"}) 
 %>

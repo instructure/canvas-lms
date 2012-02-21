@@ -16,8 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('page_views', function(I18n) {
-(function($, INST){
+define([
+  'INST' /* INST */,
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */
+], function(INST, $) {
+
   $(document).ready(function(){
     var interactionSeconds = 0,
         $page_view_id = $("#page_view_id"),
@@ -99,5 +103,5 @@ I18n.scoped('page_views', function(I18n) {
       }, 1000);
     }
   });
-})(jQuery, INST);
 });
+

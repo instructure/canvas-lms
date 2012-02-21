@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -60,7 +60,11 @@ class GradebookImporter
         process_pp(row)
         next
       end
-      
+
+      if row[0] =~ /Muted assignments do not impact Current and Final score columns/
+        next
+      end
+
       @students << process_student(row)
       @submissions << process_submissions(row, @students.last)
     end

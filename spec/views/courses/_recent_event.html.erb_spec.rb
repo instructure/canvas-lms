@@ -44,8 +44,7 @@ describe "/courses/_recent_event" do
       @quiz_submission.grade_submission
 
       @submission = @quiz_submission.submission
-      @submission.score = 1234567890987654400 # long magic number that should be distinct in the partial for the test
-      @submission.save
+      Submission.any_instance.stubs(:score).returns(1234567890987654400)
     end
 
     it "should show the score for a non-muted assignment" do

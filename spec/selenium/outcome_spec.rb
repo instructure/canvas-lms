@@ -41,22 +41,136 @@ describe "learning outcome test" do
     find_all_with_jquery('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
   end
 
-  it "should allow dragging and dropping outside of the outcomes list without throwing an error" do
-    @context = @course
-
-    get "/courses/#{@course.id}/outcomes"
-    %w{test_group_1 test_group_2}.each do |name|
-      driver.find_element(:css, '.add_outcome_group_link').click
-      driver.find_element(:id, 'learning_outcome_group_title').send_keys name
-      driver.find_element(:css, '#edit_outcome_group_form button.submit_button').click
+  def create_groups(names)
+    button = driver.find_element(:css, '.add_outcome_group_link')
+    records = []
+    names.each do |name|
+      button.click
+      input = driver.find_element(:id, 'learning_outcome_group_title').send_keys(name, :enter)
       wait_for_ajax_requests
+      records << LearningOutcomeGroup.find_by_title(name)
+    end
+    records
+  end
+
+  def create_outcomes(names)
+    button = driver.find_element(:css, '.add_outcome_link')
+    records = []
+    names.each do |name|
+      button.click
+      input = driver.find_element(:id, 'learning_outcome_short_description').send_keys(name, :enter)
+      wait_for_ajax_requests
+      records << LearningOutcome.find_by_short_description(name)
+    end
+    records
+  end
+
+  context 'drag and drop' do
+
+    before(:each) do
+      get "/courses/#{@course.id}/outcomes"
+      @group1, @group2 = create_groups ['group1', 'group2']
+      @outcome1, @outcome2 = create_outcomes ['outcome1', 'outcome2']
+      get "/courses/#{@course.id}/outcomes"
+
+      # drag/drop handles
+      @gh1, @gh2, @oh1, @oh2 = driver.find_elements(:css, '.reorder_link')
+
+      # drag and drop is flakey in selenium mac
+      load_simulate_js
     end
 
-    draggable = driver.find_element(:css, '.outcome_group .reorder_link')
-    drag_to = driver.find_element(:css, '#section-tabs')
-    driver.action.drag_and_drop(draggable, drag_to).perform
+    it "should allow dragging and dropping outside of the outcomes list without throwing an error" do
+      draggable = driver.find_element(:css, '.outcome_group .reorder_link')
+      drag_to = driver.find_element(:css, '#section-tabs')
+      driver.action.drag_and_drop(draggable, drag_to).perform
+      driver.execute_script('return INST.errorCount;').should eql 0
+    end
 
-    driver.execute_script('return INST.errorCount;').should eql 0
+    it "re-order sibling outcomes" do
+      #   <-
+      # g1
+      # g2
+      # o1
+      # o2->
+      driver.action.drag_and_drop(@oh2, @gh1).perform
+      wait_for_js
+      wait_for_ajax_requests
+      get "/courses/#{@course.id}/outcomes"
+
+      # get the elements in the order we expect
+      o2, g1, g2, o1 = driver.find_elements(:css, '#outcomes > .outcome_group .outcome_item')
+
+      # verify they are in the order we expect
+      g1.attribute(:id).should == "group_#{@group1.id}"
+      g2.attribute(:id).should == "group_#{@group2.id}"
+      o1.attribute(:id).should == "outcome_#{@outcome1.id}"
+      o2.attribute(:id).should == "outcome_#{@outcome2.id}"
+    end
+
+    it "should nest an outcome into a group" do
+      # g1<-
+      # g2
+      # o1
+      # o2->
+      drag_with_js('.reorder_link:eq(3)', 0, -165)
+      wait_for_ajax_requests
+      get "/courses/#{@course.id}/outcomes"
+      only_first_level_items_selector = '#outcomes > .outcome_group > .child_outcomes > .outcome_item'
+      g1, g2, o1, *extras = driver.find_elements :css, only_first_level_items_selector
+
+      # test top level items, make sure the fourth is gone and the others are as we expect
+      extras.length.should == 0
+      g1.attribute(:id).should == "group_#{@group1.id}"
+      g2.attribute(:id).should == "group_#{@group2.id}"
+      o1.attribute(:id).should == "outcome_#{@outcome1.id}"
+
+      # check that the outcome is nested
+      o2 = g1.find_element(:id, "outcome_#{@outcome2.id}")
+      o2.should be_displayed
+    end
+
+    it 'should re-order groups with children' do
+      # first we have to nest the outcomes
+      #   g1<-
+      # ->g2
+      #   o1->
+      # <-o2
+
+      # drag o1 into g1
+      drag_with_js('.reorder_link:eq(2)', 0, -100)
+      wait_for_ajax_requests
+
+      # drag o2 into g2
+      drag_with_js('.reorder_link:eq(3)', 0, -30)
+      wait_for_ajax_requests
+
+      # re-order the groups
+      # ->
+      #   g1
+      #     o1
+      # <-g2
+      #     o2
+      driver.action.drag_and_drop(@gh2, @gh1).perform
+      drag_with_js('.reorder_link:eq(2)', 0, -200)
+      wait_for_ajax_requests
+
+      get "/courses/#{@course.id}/outcomes"
+      only_first_level_items_selector = '#outcomes > .outcome_group > .child_outcomes > .outcome_item'
+
+      # get them in the order we expect
+      g2, g1, *extras = driver.find_elements :css, only_first_level_items_selector
+
+      # make sure we only have two
+      extras.length.should == 0
+
+      # verify they're in order
+      g1.attribute(:id).should == "group_#{@group1.id}"
+      g2.attribute(:id).should == "group_#{@group2.id}"
+
+      g1.find_element(:id, "outcome_#{@outcome1.id}").should be_displayed
+      g2.find_element(:id, "outcome_#{@outcome2.id}").should be_displayed
+    end
   end
 
   it "should create a rubric" do

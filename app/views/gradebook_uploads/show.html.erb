@@ -8,7 +8,7 @@
 
 <% 
   jammit_css :gradebook_uploads
-  jammit_js :gradebook_uploads 
+  js_bundle :gradebook_uploads 
 %>
 
 <form id="gradebook_importer_resolution_section" style="display:none;">
@@ -90,11 +90,7 @@
 
 <% js_block do %>
   <script type="text/javascript">
-    var originalGradebook = <%= raw @context.gradebook_json %>;
-    var uploadedGradebook = <%= raw @uploaded_gradebook.to_json %>;
-
-    $(function(){
-      GradebookUploader.handleThingsNeedingToBeResolved();
-    });
+    window.originalGradebook = <%= raw @context.gradebook_json %>;
+    window.uploadedGradebook = <%= raw @uploaded_gradebook.to_json %>
   </script>
 <% end %>

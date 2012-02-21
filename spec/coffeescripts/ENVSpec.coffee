@@ -13,3 +13,4 @@ define ['require'], (require) ->
         equal env2.thing2, 4
         strictEqual env1, env2
         start()
+

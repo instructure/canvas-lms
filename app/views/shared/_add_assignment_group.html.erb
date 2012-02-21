@@ -18,8 +18,16 @@
   <% end %>
 </div>
 
-<% js_block :i18n_scope => 'shared.add_assignment_group' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* showIf */
+], function(I18n, $) {
+
 window.attachAddAssignmentGroup = function($select, url) {
   var $group = $select;
   url = url || $("#add_assignment_type_form").attr('action');
@@ -27,7 +35,7 @@ window.attachAddAssignmentGroup = function($select, url) {
     if($(this).val() == "new") {
       $("#add_assignment_type").dialog('close');
       $("#add_assignment_type").show().dialog({
-        title: I18n.t('titles.add_assignment_group', "Add Assignment Group"),
+        title: <%= jt('titles.add_assignment_group', "Add Assignment Group") %>,
         width: 300,
         height: "auto",
         autoSize: true,
@@ -59,10 +67,10 @@ window.attachAddAssignmentGroup = function($select, url) {
 $(document).ready(function() {
   $("#add_assignment_type_form").formSubmit({
     beforeSubmit: function(data) {
-      $(this).find("button").attr('disabled', true).filter(".add_button").text(I18n.t('messages.adding_group', "Adding Group..."));
+      $(this).find("button").attr('disabled', true).filter(".add_button").text(<%= jt('messages.adding_group', "Adding Group...") %>);
     },
     success: function(data) {
-      $(this).find("button").attr('disabled', false).filter(".add_button").text(I18n.t('buttons.add_group', "Add Group"));
+      $(this).find("button").attr('disabled', false).filter(".add_button").text(<%= jt('buttons.add_group', "Add Group") %>);
       var group = data.assignment_group;
       var $group = $("#add_assignment_type_form").data('group_select');
       var $option = $(document.createElement('option'));
@@ -73,12 +81,13 @@ $(document).ready(function() {
     },
     error: function(data) {
       $(this).formErrors(data);
-      $(this).find("button").attr('disabled', false).filter(".add_button").text(I18n.t('errors.add_group_failed', "Add Group Failed"));
+      $(this).find("button").attr('disabled', false).filter(".add_button").text(<%= jt('errors.add_group_failed', "Add Group Failed") %>);
     }
   });
   $("#add_assignment_type .cancel_button").click(function(event) {
     $("#add_assignment_type").dialog('close');
   });
+});
 });
 </script>
 <% end %>

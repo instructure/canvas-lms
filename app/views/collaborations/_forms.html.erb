@@ -83,7 +83,7 @@
     <%= text_field :collaboration, :title, :style => "width: 300px;", :value => t('collaboration_name', "%{course_or_group_name} Collaboration", :course_or_group_name => @context.name) %>
   </div>
   <div class="content">
-  <%= before_label :description, "Description" %><br/>
+  <%= before_label :description, "Description" %><br>
   <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
   </div>
   <div class="footer">
@@ -96,6 +96,8 @@
 <% end %>
 <% js_block do %>
 <script>
+require(['INST'], function(INST) {
   INST.collaboration_types = <%= raw Collaboration.collaboration_types.to_json %>;
+});
 </script>
 <% end %>

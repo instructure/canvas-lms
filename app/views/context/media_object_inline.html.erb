@@ -10,8 +10,15 @@
 </div>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'media_comments' /* mediaComment */
+], function($) {
+
 $(document).ready(function() {
   $("#media_comment").mediaComment('show_inline', '<%= params[:id] %>', '<%= @media_object ? @media_object.media_type : 'video' %>');
+});
+
 });
 </script>
 <% end %>

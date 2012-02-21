@@ -1,0 +1,2 @@
+require ['content_exports']
+

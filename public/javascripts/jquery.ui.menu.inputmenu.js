@@ -6,7 +6,10 @@
  *
  * http://github.com/kborchers/jquery-ui-extensions
  */
-(function( $ ) {
+define([
+  'jquery',
+  'vendor/jquery.ui.menu-1.9'
+], function( $, _menu ) {
 
 var proto = $.ui.menu.prototype,
 	originalRefresh = proto.refresh;
@@ -141,4 +144,4 @@ $.extend( proto, {
 	}
 });
 
-})( jQuery );
+});

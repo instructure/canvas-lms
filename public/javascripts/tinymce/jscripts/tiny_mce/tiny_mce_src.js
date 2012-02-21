@@ -23,7 +23,6 @@
 			t.isIE7 = t.isIE && /MSIE [7]/.test(ua);
 
 			t.isIE8 = t.isIE && /MSIE [8]/.test(ua);
-
 			t.isIE9 = t.isIE && /MSIE [9]/.test(ua);
 
 			t.isGecko = !t.isWebKit && /Gecko/.test(ua);
@@ -7222,10 +7221,15 @@ window.tinymce.dom.Sizzle = Sizzle;
 
 		_wait : function(win) {
 			var t = this, doc = win.document;
-
 			// No need since the document is already loaded
 			if (win.tinyMCE_GZ && tinyMCE_GZ.loaded) {
 				t.domLoaded = 1;
+				return;
+			}
+
+			// When loaded asynchronously, the DOM Content may already be loaded
+			if (doc.readyState === "complete") {
+				t._pageInit(win);
 				return;
 			}
 
@@ -10753,8 +10757,9 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 		requireLangPack : function(n) {
 			var s = tinymce.settings;
 
-			if (s && s.language && s.language_load !== false)
+			if (s && s.language && s.language_load !== false) {
 				tinymce.ScriptLoader.add(this.urls[n] + '/langs/' + s.language + '.js');
+      }
 		},
 
 		add : function(id, o, dependencies) {
@@ -11386,8 +11391,9 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 
 			// Load scripts
 			function loadScripts() {
-				if (s.language && s.language_load !== false)
+				if (s.language && s.language_load !== false) {
 					sl.add(tinymce.baseURL + '/langs/' + s.language + '.js');
+        }
 
 				if (s.theme && s.theme.charAt(0) != '-' && !ThemeManager.urls[s.theme])
 					ThemeManager.load(s.theme, 'themes/' + s.theme + '/editor_template' + tinymce.suffix + '.js');

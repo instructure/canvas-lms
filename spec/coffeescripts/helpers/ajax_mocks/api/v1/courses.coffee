@@ -1,6 +1,6 @@
 require ['support/jquery.mockjax'], ($) ->
   $.mockjax
-    url:  '/api/v1/courses*'
+    url:  /\/api\/v1\/courses\/\d+(\?.+)?$/
     responseText: [
       name: "teacher's test course"
       id: 1

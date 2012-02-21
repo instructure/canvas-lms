@@ -11,10 +11,10 @@
 button.single_item_done_button
   display: none
 .showing-single
-  .appointment-group-item, 
+  .appointment-group-item,
   #appointment-group-list-header
     display: none
-  .appointment-group-item.active, 
+  .appointment-group-item.active,
   .single_item_done_button
     display: block
   .appointment-group-item
@@ -46,14 +46,17 @@ button.single_item_done_button
 .ag-x-of-x-signed-up
   font-size: 11px
 
-.time-block-list-wrapper
-  height: 180px
-
 .time-block-list-body-wrapper
   overflow: auto
-  height: 130px
+  max-height: 150px
   overflow-x: hidden
+  margin-bottom: 10px
 
+.time-block-list-header, .time-block-list-body-wrapper
+  width: 100%
+  border-bottom: 1px solid #DDD
+.time-block-list-body
+  width: 100%
 .time-block-list
   th
     text-align: center
@@ -62,9 +65,6 @@ button.single_item_done_button
     vertical-align: top
   .time-range-column
     width: 130px
-  .time-block-list-footer
-    tr
-      height: 38px
 
   $date_column_width: 140px
   $time_column_width: 70px
@@ -80,29 +80,26 @@ button.single_item_done_button
   .end-time-column
     width: $time_column_width
     text-align: center
-  .delete-column
-    padding-right: 2em
 
   .date_field
     width: $date_column_width - 5 - 20
-  .ui-datepicker-trigger
-    visibility: visible
   .time_field
     width: $time_column_width - 10
 
   .error
-    background: red
-
-  .datetime_suggest, .ui-datepicker-trigger
+    border: 1px solid #EE5F5B
+    padding: 2px
+    box-shadow: 0 0 4px #f8b9b7
+  .invalid_datetime, .error
+    color: #B94A48
+  .datetime_suggest
     display: none
-
+  .ui-datepicker-trigger
+    display: inline
   tr.focused
-    .ui-datepicker-trigger
-      visibility: visible
     .datetime_suggest
       display: block
-    .ui-datepicker-trigger
-      display: inline
+      min-height: 15px
 
 #edit_appointment_form
   td
@@ -113,6 +110,8 @@ button.single_item_done_button
 
 .delete-block-link
   +accessible_text_replacement
+  display: block
+  float: right
   background: url(/images/jqueryui/icon_sprite.png) 0px -16px no-repeat
   width: 16px
   height: 16px

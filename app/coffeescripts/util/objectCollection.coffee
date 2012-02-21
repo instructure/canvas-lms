@@ -3,7 +3,7 @@
 # Returns an array with extra methods.  It uses direct property injection so our
 # prototypes are still clean, but we get a nice OO syntax for these kinds
 # of arrays.
-define 'compiled/util/objectCollection', ->
+define ->
   (array) ->
 
     array.indexOf = (needle) ->
@@ -48,6 +48,7 @@ define 'compiled/util/objectCollection', ->
           a - b
 
       (prop) ->
+        return array if array.length is 0
         type = typeof array[0][prop] or 'string'
         array.sort (a, b) ->
           return sorters[type](a[prop], b[prop])

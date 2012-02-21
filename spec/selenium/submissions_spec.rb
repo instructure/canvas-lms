@@ -68,9 +68,7 @@ describe "submissions" do
     find_with_jquery('body').should be_displayed
   end
 
-  it "should allow media comments" do
-    pending
-  end
+  it "should allow media comments"
 
 end
 

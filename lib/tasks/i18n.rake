@@ -19,6 +19,33 @@ namespace :i18n do
       end
       result
     end
+
+    def to_ordered
+      keys.sort_by(&:to_s).inject ActiveSupport::OrderedHash.new do |h, k|
+        v = fetch(k)
+        h[k] = v.is_a?(Hash) ? v.to_ordered : v
+        h
+      end
+    end
+  end
+
+  def infer_scope(filename)
+    case filename
+      when /app\/views\/.*\.handlebars\z/
+        filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').underscore.gsub(/\/_?/, '.')
+      when /app\/controllers\//
+        scope = filename.gsub(/.*app\/controllers\/|controller.rb/, '').gsub(/\/_?|_\z/, '.')
+        scope == 'application.' ? '' : scope
+      when /app\/messages\//
+        filename.gsub(/.*app\/|erb/, '').gsub(/\/_?/, '.')
+      when /app\/models\//
+        scope = filename.gsub(/.*app\/models\/|rb/, '')
+        STI_SUPERCLASSES.include?(scope) ? '' : scope
+      when /app\/views\//
+        filename.gsub(/.*app\/views\/|(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')
+      else
+        ''
+    end
   end
 
   desc "Verifies all translation calls"
@@ -30,7 +57,7 @@ namespace :i18n do
         if path =~ /\*/
           path = Dir.glob(path)
         elsif path !~ /\.(e?rb|js)\z/
-          path = Dir.glob(path + '/**/*') 
+          path = Dir.glob(path + '/**/*')
         end
         path
       }.flatten
@@ -38,23 +65,6 @@ namespace :i18n do
 
     STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`.split("\n") - ['OpenStruct', 'Tableless']).
       map{ |name| name.underscore + '.' }
-
-    def infer_scope(filename)
-      case filename
-        when /app\/controllers\//
-          scope = filename.gsub(/.*app\/controllers\/|controller.rb/, '').gsub(/\/_?|_\z/, '.')
-          scope == 'application.' ? '' : scope
-        when /app\/messages\//
-          filename.gsub(/.*app\/|erb/, '').gsub(/\/_?/, '.')
-        when /app\/models\//
-          scope = filename.gsub(/.*app\/models\/|rb/, '')
-          STI_SUPERCLASSES.include?(scope) ? '' : scope
-        when /app\/views\//
-          filename.gsub(/.*app\/views\/|(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')
-        else
-          ''
-      end
-    end
 
     COLOR_ENABLED = ($stdout.tty? rescue false)
     def color(text, color_code)
@@ -111,12 +121,16 @@ namespace :i18n do
 
 
     # JavaScript
-    files = (Dir.glob('./public/javascripts/*.js') + Dir.glob('./app/views/**/*.erb')).
-      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
+    files = (Dir.glob('./public/javascripts/**/*.js') + Dir.glob('./app/views/**/*.erb')).
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
     files &= only if only
     js_extractor = I18nExtraction::JsExtractor.new(:translations => @translations)
     process_files(files) do |file|
-      file_count += 1 if js_extractor.process(File.read(file), :erb => (file =~ /\.erb\z/), :filename => file)
+      t2 = Time.now
+      ret = js_extractor.process(File.read(file), :erb => (file =~ /\.erb\z/), :filename => file)
+      file_count += 1 if ret
+      puts "#{file} #{Time.now - t2}" if Time.now - t2 > 1
+      ret
     end
 
 
@@ -125,7 +139,7 @@ namespace :i18n do
     files &= only if only
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
     process_files(files) do |file|
-      file_count += 1 if handlebars_extractor.process(File.read(file), file.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').underscore.gsub(/\/_?/, '.'))
+      file_count += 1 if handlebars_extractor.process(File.read(file), infer_scope(file))
     end
 
     print "\n\n"
@@ -168,92 +182,73 @@ namespace :i18n do
 
     Hash.send :include, HashExtensions
 
-    files = Dir.glob('public/javascripts/*.js').
-      reject{ |file| file =~ /\Apublic\/javascripts\/(i18n.js|translations\/)/ }
-
-    bundles = Jammit.configuration[:javascripts]
-    bundle_translations = bundles.keys.inject({}){ |hash, key| hash[key] = {}; hash }
+    file_translations = {}
 
     locales = I18n.available_locales - [:en]
-    all_translations = I18n.backend.send(:translations).flatten
+    all_translations = I18n.backend.send(:translations)
+    flat_translations = all_translations.flatten
+
     if locales.empty?
       puts "Nothing to do, there are no non-en translations"
       exit 0
     end
 
-    files.each do |file|
-      extractor = I18nExtraction::JsExtractor.new
-      begin
-        extractor.process(File.read(file), :filename => file) or next
-      rescue
-        raise "Error reading #{file}: #{$!}\nYou should probably run `rake i18n:check' first"
-      end
-      translations = extractor.translations.flatten.keys
-      next if translations.empty?
+    process_files = lambda do |extractor, files, arg_block|
+      files.each do |file|
+        begin
+          extractor.translations = {}
+          extractor.process(File.read(file), *arg_block.call(file)) or next
 
-      bundles.select { |bundle, files|
-        files.include?(file)
-      }.each { |bundle, files|
-        locales.each do |locale|
-          translations.each do |key|
-            bundle_translations[bundle]["#{locale}.#{key}"] = all_translations["#{locale}.#{key}"] if all_translations["#{locale}.#{key}"]
+          translations = extractor.translations.flatten.keys
+          next if translations.empty?
+
+          file_translations[extractor.scope] ||= {}
+          locales.each do |locale|
+            file_translations[extractor.scope].update flat_translations.slice(*translations.map{ |k| k.gsub(/\A/, "#{locale}.") })
           end
+        rescue
+          raise "Error reading #{file}: #{$!}\nYou should probably run `rake i18n:check' first"
         end
-      }.empty? and $stderr.puts "WARNING: #{file} has an I18n scope but is not used in any bundles"
+      end
     end
 
-    assets_file = 'config/localization_assets.yml'
-    orig_assets_content = File.read(assets_file) if File.exists?(assets_file)
-    orig_localization_assets = (YAML.load(orig_assets_content)["javascripts"] if orig_assets_content) || {}
-    orig_localization_assets.symbolize_keys!
-    assets_content = <<-TRANSLATIONS
-# this file was auto-generated by rake i18n:generate_js.
-# you probably shouldn't edit it directly
+    # JavaScript
+    files = Dir.glob('./public/javascripts/**/*.js').
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
+    js_extractor = I18nExtraction::JsExtractor.new
+    process_files.call(js_extractor, files, lambda{ |file| [{:filename => file}] } )
 
-javascripts:
-    TRANSLATIONS
+    # Handlebars
+    files = Dir.glob('./app/views/jst/**/*.handlebars')
+    handlebars_extractor = I18nExtraction::HandlebarsExtractor.new
+    process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] } )
 
-    bundle_it = proc { |bundle, *args|
-      translations = args.shift
-      translation_name = args.shift || bundle
-      bundle_file = "public/javascripts/translations/#{translation_name}.js"
+    dump_translations = lambda do |translation_name, translations|
+      file = "public/javascripts/translations/#{translation_name}.js"
       content = <<-TRANSLATIONS
 // this file was auto-generated by rake i18n:generate_js.
 // you probably shouldn't edit it directly
-$.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
+define(['i18nObj', 'jquery'], function(I18n, $) {
+  $.extend(true, I18n, {translations: #{translations.to_ordered.to_json}});
+});
       TRANSLATIONS
-      if !File.exist?(bundle_file) || File.read(bundle_file) != content
-        File.open(bundle_file, "w"){ |f| f.write content }
+      if !File.exist?(file) || File.read(file) != content
+        File.open(file, "w"){ |f| f.write content }
       end
-      if !bundles[bundle].include?(bundle_file) || orig_localization_assets[bundle].try(:include?, bundle_file)
-        assets_content << <<-TRANSLATIONS
-  #{bundle}:
-    - #{bundle_file}
-        TRANSLATIONS
-      end
-    }
-
-    all_translations = I18n.backend.send(:translations)
-    bundle_translations.each do |bundle, translations|
-      bundle_it.call(bundle, translations.expand) unless translations.empty?
     end
 
-    # in addition to getting the non-en stuff into each bundle, we need to get the core
-    # formats and stuff for all languages (en included) into the common bundle
+    file_translations.each do |scope, translations|
+      dump_translations.call(scope, translations.expand)
+    end
+
+    # in addition to getting the non-en stuff into each scope_file, we need to get the core
+    # formats and stuff for all languages (en included) into the common scope_file
     core_translations = I18n.available_locales.inject({}) { |h1, locale|
-      h1[locale] = [:date, :time, :number, :datetime, :support].inject({}) { |h2, key|
-        h2[key] = all_translations[locale][key] if all_translations[locale][key]
-        h2
-      }
+      h1[locale] = all_translations[locale].slice(:date, :time, :number, :datetime, :support)
       h1
     }
-    english_core_translations = {:en => core_translations.delete(:en)}
-    bundle_it.call(:common, english_core_translations, '_core_en')
-    bundle_it.call(:common, core_translations, '_core')
-
-    if orig_assets_content != assets_content
-      File.open(assets_file, "w"){ |f| f.write assets_content }
-    end
+    dump_translations.call('_core_en', {:en => core_translations.delete(:en)})
+    dump_translations.call('_core', core_translations)
   end
 
   desc "Exports new/changed English strings to be translated"
@@ -316,7 +311,7 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
         current_branch = $stdin.gets.strip
       end until current_branch.blank? || current_branch !~ /[^a-z0-9_\.\-]/
       current_branch = nil if current_branch.blank?
-      
+
       puts "Extracting current en translations..."
       `git checkout #{current_branch || 'master'}` if last_export[:type] == :commit || current_branch != prevgit[:branch]
       Rake::Task["i18n:generate"].invoke
@@ -450,3 +445,4 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
     }
   end
 end
+

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -471,7 +471,7 @@ class Course < ActiveRecord::Base
   end
 
   def users_not_in_groups_sql(groups, opts={})
-    ["SELECT u.id, u.name
+    ["SELECT DISTINCT u.id, u.name#{", #{opts[:order_by]}" if opts[:order_by].present?}
         FROM users u
        INNER JOIN enrollments e ON e.user_id = u.id
        WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
@@ -479,7 +479,8 @@ class Course < ActiveRecord::Base
                                   FROM group_memberships gm
                                  WHERE gm.user_id = u.id AND
                                        gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
-       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
+       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}
+       #{"#{opts[:order_by_dir]}" if opts[:order_by_dir]}", self.id]
   end
 
   def users_not_in_groups(groups)
@@ -487,7 +488,7 @@ class Course < ActiveRecord::Base
   end
 
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')} ASC"),
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')}", :order_by_dir => "ASC"),
                          :page => page, :per_page => per_page)
   end
 
@@ -1214,6 +1215,17 @@ class Course < ActiveRecord::Base
       row.concat(["Current Score", "Final Score"])
       row.concat(["Final Grade"]) if self.grading_standard_enabled?
       csv << row.flatten
+
+      #Possible muted row
+      if assignments.any?(&:muted)
+        #This is is not translated since we look for this exact string when we upload to gradebook.
+        row = ['Muted assignments do not impact Current and Final score columns', '', '']
+        row.concat(['', '']) if options[:include_sis_id]
+        row.concat(assignments.map{|a| single ? [(a.muted ? 'Muted': ''), ''] : (a.muted ? 'Muted' : '')})
+        row.concat(['', ''])
+        row.concat(['']) if self.grading_standard_enabled?
+        csv << row.flatten
+      end
 
       #Second Row
       row = ["    Points Possible", "", ""]
@@ -2515,5 +2527,11 @@ class Course < ActiveRecord::Base
 
   def open_registration_for?(user, session = nil)
     root_account.open_registration_for?(user, session)
+  end
+
+  def has_open_course_imports?
+    self.course_imports.scoped(:conditions => {
+      :workflow_state => ['created', 'started']
+    }).count > 0
   end
 end

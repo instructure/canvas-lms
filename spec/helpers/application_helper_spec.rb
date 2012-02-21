@@ -63,32 +63,6 @@ describe ApplicationHelper do
     end
   end
 
-  context "i18n js" do
-    it "should include appropriate inline translations if there is a valid I18n scope" do
-      js_blocks << {:i18n_scope => "time", :contents => '<script>alert("test")</script>'}
-      render_js_blocks.should match(/<script>.*\{"en":\{"time".*I18n\.scoped\("time", function\(I18n\)\{\nalert\("test"\)\n\}\);\n<\/script>/m)
-    end
-
-    it "should not include inline translations if there is an invalid I18n scope" do
-      js_blocks << {:i18n_scope => "foo", :contents => '<script>alert("foo")</script>'}
-      render_js_blocks.should == "<script>\nI18n.scoped(\"foo\", function(I18n){\nalert(\"foo\")\n});\n</script>"
-    end
-
-    it "should cache inline translations on render" do
-      ApplicationHelper.cached_translation_blocks = {}
-      js_blocks << {:i18n_scope => "time", :contents => '<script>alert("test")</script>'} <<
-                   {:i18n_scope => "time", :contents => '<script>alert("test2")</script>'} <<
-                   {:i18n_scope => "foo", :contents => '<script>alert("foo")</script>'} <<
-                   {:i18n_scope => "foo", :contents => '<script>alert("foo2")</script>'}
-      output = render_js_blocks
-      output.should match(/<script>.*\{"en":\{"time".*I18n\.scoped\("time", function\(I18n\)\{\nalert\("test"\)\n\}\);\n<\/script>/m)
-      output.should include "<script>\nI18n.scoped(\"time\", function(I18n){\nalert(\"test2\")\n});\n</script>"
-      output.should include "<script>\nI18n.scoped(\"foo\", function(I18n){\nalert(\"foo\")\n});\n</script>"
-      output.should include "<script>\nI18n.scoped(\"foo\", function(I18n){\nalert(\"foo2\")\n});\n</script>"
-      ApplicationHelper.cached_translation_blocks.size.should == 2
-    end
-  end
-
   it "show_user_create_course_button should work" do
     Account.default.update_attribute(:settings, { :teachers_can_create_courses => true, :students_can_create_courses => true })
     @domain_root_account = Account.default
@@ -121,6 +95,67 @@ describe ApplicationHelper do
         cache_if(false, "t1", :expires_in => 15.minutes, :no_locale => true) { output_buffer.concat "blargh" }
         @controller.read_fragment("t1").should be_nil
       end
+    end
+  end
+
+  describe "include account js" do
+    before do
+      @domain_root_account = Account.default
+      @site_admin = Account.site_admin
+      Account.stubs(:site_admin).returns(@site_admin)
+      @settings = { :global_includes => true, :global_javascript => '/path/to/js' }
+    end
+
+    context "with no custom js" do
+      it "should be empty" do
+        include_account_js.should be_nil
+      end
+    end
+
+    context "with custom js" do
+      it "should include account javascript" do
+        @domain_root_account.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.should have_tag 'script'
+        output.should match %r{/path/to/js}
+      end
+
+      it "should include site admin javascript" do
+        @site_admin.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.should have_tag 'script'
+        output.should match %r{/path/to/js}
+      end
+
+      it "should include both site admin and account javascript" do
+        Account.any_instance.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.should have_tag 'script'
+        output.scan(%r{/path/to/js}).length.should eql 2
+      end
+
+      it "should include site admin javascript first" do
+        @site_admin.stubs(:settings).returns({ :global_includes => true, :global_javascript => '/path/to/admin/js' })
+        @domain_root_account.stubs(:settings).returns(@settings)
+        output = include_account_js
+        output.scan(%r{/path/to/(admin/)?js})[0].should eql ['admin/']
+      end
+    end
+  end
+
+  describe "collection_cache_key" do
+    it "should generate a cache key, changing when an element cache_key changes" do
+      collection = [user, user, user]
+      key1 = collection_cache_key(collection)
+      key2 = collection_cache_key(collection)
+      key1.should == key2
+      # verify it's not overly long
+      key1.length.should <= 40
+
+      User.update_all({ :updated_at => 1.hour.ago }, { :id => collection[1].id })
+      collection[1].reload
+      key3 = collection_cache_key(collection)
+      key1.should_not == key3
     end
   end
 end

@@ -167,7 +167,7 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def self.delete_if_unused(ids)
-    tags = ContentTag.active.find_all_by_content_id_and_content_type('LearningOutcome', ids)
+    tags = ContentTag.active.find_all_by_content_id_and_content_type(ids, 'LearningOutcome')
     to_delete = []
     ids.each do |id|
       to_delete << id unless tags.any?{|t| t.content_id == id }

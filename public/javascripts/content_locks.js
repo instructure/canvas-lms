@@ -15,8 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'INST' /* INST */,
+  'i18n!content_locks',
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+], function(INST, I18n, $, htmlEscape) {
 
-I18n.scoped('content_locks', function(I18n) {
   INST.lockExplanation = function(data, type) {
     // Any additions to this function should also be added to similar logic in ApplicationController.rb
     if(data.lock_at) {
@@ -53,22 +60,22 @@ I18n.scoped('content_locks', function(I18n) {
       var html = '';
       switch (type) {
         case "quiz":
-          html += I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
           break;
         case "assignment":
-          html += I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
           break;
         case "topic":
-          html += I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
           break;
         case "file":
-          html += I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
           break;
         case "page":
-          html += I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
           break;
         default:
-          html += I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
           break;
       }
       if ($("#context_modules_url").length > 0) {
@@ -110,7 +117,7 @@ I18n.scoped('content_locks', function(I18n) {
           $dialog = $("<div/>").attr('id', 'lock_reason_dialog');
           $("body").append($dialog.hide());
           var $div = ("<div class='lock_reason_content'></div><div class='button-container'><button type='button' class='button'>" +
-                  $.h(I18n.t('buttons.ok_thanks', "Ok, Thanks")) + "</button></div>");
+                  htmlEscape(I18n.t('buttons.ok_thanks', "Ok, Thanks")) + "</button></div>");
           $dialog.append($div);
           $dialog.find(".button-container .button").click(function() {
             $dialog.dialog('close');

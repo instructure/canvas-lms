@@ -7,7 +7,10 @@
  *
  * http://docs.jquery.com/UI
  */
-(function( $, undefined ) {
+define([
+  'jquery',
+  'jqueryui/core' // make sure we load it first so overwrite it (in case somethign else requires it after)
+], function( $, undefined ) {
 
 // prevent duplicate loading
 // this is only a problem because we proxy existing functions
@@ -304,4 +307,4 @@ $.extend( $.ui, {
 	}
 });
 
-})( jQuery );
+});

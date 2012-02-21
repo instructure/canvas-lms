@@ -1,8 +1,12 @@
-define 'compiled/calendar/UndatedEventsList', [
+define [
+  'jquery'
   'jst/calendar/undatedEvents'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/ShowEventDetailsDialog'
-], (undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
+  'instructure-jquery.ui.draggable-patch'
+  'jquery.disableWhileLoading'
+  'vendor/jquery.ba-tinypubsub'
+], ($, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
 
   class UndatedEventsList
     constructor: (selector, @dataSource) ->

@@ -183,12 +183,11 @@ describe "context_modules" do
       end
     end
 
-    it "should edit a module item" do
+    it "should edit a module item and validate the changes stick" do
       item_edit_text = "Assignment Edit 1"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       tag = ContentTag.last
-      context_module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
-      driver.action.move_to(context_module_item).perform
+      driver.execute_script("$('#context_module_item_#{tag.id}').addClass('context_module_item_hover')")
       module_item.find_element(:css, '.edit_item_link').click
       edit_form = driver.find_element(:id, 'edit_item_form')
       replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
@@ -196,6 +195,12 @@ describe "context_modules" do
       wait_for_ajaximations
       module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(item_edit_text)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      driver.find_element(:css, 'h2.title').text.should == item_edit_text
+
+      expect_new_page_load { driver.find_element(:css, '.modules').click }
+      driver.find_element(:css, "#context_module_item_#{tag.id} .title").text.should == item_edit_text
     end
 
     it "should add an assignment to a module" do
@@ -258,30 +263,30 @@ describe "context_modules" do
     end
 
     it "should add 2 modules with the first one as a prerequisite" do
-       #Bug - 6711
-      pending("Prerequisite module doesn't save when creating and saving module in one step")
-      first_module_name = 'First Module'
-      second_module_name = 'Second Module'
+      pending("Bug 6711 - Prerequisite module doesn't save when creating and saving module in one step") do
+        first_module_name = 'First Module'
+        second_module_name = 'Second Module'
 
-      add_module(first_module_name)
-      #adding second module - can't use add_module method because a prerequisite needs to be added to this module
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), second_module_name)
-      driver.find_element(:css, '.ui-dialog .add_prerequisite_link').click
-      wait_for_animations
-      #have to do it this way because the select has no css attributes on it
-      click_option(':input:visible.eq(3)', first_module_name)
-      add_form.submit
-      wait_for_ajaximations
-      db_module = ContextModule.last
-      context_module = driver.find_element(:id, "context_module_#{db_module.id}")
-      driver.action.move_to(context_module).perform
-      driver.find_element(:css, "#context_module_#{db_module.id} .edit_module_link").click
-      driver.find_element(:css, '.ui-dialog').should be_displayed
-      wait_for_ajaximations
-      prereq_select = find_all_with_jquery(':input:visible')[3]
-      option = first_selected_option(prereq_select)
-      option.text.should == 'the module, ' + first_module_name
+        add_module(first_module_name)
+        #adding second module - can't use add_module method because a prerequisite needs to be added to this module
+        add_form = new_module_form
+        replace_content(add_form.find_element(:id, 'context_module_name'), second_module_name)
+        driver.find_element(:css, '.ui-dialog .add_prerequisite_link').click
+        wait_for_animations
+        #have to do it this way because the select has no css attributes on it
+        click_option(':input:visible.eq(3)', first_module_name)
+        add_form.submit
+        wait_for_ajaximations
+        db_module = ContextModule.last
+        context_module = driver.find_element(:id, "context_module_#{db_module.id}")
+        driver.action.move_to(context_module).perform
+        driver.find_element(:css, "#context_module_#{db_module.id} .edit_module_link").click
+        driver.find_element(:css, '.ui-dialog').should be_displayed
+        wait_for_ajaximations
+        prereq_select = find_all_with_jquery(':input:visible')[3]
+        option = first_selected_option(prereq_select)
+        option.text.should == 'the module, ' + first_module_name
+      end
     end
 
     it "should rearrange modules" do

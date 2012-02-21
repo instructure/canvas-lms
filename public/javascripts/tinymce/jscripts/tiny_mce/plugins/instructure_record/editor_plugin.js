@@ -15,7 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-(function() {
+
+define([
+  'jquery',
+  'media_comments'
+], function($) {
+
   tinymce.create('tinymce.plugins.InstructureRecord', {
     init : function(ed, url) {
       ed.addCommand('instructureRecord', function() {
@@ -43,8 +48,8 @@
       };
     }
   });
-  
+
   // Register plugin
   tinymce.PluginManager.add('instructure_record', tinymce.plugins.InstructureRecord);
-})();
+});
 

@@ -54,7 +54,7 @@ class MessageMigration < ActiveRecord::Migration
       FROM
         context_message_participants
     SQL
-    add_index :__migrated_message_participants, :migrated_message_id
+    add_index :__migrated_message_participants, :migrated_message_id, :name => :index_mmp_on_message_id
 
     if mysql
       execute  <<-SQL
@@ -75,7 +75,7 @@ class MessageMigration < ActiveRecord::Migration
         GROUP BY migrated_message_id
       SQL
     end
-    add_index :__migrated_message_participant_strings, :migrated_message_id
+    add_index :__migrated_message_participant_strings, :migrated_message_id, :name => :index_mmps_on_migrated_message_id
 
     execute <<-SQL
       UPDATE __migrated_messages #{mysql ? ", __migrated_message_participant_strings" : ""}

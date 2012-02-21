@@ -16,10 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var timing;
-I18n.scoped('quizzes.timing', function(I18n) {
+define([
+  'i18n!quizzes.timing',
+  'jquery' /* $ */,
+  'vendor/date' /* Date.parse */
+], function(I18n, $) {
 
-timing = {
+var timing = {
   initialTime: new Date(),
   initTimes: function() {
     if(timing.timesReady) { return timing.clientServerDiff; }
@@ -44,4 +47,5 @@ timing = {
   }
 };
 
+return timing;
 });

@@ -17,7 +17,7 @@
 #
 
 class OutcomeGroupsController < ApplicationController
-  before_filter :require_user_for_context
+  before_filter :require_context
   
   def create
     if authorized_action(@context, @current_user, :manage_outcomes)

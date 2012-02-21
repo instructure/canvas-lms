@@ -1,0 +1,2 @@
+require ['gradebook-history']
+

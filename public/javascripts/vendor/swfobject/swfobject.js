@@ -2,7 +2,7 @@
 	is released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
 */
 
-var swfobject = function() {
+define(function() {
 	
 	var UNDEF = "undefined",
 		OBJECT = "object",
@@ -629,8 +629,8 @@ var swfobject = function() {
 			});
 		}
 	}();
-	
-	return {
+
+	var swfobject = {
 		/* Public API
 			- Reference: http://code.google.com/p/swfobject/wiki/documentation
 		*/ 
@@ -785,4 +785,8 @@ var swfobject = function() {
 			} 
 		}
 	};
-}();
+
+  // export globally until we ready not to
+  window.swfobject = swfobject;
+  return swfobject;
+});

@@ -1,43 +1,37 @@
 define 'compiled/calendar/MessageParticipantsDialog', [
-  'i18n'
+  'i18n!calendar'
   'jst/calendar/messageParticipants'
   'jst/calendar/recipientList'
 ], (I18n, messageParticipantsTemplate, recipientListTemplate) ->
 
-  I18n = I18n.scoped 'calendar'
-
-  class
+  class MessageParticipantsDialog
     constructor: (@group, @dataSource) ->
-      @$form = $(messageParticipantsTemplate(@group))
-      @$form.submit @sendMessage
+      @$form = $(messageParticipantsTemplate(@group)).submit @sendMessage
 
       @$select = @$form.find('select.message_groups')
-      @$select.change(@loadParticipants)
-      @$select.val('unregistered')
-      
+        .change(@loadParticipants)
+        .val('unregistered')
+
       @$participantList = @$form.find('ul')
-        
+
     show: ->
-      @$form.appendTo('body').dialog
+      @$form.dialog
         width: 400
         resizable: false
-        title: if @group.participant_type is "Group" then I18n.t('message_groups', 'Message Groups') else I18n.t('message_students', 'Message Students')
         buttons: [
-          {
-            text: I18n.t('buttons.send_message', 'Send')
-            click: -> $(this).submit()
-          }
-          {
-            text: I18n.t('buttons.cancel', 'Cancel')
-            click: -> $(this).dialog('close')
-          }
+          text: I18n.t('buttons.send_message', 'Send')
+          'data-text-while-loading': I18n.t('buttons.sending_message', 'Sending...')
+          click: -> $(this).submit()
+        ,
+          text: I18n.t('buttons.cancel', 'Cancel')
+          click: -> $(this).dialog('close')
         ]
-        close: $(this).remove()
+        close: -> $(this).remove()
       @loadParticipants()
 
     participantStatus: (text=null)->
-      @$participantList.html('')
-      $status = $('<li class="status" />').appendTo(@$participantList)
+      $status = $('<li class="status" />')
+      @$participantList.html($status)
       if text
         $status.text text
       else
@@ -56,7 +50,11 @@ define 'compiled/calendar/MessageParticipantsDialog', [
             recipients: data
           ))
         else
-          @participantStatus(if @group.participant_type is "Group" then I18n.t('no_groups', 'No groups found') else I18n.t('no_users', 'No users found'))
+          text = if @group.participant_type is "Group"
+            I18n.t('no_groups', 'No groups found')
+          else
+            I18n.t('no_users', 'No users found')
+          @participantStatus(text)
 
     sendMessage: (jsEvent) =>
       jsEvent.preventDefault()
@@ -66,7 +64,7 @@ define 'compiled/calendar/MessageParticipantsDialog', [
       return unless data['recipients[]'] and data['body']
 
       deferred = $.ajaxJSON '/conversations', 'POST', data, @messageSent, @messageFailed
-      @$form.disableWhileLoading(deferred)
+      @$form.disableWhileLoading(deferred, buttons: ['[data-text-while-loading] .ui-button-text'])
 
     messageSent: (data) =>
       @$form.dialog('close')

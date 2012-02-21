@@ -1,5 +1,5 @@
 
-define 'compiled/util/Popover', [
+define [
   # 'jquery'
 ], () ->
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title><%= t :title, "Facebook Page" %></title>
-  <noscript> <meta http-equiv=refresh content="0; URL=/javascript-is-required.html" /> </noscript> 
+  <noscript> <meta http-equiv=refresh content="0; URL=/enable-javascript.html" /> </noscript> 
   <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
   <%= include_stylesheets :common, :media => "all" %>
   <%= include_stylesheets :facebook %>
@@ -13,16 +13,37 @@
   <div id="fb-root">
     <%= yield %>
   </div>
-  
-  <script>
-    var INST = <%= raw(inst_env.to_json) %>;
-  </script>
-  <%= include_javascripts :common %>
 
-  <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
-  <%= render_js_blocks %>
-  <script src="https://connect.facebook.net/en_US/all.js"></script>
   <script>
+    window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>');
+
+    INST = <%= raw(inst_env.to_json) %>;
+    ENV = <%= raw js_env.to_json %>;
+
+    require = {
+      //urlArgs: "bust=" + +new Date(),
+      translate: true,
+      baseUrl: '<%= js_base_url %>',
+      priority: ['common'],
+      paths: {
+        common: 'compiled/bundles/common',
+        jquery: 'vendor/jquery-1.6.4',
+        jqueryui: 'vendor/jqueryui',
+        uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4'
+      }
+    };
+  </script>
+
+  <%= javascript_include_tag "#{js_base_url}/vendor/require.js" %>
+  <%= include_js_bundles %>
+  <%= render_js_blocks %>
+
+
+  <script src="https://connect.facebook.net/en_US/all.js"></script>
+
+  <script>
+  require(['jquery'], function($) {
+
     FB.init({
       appId  : <%= Facebook.config['app_id'] %>,
       status : true, // check login status
@@ -36,6 +57,8 @@
         FB.Canvas.setSize({height: $("#fb-root").height() + 50});
       }, 1000);
     });
+
+  });
   </script>
 </body>
 </html>

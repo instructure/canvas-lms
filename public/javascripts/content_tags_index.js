@@ -15,8 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!content_tags',
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* getTemplateData */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/accordion' /* /\.accordion\(/ */
+], function(I18n, $) {
 
-I18n.scoped('content_tags', function(I18n) {
   var contentTags = {
     currentHover: null,
     hoverCount: -1,

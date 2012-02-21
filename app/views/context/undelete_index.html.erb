@@ -44,6 +44,12 @@
 </ul>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_misc_plugins' /* .dim */
+], function($) {
+
 $(document).ready(function() {
   $(".restore_link").click(function(event) {
     event.preventDefault();
@@ -60,8 +66,9 @@ $(document).ready(function() {
       }, function() {
         $link.text("restore failed");
       });
-    } 
+    }
   });
+});
 });
 </script>
 <% end %>

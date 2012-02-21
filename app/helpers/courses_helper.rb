@@ -29,6 +29,11 @@ module CoursesHelper
       return
     end
 
+    # because this happens in a sidebar, the context may be wrong. check and fix
+    # it if that's the case.
+    context = context.class == recent_event.class && context.id == recent_event.context_id ?
+      context : recent_event.context
+
     icon_data = [nil, 'icon-grading-gray']
     if can_do(context, current_user, :participate_as_student)
       icon_data = submission && submission.submitted_or_graded? ? [submission.readable_state, 'icon-grading'] : [t('#courses.recent_event.not_submitted', 'not submitted'), "icon-grading-gray"]

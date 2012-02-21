@@ -1,0 +1,2 @@
+require ['speed_grader']
+

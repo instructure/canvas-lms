@@ -1,15 +1,10 @@
-###
-js!requires:
-  - vendor/jquery-1.6.4.js
-  - compiled/Template.js
-  - jQuery.ajaxJSON
-###
-
-define 'compiled/widget/CustomList', [
+define [
+  'jquery'
   'compiled/util/objectCollection'
   'jst/courseList/wrapper'
   'jst/courseList/content'
-], (objectCollection, wrapper, content) ->
+  'jquery.ajaxJSON'
+], (jQuery, objectCollection, wrapper, content) ->
 
   class CustomList
     options:
@@ -49,7 +44,7 @@ define 'compiled/widget/CustomList', [
     close: ->
       @wrapper.hide 0, =>
         @teardown()
-      @element.removeClass('customListEditing');
+      @element.removeClass('customListEditing')
       @options.onToggle?(off)
       @resetList() if @pinned.length is 0
 

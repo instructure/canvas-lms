@@ -1,5 +1,14 @@
-require(['i18n', 'compiled/util/processMigrationItemSelections'], function(I18n, processMigrationItemSelections) {
-  I18n = I18n.scoped('content_imports.migrate_content_choose');
+require([
+  'i18n!content_imports',
+  'compiled/util/processMigrationItemSelections',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
+  'jquery.instructure_misc_plugins' /* showIf */,
+  'jquery.rails_flash_notifications' /* flashMessage, flashError */,
+  'vendor/date' /* Date.parse */,
+  'jqueryui/progressbar' /* /\.progressbar/ */
+], function(I18n, processMigrationItemSelections, $) {
 
   $(function () {
     $(".date_field").date_field();

@@ -265,6 +265,12 @@ Spec::Runner.configure do |config|
     @enrollment
   end
 
+  def course_with_ta(opts={})
+    course_with_user("TAEnrollment", opts)
+    @ta = @user
+    @enrollment
+  end
+
   def course_with_student_logged_in(opts={})
     course_with_student(opts)
     user_session(@user)
@@ -275,9 +281,26 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
+  def student_in_course_section(opts={})
+    @course ||= opts[:course] || course(opts)
+    @course_section = opts[:course_section] || @course.course_sections.create!
+    @user = opts[:user] || user(opts)
+    @user.register!
+    @enrollment = @course.enroll_user(@user, 'StudentEnrollment', :section => @course_section)
+    @enrollment.workflow_state = 'active'
+    @enrollment.save!
+    @course.reload
+  end
+
   def course_with_teacher(opts={})
     course_with_user('TeacherEnrollment', opts)
     @teacher = @user
+    @enrollment
+  end
+
+  def course_with_designer(opts={})
+    course_with_user('DesignerEnrollment', opts)
+    @designer = @user
     @enrollment
   end
 

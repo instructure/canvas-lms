@@ -135,6 +135,15 @@ describe Pseudonym do
     @pseudonym.should be_deleted
   end
 
+  it "should change a blank sis_user_id to nil" do
+    user
+    pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'pwd123')
+    pseudonym.password_confirmation = 'pwd123'
+    pseudonym.sis_user_id = ''
+    pseudonym.should be_valid
+    pseudonym.sis_user_id.should be_nil
+  end
+
   it "should gracefully handle unreachable LDAP servers" do
     require 'net/ldap'
     module Net

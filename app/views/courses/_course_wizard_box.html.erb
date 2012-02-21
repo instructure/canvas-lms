@@ -1,5 +1,12 @@
 <% js_block do %>
 <script>
+
+// TODO: get this out of the view
+require([
+  'jquery',
+  'jquery.instructure_misc_plugins' // indicate
+], function($, _miscPlugins) {
+
 $(document).ready(function() {
   $("#wizard_box").bind('wizard_opened', function() {
     $(this).find(".option.intro").click();
@@ -15,6 +22,8 @@ $(document).ready(function() {
   $(".wizard_options_list .option .header").mouseover(function(event) {
     $(this).parents(".option").click();
   });
+});
+
 });
 </script>
 <% end %>
