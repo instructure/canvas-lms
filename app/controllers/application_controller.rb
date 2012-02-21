@@ -698,6 +698,7 @@ class ApplicationController < ActionController::Base
         @access.membership_type ||= @accessed_asset[:membership_type]
         @access.context = @context.is_a?(UserProfile) ? @context.user : @context
         @access.summarized_at = nil
+        @access.last_access = Time.now.utc
         @access.save
         @page_view.asset_user_access_id = @access.id if @page_view
         @page_view_update = true
