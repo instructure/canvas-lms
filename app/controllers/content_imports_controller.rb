@@ -177,10 +177,11 @@ class ContentImportsController < ApplicationController
           format.html { render :action => 'copy_course_content' }
         end
       else
-        @possible_courses = @current_user.manageable_courses.scoped(:include => :enrollment_term) - [@context]
         course_id = params[:copy] && params[:copy][:course_id].to_i
-        course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
-        @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id
+        course_id = params[:copy][:autocomplete_course_id].to_i if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
+        @copy_context = @current_user.manageable_courses.scoped(
+          :conditions => ["id = ? AND id <> ?", course_id, @context.id],
+          :include => :enrollment_term).first if course_id
         if !@copy_context
           @copy_context ||= Course.find_by_id(course_id) if course_id.present?
           @copy_context = nil if @copy_context && !@copy_context.grants_rights?(@current_user, session, :manage)

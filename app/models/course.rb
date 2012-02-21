@@ -430,7 +430,11 @@ class Course < ActiveRecord::Base
   named_scope :least_recently_updated, lambda{|limit|
     {:order => 'updated_at', :limit => limit }
   }
-  named_scope :manageable_by_user, lambda{|user_id|
+  named_scope :manageable_by_user, lambda{ |*args|
+    # args[0] should be user_id, args[1], if true, will include completed
+    # enrollments as well as active enrollments
+    user_id = args[0]
+    workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
     { :select => 'DISTINCT courses.*',
       :joins => "INNER JOIN (
          SELECT caa.course_id, au.user_id FROM course_account_associations AS caa
@@ -438,7 +442,7 @@ class Course < ActiveRecord::Base
          INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
        UNION SELECT courses.id AS course_id, e.user_id FROM courses
          INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
-           AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
+           AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
          WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id"
     }
