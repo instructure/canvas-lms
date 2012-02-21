@@ -160,6 +160,7 @@ stylesheets:
   quizzes:
     - public/stylesheets/compiled/quizzes.css
     - public/stylesheets/compiled/message_students.css
+    - public/stylesheets/static/ui.selectmenu.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
   full_assignment:

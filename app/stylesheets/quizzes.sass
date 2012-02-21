@@ -1,7 +1,7 @@
 @import environment.sass
 
-fieldset.question, fieldset.display_question
-  padding: 0
+div.question
+  border-radius: 3px
 
 #sort_questions
   :max-height 250px
@@ -852,3 +852,14 @@ ul#quiz_versions
   +border-radius(5px)
   padding: 16px
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.75)
+
+.ui-selectmenu-menu a, .ui-selectmenu
+  color: #222 !important
+  font-weight: normal
+  text-decoration: none !important
+
+.ui-selectmenu
+  max-width: 100% !important
+
+.question select
+  max-width: 100%

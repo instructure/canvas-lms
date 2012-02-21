@@ -57,7 +57,7 @@ require([
 
     // Determines whether or to show the "show question details" link.
     checkShowDetails: function() {
-      var hasQuestions = this.$questions.find('fieldset:not(.essay_question, .text_only_question)').length;
+      var hasQuestions = this.$questions.find('div.display_question:not(.essay_question, .text_only_question)').length;
       this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200);
     },
 

@@ -266,32 +266,13 @@ describe "quizzes questions" do
       end
     end
 
-    # see blur.unhoverQuestion in take_quiz.js. avoids a windows chrome display glitch
-    it "should not unhover a question so long as one of its selects has focus" do
-      container = driver.find_element(:css, '.question')
-      driver.execute_script("$('.question').mouseenter()")
-      container.attribute(:class).should match(/hover/)
-
-      container.find_element(:css, 'select').click
-
-      driver.execute_script("$('.question').mouseleave()")
-      container.attribute(:class).should match(/hover/)
-
-      driver.execute_script("$('.question select').blur()")
-      container.attribute(:class).should_not match(/hover/)
-    end
-
-    it "should cancel mousewheel events on select elements" do
-      skip_if_ie('Out of memory')
-      driver.execute_script <<-EOF
-        window.mousewheelprevented = false;
-        jQuery('select').bind('mousewheel', function(event) {
-          mousewheelprevented = event.isDefaultPrevented();
-        }).trigger('mousewheel');
-      EOF
-
-      is_prevented = driver.execute_script('return window.mousewheelprevented')
-      is_prevented.should be_true
+    it "should selectmenu-ify select elements" do
+      select = driver.find_element(:css, '.question select')
+      keep_trying_until { !select.displayed? }
+      
+      driver.find_element(:css, 'a.ui-selectmenu').click
+      driver.find_elements(:css, '.ui-selectmenu-open li')[1].click
+      select[:selectedIndex].should eql "1"
     end
   end
 end
