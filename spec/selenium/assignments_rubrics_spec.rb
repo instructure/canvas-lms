@@ -21,7 +21,7 @@ describe "assignment rubrics" do
       @assignment
     end
 
-    it "should add a new rubric to assignment and verify assignment points" do
+    it "should add a new rubric to assignment and verify points" do
       initial_points = 2.5
       rubric_name = 'new rubric'
       create_assignment_with_points(initial_points)
@@ -29,7 +29,9 @@ describe "assignment rubrics" do
 
       driver.find_element(:css, '.add_rubric_link').click
       set_value(driver.find_element(:css, '.rubric_title input[name="title"]'), rubric_name)
-      set_value(find_with_jquery('.criterion_points:visible'), initial_points)
+      criterion_points = find_with_jquery('.criterion_points:visible')
+      set_value(criterion_points, initial_points)
+      criterion_points.send_keys(:return)
       driver.find_element(:id, 'grading_rubric').click
       wait_for_ajax_requests
       driver.find_element(:css, '#edit_rubric_form').submit
