@@ -226,5 +226,21 @@ describe "assignments" do
         tooltip_text_elements[1].text.should == 'submitted'
       end
     end
+
+    it "should not allow blank submissions for text entry" do
+      pending('bug #7228 - Dont allow blank submissions in Text Entry field') do
+        due_date = Time.now.utc + 2.days
+        @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date, :submission_types => 'online_text_entry')
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        driver.find_element(:css, '.submit_assignment_link').click
+        assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
+        wait_for_tiny(assignment_form)
+        assignment_form.submit
+        Submission.count.should == 0
+      end
+      #TODO - when a fix goes in for this bug, need to finish writing this spec
+      #the spec should check that the assignment is not submitted
+      #it should also check that there was some sort of error message
+    end
   end
 end
