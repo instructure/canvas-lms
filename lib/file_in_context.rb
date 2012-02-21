@@ -55,7 +55,7 @@ class FileInContext
       end
 
       @attachment = context.attachments.build(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
-      @attachment.write_attribute(:filename, explicit_filename) if explicit_filename
+      @attachment.filename = explicit_filename if explicit_filename
       @attachment.context = context
       @attachment.save!
       @attachment
