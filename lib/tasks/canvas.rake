@@ -120,6 +120,15 @@ namespace :canvas do
     output = `bundle exec compass compile -e production --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
 
+    # run compass for plugins that have stylesheets
+    Dir.glob("vendor/plugins/*/app/stylesheets/").each do |plugin|
+      plugin.gsub!(%r{^vendor/plugins/(.*)/app/stylesheets/$}, '\\1')
+      command = "compass compile vendor/plugins/#{plugin} --app rails --css-dir public/stylesheets/compiled -e production --force"
+      puts "--> Compiling static assets for #{plugin} plugin [#{command}]"
+      output = `bundle exec #{command} 2>&1`
+      raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
+    end
+
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`
     raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0

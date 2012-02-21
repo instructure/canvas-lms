@@ -1186,6 +1186,18 @@ class ApplicationController < ActionController::Base
     super
   end
 
+  def jammit_css_bundles; @jammit_css_bundles ||= []; end
+  helper_method :jammit_css_bundles
+
+  def jammit_css(*args)
+    opts = (args.last.is_a?(Hash) ? args.pop : {})
+    Array(args).flatten.each do |bundle|
+      jammit_css_bundles << [bundle, opts[:plugin]] unless jammit_css_bundles.include? [bundle, opts[:plugin]]
+    end
+    nil
+  end
+  helper_method :jammit_css
+
   def js_bundles; @js_bundles ||= []; end
   helper_method :js_bundles
 

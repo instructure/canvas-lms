@@ -293,13 +293,6 @@ module ApplicationHelper
     attr_accessor :cached_translation_blocks
   end
 
-  def jammit_css_bundles; @jammit_css_bundles ||= []; end
-  def jammit_css(*args)
-    Array(args).flatten.each do |bundle|
-      jammit_css_bundles << bundle unless jammit_css_bundles.include? bundle
-    end
-  end
-
   # See `js_base_url`
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true'
@@ -333,6 +326,13 @@ module ApplicationHelper
       "#{base_url}/compiled/bundles/#{bundle}.js"
     end
     javascript_include_tag *paths
+  end
+
+  def include_css_bundles
+    unless jammit_css_bundles.empty?
+      bundles = jammit_css_bundles.map{ |(bundle,plugin)| plugin ? "plugins/#{plugin}/#{bundle}" : bundle }
+      include_stylesheets(*bundles)
+    end
   end
 
   def section_tabs
