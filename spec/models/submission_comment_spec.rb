@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -268,13 +268,13 @@ This text has a http://www.google.com link in it...
         c1 = @submission1.add_comment(:author => @teacher1, :comment => "!", :hidden => true)
         c2 = @submission1.add_comment(:author => @student1, :comment => "a new comment").reload
         @teacher1.conversations.size.should eql 1
-        @teacher1.conversations.first.messages.last.created_at.should eql c2.created_at
+        @teacher1.conversations.first.messages.last.created_at.to_i.should eql c2.created_at.to_i
         @teacher1.conversations.first.messages.last.body.should eql c2.comment
         @teacher2.conversations.size.should eql 1
         @student1.conversations.size.should eql 0
         @assignment.unmute!
         @teacher1.reload.conversations.size.should eql 1
-        @teacher1.conversations.first.messages.last.created_at.should eql c2.created_at
+        @teacher1.conversations.first.messages.last.created_at.to_i.should eql c2.created_at.to_i
         @teacher1.conversations.first.messages.last.body.should eql c2.comment
         @teacher2.reload.conversations.size.should eql 0
         @student1.reload.conversations.size.should eql 1
@@ -311,7 +311,7 @@ This text has a http://www.google.com link in it...
         c2.destroy
         @teacher1.conversations.size.should eql 1
         tc1 = @teacher1.conversations.first
-        tc1.last_message_at.should eql c1.created_at
+        tc1.last_message_at.to_i.should eql c1.created_at.to_i
         tc1.messages.last.body.should eql c1.comment
         tc1.messages.last.author.should eql @student1
 
@@ -327,14 +327,14 @@ This text has a http://www.google.com link in it...
         c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!").reload
         c3 = @submission1.add_comment(:author => user, :comment => "ohai im in ur group")
         tc1 = @teacher1.conversations.first
-        tc1.last_message_at.should eql c2.created_at
+        tc1.last_message_at.to_i.should eql c2.created_at.to_i
         tc1.messages.last.body.should eql c2.comment
         tc1.messages.last.author.should eql @teacher1
 
         c3.destroy
 
         tc1.reload
-        tc1.last_message_at.should eql c2.created_at
+        tc1.last_message_at.to_i.should eql c2.created_at.to_i
         tc1.messages.last.body.should eql c2.comment
         tc1.messages.last.author.should eql @teacher1
       end
@@ -435,14 +435,14 @@ This text has a http://www.google.com link in it...
         comments = @submission1.submission_comments
 
         convo.reload.messages.size.should eql 2
-        convo.last_message_at.should eql comments.last.created_at
-        convo.last_authored_at.should eql comments.last.created_at
-        convo.messages.first.created_at.should eql comments.last.created_at
+        convo.last_message_at.to_i.should eql comments.last.created_at.to_i
+        convo.last_authored_at.to_i.should eql comments.last.created_at.to_i
+        convo.messages.first.created_at.to_i.should eql comments.last.created_at.to_i
 
         tconvo.reload.messages.size.should eql 2
-        tconvo.last_message_at.should eql comments.last.created_at
+        tconvo.last_message_at.to_i.should eql comments.last.created_at.to_i
         tconvo.last_authored_at.should be_nil
-        tconvo.messages.first.created_at.should eql comments.last.created_at
+        tconvo.messages.first.created_at.to_i.should eql comments.last.created_at.to_i
       end
 
       it "should skip submissions with no participant comments" do
@@ -455,14 +455,14 @@ This text has a http://www.google.com link in it...
         @submission1.create_or_update_conversations!(:migrate)
 
         convo.reload.messages.size.should eql 1
-        convo.last_message_at.should eql message.created_at
-        convo.last_authored_at.should eql message.created_at
-        convo.messages.first.created_at.should eql message.created_at
+        convo.last_message_at.to_i.should eql message.created_at.to_i
+        convo.last_authored_at.to_i.should eql message.created_at.to_i
+        convo.messages.first.created_at.to_i.should eql message.created_at.to_i
 
         tconvo.reload.messages.size.should eql 1
-        tconvo.last_message_at.should eql message.created_at
+        tconvo.last_message_at.to_i.should eql message.created_at.to_i
         tconvo.last_authored_at.should be_nil
-        tconvo.messages.first.created_at.should eql message.created_at
+        tconvo.messages.first.created_at.to_i.should eql message.created_at.to_i
       end
     end
   end
