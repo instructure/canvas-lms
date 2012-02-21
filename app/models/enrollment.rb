@@ -361,7 +361,7 @@ class Enrollment < ActiveRecord::Base
 
   workflow do
     state :invited do
-      event :reject, :transitions_to => :rejected
+      event :reject, :transitions_to => :rejected do self.user.touch; end
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
     end
@@ -371,7 +371,7 @@ class Enrollment < ActiveRecord::Base
     end
 
     state :active do
-      event :reject, :transitions_to => :rejected
+      event :reject, :transitions_to => :rejected do self.user.touch; end
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
     end

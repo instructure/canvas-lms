@@ -1081,6 +1081,17 @@ describe Enrollment do
     end
   end
 
+  it "should uncache user enrollments when rejected" do
+    enable_cache do
+      course_with_student(:active_course => 1)
+      User.update_all({:updated_at => 1.year.ago}, :id => @user.id)
+      @user.reload
+      @user.cached_current_enrollments.should == [@enrollment]
+      @enrollment.reject!
+      @user.cached_current_enrollments(true).should == []
+    end
+  end
+
   context "named scopes" do
     describe "ended" do
       it "should work" do
