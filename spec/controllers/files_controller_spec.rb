@@ -416,10 +416,7 @@ describe FilesController do
     end
     
     it "should create file placeholder (in local mode)" do
-      Attachment.stubs(:s3_storage?).returns(false)
-      Attachment.stubs(:local_storage?).returns(true)
-      Attachment.local_storage?.should eql(true)
-      Attachment.s3_storage?.should eql(false)
+      local_storage!
       course_with_teacher_logged_in(:active_all => true)
       post 'create_pending', {:attachment => {
         :context_code => @course.asset_string,
@@ -438,15 +435,7 @@ describe FilesController do
     end
     
     it "should create file placeholder (in s3 mode)" do
-      Attachment.stubs(:s3_storage?).returns(true)
-      Attachment.stubs(:local_storage?).returns(false)
-      conn = mock('AWS::S3::Connection')
-      AWS::S3::Base.stubs(:connection).returns(conn)
-      conn.stubs(:access_key_id).returns('stub_id')
-      conn.stubs(:secret_access_key).returns('stub_key')
-
-      Attachment.s3_storage?.should eql(true)
-      Attachment.local_storage?.should eql(false)
+      s3_storage!
       course_with_teacher_logged_in(:active_all => true)
       post 'create_pending', {:attachment => {
         :context_code => @course.asset_string,
@@ -465,15 +454,7 @@ describe FilesController do
     end
     
     it "should not allow going over quota for file uploads" do
-      Attachment.stubs(:s3_storage?).returns(true)
-      Attachment.stubs(:local_storage?).returns(false)
-      conn = mock('AWS::S3::Connection')
-      AWS::S3::Base.stubs(:connection).returns(conn)
-      conn.stubs(:access_key_id).returns('stub_id')
-      conn.stubs(:secret_access_key).returns('stub_key')
-
-      Attachment.s3_storage?.should eql(true)
-      Attachment.local_storage?.should eql(false)
+      s3_storage!
       course_with_student_logged_in(:active_all => true)
       Setting.set('user_default_quota', -1)
       post 'create_pending', {:attachment => {
@@ -485,15 +466,7 @@ describe FilesController do
     end
     
     it "should allow going over quota for homework submissions" do
-      Attachment.stubs(:s3_storage?).returns(true)
-      Attachment.stubs(:local_storage?).returns(false)
-      conn = mock('AWS::S3::Connection')
-      AWS::S3::Base.stubs(:connection).returns(conn)
-      conn.stubs(:access_key_id).returns('stub_id')
-      conn.stubs(:secret_access_key).returns('stub_key')
-
-      Attachment.s3_storage?.should eql(true)
-      Attachment.local_storage?.should eql(false)
+      s3_storage!
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
       Setting.set('user_default_quota', -1)

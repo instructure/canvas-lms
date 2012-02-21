@@ -1,9 +1,9 @@
+test:
+  domain: localhost
+
 development:
   domain: "localhost:3000"
 
 production:
   domain: "canvas.example.com"
   # files_domain: "canvasfiles.example.com"
-
-# don't set a domain for the test environment, this is handled automatically by
-# the specs
