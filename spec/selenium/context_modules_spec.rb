@@ -316,10 +316,10 @@ describe "context_modules" do
       lock_check = add_form.find_element(:id, 'unlock_module_at')
       lock_check.click
       wait_for_ajaximations
-      add_form.find_element(:css, 'tr.unlock_module_at_details').should_not be_displayed
+      add_form.find_element(:css, 'tr.unlock_module_at_details').should be_displayed
       lock_check.click
       wait_for_ajaximations
-      add_form.find_element(:css, 'tr.unlock_module_at_details').should be_displayed
+      add_form.find_element(:css, 'tr.unlock_module_at_details').should_not be_displayed
     end
 
     it "should properly change indent of an item" do
