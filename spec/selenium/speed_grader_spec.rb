@@ -447,6 +447,7 @@ describe "speedgrader" do
     @rubric.save!
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
     driver.find_element(:css, 'button.toggle_full_rubric').click
     driver.find_element(:css, "table.rubric.assessing tr:nth-child(1) table.ratings td:nth-child(1)").click
     driver.find_element(:css, "table.rubric.assessing tr:nth-child(3) table.ratings td:nth-child(1)").click
@@ -463,6 +464,7 @@ describe "speedgrader" do
 
     # check again that initial page load has the same data.
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
     driver.find_element(:css, "#grade_container input[type=text]").attribute(:value).should == '3'
     driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .editing").should be_displayed
     driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .ignoring").should_not be_displayed
