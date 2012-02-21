@@ -87,14 +87,17 @@ describe "context_modules" do
 
       #have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
-      @assignment = @course.assignments.create(:title => 'assignment 1', :submission_types => 'online_text_entry')
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
+      @assignment2 = @course.assignments.create!(:title => 'assignment 2',
+                                                 :submission_types => 'online_text_entry',
+                                                 :due_at => 2.days.from_now,
+                                                 :points_possible => 10)
       @course.reload
 
       get "/courses/#{@course.id}/modules"
     end
 
     it "should only display 'out-of' on an assignment min score restriction when the assignment has a total" do
-
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => @course)
       a1.points_possible = 10
@@ -317,6 +320,33 @@ describe "context_modules" do
       lock_check.click
       wait_for_ajaximations
       add_form.find_element(:css, 'tr.unlock_module_at_details').should be_displayed
+    end
+
+    it "should properly change indent of an item" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      tag = ContentTag.last
+
+      driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
+      wait_for_ajaximations
+      driver.find_element(:id, "context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+
+      tag.reload
+      tag.indent.should == 1
+    end
+
+    it "should still display due date and points possible after indent change" do
+      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
+      tag = ContentTag.last
+
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
+
+      driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
+      wait_for_ajaximations
+
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
     end
   end
 
