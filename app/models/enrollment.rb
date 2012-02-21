@@ -695,7 +695,9 @@ class Enrollment < ActiveRecord::Base
   named_scope :for_email, lambda { |email|
     {
       :joins => { :user => :communication_channels },
-      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase]
+      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase],
+      :select => 'enrollments.*',
+      :readonly => false
     }
   }
   def self.cached_temporary_invitations(email)
