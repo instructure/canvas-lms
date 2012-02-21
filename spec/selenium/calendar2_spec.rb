@@ -432,7 +432,7 @@ describe "calendar2" do
 
         appointment_groups = find_all_with_jquery('.appointment-group-item')
         appointment_groups.each_with_index do |ag, i|
-          driver.action.move_to(ag).perform
+          driver.execute_script("$('.appointment-group-item:index(#{i}').addClass('ui-state-hover')")
           ["all", "registered", "unregistered"].each do |registration_status|
             click_al_option('.message_link', i)
             form = keep_trying_until { find_with_jquery('.ui-dialog form:visible') }
@@ -444,10 +444,9 @@ describe "calendar2" do
             form.find_elements(:css, 'li input').should_not be_empty
             set_value form.find_element(:css, 'textarea'), 'hello'
             form.submit
-            
-            wait_for_ajaximations
+
             assert_flash_notice_message /Messages Sent/
-            find_with_jquery('.ui-dialog:visible').should be_nil
+            keep_trying_until{ find_with_jquery('.ui-dialog:visible').should be_nil }
           end
         end
 
