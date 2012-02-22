@@ -53,11 +53,9 @@ css_compressor_options:
   anchors = { "stylesheets" => {} }
   subdoc.gsub!(%r{^( {6})plugins/([^/]*)/([^/]*)/([^:]*): $}) do |match|
     indent, plugin, type, bundle = $1, $2, $3, $4
-    anchor = "plugins_#{plugin}_#{type}_#{bundle}"
-    if anchors[type]
-      namespaced_bundle = "plugins/#{plugin}/#{bundle}"
-      anchors[type][namespaced_bundle] = anchor
-    end
+    namespaced_bundle = "plugins_#{plugin}_#{bundle}"
+    anchor = "#{type}_#{namespaced_bundle}"
+    anchors[type][namespaced_bundle] = anchor if anchors[type]
     "#{indent}#{bundle}: &#{anchor}"
   end
 
