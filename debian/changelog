@@ -1,3 +1,13 @@
+canvas-lms (2012.02.22.14.31) stable; urgency=low
+
+  * Package ref: 702f9b379ef9e9dcc2db69b2299454f648ac1314
+  *
+  * [+5581a48] hotfix for #7348 pre-amd
+  * [+4ec6c53] escape filenames more aggressively for content-disposition header; fixes #7299
+  * [+702f9b3] pin rbx-require-relative for now
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 22 Feb 2012 14:31:22 -0700
+
 canvas-lms (2012.02.18.07.02) stable; urgency=low
 
   * Package ref: b22bae1ceec7e14af03b117ea795ed8fa12dc70e
