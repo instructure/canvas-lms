@@ -34,7 +34,7 @@
   <% else %>
     <h2><%= @attachment.display_name %></h2>
     <span style="font-size: 1.2em;">
-      <%= link_to "Download #{@attachment.filename}", download_url %>
+      <%= link_to "Download #{@attachment.display_name}", download_url %>
     </span> (<%= @attachment.readable_size %>)
     <% if @attachment.scribdable? %>
       <div id="doc_preview" data-attachment_view_inline_ping_url="<%= context_url(@context, :context_file_inline_view_url, @attachment.id) %>" data-scribd_doc_id="<%= @attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= @attachment.scribd_doc.try(:access_key) %>" data-public_url="<%= @attachment.authenticated_s3_url %>"></div>
