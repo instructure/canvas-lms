@@ -94,6 +94,16 @@ define [
       """, { classes: 'gradebook-cell-out-of-formatter' })).appendTo(@opts.container)
       @$input = @$wrapper.find('input').focus().select()
 
+  class SubmissionCell.letter_grade extends SubmissionCell
+    @formatter: (row, col, submission, assignment) ->
+      innerContents = if submission.score
+        "#{submission.grade}<span class='letter-grade-points'>#{submission.score}</span>"
+      else
+        submission.grade
+
+      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false})
+
+
   class SubmissionCell.pass_fail extends SubmissionCell
 
     states = ['pass', 'fail', '']
