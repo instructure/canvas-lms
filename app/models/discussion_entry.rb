@@ -25,7 +25,7 @@ class DiscussionEntry < ActiveRecord::Base
   attr_readonly :discussion_topic_id, :user_id, :parent_id
   has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
-  belongs_to :discussion_topic
+  belongs_to :discussion_topic, :touch => true
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   belongs_to :user
   belongs_to :attachment
@@ -109,8 +109,6 @@ class DiscussionEntry < ActiveRecord::Base
   def touch_parent
     if self.parent_id && self.parent_id != 0
       self.discussion_topic.discussion_entries.find_by_id(self.parent_id).touch rescue nil
-    else
-      self.discussion_topic.touch
     end
   end
   

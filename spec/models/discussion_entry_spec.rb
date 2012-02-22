@@ -201,4 +201,21 @@ describe DiscussionEntry do
       @topic.last_reply_at.should == @original_last_reply_at
     end
   end
+
+  it "should touch all parent discussion_topics through root_topic_id, on update" do
+    course_with_student(:active_all => true)
+    @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
+    @subtopic = @course.discussion_topics.create!(:title => "subtopic")
+    @subtopic.root_topic = @topic
+    @subtopic.save!
+
+    DiscussionTopic.update_all({ :updated_at => 1.hour.ago }, { :id => [@topic.id, @subtopic.id] })
+    @topic_updated_at = @topic.reload.updated_at
+    @subtopic_updated_at = @subtopic.reload.updated_at
+
+    @subtopic_entry = @subtopic.discussion_entries.create!(:message => "hello", :user => @user)
+
+    @subtopic_updated_at.to_i.should_not == @subtopic.reload.updated_at.to_i
+    @topic_updated_at.to_i.should_not == @topic.reload.updated_at.to_i
+  end
 end

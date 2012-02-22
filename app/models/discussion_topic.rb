@@ -41,7 +41,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
   belongs_to :old_assignment, :class_name => 'Assignment'
-  belongs_to :root_topic, :class_name => 'DiscussionTopic'
+  belongs_to :root_topic, :class_name => 'DiscussionTopic', :touch => true
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   belongs_to :user
   validates_presence_of :context_id
