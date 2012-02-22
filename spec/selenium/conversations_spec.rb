@@ -4,6 +4,27 @@ require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
 describe "conversations" do
   it_should_behave_like "conversations selenium tests"
 
+  it "should not allow double form submissions" do
+    pending("bug #7377 - conversations lets you double submit the form") do
+      student_name = 'student1'
+      new_message = 'new conversation message'
+      @s1 = User.create(:name => student_name)
+      @course.enroll_user(@s1)
+      get '/conversations'
+
+      name_input = driver.find_element(:css, '#create_message_form .token_input input')
+      name_input.send_keys(student_name)
+      wait_for_ajaximations
+      name_input.send_keys(:return)
+      driver.find_element(:id, 'body').send_keys(new_message)
+      5.times do
+        driver.find_element(:css, '.button').click
+      end
+      wait_for_ajax_requests
+      ConversationMessage.count.should == 1
+    end
+  end
+
   context "conversation loading" do
     it "should load all conversations" do
       @me = @user
@@ -91,7 +112,7 @@ describe "conversations" do
       @course1.enroll_user(@s1)
       @course1.enroll_user(@s2)
 
-      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(*100.times.to_a.reverse.map{ |h| Time.now.utc - h.hours })
+      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(*100.times.to_a.reverse.map { |h| Time.now.utc - h.hours })
 
       @c1 = conversation(@user, @s1)
       @c1.add_message('yay i sent this')
