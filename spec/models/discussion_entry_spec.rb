@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionEntry do
-  
+
   it "should set parent_id to 0 if invalid or nil" do
     course
     topic = @course.discussion_topics.create!
@@ -27,7 +27,7 @@ describe DiscussionEntry do
     entry.should_not be_nil
     entry.should_not be_new_record
     entry.parent_id.should eql(0)
-    
+
     topic_2 = @course.discussion_topics.create!
     entry_2 = topic_2.discussion_entries.create!
     sub_entry = topic.discussion_entries.build
@@ -39,18 +39,18 @@ describe DiscussionEntry do
   it "should be marked as deleted when parent is deleted" do
     topic = course.discussion_topics.create!
     entry = topic.discussion_entries.create!
-    
+
     sub_entry = topic.discussion_entries.build
     sub_entry.parent_id = entry.id
     sub_entry.save!
-    
+
     topic.discussion_entries.active.length.should == 2
     entry.destroy
     sub_entry.reload
     sub_entry.should be_deleted
     topic.discussion_entries.active.length.should == 0
   end
-  
+
   it "should only allow one level of nesting" do
     course
     topic = @course.discussion_topics.create!
@@ -58,18 +58,18 @@ describe DiscussionEntry do
     entry.should_not be_nil
     entry.should_not be_new_record
     entry.parent_id.should eql(0)
-    
+
     sub_entry = topic.discussion_entries.build
     sub_entry.parent_id = entry.id
     sub_entry.save!
     sub_entry.parent_id.should eql(entry.id)
-    
+
     sub_sub_entry = topic.discussion_entries.build
     sub_sub_entry.parent_id = sub_entry.id
     sub_sub_entry.save!
     sub_sub_entry.parent_id.should eql(entry.id)
   end
-  
+
   it "should preserve parent_id if valid" do
     course
     topic = @course.discussion_topics.create!
@@ -80,7 +80,7 @@ describe DiscussionEntry do
     sub_entry.should_not be_nil
     sub_entry.parent_id.should eql(entry.id)
   end
-  
+
   it "should santize message" do
     course_model
     topic = @course.discussion_topics.create!
@@ -89,7 +89,28 @@ describe DiscussionEntry do
     topic.save!
     topic.message.should eql("<a href=\"#\">only this should stay</a>")
   end
-  
+
+  it "should send new entry notifications" do
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+
+    notification_name = "New Discussion Entry"
+    n = Notification.create(:name => notification_name, :category => "TestImmediately")
+    NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+
+    topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+    entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
+
+    to_users = entry.messages_sent[notification_name].map(&:user)
+    to_users.should include(@teacher)
+    to_users.should_not include(@student)
+
+    entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
+    to_users = entry.messages_sent[notification_name].map(&:user)
+    to_users.should_not include(@teacher)
+    to_users.should include(@student)
+  end
+
   context "send_to_inbox" do
     it "should send to inbox" do
       course
@@ -107,7 +128,7 @@ describe DiscussionEntry do
       sub_entry.inbox_item_recipient_ids.should be_include(entry.user_id)
     end
   end
-  
+
   context "clone_for" do
     it "should clone to another context" do
       course
@@ -118,7 +139,7 @@ describe DiscussionEntry do
       new_entry.message.should eql(entry.message)
     end
   end
-  
+
   context "sub-topics" do
     it "should not allow students to edit sub-topic entries of other students" do
       course_with_student(:active_all => true)

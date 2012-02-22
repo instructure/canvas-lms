@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -208,7 +208,7 @@ class DiscussionTopic < ActiveRecord::Base
   workflow do
     state :active do
       event :lock, :transitions_to => :locked do
-        raise "cannot lock before due date" if self.assignment.try(:due_at) && self.assignment.due_at < Time.now
+        raise "cannot lock before due date" if self.assignment.try(:due_at) && self.assignment.due_at > Time.now
       end
     end
     state :post_delayed do
@@ -430,7 +430,7 @@ class DiscussionTopic < ActiveRecord::Base
   def set_assignment=(val); end
   
   def participants
-    ([self.user] + context.participants).uniq.select{|u| u}
+    ([self.user] + context.participants).compact.uniq
   end
   
   def active_participants

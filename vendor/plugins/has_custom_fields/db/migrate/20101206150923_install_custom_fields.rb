@@ -32,7 +32,7 @@ class InstallCustomFields < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :custom_fields, %w(scoper_type scoper_id target_type name)
+    add_index :custom_fields, %w(scoper_type scoper_id target_type name), :name => "custom_field_lookup"
 
     create_table :custom_field_values, :force => true do |t|
       t.integer :custom_field_id, :limit => 8

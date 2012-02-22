@@ -329,7 +329,7 @@ class FilesController < ApplicationController
       cancel_cache_buster
       send_file(attachment.full_filename, :type => attachment.content_type, :disposition => (inline ? 'inline' : 'attachment'))
     elsif redirect_to_s3
-      redirect_to attachment.cacheable_s3_url
+      redirect_to(inline ? attachment.cacheable_s3_inline_url : attachment.cacheable_s3_download_url)
     else
       require 'aws/s3'
       cancel_cache_buster
@@ -503,7 +503,7 @@ class FilesController < ApplicationController
           @attachment.errors.add_to_base(t('errors.missing_field', "Upload failed, expected form field missing"))
         end
         deleted_attachments = @attachment.handle_duplicates(duplicate_handling)
-        unless (@attachment.cacheable_s3_url rescue nil)
+        unless @attachment.downloadable?
           success = false
           if (params[:attachment][:uploaded_data].size == 0 rescue false)
             @attachment.errors.add_to_base(t('errors.empty_file', "That file is empty.  Please upload a different file."))

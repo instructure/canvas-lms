@@ -272,6 +272,26 @@ describe User do
     user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 0}, {3 => 1}].sort(&sort_account_associations)
   end
 
+  it "should not have account associations for creation_pending or deleted" do
+    user = User.create! { |u| u.workflow_state = 'creation_pending' }
+    user.should be_creation_pending
+    course = Course.create!
+    course.offer!
+    enrollment = course.enroll_student(user)
+    enrollment.should be_invited
+    user.user_account_associations.should == []
+    Account.default.add_user(user)
+    user.user_account_associations(true).should == []
+    user.pseudonyms.create!(:unique_id => 'test@example.com')
+    user.user_account_associations(true).should == []
+    user.update_account_associations
+    user.user_account_associations(true).should == []
+    user.register!
+    user.user_account_associations(true).map(&:account).should == [Account.default]
+    user.destroy
+    user.user_account_associations(true).should == []
+  end
+
   def create_course_with_student_and_assignment
     @course = course_model
     @course.offer!
@@ -783,6 +803,25 @@ describe User do
 
       @student.shared_contexts(@unrelated_user).should eql []
       @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
+    end
+
+    it "should not rank results by default" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      # ordered by name (all the same), then id
+      @student.messageable_users.map(&:id).
+        should eql [@student.id, @this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
+    end
+
+    it "should rank results if requested" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      # ordered by rank, then name (all the same), then id
+      @student.messageable_users(:rank_results => true).map(&:id).
+        should eql [@this_section_user.id] + # two contexts (course and group)
+                   [@student.id, @this_section_teacher.id, @other_section_user.id, @other_section_teacher.id] # just the course
     end
   end
   

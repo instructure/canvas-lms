@@ -44,11 +44,17 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation
 
+      term = EnrollmentTerm.create! :name => "Fall"
+      term.root_account_id = @course.root_account_id
+      term.save!
+      @course.update_attributes! :enrollment_term => term
+
       get 'index'
       response.should be_success
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
       assigns[:contexts][:courses].to_a.map{|p|p[1]}.
         reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
+      assigns[:contexts][:courses][@course.id][:term].should == "Fall"
       assigns[:filterable].should be_true
     end
 
@@ -187,6 +193,8 @@ describe ConversationsController do
     it "should correctly infer context tags" do
       course_with_teacher_logged_in(:active_all => true)
       @course1 = @course
+      @course2 = course(:active_all => true)
+      @course2.enroll_teacher(@user).accept
       @group1 = @course1.groups.create!
       @group2 = @course1.groups.create!
       @group1.users << @user
@@ -206,10 +214,10 @@ describe ConversationsController do
       @group1.users << new_user2
       @group2.users << new_user2
 
-      @course2 = course(:active_all => true)
-      enrollment3 = @course2.enroll_student(@user)
-      enrollment2.workflow_state = 'active'
-      enrollment2.save
+      new_user3 = User.create
+      enrollment3 = @course2.enroll_student(new_user3)
+      enrollment3.workflow_state = 'active'
+      enrollment3.save
 
       post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true
       response.should be_success
@@ -337,6 +345,36 @@ describe ConversationsController do
       response.body.should include(@course.name)
       response.body.should include(group.name)
       response.body.should include(other.name)
+    end
+
+    it "should not sort by rank if a search term is not used" do
+      course_with_student_logged_in(:active_all => true)
+      @user.update_attribute(:name, 'billy')
+      other = User.create(:name => 'bob')
+      @course.enroll_student(other).tap{ |e| e.workflow_state = 'active'; e.save! }
+
+      group = @course.groups.create(:name => 'group')
+      group.users << other
+
+      get 'find_recipients', :context => @course.asset_string, :per_page => '1', :type => 'user'
+      response.should be_success
+      response.body.should include('billy')
+      response.body.should_not include('bob')
+    end
+
+    it "should sort by rank if a search term is used" do
+      course_with_student_logged_in(:active_all => true)
+      @user.update_attribute(:name, 'billy')
+      other = User.create(:name => 'bob')
+      @course.enroll_student(other).tap{ |e| e.workflow_state = 'active'; e.save! }
+
+      group = @course.groups.create(:name => 'group')
+      group.users << other
+
+      get 'find_recipients', :search => 'b', :per_page => '1', :type => 'user'
+      response.should be_success
+      response.body.should include('bob')
+      response.body.should_not include('billy')
     end
   end
 end

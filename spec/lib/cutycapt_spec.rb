@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,18 +22,22 @@ require 'cutycapt'
 
 describe CutyCapt do
   context "url validation" do
+    after(:each) do 
+      CutyCapt.config = nil
+    end
+    it "should check with_indifferent_access" do
+      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({"path" => 'not used'}))
+      CutyCapt.config[:path].should_not be_nil
+    end
     it "should check for an http scheme" do
-      CutyCapt.config = CutyCapt::CUTYCAPT_DEFAULTS.dup; CutyCapt.process_config
-      
+      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({:path => 'not used'}))
       CutyCapt.verify_url("ftp://example.com/").should be_false
       CutyCapt.verify_url("http://example.com/").should be_true
       CutyCapt.verify_url("https://example.com/").should be_true
     end
     
     it "should check for blacklisted domains" do
-      CutyCapt.config = CutyCapt::CUTYCAPT_DEFAULTS.dup
-      CutyCapt.config[:domain_blacklist] = [ "example.com" ]
-      CutyCapt.process_config
+      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({:path => 'not used', :domain_blacklist => ['example.com']}))
       
       CutyCapt.verify_url("http://example.com/blah").should be_false
       CutyCapt.verify_url("http://foo.example.com/blah").should be_false
@@ -42,7 +46,7 @@ describe CutyCapt do
     end
     
     it "should check for blacklisted ip blocks" do
-      CutyCapt.config = CutyCapt::CUTYCAPT_DEFAULTS.dup; CutyCapt.process_config
+      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({:path => 'not used'}))
       
       CutyCapt.verify_url("http://10.0.1.1/blah").should be_false
       CutyCapt.verify_url("http://169.254.169.254/blah").should be_false

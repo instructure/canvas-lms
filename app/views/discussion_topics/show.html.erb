@@ -71,7 +71,7 @@
               <%= link_to image_tag('delete.png') + " " + t(:delete_topic, "Delete Topic"), context_url(@context, :context_discussion_topic_url, @topic), :method => :delete, :confirm => t(:delete_confirm, "Are you sure you want to delete this topic?"), :class => "button button-sidebar-wide" %>
             <% end %>
             <% if can_do(@context, @current_user, :moderate_forum) %>
-              <% if !@topic.locked? && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at >= Time.now) %>
+              <% if !@topic.locked? && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
                 <% form_for @topic, :url => context_url(@context, :context_discussion_topic_url, @topic.id), :html => {:method => :put} do |f| %>
                   <input type="hidden" name="discussion_topic[event]" value="lock"/>
                   <button type="submit" class="button button-sidebar-wide"><%= image_tag('lock.png') %> <%= t(:lock_topic, %{Close for Comments}) %></button>

@@ -17,6 +17,7 @@ class ContextExternalTool < ActiveRecord::Base
   attr_accessor :config_type, :config_url, :config_xml
   
   before_save :infer_defaults
+  after_save :touch_context
   validate :check_for_xml_error
 
   workflow do

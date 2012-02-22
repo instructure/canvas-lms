@@ -50,18 +50,18 @@ describe ActiveRecord::Base do
       User.columns.any? { |c| c.name == 'name' }.should be_false
       Group.columns.any? { |c| c.name == 'name' }.should be_true
     end
+  end
 
-    context "rank helpers" do
-      it "should generate appropriate rank sql" do
-        ActiveRecord::Base.rank_sql(['a', ['b', 'c'], ['d']], 'foo').
-          should eql "CASE WHEN foo IN ('a') THEN 0 WHEN foo IN ('b', 'c') THEN 1 WHEN foo IN ('d') THEN 2 ELSE 3 END"
-      end
+  context "rank helpers" do
+    it "should generate appropriate rank sql" do
+      ActiveRecord::Base.rank_sql(['a', ['b', 'c'], ['d']], 'foo').
+        should eql "CASE WHEN foo IN ('a') THEN 0 WHEN foo IN ('b', 'c') THEN 1 WHEN foo IN ('d') THEN 2 ELSE 3 END"
+    end
 
-      it "should generate appropriate rank hashes" do
-        hash = ActiveRecord::Base.rank_hash(['a', ['b', 'c'], ['d']])
-        hash.should == {'a' => 1, 'b' => 2, 'c' => 2, 'd' => 3}
-        hash['e'].should eql 4
-      end
+    it "should generate appropriate rank hashes" do
+      hash = ActiveRecord::Base.rank_hash(['a', ['b', 'c'], ['d']])
+      hash.should == {'a' => 1, 'b' => 2, 'c' => 2, 'd' => 3}
+      hash['e'].should eql 4
     end
   end
 
@@ -199,6 +199,24 @@ describe ActiveRecord::Base do
     it "should not raise an error if there are no records" do
       lambda { Course.connection.bulk_insert "courses", [] }.should_not raise_error
       Course.all.size.should eql 0
+    end
+  end
+
+  context "distinct" do
+    before do
+      User.create()
+      User.create()
+      User.create(:locale => "en")
+      User.create(:locale => "en")
+      User.create(:locale => "es")
+    end
+
+    it "should return distinct values" do
+      User.distinct(:locale).should eql ["en", "es"]
+    end
+
+    it "should return distinct values with nil" do
+      User.distinct(:locale, :include_nil => true).should eql [nil, "en", "es"]
     end
   end
 end

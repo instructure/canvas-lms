@@ -5,10 +5,6 @@
   jammit_js :account_statistics
 %>
 
-<% content_for :right_side do %>
-  <%= render :partial => "statistics_right_side", :locals => {:view => "statistics"} %>
-<% end %>
-
 <% if @counts_report %>
   <h2><%= t(:general_numbers_title, "General Numbers") %></h2>
   <table class="numbers_table">

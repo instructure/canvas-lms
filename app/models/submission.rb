@@ -28,8 +28,8 @@ class Submission < ActiveRecord::Base
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
   has_many :submission_comments, :order => 'created_at', :dependent => :destroy
-  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at', :conditions => { :hidden => false }
-  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at', :conditions => { :hidden => true }
+  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => false }
+  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   belongs_to :quiz_submission
@@ -77,11 +77,10 @@ class Submission < ActiveRecord::Base
   }
 
   named_scope :needs_grading, :conditions => <<-SQL
-    submissions.submission_type IS NOT NULL
-    AND (
-      submissions.score IS NULL
-      OR NOT submissions.grade_matches_current_submission
-      OR submissions.workflow_state IN ('submitted', 'pending_review')
+    submissions.submission_type IS NOT NULL AND
+    submissions.workflow_state IN ('submitted', 'pending_review') AND (
+      submissions.score IS NULL OR
+      NOT submissions.grade_matches_current_submission
     )
     SQL
   def self.needs_grading_conditions(prefix = nil)
@@ -600,7 +599,7 @@ class Submission < ActiveRecord::Base
     {:conditions => ['submissions.grade IS NULL'], :include => :assignment}
   }
   named_scope :having_submission, lambda {
-    {:conditions => ['submissions.submission_type IS NOT NULL'] }
+    {:conditions => ["submissions.submission_type IS NOT NULL AND submissions.workflow_state = 'submitted'"] }
   }
   named_scope :include_user, lambda {
     {:include => [:user] }
@@ -721,7 +720,7 @@ class Submission < ActiveRecord::Base
   end
 
   def conversation_message_data
-    latest = visible_submission_comments.last or return
+    latest = visible_submission_comments.scoped(:conditions => ["author_id IN (?)", possible_participants_ids]).last or return
     {
       :created_at => latest.created_at,
       :author_id => latest.author_id,
@@ -739,7 +738,11 @@ class Submission < ActiveRecord::Base
   memoize :commenting_instructors
 
   def participating_instructors
-    commenting_instructors.present? ? commenting_instructors : context.instructors
+    commenting_instructors.present? ? commenting_instructors : context.participating_instructors.uniq
+  end
+
+  def possible_participants_ids
+    [user_id] + context.participating_instructors.uniq.map(&:id)
   end
 
   # ensure that conversations/messages are created/updated for all relevant
@@ -763,6 +766,7 @@ class Submission < ActiveRecord::Base
       options[:delete_all] = visible_submission_comments.empty?
       options[:only_existing] = true
     when :migrate # don't mark-as-unread for anybody or add to empty conversations
+      return unless conversation_message_data
       options[:recalculate_count] = true
       options[:recalculate_last_authored_at] = true
       options[:only_existing] = true

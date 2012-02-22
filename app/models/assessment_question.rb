@@ -75,7 +75,9 @@ class AssessmentQuestion < ActiveRecord::Base
     # we can't translate links unless this question has a context (through a bank)
     return unless assessment_question_bank && assessment_question_bank.context
     
-    regex = Regexp.new("/#{context_type.downcase.pluralize}/#{context_id}/files/(\\d+)/(download|preview)")
+    # This either matches the id from a url like: /courses/15395/files/11454/download
+    # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
+    regex = Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"]*))})
     file_substitutions = {}
     
     deep_translate = lambda do |obj|
@@ -85,8 +87,14 @@ class AssessmentQuestion < ActiveRecord::Base
         obj.map {|v| deep_translate.call(v) }
       elsif obj.is_a?(String)
         obj.gsub(regex) do |match|
-          if !file_substitutions[$1]
-            file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, $1)
+          id_or_path = $1 || $2
+          if !file_substitutions[id_or_path]
+            if $1
+              file = Attachment.find_by_context_type_and_context_id_and_id(context_type, context_id, id_or_path)
+            elsif $2
+              path = URI.unescape(id_or_path)
+              file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
+            end
             begin
               new_file = file.clone_for(self)
             rescue => e
@@ -95,10 +103,10 @@ class AssessmentQuestion < ActiveRecord::Base
               logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{self.id} error_report: #{er.id}")
             end
             new_file.save if new_file
-            file_substitutions[$1] = new_file
+            file_substitutions[id_or_path] = new_file
           end
-          if file_substitutions[$1]
-            "/assessment_questions/#{self.id}/files/#{file_substitutions[$1].id}/download?verifier=#{file_substitutions[$1].uuid}"
+          if sub = file_substitutions[id_or_path]
+            "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}"
           else
             match
           end

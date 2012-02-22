@@ -15,9 +15,10 @@ class SetSamlEntityId < ActiveRecord::Migration
         aac.save!
       end
     end
+    AccountAuthorizationConfig.reset_column_information
   end
 
   def self.down
-    #raise ActiveRecord::IrreversibleMigration
+    raise ActiveRecord::IrreversibleMigration
   end
 end

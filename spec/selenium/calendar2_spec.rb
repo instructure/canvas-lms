@@ -96,7 +96,8 @@ describe "calendar2" do
       end
 
       it "should create an event through the context list drop down" do
-        pending("Course in context list being disabled bug - On Trello board")
+        #Bug - 7111
+        pending("Course in context list being disabled bug")
         event_title = 'new event'
         get "/calendar2"
         wait_for_ajaximations
@@ -110,7 +111,8 @@ describe "calendar2" do
       end
 
       it "should create an assignment through the context list drop down" do
-        pending("Course in context list being disabled bug - On Trello board")
+        #Bug - 7111
+        pending("Course in context list being disabled bug")
         assignment_title = 'new assignment'
         get "/calendar2"
         wait_for_ajaximations

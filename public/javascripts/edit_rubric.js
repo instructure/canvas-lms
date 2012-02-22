@@ -240,6 +240,9 @@ var rubricEditing = {
       data[pre_criterion + "[learning_outcome_id]"] = vals.learning_outcome_id;
       data[pre_criterion + "[long_description]"] = vals.long_description;
       data[pre_criterion + "[id]"] = vals.criterion_id;
+      if ($criterion.hasClass('ignore_criterion_for_scoring')) {
+        data[pre_criterion + "[ignore_for_scoring]"] = '1';
+      }
       if(vals.learning_outcome_id) {
         data[pre_criterion + "[mastery_points]"] = vals.mastery_points;
       }
@@ -336,6 +339,7 @@ var rubricEditing = {
       $criterion.find(".long_description_holder").toggleClass('empty', !criterion.long_description);
       $criterion.find(".ratings").empty();
       $criterion.toggleClass('learning_outcome_criterion', !!criterion.learning_outcome_id);
+      $criterion.toggleClass('ignore_criterion_for_scoring', !!criterion.ignore_for_scoring);
       for(var jdx in criterion.ratings) {
         var rating = criterion.ratings[jdx];
         rating.rating_id = rating.id;

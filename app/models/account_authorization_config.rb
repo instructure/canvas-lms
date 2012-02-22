@@ -25,9 +25,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
                   :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
                   :log_in_url, :log_out_url, :identifier_format,
                   :certificate_fingerprint, :entity_id, :change_password_url,
-                  :login_handle_name, :ldap_filter, :auth_filter
+                  :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context
 
-  before_validation :set_saml_entity_id, :if => Proc.new { |aac| aac.saml_authentication? }
+  before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
   validates_presence_of :account_id
   validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
   after_create :disable_open_registration_if_delegated
@@ -43,8 +43,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     ldap
   end
   
-  def set_saml_entity_id
+  def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
+    self.requested_authn_context = nil if self.requested_authn_context.blank?
   end
   
   def sanitized_ldap_login(login)
@@ -104,6 +105,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       @saml_settings.idp_slo_target_url = self.log_out_url
       @saml_settings.idp_cert_fingerprint = self.certificate_fingerprint
       @saml_settings.name_identifier_format = self.identifier_format
+      @saml_settings.requested_authn_context = self.requested_authn_context
     end
     
     @saml_settings

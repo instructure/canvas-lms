@@ -3,8 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "editing external tools" do
   it_should_behave_like "in-process server selenium tests"
 
-  it "should allow creating a new course external tool with custom fields" do
+  before (:each) do
     course_with_teacher_logged_in
+  end
+
+  it "should allow creating a new course external tool with custom fields" do
     get "/courses/#{@course.id}/settings"
 
     keep_trying_until do
@@ -46,7 +49,6 @@ describe "editing external tools" do
   end
 
   it "should allow creating a new course external tool with extensions" do
-    course_with_teacher_logged_in
     get "/courses/#{@course.id}/settings"
 
     keep_trying_until { driver.find_element(:css, "#tab-tools-link").displayed? }
@@ -66,7 +68,9 @@ describe "editing external tools" do
     driver.find_element(:css, "#external_tool_form .config_type.manual").should_not be_displayed
     driver.find_element(:css, "#external_tool_config_url").should_not be_displayed
     driver.find_element(:css, "#external_tool_config_xml").should be_displayed
-    xml = <<-XML
+
+    #XML must be broken up to avoid intermittent selenium failures
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
     xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
@@ -77,6 +81,8 @@ describe "editing external tools" do
     http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
     http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
     http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+    XML
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
     <blti:title>Other Name</blti:title>
     <blti:description>Description</blti:description>
     <blti:launch_url>http://example.com/other_url</blti:launch_url>
@@ -89,6 +95,8 @@ describe "editing external tools" do
         <lticm:property name="selection_width">500</lticm:property>
         <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
+    XML
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="resource_selection">
         <lticm:property name="url">https://example.com/wiki</lticm:property>
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
@@ -99,6 +107,8 @@ describe "editing external tools" do
         <lticm:property name="url">https://example.com/attendance</lticm:property>
         <lticm:property name="text">Attendance</lticm:property>
       </lticm:options>
+    XML
+    driver.find_element(:css, "#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="user_navigation">
         <lticm:property name="url">https://example.com/attendance</lticm:property>
         <lticm:property name="text">Attendance</lticm:property>
@@ -112,7 +122,7 @@ describe "editing external tools" do
     <cartridge_icon identifierref="BLTI001_Icon"/>
 </cartridge_basiclti_link>  
     XML
-    driver.find_element(:css, "#external_tool_config_xml").send_keys xml
+
     driver.find_element(:css, "#external_tools_dialog .save_button").click
 
     keep_trying_until { !driver.find_element(:css, "#external_tools_dialog").displayed? }
@@ -137,7 +147,6 @@ describe "editing external tools" do
   end
 
   it "should allow editing an existing external tool with custom fields" do
-    course_with_teacher_logged_in
     tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     get "/courses/#{@course.id}/settings"
 
@@ -174,7 +183,6 @@ describe "editing external tools" do
   end
 
   it "should allow adding an external tool to a course module" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     get "/courses/#{@course.id}/modules"
 
@@ -198,7 +206,6 @@ describe "editing external tools" do
   end
 
   it "should allow adding an external tool with resource selection enabled to a course module" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
@@ -243,7 +250,6 @@ describe "editing external tools" do
 
   it "should alert when invalid url data is returned by a resource selection dialog" do
     skip_if_ie("Out of memory / Stack overflow")
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
@@ -306,7 +312,6 @@ describe "editing external tools" do
   end
 
   it "should use the tool name if no link text is returned" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
@@ -350,7 +355,6 @@ describe "editing external tools" do
   end
 
   it "should allow editing the settings for a tool in a module" do
-    course_with_teacher_logged_in
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
                                 :type => 'context_external_tool',
@@ -380,7 +384,6 @@ describe "editing external tools" do
   end
 
   it "should launch assignment external tools when viewing assignment" do
-    course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     assignment_model(:course => @course, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
     tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
@@ -393,7 +396,6 @@ describe "editing external tools" do
   end
 
   it "should automatically load tools with default configuration" do
-    course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({
@@ -409,7 +411,6 @@ describe "editing external tools" do
   end
 
   it "should not automatically load tools configured to load in a new tab" do
-    course_with_teacher_logged_in
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({

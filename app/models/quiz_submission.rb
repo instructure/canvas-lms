@@ -67,7 +67,11 @@ class QuizSubmission < ActiveRecord::Base
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) || self.quiz.grants_right?(user, session, :review_grades) }
     can :read
-    
+
+    given {|user| user &&
+      self.quiz.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user_id, 'active') }
+    can :read
+
     given {|user, session| self.quiz.grants_right?(user, session, :manage) }
     can :update_scores
     

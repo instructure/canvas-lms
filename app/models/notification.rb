@@ -163,10 +163,6 @@ class Notification < ActiveRecord::Base
     
     recipients += User.find(:all, :conditions => {:id => recipient_ids}, :include => { :communication_channels => :notification_policies})
     
-    # Cancel any that haven't been sent out for the same purpose
-    all_matching_messages = self.messages.for(asset).by_name(name).for_user(recipients).in_state([:created,:staged,:sending,:dashboard])
-    Message.update_all("workflow_state='cancelled'", "id IN (#{all_matching_messages.map(&:id).join(',')})") unless all_matching_messages.empty?
-    
     messages = []
     @user_counts = {}
     recipients.uniq.each do |recipient|
@@ -233,7 +229,12 @@ class Notification < ActiveRecord::Base
       end
     end
 
-    dispatch_messages.each { |m| m.stage_without_dispatch!; m.save! }
+    Message.transaction do
+      # Cancel any that haven't been sent out for the same purpose
+      all_matching_messages = self.messages.for(asset).by_name(name).for_user(recipients).in_state([:created,:staged,:sending,:dashboard])
+      all_matching_messages.update_all(:workflow_state => 'cancelled')
+      dispatch_messages.each { |m| m.stage_without_dispatch!; m.save! }
+    end
     MessageDispatcher.batch_dispatch(dispatch_messages)
 
     # re-set cached values

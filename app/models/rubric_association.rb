@@ -264,7 +264,11 @@ class RubricAssociation < ActiveRecord::Base
         rating[:points] = [criterion.points, data[:points].to_f].min || 0
         rating[:criterion_id] = criterion.id
         rating[:learning_outcome_id] = criterion.learning_outcome_id
-        score += rating[:points]
+        if criterion.ignore_for_scoring
+          rating[:ignore_for_scoring] = true
+        else
+          score += rating[:points]
+        end
         rating[:description] = data[:description]
         rating[:comments_enabled] = true
         rating[:comments] = data[:comments]

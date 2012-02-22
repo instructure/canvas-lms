@@ -53,7 +53,7 @@ class UserProfile
       ]
       @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if @user.eportfolios_enabled?
       if user && opts[:root_account]
-        opts[:root_account].context_external_tools.having_setting('user_navigation').each do |tool|
+        opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|
           @tabs << {
             :id => tool.asset_string,
             :label => tool.label_for(:user_navigation, opts[:language]),

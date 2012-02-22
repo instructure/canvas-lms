@@ -49,5 +49,12 @@ describe CC::CCHelper do
       @exporter.media_object_infos[@obj.id].should_not be_nil
       @exporter.media_object_infos[@obj.id][:asset][:id].should == 'two'
     end
+
+    it "should ignore media links with no media comment id" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
+      html = %{<a class="youtubed instructure_inline_media_comment" href="http://www.youtube.com/watch?v=dCIP3x5mFmw">McDerp Enterprises</a>}
+      translated = @exporter.html_content(html)
+      translated.should == html
+    end
   end
 end

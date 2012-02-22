@@ -28,8 +28,6 @@ class Conversations < ActiveRecord::Migration
       t.integer  "conversation_message_id", :limit => 8
       t.integer  "conversation_participant_id", :limit => 8
     end
-    add_index "conversation_message_participants", ["conversation_message_id"]
-    add_index "conversation_message_participants", ["conversation_participant_id"]
   end
 
   def self.down

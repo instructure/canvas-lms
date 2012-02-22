@@ -111,7 +111,10 @@ describe RubricsController do
       assigns[:association].should eql(@rubric_association)
       response.should be_success
     end
-    it "should not update the rubric if it doesn't belong to the context or to an association" do
+
+    # this happens after a importing content into a new course, before a new
+    # association is set up
+    it "should create a new rubrice (and not update the existing rubric) if it doesn't belong to the context or to an association" do
       course_model
       @course2 = @course
       course_with_teacher_logged_in(:active_all => true)
@@ -122,9 +125,10 @@ describe RubricsController do
       @rubric_association.save
       rescue_action_in_public!
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id
-      assert_status(404)
+      assigns[:rubric].should_not be_nil
+      assigns[:rubric].should_not eql(@rubric)
+      assigns[:rubric].title.should eql("new title")
     end
-    
     it "should not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -178,6 +182,7 @@ describe RubricsController do
       assigns[:rubric].title.should eql("new title")
       response.should be_success
     end
+
     it "should update the newly-created rubric if updateable, even if the old id is specified" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)

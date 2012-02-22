@@ -151,4 +151,56 @@ describe PseudonymsController, :type => :integration do
       end
     end
   end
+  describe "pseudonym updates" do
+    before do
+      @student.pseudonyms.create(:unique_id => 'student@example.com')
+      @admin.pseudonyms.create(:unique_id => 'admin@example.com')
+      @teacher.pseudonyms.create(:unique_id => 'teacher@example.com')
+      @path = "/api/v1/accounts/#{@account.id}/logins/#{@student.pseudonym.id}"
+      @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :action => 'update', :account_id => @account.id.to_param, :id => @student.pseudonym.id.to_param }
+    end
+    context "an authorized user" do
+      it "should be able to update a pseudonym" do
+        json = api_call(:put, @path, @path_options, {
+          :login => {
+            :unique_id   => 'student+new@example.com',
+            :password    => 'password123',
+            :sis_user_id => 'new-12345'
+          }
+        })
+        json.should == {
+          'account_id' => @student.pseudonym.account_id,
+          'id' => @student.pseudonym.id,
+          'sis_user_id' => 'new-12345',
+          'unique_id' => 'student+new@example.com',
+          'user_id' => @student.id
+        }
+      end
+      it "should return 400 if the unique_id already exists" do
+        raw_api_call(:put, @path, @path_options, {
+          :login => {
+            :unique_id => 'teacher@example.com'
+          }
+        })
+        response.code.should eql '400'
+      end
+      it "should return 200 if a user's sis id is updated to its current value" do
+        @student.pseudonym.update_attribute(:sis_user_id, 'old-12345')
+        json = api_call(:put, @path, @path_options, {
+          :login => { :sis_user_id => 'old-12345' }
+        })
+        json['sis_user_id'].should eql 'old-12345'
+      end
+    end
+    context "an unauthorized user" do
+      it "should return 401" do
+        @path = "/api/v1/accounts/#{@account.id}/logins/#{@teacher.pseudonym.id}"
+        @user = @student
+        raw_api_call(:put, @path, @path_options.merge({ :id => @teacher.pseudonym.id.to_param }), {
+          :login => { :unique_id => 'teacher+new@example.com' }
+        })
+        response.code.should eql '401'
+      end
+    end
+  end
 end

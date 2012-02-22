@@ -49,11 +49,11 @@ class JobsController < ApplicationController
 
     case params[:update_action]
     when 'hold'
-      @jobs.find_each { |job| job.hold! }
+      @jobs.hold!
     when 'unhold'
-      @jobs.find_each { |job| job.unhold! }
+      @jobs.unhold!
     when 'destroy'
-      @jobs.find_each { |job| job.destroy }
+      @jobs.delete_all
     end
 
     render :json => { :status => 'OK' }

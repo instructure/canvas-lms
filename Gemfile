@@ -36,12 +36,13 @@ gem 'oauth',          '0.4.5'
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'rake',           '< 0.10'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
+gem 'rbx-require-relative', '0.0.5'
 gem 'rdiscount',      '1.6.8'
 gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.4'
+gem 'ruby-saml-mod',  '0.1.5'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
@@ -66,12 +67,12 @@ end
 group :test do
   gem 'barista',        '1.2.1'
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallel_tests', '0.6.11'
+  gem 'parallel_tests-instructure', '0.6.18'
   gem 'mocha',        '0.10.0'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.17.0'
+  gem 'selenium-webdriver', '2.18.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.7.2'
 end
