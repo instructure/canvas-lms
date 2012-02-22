@@ -777,7 +777,7 @@ class Attachment < ActiveRecord::Base
 
       # awesome browsers will use the filename* and get the proper unicode filename,
       # everyone else will get the sanitized ascii version of the filename
-      quoted_unicode = "UTF-8''#{URI.escape(display_name)}"
+      quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
       filename = %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
 
       # we need to have versions of the url for each content-disposition

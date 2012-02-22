@@ -50,7 +50,7 @@ define([
         $(document).unbind('media_comment_created');
         var $comment = this;
         $(document).bind('media_comment_created', function(event, data) {
-          callback.call(this, data.id, data.mediaType);
+          callback.call($comment, data.id, data.mediaType);
         });
         $.mediaComment.init(mediaType, {
           modal: modal,
@@ -128,16 +128,13 @@ define([
         }
 
         $dialog
-          .dialog('close')
           .dialog({
-            autoOpen: false,
             title: I18n.t('titles.play_comment', "Play Media Comment"),
             width: 575,
             height: 493,
             modal: true,
             draggable: false
           })
-          .dialog('open')
           .empty()
           .css({padding: 0, overflow: 'hidden'})//get rid of scrollbars and whitespace, have to do oveflow:hidden because the swf <object> is display:inline not display:block
           .append($('<div id="media_comment_play" />').html(flashRequiredMessage));
@@ -426,13 +423,12 @@ define([
       var defaultTitle = opts.defaultTitle || user_name || I18n.t('titles.media_contribution', "Media Contribution");
       var mediaCommentReady = function() {
         $("#video_record_title,#audio_record_title").val(defaultTitle);
-        $dialog.dialog('close').dialog({
-          autoOpen: false,
+        $dialog.dialog({
           title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
           width: 560,
           height: 460,
           modal: (opts.modal == false ? false : true)
-        }).dialog('open');
+        });
         $dialog.dialog('option', 'close', function() {
           $("#audio_record").before("<div id='audio_record'/>").remove();
           $("#video_record").before("<div id='video_record'/>").remove();
@@ -621,13 +617,12 @@ define([
       if($dialog.length == 0) {
         var $div = $("<div/>").attr('id', 'media_comment_dialog');
         $div.text(I18n.t('messages.loading', "Loading..."));
-        $div.dialog('close').dialog({
-          autoOpen: false,
+        $div.dialog({
           title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
           resizable: false,
           width: 470,
           height: 300
-        }).dialog('open');
+        });
         $.ajaxJSON('/api/v1/services/kaltura_session', 'POST', {}, function(data) {
           $div.data('ks', data.ks);
           $div.data('uid', data.uid);
