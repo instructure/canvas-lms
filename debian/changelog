@@ -1,3 +1,13 @@
+canvas-lms (2012.02.22.14.49) testing; urgency=low
+
+  * Package ref: fe30ca0a397496d5b9c8d09807943c433752552a
+  *
+  * [+4a57925] escape filenames more aggressively for content-disposition header; fixes #7299
+  * [+74de5b6] can submit > 1 media comments per page load fixes #7348
+  * [+fe30ca0] lock rbx-require-relative for now
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 22 Feb 2012 14:49:24 -0700
+
 canvas-lms (2012.02.21.10.40) testing; urgency=low
 
   * Package ref: 9c6e1b8ba61a23b15c4e303cdbc170a1c0b726ef
