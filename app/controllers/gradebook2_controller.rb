@@ -17,7 +17,8 @@ class Gradebook2Controller < ApplicationController
           :context_id => @context.id,
           :context_code => @context.asset_string,
           :group_weighting_scheme => @context.group_weighting_scheme,
-          :show_concluded_enrollments => @context.completed?
+          :show_concluded_enrollments => @context.completed?,
+          :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard)
         }
     end
   end

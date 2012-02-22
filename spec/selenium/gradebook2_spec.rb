@@ -31,8 +31,7 @@ describe "gradebook2" do
       cell.click
       cell.find_element(:css, '.grade')
     end
-    grade_input.clear
-    grade_input.send_keys(grade)
+    set_value(grade_input, grade)
     grade_input.send_keys(:return)
     wait_for_ajax_requests
   end
@@ -68,7 +67,7 @@ describe "gradebook2" do
   def final_score_for_row(row)
     grade_grid = driver.find_element(:css, '#gradebook_grid')
     cells = find_slick_cells(row, grade_grid)
-    cells[4].text
+    cells[4].find_element(:css, '.percentage').text
   end
 
   def switch_to_section(section=nil)
@@ -91,9 +90,7 @@ describe "gradebook2" do
     # this keep_trying_untill is there because gradebook1 loads it's cells in a bunch of setTimeouts
     keep_trying_until {
       students.each do |student_id, expected_score|
-        row_total = driver.find_element(:css, ".final_grade .student_#{student_id}").text
-        # gradebook1 has a space between number and % like: "33.3 %"
-        row_total = row_total.sub ' ', ''
+        row_total = driver.find_element(:css, ".final_grade .student_#{student_id} .grade").text + '%'
         row_total.should eql expected_score
       end
     }
@@ -122,7 +119,10 @@ describe "gradebook2" do
   end
 
   before (:each) do
-    course_with_teacher_logged_in(:active_course => true, :active_enrollment => true)
+    course_with_teacher_logged_in
+    @course.grading_standard_enabled = true
+    @course.save!
+    @course.reload
 
     #add first student
     @student_1 = User.create!(:name => STUDENT_NAME_1)
@@ -146,7 +146,7 @@ describe "gradebook2" do
     @course.reload
 
     #first assignment data
-    @group = @course.assignment_groups.create!(:name => 'first assignment group')
+    @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
     @assignment = assignment_model({
                                        :course => @course,
                                        :name => 'first assignment',
@@ -360,15 +360,21 @@ describe "gradebook2" do
     wait_for_ajaximations
 
     edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l3'), 'A-')
-
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-
+    wait_for_ajax_requests
     driver.find_element(:css, '#gradebook_grid [row="0"] .l3').text.should == 'A-'
     @assignment.submissions.size.should == 1
     sub = @assignment.submissions.first
     sub.grade.should == 'A-'
     sub.score.should == 0.0
+  end
+
+  it "show letter grade in total column" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    driver.find_element(:css, '#gradebook_grid [row="0"] .total-cell .letter-grade-points').should include_text("A")
+    edit_grade(driver.find_element(:css, '#gradebook_grid [row="1"] .l2'), '50')
+    wait_for_ajax_requests
+    driver.find_element(:css, '#gradebook_grid [row="1"] .total-cell .letter-grade-points').should include_text("A")
   end
 
   it "should change grades and validate course total is correct" do
@@ -417,7 +423,7 @@ describe "gradebook2" do
     #filter validation
     validate_cell_text(meta_cells[0], STUDENT_NAME_2 + "\n" + @other_section.name)
     validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(grade_cells[4], STUDENT_2_TOTAL_IGNORING_UNGRADED)
+    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_2_TOTAL_IGNORING_UNGRADED)
   end
 
   it "should validate setting group weights" do

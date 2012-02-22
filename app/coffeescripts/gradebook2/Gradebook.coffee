@@ -14,6 +14,7 @@ define [
   'jst/gradebook_uploads_form'
   'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
+  'jst/gradebook2/group_total_cell'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_jquery_patches'
@@ -26,7 +27,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate) ->
 
   class Gradebook
     minimumAssignmentColumWidth = 10
@@ -235,17 +236,20 @@ define [
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
-      gradeToShow = val
+
       # rounds percentage to one decimal place
-      percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 1000) / 10
+      percentage = Math.round((val.score / val.possible) * 1000) / 10
       percentage = 0 if isNaN(percentage)
-      if !gradeToShow.possible then percentage = '-' else percentage += "%"
-      """
-      <div class="gradebook-cell">
-        <div class="gradebook-tooltip">#{gradeToShow.score} / #{gradeToShow.possible}</div>
-        #{percentage}
-      </div>
-      """
+
+      if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
+        letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
+
+      groupTotalCellTemplate({
+        score: val.score
+        possible: val.possible
+        letterGrade
+        percentage
+      })
 
     calculateStudentGrade: (student) =>
       if student.loaded
@@ -568,9 +572,9 @@ define [
         field: "total_grade"
         formatter: @groupTotalFormatter
         name: "Total"
-        minWidth: 50,
+        minWidth: 85,
         maxWidth: 100,
-        width: testWidth("Total", 50)
+        width: testWidth("Total", 85)
         cssClass: "total-cell",
         sortable: true
         type: 'total_grade'
