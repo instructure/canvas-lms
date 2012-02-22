@@ -353,18 +353,6 @@ describe "calendar2" do
         create_appointment_group_manual
       end
 
-      it "should test bad data errors in date while creating a new appointment group" do
-        get "/calendar2"
-        click_scheduler_link
-        driver.find_element(:css, '.create_link').click
-        edit_form = driver.find_element(:id, 'edit_appointment_form')
-        ['start', 'end'].each { |field| set_value(edit_form.find_element(:css, ".#{field}_time"), '11111') }
-        driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
-        driver.switch_to.alert.dismiss
-        edit_form.should be_displayed
-        ['start', 'end'].each { |field| edit_form.find_element(:css, ".#{field}_time").should have_class('error') }
-      end
-
       it "should delete an appointment group" do
         create_appointment_group_api
         get "/calendar2"
