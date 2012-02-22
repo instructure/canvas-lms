@@ -127,9 +127,11 @@ class Attachment < ActiveRecord::Base
         end
         iconv.iconv(nil)
       end
-      self.update_attribute(:encoding, 'UTF-8')
+      self.encoding = 'UTF-8'
+      Attachment.update_all({:encoding => 'UTF-8'}, {:id => self.id})
     rescue Iconv::Failure
-      self.update_attribute(:encoding, '')
+      self.encoding = ''
+      Attachment.update_all({:encoding => ''}, {:id => self.id})
       return
     end
   end
