@@ -37,6 +37,19 @@ describe QuizSubmission do
     q.reload.quiz_points_possible.should eql 1.9
   end
 
+  it "should not lose time" do
+    @quiz.update_attribute(:time_limit, 10)
+    q = @quiz.quiz_submissions.create!
+    q.update_attribute(:started_at, Time.now)
+    original_end_at = q.end_at
+
+    @quiz.update_attribute(:time_limit, 5)
+    @quiz.update_quiz_submission_end_at_times
+
+    q.reload
+    q.end_at.should eql original_end_at
+  end
+
   it "should not allow updating scores on an uncompleted submission" do
     q = @quiz.quiz_submissions.create!
     q.state.should eql(:untaken)

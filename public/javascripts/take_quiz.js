@@ -78,10 +78,23 @@ define([
             setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
           }
           if(data && data.end_at) {
-            quizSubmission.end_at.text(data.end_at);
+            var endAtFromServer     = Date.parse(data.end_at),
+                submissionEndAt     = Date.parse(quizSubmission.end_at.text()),
+                serverEndAtTime     = endAtFromServer.getTime(),
+                submissionEndAtTime = submissionEndAt.getTime();
+
             quizSubmission.referenceDate = null;
-            if(data.end_at > quizSubmission.end_at.text()) {
-              $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt'));
+
+            // if the new end_at from the server is different than our current end_at, then notify
+            // the user that their time limit's changed and let updateTime do the rest.
+            if (serverEndAtTime !== submissionEndAtTime) {
+              serverEndAtTime > submissionEndAtTime ?
+                $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt')) :
+                $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
+
+              quizSubmission.end_at.text(data.end_at);
+              endAtText   = data.end_at;
+              endAtParsed = new Date(data.end_at);
             }
           }
         }, function() {

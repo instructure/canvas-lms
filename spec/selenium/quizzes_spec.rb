@@ -386,6 +386,105 @@ describe "quizzes" do
       end
     end
 
+    it "should give a student extra time if the time limit is extended" do
+      skip_if_ie('Out of memory')
+
+      @context = @course
+      bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      q = quiz_model
+      a = AssessmentQuestion.create!
+      b = AssessmentQuestion.create!
+      bank.assessment_questions << a
+      bank.assessment_questions << b
+      answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+      question = q.quiz_questions.create!(:question_data => {
+        :name => "first question",
+        'question_type' => 'multiple_choice_question',
+        'answers' => answers,
+        :points_possible => 1
+      }, :assessment_question => a)
+
+      q.generate_quiz_data
+      q.time_limit = 10
+      q.save!
+
+      get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+      driver.find_element(:link_text, 'Take the Quiz').click
+
+      answer_one = driver.find_element(:id, "question_#{question.id}_answer_1")
+      answer_two = driver.find_element(:id, "question_#{question.id}_answer_2")
+
+      # force a save to create a submission
+      answer_one.click
+      wait_for_ajax_requests
+
+      # increase the time limit on the quiz
+      q.update_attribute(:time_limit, 20)
+      q.update_quiz_submission_end_at_times
+
+      keep_trying_until do
+        driver.find_element(:id, 'flash_notice_message').text.should match 'You have been given extra time on this attempt'
+        driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
+      end
+
+      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+      driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+    end
+
+    it "should notify a student of extra time given by a moderator" do
+      skip_if_ie('Out of memory')
+
+      @context = @course
+      bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      q = quiz_model
+      a = AssessmentQuestion.create!
+      b = AssessmentQuestion.create!
+      bank.assessment_questions << a
+      bank.assessment_questions << b
+      answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+      question = q.quiz_questions.create!(:question_data => {
+        :name => "first question",
+        'question_type' => 'multiple_choice_question',
+        'answers' => answers,
+        :points_possible => 1
+      }, :assessment_question => a)
+
+      q.generate_quiz_data
+      q.time_limit = 10
+      q.save!
+
+      get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+      driver.find_element(:link_text, 'Take the Quiz').click
+
+      answer_one = driver.find_element(:id, "question_#{question.id}_answer_1")
+      answer_two = driver.find_element(:id, "question_#{question.id}_answer_2")
+
+      # force a save to create a submission
+      answer_one.click
+      wait_for_ajax_requests
+
+      # add time as a the moderator. this code replicates what happens in
+      # QuizSubmissions#extensions when a moderator extends a student's
+      # quiz time.
+      submission = QuizSubmission.last
+      submission.end_at = Time.now + 20.minutes
+      submission.save!
+
+      keep_trying_until do
+        driver.find_element(:id, 'flash_notice_message').text.should match 'You have been given extra time on this attempt'
+        driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
+        true
+      end
+
+      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+      driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+    end
+
+
     it "should display quiz statistics" do
       skip_if_ie('Out of memory')
       quiz_with_submission
