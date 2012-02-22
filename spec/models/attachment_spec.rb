@@ -641,6 +641,13 @@ describe Attachment do
       a.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
       a.cacheable_s3_inline_url
     end
+
+    it "should escape all non-alphanumeric characters in the utf-8 filename" do
+      attachment = attachment_with_context(@course, :display_name => '"This file[0] \'{has}\' \# awesome `^<> chars 100%,|<-pipe"')
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="\\\"This file[0] '{has}' \\# awesome `^<> chars 100%,|<-pipe\\\""; filename*=UTF-8''%22This%20file%5B0%5D%20%27%7Bhas%7D%27%20%5C%23%20awesome%20%60%5E%3C%3E%20chars%20100%25%2C%7C%3C%2Dpipe%22)))
+      attachment.cacheable_s3_inline_url
+    end
   end
 
   context "root_account_id" do
