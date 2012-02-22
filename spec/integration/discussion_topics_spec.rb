@@ -33,4 +33,16 @@ describe "discussion_topics" do
     get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
     response.should be_success
   end
+  
+  it "should show speed grader button" do
+    course = course_model(:reusable => true)
+    assignment_model(:course => course, :submission_types => 'discussion_topic', :title => 'Assignment Discussion')
+    topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+    course_with_teacher_logged_in(:course => @course, :active_all => true)
+
+    get "/courses/#{course.id}/discussion_topics/#{topic.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#speedgrader_button').should_not be_nil
+  end
 end
