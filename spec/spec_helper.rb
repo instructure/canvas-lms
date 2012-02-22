@@ -221,7 +221,9 @@ Spec::Runner.configure do |config|
   end
 
   def pseudonym(user, opts={})
-    username = opts[:username] || "nobody@example.com"
+    @spec_pseudonym_count ||= 0
+    username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
+    @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)

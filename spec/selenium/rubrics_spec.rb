@@ -125,4 +125,37 @@ describe "rubrics" do
       find_all_with_jquery(".custom_ratings:visible").size.should eql(1)
     end
   end
+
+  it "should display free-form comments to the student" do
+    assignment_model
+    rubric_model(:context => @course, :free_form_criterion_comments => true)
+    course_with_student(:course => @course, :active_all => true)
+    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    comment = "Hi, please see www.example.com.\n\nThanks."
+    @assessment = @association.assess({
+      :user => @student,
+      :assessor => @teacher,
+      :artifact => @assignment.find_or_create_submission(@student),
+      :assessment => {
+        :assessment_type => 'grading',
+        :criterion_crit1 => {
+          :points => 5,
+          :comments => comment,
+        }
+      }
+    })
+    user_logged_in(:user => @student)
+
+    get "/courses/#{@course.id}/grades"
+    f('.toggle_rubric_assessments_link').click
+    wait_for_animations
+    f('.rubric .criterion .custom_rating_comments').text.should == comment
+    f('.rubric .criterion .custom_rating_comments a').attribute('href').should == 'http://www.example.com/'
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+    f('.assess_submission_link').click
+    wait_for_animations
+    f('.rubric .criterion .custom_rating_comments').text.should == comment
+    f('.rubric .criterion .custom_rating_comments a').attribute('href').should == 'http://www.example.com/'
+  end
 end

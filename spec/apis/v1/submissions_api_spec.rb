@@ -1130,7 +1130,8 @@ describe 'Submissions API', :type => :integration do
         :points=>2,
         :learning_outcome_id=>nil,
         :id=>"rat1",
-        :comments=>"Rock on"}]
+        :comments=>"Rock on",
+        :comments_html=>"Rock on"}]
   end
 
   it "should allow posting a comment on a submission" do
