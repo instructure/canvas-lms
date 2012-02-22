@@ -710,7 +710,11 @@ shared_examples_for "all selenium tests" do
   self.use_transactional_fixtures = false
 
   append_after(:each) do
-    wait_for_ajax_requests
+    begin
+      wait_for_ajax_requests
+    rescue Selenium::WebDriver::Error::WebDriverError
+      # we want to ignore selenium errors when attempting to wait here
+    end
     ALL_MODELS.each { |m| truncate_table(m) }
   end
 

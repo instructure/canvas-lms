@@ -27,6 +27,7 @@ module Api::V1::Assignment
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['description'] = api_user_content(hash['description'], @context || assignment.context)
+    hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
 
     if show_admin_fields
       hash['needs_grading_count'] = assignment.needs_grading_count

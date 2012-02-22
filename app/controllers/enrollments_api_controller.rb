@@ -52,6 +52,8 @@ class EnrollmentsApiController < ApplicationController
   # @response_field root_account_id The unique id of the user's account.
   # @response_field type The type of the enrollment.
   # @response_field user_id The unique id of the user.
+  # @response_field html_url The URL to the Canvas web UI page for this course enrollment.
+  # @response_field grades[html_url] The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.
   # @response_field user[id] The unique id of the user.
   # @response_field user[login_id] The unique login of the user.
   # @response_field user[name] The name of the user.
@@ -68,6 +70,10 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "StudentEnrollment",
   #       "user_id": 1,
+  #       "html_url": "https://...",
+  #       "grades": {
+  #         "html_url": "https://...",
+  #       },
   #       "user": {
   #         "id": 1,
   #         "login_id": "bieberfever@example.com",
@@ -84,6 +90,10 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "TeacherEnrollment",
   #       "user_id": 2,
+  #       "html_url": "https://...",
+  #       "grades": {
+  #         "html_url": "https://...",
+  #       },
   #       "user": {
   #         "id": 2,
   #         "login_id": "changyourmind@example.com",
@@ -100,6 +110,10 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "StudentEnrollment",
   #       "user_id": 2,
+  #       "html_url": "https://...",
+  #       "grades": {
+  #         "html_url": "https://...",
+  #       },
   #       "user": {
   #         "id": 2,
   #         "login_id": "changyourmind@example.com",

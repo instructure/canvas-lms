@@ -51,7 +51,9 @@ describe EnrollmentsApiController, :type => :integration do
           'limit_privileges_to_course_section' => true,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
-          'type'                               => 'StudentEnrollment'
+          'type'                               => 'StudentEnrollment',
+          'html_url'                           => course_user_url(@course, @unenrolled_user),
+          'grades'                             => { 'html_url' => course_student_grades_url(@course, @unenrolled_user) },
         }
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
@@ -176,7 +178,9 @@ describe EnrollmentsApiController, :type => :integration do
           'limit_privileges_to_course_section' => true,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
-          'type'                               => 'StudentEnrollment'
+          'type'                               => 'StudentEnrollment',
+          'html_url'                           => course_user_url(@course, @unenrolled_user),
+          'grades'                             => { 'html_url' => course_student_grades_url(@course, @unenrolled_user) },
         }
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
@@ -259,7 +263,11 @@ describe EnrollmentsApiController, :type => :integration do
               'short_name' => e.user.short_name,
               'id' => e.user.id,
               'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
-            }
+            },
+            'html_url' => course_user_url(e.course_id, e.user_id),
+            'grades' => {
+              'html_url' => course_student_grades_url(e.course_id, e.user_id),
+            },
           }
         }
       end
@@ -282,7 +290,7 @@ describe EnrollmentsApiController, :type => :integration do
           res = res + @course.send("#{type}_enrollments").scoped(:include => :user, :order => 'users.sortable_name ASC')
         end
         json.should == enrollments.map { |e|
-          {
+          h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
             'enrollment_state' => e.workflow_state,
@@ -291,6 +299,7 @@ describe EnrollmentsApiController, :type => :integration do
             'type' => e.type,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
+            'html_url' => course_user_url(@course, e.user),
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -298,6 +307,10 @@ describe EnrollmentsApiController, :type => :integration do
               'id' => e.user.id
             }
           }
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+          } if e.student?
+          h
         }
       end
 
@@ -325,7 +338,11 @@ describe EnrollmentsApiController, :type => :integration do
               'sortable_name' => e.user.sortable_name,
               'short_name' => e.user.short_name,
               'id' => e.user.id
-            }
+            },
+            'html_url' => course_user_url(e.course_id, e.user_id),
+            'grades' => {
+              'html_url' => course_student_grades_url(e.course_id, e.user_id),
+            },
           }
         }
       end
@@ -360,7 +377,7 @@ describe EnrollmentsApiController, :type => :integration do
               'sis_user_id' => e.user.pseudonym.sis_user_id,
               'sis_login_id' => e.user.pseudonym.unique_id,
             }) if e.user.pseudonym && e.user.pseudonym.sis_user_id
-          {
+          h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
             'enrollment_state' => e.workflow_state,
@@ -369,8 +386,13 @@ describe EnrollmentsApiController, :type => :integration do
             'type' => e.type,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'user' => user_json
+            'user' => user_json,
+            'html_url' => course_user_url(@course, e.user),
           }
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+          } if e.student?
+          h
         end
       end
     end
@@ -397,7 +419,7 @@ describe EnrollmentsApiController, :type => :integration do
         enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
           res = res + @course.send("#{type}_enrollments").scoped(:include => :user)
         }.map do |e|
-          {
+          h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
             'enrollment_state' => e.workflow_state,
@@ -411,8 +433,13 @@ describe EnrollmentsApiController, :type => :integration do
               'sortable_name' => e.user.sortable_name,
               'short_name' => e.user.short_name,
               'id' => e.user.id
-            }
+            },
+            'html_url' => course_user_url(@course, e.user),
           }
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+          } if e.student?
+          h
         end
         link_header = response.headers['Link'].split(',')
         link_header[0].should match /page=2&per_page=1/ # next page
@@ -442,6 +469,8 @@ describe EnrollmentsApiController, :type => :integration do
             'type' => e.type,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
+            'html_url' => course_user_url(@course, e.user),
+            'grades' => { 'html_url' => course_student_grades_url(@course, e.user) },
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -461,7 +490,7 @@ describe EnrollmentsApiController, :type => :integration do
         @user = request_user
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment&type[]=TeacherEnrollment", @params.merge(:type => %w{StudentEnrollment TeacherEnrollment}))
         json.should == (@course.student_enrollments + @course.teacher_enrollments).map { |e|
-          {
+          h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
             'enrollment_state' => e.workflow_state,
@@ -470,6 +499,7 @@ describe EnrollmentsApiController, :type => :integration do
             'type' => e.type,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
+            'html_url' => course_user_url(@course, e.user),
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -477,6 +507,10 @@ describe EnrollmentsApiController, :type => :integration do
               'id' => e.user.id
             }
           }
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+          } if e.student?
+          h
         }
       end
     end

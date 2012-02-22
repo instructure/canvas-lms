@@ -255,13 +255,11 @@ describe "gradebook2" do
     end
 
     it "should not show concluded enrollments" do
-      pending "BUG 6809 - Gradebook 2 shows Concluded enrollments" do
-        conclude_and_unconclude_course
-        get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
+      conclude_and_unconclude_course
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
 
-        driver.find_elements(:css, '.student-name').count.should == @course.students.count
-      end
+      driver.find_elements(:css, '.student-name').count.should == @course.students.count
     end
 
     it "should show students sorted by their sortable_name" do
@@ -270,6 +268,16 @@ describe "gradebook2" do
 
       dom_names = driver.find_elements(:css, '.student-name').map(&:text)
       dom_names.should == [STUDENT_NAME_1, STUDENT_NAME_2]
+    end
+
+    it "should link to a student's grades page" do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      els = driver.find_elements(:css, '.student-name')
+      els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }.should == [
+        "/courses/#{@course.id}/grades/#{@student_1.id}",
+        "/courses/#{@course.id}/grades/#{@student_2.id}",
+      ]
     end
 
     it "should allow showing only a certain section" do

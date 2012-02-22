@@ -15,6 +15,7 @@ define [
   'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
+  'jst/gradebook2/row_student_name'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_jquery_patches'
@@ -27,7 +28,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     minimumAssignmentColumWidth = 10
@@ -36,6 +37,7 @@ define [
       @chunk_start = 0
       @students    = {}
       @rows        = []
+      @studentsPage = 1
       @sortFn      = (student) -> student.sortable_name
       @assignmentsToHide = ($.store.userGet("hidden_columns_#{@options.context_code}") || '').split(',')
       @sectionToShow = Number($.store.userGet("grading_show_only_section#{@options.context_id}")) || undefined
@@ -44,11 +46,14 @@ define [
       $.subscribe 'assignment_group_weights_changed', @buildRows
       $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
+
       promise = $.when(
+        $.ajaxJSON( @options.students_url, "GET"),
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
-        $.ajaxJSON( @options.sections_and_students_url, "GET", @sectionToShow && {sections: [@sectionToShow]})
-      ).then (assignmentGroupsArgs, studentsArgs) =>
-        @gotStudents.apply(this, studentsArgs)
+        $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
+      ).then ([students, status, xhr]) =>
+        @gotChunkOfStudents(students, xhr)
+
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
         opacity: 0.5
@@ -72,26 +77,41 @@ define [
           assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
           @assignments[assignment.id] = assignment
 
-    gotStudents: (sections) =>
+    gotSections: (sections) =>
       @sections = {}
-      @rows = []
       for section in sections
         htmlEscape(section)
         @sections[section.id] = section
-        for student in section.students
-          @students[student.id] ||= htmlEscape(student)
-          @students[student.id].sections ||= []
-          @students[student.id].sections.push(section.id)
       @sections_enabled = sections.length > 1
+
+    gotChunkOfStudents: (studentEnrollments, xhr) =>
+      for studentEnrollment in studentEnrollments
+        student = studentEnrollment.user
+        student.enrollment = studentEnrollment
+        @students[student.id] ||= htmlEscape(student)
+        @students[student.id].sections ||= []
+        @students[student.id].sections.push(studentEnrollment.course_section_id)
+
+      link = xhr.getResponseHeader('Link')
+      if link && link.match /rel="next"/
+        @studentsPage += 1
+        $.ajaxJSON( @options.students_url, "GET", { "page": @studentsPage}, @gotChunkOfStudents)
+      else
+        @gotAllStudents()
+
+    gotAllStudents: ->
       for id, student of @students
         student.computed_current_score ||= 0
         student.computed_final_score ||= 0
         student.secondary_identifier = student.sis_login_id || student.login_id
-        student.display_name = "<div class='student-name'>#{student.name}</div>"
+
         if @sections_enabled
-          sectionNames = (@sections[section_id].name for section_id in student.sections)
-          sectionNames.sort()
-          student.display_name += "<div class='student-section'>" + $.toSentence(sectionNames) + "</div>"
+          sectionNames = $.toSentence((@sections[sectionId].name for sectionId in student.sections).sort())
+        student.display_name = rowStudentNameTemplate
+          studentName: student.name
+          studentGradesUrl: student.enrollment.grades.html_url
+          sectionNames: sectionNames
+
         # fill in dummy submissions, so there's something there even if the
         # student didn't submit anything for that assignment
         for id, assignment of @assignments
@@ -422,7 +442,7 @@ define [
 
         $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections, scrolling: sections.length > 15))
         (updateSectionBeingShownText = =>
-          $('#section_being_shown').text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
+          $('#section_being_shown').html(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
         )()
         $('#section_to_show').after($sectionToShowMenu).show().kyleMenu
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
@@ -485,7 +505,7 @@ define [
     assignmentHeaderHtml: (assignment) ->
       columnHeaderTemplate
         assignment: assignment
-        href: "#{@options.context_url}/assignments/#{assignment.id}"
+        href: assignment.html_url
         showPointsPossible: assignment.points_possible?
 
     initGrid: =>
