@@ -73,5 +73,5 @@ define [
         at: 'center top',
         of: @trigger,
         offset: '0 -10px',
-        within: 'body',
-        collision: 'fit fit'
+        within: '#main',
+        collision: 'flipfit flipfit'
