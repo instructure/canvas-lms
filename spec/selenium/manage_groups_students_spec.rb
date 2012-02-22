@@ -223,6 +223,29 @@ describe "manage groups students" do
       group2.users.length.should == 2
       group3.users.length.should == 1
     end
+
+    it "should prevent you from loading a paginated group list page that would be empty" do
+      @students = []
+      16.times do |i|
+        name = "Student %02d" % (i+1).to_s
+        student_in_course(:active_all => true, :name => name)
+        @students << @student
+      end
+
+      group_category = @course.group_categories.create(:name => "Existing Category")
+      group = @course.groups.create(:name => "Group 1", :group_category => group_category)
+
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      simulate_group_drag(@students[0].id, "blank", group.id)
+      wait_for_ajaximations
+
+      driver.find_element(:css, ".unassigned_members_pagination .next_page").click
+      wait_for_ajaximations
+
+      driver.find_elements(:css, ".group_blank .student").length.should == 15
+    end
   end
 
   context "assign_students_link" do
