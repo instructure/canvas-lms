@@ -69,6 +69,16 @@ describe Message do
       @message.workflow_state.should == 'staged'
       @message.dispatch_at.should > Time.now + 4.minutes
     end
-    
+
+    describe "#deliver" do
+      it "should not deliver if cancelled" do
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        @message.cancel
+        @message.expects(:deliver_via_email).never
+        Mailer.expects(:deliver_message).never
+        @message.deliver.should be_nil
+        @message.reload.state.should == :cancelled
+      end
+    end
   end
 end
