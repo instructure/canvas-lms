@@ -82,7 +82,7 @@ class Account < ActiveRecord::Base
   has_many :associated_learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome
   has_many :page_views
   has_many :error_reports
-  has_many :account_notifications
+  has_many :announcements, :class_name => 'AccountNotification'
   has_many :alerts, :as => :context, :include => :criteria
   has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
   has_many :user_account_associations

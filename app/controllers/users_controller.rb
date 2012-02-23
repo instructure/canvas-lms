@@ -224,7 +224,7 @@ class UsersController < ApplicationController
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
-    @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+    @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
   end
 
   include Api::V1::StreamItem
@@ -409,7 +409,7 @@ class UsersController < ApplicationController
   end
 
   def close_notification
-    @current_user.close_notification(params[:id])
+    @current_user.close_announcement(AccountNotification.find(params[:id]))
     render :json => @current_user.to_json
   end
 

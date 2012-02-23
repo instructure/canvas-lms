@@ -1310,11 +1310,13 @@ class User < ActiveRecord::Base
   end
 
 
-  def close_notification(id)
+  def close_announcement(announcement)
     preferences[:closed_notifications] ||= []
-    preferences[:closed_notifications] << id.to_i
+    # serialize ids relative to the user
+    self.shard.activate do
+      preferences[:closed_notifications] << announcement.id
+    end
     preferences[:closed_notifications].uniq!
-    self.updated_at = Time.now
     save
   end
 
