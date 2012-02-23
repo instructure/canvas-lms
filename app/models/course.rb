@@ -2521,13 +2521,17 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def open_registration_for?(user, session = nil)
-    root_account.open_registration_for?(user, session)
-  end
-
   def has_open_course_imports?
     self.course_imports.scoped(:conditions => {
       :workflow_state => ['created', 'started']
     }).count > 0
+  end
+
+  def user_list_search_mode_for(user)
+    if self.root_account.open_registration?
+      return self.root_account.delegated_authentication? ? :preferred : :open
+    end
+    return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
+    :closed
   end
 end

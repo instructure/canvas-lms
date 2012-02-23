@@ -40,26 +40,4 @@ describe "/shared/_user_lists" do
     assigns[:context] = Account.default
     render :partial => "shared/user_lists"
   end
-
-  it "should default search existing users to open registration setting (true)" do
-    account = Account.default
-    account.add_user(user)
-    assigns[:context] = account
-    assigns[:current_user] = @user
-    render :partial => "shared/user_lists"
-    partial = Nokogiri::HTML('<document>' + response.body + '</document>')
-    partial.at_css('input[name="only_search_existing_users"]')['checked'].should == 'checked'
-  end
-
-  it "should default search existing users to open registration setting (false)" do
-    account = Account.default
-    account.add_user(user)
-    assigns[:context] = account
-    assigns[:current_user] = @user
-    account.settings = { :open_registration => true }
-    account.save!
-    render :partial => "shared/user_lists"
-    partial = Nokogiri::HTML('<document>' + response.body + '</document>')
-    partial.at_css('input[name="only_search_existing_users"]')['checked'].should be_blank
-  end
 end

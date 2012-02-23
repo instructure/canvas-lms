@@ -1043,15 +1043,15 @@ class Account < ActiveRecord::Base
     self.root_account.sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
   end
 
-  def open_registration_for?(user, session = nil)
-    root_account = self.root_account
-    return true if root_account.open_registration?
-    root_account.grants_right?(user, session, :manage_user_logins)
-  end
-
   def trusted_account_ids
     return [] if !root_account? || self == Account.site_admin
     [ Account.site_admin.id ]
+  end
+
+  def user_list_search_mode_for(user)
+    return :preferred if self.root_account.open_registration?
+    return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
+    :closed
   end
 
   named_scope :root_accounts, :conditions => {:root_account_id => nil}

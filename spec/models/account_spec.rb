@@ -621,21 +621,21 @@ describe Account do
     @account.save.should be_false
   end
 
-  describe "open_registration_for?" do
-    it "should be true for anyone if open registration is turned on" do
+  describe "user_list_search_mode_for" do
+    it "should be preferred for anyone if open registration is turned on" do
       account = Account.default
       account.settings = { :open_registration => true }
-      account.open_registration_for?(nil).should be_true
-      account.open_registration_for?(user).should be_true
+      account.user_list_search_mode_for(nil).should == :preferred
+      account.user_list_search_mode_for(user).should == :preferred
     end
 
-    it "should be true for account admins" do
+    it "should be preferred for account admins" do
       account = Account.default
-      account.open_registration_for?(nil).should be_false
-      account.open_registration_for?(user).should be_false
+      account.user_list_search_mode_for(nil).should == :closed
+      account.user_list_search_mode_for(user).should == :closed
       user
       account.add_user(@user)
-      account.open_registration_for?(@user).should be_true
+      account.user_list_search_mode_for(@user).should == :preferred
     end
   end
 

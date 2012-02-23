@@ -19,13 +19,18 @@
 
 class UserList
   # open_registration is true, false, or nil. if nil, it defaults to root_account.open_registration?
-  def initialize(string, root_account = nil, open_registration = nil)
+  # search_method configures how e-mails are handled
+  #   :open e-mails that don't match a pseudonym always create temporary users
+  #   :closed e-mails must belong to a user
+  #   :preferred if the e-mail belongs to a single user, that user is used. otherwise a temporary user is created
+  #   :infer :open or :closed according to root_account.open_registration
+  def initialize(string, root_account = nil, search_method = :infer)
     @addresses = []
     @errors = []
     @duplicate_addresses = []
     @root_account = root_account || Account.default
-    @open_registration = open_registration
-    @open_registration = @root_account.open_registration? if @open_registration.nil?
+    @search_method = search_method
+    @search_method = (@root_account.open_registration? ? :open : :closed) if search_method == :infer
     parse_list(string)
     resolve
   end
@@ -113,7 +118,7 @@ class UserList
   
   def resolve
     pseudonyms = @addresses.select { |a| a[:type] == :pseudonym }
-    emails = @addresses.select { |a| a[:type] == :email } unless @open_registration
+    emails = @addresses.select { |a| a[:type] == :email } if @search_method != :open
     emails ||= []
     pseudonyms.concat emails
 
@@ -144,7 +149,8 @@ class UserList
       end
     end if !pseudonyms.empty?
 
-    # Search for matching emails (only if open registration is disabled)
+    # Search for matching emails (only if not open registration; otherwise there's no point - we just
+    # create temporary users)
     Pseudonym.trusted_by_including_self(@root_account).active.find(:all,
         :select => 'path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state',
         :joins => { :user => :communication_channels },
@@ -170,11 +176,11 @@ class UserList
           address.merge!(login)
         end
       end
-    end if !@open_registration && !emails.empty?
+    end if @search_method != :open && !emails.empty?
 
     # Search for matching SMS
     smses = @addresses.select { |a| a[:type] == :sms }
-    sms_scope = @open_registration ? Pseudonym : Pseudonym.trusted_by_including_self(@root_account)
+    sms_scope = @search_method != :closed ? Pseudonym : Pseudonym.trusted_by_including_self(@root_account)
     sms_scope.active.find(:all,
         :select => 'path AS address, users.name AS name, communication_channels.user_id AS user_id',
         :joins => { :user => :communication_channels },
@@ -203,10 +209,16 @@ class UserList
       # Only allow addresses that we found a user, or that we can implicitly create the user
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] } ? @duplicate_addresses : @addresses) << address
-      elsif address[:type] == :email && @open_registration
+      elsif address[:type] == :email && @search_method == :open
         (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
       else
-        @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
+        if @search_method == :preferred
+          address.delete :user_id
+          address.delete :name
+          (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
+        else
+          @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
+        end
       end
     end
   end

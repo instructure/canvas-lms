@@ -328,6 +328,40 @@ describe UserList do
     end
   end
 
+  context "preferred selection" do
+    it "should find an existing user if there is only one" do
+      user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
+      @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
+      ul = UserList.new 'jt+2@instructure.com', nil, :preferred
+      ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT'}]
+      ul.errors.should == []
+      ul.duplicate_addresses.should == []
+      ul.users.should == [@user]
+    end
+
+    it "should create a new user if none exists" do
+      ul = UserList.new 'jt@instructure.com', nil, :preferred
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :email}]
+      ul.errors.should == []
+      ul.duplicate_addresses.should == []
+    end
+
+    it "should create a new user if multiple matching users are found" do
+      @user1 = user_with_pseudonym(:name => 'JT', :username => 'jt+1@instructure.com')
+      @user2 = user_with_pseudonym(:name => 'JT', :username => 'jt+2@instructure.com')
+      @user1.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      @user2.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      ul = UserList.new 'jt@instructure.com', nil, :preferred
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :email, :details => :non_unique}]
+      ul.errors.should == []
+      ul.duplicate_addresses.should == []
+      users = ul.users
+      users.length.should == 1
+      users.first.should_not == @user1
+      users.first.should_not == @user2
+    end
+  end
+
   context "user creation" do
     it "should create new users in creation_pending state" do
       ul = UserList.new 'jt@instructure.com'
@@ -367,7 +401,7 @@ describe UserList do
     it "should not create new users for users found by email" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
       @pseudonym.update_attribute(:unique_id, 'jt')
-      ul = UserList.new 'jt@instructure.com', Account.default, false
+      ul = UserList.new 'jt@instructure.com', Account.default, :closed
       ul.addresses.length.should == 1
       ul.addresses.first[:user_id].should == @user.id
       ul.addresses.first[:type].should == :email

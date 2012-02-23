@@ -2894,3 +2894,36 @@ describe Course, "#gradebook_json" do
     hash.should == JSON.parse(@course.to_json(:include_root => false))
   end
 end
+
+describe Course do
+  describe "user_list_search_mode_for" do
+    it "should be open for anyone if open registration is turned on" do
+      account = Account.default
+      account.settings = { :open_registration => true }
+      account.save!
+      course
+      @course.user_list_search_mode_for(nil).should == :open
+      @course.user_list_search_mode_for(user).should == :open
+    end
+
+    it "should be preferred for account admins" do
+      account = Account.default
+      course
+      @course.user_list_search_mode_for(nil).should == :closed
+      @course.user_list_search_mode_for(user).should == :closed
+      user
+      account.add_user(@user)
+      @course.user_list_search_mode_for(@user).should == :preferred
+    end
+
+    it "should be preferred if delegated authentication is configured" do
+      account = Account.default
+      account.settings = { :open_registration => true }
+      account.account_authorization_configs.create!(:auth_type => 'cas')
+      account.save!
+      course
+      @course.user_list_search_mode_for(nil).should == :preferred
+      @course.user_list_search_mode_for(user).should == :preferred
+    end
+  end
+end
