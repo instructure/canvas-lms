@@ -370,15 +370,6 @@ describe UsersController do
       get 'avatar_image_url', :user_id  => @user.id, :fallback => "https://test.domain/my/custom/fallback/url.png"
       response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=https%3A%2F%2Ftest.domain%2Fmy%2Fcustom%2Ffallback%2Furl.png"
     end
-    it "should handle receiving an encrypted user id" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.save!
-      @account.service_enabled?(:avatars).should be_true
-      get 'avatar_image_url', :user_id  => CGI.unescape(User.avatar_key(@user.id))
-      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=http%3A%2F%2F#{CGI.escape(HostUrl.default_host)}%2Fimages%2Fno_pic.gif"
-    end
     it "should take an invalid id and return no_pic" do
       @account = Account.default
       @account.enable_service(:avatars)

@@ -912,7 +912,7 @@ class UsersController < ApplicationController
     url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id)) do
       user = User.find_by_id(user_id) if user_id.present?
       if user && service_enabled?(:avatars)
-        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback])
+        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback], request)
       end
       url ||= params[:fallback] || '/images/no_pic.gif'
     end

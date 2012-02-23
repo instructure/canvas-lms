@@ -1088,8 +1088,8 @@ class User < ActiveRecord::Base
     User.max_messages_per_day
   end
 
-  def gravatar_url(size=50, fallback=nil)
-    fallback ||= "http://#{HostUrl.default_host}/images/no_pic.gif"
+  def gravatar_url(size=50, fallback=nil, request=nil)
+    fallback ||= request ? "#{request.protocol}#{request.host_with_port}/images/no_pic.gif" : "http://#{HostUrl.default_host}/images/no_pic.gif"
     "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
   end
 
@@ -1225,14 +1225,14 @@ class User < ActiveRecord::Base
     }.uniq
   end
 
-  def avatar_url(size=nil, avatar_setting=nil, fallback='/images/no_pic.gif')
+  def avatar_url(size=nil, avatar_setting=nil, fallback='/images/no_pic.gif', request = nil)
     size ||= 50
     avatar_setting ||= 'enabled'
     if avatar_setting == 'enabled' || (avatar_setting == 'enabled_pending' && avatar_approved?) || (avatar_setting == 'sis_only')
       @avatar_url ||= self.avatar_image_url
     end
     @avatar_url ||= fallback if self.avatar_image_source == 'no_pic'
-    @avatar_url ||= gravatar_url(size, fallback) if avatar_setting == 'enabled'
+    @avatar_url ||= gravatar_url(size, fallback, request) if avatar_setting == 'enabled'
     @avatar_url ||= fallback
   end
   

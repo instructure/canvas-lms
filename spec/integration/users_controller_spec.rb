@@ -94,5 +94,14 @@ describe UsersController do
       response.body.should match /Olds, JT.*St\. Clair, John/m
     end
   end
+
+  describe "#avatar_image_url" do
+    it "should maintain protocol and domain name in gravatar redirect" do
+      Account.default.tap { |a| a.enable_service(:avatars) }.save
+      user
+      get "https://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://someschool.instructure.com/images/no_pic.gif")}"
+    end
+  end
 end
 
