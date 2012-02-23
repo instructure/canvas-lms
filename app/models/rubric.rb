@@ -79,7 +79,15 @@ class Rubric < ActiveRecord::Base
   def default_values
     original_title = self.title
     cnt = 0
-    while Rubric.find(:first, :conditions => ['context_id = ? AND context_type = ? AND id != ? AND title = ?', self.context_id, self.context_type, self.id, self.title])
+
+    loop do
+      dup_title = if new_record?
+                    Rubric.first :conditions => ["title = ? AND context_id = ? AND context_type = ? AND workflow_state != 'deleted'", self.title, self.context_id, self.context_type]
+                  else
+                    Rubric.first :conditions => ["title = ? AND context_id = ? AND context_type = ? AND id != ? AND workflow_state != 'deleted'", self.title, self.context_id, self.context_type, self.id]
+                  end
+      break unless dup_title
+
       cnt += 1
       self.title = "#{original_title} (#{cnt})"
     end
