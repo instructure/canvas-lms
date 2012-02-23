@@ -65,4 +65,21 @@ describe "assignment groups" do
     wait_for_animations
     keep_trying_until { find_with_jquery('#group_weight_total').text.should == '50%' }
   end
+
+  it "should round assignment groups percentages to 2 decimal places" do
+    pending("bug 7387 - Assignment group weight should be rounded to 2 decimal places. Not 10") do
+      3.times do |i|
+        @course.assignment_groups.create!(:name => "group_#{i}")
+      end
+      get "/courses/#{@course.id}/assignments"
+
+      driver.find_element(:id, 'class_weighting_policy').click
+      wait_for_ajaximations
+      group_weights = driver.find_elements(:css, '.assignment_group .more_info_brief')
+      group_weights.each_with_index do |gw, i|
+        gw.text.should == "33.33%"
+      end
+      driver.find_element(:id, 'group_weight_total').text.should == "99.99%"
+    end
+  end
 end
