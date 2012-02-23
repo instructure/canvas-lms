@@ -99,8 +99,30 @@ describe "gradebook2" do
     }
   end
 
+  def set_default_grade(points = "5")
+    open_assignment_options(4)
+    driver.find_element(:css, '#ui-menu-1-3').click
+    dialog = find_with_jquery('.ui-dialog:visible')
+    dialog_form = dialog.find_element(:css, '.ui-dialog-content')
+    driver.find_element(:css, '.grading_value').send_keys(points)
+    dialog_form.submit
+  end
+
+  def conclude_and_unconclude_course
+    #conclude course
+    @course.complete!
+    @user.reload
+    @user.cached_current_enrollments(:reload)
+    @enrollment.reload
+
+    #un-conclude course
+    @enrollment.workflow_state = 'active'
+    @enrollment.save!
+    @course.reload
+  end
+
   before (:each) do
-    course_with_teacher_logged_in
+    course_with_teacher_logged_in(:active_course => true, :active_enrollment => true)
 
     #add first student
     @student_1 = User.create!(:name => STUDENT_NAME_1)
@@ -232,19 +254,10 @@ describe "gradebook2" do
 
   it "should not show concluded enrollments" do
     pending "BUG 6809 - Gradebook 2 shows Concluded enrollments" do
-      #conclude course
-      @course.complete!
-      @user.reload
-      @user.cached_current_enrollments(:reload)
-      @enrollment.reload
-
-      #un-conclude course
-      @enrollment.workflow_state = 'active'
-      @enrollment.save!
-      @course.reload
-
+      conclude_and_unconclude_course
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
+
       driver.find_elements(:css, '.student-name').count.should == @course.students.count
     end
   end
@@ -504,12 +517,7 @@ describe "gradebook2" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    open_assignment_options(4)
-    driver.find_element(:css, '#ui-menu-1-3').click
-    dialog = find_with_jquery('.ui-dialog:visible')
-    dialog_form = dialog.find_element(:css, '.ui-dialog-content')
-    driver.find_element(:css, '.grading_value').send_keys("45")
-    dialog_form.submit
+    set_default_grade(expected_grade)
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.dismiss
@@ -517,8 +525,34 @@ describe "gradebook2" do
     end
     driver.switch_to.default_content
     grade_grid = driver.find_element(:css, '#gradebook_grid')
-    2.times do |n|
+    StudentEnrollment.count.times do |n|
       find_slick_cells(n, grade_grid)[2].text.should == expected_grade
+    end
+  end
+
+  it "should not throw an error when setting the default grade when concluded enrollments exist" do
+    pending("bug 7413 - Error assigning default grade for all students when one student's enrollment has been concluded.") do
+      conclude_and_unconclude_course
+      3.times do
+        student_in_course
+      end
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      #TODO - when show concluded enrollments fix goes in we probably have to add that code right here
+      #for the test to work correctly
+
+      set_default_grade
+      driver.find_element(:css, '.error_text').should_not be_displayed
+      keep_trying_until do
+        driver.switch_to.alert.should_not be_nil
+        driver.switch_to.alert.dismiss
+        true
+      end
+      driver.switch_to.default_content
+      grade_grid = driver.find_element(:css, '#gradebook_grid')
+      StudentEnrollment.count.times do |n|
+        find_slick_cells(n, grade_grid)[2].text.should == expected_grade
+      end
     end
   end
 
