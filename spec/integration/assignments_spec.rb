@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -55,4 +55,179 @@ describe "assignments" do
     response.should be_success
     Nokogiri::HTML(response.body).at_css('.graded_count').text.should match(/0 out of 1/)
   end
+end
+
+describe "download submissions link" do
+
+  before do
+    course_with_teacher_logged_in(:active_all => true)
+    assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
+    @student = User.create!(:name => 'student1')
+    @student.register!
+    @student.workflow_state = 'active'
+    @student2 = User.create!(:name => 'student2')
+    @student2.register
+    @student2.workflow_state = 'active'
+    @student2.save
+    @course.enroll_user(@student, 'StudentEnrollment')
+    @course.enroll_user(@student2, 'StudentEnrollment')
+    @course.save!
+    @student.save!
+    @student2.save!
+  end
+
+  it "should not show download submissions button with no submissions" do
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#download_submission_button').should be_nil
+  end
+
+  it "should show download submissions button with submission not graded" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.state.should eql(:submitted)
+    @submission.save!
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#download_submission_button').should_not be_nil
+  end
+
+  it "should show download submissions button with a submission graded" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.grade_it
+    @submission.score = 5
+    @submission.save!
+    @submission.state.should eql(:graded)
+    @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
+    @submission2.save!
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#download_submission_button').should_not be_nil
+  end
+
+  it "should show download submissions button with all submissions graded" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.grade_it
+    @submission.score = 5
+    @submission.save!
+    @submission.state.should eql(:graded)
+    @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
+    @submission2.grade_it
+    @submission2.score = 5
+    @submission2.save!
+    @submission2.state.should eql(:graded)
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#download_submission_button').should_not be_nil
+  end
+
+  it "should not show download submissions button to students" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.state.should eql(:submitted)
+    @submission.save!
+    user_session(@student)
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#download_submission_button').should be_nil
+  end
+
+end
+
+describe "ratio of submissions graded" do
+
+  before do
+    course_with_teacher_logged_in(:active_all => true)
+    assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
+    @student = User.create!(:name => 'student1')
+    @student.register!
+    @student.workflow_state = 'active'
+    @student2 = User.create!(:name => 'student2')
+    @student2.register
+    @student2.workflow_state = 'active'
+    @student2.save
+    @course.enroll_user(@student, 'StudentEnrollment')
+    @course.enroll_user(@student2, 'StudentEnrollment')
+    @course.save!
+    @student.save!
+    @student2.save!
+  end
+
+  it "should not show ratio of submissions graded with no submissions" do
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#ratio_of_submissions_graded').should be_nil
+  end
+
+  it "should show ratio of submissions graded with submission not graded" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.save!
+    @submission.state.should eql(:submitted)
+    @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
+    @submission2.state.should eql(:submitted)
+    @submission2.save!
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#ratio_of_submissions_graded').text.strip.should == "0 out of 2 Submissions Graded"
+  end
+
+  it "should show ratio of submissions graded with a submission graded" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.grade_it
+    @submission.score = 5
+    @submission.save!
+    @submission.state.should eql(:graded)
+    @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
+    @submission2.state.should eql(:submitted)
+    @submission2.save!
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#ratio_of_submissions_graded').text.strip.should == "1 out of 2 Submissions Graded"
+  end
+
+  it "should show ratio of submissions graded with all submissions graded" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.grade_it
+    @submission.grade_it
+    @submission.score = 5
+    @submission.save!
+    @submission.state.should eql(:graded)
+    @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
+    @submission2.grade_it
+    @submission2.score = 5
+    @submission2.save!
+    @submission2.state.should eql(:graded)
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#ratio_of_submissions_graded').text.strip.should == "2 out of 2 Submissions Graded"
+  end
+
+  it "should not show ratio of submissions graded to students" do
+
+    @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
+    @submission.state.should eql(:submitted)
+    @submission.save!
+    user_session(@student)
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#ratio_of_submissions_graded').should be_nil
+  end
+
 end
