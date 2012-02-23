@@ -1277,6 +1277,14 @@ require([
       $(".folder_item.ui-draggable").live('mouseover', function() {
         $(this).find(".item_icon").attr('title', I18n.t('titles.drag_to_move', 'Drag to move to a different folder'));
       });
+      // on hover of the swfupload link, manually set the underline on
+      // the add files link because otherwise the swf keeps the link from
+      // registering mouseover events.
+      $swfupload_holder.hover(function(e) {
+        $add_file_link.css('text-decoration', 'underline');
+      }, function(e) {
+        $add_file_link.css('text-decoration', 'none');
+      });
       $add_file_link.bind('show', function() {
         var linkWidth = $add_file_link.width();
         var linkHeight = $add_file_link.height();
