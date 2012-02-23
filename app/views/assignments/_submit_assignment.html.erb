@@ -354,6 +354,13 @@ $(document).ready(function() {
       event.stopPropagation();
       return false;
     }
+
+    var valid = !$(this).is('#submit_online_text_entry_form') || $(this).validateForm({
+      object_name: 'submission',
+      required: ['body']
+    });
+    if (!valid) return false;
+
     $(this).find("button[type='submit']").text(<%= jt('#assignments.messages.submitting', "Submitting...") %>);
     $(this).find("button").attr('disabled', true);
     if($(this).attr('id') == 'submit_online_upload_form') {

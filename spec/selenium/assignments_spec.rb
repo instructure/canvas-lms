@@ -283,32 +283,41 @@ describe "assignments" do
     end
 
     it "should not allow blank submissions for text entry" do
-      pending('bug #7228 - Dont allow blank submissions in Text Entry field') do
-        @assignment.update_attributes(:submission_types => "online_text_entry")
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        driver.find_element(:css, '.submit_assignment_link').click
-        assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
-        wait_for_tiny(assignment_form)
+      @assignment.update_attributes(:submission_types => "online_text_entry")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      driver.find_element(:css, '.submit_assignment_link').click
+      assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
+      wait_for_tiny(assignment_form)
+      assignment_form.submit
+
+      # it should not actually submit and pop up an error message
+      driver.find_element(:css, '.error_box').should be_displayed
+      Submission.count.should == 0
+
+      # now make sure it works
+      lambda {
+        type_in_tiny('#submission_body', 'now it is not blank')
         assignment_form.submit
-        Submission.count.should == 0
-      end
-      #TODO - when a fix goes in for this bug, need to finish writing this spec
-      #the spec should check that the assignment is not submitted
-      #it should also check that there was some sort of error message
+      }.should change { Submission.count }.by(1)
     end
 
     it "should not allow a submission with only comments" do
-      pending("bug 7463 - Assignments page shows assignment turned in when only a comment has been made") do
-        #Note once this bug is fixed it will also fix bug #7464
-        @assignment.update_attributes(:submission_types => "online_text_entry")
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        driver.find_element(:css, '.submit_assignment_link').click
-        assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
-        replace_content(assignment_form.find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
-        assignment_form.find_element(:css, "#submit_online_text_entry_form button[type=submit]").click
-        #TODO - when this bug is fixed we should also check that some error was raised for trying to submit only a comment
-        Submission.count.should == 0
-      end
+      @assignment.update_attributes(:submission_types => "online_text_entry")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      driver.find_element(:css, '.submit_assignment_link').click
+      assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
+      replace_content(assignment_form.find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
+      assignment_form.find_element(:css, "#submit_online_text_entry_form button[type=submit]").click
+
+      # it should not actually submit and pop up an error message
+      driver.find_element(:css, '.error_box').should be_displayed
+      Submission.count.should == 0
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      driver.find_element(:css, '#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
     end
 
     it "should have group comment checkboxes for group assignments" do
