@@ -92,7 +92,7 @@ class DiscussionTopicsController < ApplicationController
           if api_request?
             render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
           else
-            render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session })
+            render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session }, :include => [:assignment,:attachment])
           end
         end
       end

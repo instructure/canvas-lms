@@ -47,6 +47,35 @@ describe "discussions" do
       driver.find_elements(:css, ".image_list .img_holder").length.should == 2
     end
 
+    it "should work with graded assignments and pageless" do
+
+      get "/courses/#{@course.id}/discussion_topics"
+      # create some topics. 11 is enough to trigger pageless with default value
+      # of 10 per page
+
+      driver.find_element(:css, '.add_topic_link').click
+      type_in_tiny('#topic_content_topic_new', 'asdf')
+      driver.find_element(:css, '.more_options_link').click
+      driver.find_element(:id, 'discussion_topic_assignment_set_assignment').click
+      driver.find_element(:css, '#add_topic_form_topic_new .submit_button').click
+
+      wait_for_ajax_requests
+
+      10.times do |i|
+        @course.discussion_topics.create!(:title => "Topic #{i}")
+      end
+
+      get "/courses/#{@course.id}/discussion_topics"
+
+      # scroll window to trigger pageless for #topic_list
+      driver.execute_script('window.scrollTo(0, 100000)')
+      wait_for_ajaximations
+      driver.execute_script "$('.discussion_topic:visible:last').mouseover()"
+      find_with_jquery('.edit_topic_link:visible:last').click
+      driver.find_element(:css, '.more_options_link').click
+      driver.find_element(:id, 'discussion_topic_assignment_set_assignment')['checked'].should_not be_nil
+    end
+
     it "should not record a javascript error when creating the first topic" do
       get "/courses/#{@course.id}/discussion_topics"
 

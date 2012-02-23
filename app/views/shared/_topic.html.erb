@@ -85,10 +85,10 @@
           <span class="for_grading_text"><%= t('for_grading', %{Grading will be based on posts submitted to this topic.}) %></span>
           <a href="<%= context_url(topic && topic.assignment ? topic.assignment.context : topic_context, :context_assignment_url, '{{ assignment_id }}') %>" style="display: none;" class="topic_assignment_url">&nbsp;</a>
           <div style="display: none;">
-            <span class="assignment[id]"><%= topic.assignment_id rescue nbsp %></span>
-            <span class="assignment[assignment_group_id]"><%= topic.try_rescue(:assignment).try_rescue(:assignment_group_id) || nbsp %></span>
-            <span class="assignment[points_possible]"><%= topic.try_rescue(:assignment).try_rescue(:points_possible) || nbsp %></span>
-            <span class="assignment[due_at]"><%= datetime_string(topic.try_rescue(:assignment).try_rescue(:due_at), :long) || nbsp %></span>
+            <span class="assignment_id assignment[id]"><%= topic.assignment_id rescue nbsp %></span>
+            <span class="assignment_assignment_group_id assignment[assignment_group_id]"><%= topic.try_rescue(:assignment).try_rescue(:assignment_group_id) || nbsp %></span>
+            <span class="assignment_points_possible assignment[points_possible]"><%= topic.try_rescue(:assignment).try_rescue(:points_possible) || nbsp %></span>
+            <span class="assignment_due_at assignment[due_at]"><%= datetime_string(topic.try_rescue(:assignment).try_rescue(:due_at), :long) || nbsp %></span>
           </div>
         </div>
       <% end %>
