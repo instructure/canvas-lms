@@ -1185,7 +1185,9 @@ class Course < ActiveRecord::Base
       assignments = self.assignments.active.gradeable.find(:all).sort_by{|a| [a.due_at ? 1 : 0, a.due_at || 0, group_order[a.assignment_group_id] || 0, a.position || 0, a.title || ""]}
     end
     single = assignments.length == 1
-    student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    includes = [:user, :course_section]
+    includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
+    student_enrollments = self.student_enrollments.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
@@ -1243,7 +1245,12 @@ class Course < ActiveRecord::Base
         end
         #Last Row
         row = [student.last_name_first, student.id]
-        row.concat([student.pseudonym.try(:sis_user_id), student.pseudonym.try(:unique_id)]) if options[:include_sis_id]
+        if options[:include_sis_id]
+          pseudonym = student.sis_pseudonym_for(self.root_account)
+          row << pseudonym.try(:sis_user_id)
+          pseudonym ||= student.find_pseudonym_for_account(self.root_account, true)
+          row << pseudonym.try(:unique_id)
+        end
         row << student_section
         row.concat(student_submissions)
         row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])

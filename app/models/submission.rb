@@ -625,7 +625,7 @@ class Submission < ActiveRecord::Base
   }
   named_scope :for_user, lambda {|user|
     user_id = user.is_a?(User) ? user.id : user
-    {:conditions => ['submissions.user_id = ?', user_id]}
+    {:conditions => ['submissions.user_id IN (?)', Array(user_id)]}
   }
   named_scope :needing_screenshot, lambda {
     {:conditions => ['submissions.submission_type = ? AND submissions.attachment_id IS NULL AND submissions.process_attempts < 3', 'online_url'], :order => :updated_at}
