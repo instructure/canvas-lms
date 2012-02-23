@@ -1,9 +1,6 @@
 class FixUserMergeConversations < ActiveRecord::Migration
   def self.up
-    if supports_ddl_transactions?
-      commit_db_transaction
-      decrement_open_transactions while open_transactions > 0
-    end
+    self.transactional = false
 
     # remove any duplicate CP's, possibly fixing private conversation hashes
     # (which may merge it with another conversation)
@@ -22,7 +19,7 @@ class FixUserMergeConversations < ActiveRecord::Migration
     SQL
     each do |cp|
       cp.destroy
-      cp.conversation.renegerate_private_hash! if cp.private?
+      cp.conversation.regenerate_private_hash! if cp.private?
     end
 
     # there may be a bunch more private conversations with the wrong private
@@ -37,11 +34,6 @@ class FixUserMergeConversations < ActiveRecord::Migration
         :max_attempts => 1,
         :strand => "regenerate_conversation_private_hashes"
       }, ids)
-    end
-
-    if supports_ddl_transactions?
-      increment_open_transactions
-      begin_db_transaction
     end
   end
 
