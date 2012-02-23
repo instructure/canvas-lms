@@ -161,12 +161,12 @@ class ConversationsController < ApplicationController
   #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
   # @argument body The message to be sent
   # @argument group_conversation [true|false] Ignored if there is just one
-  #   recipient. If true, this will be a group conversation (i.e. all
-  #   recipients will see all messages and replies). If false, individual
-  #   private conversations will be started with each recipient.
+  #   recipient, defaults to false. If true, this will be a group conversation
+  #   (i.e. all recipients will see all messages and replies). If false,
+  #   individual private conversations will be started with each recipient.
   def create
     if @recipient_ids.present? && params[:body].present?
-      batch_private_messages = !params[:group_conversation] && @recipient_ids.size > 1
+      batch_private_messages = !Canvas::Plugin.value_to_boolean(params[:group_conversation]) && @recipient_ids.size > 1
       conversations = (batch_private_messages ? @recipient_ids : [@recipient_ids]).map do |recipients|
         recipients = Array(recipients)
         @conversation = @current_user.initiate_conversation(recipients)

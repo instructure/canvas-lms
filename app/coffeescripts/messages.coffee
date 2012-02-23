@@ -654,7 +654,7 @@ define [
 
     reset_message_form = ->
       build_form_audience() if $selected_conversation?
-      $form.find('input[name!=authenticity_token], textarea').val('').change()
+      $form.find('input[name!=authenticity_token], textarea').not(":checkbox").val('').change()
       $form.find(".attachment:visible").remove()
       $form.find(".media_comment").hide()
       $form.find("#action_media_comment").show()
