@@ -442,7 +442,7 @@
               <%= image_tag("#{notification.icon}.png") %><%= notification.subject %>
             </div>
             <% if can_do(@account, @current_user, :manage_alerts) %>
-              <a href="#" rel="<%= context_url(@account, :context_account_notification_url, notification) %>" class="delete_notification_link" title="<%= t(:delete_alert_tooltip, "Delete this Alert") %>"><%= image_tag "delete_circle.png" %></a>
+              <a href="#" rel="<%= context_url(@account, :context_account_notification_url, notification) %>" class="delete_notification_link" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>"><%= image_tag "delete_circle.png" %></a>
             <% end %>
             <div class="clear"></div>
             <div class="dates">
