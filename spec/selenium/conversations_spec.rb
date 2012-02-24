@@ -5,24 +5,21 @@ describe "conversations" do
   it_should_behave_like "conversations selenium tests"
 
   it "should not allow double form submissions" do
-    pending("bug #7377 - conversations lets you double submit the form") do
-      student_name = 'student1'
-      new_message = 'new conversation message'
-      @s1 = User.create(:name => student_name)
-      @course.enroll_user(@s1)
-      get '/conversations'
+    student_name = 'student1'
+    new_message = 'new conversation message'
+    @s1 = User.create(:name => student_name)
+    @course.enroll_user(@s1)
+    get '/conversations'
 
-      name_input = driver.find_element(:css, '#create_message_form .token_input input')
+    expect {
+      name_input = f('#create_message_form .token_input input')
       name_input.send_keys(student_name)
       wait_for_ajaximations
+      wait_for_ajaximations
       name_input.send_keys(:return)
-      driver.find_element(:id, 'body').send_keys(new_message)
-      5.times do
-        driver.find_element(:css, '.button').click
-      end
-      wait_for_ajax_requests
-      ConversationMessage.count.should == 1
-    end
+      f('#body').send_keys(new_message)
+      5.times { f('#create_message_form button[type=submit]').click }
+    }.to change(ConversationMessage, :count).by(1)
   end
 
   context "conversation loading" do
