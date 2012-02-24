@@ -376,6 +376,23 @@ Spec::Runner.configure do |config|
     @quiz_submission.grade_submission
   end
 
+  def survey_with_submission(questions, &block)
+    course_with_student(:active_all => true)
+    @assignment = @course.assignments.create(:title => "Test Assignment")
+    @assignment.workflow_state = "available"
+    @assignment.submission_types = "online_quiz"
+    @assignment.save
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz.anonymous_submissions = true
+    @quiz.quiz_type = "graded_survey"
+    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+    @quiz.generate_quiz_data
+    @quiz.save!
+    @quiz_submission = @quiz.generate_submission(@user)
+    @quiz_submission.mark_completed
+    @quiz_submission.submission_data = yield if block_given?
+  end
+
   def rubric_for_course
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [

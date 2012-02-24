@@ -281,7 +281,8 @@ class QuizzesController < ApplicationController
         return
       end
       if authorized_action(@submission, @current_user, :read)
-        add_crumb((!@submission.user || @submission.user == @current_user ? t(:default_history_crumb, "History") : @submission.user.name))
+        dont_show_user_name = @submission.quiz.anonymous_submissions || (!@submission.user || @submission.user == @current_user)
+        add_crumb((dont_show_user_name ? t(:default_history_crumb, "History") : @submission.user.name))
         @headers = !params[:headless]
         @current_submission = @submission
         @version_instances = @submission.submitted_versions.sort_by{|v| v.version_number }
