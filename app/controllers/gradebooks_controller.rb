@@ -222,7 +222,7 @@ class GradebooksController < ApplicationController
       else
         @submissions = @context.submissions.scoped(scope_options)
       end
-      render :json => @submissions
+      render :json => @submissions.to_json(:include => [:attachments, :quiz_submission, :submission_comments])
     end
   end
   protected :gradebook_init_json

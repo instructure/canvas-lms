@@ -21,7 +21,8 @@ describe "gradebooks" do
         :course => @course,
         :name => 'first assignment',
         :due_at => nil,
-        :points_possible => 10
+        :points_possible => 10,
+        :submission_types => 'online_text_entry,online_upload'
       }
     )
   end
@@ -72,5 +73,24 @@ describe "gradebooks" do
     student_cell.should include_text @student1.sortable_name
     student_cell.should include_text @section1.display_name
     student_cell.should include_text @section2.display_name
+  end
+
+  it "should show turnitin data" do
+    s1 = @assignment.submit_homework(@student1, :submission_type => 'online_text_entry', :body => 'asdf')
+    s1.update_attribute :turnitin_data, {"submission_#{s1.id}" => {:similarity_score => 0.0, :web_overlap => 0.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'none'}}
+    a = attachment_model(:context => @user, :content_type => 'text/plain')
+    s2 = @assignment.submit_homework(@student2, :submission_type => 'online_upload', :attachments => [a])
+    s2.update_attribute :turnitin_data, {"attachment_#{a.id}" => {:similarity_score => 1.0, :web_overlap => 5.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'acceptable'}}
+
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
+    ff('img.turnitin:visible').size.should eql 2
+
+    # now create a ton of students so that the data loads via ajax
+    100.times { |i| student_in_course(:active_all => true, :name => "other guy #{i}") }
+
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
+    ff('img.turnitin:visible').size.should eql 2
   end
 end
