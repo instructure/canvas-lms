@@ -198,8 +198,27 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          <%= before_label :quiz_name, "Quiz Name" %>
-          <input type="text" name="quiz[title]" class="item_title"/>
+          <input type="hidden" name="quiz[quiz_type]" value="assignment" />
+          <table>
+            <tr>
+              <td><%= before_label :quiz_name, "Quiz Name" %></td>
+              <td><input type="text" name="quiz[title]" class="item_title"/></td>
+            </tr><tr>
+              <td><%= before_label :quiz_group, "Group" %></td>
+              <td>
+                <select name="quiz[assignment_group_id]">
+                  <% cnt = 0 %>
+                  <% @context.assignment_groups.active.each do |group| %>
+                    <% cnt += 1 %>
+                    <option value="<%= group.id %>"><%= group.name %></option>
+                  <% end %>
+                  <% if cnt == 0 %>
+                    <option value=""><%= t 'options.assignments', "Assignments" %></option>
+                  <% end %>
+                </select>
+              </td>
+            </tr>
+          </table>
           <a href="<%= context_url(@context, :context_quizzes_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>

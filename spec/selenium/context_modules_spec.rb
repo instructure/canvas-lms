@@ -51,6 +51,7 @@ describe "context_modules" do
         item_title
       end
       replace_content(item_title, item_title_text)
+      yield if block_given?
       driver.find_element(:css, '.add_item_button').click
       wait_for_ajaximations
       tag = ContentTag.last
@@ -92,6 +93,9 @@ describe "context_modules" do
                                                  :submission_types => 'online_text_entry',
                                                  :due_at => 2.days.from_now,
                                                  :points_possible => 10)
+      @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
+      @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
+
       @course.reload
 
       get "/courses/#{@course.id}/modules"
@@ -212,6 +216,14 @@ describe "context_modules" do
 
     it "should add a quiz to a module" do
       add_existing_module_item('#quizs_select', 'Quiz', @quiz.title)
+    end
+
+    it "should add a new quiz to a module in a specific assignment group" do
+      add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', "New Quiz") do
+        click_option("select[name='quiz[assignment_group_id]']", @ag2.name)
+      end
+      @ag2.assignments.length.should == 1
+      @ag2.assignments.first.title.should == "New Quiz"
     end
 
     it "should add a file item to a module" do
