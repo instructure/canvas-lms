@@ -116,33 +116,29 @@ describe "calendar2" do
         end
 
         it "should create an event through the context list drop down" do
-          pending("Bug 7111 - Course in context list being disabled bug") do
-            event_title = 'new event'
-            get "/calendar2"
-            wait_for_ajaximations
+          event_title = 'new event'
+          get "/calendar2"
+          wait_for_ajaximations
 
-            driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-            find_with_jquery('ul#context-list li:nth-child(2) button').click
-            driver.find_element(:id, "ui-menu-1-0").click
-            edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
-            edit_event_dialog.should be_displayed
-            create_calendar_event(event_title)
-          end
+          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
+          find_with_jquery('ul#context-list li:nth-child(2) button').click
+          driver.find_element(:id, "ui-menu-1-0").click
+          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          edit_event_dialog.should be_displayed
+          create_calendar_event(event_title)
         end
 
         it "should create an assignment through the context list drop down" do
-          pending("Bug 7111 - Course in context list being disabled bug") do
-            assignment_title = 'new assignment'
-            get "/calendar2"
-            wait_for_ajaximations
+          assignment_title = 'new assignment'
+          get "/calendar2"
+          wait_for_ajaximations
 
-            driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-            find_with_jquery('ul#context-list li:nth-child(2) button').click
-            driver.find_element(:id, "ui-menu-1-1").click
-            edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
-            edit_event_dialog.should be_displayed
-            create_assignment_event(assignment_title)
-          end
+          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
+          find_with_jquery('ul#context-list li:nth-child(2) button').click
+          driver.find_element(:id, "ui-menu-1-1").click
+          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          edit_event_dialog.should be_displayed
+          create_assignment_event(assignment_title)
         end
 
         it "should toggle event display when context is clicked" do
