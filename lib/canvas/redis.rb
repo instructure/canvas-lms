@@ -41,6 +41,14 @@ module Canvas::Redis
   rescue Errno::ECONNREFUSED, Timeout::Error, Errno::ECONNRESET, Errno::EPIPE, Errno::ECONNABORTED, Errno::EBADF, Errno::EINVAL
     @last_redis_failure = Time.now
     failure_retval
+  rescue Errno::EAGAIN
+    # typically this means that redis closed the connection as idle,
+    # and trying again will succeed
+    begin
+      yield
+    rescue Errno::EAGAIN
+      failure_retval
+    end
   end
 
   # while we wait for this pull request
