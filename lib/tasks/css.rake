@@ -4,6 +4,8 @@ require 'compass/commands'
 namespace :css do
   desc "Compile css assets."
   task :generate do
+    require 'config/initializers/plugin_symlinks'
+
     # initialize compass if it hasn't been yet
     Compass::AppIntegration::Rails.initialize! unless Compass::AppIntegration::Rails.booted?
 
