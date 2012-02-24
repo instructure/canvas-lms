@@ -62,7 +62,7 @@ describe "user asset accesses" do
     html.css('#usage_report .access.assignment .readable_name').text.strip.should == 'Assignment 1'
     html.css('#usage_report .access.assignment .view_score').text.strip.should == '1'
     html.css('#usage_report .access.assignment .last_viewed').text.strip.should == datetime_string(now)
-    AssetUserAccess.first(:conditions => { :user_id => @student.id }).last_access.should == now
+    AssetUserAccess.first(:conditions => { :user_id => @student.id }).last_access.to_i.should == now.to_i
 
     now2 = now + 1.hour
     Time.stubs(:now).returns(now2)
@@ -82,6 +82,6 @@ describe "user asset accesses" do
     html.css('#usage_report .access.assignment .readable_name').text.strip.should == 'Assignment 1'
     html.css('#usage_report .access.assignment .view_score').text.strip.should == '2'
     html.css('#usage_report .access.assignment .last_viewed').text.strip.should == datetime_string(now2)
-    AssetUserAccess.first(:conditions => { :user_id => @student.id }).last_access.should == now2
+    AssetUserAccess.first(:conditions => { :user_id => @student.id }).last_access.to_i.should == now2.to_i
   end
 end
