@@ -125,6 +125,7 @@ describe AssignmentGroupsController, :type => :integration do
                 ],
               },
             ],
+            'group_category_id' => nil
           },
           {
             'id' => a4.id,
@@ -141,6 +142,7 @@ describe AssignmentGroupsController, :type => :integration do
               "none",
             ],
             'grading_type' => 'points',
+            'group_category_id' => nil
           },
         ],
       },
@@ -166,6 +168,7 @@ describe AssignmentGroupsController, :type => :integration do
               "none",
             ],
             'grading_type' => 'points',
+            'group_category_id' => nil
           },
           {
             'id' => a2.id,
@@ -182,6 +185,7 @@ describe AssignmentGroupsController, :type => :integration do
               "none",
             ],
             'grading_type' => 'points',
+            'group_category_id' => nil
           },
         ],
       },

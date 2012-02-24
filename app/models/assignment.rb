@@ -956,7 +956,7 @@ class Assignment < ActiveRecord::Base
     end
 
     students.each do |student|
-      if (opts['comment'] && opts['group_comment'] == "1") || student == original_student
+      if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment'])) || student == original_student
         s = self.find_or_create_submission(student)
         s.assignment_id = self.id
         s.user_id = student.id
@@ -974,11 +974,12 @@ class Assignment < ActiveRecord::Base
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
     opts.keys.each { |k|
-      opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type].include?(k.to_sym)
+      opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
     raise "User must be enrolled in the course as a student to submit homework" unless context.students.include?(original_student)
-    comment = opts.delete :comment
+    comment = opts.delete(:comment)
+    group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
@@ -1018,7 +1019,7 @@ class Assignment < ActiveRecord::Base
     primary_homework.broadcast_group_submission if group
     homeworks.each do |homework|
       context_module_action(homework.student, :submitted)
-      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment
+      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment && (group_comment || homework == primary_homework)
     end
     touch_context
     return primary_homework

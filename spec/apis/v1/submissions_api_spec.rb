@@ -1155,6 +1155,35 @@ describe 'Submissions API', :type => :integration do
     json['submission_comments'].first['comment'].should == 'ohai!'
   end
 
+  it "should allow posting a group comment on a submission" do
+    student1 = user(:active_all => true)
+    student2 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    @course.enroll_student(student2).accept!
+    group_category = @course.group_categories.create(:name => "Category")
+    @group = @course.groups.create(:name => "Group", :group_category => group_category, :context => @course)
+    @group.users = [student1, student2]
+    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12, :group_category => group_category)
+    submit_homework(@assignment, student1)
+
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student1.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => student1.id.to_s },
+          { :comment =>
+            { :text_comment => "ohai!", :group_comment => "1" } })
+    json['submission_comments'].size.should == 1
+    json['submission_comments'].first['comment'].should == 'ohai!'
+
+    Submission.count.should == 2
+    Submission.all.each do |submission|
+      submission.submission_comments.size.should eql 1
+      submission.submission_comments.first.comment.should eql 'ohai!'
+    end
+  end
+
   it "should allow posting a media comment on a submission, given a kaltura id" do
     student = user(:active_all => true)
     course_with_teacher(:active_all => true)

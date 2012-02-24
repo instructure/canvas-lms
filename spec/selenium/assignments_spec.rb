@@ -255,5 +255,19 @@ describe "assignments" do
         Submission.count.should == 0
       end
     end
+
+    it "should have group comment checkboxes for group assignments" do
+      @u1 = @user
+      student_in_course(:course => @course)
+      @u2 = @user
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload,online_text_entry", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
+      @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      @group.users << @u1
+      @group.users << @user
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      find_all_with_jquery('table.formtable input[name="submission[group_comment]"]').size.should eql 3
+    end
   end
 end

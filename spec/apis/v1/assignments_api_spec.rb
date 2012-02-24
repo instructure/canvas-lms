@@ -105,6 +105,7 @@ describe AssignmentsApiController, :type => :integration do
               ],
             },
           ],
+          "group_category_id" => nil
         },
       ]
     end
@@ -160,6 +161,7 @@ describe AssignmentsApiController, :type => :integration do
       'submission_types' => [
         'none',
       ],
+      'group_category_id' => nil
     }
 
     Assignment.count.should == 1
@@ -201,6 +203,7 @@ describe AssignmentsApiController, :type => :integration do
       'submission_types' => [
         'none',
       ],
+      'group_category_id' => nil
     }
 
     Assignment.count.should == 1

@@ -65,9 +65,9 @@ describe "gradebook2" do
       element_to_click.click if element_to_click != nil
     end
 
-    def open_comment_dialog
+    def open_comment_dialog(x=0, y=0)
       #move_to occasionally breaks in the hudson build
-      cell = driver.execute_script "return $('#gradebook_grid .slick-row:first .slick-cell:first').addClass('hover')[0]"
+      cell = driver.execute_script "return $('#gradebook_grid .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})').addClass('hover')[0]"
       cell.find_element(:css, '.gradebook-cell-comment').click
       # the dialog fetches the comments async after it displays and then innerHTMLs the whole
       # thing again once it has fetched them from the server, completely replacing it
@@ -502,6 +502,37 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       comment = open_comment_dialog.find_element(:css, '.comment')
+      comment.should include_text(comment_text)
+    end
+
+    it "should let you post a group comment to a group assignment" do
+      group_assignment = assignment_model({
+                                               :course => @course,
+                                               :name => 'group assignment',
+                                               :due_at => (Time.now + 1.week),
+                                               :points_possible => ASSIGNMENT_3_POINTS,
+                                               :submission_types => 'online_text_entry',
+                                               :assignment_group => @group,
+                                               :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                               :grade_group_students_individually => true
+                                          })
+      project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      project_group.users << @student_1
+      project_group.users << @student_2
+
+      comment_text = "This is a new group comment!"
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      dialog = open_comment_dialog(3)
+      set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
+      dialog.find_element(:id, "group_comment").click
+      driver.find_element(:css, "form.submission_details_add_comment_form.clearfix > button.button").click
+      wait_for_ajaximations
+
+      #make sure it's on the other student's submission
+      comment = open_comment_dialog(3, 1).find_element(:css, '.comment')
       comment.should include_text(comment_text)
     end
 

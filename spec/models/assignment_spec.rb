@@ -1268,6 +1268,15 @@ describe Assignment do
       res.map{|s| s.user}.should be_include(@u1)
       res.map{|s| s.user}.should be_include(@u2)
     end
+    it "should create an initial submission comment for only the submitter by default" do
+      setup_assignment_with_group
+      sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "hey teacher, i hate my group. i did this entire project by myself :(")
+      sub.user_id.should eql(@u1.id)
+      sub.submission_comments.size.should eql 1
+      @a.reload
+      other_sub = (@a.submissions - [sub])[0]
+      other_sub.submission_comments.size.should eql 0
+    end
     it "should add a submission comment for only the specified user by default" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :comment => "woot")
@@ -1285,6 +1294,15 @@ describe Assignment do
       res.should_not be_empty
       res.length.should eql(1)
       res[0].user.should eql(@u1)
+    end
+    it "should create an initial submission comment for all group members if specified" do
+      setup_assignment_with_group
+      sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "ohai teacher, we had so much fun working together", :group_comment => "1")
+      sub.user_id.should eql(@u1.id)
+      sub.submission_comments.size.should eql 1
+      @a.reload
+      other_sub = (@a.submissions - [sub])[0]
+      other_sub.submission_comments.size.should eql 1
     end
     it "should add a submission comment for all group members if specified" do
       setup_assignment_with_group
