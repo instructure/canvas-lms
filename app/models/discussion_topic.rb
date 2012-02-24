@@ -589,7 +589,7 @@ class DiscussionTopic < ActiveRecord::Base
     if !dup.attachment_id && self.attachment
       attachment = self.attachment.clone_for(context)
       attachment.folder_id = nil
-      attachment.save_without_broadcasting!
+      attachment.save!
       context.map_merge(self.attachment, attachment)
       context.warn_merge_result("Added file \"#{attachment.folder.full_name}/#{attachment.display_name}\" which is needed for the topic \"#{self.title}\"")
       dup.attachment_id = attachment.id

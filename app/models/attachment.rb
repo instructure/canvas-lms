@@ -219,7 +219,7 @@ class Attachment < ActiveRecord::Base
       item.locked = true if hash[:locked]
       item.file_state = 'hidden' if hash[:hidden]
       item.display_name = hash[:display_name] if hash[:display_name]
-      item.save_without_broadcasting!
+      item.save!
       context.imported_migration_items << item if context.imported_migration_items
     end
     item
@@ -725,18 +725,7 @@ class Attachment < ActiveRecord::Base
     end
     filename
   end
-  has_a_broadcast_policy
 
-  set_broadcast_policy do |p|
-    p.dispatch :new_file_added
-    p.to { context.participants - [user] }
-    p.whenever { |record| 
-      !@skip_broadcast_messages and 
-      record.context.state == :available and record.just_created and
-      record.folder.visible?
-    }
-  end
-  
   def infer_display_name
     self.display_name ||= unencoded_filename
   end
