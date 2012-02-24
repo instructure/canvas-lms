@@ -101,6 +101,21 @@ describe "dashboard" do
     driver.execute_script("return $('.event a .tooltip_text').text()").should match(@course.short_name)
   end
 
+  it "should limit the number of visible items in the to do list" do
+    course_with_student_logged_in
+    due_date = Time.now.utc + 2.days
+    20.times do
+      assignment_model :due_at => due_date, :course => @course, :submission_types => 'online_text_entry'
+    end
+
+    get "/"
+
+    find_all_with_jquery(".to-do-list li:visible").size.should == 5 + 1 # +1 is the see more link
+    driver.find_element(:css, ".more_link").click
+    wait_for_animations
+    find_all_with_jquery(".to-do-list li:visible").size.should == 20
+  end
+
   it "should display assignment to grade in to do list and assignments menu for a teacher" do
     course_with_teacher_logged_in
     assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
