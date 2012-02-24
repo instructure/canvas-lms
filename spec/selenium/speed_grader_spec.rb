@@ -238,7 +238,7 @@ describe "speedgrader" do
     rubric.find_element(:css, '.criterion_comments img').click
     driver.find_element(:css, 'textarea.criterion_comments').send_keys('special rubric comment')
     driver.find_element(:css, '#rubric_criterion_comments_dialog .save_button').click
-    second_criterion = rubric.find_element(:id, 'criterion_2')
+    second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     rubric.find_element(:css, '.rubric_total').should include_text('8')
     driver.find_element(:css, '#rubric_full .save_rubric_button').click
@@ -363,9 +363,9 @@ describe "speedgrader" do
     wait_for_animations
     rubric = driver.find_element(:id, 'rubric_full')
     rubric.should be_displayed
-    first_criterion = rubric.find_element(:id, 'criterion_1')
+    first_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[0][:id]}")
     first_criterion.find_element(:css, '.ratings .edge_rating').click
-    second_criterion = rubric.find_element(:id, 'criterion_2')
+    second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     rubric.find_element(:css, '.rubric_total').should include_text('8')
     driver.find_element(:css, '#rubric_full .save_rubric_button').click
@@ -373,22 +373,22 @@ describe "speedgrader" do
     driver.find_element(:css, '.toggle_full_rubric').click
     wait_for_animations
 
-    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
-    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == "3"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == "5"
 
     driver.find_element(:css, '#gradebook_header .next').click
     wait_for_ajaximations
 
     driver.find_element(:id, 'rubric_full').should be_displayed
-    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == ""
-    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == ""
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == ""
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == ""
 
     driver.find_element(:css, '#gradebook_header .prev').click
     wait_for_ajaximations
 
     driver.find_element(:id, 'rubric_full').should be_displayed
-    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
-    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == "3"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == "5"
   end
 
   it "should handle versions correctly" do

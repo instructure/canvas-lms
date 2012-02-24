@@ -432,56 +432,49 @@ Spec::Runner.configure do |config|
     @outcome_group.add_item(@outcome)
     @outcome_group.save!
 
-    @rubric = Rubric.new(:title => 'My Rubric', :context => @course, :points_possible => 8, :hide_score_total => false)
-    @rubric.data = [
-      {
-        :points => 3,
-        :description => "Outcome row",
-        :long_description => @outcome.description,
-        :id => 1,
-        :ratings => [
-          {
-            :points => 3,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 2
+    @rubric = Rubric.generate(:context => @course,
+                              :data => {
+      :title => 'My Rubric',
+      :hide_score_total => false,
+      :criteria => {
+        "0" => {
+          :points => 3,
+          :mastery_points => 0,
+          :description => "Outcome row",
+          :long_description => @outcome.description,
+          :ratings => {
+            "0" => {
+              :points => 3,
+              :description => "Rockin'",
+            },
+            "1" => {
+              :points => 0,
+              :description => "Lame",
+            }
           },
-          {
-            :points => 0,
-            :description => "Lame",
-            :criterion_id => 1,
-            :id => 3
+          :learning_outcome_id => @outcome.id
+        },
+        "1" => {
+          :points => 5,
+          :description => "no outcome row",
+          :long_description => 'non outcome criterion',
+          :ratings => {
+            "0" => {
+              :points => 5,
+              :description => "Amazing",
+            },
+            "1" => {
+              :points => 3,
+              :description => "not too bad",
+            },
+            "2" => {
+              :points => 0,
+              :description => "no bueno",
+            }
           }
-        ],
-        :learning_outcome_id => @outcome.id
-      },
-      {
-        :points => 5,
-        :description => "no outcome row",
-        :long_description => 'non outcome criterion',
-        :id => 2,
-        :ratings => [
-          {
-            :points => 5,
-            :description => "Amazing",
-            :criterion_id => 2,
-            :id => 4
-          },
-          {
-            :points => 3,
-            :description => "not too bad",
-            :criterion_id => 2,
-            :id => 5
-          },
-          {
-            :points => 0,
-            :description => "no bueno",
-            :criterion_id => 2,
-            :id => 6
-          }
-        ]
+        }
       }
-    ]
+    })
     @rubric.instance_variable_set('@outcomes_changed', true)
     @rubric.save!
     @rubric.update_outcome_tags

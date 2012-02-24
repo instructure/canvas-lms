@@ -199,6 +199,34 @@ describe "assignment rubrics" do
       wait_for_ajaximations
       driver.find_element(:css, '.grading_value').attribute(:value).should == "5"
     end
+
+    def mark_rubric_for_grading(rubric, expect_confirmation)
+      driver.find_element(:css, "#rubric_#{rubric.id} .edit_rubric_link").click
+      driver.switch_to.alert.accept if expect_confirmation
+      find_with_jquery(".grading_rubric_checkbox:visible").click
+      find_with_jquery(".save_button:visible").click
+      wait_for_ajaximations
+    end
+
+    it "should allow multiple rubric associations for grading" do
+      outcome_with_rubric
+      @assignment1 = @course.assignments.create!(:name => "assign 1", :points_possible => @rubric.points_possible)
+      @assignment2 = @course.assignments.create!(:name => "assign 2", :points_possible => @rubric.points_possible)
+
+      @association1 = @rubric.associate_with(@assignment1, @course, :purpose => 'grading')
+      @association2 = @rubric.associate_with(@assignment2, @course, :purpose => 'grading')
+
+      get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+      mark_rubric_for_grading(@rubric, true)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
+      mark_rubric_for_grading(@rubric, true)
+
+      @association1.reload.use_for_grading.should be_true
+      @association1.rubric.id.should == @rubric.id
+      @association2.reload.use_for_grading.should be_true
+      @association2.rubric.id.should == @rubric.id
+    end
   end
 
   context "assignment rubrics as a student" do

@@ -241,6 +241,9 @@ require([
       }
       data['rubric[free_form_criterion_comments]'] = $rubric.find(".rubric_custom_rating").attr('checked') ? "1" : "0";
       data['rubric_association[id]'] = vals.rubric_association_id;
+      // make sure the association is always updated, see the comment on
+      // RubricsController#update
+      data['rubric_association_id'] = vals.rubric_association_id;
       var criterion_idx = 0;
       $rubric.find(".criterion:not(.blank)").each(function() {
         var $criterion = $(this);

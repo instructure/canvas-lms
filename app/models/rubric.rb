@@ -55,6 +55,7 @@ class Rubric < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :manage)}
     can :read and can :create and can :delete_associations
     
+    # read_only means "associated with > 1 object for grading purposes"
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :update and can :delete
     
@@ -207,7 +208,7 @@ class Rubric < ActiveRecord::Base
   end
   
   def will_change_with_update?(params)
-    return true if params[:free_form_criterion_comments] && self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
+    return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
     data = generate_criteria(params)
     return true if data.title != self.title || data.points_possible != self.points_possible
     return true if data.criteria != self.criteria
@@ -238,7 +239,7 @@ class Rubric < ActiveRecord::Base
           criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == '1'
         end
       end
-      (criterion_data[:ratings] || []).each do |jdx, rating_data|
+      (criterion_data[:ratings] || {}).each do |jdx, rating_data|
         rating = {}
         rating[:description] = (rating_data[:description] || t('no_description', "No Description")).strip
         rating[:long_description] = (rating_data[:long_description] || "").strip
