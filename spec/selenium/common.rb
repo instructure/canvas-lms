@@ -97,6 +97,25 @@ module SeleniumTestsHelperMethods
     driver
   end
 
+  # f means "find" this is a shortcut to finding elements
+  # if driver.find_element fails, then it'll try to find it with jquery
+  def f(selector)
+    begin
+      driver.find_element :css, selector
+    rescue
+      find_with_jquery selector
+    end
+  end
+
+  # same as `f` except tries to find several elements instead of one
+  def ff(selector)
+    begin
+      driver.find_elements :css, selector
+    rescue
+      find_all_with_jquery selector
+    end
+  end
+
   #this is needed for using the before_label function in I18nUtilities
   def t(*a, &b)
     I18n.t(*a, &b)
