@@ -255,7 +255,7 @@ class Notification < ActiveRecord::Base
     @user_counts[user.id] = all_messages
     for_category = recent_messages_for_user("#{user.id}_#{self.category_spaceless}") || 0
     @user_counts["#{user.id}_#{self.category_spaceless}"] = for_category
-    all_messages >= user.max_messages_per_day || (max_for_category && for_category >= max_for_category)
+    all_messages >= user.max_messages_per_day
   end
   
   # Cache the count for number of messages sent to a user/user-with-category,
@@ -280,33 +280,6 @@ class Notification < ActiveRecord::Base
         end
         lookup.count
       end
-    end
-  end
-  
-  # Maximum number of messages a user can receive per day per category
-  # These numbers are totally pulled out of the air
-  def max_for_category
-    case category
-    when 'Calendar'
-      5
-    when 'Course Content'
-      5
-    when 'Files'
-      5
-    when 'Discussion'
-      5
-    when 'DiscussionEntry'
-      5
-    when 'Due Date'
-      10
-    when 'Grading Policies'
-      3
-    when 'Membership Update'
-      5
-    when 'Student Message'
-      5
-    else
-      nil
     end
   end
   

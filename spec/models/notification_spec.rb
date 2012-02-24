@@ -211,20 +211,6 @@ describe Notification do
       DelayedMessage.count.should eql(1)
     end
     
-    it "should not send messages after the category limit" do
-      notification_set
-      Rails.cache.delete(['recent_messages_for', "#{@user.id}_#{@notification.category}"].cache_key)
-      @notification.stubs(:max_for_category).returns(1)
-      @notification.max_for_category.times do
-        messages = @notification.create_message(@assignment, @user)
-        messages.select{|m| m.to != 'dashboard'}.should_not be_empty
-      end
-      DelayedMessage.count.should eql(0)
-      messages = @notification.create_message(@assignment, @user)
-      messages.select{|m| m.to != 'dashboard'}.should be_empty
-      DelayedMessage.count.should eql(1)
-    end
-
     it "should not use notification policies for unconfirmed communication channels" do
       notification_set
       cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'unconfirmed', :path => "nope")
