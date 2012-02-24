@@ -68,10 +68,8 @@ class UserList
 
     # look for phone numbers by searching for 10 digits, allowing
     # any non-word characters
-    number = path.gsub(/[^\d\w]/, '')
-    if number =~ /^\d{10}$/
+    if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
       type = :sms
-      path = "(#{number[0,3]}) #{number[3,3]}-#{number[6,4]}"
     elsif path.include?('@') && (address = TMail::Address::parse(path) rescue nil)
       type = :email
       name = address.name
@@ -117,18 +115,13 @@ class UserList
   end
   
   def resolve
-    pseudonyms = @addresses.select { |a| a[:type] == :pseudonym }
-    emails = @addresses.select { |a| a[:type] == :email } if @search_method != :open
-    emails ||= []
-    pseudonyms.concat emails
-
     # Search for matching pseudonyms
     Pseudonym.trusted_by_including_self(@root_account).active.find(:all,
       :select => 'unique_id AS address, users.name AS name, user_id, account_id',
       :joins => :user,
-      :conditions => ["pseudonyms.workflow_state='active' AND LOWER(unique_id) IN (?)", pseudonyms.map {|x| x[:address].downcase}]
+      :conditions => ["pseudonyms.workflow_state='active' AND LOWER(unique_id) IN (?)", @addresses.map {|x| x[:address].downcase}]
     ).map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
-      addresses = @addresses.select { |a| [:pseudonym, :email].include?(a[:type]) && a[:address].downcase == login[:address].downcase }
+      addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase }
       addresses.each do |address|
         # already found a matching pseudonym
         if address[:user_id]
@@ -139,24 +132,26 @@ class UserList
             address[:type] = :pseudonym if address[:type] == :email
             address[:user_id] = false
             address[:details] = :non_unique
+            address.delete(:name)
             next
           end
           # allow this one to overrule, since it's from this-account
           address.delete(:details)
         end
         address.merge!(login)
-        address[:type] = :pseudonym if address[:type] == :email
+        address[:type] = :pseudonym
       end
-    end if !pseudonyms.empty?
+    end if !@addresses.empty?
 
     # Search for matching emails (only if not open registration; otherwise there's no point - we just
     # create temporary users)
+    emails = @addresses.select { |a| a[:type] == :email } if @search_method != :open
     Pseudonym.trusted_by_including_self(@root_account).active.find(:all,
         :select => 'path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state',
         :joins => { :user => :communication_channels },
         :conditions => ["communication_channels.workflow_state<>'retired' AND LOWER(path) IN (?)", emails.map { |x| x[:address].downcase}]
     ).map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
-      addresses = @addresses.select { |a| a[:type] == :email && a[:address].downcase == login[:address].downcase }
+      addresses = emails.select { |a| a[:address].downcase == login[:address].downcase }
       addresses.each do |address|
         # if all we've seen is unconfirmed, and this one is active, we'll allow this one to overrule
         if address[:workflow_state] == 'unconfirmed' && login[:workflow_state] == 'active'
@@ -172,6 +167,7 @@ class UserList
         if address.has_key?(:user_id) && address[:user_id] != login[:user_id]
           address[:user_id] = false
           address[:details] = :non_unique
+          address.delete(:name)
         else
           address.merge!(login)
         end
@@ -180,6 +176,11 @@ class UserList
 
     # Search for matching SMS
     smses = @addresses.select { |a| a[:type] == :sms }
+    # reformat
+    smses.each do |sms|
+      number = sms[:address].gsub(/[^\d\w]/, '')
+      sms[:address] = "(#{number[0,3]}) #{number[3,3]}-#{number[6,4]}"
+    end
     sms_scope = @search_method != :closed ? Pseudonym : Pseudonym.trusted_by_including_self(@root_account)
     sms_scope.active.find(:all,
         :select => 'path AS address, users.name AS name, communication_channels.user_id AS user_id',
@@ -187,12 +188,13 @@ class UserList
         :conditions => "communication_channels.workflow_state='active' AND (#{smses.map{|x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})"
     ).map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
       address = sms.delete(:address)[/\d+/]
-      addresses = @addresses.select { |a| a[:type] == :sms && a[:address].gsub(/[^\d]/, '') == address }
+      addresses = smses.select { |a| a[:address].gsub(/[^\d]/, '') == address }
       addresses.each do |address|
         # ccs are not unique; just error out on duplicates
         if address.has_key?(:user_id) && address[:user_id] != login[:user_id]
           address[:user_id] = false
           address[:details] = :non_unique
+          address.delete(:name)
         else
           sms[:user_id] = sms[:user_id].to_i
           address.merge!(sms)
@@ -214,7 +216,6 @@ class UserList
       else
         if @search_method == :preferred
           address.delete :user_id
-          address.delete :name
           (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
         else
           @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }

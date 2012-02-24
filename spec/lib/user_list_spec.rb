@@ -174,6 +174,24 @@ describe UserList do
     ul.duplicate_addresses.should == []
   end
 
+  it "pseudonyms should take precedence over emails" do
+    @user1 = user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
+    @user2 = user_with_pseudonym(:name => 'Bob', :username => 'jt2@instructure.com', :active_all => 1)
+    @user2.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+    ul = UserList.new 'jt@instructure.com'
+    ul.addresses.should == [{:type => :pseudonym, :address => 'jt@instructure.com', :user_id => @user1.id, :name => 'JT'}]
+    ul.duplicate_addresses.should == []
+  end
+
+  it "pseudonyms should take precedence over phone numbers" do
+    @user1 = user_with_pseudonym(:name => 'JT', :username => '8015555555', :active_all => 1)
+    @user2 = user_with_pseudonym(:name => 'Bob', :username => 'jt2@instructure.com', :active_all => 1)
+    @user2.communication_channels.create!(:path => '8015555555@tmomail.net', :path_type => 'sms') { |cc| cc.workflow_state = 'active' }
+    ul = UserList.new '8015555555'
+    ul.addresses.should == [{:type => :pseudonym, :address => '8015555555', :user_id => @user1.id, :name => 'JT'}]
+    ul.duplicate_addresses.should == []
+  end
+
   context "closed registration" do
     before(:each) do
       @account.settings = { :open_registration => false }
@@ -341,7 +359,7 @@ describe UserList do
 
     it "should create a new user if none exists" do
       ul = UserList.new 'jt@instructure.com', nil, :preferred
-      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :email}]
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :email, :name => nil}]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
     end
@@ -380,10 +398,10 @@ describe UserList do
     end
 
     it "should create new users even if a user already exists" do
-      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
-      ul = UserList.new 'jt@instructure.com'
-      ul.addresses.length.should == 1
-      ul.addresses.first[:user_id].should be_nil
+      user_with_pseudonym(:name => 'JT', :username => 'jt+1@instructure.com', :active_all => 1)
+      @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      ul = UserList.new 'Bob <jt@instructure.com>'
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :email, :name => 'Bob'}]
       users = ul.users
       users.length.should == 1
       user = users.first
