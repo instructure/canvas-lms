@@ -43,6 +43,10 @@ require([
         }
       });
     });
+    $(".grading_standard .done_button").click(function(event) {
+      event.preventDefault();
+      $("#edit_letter_grades_form").dialog('close');
+    });
     $(".grading_standard .remove_grading_standard_link").click(function(event) {
       event.preventDefault();
       var result = confirm(I18n.t('confirm.unlink_grading_scheme', "Are you sure you want to unlink this grading scheme?"));

@@ -17,6 +17,35 @@ describe "course settings tests" do
     @enrollment.save!
   end
 
+  describe "course details" do
+    def test_select_standard_for(context)
+      grading_standard_for context
+      get "/courses/#{@course.id}/settings"
+
+      f('.edit_course_link').click
+      f('.grading_standard_checkbox').click unless is_checked('.grading_standard_checkbox')
+      f('.edit_letter_grades_link').click
+      f('.find_grading_standard_link').click
+      wait_for_ajaximations
+
+      f('.grading_standard_select:visible a').click
+      f('button.select_grading_standard_link:visible').click
+      f('.done_button').click
+      f('#course_form').submit
+      wait_for_ajaximations
+
+      f('.grading_scheme_set').should include_text @standard.title
+    end
+
+    it "should allow selection of existing course grading standard" do
+      test_select_standard_for @course
+    end
+
+    it "should allow selection of existing account grading standard" do
+      test_select_standard_for @course.root_account
+    end
+  end
+
   describe "course items" do
 
     it "should change course details" do
