@@ -130,9 +130,7 @@ describe "quizzes questions" do
   it "should calculate correct quiz question points total" do
     skip_if_ie('Out of memory')
     get "/courses/#{@course.id}/quizzes"
-    expect_new_page_load {
-      driver.find_element(:css, '.new-quiz-link').click
-    }
+    expect_new_page_load { driver.find_element(:css, '.new-quiz-link').click }
     @question_count = 0
     @points_total = 0
 
@@ -146,6 +144,22 @@ describe "quizzes questions" do
     quiz = Quiz.last
     quiz.reload
     quiz.quiz_questions.length.should == @question_count
+  end
+
+  it "should round published quiz points correctly on main quiz page" do
+    pending("bug 7402 - Quiz points not rounding correctly") do
+      q = @course.quizzes.create!(:title => "new quiz")
+      75.times do
+        q.quiz_questions.create!(:question_data => {:name => "Quiz Question 1", :question_type=>'essay_question', :question_text=>'qq1', 'answers' => [], :points_possible=>1.33})
+      end
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save
+      q.reload
+
+      get "/courses/#{@course.id}/quizzes/#{Quiz.last.id}"
+      find_with_jquery('.summary td:eq(2)').text.should == "99.75%"
+    end
   end
 
   it "should round numeric questions the same when created and taking a quiz" do
@@ -193,45 +207,45 @@ describe "quizzes questions" do
       b = bank.assessment_questions.create!
       quest2 = q.quiz_questions.create!(:assessment_question => b)
       quest2.write_attribute(:question_data,
-      {
-          :neutral_comments=>"",
-          :question_text=>"<p>My hair is [x] and my wife's is [y].</p>",
-          :points_possible=>1, :question_type=>"multiple_dropdowns_question",
-            :answers=>
-                [{
-                           :comments=>"",
-                           :weight=>100,
-                           :blank_id=>"x",
-                           :text=>"brown",
-                           :id=>2624
-                       },
-                       {
-                           :comments=>"",
-                           :weight=>0,
-                           :blank_id=>"x",
-                           :text=>"black",
-                           :id=>3085
-                       },
-                       {
-                           :comments=>"",
-                           :weight=>100,
-                           :blank_id=>"y",
-                           :text=>"brown",
-                           :id=>5780
-                       },
-                       {
-                           :comments=>"",
-                           :weight=>0,
-                           :blank_id=>"y",
-                           :text=>"red",
-                           :id=>8840
-                }],
-            :correct_comments=>"",
-            :name=>"Question",
-            :question_name=>"Question",
-            :incorrect_comments=>"",
-            :assessment_question_id=>nil
-      })
+                             {
+                                 :neutral_comments=>"",
+                                 :question_text=>"<p>My hair is [x] and my wife's is [y].</p>",
+                                 :points_possible=>1, :question_type=>"multiple_dropdowns_question",
+                                 :answers=>
+                                     [{
+                                          :comments=>"",
+                                          :weight=>100,
+                                          :blank_id=>"x",
+                                          :text=>"brown",
+                                          :id=>2624
+                                      },
+                                      {
+                                          :comments=>"",
+                                          :weight=>0,
+                                          :blank_id=>"x",
+                                          :text=>"black",
+                                          :id=>3085
+                                      },
+                                      {
+                                          :comments=>"",
+                                          :weight=>100,
+                                          :blank_id=>"y",
+                                          :text=>"brown",
+                                          :id=>5780
+                                      },
+                                      {
+                                          :comments=>"",
+                                          :weight=>0,
+                                          :blank_id=>"y",
+                                          :text=>"red",
+                                          :id=>8840
+                                      }],
+                                 :correct_comments=>"",
+                                 :name=>"Question",
+                                 :question_name=>"Question",
+                                 :incorrect_comments=>"",
+                                 :assessment_question_id=>nil
+                             })
       q.generate_quiz_data
       q.save!
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
