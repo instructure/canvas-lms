@@ -23,6 +23,7 @@ define [
   'jqueryui/position'
 ], (I18n, $, htmlEscape, conversationsIntroSlideshow) ->
 
+  $inbox = []
   $conversations = []
   $conversation_list = []
   $messages = []
@@ -51,8 +52,10 @@ define [
       @placeholder.text(@options.placeholder)
       @placeholder.appendTo(@fake_input) if @options.placeholder
 
-      @tokens = $('<ul />')
+      @scroller = $('<div />')
         .appendTo(@fake_input)
+      @tokens = $('<ul />')
+        .appendTo(@scroller)
       @tokens.click (e) =>
         if $token = $(e.target).closest('li')
           $close = $(e.target).closest('a')
@@ -69,7 +72,7 @@ define [
 
       # key capture input
       @input = $('<input />')
-        .appendTo(@fake_input)
+        .appendTo(@scroller)
         .css('width', '20px')
         .css('font-size', @fake_input.css('font-size'))
         .autoGrowInput({comfortZone: 20})
@@ -100,6 +103,7 @@ define [
               if @selector.browse(@browser.data)
                 @fake_input.addClass('browse')
             .prependTo(@fake_input)
+          @fake_input.addClass('browsable')
         @selector = new type(this, @node.attr('finder_url'), @options.selector)
 
       @base_exclude = []
@@ -137,7 +141,7 @@ define [
       @placeholder.hide()
       @added?(data.data, $token, new_token) if data
       @change?(@token_values())
-      @selector?.reposition()
+      @reposition()
 
     has_token: (data) ->
       @tokens.find('#token_' + (data?.value ? data)).length > 0
@@ -146,12 +150,16 @@ define [
       id = 'token_' + (data?.value ? data)
       @tokens.find('#' + id).remove()
       @change?(@token_values())
-      @selector?.reposition()
+      @reposition()
 
     remove_last_token: (data) ->
       @tokens.find('li').last().remove()
       @change?(@token_values())
+      @reposition()
+
+    reposition: ->
       @selector?.reposition()
+      @scroller.scrollTop @scroller.prop("scrollHeight")
 
     input_keydown: (e) ->
       @keyup_action = false
@@ -171,6 +179,7 @@ define [
       input.value for input in @tokens.find('input')
 
     input_keyup: (e) ->
+      @reposition()
       @keyup_action?()
 
     bottom_offset: ->
@@ -185,7 +194,7 @@ define [
       if val?
         if val isnt @input.val()
           @input.val(val).change()
-          @selector?.reposition()
+          @reposition()
       else
         @input.val()
 
@@ -1245,8 +1254,9 @@ define [
 
     inbox_resize = ->
       available_height = $(window).height() - $('#header').outerHeight(true) - ($('#wrapper-container').outerHeight(true) - $('#wrapper-container').height()) - ($('#main').outerHeight(true) - $('#main').height()) - $('#breadcrumbs').outerHeight(true) - $('#footer').outerHeight(true)
-      available_height = 425 if available_height < 425
-      $('#inbox').height(available_height)
+      available_height = MessageInbox.min_height if available_height < MessageInbox.min_height
+      $(document.body).toggleClass('too_small', available_height <= MessageInbox.min_height)
+      $inbox.height(available_height)
       $message_list.height(available_height - $form.outerHeight(true))
       $conversation_list.height(available_height - $('#actions').outerHeight(true))
 
@@ -1265,10 +1275,9 @@ define [
         location.hash = hash
         $(document).triggerHandler('document_fragment_change', hash)
 
-    $.extend window,
-      MessageInbox: MessageInbox
-
     $(document).ready () ->
+      $inbox = $('#inbox')
+      MessageInbox.min_height = parseInt $inbox.css('min-height').replace('px', '')
       $conversations = $('#conversations')
       $conversation_list = $conversations.find("ul.conversations")
       $messages = $('#messages')
@@ -1614,7 +1623,7 @@ define [
       # to do something else only to have the page change underneath them
       lock_until_user_input = ->
         setTimeout ->
-          $('#inbox').disableWhileLoading until_user_input()
+          $inbox.disableWhileLoading until_user_input()
 
       until_user_input = ->
         d = $.Deferred()
