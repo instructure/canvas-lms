@@ -473,23 +473,21 @@ describe "calendar2" do
     describe "contexts list" do
 
       it "should not allow a student to create an assignment through the context list" do
-        pending "BUG 7033 - Create Assignment should not be an option for a student in New calendar" do
+        get "/calendar2"
+        wait_for_ajaximations
 
-          get "/calendar2"
-          wait_for_ajaximations
-
-          keep_trying_until do
-            driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
-            find_with_jquery('ul#context-list li:nth-child(1) button').click
-            driver.find_element(:id, "ui-menu-0-0").click
-            edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
-            edit_event_dialog.should be_displayed
-          end
-          tabs = find_all_with_jquery('.tab_list > li')
-          tabs.count.should == 1
-          tabs[0].should include_text('Event')
+        keep_trying_until do
+          driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
+          find_with_jquery('ul#context-list li:nth-child(1) button').click
+          driver.find_element(:id, "ui-menu-0-0").click
+          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          edit_event_dialog.should be_displayed
         end
+        tabs = find_all_with_jquery('.tab_list > li')
+        tabs.count.should == 1
+        tabs[0].should include_text('Event')
       end
+
     end
 
     describe "main calendar" do
