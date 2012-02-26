@@ -917,7 +917,7 @@ class ApplicationController < ActionController::Base
       end
       @resource_url = @tag.url
       @opaque_id = @tag.opaque_identifier(:asset_string)
-      @tool = ContextExternalTool.find_external_tool(tag.url, context)
+      @tool = ContextExternalTool.find_external_tool(tag.url, context, tag.content_id)
       @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
       if !@tool

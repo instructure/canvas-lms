@@ -266,7 +266,7 @@ class ContextModule < ActiveRecord::Base
     elsif params[:type] == 'context_external_tool'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
-      tool = ContextExternalTool.find_external_tool(params[:url], self.context)
+      tool = ContextExternalTool.find_external_tool(params[:url], self.context, params[:id].to_i)
       unless tool
         tool = ContextExternalTool.new
         tool.id = 0

@@ -108,7 +108,7 @@ $(document).ready(function() {
     } else if(item_type == 'context_external_tool') {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
-        'item[id]': $("#external_urls_select .tools .tool.selected").data('id'),
+        'item[id]': $("#context_external_tools_select .tools .tool.selected").data('id'),
         'item[new_tab]': $("#external_tool_create_new_tab").attr('checked') ? '1' : '0',
         'item[indent]': $("#content_tag_indent").val()
       }
