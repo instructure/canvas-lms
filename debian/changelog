@@ -1,3 +1,14 @@
+canvas-lms (2012.02.27.15.44) stable; urgency=low
+
+  * Package ref: 5232d9f766bb3683b8aed307784b2f0eb32050da
+  *
+  * [+7966c76] don't bypass filename escaping in FileInContext; fixes #6912
+  * [+4c4c628] remove tag on stable branch, not yet implemented
+  * [+25e7dac] don't dispatch cancelled messages, fixes #7397
+  * [+5232d9f] allow including the PID in syslog logging
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 27 Feb 2012 15:44:57 -0700
+
 canvas-lms (2012.02.22.14.31) stable; urgency=low
 
   * Package ref: 702f9b379ef9e9dcc2db69b2299454f648ac1314
