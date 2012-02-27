@@ -25,13 +25,15 @@ class ConversationMessage < ActiveRecord::Base
   belongs_to :author, :class_name => 'User'
   belongs_to :context, :polymorphic => true
   has_many :conversation_message_participants
-  has_many :attachments, :as => :context, :order => 'created_at, id'
+  has_many :attachment_associations, :as => :context
+  has_many :attachments, :through => :attachment_associations, :order => 'attachments.created_at, attachments.id'
   belongs_to :asset, :polymorphic => true, :types => :submission # TODO: move media comments into this
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
   named_scope :human, :conditions => "NOT generated"
+  named_scope :with_attachments, :conditions => "attachment_ids <> ''"
   named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL"
   named_scope :by_user, lambda { |user_or_id|
     user_or_id = user_or_id.id if user_or_id.is_a?(User)
@@ -103,6 +105,15 @@ class ConversationMessage < ActiveRecord::Base
       self.media_comment_type = @media_comment.media_type if @media_comment
     end
     self.media_comment_type = nil unless self.media_comment_id
+  end
+
+  def attachment_ids
+    read_attribute :attachment_ids
+  end
+
+  def attachment_ids=(ids)
+    self.attachments = author.conversation_attachments_folder.attachments.find_all_by_id(ids.map(&:to_i))
+    write_attribute(:attachment_ids, attachments.map(&:id).join(','))
   end
 
   def delete_from_participants

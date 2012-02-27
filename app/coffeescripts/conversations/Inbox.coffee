@@ -651,7 +651,15 @@ define [
       @$form.formSubmit
         fileUpload: =>
           return @$form.find(".file_input:visible").length > 0
-        disableWhileLoading: true,
+        preparedFileUpload: true
+        context_code: "user_" + $("#identity .user_id").text()
+        folder_id: @options.FOLDER_ID
+        intent: 'message'
+        formDataTarget: 'url'
+        handle_files: (attachments, data) ->
+          data.attachment_ids = (a.attachment.id for a in attachments)
+          data
+        disableWhileLoading: true
         success: (data) =>
           data = [data] unless data.length?
           for conversation in data

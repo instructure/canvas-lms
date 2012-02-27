@@ -394,7 +394,8 @@ describe ConversationsController, :type => :integration do
 
       it "should create a conversation with forwarded messages" do
         forwarded_message = conversation(@me, :sender => @bob).messages.first
-        attachment = forwarded_message.attachments.create(:uploaded_data => stub_png_data)
+        attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :uploaded_data => stub_png_data)
+        forwarded_message.attachments << attachment
 
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -663,10 +664,9 @@ describe ConversationsController, :type => :integration do
   context "conversation" do
     it "should return the conversation" do
       conversation = conversation(@bob)
-      attachment = nil
+      attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
       media_object = nil
-      conversation.add_message("another") do |message|
-        attachment = message.attachments.create(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
+      message = conversation.add_message("another", :attachment_ids => [attachment.id]) do |message|
         media_object = MediaObject.new
         media_object.media_id = '0_12345678'
         media_object.media_type = 'audio'
@@ -675,7 +675,7 @@ describe ConversationsController, :type => :integration do
         media_object.title = "test title"
         media_object.save!
         message.media_comment = media_object
-        message.save
+        message.save!
       end
 
       conversation.reload

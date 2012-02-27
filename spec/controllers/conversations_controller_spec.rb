@@ -452,11 +452,8 @@ describe ConversationsController do
     it "should include an attachment if one exists" do
       course_with_student
       conversation
-      @conversation.add_message('test attachment') do |message|
-        attachment_model(:filename => "somefile.doc")
-        @attachment.context = message
-        @attachment.save
-      end
+      attachment = @user.conversation_attachments_folder.attachments.create!(:filename => "somefile.doc", :context => @user, :uploaded_data => StringIO.new('test'))
+      @conversation.add_message('test attachment', :attachment_ids => [attachment.id])
       HostUrl.stubs(:context_host).returns("test.host")
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil

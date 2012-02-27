@@ -94,21 +94,6 @@ class ConversationParticipant < ActiveRecord::Base
     }.with_indifferent_access
   end
 
-  [:attachments].each do |association|
-    class_eval <<-ASSOC
-      def #{association}
-        @#{association} ||= conversation.#{association}.scoped(:conditions => <<-SQL)
-          EXISTS (
-            SELECT 1
-            FROM conversation_message_participants
-            WHERE conversation_participant_id = \#{id}
-              AND conversation_message_id = conversation_messages.id
-          )
-          SQL
-      end
-    ASSOC
-  end
-
   def participants(options = {})
     options = {
       :include_participant_contexts => false,
@@ -239,7 +224,7 @@ class ConversationParticipant < ActiveRecord::Base
         older = times.reject!{ |t| t <= last_message_at} || []
         older.first || times.reverse.first
       end
-      self.has_attachments = attachments.size > 0
+      self.has_attachments = messages.with_attachments.size > 0
       self.has_media_objects = messages.with_media_comments.size > 0
       self.visible_last_authored_at = if latest.author_id == user_id
         latest.created_at

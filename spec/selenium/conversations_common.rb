@@ -1,10 +1,4 @@
 shared_examples_for "conversations selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
-
-  prepend_before(:each) do
-    Setting.set("file_storage_test_override", "local")
-  end
-
   before(:each) do
     course_with_teacher_logged_in
 
@@ -159,13 +153,15 @@ shared_examples_for "conversations selenium tests" do
     group_conversation_link.click if group_conversation_link.displayed? && opts[:group_conversation]
 
     expect {
-      driver.find_element(:id, "create_message_form").submit
-      wait_for_ajaximations
-    }.to change(ConversationMessage, :count).by(opts[:group_conversation] ? 1 : find_all_with_jquery('.token_input li').size)
+      # ensure that we've focused on the button, since file inputs go away
+      f('#create_message_form button[type=submit]').click
+      # file uploads can trigger multiple ajax requests, so we just wait for stuff to get reenabled
+      keep_trying_until{ f('#create_message_form textarea').enabled? }
+    }.to change(ConversationMessage, :count).by(opts[:group_conversation] ? 1 : ff('.token_input li').size)
 
     if opts[:group_conversation]
       message = ConversationMessage.last
-      driver.find_element(:id, "message_#{message.id}").should_not be_nil
+      f("#message_#{message.id}").should_not be_nil
       message
     end
   end

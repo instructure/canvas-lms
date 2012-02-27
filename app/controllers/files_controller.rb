@@ -401,7 +401,6 @@ class FilesController < ApplicationController
     elsif @context && intent == 'message'
       permission_object = @context
       permission = :send_messages
-      workflow_state = 'unattached_temporary'
       @check_quota = false
     elsif @context && intent && intent != 'upload'
       # In other cases (like unzipping a file, extracting a QTI, etc.

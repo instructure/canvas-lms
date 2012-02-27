@@ -879,7 +879,7 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar
+    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
@@ -1753,9 +1753,17 @@ class User < ActiveRecord::Base
   end
 
   def profile_pics_folder
-    folder = self.active_folders.find_by_name(Folder::PROFILE_PICS_FOLDER_NAME)
+    initialize_default_folder(Folder::PROFILE_PICS_FOLDER_NAME)
+  end
+
+  def conversation_attachments_folder
+    initialize_default_folder(Folder::CONVERSATION_ATTACHMENTS_FOLDER_NAME)
+  end
+
+  def initialize_default_folder(name)
+    folder = self.active_folders.find_by_name(name)
     unless folder
-      folder = self.folders.create!(:name => Folder::PROFILE_PICS_FOLDER_NAME,
+      folder = self.folders.create!(:name => name,
         :parent_folder => Folder.root_folders(self).find {|f| f.name == Folder::MY_FILES_FOLDER_NAME })
     end
     folder

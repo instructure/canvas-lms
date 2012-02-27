@@ -30,7 +30,6 @@ class Conversation < ActiveRecord::Base
     :source => :user,
     :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups",
     :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
-  has_many :attachments, :through => :conversation_messages
 
   attr_accessible
 
@@ -114,7 +113,7 @@ class Conversation < ActiveRecord::Base
     end
 
     if options[:update_participants]
-      update_participants message, options.merge(:skip_attachments_and_media_comments => true)
+      update_participants message, options
     else
       conversation_participants.each{ |cp| cp.update_cached_data!(options.merge(:set_last_message_at => false)) }
     end
@@ -189,6 +188,7 @@ class Conversation < ActiveRecord::Base
       message.generated = options[:generated]
       message.context = options[:context]
       message.asset = options[:asset]
+      message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
       if options[:forwarded_message_ids].present?
         messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
         conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
@@ -303,10 +303,9 @@ class Conversation < ActiveRecord::Base
     ]
     updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
     conversation_participants.update_all(updates.join(", "), ["user_id IN (?)", skip_ids])
-    return if options[:skip_attachments_and_media_comments]
 
     updated = false
-    if options.has_key?(:has_attachments) ? options[:has_attachments] : message.attachments.present?
+    if message.attachment_ids.present?
       self.has_attachments = true
       conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments")
       updated = true

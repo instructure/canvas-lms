@@ -159,7 +159,8 @@ class ConversationsController < ApplicationController
           :NOTES_ENABLED => notes_enabled,
           :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
           :INITIAL_FILTER => @filter,
-          :SHOW_INTRO => !@current_user.watched_conversations_intro?
+          :SHOW_INTRO => !@current_user.watched_conversations_intro?,
+          :FOLDER_ID => @current_user.conversation_attachments_folder.id
         })
       }
       format.json { render :json => @conversations_json }
@@ -179,6 +180,13 @@ class ConversationsController < ApplicationController
   #   recipient, defaults to false. If true, this will be a group conversation
   #   (i.e. all recipients will see all messages and replies). If false,
   #   individual private conversations will be started with each recipient.
+  # @argument attachment_ids[] An array of attachments ids. These must be
+  #   files that have been previously uploaded to the sender's "conversation
+  #   attachments" folder.
+  # @argument media_comment_id Media comment id of an audio of video file to
+  #   be associated with this message.
+  # @argument media_comment_type ["audio"|"video"] Type of the associated
+  #   media file
   def create
     return render_error('recipients', 'blank') if params[:recipients].blank?
     return render_error('recipients', 'invalid') if @recipients.blank?
@@ -242,7 +250,7 @@ class ConversationsController < ApplicationController
   #   body:: The actual message body
   #   author_id:: The id of the user who sent the message (see audience, participants)
   #   generated:: If true, indicates this is a system-generated message (e.g. "Bob added Alice to the conversation")
-  #   media_comment:: Audio comment data for this message (if applicable). Fields include: display_name, content-type, media_id, media_type, url
+  #   media_comment:: Audio/video comment data for this message (if applicable). Fields include: display_name, content-type, media_id, media_type, url
   #   forwarded_messages:: If this message contains forwarded messages, they will be included here (same format as this list). Note that those messages may have forwarded messages of their own, etc.
   #   attachments:: Array of attachments for this message. Fields include: display_name, content-type, filename, url
   # @response_field submissions Array of assignment submissions having
@@ -437,6 +445,13 @@ class ConversationsController < ApplicationController
   # latest message (i.e. what we just sent)
   #
   # @argument body The message to be sent
+  # @argument attachment_ids[] An array of attachments ids. These must be
+  #   files that have been previously uploaded to the sender's "conversation
+  #   attachments" folder.
+  # @argument media_comment_id Media comment id of an audio of video file to
+  #   be associated with this message.
+  # @argument media_comment_type ["audio"|"video"] Type of the associated
+  #   media file
   #
   # @example_response
   #   {
@@ -901,13 +916,7 @@ class ConversationsController < ApplicationController
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
-    message = conversation.add_message(params[:body], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :context => @domain_root_account, :tags => @tags, :has_attachments => params[:attachments].present?) do |m|
-      if params[:attachments]
-        params[:attachments].sort_by{ |k,v| k.to_i }.each do |k,v|
-          m.attachments.create(:uploaded_data => v) if v.present?
-        end
-      end
-
+    message = conversation.add_message(params[:body], :attachment_ids => params[:attachment_ids], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :context => @domain_root_account, :tags => @tags) do |m|
       media_id = params[:media_comment_id]
       media_type = params[:media_comment_type]
       if media_id.present? && media_type.present?
