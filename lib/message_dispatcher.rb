@@ -39,7 +39,7 @@ class MessageDispatcher < Delayed::PerformableMethod
 
   # Called by delayed_job when a job fails to reschedule it.
   def reschedule_at(now, num_attempts)
-    live_object.dispatch_at
+    object.dispatch_at
   end
 
   protected
@@ -48,7 +48,7 @@ class MessageDispatcher < Delayed::PerformableMethod
     messages.each do |message|
       begin
         message.deliver
-      rescue
+      rescue Exception, Timeout::Error => e
         # this delivery failed, we'll have to make an individual job to retry
         self.dispatch(message)
       end

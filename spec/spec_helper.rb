@@ -644,4 +644,23 @@ Spec::Runner.configure do |config|
   def json_parse(json_string = response.body)
     JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
   end
+
+  def s3_storage!
+    Attachment.stubs(:s3_storage?).returns(true)
+    Attachment.stubs(:local_storage?).returns(false)
+    conn = mock('AWS::S3::Connection')
+    AWS::S3::Base.stubs(:connection).returns(conn)
+    conn.stubs(:access_key_id).returns('stub_id')
+    conn.stubs(:secret_access_key).returns('stub_key')
+    Attachment.s3_storage?.should eql(true)
+    Attachment.local_storage?.should eql(false)
+  end
+
+  def local_storage!
+    Attachment.stubs(:s3_storage?).returns(false)
+    Attachment.stubs(:local_storage?).returns(true)
+    Attachment.local_storage?.should eql(true)
+    Attachment.s3_storage?.should eql(false)
+    Attachment.local_storage?.should eql(true)
+  end
 end

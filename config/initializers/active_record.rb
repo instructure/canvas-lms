@@ -723,7 +723,7 @@ class ActiveRecord::Migrator
   end
 
   def migrations
-    @migrations ||= begin
+    @@migrations ||= begin
       files = self.class.migrations_paths.map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
 
       migrations = files.inject([]) do |klasses, file|
