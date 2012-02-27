@@ -519,6 +519,13 @@ class ContextModule < ActiveRecord::Base
                 if tag.content_type == "Quiz"
                   submission = QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
                   score = submission.try(:kept_score)
+                elsif tag.content_type == "DiscussionTopic"
+                  if tag.content
+                    submission = Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
+                    score = submission.try(:score)
+                  else
+                    score = nil
+                  end
                 else
                   submission = Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
                   score = submission.try(:score)
