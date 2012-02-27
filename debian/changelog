@@ -1,3 +1,15 @@
+canvas-lms (2012.02.27.15.58) testing; urgency=low
+
+  * Package ref: dc9b5ab4ff89f4e238e65535f3d9b4e4c1016806
+  *
+  * [+6bd1551] detect pseudonyms that are in the transition state for trusted
+  * [+4b6678c] don't bypass filename escaping in FileInContext; fixes #6912
+  * [+c91538f] don't dispatch cancelled messages, fixes #7397
+  * [+b6700cc] allow including the PID in syslog logging
+  * [+dc9b5ab] cache migrations globally closes #7443
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 27 Feb 2012 15:58:19 -0700
+
 canvas-lms (2012.02.22.14.49) testing; urgency=low
 
   * Package ref: fe30ca0a397496d5b9c8d09807943c433752552a
