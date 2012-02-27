@@ -621,6 +621,32 @@ describe "gradebook2" do
       find_slick_cells(1, driver.find_element(:css, '#gradebook_grid'))[0].text.should == curved_grade_text
     end
 
+    it "should not throw an error when setting the default grade when concluded enrollments exist" do
+      conclude_and_unconclude_course
+      3.times do
+        student_in_course
+      end
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      #TODO - when show concluded enrollments fix goes in we probably have to add that code right here
+      #for the test to work correctly
+
+      set_default_grade 2
+      keep_trying_until do
+        driver.switch_to.alert.should_not be_nil
+        driver.switch_to.alert.dismiss
+        true
+      end
+
+      driver.switch_to.default_content
+      grade_grid = driver.find_element(:css, '#gradebook_grid')
+
+      StudentEnrollment.all.each_with_index do |e, n|
+        next if e.completed?
+        find_slick_cells(n, grade_grid)[2].text.should == '5'
+      end
+    end
+
     it "should handle multiple enrollments correctly" do
       @course.student_enrollments.create!(:user => @student_1, :course_section => @other_section)
 

@@ -197,7 +197,8 @@ describe GradebooksController do
       response.should be_redirect
 
       # attempt to grade another section should throw not found
-      proc { post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => s2.user_id} }.should raise_error(ActiveRecord::RecordNotFound)
+      post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => s2.user_id}
+      flash[:error].should eql 'Submission was unsuccessful: Submission Failed'
     end
   end
 

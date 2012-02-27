@@ -253,7 +253,11 @@ class GradebooksController < ApplicationController
       @submissions = []
       submissions.compact.each do |submission|
         @assignment = @context.assignments.active.find(submission[:assignment_id])
-        @user = @context.students_visible_to(@current_user).find(submission[:user_id].to_i)
+        begin
+          @user = @context.students_visible_to(@current_user).find(submission[:user_id].to_i)
+        rescue ActiveRecord::RecordNotFound
+          next
+        end
         submission[:grader] = @current_user
         submission.delete :comment_attachments
         if params[:attachments]
