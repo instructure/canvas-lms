@@ -56,5 +56,14 @@ describe CC::CCHelper do
       translated = @exporter.html_content(html)
       translated.should == html
     end
+
+    it "should export html with a utf-8 charset" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %{<div>My Title\302\240</div>}
+      exported = @exporter.html_page(html, "my title page")
+      doc = Nokogiri::HTML(exported)
+      doc.encoding.should == 'utf-8'
+      doc.at_css('html body div').to_s.should == "<div>My Title\302\240</div>"
+    end
   end
 end
