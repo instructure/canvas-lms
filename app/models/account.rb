@@ -1049,6 +1049,11 @@ class Account < ActiveRecord::Base
     root_account.grants_right?(user, session, :manage_user_logins)
   end
 
+  def trusted_account_ids
+    return [] if !root_account? || self == Account.site_admin
+    [ Account.site_admin.id ]
+  end
+
   named_scope :root_accounts, :conditions => {:root_account_id => nil}
   named_scope :processing_sis_batch, :conditions => ['accounts.current_sis_batch_id IS NOT NULL'], :order => :updated_at
   named_scope :name_like, lambda { |name|

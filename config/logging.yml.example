@@ -11,6 +11,7 @@ production:
 #  logger: syslog
 #  app_ident: canvas-lms
 #  daemon_ident: canvas-lms-daemon
+#  include_pid: false
 #  facilities:
 #  - user
 #  - local3
