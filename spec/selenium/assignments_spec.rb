@@ -195,6 +195,50 @@ describe "assignments" do
       @assignment = @course.assignments.create(:name => 'assignment', :due_at => DUE_DATE)
     end
 
+    it "should not allow a user to submit a file-submission assignment without attaching a file" do
+      @assignment = @course.assignments.create!(
+        :name => 'test assignment',
+        :due_at => Time.now.utc + 2.days,
+        :submission_types => 'online_upload')
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      driver.find_element(:css, '.submit_assignment_link').click
+      wait_for_ajaximations
+      driver.find_element(:id, 'submit_file_button').click
+      wait_for_ajaximations
+      driver.find_element(:id, 'flash_error_message').should be_displayed
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      driver.find_element(:css, '#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
+    end
+
+    it "should expand the comments box on click" do
+      @assignment = @course.assignments.create!(
+        :name => 'test assignment',
+        :due_at => Time.now.utc + 2.days,
+        :submission_types => 'online_upload')
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      driver.find_element(:css, '.submit_assignment_link').click
+      wait_for_ajaximations
+      driver.execute_script("return $('#submission_comment').height()").should eql 16
+      driver.execute_script("$('#submission_comment').focus()")
+      #driver.find_element(:id, 'submission_comment').click
+      wait_for_ajaximations
+      driver.execute_script("return $('#submission_comment').height()").should eql 72
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      driver.find_element(:css, '#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
+    end
+
     it "should highlight mini-calendar dates where stuff is due" do
       get "/courses/#{@course.id}/assignments/syllabus"
 

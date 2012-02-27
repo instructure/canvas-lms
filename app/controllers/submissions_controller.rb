@@ -233,6 +233,13 @@ class SubmissionsController < ApplicationController
           flash[:error] = t('errors.invalid_file_type', "Invalid file type")
           return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
         end
+
+        # require at least one file to be attached
+        if params[:attachments].blank?
+          flash[:error] = t('errors.no_attached_file', "You must attach at least one file to this assignment")
+          return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+        end
+
         params[:attachments].each do |idx, attachment|
           if attachment[:uploaded_data] && !attachment[:uploaded_data].is_a?(String)
             attachment[:user] = @current_user
