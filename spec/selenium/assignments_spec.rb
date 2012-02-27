@@ -178,22 +178,21 @@ describe "assignments" do
   end
 
   context "student view" do
+    DUE_DATE = Time.now.utc + 2.days
     before (:each) do
       course_with_student_logged_in
+      @assignment = @course.assignments.create(:name => 'assignment', :due_at => DUE_DATE)
     end
 
     it "should highlight mini-calendar dates where stuff is due" do
-      due_date = Time.now.utc + 2.days
-      @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date)
-
       get "/courses/#{@course.id}/assignments/syllabus"
 
-      driver.find_element(:css, ".mini_calendar_day.date_#{due_date.strftime("%m_%d_%Y")}").
+      driver.find_element(:css, ".mini_calendar_day.date_#{DUE_DATE.strftime("%m_%d_%Y")}").
           attribute('class').should match /has_event/
     end
 
     it "should not show submission data when muted" do
-      @assignment = @course.assignments.create!(:title => "hardest assignment ever", :submission_types => "online_url,online_upload")
+      @assignment.update_attributes(:submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@student)
       @submission.submission_type = "online_url"
       @submission.save!
@@ -213,8 +212,7 @@ describe "assignments" do
 
     it "should submit an assignment and validate confirmation information" do
       pending "BUG 6783 - Coming Up assignments update error" do
-        due_date = Time.now.utc + 2.days
-        @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date, :submission_types => 'online_url')
+        @assignment.update_attributes(:submission_types => 'online_url')
         @submission = @assignment.submit_homework(@student)
         @submission.submission_type = "online_url"
         @submission.save!
@@ -231,8 +229,7 @@ describe "assignments" do
 
     it "should not allow blank submissions for text entry" do
       pending('bug #7228 - Dont allow blank submissions in Text Entry field') do
-        due_date = Time.now.utc + 2.days
-        @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date, :submission_types => 'online_text_entry')
+        @assignment.update_attributes(:submission_types => "online_text_entry")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         driver.find_element(:css, '.submit_assignment_link').click
         assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
@@ -243,6 +240,20 @@ describe "assignments" do
       #TODO - when a fix goes in for this bug, need to finish writing this spec
       #the spec should check that the assignment is not submitted
       #it should also check that there was some sort of error message
+    end
+
+    it "should not allow a submission with only comments" do
+      pending("bug 7463 - Assignments page shows assignment turned in when only a comment has been made") do
+        #Note once this bug is fixed it will also fix bug #7464
+        @assignment.update_attributes(:submission_types => "online_text_entry")
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        driver.find_element(:css, '.submit_assignment_link').click
+        assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
+        replace_content(assignment_form.find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
+        assignment_form.find_element(:css, "#submit_online_text_entry_form button[type=submit]").click
+        #TODO - when this bug is fixed we should also check that some error was raised for trying to submit only a comment
+        Submission.count.should == 0
+      end
     end
   end
 end
