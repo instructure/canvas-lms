@@ -19,6 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "discussion_topics" do
+  def discussion_assignment
+    assignment_model(:course => @course, :submission_types => 'discussion_topic', :title => 'Assignment Discussion')
+    @topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+  end
+
   it "should show assignment group discussions without errors" do
     group_assignment_discussion
     course_with_student_logged_in(:course => @course, :active_all => true)
@@ -35,14 +40,24 @@ describe "discussion_topics" do
   end
   
   it "should show speed grader button" do
-    course = course_model(:reusable => true)
-    assignment_model(:course => course, :submission_types => 'discussion_topic', :title => 'Assignment Discussion')
-    topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
-    course_with_teacher_logged_in(:course => @course, :active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    discussion_assignment
 
-    get "/courses/#{course.id}/discussion_topics/#{topic.id}"
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     response.should be_success
     doc = Nokogiri::XML(response.body)
     doc.at_css('#speedgrader_button').should_not be_nil
+  end
+
+  it "should show peer reviews button" do
+    course_with_teacher_logged_in(:active_all => true)
+    discussion_assignment
+    @assignment.peer_reviews = true
+    @assignment.save
+
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('.assignment_peer_reviews_link').should_not be_nil
   end
 end
