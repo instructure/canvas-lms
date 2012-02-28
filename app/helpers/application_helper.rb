@@ -656,7 +656,9 @@ module ApplicationHelper
     end
     if includes.length > 0
       content_tag :script, <<-ENDSCRIPT
-        require([#{includes.join(', ')}]);
+        require(['jquery'], function() {
+          require([#{includes.join(', ')}]);
+        });
       ENDSCRIPT
     end
   end
