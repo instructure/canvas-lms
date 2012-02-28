@@ -157,7 +157,8 @@ describe "course settings tests" do
 
     it "should remove a user from a section" do
       username = "user@example.com"
-      student_in_course_section(:name => username)
+      student_in_course(:name => username)
+      @enrollment.course_section = @course_section; @enrollment.save
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
@@ -170,7 +171,8 @@ describe "course settings tests" do
     it "should move a user to a new section" do
       section_name = 'Move to Course Section'
       add_section(section_name)
-      student_in_course_section(:course_section => @course_section)
+      student_in_course
+      @enrollment.course_section = @course_section; @enrollment.save
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
@@ -182,7 +184,8 @@ describe "course settings tests" do
 
     it "should view the users enrollment details" do
       username = "user@example.com"
-      student_in_course_section(:name => username)
+      student_in_course(:name => username, :active_all => true)
+      @enrollment.course_section = @course_section; @enrollment.save
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
@@ -255,7 +258,8 @@ describe "course settings tests" do
       @username = "multiple@example.com"
       add_section("Section 1")
       @old_section = @course_section
-      student_in_course_section(:name => @username, :course_section => @course_section)
+      student_in_course(:name => @username)
+      @enrollment.course_section = @course_section; @enrollment.save
       add_section("Section 2")
       multiple_student_enrollment
     end

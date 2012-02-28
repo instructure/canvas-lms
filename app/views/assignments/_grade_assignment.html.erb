@@ -8,7 +8,7 @@
       <% graded = subs.select(&:graded?).length # this includes resubmissions that were previously graded %>
       <% resubmitted = subs.select(&:needs_regrading?).length %>
       <% submitted = subs.length %>
-        <span style="<%= 'font-weight: bold;' if graded < submitted %>">
+        <span class="graded_count" style="<%= 'font-weight: bold;' if graded < submitted %>">
           <%= t :graded_count, "%{graded_count} *out of* %{total} Submissions Graded",
                 :graded_count => graded, :total => submitted,
                 :wrapper => '<span style="font-size: 0.8em;">\1</span>' %>
