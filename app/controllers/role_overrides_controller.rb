@@ -225,7 +225,7 @@ class RoleOverridesController < ApplicationController
 
       # allow setting permissions immediately through API
       if params[:permissions]
-        RoleOverride.manageable_permissions(@context).each do |permission|
+        RoleOverride.manageable_permissions(@context).keys.each do |permission|
           if settings = params[:permissions][permission]
             override = settings[:enabled].to_i == 1 if settings[:explicit].to_i == 1 && settings[:enabled].present?
             locked = settings[:locked].to_i == 1 if settings[:locked]

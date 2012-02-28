@@ -178,7 +178,7 @@ class GradebooksController < ApplicationController
           cancel_cache_buster
           Enrollment.recompute_final_score_if_stale @context
           send_data(
-            @context.gradebook_to_csv(:include_sis_id => @context.grants_right?(@current_user, session, :manage_students)),
+            @context.gradebook_to_csv(:include_sis_id => @context.grants_rights?(@current_user, session, :read_sis, :manage_sis).values.any?),
             :type => "text/csv",
             :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
             :disposition => "attachment"

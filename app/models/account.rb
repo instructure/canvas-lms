@@ -572,9 +572,18 @@ class Account < ActiveRecord::Base
   end
   
   set_policy do
-    RoleOverride.permissions.each_key do |permission|
+    enrollment_types = RoleOverride.enrollment_types.map { |role| role[:name] }
+    RoleOverride.permissions.each do |permission, details|
       given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
       can permission
+
+      next unless details[:account_only]
+      ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
+        given { |user| user && RoleOverride.permission_for(self, permission, role)[:enabled] &&
+          self.course_account_associations.find(:first, :joins => 'INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id',
+            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) }
+        can permission
+      end
     end
 
     given { |user| !self.account_users_for(user).empty? }

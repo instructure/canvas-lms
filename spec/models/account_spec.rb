@@ -667,4 +667,14 @@ describe Account do
       site_admin.grants_right?(@user, nil, :site_admin).should be_true
     end
   end
+
+  context "permissions" do
+    it "should grant :read_sis to teachers" do
+      user_with_pseudonym(:active_all => 1)
+      Account.default.grants_right?(@user, :read_sis).should be_false
+      @course = Account.default.courses.create!
+      @course.enroll_teacher(@user).accept!
+      Account.default.grants_right?(@user, :read_sis).should be_true
+    end
+  end
 end

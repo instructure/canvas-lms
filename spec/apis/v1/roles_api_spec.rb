@@ -134,8 +134,7 @@ describe "Roles API", :type => :integration do
           "name" => @account.name,
           "root_account_id" => @account.root_account_id,
           "parent_account_id" => @account.parent_account_id,
-          "id" => @account.id,
-          "sis_account_id" => @account.sis_source_id
+          "id" => @account.id
         }
         json["role"].should == @role
         json["permissions"].keys.sort.should == [
@@ -151,7 +150,7 @@ describe "Roles API", :type => :integration do
           "manage_wiki", "moderate_forum", "post_to_forum",
           "read_course_content", "read_course_list", "read_forum",
           "read_question_banks", "read_reports", "read_roster",
-          "send_messages", "view_all_grades", "view_group_pages",
+          "read_sis", "send_messages", "view_all_grades", "view_group_pages",
           "view_statistics"
         ]
 

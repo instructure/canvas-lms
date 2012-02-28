@@ -450,6 +450,8 @@ describe "API Authentication", :type => :integration do
         'short_name' => 'User',
         'primary_email' => nil,
         'login_id' => 'nobody_sis@example.com',
+        'sis_user_id' => '1234',
+        'sis_login_id' => 'nobody_sis@example.com',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end

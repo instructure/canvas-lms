@@ -33,7 +33,7 @@ module Api::V1::User
           # that's called sis_source_id.
           json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
                       # TODO: don't send sis_login_id; it's garbage data
-                      :sis_login_id => sis_pseudonym.unique_id
+                      :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_rights?(current_user, :read_sis, :manage_sis).values.any?
         end
         if pseudonym = sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account)
           json[:login_id] = pseudonym.unique_id
@@ -59,7 +59,7 @@ module Api::V1::User
       !!(
         permissions_context.grants_right?(current_user, :manage_students) ||
         permissions_account.membership_for_user(current_user) ||
-        permissions_account.grants_right?(current_user, :manage_sis)
+        permissions_account.root_account.grants_rights?(current_user, :manage_sis, :read_sis).values.any?
       )
     )
   end
