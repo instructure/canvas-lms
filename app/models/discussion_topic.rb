@@ -501,7 +501,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def ensure_submission(user)
     submission = Submission.find_by_assignment_id_and_user_id(self.assignment_id, user.id)
-    return if submission && submission.submission_type == 'discussion_topic'
+    return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state == 'submitted'
     self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
   end
 

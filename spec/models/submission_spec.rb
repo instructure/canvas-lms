@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -105,12 +105,19 @@ describe Submission do
   end
 
   context "Discussion Topic" do
-    it "should use its created_at date for its submitted_at value" do
-      submission_spec_model(:submission_type => "discussion_topic")
-      @assignment.submit_homework(@user, :submission_type => "discussion_topic")
+    it "should use correct date for its submitted_at value" do
+      course_with_student_logged_in(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "some topic")
+      @assignment = @course.assignments.create(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
+      @topic.assignment_id = @assignment.id
+      @topic.save!
+      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
       new_time = Time.now + 30.minutes
       Time.stubs(:now).returns(new_time)
-      @assignment.submit_homework(@user, :submission_type => "discussion_topic")
+      @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
       @submission.reload
       @submission.submitted_at.to_s(:db).should eql @submission.created_at.to_s(:db)
     end

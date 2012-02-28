@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -429,6 +429,19 @@ describe DiscussionTopic do
       discussion_topic_model(:user => @teacher)
     end
 
+    def build_submitted_assignment
+      student_in_course(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @topic.assignment_id = @assignment.id
+      @topic.save!
+      @entry1 = @topic.discussion_entries.create!(:message => "second message", :user => @user)
+      @entry1.created_at = 1.week.ago
+      @entry1.save!
+      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+    end
+
     it "should create submissions for existing entries when setting the assignment" do
       @student = student_in_course.user
       @topic.reply_from(:user => @student, :text => "entry")
@@ -441,6 +454,64 @@ describe DiscussionTopic do
       @student.reload
       @student.submissions.size.should == 1
       @student.submissions.first.submission_type.should == 'discussion_topic'
+    end
+
+    it "should have the correct submission date if submission has comment" do
+      student_in_course(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @topic.assignment = @assignment
+      @topic.save
+      te = @course.enroll_teacher(user)
+      @submission = @assignment.find_or_create_submission(@student.id)
+      @submission_comment = @submission.add_comment(:author => te.user, :comment => "some comment")
+      @submission.created_at = 1.week.ago
+      @submission.save!
+      @submission.workflow_state.should == 'unsubmitted'
+      @submission.submitted_at.should be_nil
+      @entry = @topic.discussion_entries.create!(:message => "somne discussion message", :user => @student)
+      @submission.reload
+      @submission.workflow_state.should == 'submitted'
+      @submission.submitted_at.to_i.should >= @entry.created_at.to_i #this time may not be exact because it goes off of time.now in the submission
+    end
+
+    it "should fix submission date after deleting the oldest entry" do
+      build_submitted_assignment()
+      @entry2 = @topic.discussion_entries.create!(:message => "some message", :user => @user)
+      @entry2.created_at = 1.day.ago
+      @entry2.save!
+      @entry1.destroy
+      @topic.reload
+      @topic.discussion_entries.should_not be_empty
+      @topic.discussion_entries.active.should_not be_empty
+      @submission.reload
+      @submission.submitted_at.to_i.should == @entry2.created_at.to_i
+      @submission.workflow_state.should == 'submitted'
+    end
+
+    it "should mark submission as unsubmitted after deletion" do
+      build_submitted_assignment()
+      @entry1.destroy
+      @topic.reload
+      @topic.discussion_entries.should_not be_empty
+      @topic.discussion_entries.active.should be_empty
+      @submission.reload
+      @submission.workflow_state.should == 'unsubmitted'
+      @submission.submission_type.should == nil
+      @submission.submitted_at.should == nil
+    end
+
+    it "should have new submission date after deletion and re-submission" do
+      build_submitted_assignment()
+      @entry1.destroy
+      @topic.reload
+      @topic.discussion_entries.should_not be_empty
+      @topic.discussion_entries.active.should be_empty
+      @entry2 = @topic.discussion_entries.create!(:message => "some message", :user => @user)
+      @submission.reload
+      @submission.submitted_at.to_i.should >= @entry2.created_at.to_i #this time may not be exact because it goes off of time.now in the submission
+      @submission.workflow_state.should == 'submitted'
     end
 
     it "should not duplicate submissions for existing entries that already have submissions" do

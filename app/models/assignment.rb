@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1006,8 +1006,8 @@ class Assignment < ActiveRecord::Base
             :workflow_state => submitted ? "submitted" : "unsubmitted",
             :group => group
           })
-          homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
-  
+          homework.submitted_at = Time.now
+
           homework.with_versioning(:explicit => true) do
             group ? homework.save_without_broadcast : homework.save!
           end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -156,6 +156,26 @@ class DiscussionEntry < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     save!
+    update_topic_submission
+  end
+
+  def update_topic_submission
+    if self.discussion_topic.for_assignment?
+      entries = self.discussion_topic.discussion_entries.scoped(:conditions => {:user_id => self.user_id, :workflow_state => 'active'})
+      submission = self.discussion_topic.assignment.submissions.scoped(:conditions => {:user_id => self.user_id}).first
+      if entries.any?
+        submission_date = entries.scoped(:order => 'created_at').first.created_at
+        if submission_date > self.created_at
+          submission.submitted_at = submission_date
+          submission.save!
+        end
+      else
+        submission.workflow_state = 'unsubmitted'
+        submission.submission_type = nil
+        submission.submitted_at = nil
+        submission.save!
+      end
+    end
   end
 
   named_scope :active, :conditions => ['discussion_entries.workflow_state != ?', 'deleted']
