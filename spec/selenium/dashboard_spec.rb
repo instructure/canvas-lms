@@ -101,6 +101,29 @@ describe "dashboard" do
     driver.execute_script("return $('.event a .tooltip_text').text()").should match(@course.short_name)
   end
 
+  it "should show submitted essay quizzes in the todo list" do
+    pending("bug 7466 - Essay's in quizzes that have been taken are not showing up in the To Do list for a Teacher") do
+      quiz_title = 'new quiz'
+      course_with_teacher_logged_in
+      student_in_course
+      q = @course.quizzes.create!(:title => quiz_title)
+      q.quiz_questions.create!(:question_data => {:name => "Quiz Essay Question 1", :question_type=>'essay_question', :question_text=>'qq1', :points_possible=>10})
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save
+      q.reload
+      qs = q.generate_submission(@user)
+      qs.workflow_state = 'complete'
+      qs.save
+      qs.reload
+      get "/"
+
+      todo_list = f('.right-side-list .to-do-list')
+      todo_list.should_not be_nil
+      todo_list.should include_text(quiz_title)
+    end
+  end
+
   it "should limit the number of visible items in the to do list" do
     course_with_student_logged_in
     due_date = Time.now.utc + 2.days
