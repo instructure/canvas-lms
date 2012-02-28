@@ -524,7 +524,7 @@ class QuizSubmission < ActiveRecord::Base
     elsif question_type == "calculated_question"
       answer_number = answer_text.to_f
       val = q[:answers].first[:answer].to_f rescue 0
-      margin = q[:answers].first[:answer_tolerance].to_f rescue 0
+      margin = q[:answer_tolerance].to_f
       min = val - margin
       max = val + margin
       user_answer[:answer_id] = q[:answers].first[:id]

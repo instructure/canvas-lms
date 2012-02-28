@@ -516,4 +516,17 @@ describe Api do
 
   end
 
+  context ".api_user_content" do
+    class T
+      extend Api
+    end
+    it "should ignore non-kaltura instructure_inline_media_comment links" do
+      student_in_course
+      html = %{<div>This is an awesome youtube:
+<a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
+</div>}
+      res = T.api_user_content(html, @course, @student)
+      res.should == html
+    end
+  end
 end
