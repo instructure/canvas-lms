@@ -22,7 +22,7 @@ css_compressor_options:
   #
   # from the myplugin plugin will become
   #
-  # public/plugins/myplugin/stylesheets/compiled/foo.css
+  # public/stylesheets/compiled/plugins/myplugin/foo.css
   #
   # in the data structure mentioned above
   plugin_assets = {}
@@ -35,7 +35,10 @@ css_compressor_options:
         # that we can detect and translate that namespace into an anchor in
         # post-processing.
         bundles["plugins/#{plugin}/#{type}/#{bundle}"] = bundles.delete(bundle).
-          map{ |entry| entry.gsub(%r{^public/}, "public/plugins/#{plugin}/") }
+          map { |entry| entry.gsub(
+            %r{^public/stylesheets/compiled/},
+            "public/stylesheets/compiled/plugins/#{plugin}/")
+          }
       end
     end
     plugin_assets[plugin] = assets
