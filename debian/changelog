@@ -1,3 +1,13 @@
+canvas-lms (2012.02.28.16.03) testing; urgency=low
+
+  * Package ref: 4cee7a997df3a3469b02907857b6b60d8d2316b5
+  *
+  * [+2e8197c] fix margin of error for formula quiz questions
+  * [+9f70e84] don't send merge notifications to same-account sis users
+  * [+4cee7a9] api_user_content handling of inline media comments
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 28 Feb 2012 16:03:59 -0700
+
 canvas-lms (2012.02.27.15.58) testing; urgency=low
 
   * Package ref: dc9b5ab4ff89f4e238e65535f3d9b4e4c1016806
