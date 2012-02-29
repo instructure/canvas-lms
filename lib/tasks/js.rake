@@ -47,7 +47,8 @@ namespace :js do
 
   desc "optimize and build js for production"
   task :build do
-    exec("node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js")
+    output = `node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1`
+    raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
   end
 
 end
