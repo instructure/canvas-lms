@@ -191,6 +191,10 @@ describe QuizSubmission do
       })
       @quiz_submission.submission.workflow_state.should eql 'graded'
     end
+
+    it "should increment the assignment needs_grading_count for pending_review state" do
+      @quiz.assignment.reload.needs_grading_count.should == 1
+    end
   end
 
   describe "with multiple essay questions" do

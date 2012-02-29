@@ -264,7 +264,6 @@ describe "dashboard" do
     end
 
     it "should display assignment to grade in to do list and assignments menu for a teacher" do
-      course_with_teacher_logged_in
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
@@ -284,26 +283,23 @@ describe "dashboard" do
     end
 
     it "should show submitted essay quizzes in the todo list" do
-      pending("bug 7466 - Essay's in quizzes that have been taken are not showing up in the To Do list for a Teacher") do
-        quiz_title = 'new quiz'
-        course_with_teacher_logged_in
-        student_in_course
-        q = @course.quizzes.create!(:title => quiz_title)
-        q.quiz_questions.create!(:question_data => {:name => "Quiz Essay Question 1", :question_type=>'essay_question', :question_text=>'qq1', :points_possible=>10})
-        q.generate_quiz_data
-        q.workflow_state = 'available'
-        q.save
-        q.reload
-        qs = q.generate_submission(@user)
-        qs.workflow_state = 'complete'
-        qs.save
-        qs.reload
-        get "/"
+      quiz_title = 'new quiz'
+      student_in_course
+      q = @course.quizzes.create!(:title => quiz_title)
+      q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type=>'essay_question', :question_text=>'qq1', :points_possible=>10})
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save
+      q.reload
+      qs = q.generate_submission(@user)
+      qs.mark_completed
+      qs.submission_data = {"question_31"=>"<p>abeawebawebae</p>", "question_text"=>"qq1"}
+      qs.grade_submission
+      get "/"
 
-        todo_list = f('.right-side-list .to-do-list')
-        todo_list.should_not be_nil
-        todo_list.should include_text(quiz_title)
-      end
+      todo_list = f('.to-do-list')
+      todo_list.should_not be_nil
+      todo_list.should include_text(quiz_title)
     end
 
     context "course menu customization" do

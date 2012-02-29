@@ -77,10 +77,11 @@ class Submission < ActiveRecord::Base
   }
 
   named_scope :needs_grading, :conditions => <<-SQL
-    submissions.submission_type IS NOT NULL AND
-    submissions.workflow_state IN ('submitted', 'pending_review') AND (
-      submissions.score IS NULL OR
-      NOT submissions.grade_matches_current_submission
+    submissions.submission_type IS NOT NULL 
+    AND (submissions.workflow_state = 'pending_review'
+      OR (submissions.workflow_state = 'submitted' 
+        AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
+      )
     )
     SQL
   def self.needs_grading_conditions(prefix = nil)
