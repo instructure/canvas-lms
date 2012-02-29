@@ -1842,6 +1842,14 @@ class User < ActiveRecord::Base
     Conversation.initiate(user_ids, private).conversation_participants.find_by_user_id(self.id)
   end
 
+  def messageable_user_clause
+    "users.workflow_state IN ('registered', 'pre_registered')"
+  end
+
+  def messageable_enrollment_user_clause
+    "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{messageable_user_clause})"
+  end
+
   def enrollment_visibility
     Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.hour) do
       full_course_ids = []
@@ -1865,7 +1873,8 @@ class User < ActiveRecord::Base
             end
             conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
-        base_conditions = self.class.reflections[:current_and_invited_enrollments].options[:conditions] + " OR " +  self.class.reflections[:concluded_enrollments].options[:conditions]
+        base_conditions = "(" + self.class.reflections[:current_and_invited_enrollments].options[:conditions] + " OR " +  self.class.reflections[:concluded_enrollments].options[:conditions] + ")"
+        base_conditions << " AND " << messageable_enrollment_user_clause
         user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).count("DISTINCT user_id")
 
         sections = course.sections_visible_to(self)
@@ -1916,11 +1925,15 @@ class User < ActiveRecord::Base
             user_counts[group.id] = group.users.size
           elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
             section_id_hash[group.id] = sections
-            conditions = {:user_id => group.group_memberships.map(&:user_id), :course_section_id => sections}
-            user_counts[group.id] = conditions[:user_id].present? ?
-                                      group.context.enrollments.scoped(:conditions => self.class.reflections[:current_and_invited_enrollments].options[:conditions]).scoped(:conditions => conditions).size +
-                                      group.context.enrollments.scoped(:conditions => self.class.reflections[:concluded_enrollments].options[:conditions]).scoped(:conditions => conditions).size :
-                                    0
+            user_counts[group.id] = group.context.enrollments.scoped(:conditions => [
+              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND (" +
+                self.class.reflections[:current_and_invited_enrollments].options[:conditions] +
+                " OR " +
+                self.class.reflections[:concluded_enrollments].options[:conditions] +
+              ")",
+              group.group_memberships.map(&:user_id),
+              sections
+            ]).size
           end
         end
       end
@@ -1985,7 +1998,7 @@ class User < ActiveRecord::Base
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
-    user_conditions = []
+    user_conditions = [messageable_user_clause]
     user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
