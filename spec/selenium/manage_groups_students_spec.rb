@@ -52,6 +52,20 @@ describe "manage groups students" do
     driver.find_element(:css, "#category_#{gc1.id} .group_blank .user_count").should include_text("1")
   end
 
+  it "should not show sections for students when managing from an account" do
+    course_with_admin_logged_in(:course => @course, :username => "admin@example.com")
+    student_in_course(:name => "Student 1", :active_all => true)
+
+    @account = Account.default
+    gc1 = @account.group_categories.create(:name => "Group Category 1")
+
+    get "/accounts/#{@account.id}/groups"
+    wait_for_ajaximations
+
+    f(".group_blank .user_id_#{@student.id} .name").should include_text @student.sortable_name
+    f(".group_blank .user_id_#{@student.id} .section_code").text.should be_blank
+  end
+
   it "should paginate and count users correctly" do
     students_count = 20
     students_count.times do |i|

@@ -37,12 +37,14 @@ require([
     paginationSize: 15,
 
     populateUserElement: function($user, data) {
-      data.section_id = data.sections.map(function(s) {
-        return s.section_id;
-      }).join(",");
-      data.section_code = data.sections.map(function(s) {
-        return s.section_code;
-      }).join(", ");
+      if (data.sections) {
+        data.section_id = data.sections.map(function(s) {
+          return s.section_id;
+        }).join(",");
+        data.section_code = data.sections.map(function(s) {
+          return s.section_code;
+        }).join(", ");
+      }
 
       $user.removeClass('user_template');
       $user.addClass('user_id_' + data.user_id);
@@ -264,7 +266,7 @@ require([
       groups.each(function() {
         var section_id_counts = {};
         $section_ids = $(this).find(".student_list .student .section_id");
-        if (!$(this).hasClass('group_blank') && $section_ids.length > 0) {
+        if (!$(this).hasClass('group_blank') && $section_ids.length > 0 && $section_ids.text()) {
           $section_ids.each(function() {
             var section_ids = $(this).text().split(",");
             for (var i = 0; i < section_ids.length; i++) {
