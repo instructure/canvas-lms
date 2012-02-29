@@ -83,6 +83,17 @@ describe "assignments" do
       end
     end
 
+    it "should verify that self sign-up link works in more options" do
+      get "/courses/#{@course.id}/assignments"
+      driver.find_element(:css, '.add_assignment_link').click
+      expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
+      driver.find_element(:id, 'assignment_group_assignment').click
+      click_option('#assignment_group_category_select', 'new', :value)
+      ui_dialog = find_with_jquery('.ui-dialog:visible')
+      ui_dialog.find_element(:css, '.self_signup_help_link img').click
+      driver.find_element(:id, 'self_signup_help_dialog').should be_displayed
+    end
+
     it "should allow creating a quiz assignment from 'more options'" do
       skip_if_ie("Out of memory")
       get "/courses/#{@course.id}/assignments"
