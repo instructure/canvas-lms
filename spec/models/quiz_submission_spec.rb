@@ -120,6 +120,20 @@ describe QuizSubmission do
     q.overdue?(true).should eql(true)
   end
 
+  it "should know if it is extendable" do
+    now = Time.now.utc
+    q = @quiz.quiz_submissions.new
+    q.end_at = now
+
+    q.extendable?.should be_true
+    q.end_at = now - 1.minute
+    q.extendable?.should be_true
+    q.end_at = now - 30.minutes
+    q.extendable?.should be_true
+    q.end_at = now - 90.minutes
+    q.extendable?.should be_false
+  end
+
   it "should calculate score based on quiz scoring policy" do
     q = @course.quizzes.create!(:scoring_policy => "keep_latest")
     s = q.quiz_submissions.new

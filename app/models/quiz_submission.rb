@@ -251,7 +251,7 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def extendable?
-    !!(untaken? && end_at && end_at < 1.hour.from_now)
+    !!(untaken? && end_at && end_at + 1.hour > Time.now.utc)
   end
   
   protected :update_assignment_submission
