@@ -205,20 +205,22 @@ class QuizSubmission < ActiveRecord::Base
   
   def update_kept_score
     self.quiz_points_possible = self.quiz && self.quiz.points_possible
+    return if self.manually_scored || @skip_after_save_score_updates
+    
     if self.completed?
       if self.submission_data && self.submission_data.is_a?(Hash)
         self.grade_submission
       end
       self.kept_score = self.score
       if self.quiz && self.quiz.scoring_policy == "keep_highest"
-        scores = [self.kept_score]
-        scores += versions.map{|v| v.model.score || 0.0} rescue []
-        self.kept_score = scores.max rescue 0
+        self.kept_score = highest_score_so_far
       end
     end
   end
   
   def update_assignment_submission
+    return if self.manually_scored || @skip_after_save_score_updates
+    
     if self.quiz && self.quiz.for_assignment? && self.quiz.assignment && !self.submission && self.user_id
       self.submission = self.quiz.assignment.find_or_create_submission(self.user_id)
     end
@@ -233,8 +235,44 @@ class QuizSubmission < ActiveRecord::Base
       s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
       s.user_id = self.user_id
       s.submission_type = "online_quiz"
+      s.saved_by = :quiz_submission
       s.save!
     end
+  end
+  
+  def highest_score_so_far
+    scores = []
+    scores << self.score if self.score
+    scores += versions.map{|v| v.model.score || 0.0} rescue []
+    scores.max
+  end
+  private :highest_score_so_far
+  
+  # Adjust the fudge points so that the score is the given score
+  # Used when the score is explicitly set by teacher instead of auto-calculating
+  def set_final_score(final_score)
+    return if final_score.blank?
+    self.manually_scored = false
+    @skip_after_save_score_updates = true
+    old_fudge = self.fudge_points || 0.0
+    old_score = self.score
+    base_score = old_score - old_fudge
+    
+    new_fudge = final_score - base_score
+    self.score = final_score
+    self.kept_score = final_score
+    self.fudge_points = new_fudge
+    
+    version = self.versions.current
+    update_submission_version(version) if version
+    if self.quiz && self.quiz.scoring_policy == "keep_highest"
+      if self.kept_score < highest_score_so_far
+        self.manually_scored = true
+      end
+    end
+    
+    self.save
+    @skip_after_save_score_updates = false
   end
 
   def less_than_allotted_time?
@@ -289,6 +327,7 @@ class QuizSubmission < ActiveRecord::Base
     if self.submission_data.is_a?(Array)
       raise "Can't grade an already-submitted submission: #{self.workflow_state} #{self.submission_data.class.to_s}" 
     end
+    self.manually_scored = false
     @tally = 0
     @user_answers = []
     data = self.submission_data || {}
@@ -380,6 +419,7 @@ class QuizSubmission < ActiveRecord::Base
   
   def update_scores(params)
     params = (params || {}).with_indifferent_access
+    self.manually_scored = false
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]
@@ -416,14 +456,14 @@ class QuizSubmission < ActiveRecord::Base
     self.submission_data = res
 
     update_submission_version(version)
+    highest = highest_score_so_far
     if version.model.attempt == self.attempt
       self.with_versioning(false) do |s|
         s.save
       end
-    elsif (self.quiz && self.quiz.scoring_policy == 'keep_highest' && self.score > self.kept_score)
-      score = self.score
+    elsif self.quiz && self.quiz.scoring_policy == 'keep_highest' && self.kept_score != highest
       self.reload
-      self.kept_score = score
+      self.kept_score = highest
       self.without_versioning(&:save)
     end
     self.context_module_action

@@ -93,6 +93,7 @@ class Submission < ActiveRecord::Base
   
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
   
+  attr_accessor :saved_by
   before_save :update_if_pending
   before_save :validate_single_submission, :validate_enrollment, :infer_values, :set_context_code
   before_save :prep_for_submitting_to_turnitin
@@ -104,6 +105,7 @@ class Submission < ActiveRecord::Base
   after_save :update_final_score
   after_save :submit_to_turnitin_later
   after_save :update_admins_if_just_submitted
+  after_save :update_quiz_submission
 
   trigger.after(:update) do |t|
     t.where('(#{Submission.needs_grading_conditions("OLD")}) <> (#{Submission.needs_grading_conditions("NEW")})') do
@@ -176,6 +178,12 @@ class Submission < ActiveRecord::Base
   def update_final_score
     Enrollment.send_later_if_production(:recompute_final_score, self.user_id, self.context.id) if @score_changed
     self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment && @score_changed
+    true
+  end
+  
+  def update_quiz_submission
+    return true if @saved_by == :quiz_submission || !self.quiz_submission || self.score == self.quiz_submission.kept_score
+    self.quiz_submission.set_final_score(self.score)
     true
   end
   

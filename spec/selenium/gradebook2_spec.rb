@@ -614,22 +614,20 @@ describe "gradebook2" do
     end
 
     it "should update a graded quiz and have the points carry over to the quiz attempts page" do
-      pending("bug 7405 - online media submission's don't show as needing to be graded in gradebook(2)") do
-        points = 50
-        q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :points_possible => points, :quiz_type => 'assignment', :workflow_state => 'available')
-        q.save!
-        qs = q.generate_submission(@student_1)
-        qs.grade_submission
-        q.reload
+      points = 50
+      q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :points_possible => points, :quiz_type => 'assignment', :workflow_state => 'available')
+      q.save!
+      qs = q.generate_submission(@student_1)
+      qs.grade_submission
+      q.reload
 
-        get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
-        edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l3'), points.to_s)
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l3'), points.to_s)
 
-        get "/courses/#{@course.id}/quizzes/#{q.id}/history?quiz_submission_id=#{qs.id}"
-        driver.find_element(:css, '.score_value').text.should == points.to_s
-        driver.find_element(:id, 'after_fudge_points_total').text.should == points.to_s
-      end
+      get "/courses/#{@course.id}/quizzes/#{q.id}/history?quiz_submission_id=#{qs.id}"
+      driver.find_element(:css, '.score_value').text.should == points.to_s
+      driver.find_element(:id, 'after_fudge_points_total').text.should == points.to_s
     end
 
     it "should validate setting default grade for an assignment" do

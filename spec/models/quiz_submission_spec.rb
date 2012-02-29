@@ -101,6 +101,97 @@ describe QuizSubmission do
     end
     res.should eql(false)
   end
+  
+  context "explicitly setting grade" do
+    
+    before(:each) do
+      course_with_student
+      @quiz = @course.quizzes.create!
+      @quiz.generate_quiz_data
+      @quiz.published_at = Time.now
+      @quiz.workflow_state = 'available'
+      @quiz.scoring_policy == "keep_highest"
+      @quiz.save!
+      @assignment = @quiz.assignment
+      @quiz_sub = @quiz.generate_submission @user, false
+      @quiz_sub.workflow_state = "complete"
+      @quiz_sub.save!
+      @quiz_sub.score = 5
+      @quiz_sub.fudge_points = 0
+      @quiz_sub.kept_score = 5
+      @quiz_sub.with_versioning(true, &:save!)
+      @submission = @quiz_sub.submission 
+    end
+    
+    it "it should adjust the fudge points" do
+      @assignment.grade_student(@user, {:grade => 3})
+      
+      @quiz_sub.reload
+      @quiz_sub.score.should == 3
+      @quiz_sub.kept_score.should == 3
+      @quiz_sub.fudge_points.should == -2
+      @quiz_sub.manually_scored.should_not be_true
+      
+      @submission.reload
+      @submission.score.should == 3
+      @submission.grade.should == "3"
+    end
+    
+    it "should use the explicit grade even if it isn't the highest score" do
+      @quiz_sub.score = 4.0
+      @quiz_sub.attempt = 2
+      @quiz_sub.with_versioning(true, &:save!)
+      
+      @quiz_sub.reload
+      @quiz_sub.score.should == 4
+      @quiz_sub.kept_score.should == 5
+      @quiz_sub.manually_scored.should_not be_true
+      @submission.reload
+      @submission.score.should == 5
+      @submission.grade.should == "5"
+      
+      @assignment.grade_student(@user, {:grade => 3})
+      @quiz_sub.reload
+      @quiz_sub.score.should == 3
+      @quiz_sub.kept_score.should == 3
+      @quiz_sub.fudge_points.should == -1
+      @quiz_sub.manually_scored.should be_true
+      @submission.reload
+      @submission.score.should == 3
+      @submission.grade.should == "3"
+    end
+    
+    it "should not have manually_scored set when updated normally" do
+      @quiz_sub.score = 4.0
+      @quiz_sub.attempt = 2
+      @quiz_sub.with_versioning(true, &:save!)
+      @assignment.grade_student(@user, {:grade => 3})
+      @quiz_sub.reload
+      @quiz_sub.manually_scored.should be_true
+      
+      @quiz_sub.update_scores(:fudge_points => 2)
+      
+      @quiz_sub.reload
+      @quiz_sub.score.should == 2
+      @quiz_sub.kept_score.should == 5
+      @quiz_sub.manually_scored.should_not be_true
+      @submission.reload
+      @submission.score.should == 5
+      @submission.grade.should == "5"
+    end
+    
+    it "it should add a version to the submission" do
+      @assignment.grade_student(@user, {:grade => 3})
+      @submission.reload
+      @submission.versions.count.should == 2
+      @submission.score.should == 3
+      @assignment.grade_student(@user, {:grade => 6})
+      @submission.reload
+      @submission.versions.count.should == 3
+      @submission.score.should == 6
+    end
+    
+  end
 
   it "should know if it is overdue" do
     now = Time.now
