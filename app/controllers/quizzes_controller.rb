@@ -462,6 +462,15 @@ class QuizzesController < ApplicationController
     return true
   end
 
+  # use this for all redirects while taking a quiz -- it'll add params to tell
+  # the lockdown browser that it's ok to follow the redirect
+  def quiz_redirect_params(opts = {})
+    return opts if !@quiz.require_lockdown_browser? || @quiz.grants_right?(@current_user, session, :grade)
+    plugin = Canvas::LockdownBrowser.plugin.base
+    plugin.redirect_params(self, opts)
+  end
+  helper_method :quiz_redirect_params
+
   def start_quiz!
     can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || @quiz.grants_right?(@current_user, session, :update))
     preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
@@ -477,11 +486,11 @@ class QuizzesController < ApplicationController
         take_quiz
       else
         # redirect to avoid refresh issues
-        redirect_to polymorphic_url([@context, @quiz, 'take'], :preview => params[:preview])
+        redirect_to polymorphic_url([@context, @quiz, 'take'], quiz_redirect_params(:preview => params[:preview]))
       end
     else
       flash[:error] = t('errors.no_more_attempts', "You have no quiz attempts left") unless @just_graded
-      redirect_to named_context_url(@context, :context_quiz_url, @quiz)
+      redirect_to named_context_url(@context, :context_quiz_url, @quiz, quiz_redirect_params)
     end
   end
 
