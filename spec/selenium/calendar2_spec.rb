@@ -20,34 +20,46 @@ describe "calendar2" do
     c
   end
 
-  def create_assignment_event(assignment_title)
+  def find_middle_day
+    driver.find_element(:css, '.calendar .fc-week1 .fc-wed')
+  end
+
+  def change_calendar(css_selector = '.fc-button-next')
+    driver.find_element(:css, '.calendar .fc-header-left ' + css_selector).click
+    wait_for_ajax_requests
+  end
+
+  def add_date(middle_number)
+    find_with_jquery('.ui-datepicker-trigger:visible').click
+    datepicker_current(middle_number)
+  end
+
+  def create_assignment_event(assignment_title, should_add_date = false)
+    middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
     edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_dialog.find_element(:css, '.edit_assignment_option').click
     edit_assignment_form = edit_event_dialog.find_element(:id, 'edit_assignment_form')
     title = edit_assignment_form.find_element(:id, 'assignment_title')
     replace_content(title, assignment_title)
-    find_with_jquery('.ui-datepicker-trigger:visible').click
-    datepicker_next('18')
+    add_date(middle_number) if should_add_date
     edit_assignment_form.submit
     wait_for_ajax_requests
-    driver.find_element(:css, '.fc-button-next').click
-    find_with_jquery('.fc-day-number:contains(18)').click
+    #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
-  def create_calendar_event(event_title)
+  def create_calendar_event(event_title, should_add_date = false)
+    middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
     edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
     title = edit_event_form.find_element(:id, 'calendar_event_title')
     replace_content(title, event_title)
-    find_with_jquery('.ui-datepicker-trigger:visible').click
-    datepicker_next('18')
+    add_date(middle_number) if should_add_date
     edit_event_form.submit
     wait_for_ajax_requests
-    driver.find_element(:css, '.fc-button-next').click
-    find_with_jquery('.fc-day-number:contains(18)').click
+    #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(event_title) }
   end
 
@@ -125,7 +137,7 @@ describe "calendar2" do
           driver.find_element(:id, "ui-menu-1-0").click
           edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
           edit_event_dialog.should be_displayed
-          create_calendar_event(event_title)
+          create_calendar_event(event_title, true)
         end
 
         it "should create an assignment through the context list drop down" do
@@ -138,7 +150,7 @@ describe "calendar2" do
           driver.find_element(:id, "ui-menu-1-1").click
           edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
           edit_event_dialog.should be_displayed
-          create_assignment_event(assignment_title)
+          create_assignment_event(assignment_title, true)
         end
 
         it "should toggle event display when context is clicked" do
@@ -179,11 +191,6 @@ describe "calendar2" do
 
     describe "main calendar" do
 
-      def change_calendar(css_selector = '.fc-button-next')
-        driver.find_element(:css, '.calendar .fc-header-left ' + css_selector).click
-        wait_for_ajax_requests
-      end
-
       def get_header_text
         header = driver.find_element(:css, '.calendar .fc-header .fc-header-title')
         header.text
@@ -191,19 +198,19 @@ describe "calendar2" do
 
       it "should create an event through clicking on a calendar day" do
         get "/calendar2"
-        driver.find_element(:css, '.calendar .fc-today').click
+        find_middle_day.click
         create_calendar_event('new event')
       end
 
       it "should create an assignment by clicking on a calendar day" do
         get "/calendar2"
-        driver.find_element(:css, '.calendar .fc-today').click
+        find_middle_day.click
         create_assignment_event('new assignment')
       end
 
-     it "more options link should go to calendar_event edit page" do
+      it "more options link should go to calendar_event edit page" do
         get "/calendar2"
-        driver.find_element(:css, '.calendar .fc-today').click
+        find_middle_day.click
         create_calendar_event('new event')
 
         driver.find_element(:css, '.fc-event').click
@@ -430,7 +437,7 @@ describe "calendar2" do
             form.submit
 
             assert_flash_notice_message /Messages Sent/
-            keep_trying_until{ find_with_jquery('.ui-dialog:visible').should be_nil }
+            keep_trying_until { find_with_jquery('.ui-dialog:visible').should be_nil }
           end
         end
 
@@ -487,7 +494,6 @@ describe "calendar2" do
         tabs.count.should == 1
         tabs[0].should include_text('Event')
       end
-
     end
 
     describe "main calendar" do

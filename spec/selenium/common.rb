@@ -580,10 +580,10 @@ shared_examples_for "all selenium tests" do
     option
   end
 
-  def datepicker_prev
+  def datepicker_prev(day_text = '15')
     datepicker = driver.find_element(:css, '#ui-datepicker-div')
     datepicker.find_element(:css, '.ui-datepicker-prev').click
-    find_with_jquery('#ui-datepicker-div a:contains(15)').click
+    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
     datepicker
   end
 
@@ -592,6 +592,11 @@ shared_examples_for "all selenium tests" do
     datepicker.find_element(:css, '.ui-datepicker-next').click
     find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
     datepicker
+  end
+
+  def datepicker_current(day_text = '15')
+    datepicker = driver.find_element(:css, '#ui-datepicker-div')
+    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
   end
 
   def stub_kaltura
