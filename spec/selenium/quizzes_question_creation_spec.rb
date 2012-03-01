@@ -324,14 +324,14 @@ describe "quizzes question creation" do
       skip_if_ie 'Out of memory'
       quiz_with_new_questions
       edit_first_html_answer
-      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      type_in_tiny '.answer:eq(3) textarea', 'HTML'
       close_first_html_answer
-      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
       find_with_jquery('.question_form:visible').submit
       refresh_page
       edit_first_question
-      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
     end
 
@@ -339,14 +339,14 @@ describe "quizzes question creation" do
       skip_if_ie 'Out of memory'
       quiz_with_new_questions
       edit_first_html_answer 'Multiple Answers'
-      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      type_in_tiny '.answer:eq(3) textarea', 'HTML'
       close_first_html_answer
-      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
       find_with_jquery('.question_form:visible').submit
       refresh_page
       edit_first_question
-      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
     end
 
@@ -371,12 +371,12 @@ describe "quizzes question creation" do
     it "should restore normal input when html answer is empty" do
       quiz_with_new_questions
       edit_first_html_answer
-      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      type_in_tiny '.answer:eq(3) textarea', 'HTML'
 
       # clear tiny
-      driver.execute_script "$('.answer:eq(2) textarea')._setContentCode('')"
+      driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
       close_first_html_answer
-      input_length = driver.execute_script "return $('.answer:eq(2) input[name=answer_text]:visible').length"
+      input_length = driver.execute_script "return $('.answer:eq(3) input[name=answer_text]:visible').length"
       input_length.should == 1
     end
 
@@ -393,11 +393,11 @@ describe "quizzes question creation" do
 
       # open it up in the editor, make sure the text matches the input
       edit_first_html_answer
-      content = driver.execute_script "return $('.answer:eq(2) textarea')._justGetCode()"
+      content = driver.execute_script "return $('.answer:eq(3) textarea')._justGetCode()"
       content.should == '<p>ohai</p>'
 
       # clear it out, make sure the original input is empty also
-      driver.execute_script "$('.answer:eq(2) textarea')._setContentCode('')"
+      driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
       close_first_html_answer
       value = driver.execute_script "return $('input[name=answer_text]:visible')[0].value"
       value.should == ''
@@ -406,24 +406,52 @@ describe "quizzes question creation" do
     it "should save open html answers when the question is submitted for multiple choice" do
       quiz_with_new_questions
       edit_first_html_answer
-      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      type_in_tiny '.answer:eq(3) textarea', 'HTML'
       find_with_jquery('.question_form:visible').submit
       refresh_page
       edit_first_question
-      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
     end
 
     it "should save open html answers when the question is submitted for multiple answers" do
       quiz_with_new_questions
       edit_first_html_answer 'Multiple Answers'
-      type_in_tiny '.answer:eq(2) textarea', 'HTML'
+      type_in_tiny '.answer:eq(3) textarea', 'HTML'
       find_with_jquery('.question_form:visible').submit
       refresh_page
       edit_first_question
-      html = driver.execute_script "return $('.answer:eq(2) .answer_html').html()"
+      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
     end
- end
+  end
+
+  it "should show errors for graded quizzes but not surveys" do
+    quiz_with_new_questions
+    change_quiz_type_to 'Graded Survey'
+    save_settings
+
+    edit_and_save_first_multiple_choice_answer 'instructure!'
+    error_displayed?.should be_false
+
+    refresh_page
+    edit_and_save_first_multiple_choice_answer 'yog!'
+    error_displayed?.should be_false
+
+    change_quiz_type_to 'Graded Quiz'
+    save_settings
+
+    edit_first_question
+    delete_first_multiple_choice_answer
+    save_question
+    error_displayed?.should be_true
+
+    refresh_page
+    edit_first_question
+    delete_first_multiple_choice_answer
+    save_question
+    error_displayed?.should be_true
+  end
+
 end
 

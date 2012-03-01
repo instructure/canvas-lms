@@ -79,7 +79,7 @@ shared_examples_for "quizzes selenium tests" do
     b = AssessmentQuestion.create!
     bank.assessment_questions << a
     bank.assessment_questions << b
-    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}, 'answer_2' => {'id' => 3}}
     @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
     @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
 
@@ -105,11 +105,47 @@ shared_examples_for "quizzes selenium tests" do
     el.find_element(:css, "textarea").send_keys(text)
   end
 
-  def edit_first_question
-    question = driver.find_element :css, '.display_question'
+  def hover_first_question
+    question = f '.display_question'
     driver.action.move_to(question).perform
-    driver.find_element(:css, '.edit_question_link').click
+  end
+
+  def edit_first_question
+    hover_first_question
+    f('.edit_question_link').click
     wait_for_animations
   end
+
+  def save_question
+    f('.question_form:visible').submit
+    wait_for_ajax_requests
+  end
+
+  def change_quiz_type_to(option_text)
+    click_option '#quiz_assignment_id', option_text
+  end
+
+  def save_settings
+    f('.save_quiz_button').click
+    wait_for_ajax_requests
+  end
+
+  def edit_first_multiple_choice_answer(text)
+    element = f 'input[name=answer_text]:visible'
+    element.click
+    element.send_keys text
+  end
+
+  def edit_and_save_first_multiple_choice_answer(text)
+    edit_first_question
+    edit_first_multiple_choice_answer text
+    save_question
+  end
+
+  def delete_first_multiple_choice_answer
+    driver.execute_script "$('.answer').addClass('hover');"
+    f('.delete_answer_link:visible').click
+  end
+
 end
 

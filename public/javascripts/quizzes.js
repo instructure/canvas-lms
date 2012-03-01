@@ -1940,7 +1940,9 @@ define([
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
         }
       }
-      if (error_text) {
+
+      var isNotSurvey = !$('#quiz_assignment_id').val().match(/survey/i);
+      if (isNotSurvey && error_text) {
         $form.find(".answers_header").errorBox(error_text, true);
         return;
       }

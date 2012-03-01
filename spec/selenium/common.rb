@@ -712,6 +712,10 @@ shared_examples_for "all selenium tests" do
     driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
   end
 
+  def error_displayed?
+    f('.error_text:visible') != nil
+  end
+
   self.use_transactional_fixtures = false
 
   append_after(:each) do
