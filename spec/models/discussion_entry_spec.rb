@@ -20,22 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionEntry do
 
-  it "should set parent_id to 0 if invalid or nil" do
-    course
-    topic = @course.discussion_topics.create!
-    entry = topic.discussion_entries.create!
-    entry.should_not be_nil
-    entry.should_not be_new_record
-    entry.parent_id.should eql(0)
-
-    topic_2 = @course.discussion_topics.create!
-    entry_2 = topic_2.discussion_entries.create!
-    sub_entry = topic.discussion_entries.build
-    sub_entry.parent_id = entry_2.id
-    sub_entry.save!
-    sub_entry.parent_id.should eql(0)
-  end
-
   it "should be marked as deleted when parent is deleted" do
     topic = course.discussion_topics.create!
     entry = topic.discussion_entries.create!
@@ -49,25 +33,6 @@ describe DiscussionEntry do
     sub_entry.reload
     sub_entry.should be_deleted
     topic.discussion_entries.active.length.should == 0
-  end
-
-  it "should only allow one level of nesting" do
-    course
-    topic = @course.discussion_topics.create!
-    entry = topic.discussion_entries.create!
-    entry.should_not be_nil
-    entry.should_not be_new_record
-    entry.parent_id.should eql(0)
-
-    sub_entry = topic.discussion_entries.build
-    sub_entry.parent_id = entry.id
-    sub_entry.save!
-    sub_entry.parent_id.should eql(entry.id)
-
-    sub_sub_entry = topic.discussion_entries.build
-    sub_sub_entry.parent_id = sub_entry.id
-    sub_sub_entry.save!
-    sub_sub_entry.parent_id.should eql(entry.id)
   end
 
   it "should preserve parent_id if valid" do

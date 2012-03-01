@@ -30,7 +30,7 @@ class DiscussionTopic < ActiveRecord::Base
   attr_readonly :context_id, :context_type, :user_id
 
   has_many :discussion_entries, :order => :created_at, :dependent => :destroy
-  has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id = ? AND discussion_entries.workflow_state != ?', 0, 'deleted']
+  has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state != ?', 'deleted']
   has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
@@ -602,7 +602,7 @@ class DiscussionTopic < ActiveRecord::Base
     if options[:include_entries]
       self.discussion_entries.sort_by{|e| e.created_at }.each do |entry|
         dup_entry = entry.clone_for(context, nil, :migrate => options[:migrate])
-        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}") || 0
+        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}")
         dup_entry.discussion_topic_id = dup.id
         dup_entry.save!
         context.map_merge(entry, dup_entry)

@@ -204,6 +204,7 @@ describe DiscussionTopicsController, :type => :integration do
       @entry = DiscussionEntry.find_by_id(json['id'])
       json.should == {
         "id" => @entry.id,
+        "parent_id" => @entry.parent_id,
         "user_id" => @user.id,
         "user_name" => @user.name,
         "read_state" => "read",
@@ -222,17 +223,6 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message })
       @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.parent_entry.should == top_entry
-    end
-
-    it "should not allow reply-to-reply" do
-      top_entry = create_entry(@topic, :message => 'top-level message')
-      sub_entry = create_reply(top_entry, :message => 'reply message')
-      raw_api_call(
-        :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{sub_entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => sub_entry.id.to_s },
-        { :message => @message })
-      response.should_not be_success
     end
 
     it "should allow including attachments on top-level entries" do
@@ -717,6 +707,64 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.unread_count(@user).should == 2
     end
   end
+
+  describe "threaded discussions" do
+    before do
+      student_in_course(:active_all => true)
+      @topic = create_topic(@course)
+      @entry = create_entry(@topic)
+      @sub1 = create_reply(@entry)
+      @sub2 = create_reply(@sub1)
+      @sub3 = create_reply(@sub2)
+      @side2 = create_reply(@entry)
+      @entry2 = create_entry(@topic)
+    end
+
+    context "in the original API" do
+      it "should return nested discussions in a flattened format" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries",
+                 { :controller => "discussion_topics_api", :action => "entries", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        json.size.should == 2
+        json[0]['id'].should == @entry2.id
+        e1 = json[1]
+        e1['id'].should == @entry.id
+        e1['recent_replies'].map { |r| r['id'] }.should == [@side2.id, @sub3.id, @sub2.id, @sub1.id]
+        e1['recent_replies'].map { |r| r['parent_id'] }.should == [@entry.id, @sub2.id, @sub1.id, @entry.id]
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
+                 { :controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+        json.size.should == 4
+        json.map { |r| r['id'] }.should == [@side2.id, @sub3.id, @sub2.id, @sub1.id]
+        json.map { |r| r['parent_id'] }.should == [@entry.id, @sub2.id, @sub1.id, @entry.id]
+      end
+
+      it "should allow posting a reply to a sub-entry" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@sub2.id}/replies",
+                 { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @sub2.id.to_s },
+                 { :message => "ohai" })
+        json['parent_id'].should == @sub2.id
+        @sub4 = DiscussionEntry.last(:order => :id)
+        @sub4.id.should == json['id']
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
+                 { :controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+        json.size.should == 5
+        json.map { |r| r['id'] }.should == [@sub4.id, @side2.id, @sub3.id, @sub2.id, @sub1.id]
+        json.map { |r| r['parent_id'] }.should == [@sub2.id, @entry.id, @sub2.id, @sub1.id, @entry.id]
+      end
+
+      it "should fail if the max entry depth is reached" do
+        entry = @entry
+        (DiscussionEntry.max_depth - 1).times do
+          entry = create_reply(entry)
+        end
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{entry.id}/replies",
+                 { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => entry.id.to_s },
+                 { :message => "ohai" }, {}, {:expected_status => 400})
+      end
+    end
+  end
+
 end
 
 def create_attachment(context, opts={})
@@ -760,8 +808,9 @@ end
 def create_reply(entry, opts={})
   created_at = opts.delete(:created_at)
   opts[:user] ||= @user
-  opts[:discussion_topic] = entry.discussion_topic
-  reply = entry.discussion_subentries.build(opts)
+  opts[:html] ||= opts.delete(:message)
+  opts[:html] ||= "<p>This is a test message</p>"
+  reply = entry.reply_from(opts)
   reply.created_at = created_at if created_at
   reply.save!
   reply
