@@ -587,10 +587,10 @@ shared_examples_for "all selenium tests" do
     datepicker
   end
 
-  def datepicker_next
+  def datepicker_next(day_text = '15')
     datepicker = driver.find_element(:css, '#ui-datepicker-div')
     datepicker.find_element(:css, '.ui-datepicker-next').click
-    find_with_jquery('#ui-datepicker-div a:contains(15)').click
+    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
     datepicker
   end
 

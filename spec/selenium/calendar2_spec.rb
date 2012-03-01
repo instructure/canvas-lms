@@ -28,11 +28,11 @@ describe "calendar2" do
     title = edit_assignment_form.find_element(:id, 'assignment_title')
     replace_content(title, assignment_title)
     find_with_jquery('.ui-datepicker-trigger:visible').click
-    datepicker_next
+    datepicker_next('18')
     edit_assignment_form.submit
     wait_for_ajax_requests
     driver.find_element(:css, '.fc-button-next').click
-    find_with_jquery('.fc-day-number:contains(15)').click
+    find_with_jquery('.fc-day-number:contains(18)').click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
@@ -43,11 +43,11 @@ describe "calendar2" do
     title = edit_event_form.find_element(:id, 'calendar_event_title')
     replace_content(title, event_title)
     find_with_jquery('.ui-datepicker-trigger:visible').click
-    datepicker_next
+    datepicker_next('18')
     edit_event_form.submit
     wait_for_ajax_requests
     driver.find_element(:css, '.fc-button-next').click
-    find_with_jquery('.fc-day-number:contains(15)').click
+    find_with_jquery('.fc-day-number:contains(18)').click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(event_title) }
   end
 
@@ -201,14 +201,14 @@ describe "calendar2" do
         create_assignment_event('new assignment')
       end
 
-      it "more options link should go to calendar_event edit page" do
+     it "more options link should go to calendar_event edit page" do
         get "/calendar2"
         driver.find_element(:css, '.calendar .fc-today').click
         create_calendar_event('new event')
 
         driver.find_element(:css, '.fc-event').click
         find_with_jquery('.popover-links-holder:visible').should_not be_nil
-        driver.find_element(:css, '.popover-links-holder .edit_event_link').click
+        driver.find_element(:css, '.event-details-links .edit_event_link').click
         link = driver.find_element(:css, '#edit_calendar_event_form .more_options_link')
         link["href"].should =~ %r{calendar_events/\d+/edit$}
       end
