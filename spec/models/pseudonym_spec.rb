@@ -144,31 +144,55 @@ describe Pseudonym do
     pseudonym.sis_user_id.should be_nil
   end
 
-  it "should gracefully handle unreachable LDAP servers" do
-    require 'net/ldap'
-    module Net
-      class LDAP
-        alias_method :bind_as_old, :bind_as
-        def bind_as(opts = {})
-          raise Net::LDAP::LdapError, "no connection to server"
-        end
-      end
+  context "LDAP errors" do
+    before do
+      require 'net/ldap'
+      user_with_pseudonym(:active_all => true)
+      @aac = @pseudonym.account.account_authorization_configs.create!(
+        :auth_type      => 'ldap',
+        :auth_base      => "ou=people,dc=example,dc=com",
+        :auth_host      => "ldap.example.com",
+        :auth_username  => "cn=query,dc=example,dc=com",
+        :auth_port      => 636,
+        :auth_filter    => "(uid={{login}})",
+        :auth_over_tls  => true
+      )
     end
-    user_with_pseudonym(:active_all => true)
-    @pseudonym.account.account_authorization_configs.create!(
-      :auth_type      => 'ldap',
-      :auth_base      => "ou=people,dc=example,dc=com",
-      :auth_host      => "ldap.example.com",
-      :auth_username  => "cn=query,dc=example,dc=com",
-      :auth_port      => 636,
-      :auth_filter    => "(uid={{login}})",
-      :auth_over_tls  => true
-    )
-    lambda{ @pseudonym.ldap_bind_result('blech') }.should_not raise_error
-    ErrorReport.last.message.should eql("no connection to server")
-    module Net; class LDAP; def bind_as(opts={}); true; end; end; end
-    @pseudonym.ldap_bind_result('yay!').should be_true
-    module Net; class LDAP; alias_method :bind_as, :bind_as_old; end; end
+
+    it "should gracefully handle unreachable LDAP servers" do
+      Net::LDAP.any_instance.expects(:bind_as).raises(Net::LDAP::LdapError, "no connection to server")
+      lambda{ @pseudonym.ldap_bind_result('blech') }.should_not raise_error
+      ErrorReport.last.message.should eql("no connection to server")
+      Net::LDAP.any_instance.expects(:bind_as).returns(true)
+      @pseudonym.ldap_bind_result('yay!').should be_true
+    end
+
+    it "should set last_timeout_failure on LDAP servers that timeout" do
+      Net::LDAP.any_instance.expects(:bind_as).once.raises(Timeout::Error, "timed out")
+      @pseudonym.ldap_bind_result('test').should be_false
+      ErrorReport.last.message.should eql("Timeout::Error")
+      @aac.reload.last_timeout_failure.should > 1.minute.ago
+    end
+
+    it "should not attempt to bind if last_timeout_failure is set recently" do
+      # calling again should not attempt to bind
+      @aac.update_attribute(:last_timeout_failure, Time.now)
+      Net::LDAP.any_instance.expects(:bind_as).never
+      @pseudonym.ldap_bind_result('test').should be_false
+
+      # updating the config should reset :last_timeout_failure
+      @aac.update_attribute(:auth_port, 637)
+      @aac.last_timeout_failure.should be_nil
+      Net::LDAP.any_instance.expects(:bind_as).returns(true)
+      @pseudonym.ldap_bind_result('test').should be_true
+    end
+
+    it "should allow another attempt once last_timeout_failure is sufficiently in the past" do
+      @aac.update_attribute(:last_timeout_failure, 5.seconds.ago)
+      Setting.set('ldap_failure_wait_time', 2.seconds)
+      Net::LDAP.any_instance.expects(:bind_as).returns(true)
+      @pseudonym.ldap_bind_result('test').should be_true
+    end
   end
 
   it "should not error on malformed SSHA password" do
