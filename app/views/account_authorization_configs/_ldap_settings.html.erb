@@ -4,6 +4,7 @@
 <div id="ldap_div" <%= raw active %>>
 <% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class=>"auth_type ldap_form" ) do %>
   <table class="formtable" style="margin-left: 20px;">
+    <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @account_configs[0] } %>
     <tr>
       <th><%= before_label(t(:auth_type_label, "Type")) %></th>
       <th><%= t :setting_type_ldap, 'LDAP' %></th>
@@ -40,6 +41,7 @@
   </div>
 
   <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px; <%= "display: none;" unless @account_configs[1].ldap_authentication? %>">
+    <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @account_configs[1] } %>
     <tr>
       <th><%= before_label(t(:auth_type_label, "Type")) %></th>
       <th><%= t(:secondary_ldap_label, "Secondary LDAP") %> <a href="#" class="auth_form remove_secondary_ldap_link"><%= t(:remove_secondary_ldap_link, "(Remove)") %></a></th>
