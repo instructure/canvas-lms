@@ -140,6 +140,7 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
+  'jst/quiz/move_question',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */,
   'jquery.instructure_jquery_patches' /* /\.dialog/ */,
@@ -148,7 +149,7 @@ require([
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
-], function(I18n, $) {
+], function(I18n, $, moveQuestion) {
 
 $(document).ready(function() {
   if($("#more_questions").length > 0) {
@@ -336,7 +337,7 @@ $(document).ready(function() {
       $.ajaxJSON(window.location.href + '/questions?page=' + this.page, 'GET', {}, $.proxy(this.onData, this));
     },
     onData: function(data){
-      var questions = $(Template('quiz/move_question', data));
+      var questions = moveQuestion(data);
       this.elements.$loadMessage.remove();
       this.elements.$questions.append(questions);
       if (this.page < data.pages){
