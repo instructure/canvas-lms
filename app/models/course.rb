@@ -500,27 +500,35 @@ class Course < ActiveRecord::Base
 
   def user_is_teacher?(user)
     return unless user
-    cache_key = [self, user, "course_user_is_teacher"].cache_key
-    res = Rails.cache.read(cache_key)
-    if res.nil?
-      res = user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
-      Rails.cache.write(cache_key, res)
+    Rails.cache.fetch([self, user, "course_user_is_teacher"].cache_key) do
+      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
-    res
   end
   memoize :user_is_teacher?
 
   def user_is_student?(user)
     return unless user
-    cache_key = [self, user, "course_user_is_student"].cache_key
-    res = Rails.cache.read(cache_key)
-    if res.nil?
-      res = !self.student_enrollments.find_by_user_id(user.id).nil?
-      Rails.cache.write(cache_key, res)
+    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
+      self.student_enrollments.find_by_user_id(user.id).present?
     end
-    res
   end
   memoize :user_is_student?
+
+  def user_has_been_teacher?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_teacher"].cache_key) do
+      self.teacher_enrollments.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_teacher?
+
+  def user_has_been_student?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
+      self.all_student_enrollments.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_student?
 
   def grade_weight_changed!
     @grade_weight_changed = true

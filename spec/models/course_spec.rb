@@ -2851,6 +2851,34 @@ describe Course, "user_is_teacher?" do
   end
 end
 
+describe Course, "user_has_been_teacher?" do
+  it "should be true for teachers, past or present" do
+    e = course_with_teacher(:active_all => true)
+    @course.user_has_been_teacher?(@teacher).should be_true
+
+    e.conclude
+    e.reload.workflow_state.should == "completed"
+    @course.user_has_been_teacher?(@teacher).should be_true
+
+    @course.complete
+    @course.user_has_been_teacher?(@teacher).should be_true
+  end
+end
+
+describe Course, "user_has_been_student?" do
+  it "should be true for students, past or present" do
+    e = course_with_student(:active_all => true)
+    @course.user_has_been_student?(@student).should be_true
+
+    e.conclude
+    e.reload.workflow_state.should == "completed"
+    @course.user_has_been_student?(@student).should be_true
+
+    @course.complete
+    @course.user_has_been_student?(@student).should be_true
+  end
+end
+
 describe Course, "#gradebook_json" do
   it "should generate gradebook json" do
     course_with_student(:active_all => true)
