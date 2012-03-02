@@ -10,6 +10,12 @@ describe "gradebook2" do
     dialog_form = dialog.find_element(:css, '.ui-dialog-content')
     driver.find_element(:css, '.grading_value').send_keys(points)
     dialog_form.submit
+    keep_trying_until do
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.dismiss
+      true
+    end
+    driver.switch_to.default_content
   end
 
   def open_assignment_options(cell_index)
@@ -275,8 +281,8 @@ describe "gradebook2" do
       wait_for_ajaximations
       els = driver.find_elements(:css, '.student-name')
       els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }.should == [
-        "/courses/#{@course.id}/grades/#{@student_1.id}",
-        "/courses/#{@course.id}/grades/#{@student_2.id}",
+          "/courses/#{@course.id}/grades/#{@student_1.id}",
+          "/courses/#{@course.id}/grades/#{@student_2.id}",
       ]
     end
 
@@ -436,33 +442,6 @@ describe "gradebook2" do
       validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_2_TOTAL_IGNORING_UNGRADED)
     end
 
-    it "should validate setting group weights" do
-      weight_num = 50.0
-
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
-      driver.find_element(:id, 'gradebook_settings').click
-      wait_for_animations
-      driver.find_element(:css, '[aria-controls="assignment_group_weights_dialog"]').click
-
-      dialog = driver.find_element(:id, 'assignment_group_weights_dialog')
-      dialog.should be_displayed
-
-      dialog.find_element(:css, '#group_weighting_scheme').click
-      set_value(dialog.find_element(:css, '.group_weight'), weight_num)
-
-      save_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Save")')
-      save_button.click
-      wait_for_ajax_requests
-      @course.reload.group_weighting_scheme.should == 'percent'
-      @group.reload.group_weight.should eql(weight_num)
-
-      # TODO: make the header cell in the UI update to reflect new value
-      # heading = find_with_jquery(".slick-column-name:contains('#{@group.name}') .assignment-points-possible")
-      # heading.should include_text("#{weight_num}% of grade")
-    end
-
     it "should validate arrange columns by due date option" do
       expected_text = "-"
 
@@ -515,14 +494,14 @@ describe "gradebook2" do
 
     it "should let you post a group comment to a group assignment" do
       group_assignment = assignment_model({
-                                               :course => @course,
-                                               :name => 'group assignment',
-                                               :due_at => (Time.now + 1.week),
-                                               :points_possible => ASSIGNMENT_3_POINTS,
-                                               :submission_types => 'online_text_entry',
-                                               :assignment_group => @group,
-                                               :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-                                               :grade_group_students_individually => true
+                                              :course => @course,
+                                              :name => 'group assignment',
+                                              :due_at => (Time.now + 1.week),
+                                              :points_possible => ASSIGNMENT_3_POINTS,
+                                              :submission_types => 'online_text_entry',
+                                              :assignment_group => @group,
+                                              :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                              :grade_group_students_individually => true
                                           })
       project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
       project_group.users << @student_1
@@ -571,16 +550,7 @@ describe "gradebook2" do
         #for the test to work correctly
 
         set_default_grade(2, 5)
-
-        keep_trying_until do
-          driver.switch_to.alert.should_not be_nil
-          driver.switch_to.alert.dismiss
-        end
-
-        driver.switch_to.default_content
-
         grade_grid = driver.find_element(:css, '#gradebook_grid')
-
         @course.student_enrollments.each_with_index do |e, n|
           next if e.completed?
           find_slick_cells(n, grade_grid)[2].text.should == 5
@@ -661,6 +631,41 @@ describe "gradebook2" do
         driver.find_element(:id, 'after_fudge_points_total').text.should == points.to_s
       end
     end
+
+    it "should validate setting default grade for an assignment" do
+      expected_grade = "45"
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      set_default_grade(2, expected_grade)
+      grade_grid = driver.find_element(:css, '#gradebook_grid')
+      StudentEnrollment.count.times do |n|
+        find_slick_cells(n, grade_grid)[2].text.should == expected_grade
+      end
+    end
+
+    it "should correctly set default grades for a specific section" do
+      pending('bug 7540 - Setting default grade for one section changes it for all ') do
+        def open_section_menu_and_click(menu_item_css)
+          driver.find_element(:id, 'section_to_show').click
+          section_menu = driver.find_element(:id, 'section-to-show-menu')
+          section_menu.should be_displayed
+          section_menu.find_element(:css, menu_item_css).click
+        end
+
+        expected_grade = "45"
+        gradebook_row_1 = '#gradebook_grid [row="1"]'
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        open_section_menu_and_click('#section-to-show-menu-1')
+        set_default_grade(2, expected_grade)
+        open_section_menu_and_click('#section-to-show-menu-0')
+        driver.find_element(:css, gradebook_row_1).should be_displayed
+        validate_cell_text(driver.find_element(:css, "#{gradebook_row_1} .r2"), '-')
+      end
+    end
   end
 
   context "group weights" do
@@ -704,23 +709,38 @@ describe "gradebook2" do
       @course.reload
     end
 
-    it "should validate setting default grade for an assignment" do
-      expected_grade = "45"
+    it "should validate setting group weights" do
+      weight_numbers = [30.0, 70.0]
 
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
-      set_default_grade(1, expected_grade)
+      driver.find_element(:id, 'gradebook_settings').click
+      wait_for_animations
+      driver.find_element(:css, '[aria-controls="assignment_group_weights_dialog"]').click
+
+      dialog = driver.find_element(:id, 'assignment_group_weights_dialog')
+      dialog.should be_displayed
+
+      group_check = dialog.find_element(:id, 'group_weighting_scheme')
       keep_trying_until do
-        driver.switch_to.alert.should_not be_nil
-        driver.switch_to.alert.dismiss
-        true
+        group_check.click
+        is_checked('#group_weighting_scheme').should be_true
       end
-      driver.switch_to.default_content
-      grade_grid = driver.find_element(:css, '#gradebook_grid')
-      StudentEnrollment.count.times do |n|
-        find_slick_cells(n, grade_grid)[1].text.should == expected_grade
+      group_weight_inputs = driver.find_elements(:css, '.group_weight')
+      2.times { |i| set_value(group_weight_inputs[i], weight_numbers[i]) }
+      save_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Save")')
+      save_button.click
+      wait_for_ajax_requests
+      @course.reload.group_weighting_scheme.should == 'percent'
+      assignment_groups = AssignmentGroup.all
+      assignment_groups.each_with_index do |ag, i|
+        ag.reload.group_weight.should eql(weight_numbers[i])
       end
+
+      # TODO: make the header cell in the UI update to reflect new value
+      # heading = find_with_jquery(".slick-column-name:contains('#{@group.name}') .assignment-points-possible")
+      # heading.should include_text("#{weight_num}% of grade")
     end
 
     it "should display group weights correctly when set on assignment groups" do
@@ -735,8 +755,7 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/assignments"
         driver.find_element(:id, 'class_weighting_policy').click
         wait_for_ajaximations
-        get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
+
 
         check_group_points('0%')
       end
