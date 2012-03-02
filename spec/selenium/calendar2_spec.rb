@@ -3,6 +3,13 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "calendar2" do
   it_should_behave_like "in-process server selenium tests"
 
+  def create_appointment_group
+    current_date = Date.today.to_s
+    ag = @course.appointment_groups.create(:title => "new appointment group", :context => @course, :new_appointments => [[current_date + ' 12:00:00', current_date + ' 13:00:00']])
+    ag.publish!
+    ag
+  end
+
   before (:each) do
     Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
   end
@@ -288,13 +295,6 @@ describe "calendar2" do
       EDIT_NAME = 'edited appointment'
       EDIT_LOCATION = 'edited location'
 
-      def create_appointment_group_api
-        current_date = Date.today.to_s
-        ag = @course.appointment_groups.create(:title => "new appointment group", :context => @course, :new_appointments => [[current_date + ' 12:00:00', current_date + ' 13:00:00']])
-        ag.publish!
-        ag.title
-      end
-
       def create_appointment_group_manual
         new_appointment_text = 'new appointment group'
         expect {
@@ -357,7 +357,7 @@ describe "calendar2" do
       end
 
       it "should delete an appointment group" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
 
@@ -369,7 +369,7 @@ describe "calendar2" do
       end
 
       it "should edit an appointment group" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
 
@@ -380,7 +380,7 @@ describe "calendar2" do
       end
 
       it "should edit an appointment group after clicking appointment group link" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -389,7 +389,7 @@ describe "calendar2" do
       end
 
       it "should delete an appointment group after clicking appointment group link" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -449,7 +449,7 @@ describe "calendar2" do
       end
 
       it "should validate the appointment group shows up on the calendar" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -457,7 +457,7 @@ describe "calendar2" do
       end
 
       it "should delete the appointment group from the calendar" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -474,7 +474,7 @@ describe "calendar2" do
   context "calendar2 as a student" do
 
     before (:each) do
-      course_with_student_logged_in
+      @student = course_with_student_logged_in(:active_all => true).user
     end
 
     describe "contexts list" do
@@ -507,6 +507,24 @@ describe "calendar2" do
         driver.find_element(:id, "popover-0").should be_displayed
         element_exists('.edit_event_link').should be_false
         element_exists('.delete_event_link').should be_false
+      end
+
+      it "should validate appointment group popup link functionality" do
+        pending("bug 6986 - clicking on the name of an appointment group in a popup should take user to scheduler") do
+          ag = create_appointment_group
+          ag.appointments.first.reserve_for @student, @me
+          @user = @me
+          get "/calendar2"
+          wait_for_ajaximations
+
+          driver.find_element(:css, '.fc-event-title').click
+          popover = driver.find_element(:id, "popover-0")
+          popover.should be_displayed
+          expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
+          wait_for_ajaximations
+          is_checked('#scheduler').should be_true
+          driver.find_element(:id, 'appointment-group-list').should include_text(ag.title)
+        end
       end
     end
   end
