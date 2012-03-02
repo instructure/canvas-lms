@@ -74,7 +74,21 @@ class Notification < ActiveRecord::Base
   end
   
   def self.summary_notification
-    find_by_name('Summaries')
+    by_name('Summaries')
+  end
+
+  def self.by_name(name)
+    @notifications ||= Notification.all.inject({}){ |h, n| h[n.name] = n; h }
+    if notification = @notifications[name]
+      copy = notification.clone
+      copy.id = notification.id
+      copy.send(:remove_instance_variable, :@new_record)
+      copy
+    end
+  end
+
+  def self.reset_cache!
+    @notifications = nil
   end
 
   def infer_default_content

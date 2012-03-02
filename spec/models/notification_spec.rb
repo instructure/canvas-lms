@@ -44,6 +44,26 @@ describe Notification do
     n.subject.should_not be_nil
     n.sms_body.should_not be_nil
   end
+
+  context "by_name" do
+    before do
+      Notification.create(:name => "foo")
+      Notification.create(:name => "bar")
+    end
+
+    it "should look up all notifications once and cache them thereafter" do
+      Notification.expects(:all).once.returns{ Notification.find(:all) }
+      Notification.by_name("foo").should eql(Notification.find_by_name("foo"))
+      Notification.by_name("bar").should eql(Notification.find_by_name("bar"))
+    end
+
+    it "should give you different object for the same notification" do
+      n1 = Notification.by_name("foo")
+      n2 = Notification.by_name("foo")
+      n1.should eql n2
+      n1.should_not equal n2
+    end
+  end
   
   context "create_message" do
     it "should only send dashboard messages for users with non-validated channels" do

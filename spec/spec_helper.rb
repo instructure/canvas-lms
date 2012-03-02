@@ -97,6 +97,7 @@ Spec::Runner.configure do |config|
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
+    Notification.after_create { Notification.reset_cache! }
   end
 
   config.before :each do
@@ -105,6 +106,7 @@ Spec::Runner.configure do |config|
     Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
     HostUrl.reset_cache!
+    Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
   end
 

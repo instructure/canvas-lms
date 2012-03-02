@@ -126,8 +126,7 @@ module Instructure #:nodoc:
           record.messages_failed[self.dispatch] = "Did not meet condition."
           return false
         end
-        notification = record.notifications.find_by_name(self.dispatch) rescue nil
-        notification ||= Notification.find_by_name(self.dispatch)
+        notification = Notification.by_name(self.dispatch)
         # logger.warn "Could not find notification for #{record.inspect}" unless notification
         unless notification
           record.messages_failed[self.dispatch] = "Could not find notification: #{self.dispatch}."
