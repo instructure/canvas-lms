@@ -1,3 +1,14 @@
+canvas-lms (2012.03.03.02) testing; urgency=low
+
+  * Package ref: 31d3f61c7aaa3bc9ca4a9fe658afbe170009f3ef
+  *
+  * [+8037944] ensure jquery exists for all global javascripts.
+  * [+d4fb964] don't exec in js:build rake task
+  * [+67a45c5] students in groups at account level don't have sections; fixes #7502
+  * [+31d3f61] fix move question template
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 02 Mar 2012 12:36:20 -0700
+
 canvas-lms (2012.02.28.16.03) testing; urgency=low
 
   * Package ref: 4cee7a997df3a3469b02907857b6b60d8d2316b5
