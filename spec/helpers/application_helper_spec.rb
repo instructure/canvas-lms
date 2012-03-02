@@ -143,6 +143,42 @@ describe ApplicationHelper do
     end
   end
 
+  describe "hidden dialogs" do
+    before do
+      hidden_dialogs.should be_empty
+    end
+
+    it "should generate empty string when there are no dialogs" do
+      str = render_hidden_dialogs
+      str.should == ''
+    end
+
+    it "should work with one hidden_dialog" do
+      hidden_dialog('my_test_dialog') { "Hello there!" }
+      str = render_hidden_dialogs
+      str.should == "<div id='my_test_dialog' style='display: none;''>Hello there!</div>"
+    end
+
+    it "should work with more than one hidden dialog" do
+      hidden_dialog('first_dialog') { "first" }
+      hidden_dialog('second_dialog') { "second" }
+      str = render_hidden_dialogs
+      str.should == "<div id='second_dialog' style='display: none;''>second</div><div id='first_dialog' style='display: none;''>first</div>"
+    end
+
+    it "should raise an error when a dialog with conflicting content is added" do
+      hidden_dialog('dialog_id') { 'content' }
+      lambda { hidden_dialog('dialog_id') { 'different content' } }.should raise_error
+    end
+
+    it "should only render a dialog once when it has been added multiple times" do
+      hidden_dialog('dialog_id') { 'content' }
+      hidden_dialog('dialog_id') { 'content' }
+      str = render_hidden_dialogs
+      str.should == "<div id='dialog_id' style='display: none;''>content</div>"
+    end
+  end
+
   describe "collection_cache_key" do
     it "should generate a cache key, changing when an element cache_key changes" do
       collection = [user, user, user]

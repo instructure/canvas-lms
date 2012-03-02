@@ -240,18 +240,4 @@ a.load_members_link, .loading_members {
   </div>
   <%= render :partial => "groups/add_group_category" %>
   <%= render :partial => "groups/edit_group_category" %>
-  <div id="self_signup_help_dialog" style="display: none;">
-    <%= mt(:self_signup_help_message, <<-TEXT)
-You can create sets of groups where students can sign up on their own.
-Students are still limited to being in only one group in the set, but this way
-students can organize themselves into groups instead of needing the teacher to
-do the work. You can also require that group members all be part of the same
-course section.
-
-Keep in mind, students can move themselves from one group to another, so when
-your students are done organizing themselves you may want to disable self
-sign-ups.
-TEXT
-    %>
-  </div>
 <% end %>

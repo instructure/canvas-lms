@@ -289,6 +289,21 @@ module ApplicationHelper
     raw(output)
   end
 
+  def hidden_dialog(id, &block)
+    content = capture(&block)
+    if !Rails.env.production? && hidden_dialogs[id] && hidden_dialogs[id] != content
+      raise "Attempted to capture a hidden dialog with #{id} and different content!"
+    end
+    @hidden_dialogs[id] = capture(&block)
+  end
+  def hidden_dialogs; @hidden_dialogs ||= {}; end
+  def render_hidden_dialogs
+    output = hidden_dialogs.inject('') do |str, item|
+      str << "<div id='#{item[0]}' style='display: none;''>" << item[1] << "</div>"
+    end
+    raw(output)
+  end
+
   class << self
     attr_accessor :cached_translation_blocks
   end
