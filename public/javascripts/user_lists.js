@@ -189,13 +189,14 @@ require([
         }
       });
 
+      enrollment.enrollment_id = enrollment.id;
       var already_existed = true;
       if(!$("#enrollment_" + enrollment.id).length) {
         already_existed = false;
         var $enrollment = $enrollment_blank
           .clone(true)
           .fillTemplateData({
-            textValues: ['name', 'membership_type', 'email'],
+            textValues: ['name', 'membership_type', 'email', 'enrollment_id'],
             id: 'enrollment_' + enrollment.id,
             hrefValues: ['id', 'user_id', 'pseudonym_id', 'communication_channel_id'],
             data: enrollment
@@ -211,6 +212,9 @@ require([
           .animate({'backgroundColor': '#FFFFFF'}, 2000, function() {
             $(this).css('backgroundColor', '');
           });
+        $enrollment.find('.enrollment_link')
+          .removeClass('enrollment_blank')
+          .addClass('enrollment_' + enrollment.id);
         $enrollment
           .parents(".user_list")
           .scrollToVisible($enrollment);

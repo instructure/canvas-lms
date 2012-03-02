@@ -112,20 +112,20 @@ describe "people" do
     end
 
     it "should link an observer to student after adding the observer to the course" do
-      pending("bug 7528 - Unexpected error if trying to link an observer to student after adding the observer to the course") do
-        expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
-        add_users_button = driver.find_element(:css, '.add_users_link')
-        add_users_button.click
-        add_user("Observers", @test_observer.name, 'ul.user_list.observer_enrollments')
-        find_with_jquery('.associated_user_link:visible').click #driver.find_element = element hidden
-        link_student_form = driver.find_element(:id, 'link_student_dialog_form')
-        click_option('#student_enrollment_link_option', @student_1.name)
-        link_student_form.find_element(:css, '.save_button').click
-        wait_for_ajax_requests
-        ObserverEnrollment.count.should == 1
-        driver.find_element(:css, '.error_text').should_not be_displayed
-        #TODO - should add validation that the student was linked when the bug fix goes in
-      end
+      expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
+      add_users_button = driver.find_element(:css, '.add_users_link')
+      add_users_button.click
+      add_user("Observers", @test_observer.name, 'ul.user_list.observer_enrollments')
+      ObserverEnrollment.count.should == 1
+      oe = ObserverEnrollment.first
+
+      find_with_jquery('.associated_user_link:visible').click #driver.find_element = element hidden
+      link_student_form = f('#link_student_dialog_form')
+      click_option('#student_enrollment_link_option', @student_1.name)
+      link_student_form.find_element(:css, '.save_button').click
+      wait_for_ajaximations
+      f(".enrollment_#{oe.id} .associated_user_name").should include_text @student_1.name
+      oe.reload.associated_user_id.should == @student_1.id
     end
 
     it "should make a new set of student groups" do
