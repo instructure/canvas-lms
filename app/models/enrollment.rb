@@ -326,8 +326,11 @@ class Enrollment < ActiveRecord::Base
   end
 
   TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
-  TYPE_RANK_SQL = rank_sql(TYPE_RANK, 'enrollments.type')
   TYPE_RANK_HASH = rank_hash(TYPE_RANK)
+  def self.type_rank_sql
+    # don't call rank_sql during class load
+    @type_rank_sql ||= rank_sql(TYPE_RANK, 'enrollments.type')
+  end
 
   def rank_sortable(student_first=false)
     type = self.class.to_s
@@ -336,8 +339,11 @@ class Enrollment < ActiveRecord::Base
   end
 
   STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
-  STATE_RANK_SQL = rank_sql(STATE_RANK, 'enrollments.workflow_state')
   STATE_RANK_HASH = rank_hash(STATE_RANK)
+  def self.state_rank_sql
+    # don't call rank_sql during class load
+    @state_rank_sql ||= rank_sql(STATE_RANK, 'enrollments.workflow_state')
+  end
 
   def state_sortable
     STATE_RANK_HASH[state.to_s]

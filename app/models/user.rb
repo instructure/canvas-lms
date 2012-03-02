@@ -1496,13 +1496,13 @@ class User < ActiveRecord::Base
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil)
     res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
       send(association).distinct_on(["courses.id"],
-        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment::TYPE_RANK_SQL} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-        :order => "courses.id, #{Enrollment::TYPE_RANK_SQL}, #{Enrollment::STATE_RANK_SQL}"
+        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+        :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}"
       )
     end.dup
     if association == :current_and_invited_courses
       if enrollment_uuid && pending_course = Course.find(:first,
-          :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment::TYPE_RANK_SQL} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+          :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
           :joins => :enrollments, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state='invited'", enrollment_uuid])
         res << pending_course
         res.uniq!
@@ -2048,7 +2048,7 @@ class User < ActiveRecord::Base
       WHERE
         user_id = users.id AND courses.id = course_id
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]})
-      ORDER BY #{Enrollment::TYPE_RANK_SQL}
+      ORDER BY #{Enrollment.type_rank_sql}
       LIMIT 1
     SQL
     user_sql << <<-SQL if account_ids.present?
