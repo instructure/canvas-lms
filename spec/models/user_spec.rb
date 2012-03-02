@@ -960,6 +960,27 @@ describe User do
       @user.avatar_image = { 'type' => 'twitter' }
       @user.avatar_image_url.should be_nil
     end
+
+    it "should return a useful avatar_fallback_url" do
+      User.avatar_fallback_url.should ==
+        "https://#{HostUrl.default_host}/images/no_pic.gif"
+      User.avatar_fallback_url("/somepath").should ==
+        "https://#{HostUrl.default_host}/somepath"
+      User.avatar_fallback_url("//somedomain/path").should ==
+        "https://somedomain/path"
+      User.avatar_fallback_url("http://somedomain/path").should ==
+        "http://somedomain/path"
+      User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :scheme => "http")).should ==
+        "http://foo/images/no_pic.gif"
+      User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+        "https://bar/somepath"
+      User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+        "https://somedomain/path"
+      User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+        "http://somedomain/path"
+      User.avatar_fallback_url('%{fallback}').should ==
+        '%{fallback}'
+    end
   end
 
   it "should find sections for course" do

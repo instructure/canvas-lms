@@ -1089,7 +1089,7 @@ class User < ActiveRecord::Base
   end
 
   def gravatar_url(size=50, fallback=nil, request=nil)
-    fallback ||= request ? "#{request.protocol}#{request.host_with_port}/images/no_pic.gif" : "http://#{HostUrl.default_host}/images/no_pic.gif"
+    fallback = self.class.avatar_fallback_url(fallback, request)
     "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
   end
 
@@ -1225,9 +1225,11 @@ class User < ActiveRecord::Base
     }.uniq
   end
 
-  def avatar_url(size=nil, avatar_setting=nil, fallback='/images/no_pic.gif', request = nil)
+  AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
+  def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil)
     size ||= 50
     avatar_setting ||= 'enabled'
+    fallback = self.class.avatar_fallback_url(fallback, request)
     if avatar_setting == 'enabled' || (avatar_setting == 'enabled_pending' && avatar_approved?) || (avatar_setting == 'sis_only')
       @avatar_url ||= self.avatar_image_url
     end
@@ -1238,6 +1240,22 @@ class User < ActiveRecord::Base
   
   def avatar_path
     "/images/users/#{User.avatar_key(self.id)}"
+  end
+  
+  def self.default_avatar_fallback
+    "/images/no_pic.gif"
+  end
+
+  def self.avatar_fallback_url(fallback=nil, request=nil)
+    return fallback if fallback == '%{fallback}'
+    if fallback and uri = URI.parse(fallback) rescue nil
+      uri.scheme ||= request ? request.scheme : "https"
+      uri.host ||= request ? request.host : HostUrl.default_host.split(/:/)[0]
+      uri.port ||= request.port if request && ![80, 443].include?(request.port)
+      uri.to_s
+    else
+      avatar_fallback_url(default_avatar_fallback, request)
+    end
   end
   
   named_scope :with_avatar_state, lambda{|state|

@@ -161,7 +161,7 @@ class ProfileController < ApplicationController
       end
     end
     @pics << {
-      :url => @current_user.gravatar_url(50, "#{request.protocol}#{request.host_with_port}/images/dotted_pic.png"),
+      :url => @current_user.gravatar_url(50, "/images/dotted_pic.png", request),
       :type => 'gravatar',
       :alt => 'gravatar pic'
     }

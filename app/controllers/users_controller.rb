@@ -912,14 +912,19 @@ class UsersController < ApplicationController
     if params[:user_id].present? && params[:user_id].match(/-/)
       user_id = User.user_id_from_avatar_key(params[:user_id])
     end
-    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id)) do
+    account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
+    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
       user = User.find_by_id(user_id) if user_id.present?
-      if user && service_enabled?(:avatars)
-        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback], request)
+      if user && account_avatar_setting != 'disabled'
+        user.avatar_url(nil, account_avatar_setting, "%{fallback}")
+      else
+        ''
       end
-      url ||= params[:fallback] || '/images/no_pic.gif'
     end
-    redirect_to url
+    fallback = User.avatar_fallback_url(params[:fallback], request)
+    redirect_to url.blank? ?
+      fallback :
+      url.sub(CGI.escape("%{fallback}"), CGI.escape(fallback))
   end
 
   protected
