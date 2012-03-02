@@ -20,6 +20,7 @@ class ConversationParticipant < ActiveRecord::Base
   include Workflow
   include TextHelper
   include SimpleTags
+  include ModelCache
 
   belongs_to :conversation
   belongs_to :user
@@ -62,6 +63,9 @@ class ConversationParticipant < ActiveRecord::Base
     sanitize_sql conditions
   end
 
+  cacheable_method :user
+  cacheable_method :conversation
+
   delegate :private?, :to => :conversation
 
   before_update :update_unread_count_for_update
@@ -72,8 +76,8 @@ class ConversationParticipant < ActiveRecord::Base
   validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
-    latest = options[:last_message] || last_message_at && messages.human.first
-    latest_authored = options[:last_authored_message] || visible_last_authored_at && messages.human.by_user(user_id).first
+    latest = last_message
+    latest_authored = last_authored_message
     options[:include_context_info] ||= private?
     {
       :id => conversation_id,
@@ -107,7 +111,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def participants(options = {})
     options = {
-      :include_context_info => true,
+      :include_participant_contexts => false,
       :include_indirect_participants => false
     }.merge(options)
 
@@ -122,7 +126,7 @@ class ConversationParticipant < ActiveRecord::Base
       user_ids -= participants.map(&:id)
       participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
     end
-    return participants unless options[:include_context_info]
+    return participants unless options[:include_participant_contexts]
     # we do this to find out the contexts they share with the user
     user.messageable_users(:ids => participants.map(&:id), :skip_visibility_checks => true).each { |user|
       context_info[user.id] = user
@@ -134,8 +138,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
   memoize :participants
 
-  def properties(latest = nil)
-    latest ||= messages.human.first
+  def properties(latest = last_message)
     properties = []
     properties << :last_author if latest && latest.author_id == user_id
     properties << :attachments if has_attachments?
@@ -205,16 +208,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.participants.size == 2 && private?
   end
 
-  def other_participants(options={})
-    if options[:as_conversation_participants]
-      # give the option to use our notion of participants, which populates
-      # extra column re: shared courses/groups
-      self.participants.reject { |u| u.id == self.user.id }
-    else
-      # by default, use the conversations notion of participants, which is
-      # lighter weight
-      conversation.participants - [self.user]
-    end
+  def other_participants(participants=conversation.participants)
+    participants.reject { |u| u.id == self.user_id }
   end
 
   def other_participant
@@ -229,7 +224,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def update_cached_data(options = {})
     options = {:recalculate_count => true, :set_last_message_at => true, :regenerate_tags => true}.update(options)
-    if latest = messages.human.first
+    if latest = last_message
       self.tags = message_tags if options[:regenerate_tags] && private?
       self.message_count = messages.human.size if options[:recalculate_count]
       self.last_message_at = if last_message_at.nil?
@@ -248,7 +243,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.has_media_objects = messages.with_media_comments.size > 0
       self.visible_last_authored_at = if latest.author_id == user_id
         latest.created_at
-      elsif latest_authored = messages.human.by_user(user_id).first
+      elsif latest_authored = last_authored_message
         latest_authored.created_at
       end
     else
@@ -296,6 +291,23 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.regenerate_private_hash! if private?
   end
 
+  attr_writer :last_message
+  def last_message
+    @last_message ||= messages.human.first if last_message_at
+  end
+
+  attr_writer :last_authored_message
+  def last_authored_message
+    @last_authored_message ||= messages.human.by_user(user_id).first if visible_last_authored_at
+  end
+
+  def self.preload_latest_messages(conversations, author_id)
+    # preload last_message
+    ConversationMessage.preload_latest conversations.select(&:last_message_at)
+    # preload last_authored_message
+    ConversationMessage.preload_latest conversations.select(&:visible_last_authored_at), author_id
+  end
+  
   protected
   def message_tags
     messages.map(&:tags).inject([], &:concat).uniq

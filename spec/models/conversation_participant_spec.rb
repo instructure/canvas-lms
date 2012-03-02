@@ -169,15 +169,11 @@ describe ConversationParticipant do
       @convo.add_message("haha i forwarded it", :forwarded_message_ids => [message.id])
     end
 
-    it "should include shared contexts by default" do
+    it "should not include shared contexts by default" do
       users = @convo.reload.participants
       users.each do |user|
-        user.common_groups.should == {}
-        if [@me.id, @u3.id].include? user.id
-          user.common_courses.should == {}
-        else
-          user.common_courses.should == {@course.id => ["StudentEnrollment"]}
-        end
+        user.common_groups.should be_nil
+        user.common_courses.should be_nil
       end
     end
 
@@ -186,11 +182,15 @@ describe ConversationParticipant do
       users.map(&:id).sort.should eql [@me.id, @u1.id, @u2.id, @u3.id]
     end
 
-    it "should not include shared contexts if asked not to" do
-      users = @convo.reload.participants(:include_context_info => false)
+    it "should include shared contexts if requested" do
+      users = @convo.reload.participants(:include_participant_contexts => true)
       users.each do |user|
-        user.common_groups.should be_nil
-        user.common_courses.should be_nil
+        user.common_groups.should == {}
+        if [@me.id, @u3.id].include? user.id
+          user.common_courses.should == {}
+        else
+          user.common_courses.should == {@course.id => ["StudentEnrollment"]}
+        end
       end
     end
 
@@ -245,7 +245,7 @@ describe ConversationParticipant do
       rconvo = c.conversation
       old_hash = rconvo.private_hash
 
-      c.move_to_user @user2
+      c.reload.move_to_user @user2
 
       c.reload.user_id.should eql @user2.id
       rconvo.reload
@@ -263,7 +263,7 @@ describe ConversationParticipant do
       c2 = @user2.initiate_conversation([other_guy.id])
       c2.add_message("hola")
 
-      c.move_to_user @user2
+      c.reload.move_to_user @user2
 
       lambda{ c.reload }.should raise_error # deleted
       lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
@@ -286,7 +286,7 @@ describe ConversationParticipant do
       rconvo = c.conversation
       old_hash = rconvo.private_hash
 
-      c.move_to_user @user2
+      c.reload.move_to_user @user2
 
       lambda{ c.reload }.should raise_error # deleted
       rconvo.reload
@@ -304,7 +304,7 @@ describe ConversationParticipant do
       c2.add_message("monologue!")
       @user2.mark_all_conversations_as_read!
 
-      c.move_to_user @user2
+      c.reload.move_to_user @user2
 
       lambda{ c.reload }.should raise_error # deleted
       lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
@@ -325,7 +325,7 @@ describe ConversationParticipant do
       c2 = @user2.initiate_conversation([@user2.id])
       c2.add_message("monologue 2")
 
-      c.move_to_user @user2
+      c.reload.move_to_user @user2
 
       lambda{ c.reload }.should raise_error # deleted
       lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted

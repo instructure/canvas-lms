@@ -37,8 +37,8 @@ class ConversationMessage < ActiveRecord::Base
     user_or_id = user_or_id.id if user_or_id.is_a?(User)
     {:conditions => {:author_id => user_or_id}}
   }
-  def self.latest_for_conversations(conversation_participants, author_id=nil)
-    return {} unless conversation_participants.present?
+  def self.preload_latest(conversation_participants, author_id=nil)
+    return unless conversation_participants.present?
     base_conditions = sanitize_sql([
       "conversation_id IN (?) AND conversation_participant_id in (?) AND NOT generated",
       conversation_participants.map(&:conversation_id),
@@ -62,12 +62,17 @@ class ConversationMessage < ActiveRecord::Base
     end
 
     ret = distinct_on('conversation_participant_id',
-      :select => "conversation_messages.*",
+      :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.tags",
       :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
       :conditions => base_conditions,
       :order => 'conversation_participant_id, created_at DESC'
     )
-    Hash[ret.map{ |m| [m.conversation_id, m]}]
+    map = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
+    if author_id
+      conversation_participants.each{ |cp| cp.last_authored_message = map[cp.id] }
+    else
+      conversation_participants.each{ |cp| cp.last_message = map[cp.id] }
+    end
   end
 
   validates_length_of :body, :maximum => maximum_text_length
@@ -123,9 +128,8 @@ class ConversationMessage < ActiveRecord::Base
     @media_comment = media_comment
   end
 
-  # TODO do this in SQL
   def recipients
-    self.subscribed_participants - [self.author]
+    self.subscribed_participants.reject{ |u| u.id == self.author_id }
   end
 
   def new_recipients

@@ -1724,11 +1724,11 @@ class User < ActiveRecord::Base
   memoize :manageable_appointment_context_codes
 
   def conversation_context_codes
-    e = enrollment_visibility
-    (e[:full_course_ids] + e[:section_id_hash].keys + e[:restricted_course_hash].keys).uniq.
-      map{ |id| "course_#{id}" } +
-    current_groups.
-      map{ |g| "group_#{g.id}"}
+    Rails.cache.fetch([self, 'conversation_context_codes'].cache_key, :expires_in => 1.day) do
+      courses.map{ |c| "course_#{c.id}" } + 
+      concluded_courses.map{ |c| "course_#{c.id}" } + 
+      current_groups.map{ |g| "group_#{g.id}"}
+    end
   end
   memoize :conversation_context_codes
 
@@ -1828,7 +1828,7 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.day) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
@@ -1878,7 +1878,7 @@ class User < ActiveRecord::Base
   end
 
   def visible_group_ids
-    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.day) do
       (courses + concluded_courses.recently_ended).inject(self.current_groups) { |groups, course|
         groups | course.groups.active
       }.map(&:id)
@@ -1887,7 +1887,7 @@ class User < ActiveRecord::Base
   memoize :visible_group_ids
 
   def group_membership_visibility
-    Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.day) do
       course_visibility = enrollment_visibility
       own_group_ids = current_groups.map(&:id)
 
@@ -1922,6 +1922,10 @@ class User < ActiveRecord::Base
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
   MESSAGEABLE_USER_CONTEXT_REGEX = /\A(course|section|group)_(\d+)(_([a-z]+))?\z/
   def messageable_users(options = {})
+    # if :ids is specified but empty (different than just not specified), don't
+    # bother doing a query that's guaranteed to return no results.
+    return [] if options[:ids] && options[:ids].empty?
+
     course_hash = enrollment_visibility
     full_course_ids = course_hash[:full_course_ids]
     restricted_course_hash = course_hash[:restricted_course_hash]
@@ -1969,12 +1973,8 @@ class User < ActiveRecord::Base
       account_ids &= options[:account_ids] if options[:account_ids]
     end
 
-    # if :ids is specified but empty (different than just not specified), don't
-    # bother doing a query that's guaranteed to return no results.
-    return [] if options[:ids] && options[:ids].empty?
-
     user_conditions = []
-    user_conditions << [messageable_user_clause] unless options[:skip_visibility_checks] && options[:ids]
+    user_conditions << messageable_user_clause unless options[:skip_visibility_checks] && options[:ids]
     user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
