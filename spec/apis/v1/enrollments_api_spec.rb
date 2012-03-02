@@ -317,6 +317,7 @@ describe EnrollmentsApiController, :type => :integration do
       it "should filter by enrollment workflow_state" do
         @teacher.enrollments.first.update_attribute(:workflow_state, 'completed')
         json = api_call(:get, "#{@path}?state[]=completed", @params.merge(:state => %w{completed}))
+        json.count.should be > 0
         json.each { |e| e['enrollment_state'].should eql 'completed' }
       end
 

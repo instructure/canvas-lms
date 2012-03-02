@@ -43,7 +43,7 @@ class EnrollmentsApiController < ApplicationController
   # user can, however, return his/her own enrollments.
   #
   # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are returned.
-  # @argument state[] Filter by enrollment state. Accepted values are 'active', 'invited', and 'creation_pending', 'deleted', 'rejected', 'completed', and 'inactive'. If omitted, 'active,' 'invited,' and 'creation_pending' enrollments are returned.
+  # @argument state[] Filter by enrollment state. Accepted values are 'active', 'invited', and 'creation_pending', 'deleted', 'rejected', 'completed', and 'inactive'. If omitted, 'active' and 'invited' enrollments are returned.
   #
   # @response_field course_id The unique id of the course.
   # @response_field course_section_id The unique id of the user's section.
@@ -178,7 +178,9 @@ class EnrollmentsApiController < ApplicationController
   protected
   def course_index_enrollments(scope_arguments)
     if authorized_action(@context, @current_user, :read_roster)
-      @context.current_enrollments.scoped(scope_arguments)
+      scope_arguments[:conditions].include?(:workflow_state) ?
+        @context.enrollments.scoped(scope_arguments) :
+        @context.current_enrollments.scoped(scope_arguments)
     else
       false
     end
@@ -198,7 +200,9 @@ class EnrollmentsApiController < ApplicationController
     end
 
     scope_arguments[:conditions].merge!({ 'enrollments.root_account_id' => approved_accounts })
-    enrollments = user.current_enrollments.scoped(scope_arguments)
+    enrollments = scope_arguments[:conditions].include?(:workflow_state) ?
+      user.enrollments.scoped(scope_arguments) :
+      user.current_and_invited_enrollments.scoped(scope_arguments)
 
     if enrollments.count == 0 && user.current_enrollments.count != 0
       render_unauthorized_action(@user)
