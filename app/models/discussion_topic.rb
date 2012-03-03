@@ -532,7 +532,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def posters
-    users = self.discussion_entries.find(:all, :include => [:user]).map(&:user)
+    users = context.participating_users(discussion_entries.map(&:user_id).uniq)
     users << self.user
     users.uniq
   end

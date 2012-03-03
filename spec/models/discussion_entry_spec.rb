@@ -55,25 +55,81 @@ describe DiscussionEntry do
     topic.message.should eql("<a href=\"#\">only this should stay</a>")
   end
 
-  it "should send new entry notifications" do
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+  context "entry notifications" do
+    before do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
 
-    notification_name = "New Discussion Entry"
-    n = Notification.create(:name => notification_name, :category => "TestImmediately")
-    NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      @notification_name = "New Discussion Entry"
+      n = Notification.create(:name => @notification_name, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+    end
 
-    topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
-    entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
+    it "should send them for course discussion topics" do
+      topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+      entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
 
-    to_users = entry.messages_sent[notification_name].map(&:user)
-    to_users.should include(@teacher)
-    to_users.should_not include(@student)
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include(@teacher)
+      to_users.should_not include(@student)
 
-    entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
-    to_users = entry.messages_sent[notification_name].map(&:user)
-    to_users.should_not include(@teacher)
-    to_users.should include(@student)
+      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should_not include(@teacher)
+      to_users.should include(@student)
+    end
+
+    it "should send them for group discussion topics" do
+      group(:group_context => @course)
+
+      s1 = @student
+      student_in_course(@course)
+      s2 = @student
+
+      @group.participating_users << s1
+      @group.participating_users << s2
+      @group.save!
+
+      topic = @group.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+      entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include(@teacher)
+      to_users.should_not include(s1)
+      to_users.should_not include(s2)
+
+      entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include(@teacher)
+      to_users.should include(s1)
+      to_users.should_not include(s2)
+    end
+
+    it "should not send them to irrelevant users" do
+      teacher  = @teacher
+      student1 = @student
+      course   = @course
+
+      student_in_course
+      quitter  = @student
+
+      course_with_teacher
+      student_in_course
+      outsider = @student
+
+      topic = course.discussion_topics.create!(:user => teacher, :message => "Hi there")
+
+      entry = topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
+      quitter.enrollments.each { |e| e.destroy }
+
+      weird_entry = topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
+      entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")
+
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include teacher
+      to_users.should_not include outsider
+      to_users.should_not include student1
+      to_users.should_not include quitter
+    end
   end
 
   context "send_to_inbox" do

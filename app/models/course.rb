@@ -2533,4 +2533,13 @@ class Course < ActiveRecord::Base
     return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
     :closed
   end
+
+  def participating_users(user_ids)
+    enrollments = self.enrollments.scoped(
+      :include => :user,
+      :conditions => ["enrollments.workflow_state = 'active' AND users.id IN (?)",
+                      user_ids]
+    )
+    enrollments.select { |e| e.active? }.map(&:user).uniq
+  end
 end

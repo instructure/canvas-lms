@@ -416,21 +416,21 @@ describe DiscussionTopic do
     end
 
     it "should include users that have posted entries" do
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @topic.reply_from(:user => @student, :text => "entry")
       @topic.posters.should include(@student)
     end
 
     it "should include users that have replies to entries" do
       @entry = @topic.reply_from(:user => @teacher, :text => "entry")
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @entry.reply_from(:user => @student, :html => "reply")
       @topic.posters.should include(@student)
     end
 
     it "should dedupe users" do
       @entry = @topic.reply_from(:user => @teacher, :text => "entry")
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @entry.reply_from(:user => @student, :html => "reply 1")
       @entry.reply_from(:user => @student, :html => "reply 2")
       @topic.posters.should include(@teacher)
@@ -477,7 +477,7 @@ describe DiscussionTopic do
     end
 
     it "should create submissions for existing entries when setting the assignment" do
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @topic.reply_from(:user => @student, :text => "entry")
       @student.reload
       @student.submissions.should be_empty
@@ -549,12 +549,12 @@ describe DiscussionTopic do
     end
 
     it "should not duplicate submissions for existing entries that already have submissions" do
-      @student = student_in_course.user
-      @topic.reload # to get the student in topic.assignment.context.students
+      @student = student_in_course(:active_all => true).user
 
       @assignment = assignment_model(:course => @course)
       @topic.assignment = @assignment
       @topic.save
+      @topic.reload # to get the student in topic.assignment.context.students
 
       @topic.reply_from(:user => @student, :text => "entry")
       @student.reload
