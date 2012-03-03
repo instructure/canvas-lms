@@ -34,4 +34,16 @@ describe "jobs ui" do
       Delayed::Job.count(:conditions => { :locked_by => 'on hold' }).should == 2
     end
   end
+
+  describe "running jobs" do
+    it "should display running jobs in the workers grid" do
+      j = Delayed::Job.last(:order => :id)
+      j.lock_exclusively!(100, 'my test worker')
+      get "/jobs"
+      wait_for_ajax_requests
+      ff('#running-grid .slick-row').size.should == 1
+      row = f('#running-grid .slick-row')
+      f('.l0', row).text.should == 'my test worker'
+    end
+  end
 end
