@@ -1,6 +1,6 @@
 <% content_for :page_title do %><%= join_title t(:page_title, "Web Conferences"), @context.name %><% end %>
 
-<% jammit_js :conferences %>
+<% js_bundle :conferences %>
 
 <% content_for :right_side do %>
   <% if can_do(@context.web_conferences.new, @current_user, :create) %>
@@ -100,7 +100,14 @@
 <%= render :partial => "shared/conference", :object => nil %>
 
 <% js_block do %>
-  <script>
+<script>
+require([
+  'INST' /* INST */,
+  'jquery' /* $ */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(INST, $) {
+
+
   INST.webConferenceUserSettings = <%=
     WebConference.conference_types.map{ |type|
       type[:user_settings].keys.map{ |setting| "user_settings[#{setting}]" }
@@ -121,5 +128,6 @@
     }.to_json.html_safe
   %>;
   INST.webConferenceDefaultDuration = <%= WebConference::DEFAULT_DURATION %>;
+});
   </script>
 <% end %>

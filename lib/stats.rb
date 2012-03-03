@@ -84,11 +84,19 @@ module Stats
       # this one is very good
       # method is summarized well here:
       # http://www.stat.yale.edu/Courses/1997-98/101/numsum.htm
+      if @items.length == 0
+        return [nil, nil, nil]
+      end
+      
       sorted_items = @items.sort
       vals = []
       
       # 1st Q
       n = (sorted_items.length+1)/4.0 -1
+      if n < 0
+        # n must be in [0,n]
+        n = 0
+      end
       weight = 1.0 -(n - n.to_i)
       n = n.to_i
       vals<<get_weighted_nth(sorted_items, n, weight)
@@ -101,6 +109,10 @@ module Stats
       
       # 3rd Q
       n = (sorted_items.length+1)*3.0/4.0 -1
+      if n > sorted_items.length - 1
+        # n must be in [0,n]
+        n = sorted_items.length - 1
+      end
       weight = 1.0 -(n - n.to_i)
       n = n.to_i
       vals<<get_weighted_nth(sorted_items, n, weight)
@@ -137,8 +149,11 @@ module Stats
     
     def get_weighted_nth(sorted_items, n, weight)
       n1 = sorted_items[n].to_f
-      n2 = sorted_items[n+1].to_f
-      val = n1*weight + n2*(1.0-weight)
+      val = n1 * weight
+      unless n == sorted_items.length - 1
+        n2 = sorted_items[n+1].to_f
+        val += n2 * (1 - weight)
+      end
       val
     end
     

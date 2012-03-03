@@ -64,11 +64,17 @@ TEXT
 <% end %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */
+], function($) {
+
 $(document).ready(function() {
   $(".facebook_setup_link").click(function(event) {
     event.preventDefault();
     $("#facebook_setup").slideToggle();
   });
+});
+
 });
 </script>
 <% end %>

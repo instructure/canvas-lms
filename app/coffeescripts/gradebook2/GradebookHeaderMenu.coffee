@@ -1,10 +1,26 @@
-I18n.scoped 'gradebook2', (I18n) ->
-  class @GradebookHeaderMenu
+define [
+  'i18n!gradebook2'
+  'jquery'
+  'message_students'
+  'compiled/AssignmentDetailsDialog'
+  'compiled/AssignmentMuter'
+  'compiled/gradebook2/SetDefaultGradeDialog'
+  'compiled/gradebook2/CurveGradesDialog'
+  'jst/gradebook2/GradebookHeaderMenu'
+  'jst/re_upload_submissions_form'
+  'jquery.instructure_forms'
+  'jquery.instructure_jquery_patches'
+  'jquery.instructure_misc_helpers'
+  'jquery.instructure_misc_plugins'
+  'compiled/jquery.kylemenu'
+], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form) ->
+
+  class GradebookHeaderMenu
     constructor: (@assignment, @$trigger, @gradebook) ->
       templateLocals =
         assignmentUrl: "#{@gradebook.options.context_url}/assignments/#{@assignment.id}"
         speedGraderUrl: "#{@gradebook.options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      @$menu = $(Template 'gradebook2/GradebookHeaderMenu', templateLocals).insertAfter(@$trigger)
+      @$menu = $(gradebookHeaderMenuTemplate(templateLocals)).insertAfter(@$trigger)
       @$trigger.kyleMenu(noButton:true)
       @$menu
         # need it to be a child of #gradebook_grid (not the header cell) to get over overflow:hidden obstacles.
@@ -67,7 +83,7 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     reuploadSubmissions: =>
       unless @$re_upload_submissions_form
-        GradebookHeaderMenu::$re_upload_submissions_form = $(Template('re_upload_submissions_form'))
+        GradebookHeaderMenu::$re_upload_submissions_form = $(re_upload_submissions_form())
           .dialog
             width: 400
             modal: true

@@ -37,6 +37,31 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :archived, :conditions => "workflow_state = 'archived'"
   named_scope :starred, :conditions => "label = 'starred'"
   named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
+
+  tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
+    user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
+    conditions = if options[:mode] == :or || tags.size == 1
+      [<<-SQL, user_ids]
+      EXISTS (
+        SELECT *
+        FROM conversation_participants cp
+        WHERE cp.conversation_id = conversation_participants.conversation_id
+        AND user_id IN (?)
+      )
+      SQL
+    else
+      [<<-SQL, user_ids, user_ids.size]
+      (
+        SELECT COUNT(*)
+        FROM conversation_participants cp
+        WHERE cp.conversation_id = conversation_participants.conversation_id
+        AND user_id IN (?)
+      ) = ?
+      SQL
+    end
+    sanitize_sql conditions
+  end
+
   delegate :private?, :to => :conversation
 
   before_update :update_unread_count
@@ -179,8 +204,16 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.participants.size == 2 && private?
   end
 
-  def other_participants
-    conversation.participants - [self.user]
+  def other_participants(options={})
+    if options[:as_conversation_participants]
+      # give the option to use our notion of participants, which populates
+      # extra column re: shared courses/groups
+      self.participants.reject { |u| u.id == self.user.id }
+    else
+      # by default, use the conversations notion of participants, which is
+      # lighter weight
+      conversation.participants - [self.user]
+    end
   end
 
   def other_participant

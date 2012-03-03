@@ -349,6 +349,8 @@ ActionController::Routing::Routes.draw do |map|
     feed.user_format "users/:feed_code.:format", :controller => "users", :action => "public_feed"
     feed.gradebook "gradebooks/:feed_code", :controller => "gradebooks", :action => "public_feed"
     feed.eportfolio "eportfolios/:eportfolio_id.:format", :controller => "eportfolios", :action => "public_feed"
+    feed.conversation "conversations/:feed_code", :controller => "conversations", :action => "public_feed"
+    feed.conversation_format "conversations/:feed_code.:format", :controller => "conversations", :action => "public_feed"
   end
 
   map.resources :assessment_questions do |question|
@@ -638,6 +640,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
       courses.get 'courses/:course_id/todo', :action => :todo_items
+      courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
     end

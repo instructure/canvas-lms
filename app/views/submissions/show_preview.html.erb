@@ -42,14 +42,16 @@
 <% elsif @submission.submission_type == "online_text_entry" %>
   <% js_block do %>
   <script>
-  $(document).ready(function() {
-    $(".data_view").change(function() {
-      if($(this).val() == "paper") {
-        $("#submission_preview").removeClass('plain_text').addClass('paper');
-      } else {
-        $("#submission_preview").removeClass('paper').addClass('plain_text');
-      }
-    }).change();
+  require(['jquery'], function($) {
+    $(document).ready(function() {
+      $(".data_view").change(function() {
+        if($(this).val() == "paper") {
+          $("#submission_preview").removeClass('plain_text').addClass('paper');
+        } else {
+          $("#submission_preview").removeClass('paper').addClass('plain_text');
+        }
+      }).change();
+    });
   });
   </script>
   <% end %>
@@ -99,6 +101,12 @@
   </div>
   <% js_block do %>
     <script>
+    require([
+      'jquery',
+      'vendor/swfobject/swfobject',
+      'jquery.instructure_jquery_patches', // .dialog patch
+      'jquery.doc_previews' // loadDocPreview
+    ], function($, swfobject, _docPreviews) {
       $(document).ready(function(){
 
         $("a.flash").click(function() {
@@ -122,6 +130,7 @@
         }
 
       });
+    });
     </script>
   <% end %>
 
@@ -142,6 +151,10 @@
 
   <% js_block do %>
     <script>
+    require([
+      'jquery',
+      'media_comments'
+    ], function($, _mediaComments) {
       $(document).ready(function() {
         $(".play_media_recording_link").click(function(event) {
           event.preventDefault();
@@ -151,6 +164,7 @@
         });
         $(".play_media_recording_link").mediaCommentThumbnail();
       });
+    });
     </script>
   <% end %>
 <% else %>

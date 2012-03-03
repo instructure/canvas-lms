@@ -1,14 +1,15 @@
-define 'compiled/calendar/EditEventDetailsDialog', [
-  'i18n'
+define [
+  'jquery'
+  'i18n!calendar'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/EditCalendarEventDetails'
   'compiled/calendar/EditAssignmentDetails'
   'compiled/calendar/EditApptCalendarEventDetails'
   'compiled/calendar/EditAppointmentGroupDetails'
   'jst/calendar/editEvent'
-], (I18n, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDetails, EditAppointmentGroupDetails, editEventTemplate) ->
-
-  I18n = I18n.scoped 'calendar'
+  'jquery.instructure_jquery_patches'
+  'jqueryui/tabs'
+], ($, I18n, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDetails, EditAppointmentGroupDetails, editEventTemplate) ->
 
   dialog = $('<div id="edit_event"><div /></div>').appendTo('body').dialog
     autoOpen: false

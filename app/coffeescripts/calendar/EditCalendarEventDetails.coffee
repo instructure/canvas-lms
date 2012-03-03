@@ -1,10 +1,14 @@
-define 'compiled/calendar/EditCalendarEventDetails', [
-  'i18n'
+define [
+  'jquery'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editCalendarEvent'
   'jst/calendar/genericSelect'
-], (I18n, commonEventFactory, TimeBlockList, editCalendarEventTemplate, genericSelectTemplate) ->
+  'jquery.instructure_date_and_time'
+  'jquery.instructure_forms'
+  'jquery.instructure_misc_helpers'
+  'vendor/date'
+], ($, commonEventFactory, TimeBlockList, editCalendarEventTemplate, genericSelectTemplate) ->
 
   class EditCalendarEventDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->

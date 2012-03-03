@@ -15,6 +15,9 @@
 </ul>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */
+], function($) {
   $(document).ready(function() {
     $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
       $(this).find(".info").addClass('info_hover');
@@ -23,5 +26,6 @@
       $(this).find(".info").removeClass('info_hover');
     });
   });
+});
 </script>
 <% end %>

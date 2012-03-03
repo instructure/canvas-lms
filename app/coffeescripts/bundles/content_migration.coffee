@@ -1,0 +1,1 @@
+require ['content_migration']

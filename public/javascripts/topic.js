@@ -16,8 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var wikiSidebar;
-I18n.scoped('topics', function(I18n) {
+require([
+  'i18n!topics',
+  'jquery' /* $ */,
+  'wikiSidebar',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, clickLink, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(I18n, $, wikiSidebar) {
+
   function editEntry($entry, params) {
     $("#add_entry_bottom").hide();
     var $form = $("#add_entry_form").clone(true);

@@ -1,10 +1,40 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
-  it_should_behave_like "in-process server selenium tests"
+  it_should_behave_like "wiki and tiny selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
+  end
+
+  it "should resize the WYSIWYG editor height gracefully" do
+    skip_if_ie('Out of memory')
+    wiki_page_tools_file_tree_setup
+    load_simulate_js
+    wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
+    make_full_screen
+    # TODO: there's an issue where we can drag the box smaller than it's supposed to be on the first resize.
+    # Until we can track that down, first we do a fake drag to make sure the rest of the resizing machinery
+    # works.
+    drag_with_js('.editor_box_resizer', 0, -1)
+    resizer_to = 1 - driver.find_element(:class, 'editor_box_resizer').location.y
+    # drag the resizer way up to the top of the screen (to make the wysiwyg the shortest it will go)
+    keep_trying_until do
+      drag_with_js('.editor_box_resizer', 0, resizer_to)
+      sleep 3
+      driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200)
+    end
+    driver.find_element(:class, 'editor_box_resizer').attribute('style').should be_blank
+
+    # now move it down 30px from 200px high
+    keep_trying_until do
+      drag_with_js('.editor_box_resizer', 0, 30)
+      true
+    end
+    driver.execute_script("return $('#wiki_page_body_ifr').height()").should be_close(230, 5)
+    driver.find_element(:class, 'editor_box_resizer').attribute('style').should be_blank
+    resize_screen_to_default
   end
 
   it "should add bold and italic text to the rce" do
@@ -22,7 +52,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
     #make sure each view uses the proper format
     driver.find_element(:css, '.wiki_switch_views_link').click
-    driver.execute_script("return $('#wiki_page_body').val()").should include '<p><em><strong>'
+    driver.execute_script("return $('#wiki_page_body').val()").should include '<em><strong>'
     driver.find_element(:css, '.wiki_switch_views_link').click
     in_frame "wiki_page_body_ifr" do
       driver.find_element(:id, 'tinymce').should_not include_text('<p>')
@@ -33,7 +63,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
 
-    driver.page_source.should match(/<p><em><strong>This is my text\./)
+    driver.page_source.should match(/<em><strong>This is my text\./)
   end
 
   it "should add a quiz to the rce" do
@@ -86,13 +116,13 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     driver.find_element(:css, '#wiki_body').find_element(:link, assignment_name).should be_displayed
   end
 
-  it "should add an equation to the rce" do
+  it "should add an equation to the rce by using equation buttons" do
     skip_if_ie('Out of memory')
     get "/courses/#{@course.id}/wiki"
 
-    driver.find_element(:css, '.mce_instructure_equation').click
+    driver.find_element(:id, 'wiki_page_body_instructure_equation').click
     wait_for_animations
-    driver.find_element(:id, 'instructure_equation_prompt')
+    driver.find_element(:id, 'instructure_equation_prompt').should be_displayed
     misc_tab = driver.find_element(:css, '.mathquill-tab-bar > li:last-child a')
     driver.action.move_to(misc_tab).perform
     driver.find_element(:css, '#Misc_tab li:nth-child(35) a').click
@@ -112,6 +142,24 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     check_image(driver.find_element(:css, '#wiki_body img'))
   end
 
+  it "should add an equation to the rce by typing into the equation editor" do
+    equation_text = '5 + 5 + 10 ='
+    get "/courses/#{@course.id}/wiki"
+
+    driver.find_element(:id, 'wiki_page_body_instructure_equation').click
+    wait_for_animations
+    driver.find_element(:id, 'instructure_equation_prompt').should be_displayed
+    3.times do
+      driver.find_element(:css, '.mathquill-editor .textarea textarea').send_keys(:backspace)
+    end
+    driver.find_element(:css, '.mathquill-editor .textarea textarea').send_keys(equation_text)
+    driver.find_element(:id, 'instructure_equation_prompt_form').submit
+    wait_for_ajax_requests
+    in_frame "wiki_page_body_ifr" do
+      keep_trying_until { driver.find_element(:css, '.equation_image').attribute('title').should == equation_text }
+    end
+  end
+
   it "should display record video dialog" do
     skip_if_ie('Out of memory')
     stub_kaltura
@@ -123,31 +171,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     driver.find_element(:css, '#media_comment_dialog #audio_upload').should be_displayed
     close_visible_dialog
     driver.find_element(:id, 'media_comment_dialog').should_not be_displayed
-  end
-
-  it "should resize the WYSIWYG editor height gracefully" do
-    skip_if_ie('Out of memory')
-    wiki_page_tools_file_tree_setup
-    wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
-    make_full_screen
-    # TODO: there's an issue where we can drag the box smaller than it's supposed to be on the first resize.
-    # Until we can track that down, first we do a fake drag to make sure the rest of the resizing machinery
-    # works.
-    driver.action.drag_and_drop_by(driver.find_element(:class, 'editor_box_resizer'), 0, -1).perform
-    resizer_to = 1 - driver.find_element(:class, 'editor_box_resizer').location.y
-    # drag the resizer way up to the top of the screen (to make the wysiwyg the shortest it will go)
-    keep_trying_until do
-      driver.action.drag_and_drop_by(driver.find_element(:class, 'editor_box_resizer'), 0, resizer_to).perform
-      sleep 3
-      driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200)
-    end
-    driver.find_element(:class, 'editor_box_resizer').attribute('style').should be_blank
-
-    # now move it down 30px from 200px high
-    keep_trying_until { driver.action.drag_and_drop_by(driver.find_element(:class, 'editor_box_resizer'), 0, 30).perform; true }
-    driver.execute_script("return $('#wiki_page_body_ifr').height()").should be_close(230, 5)
-    driver.find_element(:class, 'editor_box_resizer').attribute('style').should be_blank
-    resize_screen_to_default
   end
 
   it "should handle table borders correctly" do

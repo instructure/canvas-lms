@@ -4,8 +4,16 @@
   @body_classes << "modal" if @body_classes
   content_for :page_title, t('registration_complete', "Registration Complete")
 %>
-<% js_block :i18n_scope => "users.registered" do %>
+<% js_block do %>
 <script type="text/javascript">
+// file: app/views/users/registered.html.erb
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+], function(I18n, $) {
+
 $(document).ready(function() {
   var runAjax = true;
   $(".re_send_confirmation_link").click(function(event) {
@@ -15,12 +23,12 @@ $(document).ready(function() {
     // if it doesnt work then its ok so they can try to see if they can get it to work.
     if (runAjax) {
       var $link = $(this);
-      $link.text(I18n.t("resending", "Re-Sending..."));
+      $link.text(<%= jt("resending", "Re-Sending...") %>);
       $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-        $link.text(I18n.t("done_resending", "Done! Message may take a few minutes."));
+        $link.text(<%= jt("done_resending", "Done! Message may take a few minutes.") %>);
         runAjax = false;
       }, function(data) {
-        $link.text(I18n.t("failed_resending", "Request failed. Try again."));
+        $link.text(<%= jt("failed_resending", "Request failed. Try again.") %>);
       }); 
     }
   });
@@ -36,11 +44,12 @@ $(document).ready(function() {
   $("#play_overview_video_link").click(function(){
     $("#video_wrapper").dialog({
       width: videoWidth,
-      title: I18n.t("overview_video", "Overview Video of Canvas")
+      title: <%= jt("overview_video", "Overview Video of Canvas") %>
     });
     return false;
   });
   
+});
 });
 
 function onYouTubePlayerReady(playerid){

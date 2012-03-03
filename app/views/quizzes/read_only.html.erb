@@ -1,6 +1,6 @@
 <%
   jammit_css :quizzes
-  jammit_js :quizzes_bundle
+  js_bundle :quizzes_bundle
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
 <% content_for :right_side do %>

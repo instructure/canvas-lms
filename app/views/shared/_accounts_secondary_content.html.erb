@@ -20,7 +20,12 @@
 
 <% js_block do %>
 <script>
-  jQuery(function($){
+require([
+  'jquery' /* jQuery, $ */,
+  'jqueryui/autocomplete' /* /\.autocomplete/ */
+], function($) {
+
+  $(function($){
     var $newUserForm = $("#new_user"),
         $userName = $("#new_user").find("#user_name");
     $userName.autocomplete({
@@ -30,5 +35,6 @@
       }
     });
   });
+});
 </script>
 <% end %>

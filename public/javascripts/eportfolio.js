@@ -25,9 +25,23 @@
 // settings on their own personal eportfolio, they can't 
 // affect anyone else
 
-I18n.scoped('eportfolio', function(I18n) {
+require([
+  'i18n!eportfolio',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.inst_tree' /* instTree */,
+  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/progressbar' /* /\.progressbar/ */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(I18n, $) {
 
-(function eportfolioInit() {
   function ePortfolioFormData() {
     var data = $("#edit_page_form").getFormData({
       object_name: "eportfolio_entry", 
@@ -488,7 +502,9 @@ I18n.scoped('eportfolio', function(I18n) {
     }
   }
   function saveObject($obj, type) {
-    if($obj.length === 0) { return; }
+    var isSaving = $obj.data('event_pending');
+    if(isSaving || $obj.length === 0) { return; }
+    $obj.data('event_pending', true);
     var method = "PUT";
     var url = $obj.find(".rename_" + type + "_url").attr('href');
     if($obj.attr('id') == type + '_new') {
@@ -529,6 +545,7 @@ I18n.scoped('eportfolio', function(I18n) {
         id: type + '_' + obj.id,
         hrefValues: ['id', 'slug']
       });
+      $obj.data('event_pending', false);
       countObjects(type);
     });
     return true;
@@ -713,7 +730,7 @@ I18n.scoped('eportfolio', function(I18n) {
       var $category_select = $("#category_select_" + category.id);
       if($category_select.length === 0) {
         $category_select = $("#category_select_blank").clone(true).removeAttr('id');
-        $("#category_select_blank").before($category_select.show());
+        $("#category_select").append($category_select.show());
       }
       $category_select.attr('id', 'category_select_' + category.id)
         .val(category.id).text(category.name);
@@ -857,6 +874,4 @@ I18n.scoped('eportfolio', function(I18n) {
       }).dialog('open');
     });
   });
-})();
-
-})
+});

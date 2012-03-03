@@ -1,9 +1,11 @@
 <% 
   show_context ||= false; upcoming ||= false
-  submissions ||= @current_user_submissions || []
-  submission = nil
-  submission = submissions.detect{|s| s.assignment_id == recent_event.id} if recent_event.is_a?(Assignment)
-  
+  if recent_event.is_a?(Assignment)
+    submission = @current_user_submissions.nil? ?
+      @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => { :assignment_id => recent_event.id }).first :
+      @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
+  end
+
   cache(['recent_event_render', submission || 'no_submission', recent_event || 'blank_event', Time.zone.utc_offset, recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades), recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do 
     set_icon_data(:context => @context, :contexts => @contexts, :current_user => @current_user, :recent_event => recent_event, :submission => submission)
   %>

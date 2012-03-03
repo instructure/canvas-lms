@@ -10,13 +10,13 @@ describe "help dialog" do
 
     it "should show the Help dialog when 'help' is clicked and feedback is enabled" do
       get "/dashboard"
-      element_exists(:css, "#help-dialog").should == false
+      element_exists("#help-dialog").should be_false
       driver.find_elements(:css, '.help_dialog_trigger').length.should == 0
 
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       driver.find_elements(:css, '.help_dialog_trigger').length.should == 2
-      element_exists(:css, "#help-dialog").should == false
+      element_exists("#help-dialog").should be_false
       driver.find_element(:css, '.help_dialog_trigger').click
       wait_for_ajaximations
       driver.find_element(:css, "#help-dialog").should be_displayed
@@ -49,7 +49,7 @@ describe "help dialog" do
     it "should allow sending the teacher a message" do
       Setting.set('show_feedback_link', 'true')
       get "/courses/#{@course.id}"
-      element_exists(:css, "#help-dialog").should == false
+      element_exists("#help-dialog").should be_false
       trigger = driver.find_element(:css, '.help_dialog_trigger')
       trigger.should be_displayed
       trigger.click
@@ -104,7 +104,7 @@ describe "help dialog" do
       driver.find_element(:css, '.help_dialog_trigger').click
       wait_for_ajaximations
       driver.find_element(:css, "#help-dialog").should be_displayed
-      element_exists(:css, "#help-dialog a[href='#teacher_feedback']").should == false
+      element_exists("#help-dialog a[href='#teacher_feedback']").should be_false
     end
 
     it "should show the Help dialog on the speedGrader when 'help' is clicked and feedback is enabled" do

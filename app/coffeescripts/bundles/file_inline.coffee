@@ -1,0 +1,2 @@
+require ['file_inline']
+

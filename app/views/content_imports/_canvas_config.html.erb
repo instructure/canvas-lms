@@ -2,6 +2,7 @@
 
 <% js_block do %>
   <script>
+  require(['jquery', 'content_migration'], function($) {
     $(function() {
 
       $("#plugin_canvas_cartridge_importer").bind("pluginShown", function(event, enableFileUpload) {
@@ -9,12 +10,12 @@
         $(".qti_settings").hide();
         $(".migration_part_selection").hide();
       });
-      
+
       $("#plugin_canvas_cartridge_importer").bind("pluginHidden", function(event) {
         $(".qti_settings").show();
         $(".migration_part_selection").show();
       });
-
     });
+  });
   </script>
 <% end %>

@@ -15,7 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-I18n.scoped("learning_outcomes", function(I18n) {
+
+require([
+  'i18n!learning_outcomes',
+  'jquery' /* $ */,
+  'find_outcome',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(I18n, $, find_outcome) {
+
   var outcomes = {
     ratingCounter: 0,
     updateOutcome: function(outcome, $outcome) {
@@ -207,7 +223,7 @@ I18n.scoped("learning_outcomes", function(I18n) {
             id     = $group.children('.header').getTemplateData({ textValues: [ 'asset_string', 'id' ] }).id,
             data   = {},
             url    = $.replaceTags($("#outcome_links .reorder_items_url").attr('href'), 'id', id),
-            assets = $group.find('.child_outcomes').children('.learning_outcome, .outcome_group').map(function(i, el){
+            assets = $group.children('.child_outcomes').children('.learning_outcome, .outcome_group').map(function(i, el){
               return $(el).children('.header').getTemplateData({ textValues: [ 'asset_string', 'id' ] }).asset_string;
             });
         for (var _i = 0, _max = assets.length; _i < _max; _i++){

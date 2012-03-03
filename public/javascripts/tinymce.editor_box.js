@@ -30,8 +30,20 @@
 //   is selected, makes the selection a link, otherwise creates a link.
 //   options.url is used for the href of the link, and options.title
 //   will be the body of the link if no text is currently selected.
-(function( $ ) {
-  
+
+define([
+  'INST' /* INST */,
+  'i18nObj',
+  'jquery' /* jQuery, $ */,
+  'compiled/tinymce',
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
+  'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
+  'jquery.instructure_misc_plugins' /* /\.indicate/ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'vendor/scribd.view' /* scribd */
+], function(INST, I18nObj, $, tinyMCE) {
+
   var enableBookmarking = $("body").hasClass('ie');
   $(document).ready(function() {
     enableBookmarking = $("body").hasClass('ie');
@@ -135,6 +147,7 @@
       theme : "advanced",
       plugins: "instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
       dialog_type: 'modal',
+      language_load: false,
       relative_urls: false,
       remove_script_host: true,
       theme_advanced_buttons1: buttons1,
@@ -149,7 +162,7 @@
       theme_advanced_more_colors: false,
       extended_valid_elements : "iframe[src|width|height|name|align|style|class]",
       content_css: "/stylesheets/compiled/instructure_style.css,/stylesheets/compiled/tinymce.editor_box.css",
-      editor_css:editor_css,
+      editor_css: editor_css,
       handle_event_callback: function(e) {
         if(e.type.indexOf('keydown') === 0 || e.type.indexOf('keypress') === 0) {
           if(e.keyCode === 9) {
@@ -169,7 +182,7 @@
           }
         }
       },
-      onchange_callback: function(e) {
+        onchange_callback: function(e) {
         $("#" + id).trigger('change');
       },
       setup : function(ed) {
@@ -683,7 +696,7 @@
     }
   };
   
-})(jQuery);
+});
 
 // This Nifty Little Effect is for when you add a link the the TinyMCE editor it looks like it is physically transfered to the editor.  
 // unfortunately it doesnt work yet so dont use it.  I might go back to it sometime if we want it. -RS

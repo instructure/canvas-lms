@@ -1,10 +1,7 @@
 class PurgeDuplicateDeletedSisEnrollments < ActiveRecord::Migration
-  def self.up
-    if supports_ddl_transactions?
-      commit_db_transaction
-      decrement_open_transactions while open_transactions > 0
-    end
+  self.transactional = false
 
+  def self.up
     while true
       pairs = Enrollment.connection.select_rows("
           SELECT user_id, course_section_id, type
@@ -18,11 +15,6 @@ class PurgeDuplicateDeletedSisEnrollments < ActiveRecord::Migration
         keeper = scope.first(:select => :id)
         scope.delete_all(["id<>?", keeper.id])
       end
-    end
-
-    if supports_ddl_transactions?
-      increment_open_transactions
-      begin_db_transaction
     end
   end
 

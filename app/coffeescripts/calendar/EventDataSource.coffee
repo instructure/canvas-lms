@@ -1,6 +1,9 @@
-define 'compiled/calendar/EventDataSource', [
-  'compiled/calendar/commonEventFactory',
-], (commonEventFactory) ->
+define [
+  'jquery'
+  'compiled/calendar/commonEventFactory'
+  'jquery.ajaxJSON'
+  'vendor/jquery.ba-tinypubsub'
+], ($, commonEventFactory) ->
 
   class
     constructor: (contexts) ->

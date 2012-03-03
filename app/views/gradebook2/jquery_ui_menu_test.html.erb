@@ -1,12 +1,18 @@
-<% jammit_js :jquery_ui_menu %>
+<% js_bundle :jquery_ui_menu %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'compiled/kyleMenu'
+], function($) {
+
 $(function() {
   $('#section_to_show')
     .kyleMenu()
     .next().bind('menuselect', function(event, ui){
       $("<div/>").text("Selected: " + ui.item.text()).appendTo("#log");
     });
+});
 });
 </script>
 <% end %>

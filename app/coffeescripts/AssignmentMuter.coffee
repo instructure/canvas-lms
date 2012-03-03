@@ -1,5 +1,14 @@
-I18n.scoped 'AssignmentMuter', (I18n) ->
-  class @AssignmentMuter
+define [
+  'i18n!assignment_muter'
+  'jquery'
+  'jst/mute_dialog'
+  'jquery.ajaxJSON'
+  'jquery.disableWhileLoading'
+  'jquery.instructure_jquery_patches' # dialog
+  'vendor/jquery.ba-tinypubsub'
+], (I18n, $, mute_dialog_template) ->
+
+  class AssignmentMuter
     constructor: (@$link, @assignment, @url) ->
       @$link = $(@$link)
       @updateLink()
@@ -11,7 +20,7 @@ I18n.scoped 'AssignmentMuter', (I18n) ->
       @$link.text(if @assignment.muted then I18n.t('unmute_assignment', 'Unmute Assignment') else I18n.t('mute_assignment', 'Mute Assignment'))
 
     showDialog: =>
-      @$dialog = $(Template('mute_dialog')).dialog
+      @$dialog = $(mute_dialog_template()).dialog
         buttons: [{
           text: I18n.t('mute_assignment', 'Mute Assignment')
           'data-text-while-loading': I18n.t('muting_assignment', 'Muting Assignment...')

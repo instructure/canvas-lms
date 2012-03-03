@@ -147,7 +147,12 @@
 
 <% js_block do %>
 <script type="text/javascript">
-(function(){
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_jquery_patches' /* /\.disabled/ */,
+  'jquery.instructure_misc_plugins' /* /\.log\(/ */
+], function($) {
+
   $('.six-checkbox').click(function(){
     var $this = $(this);
     if (!$this.hasClass('six-checkbox-disabled-checked') && !$this.hasClass('six-checkbox-disabled-unchecked') ) { //if its not disabled
@@ -210,7 +215,7 @@
     //       .val(this);
     //   }
     // });
-  })  
-})();
+  });
+});
 </script>
 <% end %>

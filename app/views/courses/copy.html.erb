@@ -48,8 +48,15 @@
 
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_date_and_time' /* time_field, datetime_field */
+], function($) {
+
 $(document).ready(function() {
   $(".datetime_field").datetime_field();
+});
+
 });
 </script>
 <% end %>

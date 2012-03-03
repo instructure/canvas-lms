@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function($){
-  
+define(['jquery'], function($){
+
   // Shows an ajax-loading image on the given object.
   $.fn.loadingImg = function(options) {
     if(!this || this.length === 0) {
@@ -123,4 +123,4 @@
   };
   $.fn.loadingImage = $.fn.loadingImg;
   
-})(jQuery);
+});

@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-(function($) {
+define([
+  'jquery' /* $ */,
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/droppable' /* /\.droppable/ */
+], function($) {
   $.fn.instTree = function(options) {
     return $(this).each(function() {
       var binded = false;
@@ -438,4 +441,4 @@
       }//if ($(this).is('ul'))
     });
   };
-})(jQuery);
+});

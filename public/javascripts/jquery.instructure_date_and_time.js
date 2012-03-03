@@ -15,9 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
-I18n.scoped('instructure', function(I18n) {
-  
+define([
+  'i18n!instructure',
+  'jquery' /* jQuery, $ */,
+  'str/htmlEscape',
+  'jquery.instructure_jquery_patches' /* windowScrollTop */,
+  'jquery.keycodes' /* keycodes */,
+  'vendor/date' /* Date.parse, Date.UTC, Date.today */,
+  'jqueryui/datepicker' /* /\.datepicker/ */,
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'jqueryui/widget' /* /\.widget/ */
+], function(I18n, $, htmlEscape) {
+
   $.parseDateTime = function(date, time) {
     var date = $.datepicker.parseDate('mm/dd/yy', date);
     if(time) {
@@ -270,7 +279,7 @@ I18n.scoped('instructure', function(I18n) {
       var ampm = inst.input.data('time-ampm') || "";
       var selectedAM = (ampm == "am") ? "selected" : "";
       var selectedPM = (ampm == "pm") ? "selected" : "";
-      html += "<div class='datepicker-time'><label for='ui-datepicker-time-hour'>" + $.h(I18n.beforeLabel('datepicker.time', "Time")) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + hr + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + min + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm' title='" + $.h(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + selectedAM + ">" + $.h(I18n.t('#time.am', "am")) + "</option><option value='pm' " + selectedPM + ">" + $.h(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='button small-button ui-datepicker-ok'>" + $.h(I18n.t('#buttons.done', "Done")) + "</button></div>";
+      html += "<div class='datepicker-time'><label for='ui-datepicker-time-hour'>" + htmlEscape(I18n.beforeLabel('datepicker.time', "Time")) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + hr + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + min + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm' title='" + htmlEscape(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + selectedAM + ">" + htmlEscape(I18n.t('#time.am', "am")) + "</option><option value='pm' " + selectedPM + ">" + htmlEscape(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='button small-button ui-datepicker-ok'>" + htmlEscape(I18n.t('#buttons.done', "Done")) + "</button></div>";
     }
     return html;
   };
@@ -601,8 +610,8 @@ I18n.scoped('instructure', function(I18n) {
     pickerHtml += "<div class='clear'></div>";
     pickerHtml += "</div>";
     pickerHtml += "<div class='widget_group ampm_group'>";
-    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>" + $.h(I18n.t('#time.am', "am")) + "</div>";
-    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>" + $.h(I18n.t('#time.pm', "pm")) + "</div>";
+    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>" + htmlEscape(I18n.t('#time.am', "am")) + "</div>";
+    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>" + htmlEscape(I18n.t('#time.pm', "pm")) + "</div>";
     pickerHtml += "<div class='clear'></div>";
     pickerHtml += "</div>";
     $picker.html(pickerHtml);

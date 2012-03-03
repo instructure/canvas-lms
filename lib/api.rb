@@ -227,7 +227,8 @@ module Api
     # translate media comments into html5 video tags
     doc = Nokogiri::HTML::DocumentFragment.parse(html)
     doc.css('a.instructure_inline_media_comment').each do |anchor|
-      media_id = anchor['id'].gsub(/^media_comment_/, '')
+      media_id = anchor['id'].try(:gsub, /^media_comment_/, '')
+      next if media_id.blank?
       media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1')
       thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3)
       video_node = Nokogiri::XML::Node.new('video', doc)

@@ -161,7 +161,7 @@ describe CoursesController, :type => :integration do
       end
     end
 
-    describe "a user without permissions" do
+    context "a user without permissions" do
       it "should return 401 Unauthorized if a user lacks permissions" do
         course_with_student(:active_all => true)
         account = Account.default
@@ -175,6 +175,53 @@ describe CoursesController, :type => :integration do
           }
         )
         response.status.should eql '401 Unauthorized'
+      end
+    end
+  end
+
+  describe "course deletion" do
+    before do
+      account_admin_user
+      @path = "/api/v1/courses/#{@course.id}"
+      @params = { :controller => 'courses', :action => 'destroy', :format => 'json', :id => @course.id.to_s }
+    end
+    context "an authorized user" do
+      it "should be able to delete a course" do
+        json = api_call(:delete, @path, @params, { :event => 'delete' })
+        json.should == { 'delete' => true }
+        @course.reload
+        @course.workflow_state.should eql 'deleted'
+      end
+
+      it "should be able to complete a course" do
+        json = api_call(:delete, @path, @params, { :event => 'conclude' })
+        json.should == { 'conclude' => true }
+        @course.reload
+        @course.workflow_state.should eql 'completed'
+      end
+
+      it "should return 400 if params[:event] is missing" do
+        json = raw_api_call(:delete, @path, @params)
+        response.code.should eql '400'
+        JSON.parse(response.body).should == {
+          'message' => 'Only "delete" and "conclude" events are allowed.'
+        }
+
+      end
+
+      it "should return 400 if an unknown event type is used" do
+        raw_api_call(:delete, @path, @params, { :event => 'rm -rf like a boss' })
+        response.code.should eql '400'
+        JSON.parse(response.body).should == {
+          'message' => 'Only "delete" and "conclude" events are allowed.'
+        }
+      end
+    end
+    context "an unauthorized user" do
+      it "should return 401" do
+        @user = @student
+        raw_api_call(:delete, @path, @params, { :event => 'conclude' })
+        response.code.should eql '401'
       end
     end
   end

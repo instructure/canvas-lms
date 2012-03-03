@@ -1,9 +1,7 @@
 <% 
   dialog ||= false 
-  jammit_css :full_assignment
-  jammit_js :full_assignment 
-  jammit_js :manage_groups 
-  js_block { %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% }
+  jammit_css :full_assignment, :tinymce
+  js_bundle :full_assignment, :manage_groups
   assignment = full_assignment
   assignment_exists = assignment && (assignment.id || assignment.new_record?) rescue false 
   if !assignment_exists

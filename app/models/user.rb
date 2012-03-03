@@ -44,7 +44,7 @@ class User < ActiveRecord::Base
                            ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment'))) )"
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
-  has_many :courses, :through => :current_enrollments
+  has_many :courses, :through => :current_enrollments, :uniq => true
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments
   has_many :all_courses, :source => :course, :through => :enrollments
@@ -2174,9 +2174,8 @@ class User < ActiveRecord::Base
     associated_root_accounts.any? { |a| a.settings[:users_can_edit_name] != false } || associated_root_accounts.empty?
   end
 
-  def section_for_course(course)
-    enrollment = course.student_enrollments.active.for_user(self).first
-    enrollment && enrollment.course_section
+  def sections_for_course(course)
+    course.student_enrollments.active.for_user(self).map { |e| e.course_section }
   end
 
   def can_create_enrollment_for?(course, session, type)
@@ -2189,8 +2188,11 @@ class User < ActiveRecord::Base
 
   def group_member_json(context)
     h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
-    if context && context.is_a?(Course) && (section = self.section_for_course(context))
-      h = h.merge(:section_id => section.id, :section_code => section.section_code)
+    if context && context.is_a?(Course)
+      self.sections_for_course(context).each do |section|
+        h[:sections] ||= []
+        h[:sections] << { :section_id => section.id, :section_code => section.section_code }
+      end
     end
     h
   end

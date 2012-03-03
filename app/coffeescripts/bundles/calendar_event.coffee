@@ -1,0 +1,2 @@
+require ['calendar_event']
+

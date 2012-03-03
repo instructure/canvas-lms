@@ -293,7 +293,7 @@ class ApplicationController < ActionController::Base
           end
           session[:enrollment_uuid_count] += 1
         end
-        @context_enrollment = @context.enrollments.find_all_by_user_id(@current_user.id).sort_by{|e| [e.state_sortable, e.rank_sortable] }.first if @context && @current_user
+        @context_enrollment = @context.enrollments.find_all_by_user_id(@current_user.id).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
         @context_membership = @context_enrollment
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
         case params[:account_id]
@@ -474,7 +474,7 @@ class ApplicationController < ActionController::Base
       @ungraded_assignments = @ungraded_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
     end
     
-    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments, @undated_assignments].map(&:sort!)
+    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments, @undated_assignments, @future_assignments].map(&:sort!)
   end
   
   # Calculates the file storage quota for @context

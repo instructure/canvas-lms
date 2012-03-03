@@ -15,8 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-I18n.scoped('course_settings', function(I18n) {
+require([
+  'i18n!course_settings',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* scrollSidebar */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashError */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'link_enrollment' /* link_enrollment */,
+  'vendor/jquery.ba-tinypubsub' /* /\.publish/ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/autocomplete' /* /\.autocomplete/ */,
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'jqueryui/tabs' /* /\.tabs/ */
+], function(I18n, $) {
 
   var GradePublishing = {
     status: null,
@@ -92,7 +110,6 @@ I18n.scoped('course_settings', function(I18n) {
     }
   }
 
-
   $(document).ready(function() {
     var $add_section_form = $("#add_section_form"),
         $edit_section_form = $("#edit_section_form"),
@@ -101,9 +118,9 @@ I18n.scoped('course_settings', function(I18n) {
         $course_hashtag = $("#course_hashtag"),
         $enroll_users_form = $("#enroll_users_form"),
         $enrollment_dialog = $("#enrollment_dialog");
-        
+
     $("#course_details_tabs").tabs({cookie: {}}).show();
-        
+
     $add_section_form.formSubmit({
       required: ['course_section[name]'],
       beforeSubmit: function(data) {
@@ -113,7 +130,7 @@ I18n.scoped('course_settings', function(I18n) {
         var section = data.course_section,
             $section = $(".section_blank:first").clone(true).attr('class', 'section'),
             $option = $("<option/>");
-            
+
         $add_section_form.find("button").attr('disabled', false).text(I18n.t('buttons.add_section', "Add Section"));
         $section.fillTemplateData({
           data: section,
@@ -202,7 +219,7 @@ I18n.scoped('course_settings', function(I18n) {
         }
         return null;
       }
-      
+
       var tabs = [];
       $("#nav_enabled_list li").each(function() {
         var tab_id = tab_id_from_el(this);
@@ -212,11 +229,11 @@ I18n.scoped('course_settings', function(I18n) {
         var tab_id = tab_id_from_el(this);
         if (tab_id !== null) { tabs.push({ id: tab_id, hidden: true }); }
       });
-      
+
       $("#tabs_json").val(JSON.stringify(tabs));
       return true;
     });
-    
+
     $(".edit_nav_link").click(function(event) {
       event.preventDefault();
       $("#nav_form").dialog('close').dialog({
@@ -225,14 +242,14 @@ I18n.scoped('course_settings', function(I18n) {
         width: 400
       }).dialog('open');
     });
-    
+
     $("#nav_enabled_list, #nav_disabled_list").sortable({
       items: 'li.enabled',
       connectWith: '.connectedSortable',
       axis: 'y'
     }).disableSelection();
 
-    
+
     $(".hashtag_dialog_link").click(function(event) {
       event.preventDefault();
       $("#hashtag_dialog").dialog('close').dialog({
@@ -349,17 +366,19 @@ I18n.scoped('course_settings', function(I18n) {
       $("html,body").scrollTo($enroll_users_form);
       $enroll_users_form.find("textarea").focus().select();
     });
-    $(".associate_user_link").click(function(event) {
+    $(".associated_user_link").click(function(event) {
       event.preventDefault();
       var $user = $(this).parents(".user");
-      var data = $user.getTemplateData({textValues: ['name', 'associated_user_id', 'id']});
-      link_enrollment.choose(data.name, data.id, data.associated_user_id, function(enrollment) {
+      var $enrollment = $(this).parents(".enrollment_link");
+      var user_data = $user.getTemplateData({textValues: ['name']});
+      var enrollment_data = $enrollment.getTemplateData({textValues: ['enrollment_id', 'associated_user_id']});
+      link_enrollment.choose(user_data.name, enrollment_data.enrollment_id, enrollment_data.associated_user_id, function(enrollment) {
         if(enrollment) {
-          var user_name = enrollment.associated_user_name;
-          $("#enrollment_" + enrollment.id)
-            .find(".associated_user.associated").showIf(enrollment.associated_user_id).end()
-            .find(".associated_user.unassociated").showIf(!enrollment.associated_user_id).end()
-            .fillTemplateData({data: enrollment});
+          var $user = $(".observer_enrollments .user_" + enrollment.user_id)
+          var $enrollment_link = $user.find(".enrollment_link.enrollment_" + enrollment.id)
+          $enrollment_link.find(".associated_user.associated").showIf(enrollment.associated_user_id)
+          $enrollment_link.fillTemplateData({data: enrollment});
+          $enrollment_link.find(".associated_user.unassociated").showIf(!enrollment.associated_user_id);
         }
       });
     });
@@ -381,7 +400,7 @@ I18n.scoped('course_settings', function(I18n) {
       var $this = $(this),
           title = $this.attr('title'),
           pending_message = I18n.t('details.re_send_invitation', "This user has not yet accepted their invitation.  Click to re-send invitation.");
-      
+
       if(title != pending_message) {
         $this.data('real_title', title);
       }
@@ -394,14 +413,14 @@ I18n.scoped('course_settings', function(I18n) {
     $enrollment_dialog.find(".cancel_button").click(function() {
       $enrollment_dialog.dialog('close');
     });
-    
+
     $(".user_list").delegate('.user_information_link', 'click', function(event) {
       var $this = $(this),
           $user = $this.closest('.user'),
           pending = $user.hasClass('pending'),
           data = $user.getTemplateData({textValues: ['name', 'invitation_sent_at']}),
           admin = $user.parents(".teacher_enrollments,.ta_enrollments").length > 0;
-      
+
       data.re_send_invitation_link = I18n.t('links.re_send_invitation', "Re-Send Invitation");
       $enrollment_dialog
         .data('user', $user)
@@ -420,23 +439,28 @@ I18n.scoped('course_settings', function(I18n) {
     $('.user_list .edit_section_link').click(function(event) {
       event.preventDefault();
       var $this = $(this);
-      $user = $this.closest('.user');
-      $user.find('.section').toggle();
-      $user.find('.enrollment_course_section_form').toggle();
+      var $user = $this.parents('.user');
+      var $sections = $user.find('.sections');
+      $sections.find('.section_name').toggle();
+      $sections.find('.enrollment_course_section_form').toggle();
     });
-    $('.user_list .enrollment_course_section_form #course_section_id').change(function (event) {
-      var form = $(this).parent('form');
-      var $this = $(this)
-      var section = form.prev('.section')
-      $.ajaxJSON(form.attr('action'), 'POST', form.getFormData(), function(data) {
-        section.html($this.find('option[value="' + $this.val() + '"]').html());
-        section.toggle();
-        form.toggle();
+    $('.user_list .enrollment_course_section_form .course_section_id').change(function (event) {
+      var $this = $(this);
+      var $sections = $this.parents('.sections');
+      var $form = $this.parent('form');
+      var $section_name = $form.prev('.section_name');
+      $.ajaxJSON($form.attr('action'), 'POST', $form.getFormData(), function(data) {
+        $section_name.html($this.find('option[value="' + $this.val() + '"]').html());
+        $sections.find('.section_name').toggle();
+        $sections.find('.enrollment_course_section_form').toggle();
       }, function(data) {
+        if (data && data.enrollment) {
+          $this.val(data.enrollment.course_section_id);
+        }
         $.flashError(I18n.t('errors.move_user', "Something went wrong moving the user to the new section. Please try again later."));
       });
     });
-    
+
     $enrollment_dialog.find(".re_send_invitation_link").click(function(event) {
       event.preventDefault();
       var $link = $(this);
@@ -454,19 +478,19 @@ I18n.scoped('course_settings', function(I18n) {
       });
     });
     $(".date_entry").date_field();
-    
+
     $().data('current_default_wiki_editing_roles', $("#course_default_wiki_editing_roles").val());
     $("#course_default_wiki_editing_roles").change(function() {
       var $this = $(this);
       $(".changed_default_wiki_editing_roles").showIf($this.val() != $().data('current_default_wiki_editing_roles'));
       $(".default_wiki_editing_roles_change").text($this.find(":selected").text());
     });
-    
+
     $(".re_send_invitations_link").click(function(event) {
       event.preventDefault();
       var $button = $(this),
           oldText = I18n.t('links.re_send_all', "Re-Send All Unaccepted Invitations");
-          
+
       $button.text(I18n.t('buttons.re_sending_all', "Re-Sending Unaccepted Invitations...")).attr('disabled', true);
       $.ajaxJSON($button.attr('href'), 'POST', {}, function(data) {
         $button.text(I18n.t('buttons.re_sent_all', "Re-Sent All Unaccepted Invitations!")).attr('disabled', false);
@@ -486,8 +510,8 @@ I18n.scoped('course_settings', function(I18n) {
     });
     $(".is_public_checkbox").change(function() {
       $(".public_options").showIf($(this).attr('checked'));
-    }).change();  
-    
+    }).change();
+
     $(".self_enrollment_checkbox").change(function() {
       $(".open_enrollment_holder").showIf($(this).attr('checked'));
     }).change();

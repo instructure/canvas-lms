@@ -15,8 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-I18n.scoped('instructure', function(I18n) {
+define([
+  'INST' /* INST */,
+  'i18n!instructure',
+  'jquery' /* jQuery, $ */,
+  'vendor/scribd.view' /* scribd */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.google-analytics' /* trackEvent */,
+  'jquery.instructure_misc_helpers' /* uniqueId, /\$\.uniq/, capitalize */,
+  'jquery.loadingImg' /* loadingImage */
+], function(INST, I18n, $, scribd) {
 
   // first element in array is if scribd can handle it, second is if google can.
   var previewableMimeTypes = {
@@ -147,7 +155,7 @@ I18n.scoped('instructure', function(I18n) {
         }
       } else {
         // else fall back with a message that the document can't be viewed inline
-        $this.html('<p>' + $.h(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline, you might not have permission to view it or it might have been deleted.')) + '</p>');
+        $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline, you might not have permission to view it or it might have been deleted.')) + '</p>');
       }
     });
   };

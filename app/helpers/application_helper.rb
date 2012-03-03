@@ -39,6 +39,8 @@ module ApplicationHelper
   end
 
   def keyboard_navigation(keys)
+    # TODO: move this to JS, currently you have to know what shortcuts the JS has defined
+    # making it very likely this list will not reflect the key bindings
     content = "<ul class='navigation_list' tabindex='-1'>\n"
     keys.each do |hash|
       content += "  <li>\n"
@@ -126,7 +128,7 @@ module ApplicationHelper
         html << I18n.t('messages.visit_modules_page', "*Visit the course modules page for information on how to unlock this content.*",
           :wrapper => "<a href='#{context_url(context, :context_context_modules_url)}'>\\1</a>")
         html << "<a href='#{context_url(context, :context_context_module_prerequisites_needing_finishing_url, obj.id, hash[:asset_string])}' style='display: none;' id='module_prerequisites_lookup_link'>&nbsp;</a>".html_safe
-        jammit_js :prerequisites_lookup
+        js_bundle :prerequisites_lookup
       end
       return html
     else
@@ -277,7 +279,6 @@ module ApplicationHelper
   def js_blocks; @js_blocks ||= []; end
   def render_js_blocks
     output = js_blocks.inject('') do |str, e|
-      add_i18n_scoping!(e[:i18n_scope].to_s, e[:contents]) if e[:i18n_scope]
       # print file and line number for debugging in development mode.
       value = ""
       value << "<!-- BEGIN SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env == "development"
@@ -292,52 +293,61 @@ module ApplicationHelper
     attr_accessor :cached_translation_blocks
   end
 
-  def add_i18n_scoping!(scope, contents)
-    @included_i18n_scopes ||= []
-    translations = unless @included_i18n_scopes.include?(scope)
-      @included_i18n_scopes << scope
-      js_translations_for(scope)
-    end
-    contents.gsub!(/(<script[^>]*>)([^<].*?)(<\/script>)/m, "\\1\n#{translations}I18n.scoped(#{scope.inspect}, function(I18n){\n\\2\n});\n\\3")
-  end
-
-  def js_translations_for(scope)
-    scope = [I18n.locale] + scope.split(/\./).map(&:to_sym)
-    (ApplicationHelper.cached_translation_blocks ||= {})[scope] ||=
-    if scoped_translations = scope.inject(I18n.backend.send(:translations)) { |hash, key| hash && hash[key] }
-      last_key = scope.last
-      translations = {}
-      scope[0..scope.size-2].inject(translations) { |hash, key|
-        hash[key] ||= {}
-      }[last_key] = scoped_translations
-      <<-TRANSLATIONS
-var I18n = I18n || {};
-(function($) {
-  var translations = #{translations.to_json};
-  if (I18n.translations) {
-    $.extend(true, I18n.translations, translations);
-  } else {
-    I18n.translations = translations;
-  }
-})(jQuery);
-      TRANSLATIONS
-    else
-      ''
-    end
-  end
-
-  def jammit_js_bundles; @jammit_js_bundles ||= []; end
-  def jammit_js(*args)
-    Array(args).flatten.each do |bundle|
-      jammit_js_bundles << bundle unless jammit_js_bundles.include? bundle
-    end
-  end
-
   def jammit_css_bundles; @jammit_css_bundles ||= []; end
   def jammit_css(*args)
     Array(args).flatten.each do |bundle|
       jammit_css_bundles << bundle unless jammit_css_bundles.include? bundle
     end
+  end
+
+  # See `js_base_url`
+  def use_optimized_js?
+    if ENV['USE_OPTIMIZED_JS'] == 'true'
+      # allows overriding by adding ?debug_assets=1 to the url
+      !params[:debug_assets]
+    else
+      # allows overriding by adding ?optimized_js=1 to the url
+      params[:optimized_js] || false
+    end
+  end
+
+  # Determines the location from which to load JavaScript assets
+  #
+  # uses optimized:
+  #  * when ENV['USE_OPTIMIZED_JS'] is true
+  #  * or when ?optimized_js=true is present in the url. Run `rake js:build` to
+  #    build the optimized files
+  #
+  # uses non-optimized:
+  #   * when ENV['USE_OPTIMIZED_JS'] is false
+  #   * or when ?debug_assets=true is present in the url
+  def js_base_url
+    use_optimized_js? ? '/optimized' : '/javascripts'
+  end
+
+  def js_bundles; @js_bundles ||= []; end
+
+  # Use this method to place a bundle on the page, note that the end goal here
+  # is to only ever include one bundle per page load, so use this with care and
+  # ensure that the bundle you are requiring isn't simply a dependency of some
+  # other bundle.
+  #
+  # Bundles are defined in app/coffeescripts/bundles/<bundle>.coffee
+  #
+  # usage: js_bundle :gradebook2
+  #
+  # Only allows multiple arguments to support old usage of jammit_js
+  def js_bundle(*args)
+    output = Array(args).flatten.each do |bundle|
+      js_bundles << bundle unless js_bundles.include? bundle
+    end
+    raw output
+  end
+
+  # Returns a <script> tag for each registered js_bundle
+  def include_js_bundles
+    paths = js_bundles.map { |bundle| "#{js_base_url}/compiled/bundles/#{bundle}.js" }
+    javascript_include_tag *paths
   end
 
   def section_tabs
@@ -526,6 +536,12 @@ var I18n = I18n || {};
     concat(t(*args))
   end
 
+  def jt(key, default, js_options='{}')
+    full_key = key =~ /\A#/ ? key : i18n_scope + '.' + key
+    translated_default = I18n.backend.send(:lookup, I18n.locale, full_key) || default # string or hash
+    raw "I18n.scoped(#{i18n_scope.to_json}).t(#{key.to_json}, #{translated_default.to_json}, #{js_options})"
+  end
+
   def join_title(*parts)
     parts.join(t('#title_separator', ': '))
   end
@@ -631,4 +647,30 @@ var I18n = I18n || {};
     end
   end
 
+  def include_account_js
+    includes = [Account.site_admin, @domain_root_account].uniq.inject([]) do |js_includes, account|
+      if account && account.settings[:global_includes] && account.settings[:global_javascript].present?
+        js_includes << "'#{account.settings[:global_javascript]}'"
+      end
+      js_includes
+    end
+    if includes.length > 0
+      content_tag :script, <<-ENDSCRIPT
+        require(['jquery'], function() {
+          require([#{includes.join(', ')}]);
+        });
+      ENDSCRIPT
+    end
+  end
+
+  require 'digest'
+
+  # create a checksum of an array of objects' cache_key values.
+  # useful if we have a whole collection of objects that we want to turn into a
+  # cache key, so that we don't make an overly-long cache key.
+  # if you can avoid loading the list at all, that's even better, of course.
+  def collection_cache_key(collection)
+    keys = collection.map { |element| element.cache_key }
+    Digest::MD5.hexdigest(keys.join('/'))
+  end
 end

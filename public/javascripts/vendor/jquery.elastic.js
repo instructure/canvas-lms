@@ -11,7 +11,7 @@
 * @licens             MIT License - http://www.opensource.org/licenses/mit-license.php
 */
 
-(function($){
+define(['jquery'], function($){
   $.fn.extend({
     elastic: function(options) {
       var opts = $.extend({}, options),
@@ -112,4 +112,4 @@
       });
     }
   });
-})(jQuery);
+});

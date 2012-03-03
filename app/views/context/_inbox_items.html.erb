@@ -10,6 +10,14 @@
 <a href="<%= inbox_item_path("{{ id }}") %>" class="no-hover delete_inbox_item_link" id="message_delete_link" style="display: none; margin-right: 5px;"><%= image_tag "delete_circle.png" %></a>
 <% js_block do %>
   <script type="text/javascript">
+  require([
+    'jquery' /* $ */,
+    'jquery.instructure_misc_helpers' /* queryParam */,
+    'jquery.instructure_misc_plugins' /* confirmDelete */,
+    'jquery.templateData' /* getTemplateData */,
+    'vendor/jquery.pageless' /* pageless */
+  ], function($) {
+
     $(function(){
       $(".delete_inbox_item_link").click(function(event) {
         event.preventDefault();
@@ -71,5 +79,6 @@
         }
       });
     });
+  });
   </script>
 <% end %>

@@ -19,7 +19,7 @@
  * THE SOFTWARE.
  */
 
-(function($) {
+define(['jquery'], function($) {
   $.store = (function(){
     var api = {},
       win = window,
@@ -108,4 +108,4 @@
 
     return api;
   })();
-})(jQuery);
+});

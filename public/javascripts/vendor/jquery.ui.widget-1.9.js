@@ -7,7 +7,10 @@
  *
  * http://docs.jquery.com/UI/Widget
  */
-(function( $, undefined ) {
+define([
+  'jquery',
+  'jqueryui/widget' // make sure we overrite the old version in case other modules require it after this (hack!)
+], function( $, undefined ) {
 
 var slice = Array.prototype.slice;
 
@@ -420,4 +423,4 @@ if ( $.uiBackCompat !== false ) {
 	};
 }
 
-})( jQuery );
+});

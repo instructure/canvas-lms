@@ -15,7 +15,7 @@
 <% end %>
 
 <% jammit_css :sub_accounts %>
-<% jammit_js :sub_accounts %>
+<% js_bundle :sub_accounts %>
 
 <div id="sub_account_urls">
   <a href="<%= context_url(@context, :context_sub_account_url, "{{ id }}") %>" class="sub_account_url" style="display: none;">&nbsp;</a>

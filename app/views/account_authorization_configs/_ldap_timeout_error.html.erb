@@ -1,0 +1,11 @@
+<% if account_config.try(:last_timeout_failure).present? %>
+<tr class='last_timeout_failure'>
+  <td><%= before_label(t(:last_ldap_timeout_failure, "Last timeout failure")) %></td>
+  <td>
+    <%= datetime_string(account_config.last_timeout_failure) %>
+    <p>
+      <%= t :ldap_timeout_failure_help, "If Canvas times out communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}.", :time => distance_of_time_in_words(AccountAuthorizationConfig.ldap_failure_wait_time) %>
+    </p>
+  </td>
+</tr>
+<% end %>

@@ -13,6 +13,9 @@ config.whiny_nils = true
 config.action_controller.consider_all_requests_local = true
 config.action_controller.perform_caching             = false
 
+# run rake js:build to build the optimized JS if set to true
+# ENV['USE_OPTIMIZED_JS']                              = 'true'
+
 # Disable request forgery protection in test environment
 config.action_controller.allow_forgery_protection    = false
 

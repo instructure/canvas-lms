@@ -16,10 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var datagrid = {};
-(function() {
+define([
+  'INST' /* INST */,
+  'jquery' /* $ */,
+  'ajax_errors' /* INST.log_error */,
+  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
+  'jquery.instructure_misc_plugins' /* showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.scrollToVisible' /* scrollToVisible */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/position' /* /\.position\(/ */
+], function(INST, $) {
 
-  datagrid = {
+  var datagrid = {
     columns: [],
     rows: [],
     dataRows: [],
@@ -673,4 +682,6 @@ var datagrid = {};
       datagrid.scrollTo($new.row, $new.column);
     }
   }
-})();
+
+  return datagrid;
+});

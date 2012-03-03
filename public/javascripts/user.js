@@ -16,7 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('users', function(I18n) {
+require([
+  'i18n!users',
+  'jquery' /* $ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */
+], function(I18n, $) {
 $(function(){
   $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
     $(this).find(".info").addClass('info_hover');

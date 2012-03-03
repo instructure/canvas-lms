@@ -30,18 +30,26 @@
   <%= render :partial => "shared/wiki_sidebar" %>
 <% end %>
 <h2><%= t "#titles.discussions", "Discussions" %></h2>
-<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
-<% jammit_js :topics %>
+<%
+  js_bundle :topics
+  jammit_css :tinymce
+%>
 
 <%= render :partial => "shared/topics", :object => @topics, :locals => { :topic_type => "discussion_topic" } %>
 <%= will_paginate(@topics) %>
-<% js_block :i18n_scope => 'discussion_topics' do %>
+<% js_block do %>
   <script type="text/javascript">
+  require([
+    'i18nObj' /* I18n.t */,
+    'jquery' /* $ */,
+    'vendor/jquery.pageless' /* pageless */
+  ], function(I18n, $) {
+
     $(function(){
       $('#topic_list').pageless({
         totalPages: <%= @topics.total_pages %>,
         url: "<%= context_url(@context, :context_discussion_topics_url, :format => :json, :only_discussion_topics => params[:only_discussion_topics]) %>",
-        loaderMsg: I18n.t("loading_results", "Loading more results"),
+        loaderMsg: <%= jt("#discussion_topics.loading_results", "Loading more results") %>,
         scrape: function(data) {
           if(typeof(data) == 'string') {
             try {
@@ -58,6 +66,7 @@
         }
       });
     });
+  });
   </script>
 <% end %>
 <div id="reorder_topics_dialog" style="display: none;">

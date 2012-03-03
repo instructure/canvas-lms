@@ -10,7 +10,12 @@
   </div>
 <% end %>
 
-<% jammit_js :tool_inline %>
+<% js_block do %>
+<script>
+  require(['tool_inline']);
+</script>
+<% end %>
+
 <form action="<%= @resource_url %>" method="POST" <%= raw("target='#{@target || 'tool_content'}'") unless @self_target %> id="tool_form" class="<%= 'new_tab' if @tag.try(:new_tab) %>">
   <% @tool_settings.each do |key, value| %>
     <%= hidden_field_tag key, value %>

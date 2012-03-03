@@ -151,6 +151,12 @@
 
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_misc_plugins' /* fragmentChange */,
+  'jquery.templateData' /* getTemplateData */
+], function($) {
+
 $(document).ready(function() {
   $(window).resize(function() {
     var top = $("#file_content").offset().top;
@@ -196,6 +202,7 @@ $(document).ready(function() {
     $("#modules").parent().hide();
   });
   $("body").css('overflow', 'hidden');
+});
 });
 </script>
 <% end %>

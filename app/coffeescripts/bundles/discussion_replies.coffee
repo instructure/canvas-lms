@@ -1,0 +1,2 @@
+require ['context_inbox']
+

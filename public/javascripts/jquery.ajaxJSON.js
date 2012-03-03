@@ -15,9 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+/*jshint evil:true*/
 
-(function($){
-  
+define([
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit, defaultAjaxError */
+], function($) {
+
   $.originalGetJSON = $.getJSON;
   $.getJSON = function(url, data, callback) {
     var xhr = $.originalGetJSON(url, data, callback);
@@ -28,7 +32,7 @@
     if(!data[arg]) {
       throw arg + " option is required";
     }
-  }
+  };
   $.ajaxJSONPreparedFiles = function(options) {
     assert_option(options, 'context_code');
     var list = [];
@@ -49,10 +53,10 @@
         }
         data = options.handle_files.call(this, result, data);
       }
-      if(options.url && options.success && data != false) {
+      if(options.url && options.success && data !== false) {
         $.ajaxJSON(options.url, options.method, data, options.success, options.error);
       }
-    }
+    };
     var uploadFile = function(parameters, file) {
       $.ajaxJSON(options.uploadDataUrl || "/files/pending", 'POST', parameters, function(data) {
         try {
@@ -73,13 +77,11 @@
         }
         } catch(e) {
           var ex = e;
-          debugger;
-          ex;
         }
       }, function() { 
         return (options.upload_error || options.error).apply(this, arguments);
       });
-    }
+    };
     var next = function() {
       var item = list.shift();
       if(item) {
@@ -93,9 +95,9 @@
       } else {
         ready.call($this);
       }
-    }
+    };
     next.call($this);
-  }
+  };
   $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error, options) {
     var $newForm = $(document.createElement("form"));
     $newForm.attr('action', url).attr('method', submit_type);
@@ -179,10 +181,10 @@
             $(document).triggerHandler('page_view_id_received', page_view_id);
           }, 50);
         }
-        if(!data.length && data['errors']) {
-          ajaxError(data['errors'], null, "");
+        if(!data.length && data.errors) {
+          ajaxError(data.errors, null, "");
           if(!options || !options.skipDefaultError) {
-            $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, null, data, "0", data['errors']);
+            $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, null, data, "0", data.errors);
           } else {
             $.ajaxJSON.ignoredXHRs.push(xhr);
           }
@@ -196,7 +198,7 @@
       data: data
     };
     if(options && options.timeout) {
-      params['timeout'] = options.timeout;
+      params.timeout = options.timeout;
     }
     var xhr = $.ajax(params);
     $.ajaxJSON.storeRequest(xhr, url, submit_type, data);
@@ -223,4 +225,4 @@
     return null;
   };
   
-})(jQuery);
+});

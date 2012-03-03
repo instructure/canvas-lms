@@ -16,6 +16,9 @@
 
 <% js_block do %>
   <script>
+  require([
+    'jquery' /* $ */
+  ], function($) {
     $(function(){
       $.each(['assignment', 'student'], function(i, thing){
         $(".hide_"+ thing +"s_link,.show_"+ thing +"s_link").click(function(event) {
@@ -26,6 +29,7 @@
         });
       });
     });
+  });
   </script>
 <% end %>
 

@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+define([
+  'jquery' /* jQuery, $ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/dialog'
+], function($) {
 
-(function($){
-  
   // have UI dialogs default to modal:true
-  if ($.ui) {
-    $.widget('instructure.dialog', $.ui.dialog, { options: {modal: true} });
-  }
+  $.widget('instructure.dialog', $.ui.dialog, { options: {modal: true} });
 
   // This is so that if you disable an element, that it also gives it the class disabled.  
   // that way you can add css classes for our friend IE6. so rather than using selector:disabled, 
@@ -29,7 +30,7 @@
   // works on both $(elem).attr('disabled', ...) AND $(elem).prop('disabled', ...)
   $.each([ "prop", "attr" ], function(i, propOrAttr ) {
     // set the `disabled.set` hook like this so we don't override any existing `get` hook
-    $[propOrAttr+'Hooks'].disabled = jQuery.extend( $[propOrAttr+'Hooks'].disabled, {
+    $[propOrAttr+'Hooks'].disabled = $.extend( $[propOrAttr+'Hooks'].disabled, {
       set: function( elem, value, name ) {
         $(elem).toggleClass('disabled', !!value);
   
@@ -92,6 +93,5 @@
     return ($.browser.safari ? $("body") : $("html")).scrollTop();
   };
 
-  define('jquery.instructure_jquery_patches', [], function() { return $ });
 
-})(jQuery);
+});

@@ -68,8 +68,16 @@
  * @param {Object} options		Grid options.
  * 
  */
-function SlickGrid($container,data,columns,options)
-{
+
+define([
+  'vendor/slickgrid-googlecode/slick.globaleditorlock',
+  'jquery',
+  'jqueryui/sortable',
+  'jqueryui/resizable',
+  'vendor/jquery.getScrollbarWidth'
+], function(GlobalEditorLock, $) {
+
+return function SlickGrid($container,data,columns,options){
 	// settings
 	var defaults = {
 		enableAddRow: true,
@@ -1115,3 +1123,4 @@ function SlickGrid($container,data,columns,options)
 		"cancelCurrentEdit":	cancelCurrentEdit
 	});	
 }
+});

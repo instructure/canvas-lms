@@ -1,5 +1,5 @@
 //fgnass.github.com/spin.js
-(function(window, document, undefined) {
+define(function() {
 
 /**
  * Copyright (c) 2011 Felix Gnass [fgnass at neteye dot de]
@@ -282,4 +282,5 @@
 
   window.Spinner = Spinner;
 
-})(window, document);
+  return Spinner;
+});

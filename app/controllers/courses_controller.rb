@@ -23,7 +23,7 @@ require 'set'
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_user_for_context, :only => [:roster, :locks, :switch_role]
+  before_filter :require_context, :only => [:roster, :locks, :switch_role]
 
   include Api::V1::Course
 
@@ -191,29 +191,28 @@ class CoursesController < ApplicationController
   # @API
   # Returns the list of sections for this course.
   #
-  # @argument include[] ["students"] Associations to include with the group.
+  # @argument include[] [optional, "students"] Associations to include with the group.
   #
   # @response_field id The unique identifier for the course section.
   # @response_field name The name of the section.
   # @response_field sis_section_id The sis id of the section.
   #
   # @example_response
-  #   ?include[]=students
   #
-  # [
-  #   {
-  #     "id": 1,
-  #     "name": "Section A",
-  #     "sis_section_id": null,
-  #     "students": [...]
-  #   },
-  #   {
-  #     "id": 2,
-  #     "name": "Section B",
-  #     "sis_section_id": "section-b",
-  #     "students": [...]
-  #   }
-  # ]
+  #   [
+  #     {
+  #       "id": 1,
+  #       "name": "Section A",
+  #       "sis_section_id": null,
+  #       "students": [...]
+  #     },
+  #     {
+  #       "id": 2,
+  #       "name": "Section B",
+  #       "sis_section_id": "section-b",
+  #       "students": [...]
+  #     }
+  #   ]
   def sections
     get_context
     if authorized_action(@context, @current_user, :read_roster)
@@ -290,8 +289,15 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API
+  # Delete or conclude an existing course
+  #
+  # @argument event [String] ["delete"|"conclude"] The action to take on the course. available options are 'delete' and 'conclude.'
   def destroy
-    @context = Course.find(params[:id])
+    @context = api_request? ? api_find(Course, params[:id]) : Course.find(params[:id])
+    if api_request? && !['delete', 'conclude'].include?(params[:event])
+      return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }.to_json, :status => :bad_request)
+    end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, :delete)
       @context.workflow_state = 'deleted'
@@ -305,11 +311,13 @@ class CoursesController < ApplicationController
     end
     @current_user.touch
     respond_to do |format|
-      format.html {redirect_to dashboard_url}
-      format.json {render :json => {:deleted => true}.to_json}
+      format.html { redirect_to dashboard_url }
+      format.json {
+        render :json => { params[:event] => true }.to_json
+      }
     end
   end
-  
+
   def statistics
     get_context
     if authorized_action(@context, @current_user, :read_reports)
@@ -370,7 +378,6 @@ class CoursesController < ApplicationController
   end
   
   def roster
-    get_context
     if authorized_action(@context, @current_user, :read_roster)
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       @students = @context.participating_students.find(:all, :order => User.sortable_name_order_by_clause)
@@ -852,15 +859,22 @@ class CoursesController < ApplicationController
     @enrollment = @context.enrollments.find(params[:id])
     can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
     can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    can_move &&= @context.grants_right?(@current_user, session, :manage_account_settings) if @enrollment.defined_by_sis?
     if can_move
       respond_to do |format|
-        if @enrollment.defined_by_sis? &&! @context.grants_right?(@current_user, session, :manage_account_settings)
-          return format.json { render :json => @enrollment.to_json, :status => :bad_request }
-        end
-        @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
-        @enrollment.save!
+        # ensure user_id,section_id,type,associated_user_id is unique (this
+        # will become a DB constraint eventually)
+        @possible_dup = @context.enrollments.find(:first, :conditions =>
+          ["id <> ? AND user_id = ? AND course_section_id = ? AND type = ? AND (associated_user_id IS NULL OR associated_user_id = ?)",
+          @enrollment.id, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id])
+        if @possible_dup.present?
+          format.json { render :json => @enrollment.to_json, :status => :forbidden }
+        else
+          @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
+          @enrollment.save!
 
-        format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment.to_json }
+        end
       end
     else
       authorized_action(@context, @current_user, :permission_fail)

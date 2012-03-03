@@ -1,6 +1,10 @@
-var _gaq = _gaq || [];
+define([
+  'INST' /* INST */,
+  'jquery' /* $ */
+], function(INST, $) {
 
-(function($, INST) {
+  // requires INST global
+  var _gaq = window._gaq = window._gaq || [];
   var asyncScriptInserted = false;
 
   /**
@@ -83,4 +87,11 @@ var _gaq = _gaq || [];
     });
   }
 
-})(jQuery, this.INST);
+  return {
+    trackPage: $.trackPage,
+    setTrackingVar: $.setTrackingVar,
+    trackEvent: $.trackEvent,
+    trackPageView: $.trackPageView
+  };
+
+});

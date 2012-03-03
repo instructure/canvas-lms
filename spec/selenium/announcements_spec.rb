@@ -151,7 +151,7 @@ describe "announcements" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajaximations
-      element_exists(:link, feed_name).should be_false
+      element_exists(feed_name).should be_false
       ExternalFeed.count.should eql(0)
 
       #cancel while adding an external feed

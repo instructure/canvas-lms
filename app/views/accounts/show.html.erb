@@ -36,6 +36,11 @@
 <% end %>
 <% js_block do %>
 <script type="text/javascript">
+require([
+  'jquery' /* $ */,
+  'jqueryui/autocomplete' /* /\.autocomplete/ */
+], function($) {
+
 $(document).ready(function() {
   
   $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
@@ -57,6 +62,7 @@ $(document).ready(function() {
       }
     });
   }
+});
 });
 </script>
 <% end %>
