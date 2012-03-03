@@ -68,6 +68,14 @@ class Group < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
+  alias_method :participating_users_association, :participating_users
+
+  def participating_users(user_ids = nil)
+    user_ids ?
+      participating_users_association.scoped(:conditions => {:id => user_ids}) :
+      participating_users_association
+  end
+
   def wiki
     res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
     unless res
