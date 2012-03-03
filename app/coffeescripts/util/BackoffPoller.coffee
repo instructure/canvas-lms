@@ -13,7 +13,10 @@ js!requires:
 # stop/continue/restart behavior is controlled by the return value of the
 # handler function (just return the appropriate string).
 
-define 'compiled/util/BackoffPoller', () ->
+define [
+  'jquery'
+  'jquery.ajaxJSON'
+], (jQuery) ->
 
   class BackoffPoller
     constructor: (@url, @handler, opts={}) ->
@@ -66,3 +69,4 @@ define 'compiled/util/BackoffPoller', () ->
       return @stop() if @attempts > @maxAttempts
 
       @running = setTimeout jQuery.proxy(@poll, this), @nextInterval
+

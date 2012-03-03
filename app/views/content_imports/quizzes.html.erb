@@ -63,16 +63,22 @@
   </div>
 </div>
 
-<% js_block :i18n_scope => 'content_imports.quizzes' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $qti_file_import_form = $("#qti_file_import_form");
   $("#export_file_input").change(function() {
     if($(this).val().match(/\.zip$/i)) {
-      $("#qti_file_import_form .submit_button").text(I18n.t('buttons.import', "Import Quiz")).attr('disabled', false);
+      $("#qti_file_import_form .submit_button").text(<%= jt('buttons.import', "Import Quiz") %>).attr('disabled', false);
       $('.zip_error').hide();
     } else {
-      $("#qti_file_import_form .submit_button").text(I18n.t('messages.choose_file', "Please Choose a .zip file")).attr('disabled', true);
+      $("#qti_file_import_form .submit_button").text(<%= jt('messages.choose_file', "Please Choose a .zip file") %>).attr('disabled', true);
         $('.zip_error').show();
     }
   });
@@ -92,17 +98,18 @@ $(document).ready(function() {
     uploadDataUrl: $qti_file_import_form.attr('action'),
     postFormData: true,
     beforeSubmit: function(data) {
-      $(this).find(".submit_button").attr('disabled', true).text(I18n.t('messages.uploading_button', "Uploading QTI File..."));
+      $(this).find(".submit_button").attr('disabled', true).text(<%= jt('messages.uploading_button', "Uploading QTI File...") %>);
     },
     success: function(data) {
       $(this).slideUp();
       $("#file_uploaded").slideDown();
     },
     error: function(data) {
-      $(this).find(".submit_button").attr('disabled', false).text(I18n.t('errors.upload_failed', "Upload Failed, please try again"));
+      $(this).find(".submit_button").attr('disabled', false).text(<%= jt('errors.upload_failed', "Upload Failed, please try again") %>);
       $(this).formErrors(data);
     }
   });
+});
 });
 </script>
 <% end %>

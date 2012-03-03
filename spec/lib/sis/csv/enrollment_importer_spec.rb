@@ -307,4 +307,51 @@ describe SIS::CSV::EnrollmentImporter do
     scope.count.should == 1
     @enrollment.reload.should be_active
   end
+
+  it "should allow one user multiple enrollment types in the same section" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,",
+      "test_1,user_1,teacher,,active,"
+    )
+    @course = Course.find_by_sis_source_id('test_1')
+    @course.enrollments.count.should == 2
+    @user = Pseudonym.find_by_sis_user_id('user_1').user
+    @course.enrollments.map(&:user).should == [@user, @user]
+  end
+
+  it "should allow one user to observe multiple students" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      "user_2,user2,User,Uno,user@example.com,active",
+      "observer_1,user3,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,",
+      "test_1,user_2,student,,active,",
+      "test_1,observer_1,observer,,active,user_1",
+      "test_1,observer_1,observer,,active,user_2"
+    )
+    @course = Course.find_by_sis_source_id('test_1')
+    @course.enrollments.count.should == 4
+    @observer = Pseudonym.find_by_sis_user_id('observer_1').user
+    @user1 = Pseudonym.find_by_sis_user_id('user_1').user
+    @user2 = Pseudonym.find_by_sis_user_id('user_2').user
+    @course.observer_enrollments.map(&:user).should == [@observer, @observer]
+    @course.observer_enrollments.map(&:associated_user_id).sort.should == [@user1.id, @user2.id].sort
+  end
 end

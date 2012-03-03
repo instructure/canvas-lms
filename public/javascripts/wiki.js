@@ -16,9 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped("wiki_pages", function(I18n) {
-(function($) {
-  
+define([
+  'i18n!wiki_pages',
+  'jquery' /* $ */,
+  'wikiSidebar',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
+  'jquery.templateData' /* fillTemplateData */,
+  'tinymce.editor_box' /* editorBox */
+], function(I18n, $, wikiSidebar) {
+
   // private variables & methods
   function initEditViewSecondary(){
     $("#wiki_page_rename_link").click(function(e){
@@ -85,7 +94,7 @@ I18n.scoped("wiki_pages", function(I18n) {
   }
 
   // public variables & methods
-  window.wikiPage = {
+  var wikiPage = {
     init: function(){
       // init up the form now
       initForm();
@@ -199,5 +208,5 @@ I18n.scoped("wiki_pages", function(I18n) {
     });
   });
 
-})(jQuery);
+  return wikiPage;
 });

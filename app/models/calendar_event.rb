@@ -269,7 +269,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   class ReservationError < StandardError; end
-  def reserve_for(participant, user)
+  def reserve_for(participant, user, options = {})
     raise ReservationError, "not an appointment" unless context_type == 'AppointmentGroup'
     raise ReservationError, "ineligible participant" unless context.eligible_participant?(participant)
 
@@ -277,7 +277,14 @@ class CalendarEvent < ActiveRecord::Base
       lock! # in case two people two participants try to grab the same slot
       participant.lock! # in case two people try to make a reservation for the same participant
 
-      raise ReservationError, "participant has met per-participant limit" if context.max_appointments_per_participant && context.appointments_participants.for_context_codes(participant.asset_string).size >= context.max_appointments_per_participant
+      if options[:cancel_existing]
+        context.reservations_for(participant).scoped(:lock => true).each do |reservation|
+          reservation.updating_user = user
+          reservation.destroy
+        end
+      end
+
+      raise ReservationError, "participant has met per-participant limit" if context.max_appointments_per_participant && context.reservations_for(participant).size >= context.max_appointments_per_participant
       raise ReservationError, "all slots filled" if context.participants_per_appointment && child_events.size >= context.participants_per_appointment
       raise ReservationError, "participant has already reserved this appointment" if child_events_for(participant).present?
 

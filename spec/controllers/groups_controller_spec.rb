@@ -545,8 +545,8 @@ describe GroupsController do
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group.group_category.id
       data = json_parse
-      data['users'].first['section_id'].should == @course.default_section.id
-      data['users'].first['section_code'].should == @course.default_section.section_code
+      data['users'].first['sections'].first['section_id'].should == @course.default_section.id
+      data['users'].first['sections'].first['section_code'].should == @course.default_section.section_code
     end
   end
 
@@ -559,8 +559,8 @@ describe GroupsController do
 
       get 'context_group_members', :group_id => group.id
       data = json_parse
-      data.first['section_id'].should == @course.default_section.id
-      data.first['section_code'].should == @course.default_section.section_code
+      data.first['sections'].first['section_id'].should == @course.default_section.id
+      data.first['sections'].first['section_code'].should == @course.default_section.section_code
     end
 
     it "should require :read_roster permission" do

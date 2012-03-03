@@ -92,4 +92,64 @@ describe ConversationParticipant do
     conversation.reload
     conversation.starred.should be_false
   end
+
+  context "tagged scope" do
+    def conversation_for(*tags_or_users)
+      users, tags = tags_or_users.partition{ |u| u.is_a?(User) }
+      users << user if users.empty?
+      c = @me.initiate_conversation(users.map(&:id))
+      c.add_message("test")
+      c.tags = tags
+      c.save!
+      c.reload
+    end
+
+    before do
+      @me = user
+      @c1 = conversation_for("course_1")
+      @c2 = conversation_for("course_1", "course_2")
+      @c3 = conversation_for("course_2")
+      @c4 = conversation_for("group_1")
+      @c5 = conversation_for(@u1 = user)
+      @c6 = conversation_for(@u2 = user)
+      @c7 = conversation_for(@u1, @u2)
+      @c8 = conversation_for("course_1", @u1, user)
+    end
+
+    it "should return conversations that match the given course" do
+      @me.conversations.tagged("course_1").sort_by(&:id).should eql [@c1, @c2, @c8]
+    end
+
+    it "should return conversations that match any of the given courses" do
+      @me.conversations.tagged("course_1", "course_2").sort_by(&:id).should eql [@c1, @c2, @c3, @c8]
+    end
+
+    it "should return conversations that match all of the given courses" do
+      @me.conversations.tagged("course_1", "course_2", :mode => :and).sort_by(&:id).should eql [@c2]
+    end
+
+    it "should return conversations that match the given group" do
+      @me.conversations.tagged("group_1").sort_by(&:id).should eql [@c4]
+    end
+
+    it "should return conversations that match the given user" do
+      @me.conversations.tagged(@u1.asset_string).sort_by(&:id).should eql [@c5, @c7, @c8]
+    end
+
+    it "should return conversations that match any of the given users" do
+      @me.conversations.tagged(@u1.asset_string, @u2.asset_string).sort_by(&:id).should eql [@c5, @c6, @c7, @c8]
+    end
+
+    it "should return conversations that match all of the given users" do
+      @me.conversations.tagged(@u1.asset_string, @u2.asset_string, :mode => :and).sort_by(&:id).should eql [@c7]
+    end
+
+    it "should return conversations that match either the given course or user" do
+      @me.conversations.tagged(@u1.asset_string, "course_1").sort_by(&:id).should eql [@c1, @c2, @c5, @c7, @c8]
+    end
+
+    it "should return conversations that match both the given course and user" do
+      @me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id).should eql [@c8]
+    end
+  end
 end

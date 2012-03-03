@@ -18,8 +18,20 @@
   <% end %>
   </div>
 <% end %>
-<% js_block :i18n_scope => 'assignments.peer_reviews' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */
+], function(I18n, $) {
+
   $(document).ready(function() {
     $(".peer_review").hover(function() {
       $(".peer_review.submission-hover").removeClass('submission-hover');
@@ -36,7 +48,7 @@
       event.preventDefault();
       $(this).parents(".peer_review").confirmDelete({
         url: $(this).attr('href'),
-        message: I18n.t('messages.cancel_peer_review', "Cancel this peer review?")
+        message: <%= jt('messages.cancel_peer_review', "Cancel this peer review?") %>
       });
     });
     $(".assign_peer_review_link").click(function(event) {
@@ -81,7 +93,7 @@
         $review.slideDown();
         var assessor_name = $(this).parents(".student_reviews").find(".assessor_name").text();
         var time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted;
-        $review.find(".reminder_peer_review_link").attr('title', 'Remind ' + assessor_name + ' about Assessment, last notified ' + time);
+        $review.find(".reminder_peer_review_link").attr('title', <%= jt('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}', '{ assessor: assessor_name, time: time }') %>);
         $(this).slideUp(function() {
           $(this).remove();
         });
@@ -99,8 +111,7 @@
         $link.parents(".peer_review").loadingImage('remove');
         var assessor_name = $link.parents(".student_reviews").find(".assessor_name").text();
         var time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted;
-        $link.attr('title', I18n.t('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}',
-          { assessor: assessor_name, time: time }));
+        $link.attr('title', <%= jt('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}', '{ assessor: assessor_name, time: time }') %>);
       });
     });
     $(".remind_peer_reviews_link").click(function(event) {
@@ -108,6 +119,7 @@
       $(".peer_review.assigned .remind_peer_review_link").click();
     });
   });
+});
 </script>
 <% end %>
 <% content_for :stylesheets do %>

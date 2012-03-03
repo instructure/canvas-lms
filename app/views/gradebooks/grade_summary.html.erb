@@ -1,5 +1,5 @@
 <% 
-  jammit_js :grade_summary, :rubric_assessment
+  js_bundle :grade_summary, :rubric_assessment
   jammit_css :grade_summary 
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @student.name), @context.name)
   editable = @current_user == @student && !@no_calculations
@@ -19,7 +19,7 @@
         <%= before_label(:total, "Total") %> <%= raw(number_to_percentage(100, :precision => 0).sub(/100/, '<span class="grade"></span>')) %>
         <% if @context.grading_standard_enabled? %>
           <span class="final_letter_grade">
-            (<span class="grade">-</span>)
+            (<span class="grade" id="final_letter_grade_text">-</span>)
           </span>
         <% end %>
       </div>
@@ -52,7 +52,24 @@
     <% end %>
   </div>
 <% end %>
-<h2><%= t('headers.grades', "Grades For %{student}", :student => @student.name) %></h2>
+
+<h2>
+<% ot('headers.grades', "Grades For %{student}", :student => capture { %>
+ <% if !@observed_students || @observed_students.keys.length <= 1 %>
+   <%= @student.name %>
+ <% else %>
+  <select id="observer_user_url">
+    <% @observed_students.each do |student, enrollments| %>
+      <%
+        next unless enrollments.all? { |e| e.grants_right?(@current_user, nil, :read_grades) }
+        url = context_url(@context, :context_student_grades_url, student.id)
+      %>
+      <option value="<%= url %>" <%= 'selected' if student == @student %>><%= student.name %></option>
+    <% end %>
+  </select>
+ <% end %>
+<% }) %>
+</h2>
 <% if @courses_with_grades.length > 1 %>
   <div style="margin-left: 10px;">
   <%= t(:for_course, "For the course,") %>
@@ -73,6 +90,9 @@
   </div>
   <% js_block do %>
     <script>
+    require([
+      'jquery' /* $ */
+    ], function($) {
       $(document).ready(function() {
         $("#course_url").change(function() {
           if(location.href != $(this).val()) {
@@ -80,6 +100,7 @@
           }
         });
       });
+    });
     </script>
   <% end %>
 <% end %>
@@ -183,8 +204,8 @@
         <%= image_tag "rubric.png" %>
       </a>
       <% if turnitin_enabled %>
-        <% 
-          turntitin = nil 
+        <%
+          turntitin = nil
           url = '#'
           if can_do(submission, @current_user, :view_turnitin_report)
             if submission.submission_type == 'online_text_entry'

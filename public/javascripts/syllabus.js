@@ -16,9 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this file uses the global function calendarMonths.changeMonth from calendar.js
-// and depends on wikiSidebar
-var wikiSidebar, calendarMonths;
+require([
+  'jquery' /* jQuery, $ */,
+  'calendar_move' /* calendarMonths */,
+  'wikiSidebar',
+  'jquery.instructure_date_and_time' /* dateString, datepicker */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */,
+  'jquery.instructure_misc_helpers' /* scrollSidebar */,
+  'jquery.instructure_misc_plugins' /* ifExists, showIf */,
+  'jquery.loadingImg' /* loadingImage */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/datepicker' /* /\.datepicker/ */
+], function(jQuery, calendarMonths, wikiSidebar) {
 
 jQuery(function($){
   var $edit_course_syllabus_form = $("#edit_course_syllabus_form"),
@@ -151,4 +161,5 @@ jQuery(function($){
   $.scrollSidebar();
   highlightDaysWithEvents();
 
+});
 });

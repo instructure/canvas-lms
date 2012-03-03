@@ -21,10 +21,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+AMD Wrapper added by Instructure
 */
 
-if(jQuery)(
-	function(jQuery){
+define(['jquery'], function (jQuery) {
 		jQuery.extend(jQuery.fn,{
 			uploadify:function(options) {
 				jQuery(this).each(function(){
@@ -293,4 +294,5 @@ if(jQuery)(
 			});
 		}
 	})
-})(jQuery);
+});
+

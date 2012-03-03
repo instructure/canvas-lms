@@ -15,36 +15,62 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!groups',
+  'jquery' /* $ */,
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashMessage, flashError */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/droppable' /* /\.droppable/ */,
+  'jqueryui/tabs' /* /\.tabs/ */
+], function(I18n, $) {
 
-I18n.scoped('groups', function(I18n){
   window.contextGroups = {
     autoLoadGroupThreshold: 15,
-    
+
+    populateUserElement: function($user, data) {
+      if (data.sections) {
+        data.section_id = data.sections.map(function(s) {
+          return s.section_id;
+        }).join(",");
+        data.section_code = data.sections.map(function(s) {
+          return s.section_code;
+        }).join(", ");
+      }
+
+      $user.removeClass('user_template');
+      $user.addClass('user_id_' + data.user_id);
+      $user.fillTemplateData({ data: data });
+    },
+
     loadMembersForGroup: function($group) {
       var url = $("#manage_group_urls .list_users_url").attr('href');
       var id = $group.getTemplateData({textValues: ['group_id']}).group_id;
       url = $.replaceTags(url, "id", id)
-      
+
       $group.find(".load_members_link").hide();
       $group.find(".loading_members").show();
-      
+
       $.ajaxJSON(url, "GET", null, function(data) {
         // remove existing students from group (this should have returned everyone)
         $group.find(".student").remove();
-        
+
         // create new entries for everyone we got back, and insert them into the list.
         // TODO: we should presort the list and give an "append" option to insertIntoGroup.
         // Right now it takes O(n^2) to insert students, which can be painful in a large list.
-        var user_template = $(".user_template");
+        var $user_template = $(".user_template");
         for (var i = 0; i < data.length; i++) {
-          var user_info = data[i];
-          var user_el = user_template.clone();
-          user_el.removeClass('user_template');
-          user_el.addClass('user_id_' + user_info['user_id']);
-          user_el.fillTemplateData({ data: user_info });
-          
-          contextGroups.insertIntoGroup(user_el, $group);
-          
+          var $user = $user_template.clone();
+          contextGroups.populateUserElement($user, data[i]);
+          contextGroups.insertIntoGroup($user, $group);
+
           $group.find(".user_count_hidden").text("0");
           $(window).triggerHandler('resize');
           contextGroups.updateCategoryCounts($group.parents(".group_category"));
@@ -52,45 +78,40 @@ I18n.scoped('groups', function(I18n){
         $group.find(".loading_members").hide();
       });
     },
-    
+
     // 0 means to reload the current page, whatever it is
     // < 0 means to only load that page if no other page is loaded
     loadUnassignedMembersPage: function($group, page) {
       if (page < 0 && $group.data("page_loaded")) { return; }
       page = Math.abs(page);
-      
+
       if (page == 0) {
         page = $group.data("page_loaded") || 1;
       }
-      
+
       // This is lots of duplicated code from above, with tweaks. TODO: Refactor
       var category_id = $group.closest(".group_category").data('category_id');
       var url = $("#manage_group_urls .list_unassigned_users_url").attr('href');
       url += "?category_id=" + category_id + "&page=" + page;
-      
+
       $group.find(".load_members_link").hide();
-      $group.find(".loading_members").text(I18n.t('status.loading', "Loading..."));
       $group.find(".loading_members").show();
-      
+
       $.ajaxJSON(url, "GET", null, function(data) {
         $group.data("page_loaded", page);
         $group.find(".user_count").text(I18n.t('category.student', 'student', {count: data['total_entries']}));
         $group.find(".user_count_hidden").text(data['total_entries'] - data['users'].length);
         $group.find(".group_user_count").show();
         $group.find(".student").remove();
-        
-        var user_template = $(".user_template");
+
+        var $user_template = $(".user_template");
         var users = data['users'];
         for (var i = 0; i < users.length; i++) {
-          var user_info = users[i];
-          var user_el = user_template.clone();
-          user_el.removeClass('user_template');
-          user_el.addClass('user_id_' + user_info['user_id']);
-          user_el.fillTemplateData({ data: user_info });
-          
-          contextGroups.insertIntoGroup(user_el, $group);
+          var $user = $user_template.clone();
+          contextGroups.populateUserElement($user, users[i]);
+          contextGroups.insertIntoGroup($user, $group);
         }
-        
+
         $group.find(".loading_members").html(data['pagination_html']);
         $group.find(".unassigned_members_pagination a").click(function(event) {
           event.preventDefault();
@@ -101,11 +122,11 @@ I18n.scoped('groups', function(I18n){
             contextGroups.loadUnassignedMembersPage($(this).closest(".group_blank").first(), link_page)
           }
         });
-        
+
         $(window).triggerHandler('resize');
       })
     },
-    
+
     moveToGroup: function($student, $group) {
       if ($student.parents(".group")[0] == $group[0]) { return; }
       var id = $group.getTemplateData({textValues: ['group_id']}).group_id;
@@ -123,7 +144,7 @@ I18n.scoped('groups', function(I18n){
         user_id: user_id
       }
       $student.remove();
-      
+
       var $student_instances = $student;
       contextGroups.insertIntoGroup($student, $group);
       $category = $group.parents(".group_category")
@@ -146,18 +167,18 @@ I18n.scoped('groups', function(I18n){
           }
           $span.text(data.group_membership.group_id || "");
         });
-        
+
         $student.removeClass('event_pending');
         contextGroups.updateCategoryCounts($group.parents(".group_category"));
 
         var groups = $($original_group);
         groups = groups.add($group);
         contextGroups.updateCategoryHeterogeneity($group.parents(".group_category"), groups);
-        
+
         var unassigned_group = $group.parents(".group_category").find(".group_blank");
         var students_visible = unassigned_group.find(".student_list .student").length;
         var students_hidden = parseInt(unassigned_group.find(".user_count_hidden").text());
-        
+
         if (students_visible <= 5 && students_hidden > 0) {
           contextGroups.loadUnassignedMembersPage(unassigned_group, 0);
         }
@@ -181,15 +202,15 @@ I18n.scoped('groups', function(I18n){
         $.flashError(message);
       });
     },
-    
+
     insertIntoGroup: function($student, $group) {
       var $before = null;
       var data = $student.getTemplateData({textValues: ['name', 'user_id']})
       var student_name = data.name;
-      
+
       // don't insert users into a group they're already in
       if ($group.find(".student_list .user_id_" + data.user_id).length > 0) { return; }
-      
+
       $group.find(".student.user_" + data.user_id).remove();
       $group.find(".student_list .student").each(function() {
         var compare_name = $(this).getTemplateData({textValues: ['name']}).name;
@@ -213,46 +234,54 @@ I18n.scoped('groups', function(I18n){
         }
       });
     },
-    
+
     updateCategoryCounts: function($category) {
       $category.find(".group").each(function() {
         var userCount = $(this).find(".student_list .student").length + parseInt($(this).find(".user_count_hidden").text());
         $(this).find(".user_count").text(I18n.t('category.student', 'student', {count: userCount}));
       });
-      
+
       var groupCount = $category.find(".group:not(.group_blank)").length;
       $category.find(".group_count").text(I18n.t('group', 'Group', {count: groupCount}));
-      
+
       $category.find(".group").each(function() {
         $(this).find(".expand_collapse_links").showIf($(this).find(".student_list li").length > 0);
       });
     },
-    
+
     updateCategoryHeterogeneity: function($category, groups) {
       // check if any of the provided groups are heterogenous now (skipping the
-      // "unassigned" group should it be involved). this assumes exactly one
-      // section per student, which isn't enforced by the server data model,
-      // but should be true of students for the forseeable future.
+      // "unassigned" group should it be involved).
       var heterogenous = false;
       groups.each(function() {
-        var section_id = null;
-        if (!$(this).hasClass('group_blank')) {
-          $(this).find(".student_list .student .section_id").each(function() {
-            other_section_id = $(this).text();
-            if (section_id === null || section_id === "") {
-              section_id = other_section_id;
-            } else if (other_section_id !== "" && section_id !== other_section_id) {
-              heterogenous = true;
+        var section_id_counts = {};
+        $section_ids = $(this).find(".student_list .student .section_id");
+        if (!$(this).hasClass('group_blank') && $section_ids.length > 0 && $section_ids.text()) {
+          $section_ids.each(function() {
+            var section_ids = $(this).text().split(",");
+            for (var i = 0; i < section_ids.length; i++) {
+              if (!section_id_counts[section_ids[i]]) {
+                section_id_counts[section_ids[i]] = 0;
+              }
+              section_id_counts[section_ids[i]] += 1;
             }
           });
+
+          var found = true;
+          for (var section_id in section_id_counts) {
+            if (section_id_counts[section_id] === $section_ids.length) {
+              found = false;
+            }
+          }
+          heterogenous = heterogenous || found;
         }
       });
       $category.find('.heterogenous').text(heterogenous ? 'true' : 'false');
     },
-    
+
     populateCategory: function(panel) {
       var $category = $(panel);
-      
+
       // Start loading groups that have < X members automatically
       $category.find(".group").each(function() {
         var members = parseInt($(this).find(".user_count_hidden").text());
@@ -260,13 +289,13 @@ I18n.scoped('groups', function(I18n){
           contextGroups.loadMembersForGroup($(this));
         }
       })
-      
+
       // -1 means to load page 1, but only if there aren't any other pages loaded (for switching between tabs)
       if ($category.length) {
         contextGroups.loadUnassignedMembersPage($category.find(".group_blank"), -1);
       }
     },
-    
+
     updateCategory: function($category, category) {
       // update name in $category, tab, and sidebar
       $category.find('.category_name').text(category.name);
@@ -304,7 +333,7 @@ I18n.scoped('groups', function(I18n){
       $category.find("ul").append($group.show());
       $("#category_header").show();
     },
-    
+
     droppable_options: {
       accept: '.student',
       hoverClass: 'hover',
@@ -315,7 +344,7 @@ I18n.scoped('groups', function(I18n){
       }
     }
   }
-  
+
   $(document).ready(function() {
     $("li.student").live('mousedown', function(event) { event.preventDefault(); return false; });
     $("#group_tabs").tabs();
@@ -527,7 +556,7 @@ I18n.scoped('groups', function(I18n){
           });
           $category.find(".clearer").before($group);
           contextGroups.addGroupToSidebar(group)
-          
+
           if (group.users) {
             for(var jdx in group.users) {
               var user = group.users[jdx].user;
@@ -536,7 +565,7 @@ I18n.scoped('groups', function(I18n){
               $(".student.user_" + user.id).find(".data").append($span);
             }
           }
-          
+
           $group.find(".name.blank_name").hide().end()
             .find(".group_name").show();
           $group.find(".group_user_count").show();
@@ -554,7 +583,7 @@ I18n.scoped('groups', function(I18n){
         $category.find('.self_signup_text').showIf(group_category.self_signup);
         $category.find('.restricted_self_signup_text').showIf(group_category.self_signup == 'restricted');
         $category.find('.assign_students_link').showIf(group_category.self_signup !== 'restricted');
-        
+
         var newIndex = $("#group_tabs").tabs('length');
         if ($("li.category").last().hasClass('student_organized')) {
           newIndex -= 1;
@@ -690,16 +719,13 @@ I18n.scoped('groups', function(I18n){
           var $group = $category.find('#group_' + group.id);
           for (var j = 0; j < group.new_members.length; j++) {
             var user = group.new_members[j];
-            var user_class = 'user_id_' + user.user_id;
 
             // remove existing user element, if any
-            $category.find('.' + user_class).remove();
+            $category.find('.user_id_' + user.user_id).remove();
 
             // create new user element and place it in the right group
             var $user = user_template.clone();
-            $user.removeClass('user_template');
-            $user.addClass(user_class);
-            $user.fillTemplateData({ data: user });
+            contextGroups.populateUserElement($user, user);
             contextGroups.insertIntoGroup($user, $group);
           }
         }
@@ -768,3 +794,4 @@ I18n.scoped('groups', function(I18n){
     $("#tabs_loading_wrapper").show();
   });
 });
+

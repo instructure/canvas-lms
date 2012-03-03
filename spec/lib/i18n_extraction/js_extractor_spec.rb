@@ -23,7 +23,7 @@ describe I18nExtraction::JsExtractor do
     scope_results = scope && (options.has_key?(:scope_results) ? options.delete(:scope_results) : true)
 
     extractor = I18nExtraction::JsExtractor.new
-    source = "I18n.scoped('#{scope}', function(I18n) {\n#{source.gsub(/^/, '  ')}\n});" if scope
+    source = "require(['i18n!#{scope}'], function(I18n) {\n#{source.gsub(/^/, '  ')}\n});" if scope
     extractor.process(source, options)
     (scope_results ?
       scope.split(/\./).inject(extractor.translations) { |hash, s| hash[s] } :
@@ -36,7 +36,7 @@ describe I18nExtraction::JsExtractor do
     end
 
     it "should disallow everything else" do
-      lambda{ extract "I18n.t(foo, \"Foo\")" }.should raise_error /unable to "parse" I18n call/
+      lambda{ extract "I18n.t(foo, \"Foo\")" }.should raise_error /invalid key/
       lambda{ extract "I18n.t('f' + 'o' + 'o', \"Foo\"" }.should raise_error /unable to "parse" I18n call/
       lambda{ extract "I18n.t('f o o', \"Foo\"" }.should raise_error /unable to "parse" I18n call/
     end
@@ -99,36 +99,24 @@ describe I18nExtraction::JsExtractor do
   context "scoping" do
     it "should correctly infer the scope" do
       extract(<<-SOURCE, nil).should == {'asdf' => {'bar' => 'Bar'}}
-        I18n.scoped('asdf', function(I18n) {
-          I18n.t('bar', 'Bar');
-        });
-      SOURCE
-
-      extract(<<-SOURCE, nil).should == {'asdf' => {'bar' => 'Bar'}}
         define('bar',
         ['foo',
-         'i18n'
+         'i18n!asdf'
         ], function(Foo, I18n) {
-          I18n = I18n.scoped('asdf');
           I18n.t('bar', 'Bar');
         });
       SOURCE
     end
 
     it "should require a scope for all I18n calls" do
-      lambda{ extract(<<-SOURCE, nil) }.should raise_error /possibly unscoped I18n call on line 4/
-        I18n.scoped('asdf', function(I18n) {
+      lambda{ extract(<<-SOURCE, nil) }.should raise_error /possibly unscoped I18n call on line 2/
+        require(['i18n'], function(I18n) {
           I18n.t('bar', 'Bar');
         });
-        I18n.t('foo', 'Foo');
       SOURCE
 
-      lambda{ extract(<<-SOURCE, nil) }.should raise_error /possibly unscoped I18n call on line 5/
-        require(['i18n'], function(I18n) {
-          I18n = I18n.scoped('asdf');
-          I18n.t('bar', 'Bar');
-        });
-        I18n.t('foo', 'Foo');
+      lambda{ extract(<<-SOURCE, nil) }.should raise_error /possibly unscoped I18n call on line 1/
+        I18n.t('bar', 'Bar');
       SOURCE
     end
 
@@ -138,6 +126,17 @@ describe I18nExtraction::JsExtractor do
 
     it "should not auto-scope absolute keys" do
       extract("I18n.t('#foo', 'Foo')", 'asdf', :scope_results => false).should == {'foo' => "Foo"}
+    end
+
+    it "should not allow multiple scopes" do
+      lambda{ extract(<<-SOURCE, nil) }.should raise_error /multiple scopes are not allowed/
+        require(['i18n!asdf'], function(I18n) {
+          I18n.t('bar', 'Bar');
+        });
+        require(['i18n!qwerty'], function(I18n) {
+          I18n.t('lol', 'Wut');
+        });
+      SOURCE
     end
   end
 
@@ -156,62 +155,48 @@ describe I18nExtraction::JsExtractor do
   end
 
   context "erb" do
-    it "should require an :i18n_scope" do
-      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error /possibly unscoped I18n call/
+    it "should support jt and I18n.l calls" do
+      extract(<<-SOURCE, nil, :erb => true).should eql({}) # doesn't actually extract it
         <% js_block do %>
           <script>
-          I18n.t('#bar', 'Bar');
-          </script>
-        <% end %>
-      SOURCE
-
-      extract(<<-SOURCE, nil, :erb => true).should == {'asdf' => {'bar' => 'Bar'}}
-        <% js_block :i18n_scope => 'asdf' do %>
-          <script>
-          I18n.t('bar', 'Bar');
+            require(['i18n'], function(I18n) {
+              I18n.l('asdf', 'asdf')
+              <%= jt('bar', 'Bar') %>
+            });
           </script>
         <% end %>
       SOURCE
     end
 
-    it "should not allow scoped blocks" do
-      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error /scoped blocks are no longer supported in js_blocks/
+    it "should not support the i18n AMD plugin" do
+      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error "i18n amd plugin is not supported in js_blocks (line 3)"
         <% js_block do %>
           <script>
-          I18n.scoped('asdf', function(I18n) {
-            I18n.t('#bar', 'Bar');
-          });
-          </script>
-        <% end %>
-      SOURCE
-
-      # even if you provide an :i18n_scope, you still can't do a scoped block
-      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error /scoped blocks are no longer supported in js_blocks/
-        <% js_block :i18n_scope => 'asdf' do %>
-          <script>
-          I18n.scoped('qwerty', function(I18n) {
-            I18n.t('#bar', 'Bar');
-          });
+            require(['i18n!scope'], function(I18n) {
+              <%= jt('bar', 'Bar') %>
+            });
           </script>
         <% end %>
       SOURCE
     end
 
-    it "should not allow absolute keys" do
-      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error /absolute keys are not supported in this context/
-        <% js_block :i18n_scope => 'asdf' do %>
+    it "should not allow jt calls outside of a require/define block" do
+      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error /possibly unscoped jt call on line 3/
+        <% js_block do %>
           <script>
-          I18n.t('#bar', 'Bar');
+            <%= jt('bar', 'Bar') %>
           </script>
         <% end %>
       SOURCE
     end
 
-    it "should not allow erb in defaults" do
-      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error /erb cannot be used inside of default values/
-        <% js_block :i18n_scope => 'asdf' do %>
+    it "should not allow raw I18n calls" do
+      lambda{ extract(<<-SOURCE, nil, :erb => true) }.should raise_error /raw I18n call on line 4/
+        <% js_block do %>
           <script>
-          I18n.t('bar', 'Bar <%= no_can_do %>');
+            require(['i18n'], function(I18n) {
+              I18n.t('bar', 'Bar');
+            });
           </script>
         <% end %>
       SOURCE

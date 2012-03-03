@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-I18n.scoped('courses', function(I18n) {
+require([
+  'i18n!courses',
+  'jquery' /* $ */
+], function(I18n, $) {
   $(document).ready(function() {
     $(".reject_button").click(function(event) {
       var result = confirm(I18n.t('confirm_reject_invitation', "Are you sure you want to reject the invitation to participate in this course?"));
@@ -27,3 +29,4 @@ I18n.scoped('courses', function(I18n) {
     });
   });
 });
+

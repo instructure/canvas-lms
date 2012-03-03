@@ -1,4 +1,5 @@
 // this is just to turn spin.js into a jquery plugin
+define(['jquery', 'vendor/spin'], function($, Spinner) {
 $.fn.spin = function(opts) {
   return this.each(function() {
     var $this = $(this),
@@ -17,3 +18,4 @@ $.fn.spin = function(opts) {
     }
   });
 };
+});

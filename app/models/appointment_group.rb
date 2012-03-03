@@ -227,7 +227,7 @@ class AppointmentGroup < ActiveRecord::Base
     participant = participant_for(user_or_participant) if participant_type == 'Group' && participant.is_a?(User)
     return false unless eligible_participant?(participant)
     return false unless min_appointments_per_participant
-    return appointments_participants.for_context_codes(participant.asset_string).size < min_appointments_per_participant
+    return reservations_for(participant).size < min_appointments_per_participant
   end
 
   def participant_for(user)
@@ -237,6 +237,10 @@ class AppointmentGroup < ActiveRecord::Base
       user.groups.detect{ |g| g.group_category_id == sub_context_id }
     end
     participant if participant && eligible_participant?(participant)
+  end
+
+  def reservations_for(participant)
+    appointments_participants.for_context_codes(participant.asset_string)
   end
 
   def update_cached_values

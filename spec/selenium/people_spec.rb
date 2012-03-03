@@ -60,156 +60,251 @@ describe "people" do
     enroll_student(student_4)
   end
 
-  before (:each) do
-    course_with_teacher_logged_in
+  context "people as a teacher" do
 
-    #add first student
-    @student_1 = User.create!(:name => 'student@test.com')
-    @student_1.register!
-    @student_1.pseudonyms.create!(:unique_id => 'student@test.com', :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+    before (:each) do
+      course_with_teacher_logged_in
 
-    e1 = @course.enroll_student(@student_1)
-    e1.workflow_state = 'active'
-    e1.save!
-    @course.reload
+      #add first student
+      @student_1 = User.create!(:name => 'student@test.com')
+      @student_1.register!
+      @student_1.pseudonyms.create!(:unique_id => 'student@test.com', :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
 
-    #adding users for second selenium test to work correctly
+      e1 = @course.enroll_student(@student_1)
+      e1.workflow_state = 'active'
+      e1.save!
+      @course.reload
 
-    #teacher user
-    @test_teacher = create_user('teacher@test.com')
-    #student user
-    @student_2 = create_user('student2@test.com')
-    #ta user
-    @test_ta = create_user('ta@test.com')
-    #observer user
-    @test_observer = create_user('observer@test.com')
+      #adding users for second selenium test to work correctly
 
-    get "/courses/#{@course.id}/users"
-  end
+      #teacher user
+      @test_teacher = create_user('teacher@test.com')
+      #student user
+      @student_2 = create_user('student2@test.com')
+      #ta user
+      @test_ta = create_user('ta@test.com')
+      #observer user
+      @test_observer = create_user('observer@test.com')
 
-  it "should validate the main page" do
-    users = driver.find_elements(:css, '.user_name')
-    users[0].text.should == @teacher.name
-    users[1].text.should == @student_1.name
-  end
-
-  it "should navigate to registered services on profile page" do
-    driver.find_element(:link, I18n.t('links.view_services', 'View Registered Services')).click
-    driver.find_element(:link, I18n.t('links.link_service', 'Link web services to my account')).click
-    driver.find_element(:id, 'unregistered_services').should be_displayed
-  end
-
-  it "should add a teacher, ta, student, and observer" do
-    expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
-    add_users_button = driver.find_element(:css, '.add_users_link')
-    add_users_button.click
-    add_user('Teachers', @test_teacher.name, 'ul.user_list.teacher_enrollments')
-    add_user("Students", @student_2.name, 'ul.user_list.student_enrollments')
-    add_user("TAs", @test_ta.name, 'ul.user_list.ta_enrollments')
-    add_user("Observers", @test_observer.name, 'ul.user_list.observer_enrollments')
-  end
-
-  it "should make a new set of student groups" do
-    create_student_group
-  end
-
-  it "should test self sign up help functionality" do
-    expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
-    open_student_group_dialog
-    find_with_jquery('a.self_signup_help_link:visible').click
-    help_dialog = driver.find_element(:css, '#self_signup_help_dialog')
-    help_dialog.should be_displayed
-  end
-
-  it "should test self sign up functionality" do
-    expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
-    dialog = open_student_group_dialog
-    dialog.find_element(:css, '#category_enable_self_signup').click
-    dialog.find_element(:css, '#category_split_group_count').should_not be_displayed
-    dialog.find_element(:css, '#category_create_group_count').should be_displayed
-  end
-
-  it "should test self sign up / group structure functionality" do
-    group_count = "4"
-    expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
-    dialog = open_student_group_dialog
-    dialog.find_element(:css, '#category_enable_self_signup').click
-    dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
-    dialog.find_element(:css, '#add_category_form').submit
-    wait_for_ajaximations
-    driver.find_elements(:css, '.left_side .group_name').count.should == group_count.to_i
-  end
-
-  it "should test group structure functionality" do
-    enroll_more_students
-
-    group_count = 4
-    expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
-    dialog = open_student_group_dialog
-    dialog.find_element(:css, '#category_split_groups').click
-    dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
-    dialog.find_element(:css, '#add_category_form').submit
-    wait_for_ajaximations
-    driver.find_elements(:css, '.left_side .group_name').count.should == group_count.to_i
-  end
-
-  it "should edit a student group" do
-    new_group_name = "new group edit name"
-    create_student_group
-    driver.find_element(:css, '.edit_category_link').click
-    edit_form = driver.find_element(:css, '#edit_category_form')
-    edit_form.find_element(:css, 'input#category_name').send_keys(new_group_name)
-    edit_form.submit
-    wait_for_ajaximations
-    find_with_jquery("h3.category_name").text.should == new_group_name
-  end
-
-  it "should delete a student group" do
-    create_student_group
-    driver.find_element(:css, '.delete_category_link').click
-    keep_trying_until do
-      driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.accept
-      true
+      get "/courses/#{@course.id}/users"
     end
-    wait_for_ajaximations
-    refresh_page
-    driver.find_element(:css, '#no_groups_message').should be_displayed
-  end
 
-  it "should randomly assign students" do
-    expected_student_count = "0 students"
+    it "should validate the main page" do
+      users = driver.find_elements(:css, '.user_name')
+      users[0].text.should == @teacher.name
+      users[1].text.should == @student_1.name
+    end
 
-    enroll_more_students
+    it "should navigate to registered services on profile page" do
+      driver.find_element(:link, I18n.t('links.view_services', 'View Registered Services')).click
+      driver.find_element(:link, I18n.t('links.link_service', 'Link web services to my account')).click
+      driver.find_element(:id, 'unregistered_services').should be_displayed
+    end
 
-    group_count = 4
-    expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
-    dialog = open_student_group_dialog
-    dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
-    dialog.find_element(:css, '#add_category_form').submit
-    wait_for_ajaximations
-    group_count.times do
-      driver.find_element(:css, '.add_group_link').click
-      driver.find_element(:css, '.button-container > .small-button').click
+    it "should add a teacher, ta, student, and observer" do
+      expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
+      add_users_button = driver.find_element(:css, '.add_users_link')
+      add_users_button.click
+      add_user('Teachers', @test_teacher.name, 'ul.user_list.teacher_enrollments')
+      add_user("Students", @student_2.name, 'ul.user_list.student_enrollments')
+      add_user("TAs", @test_ta.name, 'ul.user_list.ta_enrollments')
+      add_user("Observers", @test_observer.name, 'ul.user_list.observer_enrollments')
+    end
+
+    it "should link an observer to student after adding the observer to the course" do
+      expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
+      add_users_button = driver.find_element(:css, '.add_users_link')
+      add_users_button.click
+      add_user("Observers", @test_observer.name, 'ul.user_list.observer_enrollments')
+      ObserverEnrollment.count.should == 1
+      oe = ObserverEnrollment.first
+
+      find_with_jquery('.associated_user_link:visible').click #driver.find_element = element hidden
+      link_student_form = f('#link_student_dialog_form')
+      click_option('#student_enrollment_link_option', @student_1.name)
+      link_student_form.find_element(:css, '.save_button').click
       wait_for_ajaximations
+      f(".enrollment_#{oe.id} .associated_user_name").should include_text @student_1.name
+      oe.reload.associated_user_id.should == @student_1.id
     end
-    driver.find_element(:css, '.assign_students_link').click
-    keep_trying_until do
-      driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.accept
-      true
+
+    it "should make a new set of student groups" do
+      create_student_group
     end
-    wait_for_ajax_requests
-    assert_flash_notice_message /Students assigned to groups/
-    driver.find_element(:css, '.right_side .user_count').text.should == expected_student_count
+
+    it "should test self sign up help functionality" do
+      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      open_student_group_dialog
+      find_with_jquery('a.self_signup_help_link:visible').click
+      help_dialog = driver.find_element(:css, '#self_signup_help_dialog')
+      help_dialog.should be_displayed
+    end
+
+    it "should test self sign up functionality" do
+      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      dialog = open_student_group_dialog
+      dialog.find_element(:css, '#category_enable_self_signup').click
+      dialog.find_element(:css, '#category_split_group_count').should_not be_displayed
+      dialog.find_element(:css, '#category_create_group_count').should be_displayed
+    end
+
+    it "should test self sign up / group structure functionality" do
+      group_count = "4"
+      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      dialog = open_student_group_dialog
+      dialog.find_element(:css, '#category_enable_self_signup').click
+      dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
+      dialog.find_element(:css, '#add_category_form').submit
+      wait_for_ajaximations
+      driver.find_elements(:css, '.left_side .group_name').count.should == group_count.to_i
+    end
+
+    it "should test group structure functionality" do
+      enroll_more_students
+
+      group_count = 4
+      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      dialog = open_student_group_dialog
+      dialog.find_element(:css, '#category_split_groups').click
+      dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
+      dialog.find_element(:css, '#add_category_form').submit
+      wait_for_ajaximations
+      driver.find_elements(:css, '.left_side .group_name').count.should == group_count.to_i
+    end
+
+    it "should edit a student group" do
+      new_group_name = "new group edit name"
+      create_student_group
+      driver.find_element(:css, '.edit_category_link').click
+      edit_form = driver.find_element(:css, '#edit_category_form')
+      edit_form.find_element(:css, 'input#category_name').send_keys(new_group_name)
+      edit_form.submit
+      wait_for_ajaximations
+      find_with_jquery("h3.category_name").text.should == new_group_name
+    end
+
+    it "should delete a student group" do
+      create_student_group
+      driver.find_element(:css, '.delete_category_link').click
+      keep_trying_until do
+        driver.switch_to.alert.should_not be_nil
+        driver.switch_to.alert.accept
+        true
+      end
+      wait_for_ajaximations
+      refresh_page
+      driver.find_element(:css, '#no_groups_message').should be_displayed
+    end
+
+    it "should randomly assign students" do
+      expected_student_count = "0 students"
+
+      enroll_more_students
+
+      group_count = 4
+      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      dialog = open_student_group_dialog
+      dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
+      dialog.find_element(:css, '#add_category_form').submit
+      wait_for_ajaximations
+      group_count.times do
+        driver.find_element(:css, '.add_group_link').click
+        driver.find_element(:css, '.button-container > .small-button').click
+        wait_for_ajaximations
+      end
+      driver.find_element(:css, '.assign_students_link').click
+      keep_trying_until do
+        driver.switch_to.alert.should_not be_nil
+        driver.switch_to.alert.accept
+        true
+      end
+      wait_for_ajax_requests
+      assert_flash_notice_message /Students assigned to groups/
+      driver.find_element(:css, '.right_side .user_count').text.should == expected_student_count
+    end
+
+    it "should test prior enrollment functionality" do
+      expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
+      expect_new_page_load { driver.find_element(:link, 'End this Course').click }
+      expect_new_page_load { driver.find_element(:css, '.button-container > .big-button').click }
+      get "/courses/#{@course.id}/users"
+      expect_new_page_load { driver.find_element(:link, 'View Prior Enrollments').click }
+      driver.find_element(:css, '#users').should include_text(@student_1.name)
+    end
+
+    def link_to_student(enrollment, student)
+      enrollment.find_element(:css, ".link_enrollment_link").click
+      wait_for_ajax_requests
+      click_option("#student_enrollment_link_option", student.try(:name) || "[ No Link ]")
+      driver.find_element(:css, "#link_student_dialog_form").submit
+      wait_for_ajax_requests
+    end
+
+    it "should deal with observers linked to multiple students" do
+      @students = []
+      @obs = user_model(:name => "The Observer")
+      2.times do |i|
+        student_in_course(:name => "Student #{i}")
+        @students << @student
+        e = @course.observer_enrollments.create!(:user => @obs, :workflow_state => 'active')
+        e.associated_user_id = @student.id
+        e.save!
+      end
+
+      2.times do |i|
+        student_in_course(:name => "Student #{i+2}")
+        @students << @student
+      end
+
+      get "/courses/#{@course.id}/users/#{@obs.id}"
+      driver.find_element(:css, ".more_user_information_link").click
+      wait_for_animations
+
+      enrollments = driver.find_elements(:css, ".enrollment")
+      enrollments.length.should == 2
+      enrollments[0].should include_text @students[0].name
+      enrollments[1].should include_text @students[1].name
+
+      link_to_student(enrollments[0], @students[2])
+      enrollments[0].should include_text @students[2].name
+      enrollments[1].should include_text @students[1].name
+
+      link_to_student(enrollments[1], @students[3])
+      enrollments[0].should include_text @students[2].name
+      enrollments[1].should include_text @students[3].name
+
+      @obs.reload
+      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[2].id, @students[3].id]
+
+      link_to_student(enrollments[0], nil)
+      link_to_student(enrollments[1], nil)
+      enrollments[0].find_element(:css, ".associated_user").should_not be_displayed
+      enrollments[1].find_element(:css, ".associated_user").should_not be_displayed
+
+      link_to_student(enrollments[0], @students[0])
+      link_to_student(enrollments[1], @students[1])
+      enrollments[0].should include_text @students[0].name
+      enrollments[1].should include_text @students[1].name
+
+      @obs.reload
+      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[0].id, @students[1].id]
+    end
   end
 
-  it "should test prior enrollment functionality" do
-    expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
-    expect_new_page_load { driver.find_element(:link, 'End this Course').click }
-    expect_new_page_load { driver.find_element(:css, '.button-container > .big-button').click }
-    get "/courses/#{@course.id}/users"
-    expect_new_page_load { driver.find_element(:link, 'View Prior Enrollments').click }
-    driver.find_element(:css, '#users').should include_text(@student_1.name)
+  context "people as a TA" do
+
+    before (:each) do
+      course_with_ta_logged_in
+    end
+
+    it "should validate that the TA cannot delete / conclude or reset course" do
+      pending "Bug #6227 - should not allow a TA to delete / conclude / reset course content" do
+        get "/courses/#{@course.id}/settings"
+        driver.find_element(:css, '.delete_course_link').should be_nil
+        driver.find_element(:css, '.reset_course_content_button').should be_nil
+        get "/courses/#{@course.id}/confirm_action?event=conclude"
+        driver.find_element(:css, '.ui-state-error').should include_text('Unauthorized')
+      end
+    end
   end
 end

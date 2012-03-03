@@ -3,12 +3,17 @@
 # $.detect from jquery_misc_helpers
 # jqueryui dialog
 # jquery disableWhileLoading
-define 'compiled/helpDialog', [
-  'i18n'
+
+define [
+  'i18n!help_dialog'
   'jst/helpDialog'
   'INST'
-], (I18n, helpDialogTemplate, INST) ->
-  I18n = I18n.scoped 'HelpDialog'
+  'str/htmlEscape'
+
+  'jquery.instructure_misc_helpers'
+  'jquery.instructure_jquery_patches' # dialog
+  'jquery.disableWhileLoading'
+], (I18n, helpDialogTemplate, INST, htmlEscape) ->
 
   helpDialog =
     defaultLinks: [
@@ -120,7 +125,7 @@ define 'compiled/helpDialog', [
 
         $.when(coursesDfd, @helpLinksDfd).done (coursesDfdArgs) ->
           options = ("<option value='course_#{c.id}_admins' #{if ENV.context_id is c.id then 'selected' else ''}>
-                      #{$.htmlEscape(c.name)}
+                      #{htmlEscape(c.name)}
                     </option>" for c in coursesDfdArgs[0])
           $form.find('[name="recipients[]"]').html(options.join '')
 
@@ -128,3 +133,4 @@ define 'compiled/helpDialog', [
       $('.help_dialog_trigger').click (event) =>
         event.preventDefault()
         @open()
+

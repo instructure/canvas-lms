@@ -25,8 +25,33 @@ shared_examples_for "file uploads selenium tests" do
     @course.reload
   end
 
+  it "should upload a file on the content import page" do
+    skip_if_ie("s3 test fails due to javascript error")
+    login_as(@teacher.email, @password)
+
+    get "/courses/#{@course.id}/imports/migrate"
+
+    filename, fullpath, data = get_file("testfile5.zip")
+
+    driver.find_element(:css, '#choose_migration_system').
+        find_element(:css, 'option[value="common_cartridge_importer"]').click
+    driver.find_element(:css, '#config_options').
+        find_element(:name, 'export_file').send_keys(fullpath)
+    driver.find_element(:css, '#config_options').
+        find_element(:css, '.submit_button').click
+    wait_for_ajax_requests
+    keep_trying_until { driver.find_element(:id, 'file_uploaded').should be_displayed }
+
+    ContentMigration.for_context(@course).count.should == 1
+    cm = ContentMigration.for_context(@course).first
+    cm.attachment.should_not be_nil
+    # these tests run in the forked server since we're switching file storage
+    # type, so we can't just grab the attachment contents here to examine them,
+    # unfortunately.
+  end
+
   it "should upload a file on the homework submissions page, even over quota" do
-    pending("ajax error")
+    pending('failing with unexpected nil - test needs a rewrite')
     a = @course.assignments.create!(:submission_types => "online_upload")
 
     login_as(@student.email, @password)
@@ -57,32 +82,6 @@ shared_examples_for "file uploads selenium tests" do
       end
     end
   end
-
-  it "should upload a file on the content import page" do
-    skip_if_ie("s3 test fails due to javascript error")
-    login_as(@teacher.email, @password)
-
-    get "/courses/#{@course.id}/imports/migrate"
-
-    filename, fullpath, data = get_file("testfile5.zip")
-
-    driver.find_element(:css, '#choose_migration_system').
-        find_element(:css, 'option[value="common_cartridge_importer"]').click
-    driver.find_element(:css, '#config_options').
-        find_element(:name, 'export_file').send_keys(fullpath)
-    driver.find_element(:css, '#config_options').
-        find_element(:css, '.submit_button').click
-    wait_for_ajax_requests
-    keep_trying_until { driver.find_element(:id, 'file_uploaded').should be_displayed }
-
-    ContentMigration.for_context(@course).count.should == 1
-    cm = ContentMigration.for_context(@course).first
-    cm.attachment.should_not be_nil
-    # these tests run in the forked server since we're switching file storage
-    # type, so we can't just grab the attachment contents here to examine them,
-    # unfortunately.
-  end
-
 end
 
 describe "file uploads local tests" do

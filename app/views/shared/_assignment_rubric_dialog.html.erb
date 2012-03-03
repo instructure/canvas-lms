@@ -22,5 +22,9 @@
   <% end %>
   <a href="#" class="button add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png" %> <%= t 'links.add_rubric', "Add Rubric" %></a>
 </div>
-<%= javascript_include_tag "edit_rubric.js" %>
-<%= javascript_include_tag "find_outcome.js" %>
+
+<script>
+  require(['edit_rubric'])
+</script>
+
+

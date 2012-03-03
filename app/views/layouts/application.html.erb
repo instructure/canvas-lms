@@ -8,7 +8,7 @@
     left_side_custom = yield :left_side_custom
     @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length)) 
   end
-  right_side = yield :right_side 
+  right_side = yield :right_side
   wizard = yield :wizard_box
   top_nav = yield :top_nav
   keyboard_navigation = yield :keyboard_navigation
@@ -26,9 +26,9 @@
 <head>
   <meta charset="utf-8">
   <title><%= yield :page_title || t('missing_page_title', "Add a page title here.") %></title>
-  <noscript> <meta http-equiv=refresh content="0; URL=/javascript-is-required.html" /> </noscript> 
+  <noscript> <meta http-equiv=refresh content="0; URL=/enable-javascript.html" /> </noscript>
   <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
-  
+
   <%= yield :auto_discovery %>
   <% if @active_tab %>
     <style>
@@ -49,10 +49,8 @@
   <%= include_stylesheets(*jammit_css_bundles) unless jammit_css_bundles.empty?  %>
   <!--[if lte IE 8]> <%= javascript_include_tag "vendor/html5.js" %> <![endif]-->
   <%= yield :stylesheets %>
-  <%= stylesheet_link_tag(Account.site_admin.settings[:global_stylesheet]) if Account.site_admin.settings[:global_stylesheet].present? %>
-  <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] && !@domain_root_account.settings[:global_stylesheet].try(:strip).empty?  %>
-    <link href="<%= @domain_root_account.settings[:global_stylesheet] %>" media="all" rel="stylesheet" type="text/css" />
-  <% end %>
+  <%= stylesheet_link_tag(Account.site_admin.settings[:global_stylesheet], :media => 'all') if @domain_root_account != Account.site_admin && Account.site_admin.settings[:global_stylesheet].present? %>
+  <%= stylesheet_link_tag(@domain_root_account.settings[:global_stylesheet], :media => 'all') if @domain_root_account && @domain_root_account.settings[:global_stylesheet].present? %>
   <script>
     // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
       _earlyClick = function(e){
@@ -201,7 +199,7 @@
       <a href="http://www.instructure.com"><%= image_tag 'footer-logo.png', :alt => t('instructure_description', "Instructure, makers of the open source learning management system Canvas") %></a>
       <span id="footer-links">
         <% if Setting.get_cached("show_opensource_linkback", "false") == "true" %>
-          <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>      
+          <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>
         <% end %>
         <%= help_link %>
         <%= render :partial => 'shared/footer_links' %>
@@ -255,22 +253,27 @@
 <% end %>
 
 <script>
-  window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>');
-  var INST = <%= raw(inst_env.to_json) %>;
-  var ENV = <%= raw js_env.to_json %>;
+  window.JSON || document.write('<%= (javascript_include_tag "#{js_base_url}/json2.js").gsub("</script>", "<\\/script>") %>');
+
+  INST = <%= raw(inst_env.to_json) %>;
+  ENV = <%= raw js_env.to_json %>;
+
+  require = {
+    translate: <%= use_optimized_js? %>,
+    baseUrl: '<%= js_base_url %>',
+    paths: {
+      common: 'compiled/bundles/common',
+      jquery: 'vendor/jquery-1.6.4',
+      jqueryui: 'vendor/jqueryui',
+      uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4'
+    }
+  };
 </script>
 
-<%= include_javascripts :common %>
-
-<script>
-  I18n.locale = <%= @locale %>;
-</script>
-
-<%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
+<%= javascript_include_tag "#{js_base_url}/vendor/require.js" %>
+<%= javascript_include_tag "#{js_base_url}/compiled/bundles/common" %>
+<%= include_js_bundles %>
+<%= include_account_js %>
 <%= render_js_blocks %>
-<%= javascript_include_tag(Account.site_admin.settings[:global_javascript]) if Account.site_admin.settings[:global_javascript].present? %>
-<% if @domain_root_account && @domain_root_account.settings[:global_includes] && !@domain_root_account.settings[:global_javascript].try(:strip).blank? %>
-  <script src="<%= @domain_root_account.settings[:global_javascript] %>"></script>
-<% end %>
 </body>
 </html>

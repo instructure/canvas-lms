@@ -15,8 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-I18n.scoped('instructure', function(I18n){
+define([
+  'i18n!instructure',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.scrollToVisible' /* scrollToVisible */,
+  'vendor/jquery.ba-hashchange' /* hashchange */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(I18n, $) {
 
   // this function is to prevent you from doing all kinds of expesive operations on a
   // jquery object that doesn't actually have any elements in it
@@ -420,6 +427,6 @@ I18n.scoped('instructure', function(I18n){
     });
   }
 
-  define('jquery.instructure_misc_plugins', ['i18n'], function(){ return $ });
+  return $;
 });
 

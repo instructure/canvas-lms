@@ -183,9 +183,30 @@ describe "gradebook2" do
 
     @ungraded_assignment = @course.assignments.create! :title => 'not-graded assignment',
                                                        :submission_types => 'not_graded'
+  end
 
+  it "should minimize a column and remember it" do
+    pending("draginging and droping these dont actually work in selenium")
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
+    first_dragger, second_dragger = driver.find_elements(:css, '#gradebook_grid .slick-resizable-handle')
+    driver.action.drag_and_drop(second_dragger, first_dragger).perform
+    # driver.action.drag_and_drop_by(second_dragger, -200, 0).perform
+  end
+
+  it "should not show 'not-graded' assignments" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+  end
+
+  it "should handle a ton of assignments without wrapping the slick-header" do
+    100.times do
+      @course.assignments.create! :title => 'a really long assignment name, o look how long I am this is so cool'
+    end
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    # being 38px high means it did not wrap
+    driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should eql 38
   end
 
   it "should not show 'not-graded' assignments" do
@@ -193,15 +214,43 @@ describe "gradebook2" do
   end
 
   it "should validate correct number of students showing up in gradebook" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     driver.find_elements(:css, '.student-name').count.should == @course.students.count
   end
 
+  it "should not show concluded enrollments" do
+    pending "BUG 6809 - Gradebook 2 shows Concluded enrollments" do
+      #conclude course
+      @course.complete!
+      @user.reload
+      @user.cached_current_enrollments(:reload)
+      @enrollment.reload
+
+      #un-conclude course
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+      @course.reload
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      driver.find_elements(:css, '.student-name').count.should == @course.students.count
+    end
+  end
+
   it "should show students sorted by their sortable_name" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     dom_names = driver.find_elements(:css, '.student-name').map(&:text)
     dom_names.should == [STUDENT_NAME_1, STUDENT_NAME_2]
   end
 
   it "should allow showing only a certain section" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     button = driver.find_element(:id, 'section_to_show')
     button.should include_text "All Sections"
     button.click
@@ -225,6 +274,9 @@ describe "gradebook2" do
   end
 
   it "should validate initial grade totals are correct" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     final_score_for_row(0).should eql STUDENT_1_TOTAL_IGNORING_UNGRADED
     final_score_for_row(1).should eql STUDENT_2_TOTAL_IGNORING_UNGRADED
   end
@@ -237,6 +289,9 @@ describe "gradebook2" do
   end
 
   it "should handle muting/unmuting correctly" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     toggle_muting(@second_assignment)
     find_with_jquery(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
     @second_assignment.reload.should be_muted
@@ -253,6 +308,9 @@ describe "gradebook2" do
   end
 
   it "should treat ungraded as 0's when asked, and ignore when not" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     # make sure it shows like it is not treating ungraded as 0's by default
     is_checked('#include_ungraded_assignments').should be_false
     final_score_for_row(0).should eql STUDENT_1_TOTAL_IGNORING_UNGRADED
@@ -282,6 +340,9 @@ describe "gradebook2" do
   it "should change grades and validate course total is correct" do
     expected_edited_total = "33.3%"
 
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     #editing grade for first row, first cell
     edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l0'), 0)
 
@@ -296,16 +357,22 @@ describe "gradebook2" do
 
     #go back to gradebook1 and compare to make sure they match
     check_gradebook_1_totals({
-      @student_1.id => expected_edited_total,
-      @student_2.id => expected_edited_total
-    })
+                                 @student_1.id => expected_edited_total,
+                                 @student_2.id => expected_edited_total
+                             })
   end
 
   it "should validate that gradebook settings is displayed when button is clicked" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     open_gradebook_settings
   end
 
   it "should validate row sorting works when first column is clicked" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     first_column = driver.find_elements(:css, '.slick-column-name')[0]
     2.times do
       first_column.click
@@ -321,6 +388,9 @@ describe "gradebook2" do
 
   it "should validate setting group weights" do
     weight_num = 50.0
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
 
     driver.find_element(:id, 'gradebook_settings').click
     wait_for_animations
@@ -346,12 +416,18 @@ describe "gradebook2" do
   it "should validate arrange columns by due date option" do
     expected_text = "-"
 
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-4'))
     first_row_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
     validate_cell_text(first_row_cells[0], expected_text)
   end
 
   it "should validate arrange columns by assignment group option" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-4'))
     open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-5'))
     first_row_cells = find_slick_cells(0, driver.find_element(:css, '#gradebook_grid'))
@@ -359,6 +435,9 @@ describe "gradebook2" do
   end
 
   it "should validate show attendance columns option" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     open_gradebook_settings(driver.find_element(:css, '#ui-menu-0-6'))
     headers = driver.find_elements(:css, '.slick-header')
     headers[1].should include_text(@attendance_assignment.title)
@@ -366,8 +445,10 @@ describe "gradebook2" do
   end
 
   it "should validate posting a comment to a graded assignment" do
-    pending("opening the comment dialog frequently fails")
     comment_text = "This is a new comment!"
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
 
     dialog = open_comment_dialog
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
@@ -385,6 +466,9 @@ describe "gradebook2" do
   it "should validate assignment details" do
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     open_assignment_options(2)
     driver.find_element(:css, '#ui-menu-1-0').click
     details_dialog = driver.find_element(:css, '#assignment-details-dialog')
@@ -395,6 +479,9 @@ describe "gradebook2" do
 
   it "should validate setting default grade for an assignment" do
     expected_grade = "45"
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
 
     open_assignment_options(4)
     driver.find_element(:css, '#ui-menu-1-3').click
@@ -417,6 +504,9 @@ describe "gradebook2" do
   it "should validate send a message to students who option" do
     message_text = "This is a message"
 
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
     open_assignment_options(4)
     driver.find_element(:css, '#ui-menu-1-2').click
     expect {
@@ -429,6 +519,9 @@ describe "gradebook2" do
 
   it "should validate curving grades option" do
     curved_grade_text = "8"
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
 
     open_assignment_options(2)
     driver.find_element(:css, '#ui-menu-1-4').click

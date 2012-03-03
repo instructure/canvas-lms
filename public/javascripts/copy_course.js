@@ -1,5 +1,17 @@
-require(['i18n', 'compiled/util/processItemSelections'], function(I18n, processItemSelections){
-  I18n = I18n.scoped('content_imports');
+require([
+  'jquery' /* $ */,
+  'i18n!content_imports',
+  'compiled/util/processItemSelections',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* date_field */,
+  'jquery.instructure_forms' /* formSubmit */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* .dim, showIf */,
+  'jquery.rails_flash_notifications' /* flashError */,
+  'jqueryui/autocomplete' /* /\.autocomplete/ */,
+  'jqueryui/progressbar' /* /\.progressbar/ */
+], function($, I18n, processItemSelections){
+
   $(function () {
     var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
     $("body").append($frame.hide());

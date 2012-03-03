@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
-  it_should_behave_like "in-process server selenium tests"
+  it_should_behave_like "wiki and tiny selenium tests"
 
   def add_flickr_image(el)
     el.find_element(:css, '.mce_instructure_embed').click

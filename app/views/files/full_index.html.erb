@@ -1,7 +1,7 @@
 <% 
   content_for :page_title, join_title(t(:page_title, "Files"), @context && @context.name)
   jammit_css :full_files
-  jammit_js :full_files 
+  js_bundle :full_files 
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
 %>
 <div id="file_uploads" style="display: none;">
@@ -504,19 +504,27 @@ HEREDOC
   <% end %>
 </div>
 </div>
-<% js_block :i18n_scope => 'files' do %>
+<% js_block do %>
 <script>
+require([
+  'INST' /* INST */,
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/progressbar' /* /\.progressbar/ */,
+  'vendor/scribd.view' /* scribd */
+], function(INST, I18n, $) {
+
 window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
 
-if (!window.INST) {
-  window.INST = {};
-}
 INST.downloadFolderFiles = function(url) {
   var cancelled = false;
-  $("#download_folder_files_dialog .status_box .status").text(I18n.t('messages.gathering_data', "Gathering data..."));
+  $("#download_folder_files_dialog .status_box .status").text(<%= jt('#files.messages.gathering_data', "Gathering data...") %>);
   $("#download_folder_files_dialog").dialog('close').dialog({
     autoOpen: false,
-    title: I18n.t('titles.download_folder_contents', "Download Folder Contents"),
+    title: <%= jt('#files.titles.download_folder_contents', "Download Folder Contents") %>,
     close: function() {
       cancelled = true;
     }
@@ -531,9 +539,9 @@ INST.downloadFolderFiles = function(url) {
         var attachment = data.attachment;
         if(attachment.workflow_state == 'zipped') { 
           $("#download_folder_files_dialog .progress").progressbar('value', 100);
-          var html = I18n.t('messages.zip_finished', "Finished!  Redirecting to File...");
+          var html = <%= jt('#files.messages.zip_finished', "Finished!  Redirecting to File...") %>;
           html += "<br/><a href='" + url +"'><b>";
-          html += I18n.t('links.download_zip', "Click here to download %{size}", {size: attachment.readable_size});
+          html += <%= jt('#files.links.download_zip', "Click here to download %{size}", '{size: attachment.readable_size}') %>;
           html += "</b></a>";
           $("#download_folder_files_dialog .status").html(html)
           $("#download_folder_files_dialog .status_loader").css('visibility', 'hidden');
@@ -544,7 +552,7 @@ INST.downloadFolderFiles = function(url) {
           if(isNaN(progress)) { progress = 0; }
           progress += 5
           $("#download_folder_files_dialog .progress").progressbar('value', progress);
-          $("#download_folder_files_dialog .status").text(progress >= 95 ? I18n.t('messages.creating_zip', "Creating zip file..."): I18n.t('messages.gathering_files_with_progress', "Gathering Files (%{progress}%)...", {progress: progress}))
+          $("#download_folder_files_dialog .status").text(progress >= 95 ? <%= jt('#files.messages.creating_zip', "Creating zip file...") %>: <%= jt('#files.messages.gathering_files_with_progress', "Gathering Files (%{progress}%)...", '{progress: progress}') %>)
           if(progress <= 5 || progress == lastProgress) {
             $.ajaxJSON(url + "?compile=1", 'GET', {}, function() {}, function() {});
           }
@@ -560,6 +568,7 @@ INST.downloadFolderFiles = function(url) {
   }
   checkForChange();
 }
+});
 </script>
 <% end %>
 <div id="download_folder_files_dialog" style="display: none;">

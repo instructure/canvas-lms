@@ -1,15 +1,18 @@
-define 'compiled/calendar/sidebar', [
-  'i18n'
+define [
+  'jquery'
   'jst/calendar/contextList'
   'jst/calendar/undatedEvents'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/EventDataSource'
-], (I18n, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
-  I18n = I18n.scoped 'calendar'
+  'compiled/jquery.kylemenu'
+  'jquery.instructure_misc_helpers'
+  'vendor/jquery.ba-tinypubsub'
+  'vendor/jquery.store'
+], ($, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
 
   class VisibleContextManager
-    constructor: (contexts, @$holder) ->
+    constructor: (contexts, selectedContexts, @$holder) ->
       fragmentData = try
                $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
              catch e
@@ -17,6 +20,7 @@ define 'compiled/calendar/sidebar', [
       savedContexts = $.store.userGet('checked_calendar_codes')
 
       @contexts   = fragmentData.show.split(',') if fragmentData.show
+      @contexts or= selectedContexts if selectedContexts
       @contexts or= savedContexts.split(',') if savedContexts
       @contexts or= (c.asset_string for c in contexts[0...10])
 
@@ -54,7 +58,7 @@ define 'compiled/calendar/sidebar', [
         visible = $li.data('context') in @contexts
         $li.toggleClass('checked', visible).toggleClass('not-checked', !visible)
 
-  return sidebar = (contexts, dataSource) ->
+  return sidebar = (contexts, selectedContexts, dataSource) ->
     for c in contexts
       c.can_create_stuff = c.can_create_calendar_events || c.can_create_assignments
 
@@ -62,7 +66,7 @@ define 'compiled/calendar/sidebar', [
 
     $holder.html contextListTemplate(contexts: contexts)
 
-    visibleContexts = new VisibleContextManager(contexts, $holder)
+    visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
     $holder.find('.settings').kyleMenu(buttonOpts: {icons: { primary:'ui-icon-cog-with-droparrow', secondary: null}})
 

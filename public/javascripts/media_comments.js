@@ -15,8 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+define([
+  'i18n!media_comments',
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */,
+  'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
+  'jqueryui/progressbar' /* /\.progressbar/ */,
+  'jqueryui/tabs' /* /\.tabs/ */
+], function(I18n, $, htmlEscape) {
 
-I18n.scoped('media_comments', function(I18n) {
   (function($, INST){
     var yourVersion = null;
     try {
@@ -24,9 +34,8 @@ I18n.scoped('media_comments', function(I18n) {
       yourVersion = " (you have " + yourVersion + " installed)";
     } catch(e) {
     }
-    var flashRequiredMessage = "<div>" + $.h(I18n.t('messages.flash_required', "This video requires Flash version 9 or higher (you have %{version} installed).", { version: yourVersion })) +
-            "<br/><a target='_blank' href='http://get.adobe.com/flashplayer/'>" + $.h(I18n.t('links.upgrade_flash', "Click here to upgrade")) +"</a></div>";
-
+    var flashRequiredMessage = "<div>" + htmlEscape(I18n.t('messages.flash_required', "This video requires Flash version 9 or higher (you have %{version} installed).", { version: yourVersion })) +
+            "<br/><a target='_blank' href='http://get.adobe.com/flashplayer/'>" + htmlEscape(I18n.t('links.upgrade_flash', "Click here to upgrade")) +"</a></div>";
     $.fn.mediaComment = function(command, arg1, arg2, arg3, arg4, arg5) {
       var id = arg1, mediaType = arg2, downloadUrl = arg3;
       if(!INST.kalturaSettings) { console.log('Kaltura has not been enabled for this account'); return; }
@@ -41,7 +50,7 @@ I18n.scoped('media_comments', function(I18n) {
         $(document).unbind('media_comment_created');
         var $comment = this;
         $(document).bind('media_comment_created', function(event, data) {
-          callback.call(this, data.id, data.mediaType);
+          callback.call($comment, data.id, data.mediaType);
         });
         $.mediaComment.init(mediaType, {
           modal: modal,
@@ -687,12 +696,12 @@ I18n.scoped('media_comments', function(I18n) {
     });
     $(document).bind('media_recording_error', function() {
       $("#audio_record_holder_message,#video_record_holder_message").find(".recorder_message").html(
-              $.h(I18n.t('errors.save_failed', "Saving appears to have failed.  Please close this popup to try again.")) +
+              htmlEscape(I18n.t('errors.save_failed', "Saving appears to have failed.  Please close this popup to try again.")) +
               "<div style='font-size: 0.8em; margin-top: 20px;'>" +
-              $.h(I18n.t('errors.persistent_problem', "If this problem keeps happening, you may want to try recording your media locally and then uploading the saved file instead.")) +
+              htmlEscape(I18n.t('errors.persistent_problem', "If this problem keeps happening, you may want to try recording your media locally and then uploading the saved file instead.")) +
               "</div>");
     });
-  })(jQuery, INST);
+  })($, INST);
 
   window.mediaCommentCallback = function(results) {
     var context_code = $.trim($("#current_context_code").text()) || $.trim("user_" + $("#identity .user_id").text());

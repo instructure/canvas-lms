@@ -1,0 +1,2 @@
+require ['tool_inline']
+

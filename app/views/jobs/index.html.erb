@@ -53,7 +53,7 @@
 <% @show_left_side = false %>
 
 <% jammit_css :slickgrid %>
-<% jammit_js :slickgrid, :jobs %>
+<% js_bundle :jobs %>
 
 <div id="running-wrapper" style="float:left">
   <h2><%= t 'headings.running_jobs', "Running Jobs" %></h2>
@@ -133,7 +133,7 @@
 </div>
 </div>
 
-<% js_block do
+<%
 jobs_data = @jobs.all(:limit => JobsController::LIMIT)
 jobs_data.length.upto(@jobs_count - 1) { jobs_data << {} }
 jobs_opts = {
@@ -159,12 +159,11 @@ tags_opts = {
   :refresh_rate => 10.seconds * 1000,
   :flavor => @flavor,
 }
+
+js_env :JOBS => {
+  :opts => jobs_opts.as_json(:include_root => false),
+  :running_opts => running_opts.as_json(:include_root => false),
+  :tags_opts => tags_opts
+}
 %>
-<script type="text/javascript">
-$(document).ready(function() {
-  window.jobs = new Jobs(<%= raw jobs_opts.to_json(:include_root => false) %>).init();
-  window.running = new Workers(<%= raw running_opts.to_json(:include_root => false) %>).init();
-  window.tags = new Tags(<%= raw tags_opts.to_json %>).init();
-});
-</script>
-<% end %>
+

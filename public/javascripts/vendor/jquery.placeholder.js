@@ -4,7 +4,7 @@
 * Copyright 2010, Daniel Stocks (http://webcloud.se)
 * Released under the MIT, BSD, and GPL Licenses.
 */
-(function($) {
+define(['jquery'], function($) {
     function Placeholder(input) {
         this.input = input;
         if (input.attr('type') == 'password') {
@@ -103,5 +103,5 @@
             }
         });
     }
-})(jQuery);
+});
 

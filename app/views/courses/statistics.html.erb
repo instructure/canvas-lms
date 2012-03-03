@@ -1,12 +1,10 @@
 <%
   @active_tab = 'settings'
-  jammit_js :graphael
   jammit_css :statistics
   add_crumb t('#crumbs.stats', "Statistics")
  %>
 
 <% content_for :page_title, join_title(t(:page_title, "Course Statistics"), @context.name) %>
-
 <div style="padding: 0 20px;" id="stats">
 <h2><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h2>
 
@@ -166,8 +164,11 @@
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
   <script type="text/javascript">
+  google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
+  require(['jquery'], function($) {
     var pageViewData = <%= raw @context.page_view_data(:dates => [1.month.ago, 1.second.ago]).to_json %>;
-    google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
     google.setOnLoadCallback(function(){
       var data = new google.visualization.DataTable();
       data.addColumn('date', 'Date');
@@ -191,14 +192,17 @@
       chart.draw(data, {displayAnnotations: false});
       
     });
+  });
   </script>
 <% end -%>
 <% end -%>
 
 <% js_block do -%>
   <script>
+  require(['jquery'], function() {
   $(document).ready(function() {
     $("#reports-tabs").tabs().show();
+  });
   });
   </script>
 <% end %>

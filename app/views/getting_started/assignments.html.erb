@@ -28,7 +28,7 @@
   </div>
 <% end %>
 
-<% jammit_js :assignments %>
+<% js_bundle :assignments %>
 
 <div style="margin-bottom: 10px; padding-left: 20px; " id="class_weighting_box">
   <input type="checkbox" id="class_weighting_policy" name="class_weighting_policy" <%= "checked" if @context.group_weighting_scheme == 'percent' %>/>
@@ -69,6 +69,10 @@
 <% end %>
 <% js_block do %>
 <script>
-INST.gettingStartedPage = true;
+require([
+  'INST' /* INST */
+], function(INST) {
+  INST.gettingStartedPage = true;
+});
 </script>
 <% end %>

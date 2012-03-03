@@ -8,7 +8,7 @@
  * Contributing: http://tinymce.moxiecode.com/contributing
  */
 
-(function() {
+define(['compiled/editor/stocktiny'], function(tinymce) {
 	var Event = tinymce.dom.Event, each = tinymce.each, DOM = tinymce.DOM;
 
 	/**
@@ -39,12 +39,11 @@
 			 * @param {tinymce.ui.DropMenu} menu Drop down menu to fill with more items if needed.
 			 */
 			t.onContextMenu = new tinymce.util.Dispatcher(this);
-      
+
 			ed.onContextMenu.add(function(ed, e) {
         var inTable = false;
         var obj = e.target;
         while(obj.nodeName != 'TABLE' && obj.nodeName != 'BODY' && obj.parentNode) {
-          console.log(obj.nodeName);
           obj = obj.parentNode;
         }
         if(obj.nodeName == 'TABLE') {
@@ -60,18 +59,18 @@
 					Event.cancel(e);
 				}
 			});
+
       // INSTRUCTURE: added some stuff to make the context menu
       // turn-offable
       var spellCheckEnabled = false;
 
       function toggleSpellCheck() {
         spellCheckEnabled = !spellCheckEnabled;
-        $(ed.getBody()).attr('spellcheck', spellCheckEnabled);
+        ed.getBody().setAttribute('spellcheck', spellCheckEnabled);
         cm = ed.controlManager;
         // This was supposed to help with spellcheck enabling but didn't.
         // See: http://code.google.com/p/chromium/issues/detail?id=40509
         // $(ed.getBody()).attr('contenteditable', ed.getDoc().designMode == 'on');
-        
         cm.setActive('instructure_table_mode', !spellCheckEnabled);
       }
       ed.addCommand('toggleSpellCheck', toggleSpellCheck);
@@ -160,4 +159,4 @@
 
 	// Register plugin
 	tinymce.PluginManager.add('instructure_contextmenu', tinymce.plugins.ContextMenu);
-})();
+});

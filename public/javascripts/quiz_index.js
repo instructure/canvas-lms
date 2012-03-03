@@ -16,7 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('quizzes.index', function(I18n) {
+require([
+  'i18n!quizzes.index',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formErrors */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete */,
+  'jquery.templateData' /* getTemplateData */
+], function(I18n, $) {
 
 $(document).ready(function() {
   $(".delete_quiz_link").click(function(event) {

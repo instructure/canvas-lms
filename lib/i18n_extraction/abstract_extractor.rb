@@ -51,8 +51,8 @@ module I18nExtraction
 
     def self.included(base)
       base.instance_eval do
-        attr_reader :translations, :total, :total_unique
-        attr_accessor :scope
+        attr_reader :total, :total_unique
+        attr_accessor :translations, :scope
       end
     end
   end

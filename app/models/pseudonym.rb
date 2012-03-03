@@ -133,6 +133,7 @@ class Pseudonym < ActiveRecord::Base
     if !crypted_password || crypted_password == ""
       self.generate_temporary_password
     end
+    self.sis_user_id = nil if self.sis_user_id.blank?
   end
   
   def update_passwords_on_related_pseudonyms
@@ -328,16 +329,10 @@ class Pseudonym < ActiveRecord::Base
   
   def ldap_bind_result(password_plaintext)
     self.account.account_authorization_configs.each do |config|
-      ldap = config.ldap_connection
-      filter = config.ldap_filter(self.unique_id)
-      begin
-        res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
-        return res if res
-      rescue Net::LDAP::LdapError
-        ErrorReport.log_exception(:ldap, $!)
-      end
+      res = config.ldap_bind_result(self.unique_id, password_plaintext)
+      return res if res
     end
-    nil
+    return nil
   end
   
   def add_ldap_channel

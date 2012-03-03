@@ -1,6 +1,8 @@
 <% content_for :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
-<% jammit_js :eportfolio %>
-<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
+<%
+  js_bundle :eportfolio
+  jammit_css :tinymce
+%>
 
 <% content_for :auto_discovery do %>
   <% if can_do(@portfolio, @current_user, :update) %>
@@ -161,10 +163,12 @@
             <% @portfolio.eportfolio_categories.each do |category| %>
               <option value="<%= category.id %>" id="category_select_<%= category.id %>"><%= category.name %></option>
             <% end %>
-            <option value="new" id="category_select_blank" style="display: none;">
+          </select>
+          <div style="display: none;">
+            <option value="new" id="category_select_blank">
               <%= t(:new_section, "New Section") %>
             </option>
-          </select>
+          </div>
         </td>
       </tr><tr>
         <td><%= before_label(:page_name, "Page Name") %></td>

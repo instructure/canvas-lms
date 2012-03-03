@@ -13,14 +13,36 @@ module SimpleTags
     end
 
     def self.included(klass)
-      klass.named_scope :tagged, lambda { |*tags|
-        options = tags.last.is_a?(Hash) ? tags.pop : {}
-        options[:mode] ||= :or
-        conditions = tags.map{ |tag|
-          klass.wildcard(klass.quoted_table_name + '.tags', tag, :delimiter => ',')
+      klass.send :extend, ClassMethods
+    end
+  end
+
+  module ClassMethods
+    def tagged(*tags)
+      options = tags.last.is_a?(Hash) ? tags.pop : {}
+      options[:mode] ||= :or
+      conditions = handle_tags(tags, options) +
+        tags.map{ |tag|
+          wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
         }
-        {:conditions => conditions.join(options[:mode] == :or ? " OR " : " AND ")}
-      }
+      scoped({:conditions => conditions.join(options[:mode] == :or ? " OR " : " AND ")})
+    end
+
+    def tagged_scope_handler(pattern, &block)
+      @tagged_scope_handlers ||= []
+      @tagged_scope_handlers << [pattern, block]
+    end
+
+    protected
+    def handle_tags(tags, options)
+      return [] unless @tagged_scope_handlers
+      @tagged_scope_handlers.inject([]) do |result, (pattern, handler)|
+        handler_tags = []
+        tags.delete_if do |tag|
+          handler_tags << tag and true if tag =~ pattern
+        end
+        result.concat handler_tags.present? ? [handler.call(handler_tags, options)].flatten : []
+      end
     end
   end
 

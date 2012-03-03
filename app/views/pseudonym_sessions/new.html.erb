@@ -2,19 +2,26 @@
   <%= t :page_title, "Log In to Canvas" %>
 <% end %>
 
-<% js_block :i18n_scope => 'pseudonym_sessions' do %>
+<% js_block do %>
 <script type="text/javascript">
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $(".re_send_confirmation_link").click(function(event) {
     event.preventDefault();
     var $link = $(this);
-    $link.text(I18n.t('messages.resending', "Re-Sending..."));
+    $link.text(<%= jt('#pseudonym_sessions.messages.resending', "Re-Sending...") %>);
     $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-      $link.text(I18n.t('messages.sent', "Sent! It may take a few minutes for the message to arrive."));
+      $link.text(<%= jt('#pseudonym_sessions.messages.sent', "Sent! It may take a few minutes for the message to arrive.") %>);
     }, function(data) {
-      $link.text(I18n.t('errors.request_failed', "Request failed. Try again."));
+      $link.text(<%= jt('#pseudonym_sessions.errors.request_failed', "Request failed. Try again.") %>);
     });
   });
+});
 });
 </script>
 <% end %>

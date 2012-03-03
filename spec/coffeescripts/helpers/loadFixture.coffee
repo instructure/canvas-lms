@@ -1,4 +1,4 @@
-define "helpers/loadFixture", [ "vendor/jquery-1.6.4" ], (_) ->
+define [ "jquery" ], (jQuery) ->
   $body = jQuery("body")
   $fixtures = jQuery("#fixtures")
   fixtures = {}

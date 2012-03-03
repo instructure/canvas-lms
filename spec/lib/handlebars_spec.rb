@@ -25,12 +25,12 @@ describe Handlebars do
   context "i18n" do
 
     it "should convert translate helper blocks to inline calls" do
-      Handlebars.prepare_i18n('{{#t "test"}}this is a test of {{foo}}{{/t}}', 'test').
+      Handlebars.prepare_i18n('{{#t "test"}}this is a test of {{foo}}{{/t}}', 'test')[:content].
         should eql('{{{t "test" "this is a test of %{foo}" scope="test"}}}')
     end
 
     it "should extract wrappers" do
-      Handlebars.prepare_i18n('{{#t "test"}}<b>{{person}}</b> is <b>so</b> <b title="{{definition}}"><i>cool</i></b>{{/t}}', 'test').
+      Handlebars.prepare_i18n('{{#t "test"}}<b>{{person}}</b> is <b>so</b> <b title="{{definition}}"><i>cool</i></b>{{/t}}', 'test')[:content].
         should eql('{{{t "test" "*%{person}* is *so* **cool**" scope="test" w0="<b>$1</b>" w1="<b title=\\"%{definition}\\"><i>$1</i></b>"}}}')
     end
 
@@ -41,11 +41,11 @@ describe Handlebars do
     end
 
     it "should fix up the scope" do
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', '_test').
+      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', '_test')[:content].
         should eql('{{{t "foo" "hello" scope="test"}}}')
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/test').
+      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/test')[:content].
         should eql('{{{t "foo" "hello" scope="test.test"}}}')
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/_this_is_a_test').
+      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/_this_is_a_test')[:content].
         should eql('{{{t "foo" "hello" scope="test.this_is_a_test"}}}')
     end
 

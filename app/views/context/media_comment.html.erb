@@ -4,10 +4,14 @@
 </style>
 <% end %>
 <% js_block do %>
-<%= javascript_include_tag "media_comments.js" %>
 <script>
+require([
+  'jquery' /* $ */,
+  'media_comments' /* mediaComment */
+], function($) {
 $(document).ready(function() {
   $.mediaComment.init();
+});
 });
 </script>
 <% end %>

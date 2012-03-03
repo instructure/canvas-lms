@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GroupsController < ApplicationController  
+class GroupsController < ApplicationController
   before_filter :get_context
   before_filter :require_context, :only => [:create_category, :delete_category]
   before_filter :get_group_as_context, :only => [:show]
-  
+
   def context_group_members
     @group = @context
     if authorized_action(@group, @current_user, :read_roster)
@@ -29,7 +29,7 @@ class GroupsController < ApplicationController
       end
     end
   end
-  
+
   def unassigned_members
     category = @context.group_categories.find_by_id(params[:category_id])
     return render :json => {}, :status => :not_found unless category
@@ -40,7 +40,7 @@ class GroupsController < ApplicationController
       groups = []
     end
     users = @context.paginate_users_not_in_groups(groups, page)
-    
+
     if authorized_action(@context, @current_user, :manage)
       respond_to do |format|
         format.json { render :json => {
@@ -50,18 +50,12 @@ class GroupsController < ApplicationController
           :previous_page => users.previous_page,
           :total_entries => users.total_entries,
           :pagination_html => render_to_string(:partial => 'user_pagination', :locals => { :users => users }),
-          :users => users.map do |u|
-            h = { :user_id => u.id, :name => u.last_name_first }
-            if @context.is_a?(Course) && (section = u.section_for_course(@context))
-              h = h.merge(:section_id => section.id, :section_code => section.section_code)
-            end
-            h
-          end
+          :users => users.map { |u| u.group_member_json(@context) }
         } }
       end
     end
   end
-  
+
   def index
     return context_index if @context
     @groups = @current_user ? @current_user.groups.active : []
@@ -121,7 +115,7 @@ class GroupsController < ApplicationController
       end
     end
   end
-  
+
   def update_category
     if authorized_action(@context, @current_user, :manage_groups)
       @group_category = @context.group_categories.find_by_id(params[:category_id])
@@ -133,7 +127,7 @@ class GroupsController < ApplicationController
       end
     end
   end
-  
+
   def delete_category
     if authorized_action(@context, @current_user, :manage_groups)
       @group_category = @context.group_categories.find_by_id(params[:category_id])
@@ -147,7 +141,7 @@ class GroupsController < ApplicationController
       end
     end
   end
-  
+
   def add_user
     @group = @context
     if authorized_action(@group, @current_user, :manage)
@@ -160,7 +154,7 @@ class GroupsController < ApplicationController
       end
     end
   end
-  
+
   def remove_user
     @group = @context
     if authorized_action(@group, @current_user, :manage)
@@ -326,7 +320,7 @@ class GroupsController < ApplicationController
     # sort by name, but with the student organized category in the back
     @categories = @categories.sort_by{|c| [ (c.student_organized? ? 1 : 0), c.name ] }
     @groups = @groups.sort_by{ |g| [(g.name || '').downcase, g.created_at]  }
-    
+
     if authorized_action(@context, @current_user, :read_roster)
       respond_to do |format|
         if @context.grants_right?(@current_user, session, :manage_groups)
@@ -361,7 +355,7 @@ class GroupsController < ApplicationController
     @group_category.configure_self_signup(enable_self_signup, restrict_self_signup)
     @group_category.save
   end
-  
+
   def create_default_groups_in_category
     self_signup = params[:category][:enable_self_signup] == "1"
     distribute_members = !self_signup && params[:category][:split_groups] == "1"

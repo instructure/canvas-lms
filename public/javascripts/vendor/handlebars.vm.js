@@ -210,4 +210,4 @@ Handlebars.VM = {
 
 Handlebars.template = Handlebars.VM.template;
 // register as an AMD module
-define('vendor/handlebars.vm', function(){ return Handlebars; });
+define(function(){ return Handlebars; });

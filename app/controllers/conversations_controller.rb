@@ -23,7 +23,7 @@ class ConversationsController < ApplicationController
   include ConversationsHelper
   include Api::V1::Submission
 
-  before_filter :require_user
+  before_filter :require_user, :except => [:public_feed]
   before_filter :set_avatar_size
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
@@ -118,13 +118,22 @@ class ConversationsController < ApplicationController
     end
     @scope ||= params[:scope].to_sym
     base_scope = conversations_scope
-    if params[:filter] && params[:filter] =~ /\Acourse_(\d+)\z/
-      if course = @contexts[:courses][$1.to_i]
+    if params[:filter]
+      if params[:filter] =~ /\A(course|group)_(\d+)\z/
+        if context = @contexts[$1.pluralize.to_sym][$2.to_i]
+          @filter = {:id => params[:filter], :name => context[:name]}
+        end
+      elsif params[:filter] =~ /\Auser_(\d+)\z/
+        if user = matching_participants(:ids => [$1]).first
+          @filter = {:id => params[:filter], :name => user[:name]}
+        end
+      end
+      if @filter
         conversations_scope = conversations_scope.tagged(params[:filter])
-        @filter = {:id => params[:filter], :name => course[:name]}
-        @no_messages += " (#{course[:name]})"
+        @no_messages += " (#{@filter[:name]})"
       end
     end
+
     @conversations_count = conversations_scope.count
     conversations = Api.paginate(conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
     # optimize loading the most recent messages for each conversation into a single query
@@ -147,9 +156,9 @@ class ConversationsController < ApplicationController
   # an existing private conversation with the given recipients, it will be
   # reused.
   #
-  # @argument recipients An array of recipient ids. These may be user ids
+  # @argument recipients[] An array of recipient ids. These may be user ids
   #   or course/group ids prefixed with "course_" or "group_" respectively,
-  #   e.g. [1, 2, "course_3"].
+  #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
   # @argument body The message to be sent
   # @argument group_conversation [true|false] Ignored if there is just one
   #   recipient. If true, this will be a group conversation (i.e. all
@@ -345,9 +354,9 @@ class ConversationsController < ApplicationController
   # the GET/show action, except that omits submissions and only includes the
   # latest message (e.g. "joe was added to the conversation by bob")
   #
-  # @argument recipients An array of recipient ids. These may be user ids
+  # @argument recipients[] An array of recipient ids. These may be user ids
   #   or course/group ids prefixed with "course_" or "group_" respectively,
-  #   e.g. [1, 2, "course_3"].
+  #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
   #
   # @example_response
   #   {
@@ -477,9 +486,9 @@ class ConversationsController < ApplicationController
   #   only results matching all terms will be returned.
   # @argument context Limit the search to a particular course/group (e.g.
   #   "course_3" or "group_4").
-  # @argument exclude Array of ids to exclude from the search. These may be
-  #   user ids or course/group ids prefixed with "course_" or "group_"
-  #   respectively, e.g. [1, 2, "course_3"].
+  # @argument exclude[] Array of ids to exclude from the search. These may be
+  #   user ids or course/group ids prefixed with "course_" or "group_" respectively,
+  #   e.g. exclude[]=1&exclude[]=2&exclude[]=course_3
   # @argument type ["user"|"context"] Limit the search just to users or contexts (groups/courses).
   # @argument user_id [Integer] Search for a specific user id. This ignores the other above parameters, and will never return more than one result.
   # @argument from_conversation_id [Integer] When searching by user_id, only users that could be normally messaged by this user will be returned. This parameter allows you to specify a conversation that will be referenced for a shared context -- if both the current user and the searched user are in the conversation, the user will be returned. This is used to start new side conversations.
@@ -494,7 +503,11 @@ class ConversationsController < ApplicationController
   #   groups/courses, the id is prefixed by "group_"/"course_" respectively.
   # @response_field name The name of the user/context
   # @response_field avatar_url Avatar image url for the user/context
-  # @response_field type ["context"|null] Not set for users, implicitly "user"
+  # @response_field type ["context"|"course"|"section"|"group"|"user"|null]
+  #   Type of recipients to return, defaults to null (all). "context"
+  #   encompasses "course", "section" and "group"
+  # @response_field types[] Array of recipient types to return (see type
+  #   above), e.g. types[]=user&types[]=course
   # @response_field user_count Only set for contexts, indicates number of
   #   messageable users
   # @response_field common_courses Only set for users. Hash of course ids and
@@ -502,10 +515,18 @@ class ConversationsController < ApplicationController
   # @response_field common_groups Only set for users. Hash of group ids and
   #   enrollment types for each group to show what they share with this user
   def find_recipients
+    types = (params[:types] || [] + [params[:type]]).compact
+    types |= [:course, :section, :group] if types.delete('context')
+    types = if types.present?
+      {:user => types.delete('user').present?, :context => types.present? && types.map(&:to_sym)}
+    else
+      {:user => true, :context => [:course, :section, :group]}
+    end
+
     @blank_fallback = !api_request?
     max_results = [params[:per_page].try(:to_i) || 10, 50].min
     if max_results < 1
-      if context_types.include?(params[:type]) || params[:context]
+      if !types[:user] || params[:context]
         max_results = nil # i.e. all results
       else
         max_results = params[:per_page] = 10
@@ -519,17 +540,17 @@ class ConversationsController < ApplicationController
     recipients = []
     if params[:user_id]
       recipients = matching_participants(:ids => [params[:user_id]], :conversation_id => params[:from_conversation_id])
-    elsif (params[:context] || params[:search]) && (context_types + ['user', nil]).include?(params[:type])
+    elsif (params[:context] || params[:search])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
       rank_results = params[:search].present?
-      contexts = params[:type] == 'user' ? [] : matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :type => params[:type]))
-      participants = context_types.include?(params[:type]) || @skip_users ? [] : matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)))
+      contexts = types[:context] ? matching_contexts(options.merge(:exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX), :types => types[:context])) : []
+      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))) : []
       if max_results
         has_next_page = participants.size + contexts.size > max_results
         contexts = contexts[0, max_results]
         participants = participants[0, max_results].sort_by{ |u| u[:name].downcase } # can't sort until we lop off the extra one at the end
-        if params[:type]
+        if types[:user] ^ types[:context]
           recipients = contexts + participants
           recipients.instance_eval <<-CODE
             def paginate(*args); self; end
@@ -554,6 +575,63 @@ class ConversationsController < ApplicationController
       end
     end
     render :json => recipients
+  end
+
+  def public_feed
+    return unless get_feed_context(:only => [:user])
+    @current_user = @context
+    load_all_contexts
+    feed = Atom::Feed.new do |f|
+      f.title = t('titles.rss_feed', "Conversations Feed")
+      f.links << Atom::Link.new(:href => conversations_url)
+      f.updated = Time.now
+      f.id = conversations_url
+    end
+    @entries = []
+    @conversation_contexts = {}
+    @current_user.conversations.each do |conversation|
+      @entries.concat(conversation.messages.human)
+      if @conversation_contexts[conversation.conversation.id].blank?
+        @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+      end
+    end
+    @entries = @entries.sort_by{|e| e.created_at}.reverse
+    @entries.each do |entry|
+      feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+    end
+    respond_to do |format|
+      format.atom { render :text => feed.to_xml }
+    end
+  end
+
+  def feed_context_content(conversation)
+    content = ""
+    audience = conversation.other_participants(:as_conversation_participants => true)
+    audience_names = audience.map(&:name)
+    audience_contexts = contexts_for(audience, conversation.context_tags) # will be 0, 1, or 2 contexts
+    audience_context_names = [:courses, :groups].inject([]) { |ary, context_key|
+      ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
+    }.reject(&:blank?)
+
+    content += "<hr />"
+    content += "<div>#{t('conversation_context', "From a conversation with")} "
+    participant_list_cutoff = 2
+    if audience_names.length <= participant_list_cutoff
+      content += "#{ERB::Util.h(audience_names.to_sentence)}"
+    else
+      others_string = t('other_recipients', {
+        :one => "and 1 other",
+        :other => "and %{count} others"
+      },
+        :count => audience_names.length - participant_list_cutoff)
+      content += "#{ERB::Util.h(audience_names[0...participant_list_cutoff].join(", "))} #{others_string}"
+    end
+
+    if !audience_context_names.empty?
+      content += " (#{ERB::Util.h(audience_context_names.to_sentence)})"
+    end
+    content += "</div>"
+    content
   end
 
   def watched_intro
@@ -666,15 +744,13 @@ class ConversationsController < ApplicationController
 
     result = []
     if context_name.nil?
-      result = if options[:type] == 'course'
-                 @contexts[:courses].values
-               elsif params[:search].blank?
+      result = if terms.blank?
                  courses = @contexts[:courses].values
                  group_ids = @current_user.current_groups.map(&:id)
                  groups = @contexts[:groups].slice(*group_ids).values
                  courses + groups
                else
-                 @contexts.values.map(&:values).flatten
+                 @contexts.values_at(*options[:types].map{|t|t.to_s.pluralize.to_sym}).compact.map(&:values).flatten
                end
     elsif options[:synthetic_contexts]
       if context_name =~ /\Acourse_(\d+)(_(groups|sections))?\z/ && (course = @contexts[:courses][$1.to_i]) && course[:active]
@@ -787,7 +863,7 @@ class ConversationsController < ApplicationController
 
   def jsonify_conversation(conversation, options = {})
     result = conversation.as_json(options)
-    audience = conversation.participants.reject{ |u| u.id == conversation.user_id }
+    audience = conversation.other_participants(:as_conversation_participants => true)
     result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
     result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
     unless interleave_submissions
@@ -838,9 +914,5 @@ class ConversationsController < ApplicationController
 
   def blank_fallback
     params[:blank_avatar_fallback] || @blank_fallback
-  end
-
-  def context_types
-    ['context', 'course']
   end
 end

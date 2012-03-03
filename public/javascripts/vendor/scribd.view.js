@@ -47,10 +47,14 @@ On Thu, Jan 27, 2011 at 4:50 PM, Jared Friedman <[redacted]> wrote:
 */
 
 //this file appears to be written so that does not require prototype, fyi - tom
-(function(){
+define([
+  'INST' /* INST */,
+  'i18n!scribd' 
+], function(INST, I18n) {
+
 if(typeof scribd == "undefined") {
 
-	var scribd = window.scribd = new Object();
+	var scribd = new Object();
 	
 	/* ------------------------
 		  Scribd Document
@@ -427,9 +431,7 @@ if(typeof scribd == "undefined") {
         // INSTRUCTURE: Make it a span with display: block instead of a div 
         //   to prevent evil and sadness on browsers that actually care about 
         //   such things
-        I18n.scoped('scribd', function(I18n) {
-          embedString = '<span style="display:block;font-size:16px;width:300px;border:1px solid #dddddd;padding:3px">' + I18n.t('upgrade_flash', 'Hello, you have an old version of Adobe Flash Player. To use iPaper (and lots of other stuff on the web) you need to %{link_tag}get the latest Flash player%{end_link}.', {link_tag: '<a href="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash">', end_link: '</a>'}) + '  </span>';
-        });
+        embedString = '<span style="display:block;font-size:16px;width:300px;border:1px solid #dddddd;padding:3px">' + I18n.t('upgrade_flash', 'Hello, you have an old version of Adobe Flash Player. To use iPaper (and lots of other stuff on the web) you need to %{link_tag}get the latest Flash player%{end_link}.', {link_tag: '<a href="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash">', end_link: '</a>'}) + '  </span>';
       }
 			
 			
@@ -864,8 +866,9 @@ if(typeof scribd == "undefined") {
 		scribd_view_callback();
 	}
 }
-  
-})();
+
+return scribd;
+});
 
 /* ------------------------
      (c) Scribd 2008

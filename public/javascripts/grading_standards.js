@@ -1,4 +1,15 @@
-I18n.scoped('grading_standards', function(I18n){
+require([
+  'i18n!grading_standards',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* fillFormData, getFormData */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */,
+  'jquery.rails_flash_notifications' /* flashError */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(I18n, $) {
+
   $(document).ready(function() {
     $(".add_standard_link").click(function(event) {
       event.preventDefault();

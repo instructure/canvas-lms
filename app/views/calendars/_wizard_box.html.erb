@@ -96,6 +96,11 @@
   <div class="clear"></div>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_misc_plugins' /* /\.indicate/ */
+], function($) {
+
 $(document).ready(function() {
   $(document).bind('edit_event_dialog', function() {
     if($("#wizard_box .option.create_calendar_event_option.selected").length > 0) {
@@ -137,6 +142,7 @@ $(document).ready(function() {
   $(".highlight_delete_event").hover(function() {
     $("#event_details .delete_event_link").indicate();
   }, function() {});
+});
 });
 </script>
 <% end %>

@@ -6,10 +6,14 @@ require([
   'specs/userNamePartsSpec',
   'specs/objectCollectionSpec',
   'specs/helpDialogSpec',
+  'specs/paginatedListSpec',
   'specs/util/BackoffPollerSpec',
-  'specs/jQuery.instructureJqueryPatches',
+  'specs/jQuery.instructureJqueryPatchesSpec',
   'specs/ENVSpec',
   'specs/calendar/TimeBlockListManagerSpec',
+  'specs/calendar/TimeBlockListSpec',
+  'specs/calendar/TimeBlockRowSpec',
   'specs/util/processMigrationItemSelectionsSpec',
   'specs/util/processItemSelectionsSpec'
 ]);
+

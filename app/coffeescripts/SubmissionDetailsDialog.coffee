@@ -1,5 +1,16 @@
-I18n.scoped 'AssignmentDetailsDialog', (I18n) ->
-  class @SubmissionDetailsDialog
+define [
+  'jquery'
+  'jst/SubmissionDetailsDialog'
+  'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
+  'jquery.ajaxJSON'
+  'jquery.disableWhileLoading'
+  'jquery.instructure_forms'
+  'jquery.instructure_jquery_patches'
+  'jquery.instructure_misc_plugins'
+  'vendor/jquery.scrollTo'
+], ($, submissionDetailsDialog) ->
+
+  class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"], 
@@ -7,7 +18,7 @@ I18n.scoped 'AssignmentDetailsDialog', (I18n) ->
         speedGraderUrl: "#{@options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@student.id}%7D"
         loading: true
       @dialog = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
-      @dialog.html(Template('SubmissionDetailsDialog', @submission))
+      @dialog.html(submissionDetailsDialog(@submission))
         .dialog
           title: @student.name
           width: 600
@@ -49,7 +60,7 @@ I18n.scoped 'AssignmentDetailsDialog', (I18n) ->
           if turnitinDataForThisAttachment = submission.turnitin_data?["attachment_#{attachment.id}"]
             attachment.turnitinUrl = "#{@options.context_url}/assignments/#{@assignment.id}/submissions/#{@student.id}/turnitin/attachment_#{attachment.id}"
             attachment.turnitin_data = turnitinDataForThisAttachment
-      @dialog.html(Template('SubmissionDetailsDialog', @submission))
+      @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()
     
@@ -57,3 +68,4 @@ I18n.scoped 'AssignmentDetailsDialog', (I18n) ->
 
     @open: (assignment, student, options) ->
       (SubmissionDetailsDialog.cachedDialogs["#{assignment.id}-#{student.id}"] ||= new SubmissionDetailsDialog(assignment, student, options)).open()
+

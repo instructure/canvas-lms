@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+define([
+  'jquery' /* $ */
+], function($) {
 
-(function($){
-  
   // Simple dropdown list.  Takes the list of attributes specified in "options" and displays them
   // in a menu anchored to the selected element.
   $.fn.dropdownList = function(options) {
@@ -139,4 +140,4 @@
   };
   $.fn.dropdownList.defaults = {height: 250, width: "auto"};
   
-})(jQuery);
+});

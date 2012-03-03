@@ -123,8 +123,11 @@ describe "grading standards" do
     @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
     @assignment.grade_student(student, :grade => 899)
     get "/courses/#{@course.id}/grades/#{student.id}"
+    grading_scheme = driver.execute_script "return grading_scheme"
+    grading_scheme[2][0].should == 'B+'
+    driver.execute_script("return INST.GradeCalculator.letter_grade(grading_scheme, 89.9)").should == 'B+'
     driver.find_element(:css, '#right-side .final_grade .grade').text.should == '89.9'
-    driver.find_element(:css, '#right-side .final_letter_grade .grade').text.should == 'B+'
+    driver.find_element(:css, '#final_letter_grade_text').text.should == 'B+'
   end
 
   it "should allow editing the standard again without reloading the page" do

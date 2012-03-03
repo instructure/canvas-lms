@@ -1,5 +1,5 @@
 <% jammit_css :learning_outcomes %>
-<% jammit_js :rubric_assessment %>
+<% js_bundle :rubric_assessment %>
 <% content_for :page_title do %><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %><% end %>
   
 <% content_for :right_side do %>
@@ -62,6 +62,10 @@
 <% end %>
 <% js_block do %>
   <script>
+  require([
+    'jquery' /* $ */
+  ], function($) {
+
   $(document).ready(function() {
     var showAllArtifacts = $("#show_all_artifacts_link");
     showAllArtifacts.click(function(event) {
@@ -73,6 +77,7 @@
         showAllArtifacts.html('<%= t "#buttons.show_all_artifacts", "Show All Artifacts" %>');
       }
     });
+  });
   });
   </script>
 <% end %>

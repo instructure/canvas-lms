@@ -7,7 +7,7 @@
  *
  * http://docs.jquery.com/UI/Position
  */
-(function( $, undefined ) {
+define(['jquery'], function( $, undefined ) {
 
 $.ui = $.ui || {};
 
@@ -363,7 +363,7 @@ if ( $.uiBackCompat !== false ) {
 				offset: undefined
 			} ) );
 		}
-	}( jQuery ) );
+	}( $ ) );
 }
 
-}( jQuery ) );
+});

@@ -36,8 +36,18 @@
     <% end %>
   </div>
 <% end %>
-<% js_block :i18n_scope => 'shared.add_assignment' do %>
+<% js_block do %>
   <script>
+  require([
+    'i18nObj' /* I18n.t */,
+    'jquery' /* $ */,
+    'jquery.instructure_date_and_time' /* time_field, datetime_field */,
+    'jquery.instructure_forms' /* formSubmit */,
+    'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+    'jquery.instructure_misc_plugins' /* showIf */,
+    'jquery.loadingImg' /* loadingImage */
+  ], function(I18n, $) {
+
     $(document).ready(function() {
       $(".add_assignment_inline:not(:first)").remove();
     });
@@ -49,7 +59,7 @@
         if($(this).val() == "new") {
           $("#add_assignment_inline").dialog('close');
           $("#add_assignment_inline").show().dialog({
-            title: I18n.t('titles.add_assignment', "Add Assignment"),
+            title: <%= jt('titles.add_assignment', "Add Assignment") %>,
             width: 300,
             height: "auto",
             autoSize: true,
@@ -115,5 +125,6 @@
         $("#add_assignment_inline").dialog('close');
       });
     });
+  });
   </script>
 <% end %>

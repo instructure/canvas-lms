@@ -915,9 +915,9 @@ describe User do
     end
   end
 
-  it "should find section for course" do
+  it "should find sections for course" do
     course_with_student
-    @student.section_for_course(@course).should == @course.default_section
+    @student.sections_for_course(@course).should include @course.default_section
   end
 
   describe "name_parts" do
@@ -1002,8 +1002,10 @@ describe User do
         :user_id => @student.id,
         :name => 'Doe, John',
         :display_name => 'Johnny',
-        :section_id => @section.id,
-        :section_code => @section.section_code
+        :sections => [ {
+          :section_id => @section.id,
+          :section_code => @section.section_code
+        } ]
       }
     end
   end

@@ -75,8 +75,13 @@
 </p>
 <% else %>
 <% jammit_css :quizzes %>
-<% js_block :i18n_scope => 'quizzes.quiz_submission' do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $("#questions.assessment_results .question").hover(function() {
     $(this).addClass('hover');
@@ -91,7 +96,7 @@ $(document).ready(function() {
       borderStyle: 'solid',
       borderWidth: '2px',
       padding: 2
-    }).attr('title', I18n.t('titles.this_is_an_image', 'This is an image, not text, and could have changed since the student submitted'));
+    }).attr('title', <%= jt('titles.this_is_an_image', 'This is an image, not text, and could have changed since the student submitted') %>);
   });
   $(".quiz_response_text iframe").each(function() {
     $(this).css({
@@ -99,7 +104,7 @@ $(document).ready(function() {
       borderStyle: 'solid',
       borderWidth: '2px',
       padding: 2
-    }).attr('title', I18n.t('titles.this_is_an_external_frame', 'This is an external frame, not text, and could have changed since the student submitted'));
+    }).attr('title', <%= jt('titles.this_is_an_external_frame', 'This is an external frame, not text, and could have changed since the student submitted') %>);
   });
   var $list = $("nothing");
   $(".quiz_response_text").find("object,embed").each(function() {
@@ -114,8 +119,9 @@ $(document).ready(function() {
       borderStyle: 'solid',
       borderWidth: '2px',
       padding: 2
-    }).attr('title', I18n.t('titles.this_is_an_external_element', 'This is an external element, not text, and could have changed since the student submitted'));
+    }).attr('title', <%= jt('titles.this_is_an_external_element', 'This is an external element, not text, and could have changed since the student submitted') %>);
   });
+});
 });
 </script>
 <% end %>

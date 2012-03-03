@@ -16,7 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('sis_import', function(I18n) {
+require([
+  'i18n!sis_import',
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit, formErrors */,
+  'jquery.instructure_misc_plugins' /* showIf, disableIf */,
+  'jqueryui/progressbar' /* /\.progressbar/ */
+], function(I18n, $, htmlEscape) {
+
 $(document).ready(function(event) {
   var state = 'nothing';
   
@@ -47,7 +56,7 @@ $(document).ready(function(event) {
       output += "<li>" + I18n.t('headers.import_errors', "Errors that prevent importing") + "\n<ul>";
       for(var i in batch.processing_errors) {
         var message = batch.processing_errors[i];
-        output += "<li>" + $.htmlEscape(message[0]) + " - " + $.htmlEscape(message[1]) + "</li>";
+        output += "<li>" + htmlEscape(message[0]) + " - " + htmlEscape(message[1]) + "</li>";
       }
       output += "</ul>\n</li>";
     }
@@ -55,7 +64,7 @@ $(document).ready(function(event) {
       output += "<li>" + I18n.t('headers.import_warnings', "Warnings") + "\n<ul>";
       for(var i in batch.processing_warnings) {
         var message = batch.processing_warnings[i];
-        output += "<li>" + $.htmlEscape(message[0]) + " - " + $.htmlEscape(message[1]) + "</li>";
+        output += "<li>" + htmlEscape(message[0]) + " - " + htmlEscape(message[1]) + "</li>";
       }
       output += "</ul>\n</li>";
     }

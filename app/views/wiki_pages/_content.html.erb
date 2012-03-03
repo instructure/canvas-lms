@@ -131,15 +131,21 @@ course will see this page first.  You can change that from [the course home page
   <% end -%>
 <% js_block do  %>
   <script type="text/javascript">
+  require([
+    'jquery' /* $ */,
+    'wiki',
+    'vendor/jquery.pageless' /* pageless */
+  ], function($, wikiPage) {
     wikiPage.init(); //this is purposly not in a domready, for some reason it wont work there.
-  </script>
-  <% if @editing %>
-    <script>
+
+    <% if @editing %>
       $(document).ready(function() {
         $("#wiki_show_view_secondary .edit:first").click();
       });
-    </script>
-  <% end %>
+    <% end %>
+
+  });
+  </script>
 <% end %>
 </div>
 <% if WikiPage.comments_enabled? && @context.allow_wiki_comments && !@page.new_record? %>
@@ -150,13 +156,20 @@ course will see this page first.  You can change that from [the course home page
     <%= render :partial => "wiki_pages/wiki_page_comment_form" %>
   <% end %>
   <%= render :partial => "wiki_pages/wiki_page_comment", :collection => comments %>
-  <% js_block :i18n_scope => 'wiki_pages' do %>
+  <% js_block do %>
     <script type="text/javascript">
+    require([
+      'i18nObj',
+      'jquery' /* $ */,
+      'wiki',
+      'vendor/jquery.pageless' /* pageless */
+    ], function(I18n, $, wikiPage) {
+
       $(function(){
         $('#wiki_page_comments').pageless({
           totalPages: <%= comments.total_pages %>,
           url: "<%= context_url(@context, :context_wiki_page_wiki_page_comments_url, @page.id, :format => :json) %>",
-          loaderMsg: I18n.t('loading_comments', "Loading more results"),
+          loaderMsg: <%= jt('#wiki_pages.loading_comments', "Loading more results") %>,
           scrape: function(data) {
             if(typeof(data) == 'string') {
               try {
@@ -172,6 +185,7 @@ course will see this page first.  You can change that from [the course home page
           }
         });
       });
+    });
     </script>
   <% end %>
   <!-- will_paginate the rest -->
