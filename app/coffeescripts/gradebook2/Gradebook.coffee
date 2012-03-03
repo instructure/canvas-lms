@@ -1,10 +1,30 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
-define 'compiled/Gradebook', [
-  'i18n'
+define [
+  'i18n!gradebook2'
+  'jquery'
+  'compiled/grade_calculator'
+  'vendor/spin'
+  'compiled/multi_grid'
+  'compiled/SubmissionDetailsDialog'
+  'compiled/gradebook2/AssignmentGroupWeightsDialog'
+  'compiled/gradebook2/SubmissionCell'
+  'compiled/gradebook2/GradebookHeaderMenu'
+  'str/htmlEscape'
+  'jst/gradebook_uploads_form'
   'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
-], (I18n, sectionToShowMenuTemplate, columnHeaderTemplate) ->
-  I18n = I18n.scoped 'gradebook2'
+  'jquery.ajaxJSON'
+  'jquery.instructure_date_and_time'
+  'jquery.instructure_jquery_patches'
+  'jquery.instructure_misc_helpers'
+  'jquery.instructure_misc_plugins'
+  'vendor/jquery.ba-tinypubsub'
+  'vendor/jquery.store'
+  'jqueryui/mouse'
+  'jqueryui/position'
+  'jqueryui/sortable'
+  'compiled/jquery.kylemenu'
+], (I18n, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate) ->
 
   class Gradebook
     minimumAssignmentColumWidth = 10
@@ -41,10 +61,10 @@ define 'compiled/Gradebook', [
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
-        $.htmlEscapeValues(group)
+        htmlEscape(group)
         @assignmentGroups[group.id] = group
         for assignment in group.assignments
-          $.htmlEscapeValues(assignment)
+          htmlEscape(assignment)
           assignment.assignment_group = group
           assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
           @assignments[assignment.id] = assignment
@@ -53,10 +73,10 @@ define 'compiled/Gradebook', [
       @sections = {}
       @rows = []
       for section in sections
-        $.htmlEscapeValues(section)
+        htmlEscape(section)
         @sections[section.id] = section
         for student in section.students
-          $.htmlEscapeValues(student)
+          htmlEscape(student)
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
           student.secondary_identifier = student.sis_login_id || student.login_id
@@ -283,8 +303,8 @@ define 'compiled/Gradebook', [
       columnDef.unselectable = true
       columnDef.unminimizedName = columnDef.name
       columnDef.name = ''
-      @$grid.find(".c#{colIndex}").add($columnHeader).addClass('minimized')
-      $columnHeader.data('minimized', true)
+      columnDef.minimized = true
+      @$grid.find(".l#{colIndex}").add($columnHeader).addClass('minimized')
       @assignmentsToHide.push(columnDef.id)
       $.store.userSet("hidden_columns_#{@options.context_code}", $.uniq(@assignmentsToHide).join(','))
 
@@ -294,8 +314,9 @@ define 'compiled/Gradebook', [
       columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '')
       columnDef.unselectable = false
       columnDef.name = columnDef.unminimizedName
-      @$grid.find(".c#{colIndex}").add($columnHeader).removeClass('minimized')
-      $columnHeader.removeData('minimized')
+      columnDef.minimized = false
+      @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
+      $columnHeader.find('.slick-column-name').html(columnDef.name)
       @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
       $.store.userSet("hidden_columns_#{@options.context_code}", $.uniq(@assignmentsToHide).join(','))
 
@@ -336,6 +357,14 @@ define 'compiled/Gradebook', [
         else
           $tooltip.remove()
 
+    # this is because of a limitation with SlickGrid,
+    # when it makes the header row it does this:
+    # $("<div class='slick-header-columns' style='width:10000px; left:-1000px' />")
+    # if a course has a ton of assignments then it will not be wide enough to
+    # contain them all
+    fixMaxHeaderWidth: ->
+      @$grid.find('.slick-header-columns').width(1000000)
+
     onGridInit: () ->
       @fixColumnReordering()
       tooltipTexts = {}
@@ -361,13 +390,14 @@ define 'compiled/Gradebook', [
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
 
+      @fixMaxHeaderWidth()
       $('#gradebook_grid .slick-resizable-handle').live 'drag', (e,dd) =>
-        @$grid.find('.slick-header-column').each (i, elem) =>
+        @$grid.find('.slick-header-column').each (colIndex, elem) =>
           $columnHeader = $(elem)
-          isMinimized = $columnHeader.data('minimized')
+          columnDef = @gradeGrid.getColumns()[colIndex]
           if $columnHeader.outerWidth() <= minimumAssignmentColumWidth
-            @minimizeColumn($columnHeader) unless isMinimized
-          else if isMinimized
+            @minimizeColumn($columnHeader) unless columnDef.minimized
+          else if columnDef.minimized
             @unminimizeColumn($columnHeader)
       $(document).trigger('gridready')
 
@@ -422,7 +452,7 @@ define 'compiled/Gradebook', [
             download_gradebook_csv_url: "#{@options.context_url}/gradebook.csv"
             action: "#{@options.context_url}/gradebook_uploads"
             authenticityToken: $("#ajax_authenticity_token").text()
-          $upload_modal = $(Template('gradebook_uploads_form', locals))
+          $upload_modal = $(gradebook_uploads_form(locals))
             .dialog
               bgiframe: true
               autoOpen: false
@@ -502,7 +532,7 @@ define 'compiled/Gradebook', [
             $(document)
               .bind('gridready', => @minimizeColumn(@$grid.find("[id*='#{fieldName}']")))
               .unbind('gridready.render')
-              .bind('gridready.render', @gradeGrid.invalidate)
+              .bind('gridready.render', => @gradeGrid.invalidate() )
         columnDef
 
       @aggregateColumns = for id, group of @assignmentGroups
@@ -594,3 +624,4 @@ define 'compiled/Gradebook', [
         # TODO: start editing automatically when a number or letter is typed
         false
       @onGridInit()
+

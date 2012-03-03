@@ -1,9 +1,7 @@
 class RestoreUsersSortableName < ActiveRecord::Migration
+  self.transactional = false
+
   def self.up
-    if supports_ddl_transactions?
-      commit_db_transaction
-      decrement_open_transactions while open_transactions > 0
-    end
     User.find_in_batches do |batch|
       User.transaction do
         batch.each do |user|
@@ -12,10 +10,6 @@ class RestoreUsersSortableName < ActiveRecord::Migration
           User.update_all({ :sortable_name => user.sortable_name }, :id => user.id) if user.changed?
         end
       end
-    end
-    if supports_ddl_transactions?
-      increment_open_transactions
-      begin_db_transaction
     end
   end
 

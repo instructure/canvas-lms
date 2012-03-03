@@ -15,16 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-(function() {
-  $("<link/>", {
-     rel: "stylesheet",
-     type: "text/css",
-     href: location.protocol + "//" + location.host + "/stylesheets/static/mathquill.css"
-  }).appendTo("head");
-  $.getScript("/javascripts/mathquill.js", function() {
-    // hidden span so that we pre-load Symbola long before the equation popup ever opens
-    $("<span class='mathquill-embedded-latex' style='position: absolute; z-index: -1; top: 0; left: 0; width: 0; height: 0; overflow: hidden;'>a</span>").appendTo("body").mathquill();
-  });
+
+define([
+  'compiled/editor/stocktiny',
+  'jquery',
+  'jquery.instructure_jquery_patches',
+  'mathquill'
+], function(tinymce, $) {
+
+  $("<span class='mathquill-embedded-latex' style='position: absolute; z-index: -1; top: 0; left: 0; width: 0; height: 0; overflow: hidden;'>a</span>").appendTo("body").mathquill();
 
   // like $.text() / Sizzle.getText(elems), except it also gets alt attributes
   // from images
@@ -127,8 +126,8 @@
       };
     }
   });
-  
+
   // Register plugin
   tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation);
-})();
+});
 

@@ -16,10 +16,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var wikiSidebar;
-var attachAddAssignment;
-var topics = {};
-I18n.scoped('topics', function(I18n) {
+require([
+  'INST' /* INST */,
+  'i18n!topics',
+  'jquery' /* $ */,
+  'wikiSidebar',
+  'ajax_errors' /* INST.log_error */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox, hideErrors, formSuggestion */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'tinymce.editor_box' /* editorBox */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(INST, I18n, $, wikiSidebar) {
+
+  // TODO AMD: get this stuff out of the global ns and the views
+  var attachAddAssignment = window.attachAddAssignment;
+  var topics = window.topics = {};
+
   topics.updateTopic = updateTopic;
   function updateTopic($topic, data) {
     if(!$topic) {
@@ -467,3 +487,4 @@ I18n.scoped('topics', function(I18n) {
     }).fragmentChange();
   });
 });
+

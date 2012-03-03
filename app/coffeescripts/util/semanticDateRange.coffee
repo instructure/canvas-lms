@@ -1,7 +1,5 @@
 # requires $.parseFromISO and $.dateString
-define 'compiled/util/semanticDateRange', ['i18n'], (I18n) ->
-  I18n = I18n.scoped 'dates'
-
+define ['i18n!dates'], (I18n) ->
   semanticDateRange = (startISO, endISO) ->
     unless startISO
       return """

@@ -77,9 +77,11 @@ describe PseudonymSessionsController do
 
     it "should login for a pseudonym from a different account" do
       account = Account.create!
+      Account.any_instance.stubs(:trusted_account_ids).returns([account.id])
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
       response.should redirect_to(dashboard_url(:login_success => 1))
+      flash[:notice].should == "Login successful."
     end
 
     it "should login for a user with multiple identical pseudonyms" do
@@ -90,16 +92,28 @@ describe PseudonymSessionsController do
       response.should redirect_to(dashboard_url(:login_success => 1))
       # it should have preferred the site admin pseudonym
       assigns[:pseudonym].should == @pseudonym
+      flash[:notice].should == "Login successful."
     end
 
     it "should not login for multiple users with identical pseudonyms" do
       account1 = Account.create!
       account2 = Account.create!
+      Account.any_instance.stubs(:trusted_account_ids).returns([account1.id, account2.id])
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account1)
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account2)
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
       response.should_not be_success
       response.should render_template('pseudonym_sessions/new')
+    end
+
+    it "should warn for deprecated trust method" do
+      account = Account.create!
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
+      HostUrl.stubs(:context_host).with(Account.default).returns('www.example.com')
+      HostUrl.expects(:context_host).with(account).returns('somewhere.else.com')
+      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      flash[:notice].should == 'In the future, please login at somewhere.else.com.'
     end
   end
 

@@ -22,8 +22,17 @@
   </div>
   <a href="<%= context_url(@context, :import_status_context_zip_file_imports_url) %>" class="zip_file_import_status_url" style="display: none;">&nbsp;</a>
 <% end %>
-<% js_block :i18n_scope => "zip_file_imports" do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* getJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jquery.rails_flash_notifications' /* flashError */,
+  'jqueryui/progressbar' /* /\.progressbar/ */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $("#zip_file_import_form #zip_file").change(function() {
     var val = $(this).val();
@@ -57,7 +66,7 @@ $(document).ready(function() {
     $("#zip_file_import_form .errors").hide();
     var importFailed = function(errors) {
       var $div = $("<div class='errors' style='color: #a00; font-weight: bold;'/>");
-      var error_message = I18n.t('errors.extracting_file', "There were some errors extracting the zip file.  Please try again");
+      var error_message = <%= jt('#zip_file_imports.errors.extracting_file', "There were some errors extracting the zip file.  Please try again") %>;
       $div.text(error_message);
       $.flashError(error_message);
       $("#zip_import_batch_id").val($("#zip_import_batch_id").val() + "0");
@@ -79,13 +88,13 @@ $(document).ready(function() {
           importFailed(data.errors);
         } else if(data && data.complete) {
           $("#uploading_progressbar").progressbar('value', 100);
-          $("#uploading_please_wait_dialog").prepend(I18n.t('notices.uploading_complete', "Uploading complete!"));
+          $("#uploading_please_wait_dialog").prepend(<%= jt('#zip_file_imports.notices.uploading_complete', "Uploading complete!") %>);
           location.href = $("#return_to").val();
         } else if(hadSomeProgress && (!data || data.progress == null)) {
           pollImport.blankCount = pollImport.blankCount || 0;
           pollImport.blankCount++;
           if(pollImport.blankCount > 10) {
-            importFailed([I18n.t('errors.server_status', "The server stopped returning a valid status")]);
+            importFailed([<%= jt('#zip_file_imports.errors.server_status', "The server stopped returning a valid status") %>]);
           } else {
             setTimeout(pollImport, 2000);
           }
@@ -100,7 +109,7 @@ $(document).ready(function() {
         pollImport.errorCount = pollImport.errorCount || 0;
         pollImport.errorCount++;
         if(pollImport.errorCount > 10) {
-          importFailed([I18n.t('errors.server_stopped_responding', "The server stopped responding to status requests")]);
+          importFailed([<%= jt('#zip_file_imports.errors.server_stopped_responding', "The server stopped responding to status requests") %>]);
         } else {
           setTimeout(pollImport, 2000);
         }
@@ -108,6 +117,7 @@ $(document).ready(function() {
     };
     setTimeout(pollImport, 5000);
   });
+});
 });
 </script>
 <% end %>

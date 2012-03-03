@@ -88,6 +88,13 @@
 
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_forms' /* formSubmit */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImage */
+], function($) {
+
   var new_type = null;
   
   $(".edit_auth_link").click(function(event) {
@@ -146,6 +153,6 @@
     $("#secondary_ldap_config_disabled").val("1");
     $(".add_secondary_ldap_link").show();
   });
-  
+});  
 </script>
 <% end %>

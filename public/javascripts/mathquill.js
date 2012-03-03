@@ -2,8 +2,10 @@
  * Copyright 2010 Jay and Han (laughinghan@gmail.com)
  * License, Usage and Readme at http://mathquill.com
  */
-
-I18n.scoped('mathquill', function(I18n) {
+define([
+  'i18n!mathquill',
+  'jquery' /* jQuery, $ */
+], function(I18n, $) {
 
   var _, //temp variable of prototypes
     undefined,
@@ -2645,6 +2647,5 @@ I18n.scoped('mathquill', function(I18n) {
     $('.mathquill-textbox').mathquill('textbox');
     $('.mathquill-embedded-latex').mathquill();
   });
-
 
 });

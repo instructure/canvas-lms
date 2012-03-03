@@ -25,6 +25,8 @@
 // this file is the same as http://code.google.com/p/datejs/source/browse/trunk/src/core.js but with 
 // the beginning and ending quotes on the return string removed
 
+define(function () {
+
 if (!Date.prototype.toISOString) {
   /**
   * Converts the current date instance into a string with an ISO 8601 format. The date is converted to it's UTC value.
@@ -44,3 +46,4 @@ if (!Date.prototype.toISOString) {
             f(this.getUTCSeconds())   + 'Z';
   };
 }
+});

@@ -15,12 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!content_exports',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* formSubmit */,
+  'jqueryui/progressbar' /* /\.progressbar/ */
+], function(I18n, $) {
 
-I18n.scoped('content_exports', function(I18n) {
 $(document).ready(function(event) {
   var state = 'nothing';
   var current_id = null;
- 
+
   function startPoll() {
     $("#exporter_form").html(I18n.t('messages.processing', "Processing") + "<div style='font-size: 0.8em;'>" + I18n.t('messages.this_may_take_a_bit', "this may take a bit...") + "</div>")
        .attr('disabled', true);

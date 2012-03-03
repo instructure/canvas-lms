@@ -13,12 +13,18 @@
 <% end %>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function($) {
+
 $(document).ready(function() {
   $(".previous_courses_link").click(function(event) {
     event.preventDefault();
     $("#previous_courses").show();
     $("html,body").scrollTo($("#previous_courses"));
   });
+});
 });
 </script>
 <% end %>

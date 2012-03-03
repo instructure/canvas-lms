@@ -1,12 +1,10 @@
-###
-requires:
-  - js!vendor/jquery-1.6.4.js
-###
-define 'compiled/widget/courseList', [
+define [
+  'jquery'
   'compiled/widget/CustomList'
   'jst/courseList/wrapper'
   'jst/courseList/content'
-], (CustomList, wrapper, content) ->
+  'vendor/jquery.ba-tinypubsub'
+], (jQuery, CustomList, wrapper, content) ->
 
   init: ->
     jQuery ->

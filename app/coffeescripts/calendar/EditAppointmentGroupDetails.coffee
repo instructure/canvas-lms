@@ -1,9 +1,12 @@
-define 'compiled/calendar/EditAppointmentGroupDetails', [
-  'i18n'
+define [
+  'jquery'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editAppointmentGroup'
   'jst/calendar/genericSelect'
-], (I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
+  'jquery.ajaxJSON'
+  'jquery.disableWhileLoading'
+  'jquery.instructure_forms'
+], ($, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
 
   class EditAppointmentGroupDetails
     constructor: (selector, @apptGroup, @contextChangeCB, @closeCB) ->
@@ -39,11 +42,8 @@ define 'compiled/calendar/EditAppointmentGroupDetails', [
       else
         @form.attr('action', @currentContextInfo.create_appointment_group_url)
 
-      timeBlocks = []
-      if @apptGroup.appointmentEvents
-        for appt in @apptGroup.appointmentEvents
-          timeBlocks.push [appt.start, appt.end, true]
-      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body-wrapper"), @form.find(".splitter"), timeBlocks)
+      timeBlocks = ([appt.start, appt.end, true] for appt in @apptGroup.appointmentEvents || [] )
+      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks)
 
       @form.find('[name="slot_duration"]').change (e) =>
         if @form.find('[name="autosplit_option"]').is(":checked")
@@ -102,7 +102,7 @@ define 'compiled/calendar/EditAppointmentGroupDetails', [
       }
 
       params['appointment_group[new_appointments]'] = []
-      @return false unless @timeBlockList.validate()
+      return false unless @timeBlockList.validate()
       for range in @timeBlockList.blocks()
         params['appointment_group[new_appointments]'].push([
           $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(range[0])),

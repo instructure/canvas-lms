@@ -3,7 +3,7 @@
   @body_classes << "gradebook2"
   @show_left_side = false
   add_crumb t(:go_back_to_the_old_gradebook, "Go back to the old gradebook"), context_url(@context, :change_gradebook_version_context_gradebook_url, :reset => true), :id => 'change_gradebook_version_link_holder'
-  jammit_js :jquery_ui_menu, :slickgrid, :assignmentMuter, :gradebook2
+  js_bundle :gradebook2
   jammit_css :slickgrid, :gradebook2
   options = {
     :chunk_size => Setting.get_cached('gradebook2.submissions_chunk_size', '35').to_i,
@@ -47,25 +47,21 @@
   </div>
 </div>
 
-<% js_block do %>
-  <script>
-    GRADEBOOK_TRANSLATIONS = <%= {
-      :submission_tooltip_dropped => t('dropped_for_grading', 'Dropped for grading purposes'),
-      :submission_tooltip_late => t('submitted_late', 'Submitted late'),
-      :submission_tooltip_muted => t('assignment_muted', 'Assignment muted'),
-      :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
-      :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading'),
-      :submission_tooltip_online_url => t('titles.url', "URL Submission"),
-      :submission_tooltip_discussion_topic => t('titles.discussion', "Discussion Submission"),
-      :submission_tooltip_online_upload => t('titles.upload', "File Upload Submission"),
-      :submission_tooltip_online_text_entry => t('titles.text', "Text Entry Submission"),
-      :submission_tooltip_pending_review => t('titles.quiz_review', "This quiz needs review"),
-      :submission_tooltip_media_comment => t('titles.media', "Media Comment Submission"),
-      :submission_tooltip_quiz => t('title.quiz', "Quiz Submission")
-    }.to_json.html_safe %>;
-    require(['compiled/Gradebook'], function(Gradebook){
-      new Gradebook(<%= options.to_json.html_safe %>);
-    });
+<script>
+  GRADEBOOK_TRANSLATIONS = <%= {
+    :submission_tooltip_dropped => t('dropped_for_grading', 'Dropped for grading purposes'),
+    :submission_tooltip_late => t('submitted_late', 'Submitted late'),
+    :submission_tooltip_muted => t('assignment_muted', 'Assignment muted'),
+    :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
+    :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading'),
+    :submission_tooltip_online_url => t('titles.url', "URL Submission"),
+    :submission_tooltip_discussion_topic => t('titles.discussion', "Discussion Submission"),
+    :submission_tooltip_online_upload => t('titles.upload', "File Upload Submission"),
+    :submission_tooltip_online_text_entry => t('titles.text', "Text Entry Submission"),
+    :submission_tooltip_pending_review => t('titles.quiz_review', "This quiz needs review"),
+    :submission_tooltip_media_comment => t('titles.media', "Media Comment Submission"),
+    :submission_tooltip_quiz => t('title.quiz', "Quiz Submission")
+  }.to_json.html_safe %>;
 
-  </script>
-<% end %>
+  GRADEBOOK_OPTIONS = (<%= options.to_json.html_safe %>);
+</script>

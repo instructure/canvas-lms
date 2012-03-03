@@ -16,16 +16,40 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var jsonData, visibleRubricAssessments;
-var anonymousAssignment = false;
+require([
+  'INST' /* INST */,
+  'i18n!gradebook',
+  'jquery' /* $ */,
+  'str/htmlEscape',
+  'rubric_assessment',
+  'ajax_errors' /* INST.log_error */,
+  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jquery.ajaxJSON' /* getJSON, ajaxJSONFiles, ajaxJSON */,
+  'jquery.doc_previews' /* loadDocPreview */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.store/ */,
+  'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
+  'jquery.keycodes' /* keycodes */,
+  'jquery.loadingImg' /* loadingImg, loadingImage */,
+  'jquery.shake' /* /\.shake/ */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'media_comments' /* mediaComment, mediaCommentThumbnail */,
+  'vendor/jquery.ba-hashchange' /* hashchange */,
+  'vendor/jquery.elastic' /* elastic */,
+  'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'vendor/jquery.spin' /* /\.spin/ */,
+  'vendor/jquery.store' /* /\$\.store/ */,
+  'vendor/scribd.view' /* scribd */,
+  'vendor/spin' /* new Spinner */,
+  'vendor/ui.selectmenu' /* /\.selectmenu/ */
+], function(INST, I18n, $, htmlEscape, rubricAssessment) {
 
-I18n.scoped('gradebook', function(I18n) {
-
-(function($, INST, scribd, rubricAssessment) {
-  
-  // fire off the request to get the jsonData,
+  // fire off the request to get the jsonData
+  window.jsonData = {};
   $.ajaxJSON(window.location.pathname+ '.json' + window.location.search, 'GET', {}, function(json) {
-    window.jsonData = json;
+    jsonData = json;
     $(EG.jsonReady);
   });
   // ...and while we wait for that, get this stuff ready
@@ -64,6 +88,7 @@ I18n.scoped('gradebook', function(I18n) {
       $grded_so_far = $("#x_of_x_graded span:first"),
       $average_score = $("#average_score"),
       $this_student_does_not_have_a_submission = $("#this_student_does_not_have_a_submission").hide(),
+      $this_student_has_a_submission = $('#this_student_has_a_submission').hide(),
       $rubric_assessments_select = $("#rubric_assessments_select"),
       $rubric_summary_container = $("#rubric_summary_container"),
       $rubric_holder = $("#rubric_holder"),
@@ -196,12 +221,12 @@ I18n.scoped('gradebook', function(I18n) {
   function initDropdown(){
     var hideStudentNames;
     
-    if ($.store.userGet("eg_hide_student_names") == "true" || anonymousAssignment) {
+    if ($.store.userGet("eg_hide_student_names") == "true" || window.anonymousAssignment) {
       hideStudentNames = true;
     }
     $("#hide_student_names").attr('checked', hideStudentNames);
     var options = $.map(jsonData.studentsWithSubmissions, function(s, idx){
-      var name = $.htmlEscape(s.name),
+      var name = htmlEscape(s.name),
           className = classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
@@ -217,7 +242,7 @@ I18n.scoped('gradebook', function(I18n) {
         style:'dropdown',
         format: function(text){
           var parts = text.split(" ---- ");
-          return '<span class="ui-selectmenu-item-header">' + $.htmlEscape(parts[0]) + '</span><span class="ui-selectmenu-item-footer">' + parts[1] + '</span>';
+          return '<span class="ui-selectmenu-item-header">' + htmlEscape(parts[0]) + '</span><span class="ui-selectmenu-item-footer">' + parts[1] + '</span>';
         },
         icons: [
           {find: '.graded'},
@@ -235,7 +260,7 @@ I18n.scoped('gradebook', function(I18n) {
           
           
       $menu.find('ul').append($.map(jsonData.context.active_course_sections, function(section, i){
-        return '<li><a data-section-id="'+ section.id +'" href="#">'+ section.name  +'</a></li>';
+        return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ section.name  +'</a></li>';
       }).join(''));
             
       $menu.insertBefore($selectmenu_list).bind('mouseenter mouseleave', function(event){
@@ -473,8 +498,8 @@ I18n.scoped('gradebook', function(I18n) {
   
   function isAssessmentEditableByMe(assessment){
     //if the assessment is mine or I can :manage_course then it is editable
-    if (!assessment || assessment.assessor_id === rubricAssessment.assessor_id ||
-         (rubricAssessment.assessment_type == 'grading' && assessment.assessment_type == 'grading')
+    if (!assessment || assessment.assessor_id === ENV.RUBRIC_ASSESSMENT.assessor_id ||
+         (ENV.RUBRIC_ASSESSMENT.assessment_type == 'grading' && assessment.assessment_type == 'grading')
        ){
           return true;
     }
@@ -1085,7 +1110,7 @@ I18n.scoped('gradebook', function(I18n) {
         $single_submission.show();
       }
     },
-    
+
     showSubmissionDetails: function(){
       //if there is a submission
       if (this.currentStudent.submission && this.currentStudent.submission.submitted_at) {
@@ -1121,9 +1146,9 @@ I18n.scoped('gradebook', function(I18n) {
           return sum / arr.length;
         }
         function roundWithPrecision(number, precision) {
-        	precision = Math.abs(parseInt(precision, 10)) || 0;
-        	var coefficient = Math.pow(10, precision);
-        	return Math.round(number*coefficient)/coefficient;
+          precision = Math.abs(parseInt(precision, 10)) || 0;
+          var coefficient = Math.pow(10, precision);
+          return Math.round(number*coefficient)/coefficient;
         }
         var outOf = jsonData.points_possible ? ([" / ", jsonData.points_possible, " (", Math.round( 100 * (avg(scores) / jsonData.points_possible)), "%)"].join("")) : "";
         $average_score.html( [roundWithPrecision(avg(scores), 2) + outOf].join("") );
@@ -1137,15 +1162,16 @@ I18n.scoped('gradebook', function(I18n) {
     loadAttachmentInline: function(attachment){
       $submissions_container.children().hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
-  	    $this_student_does_not_have_a_submission.show();
-  	  }
-  	  else {
+          $this_student_does_not_have_a_submission.show();
+      } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
+          $this_student_has_a_submission.show()
+      } else {
         $iframe_holder.empty();
-        
+
         //if it's a scribd doc load it.
         var scribdDocAvailable = attachment && attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
-  	    if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) { 
-  	      var options = {
+        if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) { 
+          var options = {
               height: '100%',
               mimeType: attachment.content_type,
               attachment_id: attachment.id,
@@ -1189,10 +1215,10 @@ I18n.scoped('gradebook', function(I18n) {
     showRubric: function(){
       //if this has some rubric_assessments
       if (jsonData.rubric_association) {
-        rubricAssessment.assessment_user_id = this.currentStudent.id;
+        ENV.RUBRIC_ASSESSMENT.assessment_user_id = this.currentStudent.id;
 
         var assessmentsByMe = $.grep(EG.currentStudent.rubric_assessments, function(n,i){
-          return n.assessor_id === rubricAssessment.assessor_id;
+          return n.assessor_id === ENV.RUBRIC_ASSESSMENT.assessor_id;
         });
         var gradingAssessments = $.grep(EG.currentStudent.rubric_assessments, function(n,i){
           return n.assessment_type == 'grading';
@@ -1205,7 +1231,7 @@ I18n.scoped('gradebook', function(I18n) {
 
         // show a new option if there is not an assessment by me
         // or, if I can :manage_course, there is not an assessment already with assessment_type = 'grading'
-        if( !assessmentsByMe.length || (rubricAssessment.assessment_type == 'grading' && !gradingAssessments.length) ) {
+        if( !assessmentsByMe.length || (ENV.RUBRIC_ASSESSMENT.assessment_type == 'grading' && !gradingAssessments.length) ) {
           $rubric_assessments_select.append('<option value="new">' + I18n.t('new_assessment', '[New Assessment]') + '</option>');
         }
 
@@ -1239,11 +1265,11 @@ I18n.scoped('gradebook', function(I18n) {
 
           // if(comment.anonymous) { comment.author_name = "Anonymous"; }
           var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
-          $comment.find('span.comment').html($.htmlEscape(comment.comment).replace(/\n/g, "<br />"));
+          $comment.find('span.comment').html(htmlEscape(comment.comment).replace(/\n/g, "<br />"));
           // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
           // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
-          var commentIsDeleteableByMe = rubricAssessment.assessment_type === "grading" || 
-                                        rubricAssessment.assessor_id === comment.author_id;
+          var commentIsDeleteableByMe = ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" || 
+                                        ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id;
 
           $comment.find(".delete_comment_link").click(function(event) {
             $(this).parents(".comment").confirmDelete({
@@ -1446,8 +1472,8 @@ I18n.scoped('gradebook', function(I18n) {
   };
 
   //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
-  $(EG.domReady);
+  $(document).ready(function() {
+    EG.domReady();
+  });
 
-})(jQuery, INST, scribd, rubricAssessment);
-
-})
+});

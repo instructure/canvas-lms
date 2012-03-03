@@ -11,7 +11,12 @@
  *	jquery.ui.core.js
  *	jquery.ui.widget.js
  */
-(function( $, undefined ) {
+define([
+  'jquery',
+  'jqueryui/button', // ensure we overwrite the old version in case another module includes it later (gross hack)
+  'vendor/jquery.ui.core-1.9',
+  'vendor/jquery.ui.widget-1.9'
+], function( $, undefined ) {
 
 var lastActive, startXPos, startYPos, clickDragged,
 	baseClasses = "ui-button ui-widget ui-state-default ui-corner-all",
@@ -413,4 +418,4 @@ $.widget( "ui.buttonset", {
 	}
 });
 
-}( jQuery ) );
+});

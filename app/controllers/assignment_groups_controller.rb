@@ -20,7 +20,7 @@
 #
 # API for accessing Assignment Group and Assignment information.
 class AssignmentGroupsController < ApplicationController
-  before_filter :require_user_for_context
+  before_filter :require_context
 
   include Api::V1::Assignment
 

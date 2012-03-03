@@ -12,8 +12,16 @@
     end
   end
 %>
-<% js_block :i18n_scope => "users.new" do %>
+<% js_block do %>
 <script type="text/javascript">
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.fancyplaceholder' /* fancyPlaceholder */,
+  'jquery.instructure_forms' /* getFormData, formErrors */,
+  'jquery.rails_flash_notifications' /* flashError */
+], function(I18n, $) {
+
 $(function(){
   $(".field-with-fancyplaceholder input").fancyPlaceholder();
   var $form = $("#register_form");
@@ -24,13 +32,13 @@ $(function(){
     
     if(!data['user[name]']) {
       $form.formErrors({
-        'user[name]': I18n.t("username_required", "User name is required")
+        'user[name]': <%= jt("username_required", "User name is required") %>
       });
       success = false;
     } 
     if(!data.unique_id || !data.unique_id.length || data.unique_id.length < 3 || !data.unique_id.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,10}$/i)) {
       $form.formErrors({
-        unique_id: I18n.t("invalid_email", "Invalid Email Address")
+        unique_id: <%= jt("invalid_email", "Invalid Email Address") %>
       });
       success = false;
     } 
@@ -38,8 +46,9 @@ $(function(){
   });
   var errors = <%= raw(@errors.join(', ').to_json) %>;
   if (errors) {
-    $.flashError(I18n.t("problems_with_fields", 'There were problems with the following fields: %{errors}', {errors: errors}));
+    $.flashError(<%= jt("problems_with_fields", 'There were problems with the following fields: %{errors}', '{errors: errors}') %>);
   }
+});
 });
 </script>
 <% end %>

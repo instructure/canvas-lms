@@ -1,13 +1,16 @@
-define 'compiled/calendar/ShowEventDetailsDialog', [
-  'i18n'
+define [
+  'jquery'
+  'i18n!calendar'
   'compiled/util/Popover'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/EditEventDetailsDialog'
   'jst/calendar/eventDetails'
   'jst/calendar/deleteItem'
-], (I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate) ->
-
-  I18n = I18n.scoped 'calendar'
+  'jquery.ajaxJSON'
+  'jquery.instructure_misc_helpers'
+  'jquery.instructure_misc_plugins'
+  'vendor/jquery.ba-tinypubsub'
+], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate) ->
 
   class ShowEventDetailsDialog
     constructor: (event) ->

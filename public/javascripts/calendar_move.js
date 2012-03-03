@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+define([
+  'i18n!calendars',
+  'jquery' /* $ */,
+  'jquery.instructure_date_and_time' /* datepicker */,
+  'jquery.templateData' /* fillTemplateData */,
+  'jqueryui/datepicker' /* /\.datepicker/ */
+], function(I18n, $) {
 
+  var monthNames = I18n.t('#date.month_names');
 
-var calendarMonths = (function() {
-  var monthNames;
-  I18n.scoped('calendars', function(I18n) {
-    monthNames = I18n.t('#date.month_names');
-  });
   function makeDate(date) {
     return {
       day: date.getDate(),
@@ -29,6 +32,7 @@ var calendarMonths = (function() {
       year: date.getFullYear()
     }
   }
+
   return {
     changeMonth: function($month, change) {
       var monthData = $month.data('calendar_objects');
@@ -156,4 +160,4 @@ var calendarMonths = (function() {
       }
     }
   };
-})();
+});

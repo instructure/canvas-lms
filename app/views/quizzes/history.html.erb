@@ -97,6 +97,14 @@
 <% end %>
 <% js_block do %>
   <script>
+  require([
+    'INST' /* INST */,
+    'jquery' /* $ */,
+    'jquery.instructure_misc_plugins' /* fragmentChange */,
+    'jquery.templateData' /* getTemplateData */,
+    'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+  ], function(INST, $) {
+
   $(document).ready(function() {
     $(":text").focus(function() {
       $(this).select();
@@ -108,6 +116,7 @@
     window.parent.INST.refreshGrades();
     <% end %>    
   });
+  });
   </script>
 <% end %>
 <div style="display: none;" id="submission_details">
@@ -116,6 +125,13 @@
 </div>
 <% js_block do %>
   <script>
+  require([
+    'jquery' /* $ */,
+    'jquery.instructure_misc_plugins' /* fragmentChange */,
+    'fragmentChangejquery.templateData' /* getTemplateData */,
+    'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+  ], function($) {
+
   var data = $("#submission_details").getTemplateData({textValues: ['version_number', 'user_id']});
   var scoringSnapshot = {
     snapshot: {
@@ -218,9 +234,17 @@
       $total.text(total || "0");
     });
   });
+  });
   </script>
   <% if params[:score_updated] %>
     <script>
+    require([
+      'jquery' /* $ */,
+      'jquery.instructure_misc_plugins' /* fragmentChange */,
+      'jquery.templateData' /* getTemplateData */,
+      'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+    ], function($) {
+
     $(document).ready(function() {
       if(window.parent && window.parent.INST && window.parent.INST.refreshGrades && $.isFunction(window.parent.INST.refreshGrades)) {
         window.parent.INST.refreshGrades();
@@ -228,6 +252,7 @@
       if(window.parent && window.parent.INST && window.parent.INST.clearQuizSubmissionSnapshot && $.isFunction(window.parent.INST.clearQuizSubmissionSnapshot)) {
         window.parent.INST.clearQuizSubmissionSnapshot(scoringSnapshot.snapshot);
       }
+    });
     });
     </script>
   <% end %>

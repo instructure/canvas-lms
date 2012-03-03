@@ -1,6 +1,6 @@
 <% content_for :page_title do %><%= join_title t(:page_title, "Web Conference"), @conference.title %><% end %>
 
-<% jammit_js :conferences %>
+<% js_bundle :conferences %>
 
 <% if can_do(@conference, @current_user, :update) && !@conference.finished? %>
   <% content_for :right_side do %>

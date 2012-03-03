@@ -16,8 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var calcCmd;
-I18n.scoped('calculator', function(I18n){
+require([
+  'i18n!calculator',
+  'jquery' /* $ */,
+  'calcCmd',
+  'str/htmlEscape',
+  'jquery.instructure_misc_helpers' /* /\$\.raw/ */,
+  'jquery.instructure_misc_plugins' /* showIf */,
+  'jqueryui/sortable' /* /\.sortable/ */
+], function(I18n, $, calcCmd, htmlEscape) {
+
   var generateFinds = function($table) {
     var finds = {};
     finds.formula_rows = $table.find(".formula_row");
@@ -46,9 +54,9 @@ I18n.scoped('calculator', function(I18n){
       options.c1 = true;
       var $entryBox = $(this);
       var $table = $("<table class='formulas'>" +
-                        "<thead><tr><th>" + $.h(I18n.t('headings.formula', "Formula")) + "</th><th>" + $.h(I18n.t('headings.result', "Result")) + "</th><th>&nbsp;</th></tr></thead>" +
+                        "<thead><tr><th>" + htmlEscape(I18n.t('headings.formula', "Formula")) + "</th><th>" + htmlEscape(I18n.t('headings.result', "Result")) + "</th><th>&nbsp;</th></tr></thead>" +
                         "<tfoot>" +
-                          "<tr><td colspan='3' class='last_row_details' style='display: none;'>" + $.h(I18n.t('last_formula_row', "the last formula row will be used to compute the final answer")) + "</td></tr>" +
+                          "<tr><td colspan='3' class='last_row_details' style='display: none;'>" + htmlEscape(I18n.t('last_formula_row', "the last formula row will be used to compute the final answer")) + "</td></tr>" +
                           "<tr><td></td><td class='decimal_places'>" +
                             I18n.t('how_many_decimal_places', '%{number_selector} Decimal Places', {number_selector: $.raw("<select class='round'><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select>")}) +
                           "</td></tr>" +
@@ -60,7 +68,7 @@ I18n.scoped('calculator', function(I18n){
       $table.find("tfoot tr:last td:first").append($entryBox);
       var $displayBox = $entryBox.clone(true).removeAttr('id');
       $table.find("tfoot tr:last td:first").append($displayBox);
-      var $enter = $("<button type='button' class='save_formula_button'>" + $.h(I18n.t('buttons.save', "Save")) + "</button>");
+      var $enter = $("<button type='button' class='save_formula_button'>" + htmlEscape(I18n.t('buttons.save', "Save")) + "</button>");
       $table.find("tfoot tr:last td:first").append($enter);
       $entryBox.hide();
       var $input = $("<input type='text' readonly='true'/>");
@@ -132,7 +140,7 @@ I18n.scoped('calculator', function(I18n){
         if(event.keyCode == 13 || enter && $displayBox.val()) {
           event.preventDefault();
           event.stopPropagation();
-          var $tr = $("<tr class='formula_row'><td class='formula' title='" + $.h(I18n.t('drag_to_reorder', 'Drag to reorder')) + "'></td><td class='status'></td><td><a href='#' class='delete_formula_row_link no-hover'><img src='/images/delete_circle.png'/></a></td></tr>");
+          var $tr = $("<tr class='formula_row'><td class='formula' title='" + htmlEscape(I18n.t('drag_to_reorder', 'Drag to reorder')) + "'></td><td class='status'></td><td><a href='#' class='delete_formula_row_link no-hover'><img src='/images/delete_circle.png'/></a></td></tr>");
           $tr.find("td:first").text($entryBox.val());
           $entryBox.val("");
           $displayBox.val("");

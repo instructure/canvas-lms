@@ -265,6 +265,12 @@ Spec::Runner.configure do |config|
     @enrollment
   end
 
+  def course_with_ta(opts={})
+    course_with_user("TAEnrollment", opts)
+    @ta = @user
+    @enrollment
+  end
+
   def course_with_student_logged_in(opts={})
     course_with_student(opts)
     user_session(@user)
@@ -275,9 +281,26 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
+  def student_in_course_section(opts={})
+    @course ||= opts[:course] || course(opts)
+    @course_section = opts[:course_section] || @course.course_sections.create!
+    @user = opts[:user] || user(opts)
+    @user.register!
+    @enrollment = @course.enroll_user(@user, 'StudentEnrollment', :section => @course_section)
+    @enrollment.workflow_state = 'active'
+    @enrollment.save!
+    @course.reload
+  end
+
   def course_with_teacher(opts={})
     course_with_user('TeacherEnrollment', opts)
     @teacher = @user
+    @enrollment
+  end
+
+  def course_with_designer(opts={})
+    course_with_user('DesignerEnrollment', opts)
+    @designer = @user
     @enrollment
   end
 
@@ -620,5 +643,24 @@ Spec::Runner.configure do |config|
 
   def json_parse(json_string = response.body)
     JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
+  end
+
+  def s3_storage!
+    Attachment.stubs(:s3_storage?).returns(true)
+    Attachment.stubs(:local_storage?).returns(false)
+    conn = mock('AWS::S3::Connection')
+    AWS::S3::Base.stubs(:connection).returns(conn)
+    conn.stubs(:access_key_id).returns('stub_id')
+    conn.stubs(:secret_access_key).returns('stub_key')
+    Attachment.s3_storage?.should eql(true)
+    Attachment.local_storage?.should eql(false)
+  end
+
+  def local_storage!
+    Attachment.stubs(:s3_storage?).returns(false)
+    Attachment.stubs(:local_storage?).returns(true)
+    Attachment.local_storage?.should eql(true)
+    Attachment.s3_storage?.should eql(false)
+    Attachment.local_storage?.should eql(true)
   end
 end

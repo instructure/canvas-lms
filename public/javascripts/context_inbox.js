@@ -15,8 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+require([
+  'i18n!context.inbox',
+  'jquery' /* $ */,
+  'str/pluralize',
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_forms' /* formSubmit */,
+  'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
+  'jquery.templateData' /* fillTemplateData */,
+  'vendor/jquery.pageless' /* pageless */,
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+], function(I18n, $, pluralize) {
 
-I18n.scoped('context.inbox', function(I18n) {
   $(document).ready(function() {
     var previous_visible_types = [];
     $("#visible_message_types :checkbox").each(function() {
@@ -69,7 +80,7 @@ I18n.scoped('context.inbox', function(I18n) {
       message.sender_name = message.sender_name;
       var code = message.context_code.split("_");
       message.context_id = code.pop();
-      message.context_type_pluralized = $.pluralize(code.join("_"));
+      message.context_type_pluralized = pluralize(code.join("_"));
       message.context_name = $(".context_name_for_" + message.context_code).text();
       $message.fillTemplateData({
         data: message,

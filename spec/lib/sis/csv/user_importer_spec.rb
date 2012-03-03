@@ -338,6 +338,25 @@ describe SIS::CSV::UserImporter do
 
   it "should add two users with different user_ids, login_ids, but the same email" do
     notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    user1 = User.create!(:name => 'User Uno')
+    user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    user1.communication_channels.create!(:path => 'user@example.com') { |cc| cc.workflow_state = 'active' }
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user@example.com,active"
+    )
+    user2 = Pseudonym.find_by_unique_id('user2').user
+    user1.should_not == user2
+    user2.last_name.should == "Dos"
+    user2.pseudonyms.count.should == 1
+    user2.pseudonyms.first.communication_channel_id.should_not be_nil
+
+    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+  end
+
+  it "should not notify about a merge opportunity to an SIS user in the same account" do
+    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active",
@@ -353,7 +372,7 @@ describe SIS::CSV::UserImporter do
     user1.pseudonyms.first.communication_channel_id.should_not be_nil
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
   end
 
   it "should not notify about merge opportunities for users that have no means of logging in" do
@@ -402,7 +421,7 @@ describe SIS::CSV::UserImporter do
     user2.email_channel.should be_active
     user2.email.should == 'user1@example.com'
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
   end
 
   it "should not have a problem adding an existing e-mail that differs in case" do
@@ -442,19 +461,20 @@ describe SIS::CSV::UserImporter do
 
   it "should send merge opportunity notifications when reactivating an email" do
     notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    user1 = User.create!(:name => 'User Uno')
+    user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    user1.communication_channels.create!(:path => 'user1@example.com') { |cc| cc.workflow_state = 'active' }
+
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user2,User,Dos,user1@example.com,deleted"
     )
-    user1 = Pseudonym.find_by_unique_id('user1').user
     user2 = Pseudonym.find_by_unique_id('user2').user
     user1.should_not == user2
     user1.last_name.should == "Uno"
     user2.last_name.should == "Dos"
     user1.pseudonyms.count.should == 1
     user2.pseudonyms.count.should == 1
-    user1.pseudonyms.first.communication_channel_id.should_not be_nil
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
     user1.email_channel.should_not == user2.email_channel
     Message.count.should == 0

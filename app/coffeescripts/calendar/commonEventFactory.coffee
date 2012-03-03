@@ -1,8 +1,9 @@
-define 'compiled/calendar/commonEventFactory', [
+define [
+  'jquery'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/CommonEvent.Assignment',
   'compiled/calendar/CommonEvent.CalendarEvent'
-], (CommonEvent, Assignment, CalendarEvent) ->
+], ($, CommonEvent, Assignment, CalendarEvent) ->
 
   (data, contexts) ->
     if data == null

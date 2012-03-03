@@ -121,5 +121,30 @@ describe Stats do
       q.should == [-0.75, 2.5, 5.25]
     end
     
+    it "should return nils for quartiles when there is no data" do
+      c = Stats::Counter.new([])
+      q = c.quartiles
+      q.should == [nil, nil, nil]
+    end
+    
+    it "should return a single number for quartiles if that is the only thing in the data" do
+      c = Stats::Counter.new([5])
+      q = c.quartiles
+      q.should == [5, 5, 5]
+    end
+    
+    it "should return properly for a dataset of length 3" do
+       c = Stats::Counter.new([1,2,10])
+       q = c.quartiles
+       q.should == [1, 2, 10]
+    end
+
+    it "should return properly for a dataset of length 2" do
+       c = Stats::Counter.new([1,10])
+       q = c.quartiles
+       q.should == [1, 5.5, 10]
+    end
+    
+    
   end
 end

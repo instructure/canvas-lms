@@ -321,10 +321,12 @@ class Message < ActiveRecord::Base
       res = "#{addr}+#{self.reply_to_secure_id}-#{self.id}@#{domain}"
     end
   end
-  
+
   def deliver
-    self.dispatch
-    
+    unless self.dispatch
+      return # don't dispatch cancelled or already-sent messages
+    end
+
     if not self.path_type
       logger.warn("Could not find a path type for #{self.inspect}")
       return
@@ -335,10 +337,10 @@ class Message < ActiveRecord::Base
       logger.warn("Could not set delivery_method from #{self.path_type}")
       return
     end
-    
+
     self.send(delivery_method)
   end
-  
+
   def self.dashboard_messages(messages)
     message_types = {}
     messages.each do |m|

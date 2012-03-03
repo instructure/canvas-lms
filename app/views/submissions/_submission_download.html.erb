@@ -1,13 +1,19 @@
-<% js_block :i18n_scope => "submissions" do %>
+<% js_block do %>
 <script>
-  if (!window.INST) {
-    window.INST = {};
-  }
+require([
+  'INST' /* INST */,
+  'i18nObj',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/progressbar' /* /\.progressbar/ */
+], function(INST, I18n, $) {
+
   INST.downloadSubmissions = function(url) {
     var cancelled = false;
     $("#download_submissions_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: I18n.t("download_submissions", "Download Assignment Submissions"),
+      title: <%= jt("#submissions.download_submissions", "Download Assignment Submissions") %>,
       close: function() {
         cancelled = true;
       }
@@ -22,8 +28,8 @@
           var attachment = data.attachment;
           if(attachment.workflow_state == 'zipped') { 
             $("#download_submissions_dialog .progress").progressbar('value', 100);
-            var message = I18n.t("finished_redirecting", "Finished!  Redirecting to File...");
-            var link = "<a href=\"" + url + "\"><b> " + I18n.t("click_to_download", "Click here to download %{size_of_file}", {size_of_file: attachment.readable_size}) + "</b></a>"
+            var message = <%= jt("#submissions.finished_redirecting", "Finished!  Redirecting to File...") %>;
+            var link = "<a href=\"" + url + "\"><b> " + <%= jt("#submissions.click_to_download", "Click here to download %{size_of_file}", '{size_of_file: attachment.readable_size}') %> + "</b></a>"
             $("#download_submissions_dialog .status").html(message + "<br>" + link);
             $("#download_submissions_dialog .status_loader").css('visibility', 'hidden');
             location.href = url;
@@ -35,9 +41,9 @@
             $("#download_submissions_dialog .progress").progressbar('value', progress);
             var message = null;
             if(progress >= 95){
-              message = I18n.t("creating_zip", "Creating zip file...");
+              message = <%= jt("#submissions.creating_zip", "Creating zip file...") %>;
             } else {
-              message = I18n.t("gathering_files", "Gathering Files (%{progress})...", {progress: I18n.toPercentage(progress)});
+              message = <%= jt("#submissions.gathering_files_progress", "Gathering Files (%{progress})...", '{progress: I18n.toPercentage(progress)}') %>;
             }
             $("#download_submissions_dialog .status").text(message);
             if(progress <= 5 || progress == lastProgress) {
@@ -54,7 +60,8 @@
       });
     }
     checkForChange();
-  }
+  };
+});
 </script>
 <% end %>
 <div id="download_submissions_dialog" style="display: none;">

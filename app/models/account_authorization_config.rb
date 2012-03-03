@@ -31,6 +31,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   validates_presence_of :account_id
   validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
   after_create :disable_open_registration_if_delegated
+  # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
+  before_save :clear_last_timeout_failure
 
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
@@ -264,6 +266,44 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     if self.delegated_authentication? && self.account.open_registration?
       @account.settings = { :open_registration => false }
       @account.save!
+    end
+  end
+
+  def self.ldap_failure_wait_time
+    Setting.get('ldap_failure_wait_time', 1.minute.to_s).to_i
+  end
+
+  def ldap_bind_result(unique_id, password_plaintext)
+    if self.last_timeout_failure.present?
+      failure_timeout = self.class.ldap_failure_wait_time.ago
+      if self.last_timeout_failure >= failure_timeout
+        # we've failed too recently, don't try again
+        return nil
+      end
+    end
+
+    timelimit = Setting.get('ldap_timelimit', 5.seconds.to_s).to_f
+
+    begin
+      Timeout.timeout(timelimit) do
+        ldap = self.ldap_connection
+        filter = self.ldap_filter(unique_id)
+        res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
+        return res if res
+      end
+    rescue Net::LDAP::LdapError
+      ErrorReport.log_exception(:ldap, $!)
+    rescue Timeout::Error
+      ErrorReport.log_exception(:ldap, $!)
+      self.update_attribute(:last_timeout_failure, Time.now)
+    end
+
+    return nil
+  end
+
+  def clear_last_timeout_failure
+    unless self.last_timeout_failure_changed?
+      self.last_timeout_failure = nil
     end
   end
 end

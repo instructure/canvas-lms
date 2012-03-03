@@ -17,7 +17,7 @@
 #
 
 class AnnouncementsController < ApplicationController
-  before_filter :require_user_for_context, :except => :public_feed
+  before_filter :require_context, :except => :public_feed
   before_filter { |c| c.active_tab = "announcements" }  
   
   def index

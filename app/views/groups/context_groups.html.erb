@@ -11,7 +11,7 @@
   </div>
 <% end %>
 
-<% jammit_js :groups %>
+<% js_bundle :groups %>
 <h2><%= @context.is_a?(Account) ? t('account_groups', 'Account Groups') : t('course_groups', 'Course Groups') %></h2>
 <p>
 <%= t 'group_explanation', <<-TEXT

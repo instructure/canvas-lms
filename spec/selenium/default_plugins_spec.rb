@@ -128,8 +128,8 @@ describe "default plugins" do
     keep_trying_until {
       driver.find_element(:css, "button.save_button").click
       wait_for_ajaximations
+      assert_flash_error_message /There was an error/
     }
-    assert_flash_error_message /There was an error/
 
     ScribdAPI.stubs(:config_check).returns(nil)
     driver.find_element(:css, "button.save_button").click

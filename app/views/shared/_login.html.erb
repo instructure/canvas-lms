@@ -1,7 +1,17 @@
 <% jammit_css :login %>
 <% @body_classes << "modal" if @body_classes %>
-<% js_block :i18n_scope => "pseudonyms.login"  do %>
+<% js_block do %>
 <script>
+require([
+  'i18nObj' /* I18n.t */,
+  'jquery' /* $ */,
+  'jquery.fancyplaceholder' /* fancyPlaceholder */,
+  'jquery.google-analytics' /* trackPage, trackPageview */,
+  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
+  'jquery.loadingImg' /* loadingImage */,
+  'jquery.rails_flash_notifications' /* flashMessage */
+], function(I18n, $) {
+
 $(document).ready(function() {
   $("#register_link").click(function(){
     $.trackPageview("/clicked_register_on_login_form");
@@ -16,7 +26,7 @@ $(document).ready(function() {
     },
     success: function(data) {
       $(this).loadingImage('remove');
-      $.flashMessage(I18n.t("password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", {email_address: $(this).find(".email_address").val()}));
+      $.flashMessage(<%= jt("#pseudonyms.login.password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", '{email_address: $(this).find(".email_address").val()}') %>);
       $(".login_link:first").click();
     },
     error: function(data) {
@@ -40,12 +50,12 @@ $(document).ready(function() {
       var success = true;
       if(!data.unique_id || data.unique_id.length < 1) {
         $(this).formErrors({
-          unique_id: I18n.t("invalid_login", 'Invalid login')
+          unique_id: <%= jt("#pseudonyms.login.invalid_login", 'Invalid login') %>
         });
         success = false;
       } else if(!data.password || data.password.length < 1) {
         $(this).formErrors({
-          password: I18n.t("invalid_password", 'Invalid password')
+          password: <%= jt("#pseudonyms.login.invalid_password", 'Invalid password') %>
         });
         success = false;
       }
@@ -53,6 +63,7 @@ $(document).ready(function() {
     })
     .find(":text:first")
       .focus().select();
+});
 });
 </script>
 <% end %>

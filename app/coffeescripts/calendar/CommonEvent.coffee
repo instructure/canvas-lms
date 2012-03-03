@@ -1,8 +1,8 @@
-define 'compiled/calendar/CommonEvent', [
-  'i18n'
-], (I18n) ->
-
-  I18n = I18n.scoped 'calendar'
+define [
+  'jquery'
+  'jquery.ajaxJSON'
+  'vendor/jquery.ba-tinypubsub'
+], ($) ->
 
   class
     constructor: (data, contextInfo) ->

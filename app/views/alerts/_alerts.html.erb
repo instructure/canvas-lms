@@ -1,5 +1,5 @@
 <% jammit_css :alerts %>
-<% jammit_js :alerts %>
+<% js_bundle :alerts %>
 
 <p>
 <%=
@@ -29,10 +29,17 @@
 
 <% js_block do %>
   <script type="text/javascript">
-    var alert_data = <%= @alerts.to_json.html_safe %>;
+  require([
+    'jquery' /* $ */,
+    'jquery.instructure_forms' /* formSubmit */,
+    'jquery.keycodes' /* keycodes */,
+    'jquery.loadingImg' /* loadingImage */
+  ], function($) {
 
-    var possible_alert_recipients_order = [':student', ':teachers'];
-    var possible_alert_recipients = {
+    window.alert_data = <%= @alerts.to_json.html_safe %>;
+
+    window.possible_alert_recipients_order = [':student', ':teachers'];
+    window.possible_alert_recipients = {
       ':student': { label: <%= h(t(:the_student, "The Student")).to_json.html_safe %> },
       ':teachers': { label: <%= h(t(:the_teacher, "The Teacher")).to_json.html_safe %> }
     };
@@ -41,9 +48,9 @@
       possible_alert_recipients[<%= role[:name].to_json.html_safe %>] = { label: <%= role[:label].to_json.html_safe %> };
     <% end %>
 
-    var possible_alert_criteria_order = ['Interaction', 'UngradedCount', 'UngradedTimespan'];
+    window.possible_alert_criteria_order = ['Interaction', 'UngradedCount', 'UngradedTimespan'];
     <% count = "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />".html_safe %>
-    var possible_alert_criteria = {
+    window.possible_alert_criteria = {
       Interaction: {
         label: <%= t(:description, "A teacher has not interacted with the student for %{count} days", :count => count).to_json.html_safe %>,
         option: <%= t(:option, "No Teacher Interaction").to_json.html_safe %>,
@@ -68,5 +75,6 @@
         title: <%= t(:usernote_title, "Days since a faculty journal has been added").to_json.html_safe %>,
         default_threshold: 7 };
     <% end %>
+  });
   </script>
 <% end %>

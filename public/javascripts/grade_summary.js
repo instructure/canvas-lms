@@ -16,8 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var grading_scheme;
-I18n.scoped('gradebook', function(I18n) {
+require([
+  'INST' /* INST */,
+  'i18n!gradebook',
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* getFormData */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
+  'jquery.instructure_misc_plugins' /* showIf */,
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'media_comments' /* mediaComment, mediaCommentThumbnail */
+], function(INST, I18n, $) {
+
   function setGroupData(groups, $group) {
     if($group.length === 0) { return; }
     var data = $group.getTemplateData({textValues: ['assignment_group_id', 'rules', 'group_weight']});
@@ -201,9 +211,11 @@ I18n.scoped('gradebook', function(I18n) {
       finalGrade = 0;
     }
     $(".student_assignment.final_grade").find(".grade").text(finalGrade);
-    if(grading_scheme) {
+
+    if(window.grading_scheme) {
       $(".final_letter_grade .grade").text(INST.GradeCalculator.letter_grade(grading_scheme, finalGrade));
     }
+
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);
     var eTime = (new Date()).getTime();
   }
@@ -372,5 +384,12 @@ I18n.scoped('gradebook', function(I18n) {
       $("tr.rubric_assessments").show();
     });
     $.scrollSidebar();
+    $("#observer_user_url").change(function() {
+      if(location.href != $(this).val()) {
+        location.href = $(this).val();
+      }
+    });
   });
+
 });
+

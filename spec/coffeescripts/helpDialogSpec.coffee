@@ -20,20 +20,17 @@ require [
     $tester = $('<a class="help_dialog_trigger" />').appendTo('body')
     helpDialog.initTriggers()
     $tester.click()
-    $dialog = $('.ui-dialog-content')
-    ok $dialog.is(':visible'), "help dialog appears when you click 'help' link"
+    ok $('.ui-dialog-content').is(':visible'), "help dialog appears when you click 'help' link"
 
-  module 'HelpDialog',
-    setup: ->
-      helpDialog.open()
-      stop()
-      $(helpDialog).bind 'ready', start
-    teardown: ->
-      helpDialog.$dialog.dialog('close')
+  module 'HelpDialog'
 
   asyncTest 'teacher feedback', 1, ->
-    helpDialog.switchTo "#teacher_feedback"
-    setTimeout =>
-      ok helpDialog.$dialog.find('#teacher-feedback-body').is(':visible'), "textarea shows up"
-      start()
-    , 101
+    $(helpDialog).bind 'ready', ->
+      helpDialog.switchTo "#teacher_feedback"
+      setTimeout ->
+        ok helpDialog.$dialog.find('#teacher-feedback-body').is(':visible'), "textarea shows up"
+        helpDialog.$dialog.dialog('close') #cleanup
+        start()
+      , 101
+    helpDialog.open()
+

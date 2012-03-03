@@ -140,10 +140,10 @@ describe "profile" do
       # Make ajax request slow down to verify transitional state
       FilesController.before_filter { sleep 5; true }
 
-      dialog.find_element(:css, 'button[type="submit"]').click
-      spans = dialog.find_elements(:css, ".profile_pic_list span.img")
-      new_image = spans.last.find_element(:css, 'img')
+      driver.find_element(:id, 'add_pic_form').submit
+      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
       new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+      spans = dialog.find_elements(:css, ".profile_pic_list span.img")
       spans.length.should == 3
 
       FilesController.filter_chain.pop

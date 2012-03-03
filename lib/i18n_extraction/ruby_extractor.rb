@@ -13,7 +13,7 @@ module I18nExtraction
       s
     end
 
-    TRANSLATE_CALLS = [:t, :ot, :mt, :translate, :before_label]
+    TRANSLATE_CALLS = [:t, :ot, :mt, :translate, :before_label, :jt]
     LABEL_CALLS = [:label, :blabel, :label_tag, :_label_symbol_translation]
     ALL_CALLS = TRANSLATE_CALLS + LABEL_CALLS + [:label_with_symbol_translation]
 
@@ -71,16 +71,24 @@ module I18nExtraction
       default = process_default_translation(args.shift, key)
 
       options = if args.first.is_a?(Sexp)
-        if args.first.sexp_type != :hash
-          raise "translate options must be a hash: #{key.inspect} on line #{line}"
+        if method == :jt
+          if args.first.sexp_type != :str
+            raise "jt options must be a javascript string: #{key.inspect} on line #{line}"
+          end
+          str = args.shift.last
+          str.scan(/['"]?(\w+)['"]?:/).flatten.map(&:to_sym)
+        else
+          if args.first.sexp_type != :hash
+            raise "translate options must be a hash: #{key.inspect} on line #{line}"
+          end
+          hash = args.shift
+          hash.shift
+          (0...(hash.size/2)).map{ |i|
+            process hash[i * 2 + 1]
+            raise "option keys must be strings or symbols on line #{line}" unless [:lit, :str].include?(hash[i * 2].sexp_type)
+            hash[i * 2].last.to_sym
+          }
         end
-        hash = args.shift
-        hash.shift
-        (0...(hash.size/2)).map{ |i|
-          process hash[i * 2 + 1]
-          raise "option keys must be strings or symbols on line #{line}" unless [:lit, :str].include?(hash[i * 2].sexp_type)
-          hash[i * 2].last.to_sym
-        }
       else
         []
       end
@@ -98,7 +106,7 @@ module I18nExtraction
             raise "interpolation value not provided for #{match[0].to_sym.inspect} (#{sub_key.inspect}) on line #{line}"
           end
         end
-        add_translation sub_key, str, (:remove_whitespace if @in_html_view && method != :mt)
+        add_translation sub_key, str, (:remove_whitespace if @in_html_view && ![:mt, :jt].include?(method))
       end
     end
 

@@ -12,7 +12,12 @@
  *	jquery.ui.widget.js
  *	jquery.ui.position.js
  */
-(function($) {
+define([
+  'jquery',
+  'vendor/jquery.ui.core-1.9',
+  'vendor/jquery.ui.widget-1.9',
+  'vendor/jquery.ui.position-1.9'
+], function($, _core, _widget, _position) {
 
 var idIncrement = 0;
 
@@ -206,4 +211,4 @@ $.widget( "ui.popup", {
 	}
 });
 
-}(jQuery));
+});

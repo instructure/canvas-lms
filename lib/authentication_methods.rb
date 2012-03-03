@@ -168,32 +168,6 @@ module AuthenticationMethods
   end
   private :load_user
 
-  def require_user_for_context
-    get_context
-    if !@context
-      redirect_to '/'
-      return false
-    elsif @context.state == 'available'
-      if !@current_user 
-        respond_to do |format|
-          store_location
-          flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page")
-          format.html {redirect_to login_url}
-          format.json {render :json => {:errors => {:message => I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page")}}, :status => :unauthorized}
-        end
-        return false;
-      elsif !@context.users.include?(@current_user)
-        respond_to do |format|
-          flash[:notice] = I18n.t('lib.auth.errors.not_authorized', "You are not authorized to view this page")
-          format.html {redirect_to "/"}
-          format.json {render :json => {:errors => {:message => I18n.t('lib.auth.errors.not_authorized', "You are not authorized to view this page")}}, :status => :unauthorized}
-        end
-        return false
-      end
-    end
-  end
-  protected :require_user_for_context
-  
   def require_user
     unless @current_pseudonym && @current_user
       respond_to do |format|

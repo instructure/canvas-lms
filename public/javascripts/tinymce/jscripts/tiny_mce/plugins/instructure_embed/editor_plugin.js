@@ -15,23 +15,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-(function () {
-  var $box, $editor, $userURL, $altText, $actions, $flickrLink, TRANSLATIONS,
-      initted = false;
 
-  I18n.scoped('#tinymce', function (I18n) {
-    TRANSLATIONS = {
-      click_to_embed: I18n.t('click_to_embed', 'Click to embed the image'),
-      instructions: $.h(I18n.t('instructions', "Paste or type the URL of the image you'd like to embed:")),
-      url: $.h(I18n.t('url', 'URL:')),
-      alt_text: $.h(I18n.t('alt_text', 'Alternate Text:')),
-      search_flickr: I18n.t('alt_text', 'Search flickr creative commons'),
-      loading: I18n.t('loading', 'Loading...'),
-      embed_external: I18n.t('embed_external', 'Embed External Image'),
-      embed_image: $.h(I18n.t('embed_image', 'Embed Image')),
-      image_not_found: I18n.t('image_not_found', 'Image not found, please try a new URL')
-    };
-  });
+// tinymce doesn't like its plugins being async,
+// all dependencies must export to window
+
+define([
+  'compiled/editor/stocktiny',
+  'i18n!editor',
+  'jquery',
+  'str/htmlEscape',
+  'jquery.instructure_jquery_patches',
+  'jquery.instructure_misc_helpers'
+], function(tinymce, I18n, $, htmlEscape) {
+
+  var $box, $editor, $userURL, $altText, $actions, $flickrLink;
+
+  var initted = false;
+
+  var TRANSLATIONS = {
+    click_to_embed: I18n.t('click_to_embed', 'Click to embed the image'),
+    instructions: INST.htmlEscape(I18n.t('instructions', "Paste or type the URL of the image you'd like to embed:")),
+    url: INST.htmlEscape(I18n.t('url', 'URL:')),
+    alt_text: INST.htmlEscape(I18n.t('alt_text', 'Alternate Text:')),
+    search_flickr: I18n.t('search_flickr', 'Search flickr creative commons'),
+    loading: I18n.t('loading', 'Loading...'),
+    embed_external: I18n.t('embed_external', 'Embed External Image'),
+    embed_image: INST.htmlEscape(I18n.t('embed_image', 'Embed Image')),
+    image_not_found: I18n.t('image_not_found', 'Image not found, please try a new URL')
+  };
 
   function initShared () {
     $box = $('<div/>', {html: TRANSLATIONS.instructions + "<form id='instructure_embed_prompt_form' style='margin-top: 5px;'><table class='formtable'><tr><td>"+ TRANSLATIONS.url +"</td><td><input type='text' class='prompt' style='width: 250px;' value='http://'/></td></tr><tr><td class='nobr'>"+TRANSLATIONS.alt_text+"</td><td><input type='text' class='alt_text' style='width: 150px;' value=''/></td></tr><tr><td colspan='2' style='text-align: right;'><input type='submit' value='Embed Image'/></td></tr></table></form><div class='actions'></div>"}).hide();
@@ -64,7 +75,7 @@
     event.preventDefault();
     $box.dialog('close');
     $.findImageForService('flickr_creative_commons', function (data) {
-      var title = $.h(data.title),
+      var title = INST.htmlEscape(data.title),
           html = '<a href="' + data.link_url + '"><img src="' + data.image_url + '" title="' + title + '"alt="' + title + '" style="max-width: 500; max-height: 500"></a>';
       $box.dialog('close');
       $editor.editorBox('insert_code', html);
@@ -72,8 +83,8 @@
   }
 
   function embedURLImage (event) {
-    var alt = $.h($altText.val() || ''),
-        text = $.h($userURL.val());
+    var alt = INST.htmlEscape($altText.val() || ''),
+        text = INST.htmlEscape($userURL.val());
 
     event.preventDefault();
     $editor.editorBox('insert_code', "<img src='" + text + "' alt='" + alt + "'/>");
@@ -145,4 +156,5 @@
   });
 
   tinymce.PluginManager.add('instructure_embed', tinymce.plugins.InstructureEmbed);
-}());
+});
+

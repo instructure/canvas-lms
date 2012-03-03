@@ -7,7 +7,7 @@
  * http://benalman.com/about/license/
  */
 
-(function($){
+define(['jquery'], function($){
 
   // Create a "dummy" jQuery object on which to bind, unbind and trigger event
   // handlers. Note that $({}) works in jQuery 1.4.3+.
@@ -47,4 +47,4 @@
     o.trigger.apply( o, arguments );
   };
 
-})(jQuery);
+});

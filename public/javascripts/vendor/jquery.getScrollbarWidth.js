@@ -6,7 +6,7 @@
 /**
  * Gets the width of the OS scrollbar
  */
-(function($) {
+define(['jquery'], function($) {
 	var scrollbarWidth = 0;
 	$.getScrollbarWidth = function() {
 		if ( !scrollbarWidth ) {
@@ -28,4 +28,4 @@
 		}
 		return scrollbarWidth;
 	};
-})(jQuery);
+});

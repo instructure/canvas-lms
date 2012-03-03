@@ -15,23 +15,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-(function() {
-  I18n.scoped('#tinymce', function (I18n) {
-    TRANSLATIONS = {
-      embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
-      more_external_tools: $.h(I18n.t('more_external_tools', "More External Tools"))
-    };
-  });
-	tinymce.create('tinymce.plugins.InstructureExternalTools', {
-		init : function(ed, url) {
-		  if(!window || !window.INST || !window.INST.editorButtons || !window.INST.editorButtons.length) {
-		    return
-		  }
-		  var $dialog = null;
-		  var clumpedButtons = [];
-		  function buttonSelected(button) {
+
+// tinymce doesn't like its plugins being async,
+// all dependencies must export to window
+
+define([
+  'compiled/editor/stocktiny',
+  'i18n!editor',
+  'jquery',
+  'str/htmlEscape',
+  'jquery.dropdownList',
+  'jquery.instructure_jquery_patches',
+  'jquery.instructure_misc_helpers',
+  'jquery.instructure_misc_plugins',
+], function(tinymce, I18n, $, htmlEscape) {
+
+  var TRANSLATIONS = {
+    embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
+    more_external_tools: INST.htmlEscape(I18n.t('more_external_tools', "More External Tools"))
+  };
+
+  tinymce.create('tinymce.plugins.InstructureExternalTools', {
+    init : function(ed, url) {
+      if(!window || !window.INST || !window.INST.editorButtons || !window.INST.editorButtons.length) {
+        return
+      }
+      var $dialog = null;
+      var clumpedButtons = [];
+      function buttonSelected(button) {
         var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
-		    if(!$dialog) {
+        if(!$dialog) {
           $dialog = $('<div id="external_tool_button_dialog" style="padding: 0; overflow-y: hidden;"/>')
             .hide()
             .html("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>" +
@@ -111,22 +124,22 @@
               $("#external_tool_button_dialog iframe").attr('src', 'about:blank');
               $("#external_tool_button_dialog").dialog('close');
             });
-		    }
-		    $dialog.dialog('option', 'title', 'Embed content from ' + button.name);
-		    $dialog.dialog('close')
-		      .dialog('option', 'width', button.width || 800)
-		      .dialog('option', 'height', button.height || frameHeight || 400)
-		      .dialog('open');
-		    $dialog.triggerHandler('dialogresize')
-		    $dialog.data('editor', ed);
-		    var url = $.replaceTags($("#context_external_tool_resource_selection_url").attr('href'), 'id', button.id);
+        }
+        $dialog.dialog('option', 'title', 'Embed content from ' + button.name);
+        $dialog.dialog('close')
+          .dialog('option', 'width', button.width || 800)
+          .dialog('option', 'height', button.height || frameHeight || 400)
+          .dialog('open');
+        $dialog.triggerHandler('dialogresize')
+        $dialog.data('editor', ed);
+        var url = $.replaceTags($("#context_external_tool_resource_selection_url").attr('href'), 'id', button.id);
         $dialog.find("iframe").attr('src', url);
-		  }
-		  for(var idx in INST.editorButtons) {
-		    var current_button = INST.editorButtons[idx];
-		    if(INST.editorButtons.length > INST.maxVisibleEditorButtons && idx >= INST.maxVisibleEditorButtons - 1) {
-		      clumpedButtons.push(current_button);
-		    } else {
+      }
+      for(var idx in INST.editorButtons) {
+        var current_button = INST.editorButtons[idx];
+        if(INST.editorButtons.length > INST.maxVisibleEditorButtons && idx >= INST.maxVisibleEditorButtons - 1) {
+          clumpedButtons.push(current_button);
+        } else {
           (function(button) {
             ed.addCommand('instructureExternalButton' + button.id, function() {
               buttonSelected(button);
@@ -138,8 +151,8 @@
               'class': 'instructure_external_tool_button'
             });
           })(current_button)
-		    }
-		  }
+        }
+      }
       if(clumpedButtons.length) {
         ed.addCommand('instructureExternalButtonClump', function() {
           var items = {};
@@ -160,20 +173,20 @@
           image: '/images/downtick.png'
         })
       }
-		},
+    },
 
-		getInfo : function() {
-			return {
-				longname : 'InstructureExternalTools',
-				author : 'Brian Whitmer',
-				authorurl : 'http://www.instructure.com',
-				infourl : 'http://www.instructure.com',
-				version : tinymce.majorVersion + "." + tinymce.minorVersion
-			};
-		}
-	});
-	
-	// Register plugin
-	tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools);
-})();
+    getInfo : function() {
+      return {
+        longname : 'InstructureExternalTools',
+        author : 'Brian Whitmer',
+        authorurl : 'http://www.instructure.com',
+        infourl : 'http://www.instructure.com',
+        version : tinymce.majorVersion + "." + tinymce.minorVersion
+      };
+    }
+  });
+
+  // Register plugin
+  tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools);
+});
 

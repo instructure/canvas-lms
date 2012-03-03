@@ -94,6 +94,18 @@ describe CalendarEventsApiController, :type => :integration do
       json.size.should eql 0 # first context has no events
     end
 
+    it "should allow specifying an unenrolled but accessible context" do
+      unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
+      Account.default.add_user(@user)
+      CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
+
+      json = api_call(:get, "/api/v1/calendar_events",
+                      { :controller => "calendar_events_api", :action => "index", :format => "json", },
+                        { :start_date => 2.days.ago.strftime("%Y-%m-%d"), :end_date => 2.days.from_now.strftime("%Y-%m-%d"), :context_codes => ["course_#{unrelated_course.id}"] })
+      json.size.should == 1
+      json.first['title'].should == "from unrelated one"
+    end
+
     it 'should return undated events' do
       @course.calendar_events.create(:title => 'undated')
       @course.calendar_events.create(:title => "dated", :start_at => '2012-01-08 12:00:00')
@@ -285,9 +297,10 @@ describe CalendarEventsApiController, :type => :integration do
 
           student_in_course(:course => @course, :user => (@other_guy = user), :active_all => true)
 
-          @ag1 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+          @ag1 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00", "2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
           @ag1.publish!
           @event1 = @ag1.appointments.first
+          @event2 = @ag1.appointments.last
 
           cat = @course.group_categories.create
           @group = cat.groups.create(:context => @course)
@@ -297,7 +310,7 @@ describe CalendarEventsApiController, :type => :integration do
           @me.reload
           @ag2 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :sub_context_code => cat.asset_string, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
           @ag2.publish!
-          @event2 = @ag2.appointments.first
+          @event3 = @ag2.appointments.first
 
           @user = @me
         end
@@ -309,8 +322,8 @@ describe CalendarEventsApiController, :type => :integration do
           json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url']).sort)
           json['appointment_group_id'].should eql(@ag1.id)
 
-          json = api_call(:post, "/api/v1/calendar_events/#{@event2.id}/reservations", {
-                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event2.id.to_s})
+          json = api_call(:post, "/api/v1/calendar_events/#{@event3.id}/reservations", {
+                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event3.id.to_s})
           json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url']).sort)
           json['appointment_group_id'].should eql(@ag2.id)
         end
@@ -330,14 +343,37 @@ describe CalendarEventsApiController, :type => :integration do
           response.should be_success
           raw_api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
                         :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s})
-          JSON.parse(response.body).should eql [["reservation", "participant has already reserved this appointment"]]
+          errors = JSON.parse(response.body)
+          errors.size.should eql 1
+          error = errors.first
+          error.slice("attribute", "type", "message").should eql({"attribute" => "reservation", "type" => "calendar_event", "message" => "participant has already reserved this appointment"})
+          error['reservations'].size.should eql 1
+        end
+
+        it "should cancel existing reservations if cancel_existing = true" do
+          prepare(true)
+          json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
+                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s})
+          json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url']).sort)
+          json['appointment_group_id'].should eql(@ag1.id)
+          @ag1.reservations_for(@me).map(&:parent_calendar_event_id).should eql [@event1.id]
+
+          json = api_call(:post, "/api/v1/calendar_events/#{@event2.id}/reservations?cancel_existing=1", {
+                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event2.id.to_s, :cancel_existing => '1'})
+          json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url']).sort)
+          json['appointment_group_id'].should eql(@ag1.id)
+          @ag1.reservations_for(@me).map(&:parent_calendar_event_id).should eql [@event2.id]
         end
 
         it "should not allow students to specify the participant" do
           prepare(true)
           raw_api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations/#{@other_guy.id}", {
                         :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :participant_id => @other_guy.id.to_s})
-          JSON.parse(response.body).should eql [["reservation", "invalid participant"]]
+          errors = JSON.parse(response.body)
+          errors.size.should eql 1
+          error = errors.first
+          error.slice("attribute", "type", "message").should eql({"attribute" => "reservation", "type" => "calendar_event", "message" => "invalid participant"})
+          error['reservations'].size.should eql 0
         end
 
         it "should allow admins to specify the participant" do
@@ -347,8 +383,8 @@ describe CalendarEventsApiController, :type => :integration do
           json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url']).sort)
           json['appointment_group_id'].should eql(@ag1.id)
 
-          json = api_call(:post, "/api/v1/calendar_events/#{@event2.id}/reservations/#{@group.id}", {
-                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event2.id.to_s, :participant_id => @group.id.to_s})
+          json = api_call(:post, "/api/v1/calendar_events/#{@event3.id}/reservations/#{@group.id}", {
+                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event3.id.to_s, :participant_id => @group.id.to_s})
           json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url']).sort)
           json['appointment_group_id'].should eql(@ag2.id)
         end
@@ -357,7 +393,11 @@ describe CalendarEventsApiController, :type => :integration do
           prepare
           raw_api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations/#{@me.id}", {
                         :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :participant_id => @me.id.to_s})
-          JSON.parse(response.body).should eql [["reservation", "invalid participant"]]
+          errors = JSON.parse(response.body)
+          errors.size.should eql 1
+          error = errors.first
+          error.slice("attribute", "type", "message").should eql({"attribute" => "reservation", "type" => "calendar_event", "message" => "invalid participant"})
+          error['reservations'].size.should eql 0
         end
 
         it "should notify the teacher when appointment is cancelled" do

@@ -28,6 +28,11 @@
 </div>
 <% js_block do %>
 <script>
+require([
+  'jquery' /* $ */,
+  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+], function($) {
+
 $(document).ready(function() {
   $(".delete_group_link").click(function(event) {
     event.preventDefault();
@@ -40,6 +45,8 @@ $(document).ready(function() {
   $("#delete_group_dialog .cancel_button").click(function() {
     $("#delete_group_dialog").dialog('close');
   });
+});
+
 });
 </script>
 <% end %>

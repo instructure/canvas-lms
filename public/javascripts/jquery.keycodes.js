@@ -1,6 +1,11 @@
 // Catches specified key events and calls the provided function
 // when they occur.  Can use text or key codes, passed in as a
 // space-separated string.
+define([
+  'jquery' /* jQuery, $ */,
+  'jquery.instructure_date_and_time' /* datepicker */
+], function($) {
+
 $.fn.keycodes = function(options, fn) {
   /* Based loosely on Tzury Bar Yochay's js-hotkeys:
   (c) Copyrights 2007 - 2008
@@ -74,3 +79,5 @@ $.fn.keycodes = function(options, fn) {
   return this;
 };
 $.fn.keycodes.defaults = {ignore: ":input,object,embed", keyCodes: ""};
+
+});

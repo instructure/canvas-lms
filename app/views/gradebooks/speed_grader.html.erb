@@ -1,7 +1,13 @@
-<% 
-  jammit_js :jquery_ui_menu, :speed_grader
+<%
+  js_bundle :speed_grader
   jammit_css :speed_grader
-  @show_left_side = false 
+  js_env({
+    :RUBRIC_ASSESSMENT => {
+      :assessor_id => @current_user ? @current_user.id : "null",
+      :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
+    }
+  })
+  @show_left_side = false
   @can_edit_anything = !@context.completed?
 %>
 <% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
@@ -47,6 +53,12 @@
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
           <h3><%= t('headers.no_submission', "This student does not have a submission for this assignment") %></h3>
+        </div>
+        <div id="this_student_has_a_submission">
+          <h3>
+            <%= t('headers.submission', "This student has submitted the assignment") %>
+            <span class="subheader"><%= t('headers.anonymous_submission', "This student's responses are hidden because this assignment is anonymous.") %></span>
+          </h3>
         </div>
         <div id="iframe_holder" style="display:none;"></div>
         <div id="resize_overlay" style="display:none;"></div>
@@ -259,12 +271,9 @@
 </ul>
 
 <% js_block do %>
-  <script type="text/javascript">
-    anonymousAssignment = <%= @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions ? "true" : "false" %>;
-    var visibleRubricAssessments = <%= raw((@assignment.visible_rubric_assessments_for(@current_user) || {}).to_json(:methods => [:assessor_name], :include_root => false)) %>;
-    
-    rubricAssessment.assessor_id = <%= @current_user ? @current_user.id : "null" %>;
-    rubricAssessment.assessment_type = '<%= can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review" %>';
+  <script>
+    window.anonymousAssignment = <%= @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions ? "true" : "false" %>;
+    window.visibleRubricAssessments = <%= raw((@assignment.visible_rubric_assessments_for(@current_user) || {}).to_json(:methods => [:assessor_name], :include_root => false)) %>;
   </script>
 <% end %>
 <div id="current_context_code" style="display: none;"><%= @context.asset_string %></div>

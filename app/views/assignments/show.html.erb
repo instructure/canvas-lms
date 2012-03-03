@@ -5,7 +5,15 @@
 <% end %>
 <% js_block do %>
 <script>
-var limitToOneRubric = true;
+require([
+  'INST' /* INST */,
+  'jquery' /* $ */,
+  'find_outcome',
+  'jquery.instructure_forms' /* getFormData, formErrors */
+], function(INST, $) {
+
+window.limitToOneRubric = true;
+
 $(document).ready(function() {
   $(".upload_submissions_link").click(function(event) {
     event.preventDefault();
@@ -36,6 +44,7 @@ $(document).ready(function() {
       $(".assignment_peer_reviews_link").slideUp();
     }
   });
+});
 });
 </script>
 <% end %>
@@ -72,7 +81,7 @@ $(document).ready(function() {
   <%= render :partial => "submit_assignment" %>
 <% end %>
 
-<% jammit_js :edit_rubric if can_do(@assignment, @current_user, :update) %>
+<% js_bundle :edit_rubric if can_do(@assignment, @current_user, :update) %>
 
 <% unless @assignment.new_record? %>
   <div id="rubrics" style="margin-bottom: 10px;">

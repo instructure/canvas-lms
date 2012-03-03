@@ -1,5 +1,5 @@
 <% content_for :page_title do %><%= t('user_dashboard', 'User Dashboard') %><% end %>
-<% jammit_js :dashboard %>
+<% js_bundle :dashboard %>
 <% content_for :auto_discovery do %>
   <% if @current_user %>
       <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")}) %>

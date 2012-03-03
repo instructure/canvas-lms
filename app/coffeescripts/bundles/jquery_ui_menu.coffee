@@ -1,0 +1,2 @@
+require ['compiled/jquery.kylemenu']
+

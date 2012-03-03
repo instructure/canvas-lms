@@ -20,13 +20,20 @@
   </table>
 </div>
 <%= will_paginate(@page_views) %>
-<% js_block :i18n_scope => 'page_views._table' do %>
+<% js_block do %>
   <script type="text/javascript">
+  require([
+    'i18nObj' /* I18n.t */,
+    'jquery' /* $ */,
+    'jquery.instructure_misc_helpers' /* parseUserAgentString */,
+    'vendor/jquery.pageless' /* pageless */
+  ], function(I18n, $) {
+
     $(function(){
       $('#page_view_results').pageless({
         totalPages: <%= @page_views.total_pages %>,
         url: <%= raw user_page_views_path(@user, :format => :html, :html_xhr => true, :per_page => @page_views.per_page).to_json %>,
-        loaderMsg: I18n.t('loading_more_results', "Loading more results"),
+        loaderMsg: <%= jt('loading_more_results', "Loading more results") %>,
         complete: function() {
           $(document).triggerHandler('page_views_added');
         }
@@ -46,5 +53,6 @@
         });
       }).triggerHandler('page_views_added');
     });
+  });
   </script>
 <% end %>

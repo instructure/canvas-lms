@@ -10,6 +10,10 @@ describe "handlebars" do
   end
 
   it "should render templates correctly" do
+
+    # need to inject the translation file onto the page because the compiled template requires it
+    driver.execute_script "define('translations/test', function(){ return {} });"
+
     template = <<-HTML
       <h1>{{title}}</h1>
       <p>{{#t "message"}}ohai my name is {{name}} im your <b>{{type}}</b> instructure!! ;) heres some tips to get you started:{{/t}}</p>
@@ -20,9 +24,18 @@ describe "handlebars" do
       </ol>
       {{#t "bye"}}welp, see you l8r! dont forget 2 <a href="{{url}}">like us</a> on facebook lol{{/t}}
     HTML
-    driver.execute_script Handlebars.compile_template(template, 'test')
+    compiled = Handlebars.compile_template(template, 'test')
+    driver.execute_script compiled
 
-    result = driver.execute_script("return Template('test', {title: 'greetings', name: 'katie', type: 'yoga', items: ['dont forget to stretch!!!'], url: 'http://foo.bar'})")
+    result = require_exec 'jst/test', <<-CS
+      test
+        title: 'greetings'
+        name: 'katie'
+        type: 'yoga'
+        items: ['dont forget to stretch!!!']
+        url: 'http://foo.bar'
+    CS
+
     result.should eql(<<-RESULT)
       <h1>greetings</h1>
       <p>ohai my name is katie im your <b>yoga</b> instructure!! ;) heres some tips to get you started:</p>
@@ -35,3 +48,4 @@ describe "handlebars" do
     RESULT
   end
 end
+

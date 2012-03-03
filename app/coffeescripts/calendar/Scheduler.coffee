@@ -1,13 +1,17 @@
-define 'compiled/calendar/Scheduler', [
-  'i18n'
+define [
+  'jquery',
+  'i18n!calendar'
   'jst/calendar/appointmentGroupList'
   'jst/calendar/schedulerRightSideAdminSection'
   'compiled/calendar/EditAppointmentGroupDialog'
   'compiled/calendar/MessageParticipantsDialog'
   'jst/calendar/deleteItem'
-], (I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate) ->
-
-  I18n = I18n.scoped 'calendar'
+  'jquery.instructure_date_and_time'
+  'jquery.instructure_jquery_patches'
+  'jquery.instructure_misc_plugins'
+  'vendor/jquery.ba-tinypubsub'
+  'vendor/jquery.spin'
+], ($, I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate) ->
 
   class Scheduler
     constructor: (selector, @calendar) ->

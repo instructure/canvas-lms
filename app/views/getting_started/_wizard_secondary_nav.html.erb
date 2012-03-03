@@ -29,12 +29,16 @@
     <% end %>
   </li>
 </ul>
-  
 
 <% js_block do %>
   <script type="text/javascript">
+  require([
+    'jquery' /* $ */,
+    'jquery.instructure_misc_plugins' /* chevronCrumbs */
+  ], function($) {
     $(function(){
       $("#wizard-steps").chevronCrumbs();
     });
+  });
   </script>
 <% end %>

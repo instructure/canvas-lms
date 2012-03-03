@@ -1,0 +1,2 @@
+require ['manage_avatars']
+

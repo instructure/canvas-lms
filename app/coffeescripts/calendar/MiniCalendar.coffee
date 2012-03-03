@@ -1,6 +1,8 @@
-define 'compiled/calendar/MiniCalendar', ['i18n'], (I18n) ->
-  I18n = I18n.scoped 'calendar'
-  
+define [
+  'jquery'
+  'i18n!calendar'
+  'vendor/jquery.ba-tinypubsub'
+], ($, I18n) ->
   class MiniCalendar
     constructor: (selector, @mainCalendar) ->
       @calendar = $(selector)

@@ -10,10 +10,16 @@
   </div>
   <% js_block do %>
     <script>
+    require([
+      'jquery' /* $ */,
+      'jquery.keycodes' /* keycodes */
+    ], function($) {
+
     $(document).ready(function() {
       $(document).keycodes("s", function() {
         $("#backtrace").slideToggle();
       });
+    });
     });
     </script>
   <% end %>

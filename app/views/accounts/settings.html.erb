@@ -1,11 +1,10 @@
 <%
   @active_tab = "settings"
   add_crumb t(:settings_crumb, "Settings")
-  jammit_js :account_settings
-  jammit_css :account_settings, :reports
+  js_bundle :account_settings
+  jammit_css :account_settings, :reports, :tinymce
   content_for :page_title, t(:page_title, "Account Settings")
 %>
-<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
 
 <% content_for :right_side do %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>
@@ -310,7 +309,7 @@
               </tr>
               <tr>
                 <td><%= f.blabel :turnitin_shared_secret, :en => "Turnitin Shared Secret" %></td>
-                <td><%= f.text_field :turnitin_shared_secret, :style => "width: 150px;", :class => "turnitin_account_settings" %></td>
+                <td><%= f.text_field :turnitin_shared_secret, :class => "turnitin_account_settings" %></td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
@@ -319,7 +318,7 @@
                 </td>
               </tr>
               <tr>
-                <td><%= f.blabel :turnitin_comments, :en => "Turnitin Submission Comments" %></td>
+                <td><%= f.blabel :turnitin_comments, :en => "Submission Comments" %></td>
                 <td>
                   <span style="font-size: 0.9em;"><%= t(:turnitin_comments_help, "these comments will be shown to students when submitting a Turnitin-enabled assignment") %></span>
                   <%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %>
@@ -403,7 +402,7 @@
       <%= render :partial => 'account_user', :object => nil %>
     </ul>
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
-      <% jammit_js :user_lists %>
+      <% js_bundle :user_lists %>
       <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_admins', %{Add Account Admins}) %></a>
       <% form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
@@ -519,6 +518,8 @@
            last_complete = @last_complete_reports[report]
            last_report = @last_reports[report]
            in_progress = last_report && last_report.in_progress?
+           #the extra text is added so that you can give more than the date for the last run report
+           extra_text = last_complete.try(:parameters).try(:[], "extra_text")
         %>
           <tr id="<%= report %>" class="reports">
             <td class="title reports">
@@ -533,6 +534,10 @@
             <td class="last-run reports">
               <% if last_complete %>
                 <%= datetime_string(last_complete.created_at) %>
+                <%#the extra text is added so that you can give more than the date for the last run report %>
+                <% if extra_text %>
+                  (<%= extra_text %>)
+                <% end %>
                 <%= link_to image_tag("download.png"), context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>
