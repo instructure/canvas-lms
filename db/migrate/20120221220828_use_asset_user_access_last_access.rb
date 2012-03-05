@@ -2,7 +2,7 @@ class UseAssetUserAccessLastAccess < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    AssetUserAccess.update_all("last_access = updated_at", "last_access is null")
+    DataFixup::UseAssetUserAccessLastAccess.send_later_if_production(:run)
   end
 
   def self.down
