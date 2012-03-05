@@ -1,3 +1,14 @@
+canvas-lms (2012.03.03.08) stable; urgency=low
+
+  * Package ref: 173b6ee58543208f77de06f579d5caed24c2bd09
+  *
+  * [+8ab2ce0] rescue and retry EAGAIN for redis failures
+  * [+38e3755] fix displaying of running jobs
+  * [+cd91829] require -> define in public/javascripts
+  * [+173b6ee] don't include api urls in hrefs for hiding todo items
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 05 Mar 2012 13:20:25 -0700
+
 canvas-lms (2012.03.03.04) stable; urgency=low
 
   * Package ref: 05bb8a4febb62e24740117d4133db6102932ce42
