@@ -9,7 +9,7 @@
  * https://github.com/fnagel/jquery-ui/wiki/Selectmenu
  */
 
-require([
+define([
   'jquery' /* jQuery, $ */,
   'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,

@@ -1,4 +1,4 @@
-define 'compiled/util/processMigrationItemSelections', [], ->
+define ->
   processMigrationItemSelections = (data) ->
     newData = {items_to_copy: {}}
     # matches copy[folders][I_00001_R] and puts "folder" in first capture and the id in second

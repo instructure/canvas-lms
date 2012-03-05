@@ -1,4 +1,4 @@
-require([
+define([
   'INST' /* INST */,
   'i18n!conferences',
   'jquery' /* $ */,

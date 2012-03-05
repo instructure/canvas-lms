@@ -1,4 +1,4 @@
-require([
+define([
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit */,
   'jquery.keycodes' /* keycodes */,

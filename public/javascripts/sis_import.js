@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
+define([
   'i18n!sis_import',
   'jquery' /* $ */,
   'str/htmlEscape',

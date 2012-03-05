@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!content_imports',
   'compiled/util/processMigrationItemSelections',
   'jquery' /* $ */,

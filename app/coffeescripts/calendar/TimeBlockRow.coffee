@@ -1,4 +1,4 @@
-define 'compiled/calendar/TimeBlockRow', [
+define [
   'i18n!calendar'
   'jst/calendar/TimeBlockRow'
 ], (I18n, timeBlockRowTemplate) ->

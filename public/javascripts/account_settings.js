@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!account_settings',
   'jquery', // $
   'jquery.ajaxJSON', // ajaxJSON

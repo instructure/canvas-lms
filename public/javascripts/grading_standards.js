@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!grading_standards',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
