@@ -1,4 +1,4 @@
-require([
+define([
   'jquery' /* jQuery, $ */,
   'user_utils' /* userUtils */
 ], function($, userUtils) {

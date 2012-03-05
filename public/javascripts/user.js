@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
+define([
   'i18n!users',
   'jquery' /* $ */,
   'jquery.instructure_misc_plugins' /* confirmDelete */

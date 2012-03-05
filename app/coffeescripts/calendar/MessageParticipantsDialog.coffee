@@ -1,4 +1,4 @@
-define 'compiled/calendar/MessageParticipantsDialog', [
+define [
   'i18n!calendar'
   'jst/calendar/messageParticipants'
   'jst/calendar/recipientList'

@@ -8,7 +8,7 @@
  * http://docs.jquery.com/UI
  */
 
-require([
+define([
   'jquery' /* jQuery, $ */,
   'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,

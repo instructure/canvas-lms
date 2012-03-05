@@ -1,4 +1,4 @@
-define 'compiled/calendar/EditApptCalendarEventDetails', [
+define [
   'i18n'
   'jst/calendar/editApptCalendarEvent'
 ], (I18n, editApptCalendarEventTemplate) ->

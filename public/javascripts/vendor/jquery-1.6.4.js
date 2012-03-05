@@ -279,7 +279,9 @@ jQuery.fn = jQuery.prototype = {
 		jQuery.bindReady();
 
 		// Add the callback
-		readyList.done( fn );
+		setTimeout(function() {
+			readyList.done( fn );
+		}, 1);
 
 		return this;
 	},
