@@ -97,6 +97,25 @@ module SeleniumTestsHelperMethods
     driver
   end
 
+  # f means "find" this is a shortcut to finding elements
+  # if driver.find_element fails, then it'll try to find it with jquery
+  def f(selector, scope = nil)
+    begin
+      (scope || driver).find_element :css, selector
+    rescue
+      find_with_jquery selector, scope
+    end
+  end
+
+  # same as `f` except tries to find several elements instead of one
+  def ff(selector, scope = nil)
+    begin
+      (scope || driver).find_elements :css, selector
+    rescue
+      find_all_with_jquery selector, scope
+    end
+  end
+
   #this is needed for using the before_label function in I18nUtilities
   def t(*a, &b)
     I18n.t(*a, &b)
@@ -457,12 +476,12 @@ shared_examples_for "all selenium tests" do
     val
   end
 
-  def find_with_jquery(selector)
-    driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}')[0];")
+  def find_with_jquery(selector, scope = nil)
+    driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1]))[0];", selector, scope)
   end
 
-  def find_all_with_jquery(selector)
-    driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}').toArray();")
+  def find_all_with_jquery(selector, scope = nil)
+    driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1])).toArray();", selector, scope)
   end
 
   # pass in an Element pointing to the textarea that is tinified.

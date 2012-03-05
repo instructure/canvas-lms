@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!question_bank',
   'jquery' /* $ */,
   'find_outcome',
