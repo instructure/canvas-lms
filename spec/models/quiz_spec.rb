@@ -504,6 +504,43 @@ describe Quiz do
       stats[:submission_score_low].should == 15
       stats[:submission_score_stdev].should be_close(Math::sqrt(4 + 2.0/9), 0.0000000001)
     end
+
+    context 'csv' do
+      it 'should include previous versions even if the current version is incomplete' do
+        q = @course.quizzes.create!
+        q.quiz_questions.create!(:question_data => { :name => "test 1" })
+        q.generate_quiz_data
+        @user1 = User.create! :name => "some_user 1"
+        student_in_course :course => @course, :user => @user1
+        sub = q.generate_submission(@user1)
+        sub.workflow_state = 'complete'
+        sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => -1 }]
+        sub.with_versioning(true, &:save!)
+        sub = q.generate_submission(@user1)
+        sub.save!
+
+        stats = FasterCSV.parse(q.statistics_csv(:include_all_versions => true))
+        stats.first.length.should == 3
+      end
+
+      it 'should not include previous versions even if not asked' do
+        q = @course.quizzes.create!
+        q.quiz_questions.create!(:question_data => { :name => "test 1" })
+        q.generate_quiz_data
+        @user1 = User.create! :name => "some_user 1"
+        student_in_course :course => @course, :user => @user1
+        sub = q.generate_submission(@user1)
+        sub.workflow_state = 'complete'
+        sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => -1 }]
+        sub.with_versioning(true, &:save!)
+        sub = q.generate_submission(@user1)
+        sub.save!
+
+        stats = FasterCSV.parse(q.statistics_csv)
+        stats.first.length.should == 2
+      end
+
+    end
   end
 
   context "clone_for" do
