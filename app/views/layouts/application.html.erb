@@ -19,10 +19,10 @@
   @body_classes << "context-#{@context.asset_string}" if @context
 
 -%><!DOCTYPE html>
-<!--[if IE 7 ]>    <html class="ie ie7" lang=<%= @locale %>> <![endif]-->
-<!--[if IE 8 ]>    <html class="ie ie8" lang=<%= @locale %>> <![endif]-->
-<!--[if gte IE 9 ]><html class="ie ie9" lang=<%= @locale %>> <![endif]-->
-<!--[if !(IE)]><!--> <html class="not-ie" lang=<%= @locale %>> <!--<![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
+<!--[if gte IE 9 ]><html class="ie ie9 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
+<!--[if !(IE)]><!--> <html class="not-ie not-ready scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   <title><%= yield :page_title || t('missing_page_title', "Add a page title here.") %></title>
@@ -275,5 +275,27 @@
 <%= include_js_bundles %>
 <%= include_account_js %>
 <%= render_js_blocks %>
+
+<script>
+// Determines if the scripts are loaded.
+// When we get everything out of the views, and have a single top-level
+// `require`, this becomes meaningless and will be abandoned.
+(function() {
+  var attempts = 0;
+  var timeout = 10;
+  var check = function() {
+    attempts++;
+    var done = require.resourcesDone === true
+    var giveup = attempts === 100; // 1 second
+    if (done || giveup) {
+      $('html').removeClass('scripts-not-loaded');
+      return;
+    }
+    setTimeout(check, timeout);
+  };
+
+  check();
+}).call(this);
+</script>
 </body>
 </html>
