@@ -977,7 +977,7 @@ define([
     $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message");
-      var url = $(this).attr('href');
+      var url = $(this).data('api-href');
       function remove(delete_url) {
         $item.confirmDelete({
           url: delete_url,
