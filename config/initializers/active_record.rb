@@ -17,9 +17,11 @@ class ActiveRecord::Base
   end
 
   def opaque_identifier(column)
-    str = send(column).to_s
-    raise "Empty value" if str.blank?
-    Canvas::Security.hmac_sha1(str)
+    self.shard.activate do
+      str = send(column).to_s
+      raise "Empty value" if str.blank?
+      Canvas::Security.hmac_sha1(str, self.shard.settings[:encryption_key])
+    end
   end
 
   def self.maximum_text_length

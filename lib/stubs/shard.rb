@@ -41,6 +41,10 @@ class Shard
     true
   end
 
+  def settings
+    {}
+  end
+
   module RSpec
     def self.included(klass)
       klass.before do
