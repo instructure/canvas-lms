@@ -306,5 +306,13 @@ describe "people" do
         driver.find_element(:css, '.ui-state-error').should include_text('Unauthorized')
       end
     end
+
+    it "should validate that a TA cannot rename a teacher" do
+      pending('bug 7106 - do not allow TA to edit teachers name') do
+        teacher_enrollment = teacher_in_course(:name => 'teacher@example.com')
+        get "/courses/#{@course.id}/users/#{teacher_enrollment.user.id}"
+        driver.find_element(:css, '.edit_user_link').should_not be_displayed
+      end
+    end
   end
 end

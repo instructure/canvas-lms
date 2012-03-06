@@ -291,6 +291,11 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
+  def teacher_in_course(opts={})
+      opts[:course] = @course if @course && !opts[:course]
+      course_with_teacher(opts)
+  end
+
   def course_with_teacher(opts={})
     course_with_user('TeacherEnrollment', opts)
     @teacher = @user
