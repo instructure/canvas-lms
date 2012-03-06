@@ -222,7 +222,8 @@ describe "gradebook2" do
                                                 })
 
       @ungraded_assignment = @course.assignments.create! :title => 'not-graded assignment',
-                                                         :submission_types => 'not_graded'
+                                                         :submission_types => 'not_graded',
+                                                         :assignment_group => @group
     end
 
     it "should minimize a column and remember it" do
@@ -237,6 +238,8 @@ describe "gradebook2" do
     it "should not show 'not-graded' assignments" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
+
+      driver.find_element(:css, '.slick-header-columns').should_not include_text(@ungraded_assignment.title)
     end
 
     it "should handle a ton of assignments without wrapping the slick-header" do
@@ -312,6 +315,22 @@ describe "gradebook2" do
 
       final_score_for_row(0).should eql STUDENT_1_TOTAL_IGNORING_UNGRADED
       final_score_for_row(1).should eql STUDENT_2_TOTAL_IGNORING_UNGRADED
+    end
+
+    it "should not factor non graded assignments into group total" do
+      pending("bug 7558 - Non-Graded Assignments are being factored in the Assignment Group's total") do
+        expected_totals = [STUDENT_1_TOTAL_IGNORING_UNGRADED, STUDENT_2_TOTAL_IGNORING_UNGRADED]
+        ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
+        @ungraded_assignment.grade_student(@student_1, :grade => 20)
+        ungraded_submission.save!
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        assignment_group_cells = driver.find_elements(:css, '.assignment-group-cell')
+        assignment_group_cells.each_with_index do |agc, i|
+          validate_cell_text(agc, expected_totals[i])
+        end
+      end
     end
 
     def toggle_muting(assignment)
