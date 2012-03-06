@@ -47,7 +47,9 @@ class UsersController < ApplicationController
       end
       #@prior_enrollments.concat @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
 
-      @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
+      @student_enrollments = @current_enrollments.
+        select{ |e| e.is_a?(StudentEnrollment) }.
+        inject({}){ |hash, e| hash[e.course] = e; hash }
 
       @observer_enrollments = @current_enrollments.select{|e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
       @observed_enrollments = []
@@ -56,14 +58,16 @@ class UsersController < ApplicationController
       end
       @observed_enrollments = @observed_enrollments.uniq.compact
 
-      if @current_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
+      @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
+
+      if @student_enrollments.length + @teacher_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
         redirect_to course_grades_url(@current_enrollments.first.course_id)
         return
       end
-      Enrollment.send(:preload_associations, @observed_enrollments, :course)
 
-      @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
+      Enrollment.send(:preload_associations, @observed_enrollments, :course)
       #Enrollment.send(:preload_associations, @prior_enrollments, :course)
+
       @course_grade_summaries = {}
       @teacher_enrollments.each do |enrollment|
         @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', enrollment.course].cache_key) do

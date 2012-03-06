@@ -203,5 +203,21 @@ describe UsersController do
       end
     end
   end
+
+  describe "#grades" do
+    it "should only list courses once for multiple enrollments" do
+      course_with_student_logged_in(:active_all => true)
+      @first_course = @course
+      add_section("other section")
+      multiple_student_enrollment(@student, @course_section)
+      course_with_student(:user => @student, :active_all => true)
+
+      get grades_url
+      student_grades = Nokogiri::HTML(response.body).css('.student_grades tr')
+      student_grades.length.should == 2
+      student_grades.text.should match /#{@first_course.name}/
+      student_grades.text.should match /#{@course.name}/
+    end
+  end
 end
 

@@ -192,6 +192,8 @@ stylesheets:
     - public/javascripts/vendor/slickgrid/slick.grid.css
   sub_accounts:
     - public/stylesheets/compiled/sub_accounts.css
+  user_grades:
+    - public/stylesheets/compiled/user_grades.css
   user_logins:
     - public/stylesheets/compiled/user_logins.css
   account_settings:
