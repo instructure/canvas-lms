@@ -701,6 +701,46 @@ describe "gradebook2" do
       end
     end
 
+    def set_group_weights(number_of_groups, weight_numbers)
+      driver.find_element(:id, 'gradebook_settings').click
+      wait_for_animations
+      driver.find_element(:css, '[aria-controls="assignment_group_weights_dialog"]').click
+
+      dialog = driver.find_element(:id, 'assignment_group_weights_dialog')
+      dialog.should be_displayed
+
+      group_check = dialog.find_element(:id, 'group_weighting_scheme')
+      keep_trying_until do
+        group_check.click
+        is_checked('#group_weighting_scheme').should be_true
+      end
+      group_weight_inputs = driver.find_elements(:css, '.group_weight')
+      number_of_groups.should == group_weight_inputs.count
+      if weight_numbers.is_a? Array
+        number_of_groups.times { |i| set_value(group_weight_inputs[i], weight_numbers[i]) }
+      else
+        set_value(group_weight_inputs, weight_numbers)
+      end
+      save_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Save")')
+      save_button.click
+      wait_for_ajax_requests
+      @course.reload.group_weighting_scheme.should == 'percent'
+    end
+
+    def validate_group_weight_text(assignment_groups, weight_numbers)
+      assignment_groups.each_with_index do |ag, i|
+        heading = find_with_jquery(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
+        heading.should include_text("#{weight_numbers[i]}% of grade")
+      end
+    end
+
+    def validate_groups_weight(weight_numbers)
+      assignment_groups = AssignmentGroup.all
+      assignment_groups.each_with_index do |ag, i|
+        ag.reload.group_weight.should eql(weight_numbers[i])
+      end
+    end
+
     before (:each) do
       course_with_teacher_logged_in
       student_in_course
@@ -727,37 +767,16 @@ describe "gradebook2" do
     end
 
     it "should validate setting group weights" do
-      weight_numbers = [30.0, 70.0]
+      weight_numbers = [26.0, 73.5]
 
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
-      driver.find_element(:id, 'gradebook_settings').click
-      wait_for_animations
-      driver.find_element(:css, '[aria-controls="assignment_group_weights_dialog"]').click
-
-      dialog = driver.find_element(:id, 'assignment_group_weights_dialog')
-      dialog.should be_displayed
-
-      group_check = dialog.find_element(:id, 'group_weighting_scheme')
-      keep_trying_until do
-        group_check.click
-        is_checked('#group_weighting_scheme').should be_true
-      end
-      group_weight_inputs = driver.find_elements(:css, '.group_weight')
-      2.times { |i| set_value(group_weight_inputs[i], weight_numbers[i]) }
-      save_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Save")')
-      save_button.click
-      wait_for_ajax_requests
-      @course.reload.group_weighting_scheme.should == 'percent'
-      assignment_groups = AssignmentGroup.all
-      assignment_groups.each_with_index do |ag, i|
-        ag.reload.group_weight.should eql(weight_numbers[i])
-      end
+      set_group_weights(AssignmentGroup.all.count, weight_numbers)
+      validate_groups_weight(weight_numbers)
 
       # TODO: make the header cell in the UI update to reflect new value
-      # heading = find_with_jquery(".slick-column-name:contains('#{@group.name}') .assignment-points-possible")
-      # heading.should include_text("#{weight_num}% of grade")
+      # validate_group_weight_text(AssignmentGroup.all, weight_numbers)
     end
 
     it "should display group weights correctly when set on assignment groups" do
@@ -770,10 +789,9 @@ describe "gradebook2" do
     it "should display group weights correctly when unsetting group weights through assignments page" do
       pending("bug 7435 - Gradebook2 keeps weighted assignment groups, even when turned off") do
         get "/courses/#{@course.id}/assignments"
+
         driver.find_element(:id, 'class_weighting_policy').click
         wait_for_ajaximations
-
-
         check_group_points('0%')
       end
     end
