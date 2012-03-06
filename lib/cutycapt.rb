@@ -35,86 +35,112 @@ require 'netaddr'
 class CutyCapt
   CUTYCAPT_DEFAULTS = {
     :delay => 3000,
-    :timeout => 30000,
+    :timeout => 60000,
     :ip_blacklist => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254' ],
     :domain_blacklist => [ ],
     :allowed_schemes => [ 'http', 'https' ]
   }
-  
+
   cattr_writer :config
-  
+
   def self.config
     return @@config if defined?(@@config) && @@config
-    @@config = CUTYCAPT_DEFAULTS.merge(Setting.from_config('cutycapt') || {}).with_indifferent_access
+    setting = (Setting.from_config('cutycapt') || {}).symbolize_keys
+    @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
     self.process_config
     @@config = nil unless @@config[:path]
     @@config
   end
-  
+
   def self.process_config
     @@config[:ip_blacklist] = @@config[:ip_blacklist].map {|ip| NetAddr::CIDR.create(ip) } if @@config[:ip_blacklist]
     @@config[:domain_blacklist] = @@config[:domain_blacklist].map {|domain| Resolv::DNS::Name.create(domain) } if @@config[:domain_blacklist]
   end
-  
+
   def self.logger
     RAILS_DEFAULT_LOGGER
   end
-  
+
   def self.enabled?
     return !self.config.nil?
   end
-  
+
   def self.verify_url(url)
     config = self.config
-    
+
     uri = URI.parse(url)
     unless config[:allowed_schemes] && config[:allowed_schemes].include?(uri.scheme)
       logger.warn("Skipping non-http[s] URL: #{url}")
       return false
     end
-    
+
     dns_host = Resolv::DNS::Name.create(uri.host)
     if config[:domain_blacklist] && config[:domain_blacklist].any? {|bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
       logger.warn("Skipping url because of blacklisted domain: #{url}")
       return false
     end
-    
+
     addresses = Resolv.getaddresses(uri.host)
     if config[:ip_blacklist] && addresses.any? {|address| config[:ip_blacklist].any? {|cidr| cidr.matches?(address) rescue false } }
       logger.warn("Skipping url because of blacklisted IP address: #{url}")
       return false
     end
-    
+
     true
   end
-  
+
+  def self.cuty_arguments(path, url, img_file, format, delay, timeout)
+    [ path, "--url=#{url}", "--out=#{img_file}", "--out-format=#{format}", "--delay=#{delay}", "--max-wait=#{timeout}" ]
+  end
+
   def self.snapshot_url(url, format = "png", &block)
     return nil unless config = self.config
     return nil unless self.verify_url(url)
-    
-    img_file = Tempfile.new('websnappr').path + ".#{format}"
-    
-    saved_display = ENV["DISPLAY"]
-    ENV["DISPLAY"] = config[:display] if config[:display]
-    result = Kernel.system(config[:path], "--url=#{url}",
-                                          "--out=#{img_file}",
-                                          "--out-format=#{format}",
-                                          "--delay=#{config[:delay]}",
-                                          "--max-wait=#{config[:timeout]}")
-    ENV["DISPLAY"] = saved_display
-    
-    if !result
-      logger.error("Capture failed with code: #{$?}")
-      File.unlink(img_file)
-      return nil
+
+    tmp_file = Tempfile.new('websnappr')
+    img_file = tmp_file.path + ".#{format}"
+    # We need to finalize the tmp_file now, because if we don't then it will get closed
+    # in the child process below, deleting it. This does introduce a potential race condition
+    # but in practice shouldn't be a problem since Tempfiles normally include the process pid.
+    tmp_file.close!
+    success = true
+
+    start = Time.now
+    logger.info("Starting web capture of #{url}")
+
+    if (pid = fork).nil?
+      ENV["DISPLAY"] = config[:display] if config[:display]
+      Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout]))
+    else
+      begin
+        Timeout::timeout(config[:timeout].to_i / 1000) do
+          Process.waitpid(pid)
+          unless $?.success?
+            logger.error("Capture failed with code: #{$?.exitstatus}")
+            success = false
+          end
+        end
+      rescue Timeout::Error
+        logger.error("Capture timed out")
+        Process.kill("KILL", pid)
+        Process.waitpid(pid)
+        success = false
+      end
     end
-    
+
+    if !success
+      File.unlink(img_file) if File.exists?(img_file)
+      return nil
+    else
+      logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
+    end
+
     if block_given?
       yield img_file
-      File.unlink(img_file)
+      File.unlink(img_file) if File.exists?(img_file)
       return nil
     end
-    
+
     img_file
   end
 end
