@@ -1998,7 +1998,8 @@ class User < ActiveRecord::Base
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
-    user_conditions = [messageable_user_clause]
+    user_conditions = []
+    user_conditions << [messageable_user_clause] unless options[:skip_visibility_checks] && options[:ids]
     user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
@@ -2071,7 +2072,7 @@ class User < ActiveRecord::Base
             AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
             #{user_condition_sql}
         SQL
-      elsif options[:no_check_context]
+      elsif options[:skip_visibility_checks] # we don't care about the contexts, we've passed in ids
         user_sql << <<-SQL
           SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users

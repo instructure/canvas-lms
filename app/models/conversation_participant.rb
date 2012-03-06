@@ -124,7 +124,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
     return participants unless options[:include_context_info]
     # we do this to find out the contexts they share with the user
-    user.messageable_users(:ids => participants.map(&:id), :no_check_context => true).each { |user|
+    user.messageable_users(:ids => participants.map(&:id), :skip_visibility_checks => true).each { |user|
       context_info[user.id] = user
     }
     participants.each { |user|
