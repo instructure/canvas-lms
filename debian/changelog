@@ -1,3 +1,13 @@
+canvas-lms (2012.03.03.10) stable; urgency=low
+
+  * Package ref: 1e5365a37a447a432d689fcce01b4360363c645e
+  *
+  * [+d1906d2] hide content until scripts are loaded
+  * [+104c316] load account javascript ourselves
+  * [+1e5365a] fix public course home page fixes #7589
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 06 Mar 2012 13:13:31 -0700
+
 canvas-lms (2012.03.03.08) stable; urgency=low
 
   * Package ref: 173b6ee58543208f77de06f579d5caed24c2bd09
