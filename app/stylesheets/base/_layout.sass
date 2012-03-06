@@ -5,7 +5,6 @@ body, html
 body
   background: url("/images/body-bg.png") repeat-x top #e0e0e0
 
-  
   &.no-headers
     background: #fff
     #header, #topbar, #left-side, #breadcrumbs
@@ -22,14 +21,19 @@ body
       box-shadow: none
     #content
       padding-top: 0
-      
+
+// so we don't get the non-interactionable content
+.scripts-not-loaded
+  a, button
+    visibility: hidden !important
+
 #wrapper-container
   // the sole purpose of this div is to make it so the shadow on #wrapper does not cause the page to have scroll bars.
   overflow: hidden
 #wrapper
   margin: 0 21px
   +pie-clearfix
-  
+
 
 
 #main

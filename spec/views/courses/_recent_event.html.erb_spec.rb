@@ -28,7 +28,16 @@ describe "/courses/_recent_event" do
     response.should_not be_nil
     response.body.should =~ %r{<b>my assignment</b>}
   end
-  
+
+  it "should render without a user" do
+    course
+    assignment = @course.assignments.create!(:title => 'my assignment')
+    view_context
+    render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
+    response.should_not be_nil
+    response.body.should =~ %r{<b>my assignment</b>}
+  end
+
   context "assignment muting and tooltips" do
     before(:each) do
       course_with_student
