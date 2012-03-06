@@ -319,6 +319,16 @@ Spec::Runner.configure do |config|
     user_session(@user)
   end
 
+  def add_section(section_name)
+    @course_section = @course.course_sections.create!(:name => section_name)
+    @course.reload
+  end
+
+  def multiple_student_enrollment(user, section)
+    @enrollment = @course.student_enrollments.build(:user => user, :workflow_state => "active", :course_section => section)
+    @enrollment.save!
+  end
+
   def group(opts={})
     if opts[:group_context]
       @group = opts[:group_context].groups.create!
