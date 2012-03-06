@@ -655,11 +655,23 @@ module ApplicationHelper
       js_includes
     end
     if includes.length > 0
-      content_tag :script, <<-ENDSCRIPT
-        require(['jquery'], function() {
-          require([#{includes.join(', ')}]);
-        });
+      str = <<-ENDSCRIPT
+        (function() {
+          var inject = function(src) {
+            var s = document.createElement('script');
+            s.src = src;
+            s.type = 'text/javascript';
+            document.body.appendChild(s);
+          };
+          var srcs = [#{includes.join(', ')}];
+          require(['jquery'], function() {
+            for (var i = 0, l = srcs.length; i < l; i++) {
+              inject(srcs[i]);
+            }
+          });
+        })();
       ENDSCRIPT
+      content_tag(:script, str, {}, false)
     end
   end
 
