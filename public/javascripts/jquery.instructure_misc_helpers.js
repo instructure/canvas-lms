@@ -386,9 +386,9 @@ define([
             $dialog.find(".results").empty();
             for(var idx in data.photos.photo) {
               var photo = data.photos.photo[idx],
-                  image_url = "http://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_s.jpg",
-                  big_image_url = "http://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg",
-                  source_url = "http://www.flickr.com/photos/" + photo.owner + "/" + photo.id;
+                  image_url = "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_s.jpg",
+                  big_image_url = "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg",
+                  source_url = "https://secure.flickr.com/photos/" + photo.owner + "/" + photo.id;
 
               $dialog.find(".results").append(
                 $('<div class="image" style="float: left; padding: 2px; cursor: pointer;"/>')
@@ -410,7 +410,7 @@ define([
         });
         var query = encodeURIComponent($dialog.find(".query").val());
         // this request will be handled by window.jsonFlickerApi()
-        $.getScript("http://www.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key=734839aadcaa224c4e043eaf74391e50&per_page=25&license=1,2,3,4,5,6&sort=relevance&text=" + query);
+        $.getScript("https://secure.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key=734839aadcaa224c4e043eaf74391e50&per_page=25&license=1,2,3,4,5,6&sort=relevance&text=" + query);
       });
       $dialog.delegate('.image_link', 'click', function(event) {
         event.preventDefault();
