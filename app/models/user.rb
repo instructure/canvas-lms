@@ -1123,8 +1123,9 @@ class User < ActiveRecord::Base
         end
       end
     elsif val['type'] == 'linked_in'
-      linked_in = self.user_services.for_service('linked_in').first rescue nil
-      if linked_in
+      @linked_in_service = self.user_services.for_service('linked_in').first rescue nil
+      if @linked_in_service
+        self.extend LinkedIn
         profile = linked_in_profile
         if profile
           self.avatar_image_url = profile['picture_url']
