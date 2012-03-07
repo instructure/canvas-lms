@@ -115,27 +115,30 @@
         </tr>
       </thead>
       <tbody>
-        <% permissions = RoleOverride.permissions.select{|k, p| @managing_account_roles || !p[:account_only] }.to_a.sort { |a, b| a.last[:label].call() <=> b.last[:label].call() } %>
-        <% if @managing_account_roles && @context == Account.site_admin -%>
-        <tr class='ui-widget-header'>
-          <td><%= t 'headers.site_admin_permissions', "Site Admin Permissions" %></td>
-          <td colspan='<%= @role_types.size %>'></td>
-        </tr>
-        <%= render :partial => 'permission', :collection => permissions.select { |k, p| p[:account_only] == :site_admin } %>
+        <% permissions = RoleOverride.manageable_permissions(@context) %>
+        <% permissions.reject! { |k, p| (p[:available_to] & RoleOverride.enrollment_types.map { |role| role[:name] }).empty? unless @managing_account_roles } %>
+        <% permissions.to_a.sort { |a, b| a.last[:label].call() <=> b.last[:label].call() } %>
+        <% site_admin_permissions, permissions = permissions.partition { |(k, p)| p[:account_only] == :site_admin } %>
+        <% account_permissions, permissions = permissions.partition { |(k, p)| p[:account_only] } %>
+        <% unless site_admin_permissions.empty? -%>
+          <tr class='ui-widget-header'>
+            <td><%= t 'headers.site_admin_permissions', "Site Admin Permissions" %></td>
+            <td colspan='<%= @role_types.size %>'></td>
+          </tr>
+          <%= render :partial => 'permission', :collection => site_admin_permissions %>
         <% end -%>
-        <% if @managing_account_roles -%>
-        <tr class='ui-widget-header'>
-          <td><%= t 'headers.account_permissions', "Account Permissions" %></td>
-          <td colspan='<%= @role_types.size %>'></td>
-        </tr>
-        <%= render :partial => 'permission', :collection => permissions.select { |k, p| p[:account_only] == true || p[:account_only] == :root && @context.root_account? } %>
+        <% unless account_permissions.empty? -%>
+          <tr class='ui-widget-header'>
+            <td><%= t 'headers.account_permissions', "Account Permissions" %></td>
+            <td colspan='<%= @role_types.size %>'></td>
+          </tr>
+          <%= render :partial => 'permission', :collection => account_permissions %>
+        <% end -%>
         <tr class='ui-widget-header'>
           <td><%=  t 'headers.course_permissions',  "Course & Account Permissions" %></td>
           <td colspan='<%= @role_types.size %>'></td>
         </tr>
-        <% end -%>
-
-        <%= render :partial => 'permission', :collection => permissions.select { |k, p| !p[:account_only] } %>
+        <%= render :partial => 'permission', :collection => permissions %>
       </tbody>
     </table>
     <div class="button-container">

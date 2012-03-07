@@ -90,6 +90,7 @@ class RoleOverridesController < ApplicationController
   #     read_question_banks              -- View and link to question banks
   #     read_reports                     -- View usage reports for the course
   #     read_roster                      -- See the list of users
+  #     read_sis                         -- Read SIS data
   #     send_messages                    -- Send messages to course members
   #     site_admin                       -- Use the Site Admin section and admin all other accounts
   #     view_all_grades                  -- View all grades
@@ -100,6 +101,8 @@ class RoleOverridesController < ApplicationController
   #   Some of these permissions are applicable only for roles on the site admin
   #   account or on a root account; if specified for a role on an inapplicable
   #   account, the permission will be ignored.
+  #
+  #   Additional permissions may exist based on installed plugins.
   #
   # @argument permissions[<X>][locked] [Optional]
   #   If the value is 1, permission <X> will be locked downstream (new roles in
@@ -225,7 +228,7 @@ class RoleOverridesController < ApplicationController
 
       # allow setting permissions immediately through API
       if params[:permissions]
-        RoleOverride.manageable_permissions(@context).each do |permission|
+        RoleOverride.manageable_permissions(@context).keys.each do |permission|
           if settings = params[:permissions][permission]
             override = settings[:enabled].to_i == 1 if settings[:explicit].to_i == 1 && settings[:enabled].present?
             locked = settings[:locked].to_i == 1 if settings[:locked]

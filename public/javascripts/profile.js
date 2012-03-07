@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-require([
+define([
   'INST' /* INST */,
   'i18n!profile',
   'jquery' /* $ */,
@@ -95,7 +95,7 @@ require([
   $update_profile_form
     .attr('method', 'PUT')
     .formSubmit({
-      required: ['name'],
+      required: $update_profile_form.find('#user_name').length ? ['name'] : [],
       object_name: 'user',
       property_validations: {
         '=default_email_id': function(val, data) {

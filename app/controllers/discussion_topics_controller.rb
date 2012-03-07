@@ -21,23 +21,25 @@
 # API for accessing and participating in discussion topics in groups and courses.
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
-  
+
   add_crumb(proc { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
-  before_filter { |c| c.active_tab = "discussions" }  
-  
+  before_filter { |c| c.active_tab = "discussions" }
+
   include Api::V1::DiscussionTopics
-  
+
   # @API
   #
   # Returns the list of discussion topics for this course.
   #
   # @response_field assignment_id The unique identifier of the assignment if the topic is for grading, otherwise null
   # @response_field attachments Array of attachments
-  # @response_field delayed_post_at The datetime to post the topic (if not right away) 
+  # @response_field delayed_post_at The datetime to post the topic (if not right away)
   # @response_field discussion_subentry_count The count of entries in the topic
+  # @response_field read_state The read_state of the topic, "read" or "unread"
+  # @response_field unread_count The count of unread entries of this topic
   # @response_field id The unique identifier for the discussion topic.
   # @response_field last_reply_at The datetime for when the last reply was in the topic
-  # @response_field message The HTML content of the topic 
+  # @response_field message The HTML content of the topic
   # @response_field podcast_url If the topic is a podcast topic this is the feed url for the current user
   # @response_field posted_at The datetime the topic was posted. If it is null it hasn't been posted yet. (see delayed_post_at)
   # @response_field require_initial_post If true then a user may not respond to other replies until that user has made an initial reply
@@ -57,6 +59,8 @@ class DiscussionTopicsController < ApplicationController
   #        "last_reply_at":"2037-07-28T19:38:31Z",
   #        "require_initial_post":null,
   #        "discussion_subentry_count":0,
+  #        "read_state":"read",
+  #        "unread_count":0,
   #        "assignment_id":null,
   #        "delayed_post_at":null,
   #        "user_name":"User Name",
@@ -77,7 +81,8 @@ class DiscussionTopicsController < ApplicationController
     @context.assert_assignment_group rescue nil
     @all_topics = @context.discussion_topics.active
     @all_topics = @all_topics.only_discussion_topics if params[:include_announcements] != "1"
-    @topics = Api.paginate(@all_topics, self, topic_pagination_path).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @topics = Api.paginate(@all_topics, self, topic_pagination_path).reject{|a| a.locked_for?(@current_user, :check_policies => true) }.
+      each { |t| t.current_user = @current_user }
     if authorized_action(@context.discussion_topics.new, @current_user, :read)
       return child_topic if params[:root_discussion_topic_id] && @context.respond_to?(:context) && @context.context && @context.context.discussion_topics.find(params[:root_discussion_topic_id])
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
@@ -87,13 +92,13 @@ class DiscussionTopicsController < ApplicationController
           if api_request?
             render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
           else
-            render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count], :permissions => {:user => @current_user, :session => session })
+            render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session }, :include => [:assignment,:attachment])
           end
         end
       end
     end
   end
-  
+
   def reorder
     if authorized_action(@context, @current_user, :moderate_forum)
       @topics = @context.discussion_topics
@@ -102,7 +107,7 @@ class DiscussionTopicsController < ApplicationController
       redirect_to named_context_url(@context, :context_discussion_topics_url)
     end
   end
-  
+
   def child_topic
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @context.discussion_topics.find_or_initialize_by_root_topic_id(params[:root_discussion_topic_id])
@@ -130,7 +135,7 @@ class DiscussionTopicsController < ApplicationController
       @headers = !params[:headless]
       @all_entries = @topic.discussion_entries.active
       @grouped_entries = @all_entries.group_by(&:parent_id)
-      @entries = @all_entries.select{|e| e.parent_id == parent_id}
+      @entries = @all_entries.select{|e| e.parent_id == parent_id}.each{|e| e.current_user = @current_user}
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @topic.context_module_action(@current_user, :read) if !@locked
       if @topic.for_group_assignment?
@@ -138,17 +143,21 @@ class DiscussionTopicsController < ApplicationController
         if params[:combined]
           @topic_agglomerated = true
           @topics = @topic.child_topics.select{|t| @groups.include?(t.context) }
-          @entries = @topics.map{|t| t.discussion_entries.active.find(:all, :conditions => ['parent_id = ?', 0])}.flatten.sort_by{|e| e.created_at}
+          @entries = @topics.map{|t| t.discussion_entries.active.find(:all, :conditions => ['parent_id = ?', 0])}.
+            flatten.
+            sort_by{|e| e.created_at}.
+            each{|e| e.current_user = @current_user}
         else
           @topics = @topic.child_topics.to_a
           @topics = @topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
           @group_entry = @topic.discussion_entries.build(:message => render_to_string(:partial => 'group_assignment_discussion_entry'))
           @group_entry.new_record_header = t '#titles.group_discussion', "Group Discussion"
+          @group_entry.current_user = @current_user
           @topic_uneditable = true
           @entries = [@group_entry]
         end
       end
-      
+
       if @topic.require_initial_post?
         # check if the user, or the user being observed can see the posts
         if @context_enrollment && @context_enrollment.respond_to?(:associated_user) && @context_enrollment.associated_user
@@ -168,12 +177,12 @@ class DiscussionTopicsController < ApplicationController
           format.html { redirect_to named_context_url(@topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
         else
           format.html { render :action => "show" }
-          format.json  { render :json => @entries.to_json(:methods => :user_name, :permissions => {:user => @current_user, :session => session}) }
+          format.json  { render :json => @entries.to_json(:methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}) }
         end
       end
     end
   end
-  
+
   def permissions
     if authorized_action(@context, @current_user, :read)
       @topic = @context.discussion_topics.find(params[:discussion_topic_id])
@@ -182,7 +191,7 @@ class DiscussionTopicsController < ApplicationController
       render :json => @entries.to_json(:only => [:id], :permissions => {:user => @current_user, :session => session})
     end
   end
-  
+
   def generate_assignment(assignment)
     if assignment[:set_assignment] && assignment[:set_assignment] != '1'
       params[:discussion_topic][:assignment] = nil
@@ -209,7 +218,7 @@ class DiscussionTopicsController < ApplicationController
     params[:discussion_topic][:assignment] = @assignment
   end
   protected :generate_assignment
-  
+
   def create
     params[:discussion_topic].delete(:remove_attachment)
 
@@ -229,10 +238,11 @@ class DiscussionTopicsController < ApplicationController
     @topic.workflow_state = 'post_delayed' if delay_posting == '1' && @topic.delayed_post_at && @topic.delayed_post_at > Time.now
     @topic.delayed_post_at = "" unless @topic.post_delayed?
     @topic.user = @current_user
+    @topic.current_user = @current_user
 
     if authorized_action(@topic, @current_user, :create)
       return if params[:attachment] && params[:attachment][:uploaded_data] &&
-        params[:attachment][:uploaded_data].size > 1.kilobytes && 
+        params[:attachment][:uploaded_data].size > 1.kilobytes &&
         @topic.grants_right?(@current_user, session, :attach) &&
         quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
       respond_to do |format|
@@ -247,8 +257,8 @@ class DiscussionTopicsController < ApplicationController
           end
           flash[:notice] = t :topic_created_notice, 'Topic was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic) }
-          format.json  { render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :created }
-          format.text  { render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.json  { render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => [:user_name, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.text  { render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => [:user_name, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session}), :status => :created }
         else
           format.html { render :action => "new" }
           format.json { render :json => @topic.errors.to_json, :status => :bad_request }
@@ -283,6 +293,7 @@ class DiscussionTopicsController < ApplicationController
       @topic.workflow_state = (delay_posting == '1' && delayed_post_at > Time.now ? 'post_delayed' : @topic.workflow_state)
       @topic.workflow_state = 'active' if @topic.post_delayed? && (!delayed_post_at || delay_posting != '1')
       @topic.delayed_post_at = @topic.post_delayed? ? delayed_post_at : nil
+      @topic.current_user = @current_user
 
       return if params[:attachment] && params[:attachment][:uploaded_data] &&
             params[:attachment][:uploaded_data].size > 1.kilobytes &&
@@ -301,8 +312,8 @@ class DiscussionTopicsController < ApplicationController
           end
           flash[:notice] = t :topic_updated_notice, 'Topic was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic) }
-          format.json  { render :json => @topic.to_json(:include => [:assignment, :attachment], :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :ok }
-          format.text  { render :json => @topic.to_json(:include => [:assignment, :attachment], :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :ok }
+          format.json  { render :json => @topic.to_json(:include => [:assignment, :attachment], :methods => [:user_name, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session}), :status => :ok }
+          format.text  { render :json => @topic.to_json(:include => [:assignment, :attachment], :methods => [:user_name, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @topic.errors.to_json, :status => :bad_request }
@@ -322,7 +333,7 @@ class DiscussionTopicsController < ApplicationController
       end
     end
   end
-  
+
   def public_feed
     return unless get_feed_context
     feed = Atom::Feed.new do |f|
@@ -340,9 +351,9 @@ class DiscussionTopicsController < ApplicationController
     end
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
-    end    
+    end
   end
-  
+
   def public_topic_feed
   end
 end

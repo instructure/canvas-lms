@@ -27,6 +27,7 @@ class GroupMembership < ActiveRecord::Base
   
   before_save :ensure_mutually_exclusive_membership
   before_save :assign_uuid
+  before_save :auto_join
   before_save :capture_old_group_id
   before_validation :verify_section_homogeneity_if_necessary
   
@@ -51,7 +52,7 @@ class GroupMembership < ActiveRecord::Base
     
     p.dispatch :group_membership_accepted
     p.to { self.user }
-    p.whenever {|record| record.changed_state(:available, :requested) }
+    p.whenever {|record| record.changed_state(:accepted, :requested) }
     
     p.dispatch :group_membership_rejected
     p.to { self.user }
@@ -70,9 +71,15 @@ class GroupMembership < ActiveRecord::Base
   
   def assign_uuid
     self.uuid ||= AutoHandle.generate_securish_uuid
-    self.workflow_state = 'accepted' if self.requested? && self.group && self.group.free_association?(self.user)
   end
   protected :assign_uuid
+
+  # auto accept 'requested' or 'invited' memberships until we implement
+  # accepting requests/invitations
+  def auto_join
+    self.workflow_state = 'accepted' if self.group && (self.requested? || self.invited?)
+  end
+  protected :auto_join
 
   def ensure_mutually_exclusive_membership
     return unless self.group
@@ -118,8 +125,7 @@ class GroupMembership < ActiveRecord::Base
   # true iff 'active' and the pair of user and group's course match one of the
   # provided enrollments
   def active_given_enrollments?(enrollments)
-    state != :requested && state != :deleted && 
-    (!self.group.context.is_a?(Course) ||
+    accepted? && (!self.group.context.is_a?(Course) ||
      enrollments.any?{ |e| e.user == self.user && e.course == self.group.context })
   end
 end

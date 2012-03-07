@@ -69,7 +69,7 @@
   <div class="email"><%= enrollment.try_rescue(:user).try_rescue(:email) %></div>
   <%# [nil] because we want a blank template to show up when enrollments is nil %>
   <% (enrollments || [nil]).each do |enrollment| %>
-    <div class="enrollment_link enrollment_<%= enrollment.try_rescue(:id)%>">
+    <div class="enrollment_link enrollment_<%= enrollment.try_rescue(:id) || "blank" %>">
       <div class="associated_user associated" style="<%= hidden unless enrollment.try_rescue(:associated_user_id) %>">
         <%= before_label :linked_to, "linked to" %>
         <span class="associated_user_name associated_user_link"><%= context_user_name(@context, enrollment.try_rescue(:associated_user_id)) %></span>

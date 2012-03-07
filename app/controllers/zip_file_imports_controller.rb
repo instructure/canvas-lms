@@ -24,45 +24,31 @@ class ZipFileImportsController < ApplicationController
     end
   end
 
-  def import_status
-    if authorized_action(@context, @current_user, :manage_files)
-      @status = SisBatch.find_by_account_id_and_batch_id(0, params[:batch_id])
-      res = (@status && @status.data) || {}
-      @status.data ||= {} if @status
-      render :json => res.to_json
+  def show
+    @import = @context.zip_file_imports.find(params[:id])
+    if authorized_action(@import, @current_user, :read)
+      render :json => @import.to_json
     end
   end
-  
+
   def create
     if authorized_action(@context, @current_user, :manage_files)
-      params[:batch_id] ||= params[:zip_import_batch_id]
-      zip_params = params.dup.merge(:context => @context).delete_if { |k,v| !%w(zip_file context folder_id batch_id).include?(k) }
-      @zfi = ZipFileImport.new(zip_params)
-      respond_to do |format|
-        if @zfi.process!
-          flash[:notice] = t('notices.upload_and_unzip_done',
-            "Uploaded and unzipped %{original_filename} into %{destination}.",
-            :original_filename => @zfi.zip_file.original_filename,
-            :destination => @zfi.root_directory.full_name)
-          format.html { return_to(params[:return_to], named_context_url(@context, :context_url)) }
-          format.json { render :json => @zfi.to_json }
-        else
-          @status = SisBatch.find_by_account_id_and_batch_id(0, params[:batch_id])
-          if @status
-            @status.data ||= {}
-            @status.data[:errors] = @zfi.errors.full_messages
-            @status.save
-          end
-          format.html do
-            if params[:redirect_to] =~ /imports\/quizzes/
-              render :template => 'content_imports/files'
-            else
-              render :action => "new"
-            end
-          end
-          format.json { render :json => @zfi.errors.to_json }
-        end
-      end
+      @folder = @context.folders.active.find(params[:folder_id])
+
+      @import = @context.zip_file_imports.create!(:folder => @folder)
+
+      att = Attachment.new
+      att.context = @import
+      att.uploaded_data = params[:zip_file]
+      att.display_name = t :zip_import_filename, "zip_import_%{id}.zip", :id => @import.id
+      att.position = 0
+      att.save
+
+      @import.attachment = att
+      @import.save
+      @import.process # happens async
+
+      render :json => @import.to_json
     end
   end
 end

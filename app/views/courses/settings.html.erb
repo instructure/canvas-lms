@@ -182,7 +182,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           </span>
           </td>
         <% end %>
-      <% if @context.sis_source_id || can_do(@context.root_account, @current_user, :manage_sis) %>
+      <% if @context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
           <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
           <td>

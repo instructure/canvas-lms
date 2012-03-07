@@ -19,11 +19,11 @@
 class Conversation < ActiveRecord::Base
   include SimpleTags
 
-  has_many :conversation_participants
+  has_many :conversation_participants, :dependent => :destroy
   has_many :subscribed_conversation_participants,
            :conditions => "subscribed",
            :class_name => 'ConversationParticipant'
-  has_many :conversation_messages, :order => "created_at DESC, id DESC"
+  has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all
 
   # see also User#messageable_users
   has_many :participants,
@@ -371,6 +371,48 @@ class Conversation < ActiveRecord::Base
 
   def self.batch_sanitize_context_tags!(ids)
     find_all_by_id(ids).each(&:sanitize_context_tags!)
+  end
+
+  # if the participant list has changed, e.g. we merged user accounts
+  def regenerate_private_hash!(user_ids = nil)
+    return unless private?
+    self.private_hash = Conversation.private_hash_for(user_ids || self.participant_ids)
+    return unless private_hash_changed?
+    if existing = Conversation.find_by_private_hash(private_hash)
+      merge_into(existing)
+    else
+      save!
+    end
+  end
+
+  def self.batch_regenerate_private_hashes!(ids)
+    find(:all,
+     :select => "conversations.*, (SELECT #{connection.func(:group_concat, :user_id, ',')} FROM conversation_participants WHERE conversation_id = conversations.id) AS user_ids",
+     :conditions => {:id => ids}
+    ).each do |c|
+      c.regenerate_private_hash!(c.user_ids.split(',').map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting
+    end
+  end
+
+  def merge_into(other)
+    transaction do
+      new_participants = other.conversation_participants.inject({}){ |h,p| h[p.user_id] = p; h }
+      conversation_participants(true).each do |cp|
+        if new_cp = new_participants[cp.user_id]
+          new_cp.update_attribute(:workflow_state, cp.workflow_state) if cp.unread? || new_cp.archived?
+          cp.conversation_message_participants.update_all(["conversation_participant_id = ?", new_cp.id])
+          cp.destroy
+        else
+          cp.update_attribute(:conversation_id, other.id)
+        end
+      end
+      conversation_messages.update_all(["conversation_id = ?", other.id])
+      conversation_participants.reload # now empty ... need to make sure callbacks don't double-delete
+      other.conversation_participants(true).each do |cp|
+        cp.update_cached_data! :recalculate_count => true, :set_last_message_at => false, :regenerate_tags => false
+      end
+      destroy
+    end
   end
 
   protected

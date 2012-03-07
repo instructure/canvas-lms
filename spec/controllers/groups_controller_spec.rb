@@ -24,7 +24,7 @@ describe GroupsController do
   it "should use GroupsController" do
     controller.should be_an_instance_of(GroupsController)
   end
-  
+
   describe "GET context_index" do
     it "should require authorization" do
       course_with_student
@@ -36,7 +36,7 @@ describe GroupsController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       category1 = @course.group_categories.create(:name => "category 1")
@@ -52,14 +52,14 @@ describe GroupsController do
       assigns[:categories].length.should eql(2)
     end
   end
-  
+
   describe "GET index" do
     it "should assign variables" do
       get 'index'
       assigns[:groups].should_not be_nil
     end
   end
-  
+
   describe "GET show" do
     it "should require authorization" do
       @group = Group.create!(:name => "some group")
@@ -67,7 +67,7 @@ describe GroupsController do
       assigns[:group].should eql(@group)
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       @group = Group.create!(:name => "some group")
       @user = user_model
@@ -78,8 +78,54 @@ describe GroupsController do
       assigns[:group].should eql(@group)
       assigns[:context].should eql(@group)
     end
+
+    it "should allow user to join self-signup groups" do
+      course_with_student_logged_in(:active_all => true)
+      category1 = @course.group_categories.create!(:name => "category 1")
+      category1.configure_self_signup(true, false)
+      category1.save!
+      g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+
+      get 'show', :course_id => @course.id, :id => g1.id, :join => 1
+      g1.reload
+      g1.users.map(&:id).should include @student.id
+    end
+
+    it "should allow user to leave self-signup groups" do
+      course_with_student_logged_in(:active_all => true)
+      category1 = @course.group_categories.create!(:name => "category 1")
+      category1.configure_self_signup(true, false)
+      category1.save!
+      g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+      g1.add_user(@student)
+
+      get 'show', :course_id => @course.id, :id => g1.id, :leave => 1
+      g1.reload
+      g1.users.map(&:id).should_not include @student.id
+    end
+
+    it "should allow user to join student organized groups" do
+      course_with_student_logged_in(:active_all => true)
+      category1 = GroupCategory.student_organized_for(@course)
+      g1 = @course.groups.create!(:name => "some group", :group_category => category1, :join_level => "parent_context_auto_join")
+
+      get 'show', :course_id => @course.id, :id => g1.id, :join => 1
+      g1.reload
+      g1.users.map(&:id).should include @student.id
+    end
+
+    it "should allow user to leave student organized groups" do
+      course_with_student_logged_in(:active_all => true)
+      category1 = @course.group_categories.create!(:name => "category 1", :role => "student_organized")
+      g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+      g1.add_user(@student)
+
+      get 'show', :course_id => @course.id, :id => g1.id, :leave => 1
+      g1.reload
+      g1.users.map(&:id).should_not include @student.id
+    end
   end
-  
+
   describe "GET new" do
     it "should require authorization" do
       @course = course_model(:reusable => true)
@@ -88,7 +134,7 @@ describe GroupsController do
       assert_unauthorized
     end
   end
-  
+
   describe "POST create_category" do
     it "should require authorization" do
       @course = course_model(:reusable => true)
@@ -96,7 +142,7 @@ describe GroupsController do
       post 'create_category', :course_id => @course.id, :category => {}
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       @group = @course.groups.create(:name => "some groups")
@@ -114,7 +160,7 @@ describe GroupsController do
       groups[0].users.length.should eql(3)
       groups[1].users.length.should eql(3)
     end
-    
+
     it "should give the new groups the right group_category" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
@@ -148,7 +194,7 @@ describe GroupsController do
       response.should be_success
       assigns[:group_category].name.should == "Study Groups"
     end
-    
+
     it "should respect enable_self_signup" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
@@ -158,7 +204,7 @@ describe GroupsController do
       assigns[:group_category].should be_self_signup
       assigns[:group_category].should be_unrestricted_self_signup
     end
-    
+
     it "should use create_group_count when self-signup" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
@@ -167,7 +213,7 @@ describe GroupsController do
       assigns[:group_category].should_not be_nil
       assigns[:group_category].groups.size.should == 3
     end
-    
+
     it "should not distribute students when self-signup" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
@@ -179,7 +225,7 @@ describe GroupsController do
       assigns[:group_category].should_not be_nil
       assigns[:group_category].groups.all?{ |g| g.users.should be_empty }
     end
-    
+
     it "should respect restrict_self_signup" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
@@ -197,7 +243,7 @@ describe GroupsController do
       assigns[:group_category].should_not be_nil
     end
   end
-  
+
   describe "PUT update_category" do
     before :each do
       course_with_teacher(:active_all => true)
@@ -208,7 +254,7 @@ describe GroupsController do
       put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {}
       assert_unauthorized
     end
-    
+
     it "should update category" do
       user_session(@user)
       put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "Different Category", :enable_self_signup => "1"}
@@ -264,9 +310,9 @@ describe GroupsController do
       user_session(@teacher)
       put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:enable_self_signup => '1', :restrict_self_signup => '1'}
       response.should_not be_success
-    end 
+    end
   end
-  
+
   describe "DELETE delete_category" do
     it "should require authorization" do
       @course = course_model(:reusable => true)
@@ -274,7 +320,7 @@ describe GroupsController do
       delete 'delete_category', :course_id => @course.id, :category_id => group_category.id
       assert_unauthorized
     end
-    
+
     it "should delete the category and groups" do
       course_with_teacher_logged_in(:active_all => true)
       category1 = @course.group_categories.create(:name => "Study Groups")
@@ -289,27 +335,27 @@ describe GroupsController do
       @course.groups.length.should eql(2)
       @course.groups.active.length.should eql(1)
     end
-    
+
     it "should fail if category doesn't exist" do
       course_with_teacher_logged_in(:active_all => true)
       delete 'delete_category', :course_id => @course.id, :category_id => 11235
       response.should_not be_success
     end
-    
+
     it "should fail if category is protected" do
       course_with_teacher_logged_in(:active_all => true)
       delete 'delete_category', :course_id => @course.id, :category_id => GroupCategory.student_organized_for(@course).id
       response.should_not be_success
     end
   end
-  
+
   describe "POST add_user" do
     it "should require authorization" do
       @group = Group.create(:name => "some group")
       post 'add_user', :group_id => @group.id
       assert_unauthorized
     end
-    
+
     it "should add user" do
       @group = Group.create(:name => "some group")
       @user = user(:active_all => true)
@@ -339,9 +385,9 @@ describe GroupsController do
       assigns[:membership].should_not be_nil
       assigns[:membership].user.should eql(user2)
       assigns[:membership].errors[:user_id].should_not be_nil
-    end 
+    end
   end
-  
+
   describe "DELETE remove_user" do
     it "should require authorization" do
       @group = Group.create(:name => "some group")
@@ -350,7 +396,7 @@ describe GroupsController do
       delete 'remove_user', :group_id => @group.id, :user_id => @user.id
       assert_unauthorized
     end
-    
+
     it "should remove user" do
       @group = Group.create(:name => "some group")
       @user = user(:active_all => true)
@@ -362,14 +408,14 @@ describe GroupsController do
       @group.users.should be_empty
     end
   end
-  
+
   describe "POST create" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should create new group" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', :course_id => @course.id, :group => {:name => "some group"}
@@ -403,7 +449,7 @@ describe GroupsController do
       response.should_not be_success
     end
   end
-  
+
   describe "GET edit" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -411,7 +457,7 @@ describe GroupsController do
       get 'edit', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       @group = @course.groups.create!(:name => "some group")
@@ -419,7 +465,7 @@ describe GroupsController do
       assigns[:group].should eql(@group)
     end
   end
-  
+
   describe "PUT update" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -427,7 +473,7 @@ describe GroupsController do
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => "new name"}
       assert_unauthorized
     end
-    
+
     it "should update group" do
       course_with_teacher_logged_in(:active_all => true)
       @group = @course.groups.create!(:name => "some group")
@@ -455,7 +501,7 @@ describe GroupsController do
       response.should_not be_success
     end
   end
-  
+
   describe "DELETE destroy" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -463,7 +509,7 @@ describe GroupsController do
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
-    
+
     it "should delete group" do
       course_with_teacher_logged_in(:active_all => true)
       @group = @course.groups.create!(:name => "some group")
@@ -475,7 +521,7 @@ describe GroupsController do
       @course.groups.active.should_not be_include(@group)
     end
   end
-  
+
   describe "GET 'unassigned_members'" do
     it "should include all users if the category is student organized" do
       course_with_teacher_logged_in(:active_all => true)

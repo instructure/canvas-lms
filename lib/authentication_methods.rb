@@ -137,7 +137,7 @@ module AuthenticationMethods
         end
       end
 
-      if request_become_user && request_become_user.id != session[:become_user_id].to_i && request_become_user.grants_right?(@current_user, session, :become_user)
+      if request_become_user && request_become_user.id != session[:become_user_id].to_i && request_become_user.can_masquerade?(@current_user, @domain_root_account)
         params_without_become = params.dup
         params_without_become.delete_if {|k,v| [ 'become_user_id', 'become_teacher', 'become_student', 'me' ].include? k }
         params_without_become[:only_path] = true
@@ -153,9 +153,11 @@ module AuthenticationMethods
         user = api_find(User, as_user_id)
       rescue ActiveRecord::RecordNotFound
       end
-      if user && user.grants_right?(@current_user, session, :become_user)
+      if user && user.can_masquerade?(@current_user, @domain_root_account)
         @real_current_user = @current_user
         @current_user = user
+        @real_current_pseudonym = @current_pseudonym
+        @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       elsif api_request?
         # fail silently for UI, but not for API
@@ -251,9 +253,17 @@ module AuthenticationMethods
 
   def initiate_saml_login(preferred_account_domain=nil)
     reset_session_for_login
-    settings = @domain_root_account.account_authorization_config.saml_settings(preferred_account_domain)
-    request = Onelogin::Saml::AuthRequest.create(settings)
-    delegated_auth_redirect(request)
+    aac = @domain_root_account.account_authorization_config
+    settings = aac.saml_settings(preferred_account_domain)
+    request = Onelogin::Saml::AuthRequest.new(settings)
+    forward_url = request.generate_request
+    if aac.debugging? && !aac.debug_get(:request_id)
+      aac.debug_set(:request_id, request.id)
+      aac.debug_set(:to_idp_url, forward_url)
+      aac.debug_set(:to_idp_xml, request.request_xml)
+      aac.debug_set(:debugging, "Forwarding user to IdP for authentication")
+    end
+    delegated_auth_redirect(forward_url)
   end
 
   def delegated_auth_redirect(uri)

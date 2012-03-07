@@ -37,6 +37,7 @@ define([
   'jquery.loadingImg' /* loadingImage */,
   'jquery.rails_flash_notifications' /* flashMessage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'compiled/jquery/fixDialogButtons',
   'media_comments' /* mediaComment, mediaCommentThumbnail */,
   'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
@@ -339,6 +340,7 @@ define([
             autoOpen: false,
             modal: true
           }, $(link).data('dialogOpts')));
+          $dialog.fixDialogButtons();
         }
 
         $dialog.dialog('open');
@@ -975,7 +977,7 @@ define([
     $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message");
-      var url = $(this).attr('href');
+      var url = $(this).data('api-href');
       function remove(delete_url) {
         $item.confirmDelete({
           url: delete_url,

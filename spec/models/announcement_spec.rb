@@ -25,12 +25,6 @@ describe Announcement do
   end
   
   context "broadcast policy" do
-    it "should have a broadcast policy" do
-      announcement_model
-      @a.should be_respond_to(:dispatch)
-      @a.should be_respond_to(:to)
-    end
-
     it "should sanitize message" do
       announcement_model
       @a.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"

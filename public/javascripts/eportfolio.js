@@ -25,7 +25,7 @@
 // settings on their own personal eportfolio, they can't 
 // affect anyone else
 
-require([
+define([
   'i18n!eportfolio',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,

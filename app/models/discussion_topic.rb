@@ -17,14 +17,14 @@
 #
 
 class DiscussionTopic < ActiveRecord::Base
-  
+
   include Workflow
   include SendToStream
   include HasContentTags
   include CopyAuthorizedLinks
-  
-  attr_accessible :title, :message, :user, :delayed_post_at, :assignment, 
-    :plaintext_message, :podcast_enabled, :podcast_has_student_posts, 
+
+  attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
+    :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post
 
   attr_readonly :context_id, :context_type, :user_id
@@ -34,25 +34,25 @@ class DiscussionTopic < ActiveRecord::Base
   has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
-  
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   belongs_to :attachment
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
   belongs_to :old_assignment, :class_name => 'Assignment'
-  belongs_to :root_topic, :class_name => 'DiscussionTopic'
+  belongs_to :root_topic, :class_name => 'DiscussionTopic', :touch => true
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
+  has_many :discussion_topic_participants, :dependent => :destroy
   belongs_to :user
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
-  
+
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
   acts_as_list :scope => :context
-  
+
   before_create :initialize_last_reply_at
   before_save :default_values
   before_save :set_schedule_delayed_post
@@ -60,7 +60,8 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :update_subtopics
   after_save :touch_context
   after_save :schedule_delayed_post
-  
+  after_create :create_participant
+
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= t '#discussion_topic.default_title', "No Title"
@@ -77,22 +78,22 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
   protected :default_values
-  
+
   def set_schedule_delayed_post
     @should_schedule_delayed_post = self.delayed_post_at_changed?
     true
   end
-  
+
   def schedule_delayed_post
     self.send_at(self.delayed_post_at, :try_posting_delayed) if @should_schedule_delayed_post
   end
-  
+
   def update_subtopics
     if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.has_group_category?
       send_later :refresh_subtopics
     end
   end
-  
+
   def refresh_subtopics
     category = self.assignment && self.assignment.group_category
     return unless category && self.context && self.context.respond_to?(:groups)
@@ -106,7 +107,7 @@ class DiscussionTopic < ActiveRecord::Base
       topic
     end
   end
-  
+
   attr_accessor :saved_by
   def update_assignment
     if !self.assignment_id && @old_assignment_id && self.context_module_tag
@@ -133,7 +134,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
   protected :update_assignment
-  
+
   def restore_old_assignment
     return nil unless self.old_assignment && self.old_assignment.deleted?
     self.old_assignment.workflow_state = 'available'
@@ -143,15 +144,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def is_announcement; false end
-  
+
   def root_topic?
     !self.root_topic_id && self.assignment_id && self.assignment.has_group_category?
   end
-  
+
   def discussion_subentries
     self.root_discussion_entries
   end
-  
+
   def discussion_subentry_count
     discussion_subentries.count
   end
@@ -159,25 +160,114 @@ class DiscussionTopic < ActiveRecord::Base
   def for_assignment?
     self.assignment && self.assignment.submission_types =~ /discussion_topic/
   end
-  
+
   def for_group_assignment?
     self.for_assignment? && self.context == self.assignment.context && self.assignment.has_group_category?
   end
-  
+
   def plaintext_message=(val)
     self.extend TextHelper
     self.message = format_message(strip_tags(val)).first
   end
-  
+
   def plaintext_message
     self.extend TextHelper
     truncate_html(self.message, :max_length => 250)
   end
 
+  def create_participant
+    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+  end
+
+  # If no join record exists, assume all discussion enrties are unread, and
+  # that a join record will be created the first time one is marked as read.
+  attr_accessor :current_user
+  def read_state(current_user = nil)
+    current_user ||= self.current_user
+    return "read" unless current_user #default for logged out user
+    uid = current_user.is_a?(User) ? current_user.id : current_user
+    discussion_topic_participants.find_by_user_id(uid).try(:workflow_state) || "unread"
+  end
+
+  def read?(current_user = nil)
+    read_state(current_user) == "read"
+  end
+
+  def unread?(current_user = nil)
+    !read?(current_user)
+  end
+
+  def change_read_state(new_state, current_user = nil)
+    current_user ||= self.current_user
+    return nil unless current_user
+
+    if new_state != self.read_state(current_user)
+      self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
+    else
+      true
+    end
+  end
+
+  def change_all_read_state(new_state, current_user = nil)
+    current_user ||= self.current_user
+    return unless current_user
+
+    transaction do
+      new_count = (new_state == 'unread' ? self.default_unread_count : 0)
+      self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
+
+      entry_ids = self.discussion_entries.map(&:id)
+      if entry_ids.present?
+        existing_entry_participants = DiscussionEntryParticipant.find(:all, :conditions => ["user_id = ? AND discussion_entry_id IN (?)",
+                                                                      current_user.id, entry_ids])
+        existing_ids = existing_entry_participants.map(&:id)
+        DiscussionEntryParticipant.update_all({:workflow_state => new_state}, ["id IN (?)", existing_ids]) if existing_ids.present?
+
+        if new_state == "read"
+          new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
+          connection.bulk_insert('discussion_entry_participants', new_entry_ids.map { |entry_id|
+            {
+              :discussion_entry_id => entry_id,
+              :user_id => current_user.id,
+              :workflow_state => new_state
+            }
+          })
+        end
+      end
+    end
+  end
+
+  def default_unread_count
+    self.discussion_entries.count
+  end
+
+  def unread_count(current_user = nil)
+    current_user ||= self.current_user
+    return 0 unless current_user # default for logged out users
+    uid = current_user.is_a?(User) ? current_user.id : current_user
+    topic_participant = discussion_topic_participants.find_by_user_id(uid)
+    topic_participant.try(:unread_entry_count) || self.default_unread_count
+  end
+
+  def update_or_create_participant(opts={})
+    current_user = opts[:current_user] || self.current_user
+    return nil unless current_user
+
+    topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
+    topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
+                                                                   :unread_entry_count => self.unread_count(current_user),
+                                                                   :workflow_state => "unread")
+    topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
+    topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
+    topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+    topic_participant.save
+    topic_participant
+  end
+
   def self.search(query)
     find(:all, :conditions => wildcard('title', 'message', query))
   end
-  
+
   named_scope :recent, lambda{
     {:conditions => ['discussion_topics.last_reply_at > ?', 2.weeks.ago], :order => 'discussion_topics.last_reply_at DESC'}
   }
@@ -194,17 +284,17 @@ class DiscussionTopic < ActiveRecord::Base
   named_scope :for_context_codes, lambda {|codes|
     {:conditions => ['discussion_topics.context_code IN (?)', codes] }
   }
-  
+
   named_scope :before, lambda {|date|
     {:conditions => ['discussion_topics.created_at < ?', date]}
   }
-  
+
   def try_posting_delayed
     if self.post_delayed? && Time.now >= self.delayed_post_at
       self.delayed_post
     end
   end
-  
+
   workflow do
     state :active do
       event :lock, :transitions_to => :locked do
@@ -223,7 +313,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
     state :deleted
   end
-  
+
   def should_send_to_stream
     if self.delayed_post_at && self.delayed_post_at > Time.now
       false
@@ -237,35 +327,35 @@ class DiscussionTopic < ActiveRecord::Base
       true
     end
   end
-  
+
   on_create_send_to_streams do
     if should_send_to_stream
       self.active_participants
     end
   end
-  
+
   on_update_send_to_streams do
     if should_send_to_stream && (@delayed_just_posted || @content_changed || changed_state(:active, :post_delayed))
       self.active_participants
     end
   end
-  
+
   def require_initial_post?
     self.require_initial_post || (self.root_topic && self.root_topic.require_initial_post)
   end
-  
+
   def user_ids_who_have_posted_and_admins
     ids = DiscussionEntry.active.scoped(:select => "distinct user_id").find_all_by_discussion_topic_id(self.id).map(&:user_id)
     ids += self.context.admin_enrollments.scoped(:select => 'user_id').map(&:user_id) if self.context.respond_to?(:admin_enrollments)
     ids
   end
   memoize :user_ids_who_have_posted_and_admins
-  
+
   def user_can_see_posts?(user, session=nil)
     return false unless user
-    !self.require_initial_post || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id) 
+    !self.require_initial_post || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
   end
-  
+
   def reply_from(opts)
     user = opts[:user]
     message = opts[:text].strip
@@ -284,7 +374,7 @@ class DiscussionTopic < ActiveRecord::Base
       })
     end
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     ContentTag.delete_for(self)
@@ -295,7 +385,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.destroy unless self.assignment.deleted?
     end
   end
-  
+
   def restore
     self.workflow_state = 'active'
     self.save
@@ -303,7 +393,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.restore(:discussion_topic)
     end
   end
-  
+
   def self.find_or_create_for_new_context(new_context, old_context, old_id)
     res = new_context.discussion_topics.active.find_by_cloned_item_id(old_context.discussion_topics.find_by_id(old_id).cloned_item_id || 0) rescue nil
     res = nil if res && !res.cloned_item_id
@@ -326,11 +416,11 @@ class DiscussionTopic < ActiveRecord::Base
     end
     self.child_topics.each{|t| t.unlink_from(:assignment) }
   end
-  
+
   def self.per_page
     10
   end
-  
+
   def initialize_last_reply_at
     self.posted_at ||= Time.now
     self.last_reply_at = Time.now
@@ -339,16 +429,16 @@ class DiscussionTopic < ActiveRecord::Base
   set_policy do
     given { |user| self.user && self.user == user && !self.locked? }
     can :update and can :reply and can :read
-    
+
     given { |user| self.user && self.user == user }
     can :read
 
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && !self.locked? && !self.root_topic_id }
     can :delete
-    
+
     given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :read_forum) }#
     can :read
-    
+
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :reply and can :read
 
@@ -357,10 +447,10 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) and not self.is_announcement }
     can :create
-    
+
     given { |user, session| self.context.respond_to?(:allow_student_forum_attachments) && self.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
     can :attach
-    
+
     given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.locked? }
     can :update and can :delete and can :create and can :read and can :attach
 
@@ -370,7 +460,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
     can :update
-    
+
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
     can :delete
   end
@@ -378,11 +468,11 @@ class DiscussionTopic < ActiveRecord::Base
   def discussion_topic_id
     self.id
   end
-  
+
   def discussion_topic
     self
   end
-  
+
   def to_atom(opts={})
     prefix = [self.is_announcement ? t('#titles.announcement', "Announcement") : t('#titles.discussion', "Discussion")]
     prefix << self.context.name if opts[:include_context]
@@ -391,16 +481,16 @@ class DiscussionTopic < ActiveRecord::Base
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{self.feed_code}"
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/discussion_topics/#{self.id}")
       entry.content   = Atom::Content::Html.new(self.message || "")
     end
   end
-  
+
   def context_prefix
     context_url_prefix
   end
-  
+
   def context_module_action(user, action, points=nil)
     self.context_module_tag.context_module_action(user, action, points) if self.context_module_tag
     if self.for_assignment?
@@ -411,7 +501,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def ensure_submission(user)
     submission = Submission.find_by_assignment_id_and_user_id(self.assignment_id, user.id)
-    return if submission && submission.submission_type == 'discussion_topic'
+    return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state == 'submitted'
     self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
   end
 
@@ -425,14 +515,14 @@ class DiscussionTopic < ActiveRecord::Base
       ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))
     }
   end
-  
+
   def delay_posting=(val); end
   def set_assignment=(val); end
-  
+
   def participants
     ([self.user] + context.participants).compact.uniq
   end
-  
+
   def active_participants
     if !self.context.available? && self.context.respond_to?(:participating_admins)
       self.context.participating_admins
@@ -440,7 +530,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.participants
     end
   end
-  
+
   def posters
     users = self.discussion_entries.find(:all, :include => [:user]).map(&:user)
     users << self.user
@@ -450,7 +540,7 @@ class DiscussionTopic < ActiveRecord::Base
   def user_name
     self.user.name rescue t '#discussion_topic.default_user_name', "User Name"
   end
-  
+
   def locked_for?(user=nil, opts={})
     @locks ||= {}
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
@@ -468,7 +558,7 @@ class DiscussionTopic < ActiveRecord::Base
       locked
     end
   end
-    
+
   attr_accessor :clone_updated
   attr_accessor :assignment_clone_updated
   def clone_for(context, dup=nil, options={})
@@ -499,7 +589,7 @@ class DiscussionTopic < ActiveRecord::Base
     if !dup.attachment_id && self.attachment
       attachment = self.attachment.clone_for(context)
       attachment.folder_id = nil
-      attachment.save_without_broadcasting!
+      attachment.save!
       context.map_merge(self.attachment, attachment)
       context.warn_merge_result("Added file \"#{attachment.folder.full_name}/#{attachment.display_name}\" which is needed for the topic \"#{self.title}\"")
       dup.attachment_id = attachment.id
@@ -544,7 +634,7 @@ class DiscussionTopic < ActiveRecord::Base
     topics_to_import = migration.to_import 'topics'
     topic_entries_to_import = migration.to_import 'topic_entries'
       topics.each do |topic|
-        context = Group.find_by_context_id_and_context_type_and_migration_id(migration.context.id, migration.context.class.to_s, topic['group_id']) if topic['group_id'] 
+        context = Group.find_by_context_id_and_context_type_and_migration_id(migration.context.id, migration.context.class.to_s, topic['group_id']) if topic['group_id']
         context ||= migration.context
         if context
           if topic['migration_id'] && (!topics_to_import || topics_to_import[topic['migration_id']])
@@ -557,7 +647,7 @@ class DiscussionTopic < ActiveRecord::Base
         end
       end
   end
-  
+
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access
     return nil if hash[:migration_id] && hash[:topics_to_import] && !hash[:topics_to_import][hash[:migration_id]]
@@ -612,7 +702,7 @@ class DiscussionTopic < ActiveRecord::Base
     context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items
     item
   end
-  
+
   def self.podcast_elements(messages, context)
     attachment_ids = []
     media_object_ids = []
@@ -667,7 +757,7 @@ class DiscussionTopic < ActiveRecord::Base
       elsif asset.is_a?(DiscussionEntry)
         link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.discussion_topic_id}"
       end
-      
+
       item.link = link
       item.guid = RSS::Rss::Channel::Item::Guid.new
       item.pubDate = elem.updated_at.utc

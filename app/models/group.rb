@@ -60,6 +60,7 @@ class Group < ActiveRecord::Base
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
   has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :media_objects, :as => :context
+  has_many :zip_file_imports, :as => :context
 
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted
@@ -330,6 +331,10 @@ class Group < ActiveRecord::Base
     Rails.cache.fetch(['group_members_count', self].cache_key) do
       self.members_json_cached.length
     end
+  end
+
+  def participating_users_count
+    self.participating_users.count
   end
 
   def quota

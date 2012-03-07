@@ -255,7 +255,7 @@ class Alert < ActiveRecord::Base
   end
 
   def self.send_alert(alert, user_ids, student_enrollment)
-    notification = Notification.find_by_name("Alert")
+    notification = Notification.by_name("Alert")
     notification.create_message(alert, user_ids, {:asset_context => student_enrollment})
   end
 end

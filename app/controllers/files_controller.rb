@@ -327,13 +327,13 @@ class FilesController < ApplicationController
     elsif Attachment.local_storage?
       @headers = false if @files_domain
       cancel_cache_buster
-      send_file(attachment.full_filename, :type => attachment.content_type, :disposition => (inline ? 'inline' : 'attachment'))
+      send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'))
     elsif redirect_to_s3
       redirect_to(inline ? attachment.cacheable_s3_inline_url : attachment.cacheable_s3_download_url)
     else
       require 'aws/s3'
       cancel_cache_buster
-      send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
+      send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
       render :status => 200, :text => Proc.new { |response, output|
         AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
          output.write chunk

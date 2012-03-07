@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,13 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
+class DiscussionTopicParticipant < ActiveRecord::Base
+  include Workflow
 
-describe 'new_file_added.facebook' do
-  it "should render" do
-    attachment_model
-    @object = @attachment
-    generate_message(:new_file_added, :facebook, @object)
+  # Be more restrictive if this is ever updatable from user params
+  attr_accessible :discussion_topic, :user, :workflow_state, :unread_entry_count
+
+  belongs_to :discussion_topic
+  belongs_to :user
+
+  # keeps track of the read state for the initial discussion topic text
+  workflow do
+    state :unread
+    state :read
   end
 end

@@ -119,6 +119,9 @@
         <% if can_do(@topic.assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
           <a href="#" rel="<%= context_url(@assignment.context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> <%= t :show_assignment_rubric, "Show Assignment Rubric" %></a>
         <% end %>
+        <% if can_do(@assignment, @current_user, :grade) %>
+          <a style="<%= hidden unless @assignment.has_peer_reviews? %>" class="assignment_peer_reviews_link button button-sidebar-wide" href="<%= context_url(@assignment.context, :context_assignment_peer_reviews_url, @assignment.id) %>"><%= image_tag "word_bubble.png", :alt => "" %> <%= t 'links.peer_reviews', "Peer Reviews" %></a>
+        <% end %>
       </div>
     <% end %>
   <% end %>
@@ -215,9 +218,10 @@
   <% end %>
   <% 
     sequence_asset = @topic
+    sequence_asset = @topic.root_topic if @topic.root_topic && !@topic.context_module_tag && @topic.root_topic.context_module_tag
     sequence_asset = @topic.assignment if @topic.assignment && !@topic.context_module_tag && @topic.assignment.context_module_tag
   %>
-  <%= render :partial => "shared/sequence_footer", :locals => {:asset => sequence_asset} if sequence_asset.context_module_tag %>
+  <%= render :partial => "shared/sequence_footer", :locals => {:asset => sequence_asset, :context => sequence_asset.context} if sequence_asset.context_module_tag %>
   <div style="display: none;">
     <a href="<%= context_url(@context, {:controller => :discussion_entries, :action => :create}) %>" class="add_entry_url">&nbsp;</a>
   </div>

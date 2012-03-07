@@ -142,17 +142,39 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     check_image(driver.find_element(:css, '#wiki_body img'))
   end
 
-  it "should add an equation to the rce by typing into the equation editor" do
-    equation_text = '5 + 5 + 10 ='
+  it "should add an equation to the rce by using the equation editor" do
+    equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}'
+
     get "/courses/#{@course.id}/wiki"
 
     driver.find_element(:id, 'wiki_page_body_instructure_equation').click
     wait_for_animations
     driver.find_element(:id, 'instructure_equation_prompt').should be_displayed
+    textarea = f('.mathquill-editor .textarea textarea')
     3.times do
-      driver.find_element(:css, '.mathquill-editor .textarea textarea').send_keys(:backspace)
+      textarea.send_keys(:backspace)
     end
-    driver.find_element(:css, '.mathquill-editor .textarea textarea').send_keys(equation_text)
+
+    # "paste" some latex
+    driver.execute_script "$('.mathquill-editor .textarea textarea').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
+    # make sure it renders correctly (inclding the medium space)
+    f('.mathquill-editor').text.should include "yay math stuff: \nd\n\dx\n"
+
+    # type and click a bit
+    textarea.send_keys "d/dx"
+    textarea.send_keys :arrow_right
+    textarea.send_keys "x^1/2"
+    textarea.send_keys :arrow_right
+    textarea.send_keys :arrow_right
+    f('.mathquill-editor .mathquill-toolbar a[title="="]').click
+    textarea.send_keys "1/2"
+    textarea.send_keys :arrow_right
+    textarea.send_keys "x^-1/2"
+    textarea.send_keys :arrow_right
+    textarea.send_keys :arrow_right
+    textarea.send_keys "=1/2"
+    f('.mathquill-editor .mathquill-toolbar a[title="\\\\sqrt"]').click
+    textarea.send_keys "x"
     driver.find_element(:id, 'instructure_equation_prompt_form').submit
     wait_for_ajax_requests
     in_frame "wiki_page_body_ifr" do

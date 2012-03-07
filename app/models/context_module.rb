@@ -266,7 +266,7 @@ class ContextModule < ActiveRecord::Base
     elsif params[:type] == 'context_external_tool'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
-      tool = ContextExternalTool.find_external_tool(params[:url], self.context)
+      tool = ContextExternalTool.find_external_tool(params[:url], self.context, params[:id].to_i)
       unless tool
         tool = ContextExternalTool.new
         tool.id = 0
@@ -519,6 +519,13 @@ class ContextModule < ActiveRecord::Base
                 if tag.content_type == "Quiz"
                   submission = QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
                   score = submission.try(:kept_score)
+                elsif tag.content_type == "DiscussionTopic"
+                  if tag.content
+                    submission = Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
+                    score = submission.try(:score)
+                  else
+                    score = nil
+                  end
                 else
                   submission = Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
                   score = submission.try(:score)

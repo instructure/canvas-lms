@@ -36,15 +36,14 @@ define([
     }
     var flashRequiredMessage = "<div>" + htmlEscape(I18n.t('messages.flash_required', "This video requires Flash version 9 or higher (you have %{version} installed).", { version: yourVersion })) +
             "<br/><a target='_blank' href='http://get.adobe.com/flashplayer/'>" + htmlEscape(I18n.t('links.upgrade_flash', "Click here to upgrade")) +"</a></div>";
-    $.fn.mediaComment = function(command, arg1, arg2, arg3, arg4, arg5) {
+    $.fn.mediaComment = function(command, arg1, arg2, arg3, arg4) {
       var id = arg1, mediaType = arg2, downloadUrl = arg3;
       if(!INST.kalturaSettings) { console.log('Kaltura has not been enabled for this account'); return; }
       if(command == 'create') {
         mediaType = arg1;
         var callback = arg2;
         var cancel_callback = arg3;
-        var modal = arg4;
-        var defaultTitle = arg5;
+        var defaultTitle = arg4;
         $("#media_recorder_container").removeAttr('id').addClass('old_recorder_container');
         this.attr('id', 'media_recorder_container').removeClass('old_recorder_container');
         $(document).unbind('media_comment_created');
@@ -53,7 +52,7 @@ define([
           callback.call($comment, data.id, data.mediaType);
         });
         $.mediaComment.init(mediaType, {
-          modal: modal,
+          modal: false,
           close: function() {
             if(cancel_callback && $.isFunction(cancel_callback)) {
               cancel_callback.call($comment);

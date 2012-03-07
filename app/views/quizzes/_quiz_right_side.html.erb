@@ -27,6 +27,11 @@
                   :score => @submission.kept_score,
                   :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
       </tr>
+        <% if @submission.manually_scored %>
+          <tr>
+            <td colspan="2"><%= t('score_set_manually', 'This score was set by the teacher') %></td>
+          </tr>
+        <% end %>
       <% end %>
     </table>
     </div>

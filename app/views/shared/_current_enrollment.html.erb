@@ -1,33 +1,12 @@
-<li class="<%= 'unpublished' if current_enrollment.course.created? || current_enrollment.course.claimed? %> <%= current_enrollment.state_based_on_date %>">
+<% dashboard ||= false %>
+<% unless dashboard %>
+  <li class="<%= 'unpublished' if current_enrollment.course.created? || current_enrollment.course.claimed? %> <%= current_enrollment.state_based_on_date %>">
+<% end %>
   <% if current_enrollment.workflow_state == "invited" %>
-  <div class="reminder">
+  <div class="<%= dashboard ? 'communication_message dashboard_notification pinned_notification' : 'reminder' %>">
     <h2><a href="<%= course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid) %>"><%= current_enrollment.long_name %></a></h2>
     <div class="body">
-      <%=
-          case current_enrollment.type
-          when 'TeacherEnrollment'
-            mt :body_teacher, "You've been invited to join %{course} as a **teacher** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
-          when 'TaEnrollment'
-            mt :body_ta, "You've been invited to join %{course} as a **TA** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
-          when 'ObserverEnrollment'
-            mt :body_observer, "You've been invited to join %{course} as an **observer** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
-          when 'CourseDesignerEnrollment'
-            mt :body_designer, "You've been invited to join %{course} as a **designer** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
-          else
-            mt :body_student, "You've been invited to join %{course} as a **student** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
-          end
-      %>  
-      <% if !@domain_root_account || @domain_root_account.allow_invitation_previews? %>
-        <%= mt('wander_around_dont_get_lost', "Feel free to [wander around](%{link_to_course}) and see what it's like.", :link_to_course => course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid)) %>
-      <% end %>
-      <%= t('accept_or_reject', "When you're ready, you can either accept or reject the invitation.") %>
-      <div class="button-container button-container-right-aligned">
-        <% form_tag course_enrollment_invitation_path(current_enrollment.course_id) do %>
-          <input type="hidden" name="invitation" value="<%= current_enrollment.uuid %>" />
-          <button type="submit" name="accept" class="button positive button-default"><%= t('buttons.accept', 'Accept Invitation') %></button>
-          <button type="submit" name="reject" class="button reject_button"><%= t('buttons.reject', 'Reject Invitation') %></button>
-        <% end %>
-      </div>
+      <%=  render :partial => 'shared/invitation', :object => current_enrollment %>
     </div>
   </div>
   <% else %>
@@ -59,4 +38,6 @@
     <span class="subtitle ellipsis"><%= message %></span> 
   </a>  
   <% end %>
-</li>
+<% unless dashboard %>
+  </li>
+<% end %>

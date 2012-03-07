@@ -25,6 +25,7 @@ class PageView < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
   belongs_to :real_user, :class_name => 'User'
+  belongs_to :asset_user_access
 
   before_save :ensure_account
   before_save :cap_interaction_seconds

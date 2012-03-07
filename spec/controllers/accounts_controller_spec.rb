@@ -213,7 +213,7 @@ describe AccountsController do
       account_with_admin_logged_in(:active_all => 1)
       @subaccount = @account.sub_accounts.create!
       @munda = user_with_pseudonym(:account => @account, :active_all => 1, :username => 'munda@instructure.com')
-      post 'add_account_user', :account_id => @subaccount.id, :membership_type => 'AccountAdmin', :user_list => 'munda@instructure.com', :only_search_existing_users => 1
+      post 'add_account_user', :account_id => @subaccount.id, :membership_type => 'AccountAdmin', :user_list => 'munda@instructure.com'
       response.should be_success
       @subaccount.account_users.map(&:user).should == [@munda]
     end

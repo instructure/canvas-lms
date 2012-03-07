@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!quizzes.rubric',
   'jquery' /* $ */,
   'jquery.instructure_jquery_patches' /* /\.dialog/ */

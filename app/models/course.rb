@@ -159,6 +159,7 @@ class Course < ActiveRecord::Base
   has_many :appointment_groups, :as => :context
   has_many :appointment_participants, :class_name => 'CalendarEvent', :foreign_key => :effective_context_code, :primary_key => :asset_string, :conditions => "workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL"
   attr_accessor :import_source
+  has_many :zip_file_imports, :as => :context
 
   before_save :assign_uuid
   before_save :assert_defaults
@@ -494,36 +495,40 @@ class Course < ActiveRecord::Base
 
   def instructors_in_charge_of(user_id)
     section_ids = current_enrollments.find(:all, :select => 'course_section_id, course_id, user_id, limit_privileges_to_course_section', :conditions => {:course_id => self.id, :user_id => user_id}).map(&:course_section_id).compact.uniq
-    if section_ids.empty?
-      participating_instructors
-    else
-      participating_instructors.for_course_section(section_ids)
-    end
+    participating_instructors.restrict_to_sections(section_ids)
   end
 
   def user_is_teacher?(user)
     return unless user
-    cache_key = [self, user, "course_user_is_teacher"].cache_key
-    res = Rails.cache.read(cache_key)
-    if res.nil?
-      res = user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
-      Rails.cache.write(cache_key, res)
+    Rails.cache.fetch([self, user, "course_user_is_teacher"].cache_key) do
+      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
-    res
   end
   memoize :user_is_teacher?
 
   def user_is_student?(user)
     return unless user
-    cache_key = [self, user, "course_user_is_student"].cache_key
-    res = Rails.cache.read(cache_key)
-    if res.nil?
-      res = !self.student_enrollments.find_by_user_id(user.id).nil?
-      Rails.cache.write(cache_key, res)
+    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
+      self.student_enrollments.find_by_user_id(user.id).present?
     end
-    res
   end
   memoize :user_is_student?
+
+  def user_has_been_teacher?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_teacher"].cache_key) do
+      self.teacher_enrollments.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_teacher?
+
+  def user_has_been_student?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
+      self.all_student_enrollments.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_student?
 
   def grade_weight_changed!
     @grade_weight_changed = true
@@ -1188,7 +1193,9 @@ class Course < ActiveRecord::Base
       assignments = self.assignments.active.gradeable.find(:all).sort_by{|a| [a.due_at ? 1 : 0, a.due_at || 0, group_order[a.assignment_group_id] || 0, a.position || 0, a.title || ""]}
     end
     single = assignments.length == 1
-    student_enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    includes = [:user, :course_section]
+    includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
+    student_enrollments = self.student_enrollments.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
@@ -1246,7 +1253,12 @@ class Course < ActiveRecord::Base
         end
         #Last Row
         row = [student.last_name_first, student.id]
-        row.concat([student.pseudonym.try(:sis_user_id), student.pseudonym.try(:unique_id)]) if options[:include_sis_id]
+        if options[:include_sis_id]
+          pseudonym = student.sis_pseudonym_for(self.root_account)
+          row << pseudonym.try(:sis_user_id)
+          pseudonym ||= student.find_pseudonym_for_account(self.root_account, true)
+          row << pseudonym.try(:unique_id)
+        end
         row << student_section
         row.concat(student_submissions)
         row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])
@@ -1334,19 +1346,6 @@ class Course < ActiveRecord::Base
     else
       self.grading_standard = self.grading_standard_id = nil
     end
-  end
-
-  def gradebook_json
-    hash = self.as_json(:include_root => false)
-    submissions = Hash.new { |h,k| h[k] = [] }
-    self.submissions.each { |s| submissions[s.user_id] << s }
-    hash['active_assignments'] = self.active_assignments.map{|a| a.as_json(:include_root => false) }
-    hash['students'] = self.students.map do |user|
-      res = user.as_json(:include_root => false)
-      res['submissions'] = submissions[user.id].map{|s| s.as_json(:include_root => false) }
-      res
-    end
-    hash.to_json
   end
 
   def add_aggregate_entries(entries, feed)
@@ -1872,7 +1871,7 @@ class Course < ActiveRecord::Base
           new_folder_id = merge_mapped_id(file.folder)
         end
         new_file.folder_id = new_folder_id
-        new_file.save_without_broadcasting!
+        new_file.save!
         map_merge(file, new_file)
       end
     end
@@ -2525,13 +2524,17 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def open_registration_for?(user, session = nil)
-    root_account.open_registration_for?(user, session)
-  end
-
   def has_open_course_imports?
     self.course_imports.scoped(:conditions => {
       :workflow_state => ['created', 'started']
     }).count > 0
+  end
+
+  def user_list_search_mode_for(user)
+    if self.root_account.open_registration?
+      return self.root_account.delegated_authentication? ? :preferred : :open
+    end
+    return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
+    :closed
   end
 end

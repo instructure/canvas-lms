@@ -24,7 +24,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   before_filter :require_context
   before_filter :require_topic
-  before_filter :require_initial_post, :except => :add_entry
+  before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread]
 
   # @API
   # Create a new entry in a discussion topic. Returns a json representation of
@@ -84,6 +84,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @response_field message The content of the entry.
   #
+  # @response_field read_state The read state of the entry, "read" or "unread".
+  #
   # @response_field created_at The creation time of the entry, in ISO8601
   #   format.
   #
@@ -108,6 +110,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_id": 7086,
   #       "user_name": "nobody@example.com",
   #       "message": "Newer entry",
+  #       "read_state": "read",
   #       "created_at": "2011-11-03T21:33:29Z",
   #       "attachment": {
   #         "content-type": "unknown/unknown",
@@ -119,6 +122,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_id": 7086,
   #       "user_name": "nobody@example.com",
   #       "message": "first top-level entry",
+  #       "read_state": "unread",
   #       "created_at": "2011-11-03T21:32:29Z",
   #       "recent_replies": [
   #         {
@@ -180,6 +184,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @response_field message The content of the reply.
   #
+  # @response_field read_state The read state of the entry, "read" or "unread".
+  #
   # @response_field created_at The creation time of the reply, in ISO8601
   #   format.
   #
@@ -189,12 +195,14 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_id": 7084,
   #       "user_name": "nobody@example.com",
   #       "message": "Newer message",
+  #       "read_state": "read",
   #       "created_at": "2011-11-03T21:27:44Z" },
   #     {
   #       "id": 1014,
   #       "user_id": 7084,
   #       "user_name": "nobody@example.com",
   #       "message": "Older message",
+  #       "read_state": "unread",
   #       "created_at": "2011-11-03T21:26:44Z" } ]
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
@@ -202,6 +210,111 @@ class DiscussionTopicsApiController < ApplicationController
       @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_path(@parent))
       render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
     end
+  end
+
+  # @API
+  # Mark the initial text of the discussion topic as read.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \ 
+  #        -X PUT \ 
+  #        -H "Authorization: Bearer <token>"
+  #        -H "Content-Length: 0"
+  def mark_topic_read
+    change_topic_read_state("read")
+  end
+
+  # @API
+  # Mark the initial text of the discussion topic as unread.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \ 
+  #        -X DELETE \ 
+  #        -H "Authorization: Bearer <token>"
+  def mark_topic_unread
+    change_topic_read_state("unread")
+  end
+
+  # @API
+  # Mark the discussion topic and all its entries as read.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \ 
+  #        -X PUT \ 
+  #        -H "Authorization: Bearer <token>" \ 
+  #        -H "Content-Length: 0"
+  def mark_all_read
+    if authorized_action(@topic, @current_user, :read)
+      @topic.change_all_read_state("read", @current_user)
+      render :json => {}, :status => :no_content
+    end
+  end
+
+  # @API
+  # Mark the discussion topic and all its entries as unread.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \ 
+  #        -X DELETE \ 
+  #        -H "Authorization: Bearer <token>"
+  def mark_all_unread
+    if authorized_action(@topic, @current_user, :read)
+      @topic.change_all_read_state("unread", @current_user)
+      render :json => {}, :status => :no_content
+    end
+  end
+
+  # @API
+  # Mark a discussion entry as read.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ \ 
+  #        -X PUT \ 
+  #        -H "Authorization: Bearer <token>"\ 
+  #        -H "Content-Length: 0"
+  def mark_entry_read
+    change_entry_read_state("read")
+  end
+
+  # @API
+  # Mark a discussion entry as unread.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ 
+  #        -X DELETE \ 
+  #        -H "Authorization: Bearer <token>"
+  def mark_entry_unread
+    change_entry_read_state("unread")
   end
 
   protected
@@ -253,5 +366,30 @@ class DiscussionTopicsApiController < ApplicationController
 
   def reply_entries(entry)
     entry.unordered_discussion_subentries.active
+  end
+
+  def change_topic_read_state(new_state)
+    if authorized_action(@topic, @current_user, :read)
+      topic_participant = @topic.change_read_state(new_state, @current_user)
+      if topic_participant.present? && (topic_participant == true || topic_participant.errors.blank?)
+        render :nothing => true, :status => :no_content
+      else
+        error_json = topic_participant.errors.to_json rescue {}
+        render :json => error_json, :status => :bad_request
+      end
+    end
+  end
+
+  def change_entry_read_state(new_state)
+    @entry = @topic.discussion_entries.find(params[:entry_id])
+    if authorized_action(@entry, @current_user, :read)
+      entry_participant = @entry.change_read_state(new_state, @current_user)
+      if entry_participant.present? && (entry_participant == true || entry_participant.errors.blank?)
+        render :nothing => true, :status => :no_content
+      else
+        error_json = entry_participant.errors.to_json rescue {}
+        render :json => error_json, :status => :bad_request
+      end
+    end
   end
 end

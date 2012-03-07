@@ -24,7 +24,7 @@ define [
         url: '#teacher_feedback'
       },
       {
-        available_to: ['student', 'teacher', 'admin']
+        available_to: ['user', 'student', 'teacher', 'admin']
         text: I18n.t 'search_the_canvas_guides', 'Search the Canvas Guides'
         subtext: I18n.t 'canvas_help_sub', 'Find answers to common questions'
         url: 'http://guides.instructure.com'
@@ -56,7 +56,8 @@ define [
         # only show the links that are available to the roles of this user
         links = $.grep @defaultLinks.concat(links), (link) ->
           $.detect link.available_to, (role) ->
-            role in ENV.current_user_roles
+            role is 'user' or
+            (ENV.current_user_roles and role in ENV.current_user_roles)
         locals =
           showEmail: not ENV.current_user_id
           helpLinks: links
@@ -110,7 +111,8 @@ define [
       @initTeacherFeedback()
 
     initTeacherFeedback: ->
-      if !@teacherFeedbackInited and 'student' in ENV.current_user_roles
+      currentUserIsStudent = ENV.current_user_roles and 'student' in ENV.current_user_roles
+      if !@teacherFeedbackInited and currentUserIsStudent
         @teacherFeedbackInited = true
         coursesDfd = $.getJSON '/api/v1/courses.json'
         $form = null

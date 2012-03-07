@@ -164,21 +164,15 @@ class GradingStandard < ActiveRecord::Base
     res
   end
   
-  def self.standards_for(context, options={})
-    user = options[:user]
+  def self.standards_for(context)
     context_codes = [context.asset_string]
-    if user
-      context_codes += ([user] + user.management_contexts).uniq.map(&:asset_string)
-    end
-    if options[:include_parents]
-      context_codes += Account.all_accounts_for(context).map(&:asset_string)
-    end
+    context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
     standards = GradingStandard.active.find_all_by_context_code(context_codes.uniq)
     standards.uniq
   end
   
-  def self.sorted_standards_for(context, options={})
-    standards_for(context, options).sort_by{|s| [(s.usage_count || 0) > 3 ? 'a' : 'b', (s.title.downcase rescue "zzzzz")]}
+  def self.sorted_standards_for(context)
+    standards_for(context).sort_by{|s| [(s.usage_count || 0) > 3 ? 'a' : 'b', (s.title.downcase rescue "zzzzz")]}
   end
   
   def standard_data=(params={})

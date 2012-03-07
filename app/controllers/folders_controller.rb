@@ -84,8 +84,8 @@ class FoldersController < ApplicationController
               format.zip { redirect_to @attachment.cacheable_s3_inline_url }
             else
               cancel_cache_buster
-              format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
-              format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
+              format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
+              format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
             end
             format.json { render :json => @attachment.to_json(:methods => :readable_size) }
           else

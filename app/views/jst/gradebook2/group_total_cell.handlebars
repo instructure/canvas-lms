@@ -1,0 +1,13 @@
+<div class="gradebook-cell">
+  <div class="gradebook-tooltip">{{score}} / {{possible}}</div>
+  <span class="percentage">
+    {{#if possible}}
+      {{percentage}}%
+    {{else}}
+      -
+    {{/if}}
+  </span>
+   {{#if letterGrade}}
+    <span class='letter-grade-points'>{{letterGrade}}</span>
+  {{/if}}
+</div>

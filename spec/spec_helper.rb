@@ -94,11 +94,19 @@ Spec::Runner.configure do |config|
 
   config.include Webrat::Matchers, :type => :views
 
+  config.before :all do
+    # so before(:all)'s don't get confused
+    Account.clear_special_account_cache!
+    Notification.after_create { Notification.reset_cache! }
+  end
+
   config.before :each do
     Time.zone = 'UTC'
+    Account.clear_special_account_cache!
     Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
     HostUrl.reset_cache!
+    Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
   end
 
@@ -215,7 +223,9 @@ Spec::Runner.configure do |config|
   end
 
   def pseudonym(user, opts={})
-    username = opts[:username] || "nobody@example.com"
+    @spec_pseudonym_count ||= 0
+    username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
+    @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
@@ -281,17 +291,6 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
-  def student_in_course_section(opts={})
-    @course ||= opts[:course] || course(opts)
-    @course_section = opts[:course_section] || @course.course_sections.create!
-    @user = opts[:user] || user(opts)
-    @user.register!
-    @enrollment = @course.enroll_user(@user, 'StudentEnrollment', :section => @course_section)
-    @enrollment.workflow_state = 'active'
-    @enrollment.save!
-    @course.reload
-  end
-
   def course_with_teacher(opts={})
     course_with_user('TeacherEnrollment', opts)
     @teacher = @user
@@ -322,7 +321,7 @@ Spec::Runner.configure do |config|
 
   def group(opts={})
     if opts[:group_context]
-      opts[:group_context].groups.create!
+      @group = opts[:group_context].groups.create!
     else
       @group = Group.create!
     end
@@ -372,10 +371,29 @@ Spec::Runner.configure do |config|
     @quiz = Quiz.find_by_assignment_id(@assignment.id)
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
+    @quiz.workflow_state = "available"
+    @quiz.save!
     @quiz_submission = @quiz.generate_submission(@user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
     @quiz_submission.grade_submission
+  end
+
+  def survey_with_submission(questions, &block)
+    course_with_student(:active_all => true)
+    @assignment = @course.assignments.create(:title => "Test Assignment")
+    @assignment.workflow_state = "available"
+    @assignment.submission_types = "online_quiz"
+    @assignment.save
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz.anonymous_submissions = true
+    @quiz.quiz_type = "graded_survey"
+    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+    @quiz.generate_quiz_data
+    @quiz.save!
+    @quiz_submission = @quiz.generate_submission(@user)
+    @quiz_submission.mark_completed
+    @quiz_submission.submission_data = yield if block_given?
   end
 
   def rubric_for_course
@@ -417,59 +435,60 @@ Spec::Runner.configure do |config|
     @outcome_group.add_item(@outcome)
     @outcome_group.save!
 
-    @rubric = Rubric.new(:title => 'My Rubric', :context => @course, :points_possible => 8, :hide_score_total => false)
-    @rubric.data = [
-      {
-        :points => 3,
-        :description => "Outcome row",
-        :long_description => @outcome.description,
-        :id => 1,
-        :ratings => [
-          {
-            :points => 3,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 2
+    @rubric = Rubric.generate(:context => @course,
+                              :data => {
+      :title => 'My Rubric',
+      :hide_score_total => false,
+      :criteria => {
+        "0" => {
+          :points => 3,
+          :mastery_points => 0,
+          :description => "Outcome row",
+          :long_description => @outcome.description,
+          :ratings => {
+            "0" => {
+              :points => 3,
+              :description => "Rockin'",
+            },
+            "1" => {
+              :points => 0,
+              :description => "Lame",
+            }
           },
-          {
-            :points => 0,
-            :description => "Lame",
-            :criterion_id => 1,
-            :id => 3
+          :learning_outcome_id => @outcome.id
+        },
+        "1" => {
+          :points => 5,
+          :description => "no outcome row",
+          :long_description => 'non outcome criterion',
+          :ratings => {
+            "0" => {
+              :points => 5,
+              :description => "Amazing",
+            },
+            "1" => {
+              :points => 3,
+              :description => "not too bad",
+            },
+            "2" => {
+              :points => 0,
+              :description => "no bueno",
+            }
           }
-        ],
-        :learning_outcome_id => @outcome.id
-      },
-      {
-        :points => 5,
-        :description => "no outcome row",
-        :long_description => 'non outcome criterion',
-        :id => 2,
-        :ratings => [
-          {
-            :points => 5,
-            :description => "Amazing",
-            :criterion_id => 2,
-            :id => 4
-          },
-          {
-            :points => 3,
-            :description => "not too bad",
-            :criterion_id => 2,
-            :id => 5
-          },
-          {
-            :points => 0,
-            :description => "no bueno",
-            :criterion_id => 2,
-            :id => 6
-          }
-        ]
+        }
       }
-    ]
+    })
     @rubric.instance_variable_set('@outcomes_changed', true)
     @rubric.save!
     @rubric.update_outcome_tags
+  end
+
+  def grading_standard_for(context)
+    @standard = context.grading_standards.create!(:title => "My Grading Standard", :standard_data => {
+      "scheme_0" => {:name => "A", :value => "0.9"},
+      "scheme_1" => {:name => "B", :value => "0.8"},
+      "scheme_2" => {:name => "C", :value => "0.7"}
+    })
   end
 
   def eportfolio(opts={})
@@ -662,5 +681,9 @@ Spec::Runner.configure do |config|
     Attachment.local_storage?.should eql(true)
     Attachment.s3_storage?.should eql(false)
     Attachment.local_storage?.should eql(true)
+  end
+
+  def run_job(job)
+    Delayed::Worker.new.perform(job)
   end
 end

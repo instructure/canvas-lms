@@ -30,31 +30,31 @@ module Canvas::Security
     @config ||= (YAML.load_file(RAILS_ROOT + "/config/security.yml")[RAILS_ENV] rescue nil)
   end
   
-  def self.encrypt_password(secret, key)
+  def self.encrypt_password(secret, key, encryption_key = nil)
     require 'base64'
     c = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
     c.encrypt
-    c.key = Digest::SHA1.hexdigest(key + "_" + encryption_key)
+    c.key = Digest::SHA1.hexdigest(key + "_" + (encryption_key || self.encryption_key))
     c.iv = iv = c.random_iv
     e = c.update(secret)
     e << c.final
     [Base64.encode64(e), Base64.encode64(iv)]
   end
   
-  def self.decrypt_password(secret, salt, key)
+  def self.decrypt_password(secret, salt, key, encryption_key = nil)
     require 'base64'
     c = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
     c.decrypt
-    c.key = Digest::SHA1.hexdigest(key + "_" + encryption_key)
+    c.key = Digest::SHA1.hexdigest(key + "_" + (encryption_key || self.encryption_key))
     c.iv = Base64.decode64(salt)
     d = c.update(Base64.decode64(secret))
     d << c.final
     d.to_s
   end
   
-  def self.hmac_sha1(str)
+  def self.hmac_sha1(str, encryption_key = nil)
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest::Digest.new('sha1'), encryption_key, str
+      OpenSSL::Digest::Digest.new('sha1'), (encryption_key || self.encryption_key), str
     )
   end
 

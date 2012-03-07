@@ -41,16 +41,6 @@ define([
         // Only allow non-intrusive types to be auto-opened (i.e. don't
         // allow auto-playing of video files on page load)
         var autoShowContentClasses = ['instructure_scribd_file'];
-        setInterval(function() {
-          promptInteraction.counter = (promptInteraction.counter || 0) + 1;
-          if(promptInteraction.counter > 5) {
-            promptInteraction.counter = 0;
-            if (promptInteraction.hasChanged) {
-              promptInteraction.hasChanged = false;
-              $("#instructure_link_prompt_form .prompt").triggerHandler('data_update');
-            }
-          }
-        }, 100);
         ed.addCommand('instructureLinks', function() {
           var $editor = $("#" + ed.id);
           if ($editor.data('enable_bookmarking')) {
@@ -148,10 +138,7 @@ define([
               $editor.editorBox('create_link', $(event.target).closest('img').attr('alt'));
               $box.dialog('close');
             });
-            $box.find("#instructure_link_prompt_form .prompt").bind('change keypress', function(e) {
-              promptInteraction.counter = 0;
-              promptInteraction.hasChanged = true;
-            }).bind('data_update', function() {
+            $box.find("#instructure_link_prompt_form .prompt").bind('change keyup', function() {
               $("#instructure_link_prompt .actions").empty();
               var val = $(this).val();
               // If the user changes the link then it should no longer

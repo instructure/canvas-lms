@@ -113,7 +113,8 @@ describe PseudonymSessionsController do
       HostUrl.expects(:context_host).with(account).returns('somewhere.else.com')
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
       response.should redirect_to(dashboard_url(:login_success => 1))
-      flash[:notice].should == 'In the future, please login at somewhere.else.com.'
+      flash[:notice].should be_blank
+      flash[:error].should == 'In the future, please login at somewhere.else.com.'
     end
   end
 

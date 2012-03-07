@@ -55,6 +55,7 @@ class Rubric < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :manage)}
     can :read and can :create and can :delete_associations
     
+    # read_only means "associated with > 1 object for grading purposes"
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :update and can :delete
     
@@ -79,7 +80,15 @@ class Rubric < ActiveRecord::Base
   def default_values
     original_title = self.title
     cnt = 0
-    while Rubric.find(:first, :conditions => ['context_id = ? AND context_type = ? AND id != ? AND title = ?', self.context_id, self.context_type, self.id, self.title])
+
+    loop do
+      dup_title = if new_record?
+                    Rubric.first :conditions => ["title = ? AND context_id = ? AND context_type = ? AND workflow_state != 'deleted'", self.title, self.context_id, self.context_type]
+                  else
+                    Rubric.first :conditions => ["title = ? AND context_id = ? AND context_type = ? AND id != ? AND workflow_state != 'deleted'", self.title, self.context_id, self.context_type, self.id]
+                  end
+      break unless dup_title
+
       cnt += 1
       self.title = "#{original_title} (#{cnt})"
     end
@@ -199,7 +208,7 @@ class Rubric < ActiveRecord::Base
   end
   
   def will_change_with_update?(params)
-    return true if params[:free_form_criterion_comments] && self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
+    return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
     data = generate_criteria(params)
     return true if data.title != self.title || data.points_possible != self.points_possible
     return true if data.criteria != self.criteria
@@ -230,7 +239,7 @@ class Rubric < ActiveRecord::Base
           criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == '1'
         end
       end
-      (criterion_data[:ratings] || []).each do |jdx, rating_data|
+      (criterion_data[:ratings] || {}).each do |jdx, rating_data|
         rating = {}
         rating[:description] = (rating_data[:description] || t('no_description', "No Description")).strip
         rating[:long_description] = (rating_data[:long_description] || "").strip

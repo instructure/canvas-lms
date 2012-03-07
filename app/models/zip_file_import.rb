@@ -16,31 +16,70 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ZipFileImport < Tableless
-  attr_accessor :zip_file, :context, :folder_id, :batch_id
-  attr_reader :unzip_attachment, :root_directory, :unzip_attachment
-  attr_accessible :zip_file, :context, :folder_id, :batch_id
+class ZipFileImport < ActiveRecord::Base
+  attr_accessible :attachment, :folder, :context
+  include Workflow
 
-  validates_presence_of :zip_file, :context, :folder_id
-  validates_each :zip_file do |record, attr, value|
-    record.errors.add attr, t('errors.must_upload_file', 'Must Upload A file') unless record.zip_file.class == Tempfile
-    record.errors.add attr, t('errors.file_must_be_zip', 'The file must be a valid .zip archive') unless record.zip_file.respond_to?(:content_type) && record.zip_file.content_type.to_s.strip.match(/application\/(x-)?zip/)
+  belongs_to :attachment
+  belongs_to :folder
+  belongs_to :context, :polymorphic => true
+  validates_presence_of :context
+
+  serialize :data
+
+  set_policy do
+    given { |user| self.context.try(:grants_right?, user, :manage_files) }
+    can :read
   end
 
-  def process!
-    return false unless valid?
-    @root_directory = context.folders.find(folder_id)
-    begin
-      @unzip_attachment = UnzipAttachment.process(
-        :batch_id => batch_id,
-        :course => context,
-        :root_directory => @root_directory,
-        :filename => zip_file.path
-      )
-    rescue => e
-      @error = ErrorReport.log_exception(:default, e)
-      self.errors.add :zip_file, t('errors.unexpected', "Unexpected Error (%{error_id}) while processing zipped files", :error_id => @error.id)
-      return false
+  workflow do
+    state :created
+    state :importing
+    state :imported
+    state :failed
+  end
+
+  def download_zip
+    if self.data[:file_path]
+      File.open(self.data[:file_path], 'rb')
+    else
+      self.attachment.open(:need_local_file => true)
     end
   end
+
+  def process
+    self.workflow_state = :importing
+    self.progress = 0
+    self.data ||= {}
+    self.save
+
+    zipfile = download_zip
+
+    update_progress_proc = Proc.new do |pct|
+      if self.updated_at < 2.seconds.ago || pct == 1.0
+        self.update_attribute(:progress, pct)
+      end
+    end
+
+    UnzipAttachment.process(
+      :context => self.context,
+      :root_directory => self.folder,
+      :filename => zipfile.path,
+      :callback => update_progress_proc
+    )
+
+    zipfile.close
+    zipfile = nil
+
+    self.workflow_state = :imported
+    self.save
+  rescue => e
+    ErrorReport.log_exception(:zip_file_import, e)
+
+    self.data[:error_message] = e.to_s
+    self.data[:stack_trace] = "#{e.to_s}\n#{e.backtrace.join("\n")}"
+    self.workflow_state = "failed"
+    self.save
+  end
+  handle_asynchronously :process, :strand => proc { |zip_file_import| "zip_file_import:#{zip_file_import.context.asset_string}" }
 end

@@ -564,15 +564,35 @@ class Account < ActiveRecord::Base
   def account_users_for(user)
     @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
     @account_users_cache ||= {}
-    @account_users_cache[user] ||= AccountUser.find(:all, :conditions => { :account_id => @account_chain_ids, :user_id => user.id }) if user
+    @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
+      AccountUser.find(:all, :conditions => { :account_id => account_chain_ids, :user_id => user.id })
+    end if user
     @account_users_cache[user] ||= []
     @account_users_cache[user]
   end
-  
+
+  # returns all account users for this entire account tree
+  def all_account_users_for(user)
+    raise "must be a root account" unless self.root_account?
+    Shard.partition_by_shard([self, Account.site_admin].uniq) do |accounts|
+      ids = accounts.map(&:id)
+      AccountUser.find(:all, :include => :account, :joins => :account, :conditions => ["user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user.id, ids, ids])
+    end
+  end
+
   set_policy do
-    RoleOverride.permissions.each_key do |permission|
+    enrollment_types = RoleOverride.enrollment_types.map { |role| role[:name] }
+    RoleOverride.permissions.each do |permission, details|
       given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
       can permission
+
+      next unless details[:account_only]
+      ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
+        given { |user| user && RoleOverride.permission_for(self, permission, role)[:enabled] &&
+          self.course_account_associations.find(:first, :joins => 'INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id',
+            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) }
+        can permission
+      end
     end
 
     given { |user| !self.account_users_for(user).empty? }
@@ -690,37 +710,35 @@ class Account < ActiveRecord::Base
   end
 
   def self.site_admin
-    get_special_account('site_admin', 'Site Admin')
+    get_special_account(:site_admin, 'Site Admin')
   end
 
   def self.default
-    get_special_account('default', 'Default Account')
+    get_special_account(:default, 'Default Account')
+  end
+
+  def self.clear_special_account_cache!
+    @special_accounts = {}
   end
 
   def self.get_special_account(special_account_type, default_account_name)
+    @special_account_ids ||= {}
     @special_accounts ||= {}
 
-    if Rails.env.test?
-      # TODO: we have to do this because tests run in transactions. maybe it'd
-      # be good to create some sort of of memoize_if_safe method, that only
-      # memoizes when we're caching classes and not in test mode? I dunno. But
-      # this stinks.
-      @special_accounts[special_account_type] = Account.find_by_parent_account_id_and_name(nil, default_account_name)
-      return @special_accounts[special_account_type] ||= Account.create(:parent_account => nil, :name => default_account_name)
-    end
-
     account = @special_accounts[special_account_type]
-    return account if account
-    if (account_id = Setting.get("#{special_account_type}_account_id", nil)) && account_id.present?
-      account = Account.find_by_id(account_id)
+    unless account
+      special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
+      account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id) if special_account_id
     end
-    return @special_accounts[special_account_type] = account if account
-    # TODO i18n
-    t '#account.default_site_administrator_account_name', 'Site Admin'
-    t '#account.default_account_name', 'Default Account'
-    account = Account.create!(:name => default_account_name)
-    Setting.set("#{special_account_type}_account_id", account.id)
-    return @special_accounts[special_account_type] = account
+    unless account
+      # TODO i18n
+      t '#account.default_site_administrator_account_name', 'Site Admin'
+      t '#account.default_account_name', 'Default Account'
+      account = @special_accounts[special_account_type] = Account.create!(:name => default_account_name)
+      Setting.set("#{special_account_type}_account_id", account.id)
+      @special_account_ids[special_account_type] = account.id
+    end
+    account
   end
 
   def site_admin?
@@ -1043,15 +1061,15 @@ class Account < ActiveRecord::Base
     self.root_account.sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
   end
 
-  def open_registration_for?(user, session = nil)
-    root_account = self.root_account
-    return true if root_account.open_registration?
-    root_account.grants_right?(user, session, :manage_user_logins)
-  end
-
   def trusted_account_ids
     return [] if !root_account? || self == Account.site_admin
     [ Account.site_admin.id ]
+  end
+
+  def user_list_search_mode_for(user)
+    return :preferred if self.root_account.open_registration?
+    return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
+    :closed
   end
 
   named_scope :root_accounts, :conditions => {:root_account_id => nil}

@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
+define([
   'INST' /* INST */,
   'i18n!topics',
   'jquery' /* $ */,
@@ -84,6 +84,14 @@ require([
       if(topic.assignment.points_possible) {
         topic.assignment_points_possible = topic.assignment.points_possible;
       }
+
+      // get stuff ready for fillTemplateData
+      $.each(['id', 'assignment_group_id', 'points_possible', 'due_at'], function(i, prop){
+        if (!topic['assignment_'+prop]) {
+          topic['assignment_'+prop] = topic.assignment[prop];
+        }
+      });
+
     }
     $topic.find(".attachment_data").showIf(topic.attachment);
     if(topic.attachment) {
@@ -338,10 +346,10 @@ require([
       });
     });
     $("#add_topic_form").formSubmit({
-      fileUpload: function(data) { 
+      fileUpload: function(data) {
         var doUpload = data['attachment[uploaded_data]'];
         if(doUpload) { $(this).attr('action', $(this).attr('action') + '.text'); }
-        return doUpload; 
+        return doUpload;
       },
       object_name: 'discussion_topic',
       required: ['title'],

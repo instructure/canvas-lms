@@ -19,45 +19,45 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "discussion_topics" do
+  def discussion_assignment
+    assignment_model(:course => @course, :submission_types => 'discussion_topic', :title => 'Assignment Discussion')
+    @topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+  end
 
   it "should show assignment group discussions without errors" do
-    course_with_student_logged_in(:active_all => true)
-
-    group_category = @course.group_categories.create(:name => "Project Group")
-    @group = Group.create(:name => "Project Group", :group_category => group_category, :context => @course)
+    group_assignment_discussion
+    course_with_student_logged_in(:course => @course, :active_all => true)
     @group.users << @user
 
-    assignment = @course.assignments.build :automatic_peer_reviews => 0,
-                                           :grade_group_students_individually => 0,
-                                           :grading_type => "points",
-                                           :group_category => group_category,
-                                           :notify_of_update => 0,
-                                           :peer_reviews => 0,
-                                           :submission_types => "discussion_topic",
-                                           :title => "Assignment"
-    assignment.workflow_state = 'available'
-    assignment.content_being_saved_by(@user)
-    assignment.infer_due_at
-    assignment.save
-
-    root_topic = DiscussionTopic.find_by_assignment_id(assignment.id)
-    topic = @group.discussion_topics.find_or_initialize_by_root_topic_id(root_topic.id)
-    topic.message = root_topic.message
-    topic.title = root_topic.title
-    topic.assignment_id = root_topic.assignment_id
-    topic.user_id = root_topic.user_id
-    topic.require_initial_post = true
-    topic.save
-
-    get "/groups/#{@group.id}/discussion_topics/#{topic.id}"
+    get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
     response.should be_success
 
-    post "/groups/#{@group.id}/discussion_entries", :discussion_entry => { :discussion_topic_id => topic.id, :message => "frist!!1" }
+    post "/groups/#{@group.id}/discussion_entries", :discussion_entry => { :discussion_topic_id => @topic.id, :message => "frist!!1" }
     response.should be_redirect
 
-    get "/groups/#{@group.id}/discussion_topics/#{topic.id}"
+    get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
     response.should be_success
   end
+  
+  it "should show speed grader button" do
+    course_with_teacher_logged_in(:active_all => true)
+    discussion_assignment
+
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('#speedgrader_button').should_not be_nil
+  end
+
+  it "should show peer reviews button" do
+    course_with_teacher_logged_in(:active_all => true)
+    discussion_assignment
+    @assignment.peer_reviews = true
+    @assignment.save
+
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    response.should be_success
+    doc = Nokogiri::XML(response.body)
+    doc.at_css('.assignment_peer_reviews_link').should_not be_nil
+  end
 end
-
-

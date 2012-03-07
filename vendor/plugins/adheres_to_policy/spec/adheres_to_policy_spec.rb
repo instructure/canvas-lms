@@ -23,29 +23,41 @@ require File.join(File.dirname(__FILE__), "/../lib/adheres_to_policy")
 include ::Instructure::AdheresToPolicy
 
 describe Policy, "set_policy" do
-  
-  before(:all) do
+
+  before(:each) do
     class AnotherModel
       extend ClassMethods
     end
   end
-    
+
+  after(:each) do
+    Object.send(:remove_const, :AnotherModel)
+  end
+
   it "should take a block" do
     lambda{ class AnotherModel
       set_policy { 1 + 1 }
     end }.should_not raise_error
   end
-    
-  after(:all) do
-    Object.send(:remove_const, :AnotherModel)
+
+  it "should allow multiple calls" do
+    lambda{ class AnotherModel
+      3.times do
+        set_policy { 1 + 1 }
+      end
+    end }.should_not raise_error
   end
 end
 
 describe ClassMethods do
-  before(:all) do
+  before(:each) do
     class A
       extend ClassMethods
     end
+  end
+
+  after(:each) do
+    Object.send(:remove_const, :A)
   end
 
   it "should filter policy_block through a block filter with set_policy" do
@@ -54,7 +66,7 @@ describe ClassMethods do
     b = lambda {1}
     lambda {A.set_policy(&b)}.should_not raise_error
   end
-  
+
   it "should use set_permissions as set_policy" do
     A.methods.should be_include("set_permissions")
     lambda {A.set_permissions(1)}.should raise_error
@@ -63,15 +75,28 @@ describe ClassMethods do
   end
 
   it "should provide a Policy instance through policy" do
+    A.set_policy { 1 }
     A.policy.should be_is_a(Policy)
   end
 
   it "should continue to use the same Policy instance (an important check, since this is also a constructor)" do
+    A.set_policy { 1 }
     A.policy.should eql(A.policy)
   end
 
-  after(:all) do
-    Object.send(:remove_const, :A)
+  it "should apply all given policy blocks to the Policy instance" do
+    A.set_policy do
+      given { |user| true }
+      can :read
+    end
+
+    A.set_policy do
+      given { |user| true }
+      can :write
+    end
+
+    a = A.new
+    a.check_policy(nil).should == [:read, :write]
   end
 end
 
@@ -86,11 +111,15 @@ describe InstanceMethods do
       end
     end
   end
-  
+
   before(:each) do
     @a = A.new
   end
-  
+
+  after(:each) do
+    Object.send(:remove_const, :B) if Object.send(:const_defined?, :B)
+  end
+
   it "should have setup a series of methods on the instance" do
     %w(check_policy grants_rights? has_rights?).each do |method|
       @a.methods.should be_include(method)
@@ -222,9 +251,8 @@ describe InstanceMethods do
     b.check_policy(nil, nil, :read, :write).should == [:read, :write]
     b.total.should == 2
   end
-  
+
   after(:all) do
     Object.send(:remove_const, :A)
-    Object.send(:remove_const, :B)
   end
 end
