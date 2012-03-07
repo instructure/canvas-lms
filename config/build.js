@@ -19,10 +19,24 @@
 
   // paths we have set up (matches require onfig in application.html.erb)
   paths: {
+    common: 'compiled/bundles/common',
     jquery: 'vendor/jquery-1.6.4',
     jqueryui: 'vendor/jqueryui',
+    underscore: 'vendor/underscore',
+    backbone: 'vendor/backbone',
     uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
-    common: 'compiled/bundles/common'
+    use: 'vendor/use'
+  },
+
+  // non-amd shims
+  use: {
+    backbone: {
+      deps: ['use!underscore', 'jquery'],
+      attach: 'Backbone'
+    },
+    underscore: {
+      attach: '_'
+    }
   },
 
   // which modules should have their dependencies concatenated into them

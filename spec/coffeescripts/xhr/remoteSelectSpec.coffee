@@ -1,5 +1,5 @@
 define [
-  'vendor/underscore'
+  'use!underscore'
   'compiled/xhr/RemoteSelect'
   'helpers/loadFixture'
 ], (_, RemoteSelect, loadFixture) ->
