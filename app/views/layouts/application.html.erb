@@ -22,7 +22,7 @@
 <!--[if IE 7 ]>    <html class="ie ie7 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
 <!--[if IE 8 ]>    <html class="ie ie8 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
 <!--[if gte IE 9 ]><html class="ie ie9 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
-<!--[if !(IE)]><!--> <html class="not-ie not-ready scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
+<!--[if !(IE)]><!--> <html class="not-ie scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   <title><%= yield :page_title || t('missing_page_title', "Add a page title here.") %></title>
@@ -289,7 +289,8 @@
     var done = require.resourcesDone === true
     var giveup = attempts === 100; // 1 second
     if (done || giveup) {
-      $('html').removeClass('scripts-not-loaded');
+      var className = document.documentElement.className;
+      document.documentElement.className = className.replace(/scripts-not-loaded/, '');
       return;
     }
     setTimeout(check, timeout);
