@@ -24,7 +24,7 @@ describe DiscussionTopic do
     @course.discussion_topics.create!(:message => "<a href='#' onclick='alert(12);'>only this should stay</a>")
     @course.discussion_topics.first.message.should eql("<a href=\"#\">only this should stay</a>")
   end
-  
+
   it "should update the assignment it is associated with" do
     course_model
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -38,7 +38,7 @@ describe DiscussionTopic do
     a.discussion_topic.should eql(t)
     a.submission_types.should eql("discussion_topic")
   end
-  
+
   it "should delete the assignment if the topic is no longer graded" do
     course_model
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -109,7 +109,7 @@ describe DiscussionTopic do
     @entry = @topic.discussion_entries.create!(:user => @teacher)
     (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
   end
-  
+
   context "delayed posting" do
     def delayed_discussion_topic(opts = {})
       @topic = @course.discussion_topics.build(opts)
@@ -117,16 +117,16 @@ describe DiscussionTopic do
       @topic.save!
       @topic
     end
-    
+
     it "shouldn't send to streams on creation or update if it's delayed" do
       course_with_student(:active_all => true)
       @user.register
       topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
       StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
-      
+
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
-      
+
       topic.message = "content changed!"
       topic.save
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
@@ -138,7 +138,7 @@ describe DiscussionTopic do
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       topic.workflow_state.should == 'post_delayed'
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
-      
+
       topic.delayed_post_at = nil
       topic.title = "this isn't delayed any more"
       topic.workflow_state = 'active'
@@ -146,7 +146,7 @@ describe DiscussionTopic do
       StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
     end
   end
-  
+
   context "clone_for" do
     it "should clone to another context" do
       course_model
@@ -159,7 +159,7 @@ describe DiscussionTopic do
       new_topic.title.should eql(topic.title)
     end
   end
-  
+
   context "sub-topics" do
     it "should default subtopics_refreshed_at on save if a group assignment" do
       course_with_student(:active_all => true)
@@ -223,7 +223,7 @@ describe DiscussionTopic do
       subtopics = @topic.refresh_subtopics
       subtopics.should_not be_nil
       subtopics.size.should == 2
-      subtopics.each{ |t| t.root_topic.should == @topic }
+      subtopics.each { |t| t.root_topic.should == @topic }
       @group1.reload.discussion_topics.should_not be_empty
       @group2.reload.discussion_topics.should_not be_empty
     end
@@ -342,14 +342,14 @@ describe DiscussionTopic do
       @parent_topic.should_send_to_stream.should be_true
       @subtopic.should_send_to_stream.should be_false
     end
-    
+
     it "should not send stream items to students if course isn't published'" do
       course
       course_with_teacher(:course => @course, :active_all => true)
       student_in_course(:course => @course, :active_all => true)
-      
+
       topic = @course.discussion_topics.create(:title => "secret topic", :user => @teacher)
-      
+
       StreamItem.for_user(@student).count.should == 0
       StreamItem.for_user(@teacher).count.should == 1
 
@@ -358,9 +358,9 @@ describe DiscussionTopic do
       StreamItem.for_user(@student).count.should == 0
       StreamItem.for_user(@teacher).count.should == 1
     end
-    
+
   end
-  
+
   context "posting first to view" do
     before(:each) do
       course_with_student(:active_all => true)
@@ -371,22 +371,22 @@ describe DiscussionTopic do
       @topic.require_initial_post = true
       @topic.save
     end
-    
+
     it "should allow admins to see posts without posting" do
       @topic.user_can_see_posts?(@teacher).should == true
     end
-    
+
     it "shouldn't allow student (and observer) who hasn't posted to see" do
       @topic.user_can_see_posts?(@student).should == false
     end
-    
-    it "should allow student (and observer) who has posted to see" do 
+
+    it "should allow student (and observer) who has posted to see" do
       @topic.reply_from(:user => @student, :text => 'hai')
       @topic.user_can_see_posts?(@student).should == true
     end
-    
+
   end
-  
+
   context "posters" do
     before :each do
       @teacher = course_with_teacher(:active_all => true).user
@@ -440,6 +440,23 @@ describe DiscussionTopic do
       @entry1.created_at = 1.week.ago
       @entry1.save!
       @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+    end
+
+    it "should not re-flag graded discussion as needs grading if student make another comment" do
+      pending('bug 6273 - do not re-flag graded discussion as needs grading if student make another comment') do
+        student_enrollment = student_in_course(:name => 'student in course')
+        student = student_enrollment.user
+        assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
+        topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
+        topic.discussion_entries.create!(:message => "student message for grading", :user => student)
+        student_submission = Submission.last
+        student_submission.assignment.grade_student(student, {:grade => 9})
+        student_submission.reload
+        student_submission.workflow_state.should == 'graded'
+        topic.discussion_entries.create!(:message => "student message 2 for grading", :user => student)
+        student_submission.reload
+        student_submission.workflow_state.should == 'graded'
+      end
     end
 
     it "should create submissions for existing entries when setting the assignment" do
