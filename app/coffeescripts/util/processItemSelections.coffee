@@ -1,4 +1,4 @@
-define 'compiled/util/processItemSelections', [], ->
+define ->
   processItemSelections = (data) ->
     newData = {items_to_copy: []}
     reAssetString = /copy\[([^\]]*)\]$/

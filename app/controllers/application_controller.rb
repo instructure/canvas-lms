@@ -698,6 +698,7 @@ class ApplicationController < ActionController::Base
         @access.membership_type ||= @accessed_asset[:membership_type]
         @access.context = @context.is_a?(UserProfile) ? @context.user : @context
         @access.summarized_at = nil
+        @access.last_access = Time.now.utc
         @access.save
         @page_view.asset_user_access_id = @access.id if @page_view
         @page_view_update = true
@@ -916,7 +917,7 @@ class ApplicationController < ActionController::Base
       end
       @resource_url = @tag.url
       @opaque_id = @tag.opaque_identifier(:asset_string)
-      @tool = ContextExternalTool.find_external_tool(tag.url, context)
+      @tool = ContextExternalTool.find_external_tool(tag.url, context, tag.content_id)
       @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
       if !@tool
@@ -1091,7 +1092,6 @@ class ApplicationController < ActionController::Base
   def require_site_admin
     require_site_admin_with_permission(:site_admin)
   end
-  helper_method :current_user_is_site_admin?
 
   def require_site_admin_with_permission(permission)
     unless current_user_is_site_admin?(permission)
@@ -1184,5 +1184,55 @@ class ApplicationController < ActionController::Base
       end
     end
     super
+  end
+
+  def jammit_css_bundles; @jammit_css_bundles ||= []; end
+  helper_method :jammit_css_bundles
+
+  def jammit_css(*args)
+    opts = (args.last.is_a?(Hash) ? args.pop : {})
+    Array(args).flatten.each do |bundle|
+      jammit_css_bundles << [bundle, opts[:plugin]] unless jammit_css_bundles.include? [bundle, opts[:plugin]]
+    end
+    nil
+  end
+  helper_method :jammit_css
+
+  def js_bundles; @js_bundles ||= []; end
+  helper_method :js_bundles
+
+  # Use this method to place a bundle on the page, note that the end goal here
+  # is to only ever include one bundle per page load, so use this with care and
+  # ensure that the bundle you are requiring isn't simply a dependency of some
+  # other bundle.
+  #
+  # Bundles are defined in app/coffeescripts/bundles/<bundle>.coffee
+  #
+  # usage: js_bundle :gradebook2
+  #
+  # Only allows multiple arguments to support old usage of jammit_js
+  #
+  # Optional :plugin named parameter allows you to specify a plugin which
+  # contains the bundle. Example:
+  #
+  # js_bundle :gradebook2, :plugin => :my_feature
+  #
+  # will look for the bundle in
+  # /plugins/my_feature/(optimized|javascripts)/compiled/bundles/ rather than
+  # /(optimized|javascripts)/compiled/bundles/
+  def js_bundle(*args)
+    opts = (args.last.is_a?(Hash) ? args.pop : {})
+    Array(args).flatten.each do |bundle|
+      js_bundles << [bundle, opts[:plugin]] unless js_bundles.include? [bundle, opts[:plugin]]
+    end
+    nil
+  end
+  helper_method :js_bundle
+
+  def get_course_from_section
+    if params[:section_id]
+      @section = api_find(CourseSection, params.delete(:section_id))
+      params[:course_id] = @section.course_id
+    end
   end
 end

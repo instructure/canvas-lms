@@ -16,8 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
+define([
  'i18n!edit_rubric',
+ 'jst/changePointsPossibleToMatchRubricDialog',
  'jquery' /* $ */,
  'find_outcome',
  'jquery.ajaxJSON' /* ajaxJSON */,
@@ -29,7 +30,7 @@ require([
  'jquery.templateData' /* fillTemplateData, getTemplateData */,
  'vendor/jquery.ba-throttle-debounce' /* debounce */,
  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $) {
+], function(I18n, changePointsPossibleToMatchRubricDialog, $) {
 
   var rubricEditing = {
     htmlBody: null,
@@ -240,6 +241,9 @@ require([
       }
       data['rubric[free_form_criterion_comments]'] = $rubric.find(".rubric_custom_rating").attr('checked') ? "1" : "0";
       data['rubric_association[id]'] = vals.rubric_association_id;
+      // make sure the association is always updated, see the comment on
+      // RubricsController#update
+      data['rubric_association_id'] = vals.rubric_association_id;
       var criterion_idx = 0;
       $rubric.find(".criterion:not(.blank)").each(function() {
         var $criterion = $(this);
@@ -626,49 +630,42 @@ require([
       $(this).parents(".rubric_brief").find(".expand_data_link,.collapse_data_link").toggle().end()
         .find(".details").slideToggle();
     });
+
     var forceSubmit = false,
-        skip_points_update = false;
+        skipPointsUpdate = false;
     $("#edit_rubric_form").formSubmit({
       processData: function(data) {
         var $rubric = $(this).parents(".rubric");
-        if($rubric.find(".criterion:not(.blank)").length === 0) { return false; }
+        if (!$rubric.find(".criterion:not(.blank)").length) return false;
         var data = rubricEditing.rubricData($rubric);
-        if(data['rubric_association[use_for_grading]'] == '1') {
-          var assignment_points = parseFloat($("#full_assignment .points_possible").text());
-          var rubric_points = parseFloat(data.points_possible);
-          if(assignment_points && rubric_points != assignment_points && !forceSubmit) {
-            var assignment_title = $.trim($("#full_assignment .title").text());
-            var $confirm_dialog = $('<p />')
-              .text(I18n.t('prompts.update_assignment_points', "%{assignment_title} has %{assignment_points} points possible, " +
-                    "would you like to change it to have %{rubric_points} points possible to match this rubric?",
-                    {'assignment_points':assignment_points, 'assignment_title':assignment_title,'rubric_points':rubric_points} ))
-              .dialog({
-                buttons: {
-                  "Change" : function(){
-                    forceSubmit = true;
-                    skip_points_update = false;
-                    $confirm_dialog.remove();
-                    $("#edit_rubric_form").submit();
-                  },
-                  "Leave different" : function(){
-                    forceSubmit = true;
-                    skip_points_update = true;
-                    $confirm_dialog.remove();
-                    $("#edit_rubric_form").submit();
-                  }
-                },
-                width: 320,
-                resizable: false,
-                title: I18n.t('titles.update_assignment_points', "Change points possible to match rubric?"),
-                close: function(){
-                  $confirm_dialog.remove();
-                }
-              });
+        if (data['rubric_association[use_for_grading]'] == '1') {
+          var assignmentPoints = parseFloat($("#full_assignment .points_possible").text());
+          var rubricPoints = parseFloat(data.points_possible);
+          if (assignmentPoints && rubricPoints != assignmentPoints && !forceSubmit) {
+            var $confirmDialog = $(changePointsPossibleToMatchRubricDialog({
+              assignmentPoints: assignmentPoints,
+              rubricPoints: rubricPoints
+            }));
+            var closeDialog = function(skip){
+              forceSubmit = true;
+              skipPointsUpdate = skip === true;
+              $confirmDialog.remove();
+              $("#edit_rubric_form").submit();
+            };
+            $confirmDialog.dialog({
+              buttons: {
+                "Change" : closeDialog,
+                "Leave different" : function(){ closeDialog(true); }
+              },
+              width: 320,
+              resizable: false,
+              close: $confirmDialog.remove
+            });
             return false;
           }
         }
-        data.skip_updating_points_possible = skip_points_update;
-        skip_points_update = false;
+        data.skip_updating_points_possible = skipPointsUpdate;
+        skipPointsUpdate = false;
         forceSubmit = false;
         return data;
       },
@@ -696,7 +693,7 @@ require([
           rubric.permissions.delete_association = data.rubric_association.permissions['delete'];
         }
         rubricEditing.updateRubric($rubric, rubric);
-        if(data.rubric_association && data.rubric_association.use_for_grading && !data.rubric_association.skip_updating_points_possible) {
+        if (data.rubric_association && data.rubric_association.use_for_grading && !data.rubric_association.skip_updating_points_possible) {
           $("#full_assignment .points_possible").text(rubric.points_possible);
           $("#full_assignment input.points_possible").val(rubric.points_possible);
         }

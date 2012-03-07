@@ -1081,6 +1081,17 @@ describe Enrollment do
     end
   end
 
+  it "should uncache user enrollments when rejected" do
+    enable_cache do
+      course_with_student(:active_course => 1)
+      User.update_all({:updated_at => 1.year.ago}, :id => @user.id)
+      @user.reload
+      @user.cached_current_enrollments.should == [@enrollment]
+      @enrollment.reject!
+      @user.cached_current_enrollments(true).should == []
+    end
+  end
+
   context "named scopes" do
     describe "ended" do
       it "should work" do
@@ -1157,6 +1168,92 @@ describe Enrollment do
       @e1.update_attribute('sis_source_id', nil)
       enrollment_model(:course_section => @course.course_sections.first, :user => @user, :type => "StudentEnrollment")
       expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
+    end
+  end
+
+  describe "effective_start_at" do
+    before :each do
+      course_with_student(:active_all => true)
+      (@term = @course.enrollment_term).should_not be_nil
+      (@section = @enrollment.course_section).should_not be_nil
+
+      # 6 different possible times, make sure they're distinct
+      @enrollment.start_at = 6.minutes.ago
+      @section.start_at = 5.minutes.ago
+      @course.start_at = 4.minutes.ago
+      @term.start_at = 3.minutes.ago
+      @section.created_at = 2.minutes.ago
+      @course.created_at = 1.minute.ago
+    end
+
+    it "should follow chain of fallbacks in correct order" do
+      # start peeling away things from most preferred to least preferred to
+      # test fallback chain
+      @enrollment.effective_start_at.should == @enrollment.start_at
+      @enrollment.start_at = nil
+      @enrollment.effective_start_at.should == @section.start_at
+      @section.start_at = nil
+      @enrollment.effective_start_at.should == @course.start_at
+      @course.start_at = nil
+      @enrollment.effective_start_at.should == @term.start_at
+      @term.start_at = nil
+      @enrollment.effective_start_at.should == @section.created_at
+      @section.created_at = nil
+      @enrollment.effective_start_at.should == @course.created_at
+      @course.created_at = nil
+      @enrollment.effective_start_at.should be_nil
+    end
+
+    it "should not explode when missing section or term" do
+      @enrollment.course_section = nil
+      @course.enrollment_term = nil
+
+      @enrollment.effective_start_at.should == @enrollment.start_at
+      @enrollment.start_at = nil
+      @enrollment.effective_start_at.should == @course.start_at
+      @course.start_at = nil
+      @enrollment.effective_start_at.should == @course.created_at
+      @course.created_at = nil
+      @enrollment.effective_start_at.should be_nil
+    end
+  end
+
+  describe "effective_end_at" do
+    before :each do
+      course_with_student(:active_all => true)
+      (@term = @course.enrollment_term).should_not be_nil
+      (@section = @enrollment.course_section).should_not be_nil
+
+      # 4 different possible times, make sure they're distinct
+      @enrollment.end_at = 4.minutes.ago
+      @section.end_at = 3.minutes.ago
+      @course.conclude_at = 2.minutes.ago
+      @term.end_at = 1.minutes.ago
+    end
+
+    it "should follow chain of fallbacks in correct order" do
+      # start peeling away things from most preferred to least preferred to
+      # test fallback chain
+      @enrollment.effective_end_at.should == @enrollment.end_at
+      @enrollment.end_at = nil
+      @enrollment.effective_end_at.should == @section.end_at
+      @section.end_at = nil
+      @enrollment.effective_end_at.should == @course.conclude_at
+      @course.conclude_at = nil
+      @enrollment.effective_end_at.should == @term.end_at
+      @term.end_at = nil
+      @enrollment.effective_end_at.should be_nil
+    end
+
+    it "should not explode when missing section or term" do
+      @enrollment.course_section = nil
+      @course.enrollment_term = nil
+
+      @enrollment.effective_end_at.should == @enrollment.end_at
+      @enrollment.end_at = nil
+      @enrollment.effective_end_at.should == @course.conclude_at
+      @course.conclude_at = nil
+      @enrollment.effective_end_at.should be_nil
     end
   end
 end

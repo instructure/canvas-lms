@@ -62,9 +62,10 @@
       <tr>
         <td colspan="2">
           <%= blabel :submission, :comment, :en => "Comments" %>
-          <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
+          <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
         </td>
       </tr>
+      <%= render :partial => "group_comment" %>
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
       <% end %>
@@ -101,9 +102,10 @@
       </tr><tr>
         <td>
           <%= blabel :submission, :comment, :en => "Comments" %>
-          <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
+          <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
         </td>
       </tr>
+      <%= render :partial => "group_comment" %>
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
       <% end %>
@@ -137,9 +139,11 @@
           <div style="text-align: left;">
             <%= blabel :submission, :comment, :en => "Comments" %>
           </div>
-          <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
+          <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
         </td>
-      </tr><tr>
+      </tr>
+      <%= render :partial => "group_comment" %>
+      <tr>
         <td colspan="2" class='button-container'>
           <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
           <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
@@ -222,6 +226,7 @@
               <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
             </td>
           </tr>
+          <%= render :partial => "group_comment" %>
           <% if @assignment.turnitin_enabled? %>
             <%= render :partial => "turnitin" %>
           <% end %>
@@ -286,9 +291,11 @@
               <div style="text-align: left;">
                 <%= blabel :submission, :comment, :en => "Comments" %>
               </div>
-              <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
+              <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
             </td>
-          </tr><tr>
+          </tr>
+          <%= render :partial => "group_comment" %>
+          <tr>
             <td colspan="2" class='button-container'>
               <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
               <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
@@ -310,6 +317,7 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
+  'jquery.rails_flash_notifications' /* $.flashError */,
   'jquery.ajaxJSON' /* ajaxJSONPreparedFiles, ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* getFormData */,
@@ -325,8 +333,20 @@ require([
   window.allowed_extensions = <%= raw((@assignment.allowed_extensions || []).to_json) %>
 
 $(document).ready(function() {
-  var submitting = false;
-  $(".submit_assignment_form").submit(function(event) {
+  var submitting = false,
+      submissionForm = $('.submit_assignment_form');
+
+  // grow and shrink the comments box on focus/blur if the user
+  // hasn't entered any content.
+  submissionForm.delegate('#submission_comment', 'focus', function(e) {
+    var box = $(this);
+    if (box.val().trim() === '') { box.css('height', '72px'); }
+  }).delegate('#submission_comment', 'blur', function(e) {
+    var box = $(this);
+    if (box.val().trim() === '') { box.css('height', '16px'); }
+  });
+
+  submissionForm.submit(function(event) {
     var $turnitin = $(this).find(".turnitin_pledge");
     if($turnitin.length > 0 && !$turnitin.attr('checked')) {
       alert(<%= jt('#assignments.messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment.") %>);
@@ -334,12 +354,28 @@ $(document).ready(function() {
       event.stopPropagation();
       return false;
     }
+
+    var valid = !$(this).is('#submit_online_text_entry_form') || $(this).validateForm({
+      object_name: 'submission',
+      required: ['body']
+    });
+    if (!valid) return false;
+
     $(this).find("button[type='submit']").text(<%= jt('#assignments.messages.submitting', "Submitting...") %>);
     $(this).find("button").attr('disabled', true);
     if($(this).attr('id') == 'submit_online_upload_form') {
-      event.preventDefault();
-      event.stopPropagation();
-      console.log("uploading files");
+      event.preventDefault() && event.stopPropagation();
+      var fileElements = $(this).find('input[type=file]:visible').filter(function() {
+        return $(this).val() !== '';
+      });
+      // warn user if they haven't uploaded any files
+      if (fileElements.length === 0) {
+        $.flashError(<%= jt('#errors.no_attached_file', 'You must attach at least one file to this assignment') %>);
+        $(this).find('button[type=submit]')
+          .text(<%= jt('#button.submit_assignment', 'Submit Assignment') %>)
+          .prop('disabled', false);
+        return false;
+      }
       $.ajaxJSONPreparedFiles.call(this, {
         handle_files: function(attachments, data) {
           var ids = (data['submission[attachment_ids]'] || "").split(",");
@@ -352,19 +388,14 @@ $(document).ready(function() {
         context_code: $("#submit_assignment").data('context_code'),
         asset_string: $("#submit_assignment").data('asset_string'),
         intent: "submit",
-        file_elements: $(this).find("input[type='file']:visible").filter(function(){ 
-          // only include file inputs where user has selected a file, no blank ones.
-          return $(this).val() !== ''; 
-        }),
+        file_elements: fileElements,
         data: $(this).getFormData(),
         url: $(this).attr('action'),
         success: function(data) {
-          console.log("successfully uploaded files");
           submitting = true;
           window.location = window.location.href.replace(window.location.hash, "");
         },
         error: function(data) {
-          console.log("failed uploading files");
           $(this).find("button[type='submit']").text(<%= jt('#assignments.messages.submit_failed', "Submit Failed, please try again") %>);
           $(this).find("button").attr('disabled', false);
         }

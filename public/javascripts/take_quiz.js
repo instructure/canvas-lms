@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-require([
+define([
   'i18n!quizzes.take_quiz',
   'jquery' /* $ */,
   'quiz_timing',
@@ -26,7 +26,8 @@ require([
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.rails_flash_notifications' /* flashMessage */,
   'tinymce.editor_box' /* editorBox */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'compiled/behaviors/quiz_selectmenu'
 ], function(I18n, $, timing) {
 
   var lastAnswerSelected = null;
@@ -188,9 +189,6 @@ require([
   });
 
   $(function() {
-    // prevent mousewheel from changing answers on dropdowns see #6143
-    $('select').bind('mousewheel', false);
-
     $.scrollSidebar();
 
     if($("#preview_mode_link").length == 0) {
@@ -201,7 +199,7 @@ require([
         }
       };
       $(document).delegate('a', 'click', function(event) {
-        if($(this).closest('.ui-dialog,.mceToolbar').length > 0) { return; }
+        if($(this).closest('.ui-dialog,.mceToolbar,.ui-selectmenu').length > 0) { return; }
         if(!event.isDefaultPrevented()) {
           var url = $(this).attr('href') || "";
           var hashStripped = location.href;
@@ -255,33 +253,6 @@ require([
       },
       mouseleave: function(event) {
         $(this).removeClass('hover');
-      }
-    });
-
-    /* the intent of this is to ensure that the class doesn't ever change while
-       the dropdown is open. in windows chrome, mouseleave events still fire
-       for ancestors when a dropdown is open, and any style changes to them
-       cause the dropdown to jump/reset. this effectively normalizes the
-       mouseenter/mouseleave behavior across platforms and browsers, but the
-       side effect is that the hover class is retained until the mouse has left
-       and the select has blurred. */
-    $questions.find('.question').bind({
-      mouseenter: function(event) {
-        var $container = $(this);
-        var $activeSelect = $container.find($(document.activeElement)).filter("select");
-        if ($activeSelect.length) $activeSelect.unbind('blur.unhoverQuestion');
-        if (!$container.hasClass('hover')) $container.addClass('hover');
-      },
-      mouseleave: function(event) {
-        var $container = $(this);
-        var $activeSelect = $container.find($(document.activeElement)).filter("select");
-        if ($activeSelect.length) {
-          $activeSelect.one('blur.unhoverQuestion', function() {
-            $(this).closest('.question').trigger('mouseleave');
-          });
-        } else {
-          $container.removeClass('hover');
-        }
       }
     });
 

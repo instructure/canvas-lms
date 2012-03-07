@@ -35,16 +35,17 @@ module Instructure #:nodoc:
       # macro.  The policy block will be stored in @policy_block.  Then, an
       # instance will use that to instantiate a Policy object.
       def set_policy(&block)
-        include InstanceMethods unless @_policy_block
+        include InstanceMethods if @_policy_blocks.nil? || @_policy_blocks.empty?
         @_policy = nil
-        @_policy_block = block
+        @_policy_blocks ||= []
+        @_policy_blocks << block
       end
       alias :set_permissions :set_policy
 
       def policy
-        return superclass.policy unless @_policy_block
+        return superclass.policy if @_policy_blocks.nil? || @_policy_blocks.empty?
         return @_policy if @_policy
-        @_policy = Policy.new(&@_policy_block)
+        @_policy = Policy.new(*@_policy_blocks)
       end
     end
 
@@ -52,9 +53,10 @@ module Instructure #:nodoc:
     class Policy
       attr_reader :conditions
 
-      def initialize(&block)
+      def initialize(*blocks, &block)
         @conditions = []
-        instance_eval(&block)
+        blocks.each{ |b| instance_eval(&b) }
+        instance_eval(&block) if block
       end
 
       # Stores a condition that will match with every permission that is set

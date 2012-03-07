@@ -25,8 +25,7 @@ class UserListsController < ApplicationController
   def create
     return unless authorized_action(@context, @current_user, @context.is_a?(Course) ? [:manage_students, :manage_admin_users] : :manage_account_memberships)
     respond_to do |format|
-      format.json { render :json => UserList.new(params[:user_list], @context.root_account,
-          params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user)) }
+      format.json { render :json => UserList.new(params[:user_list], @context.root_account, @context.user_list_search_mode_for(@current_user)) }
     end
   end
 end

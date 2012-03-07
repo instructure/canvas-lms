@@ -20,7 +20,7 @@
     <button type="submit" class="submit_button button big-button"><%= t 'buttons.upload_file', 'Upload File' %></button>
     <a class="cancel_button button button-secondary" href="#"><%= t '#buttons.cancel', 'Cancel' %></a>
   </div>
-  <a href="<%= context_url(@context, :import_status_context_zip_file_imports_url) %>" class="zip_file_import_status_url" style="display: none;">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_zip_file_import_url, "{{ id }}", :format => :json) %>" class="zip_file_import_status_url" style="display: none;">&nbsp;</a>
 <% end %>
 <% js_block do %>
 <script>
@@ -59,10 +59,13 @@ $(document).ready(function() {
   var $frame = $("<iframe id='import_frame' name='import_frame'/>")
   $("body").append($frame.hide());
   $("#zip_file_import_form").attr('target', 'import_frame');
-  $("#zip_file_import_form").submit(function() {
+  $("#zip_file_import_form").submit(function(event) {
+    event.preventDefault();
+    
     $("#uploading_progressbar").progressbar('value', 0);
-    var id = $("#zip_import_batch_id").val();
-    var url = $(".zip_file_import_status_url").attr('href') + "?batch_id=" + id;
+    
+    var pollURL = null;
+    
     $("#zip_file_import_form .errors").hide();
     var importFailed = function(errors) {
       var $div = $("<div class='errors' style='color: #a00; font-weight: bold;'/>");
@@ -81,16 +84,10 @@ $(document).ready(function() {
       $("#zip_file_import_form").prepend($ul).prepend($div);
       $("#uploading_please_wait_dialog").dialog('close');
     }
-    var hadSomeProgress = false;
     var pollImport = function() {
-      $.getJSON(url, function(data) {
-        if(data && data.errors) {
-          importFailed(data.errors);
-        } else if(data && data.complete) {
-          $("#uploading_progressbar").progressbar('value', 100);
-          $("#uploading_please_wait_dialog").prepend(<%= jt('#zip_file_imports.notices.uploading_complete', "Uploading complete!") %>);
-          location.href = $("#return_to").val();
-        } else if(hadSomeProgress && (!data || data.progress == null)) {
+      $.getJSON(pollURL, function(data) {
+        var zfi = data.zip_file_import;
+        if (zfi == null) {
           pollImport.blankCount = pollImport.blankCount || 0;
           pollImport.blankCount++;
           if(pollImport.blankCount > 10) {
@@ -98,12 +95,19 @@ $(document).ready(function() {
           } else {
             setTimeout(pollImport, 2000);
           }
+        } else if (zfi.data && zfi.data.errors) {
+          importFailed(zfi.data.errors);
+        } else if (zfi.workflow_state == 'failed') {
+          importFailed([]);
+        } else if (zfi.workflow_state == 'imported') {
+          $("#uploading_progressbar").progressbar('value', 100);
+          $("#uploading_please_wait_dialog").prepend(<%= jt('notices.uploading_complete', "Uploading complete!") %>);
+          location.href = $("#return_to").val();
         } else {
           pollImport.errorCount = 0;
           pollImport.blankCount = 0;
-          hadSomeProgress = true;
+          $("#uploading_progressbar").progressbar('value', ((zfi.progress || 0) * 100));
           setTimeout(pollImport, 2000);
-          $("#uploading_progressbar").progressbar('value', ((data.progress || 0) * 100));
         }
       }, function() {
         pollImport.errorCount = pollImport.errorCount || 0;
@@ -115,7 +119,28 @@ $(document).ready(function() {
         }
       });
     };
-    setTimeout(pollImport, 5000);
+    
+    var params = {
+      'folder_id': $(this).find("select[name=folder_id]").val(),
+      'format': 'json'
+    };
+    
+    $.ajaxJSONFiles(
+      $(this).attr('action'),
+      'POST',
+      params,
+      $(this).find("#zip_file"),
+      function(data) {
+        zip_import_id = data.zip_file_import.id;
+        pollURL = $(".zip_file_import_status_url").attr('href');
+        pollURL = $.replaceTags(pollURL, 'id', zip_import_id);
+        
+        pollImport();
+      },
+      function(data) {
+        $dialog.text(<%= jt('errors.uploading', "There were errors uploading the zip file.")%>);
+      }
+    );
   });
 });
 });

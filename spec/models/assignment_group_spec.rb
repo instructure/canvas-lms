@@ -35,17 +35,6 @@ describe AssignmentGroup do
   end
   
   context "broadcast policy" do
-    it "should have a broadcast policy" do
-      assignment_group_model
-      @ag.should be_respond_to(:dispatch)
-      @ag.should be_respond_to(:to)
-    end
-    
-    # it "should have 1 policy defined" do
-      # assignment_group_model
-      # @ag.broadcast_policy_list.size.should eql(1)
-    # end
-        
     context "grade weight changed" do
       # it "should have a 'Grade Weight Changed' policy" do
         # assignment_group_model

@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!external_tools',
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData */,

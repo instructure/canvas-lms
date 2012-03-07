@@ -77,10 +77,11 @@ class Submission < ActiveRecord::Base
   }
 
   named_scope :needs_grading, :conditions => <<-SQL
-    submissions.submission_type IS NOT NULL AND
-    submissions.workflow_state IN ('submitted', 'pending_review') AND (
-      submissions.score IS NULL OR
-      NOT submissions.grade_matches_current_submission
+    submissions.submission_type IS NOT NULL 
+    AND (submissions.workflow_state = 'pending_review'
+      OR (submissions.workflow_state = 'submitted' 
+        AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
+      )
     )
     SQL
   def self.needs_grading_conditions(prefix = nil)
@@ -92,6 +93,7 @@ class Submission < ActiveRecord::Base
   
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
   
+  attr_accessor :saved_by
   before_save :update_if_pending
   before_save :validate_single_submission, :validate_enrollment, :infer_values, :set_context_code
   before_save :prep_for_submitting_to_turnitin
@@ -103,6 +105,7 @@ class Submission < ActiveRecord::Base
   after_save :update_final_score
   after_save :submit_to_turnitin_later
   after_save :update_admins_if_just_submitted
+  after_save :update_quiz_submission
 
   trigger.after(:update) do |t|
     t.where('(#{Submission.needs_grading_conditions("OLD")}) <> (#{Submission.needs_grading_conditions("NEW")})') do
@@ -178,6 +181,12 @@ class Submission < ActiveRecord::Base
     true
   end
   
+  def update_quiz_submission
+    return true if @saved_by == :quiz_submission || !self.quiz_submission || self.score == self.quiz_submission.kept_score
+    self.quiz_submission.set_final_score(self.score)
+    true
+  end
+  
   def url
     read_body = read_attribute(:body) && CGI::unescapeHTML(read_attribute(:body))
     if read_body && read_attribute(:url) && read_body[0..250] == read_attribute(:url)[0..250]
@@ -249,7 +258,8 @@ class Submission < ActiveRecord::Base
   
   def submit_to_turnitin_later
     if self.turnitinable? && @submit_to_turnitin
-      send_later(:submit_to_turnitin)
+      delay = Setting.get_cached('turnitin_submission_delay_seconds', 60.to_s).to_i
+      send_at(delay.seconds.from_now, :submit_to_turnitin)
     end
   end
   
@@ -369,7 +379,7 @@ class Submission < ActiveRecord::Base
     if self.score_changed?
       @score_changed = true
       if self.assignment
-        self.grade = self.assignment.score_to_grade(self.score) if self.assignment.points_possible.to_f > 0.0 || self.assignment.grading_type != 'pass_fail'
+        self.grade = self.assignment.score_to_grade(self.score, self.grade)
       else
         self.grade = self.score.to_s
       end
@@ -624,7 +634,7 @@ class Submission < ActiveRecord::Base
   }
   named_scope :for_user, lambda {|user|
     user_id = user.is_a?(User) ? user.id : user
-    {:conditions => ['submissions.user_id = ?', user_id]}
+    {:conditions => ['submissions.user_id IN (?)', Array(user_id)]}
   }
   named_scope :needing_screenshot, lambda {
     {:conditions => ['submissions.submission_type = ? AND submissions.attachment_id IS NULL AND submissions.process_attempts < 3', 'online_url'], :order => :updated_at}

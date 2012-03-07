@@ -43,6 +43,21 @@ require([
           <br/>
           <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" />
           <label for="category_restrict_self_signup"><%= t :restricted_self_signup, "Require group members to be in the same section" %></label>
+            <% hidden_dialog("self_signup_help_dialog") do %>
+              <%= mt(:self_signup_help_message, <<-TEXT)
+You can create sets of groups where students can sign up on their own.
+Students are still limited to being in only one group in the set, but this way
+students can organize themselves into groups instead of needing the teacher to
+do the work. You can also require that group members all be part of the same
+course section.
+
+Keep in mind, students can move themselves from one group to another, so when
+your students are done organizing themselves you may want to disable self
+sign-ups.
+TEXT
+              %>
+            <% end %>
+          </div>
         </td>
       </tr>
       <tr>

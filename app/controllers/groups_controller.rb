@@ -69,26 +69,24 @@ class GroupsController < ApplicationController
     end
     @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
     @groups = @current_user.group_memberships_for(@group.context) if @current_user
-    if @group.free_association?(@current_user)
-      if params[:join]
-        @group.request_user(@current_user)
-        if !@group.grants_right?(@current_user, session, :read)
-          render :action => 'membership_pending'
-          return
-        else
-          flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
-          redirect_to named_context_url(@group.context, :context_groups_url)
-          return
-        end
+    if params[:join] && @group.free_association?(@current_user)
+      @group.request_user(@current_user)
+      if !@group.grants_right?(@current_user, session, :read)
+        render :action => 'membership_pending'
+        return
+      else
+        flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
+        redirect_to named_context_url(@group.context, :context_groups_url)
+        return
       end
-      if params[:leave]
-        membership = @group.membership_for_user(@current_user)
-        if membership
-          membership.destroy
-          flash[:notice] = t('notices.goodbye', "You have removed yourself from the group %{group_name}.", :group_name => @group.name)
-          redirect_to named_context_url(@group.context, :context_groups_url)
-          return
-        end
+    end
+    if params[:leave] && (@group.free_association?(@current_user) || @group.student_organized?)
+      membership = @group.membership_for_user(@current_user)
+      if membership
+        membership.destroy
+        flash[:notice] = t('notices.goodbye', "You have removed yourself from the group %{group_name}.", :group_name => @group.name)
+        redirect_to named_context_url(@group.context, :context_groups_url)
+        return
       end
     end
     if authorized_action(@group, @current_user, :read)
@@ -187,7 +185,7 @@ class GroupsController < ApplicationController
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
-          format.json { render :json => @group.to_json }
+          format.json { render :json => @group.to_json(:methods => :participating_users_count) }
         else
           format.html { render :action => "new" }
           format.json { render :json => @group.errors.to_json }
@@ -216,7 +214,7 @@ class GroupsController < ApplicationController
         if @group.update_attributes(params[:group])
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to group_url(@group) }
-          format.json { render :json => @group.to_json }
+          format.json { render :json => @group.to_json(:methods => :participating_users_count) }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @group.errors.to_json }

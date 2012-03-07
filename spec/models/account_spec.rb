@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Account do
 
@@ -621,21 +621,21 @@ describe Account do
     @account.save.should be_false
   end
 
-  describe "open_registration_for?" do
-    it "should be true for anyone if open registration is turned on" do
+  describe "user_list_search_mode_for" do
+    it "should be preferred for anyone if open registration is turned on" do
       account = Account.default
       account.settings = { :open_registration => true }
-      account.open_registration_for?(nil).should be_true
-      account.open_registration_for?(user).should be_true
+      account.user_list_search_mode_for(nil).should == :preferred
+      account.user_list_search_mode_for(user).should == :preferred
     end
 
-    it "should be true for account admins" do
+    it "should be preferred for account admins" do
       account = Account.default
-      account.open_registration_for?(nil).should be_false
-      account.open_registration_for?(user).should be_false
+      account.user_list_search_mode_for(nil).should == :closed
+      account.user_list_search_mode_for(user).should == :closed
       user
       account.add_user(@user)
-      account.open_registration_for?(@user).should be_true
+      account.user_list_search_mode_for(@user).should == :preferred
     end
   end
 
@@ -650,6 +650,31 @@ describe Account do
         account.settings = { :global_javascript => 'bob' }
         account.settings[:global_javascript].should == 'bob'
       end
+    end
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should properly return site admin permissions regardless of active shard" do
+      user
+      site_admin = Account.site_admin
+      site_admin.add_user(@user)
+
+      @shard1.activate do
+        site_admin.grants_right?(@user, nil, :site_admin).should be_true
+      end
+      site_admin.grants_right?(@user, nil, :site_admin).should be_true
+    end
+  end
+
+  context "permissions" do
+    it "should grant :read_sis to teachers" do
+      user_with_pseudonym(:active_all => 1)
+      Account.default.grants_right?(@user, :read_sis).should be_false
+      @course = Account.default.courses.create!
+      @course.enroll_teacher(@user).accept!
+      Account.default.grants_right?(@user, :read_sis).should be_true
     end
   end
 end

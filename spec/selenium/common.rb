@@ -97,6 +97,25 @@ module SeleniumTestsHelperMethods
     driver
   end
 
+  # f means "find" this is a shortcut to finding elements
+  # if driver.find_element fails, then it'll try to find it with jquery
+  def f(selector, scope = nil)
+    begin
+      (scope || driver).find_element :css, selector
+    rescue
+      find_with_jquery selector, scope
+    end
+  end
+
+  # same as `f` except tries to find several elements instead of one
+  def ff(selector, scope = nil)
+    begin
+      (scope || driver).find_elements :css, selector
+    rescue
+      find_all_with_jquery selector, scope
+    end
+  end
+
   #this is needed for using the before_label function in I18nUtilities
   def t(*a, &b)
     I18n.t(*a, &b)
@@ -261,6 +280,9 @@ shared_examples_for "all selenium tests" do
 
   include SeleniumTestsHelperMethods
   include CustomSeleniumRspecMatchers
+
+  # set up so you can use rails urls helpers in your selenium tests
+  include ActionController::UrlWriter
 
   def selenium_driver; $selenium_driver; end
 
@@ -457,12 +479,12 @@ shared_examples_for "all selenium tests" do
     val
   end
 
-  def find_with_jquery(selector)
-    driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}')[0];")
+  def find_with_jquery(selector, scope = nil)
+    driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1]))[0];", selector, scope)
   end
 
-  def find_all_with_jquery(selector)
-    driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}').toArray();")
+  def find_all_with_jquery(selector, scope = nil)
+    driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1])).toArray();", selector, scope)
   end
 
   # pass in an Element pointing to the textarea that is tinified.
@@ -558,18 +580,23 @@ shared_examples_for "all selenium tests" do
     option
   end
 
-  def datepicker_prev
+  def datepicker_prev(day_text = '15')
     datepicker = driver.find_element(:css, '#ui-datepicker-div')
     datepicker.find_element(:css, '.ui-datepicker-prev').click
-    find_with_jquery('#ui-datepicker-div a:contains(15)').click
+    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
     datepicker
   end
 
-  def datepicker_next
+  def datepicker_next(day_text = '15')
     datepicker = driver.find_element(:css, '#ui-datepicker-div')
     datepicker.find_element(:css, '.ui-datepicker-next').click
-    find_with_jquery('#ui-datepicker-div a:contains(15)').click
+    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
     datepicker
+  end
+
+  def datepicker_current(day_text = '15')
+    datepicker = driver.find_element(:css, '#ui-datepicker-div')
+    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
   end
 
   def stub_kaltura
@@ -590,9 +617,12 @@ shared_examples_for "all selenium tests" do
     Kaltura::ClientV3.stubs(:new).returns(kal)
   end
 
-  def get(link)
+  # you can pass an array to use the rails polymorphic_path helper, example:
+  # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
+  def get(link, wait_for_dom = true)
+    link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
-    wait_for_dom_ready
+    wait_for_dom_ready if wait_for_dom
   end
 
   def refresh_page
@@ -682,10 +712,18 @@ shared_examples_for "all selenium tests" do
     driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
   end
 
+  def error_displayed?
+    f('.error_text:visible') != nil
+  end
+
   self.use_transactional_fixtures = false
 
   append_after(:each) do
-    wait_for_ajax_requests
+    begin
+      wait_for_ajax_requests
+    rescue Selenium::WebDriver::Error::WebDriverError
+      # we want to ignore selenium errors when attempting to wait here
+    end
     ALL_MODELS.each { |m| truncate_table(m) }
   end
 
@@ -696,6 +734,7 @@ shared_examples_for "all selenium tests" do
 
   append_before (:all) do
     $selenium_driver ||= setup_selenium
+    default_url_options[:host] = $app_host_and_port
   end
 
   append_before (:all) do
@@ -718,12 +757,13 @@ end
     "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
     "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
     "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
+    "attachments.zip" => File.read(File.dirname(__FILE__) + "/../fixtures/attachments.zip"),
     "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'),
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
   }
 
-  def get_file(filename)
-    data = TEST_FILE_UUIDS[filename]
+  def get_file(filename, data = nil)
+    data ||= TEST_FILE_UUIDS[filename]
     @file = Tempfile.new(filename.split(/(?=\.)/))
     @file.write data
     @file.close

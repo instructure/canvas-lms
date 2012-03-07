@@ -121,6 +121,7 @@
     <% unless grading_standard_list %>
       <div class="displaying" style="text-align: right;">
         <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
+        <button type="button" class="done_button button"><%= t('buttons.done', 'Done') %></button>
       </div>
     <% end %>
     <div class="editing_box button-container">

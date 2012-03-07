@@ -61,6 +61,12 @@
   <form class="submission_details_add_comment_form clearfix">
     <label for="add_a_comment">{{#t "add_a_comment"}}Add a comment{{/t}}</label>
     <textarea id="add_a_comment" name="comment[text_comment]"></textarea>
+    {{#if assignment.group_category_id}}
+    <span id="group-comment-container">
+      <input type="checkbox" id="group_comment" name="comment[group_comment]" />
+      <label for="group_comment">{{#t "labels.group_comment"}}Send Comment to the Whole Group{{/t}}</label>
+    </span>
+    {{/if}}
     <button class="button" type="submit">{{#t "post_comment"}}Post Comment{{/t}}</button>
   </form>
 </div>

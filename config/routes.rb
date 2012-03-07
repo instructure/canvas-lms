@@ -131,6 +131,11 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
 
+  def add_zip_file_imports(context)
+    context.resources :zip_file_imports, :only => [:new, :create, :show]
+    context.import_files 'imports/files', :controller => 'content_imports', :action => 'files'
+  end
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -184,8 +189,7 @@ ActionController::Routing::Routes.draw do |map|
     course.attendance 'attendance', :controller => 'gradebooks', :action => 'attendance'
     course.attendance_user 'attendance/:user_id', :controller => 'gradebooks', :action => 'attendance'
     course.imports 'imports', :controller => 'content_imports', :action => 'intro'
-    course.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    course.import_files 'imports/files', :controller => 'content_imports', :action => 'files'
+    add_zip_file_imports(course)
     course.import_quizzes 'imports/quizzes', :controller => 'content_imports', :action => 'quizzes'
     course.import_content 'imports/content', :controller => 'content_imports', :action => 'content'
     course.import_copy 'imports/copy', :controller => 'content_imports', :action => 'copy_course', :conditions => {:method => :get}
@@ -384,8 +388,8 @@ ActionController::Routing::Routes.draw do |map|
     add_discussions(group)
     group.resources :calendar_events
     add_chat(group)
-    group.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     add_files(group, :images => true, :folders => true)
+    add_zip_file_imports(group)
     group.resources :external_tools, :only => [:show], :collection => {:retrieve => :get}
     add_wiki(group)
     add_conferences(group)
@@ -428,6 +432,8 @@ ActionController::Routing::Routes.draw do |map|
     account.test_ldap_binds 'test_ldap_binds', :controller => 'account_authorization_configs', :action => 'test_ldap_bind'
     account.test_ldap_searches 'test_ldap_searches', :controller => 'account_authorization_configs', :action => 'test_ldap_search'
     account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
+    account.saml_testing 'saml_testing', :controller => 'account_authorization_configs', :action => 'saml_testing'
+    account.saml_testing_stop 'saml_testing_stop', :controller => 'account_authorization_configs', :action => 'saml_testing_stop'
     account.resources :external_tools do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
@@ -445,7 +451,6 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :rubric_associations do |association|
       association.resources :rubric_assessments, :as => 'assessments'
     end
-    account.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     add_files(account, :relative => true, :images => true, :folders => true)
     add_media(account)
     add_groups(account)
@@ -459,7 +464,7 @@ ActionController::Routing::Routes.draw do |map|
     add_question_banks(account)
     account.resources :user_lists, :only => :create
   end
-  map.avatar_image 'images/users/:user_id', :controller => 'info', :action => 'avatar_image_url', :conditions => {:method => :get}
+  map.avatar_image 'images/users/:user_id', :controller => 'users', :action => 'avatar_image_url', :conditions => {:method => :get}
   map.thumbnail_image 'images/thumbnails/:id/:uuid', :controller => 'files', :action => 'image_thumbnail'
   map.show_thumbnail_image 'images/thumbnails/show/:id/:uuid', :controller => 'files', :action => 'show_thumbnail'
   map.report_avatar_image 'images/users/:user_id/report', :controller => 'users', :action => 'report_avatar_image', :conditions => {:method => :post}
@@ -485,6 +490,7 @@ ActionController::Routing::Routes.draw do |map|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
     add_files(user, :images => true)
+    add_zip_file_imports(user)
     user.resources :page_views, :only => [:index]
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -507,7 +513,6 @@ ActionController::Routing::Routes.draw do |map|
     user.resources :user_notes
     user.manageable_courses 'manageable_courses', :controller => 'users', :action => 'manageable_courses'
     user.outcomes 'outcomes', :controller => 'outcomes', :action => 'user_outcome_results'
-    user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
@@ -646,7 +651,8 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
-      enrollments.get  'courses/:course_id/enrollments', :action => :index, :path_name => 'enrollments'
+      enrollments.get  'courses/:course_id/enrollments', :action => :index, :path_name => 'course_enrollments'
+      enrollments.get  'users/:user_id/enrollments', :action => :index, :path_name => 'user_enrollments'
       enrollments.post 'courses/:course_id/enrollments', :action => :create
     end
 
@@ -664,8 +670,11 @@ ActionController::Routing::Routes.draw do |map|
       submissions.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
       submissions.get 'sections/:section_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'section_student_submissions'
 
-      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show
-      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :show
+      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "course_assignment_submission"
+      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "section_assignment_submission"
+
+      submissions.post 'courses/:course_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
+      submissions.post 'sections/:section_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
 
       submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'course_assignment_submission'
       submissions.put 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'section_assignment_submission'
@@ -687,6 +696,19 @@ ActionController::Routing::Routes.draw do |map|
       topics.post 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :add_reply, :path_name => 'group_discussion_add_reply'
       topics.get 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'course_discussion_replies'
       topics.get 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'group_discussion_replies'
+
+      topics.put 'courses/:course_id/discussion_topics/:topic_id/read', :action => :mark_topic_read, :path_name => 'course_discussion_topic_mark_read'
+      topics.put 'groups/:group_id/discussion_topics/:topic_id/read', :action => :mark_topic_read, :path_name => 'group_discussion_topic_mark_read'
+      topics.delete 'courses/:course_id/discussion_topics/:topic_id/read', :action => :mark_topic_unread, :path_name => 'course_discussion_topic_mark_unread'
+      topics.delete 'groups/:group_id/discussion_topics/:topic_id/read', :action => :mark_topic_unread, :path_name => 'group_discussion_topic_mark_unread'
+      topics.put 'courses/:course_id/discussion_topics/:topic_id/read_all', :action => :mark_all_read, :path_name => 'course_discussion_topic_mark_all_read'
+      topics.put 'groups/:group_id/discussion_topics/:topic_id/read_all', :action => :mark_all_read, :path_name => 'group_discussion_topic_mark_all_read'
+      topics.delete 'courses/:course_id/discussion_topics/:topic_id/read_all', :action => :mark_all_unread, :path_name => 'course_discussion_topic_mark_all_unread'
+      topics.delete 'groups/:group_id/discussion_topics/:topic_id/read_all', :action => :mark_all_unread, :path_name => 'group_discussion_topic_mark_all_unread'
+      topics.put 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_read, :path_name => 'course_discussion_topic_discussion_entry_mark_read'
+      topics.put 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_read, :path_name => 'group_discussion_topic_discussion_entry_mark_read'
+      topics.delete 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_unread, :path_name => 'course_discussion_topic_discussion_entry_mark_unread'
+      topics.delete 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_unread, :path_name => 'group_discussion_topic_discussion_entry_mark_unread'
     end
 
     api.with_options(:controller => :external_tools) do |tools|

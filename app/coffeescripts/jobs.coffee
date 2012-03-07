@@ -77,7 +77,7 @@ define [
           return
         @loading[row] = true
         $.ajaxJSON @options.url, "GET", { flavor: @options.flavor, q: @query, offset: row }, (data) =>
-          @data[row ... row + data.jobs.length] = data.jobs
+          @data[row ... row + data[@type_name].length] = data[@type_name]
           @grid.invalidate()
           @$element.dequeue()
 

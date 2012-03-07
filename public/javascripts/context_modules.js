@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Instructure, Inc.
+ * Copyright (C) 2012 Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
+define([
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
@@ -200,7 +200,7 @@ require([
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
-        $form.find("#unlock_module_at").attr('checked', data.unlock_at).triggerHandler('change');
+        $form.find("#unlock_module_at").prop('checked', data.unlock_at).triggerHandler('change');
         $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
         $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
         var prerequisites = [];
@@ -942,6 +942,7 @@ require([
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items").sortable('refresh');
+        modules.updateAssignmentData();
       }, function(data) {
       });
     });

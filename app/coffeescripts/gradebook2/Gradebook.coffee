@@ -1,6 +1,7 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
   'i18n!gradebook2'
+  'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'compiled/grade_calculator'
   'vendor/spin'
@@ -13,6 +14,8 @@ define [
   'jst/gradebook_uploads_form'
   'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
+  'jst/gradebook2/group_total_cell'
+  'jst/gradebook2/row_student_name'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_jquery_patches'
@@ -24,7 +27,8 @@ define [
   'jqueryui/position'
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
-], (I18n, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate) ->
+  'compiled/jquery/fixDialogButtons'
+], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     minimumAssignmentColumWidth = 10
@@ -33,6 +37,7 @@ define [
       @chunk_start = 0
       @students    = {}
       @rows        = []
+      @studentsPage = 1
       @sortFn      = (student) -> student.sortable_name
       @assignmentsToHide = ($.store.userGet("hidden_columns_#{@options.context_code}") || '').split(',')
       @sectionToShow = Number($.store.userGet("grading_show_only_section#{@options.context_id}")) || undefined
@@ -41,11 +46,14 @@ define [
       $.subscribe 'assignment_group_weights_changed', @buildRows
       $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
+
       promise = $.when(
+        $.ajaxJSON( @options.students_url, "GET"),
         $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
-        $.ajaxJSON( @options.sections_and_students_url, "GET", @sectionToShow && {sections: [@sectionToShow]})
-      ).then (assignmentGroupsArgs, studentsArgs) =>
-        @gotStudents.apply(this, studentsArgs)
+        $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
+      ).then ([students, status, xhr]) =>
+        @gotChunkOfStudents(students, xhr)
+
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
         opacity: 0.5
@@ -69,28 +77,46 @@ define [
           assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
           @assignments[assignment.id] = assignment
 
-    gotStudents: (sections) =>
+    gotSections: (sections) =>
       @sections = {}
-      @rows = []
       for section in sections
         htmlEscape(section)
         @sections[section.id] = section
-        for student in section.students
-          htmlEscape(student)
-          student.computed_current_score ||= 0
-          student.computed_final_score ||= 0
-          student.secondary_identifier = student.sis_login_id || student.login_id
-          @students[student.id] = student
-          student.section = section
-          # fill in dummy submissions, so there's something there even if the
-          # student didn't submit anything for that assignment
-          for id, assignment of @assignments
-            student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
-          @rows.push(student)
       @sections_enabled = sections.length > 1
+
+    gotChunkOfStudents: (studentEnrollments, xhr) =>
+      for studentEnrollment in studentEnrollments
+        student = studentEnrollment.user
+        student.enrollment = studentEnrollment
+        @students[student.id] ||= htmlEscape(student)
+        @students[student.id].sections ||= []
+        @students[student.id].sections.push(studentEnrollment.course_section_id)
+
+      link = xhr.getResponseHeader('Link')
+      if link && link.match /rel="next"/
+        @studentsPage += 1
+        $.ajaxJSON( @options.students_url, "GET", { "page": @studentsPage}, @gotChunkOfStudents)
+      else
+        @gotAllStudents()
+
+    gotAllStudents: ->
       for id, student of @students
-        student.display_name = "<div class='student-name'>#{student.name}</div>"
-        student.display_name += "<div class='student-section'>#{student.section.name}</div>" if @sections_enabled
+        student.computed_current_score ||= 0
+        student.computed_final_score ||= 0
+        student.secondary_identifier = student.sis_login_id || student.login_id
+
+        if @sections_enabled
+          sectionNames = $.toSentence((@sections[sectionId].name for sectionId in student.sections).sort())
+        student.display_name = rowStudentNameTemplate
+          studentName: student.name
+          studentGradesUrl: student.enrollment.grades.html_url
+          sectionNames: sectionNames
+
+        # fill in dummy submissions, so there's something there even if the
+        # student didn't submit anything for that assignment
+        for id, assignment of @assignments
+          student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
+        @rows.push(student)
       @initGrid()
       @buildRows()
       @getSubmissionsChunks()
@@ -134,7 +160,7 @@ define [
       throw "unhandled column sort condition"
 
     rowFilter: (student) =>
-      !@sectionToShow || (student.section.id == @sectionToShow)
+      !@sectionToShow || (@sectionToShow in student.sections)
 
     handleAssignmentMutingChange: (assignment) =>
       idx = @gradeGrid.getColumnIndex("assignment_#{assignment.id}")
@@ -230,17 +256,20 @@ define [
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
-      gradeToShow = val
+
       # rounds percentage to one decimal place
-      percentage = Math.round((gradeToShow.score / gradeToShow.possible) * 1000) / 10
+      percentage = Math.round((val.score / val.possible) * 1000) / 10
       percentage = 0 if isNaN(percentage)
-      if !gradeToShow.possible then percentage = '-' else percentage += "%"
-      """
-      <div class="gradebook-cell">
-        <div class="gradebook-tooltip">#{gradeToShow.score} / #{gradeToShow.possible}</div>
-        #{percentage}
-      </div>
-      """
+
+      if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
+        letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
+
+      groupTotalCellTemplate({
+        score: val.score
+        possible: val.possible
+        letterGrade
+        percentage
+      })
 
     calculateStudentGrade: (student) =>
       if student.loaded
@@ -413,7 +442,7 @@ define [
 
         $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections, scrolling: sections.length > 15))
         (updateSectionBeingShownText = =>
-          $('#section_being_shown').text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
+          $('#section_being_shown').html(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
         )()
         $('#section_to_show').after($sectionToShowMenu).show().kyleMenu
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
@@ -476,7 +505,7 @@ define [
     assignmentHeaderHtml: (assignment) ->
       columnHeaderTemplate
         assignment: assignment
-        href: "#{@options.context_url}/assignments/#{assignment.id}"
+        href: assignment.html_url
         showPointsPossible: assignment.points_possible?
 
     initGrid: =>
@@ -563,9 +592,9 @@ define [
         field: "total_grade"
         formatter: @groupTotalFormatter
         name: "Total"
-        minWidth: 50,
+        minWidth: 85,
         maxWidth: 100,
-        width: testWidth("Total", 50)
+        width: testWidth("Total", 85)
         cssClass: "total-cell",
         sortable: true
         type: 'total_grade'

@@ -17,6 +17,35 @@ describe "course settings tests" do
     @enrollment.save!
   end
 
+  describe "course details" do
+    def test_select_standard_for(context)
+      grading_standard_for context
+      get "/courses/#{@course.id}/settings"
+
+      f('.edit_course_link').click
+      f('.grading_standard_checkbox').click unless is_checked('.grading_standard_checkbox')
+      f('.edit_letter_grades_link').click
+      f('.find_grading_standard_link').click
+      wait_for_ajaximations
+
+      f('.grading_standard_select:visible a').click
+      f('button.select_grading_standard_link:visible').click
+      f('.done_button').click
+      f('#course_form').submit
+      wait_for_ajaximations
+
+      f('.grading_scheme_set').should include_text @standard.title
+    end
+
+    it "should allow selection of existing course grading standard" do
+      test_select_standard_for @course
+    end
+
+    it "should allow selection of existing account grading standard" do
+      test_select_standard_for @course.root_account
+    end
+  end
+
   describe "course items" do
 
     it "should change course details" do
@@ -128,7 +157,8 @@ describe "course settings tests" do
 
     it "should remove a user from a section" do
       username = "user@example.com"
-      student_in_course_section(:name => username)
+      student_in_course(:name => username)
+      @enrollment.course_section = @course_section; @enrollment.save
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
@@ -141,7 +171,8 @@ describe "course settings tests" do
     it "should move a user to a new section" do
       section_name = 'Move to Course Section'
       add_section(section_name)
-      student_in_course_section(:course_section => @course_section)
+      student_in_course
+      @enrollment.course_section = @course_section; @enrollment.save
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
@@ -153,7 +184,8 @@ describe "course settings tests" do
 
     it "should view the users enrollment details" do
       username = "user@example.com"
-      student_in_course_section(:name => username)
+      student_in_course(:name => username, :active_all => true)
+      @enrollment.course_section = @course_section; @enrollment.save
 
       get "/courses/#{@course.id}/settings"
       driver.find_element(:link, 'Users').click
@@ -226,7 +258,8 @@ describe "course settings tests" do
       @username = "multiple@example.com"
       add_section("Section 1")
       @old_section = @course_section
-      student_in_course_section(:name => @username, :course_section => @course_section)
+      student_in_course(:name => @username)
+      @enrollment.course_section = @course_section; @enrollment.save
       add_section("Section 2")
       multiple_student_enrollment
     end

@@ -33,6 +33,7 @@ describe "external tool buttons" do
   end
 
   it "should allow inserting oembed content from external tool buttons" do
+    pending("spec rewrite so we do not have to actually hit flickr")
     load_selection_test_tool do
       driver.find_element(:css, "#oembed_link").click
     end
@@ -102,6 +103,7 @@ describe "external tool buttons" do
   end
 
   it "should load external tool if selected from the dropdown" do
+    pending("spec rewrite so we do not have to actually hit flickr")
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")

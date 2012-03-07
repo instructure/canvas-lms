@@ -311,4 +311,20 @@ describe CommunicationChannel do
     # the unconfirmed should still be valid, even though a retired exists
     @cc.should be_valid
   end
+
+  context "notifications" do
+    it "should forward the root account to the message" do
+      notification = Notification.create!(:name => 'Confirm Email Communication Channel', :category => 'Registration')
+      @user = User.create!
+      @user.register!
+      @cc = @user.communication_channels.create!(:path => 'user1@example.com')
+      account = Account.create!
+      HostUrl.stubs(:context_host).with(account).returns('someserver.com')
+      HostUrl.stubs(:context_host).with(nil).returns('default')
+      @cc.send_confirmation!(account)
+      message = Message.find(:first, :conditions => { :communication_channel_id => @cc.id, :notification_id => notification.id })
+      message.should_not be_nil
+      message.body.should match /someserver.com/
+    end
+  end
 end

@@ -31,12 +31,16 @@ class EnrollmentsApiController < ApplicationController
   include Api::V1::Enrollment
   #
   # @API
-  # Return a list of all enrolled users in a course. Includes students,
-  # teachers, TAs, and observers.
+  # Depending on the URL given, return either (1) all of the enrollments in
+  # a course, or (2) all of a user's enrollments. This includes student,
+  # teacher, TA, and observer enrollments.
   #
-  # If a user has multiple enrollments in the course (e.g. as a teacher
-  # and a student or in multiple sections), each enrollment will be
+  # If a user has multiple enrollments in a context (e.g. as a teacher
+  # and a student or in multiple course sections), each enrollment will be
   # listed separately.
+  #
+  # note: Currently, only an admin user can return other users' enrollments. A
+  # user can, however, return his/her own enrollments.
   #
   # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are returned.
   # @argument state[] Filter by enrollment state. Accepted values are 'active', 'invited', and 'creation_pending', 'deleted', 'rejected', 'completed', and 'inactive'. If omitted, 'active,' 'invited,' and 'creation_pending' enrollments are returned.
@@ -48,6 +52,8 @@ class EnrollmentsApiController < ApplicationController
   # @response_field root_account_id The unique id of the user's account.
   # @response_field type The type of the enrollment.
   # @response_field user_id The unique id of the user.
+  # @response_field html_url The URL to the Canvas web UI page for this course enrollment.
+  # @response_field grades[html_url] The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.
   # @response_field user[id] The unique id of the user.
   # @response_field user[login_id] The unique login of the user.
   # @response_field user[name] The name of the user.
@@ -64,6 +70,10 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "StudentEnrollment",
   #       "user_id": 1,
+  #       "html_url": "https://...",
+  #       "grades": {
+  #         "html_url": "https://...",
+  #       },
   #       "user": {
   #         "id": 1,
   #         "login_id": "bieberfever@example.com",
@@ -80,6 +90,10 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "TeacherEnrollment",
   #       "user_id": 2,
+  #       "html_url": "https://...",
+  #       "grades": {
+  #         "html_url": "https://...",
+  #       },
   #       "user": {
   #         "id": 2,
   #         "login_id": "changyourmind@example.com",
@@ -96,6 +110,10 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "StudentEnrollment",
   #       "user_id": 2,
+  #       "html_url": "https://...",
+  #       "grades": {
+  #         "html_url": "https://...",
+  #       },
   #       "user": {
   #         "id": 2,
   #         "login_id": "changyourmind@example.com",
@@ -106,17 +124,17 @@ class EnrollmentsApiController < ApplicationController
   #     }
   #   ]
   def index
-    get_context
-    return unless authorized_action(@context, @current_user, :read_roster)
-    conditions = {}.tap { |c|
+    @conditions = {}.tap { |c|
       c[:type] = params[:type] if params[:type].present?
       c[:workflow_state] = params[:state] if params[:state].present?
     }
+    scope_arguments = { :conditions => @conditions, :order => 'enrollments.type ASC, users.sortable_name ASC' }
+    return unless enrollments = @context.is_a?(Course) ?
+      course_index_enrollments(scope_arguments) :
+      user_index_enrollments(scope_arguments)
     enrollments = Api.paginate(
-      @context.
-        send(conditions[:workflow_state].present? ? :enrollments : :current_enrollments).
-        scoped(:conditions => conditions, :order => 'enrollments.type ASC, users.sortable_name ASC'),
-      self, api_v1_enrollments_path)
+      enrollments,
+      self, send("api_v1_#{@context.class.to_s.downcase}_enrollments_path"))
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, [:user]) }
   end
 
@@ -155,5 +173,38 @@ class EnrollmentsApiController < ApplicationController
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session).to_json) :
       render(:json => @enrollment.errors.to_json)
+  end
+
+  protected
+  def course_index_enrollments(scope_arguments)
+    if authorized_action(@context, @current_user, :read_roster)
+      @context.current_enrollments.scoped(scope_arguments)
+    else
+      false
+    end
+  end
+
+  def user_index_enrollments(scope_arguments)
+    user = api_find(User, params[:user_id])
+    # if user is requesting for themselves, just return all of their
+    # enrollments without any extra checking.
+    return user.current_enrollments if user == @current_user
+
+    # otherwise check for read_roster rights on all of the requested
+    # user's accounts
+    approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
+      accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
+      accounts
+    end
+
+    scope_arguments[:conditions].merge!({ 'enrollments.root_account_id' => approved_accounts })
+    enrollments = user.current_enrollments.scoped(scope_arguments)
+
+    if enrollments.count == 0 && user.current_enrollments.count != 0
+      render_unauthorized_action(@user)
+      return false
+    else
+      return enrollments
+    end
   end
 end

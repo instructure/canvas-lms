@@ -64,20 +64,18 @@ class RubricsController < ApplicationController
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
     if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_grades)
-      if params[:rubric_association_id].present?
-        @association = @context.rubric_associations.find_by_id(params[:rubric_association_id])
-      end
+      @association = @context.rubric_associations.find_by_id(params[:rubric_association_id]) if params[:rubric_association_id].present?
       @association_object ||= @association.association if @association
       params[:rubric_association][:association] = @association_object
       params[:rubric_association][:update_if_existing] = params[:action] == 'update'
       skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
       params[:rubric_association][:skip_updating_points_possible] = skip_points_update
       @rubric = @association.rubric if params[:id] && @association && (@association.rubric_id == params[:id].to_i || (@association.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))
-      @rubric ||= @context.rubrics.find_by_id(params[:id]) if params[:id]
+      @rubric ||= @context.rubrics.find_by_id(params[:id]) if params[:id].present?
       @association = nil unless @association && @rubric && @association.rubric_id == @rubric.id
       params[:rubric_association][:id] = @association.id if @association
       # Update the rubric if you can
-      # Better specify params[:rubric_association][:id] if you want it to update an existing association
+      # Better specify params[:rubric_association_id] if you want it to update an existing association
       
       # If this is a brand new rubric OR if the rubric isn't editable,
       # then create a new rubric

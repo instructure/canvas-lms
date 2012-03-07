@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -523,7 +523,7 @@ class Assignment < ActiveRecord::Base
       result = "#{result}%"
     elsif self.grading_type == "pass_fail"
       if self.points_possible.to_f > 0.0
-        passed = score.to_f == self.points_possible
+        passed = score.to_f == self.points_possible.to_f
       elsif given_grade
         # the score for a zero-point pass/fail assignment could be considered
         # either pass *or* fail, so look at what the current given grade is
@@ -534,8 +534,20 @@ class Assignment < ActiveRecord::Base
       end
       result = passed ? "complete" : "incomplete"
     elsif self.grading_type == "letter_grade"
-      score = score.to_f / self.points_possible
-      result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
+      if self.points_possible.to_f > 0.0
+        score = score.to_f / self.points_possible.to_f
+        result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
+      elsif given_grade
+        # the score for a zero-point letter_grade assignment could be considered
+        # to be *any* grade, so look at what the current given grade is
+        # instead of trying to calculate it
+        result = given_grade
+      else
+        # there's not really any reasonable value we can set here -- if the
+        # assignment is worth no points, and the grader didn't enter an
+        # explicit letter grade, any letter grade is as valid as any other.
+        result = GradingStandard.score_to_grade(self.grading_scheme, score.to_f)
+      end
     end
     result.to_s
   end
@@ -556,7 +568,7 @@ class Assignment < ActiveRecord::Base
     else
       # try to treat it as a letter grade
       if grading_scheme && standard_based_score = GradingStandard.grade_to_score(grading_scheme, grade)
-        (points_possible * standard_based_score).round / 100.0
+        ((points_possible || 0.0) * standard_based_score).round / 100.0
       else
         nil
       end
@@ -687,6 +699,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def submission_types_array
+    (self.submission_types || "").split(",")
+  end
+
   def submittable_type?
     submission_types && self.submission_types != "" && self.submission_types != "none" && self.submission_types != 'not_graded' && self.submission_types != "online_quiz" && self.submission_types != 'discussion_topic' && self.submission_types != 'attendance' && self.submission_types != "external_tool"
   end
@@ -733,7 +749,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    if lock_info = self.locked_for?(user)
+    if lock_info = self.locked_for?(user, :check_policies => true)
       hash.delete('description')
       hash['lock_info'] = lock_info
     end
@@ -940,7 +956,7 @@ class Assignment < ActiveRecord::Base
     end
 
     students.each do |student|
-      if (opts['comment'] && opts['group_comment'] == "1") || student == original_student
+      if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment'])) || student == original_student
         s = self.find_or_create_submission(student)
         s.assignment_id = self.id
         s.user_id = student.id
@@ -958,11 +974,12 @@ class Assignment < ActiveRecord::Base
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
     opts.keys.each { |k|
-      opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type].include?(k.to_sym)
+      opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
     raise "User must be enrolled in the course as a student to submit homework" unless context.students.include?(original_student)
-    comment = opts.delete :comment
+    comment = opts.delete(:comment)
+    group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
@@ -989,8 +1006,8 @@ class Assignment < ActiveRecord::Base
             :workflow_state => submitted ? "submitted" : "unsubmitted",
             :group => group
           })
-          homework.submitted_at = Time.now unless homework.submission_type == "discussion_topic"
-  
+          homework.submitted_at = Time.now
+
           homework.with_versioning(:explicit => true) do
             group ? homework.save_without_broadcast : homework.save!
           end
@@ -1002,7 +1019,7 @@ class Assignment < ActiveRecord::Base
     primary_homework.broadcast_group_submission if group
     homeworks.each do |homework|
       context_module_action(homework.student, :submitted)
-      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment
+      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment && (group_comment || homework == primary_homework)
     end
     touch_context
     return primary_homework
@@ -1644,13 +1661,14 @@ class Assignment < ActiveRecord::Base
     protected :partition_for_user
 
   # Infers the user, submission, and attachment from a filename
-  def infer_comment_context_from_filename(filename)
+  def infer_comment_context_from_filename(fullpath)
+    filename = File.basename(fullpath)
     split_filename = filename.split('_')
     # If the filename is like Richards_David_2_link.html, then there is no
     # useful attachment here.  The assignment was submitted as a URL and the
     # teacher commented directly with the gradebook.  Otherwise, grab that
     # last value and strip off everything after the first period.
-    user_id, attachment_id = split_filename.grep(/^\d+$/).last(2)
+    user_id, attachment_id = split_filename.grep(/^\d+$/).take(2)
     attachment_id = nil if split_filename.last =~ /^link/ || filename =~ /^\._/
 
     if user_id
@@ -1660,14 +1678,14 @@ class Assignment < ActiveRecord::Base
     attachment = Attachment.find_by_id(attachment_id) if attachment_id
 
     if !attachment || !submission
-      @ignored_files << filename
+      @ignored_files << fullpath
       return nil
     end
 
     {
       :user => user,
       :submission => submission,
-      :filename => filename,
+      :filename => fullpath,
       :display_name => attachment.display_name
     }
   end

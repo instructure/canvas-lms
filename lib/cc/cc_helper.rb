@@ -172,7 +172,7 @@ module CCHelper
       content = html_content(html)
       meta_html = id.nil? ? "" : %{<meta name="identifier" content="#{id}"/>\n}
 
-      %{<html>\n<head>\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
+      %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
     end
 
     def html_content(html)

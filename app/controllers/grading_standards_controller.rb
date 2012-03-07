@@ -27,12 +27,10 @@ class GradingStandardsController < ApplicationController
   
   def index
     if authorized_action(@context, @current_user, :manage_grades)
+      @standards = GradingStandard.sorted_standards_for(@context)
       respond_to do |format|
-        format.html {
-          @standards = GradingStandard.sorted_standards_for(@context)
-        }
+        format.html { }
         format.json {
-          @standards = GradingStandard.sorted_standards_for(@context, :user => @current_user, :include_parents => true)
           render :json => @standards.to_json(:methods => [:display_name, :context_code])
         }
       end

@@ -83,6 +83,17 @@ describe "assignments" do
       end
     end
 
+    it "should verify that self sign-up link works in more options" do
+      get "/courses/#{@course.id}/assignments"
+      driver.find_element(:css, '.add_assignment_link').click
+      expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
+      driver.find_element(:id, 'assignment_group_assignment').click
+      click_option('#assignment_group_category_select', 'new', :value)
+      ui_dialog = find_with_jquery('.ui-dialog:visible')
+      ui_dialog.find_element(:css, '.self_signup_help_link img').click
+      driver.find_element(:id, 'self_signup_help_dialog').should be_displayed
+    end
+
     it "should allow creating a quiz assignment from 'more options'" do
       skip_if_ie("Out of memory")
       get "/courses/#{@course.id}/assignments"
@@ -109,7 +120,8 @@ describe "assignments" do
       @course.assignments.create!(
           :name => assignment_name,
           :due_at => due_date,
-          :assignment_group => group
+          :assignment_group => group,
+          :unlock_at => due_date - 1.day
       )
 
       get "/courses/#{@course.id}/assignments"
@@ -141,6 +153,7 @@ describe "assignments" do
       #save changes
       driver.find_element(:id, 'edit_assignment_form').submit
       wait_for_ajaximations
+      driver.find_elements(:css, '.loading_image_holder').length.should eql 0
       driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
     end
 
@@ -176,22 +189,65 @@ describe "assignments" do
   end
 
   context "student view" do
+    DUE_DATE = Time.now.utc + 2.days
     before (:each) do
       course_with_student_logged_in
+      @assignment = @course.assignments.create(:name => 'assignment', :due_at => DUE_DATE)
+    end
+
+    it "should not allow a user to submit a file-submission assignment without attaching a file" do
+      @assignment = @course.assignments.create!(
+        :name => 'test assignment',
+        :due_at => Time.now.utc + 2.days,
+        :submission_types => 'online_upload')
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      driver.find_element(:css, '.submit_assignment_link').click
+      wait_for_ajaximations
+      driver.find_element(:id, 'submit_file_button').click
+      wait_for_ajaximations
+      driver.find_element(:id, 'flash_error_message').should be_displayed
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      driver.find_element(:css, '#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
+    end
+
+    it "should expand the comments box on click" do
+      @assignment = @course.assignments.create!(
+        :name => 'test assignment',
+        :due_at => Time.now.utc + 2.days,
+        :submission_types => 'online_upload')
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      driver.find_element(:css, '.submit_assignment_link').click
+      wait_for_ajaximations
+      driver.execute_script("return $('#submission_comment').height()").should eql 16
+      driver.execute_script("$('#submission_comment').focus()")
+      #driver.find_element(:id, 'submission_comment').click
+      wait_for_ajaximations
+      driver.execute_script("return $('#submission_comment').height()").should eql 72
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      driver.find_element(:css, '#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
     end
 
     it "should highlight mini-calendar dates where stuff is due" do
-      due_date = Time.now.utc + 2.days
-      @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date)
-
       get "/courses/#{@course.id}/assignments/syllabus"
 
-      driver.find_element(:css, ".mini_calendar_day.date_#{due_date.strftime("%m_%d_%Y")}").
+      driver.find_element(:css, ".mini_calendar_day.date_#{DUE_DATE.strftime("%m_%d_%Y")}").
           attribute('class').should match /has_event/
     end
 
     it "should not show submission data when muted" do
-      @assignment = @course.assignments.create!(:title => "hardest assignment ever", :submission_types => "online_url,online_upload")
+      @assignment.update_attributes(:submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@student)
       @submission.submission_type = "online_url"
       @submission.save!
@@ -211,8 +267,7 @@ describe "assignments" do
 
     it "should submit an assignment and validate confirmation information" do
       pending "BUG 6783 - Coming Up assignments update error" do
-        due_date = Time.now.utc + 2.days
-        @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date, :submission_types => 'online_url')
+        @assignment.update_attributes(:submission_types => 'online_url')
         @submission = @assignment.submit_homework(@student)
         @submission.submission_type = "online_url"
         @submission.save!
@@ -225,6 +280,58 @@ describe "assignments" do
         driver.find_element(:css, '.tooltip_text').should be_displayed
         tooltip_text_elements[1].text.should == 'submitted'
       end
+    end
+
+    it "should not allow blank submissions for text entry" do
+      @assignment.update_attributes(:submission_types => "online_text_entry")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      driver.find_element(:css, '.submit_assignment_link').click
+      assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
+      wait_for_tiny(assignment_form)
+      assignment_form.submit
+
+      # it should not actually submit and pop up an error message
+      driver.find_element(:css, '.error_box').should be_displayed
+      Submission.count.should == 0
+
+      # now make sure it works
+      lambda {
+        type_in_tiny('#submission_body', 'now it is not blank')
+        assignment_form.submit
+      }.should change { Submission.count }.by(1)
+    end
+
+    it "should not allow a submission with only comments" do
+      @assignment.update_attributes(:submission_types => "online_text_entry")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      driver.find_element(:css, '.submit_assignment_link').click
+      assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
+      replace_content(assignment_form.find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
+      assignment_form.find_element(:css, "#submit_online_text_entry_form button[type=submit]").click
+
+      # it should not actually submit and pop up an error message
+      driver.find_element(:css, '.error_box').should be_displayed
+      Submission.count.should == 0
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      driver.find_element(:css, '#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
+    end
+
+    it "should have group comment checkboxes for group assignments" do
+      @u1 = @user
+      student_in_course(:course => @course)
+      @u2 = @user
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload,online_text_entry", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
+      @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      @group.users << @u1
+      @group.users << @user
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      find_all_with_jquery('table.formtable input[name="submission[group_comment]"]').size.should eql 3
     end
   end
 end

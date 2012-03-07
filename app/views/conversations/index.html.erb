@@ -45,7 +45,7 @@
         <label for="context_tags">
           <%= before_label :filter, "Filter" %>
         </label>
-        <%= text_field_tag :context_tags, nil, :finder_url => conversations_find_recipients_url(:types => ['course', 'user', 'group']) %>
+        <%= text_field_tag :context_tags, nil, :finder_url => conversations_find_recipients_url(:types => ['course', 'user', 'group'], :include_inactive => true) %>
       </div>
       <div class="clear"></div>
     </div>

@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!grading_standards',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -42,6 +42,10 @@ require([
           $.flashError(I18n.t('errors.cannot_delete_grading_scheme', "There was a problem deleting this grading scheme"));
         }
       });
+    });
+    $(".grading_standard .done_button").click(function(event) {
+      event.preventDefault();
+      $("#edit_letter_grades_form").dialog('close');
     });
     $(".grading_standard .remove_grading_standard_link").click(function(event) {
       event.preventDefault();

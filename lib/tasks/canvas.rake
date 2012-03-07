@@ -116,14 +116,14 @@ namespace :canvas do
 
   desc "Compile javascript and css assets."
   task :compile_assets do
-    puts "--> Compiling static assets [compass compile -e production --force]"
-    output = `bundle exec compass compile -e production --force 2>&1`
-    raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
+    puts "--> Compiling static assets [css]"
+    Rake::Task['css:generate'].invoke
 
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`
     raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
 
+    puts "--> Compiling static assets [javascript]"
     Rake::Task['js:generate'].invoke
 
     puts "--> Generating js localization bundles"
