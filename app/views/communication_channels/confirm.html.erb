@@ -112,7 +112,7 @@
             <div style="font-size: 0.8em;"><%= t 'tips.name', "Teachers will use this name for grading." %></div>
           </td>
         </tr><tr>
-          <td><%= blabel :user, :short_name, :en => "Short Name" %></td>
+          <td><%= blabel :user, :short_name, :en => "Display Name" %></td>
           <td>
             <%= text_field :user, :short_name, :value => @user.short_name %>
             <div style="font-size: 0.8em;"><%= t 'tips.short_name', "People will see this name in discussions, messages and comments." %></div>
