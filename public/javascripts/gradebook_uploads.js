@@ -17,15 +17,15 @@
  */
 define([
   'i18n!gradebook',
-  'jquery' /* $ */,
+  'jquery',
+  'use!underscore',
   'str/htmlEscape',
   'vendor/slickgrid-googlecode/slick.grid',
   'vendor/slickgrid-googlecode/slick.editors',
   'jquery.instructure_forms' /* errorBox */,
   'jquery.instructure_misc_helpers' /* /\.detect/ */,
   'jquery.templateData' /* fillTemplateData */,
-  'vendor/underscore' /* /_\./ */
-], function(I18n, $, htmlEscape, SlickGrid) {
+], function(I18n, $, _, htmlEscape, SlickGrid) {
 
   var GradebookUploader = {
     init:function(){

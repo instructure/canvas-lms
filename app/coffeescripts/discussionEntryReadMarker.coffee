@@ -1,6 +1,6 @@
 define [
   'i18n!discussions'
-  'vendor/underscore'
+  'use!underscore'
   'jquery'
   'jquery.ajaxJSON'
 ], (I18n, _, $) ->
