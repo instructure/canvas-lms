@@ -100,7 +100,8 @@ class Group < ActiveRecord::Base
     allow_join_request?(user) || allow_self_signup?(user)
   end
 
-  def participants
+  def participants(include_observers=false)
+    # argument needed because #participants is polymorphic for contexts
     participating_users.uniq
   end
 

@@ -85,6 +85,7 @@ class Course < ActiveRecord::Base
   has_many :designers, :through => :designer_enrollments, :source => :user
   has_many :designer_enrollments, :class_name => 'DesignerEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :observers, :through => :observer_enrollments, :source => :user
+  has_many :participating_observers, :through => :observer_enrollments, :source => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
   has_many :observer_enrollments, :class_name => 'ObserverEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :instructors, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
   has_many :instructor_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
@@ -1292,8 +1293,8 @@ class Course < ActiveRecord::Base
     GradingStandard.score_to_grade(scheme, score)
   end
 
-  def participants
-    (participating_admins + participating_students).uniq
+  def participants(include_observers=false)
+    (participating_admins + participating_students + (include_observers ? participating_observers : [])).uniq
   end
 
   def enroll_user(user, type='StudentEnrollment', opts={})

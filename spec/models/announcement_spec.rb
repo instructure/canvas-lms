@@ -50,5 +50,22 @@ describe Announcement do
       dom.css('object')[0]['data'].should eql("http://www.youtuube.com/test")
       dom.css('object')[0]['othertag'].should eql(nil)
     end
+
+    it "should broadcast to students and observers" do
+      course_with_student(:active_all => true)
+      course_with_observer(:course => @course, :active_all => true)
+
+      notification_name = "New Announcement"
+      n = Notification.create(:name => notification_name, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @observer.communication_channel, :frequency => "immediately")
+
+      @context = @course
+      announcement_model
+
+      to_users = @a.messages_sent[notification_name].map(&:user)
+      to_users.should include(@student)
+      to_users.should include(@observer)
+    end
   end
 end

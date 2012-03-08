@@ -519,15 +519,15 @@ class DiscussionTopic < ActiveRecord::Base
   def delay_posting=(val); end
   def set_assignment=(val); end
 
-  def participants
-    ([self.user] + context.participants).compact.uniq
+  def participants(include_observers=false)
+    ([self.user] + context.participants(include_observers)).compact.uniq
   end
 
-  def active_participants
+  def active_participants(include_observers=false)
     if !self.context.available? && self.context.respond_to?(:participating_admins)
       self.context.participating_admins
     else
-      self.participants
+      self.participants(include_observers)
     end
   end
 
