@@ -117,6 +117,23 @@ describe "grades" do
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").should_not be_displayed
     end
 
+    it "should not display letter grade score on muted assignment" do
+      @another_assignment = assignment_model({
+                                               :course => @course,
+                                               :name => 'another assignment',
+                                               :points_possible => 100,
+                                               :submission_types => 'online_text_entry',
+                                               :assignment_group => @group,
+                                               :grading_type => 'letter_grade',
+                                               :muted => 'true'
+                                             })
+      @another_submission = @another_assignment.submit_homework(@student_1, :body => 'student second submission')
+      @another_assignment.grade_student(@student_1, :grade => 81)
+      @another_submission.save!
+      get "/courses/#{@course.id}/grades"
+      f('.score_value').text.should == ''
+    end
+
     it "should display teacher comment and assignment statistics" do
       #check comment
       driver.find_element(:css, '.toggle_comments_link img').click
