@@ -43,7 +43,7 @@ class Attachment < ActiveRecord::Base
   before_destroy :delete_scribd_doc
   acts_as_list :scope => :folder
   after_save :touch_context_if_appropriate
-  after_create :build_media_object
+  after_save :build_media_object
   
   attr_accessor :podcast_associated_asset
 
@@ -166,7 +166,10 @@ class Attachment < ActiveRecord::Base
   
   def build_media_object
     return true if self.class.skip_media_object_creation?
-    if self.content_type && self.content_type.match(/\A(video|audio)/)
+    in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/
+    transitioned_to_this_state = self.id_was == nil || self.file_state_changed? && self.workflow_state_was =~ /^unattached/
+    if in_the_right_state && transitioned_to_this_state &&
+        self.content_type && self.content_type.match(/\A(video|audio)/)
       delay = Setting.get_cached('attachment_build_media_object_delay_seconds', 10.to_s).to_i
       MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now }, self, false)
     end
