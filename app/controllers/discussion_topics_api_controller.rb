@@ -276,6 +276,51 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   # @API
+  # Retrieve a paginated list of discussion entries, given a list of ids.
+  #
+  # May require (depending on the topic) that the user has posted in the topic.
+  # If it is required, and the user has not posted, will respond with a 403
+  # Forbidden status and the body 'require_initial_post'.
+  #
+  # @argument ids[] A list of entry ids to retrieve. Entries will be returned in id order, smallest id first.
+  #
+  # @response_field id The unique identifier for the reply.
+  #
+  # @response_field user_id The unique identifier for the author of the reply.
+  #
+  # @response_field user_name The name of the author of the reply.
+  #
+  # @response_field message The content of the reply.
+  #
+  # @response_field read_state The read state of the entry, "read" or "unread".
+  #
+  # @response_field created_at The creation time of the reply, in ISO8601
+  #   format.
+  #
+  # @response_field deleted If the entry has been deleted, returns true. The
+  #   user_id, user_name, and message will not be returned for deleted entries.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entry_list?ids[]=1&ids[]=2&ids[]=3' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #   [
+  #     { ... entry 1 ... },
+  #     { ... entry 2 ... },
+  #     { ... entry 3 ... },
+  #   ]
+  def entry_list
+    if authorized_action(@topic, @current_user, :read)
+      ids = Array(params[:ids])
+      entries = @topic.discussion_entries.find(ids, :order => :id)
+      @entries = Api.paginate(entries, self, entry_pagination_path(@topic))
+      render :json => discussion_entry_api_json(@entries, @context, @current_user, session, false)
+    end
+  end
+
+  # @API
   # Mark the initial text of the discussion topic as read.
   #
   # No request fields are necessary.

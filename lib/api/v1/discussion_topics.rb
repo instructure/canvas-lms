@@ -90,9 +90,6 @@ module Api::V1::DiscussionTopics
           json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session, false)
           json[:has_more_replies] = replies.size > 10
         end
-        json[:attachment] = attachment_json(entry.attachment) if entry.attachment
-        # this is for backwards compatibility, and can go away if we make an api v2
-        json[:attachments] = [attachment_json(entry.attachment)] if entry.attachment
       end
       json
     end

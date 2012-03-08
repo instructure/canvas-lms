@@ -778,6 +778,31 @@ describe DiscussionTopicsController, :type => :integration do
                  { :message => "ohai" }, {}, {:expected_status => 400})
       end
     end
+
+    context "in the updated API" do
+      it "should return a paginated entry_list" do
+        entries = [@entry2, @sub1, @side2]
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entry_list?per_page=2",
+                  { :controller => "discussion_topics_api", :action => "entry_list", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '2' },
+                 { :ids => entries.map(&:id) })
+        json.size.should == 2
+        # response order is by id
+        json.map { |e| e['id'] }.should == [@sub1.id, @side2.id]
+        response['Link'].should match(/next/)
+      end
+
+      it "should return deleted entries, but with limited data" do
+        @sub1.destroy
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entry_list",
+                  { :controller => "discussion_topics_api", :action => "entry_list", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
+                 { :ids => @sub1.id })
+        json.size.should == 1
+        pending("read state should be read") do
+          json.first.delete('read_state').should == 'read'
+        end
+        json.first.should == { 'id' => @sub1.id, 'deleted' => true, 'parent_id' => @entry.id, 'updated_at' => @sub1.updated_at.as_json, 'created_at' => @sub1.created_at.as_json }
+      end
+    end
   end
 
   context "materialized view API" do
