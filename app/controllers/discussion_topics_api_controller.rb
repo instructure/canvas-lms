@@ -27,6 +27,65 @@ class DiscussionTopicsApiController < ApplicationController
   before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread]
 
   # @API
+  # Return a summary structure of the discussion topic, containing all entries,
+  # their authors, and a summarized version of their message bodies.
+  #
+  # May require (depending on the topic) that the user has posted in the topic.
+  # If it is required, and the user has not posted, will respond with a 403
+  # Forbidden status and the body 'require_initial_post'.
+  #
+  # In some rare situations, this summary structure may not be available yet. In
+  # that case, the server will respond with a 503 error, and the caller should
+  # try again soon.
+  #
+  # The response is an object containing the following keys:
+  # * "participants": a list of summary information on users who have posted to
+  #   the discussion. Each value is an object containing their id, display_name,
+  #   and avatar_url.
+  # * "unread_entries": a list of entry ids that are unread by the current
+  #   user. this implies that any entry not in this list is read.
+  # * "view": a threaded view of all the entries in the discussion, containing
+  #   the id, user_id, and summary of the message. to get the full message text,
+  #   use the other discussion api calls.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/view' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #   {
+  #     "unread_entries": [1,3,4],
+  #     "participants": [
+  #       { "id": 10, "display_name": "user 1", "avatar_url": "https://..." },
+  #       { "id": 11, "display_name": "user 2", "avatar_url": "https://..." }
+  #     ],
+  #     "view": [
+  #       { "id": 1, "user_id": 10, "parent_id": null, "summary": "...html text...", "replies": [
+  #         { "id": 3, "user_id": 11, "parent_id": 1, "summary": "...html....", "replies": [...] }
+  #       ]},
+  #       { "id": 2, "user_id": 11, "parent_id": null, "summary": "...html..." },
+  #       { "id": 4, "user_id": 10, "parent_id": null, "summary": "...html..." }
+  #     ]
+  #   }
+  def view
+    return unless authorized_action(@topic, @current_user, :read)
+    structure, participant_ids, entry_ids = @topic.materialized_view
+    if structure
+      participant_info = User.find(participant_ids).map do |user|
+        { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)) }
+      end
+      unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
+      # as an optimization, the view structure is pre-serialized as a json
+      # string, so we have to do a bit of manual json building here to fit it
+      # into the response.
+      render :json => %[{ "unread_entries": #{unread_entries.to_json}, "participants": #{participant_info.to_json}, "view": #{structure} }]
+    else
+      render :nothing => true, :status => 503
+    end
+  end
+
+  # @API
   # Create a new entry in a discussion topic. Returns a json representation of
   # the created entry (see documentation for 'entries' method) on success.
   #
@@ -55,7 +114,7 @@ class DiscussionTopicsApiController < ApplicationController
           @entry.attachment = @attachment
           @entry.save
         end
-        render :json => discussion_entry_api_json([@entry], @context, @current_user, session).first, :status => :created
+        render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first, :status => :created
       end
     end
   end
@@ -79,6 +138,8 @@ class DiscussionTopicsApiController < ApplicationController
   # @response_field id The unique identifier for the entry.
   #
   # @response_field user_id The unique identifier for the author of the entry.
+  #
+  # @response_field editor_id The unique user id of the person to last edit the entry, if different than user_id.
   #
   # @response_field user_name The name of the author of the entry.
   #
@@ -136,7 +197,7 @@ class DiscussionTopicsApiController < ApplicationController
   def entries
     if authorized_action(@topic, @current_user, :read)
       @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_path(@topic))
-      render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
+      render :json => discussion_entry_api_json(@entries, @context, @current_user, session, true)
     end
   end
 
@@ -161,7 +222,7 @@ class DiscussionTopicsApiController < ApplicationController
     @entry = build_entry(@parent.discussion_subentries)
     if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
       if save_entry
-        render :json => discussion_entry_api_json([@entry], @context, @current_user, session).first, :status => :created
+        render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first, :status => :created
       end
     end
   end
@@ -179,6 +240,8 @@ class DiscussionTopicsApiController < ApplicationController
   # @response_field id The unique identifier for the reply.
   #
   # @response_field user_id The unique identifier for the author of the reply.
+  #
+  # @response_field editor_id The unique user id of the person to last edit the entry, if different than user_id.
   #
   # @response_field user_name The name of the author of the reply.
   #
@@ -208,7 +271,7 @@ class DiscussionTopicsApiController < ApplicationController
     @parent = root_entries(@topic).find(params[:entry_id])
     if authorized_action(@topic, @current_user, :read)
       @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_path(@parent))
-      render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
+      render :json => discussion_entry_api_json(@replies, @context, @current_user, session, true)
     end
   end
 

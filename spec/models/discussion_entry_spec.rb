@@ -365,4 +365,21 @@ describe DiscussionEntry do
       sub2.root_entry.should == root
     end
   end
+
+  context "DiscussionEntryParticipant.read_entry_ids" do
+    it "should return the ids of the read entries" do
+      topic_with_nested_replies
+      @root2.change_read_state('read', @teacher)
+      @reply_reply1.change_read_state('read', @teacher)
+      @reply_reply2.change_read_state('read', @teacher)
+      @reply3.change_read_state('read', @teacher)
+      # change one back to unread, it shouldn't be returned
+      @reply_reply2.change_read_state('unread', @teacher)
+      read = DiscussionEntryParticipant.read_entry_ids(@topic.discussion_entries.map(&:id), @teacher).sort
+      pending("deleted entries marked as read") do
+        read.delete(@reply1.id).should be_present
+      end
+      read.should == [@root2, @reply2, @reply_reply1, @reply3].map(&:id)
+    end
+  end
 end

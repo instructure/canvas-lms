@@ -36,3 +36,20 @@ def group_assignment_discussion(opts = {})
   @root_topic.refresh_subtopics
   @topic = @group.discussion_topics.find_by_root_topic_id(@root_topic.id)
 end
+
+def topic_with_nested_replies(opts = {})
+  course_with_teacher(:active_all => true)
+  student_in_course(:course => @course, :active_all => true)
+  @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :threaded => true)
+  @root1 = @topic.reply_from(:user => @student, :html => "root1")
+  @root2 = @topic.reply_from(:user => @student, :html => "root2")
+  @reply1 = @root1.reply_from(:user => @teacher, :html => "reply1")
+  @reply2 = @root1.reply_from(:user => @teacher, :html => "reply2")
+  @reply_reply1 = @reply2.reply_from(:user => @student, :html => "reply_reply1")
+  @reply_reply2 = @reply1.reply_from(:user => @student, :html => "reply_reply2")
+  @reply3 = @root2.reply_from(:user => @student, :html => "reply3")
+  @reply1.destroy
+  @all_entries = [@root1, @root2, @reply1, @reply2, @reply_reply1, @reply_reply2, @reply3]
+  @all_entries.each &:reload
+  @topic
+end

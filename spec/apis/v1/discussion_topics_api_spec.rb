@@ -780,6 +780,92 @@ describe DiscussionTopicsController, :type => :integration do
     end
   end
 
+  context "materialized view API" do
+    it "should respond with the materialized information about the discussion" do
+      topic_with_nested_replies
+      # mark a couple entries as read
+      @user = @student
+      @root2.change_read_state("read", @user)
+      @reply3.change_read_state("read", @user)
+      # have the teacher edit one of the student's replies
+      @reply_reply1.editor = @teacher
+      @reply_reply1.update_attributes(:message => '<p>censored</p>')
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                { :controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+
+      json['unread_entries'].size.should == 2 # two marked read, then ones this user wrote are never unread
+      json['unread_entries'].sort.should == (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
+
+      json['participants'].sort_by { |h| h['id'] }.should == [
+        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}" },
+        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@teacher.id)}" },
+      ].sort_by { |h| h['id'] }
+
+      json['view'].should == [
+        {
+          'id' => @root1.id,
+          'parent_id' => nil,
+          'user_id' => @student.id,
+          'summary' => "root1",
+          'created_at' => @root1.created_at.as_json,
+          'updated_at' => @root1.updated_at.as_json,
+          'replies' => [
+            {
+              'id' => @reply1.id,
+              'deleted' => true,
+              'parent_id' => @root1.id,
+              'created_at' => @reply1.created_at.as_json,
+              'updated_at' => @reply1.updated_at.as_json,
+              'replies' => [ {
+                'id' => @reply_reply2.id,
+                'parent_id' => @reply1.id,
+                'user_id' => @student.id,
+                'summary' => 'reply_reply2',
+                'created_at' => @reply_reply2.created_at.as_json,
+                'updated_at' => @reply_reply2.updated_at.as_json,
+               } ],
+            },
+            { 'id' => @reply2.id,
+              'parent_id' => @root1.id,
+              'user_id' => @teacher.id,
+              'summary' => 'reply2',
+              'created_at' => @reply2.created_at.as_json,
+              'updated_at' => @reply2.updated_at.as_json,
+              'replies' => [ {
+                'id' => @reply_reply1.id,
+                'parent_id' => @reply2.id,
+                'user_id' => @student.id,
+                'editor_id' => @teacher.id,
+                'summary' => 'censored',
+                'created_at' => @reply_reply1.created_at.as_json,
+                'updated_at' => @reply_reply1.updated_at.as_json,
+              } ],
+            },
+          ],
+        },
+        {
+          'id' => @root2.id,
+          'parent_id' => nil,
+          'user_id' => @student.id,
+          'summary' => 'root2',
+          'created_at' => @root2.created_at.as_json,
+          'updated_at' => @root2.updated_at.as_json,
+          'replies' => [
+            {
+              'id' => @reply3.id,
+              'parent_id' => @root2.id,
+              'user_id' => @student.id,
+              'summary' => 'reply3',
+              'created_at' => @reply3.created_at.as_json,
+              'updated_at' => @reply3.updated_at.as_json,
+            },
+          ],
+        },
+      ]
+    end
+  end
+
 end
 
 def create_attachment(context, opts={})

@@ -22,6 +22,7 @@ class DiscussionTopic < ActiveRecord::Base
   include SendToStream
   include HasContentTags
   include CopyAuthorizedLinks
+  include TextHelper
 
   attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
@@ -167,12 +168,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def plaintext_message=(val)
-    self.extend TextHelper
     self.message = format_message(strip_tags(val)).first
   end
 
   def plaintext_message
-    self.extend TextHelper
     truncate_html(self.message, :max_length => 250)
   end
 
@@ -364,9 +363,12 @@ class DiscussionTopic < ActiveRecord::Base
 
   def reply_from(opts)
     user = opts[:user]
-    message = opts[:text].strip
-    self.extend TextHelper
-    message = format_message(message).first
+    if opts[:text]
+      message = opts[:text].strip
+      message = format_message(message).first
+    else
+      message = opts[:html].strip
+    end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
@@ -780,6 +782,56 @@ class DiscussionTopic < ActiveRecord::Base
         item.enclosure = RSS::Rss::Channel::Item::Enclosure.new("http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}/media_download.#{details[:fileExt]}?entryId=#{elem.media_id}&redirect=1", size, content_type)
       end
       item
+    end
+  end
+
+  # returns the materialized view of the discussion as structure, participant_ids, and entry_ids
+  # the view is already converted to a json string, the other two arrays of ids are ruby arrays
+  # see the description of the format in the discussion topics api documentation.
+  #
+  # returns nil if the view is not currently available, and kicks off a
+  # background job to build the view. this typically only takes a couple seconds.
+  #
+  # if a new message is posted, it won't appear in this view until the job to
+  # update it completes. so this view is eventually consistent.
+  def materialized_view
+    # coming soon: do this in a job and save to the db
+    MaterializedViewBuilder.new(context).build_materialized_view(discussion_entries)
+  end
+
+  protected
+
+  class MaterializedViewBuilder
+    include Api::V1::DiscussionTopics
+    include ActionController::UrlWriter
+
+    def initialize(context)
+      @context = context
+    end
+
+    def self.default_url_options(options = nil)
+      { :only_path => false, :host => HostUrl.context_host(@context) }
+    end
+
+    def build_materialized_view(discussion_entries)
+      entry_lookup = {}
+      view = []
+      user_ids = Set.new
+      discussion_entries.find_each do |entry|
+        json = discussion_entry_api_json([entry], @context, nil, nil, false).first
+        json.delete(:user_name) # this can get out of date in the cached view
+        json[:summary] = entry.summary unless entry.deleted?
+        entry_lookup[entry.id] = json
+        user_ids << entry.user_id
+        user_ids << entry.editor_id if entry.editor_id
+        if parent = entry_lookup[entry.parent_id]
+          parent['replies'] ||= []
+          parent['replies'] << json
+        else
+          view << json
+        end
+      end
+      return view.to_json, user_ids.to_a, entry_lookup.keys
     end
   end
 end

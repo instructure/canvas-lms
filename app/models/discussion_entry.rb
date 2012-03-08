@@ -20,6 +20,7 @@ class DiscussionEntry < ActiveRecord::Base
   include Workflow
   include SendToInbox
   include SendToStream
+  include TextHelper
 
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
@@ -144,7 +145,6 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def plaintext_message=(val)
-    self.extend TextHelper
     self.message = format_message(val).first
   end
 
@@ -152,8 +152,11 @@ class DiscussionEntry < ActiveRecord::Base
     plaintext_message(length)
   end
 
+  def summary(length=250)
+    strip_and_truncate(message, :max_length => length)
+  end
+
   def plaintext_message(length=250)
-    self.extend TextHelper
     truncate_html(self.message, :max_length => length)
   end
 
