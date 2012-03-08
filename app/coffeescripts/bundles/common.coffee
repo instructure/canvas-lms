@@ -17,9 +17,13 @@ require [
   'page_views'
   'compiled/license_help'
 
-  # stuff we simply want to load since it's used regularly across
-  # several modules
-  'tinymce.editor_box'
+  # other stuff several bundles use
+  'media_comments'
+  'order'
+  'jqueryui/effects/core'
+  'jqueryui/effects/drop'
+  'jqueryui/progressbar'
+  'jqueryui/tabs'
 
   # random modules required by the js_blocks, put them all in here
   # so RequireJS doesn't try to load them before common is loaded

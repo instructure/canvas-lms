@@ -25,6 +25,7 @@ define([
   'jquery.instructure_jquery_patches' /* /\.dialog/ */,
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.rails_flash_notifications' /* flashMessage */,
+  'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
