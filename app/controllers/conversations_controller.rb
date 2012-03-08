@@ -146,6 +146,21 @@ class ConversationsController < ApplicationController
         # TODO: remove this in a subsequent release, since everything will be
         # filterable once the data migration has run
         @filterable = (base_scope.scoped(:conditions => "conversations.tags IS NULL").size == 0)
+
+        notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
+        can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+        js_env(:CONVERSATIONS => {
+          :USER => jsonify_users([@current_user]).first,
+          :CONTEXTS => @contexts,
+          :INITIAL_CONVERSATIONS => @conversations_json,
+          :CONVERSATIONS_COUNT => @conversations_count,
+          :CONVERSATIONS_PER_PAGE => @page_max,
+          :SCOPE => @scope,
+          :NOTES_ENABLED => notes_enabled,
+          :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
+          :INITIAL_FILTER => @filter,
+          :SHOW_INTRO => !@current_user.watched_conversations_intro?
+        })
       }
       format.json { render :json => @conversations_json }
     end

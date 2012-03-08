@@ -35,7 +35,7 @@ shared_examples_for "conversations selenium tests" do
   def add_recipient(search)
     input = find_with_jquery("#create_message_form input:visible")
     input.send_keys(search)
-    keep_trying_until { driver.execute_script("return $('#recipients').data('token_input').selector.last_search") == search }
+    keep_trying_until { driver.execute_script("return $('#recipients').data('token_input').selector.lastSearch") == search }
     input.send_keys(:return)
   end
 
@@ -105,7 +105,7 @@ shared_examples_for "conversations selenium tests" do
   def search(text, input_id="recipients")
     @input.send_keys(text)
     keep_trying_until do
-      driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == text
+      driver.execute_script("return $('\##{input_id}').data('token_input').selector.lastSearch") == text
     end
     @elements = nil
     yield
@@ -114,7 +114,7 @@ shared_examples_for "conversations selenium tests" do
       @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
       keep_trying_until do
         driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 ||
-            driver.execute_script("return $('\##{input_id}').data('token_input').selector.last_search") == ''
+            driver.execute_script("return $('\##{input_id}').data('token_input').selector.lastSearch") == ''
       end
     end
   end
