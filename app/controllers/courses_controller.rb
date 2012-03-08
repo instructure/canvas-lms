@@ -23,6 +23,7 @@ require 'set'
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
+  before_filter :require_pseudonym, :only => [:index]
   before_filter :require_context, :only => [:roster, :locks, :switch_role]
 
   include Api::V1::Course

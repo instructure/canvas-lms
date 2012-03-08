@@ -19,6 +19,7 @@
 # @API Admins
 class AdminsController < ApplicationController
   before_filter :require_user
+  before_filter :require_pseudonym
   before_filter :get_context
 
   include Api::V1::Admin

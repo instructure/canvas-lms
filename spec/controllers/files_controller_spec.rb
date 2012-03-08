@@ -410,9 +410,17 @@ describe FilesController do
   
   describe "POST 'create_pending'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
+      course(:active_course => true)
+      user(:acitve_user => true)
+      user_session(user)
       post 'create_pending', {:attachment => {:context_code => @course.asset_string}}
       assert_unauthorized
+    end
+
+    it "should require a pseudonym" do
+      course_with_teacher(:active_all => true)
+      post 'create_pending', {:attachment => {:context_code => @course.asset_string}}
+      response.should redirect_to login_url
     end
     
     it "should create file placeholder (in local mode)" do

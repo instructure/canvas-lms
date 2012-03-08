@@ -18,6 +18,7 @@
 
 class CommunicationChannelsController < ApplicationController
   before_filter :require_user, :only => [:create, :destroy]
+  before_filter :require_pseudonym, :only => [:create, :destroy]
   
   def create
     if params[:build_pseudonym]

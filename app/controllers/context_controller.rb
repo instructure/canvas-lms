@@ -19,6 +19,7 @@
 class ContextController < ApplicationController
   before_filter :require_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
+  before_filter :require_pseudonym, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
   def create_media_object

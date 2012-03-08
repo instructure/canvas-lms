@@ -24,6 +24,7 @@ class ConversationsController < ApplicationController
   include Api::V1::Submission
 
   before_filter :require_user, :except => [:public_feed]
+  before_filter :require_pseudonym, :except => [:public_feed]
   before_filter :set_avatar_size
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]

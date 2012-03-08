@@ -19,6 +19,7 @@
 class EportfoliosController < ApplicationController
   include EportfolioPage
   before_filter :require_user, :only => [:index, :user_index]
+  before_filter :require_pseudonym, :only => [:index, :user_index]
   
   def index
     user_index

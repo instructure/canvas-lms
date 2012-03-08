@@ -20,6 +20,7 @@ class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
 
   before_filter :require_user
+  before_filter :require_pseudonym
   before_filter :get_context, :only => :create
   before_filter :get_options, :only => :index
 
