@@ -671,4 +671,43 @@ describe DiscussionTopic do
       @topic.unread_count(@student).should == 1
     end
   end
+
+  context "materialized view" do
+    def map_to_ids_and_replies(list)
+      list.map { |l| l = l.slice('id', 'replies'); l['replies'] = map_to_ids_and_replies(l['replies'] || []); l }
+    end
+
+    it "should build a materialized view of the structure, participants and entry ids" do
+      topic_with_nested_replies
+      structure, participant_ids, entry_ids = @topic.materialized_view
+      participant_ids.sort.should == [@student.id, @teacher.id].sort
+      entry_ids.sort.should == @topic.discussion_entries.map(&:id).sort
+      view = JSON.parse(structure)
+      view.size.should == 2
+      view.map { |e| e['id'] }.should == [@root1.id, @root2.id]
+      view.map { |e| e['parent_id'] }.should == [nil, nil]
+      view.map { |e| e['summary'] }.should == ['root1', 'root2']
+      deleted = view[0]['replies'][0]
+      deleted['deleted'].should == true
+      deleted['user_id'].should be_nil
+      deleted['summary'].should be_nil
+      # the deleted entry will be marked deleted and have no summary
+      view = map_to_ids_and_replies(view)
+      view.should == [
+        {
+          'id' => @root1.id,
+          'replies' => [
+            { 'id' => @reply1.id, 'replies' => [ { 'id' => @reply_reply2.id, 'replies' => [] } ], },
+            { 'id' => @reply2.id, 'replies' => [ { 'id' => @reply_reply1.id, 'replies' => [] } ], },
+          ],
+        },
+        {
+          'id' => @root2.id,
+          'replies' => [
+            { 'id' => @reply3.id, 'replies' => [], },
+          ],
+        },
+      ]
+    end
+  end
 end

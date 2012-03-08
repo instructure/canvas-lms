@@ -118,7 +118,7 @@ module Api::V1::Submission
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
       end
-      hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
+      hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session, true)
     end
 
     hash
