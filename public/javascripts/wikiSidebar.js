@@ -28,7 +28,7 @@ define([
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
   'jquery.rails_flash_notifications' /* flashError */,
   'jquery.templateData' /* fillTemplateData */,
-  'tinymce.editor_box' /* editorBox */,
+  'tinymce.editor_box',
   'vendor/jquery.pageless' /* pageless */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
