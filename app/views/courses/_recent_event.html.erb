@@ -1,9 +1,11 @@
 <% 
   show_context ||= false; upcoming ||= false
   if recent_event.is_a?(Assignment)
-    submission = @current_user_submissions.nil? ?
-      @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => { :assignment_id => recent_event.id }).first :
-      @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
+    if @current_user_submissions
+      submission = @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
+    elsif @current_user
+      submission = @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => { :assignment_id => recent_event.id }).first
+    end
   end
 
   cache(['recent_event_render', submission || 'no_submission', recent_event || 'blank_event', Time.zone.utc_offset, recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades), recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do 

@@ -11,7 +11,7 @@ namespace :css do
 
     # build the list of files ourselves so that we get it to follow symlinks
     sass_path = File.expand_path(Compass.configuration.sass_path)
-    sass_files = Dir.glob("#{sass_path}/**{,/*/**}/[^_]*.s[ac]ss")
+    sass_files = Dir.glob("#{sass_path}/{,plugins/*/}**/[^_]*.s[ac]ss")
 
     # build and execute the compass command
     compass = Compass::Commands::UpdateProject.new(RAILS_ROOT,

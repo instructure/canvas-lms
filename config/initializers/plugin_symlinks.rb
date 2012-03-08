@@ -12,4 +12,6 @@ def maintain_plugin_symlinks(relative_path)
 end
 
 maintain_plugin_symlinks('public')
+maintain_plugin_symlinks('app/coffeescripts')
+maintain_plugin_symlinks('app/views/jst')
 maintain_plugin_symlinks('app/stylesheets')
