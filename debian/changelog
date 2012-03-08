@@ -1,3 +1,14 @@
+canvas-lms (2012.03.17.04) testing; urgency=low
+
+  * Package ref: 17ad1315870644fc454802cebec55eb7edcf4fc7
+  *
+  * [+52a0629] fix public course home page fixes #7589
+  * [+fc7f8e0] do not show rubric results on muted assignments
+  * [+cc4d49b] hide rubric results from students for muted assignments
+  * [+17ad131] fix rake canvas:compile_assets for plugins
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 08 Mar 2012 10:00:54 -0700
+
 canvas-lms (2012.03.17.02) testing; urgency=low
 
   * Package ref: acb04f5b4132c5371372b497158e053e6658289b
