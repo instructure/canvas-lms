@@ -905,6 +905,10 @@ describe DiscussionTopicsController, :type => :integration do
 
       @all_entries.each &:reload
 
+      job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
+      job.should be_present
+      run_job(job)
+
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
                 { :controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
 
