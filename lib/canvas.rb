@@ -51,6 +51,13 @@ module Canvas
     @redis_enabled ||= Setting.from_config('redis').present?
   end
 
+  def self.reconnect_redis
+    @redis = nil
+    if Rails.cache && Rails.cache.respond_to?(:reconnect)
+      Rails.cache.reconnect
+    end
+  end
+
   def self.cache_store_config
     cache_store_config = {
       'cache_store' => 'mem_cache_store',
