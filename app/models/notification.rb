@@ -208,9 +208,10 @@ class Notification < ActiveRecord::Base
         to_path = c
         to_path = c.path if c.respond_to?("path")
 
-        message = self.messages.build(
+        message = (user || cc || self).messages.build(
           :subject => self.subject, 
-          :to => to_path
+          :to => to_path,
+          :notification => self
         )
 
         message.body = self.body
