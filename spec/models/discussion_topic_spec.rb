@@ -673,41 +673,37 @@ describe DiscussionTopic do
   end
 
   context "materialized view" do
-    def map_to_ids_and_replies(list)
-      list.map { |l| l = l.slice('id', 'replies'); l['replies'] = map_to_ids_and_replies(l['replies'] || []); l }
+    before do
+      topic_with_nested_replies
     end
 
-    it "should build a materialized view of the structure, participants and entry ids" do
-      topic_with_nested_replies
-      structure, participant_ids, entry_ids = @topic.materialized_view
-      participant_ids.sort.should == [@student.id, @teacher.id].sort
-      entry_ids.sort.should == @topic.discussion_entries.map(&:id).sort
-      view = JSON.parse(structure)
-      view.size.should == 2
-      view.map { |e| e['id'] }.should == [@root1.id, @root2.id]
-      view.map { |e| e['parent_id'] }.should == [nil, nil]
-      view.map { |e| e['summary'] }.should == ['root1', 'root2']
-      deleted = view[0]['replies'][0]
-      deleted['deleted'].should == true
-      deleted['user_id'].should be_nil
-      deleted['summary'].should be_nil
-      # the deleted entry will be marked deleted and have no summary
-      view = map_to_ids_and_replies(view)
-      view.should == [
-        {
-          'id' => @root1.id,
-          'replies' => [
-            { 'id' => @reply1.id, 'replies' => [ { 'id' => @reply_reply2.id, 'replies' => [] } ], },
-            { 'id' => @reply2.id, 'replies' => [ { 'id' => @reply_reply1.id, 'replies' => [] } ], },
-          ],
-        },
-        {
-          'id' => @root2.id,
-          'replies' => [
-            { 'id' => @reply3.id, 'replies' => [], },
-          ],
-        },
-      ]
+    it "should return nil if the view has not been built yet, and schedule a job" do
+      # test that it kicks off the view building right as the discussion is first created
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      @topic.materialized_view.should be_nil
+      @topic.materialized_view.should be_nil
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+    end
+
+    it "should return the materialized view if it's up to date" do
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
+      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array]
+    end
+
+    it "should update the materialized view on new entry" do
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      @topic.reply_from(:user => @user, :text => "ohai")
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+    end
+
+    it "should update the materialized view on edited entry" do
+      reply = @topic.reply_from(:user => @user, :text => "ohai")
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      reply.update_attributes(:message => "i got that wrong before")
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
     end
   end
 end

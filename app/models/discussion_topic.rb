@@ -63,6 +63,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :touch_context
   after_save :schedule_delayed_post
   after_create :create_participant
+  after_create :update_materialized_view
 
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
@@ -177,6 +178,10 @@ class DiscussionTopic < ActiveRecord::Base
 
   def create_participant
     self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+  end
+
+  def update_materialized_view
+    materialized_view # kick off building of the view
   end
 
   # If no join record exists, assume all discussion enrties are unread, and
@@ -796,42 +801,6 @@ class DiscussionTopic < ActiveRecord::Base
   # update it completes. so this view is eventually consistent.
   def materialized_view
     # coming soon: do this in a job and save to the db
-    MaterializedViewBuilder.new(context).build_materialized_view(discussion_entries)
-  end
-
-  protected
-
-  class MaterializedViewBuilder
-    include Api::V1::DiscussionTopics
-    include ActionController::UrlWriter
-
-    def initialize(context)
-      @context = context
-    end
-
-    def self.default_url_options(options = nil)
-      { :only_path => false, :host => HostUrl.context_host(@context) }
-    end
-
-    def build_materialized_view(discussion_entries)
-      entry_lookup = {}
-      view = []
-      user_ids = Set.new
-      discussion_entries.find_each do |entry|
-        json = discussion_entry_api_json([entry], @context, nil, nil, false).first
-        json.delete(:user_name) # this can get out of date in the cached view
-        json[:summary] = entry.summary unless entry.deleted?
-        entry_lookup[entry.id] = json
-        user_ids << entry.user_id
-        user_ids << entry.editor_id if entry.editor_id
-        if parent = entry_lookup[entry.parent_id]
-          parent['replies'] ||= []
-          parent['replies'] << json
-        else
-          view << json
-        end
-      end
-      return view.to_json, user_ids.to_a, entry_lookup.keys
-    end
+    DiscussionTopic::MaterializedView.materialized_view_for(self)
   end
 end

@@ -39,7 +39,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
 
   before_create :infer_root_entry_id
-  after_save :touch_root
+  after_save :update_discussion
   after_save :context_module_action_later
   after_create :create_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -118,10 +118,6 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  def touch_root
-    self.root_entry.try(:touch)
-  end
-
   def reply_from(opts)
     user = opts[:user]
     message = opts[:html].strip
@@ -168,6 +164,13 @@ class DiscussionEntry < ActiveRecord::Base
     self.deleted_at = Time.now
     save!
     update_topic_submission
+  end
+
+  def update_discussion
+    if %w(workflow_state message attachment_id editor_id).any? { |a| self.changed.include?(a) }
+      self.discussion_topic.touch
+      self.discussion_topic.update_materialized_view
+    end
   end
 
   def update_topic_submission
