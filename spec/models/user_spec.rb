@@ -556,6 +556,18 @@ describe User do
       c2.conversation.private_hash.should_not eql old_private_hash
       @user2.reload.unread_conversations_count.should eql 2
     end
+
+    it "should point other user's observers to the new user" do
+      @user1 = user_model
+      @user2 = user_model
+      @observer = user_model
+      course
+      @course.enroll_student(@user1)
+      @oe = @course.enroll_user(@observer, 'ObserverEnrollment')
+      @oe.update_attribute(:associated_user_id, @user1.id)
+      @user1.move_to_user(@user2)
+      @oe.reload.associated_user_id.should == @user2.id
+    end
   end
 
   describe "can_masquerade?" do

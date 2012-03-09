@@ -857,6 +857,8 @@ class User < ActiveRecord::Base
     end
     updates['submission_comments'] = 'author_id'
     updates['conversation_messages'] = 'author_id'
+    updates = updates.map
+    updates << ['enrollments', 'associated_user_id']
     updates.each do |table, column|
       begin
         klass = table.classify.constantize
