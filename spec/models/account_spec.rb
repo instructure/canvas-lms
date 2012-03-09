@@ -307,18 +307,6 @@ describe Account do
     a2.enrollment_terms.size.should == 0
   end
 
-  context "page view reports" do
-    before(:each) do
-      @a = Account.create!(:name => 'nada')
-    end
-    it "should build hourly reports" do
-      lambda{@a.page_views_by_hour}.should_not raise_error
-    end
-    it "should build daily reports" do
-      lambda{@a.page_views_by_day}.should_not raise_error
-    end
-  end
-
   def account_with_admin_and_restricted_user(account)
     account.add_account_membership_type('Restricted Admin')
     admin = User.create

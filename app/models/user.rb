@@ -169,25 +169,6 @@ class User < ActiveRecord::Base
     }
   }
 
-  # scopes to the most active users across the system
-  named_scope :most_active, lambda { |*args|
-    {
-      :joins => [:page_views],
-      :order => "users.page_views_count DESC",
-      :limit => (args.first || 10)
-    }
-  }
-
-  # scopes to the most active users (by page view count) in a context:
-  # User.x_most_active_in_context(30, Course.find(112)) # will give you the 30 most active users in course 112
-  named_scope :x_most_active_in_context, lambda { |*args|
-    {
-      :select => "users.*, (SELECT COUNT(*) FROM page_views WHERE user_id = users.id AND context_id = #{args.last.id} AND context_type = '#{args.last.class.to_s}') AS page_views_count",
-      :order => "page_views_count DESC",
-      :limit => (args.first || 10),
-    }
-  }
-
   has_a_broadcast_policy
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
@@ -197,25 +178,6 @@ class User < ActiveRecord::Base
   before_save :update_avatar_image
   after_save :generate_reminders_if_changed
   after_save :update_account_associations_if_necessary
-
-  def page_views_by_day(options={})
-    conditions = {}
-    if options[:dates]
-      conditions.merge!({
-        :created_at => (options[:dates].first)..(options[:dates].last)
-      })
-    end
-    page_views_as_hash = {}
-    self.page_views.count(
-      :group => "date(created_at)",
-      :order => "date(created_at)",
-      :conditions => conditions
-    ).each do |day|
-      page_views_as_hash[day.first] = day.last
-    end
-    page_views_as_hash
-  end
-  memoize :page_views_by_day
 
   def self.skip_updating_account_associations(&block)
     @skip_updating_account_associations = true
@@ -370,27 +332,6 @@ class User < ActiveRecord::Base
       UserAccountAssociation.delete_all(:id => to_delete) unless incremental || to_delete.empty?
     end
   end
-
-  def page_view_data(options={})
-    # if they dont supply a date range then use the first day returned by page_views_by_day
-    # (which should be the first day that there is pageview statistics gathered)
-    dates = options[:dates] && options[:dates].first ?
-      [options[:dates].first, (options[:dates].last || Time.now)] :
-      [page_views_by_day.sort.first.first.to_datetime, Time.now]
-    enrollments_with_page_views = enrollments.reject{ |e| e.page_views_by_day(:dates => dates).empty? }
-    days = []
-    dates.first.to_datetime.upto(dates.last) do |d|
-      # this * 1000 part is because the Highcharts expects something like what Date.UTC(2006, 2, 28) would give you,
-      # which is MILLISECONDS from the unix epoch, ruby's to_f gives you SECONDS since then.
-      days << [ (d.at_beginning_of_day.to_f * 1000).to_i, page_views_by_day(:dates => dates)[d.to_date.to_s].to_i, nil, nil].concat(
-        # these 2 nil's at the end here are because the google annotatedtimeline expects a title and a text,
-        # we can put something meaninful here once we start tracking noteworth events
-        enrollments_with_page_views.map{ |enrollment| [ enrollment.page_views_by_day(:dates => dates)[d.to_date.to_s].to_i, nil, nil] }
-      ).flatten
-    end
-    { :days => days, :labels => ["All Page Views"] + enrollments_with_page_views.map{ |e| e.course.name  } }
-  end
-  memoize :page_view_data
 
   # These two methods can be overridden by a plugin if you want to have an approval process for new teachers
   def registration_approval_required?; false; end

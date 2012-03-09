@@ -392,15 +392,6 @@ class Course < ActiveRecord::Base
     self.non_unique_associated_accounts.uniq
   end
 
-  # objects returned from this query will give you an additional attribute "page_views_count" that you can use, so:
-  # Account.first.courses.most_active(10).first.page_views_count  #=> "466"
-  named_scope :most_active, lambda { |limit|
-    {
-      :select => "courses.*, (SELECT COUNT(*) FROM page_views WHERE context_id = courses.id AND context_type = 'Course') AS page_views_count",
-      :order => "page_views_count DESC",
-      :limit => limit
-    }
-  }
   named_scope :recently_started, lambda {
     {:conditions => ['start_at < ? and start_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
   }
