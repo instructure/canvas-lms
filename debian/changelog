@@ -1,3 +1,20 @@
+canvas-lms (2012.03.17.07) testing; urgency=low
+
+  * Package ref: 01906ade6ab0f39600c3b9a6c998a250c6b923c5
+  *
+  * [+aee12d9] removed tiny from common.js
+  * [+95d30d7] don't show letter grade on muted assignmnets
+  * [+36b5666] log exception on redis failure recovery
+  * [+5b70d47] fix error with hidden_dialogs in production environment; fixes #7668
+  * [+f5dd4b5] reconnect redis when in passenger smart spawning mode
+  * [+47d1b63] fix page error if observed is not an active student
+  * [+a49c791] try to process zips that use backslashes as path separators
+  * [+2399e11] timeout cutycapt processes that take too long; closes #7568
+  * [+942568b] update observers when merging users fixes #7678
+  * [+01906ad] wait until direct-to-s3 upload is complete before sending to kaltura
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 10 Mar 2012 16:12:01 -0700
+
 canvas-lms (2012.03.17.04) testing; urgency=low
 
   * Package ref: 17ad1315870644fc454802cebec55eb7edcf4fc7
