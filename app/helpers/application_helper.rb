@@ -294,7 +294,7 @@ module ApplicationHelper
     if !Rails.env.production? && hidden_dialogs[id] && hidden_dialogs[id] != content
       raise "Attempted to capture a hidden dialog with #{id} and different content!"
     end
-    @hidden_dialogs[id] = capture(&block)
+    hidden_dialogs[id] = capture(&block)
   end
   def hidden_dialogs; @hidden_dialogs ||= {}; end
   def render_hidden_dialogs

@@ -393,6 +393,17 @@ describe Attachment do
       MediaObject.expects(:send_later_enqueue_args).times(0)
       @attachment.save!
     end
+
+    it "should create a media object *after* a direct-to-s3 upload" do
+      MediaObject.expects(:send_later_enqueue_args).never
+      @attachment.workflow_state = 'unattached'
+      @attachment.file_state = 'deleted'
+      @attachment.save!
+      MediaObject.expects(:send_later_enqueue_args).once
+      @attachment.workflow_state = nil
+      @attachment.file_state = 'available'
+      @attachment.save!
+    end
   end
 
   context "destroy" do
