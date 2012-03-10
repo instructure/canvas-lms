@@ -34,6 +34,7 @@ define([
   'jquery.rails_flash_notifications' /* flashMessage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'supercalc' /* superCalc */,
+  'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.placeholder' /* /\.placeholder/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,

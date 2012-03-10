@@ -166,7 +166,7 @@
           </span>
           <% if assignment.grading_type == 'letter_grade' %>
             <span class="score_value" style="font-size: 0.8em; color: #aaa;">
-              <% if submission %>
+              <% unless assignment.muted? || submission.nil? %>
                 <%= submission.published_score %>
                 (<%= submission.published_grade %>)
               <% end %>
