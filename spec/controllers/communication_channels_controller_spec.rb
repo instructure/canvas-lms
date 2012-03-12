@@ -437,6 +437,39 @@ describe CommunicationChannelsController do
         @old_user.pseudonyms.length.should == 2
         @old_user.pseudonyms.detect { |p| p.account == @account2 }.unique_id.should == 'jt@instructure.com'
       end
+
+      it "should include all pseudonyms if there are multiple" do
+        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
+        @account1 = Account.create!(:name => 'A')
+        @account2 = Account.create!(:name => 'B')
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
+        @pseudonym1 = @pseudonym
+        @user1 = @user
+        @pseudonym2 = @account2.pseudonyms.create!(:user => @user1, :unique_id => 'jt')
+
+        user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1, :account => Account.default)
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+
+        get 'confirm', :nonce => @cc.confirmation_code
+        response.should render_template('confirm')
+        assigns[:merge_opportunities].should == [[@user1, [@pseudonym1, @pseudonym2]]]
+      end
+
+      it "should only include the current account's pseudonym if there are multiple" do
+        @account1 = Account.default
+        @account2 = Account.create!
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
+        @pseudonym1 = @pseudonym
+        @user1 = @user
+        @pseudonym2 = @account2.pseudonyms.create!(:user => @user1, :unique_id => 'jt')
+
+        user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1, :account => @account1)
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+
+        get 'confirm', :nonce => @cc.confirmation_code
+        response.should render_template('confirm')
+        assigns[:merge_opportunities].should == [[@user1, [@pseudonym1]]]
+      end
     end
 
     describe "invitations" do
