@@ -579,6 +579,90 @@ describe DiscussionTopicsController, :type => :integration do
     end
   end
 
+  context "update entry" do
+    before do
+      @topic = create_topic(@course, :title => "topic", :message => "topic")
+      @entry = create_entry(@topic, :message => "<p>top-level entry</p>")
+    end
+
+    it "should 401 if the user can't update" do
+      student_in_course(:course => @course, :user => user_with_pseudonym)
+      api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => 'haxor' }, {}, :expected_status => 401)
+      @entry.reload.message.should == '<p>top-level entry</p>'
+    end
+
+    it "should 404 if the entry is deleted" do
+      @entry.destroy
+      api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => 'haxor' }, {}, :expected_status => 404)
+    end
+
+    it "should update the message" do
+      api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => '<p>i had a spleling error</p>' })
+      @entry.reload.message.should == '<p>i had a spleling error</p>'
+    end
+
+    it "should allow passing an plaintext message (undocumented)" do
+      # undocumented but used by the dashboard right now (this'll go away eventually)
+      api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :plaintext_message => 'i had a spleling error' })
+      @entry.reload.message.should == 'i had a spleling error'
+    end
+
+    it "should allow teachers to edit student entries" do
+      @teacher = @user
+      student_in_course(:course => @course, :user => user_with_pseudonym)
+      @student = @user
+      @user = @teacher
+      @entry = create_entry(@topic, :message => 'i am a student', :user => @student)
+      @entry.user.should == @student
+      @entry.editor.should be_nil
+
+      api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => '<p>denied</p>' })
+      @entry.reload.message.should == '<p>denied</p>'
+      @entry.editor.should == @teacher
+    end
+  end
+
+  context "delete entry" do
+    before do
+      @topic = create_topic(@course, :title => "topic", :message => "topic")
+      @entry = create_entry(@topic, :message => "top-level entry")
+    end
+
+    it "should 401 if the user can't delete" do
+      student_in_course(:course => @course, :user => user_with_pseudonym)
+      api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 401)
+      @entry.reload.should_not be_deleted
+    end
+
+    it "should soft-delete the entry" do
+      raw_api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 204)
+      response.body.should be_blank
+      @entry.reload.should be_deleted
+    end
+
+    it "should allow teachers to delete student entries" do
+      @teacher = @user
+      student_in_course(:course => @course, :user => user_with_pseudonym)
+      @student = @user
+      @user = @teacher
+      @entry = create_entry(@topic, :message => 'i am a student', :user => @student)
+      @entry.user.should == @student
+      @entry.editor.should be_nil
+
+      raw_api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 204)
+      @entry.reload.should be_deleted
+      @entry.editor.should == @teacher
+    end
+  end
+
   context "read/unread state" do
     before(:each) do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
@@ -768,6 +852,9 @@ describe DiscussionTopicsController, :type => :integration do
         json.map { |r| r['parent_id'] }.should == [@sub2.id, @entry.id, @sub2.id, @sub1.id, @entry.id]
       end
 
+      it "should set and return editor_id if editing another user's post" do
+      end
+
       it "should fail if the max entry depth is reached" do
         entry = @entry
         (DiscussionEntry.max_depth - 1).times do
@@ -815,6 +902,8 @@ describe DiscussionTopicsController, :type => :integration do
       # have the teacher edit one of the student's replies
       @reply_reply1.editor = @teacher
       @reply_reply1.update_attributes(:message => '<p>censored</p>')
+
+      @all_entries.each &:reload
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
                 { :controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
