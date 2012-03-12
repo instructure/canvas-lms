@@ -178,7 +178,7 @@ describe "dashboard" do
 
 
     it "should display student groups in course menu" do
-      group = Group.create!(:name=>"group1", :context => @course)
+      group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@user)
       @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
       Enrollment.update_all(["created_at = ?", 1.minute.ago])
@@ -263,6 +263,27 @@ describe "dashboard" do
       course_with_teacher_logged_in(:active_cc => true)
     end
 
+    it "should validate the functionality of soft concluded courses" do
+      pending('bug 7536 - When a course is soft concluded, it should no longer be in the courses drop down as an active course') do
+        start_time = Time.now - 5.days
+        end_time = Time.now - 1.day
+        term = EnrollmentTerm.new(:name => "Super Term", :start_at => start_time, :end_at => end_time)
+        term.root_account_id = @course.root_account_id
+        term.save!
+        @course.update_attributes!(:enrollment_term => term, :start_at => start_time, :conclude_at => end_time)
+        @course.reload
+        get "/"
+
+        driver.action.move_to(driver.find_element(:link, 'Courses').find_element(:xpath, '..')).perform
+        course_menu = driver.find_element(:id, 'menu_enrollments')
+        course_menu.should be_displayed
+        course_menu.should_not include_text(@course.name)
+
+        get "/courses"
+        driver.find_element(:css, '.past_enrollments').should include_text(@course.name)
+      end
+    end
+
     it "should display assignment to grade in to do list and assignments menu for a teacher" do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
@@ -286,14 +307,14 @@ describe "dashboard" do
       quiz_title = 'new quiz'
       student_in_course
       q = @course.quizzes.create!(:title => quiz_title)
-      q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type=>'essay_question', :question_text=>'qq1', :points_possible=>10})
+      q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type => 'essay_question', :question_text => 'qq1', :points_possible => 10})
       q.generate_quiz_data
       q.workflow_state = 'available'
       q.save
       q.reload
       qs = q.generate_submission(@user)
       qs.mark_completed
-      qs.submission_data = {"question_31"=>"<p>abeawebawebae</p>", "question_text"=>"qq1"}
+      qs.submission_data = {"question_31" => "<p>abeawebawebae</p>", "question_text" => "qq1"}
       qs.grade_submission
       get "/"
 
