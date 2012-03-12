@@ -19,7 +19,7 @@
 ##
 # sectionEnrollmentPresenter
 #
-# this function expects JSON input from /courses/:course_id/enrollments and
+# this function expects JSON input from /sections/:course_id/enrollments and
 # returns an array of enrollments meant for display on /courses/:course_id/sections/:id.
 
 define [

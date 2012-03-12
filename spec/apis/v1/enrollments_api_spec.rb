@@ -22,13 +22,13 @@ describe EnrollmentsApiController, :type => :integration do
   describe "enrollment creation" do
     context "an admin user" do
       before do
-        course_with_student(:active_all => true)
-        Account.site_admin.add_user(@student)
+        site_admin_user(:active_all => true)
+        course(:active_course => true)
         @unenrolled_user = user_with_pseudonym
-        @section         = @course.course_sections.create
+        @section         = @course.course_sections.create!
         @path            = "/api/v1/courses/#{@course.id}/enrollments"
         @path_options    = { :controller => 'enrollments_api', :action => 'create', :format => 'json', :course_id => @course.id.to_s }
-        @user            = @student
+        @user            = @admin
       end
 
       it "should create a new student enrollment" do
@@ -37,7 +37,7 @@ describe EnrollmentsApiController, :type => :integration do
             :enrollment => {
               :user_id                            => @unenrolled_user.id,
               :type                               => 'StudentEnrollment',
-              :enrollment_state                     => 'active',
+              :enrollment_state                   => 'active',
               :course_section_id                  => @section.id,
               :limit_privileges_to_course_section => true
             }
@@ -106,7 +106,7 @@ describe EnrollmentsApiController, :type => :integration do
         Enrollment.find(json['id']).should be_an_instance_of ObserverEnrollment
       end
 
-      it "should default new enrollments to the 'invited' state" do
+      it "should default new enrollments to the 'invited' state in the default section" do
         json = api_call :post, @path, @path_options,
           {
             :enrollment => {
@@ -115,7 +115,9 @@ describe EnrollmentsApiController, :type => :integration do
             }
           }
 
-        Enrollment.find(json['id']).workflow_state.should eql 'invited'
+        e = Enrollment.find(json['id'])
+        e.workflow_state.should eql 'invited'
+        e.course_section.should eql @course.default_section
       end
 
       it "should throw an error if no params are given" do
@@ -142,6 +144,14 @@ describe EnrollmentsApiController, :type => :integration do
         JSON.parse(response.body).should == {
           'message' => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment"
         }
+      end
+
+      it "should enroll to the right section using the section-specific URL" do
+        @path         = "/api/v1/sections/#{@section.id}/enrollments"
+        @path_options = { :controller => 'enrollments_api', :action => 'create', :format => 'json', :section_id => @section.id.to_s }
+        json = api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id, } }
+
+        Enrollment.find(json['id']).course_section.should eql @section
       end
     end
 
@@ -236,6 +246,7 @@ describe EnrollmentsApiController, :type => :integration do
       @user_path = "/api/v1/users/#{@user.id}/enrollments"
       @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json" }
       @user_params = { :controller => "enrollments_api", :action => "index", :user_id => @user.id.to_param, :format => "json" }
+      @section = @course.course_sections.create!
     end
 
     context "an account admin" do
@@ -280,6 +291,19 @@ describe EnrollmentsApiController, :type => :integration do
 
         json = api_call(:get, @user_path, @user_params)
         json.length.should eql 1
+      end
+
+      it "should list section enrollments properly" do
+        enrollment = @student.enrollments.first
+        enrollment.course_section = @section
+        enrollment.save!
+        
+        @path = "/api/v1/sections/#{@section.id}/enrollments"
+        @params = { :controller => "enrollments_api", :action => "index", :section_id => @section.id.to_param, :format => "json" }
+        json = api_call(:get, @path, @params)
+
+        json.length.should eql 1
+        json.all?{ |r| r["course_section_id"] == @section.id }.should be_true
       end
     end
 

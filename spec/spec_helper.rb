@@ -292,8 +292,8 @@ Spec::Runner.configure do |config|
   end
 
   def teacher_in_course(opts={})
-      opts[:course] = @course if @course && !opts[:course]
-      course_with_teacher(opts)
+    opts[:course] = @course if @course && !opts[:course]
+    course_with_teacher(opts)
   end
 
   def course_with_teacher(opts={})

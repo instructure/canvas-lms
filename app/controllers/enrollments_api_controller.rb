@@ -19,7 +19,7 @@
 # @API Enrollments
 # API for creating and viewing course enrollments
 class EnrollmentsApiController < ApplicationController
-  before_filter :require_context
+  before_filter :get_course_from_section, :require_context
 
   @@errors = {
     :missing_parameters => "No parameters given",
@@ -32,8 +32,8 @@ class EnrollmentsApiController < ApplicationController
   #
   # @API
   # Depending on the URL given, return either (1) all of the enrollments in
-  # a course, or (2) all of a user's enrollments. This includes student,
-  # teacher, TA, and observer enrollments.
+  # a course, (2) all of the enrollments in a section or (3) all of a user's
+  # enrollments. This includes student, teacher, TA, and observer enrollments.
   #
   # If a user has multiple enrollments in a context (e.g. as a teacher
   # and a student or in multiple course sections), each enrollment will be
@@ -127,24 +127,26 @@ class EnrollmentsApiController < ApplicationController
     @conditions = {}.tap { |c|
       c[:type] = params[:type] if params[:type].present?
       c[:workflow_state] = params[:state] if params[:state].present?
+      c[:course_section_id] = @section.id if @section.present?
     }
+    endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
     scope_arguments = { :conditions => @conditions, :order => 'enrollments.type ASC, users.sortable_name ASC' }
     return unless enrollments = @context.is_a?(Course) ?
       course_index_enrollments(scope_arguments) :
       user_index_enrollments(scope_arguments)
     enrollments = Api.paginate(
       enrollments,
-      self, send("api_v1_#{@context.class.to_s.downcase}_enrollments_path"))
+      self, send("api_v1_#{endpoint_scope}_enrollments_path"))
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, [:user]) }
   end
 
   # @API
-  # Create a new user enrollment for a course.
+  # Create a new user enrollment for a course or section.
   #
   # @argument enrollment[user_id] [String] The ID of the user to be enrolled in the course.
   # @argument enrollment[type] [String] [StudentEnrollment|TeacherEnrollment|TaEnrollment|ObserverEnrollment] Enroll the user as a student, teacher, TA, or observer. If no value is given, 'StudentEnrollment' will be used.
   # @argument enrollment[enrollment_state] [String] [Optional, active|invited] [String] If set to 'active,' student will be immediately enrolled in the course. Otherwise they will receive an email invitation. Default is 'invited.'
-  # @argument enrollment[course_section_id] [Integer] [Optional] The ID of the course section to enroll the student in.
+  # @argument enrollment[course_section_id] [Integer] [Optional] The ID of the course section to enroll the student in. If the section-specific URL is used, this argument is redundant and will be ignored
   # @argument enrollment[limit_privileges_to_course_section] [Boolean] [Optional] If a teacher or TA enrollment, teacher/TA will be restricted to the section given by course_section_id.
   def create
     # error handling
@@ -165,6 +167,7 @@ class EnrollmentsApiController < ApplicationController
     unless @current_user.can_create_enrollment_for?(@context, session, type)
       render_unauthorized_action(@context) && return
     end
+    params[:enrollment][:course_section_id] = @section.id if @section.present?
     if params[:enrollment][:course_section_id].present?
       params[:enrollment][:section] = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
     end
