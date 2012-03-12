@@ -1,3 +1,11 @@
+canvas-lms (2012.03.17.08) testing; urgency=low
+
+  * Package ref: e13d25cbbf82c888d141f2de30607b798985426f
+  *
+  * [+e13d25c] add option for completed courses on course import. fixes #2184
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 12 Mar 2012 16:21:35 -0600
+
 canvas-lms (2012.03.17.07) testing; urgency=low
 
   * Package ref: 01906ade6ab0f39600c3b9a6c998a250c6b923c5
