@@ -331,18 +331,22 @@ class UsersController < ApplicationController
 
   def manageable_courses
     get_context
-    if authorized_action(@context, @current_user, :manage)
-      @courses = []
-      @query = (params[:course] && params[:course][:name]) || params[:term]
-      @courses = @context.manageable_courses_name_like(@query) if @context && @query
-      respond_to do |format|
-        format.json  {
-          cancel_cache_buster
-          expires_in 30.minutes
-          render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
-        }
-      end
-    end
+    return unless authorized_action(@context, @current_user, :manage)
+
+    # include concluded enrollments as well as active ones if requested
+    include_concluded = params[:include].try(:include?, 'concluded')
+    @query   = params[:course].try(:[], :name) || params[:term]
+    @courses = @query.present? ?
+      @context.manageable_courses_name_like(@query, include_concluded) :
+      @context.manageable_courses(include_concluded).limit(500)
+
+    cancel_cache_buster
+    expires_in 30.minutes
+    render :json => @courses.map { |c|
+      { :label => c.name, :id => c.id, :term => c.enrollment_term.name,
+        :enrollment_start => c.enrollment_term.start_at,
+        :account_name => c.enrollment_term.root_account.name, :account_id => c.enrollment_term.root_account.id }
+    }.to_json
   end
 
   include Api::V1::TodoItem
