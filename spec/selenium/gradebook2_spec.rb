@@ -718,7 +718,7 @@ describe "gradebook2" do
       end
     end
 
-    def set_group_weights(number_of_groups, weight_numbers)
+    def set_group_weight(assignment_group, weight_number)
       driver.find_element(:id, 'gradebook_settings').click
       wait_for_animations
       driver.find_element(:css, '[aria-controls="assignment_group_weights_dialog"]').click
@@ -731,16 +731,11 @@ describe "gradebook2" do
         group_check.click
         is_checked('#group_weighting_scheme').should be_true
       end
-      group_weight_inputs = driver.find_elements(:css, '.group_weight')
-      number_of_groups.should == group_weight_inputs.count
-      if weight_numbers.is_a? Array
-        number_of_groups.times { |i| set_value(group_weight_inputs[i], weight_numbers[i]) }
-      else
-        set_value(group_weight_inputs, weight_numbers)
-      end
+      group_weight_input = driver.find_element(:id, "assignment_group_#{assignment_group.id}_weight")
+      set_value(group_weight_input, weight_number)
       save_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Save")')
       save_button.click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       @course.reload.group_weighting_scheme.should == 'percent'
     end
 
@@ -751,11 +746,8 @@ describe "gradebook2" do
       end
     end
 
-    def validate_groups_weight(weight_numbers)
-      assignment_groups = AssignmentGroup.all
-      assignment_groups.each_with_index do |ag, i|
-        ag.reload.group_weight.should eql(weight_numbers[i])
-      end
+    def validate_group_weight(assignment_group, weight_number)
+      assignment_group.reload.group_weight.should == weight_number
     end
 
     before (:each) do
@@ -763,7 +755,7 @@ describe "gradebook2" do
       student_in_course
       @course.update_attributes(:group_weighting_scheme => 'percent')
       @group1 = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 50)
-      @group2 = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 50)
+      @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 50)
       @assignment1 = assignment_model({
                                           :course => @course,
                                           :name => 'first assignment',
@@ -789,8 +781,16 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
-      set_group_weights(AssignmentGroup.all.count, weight_numbers)
-      validate_groups_weight(weight_numbers)
+      group_1 = AssignmentGroup.find_by_name(@group1.name)
+      group_2 = AssignmentGroup.find_by_name(@group2.name)
+
+      #set and check the group weight of the first assignment group
+      set_group_weight(group_1, weight_numbers[0])
+      validate_group_weight(group_1, weight_numbers[0])
+
+      #set and check the group weight of the first assignment group
+      set_group_weight(group_2, weight_numbers[1])
+      validate_group_weight(group_2, weight_numbers[1])
 
       # TODO: make the header cell in the UI update to reflect new value
       # validate_group_weight_text(AssignmentGroup.all, weight_numbers)
