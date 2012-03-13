@@ -346,6 +346,19 @@ describe "gradebook2" do
       driver.switch_to.default_content
     end
 
+    it "should not update default grades for users not in this section" do
+      # create new user and section
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      driver.execute_script "$('#section_option_#{@other_section.id}').click()"
+
+      set_default_grade(2, 13)
+      @other_section.users.each { |u| u.submissions.map(&:grade).should include '13' }
+      @course.default_section.users.each { |u| u.submissions.map(&:grade).should_not include '13' }
+    end
+
     it "should validate correct number of students showing up in gradebook" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations

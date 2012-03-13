@@ -2,6 +2,7 @@ define [
   'i18n!gradebook2'
   'jquery'
   'jst/SetDefaultGradeDialog'
+  'use!underscore'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
   'jquery.instructure_jquery_patches'
@@ -13,7 +14,7 @@ define [
   # since you cant declare a dependency in a handlebars file, we need to do it here
   'jst/_grading_box'
 
-], (I18n, $, setDefaultGradeDialogTemplate) ->
+], (I18n, $, setDefaultGradeDialogTemplate, _) ->
 
   class SetDefaultGradeDialog
     constructor: (@assignment, @gradebook) ->
@@ -36,11 +37,20 @@ define [
         disableWhileLoading: true
         processData: (data) =>
           studentsAffected = 0
-          for idx, student of @gradebook.students when !student["assignment_#{@assignment.id}"].score? || data.overwrite_existing_grades
+          hasNoScore = (student) => !student["assignment_#{@assignment.id}"].score?
+          canOverwrite = data.overwrite_existing_grades
+          inSection = (student) => if @gradebook.sectionToShow
+            _.include(student.sections, @gradebook.sectionToShow)
+          else
+            true
+          updateData = (idx, student) =>
             studentsAffected = studentsAffected + 1
             data["submissions[submission_#{idx}][assignment_id]"] = @assignment.id
             data["submissions[submission_#{idx}][user_id]"] = student.id
             data["submissions[submission_#{idx}][grade]"] = data.default_grade
+
+          updateData(idx, student) for idx, student of @gradebook.students when (hasNoScore(student) or canOverwrite) and inSection(student)
+
           if studentsAffected is 0
             alert I18n.t('alerts.none_to_update', "None to Update")
             return false
@@ -49,5 +59,5 @@ define [
           # fix
           submissions = (datum.submission for datum in data)
           $.publish 'submissions_updated', [submissions]
-          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%{count} Student scores updated'}, {'count': data.length}));
+          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%{count} Student scores updated'}, {'count': data.length}))
           @$dialog.remove()
