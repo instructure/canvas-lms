@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
+define([
   'i18n!quizzes.show',
   'jquery' /* $ */,
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,

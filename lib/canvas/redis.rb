@@ -38,15 +38,21 @@ module Canvas::Redis
   def self.handle_redis_failure(failure_retval)
     return failure_retval if redis_failure?
     yield
-  rescue Errno::ECONNREFUSED, Timeout::Error, Errno::ECONNRESET, Errno::EPIPE, Errno::ECONNABORTED, Errno::EBADF, Errno::EINVAL
+  rescue Errno::ECONNREFUSED, Timeout::Error, Errno::ECONNRESET, Errno::EPIPE, Errno::ECONNABORTED, Errno::EBADF, Errno::EINVAL => e
+    ErrorReport.log_exception(:redis, e)
+    Rails.logger.error "Failure handling redis command: #{e.inspect}"
     @last_redis_failure = Time.now
     failure_retval
-  rescue Errno::EAGAIN
+  rescue Errno::EAGAIN => e
+    ErrorReport.log_exception(:redis, e)
+    Rails.logger.error "Redis EAGAIN failure, trying again: #{e.inspect}"
     # typically this means that redis closed the connection as idle,
     # and trying again will succeed
     begin
       yield
-    rescue Errno::EAGAIN
+    rescue Errno::EAGAIN => e
+      ErrorReport.log_exception(:redis, e)
+      Rails.logger.error "Failure handling redis command: #{e.inspect}"
       failure_retval
     end
   end

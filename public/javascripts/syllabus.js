@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
+define([
   'jquery' /* jQuery, $ */,
   'calendar_move' /* calendarMonths */,
   'wikiSidebar',
@@ -25,6 +25,7 @@ require([
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, showIf */,
   'jquery.loadingImg' /* loadingImage */,
+  'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/datepicker' /* /\.datepicker/ */

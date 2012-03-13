@@ -25,7 +25,7 @@
 // settings on their own personal eportfolio, they can't 
 // affect anyone else
 
-require([
+define([
   'i18n!eportfolio',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -36,6 +36,7 @@ require([
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,

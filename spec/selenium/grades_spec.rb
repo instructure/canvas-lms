@@ -109,6 +109,14 @@ describe "grades" do
       driver.find_element(:css, '.assessment-comments div').text.should == 'cool, yo'
     end
 
+    it "should not display rubric on muted assignment" do
+      @first_assignment.muted = true
+      @first_assignment.save!
+      get "/courses/#{@course.id}/grades"
+
+      f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").should_not be_displayed
+    end
+
     it "should display teacher comment and assignment statistics" do
       #check comment
       driver.find_element(:css, '.toggle_comments_link img').click

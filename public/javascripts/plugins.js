@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!plugins',
   'jquery' /* $ */,
   'jquery.instructure_misc_plugins' /* showIf */

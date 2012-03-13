@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-require([
+define([
   'i18n!quizzes.take_quiz',
   'jquery' /* $ */,
   'quiz_timing',
@@ -25,6 +25,7 @@ require([
   'jquery.instructure_jquery_patches' /* /\.dialog/ */,
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.rails_flash_notifications' /* flashMessage */,
+  'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(I18n, $, timing) {
