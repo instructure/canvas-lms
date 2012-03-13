@@ -48,6 +48,7 @@ class DiscussionTopicsController < ApplicationController
   # @response_field topic_children An array of topic_ids for the group discussions the user is a part of
   # @response_field user_name The username of the creator
   # @response_field url The URL to the discussion topic in canvas
+  # @response_field permissions[attach] If true, the calling user can attach files to this discussion's entries.
   #
   # @example_response
   #     [
@@ -74,7 +75,8 @@ class DiscussionTopicsController < ApplicationController
   #            "filename":"content.txt",
   #            "display_name":"content.txt"
   #          }
-  #        ]
+  #        ],
+  #        "permissions": { "attach": true }
   #      }
   #     ]
   def index

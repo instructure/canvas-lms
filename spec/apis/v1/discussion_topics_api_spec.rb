@@ -30,6 +30,7 @@ describe Api::V1::DiscussionTopics do
     @test_api = TestCourseApi.new
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
+    student_in_course(:active_all => true, :course => @course)
     @topic = @course.discussion_topics.create
   end
 
@@ -40,6 +41,18 @@ describe Api::V1::DiscussionTopics do
       data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, {})
     }.should_not raise_error
     data[:podcast_url].should match /feeds_topic_format_path/
+  end
+
+  it "should set can_post_attachments" do
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
+    data[:permissions][:attach].should == true # teachers can always attach
+
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @student, nil)
+    data[:permissions][:attach].should == false # students can't attach by default
+
+    @topic.context.update_attribute(:allow_student_forum_attachments, true)
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @student, nil)
+    data[:permissions][:attach].should == true
   end
 end
 
@@ -78,7 +91,8 @@ describe DiscussionTopicsController, :type => :integration do
                                    "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                                    "filename"=>"content.txt",
                                    "display_name"=>"content.txt"}],
-                  "topic_children"=>[sub.id]}
+                  "topic_children"=>[sub.id],
+                  "permissions" => { "attach" => true }}
   end
 
   it "should translate user content in topics" do
@@ -144,7 +158,8 @@ describe DiscussionTopicsController, :type => :integration do
                                     "display_name"=>"content.txt"}],
                           "posted_at"=>gtopic.posted_at.as_json,
                           "root_topic_id"=>nil,
-                          "topic_children"=>[]}
+                          "topic_children"=>[],
+                          "permissions" => { "attach" => true }}
   end
 
   it "should paginate and return proper pagination headers for groups" do

@@ -39,9 +39,9 @@ module Api::V1::DiscussionTopics
 
     children = topic.child_topics.scoped(:select => 'id').map(&:id)
 
-    api_json(topic, user, session,
+    api_json(topic, user, session, {
                   :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at require_initial_post root_topic_id),
-                  :methods => [:user_name, :discussion_subentry_count]
+                  :methods => [:user_name, :discussion_subentry_count], }, [:attach]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
                   :podcast_url => url,
