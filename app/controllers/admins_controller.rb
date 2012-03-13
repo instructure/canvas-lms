@@ -19,6 +19,7 @@
 # @API Admins
 class AdminsController < ApplicationController
   before_filter :require_user
+  before_filter :reject_student_view_student
   before_filter :require_pseudonym
   before_filter :get_context
 

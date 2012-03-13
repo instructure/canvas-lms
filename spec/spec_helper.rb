@@ -277,7 +277,7 @@ Spec::Runner.configure do |config|
   end
 
   def course_with_ta(opts={})
-    course_with_user("TAEnrollment", opts)
+    course_with_user("TaEnrollment", opts)
     @ta = @user
     @enrollment
   end
@@ -331,8 +331,17 @@ Spec::Runner.configure do |config|
   end
 
   def multiple_student_enrollment(user, section)
-    @enrollment = @course.student_enrollments.build(:user => user, :workflow_state => "active", :course_section => section)
-    @enrollment.save!
+    @enrollment = @course.enroll_student(user,
+                                         :enrollment_state => "active",
+                                         :section => section,
+                                         :allow_multiple_enrollments => true)
+  end
+
+  def enter_student_view(opts={})
+    course = opts[:course] || @course || course(opts)
+    @fake_student = course.student_view_student
+    post "/users/#{@fake_student.id}/masquerade"
+    session[:become_user_id].should == @fake_student.id.to_s
   end
 
   def group(opts={})

@@ -36,12 +36,12 @@ class User < ActiveRecord::Base
   has_one :communication_channel, :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
+  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment'))) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
   has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')))", :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
+           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment'))) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
                            OR
-                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment'))) )"
+                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')))) )"
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments, :uniq => true
@@ -306,6 +306,9 @@ class User < ActiveRecord::Base
           user ||= User.find(user_id)
           account_ids_with_depth = user.calculate_account_associations(account_chain_cache)
         end
+
+        # we don't want student view students to have account associations.
+        next if user && user.fake_student?
 
         account_ids_with_depth.each do |account_id, depth|
           key = [user_id, account_id]
@@ -926,6 +929,8 @@ class User < ActiveRecord::Base
 
   def can_masquerade?(masquerader, account)
     return true if self == masquerader
+    # student view should only ever have enrollments in a single course
+    return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, nil, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
     account_users = account.all_account_users_for(self)
@@ -1152,7 +1157,7 @@ class User < ActiveRecord::Base
     return ["urn:lti:sysrole:ims/lis/None"] if memberships.empty?
     memberships.map{|membership|
       case membership
-      when StudentEnrollment
+      when StudentEnrollment, StudentViewEnrollment
         'Learner'
       when TeacherEnrollment
         'Instructor'
@@ -1699,7 +1704,7 @@ class User < ActiveRecord::Base
   def appointment_context_codes
     ret = {:primary => [], :secondary => []}
     cached_current_enrollments.each do |e|
-      next unless e.is_a?(StudentEnrollment) && e.active?
+      next unless e.student? && e.active?
       ret[:primary] << "course_#{e.course_id}"
       ret[:secondary] << "course_section_#{e.course_section_id}"
     end
@@ -1860,12 +1865,12 @@ class User < ActiveRecord::Base
         end
         base_conditions = messageable_enrollment_clause
         base_conditions << " AND " << messageable_enrollment_user_clause
-        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).count("DISTINCT user_id")
+        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").count("DISTINCT user_id")
 
         sections = course.sections_visible_to(self)
         if sections.size > 1
           sections.each{ |section| section_user_counts[section.id] = 0 }
-          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} GROUP BY course_section_id").each do |row|
+          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} AND enrollments.type != 'StudentViewEnrollment' GROUP BY course_section_id").each do |row|
             section_user_counts[row["course_section_id"].to_i] = row["user_count"].to_i
           end
         end
@@ -1945,7 +1950,7 @@ class User < ActiveRecord::Base
     account_ids = []
 
     limited_id = {}
-    enrollment_type_sql = nil
+    enrollment_type_sql = " AND enrollments.type != 'StudentViewEnrollment'"
     include_concluded_students = true
 
     if options[:context]
@@ -1956,9 +1961,9 @@ class User < ActiveRecord::Base
         enrollment_type = $4
         if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
           if enrollment_type == 'admins'
-            enrollment_type_sql = " AND enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
+            enrollment_type_sql += " AND enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
           else
-            enrollment_type_sql = " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
+            enrollment_type_sql += " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
           end
         end
       end
@@ -2254,5 +2259,9 @@ class User < ActiveRecord::Base
       admin.account_user_registration!
     end
     admin
+  end
+
+  def fake_student?
+    self.preferences[:fake_student] && !!self.enrollments.find(:first, :conditions => {:type => "StudentViewEnrollment"})
   end
 end

@@ -149,19 +149,19 @@ h3 .tally {
 <div style="margin-bottom: 20px;">
   <div id="enrollments_div">
     <table id="enrollment_table">
-    <% if @pending_enrollments > 0 %>
+    <% if @pending_enrollments_count > 0 %>
           <tr>
-            <td class="pending_enrollments"><%= t('pending_enrollment', {:one => '1 Pending Enrollment', :other => '%{count} Pending Enrollments'}, :count => @pending_enrollments) %></td>
+            <td class="pending_enrollments"><%= t('pending_enrollment', {:one => '1 Pending Enrollment', :other => '%{count} Pending Enrollments'}, :count => @pending_enrollments_count) %></td>
           </tr>
     <% end %>
-    <% if @enrollments > 0 %>
+    <% if @enrollments_count > 0 %>
       <tr>
-        <td class="active_enrollments"><%= t('active_enrollment', {:one => '1 Active Enrollment', :other => '%{count} Active Enrollments'}, :count => @enrollments) %></td>
+        <td class="active_enrollments"><%= t('active_enrollment', {:one => '1 Active Enrollment', :other => '%{count} Active Enrollments'}, :count => @enrollments_count) %></td>
       </tr>
     <% end %>
-    <% if @completed_enrollments > 0 %>
+    <% if @completed_enrollments_count > 0 %>
           <tr>
-            <td class="completed_enrollments"><%= t('completed_enrollment', {:one => '1 Completed Enrollment', :other => '%{count} Completed Enrollments'}, :count => @completed_enrollments) %></td>
+            <td class="completed_enrollments"><%= t('completed_enrollment', {:one => '1 Completed Enrollment', :other => '%{count} Completed Enrollments'}, :count => @completed_enrollments_count) %></td>
           </tr>
     <% end %>
     </table>
@@ -250,7 +250,7 @@ h3 .tally {
         <%= mt('decrosslist_description', 'This will move the section back to its original course, **%{course_name}**.', :course_name => @section.nonxlist_course.name) %>
       <% end %>
     </p>
-    <% if @student_enrollments > 0 %>
+    <% if @student_enrollments_count > 0 %>
       <p>
         <%= t('decrosslist_long_description', %{
         All grades for students in this course will no longer be visible.

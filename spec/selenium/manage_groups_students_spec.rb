@@ -42,9 +42,10 @@ describe "manage groups students" do
   it "should list all sections a student belongs to" do
     @other_section = @course.course_sections.create!(:name => "Other Section")
     student_in_course(:active_all => true)
-    @course.student_enrollments.create!(:user => @student,
-                                        :workflow_state => "active",
-                                        :course_section => @other_section)
+    @course.enroll_student(@student,
+                           :enrollment_state => "active",
+                           :section => @other_section,
+                           :allow_multiple_enrollments => true)
 
     gc1 = @course.group_categories.create(:name => "Group Category 1")
 
@@ -79,9 +80,10 @@ describe "manage groups students" do
     end
 
     @other_section = @course.course_sections.create!(:name => "Other Section")
-    @course.student_enrollments.create!(:user => @student,
-                                        :workflow_state => "active",
-                                        :course_section => @other_section)
+    @course.enroll_student(@student,
+                           :enrollment_state => "active",
+                           :section => @other_section,
+                           :allow_multiple_enrollments => true)
 
     group_category = @course.group_categories.create(:name => "My Groups")
 
@@ -100,6 +102,28 @@ describe "manage groups students" do
 
     unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
     unassigned_div.find_elements(:css, ".student").length.should == 5
+  end
+
+  it "should not include student view student in the unassigned student list at the course level" do
+    @fake_student = @course.student_view_student
+    group_category1 = @course.group_categories.create(:name => "Group Category 1")
+
+    get "/courses/#{@course.id}/groups"
+    wait_for_ajaximations
+
+    find_all_with_jquery(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+  end
+
+  it "should not include student view student in the unassigned student list at the account level" do
+    site_admin_logged_in
+    @account = Account.default
+    @fake_student = @course.student_view_student
+    group_category1 = @account.group_categories.create(:name => "Group Category 1")
+
+    get "/accounts/#{@account.id}/groups"
+    wait_for_ajaximations
+
+    find_all_with_jquery(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
   end
 
   context "dragging a user between groups" do
@@ -173,9 +197,10 @@ describe "manage groups students" do
       @third_section = @course.course_sections.create!(:name => "Third Section")
 
       students = groups_student_enrollment 4, "2" => {:section => @other_section}, "3" => {:section => @third_section}
-      @course.student_enrollments.create!(:user => students[3],
-                                          :workflow_state => "active",
-                                          :course_section => @other_section)
+      @course.enroll_student(students[3],
+                             :workflow_state => "active",
+                             :section => @other_section,
+                             :allow_multiple_enrollments => true)
 
       group_category = @course.group_categories.create(:name => "Other Groups")
       groups = add_groups_in_category group_category, 3

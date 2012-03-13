@@ -62,7 +62,7 @@ class CountsReport
         data[:courses] = course_ids.length
         data[:teachers] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'TeacherEnrollment' })
         data[:students] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'StudentEnrollment' })
-        data[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids })
+        data[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => ["course_id IN (?) AND type <> ?", course_ids, 'StudentViewEnrollment'])
         # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
         data[:files], data[:files_size] = course_ids.length == 0 ? [0, 0] : Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.id]).first.map(&:to_i)
         data[:media_files], data[:media_files_size] = course_ids.length == [0, 0] ? 0 : MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)

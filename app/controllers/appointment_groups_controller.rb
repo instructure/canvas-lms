@@ -20,7 +20,6 @@ class AppointmentGroupsController < ApplicationController
   include Api::V1::CalendarEvent
 
   before_filter :require_user
-  before_filter :require_pseudonym
   before_filter :get_context, :only => :create
   before_filter :get_appointment_group, :only => [:show, :update, :destroy, :users, :groups]
 

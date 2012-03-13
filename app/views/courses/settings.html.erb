@@ -29,6 +29,9 @@
 <% content_for :right_side do %>
 
   <div class="rs-margin-lr rs-margin-top">
+    <% if can_do(@context, @current_user, :use_student_view) %>
+      <%= link_to image_tag("student_view_icon.png") + " " + t('links.student_view', %{Student View}), course_student_view_path(@context), { :method => :post, :class => 'button button-sidebar-wide student_view_button' }%>
+    <% end %>
     <% if can_do(@context, @current_user, :read_reports) %>
       <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> <%= t('links.stats', %{Course Statistics}) %></a>
     <% end %>
@@ -434,7 +437,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <% end %>
           <span class="users_count">
             (
-              <%= t 'enrollment_count', 'User', :count => section.enrollments.count %><% if section && section.sis_source_id %>, 
+              <%= t 'enrollment_count', 'User', :count => section.enrollments.not_fake.count %><% if section && section.sis_source_id %>,
                 <%= t 'section_sis_id', 'SIS ID: %{section_sis}', :section_sis => section.sis_source_id %>
               <% end %>
             )

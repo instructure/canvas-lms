@@ -155,14 +155,14 @@ describe "gradebook2" do
 
       #first assignment data
       @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
-      @assignment = assignment_model({
-                                         :course => @course,
-                                         :name => 'first assignment',
-                                         :due_at => nil,
-                                         :points_possible => ASSIGNMENT_1_POINTS,
-                                         :submission_types => 'online_text_entry',
-                                         :assignment_group => @group
-                                     })
+      @first_assignment = assignment_model({
+        :course => @course,
+        :name => 'first assignment',
+        :due_at => nil,
+        :points_possible => ASSIGNMENT_1_POINTS,
+        :submission_types => 'online_text_entry',
+        :assignment_group => @group
+      })
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
@@ -179,13 +179,13 @@ describe "gradebook2" do
 
       #second assignment data
       @second_assignment = assignment_model({
-                                                :course => @course,
-                                                :name => 'second assignment',
-                                                :due_at => nil,
-                                                :points_possible => ASSIGNMENT_2_POINTS,
-                                                :submission_types => 'online_text_entry',
-                                                :assignment_group => @group
-                                            })
+        :course => @course,
+        :name => 'second assignment',
+        :due_at => nil,
+        :points_possible => ASSIGNMENT_2_POINTS,
+        :submission_types => 'online_text_entry',
+        :assignment_group => @group
+      })
       @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
 
       #student 1 submission for assignment 2
@@ -201,29 +201,30 @@ describe "gradebook2" do
       #third assignment data
       due_date = Time.now + 1.days
       @third_assignment = assignment_model({
-                                               :course => @course,
-                                               :name => 'assignment three',
-                                               :due_at => due_date,
-                                               :points_possible => ASSIGNMENT_3_POINTS,
-                                               :submission_types => 'online_text_entry',
-                                               :assignment_group => @group
-                                           })
+        :course => @course,
+        :name => 'assignment three',
+        :due_at => due_date,
+        :points_possible => ASSIGNMENT_3_POINTS,
+        :submission_types => 'online_text_entry',
+        :assignment_group => @group
+      })
       @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
 
       #attendance assignment
       @attendance_assignment = assignment_model({
-                                                    :course => @course,
-                                                    :name => 'attendance assignment',
-                                                    :title => 'attendance assignment',
-                                                    :due_at => nil,
-                                                    :points_possible => ATTENDANCE_POINTS,
-                                                    :submission_types => 'attendance',
-                                                    :assignment_group => @group,
-                                                })
+        :course => @course,
+        :name => 'attendance assignment',
+        :title => 'attendance assignment',
+        :due_at => nil,
+        :points_possible => ATTENDANCE_POINTS,
+        :submission_types => 'attendance',
+        :assignment_group => @group,
+      })
 
-      @ungraded_assignment = @course.assignments.create! :title => 'not-graded assignment',
-                                                         :submission_types => 'not_graded',
-                                                         :assignment_group => @group
+      @ungraded_assignment = @course.assignments.create!(
+        :title => 'not-graded assignment',
+        :submission_types => 'not_graded',
+        :assignment_group => @group)
     end
 
     it "should minimize a column and remember it" do
@@ -689,7 +690,7 @@ describe "gradebook2" do
     end
 
     it "should handle multiple enrollments correctly" do
-      @course.student_enrollments.create!(:user => @student_1, :course_section => @other_section)
+      @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
@@ -757,6 +758,16 @@ describe "gradebook2" do
         driver.find_element(:css, gradebook_row_1).should be_displayed
         validate_cell_text(driver.find_element(:css, "#{gradebook_row_1} .r2"), '-')
       end
+    end
+
+    it "should include student view student for grading" do
+      @fake_student = @course.student_view_student
+      @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      ff('.student-name').map(&:text).join(" ").should match @fake_student.name
     end
   end
 

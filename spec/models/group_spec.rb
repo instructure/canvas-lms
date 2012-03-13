@@ -158,26 +158,23 @@ describe Group do
   end
 
   it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
-    e = course_with_teacher
-    course = e.context
-    teacher = e.user
-    e = student_in_course(:course => course)
-    student = e.user
+    course_with_teacher
+    student_in_course
 
     # default join_level == 'invitation_only' and default category is not self-signup
-    group = course.groups.create
-    group.grants_right?(student, nil, :read_roster).should be_false
+    group = @course.groups.create
+    group.grants_right?(@student, nil, :read_roster).should be_false
 
     # join_level allows requesting group membership
-    group = course.groups.create(:join_level => 'parent_context_request')
-    group.grants_right?(student, nil, :read_roster).should be_true
+    group = @course.groups.create(:join_level => 'parent_context_request')
+    group.grants_right?(@student, nil, :read_roster).should be_true
 
     # category is self-signup
-    category = course.group_categories.build
+    category = @course.group_categories.build
     category.configure_self_signup(true, false)
     category.save
-    group = course.groups.create(:group_category => category)
-    group.grants_right?(student, nil, :read_roster).should be_true
+    group = @course.groups.create(:group_category => category)
+    group.grants_right?(@student, nil, :read_roster).should be_true
   end
 
   describe "root account" do

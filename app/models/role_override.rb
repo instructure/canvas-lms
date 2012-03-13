@@ -33,6 +33,7 @@ class RoleOverride < ActiveRecord::Base
 
   ENROLLMENT_TYPES =
     [
+      # StudentViewEnrollment permissions will mirror StudentPermissions
       {:name => 'StudentEnrollment', :label => lambda { t('roles.student', 'Student') } },
       {:name => 'TaEnrollment', :label => lambda { t('roles.ta', 'TA') } },
       {:name => 'TeacherEnrollment', :label => lambda { t('roles.teacher', 'Teacher') } },
@@ -49,6 +50,7 @@ class RoleOverride < ActiveRecord::Base
       'TaEnrollment',
       'DesignerEnrollment',
       'StudentEnrollment',
+      'StudentViewEnrollment',
       'ObserverEnrollment',
       'TeacherlessStudentEnrollment',
       'AccountAdmin'
@@ -606,8 +608,8 @@ class RoleOverride < ActiveRecord::Base
   RESERVED_ROLES =
     [
       'AccountAdmin', 'AccountMembership', 'DesignerEnrollment',
-      'ObserverEnrollment', 'StudentEnrollment', 'TaEnrollment',
-      'TeacherEnrollment', 'TeacherlessStudentEnrollment'
+      'ObserverEnrollment', 'StudentEnrollment', 'StudentViewEnrollment', 
+      'TaEnrollment', 'TeacherEnrollment', 'TeacherlessStudentEnrollment'
     ].freeze
 
   def self.permissions
@@ -672,6 +674,7 @@ class RoleOverride < ActiveRecord::Base
   end
   
   def self.permission_for(context, permission, enrollment_type=nil)
+    enrollment_type = 'StudentEnrollment' if enrollment_type == 'StudentViewEnrollment'
     @cached_permissions ||= {}
     key = [context.cache_key, permission.to_s, enrollment_type.to_s].join
     permissionless_key = [context.cache_key, enrollment_type.to_s].join
@@ -687,12 +690,6 @@ class RoleOverride < ActiveRecord::Base
       :explicit   => false,
       :enrollment_type => enrollment_type
     }
-    if context.is_a?(Enrollment)
-      generated_permission.merge!({
-        :enabled         =>  self.permissions[permission][:true_for].include?(context.class.to_s),
-        :enrollment_type => context.class.to_s
-      })
-    end
     
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key]

@@ -370,6 +370,13 @@ shared_examples_for "all selenium tests" do
     user_logged_in({:user => @user}.merge(opts))
   end
 
+  def enter_student_view(opts={})
+    course = opts[:course] || @course || course(opts)
+    get "/courses/#{@course.id}/settings"
+    f(".student_view_button").click
+    wait_for_dom_ready
+  end
+
   def expect_new_page_load
     driver.execute_script("INST.still_on_old_page = true;")
     yield

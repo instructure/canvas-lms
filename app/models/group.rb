@@ -87,21 +87,22 @@ class Group < ActiveRecord::Base
   end
 
   def auto_accept?(user)
-    return false unless user
-    self.student_organized? && self.context.users.include?(user) &&
-    self.join_level == 'parent_context_auto_join'
+    self.context.grants_right?(user, :participate_in_groups) &&
+      self.student_organized? && 
+      self.join_level == 'parent_context_auto_join'
   end
 
   def allow_join_request?(user)
-    return false unless user
-    self.student_organized? && self.context.users.include?(user) &&
-    ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
+    self.context.grants_right?(user, :participate_in_groups) &&
+      self.student_organized? && 
+      ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
 
   def allow_self_signup?(user)
-    return false unless user && self.group_category
-    self.group_category.unrestricted_self_signup? ||
-    (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user))
+    self.context.grants_right?(user, :participate_in_groups) &&
+      self.group_category &&
+      (self.group_category.unrestricted_self_signup? ||
+        (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user)))
   end
 
   def free_association?(user)

@@ -163,5 +163,14 @@ describe "announcements" do
       wait_for_animations
       driver.find_element(:id, 'add_external_feed_form').should_not be_displayed
     end
+
+    it "should show announcements to student view student" do
+      create_announcement
+      enter_student_view
+      get "/courses/#{@course.id}/announcements"
+
+      announcement = f('#topic_list .topic')
+      announcement.find_element(:css, '.message').should include_text(@announcement.message)
+    end
   end
 end

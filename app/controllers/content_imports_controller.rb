@@ -19,6 +19,7 @@
 # @API Courses
 class ContentImportsController < ApplicationController
   before_filter :require_pseudonym, :only => [:migrate_content]
+  before_filter :reject_student_view_student, :only => [:migrate_content]
   before_filter :require_context, :add_imports_crumb
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload

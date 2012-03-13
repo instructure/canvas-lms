@@ -25,6 +25,7 @@ class ConversationsController < ApplicationController
   include Api::V1::Attachment
 
   before_filter :require_user, :except => [:public_feed]
+  before_filter :reject_student_view_student
   before_filter :require_pseudonym, :except => [:public_feed]
   before_filter :set_avatar_size
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
