@@ -256,6 +256,27 @@ describe "gradebook2" do
       driver.find_element(:css, '#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
     end
 
+    it "should notify user that no updates are made if default grade assignment doesn't change anything" do
+      get "/courses/#{@course.id}/gradebook2"
+
+      ##
+      # borrowed this code from set_default_grade method. not calling it directly because
+      # we need to assert the content of the alert box.
+      open_assignment_options(0)
+      driver.find_element(:css, '#ui-menu-1-3').click
+      dialog = find_with_jquery('.ui-dialog:visible')
+      dialog_form = dialog.find_element(:css, '.ui-dialog-content')
+      driver.find_element(:css, '.grading_value').send_keys(5)
+      dialog_form.submit
+      keep_trying_until do
+        driver.switch_to.alert.should_not be_nil
+        driver.switch_to.alert.text.should eql 'None to Update'
+        driver.switch_to.alert.dismiss
+        true
+      end
+      driver.switch_to.default_content
+    end
+
     it "should validate correct number of students showing up in gradebook" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations

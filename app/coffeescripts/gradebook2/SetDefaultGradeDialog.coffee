@@ -35,11 +35,13 @@ define [
       @$dialog.formSubmit
         disableWhileLoading: true
         processData: (data) =>
+          studentsAffected = 0
           for idx, student of @gradebook.students when !student["assignment_#{@assignment.id}"].score? || data.overwrite_existing_grades
+            studentsAffected = studentsAffected + 1
             data["submissions[submission_#{idx}][assignment_id]"] = @assignment.id
             data["submissions[submission_#{idx}][user_id]"] = student.id
             data["submissions[submission_#{idx}][grade]"] = data.default_grade
-          if idx is 0
+          if studentsAffected is 0
             alert I18n.t('alerts.none_to_update', "None to Update")
             return false
           data
