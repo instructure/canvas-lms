@@ -89,7 +89,7 @@
     <% if @current_user %>
     <ul role="navigation" id="menu">
       <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
-      <li class="menu-item">
+      <li id="courses_menu_item" class="menu-item">
         <%- if show_home_menu? -%>
           <%= render(:partial => 'shared/home_menu') %>
         <%- else  -%>
@@ -97,7 +97,7 @@
         <%- end -%>
       </li>
       <%- end -%>
-      <li class="menu-item">
+      <li id="assignments_menu_item" class="menu-item">
       <% 
       # this will cache the assignments menu for 3 minutes.  the way it is right now it does 3 really expensive queries every page load.
       # to do this better we would either figure a better way to find needing_submitting, needing_grading, and recently_graded
@@ -143,10 +143,10 @@
         <%- end -%>
       <% end %>
       </li>
-      <li class="menu-item">
+      <li id="grades_menu_item" class="menu-item">
         <%= link_to(t('menu.grades', 'Grades'), :grades, :class=>"menu-item-no-drop") %>
       </li>
-      <li class="menu-item">
+      <li id="calendar_menu_item" class="menu-item">
         <a href="<%= calendar_path %>" class="menu-item-no-drop"><%= t('menu.calendar', 'Calendar') %></a>
       </li>      
     </ul>

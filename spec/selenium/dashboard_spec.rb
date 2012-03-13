@@ -157,7 +157,7 @@ describe "dashboard" do
       driver.find_element(:css, '.to-do-list > li').should include_text(assignment.submission_action_string)
 
       #verify assignment is in drop down
-      assignment_menu = driver.find_element(:link, 'Assignments').find_element(:xpath, '..')
+      assignment_menu = driver.find_element(:id, 'assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
       assignment_menu.should include_text("To Turn In")
       assignment_menu.should include_text(assignment.title)
@@ -169,7 +169,7 @@ describe "dashboard" do
 
       get "/"
 
-      course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+      course_menu = driver.find_element(:id, 'courses_menu_item')
 
       driver.action.move_to(course_menu).perform
       course_menu.should include_text('My Courses')
@@ -185,7 +185,7 @@ describe "dashboard" do
 
       get "/"
 
-      course_menu = driver.find_element(:link, 'Courses & Groups').find_element(:xpath, '..')
+      course_menu = driver.find_element(:id, 'courses_menu_item')
 
       driver.action.move_to(course_menu).perform
       course_menu.should include_text('Current Groups')
@@ -274,7 +274,7 @@ describe "dashboard" do
         @course.reload
         get "/"
 
-        driver.action.move_to(driver.find_element(:link, 'Courses').find_element(:xpath, '..')).perform
+        driver.action.move_to(driver.find_element(:id, 'courses_menu_item')).perform
         course_menu = driver.find_element(:id, 'menu_enrollments')
         course_menu.should be_displayed
         course_menu.should_not include_text(@course.name)
@@ -297,7 +297,7 @@ describe "dashboard" do
       driver.find_element(:css, '.to-do-list > li').should include_text('Grade ' + assignment.title)
 
       #verify assignment is in drop down
-      assignment_menu = driver.find_element(:link, 'Assignments').find_element(:xpath, '..')
+      assignment_menu = driver.find_element(:id, 'assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
       assignment_menu.should include_text("Needing Grading")
       assignment_menu.should include_text(assignment.title)
@@ -330,7 +330,7 @@ describe "dashboard" do
 
         get "/"
 
-        course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+        course_menu = driver.find_element(:id, 'courses_menu_item')
         driver.action.move_to(course_menu).perform
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
@@ -342,7 +342,7 @@ describe "dashboard" do
 
         get "/"
 
-        course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+        course_menu = driver.find_element(:id, 'courses_menu_item')
         driver.action.move_to(course_menu).perform
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
@@ -358,7 +358,7 @@ describe "dashboard" do
 
         get "/"
 
-        course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+        course_menu = driver.find_element(:id, 'courses_menu_item')
         driver.action.move_to(course_menu).perform
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
@@ -374,7 +374,7 @@ describe "dashboard" do
         # be enough.
         UsersController.before_filter { sleep 1; true }
 
-        course_menu = driver.find_element(:link, 'Courses').find_element(:xpath, '..')
+        course_menu = driver.find_element(:id, 'courses_menu_item')
         driver.execute_script(%{$("#menu li.menu-item:first").trigger('mouseenter')})
         sleep 0.4 # there's a fixed 300ms delay before the menu will display
 

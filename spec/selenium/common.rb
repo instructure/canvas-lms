@@ -805,8 +805,10 @@ end
 
   def validate_link(link_element, breadcrumb_text)
     expect_new_page_load { link_element.click }
-    breadcrumb = driver.find_element(:id, 'breadcrumbs')
-    breadcrumb.should include_text(breadcrumb_text)
+    if breadcrumb_text != nil
+      breadcrumb = driver.find_element(:id, 'breadcrumbs')
+      breadcrumb.should include_text(breadcrumb_text)
+    end
     driver.execute_script("return INST.errorCount;").should == 0
   end
 
