@@ -298,7 +298,7 @@ describe Enrollment do
       course_with_student(:active_all => true)
       @c1 = @course
       @s2 = @course.course_sections.create!(:name => 's2')
-      @course.student_enrollments.create!(:user => @user, :course_section => @s2)
+      @course.enroll_student(@user, :section => @s2, :allow_multiple_enrollments => true)
       @user.student_enrollments(true).count.should == 2
       course_with_student(:user => @user)
       @c2 = @course

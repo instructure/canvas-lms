@@ -18,7 +18,6 @@
 
 class CalendarsController < ApplicationController
   before_filter :require_user, :except => [ :public_feed ]
-  before_filter :require_pseudonym, :except => [ :public_feed ]
   before_filter :check_preferred_calendar, :only => [ :show, :show2 ]
 
   def show

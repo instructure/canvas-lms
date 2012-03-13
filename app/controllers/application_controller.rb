@@ -1250,4 +1250,10 @@ class ApplicationController < ActionController::Base
       params[:course_id] = @section.course_id
     end
   end
+
+  def reject_student_view_student
+    return unless @current_user && @current_user.fake_student?
+    @unauthorized_message ||= t('#application.errors.student_view_unauthorized', "You cannot access this functionality in student view.")
+    render_unauthorized_action(@current_user)
+  end
 end

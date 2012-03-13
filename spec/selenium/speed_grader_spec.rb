@@ -362,8 +362,10 @@ describe "speedgrader" do
     before(:each) do
       student_in_course
       @course_section = @course.course_sections.create!(:name => "Other Section")
-      @enrollment = @course.student_enrollments.build(:user => @student, :workflow_state => "active", :course_section => @course_section)
-      @enrollment.save!
+      @enrollment = @course.enroll_student(@student,
+                                           :enrollment_state => "active",
+                                           :section => @course_section,
+                                           :allow_multiple_enrollments => true)
     end
 
     def goto_section(section_id)
@@ -563,5 +565,13 @@ describe "speedgrader" do
     driver.find_element(:css, "#rubric_summary_container tr:nth-child(3) .editing").should_not be_displayed
     driver.find_element(:css, "#rubric_summary_container tr:nth-child(3) .ignoring").should be_displayed
     driver.find_element(:css, "#rubric_summary_container tr.summary .rubric_total").text.should == '3'
+  end
+
+  it "should included the student view student for grading" do
+    @fake_student = @course.student_view_student
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    driver.find_elements(:css, "#students_selectmenu option").length.should == 1
   end
 end

@@ -114,6 +114,15 @@ describe ConversationsController do
       response.should be_success
       assigns[:filterable].should be_false
     end
+
+    it "should not allow student view student to load inbox" do
+      course_with_teacher_logged_in(:active_all => true)
+      @fake_student = @course.student_view_student
+      session[:become_user_id] = @fake_student.id
+
+      get 'index'
+      assert_unauthorized
+    end
   end
 
   describe "GET 'show'" do
@@ -459,17 +468,6 @@ describe ConversationsController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       feed.should_not be_nil
       feed.entries.first.content.should match(/somefile\.doc/)
-    end
-
-    it "should not include deleted messages" do
-      course_with_student
-      conversation
-      @conversation.add_message('second message')
-      @conversation.remove_messages(@conversation.messages.first)
-      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.length.should == 1
     end
   end
 end

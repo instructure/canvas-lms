@@ -316,6 +316,8 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :user_lists, :only => :create
     course.reset 'reset', :controller => 'courses', :action => 'reset_content', :conditions => {:method => :post}
     course.resources :alerts
+    course.student_view 'student_view', :controller => 'courses', :action => 'student_view', :conditions => {:method => :post}
+    course.student_view 'student_view', :controller => 'courses', :action => 'leave_student_view', :conditions => {:method => :delete}
   end
 
   map.resources :page_views, :only => [:update,:index]

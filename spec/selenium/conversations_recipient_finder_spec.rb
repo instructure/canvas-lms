@@ -245,4 +245,11 @@ describe "conversations recipient finder" do
     wait_for_ajaximations
     tokens.should eql ["other guy"]
   end
+
+  it "should not show student view student to other students" do
+    @fake_student = @course.student_view_student
+    search(@fake_student.name) do
+      menu.should eql ["No results found"]
+    end
+  end
 end

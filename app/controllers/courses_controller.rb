@@ -23,7 +23,6 @@ require 'set'
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_pseudonym, :only => [:index]
   before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
 
   include Api::V1::Course
@@ -505,7 +504,7 @@ class CoursesController < ApplicationController
       e = enrollment
       session[:enrollment_uuid] = e.uuid
       session[:session_affects_permissions] = true
-      session[:enrollment_as_student] = true if e.is_a?(StudentEnrollment)
+      session[:enrollment_as_student] = true if e.student?
       session[:enrollment_uuid_course_id] = e.course_id
       @pending_enrollment = enrollment
       if @context.root_account.allow_invitation_previews?
@@ -1054,5 +1053,22 @@ class CoursesController < ApplicationController
     @new_course = @context.reset_content
     redirect_to course_settings_path(@new_course.id)
   end
+  
+  def student_view
+    get_context
+    if authorized_action(@context, @current_user, :use_student_view)
+      @fake_student = @context.student_view_student
+      session[:become_user_id] = @fake_student.id
+      return_url = course_path(@context)
+      session[:masquerade_return_to] = nil
+      return return_to(return_url, request.referer || dashboard_url)
+    end
+  end
 
+  def leave_student_view
+    session[:become_user_id] = nil
+    return_url = session[:masquerade_return_to]
+    session[:masquerade_return_to] = nil
+    return return_to(return_url, request.referer || dashboard_url)
+  end
 end

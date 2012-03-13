@@ -63,6 +63,9 @@ class UserProfile
           }
         end
       end
+      if user && user.fake_student?
+        @tabs = @tabs.slice(0,2)
+      end
     end
     @tabs
   end

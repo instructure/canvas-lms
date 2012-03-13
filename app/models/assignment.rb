@@ -977,7 +977,7 @@ class Assignment < ActiveRecord::Base
       opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
-    raise "User must be enrolled in the course as a student to submit homework" unless context.students.include?(original_student)
+    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.find(:first, :conditions => { :user_id => original_student.id })
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)

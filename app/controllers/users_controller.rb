@@ -28,7 +28,8 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  before_filter :require_user, :require_pseudonym, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
+  before_filter :reject_student_view_student, :require_pseudonym, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
   before_filter :require_open_registration, :only => [:new, :create]
 
   def grades
@@ -48,7 +49,7 @@ class UsersController < ApplicationController
       #@prior_enrollments.concat @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
 
       @student_enrollments = @current_enrollments.
-        select{ |e| e.is_a?(StudentEnrollment) }.
+        select{ |e| e.student? }.
         inject({}){ |hash, e| hash[e.course] = e; hash }
 
       @observer_enrollments = @current_enrollments.select{|e| e.is_a?(ObserverEnrollment) && e.associated_user_id }

@@ -182,6 +182,7 @@ module AuthenticationMethods
 
   def require_pseudonym
     unless @current_pseudonym
+      session[:become_user_id] = nil
       redirect_to_login
       return false
     end
