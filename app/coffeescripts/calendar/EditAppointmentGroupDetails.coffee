@@ -1,12 +1,13 @@
 define [
   'jquery'
+  'i18n!EditAppointmentGroupDetails'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editAppointmentGroup'
   'jst/calendar/genericSelect'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ($, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
+], ($, I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
 
   class EditAppointmentGroupDetails
     constructor: (selector, @apptGroup, @contextChangeCB, @closeCB) ->
@@ -74,6 +75,17 @@ define [
       else
         @form.find('[name="participants_per_appointment"]').attr('disabled', true)
 
+      maxPerStudentInput = @form.find('[name="max_appointments_per_participant"]')
+      maxAppointmentsPerStudent = @apptGroup.max_appointments_per_participant || 1
+      maxPerStudentInput.val(maxAppointmentsPerStudent)
+      maxPerStudentCheckbox = @form.find('#max-per-student-option')
+      maxPerStudentCheckbox.change ->
+        maxPerStudentInput.prop('disabled', not maxPerStudentCheckbox.prop('checked'))
+      if maxAppointmentsPerStudent > 0
+        maxPerStudentCheckbox.prop('checked', true)
+      else
+        maxPerStudentInput.attr('disabled', true)
+
       if @apptGroup.workflow_state == 'active'
         @form.find("#appointment-blocks-active-button").attr('disabled', true).prop('checked', true)
 
@@ -101,6 +113,16 @@ define [
         'appointment_group[location_name]': data.location
       }
 
+      if data.max_appointments_per_participant_option
+        if data.max_appointments_per_participant < 1
+          $('[name="max_appointments_per_participant"]').errorBox(
+            I18n.t('bad_max_appts', 'You must allow at least one appointment per participant'))
+          return false
+        else
+          params['appointment_group[max_appointments_per_participant]'] = data.max_appointments_per_participant
+      else
+        params['appointment_group[max_appointments_per_participant]'] = ""
+
       params['appointment_group[new_appointments]'] = []
       return false unless @timeBlockList.validate()
       for range in @timeBlockList.blocks()
@@ -125,8 +147,7 @@ define [
         else if data.section_id && data.section_id != 'all'
           params['appointment_group[sub_context_code]'] = data.section_id
 
-        # TODO: Provide UI for specifying these
-        params['appointment_group[max_appointments_per_participant]'] = 1
+        # TODO: Provide UI for specifying this
         params['appointment_group[min_appointments_per_participant]'] = 1
 
       onSuccess = => @closeCB(true)
