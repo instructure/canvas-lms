@@ -104,7 +104,7 @@ class ConversationsController < ApplicationController
       when 'sent'
         @view_name = I18n.t('index.inbox_views.sent', 'Sent')
         @no_messages = I18n.t('no_sent_messages', 'You have no sent messages')
-        @current_user.all_conversations.default.sent
+        @current_user.all_conversations.sent
       when 'archived'
         @view_name = I18n.t('index.inbox_views.archived', 'Archived')
         @no_messages = I18n.t('no_archived_messages', 'You have no archived messages')
