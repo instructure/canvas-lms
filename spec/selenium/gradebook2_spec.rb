@@ -594,20 +594,39 @@ describe "gradebook2" do
       end
     end
 
-    it "should validate send a message to students who option" do
-      message_text = "This is a message"
+    describe "message students who" do
+      it "should send messages" do
+        message_text = "This is a message"
 
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
-      open_assignment_options(2)
-      driver.find_element(:css, '#ui-menu-1-2').click
-      expect {
-        message_form = driver.find_element(:css, '#message_assignment_recipients')
-        message_form.find_element(:css, '#body').send_keys(message_text)
-        message_form.submit
+        get "/courses/#{@course.id}/gradebook2"
         wait_for_ajaximations
-      }.to change(ConversationMessage, :count).by(2)
+
+        open_assignment_options(2)
+        driver.find_element(:css, '#ui-menu-1-2').click
+        expect {
+          message_form = driver.find_element(:css, '#message_assignment_recipients')
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          message_form.submit
+          wait_for_ajax_requests
+        }.to change(ConversationMessage, :count).by(2)
+      end
+
+      it "should have a 'Haven't been graded' option" do
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        # set grade for first student, 3rd assignment
+        edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l2'), 0)
+        open_assignment_options(2)
+
+        # expect dialog to show 1 fewer student with the "Haven't been graded" option
+        driver.find_element(:css, '#ui-menu-1-2').click
+        find_all_with_jquery('.student_list li:visible').size.should eql 2
+        # select option
+        select = driver.find_element(:css, '#message_assignment_recipients select.message_types')
+        select.click
+        select.all(:tag_name => 'option').find {|o| o.text == "Haven't been graded"}.click
+        find_all_with_jquery('.student_list li:visible').size.should eql 1
+      end
     end
 
     it "should validate curving grades option" do
