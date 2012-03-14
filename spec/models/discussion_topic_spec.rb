@@ -194,6 +194,20 @@ describe DiscussionTopic do
   end
 
   context "refresh_subtopics" do
+    def topic_for_group_assignment
+      course_with_student(:active_all => true)
+      group_category = @course.group_categories.create(:name => "category")
+      @group1 = @course.groups.create(:name => "group 1", :group_category => group_category)
+      @group2 = @course.groups.create(:name => "group 2", :group_category => group_category)
+
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
+      @assignment.infer_due_at
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+    end
+
     it "should be a no-op unless there's an assignment and it has a group_category" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
@@ -208,24 +222,27 @@ describe DiscussionTopic do
     end
 
     it "should create a topic per active group in the category otherwise" do
-      course_with_student(:active_all => true)
-      group_category = @course.group_categories.create(:name => "category")
-      @group1 = @course.groups.create(:name => "group 1", :group_category => group_category)
-      @group2 = @course.groups.create(:name => "group 2", :group_category => group_category)
-
-      @topic = @course.discussion_topics.build(:title => "topic")
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
-      @assignment.infer_due_at
-      @assignment.saved_by = :discussion_topic
-      @topic.assignment = @assignment
-      @topic.save
-
+      topic_for_group_assignment
       subtopics = @topic.refresh_subtopics
       subtopics.should_not be_nil
       subtopics.size.should == 2
       subtopics.each { |t| t.root_topic.should == @topic }
       @group1.reload.discussion_topics.should_not be_empty
       @group2.reload.discussion_topics.should_not be_empty
+    end
+
+    it "should only save the subtopic if it is new or has changed and not spawn new jobs" do
+      topic_for_group_assignment
+      @topic.refresh_subtopics
+
+      count_before = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).count
+      ids_before = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).map(&:id)
+      @topic.refresh_subtopics
+      count_after = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).count
+      ids_after = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).map(&:id)
+
+      count_before.should eql count_after
+      ids_before.sort.should eql ids_after.sort
     end
   end
 
