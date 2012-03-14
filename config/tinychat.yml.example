@@ -1,9 +1,0 @@
-production:
-  api_key: key
-  
-development:
- api_key: key 
-     
-test:
-  api_key: key
-
