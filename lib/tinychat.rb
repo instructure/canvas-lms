@@ -33,9 +33,7 @@ class Tinychat
   end
   
   def self.config
-    # Return existing value, even if nil, as long as it's defined
-    return @config if defined?(@config)
-    @config ||= Canvas::Plugin.find(:tinychat).try(:settings)
-    @config ||= (YAML.load_file(RAILS_ROOT + "/config/tinychat.yml")[RAILS_ENV] rescue nil)
+    Canvas::Plugin.find(:tinychat).try(:settings) ||
+      (YAML.load_file(RAILS_ROOT + "/config/tinychat.yml")[RAILS_ENV] rescue nil)
   end
 end
