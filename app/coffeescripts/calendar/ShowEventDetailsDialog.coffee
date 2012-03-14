@@ -46,19 +46,27 @@ define [
     reserveErrorCB: (data) =>
       for error in data when error.message is 'participant has met per-participant limit'
         errorHandled = true
+        error.reschedulable = error.reservations.length == 1
         $dialog = $(reservationOverLimitDialog(error)).dialog
           resizable: false
           width: 450
-          buttons: [
-            text: I18n.t 'reschedule', 'Reschedule'
-            'class': 'ui-button-primary'
-            click: =>
-              $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
-                $dialog.dialog('close')
-          ,
-            text: I18n.t 'do_nothing', 'Do Nothing'
-            click: -> $dialog.dialog('close')
-          ]
+          buttons: if error.reschedulable
+                     [
+                       text: I18n.t 'reschedule', 'Reschedule'
+                       'class': 'ui-button-primary'
+                       click: =>
+                         $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
+                           $dialog.dialog('close')
+                     ,
+                       text: I18n.t 'do_nothing', 'Do Nothing'
+                       click: -> $dialog.dialog('close')
+                     ]
+                   else
+                     [
+                       text: I18n.t 'ok', 'OK'
+                       click: -> $dialog.dialog('close')
+                     ]
+
       unless errorHandled
         alert "Could not reserve event: #{data}"
         $.publish "CommonEvent/eventSaveFailed", @event

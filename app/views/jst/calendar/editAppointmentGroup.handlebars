@@ -56,20 +56,30 @@
         </div>
       </div>
     </div>
-    <p>
-      <b>Options</b><br />
-      <input type="checkbox" id="appointment-blocks-per-slot-option-button" name="per_slot_option" value="1" />
-      <label for="appointment-blocks-per-slot-option-button">Limit each time slot to</label>
-      <input type="number" name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" style="width: 40px;" />
-      <label for="appointment-blocks-per-slot-option-button">
-        <span {{#ifEqual participant_type "Group"}} {{else}} style="display:none;" {{/ifEqual}} class="per_appointment_groups_label">groups.</span>
-        <span {{#ifEqual participant_type "Group"}} style="display:none;" {{/ifEqual}} class="per_appointment_users_label">users.</span>
-      </label>
-      <br />
-      <br />
-      <input type="checkbox" id="appointment-blocks-participant-visibility-button" name="participant_visibility" value="1" />
-      <label for="appointment-blocks-participant-visibility-button">Allow students to see who has signed up for time slots in this group.</label>
-    </p>
+    <div style="margin-top: 1.5em">
+      <b>Options</b>
+      <ul class="ag-options">
+        <li>
+          <input type="checkbox" id="appointment-blocks-per-slot-option-button" name="per_slot_option" value="1" />
+          <label for="appointment-blocks-per-slot-option-button">Limit each time slot to</label>
+          <input type="number" name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" style="width: 40px;" />
+          <label for="appointment-blocks-per-slot-option-button">
+            <span {{#ifEqual participant_type "Group"}} {{else}} style="display:none;" {{/ifEqual}} class="per_appointment_groups_label">groups.</span>
+            <span {{#ifEqual participant_type "Group"}} style="display:none;" {{/ifEqual}} class="per_appointment_users_label">users.</span>
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="appointment-blocks-participant-visibility-button" name="participant_visibility" value="1" />
+          <label for="appointment-blocks-participant-visibility-button">Allow students to see who has signed up for time slots.</label>
+        </li>
+        <li>
+          <input type="checkbox" id="max-per-student-option" name="max_appointments_per_participant_option" value="1">
+          <label for="max-per-student-option">Limit participants to</label>
+          <input type="number" name="max_appointments_per_participant" value="{{appointment_group.max_appointments_per_participant}}" min="1"style="width: 40px">
+          <label for="max-per-student-option">appointment(s).</label>
+        </li>
+      </ul>
+    </div>
   </div>
   <div class="details-wrapper">
     <b>Details:</b><br />
