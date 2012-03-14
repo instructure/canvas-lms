@@ -70,7 +70,7 @@ shared_examples_for "conversations selenium tests" do
 
     @elements = prev_elements
     @level -= 1
-    @input.send_keys(:arrow_left)
+    @input.send_keys(:arrow_left) unless ff('.autocomplete_menu:visible .list').empty?
     wait_for_animations
   end
 

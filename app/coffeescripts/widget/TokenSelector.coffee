@@ -32,6 +32,7 @@ define [
       @fetchListAjaxRequests = []
       @queryCache = {}
       @$container = $('<div />').addClass('autocomplete_menu')
+      @$container.addClass('with-toggles') if @options.showToggles
       @$menu = $('<div />').append(@$list = @newList())
       @$container.append($('<div />').append(@$menu))
       @$container.css('top', 0).css('left', 0)
@@ -353,7 +354,7 @@ define [
 
     populateRow: ($node, data, options={}) ->
       if @options.populator
-        @options.populator($node, data, options)
+        @options.populator(this, $node, data, options)
       else
         $node.data('id', data.text)
         $node.text(data.text)
@@ -419,7 +420,7 @@ define [
         @uiLocked = false
 
     preparePost: (data) ->
-      postData = $.extend(data, {search: @input.val().replace(/^\s+|\s+$/g, "")}, @options.baseData ? {})
+      postData = $.extend({}, @options.baseData ? {}, data, {search: @input.val().replace(/^\s+|\s+$/g, "")})
       postData.exclude = @input.baseExclude.concat(if @stack.length then [] else @input.tokenValues())
       postData.context = @stack[@stack.length - 1][0].data('id') if @listExpanded()
       postData.per_page ?= @options.limiter?(level: @stack.length)

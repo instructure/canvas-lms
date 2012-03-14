@@ -983,8 +983,57 @@ define [
       d.promise()
 
     initializeTokenInputs: ->
+      buildPopulator = (pOptions={}) =>
+        (selector, $node, data, options={}) =>
+          data.id = "#{data.id}"
+          if data.avatar_url
+            $img = $('<img class="avatar" />')
+            $img.attr('src', data.avatar_url)
+            $node.append($img)
+          $b = $('<b />')
+          $b.text(data.name)
+          $name = $('<span />', class: 'name')
+          $contextInfo = @buildContextInfo(data) unless options.parent
+          $name.append($b, $contextInfo)
+          $span = $('<span />', class: 'details')
+          if data.common_courses?
+            $span.text(@contextList(courses: data.common_courses, groups: data.common_groups))
+          else if data.type and data.user_count?
+            $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
+          else if data.item_count?
+            if data.id.match(/_groups$/)
+              $span.text(I18n.t('groups_count', 'group', {count: data.item_count}))
+            else if data.id.match(/_sections$/)
+              $span.text(I18n.t('sections_count', 'section', {count: data.item_count}))
+          else if data.subText
+            $span.text(data.subText)
+          $node.append($name, $span)
+          $node.attr('title', data.name)
+          text = data.name
+          if options.parent
+            if data.selectAll and data.noExpand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"
+              text = options.parent.data('text')
+            else if data.id.match(/_\d+_/) # e.g. course_123_teachers -> "Spanish 101: Teachers"
+              text = I18n.beforeLabel(options.parent.data('text')) + " " + text
+          $node.data('text', text)
+          $node.data('id', if data.type is 'context' or not pOptions.prefixUserIds then data.id else "user_#{data.id}")
+          data.rootId = options.ancestors[0]
+          $node.data('user_data', data)
+          $node.addClass(if data.type then data.type else 'user')
+          if options.level > 0 and selector.options.showToggles
+            $node.prepend('<a class="toggle"><i></i></a>')
+            $node.addClass('toggleable') unless data.item_count # can't toggle certain synthetic contexts, e.g. "Student Groups"
+          if data.type == 'context' and not data.noExpand
+            $node.prepend('<a class="expand"><i></i></a>')
+            $node.addClass('expandable')
+
+      placeholderText =  I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
+      noResultsText = I18n.t('no_results', 'No results found')
+      everyoneText  = I18n.t('enrollments_everyone', "Everyone")
+      selectAllText = I18n.t('select_all', "Select All")
+
       $('.recipients').tokenInput
-        placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
+        placeholder: placeholderText
         added: (data, $token, newToken) =>
           data.id = "#{data.id}"
           if newToken and data.rootId
@@ -1002,49 +1051,11 @@ define [
             currentData = @userCache[data.id] ? {}
             @userCache[data.id] = $.extend(currentData, data)
         selector:
-          messages: {noResults: I18n.t('no_results', 'No results found')}
-          populator: ($node, data, options={}) =>
-            data.id = "#{data.id}"
-            if data.avatar_url
-              $img = $('<img class="avatar" />')
-              $img.attr('src', data.avatar_url)
-              $node.append($img)
-            $b = $('<b />')
-            $b.text(data.name)
-            $name = $('<span />', class: 'name')
-            $contextInfo = @buildContextInfo(data) unless options.parent
-            $name.append($b, $contextInfo)
-            $span = $('<span />', class: 'details')
-            if data.common_courses?
-              $span.text(@contextList(courses: data.common_courses, groups: data.common_groups))
-            else if data.type and data.user_count?
-              $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
-            else if data.item_count?
-              if data.id.match(/_groups$/)
-                $span.text(I18n.t('groups_count', 'group', {count: data.item_count}))
-              else if data.id.match(/_sections$/)
-                $span.text(I18n.t('sections_count', 'section', {count: data.item_count}))
-            $node.append($name, $span)
-            $node.attr('title', data.name)
-            text = data.name
-            if options.parent
-              if data.selectAll and data.noExpand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"
-                text = options.parent.data('text')
-              else if data.id.match(/_\d+_/) # e.g. course_123_teachers -> "Spanish 101: Teachers"
-                text = I18n.beforeLabel(options.parent.data('text')) + " " + text
-            $node.data('text', text)
-            $node.data('id', data.id)
-            data.rootId = options.ancestors[0]
-            $node.data('user_data', data)
-            $node.addClass(if data.type then data.type else 'user')
-            if options.level > 0
-              $node.prepend('<a class="toggle"><i></i></a>')
-              $node.addClass('toggleable') unless data.item_count # can't toggle synthetic contexts, e.g. "Student Groups"
-            if data.type == 'context' and not data.noExpand
-              $node.prepend('<a class="expand"><i></i></a>')
-              $node.addClass('expandable')
+          messages: {noResults: noResultsText}
+          populator: buildPopulator()
           limiter: (options) =>
             if options.level > 0 then -1 else 5
+          showToggles: true
           preparer: (postData, data, parent) =>
             context = postData.context
             if not postData.search and context and data.length > 1
@@ -1052,7 +1063,7 @@ define [
                 # i.e. we are listing synthetic contexts under a course or section
                 data.unshift
                   id: "#{context}_all"
-                  name: I18n.t('enrollments_everyone', "Everyone")
+                  name: everyoneText
                   user_count: parent.data('user_data').user_count
                   type: 'context'
                   avatar_url: parent.data('user_data').avatar_url
@@ -1061,7 +1072,7 @@ define [
                 # i.e. we are listing all users in a group or synthetic context
                 data.unshift
                   id: context
-                  name: I18n.t('select_all', "Select All")
+                  name: selectAllText
                   user_count: parent.data('user_data').user_count
                   type: 'context'
                   avatar_url: parent.data('user_data').avatar_url
@@ -1089,35 +1100,43 @@ define [
         @resize()
 
       $('#context_tags').tokenInput
-        placeholder: I18n.t('filter_placeholder', "Enter a name, course, or group")
+        placeholder: placeholderText
         added: (data, $token, newToken) =>
           $token.prevAll().remove()
         tokenWrapBuffer: 80
         selector:
-          messages: {noResults: I18n.t('no_results', 'No results found')}
-          populator: ($node, data, options={}) =>
-            data.id = "#{data.id}"
-            if data.avatar_url
-              $img = $('<img class="avatar" />')
-              $img.attr('src', data.avatar_url)
-              $node.append($img)
-            $b = $('<b />')
-            $b.text(data.name)
-            $name = $('<span />', class: 'name')
-            $contextInfo = @buildContextInfo(data) unless options.parent
-            $name.append($b, $contextInfo)
-            $span = $('<span />', class: 'details')
-            if data.common_courses?
-              $span.text(@contextList(courses: data.common_courses, groups: data.common_groups))
-            $node.append($name, $span)
-            $node.attr('title', data.name)
-            text = data.name
-            $node.data('text', text)
-            $node.data('id', if data.type is 'context' then data.id else "user_#{data.id}")
-            $node.data('user_data', data)
-            $node.addClass(data.type)
-            $node.addClass('toggleable')
+          messages: {noResults: noResultsText}
+          populator: buildPopulator(prefixUserIds: true)
           limiter: (options) => 5
+          preparer: (postData, data, parent) =>
+            context = postData.context
+            if not postData.search and context and data.length > 0 and context.match(/^(course|group)_\d+$/)
+              if data.length > 1 and context.match(/^course_/)
+                data.unshift
+                  id: "#{context}_all"
+                  name: everyoneText
+                  user_count: parent.data('user_data').user_count
+                  type: 'context'
+                  avatar_url: parent.data('user_data').avatar_url
+              filterText = if context.match(/^course/)
+                I18n.t('filter_by_course', 'Fiter by this course')
+              else
+                I18n.t('filter_by_group', 'Fiter by this group')
+              data.unshift
+                id: context
+                name: parent.data('text')
+                type: 'context'
+                avatar_url: parent.data('user_data').avatar_url
+                subText: filterText
+                noExpand: true
+          baseData:
+            synthetic_contexts: 1
+            types: ['course', 'user', 'group']
+            include_inactive: true
+          browser:
+            data:
+              per_page: -1
+              types: ['context']
       filterInput = $('#context_tags').data('token_input')
       filterInput.change = (tokenValues) =>
         if @currentFilter isnt tokenValues[0]
