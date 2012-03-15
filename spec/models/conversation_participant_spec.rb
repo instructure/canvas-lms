@@ -153,6 +153,53 @@ describe ConversationParticipant do
     end
   end
 
+  context "participants" do
+    before do
+      @me = course_with_student(:active_all => true).user
+      @u1 = student_in_course(:active_all => true).user
+      @u2 = student_in_course(:active_all => true).user
+      @u3 = student_in_course(:active_all => true).user
+      @convo = @me.initiate_conversation([@u1.id, @u2.id, @u3.id])
+      @convo.add_message "ohai"
+      @u3.destroy
+      @u4 = student_in_course(:active_all => true).user
+
+      other_convo = @u4.initiate_conversation([@me.id])
+      message = other_convo.add_message "just between you and me"
+      @convo.add_message("haha i forwarded it", :forwarded_message_ids => [message.id])
+    end
+
+    it "should include shared contexts by default" do
+      users = @convo.reload.participants
+      users.each do |user|
+        user.common_groups.should == {}
+        if [@me.id, @u3.id].include? user.id
+          user.common_courses.should == {}
+        else
+          user.common_courses.should == {@course.id => ["StudentEnrollment"]}
+        end
+      end
+    end
+
+    it "should not include forwarded participants by default" do
+      users = @convo.reload.participants
+      users.map(&:id).sort.should eql [@me.id, @u1.id, @u2.id, @u3.id]
+    end
+
+    it "should not include shared contexts if asked not to" do
+      users = @convo.reload.participants(:include_context_info => false)
+      users.each do |user|
+        user.common_groups.should be_nil
+        user.common_courses.should be_nil
+      end
+    end
+
+    it "should include include forwarded participants if requested" do
+      users = @convo.reload.participants(:include_indirect_participants => true)
+      users.map(&:id).sort.should eql [@me.id, @u1.id, @u2.id, @u3.id, @u4.id]
+    end
+  end
+
   context "move_to_user" do
     before do
       @user1 = user_model

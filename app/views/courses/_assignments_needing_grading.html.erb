@@ -5,8 +5,8 @@
 cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
  show_context = !contexts || contexts.length > 1
  visible_limit = 5
- needs_grading = @current_user.assignments_needing_grading(:contexts => contexts, :limit => 100)
- needs_submitting = @current_user.assignments_needing_submitting(:contexts => contexts, :limit => 100)
+ needs_grading = @current_user ? @current_user.assignments_needing_grading(:contexts => contexts, :limit => 100) : []
+ needs_submitting = @current_user ? @current_user.assignments_needing_submitting(:contexts => contexts, :limit => 100) : []
  hidden_todos = 0
 %>
 

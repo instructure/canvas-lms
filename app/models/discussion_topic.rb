@@ -103,7 +103,7 @@ class DiscussionTopic < ActiveRecord::Base
       topic.title = "#{self.title} - #{group.name}"
       topic.assignment_id = self.assignment_id
       topic.user_id = self.user_id
-      topic.save
+      topic.save if topic.changed?
       topic
     end
   end

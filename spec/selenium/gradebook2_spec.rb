@@ -584,7 +584,7 @@ describe "gradebook2" do
       driver.find_element(:css, '#ui-menu-1-4').click
       curve_form = driver.find_element(:css, '#curve_grade_dialog')
       set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
-      curve_form.submit
+      find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
       keep_trying_until do
         driver.switch_to.alert.should_not be_nil
         driver.switch_to.alert.dismiss

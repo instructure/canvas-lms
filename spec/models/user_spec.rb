@@ -708,6 +708,14 @@ describe User do
       set_up_course_with_users
       @student.messageable_users.map(&:id).should_not include(@deleted_user.id)
       @student.messageable_users(:search => @deleted_user.name).map(&:id).should be_empty
+      @student.messageable_users(:ids => [@deleted_user.id]).map(&:id).should be_empty
+      @student.messageable_users(:skip_visibility_checks => true).map(&:id).should_not include(@deleted_user.id)
+      @student.messageable_users(:skip_visibility_checks => true, :search => @deleted_user.name).map(&:id).should be_empty
+    end
+
+    it "should include deleted iff skip_visibility_checks=true && ids are given" do
+      set_up_course_with_users
+      @student.messageable_users(:skip_visibility_checks => true, :ids => [@deleted_user.id]).map(&:id).should == [@deleted_user.id]
     end
 
     it "should only include users from the specified section" do
