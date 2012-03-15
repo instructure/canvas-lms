@@ -2,11 +2,11 @@
   <div class='event-details-header'>
     <a href="#" class="popover_close x-close-link">×</a>
     <h3 class="details_title title">
-      {{#ifAll can_edit fullDetailsURL}}
+      {{#if showEventLink}}
         <a href="{{fullDetailsURL}}" class="view_event_link">{{title}}</a>
       {{else}}
         {{title}}
-      {{/ifAll}}
+      {{/if}}
     </h3>
   </div>
   <div class="event-details-content">
