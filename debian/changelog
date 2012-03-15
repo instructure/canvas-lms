@@ -1,3 +1,17 @@
+canvas-lms (2012.03.17.12) testing; urgency=low
+
+  * Package ref: 49901ff11fffec682a20e6f6653de5bc030d163b
+  *
+  * [+0289791] easier dialogs for users sharing email address
+  * [+926d43b] don't throw js error on clicking curve grade button
+  * [+5cab452] fix todo bug introduced in 17494bce1a745af20c8ec20
+  * [+359d362] ensure conversations with deleted users load correctly
+  * [+561a2dc] prevent group discussion assignments from spawning jobs recursively
+  * [+09702f1] don't cache tinychat settings on the Tinychat class
+  * [+49901ff] load account javascript ourselves
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 15 Mar 2012 16:12:10 -0600
+
 canvas-lms (2012.03.17.08) testing; urgency=low
 
   * Package ref: e13d25cbbf82c888d141f2de30607b798985426f
