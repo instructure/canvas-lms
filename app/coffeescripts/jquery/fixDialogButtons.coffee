@@ -17,6 +17,6 @@ define ['jquery', 'jqueryui/dialog' ], ($) ->
           return {
             text: $button.text()
             "data-text-while-loading": $button.data("textWhileLoading")
-            click: $button.click
+            click: -> $button.click()
           }
         $dialog.dialog "option", "buttons", buttons

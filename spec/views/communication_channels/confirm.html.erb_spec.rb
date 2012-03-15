@@ -76,7 +76,7 @@ describe "communication_channels/confirm.html.erb" do
       page.css('#register.button').first.should_not be_nil
       merge_button = page.css('#merge.button').first
       merge_button.should_not be_nil
-      merge_button.text.should == 'Use This Account'
+      merge_button.text.should == 'Yes'
       merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
       page.css('#back.button').first.should_not be_nil
     end
@@ -95,7 +95,7 @@ describe "communication_channels/confirm.html.erb" do
       merge_button = page.css('#merge.button').first
       merge_button.should_not be_nil
       merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
-      merge_button.text.should == 'Add Email Address'
+      merge_button.text.should == 'Yes, Add Email Address'
       page.css('#back.button').first.should_not be_nil
     end
 
@@ -135,8 +135,8 @@ describe "communication_channels/confirm.html.erb" do
       registration_form = page.css('#registration_confirmation_form').first
       registration_form.should_not be_nil
       registration_form['style'].should match /display:\s*none/
-      page.css('input[type="radio"][name="pseudonym_select"]').length.should == 5
-      page.css('#register.button').first.should_not be_nil
+      page.css('input[type="radio"][name="pseudonym_select"]').length.should == 6
+      page.css('#register.button').should be_empty
       merge_button = page.css('#merge.button').first
       merge_button.should_not be_nil
       merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
@@ -228,7 +228,7 @@ describe "communication_channels/confirm.html.erb" do
       page.css('#register.button').first.should be_nil
       merge_button = page.css('#merge.button').first
       merge_button.should_not be_nil
-      merge_button.text.should == 'Combine'
+      merge_button.text.should == 'Continue'
       merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :pseudonym_session => {:unique_id => @pseudonym1.unique_id}, :expected_user_id => @pseudonym1.user_id)
     end
   end
