@@ -1813,6 +1813,17 @@ class User < ActiveRecord::Base
     "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{messageable_user_clause})"
   end
 
+  def messageable_enrollment_clause(include_concluded_students=false)
+    <<-SQL
+    (
+      #{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
+      OR
+      #{self.class.reflections[:concluded_enrollments].options[:conditions]}
+      #{include_concluded_students ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
+    )
+    SQL
+  end
+
   def enrollment_visibility
     Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.hour) do
       full_course_ids = []
@@ -1836,7 +1847,7 @@ class User < ActiveRecord::Base
             end
             conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
-        base_conditions = "(" + self.class.reflections[:current_and_invited_enrollments].options[:conditions] + " OR " +  self.class.reflections[:concluded_enrollments].options[:conditions] + ")"
+        base_conditions = messageable_enrollment_clause
         base_conditions << " AND " << messageable_enrollment_user_clause
         user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).count("DISTINCT user_id")
 
@@ -1889,11 +1900,7 @@ class User < ActiveRecord::Base
           elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
             section_id_hash[group.id] = sections
             user_counts[group.id] = group.context.enrollments.scoped(:conditions => [
-              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND (" +
-                self.class.reflections[:current_and_invited_enrollments].options[:conditions] +
-                " OR " +
-                self.class.reflections[:concluded_enrollments].options[:conditions] +
-              ")",
+              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(true)}",
               group.group_memberships.map(&:user_id),
               sections
             ]).size
@@ -1924,10 +1931,12 @@ class User < ActiveRecord::Base
 
     limited_id = {}
     enrollment_type_sql = nil
+    include_concluded_students = true
 
     if options[:context]
       if options[:context].sub(/_all\z/, '') =~ MESSAGEABLE_USER_CONTEXT_REGEX
         type = $1
+        include_concluded_students = false unless type == 'group'
         limited_id[type] = $2.to_i
         enrollment_type = $4
         if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
@@ -1988,9 +1997,7 @@ class User < ActiveRecord::Base
       FROM users, enrollments, courses
       WHERE course_id IN (#{all_course_ids.join(', ')})
         AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
-        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
-          OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
-        )
+        AND #{messageable_enrollment_clause(include_concluded_students)}
         #{enrollment_type_sql}
         #{user_condition_sql}
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
