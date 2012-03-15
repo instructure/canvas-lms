@@ -354,6 +354,9 @@ class WebConference < ActiveRecord::Base
     given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) }
     can :read and can :join
     
+    given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) && long_running? && active? }
+    can :resume
+    
     given { |user, session| (self.is_public rescue false) }
     can :read and can :join
     

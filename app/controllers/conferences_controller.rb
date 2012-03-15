@@ -102,7 +102,7 @@ class ConferencesController < ApplicationController
         redirect_to named_context_url(@context, :context_conferences_url)
         return
       end
-      if @conference.grants_right?(@current_user, session, :initiate) || @conference.active?(true)
+      if @conference.grants_right?(@current_user, session, :initiate) || @conference.grants_right?(@current_user, session, :resume) || @conference.active?(true)
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", 'participate')
