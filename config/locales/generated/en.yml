@@ -4076,17 +4076,17 @@ en:
       page_title: "Try It: Add Students"
       save_and_skip: "Save & Skip the Rest"
       save_next_step_link: "Next Step: Save"
-      teacher_add_student_notice_just_email: "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. Paste in just email addresses (bob@example.com) or names with addresses #(\"Jones, Bob M.\" <bob@example.com>)# separated by commas or on separate lines."
-      teacher_add_student_notice_with_login_handle: "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. You can paste in their %{login_handle_name}, just their email address (bob@example.com), or their name and address #(\"Jones, Bob M.\" <bob@example.com>)#. Multiple users should be separated by commas or be on separate lines."
+      teacher_add_student_notice_just_email: "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. Paste in email addresses (bob@example.edu) or names with addresses #(\"Jones, Bob M.\" <bob@example.edu>)# separated by commas or on separate lines."
+      teacher_add_student_notice_with_login_handle: "*Next, you'll want to add students to your course.* You can add students one by one or as a whole list. You can paste in their %{login_handle_name}, just their email address (bob@example.edu), or their name and address #(\"Jones, Bob M.\" <bob@example.edu>)#. Multiple users should be separated by commas or should be on separate lines."
       teacher_add_student_skip: "If you're not sure who's going to be in your class, you can skip this step and add students (along with TAs and other teachers) anytime after you finish the wizard."
-      teacherless_add_student_notice_just_email: "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies all over again, and we'll also give you a place to share files and collaborate. Just paste in a list of email addresses below to invite others to join."
-      teacherless_add_student_notice_with_login_handle: "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies all over again, and we'll also give you a place to share files and collaborate. Just paste in a list of users below to invite others to join. You can use their email addresses or %{login_handle_name}."
+      teacherless_add_student_notice_just_email: "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies again, and we'll also give you a place to share files and collaborate. Paste in a list of email addresses below to invite others to join."
+      teacherless_add_student_notice_with_login_handle: "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies again, and we'll also give you a place to share files and collaborate. Paste in a list of users below to invite others to join. You can use their email addresses or %{login_handle_name}."
       teacherless_add_student_skip: "You can always skip this step and invite your classmates (or even your teacher) to share this course later on."
     teacherless: 
       get_started: "Click here to get started"
       page_title: "Try It: New Course"
       setup: "Set up a new Course in Canvas"
-      teacherless_explanation: "You can use Canvas to keep track of how you're doing in all your courses, whether they're using Canvas or not. Just tell us how your course's grading policy is set up and then enter your scores manually. You can also invite your classmates to use the course you set up so they can track their grades, too!"
+      teacherless_explanation: "You can use Canvas to keep track of how you're doing in all your courses, whether they're using Canvas or not. Just tell us how your course's grading policy is set up, and then enter your scores manually. You can also invite your classmates to use the course you set up so they can track their grades too!"
       use_canvas_for_grading: "Use Canvas for Grading"
     wizard_secondary_nav: 
       assignments: Assignments
@@ -7344,10 +7344,10 @@ en:
       skip_question_text: "Skip to question text."
       titles: 
         mark_to_revisit: "Mark this question to come back to later"
-        question_correct_comment: "Students will see this comment if they get the question correct"
-        question_incorrect_comment: "Students will see this comment if they get the question wrong"
+        question_correct_comment: "Students will see this comment if they answer the question correctly"
+        question_incorrect_comment: "Students will see this comment if they answer the question incorrectly"
         question_neutral_comment: "Students will see this comment once they've answered the question"
-      unsupported_question_type: "This question was imported from an external source. It was a '%{question_type}' question, which is not supported in this quiz tool."
+      unsupported_question_type: "This question was imported from an external source. The '%{question_type}' question is not supported in this quiz tool."
       you_left_this_blank: "You left this blank"
     enter_answer_variable_above: "[ Enter Answer Variables Above ]"
     equations_help: 
@@ -7372,10 +7372,10 @@ en:
           same question with the same answer. See the "variables" tab for more
           information on variables.
       equation_variables: |-
-          You can also define variables in you question text using brackets 
+          You can also define variables in your question text using brackets 
           ("What is [a] + [b]?").  For every variable, you'll see an "Example Value"
-          based on the variable settings.  This is so you can check your math and
-          make sure your formulas work.
+          based on the variable settings.  This allows you to check the math and
+          make sure the formulas work.
           
           For example, if your question was "What is [a] + 5?" then you'd
           be asked to define the variable "a".  If the example value for "a" 
@@ -9063,12 +9063,12 @@ en:
     user_lists: 
       copy_and_paste_notice_just_email: "Copy and paste a list of email addresses to add users."
       copy_and_paste_notice_with_login_handle: "Copy and paste a list of users. You can use their email address or %{login_handle_name}."
-      example_user_list: "\"Example Student\" <student@example.com> \"Other Student\" <otherstudent@example.com> \"Lastname, Firstname\" <firstlast@example.com> <justAnEmailAddress@example.com>"
+      example_user_list: "\"Example Student\" <student@example.edu> \"Other Student\" <otherstudent@example.edu> \"Lastname, Firstname\" <firstlast@example.edu> <justAnEmailAddress@example.edu>"
       labels: 
         alert: Alert
         notice: Notice
         only_search_existing_users: "only search existing users"
-      no_valid_users: "*Sorry,* it does not seem as if there were any valid email addresses or login IDs typed in, please go back and try again."
+      no_valid_users: "*Sorry,* it does not seem as if there were any valid email addresses or login IDs typed in. Please click \"Go back and edit the list of users\" to try again."
     wiki_image: 
       titles: 
         click_to_embed: "Click to embed %{image}"
