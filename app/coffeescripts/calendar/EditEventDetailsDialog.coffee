@@ -5,12 +5,12 @@ define [
   'compiled/calendar/CommonEvent'
   'compiled/calendar/EditCalendarEventDetails'
   'compiled/calendar/EditAssignmentDetails'
-  'compiled/calendar/EditApptCalendarEventDetails'
+  'compiled/calendar/EditApptCalendarEventDialog'
   'compiled/calendar/EditAppointmentGroupDetails'
   'jst/calendar/editEvent'
   'jquery.instructure_jquery_patches'
   'jqueryui/tabs'
-], ($, I18n, _, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDetails, EditAppointmentGroupDetails, editEventTemplate) ->
+], ($, I18n, _, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDialog, EditAppointmentGroupDetails, editEventTemplate) ->
 
   dialog = $('<div id="edit_event"><div /></div>').appendTo('body').dialog
     autoOpen: false
@@ -69,26 +69,23 @@ define [
       dialog.dialog('close')
 
     show: =>
-      html = editEventTemplate()
-      dialog.children().replaceWith(html)
+      if @event.isAppointmentGroupEvent()
+        new EditApptCalendarEventDialog(@event).show()
+      else
+        html = editEventTemplate()
+        dialog.children().replaceWith(html)
 
-      if @event.isNewEvent() || @event.eventType == 'calendar_event'
-
-        formHolder = dialog.find('#edit_calendar_event_form_holder')
-        ## special case: appointment groups
-        if @event.isAppointmentGroupEvent()
-          @apptGroupEventForm = new EditApptCalendarEventDetails(formHolder, @event, @contextChange, @closeCB)
-          formHolder.data('form-widget', @apptGroupEventForm)
-        else
+        if @event.isNewEvent() || @event.eventType == 'calendar_event'
+          formHolder = dialog.find('#edit_calendar_event_form_holder')
           @calendarEventForm = new EditCalendarEventDetails(formHolder, @event, @contextChange, @closeCB)
           formHolder.data('form-widget', @calendarEventForm)
 
-      if @event.isNewEvent() || @event.eventType == 'assignment'
-        @assignmentDetailsForm = new EditAssignmentDetails($('#edit_assignment_form_holder'), @event, @contextChange, @closeCB)
-        dialog.find("#edit_assignment_form_holder").data('form-widget', @assignmentDetailsForm)
+        if @event.isNewEvent() || @event.eventType == 'assignment'
+          @assignmentDetailsForm = new EditAssignmentDetails($('#edit_assignment_form_holder'), @event, @contextChange, @closeCB)
+          dialog.find("#edit_assignment_form_holder").data('form-widget', @assignmentDetailsForm)
 
-      @setupTabs()
+        @setupTabs()
 
-      # TODO: select the tab that should be active
+        # TODO: select the tab that should be active
 
-      dialog.dialog('open')
+        dialog.dialog('open')
