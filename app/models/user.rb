@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1460,15 +1460,17 @@ class User < ActiveRecord::Base
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil)
     res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
-      send(association).distinct_on(["courses.id"],
-        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-        :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}"
-      )
+      courses = send(association).distinct_on(["courses.id"],
+        :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+        :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+      soft_concluded = Enrollment.find(:all, :conditions => { :id => courses.map{ |course| course.primary_enrollment_id } }).select{ |e| e.completed? }.map{ |e| e.id }
+      courses.reject! { |course| soft_concluded.include?(course.primary_enrollment_id.to_i) }
+      courses
     end.dup
     if association == :current_and_invited_courses
       if enrollment_uuid && pending_course = Course.find(:first,
-          :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-          :joins => :enrollments, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state='invited'", enrollment_uuid])
+        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+        :joins => :enrollments, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state='invited'", enrollment_uuid])
         res << pending_course
         res.uniq!
       end
@@ -2172,7 +2174,7 @@ class User < ActiveRecord::Base
     return @menu_courses if @menu_courses
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid)
     return (@menu_courses = favorites) if favorites.length > 0
-    @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid)[0..11]
+    @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
   end
 
   def user_can_edit_name?

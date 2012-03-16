@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -770,20 +770,10 @@ class Enrollment < ActiveRecord::Base
   end
 
   def effective_start_at
-    [ start_at,
-      course_section && course_section.start_at,
-      course.start_at,
-      course.enrollment_term && course.enrollment_term.start_at,
-      course_section && course_section.created_at,
-      course.created_at
-    ].compact.first
+    self.enrollment_dates.map(&:first).compact.min
   end
 
   def effective_end_at
-    [ end_at,
-      course_section && course_section.end_at,
-      course.conclude_at,
-      course.enrollment_term && course.enrollment_term.end_at
-    ].compact.first
+    self.enrollment_dates.map(&:last).compact.max
   end
 end
