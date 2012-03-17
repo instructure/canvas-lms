@@ -253,14 +253,17 @@ class DiscussionTopic < ActiveRecord::Base
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
 
-    topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
-    topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
-                                                                   :unread_entry_count => self.unread_count(current_user),
-                                                                   :workflow_state => "unread")
-    topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
-    topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
-    topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
-    topic_participant.save
+    topic_participant = nil
+    DiscussionTopic.unique_constraint_retry do
+      topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
+      topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
+                                                                     :unread_entry_count => self.unread_count(current_user),
+                                                                     :workflow_state => "unread")
+      topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
+      topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
+      topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+      topic_participant.save
+    end
     topic_participant
   end
 
