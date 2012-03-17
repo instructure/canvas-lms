@@ -416,11 +416,13 @@ class DiscussionEntry < ActiveRecord::Base
     return nil unless current_user
 
     entry_participant = nil
-    DiscussionEntry.unique_constraint_retry do
-      entry_participant = self.discussion_entry_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
-      entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
-      entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
-      entry_participant.save
+    DiscussionEntry.uncached do
+      DiscussionEntry.unique_constraint_retry do
+        entry_participant = self.discussion_entry_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
+        entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
+        entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
+        entry_participant.save
+      end
     end
     entry_participant
   end
