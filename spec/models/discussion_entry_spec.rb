@@ -323,5 +323,10 @@ describe DiscussionEntry do
       @topic.change_all_read_state("read", @s5)
       @topic.unread_count(@s5).should == 0
     end
+
+    it "should use unique_constaint_retry when updating read state" do
+      DiscussionEntry.expects(:unique_constraint_retry).once
+      @entry.change_read_state("read", @student)
+    end
   end
 end
