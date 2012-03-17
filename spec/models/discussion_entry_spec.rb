@@ -276,6 +276,17 @@ describe DiscussionEntry do
       @topic.unread_count(@student).should == 2
     end
 
+    it "should decrement unread counts on destroy" do
+      @topic.unread_count(@student).should == 1
+      @entry.change_read_state("read", @student)
+      @topic.unread_count(@student).should == 0
+      @entry2 = @topic.discussion_entries.create!(:message => "entry 2", :user => @teacher)
+      @topic.unread_count(@student).should == 1
+      @entry2.destroy
+      @topic.unread_count(@student).should == 0
+      @topic.unread_count(@teacher).should == 0
+    end
+
     it "should allow a complex series of read/unread updates" do
       @s1 = @student
       student_in_course(:active_all => true); @s2 = @student
@@ -312,9 +323,11 @@ describe DiscussionEntry do
       @topic.unread_count(@s2).should == 4
       @topic.read?(@s2).should be_false
       @entry.read?(@s2).should be_false
+      @s1entry.destroy
+      @topic.unread_count(@s2).should == 3
 
       student_in_course(:active_all => true); @s4 = @student
-      @topic.unread_count(@s4).should == 4
+      @topic.unread_count(@s4).should == 3
       @topic.change_all_read_state("unread", @s4)
       @topic.read?(@s4).should be_false
       @entry.read?(@s4).should be_false
