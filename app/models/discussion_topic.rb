@@ -245,7 +245,7 @@ class DiscussionTopic < ActiveRecord::Base
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    topic_participant = discussion_topic_participants.find_by_user_id(uid)
+    topic_participant = discussion_topic_participants.find_by_user_id(uid, :lock => true)
     topic_participant.try(:unread_entry_count) || self.default_unread_count
   end
 
@@ -254,15 +254,17 @@ class DiscussionTopic < ActiveRecord::Base
     return nil unless current_user
 
     topic_participant = nil
-    DiscussionTopic.unique_constraint_retry do
-      topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
-      topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
-                                                                     :unread_entry_count => self.unread_count(current_user),
-                                                                     :workflow_state => "unread")
-      topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
-      topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
-      topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
-      topic_participant.save
+    DiscussionTopic.uncached do
+      DiscussionTopic.unique_constraint_retry do
+        topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id], :lock => true)
+        topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
+                                                                       :unread_entry_count => self.unread_count(current_user),
+                                                                       :workflow_state => "unread")
+        topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
+        topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
+        topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+        topic_participant.save
+      end
     end
     topic_participant
   end
