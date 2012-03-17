@@ -615,5 +615,12 @@ describe DiscussionTopic do
       DiscussionTopic.expects(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
     end
+
+    it "should use active entries as deafult unread count" do
+      @entry1 = @topic.discussion_entries.create!(:message => "HI 1", :user => @teacher)
+      @entry2 = @topic.discussion_entries.create!(:message => "HI 2", :user => @teacher)
+      @entry2.destroy
+      @topic.unread_count(@student).should == 1
+    end
   end
 end
