@@ -55,7 +55,7 @@ define([
       var $link = $(this);
       $link.parents("li").confirmDelete({
         url: $link.attr('rel'),
-        message: I18n.t('confirms.delete_alert', "Are you sure you want to delete this alert?"),
+        message: I18n.t('confirms.delete_announcement', "Are you sure you want to delete this announcement?"),
         success: function() {
           $(this).slideUp(function() {
             $(this).remove();

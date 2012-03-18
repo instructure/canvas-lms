@@ -393,6 +393,17 @@ describe Attachment do
       MediaObject.expects(:send_later_enqueue_args).times(0)
       @attachment.save!
     end
+
+    it "should create a media object *after* a direct-to-s3 upload" do
+      MediaObject.expects(:send_later_enqueue_args).never
+      @attachment.workflow_state = 'unattached'
+      @attachment.file_state = 'deleted'
+      @attachment.save!
+      MediaObject.expects(:send_later_enqueue_args).once
+      @attachment.workflow_state = nil
+      @attachment.file_state = 'available'
+      @attachment.save!
+    end
   end
 
   context "destroy" do
@@ -665,6 +676,49 @@ describe Attachment do
     it "should return account id for localstorage namespaces" do
       @a.namespace = "_localstorage_/#{@account.file_namespace}"
       @a.root_account_id.should == @account.id
+    end
+  end
+
+  context "encoding detection" do
+    it "should include the charset when appropriate" do
+      a = Attachment.new
+      a.content_type = 'text/html'
+      a.content_type_with_encoding.should == 'text/html'
+      a.encoding = ''
+      a.content_type_with_encoding.should == 'text/html'
+      a.encoding = 'UTF-8'
+      a.content_type_with_encoding.should == 'text/html; charset=UTF-8'
+      a.encoding = 'mycustomencoding'
+      a.content_type_with_encoding.should == 'text/html; charset=mycustomencoding'
+    end
+
+    it "should schedule encoding detection when appropriate" do
+      prior_count = Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'})
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'image/png'), :content_type => 'image/png')
+      Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'}).should == prior_count
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+      Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'}).should == prior_count + 1
+      prior_count += 1
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html', :encoding => 'UTF-8')
+      Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'}).should == prior_count
+    end
+
+    it "should properly infer encoding" do
+      attachment_model(:uploaded_data => stub_png_data('blank.gif', "GIF89a\001\000\001\000\200\377\000\377\377\377\000\000\000,\000\000\000\000\001\000\001\000\000\002\002D\001\000;"))
+      @attachment.encoding.should be_nil
+      @attachment.infer_encoding
+      # can't figure out GIF encoding
+      @attachment.encoding.should == ''
+
+      attachment_model(:uploaded_data => stub_png_data('blank.txt', "Hello World!"))
+      @attachment.encoding.should be_nil
+      @attachment.infer_encoding
+      @attachment.encoding.should == 'UTF-8'
+
+      attachment_model(:uploaded_data => stub_png_data('blank.txt', "\xc2\xa9 2011"))
+      @attachment.encoding.should be_nil
+      @attachment.infer_encoding
+      @attachment.encoding.should == 'UTF-8'
     end
   end
 end

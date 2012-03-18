@@ -409,6 +409,20 @@ class ActiveRecord::Base
       end
     end
   end
+
+  # note this does a raw connection.select_values, so it doesn't work with scopes
+  def self.find_ids_in_batches(options = {})
+    batch_size = options.delete(:batch_size) || 1000
+    ids = connection.select_values("select #{primary_key} from #{table_name} order by #{primary_key} limit #{batch_size.to_i}")
+    ids = ids.map(&:to_i) unless options[:no_integer_cast]
+    while ids.present?
+      yield ids
+      break if ids.size < batch_size
+      last_value = ids.last
+      ids = connection.select_values(sanitize_sql_array(["select #{primary_key} from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}", last_value]))
+      ids = ids.map(&:to_i) unless options[:no_integer_cast]
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do

@@ -127,7 +127,7 @@ Publishing will send out email invitations to all the course users so they can s
         <div class="details" style="display: none;">
           <% if @context.created? %>
             <% if @context_just_saved %>
-              <%= mt 'details.created.saved', %{Done and done!  Your course, %{course} is now officially created.  It's only visible to you until is is published -- but before you jump the gun, you'll want to run through the list to the left to get a feel for how Canvas works and to make sure you really are ready to teach.
+              <%= mt 'details.created.saved', %{Done and done!  Your course, %{course} is now officially created.  It's only visible to you until it is published -- but before you jump the gun, you'll want to run through the list to the left to get a feel for how Canvas works and to make sure you really are ready to teach.
 
 If you need to leave and come back before then, just save *this link* to get back here later.
 
@@ -149,7 +149,7 @@ Please **log in** or ***register*** to claim this course.}, :wrapper => {
             <% end %>
           <% elsif @context.claimed? %>
             <% if @context_just_saved %>
-              <%= mt 'details.claimed.saved', %{Done and done!  Your course, %{course} is now officially created. It's only visible to you until is is published -- but before you jump the gun, you'll want to run through the list to the left to get a feel for how Canvas works and to make sure you really are ready to teach.}, :course => @context.name %>
+              <%= mt 'details.claimed.saved', %{Done and done!  Your course, %{course} is now officially created. It's only visible to you until it is published -- but before you jump the gun, you'll want to run through the list to the left to get a feel for how Canvas works and to make sure you really are ready to teach.}, :course => @context.name %>
               </p>
             <% else %>
               <%= mt 'details.claimed.not_saved', %{Great, so you've got a course...  Now what?  Well, before you go publishing it to the world, you may want to check and make sure you've got the basics laid out.  Work through the list on the left to ensure that your course is ready to use.

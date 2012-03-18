@@ -43,8 +43,7 @@
         </div>
       </div>
       <div class="displaying custom_rating_comments not_assessing" style="font-size: 0.8em; padding: 0px 5px;">
-        <%= t 'description.custom_comments_area', "This area will be used by the assessor to leave
-        comments related to this criterion." %>
+        <%= assessment_rating && (assessment_rating[:comments_html] ? assessment_rating[:comments_html].html_safe : assessment_rating[:comments]) %>
       </div>
     <% else %>
       <table class="ratings" style="<%= hidden if rubric && rubric.free_form_criterion_comments %>"><tr>

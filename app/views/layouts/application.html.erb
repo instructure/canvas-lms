@@ -46,7 +46,7 @@
   <% if @eportfolio_view === true %>
     <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
   <% end %>
-  <%= include_stylesheets(*jammit_css_bundles) unless jammit_css_bundles.empty?  %>
+  <%= include_css_bundles %>
   <!--[if lte IE 8]> <%= javascript_include_tag "vendor/html5.js" %> <![endif]-->
   <%= yield :stylesheets %>
   <%= stylesheet_link_tag(Account.site_admin.settings[:global_stylesheet], :media => 'all') if @domain_root_account != Account.site_admin && Account.site_admin.settings[:global_stylesheet].present? %>
@@ -275,6 +275,7 @@
 <%= include_js_bundles %>
 <%= include_account_js %>
 <%= render_js_blocks %>
+<%= render_hidden_dialogs %>
 
 <script>
 // Determines if the scripts are loaded.

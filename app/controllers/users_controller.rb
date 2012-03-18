@@ -197,17 +197,16 @@ class UsersController < ApplicationController
 
   def masquerade
     @user = User.find(:first, :conditions => {:id => params[:user_id]})
-    if (authorized_action(@user, @real_current_user || @current_user, :become_user))
-      if request.post?
-        if @user == @real_current_user
-          session[:become_user_id] = nil
-        else
-          session[:become_user_id] = params[:user_id]
-        end
-        return_url = session[:masquerade_return_to]
-        session[:masquerade_return_to] = nil
-        return return_to(return_url, request.referer || dashboard_url)
+    return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
+    if request.post?
+      if @user == @real_current_user
+        session[:become_user_id] = nil
+      else
+        session[:become_user_id] = params[:user_id]
       end
+      return_url = session[:masquerade_return_to]
+      session[:masquerade_return_to] = nil
+      return return_to(return_url, request.referer || dashboard_url)
     end
   end
 
@@ -226,7 +225,6 @@ class UsersController < ApplicationController
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
     @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
-    @is_default_account = @current_user.pseudonyms.active.map(&:account_id).include?(Account.default.id)
   end
 
   include Api::V1::StreamItem
@@ -333,18 +331,22 @@ class UsersController < ApplicationController
 
   def manageable_courses
     get_context
-    if authorized_action(@context, @current_user, :manage)
-      @courses = []
-      @query = (params[:course] && params[:course][:name]) || params[:term]
-      @courses = @context.manageable_courses_name_like(@query) if @context && @query
-      respond_to do |format|
-        format.json  {
-          cancel_cache_buster
-          expires_in 30.minutes
-          render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
-        }
-      end
-    end
+    return unless authorized_action(@context, @current_user, :manage)
+
+    # include concluded enrollments as well as active ones if requested
+    include_concluded = params[:include].try(:include?, 'concluded')
+    @query   = params[:course].try(:[], :name) || params[:term]
+    @courses = @query.present? ?
+      @context.manageable_courses_name_like(@query, include_concluded) :
+      @context.manageable_courses(include_concluded).limit(500)
+
+    cancel_cache_buster
+    expires_in 30.minutes
+    render :json => @courses.map { |c|
+      { :label => c.name, :id => c.id, :term => c.enrollment_term.name,
+        :enrollment_start => c.enrollment_term.start_at,
+        :account_name => c.enrollment_term.root_account.name, :account_id => c.enrollment_term.root_account.id }
+    }.to_json
   end
 
   include Api::V1::TodoItem
@@ -876,7 +878,10 @@ class UsersController < ApplicationController
         student = User.find(params[:student_id])
         enrollments = student.student_enrollments.active.all(:include => :course)
         enrollments.each do |enrollment|
-          if enrollment.course.user_is_teacher?(@teacher) && enrollment.course.enrollments_visible_to(@teacher).find_by_id(enrollment.id) && enrollment.course.grants_right?(@current_user, :read_reports)
+          should_include = enrollment.course.user_has_been_teacher?(@teacher) && 
+                           enrollment.course.enrollments_visible_to(@teacher, true).find_by_id(enrollment.id) && 
+                           enrollment.course.grants_right?(@current_user, :read_reports)
+          if should_include
             Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
           end
@@ -889,16 +894,36 @@ class UsersController < ApplicationController
 
       else # implied params[:course_id]
         course = Course.find(params[:course_id])
-        if !course.user_is_teacher?(@teacher)
+        if !course.user_has_been_teacher?(@teacher)
           flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
           Enrollment.recompute_final_score_if_stale(course)
-          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher))
+          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher, true))
         end
       end
 
     end
+  end
+
+  def avatar_image_url
+    cancel_cache_buster
+    # TODO: remove support for specifying user ids by id, require using
+    # the encrypted version. We can't do it right away because there are
+    # a bunch of places that will have cached fragments using the old
+    # style.
+    user_id = params[:user_id].to_i
+    if params[:user_id].present? && params[:user_id].match(/-/)
+      user_id = User.user_id_from_avatar_key(params[:user_id])
+    end
+    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id)) do
+      user = User.find_by_id(user_id) if user_id.present?
+      if user && service_enabled?(:avatars)
+        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback], request)
+      end
+      url ||= params[:fallback] || '/images/no_pic.gif'
+    end
+    redirect_to url
   end
 
   protected
@@ -951,5 +976,6 @@ class UsersController < ApplicationController
 
     data.values.sort_by { |e| e[:enrollment].user.sortable_name.downcase }
   end
+  
 
 end

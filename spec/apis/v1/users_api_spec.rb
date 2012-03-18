@@ -47,7 +47,7 @@ describe Api::V1::User do
       @test_api.services_enabled = [:avatars]
       @test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url").should be_false
       @test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).should encompass({
-        "avatar_url" => "avatar_image_url(#{@student.id})"
+        "avatar_url" => "avatar_image_url(#{User.avatar_key(@student.id)})"
       })
     end
 
@@ -196,7 +196,7 @@ describe "Users API", :type => :integration do
       'sis_user_id' => 'sis-user-id',
       'sis_login_id' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{@student.id}",
+      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}",
     }
   end
 
@@ -215,7 +215,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'new guy',
       'login_id' => nil,
       'primary_email' => nil,
-      'avatar_url' => "http://www.example.com/images/users/#{new_user.id}",
+      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(new_user.id)}",
     }
 
     get("/courses/#{@course.id}/students")
@@ -231,7 +231,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'User',
       'primary_email' => 'nobody@example.com',
       'login_id' => 'nobody@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{@admin.id}",
+      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@admin.id)}",
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
     }
   end
@@ -247,7 +247,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'Student',
       'primary_email' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{@student.id}",
+      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}",
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
     }
   end

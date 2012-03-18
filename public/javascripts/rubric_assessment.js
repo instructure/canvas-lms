@@ -18,13 +18,14 @@
 define([
   'i18n!rubric_assessment',
   'jquery' /* $ */,
+  'str/htmlEscape',
   'jquery.instructure_forms' /* fillFormData */,
   'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
   'jquery.instructure_misc_helpers' /* truncateText */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $) {
+], function(I18n, $, htmlEscape) {
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 window.rubricAssessment = {
@@ -243,6 +244,11 @@ window.rubricAssessment = {
       for(var idx in assessment.data) {
         var rating = assessment.data[idx];
         var comments = rating.comments_enabled ? rating.comments : rating.description;
+        if (rating.comments_enabled && rating.comments_html) {
+          var comments_html = rating.comments_html;
+        } else {
+          var comments_html = htmlEscape(comments);
+        }
         var $criterion = $rubric.find("#criterion_" + rating.criterion_id);
         if(!rating.id) {
           $criterion.find(".rating").each(function() {
@@ -256,7 +262,7 @@ window.rubricAssessment = {
           .find(".criterion_description").addClass('original_completed').end()
           .find("#rating_" + rating.id).addClass('original_selected').addClass('selected').end()
           .find(".custom_rating_field").val(comments).end()
-          .find(".custom_rating_comments").text(comments).end()
+          .find(".custom_rating_comments").html(comments_html).end()
           .find(".criterion_points").val(rating.points).change().end()
           .find(".criterion_rating_points_holder").showIf(rating.points || rating.points === 0).end()
           .find(".criterion_rating_points").text(rating.points).end()

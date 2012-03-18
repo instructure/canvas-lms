@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-require([
+define([
   'i18n!quizzes',
   'jquery' /* $ */,
   'calcCmd',
   'str/htmlEscape',
   'str/pluralize',
   'wikiSidebar',
+  'compiled/editor/MultipleChoiceToggle',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -39,7 +40,7 @@ require([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar) {
+], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar, MultipleChoiceToggle) {
 
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
@@ -58,7 +59,7 @@ require([
 
     // Determines whether or to show the "show question details" link.
     checkShowDetails: function() {
-      var hasQuestions = this.$questions.find('fieldset:not(.essay_question, .text_only_question)').length;
+      var hasQuestions = this.$questions.find('div.display_question:not(.essay_question, .text_only_question)').length;
       this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200);
     },
 
@@ -179,7 +180,21 @@ require([
       if (question_type == "matching_question") {
         $answer.removeClass('correct_answer');
       }
+
+      // won't exist if they've never clicked the edit button
+      var htmlToggle = $answer.find('.edit_html').data('editorToggle')
+
+      var supportsHTMLAnswers = question_type === 'multiple_choice_question' || question_type === 'multiple_answers_question'
+      if (htmlToggle && supportsHTMLAnswers) {
+        // some answer types share the same text fields, so we show it
+        htmlToggle.showAnswerText();
+      } else if (htmlToggle) {
+        // call display so the editor gets closed and we display the HTML next
+        // time we're editing an answer type that supports HTML answers
+        htmlToggle.display();
+      }
     },
+
     questionContentCounter: 0,
 
     showFormQuestion: function($form) {
@@ -778,6 +793,7 @@ require([
     var $answer = $("#form_answer_template").clone(true).attr('id', '');
     $answer.find(".answer_type").hide().filter("." + answer.answer_type).show();
     answer.answer_weight = parseFloat(answer.answer_weight);
+
     if (isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
     quiz.updateFormAnswer($answer, answer, true);
     $answer.find('input[placeholder]').placeholder();
@@ -1898,7 +1914,7 @@ require([
 
     $("#question_form_template").submit(function(event) {
       event.preventDefault();
-      event.stopPropagation();    
+      event.stopPropagation();
       var $displayQuestion = $(this).prev();
       var $form = $(this);
       var $answers = $form.find(".answer");
@@ -1908,6 +1924,10 @@ require([
         values: ['question_type', 'question_name', 'question_points', 'correct_comments', 'incorrect_comments', 'neutral_comments',
           'question_text', 'answer_selection_type', 'text_after_answers', 'matching_answer_incorrect_matches']
       });
+
+      // save any open html answers
+      $form.find('.edit_html_done').trigger('click');
+
       questionData.assessment_question_bank_id = $(".question_bank_id").text() || ""
       var error_text = null;
       if (questionData.question_type == 'calculated_question') {
@@ -1921,7 +1941,9 @@ require([
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
         }
       }
-      if (error_text) {
+
+      var isNotSurvey = !$('#quiz_assignment_id').val().match(/survey/i);
+      if (isNotSurvey && error_text) {
         $form.find(".answers_header").errorBox(error_text, true);
         return;
       }
@@ -1948,6 +1970,7 @@ require([
         var data = $answer.getFormData();
         data.blank_id = $answer.find(".blank_id").text();
         data.answer_text = $answer.find("input[name='answer_text']:visible").val();
+        data.answer_html = $answer.find(".answer_html").html();
         if (questionData.question_type == "true_false_question") {
           data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
         }
@@ -2370,9 +2393,7 @@ require([
       wikiSidebar.attachToEditor($("#quiz_description"));
     }
 
-    setTimeout(function() {
-      $("#quiz_description").editorBox();
-    }, 2000);
+    $("#quiz_description").editorBox();
 
     $(".toggle_description_views_link").click(function(event) {
       event.preventDefault();
@@ -2756,5 +2777,20 @@ require([
       $question.triggerHandler('settings_change', false);
     }).change();
   }
-  
+
+  // attach HTML answers but only when they click the button
+  $('#questions').delegate('.edit_html', 'click', function(event) {
+    event.preventDefault();
+    var $this = $(this);
+    var toggler = $this.data('editorToggle');
+
+    // create toggler instance on the first click
+    if (!toggler) {
+      toggler = new MultipleChoiceToggle($this);
+      $this.data('editorToggle', toggler);
+    }
+
+    toggler.toggle();
+  });
+
 });

@@ -35,8 +35,9 @@ class GradeCalculator
   
   # recomputes the scores and saves them to each user's Enrollment
   def recompute_and_save_scores
+    all_submissions = @course.submissions.for_user(@user_ids).to_a
     @user_ids.each do |user_id|
-      submissions = Submission.for_user(user_id)
+      submissions = all_submissions.select { |submission| submission.user_id == user_id }
       calculate_current_score(user_id, submissions)
       calculate_final_score(user_id, submissions)
     end

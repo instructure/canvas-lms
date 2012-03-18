@@ -128,8 +128,9 @@
   require([
     'jquery' /* $ */,
     'jquery.instructure_misc_plugins' /* fragmentChange */,
-    'fragmentChangejquery.templateData' /* getTemplateData */,
-    'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+    'jquery.templateData' /* getTemplateData */,
+    'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+    'compiled/behaviors/quiz_selectmenu'
   ], function($) {
 
   var data = $("#submission_details").getTemplateData({textValues: ['version_number', 'user_id']});

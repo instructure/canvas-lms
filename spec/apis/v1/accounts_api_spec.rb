@@ -39,8 +39,7 @@ describe "Accounts API", :type => :integration do
         'id' => @a1.id,
         'name' => 'root',
         'root_account_id' => nil,
-        'parent_account_id' => nil,
-        'sis_account_id' => nil,
+        'parent_account_id' => nil
       },
       {
         'id' => @a2.id,
@@ -61,8 +60,7 @@ describe "Accounts API", :type => :integration do
         'id' => @a1.id,
         'name' => 'root',
         'root_account_id' => nil,
-        'parent_account_id' => nil,
-        'sis_account_id' => nil,
+        'parent_account_id' => nil
       }
   end
 

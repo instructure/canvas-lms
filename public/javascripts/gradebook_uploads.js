@@ -30,7 +30,6 @@ define([
   var GradebookUploader = {
     init:function(){
       var gradebookGrid,
-          mergedGradebook = $.extend(true, {}, originalGradebook), // originalGradebook is set in the view
           $gradebook_grid = $("#gradebook_grid"),
           gridData = {
             columns: [
@@ -52,133 +51,60 @@ define([
             },
             data: []
           };
+      delete uploadedGradebook.missing_objects;
+      delete uploadedGradebook.original_submissions;
 
-      $.each(mergedGradebook.assignments, function(){
-        gridData.columns.push({
+      $.each(uploadedGradebook.assignments, function(){
+        var col = {
           id: this.id,
           name: htmlEscape(this.title),
           field: this.id,
           width:200,
-          editor: NullGradeEditor,
+          editor: GradeCellEditor,
           formatter: simpleGradeCellFormatter,
-          _original: this
-        });
-      });
-
-      $.each(mergedGradebook.students, function(){
-        var row = {
-          "student"   : this,
-          "id"        : this.id,
-          "_original" : this
+          active: true,
+          original_id: this.original_id
         };
-        $.each(this.submissions, function(){
-          row[this.assignment_id] = this;
-          row[this.assignment_id]._original = $.extend({}, this);
-        });
-        gridData.data.push(row);
-      });
-
-      $.each(uploadedGradebook.assignments, function(){
-        var col,
-            assignment = this;
+        gridData.columns.push(col);
         if (this.original_id) {
-          col = _.detect(gridData.columns, function(column){
-            return (column._original && column._original.id == assignment.original_id);
-          });
-          col.cssClass = "active changed";
+          col.cssClass = "active changed"
+        } else {
+          col.cssClass = "active new"
         }
-        else {
-          col = {
-            id: assignment.id,
-            name: htmlEscape(assignment.title),
-            field: assignment.id,
-            formatter: simpleGradeCellFormatter,
-            cssClass: "active new"
-          };
-          gridData.columns.push(col);
-        }
-        col.editor = GradeCellEditor;
-        col.active = true;
-        col._uploaded = assignment;
         col.setValueHandler = function(value, assignment, student){
           if (student[assignment.id]) {
-            student[assignment.id].grade = student[assignment.id]._uploaded.grade =  value;
+            student[assignment.id].grade = value;
             //there was already an uploaded submission for this assignment, update it
-          }
-          else {
-            //they did not upload a score for this assignment.  create a submission and link it.
+          } else {
+            //they did not upload a score for this assignment. create a submission and link it.
             var submission = {
               grade: value,
               assignment_id: assignment.id
             };
-            submission._uploaded = submission;
-            var arrayLength = student._uploaded.submissions.push(submission);
-            student[assignment.id] = student._uploaded.submissions[arrayLength - 1];
+            var arrayLength = student.submissions.push(submission);
+            student[assignment.id] = student.submissions[arrayLength - 1];
           }
         };
-
       });
 
       $.each(uploadedGradebook.students, function(){
-        var row,
-            student = this;
-        if (student.original_id) {
-          row = _.detect(gridData.data, function(row){
-            return (row._original && row._original.id == student.original_id);
-          });
-        }
-        else {
-          row = {
-            id: student.id,
-            student: student
-          };
-          gridData.data.push(row);
-        }
-        $.each(student.submissions, function(){
-          // when we get to here, if the student didnt have a submission for this assignment in the originalGradebook, it wont have anything in row[this.assignment_id]
-          // so we check if row[this.assignment_id] is there, and if it is, extend it with this submission (so it gets a new grade).
-          row[this.assignment_id] = row[this.assignment_id] ? $.extend(row[this.assignment_id], this) : this;
-          if(!row[this.assignment_id]._original && this.grade) {
-            row[this.assignment_id]._original = {score: null};
-          }
-          row[this.assignment_id]._uploaded = this;
+        var row = {
+          student   : this,
+          id        : this.id
+        };
+        $.each(this.submissions, function(){
+          row[this.assignment_id] = this;
         });
+        gridData.data.push(row);
         row.active = true;
-        row._uploaded = student;
-      });
-      // only show the columns where there were submissions that have grades that have changed.
-      var oldGridDataLength = gridData.columns.length;
-      gridData.columns = _.select(gridData.columns, function(col){
-        return col.id === "student" || _.detect(gridData.data, function(row){
-          return row[col.id] &&
-                 row[col.id]._original &&
-                 row[col.id]._uploaded &&
-                 row[col.id]._original.score != row[col.id]._uploaded.grade;
-        });
       });
 
       // if there are still assignments with changes detected.
       if (gridData.columns.length > 1) {
-        if (gridData.columns.length < oldGridDataLength) {
+        if (uploadedGradebook.unchanged_assignments) {
           $("#assignments_without_changes_alert").show();
         }
         $("#gradebook_grid_form").submit(function(e){
-          //we use this function to get rid of the infinate nesting like
-          //uploadedGradebook.students[0]._original._original._original etc...
-          //so that when we convert it to json we dont get an infinate loop.
-          var flattenRecursiveObjects = function(i,o){
-            $.each(["_original", "_uploaded"], function(i, j){
-              if(o[j]){
-                var flattened = $.extend({}, o[j]);
-                delete o[j];
-                delete flattened[j];
-                o[j] = flattened;
-              }
-            });
-          };
-          $.each(uploadedGradebook.students, function(){
-            $.each(this.submissions, flattenRecursiveObjects);
-          });
           $(this).find("input[name='json_data_to_submit']").val(JSON.stringify(uploadedGradebook));
         }).show();
 
@@ -196,10 +122,6 @@ define([
     handleThingsNeedingToBeResolved: function(){
       var needingReview = {},
           possibilitiesToMergeWith = {};
-
-      // do this because I had to use the active_assignments has many relationship because we dont want to see deleted assignments.
-      // but everthing else here expects there to be an originalGradebook.assignments array.
-      originalGradebook.assignments = originalGradebook.active_assignments;
 
       // first, figure out if there is anything that needs to be resolved
       $.each(["student", "assignment"], function(i, thing){
@@ -228,13 +150,7 @@ define([
             }
           });
 
-          possibilitiesToMergeWith[thing] = _.reject(originalGradebook[thing+"s"], function(thng){
-            return _.detect(uploadedGradebook[thing+"s"], function(newThng){
-              return newThng.original_id == thng.id;
-            });
-          });
-
-          $.each(possibilitiesToMergeWith[thing], function() {
+          $.each(uploadedGradebook.missing_objects[thing + 's'], function() {
             $('<option value="' + this.id + '" >' + htmlEscape(this.name || this.title) + '</option>').appendTo($select);
           });
 
@@ -299,11 +215,59 @@ define([
               break;
             default:
               //merge
-              _.detect(uploadedGradebook[thing+"s"], function(thng){
+              var obj = _.detect(uploadedGradebook[thing+"s"], function(thng){
                 return id == thng.id;
-              }).original_id = val;
+              });
+              obj.id = obj.original_id = val;
+              if (thing === 'assignment') {
+                // find the original grade for this assignment for each student
+                $.each(uploadedGradebook['students'], function() {
+                  var student = this;
+                  var submission = _.detect(student.submissions, function(thng) {
+                    return thng.assignment_id == id;
+                  });
+                  submission.assignment_id = val;
+                  var original_submission = _.detect(uploadedGradebook.original_submissions, function(sub) {
+                    return sub.user_id == student.id && sub.assignment_id == val;
+                  });
+                  if (original_submission) {
+                    submission.original_grade = original_submission.score;
+                  }
+                });
+              } else if (thing === 'student') {
+                // find the original grade for each assignment for this student
+                $.each(obj.submissions, function() {
+                  var submission = this;
+                  var original_submission = _.detect(uploadedGradebook.original_submissions, function(sub) {
+                    return sub.user_id == obj.id && sub.assignment_id == submission.assignment_id;
+                  });
+                  if (original_submission) {
+                    submission.original_grade = original_submission.score;
+                  }
+                });
+              }
             }
           });
+
+          // remove assignments that have no changes
+          var indexes_to_delete = [];
+          $.each(uploadedGradebook.assignments, function(index){
+            if(uploadedGradebook.assignments[index].original_id && _.all(uploadedGradebook.students, function(student){
+              var submission = student.submissions[index];
+              return submission.original_grade == submission.grade || (!submission.original_grade && !submission.grade);
+            })) {
+              indexes_to_delete.push(index);
+            }
+          });
+          _.each(indexes_to_delete.reverse(), function(index) {
+            uploadedGradebook.assignments.splice(index, 1);
+            $.each(uploadedGradebook.students, function() {
+              this.submissions.splice(index, 1);
+            });
+          });
+          if (indexes_to_delete.length != 0) {
+            uploadedGradebook.unchanged_assignments = true;
+          }
 
           $(this).hide();
           GradebookUploader.init();

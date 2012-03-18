@@ -14,9 +14,12 @@ class Handlebars
     #   root_path (string) - The root directory to find templates to compile
     #   compiled_path (string) - The destination directory in which to save the
     #     compiled templates.
-    def compile(root_path, compiled_path)
+    #   plugin (string) - Optional plugin to which the files belong. Will be
+    #     used in scoping the generated module names. If absent, but a file is
+    #     visibly under a plugin, the plugin for that file will be inferred.
+    def compile(root_path, compiled_path, plugin=nil)
       files = Dir["#{root_path}/**/**.handlebars"]
-      files.each { |file| compile_file file, root_path, compiled_path }
+      files.each { |file| compile_file file, root_path, compiled_path, plugin }
     end
 
     # Compiles a single file into a destination directory.
@@ -25,13 +28,15 @@ class Handlebars
     #   file (string) - The file to compile.
     #   root_path - See `compile`
     #   compiled_path - See `compile`
-    def compile_file(file, root_path, compiled_path)
+    #   plugin - See `compile`
+    def compile_file(file, root_path, compiled_path, plugin=nil)
       require 'execjs'
       id       = file.gsub(root_path + '/', '').gsub(/.handlebars$/, '')
       path     = "#{compiled_path}/#{id}.js"
       dir      = File.dirname(path)
       source   = File.read(file)
-      js       = compile_template(source, id, compiled_path =~ /vendor\/plugins\/([^\/]*)\// ? $1 : nil)
+      plugin ||= compiled_path =~ /vendor\/plugins\/([^\/]*)\// ? $1 : nil
+      js       = compile_template(source, id, plugin)
       FileUtils.mkdir_p(dir) unless File.exists?(dir)
       File.open(path, 'w') { |file| file.write(js) }
     end

@@ -57,12 +57,12 @@ class RoleOverride < ActiveRecord::Base
     KNOWN_ROLE_TYPES
   end
 
+  # immediately register stock canvas-lms permissions
   # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
   # for legacy reasons
   # NOTE: if you add a permission, please also update the API documentation for
   # RoleOverridesController#add_role
-  PERMISSIONS =
-    {
+  Permissions.register({
       :manage_wiki => {
         :label => lambda { t('permissions.manage_wiki', "Manage wiki (add / edit / delete pages)") },
         :available_to => [
@@ -519,6 +519,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :read_sis => {
+        :label => lambda { t('permission.read_sis', "Read SIS data") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin TeacherEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment StudentEnrollment)
+      },
       :read_course_list => {
         :label => lambda { t('permissions.read_course_list', "View the list of courses") },
         :account_only => true,
@@ -547,7 +553,6 @@ class RoleOverride < ActiveRecord::Base
       },
       :read_course_content => {
         :label => lambda { t('permissions.read_course_content', "View course content") },
-        :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
@@ -596,7 +601,7 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
       }
-    }.freeze
+    })
 
   RESERVED_ROLES =
     [
@@ -606,14 +611,14 @@ class RoleOverride < ActiveRecord::Base
     ].freeze
 
   def self.permissions
-    PERMISSIONS
+    Permissions.retrieve
   end
 
   def self.manageable_permissions(context)
     permissions = self.permissions.dup
     permissions.reject!{ |k, p| p[:account_only] == :site_admin } unless context.site_admin?
     permissions.reject!{ |k, p| p[:account_only] == :root } unless context.root_account?
-    permissions.keys
+    permissions
   end
 
   def self.css_class_for(context, permission, enrollment_type)

@@ -326,8 +326,11 @@ class Enrollment < ActiveRecord::Base
   end
 
   TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
-  TYPE_RANK_SQL = rank_sql(TYPE_RANK, 'enrollments.type')
   TYPE_RANK_HASH = rank_hash(TYPE_RANK)
+  def self.type_rank_sql
+    # don't call rank_sql during class load
+    @type_rank_sql ||= rank_sql(TYPE_RANK, 'enrollments.type')
+  end
 
   def rank_sortable(student_first=false)
     type = self.class.to_s
@@ -336,8 +339,11 @@ class Enrollment < ActiveRecord::Base
   end
 
   STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
-  STATE_RANK_SQL = rank_sql(STATE_RANK, 'enrollments.workflow_state')
   STATE_RANK_HASH = rank_hash(STATE_RANK)
+  def self.state_rank_sql
+    # don't call rank_sql during class load
+    @state_rank_sql ||= rank_sql(STATE_RANK, 'enrollments.workflow_state')
+  end
 
   def state_sortable
     STATE_RANK_HASH[state.to_s]
@@ -361,7 +367,7 @@ class Enrollment < ActiveRecord::Base
 
   workflow do
     state :invited do
-      event :reject, :transitions_to => :rejected
+      event :reject, :transitions_to => :rejected do self.user.touch; end
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
     end
@@ -371,7 +377,7 @@ class Enrollment < ActiveRecord::Base
     end
 
     state :active do
-      event :reject, :transitions_to => :rejected
+      event :reject, :transitions_to => :rejected do self.user.touch; end
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
     end
@@ -593,7 +599,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.recompute_final_score_if_stale(course, user=nil)
-    Rails.cache.fetch(['recompute_final_scores', course, user].cache_key, :expires_in => Setting.get_cached('recompute_grades_window', 600).to_i) do
+    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get_cached('recompute_grades_window', 600).to_i.seconds) do
       recompute_final_score user ? user.id : course.student_enrollments.map(&:user_id), course.id
       yield if block_given?
       true
@@ -695,7 +701,9 @@ class Enrollment < ActiveRecord::Base
   named_scope :for_email, lambda { |email|
     {
       :joins => { :user => :communication_channels },
-      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase]
+      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase],
+      :select => 'enrollments.*',
+      :readonly => false
     }
   }
   def self.cached_temporary_invitations(email)
@@ -782,5 +790,23 @@ class Enrollment < ActiveRecord::Base
       end
     end
     return deleted
+  end
+
+  def effective_start_at
+    [ start_at,
+      course_section && course_section.start_at,
+      course.start_at,
+      course.enrollment_term && course.enrollment_term.start_at,
+      course_section && course_section.created_at,
+      course.created_at
+    ].compact.first
+  end
+
+  def effective_end_at
+    [ end_at,
+      course_section && course_section.end_at,
+      course.conclude_at,
+      course.enrollment_term && course.enrollment_term.end_at
+    ].compact.first
   end
 end

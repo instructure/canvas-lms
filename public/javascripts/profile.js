@@ -95,7 +95,7 @@ define([
   $update_profile_form
     .attr('method', 'PUT')
     .formSubmit({
-      required: ['name'],
+      required: $update_profile_form.find('#user_name').length ? ['name'] : [],
       object_name: 'user',
       property_validations: {
         '=default_email_id': function(val, data) {

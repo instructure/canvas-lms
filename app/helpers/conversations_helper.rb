@@ -42,7 +42,7 @@ module ConversationsHelper
       "/images/messages/avatar-#{avatar_size}.png"
     )
     if service_enabled?(:avatars)
-      user.avatar_url(avatar_size, nil, default_avatar).sub(%r{\A/}, "#{request.protocol}#{request.host_with_port}/")
+      "#{request.protocol}#{request.host_with_port}#{user.avatar_path}"
     else
       default_avatar
     end

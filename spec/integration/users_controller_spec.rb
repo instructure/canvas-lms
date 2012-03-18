@@ -23,12 +23,12 @@ describe UsersController do
     before do
       course_with_teacher_logged_in(:active_all => true)
       @course.update_attribute(:name, 'coursename1')
-      @teacher = @user
       @enrollment.update_attribute(:limit_privileges_to_course_section, true)
+      @et = @enrollment
       @s1 = @course.course_sections.first
       @s2 = @course.course_sections.create!(:name => 'Section B')
-      @e1 = student_in_course
-      @e2 = student_in_course
+      @e1 = student_in_course(:active_all => true)
+      @e2 = student_in_course(:active_all => true)
       @e1.user.update_attribute(:name, 'studentname1')
       @e2.user.update_attribute(:name, 'studentname2')
       @e2.update_attribute(:course_section, @s2)
@@ -79,6 +79,35 @@ describe UsersController do
       response.body.should match(/coursename1/)
       response.body.should match(/coursename2/)
     end
+
+    it "should be available for concluded courses/enrollments" do
+      account_admin_user(:username => "admin")
+      user_session(@admin)
+
+      @course.complete
+      @et.conclude
+      @e1.conclude
+
+      get user_student_teacher_activity_url(@teacher, @e1.user)
+      response.should be_success
+      response.body.should match(/studentname1/)
+
+      get user_course_teacher_activity_url(@teacher, @course)
+      response.should be_success
+      response.body.should match(/studentname1/)
+    end
+
+    it "should show concluded students to active teachers" do
+      @e1.conclude
+
+      get user_student_teacher_activity_url(@teacher, @e1.user)
+      response.should be_success
+      response.body.should match(/studentname1/)
+
+      get user_course_teacher_activity_url(@teacher, @course)
+      response.should be_success
+      response.body.should match(/studentname1/)
+    end
   end
 
   describe "#index" do
@@ -92,6 +121,15 @@ describe UsersController do
       get account_users_url(Account.default)
       response.should be_success
       response.body.should match /Olds, JT.*St\. Clair, John/m
+    end
+  end
+
+  describe "#avatar_image_url" do
+    it "should maintain protocol and domain name in gravatar redirect" do
+      Account.default.tap { |a| a.enable_service(:avatars) }.save
+      user
+      get "https://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://someschool.instructure.com/images/no_pic.gif")}"
     end
   end
 end

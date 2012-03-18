@@ -110,6 +110,7 @@ describe AssignmentGroupsController, :type => :integration do
             'grading_type' => 'points',
             'use_rubric_for_grading' => true,
             'free_form_criterion_comments' => false,
+            'html_url' => course_assignment_url(@course, a3),
             'rubric' => [
               {'id' => 'crit1', 'points' => 10, 'description' => 'Crit1',
                 'ratings' => [
@@ -125,6 +126,7 @@ describe AssignmentGroupsController, :type => :integration do
                 ],
               },
             ],
+            'group_category_id' => nil
           },
           {
             'id' => a4.id,
@@ -141,6 +143,8 @@ describe AssignmentGroupsController, :type => :integration do
               "none",
             ],
             'grading_type' => 'points',
+            'group_category_id' => nil,
+            'html_url' => course_assignment_url(@course, a4),
           },
         ],
       },
@@ -166,6 +170,8 @@ describe AssignmentGroupsController, :type => :integration do
               "none",
             ],
             'grading_type' => 'points',
+            'group_category_id' => nil,
+            'html_url' => course_assignment_url(@course, a1),
           },
           {
             'id' => a2.id,
@@ -182,6 +188,8 @@ describe AssignmentGroupsController, :type => :integration do
               "none",
             ],
             'grading_type' => 'points',
+            'group_category_id' => nil,
+            'html_url' => course_assignment_url(@course, a2),
           },
         ],
       },

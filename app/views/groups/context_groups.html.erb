@@ -55,9 +55,12 @@ TEXT
   <tr>
     <td><%= before_label :restrictions_for_joining_groups, 'Joining' %></td>
     <td>
-      <select name="group[join_level]">
+      <select id="group_join_level" name="group[join_level]">
         <option value="parent_context_auto_join"><%= t 'options.open_to_course_members', 'Course members are free to join' %></option>
-        <option value="parent_context_request"><%= t 'options.course_member_can_request_access', 'Course members can request to join' %></option>
+        <%# Right now the 'parent_context_request' option isn't any different
+        than 'parent_context_auto_join' because we're auto-accepting requested
+        memberships. So, we're removing it until we implement an accept request
+        feature. %>
         <option value="invitation_only"><%= t 'options.invite_only', 'Membership by invitation only' %></option>
       </select>
     </td>

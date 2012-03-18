@@ -2,14 +2,14 @@ require File.dirname(__FILE__) + '/../../qti_helper'
 if Qti.migration_executable
   describe "QTI 1.2 zip with id prepender value" do
     before(:all) do
-      archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti', 'plain_qti.zip')
-      unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
-      @dir = File.join(File.dirname(archive_file_path), "qti_plain_qti")
+      @archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti', 'plain_qti.zip')
+      unzipped_file_path = File.join(File.dirname(@archive_file_path), "qti_#{File.basename(@archive_file_path, '.zip')}", 'oi')
+      @dir = File.join(File.dirname(@archive_file_path), "qti_plain_qti")
       
       @course = Course.create!(:name => 'tester')
       @migration = ContentMigration.create(:context => @course)
       
-      @converter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path, :id_prepender=>'prepend_test', :content_migration => @migration)
+      @converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :base_download_dir=>unzipped_file_path, :id_prepender=>'prepend_test', :content_migration => @migration)
       @converter.export
       @course_data = @converter.course.with_indifferent_access
       @course_data['all_files_export'] ||= {}
@@ -51,33 +51,56 @@ if Qti.migration_executable
       @course.attachments.count.should == 4
 
       dir = Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY
-      @course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
-      @course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1").full_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
-      @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
-      @course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22").full_path.should == "course files/#{dir}/#{@migration.id}/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1").full_path.should == "course files/#{dir}/#{@migration.id}/contact info.png"
+      @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30").full_path.should == "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
+      @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22").full_path.should == "course files/#{dir}/#{@migration.id}/image.png"
     end
 
     it "should use expected file links in questions" do
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")
-      att = aq.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30")
+      att = aq.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1007")
-      att = aq.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821")
+      att = aq.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821")
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1014")
-      att = aq.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22")
+      att = aq.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22")
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1053")
-      att = aq.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1")
+      att = aq.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1")
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
     end
     
     it "should hide the quiz directory" do
       folder = @course.folders.find_by_name(Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY)
       folder.hidden?.should be_true
+    end
+    
+    it "should use new attachments for imports with same file names" do
+      # run a second migration and check that there are different attachments on the questions
+      migration = ContentMigration.create(:context => @course)
+      converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :id_prepender=>'test2', :content_migration => migration)
+      converter.export
+      course_data = converter.course.with_indifferent_access
+      course_data['all_files_export'] ||= {}
+      course_data['all_files_export']['file_path'] = course_data['all_files_zip']
+      migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
+      migration.migration_settings[:files_import_root_path] = course_data[:files_import_root_path]
+      @course.import_from_migration(course_data, nil, migration)
+      
+      # Check the first import
+      aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")
+      att = aq.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
+      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
+      
+      # check the second import
+      aq = @course.assessment_questions.find_by_migration_id("test2_QUE_1003")
+      att = aq.attachments.find_by_migration_id("test2_4d348a246af616c7d9a7d403367c1a30")
+      aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
     end
 
   end

@@ -439,6 +439,7 @@ describe "security" do
       student_in_course
       @student = @user
       user_with_pseudonym :user => @student, :username => 'student@example.com', :password => 'password'
+      @student_pseudonym = @pseudonym
 
       account_admin_user :account => Account.site_admin
       @admin = @user
@@ -471,6 +472,7 @@ describe "security" do
       assert_response 200
       session[:become_user_id].should == @student.id.to_s
       assigns['current_user'].id.should == @student.id
+      assigns['current_pseudonym'].should == @student_pseudonym
       assigns['real_current_user'].id.should == @admin.id
     end
 

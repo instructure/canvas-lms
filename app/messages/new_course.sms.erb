@@ -6,4 +6,4 @@
     
 <% end %><% end %>
 
-<%= t :details, "More info at %{url}", :url => HostUrl.default_host %>
+<%= t :details, "More info at %{url}", :url => HostUrl.context_host(asset) %>

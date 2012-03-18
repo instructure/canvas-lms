@@ -113,27 +113,7 @@ notifications_018:
   subject: "Assignment Graded: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>"
   workflow_state: active
   created_at: 2009-04-30 23:55:46
-notifications_007: 
-  name: New File Added
-  sms_body: "\n      New file added for <%= asset.context.name %>:\n      <%= asset.title %>\n      \n      <%= asset.readable_size %>\n    "
-  category: Course Content
-  updated_at: 2009-04-30 23:55:46
-  body: |-
-    A new file has been added for the course, <%= asset.context.name %>:
-    
-    <%= asset.title %>
-    
-    <%= asset.readable_size %>
-    
-    
-    You can view it here:
-    http://instructure.com/courses/<%= asset.context_id %>/files/<%= asset.id %>
-  delay_for: "120"
-  id: "7"
-  subject: "New File Added: <%= asset.title %>, <%= asset.context.name %>"
-  workflow_state: active
-  created_at: 2009-04-30 23:55:46
-notifications_020: 
+notifications_020:
   name: New Wiki Page
   sms_body: "\n      New wiki page for <%= asset.find_namespace_for_user(user).context.name rescue \"\" %>:\n      \n      <%= asset.title.titleize %>\n      \n      <%= strip_and_truncate(asset.body, :max_length => 200) %>\n    "
   category: Course Content

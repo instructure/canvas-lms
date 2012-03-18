@@ -165,13 +165,28 @@
             <% end %>
           </span>
           <% if assignment.grading_type == 'letter_grade' %>
-            <span class="score_value" style="font-size: 0.8em; color: #aaa; <%= hidden unless submission && submission.published_score %>"><%= submission.published_score rescue nbsp %></span>
+            <span class="score_value" style="font-size: 0.8em; color: #aaa;">
+              <% unless assignment.muted? || submission.nil? %>
+                <%= submission.published_score %>
+                (<%= submission.published_grade %>)
+              <% end %>
+            </span>
           <% end %>
           <%= "%" if assignment.special_class %>
         </span>
         <div style="display: none;">
-          <span class="original_score"><%= if assignment.muted? then "" else submission.published_score end rescue "" %></span>
-          <span class="score"><%= if assignment.muted? then "" else submission.published_score end rescue "" %></span>
+          <span class="original_score">
+            <% unless assignment.muted? || submission.nil? %>
+              <%= submission.published_score %>
+              <%= assignment.grading_type == 'letter_grade' ? "(#{submission.published_grade})" : '' %>
+            <% end %>
+          </span>
+          <span class="score">
+            <% unless assignment.muted? || submission.nil? %>
+              <%= submission.published_score %>
+              <%= assignment.grading_type == 'letter_grade' ? "(#{submission.published_grade})" : '' %>
+            <% end %>
+          </span>
           <span class="assignment_group_id"><%= assignment.assignment_group_id rescue "" %></span>
           <span class="assignment_id"><%= assignment.id.to_s %></span>
           <span class="group_weight"><%= assignment.group_weight rescue "" %></span>

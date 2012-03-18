@@ -3,6 +3,13 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "calendar2" do
   it_should_behave_like "in-process server selenium tests"
 
+  def create_appointment_group
+    current_date = Date.today.to_s
+    ag = @course.appointment_groups.create(:title => "new appointment group", :context => @course, :new_appointments => [[current_date + ' 12:00:00', current_date + ' 13:00:00']])
+    ag.publish!
+    ag
+  end
+
   before (:each) do
     Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
   end
@@ -20,34 +27,46 @@ describe "calendar2" do
     c
   end
 
-  def create_assignment_event(assignment_title)
+  def find_middle_day
+    driver.find_element(:css, '.calendar .fc-week1 .fc-wed')
+  end
+
+  def change_calendar(css_selector = '.fc-button-next')
+    driver.find_element(:css, '.calendar .fc-header-left ' + css_selector).click
+    wait_for_ajax_requests
+  end
+
+  def add_date(middle_number)
+    find_with_jquery('.ui-datepicker-trigger:visible').click
+    datepicker_current(middle_number)
+  end
+
+  def create_assignment_event(assignment_title, should_add_date = false)
+    middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
     edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_dialog.find_element(:css, '.edit_assignment_option').click
     edit_assignment_form = edit_event_dialog.find_element(:id, 'edit_assignment_form')
     title = edit_assignment_form.find_element(:id, 'assignment_title')
     replace_content(title, assignment_title)
-    find_with_jquery('.ui-datepicker-trigger:visible').click
-    datepicker_next
+    add_date(middle_number) if should_add_date
     edit_assignment_form.submit
     wait_for_ajax_requests
-    driver.find_element(:css, '.fc-button-next').click
-    find_with_jquery('.fc-day-number:contains(15)').click
+    #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
-  def create_calendar_event(event_title)
+  def create_calendar_event(event_title, should_add_date = false)
+    middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
     edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
     title = edit_event_form.find_element(:id, 'calendar_event_title')
     replace_content(title, event_title)
-    find_with_jquery('.ui-datepicker-trigger:visible').click
-    datepicker_next
+    add_date(middle_number) if should_add_date
     edit_event_form.submit
     wait_for_ajax_requests
-    driver.find_element(:css, '.fc-button-next').click
-    find_with_jquery('.fc-day-number:contains(15)').click
+    #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(event_title) }
   end
 
@@ -116,33 +135,29 @@ describe "calendar2" do
         end
 
         it "should create an event through the context list drop down" do
-          pending("Bug 7111 - Course in context list being disabled bug") do
-            event_title = 'new event'
-            get "/calendar2"
-            wait_for_ajaximations
+          event_title = 'new event'
+          get "/calendar2"
+          wait_for_ajaximations
 
-            driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-            find_with_jquery('ul#context-list li:nth-child(2) button').click
-            driver.find_element(:id, "ui-menu-1-0").click
-            edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
-            edit_event_dialog.should be_displayed
-            create_calendar_event(event_title)
-          end
+          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
+          find_with_jquery('ul#context-list li:nth-child(2) button').click
+          driver.find_element(:id, "ui-menu-1-0").click
+          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          edit_event_dialog.should be_displayed
+          create_calendar_event(event_title, true)
         end
 
         it "should create an assignment through the context list drop down" do
-          pending("Bug 7111 - Course in context list being disabled bug") do
-            assignment_title = 'new assignment'
-            get "/calendar2"
-            wait_for_ajaximations
+          assignment_title = 'new assignment'
+          get "/calendar2"
+          wait_for_ajaximations
 
-            driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-            find_with_jquery('ul#context-list li:nth-child(2) button').click
-            driver.find_element(:id, "ui-menu-1-1").click
-            edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
-            edit_event_dialog.should be_displayed
-            create_assignment_event(assignment_title)
-          end
+          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
+          find_with_jquery('ul#context-list li:nth-child(2) button').click
+          driver.find_element(:id, "ui-menu-1-1").click
+          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          edit_event_dialog.should be_displayed
+          create_assignment_event(assignment_title, true)
         end
 
         it "should toggle event display when context is clicked" do
@@ -183,11 +198,6 @@ describe "calendar2" do
 
     describe "main calendar" do
 
-      def change_calendar(css_selector = '.fc-button-next')
-        driver.find_element(:css, '.calendar .fc-header-left ' + css_selector).click
-        wait_for_ajax_requests
-      end
-
       def get_header_text
         header = driver.find_element(:css, '.calendar .fc-header .fc-header-title')
         header.text
@@ -195,24 +205,24 @@ describe "calendar2" do
 
       it "should create an event through clicking on a calendar day" do
         get "/calendar2"
-        driver.find_element(:css, '.calendar .fc-today').click
+        find_middle_day.click
         create_calendar_event('new event')
       end
 
       it "should create an assignment by clicking on a calendar day" do
         get "/calendar2"
-        driver.find_element(:css, '.calendar .fc-today').click
+        find_middle_day.click
         create_assignment_event('new assignment')
       end
 
       it "more options link should go to calendar_event edit page" do
         get "/calendar2"
-        driver.find_element(:css, '.calendar .fc-today').click
+        find_middle_day.click
         create_calendar_event('new event')
 
         driver.find_element(:css, '.fc-event').click
         find_with_jquery('.popover-links-holder:visible').should_not be_nil
-        driver.find_element(:css, '.popover-links-holder .edit_event_link').click
+        driver.find_element(:css, '.event-details-links .edit_event_link').click
         link = driver.find_element(:css, '#edit_calendar_event_form .more_options_link')
         link["href"].should =~ %r{calendar_events/\d+/edit$}
       end
@@ -285,13 +295,6 @@ describe "calendar2" do
       EDIT_NAME = 'edited appointment'
       EDIT_LOCATION = 'edited location'
 
-      def create_appointment_group_api
-        current_date = Date.today.to_s
-        ag = @course.appointment_groups.create(:title => "new appointment group", :context => @course, :new_appointments => [[current_date + ' 12:00:00', current_date + ' 13:00:00']])
-        ag.publish!
-        ag.title
-      end
-
       def create_appointment_group_manual
         new_appointment_text = 'new appointment group'
         expect {
@@ -353,20 +356,8 @@ describe "calendar2" do
         create_appointment_group_manual
       end
 
-      it "should test bad data errors in date while creating a new appointment group" do
-        get "/calendar2"
-        click_scheduler_link
-        driver.find_element(:css, '.create_link').click
-        edit_form = driver.find_element(:id, 'edit_appointment_form')
-        ['start', 'end'].each { |field| set_value(edit_form.find_element(:css, ".#{field}_time"), '11111') }
-        driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
-        driver.switch_to.alert.dismiss
-        edit_form.should be_displayed
-        ['start', 'end'].each { |field| edit_form.find_element(:css, ".#{field}_time").should have_class('error') }
-      end
-
       it "should delete an appointment group" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
 
@@ -378,7 +369,7 @@ describe "calendar2" do
       end
 
       it "should edit an appointment group" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
 
@@ -389,7 +380,7 @@ describe "calendar2" do
       end
 
       it "should edit an appointment group after clicking appointment group link" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -398,7 +389,7 @@ describe "calendar2" do
       end
 
       it "should delete an appointment group after clicking appointment group link" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -432,7 +423,7 @@ describe "calendar2" do
 
         appointment_groups = find_all_with_jquery('.appointment-group-item')
         appointment_groups.each_with_index do |ag, i|
-          driver.action.move_to(ag).perform
+          driver.execute_script("$('.appointment-group-item:index(#{i}').addClass('ui-state-hover')")
           ["all", "registered", "unregistered"].each do |registration_status|
             click_al_option('.message_link', i)
             form = keep_trying_until { find_with_jquery('.ui-dialog form:visible') }
@@ -444,10 +435,9 @@ describe "calendar2" do
             form.find_elements(:css, 'li input').should_not be_empty
             set_value form.find_element(:css, 'textarea'), 'hello'
             form.submit
-            
-            wait_for_ajaximations
+
             assert_flash_notice_message /Messages Sent/
-            find_with_jquery('.ui-dialog:visible').should be_nil
+            keep_trying_until { find_with_jquery('.ui-dialog:visible').should be_nil }
           end
         end
 
@@ -459,7 +449,7 @@ describe "calendar2" do
       end
 
       it "should validate the appointment group shows up on the calendar" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -467,7 +457,7 @@ describe "calendar2" do
       end
 
       it "should delete the appointment group from the calendar" do
-        create_appointment_group_api
+        create_appointment_group
         get "/calendar2"
         click_scheduler_link
         click_appointment_link
@@ -484,28 +474,25 @@ describe "calendar2" do
   context "calendar2 as a student" do
 
     before (:each) do
-      course_with_student_logged_in
+      @student = course_with_student_logged_in(:active_all => true).user
     end
 
     describe "contexts list" do
 
       it "should not allow a student to create an assignment through the context list" do
-        pending "BUG 7033 - Create Assignment should not be an option for a student in New calendar" do
+        get "/calendar2"
+        wait_for_ajaximations
 
-          get "/calendar2"
-          wait_for_ajaximations
-
-          keep_trying_until do
-            driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
-            find_with_jquery('ul#context-list li:nth-child(1) button').click
-            driver.find_element(:id, "ui-menu-0-0").click
-            edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
-            edit_event_dialog.should be_displayed
-          end
-          tabs = find_all_with_jquery('.tab_list > li')
-          tabs.count.should == 1
-          tabs[0].should include_text('Event')
+        keep_trying_until do
+          driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
+          find_with_jquery('ul#context-list li:nth-child(1) button').click
+          driver.find_element(:id, "ui-menu-0-0").click
+          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          edit_event_dialog.should be_displayed
         end
+        tabs = find_all_with_jquery('.tab_list > li')
+        tabs.count.should == 1
+        tabs[0].should include_text('Event')
       end
     end
 
@@ -520,6 +507,24 @@ describe "calendar2" do
         driver.find_element(:id, "popover-0").should be_displayed
         element_exists('.edit_event_link').should be_false
         element_exists('.delete_event_link').should be_false
+      end
+
+      it "should validate appointment group popup link functionality" do
+        pending("bug 6986 - clicking on the name of an appointment group in a popup should take user to scheduler") do
+          ag = create_appointment_group
+          ag.appointments.first.reserve_for @student, @me
+          @user = @me
+          get "/calendar2"
+          wait_for_ajaximations
+
+          driver.find_element(:css, '.fc-event-title').click
+          popover = driver.find_element(:id, "popover-0")
+          popover.should be_displayed
+          expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
+          wait_for_ajaximations
+          is_checked('#scheduler').should be_true
+          driver.find_element(:id, 'appointment-group-list').should include_text(ag.title)
+        end
       end
     end
   end

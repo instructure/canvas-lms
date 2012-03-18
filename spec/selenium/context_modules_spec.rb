@@ -51,6 +51,7 @@ describe "context_modules" do
         item_title
       end
       replace_content(item_title, item_title_text)
+      yield if block_given?
       driver.find_element(:css, '.add_item_button').click
       wait_for_ajaximations
       tag = ContentTag.last
@@ -87,14 +88,20 @@ describe "context_modules" do
 
       #have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
-      @assignment = @course.assignments.create(:title => 'assignment 1', :submission_types => 'online_text_entry')
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
+      @assignment2 = @course.assignments.create!(:title => 'assignment 2',
+                                                 :submission_types => 'online_text_entry',
+                                                 :due_at => 2.days.from_now,
+                                                 :points_possible => 10)
+      @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
+      @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
+
       @course.reload
 
       get "/courses/#{@course.id}/modules"
     end
 
     it "should only display 'out-of' on an assignment min score restriction when the assignment has a total" do
-
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => @course)
       a1.points_possible = 10
@@ -211,6 +218,14 @@ describe "context_modules" do
       add_existing_module_item('#quizs_select', 'Quiz', @quiz.title)
     end
 
+    it "should add a new quiz to a module in a specific assignment group" do
+      add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', "New Quiz") do
+        click_option("select[name='quiz[assignment_group_id]']", @ag2.name)
+      end
+      @ag2.assignments.length.should == 1
+      @ag2.assignments.first.title.should == "New Quiz"
+    end
+
     it "should add a file item to a module" do
       #adding file to course
       @folder = @course.folders.create!(:name => "test folder", :workflow_state => "visible")
@@ -313,10 +328,37 @@ describe "context_modules" do
       lock_check = add_form.find_element(:id, 'unlock_module_at')
       lock_check.click
       wait_for_ajaximations
-      add_form.find_element(:css, 'tr.unlock_module_at_details').should_not be_displayed
+      add_form.find_element(:css, 'tr.unlock_module_at_details').should be_displayed
       lock_check.click
       wait_for_ajaximations
-      add_form.find_element(:css, 'tr.unlock_module_at_details').should be_displayed
+      add_form.find_element(:css, 'tr.unlock_module_at_details').should_not be_displayed
+    end
+
+    it "should properly change indent of an item" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      tag = ContentTag.last
+
+      driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
+      wait_for_ajaximations
+      driver.find_element(:id, "context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+
+      tag.reload
+      tag.indent.should == 1
+    end
+
+    it "should still display due date and points possible after indent change" do
+      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
+      tag = ContentTag.last
+
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
+
+      driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
+      wait_for_ajaximations
+
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
     end
   end
 
@@ -408,6 +450,29 @@ describe "context_modules" do
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
       driver.find_element(:id, 'module_prerequisites_list').should be_displayed
+    end
+  end
+
+  describe "sequence footer" do
+    it "should show module navigation for group assignment discussions" do
+      course_with_student_logged_in
+      group_assignment_discussion(:course => @course)
+      @group.users << @student
+      assignment_model(:course => @course)
+      @module = ContextModule.create!(:context => @course)
+      @page = wiki_page_model(:course => @course)
+      i1 = @module.content_tags.create!(:context => @course, :content => @assignment, :tag_type => 'context_module')
+      i2 = @module.content_tags.create!(:context => @course, :content => @root_topic, :tag_type => 'context_module')
+      i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
+      @module2 = ContextModule.create!(:context => @course, :name => 'second module')
+      get "/courses/#{@course.id}/modules/items/#{i2.id}"
+      wait_for_ajaximations
+
+      prev = driver.find_element(:css, '#sequence_footer a.prev')
+      URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i1.id}"
+
+      nxt = driver.find_element(:css, '#sequence_footer a.next')
+      URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i3.id}"
     end
   end
 end

@@ -23,7 +23,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   belongs_to :conversation
   belongs_to :user
-  has_many :conversation_message_participants
+  has_many :conversation_message_participants, :dependent => :delete_all
   has_many :messages, :source => :conversation_message,
            :through => :conversation_message_participants,
            :select => "conversation_messages.*, conversation_message_participants.tags",
@@ -64,7 +64,8 @@ class ConversationParticipant < ActiveRecord::Base
 
   delegate :private?, :to => :conversation
 
-  before_update :update_unread_count
+  before_update :update_unread_count_for_update
+  before_destroy :update_unread_count_for_destroy
 
   attr_accessible :subscribed, :starred, :workflow_state
 
@@ -123,7 +124,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
     return participants unless options[:include_context_info]
     # we do this to find out the contexts they share with the user
-    user.messageable_users(:ids => participants.map(&:id), :no_check_context => true).each { |user|
+    user.messageable_users(:ids => participants.map(&:id), :skip_visibility_checks => true).each { |user|
       context_info[user.id] = user
     }
     participants.each { |user|
@@ -284,16 +285,38 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.infer_new_tags_for(self, []).first
   end
 
+  def move_to_user(new_user)
+    conversation.conversation_messages.update_all(["author_id = ?", new_user.id], ["author_id = ?", user_id])
+    if existing = conversation.conversation_participants.find_by_user_id(new_user.id)
+      existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+      destroy
+    else
+      update_attribute :user_id, new_user.id
+    end
+    conversation.regenerate_private_hash! if private?
+  end
+
   protected
   def message_tags
     messages.map(&:tags).inject([], &:concat).uniq
   end
 
   private
-  def update_unread_count
-    if workflow_state_changed? && [workflow_state, workflow_state_was].include?('unread')
-      User.update_all "unread_conversations_count = unread_conversations_count #{workflow_state == 'unread' ? '+' : '-'} 1, updated_at = '#{Time.now.to_s(:db)}'",
-                      :id => user_id
+  def update_unread_count(direction=:up, user_id=self.user_id)
+    User.update_all "unread_conversations_count = unread_conversations_count #{direction == :up ? '+' : '-'} 1, updated_at = '#{Time.now.to_s(:db)}'",
+                    :id => user_id
+  end
+
+  def update_unread_count_for_update
+    if user_id_changed?
+      update_unread_count(:up) if unread?
+      update_unread_count(:down, user_id_was) if workflow_state_was == 'unread'
+    elsif workflow_state_changed? && [workflow_state, workflow_state_was].include?('unread')
+      update_unread_count(workflow_state == 'unread' ? :up : :down)
     end
+  end
+
+  def update_unread_count_for_destroy
+    update_unread_count(:down) if unread?
   end
 end

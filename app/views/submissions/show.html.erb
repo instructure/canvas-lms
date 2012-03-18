@@ -28,14 +28,6 @@
   </style>
 <% end %>
 
-<% content_for :stylesheets do %>
-  <style>
-    .rubric {
-      max-width: 600px;
-    }
-  </style>
-<% end %>
-
   <div style="padding: 0px 20px 3px;" class="submission_details">
     <div style="float: right;">
       <% if @assignment.muted? %>
@@ -219,7 +211,7 @@
             </div>
             <% if @assignment.has_group_category? && can_do(@submission, @current_user, :make_group_comment) %>
               <br/>
-              <input type="checkbox" name="group_comment" id="submission_group_comment" checked/>
+              <input type="checkbox" name="group_comment" id="submission_group_comment"/>
               <label for="submission_group_comment"><%= t('sent_to_whole_group', 'Send Comment to the Whole Group') %></label>
             <% end %>
             <div class="button-container">

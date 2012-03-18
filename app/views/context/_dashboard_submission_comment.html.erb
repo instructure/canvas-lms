@@ -25,8 +25,12 @@
     <% if !comment %>
      <% form_for :submission, :url => "#{context_prefix(context_code)}/assignments/#{submission ? submission.assignment_id : '{{ assignment_id }}'}/submissions/#{submission ? submission.user_id : '{{ user_id }}'}", :html => {:method => 'put', :class => "add_sub_message_form submission_comment_form"} do |f| %>
         <input type="hidden" name="from_dashboard" value="1"/>
-        <%= f.hidden_field :group_comment, :value => '1'%>
         <%= f.text_area :comment, :style => "height: 50px;" %>
+        <% if submission && submission.assignment.group_category_id %>
+          <br/>
+          <input type="checkbox" name="submission[group_comment]" id="submission_group_comment"/>
+          <label for="submission_group_comment"><%= t('labels.group_comment', 'Send Comment to the Whole Group') %></label>
+        <% end %>
         <div style="float: right;">
           <a href="<%= context_prefix(context_code) %>/assignments/<%= submission ? submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= submission ? submission.user_id : "{{ user_id }}" %>#comment" style="padding-right: 10px;" class="more_options_reply_link"><%= t('#links.more_options', %{more options}) %></a>
         </div>

@@ -193,6 +193,19 @@ describe "profile" do
       driver.find_element(:css, '.profile_table').should include_text('Nombre')
     end
 
+    it "should change the language even if you can't update your name" do
+      a = Account.default
+      a.settings[:users_can_edit_name] = false
+      a.save!
+
+      get "/profile"
+      edit_form = click_edit
+      edit_form.find_elements(:id, 'user_short_name').first.should be_nil
+      click_option('#user_locale', 'Español')
+      expect_new_page_load { edit_form.submit }
+      driver.find_element(:css, '.profile_table').should include_text('Nombre')
+    end
+
     it "should add another contact method - sms" do
       test_cell_number = '8017121011'
       get "/profile"

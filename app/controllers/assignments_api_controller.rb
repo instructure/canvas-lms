@@ -42,6 +42,8 @@ class AssignmentsApiController < ApplicationController
   # @response_field rubric [Rubric]
   #   A list of rows and ratings for each row. TODO: need more discussion of the
   #   rubric data format and usage for grading.
+  # @response_field group_category_id [Integer] The unique identifier of the assignment's group set (if this is a group assignment)
+  # @response_field html_url The URL to the Canvas web UI page for the assignment.
   #
   # @example_response
   #   [
@@ -57,8 +59,9 @@ class AssignmentsApiController < ApplicationController
   #         "online_text_entry",
   #         "online_url",
   #         "media_recording"
-  #        ]
+  #        ],
   #       "use_rubric_for_grading": true,
+  #       "html_url": "https://...",
   #       "rubric": [
   #         {
   #           "ratings": [
@@ -99,7 +102,8 @@ class AssignmentsApiController < ApplicationController
   #           "id": "crit2",
   #           "description": "Crit2"
   #         }
-  #       ]
+  #       ],
+  #       "group_category_id: 1
   #     }
   #   ]
   def index

@@ -2,7 +2,7 @@
   show_context ||= false
   comment = nil
   grade = nil
-   score = nil
+  score = nil
 
   cache(['recent_feedback_render', recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do 
     context = recent_feedback.context
@@ -16,6 +16,8 @@
     icon_explanation = case recent_feedback.workflow_state
     when 'submitted'
       t 'submitted', 'Submitted'
+    when 'pending_review'
+      t 'pending_review', 'Pending review'
     when 'graded'
       t 'graded', 'Graded'
     else

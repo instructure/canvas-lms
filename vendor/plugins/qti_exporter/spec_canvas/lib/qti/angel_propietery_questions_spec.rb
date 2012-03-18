@@ -36,6 +36,12 @@ describe "Converting Angel QTI" do
     hash.should == AngelPropExpected::SHORT_ANSWER
   end
 
+  it "should convert short answer with no correct answers into essay" do
+    qti_data = file_as_string(angel_question_dir, 'p_short_answer_as_essay.xml')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'short_answer_question', :custom_type=>'angel')
+    hash.should == AngelPropExpected::SHORT_ANSWER_AS_ESSAY
+  end
+
   it "should convert matching questions" do
     qti_data = file_as_string(angel_question_dir, 'p_matching.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'matching_question', :custom_type=>'angel')
@@ -177,6 +183,17 @@ module AngelPropExpected
        :points_possible=>1,
        :question_type=>"short_answer_question",
        :question_text=>"<div>What is your answer</div>"}
+  
+  SHORT_ANSWER_AS_ESSAY =
+      {
+          :incorrect_comments=>"",
+          :question_type=>"essay_question",
+          :migration_id=>"",
+          :question_text=>"<div>State one advantage Pandas have over Darwin.</div>",
+          :answers=>[],
+          :question_name=>"",
+          :points_possible=>1,
+          :correct_comments=>""}
 
   MATCHING =
       {

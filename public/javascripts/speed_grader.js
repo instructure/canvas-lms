@@ -938,18 +938,16 @@ define([
 
     goToStudent: function(student_id){
       var student = $.grep(jsonData.studentsWithSubmissions, function(o){
-  	    return o.id === student_id;
-  	  })[0];
+        return o.id === student_id;
+      })[0];
 
-  	  var indexOfStudentInOptions = $selectmenu.find('option').index($selectmenu.find('option[value="' + student.id + '"]'));
-  	  if (!(indexOfStudentInOptions >= 0)) {
-  	    throw "student not found";
-  	  }
-  	  $selectmenu.selectmenu("value", indexOfStudentInOptions);
-  	  //this is lame but I have to manually tell $selectmenu to fire its 'change' event if has changed.
-  	  if (!this.currentStudent || (this.currentStudent.id != student.id)) {
-  	    $selectmenu.change();
-  	  }
+      if (student) {
+        $selectmenu.selectmenu("value", student.id);
+        //this is lame but I have to manually tell $selectmenu to fire its 'change' event if has changed.
+        if (!this.currentStudent || (this.currentStudent.id != student.id)) {
+          $selectmenu.change();
+        }
+      }
     },
 
     currentIndex: function(){

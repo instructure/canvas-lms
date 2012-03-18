@@ -443,6 +443,7 @@ define([
     if(editor && editor.execCommand) {
       editor.execCommand.apply(editor, arguments);
     }
+    return this;
   };
   
   $.fn._justGetCode = function() {

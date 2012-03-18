@@ -18,28 +18,62 @@ describe "assignment rubrics" do
           :points_possible => points,
           :assignment_group => @group
       )
+      @assignment
     end
 
-    it "should add a new rubric to assignment and verify assignment points" do
-      initial_points = 9
+    it "should add a new rubric to assignment and verify points" do
+      initial_points = 2.5
       rubric_name = 'new rubric'
       create_assignment_with_points(initial_points)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       driver.find_element(:css, '.add_rubric_link').click
-      replace_content(driver.find_element(:css, '.rubric_title input[name="title"]'), rubric_name)
-      driver.find_element(:css, '.add_criterion_link').click
+      set_value(driver.find_element(:css, '.rubric_title input[name="title"]'), rubric_name)
+      criterion_points = find_with_jquery('.criterion_points:visible')
+      set_value(criterion_points, initial_points)
+      criterion_points.send_keys(:return)
       driver.find_element(:id, 'grading_rubric').click
+      wait_for_ajax_requests
       driver.find_element(:css, '#edit_rubric_form').submit
-      dialog_buttons = find_all_with_jquery('.ui-dialog:visible .ui-button')
-      dialog_buttons[0].click
       wait_for_ajaximations
+      rubric = Rubric.last
+      rubric.data.first[:points].should eql(initial_points)
+      rubric.data.first[:ratings].first[:points].should eql(initial_points)
       driver.find_element(:css, '#rubrics .rubric .rubric_title .displaying .title').should include_text(rubric_name)
 
       #Commented out because we still want this test to run but this is the part where the bug is
       #BUG 7193 - Rubric total overwrites assignment total despite choosing to leave them different
       #get "/courses/#{@course.id}/assignments"
       #driver.find_element(:css, '.points_text').should include_text(initial_points.to_s)
+    end
+
+    it "should carry decimal values through rubric to grading" do
+      student_in_course
+      @assignment = create_assignment_with_points(2.5)
+      rubric_model(:title => 'new rubric', :data =>
+          [{
+          :description => "Some criterion",
+          :points => 2.5,
+          :id => 'crit1',
+          :ratings =>
+              [{:description => "Good", :points => 2.5, :id => 'rat1', :criterion_id => 'crit1'}]
+          }], :description => 'new rubric description')
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajax_requests
+      full_rubric_button =
+          keep_trying_until do
+            full_rubric_button = find_with_jquery('.toggle_full_rubric')
+            full_rubric_button.should be_displayed
+            full_rubric_button
+          end
+      full_rubric_button.click
+      find_with_jquery('#rubric_holder .criterion:visible .rating').click
+      driver.find_element(:css, '#rubric_holder .save_rubric_button').click
+      wait_for_ajaximations
+
+      driver.find_element(:css, '#rubric_summary_container .rubric_total').text.should == '2.5'
     end
 
     it "should import rubric to assignment" do
@@ -89,30 +123,6 @@ describe "assignment rubrics" do
 
       driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
       driver.find_element(:css, "#full_assignment .points_possible").text.should == '5'
-    end
-
-    it "should carry decimal values through rubric to grading" do
-      pending("failing on .toggle_full_rubric selector")
-      student_in_course
-      create_assignment_with_points(2.5)
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      driver.find_element(:css, '.add_rubric_link').click
-      replace_content(find_with_jquery(".criterion_points:visible"), '2.5')
-      driver.find_element(:id, 'grading_rubric').click
-      driver.find_element(:id, 'edit_rubric_form').submit
-      wait_for_ajaximations
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-      keep_trying_until { driver.find_element(:css, '.toggle_full_rubric').should be_displayed }
-      driver.find_element(:css, '.toggle_full_rubric').click
-      find_with_jquery('#rubric_holder .criterion:visible .rating').click
-      driver.find_element(:css, '#rubric_holder .save_rubric_button').click
-      wait_for_ajaximations
-
-      driver.find_element(:css, '#rubric_summary_container .rubric_total').text.should == '2.5'
     end
 
     it "should not allow XSS attacks through rubric descriptions" do
@@ -188,6 +198,34 @@ describe "assignment rubrics" do
       driver.find_element(:css, '.save_rubric_button').click
       wait_for_ajaximations
       driver.find_element(:css, '.grading_value').attribute(:value).should == "5"
+    end
+
+    def mark_rubric_for_grading(rubric, expect_confirmation)
+      driver.find_element(:css, "#rubric_#{rubric.id} .edit_rubric_link").click
+      driver.switch_to.alert.accept if expect_confirmation
+      find_with_jquery(".grading_rubric_checkbox:visible").click
+      find_with_jquery(".save_button:visible").click
+      wait_for_ajaximations
+    end
+
+    it "should allow multiple rubric associations for grading" do
+      outcome_with_rubric
+      @assignment1 = @course.assignments.create!(:name => "assign 1", :points_possible => @rubric.points_possible)
+      @assignment2 = @course.assignments.create!(:name => "assign 2", :points_possible => @rubric.points_possible)
+
+      @association1 = @rubric.associate_with(@assignment1, @course, :purpose => 'grading')
+      @association2 = @rubric.associate_with(@assignment2, @course, :purpose => 'grading')
+
+      get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+      mark_rubric_for_grading(@rubric, true)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
+      mark_rubric_for_grading(@rubric, true)
+
+      @association1.reload.use_for_grading.should be_true
+      @association1.rubric.id.should == @rubric.id
+      @association2.reload.use_for_grading.should be_true
+      @association2.rubric.id.should == @rubric.id
     end
   end
 

@@ -34,6 +34,7 @@ define([
 
   window.contextGroups = {
     autoLoadGroupThreshold: 15,
+    paginationSize: 15,
 
     populateUserElement: function($user, data) {
       if (data.sections) {
@@ -87,6 +88,15 @@ define([
 
       if (page == 0) {
         page = $group.data("page_loaded") || 1;
+      }
+
+      var students_visible = $group.find(".student_list .student").length;
+      var students_hidden = parseInt($group.find(".user_count_hidden").text());
+      var total_students = students_visible + students_hidden;
+
+      // ensure we don't try to go to a page that won't have any students on it
+      if (total_students > 0) {
+        page = Math.min(page, Math.floor((total_students - 1) / contextGroups.paginationSize) + 1);
       }
 
       // This is lots of duplicated code from above, with tweaks. TODO: Refactor

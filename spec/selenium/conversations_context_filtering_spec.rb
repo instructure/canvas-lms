@@ -45,6 +45,15 @@ describe "conversations context filtering" do
     audience.text.should_not include @group.name
   end
 
+  it "should order by active-ness before name or type" do
+    @course2.complete!
+    new_conversation
+    @input = find_with_jquery("#context_tags_filter input:visible")
+    search("th", "context_tags") do
+      menu.should eql ["the course", "the group", "that course"]
+    end
+  end
+
   it "should let you filter by a course" do
     new_conversation
     browse_menu
@@ -58,6 +67,33 @@ describe "conversations context filtering" do
 
     find_all_with_jquery('#conversations > ul > li:visible').size.should eql 2
 
+    @input = find_with_jquery("#context_tags_filter input:visible")
+    search("the course", "context_tags") { click("the course") }
+
+    keep_trying_until { driver.find_element(:id, "create_message_form") }
+    conversations = find_all_with_jquery('#conversations > ul > li:visible')
+    conversations.size.should eql 1
+    conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+  end
+
+  it "should let you filter by a course that was concluded a long time ago" do
+    new_conversation
+    browse_menu
+    browse("the course", "Everyone") { click "Select All" }
+    submit_message_form(:add_recipient => false, :message => "asdf")
+
+    new_conversation(false)
+    browse_menu
+    browse("that course", "Everyone") { click "Select All" }
+    submit_message_form(:add_recipient => false, :message => "qwerty")
+
+    find_all_with_jquery('#conversations > ul > li:visible').size.should eql 2
+
+    @course1.complete!
+    @course1.update_attribute :conclude_at, 1.year.ago
+
+    get "/conversations/sent"
+    
     @input = find_with_jquery("#context_tags_filter input:visible")
     search("the course", "context_tags") { click("the course") }
 

@@ -45,6 +45,8 @@ module Api::V1::DiscussionTopics
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
                   :podcast_url => url,
+                  :read_state => topic.read_state(user),
+                  :unread_count => topic.unread_count(user),
                   :topic_children => children,
                   :attachments => attachments,
                   :url => named_context_url(context,
@@ -60,6 +62,7 @@ module Api::V1::DiscussionTopics
                            :only => %w(id user_id created_at updated_at),
                            :methods => [:user_name, :discussion_subentry_count])
       json[:message] = api_user_content(entry.message, context)
+      json[:read_state] = entry.read_state(user)
       if entry.parent_id.zero?
         replies = entry.unordered_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
         unless replies.empty?

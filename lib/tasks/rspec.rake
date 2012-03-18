@@ -192,4 +192,23 @@ namespace :spec do
   end
 end
 
+namespace :parallel do
+  task :nonselenium, :count do |t,args|
+    require "parallel_tests"
+    count = args[:count]
+    test_files = FileList['vendor/plugins/*/spec_canvas'] + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
+    test_files.map!{|f| "#{Rails.root}/#{f}" }
+    Rake::Task['parallel:spec'].invoke(count,'','',test_files.join(' '))
+  end
+
+  task :selenium, :count do |t,args|
+    require "parallel_tests"
+    count = args[:count]
+    test_files = FileList['spec/selenium/*_spec.rb']
+    test_files.map!{|f| "#{Rails.root}/#{f}" }
+    Rake::Task['parallel:spec'].invoke(count,'','',test_files.join(' '))
+  end
+
+end
+
 end
