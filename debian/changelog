@@ -1,3 +1,207 @@
+canvas-lms (2012.03.17.16) stable; urgency=low
+
+  * Package ref: 8f48fee5d3b68e36988cf8d9295281a4a0198980
+  *
+  * [-fe30ca0] lock rbx-require-relative for now
+  * [+faaa207] change how group sis csvs are detected
+  * [+8d18831] don't perma-cache special accounts
+  * [+a9c7d77] extend js_bundle for plugins and controllers
+  * [+0843818] let User.for_course_section work with no sections
+  * [+39fdc9c] include asset_user_access relation in page_view model
+  * [+887520e] put an id on the roster_user right nav
+  * [+9e25831] use context_host for several more messages refs #5711
+  * [+7c9251b] added methods to enrollment to determine rough start and end dates.
+  * [+7976569] show message if quiz submission needs grading because quiz has changed
+  * [+41e3ba8] display module progression links on group assignment discussions
+  * [+0cc2af7] fix spec that was dependent on microsecond timing
+  * [+b6cdc7e] remove variable that is unused
+  * [+9088713] clean up old user account associations on deleted/temp users
+  * [+4499442] handle multiple enrollments in gradebook; fixes #7264
+  * [+0871657] don't try to validate name if it's not editable, fixes #7081
+  * [+9d93066] detect UTF-8 in attachments closes #6035
+  * [+96047e3] fixes sporadic failures when comparing dates
+  * [+996d36f] various typo fixes
+  * [+30c5f49] fix selenium assignment rubric spec
+  * [+2a50d7a] selenium calendar2 spec fix
+  * [+e0448d0] make sass->css and jammit of that css work in plugins
+  * [+f631a13] made tinymce record media non-modal closes #7035
+  * [+0071729] don't fail opening help dialog from login page
+  * [+a36c0e8] module item indent change keeps item due-date/points; fixes #6503
+  * [+37319a7] removing intermittently failing selenium test in calendar2
+  * [+55a6440] remove import option that wasn't used
+  * [+31edfd6] simple debugging feature for saml authentication
+  * [+167afc6] show invitations as a sticky on the dashboard closes #7162
+  * [+8abbe35] make sure temporary invitations aren't readonly fixes #7361
+  * [+215dace] touch the user when rejecting invitations fixes #7362
+  * [+72b6da8] fix selenium assignments rubrics spec
+  * [+fa7b841] make speedgrader spec more robust
+  * [+82f0a83] add custom rake tasks for parallel specs
+  * [+02fd084] allow setting a letter grade on no-points assignments
+  * [+6486b9c] show the correct date/time for the student access report
+  * [+fba4a32] improve student group membership state flow; fixes #6948
+  * [+b48b122] use a meaningful context for confirmation notifications
+  * [+6c20033] spec: adding selenium assignments spec refs #7228
+  * [+411af03] spec: added selenium converstaions spec refs #7377
+  * [+c129c23] don't use / in namespaced bundle name, breaks jammit
+  * [+17e9761] get rid of extra height in cog menu
+  * [+95ccf4f] show points next to letter grade in gradebook2, fixes #6410
+  * [+35eae83] pull fixDialogButtons out into it's own file
+  * [+1016319] remove assignment_group_weights erb, was replaced with .handlebars
+  * [+e493f14] fix buggy file-upload commenting
+  * [+e9f22cc] show display_name as filename to download
+  * [+200ae6f] return description in json for locked assignments. fixes #5853.
+  * [+7025bb9] ability to filter by concluded courses, fixes #7071
+  * [+b234b0b] delay turnitin submission by 60 seconds, fixes #7330
+  * [+17d1d16] added a selenium spec to assignments groups spec that refs #7387
+  * [+14de7a0] touch all parent discussion topics on entry update; fixes #6967
+  * [+cb06deb] be smarter about loading group list pagination; fixes #6407
+  * [+7dad73d] correctly merge conversations when merging users, fixes #7246
+  * [+d375fc3] handle sharding in Account#account_users_for
+  * [+7489de2] improve UTF-8 detection migration refs #6035
+  * [+801d5cf] s/alert/announcement/ fixes #7398
+  * [+bdb90ae] spec: merging selenium course links and main links into one file
+  * [+f429932] fix popovers popping up way above the cal event
+  * [+898ca83] spec: marking flickr failing specs as pending for rewrite
+  * [+72e5386] spec: adding selenium spec to gradebook2 refs #7413
+  * [+d644a0a] makes checkbox for module 'lock until' default off
+  * [+ac13f00] always show link to speedgrader on discussion
+  * [+bd66469] grading a quiz while it's being re-taken, fixes #7213
+  * [+864aa08] improve the partition_by_shard stub
+  * [+8dc494c] don't disable a calendar when you click something in it's cog menu
+  * [+d253888] spec: cleaning up / breaking up selenium quizzes file
+  * [+57d3a82] fix migration error
+  * [+96d6f5e] better loading indication in messages, fixes: #7377
+  * [+5ccd253] move gradebook2 stuff out of the erb template
+  * [+338e4fa] Show letter grade in total column in gradebook2, fixes: #6724
+  * [+258e6b3] read/unread state + counts for discussions; closes #7173
+  * [+8d7179f] mark discussions as read (frontend), closes #7174
+  * [+1cb7dc6] added f and ff selenium helpers
+  * [+03238a2] don't regard deleted rubrics' titles for dup check
+  * [+d9a1d61] less guessable avatar urls
+  * [+553e0eb] pin rbx-require-relative to 0.0.5 temporarily
+  * [+b391c45] un-mark fixed double-submit spec as pending
+  * [+0546c78] removing typos in doc/api/sis_csv refs #6684
+  * [+17494bc] show more To Do items (fixes #6140)
+  * [+3d89e9f] fix microseconds spec failure
+  * [+732f6ef] spec: fix intermittently failing selenium grades spec
+  * [+be58ab1] added selenium spec to quizzes questions spec refs #7402
+  * [+9f9b769] fix ie 8 select clipping in quizzes, fixes #4681
+  * [+104acf2] remove notification throttles and increase daily limit; fixes #6955
+  * [+4b40b2b] allow setting account grading scheme on course; fixes #5690
+  * [+736347b] student assignment submission api, refs #7171
+  * [+3259ba8] fix wording on "Change pts to match rubric?" dialog
+  * [+0ce24b5] remove unused notification categories fixes #7394
+  * [+223e2df] don't fail if entry.id is nil
+  * [+566b36d] calendar2: don't show the assignments tab to students
+  * [+0ce7e4b] don't hide student names while editing groups, fixes: #6283
+  * [+724da36] link to peer reviews from discussion assignment; fixes #5032
+  * [+25d1367] spec: add selenium spec to gradebook2 file refs #7435
+  * [+a86080d] Show freeform rubric comments to students, fixes #4864
+  * [+47d6719] spec: add selenium spec to assignments file refs #7463 #7464
+  * [+ef74b58] handle discussion assignments correcly when unlocking modules
+  * [+d6a459e] prevent subsequent qti imports from referencing the wrong file
+  * [+cd0064d] introduce preferred user list search mode
+  * [+fa824fc] fix pseudonyms not being found if a conflicting communication exists
+  * [+66ee14d] spec: added selenium spec to dashboard file refs #7466
+  * [+2fdbb37] Allow launch preference when external tools have matching precedence
+  * [+139484a] fix full name description for teachers on user profile refs #5798
+  * [+4f86d87] handle buttons in dialog_opener[aria-controls] links
+  * [+6967de5] show letter grade in grade summary table. fixes #7110
+  * [+4956ad7] execute compass directly in new css:generate task
+  * [+1cafd0c] properly style 'add files' link on hover. fixes #7037
+  * [+c0bce64] export CC html content as utf-8
+  * [+d750082] automatically maintain plugin symlinks
+  * [+4708f1c] spec: add selenium spec to gradebook2 refs #7408
+  * [+0513e48] spec: add selenium spec to assignments_group file refs #7480
+  * [+9434832] add user enrollments listing api. fixes #7150
+  * [+70c09c4] report correct # students for section limited ta; fixes #5844
+  * [+03ffdbe] make anonymous surveys more anonymous, fixes #7200
+  * [+7de50fe] remove search field duplication fixes #5133
+  * [+3c1a143] accept quiz answers on touch devices with only one tap. fixes #6966
+  * [+3b4f648] make topics rendered by infinite scroll remember they are assignments
+  * [+1d19c86] treat short answer questions with no answers as essay questions
+  * [+accee8c] make zip file processing asynchronous
+  * [+460d78e] add :read_sis as an account level permission that can be granted to teachers
+  * [+40c3add] allow setting assignment group on quiz from add module item dialog
+  * [+6e499fd] fix javascript message to be more understandable refs #5208
+  * [+742b559] show turnitin info for file upload submissions, fixes #6029
+  * [+0a3383d] improve styling for html quiz answers; closes #7467
+  * [+91c6139] quiz_redirect_params method for LDB compatibility
+  * [+3d46f1f] make selectmenu wider to accommodate scrollbar
+  * [+f440b62] refactor masquerading permissions closes #6968
+  * [+72fd416] spec: fix calendar2 selenium spec
+  * [+db48cdd] uncheck group comment by default, fixes #7206
+  * [+22f9590] allow multiple rubric associations for grading; fixes #7091
+  * [+cb5fd45] optimize gradebook downloads
+  * [+57e7b1c] fix api behavior to match docs, fixes #7389
+  * [+cfeeb75] quiz html answers closes #7176
+  * [+e737ac5] make self sign-up help button work fixes #5954
+  * [+aa0d5d7] fix low-res display issues, closes #7141
+  * [+2b4cc26] warn users who submit a file assignment without any files.
+  * [+0825ce0] month localization keys
+  * [+a6f77fc] link student names to their grades page in gradebook2
+  * [+c529fc4] spec: add selenium spec to dashboard file refs #6610
+  * [+7a31e12] spec: make calendar2 specs more robust
+  * [+143cb3f] skip concluded students when setting default grade. fixes #7413
+  * [+8c61132] can edit survey questions after reload fixes #6157
+  * [+8dcaae7] don't return deleted/incomplete users, fixes #7471
+  * [+8a974b5] allow registering new permissions in plugins
+  * [+a826b30] fix logic for determining if a quizsubmission is extendable fixes #4847
+  * [+132ec17] set gradebook2 concluded enrollment spec back to pending.
+  * [+df8258d] fixes alert notification to say why it was sent
+  * [+8883c2f] set current_pseudonym to the correct value when masquerading
+  * [+69c113d] add pending_review submissions to todo list for grading
+  * [+0b4287c] don't call rank_sql on class load
+  * [+9aeff53] plumb host and protocol to gravatar fallbacks
+  * [+326c9cb] allow specifying an encryption key for use with Security helpers
+  * [+7ef5c61] Don't allow blank submissions in "Text Entry" field, fixes #7228, #7463, #7464
+  * [+ff847d8] allow download submissions if all are graded
+  * [+fa0f116] fixes discussion submission submitted_at times for certain discussions
+  * [+2dbfa74] spec: add selenium spec to gradebook2 file refs #7540
+  * [+33dbb58] spec: add selenium spec to calendar2 file refs #6986
+  * [+041c90e] fix intermittent spec failure
+  * [+d03b0ad] include concluded enrollments in interaction report; fixes #7024
+  * [+30a7479] increase height of swf files on module pages. fixes #5991
+  * [+f8c1bf3] loosen spec that didn't play nice with plugins
+  * [+fb68a31] correctly update quiz submisison when changing grade in gradebook
+  * [+88adc8d] do gradebook upload diffing server side
+  * [+70ca4d3] step up transition warning to red
+  * [+0f8f0a9] upgraded mathquill, fixes #7391, refs #6462, #6858
+  * [+f63077a] cache notifications in memory
+  * [+9bad93d] add a hidden_dialog helper to handle dialogs that we only want one of on a page
+  * [+b360075] run UseAssetUserAccessLastAccess as a delayed job
+  * [+acb04f5] remove some database columns from long ago
+  * [+fc7f8e0] do not show rubric results on muted assignments
+  * [+cc4d49b] hide rubric results from students for muted assignments
+  * [+17ad131] fix rake canvas:compile_assets for plugins
+  * [+aee12d9] removed tiny from common.js
+  * [+95d30d7] don't show letter grade on muted assignmnets
+  * [+36b5666] log exception on redis failure recovery
+  * [+5b70d47] fix error with hidden_dialogs in production environment; fixes #7668
+  * [+f5dd4b5] reconnect redis when in passenger smart spawning mode
+  * [+47d1b63] fix page error if observed is not an active student
+  * [+a49c791] try to process zips that use backslashes as path separators
+  * [+2399e11] timeout cutycapt processes that take too long; closes #7568
+  * [+942568b] update observers when merging users fixes #7678
+  * [+01906ad] wait until direct-to-s3 upload is complete before sending to kaltura
+  * [+e13d25c] add option for completed courses on course import. fixes #2184
+  * [+0289791] easier dialogs for users sharing email address
+  * [+926d43b] don't throw js error on clicking curve grade button
+  * [+5cab452] fix todo bug introduced in 17494bce1a745af20c8ec20
+  * [+359d362] ensure conversations with deleted users load correctly
+  * [+561a2dc] prevent group discussion assignments from spawning jobs recursively
+  * [+09702f1] don't cache tinychat settings on the Tinychat class
+  * [+06d31bc] don't cache discussion topic html to work with marking as read
+  * [+046eb24] move ungraded count migration to dj
+  * [+b110d8c] discussions: only notify people in course or group
+  * [+01fdd92] modify data fixup to work in batches of assignments at a time
+  * [+75e06c6] don't try to update the whole AssetUserAccesses table at one time
+  * [+11089c5] retry updating discussion participant on duplicate key error
+  * [+7450373] exclude deleted discussion entries from read counts; fixes #7741
+  * [+8f48fee] lock discussion_topic_participant row for updating when updating read counts
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 17 Mar 2012 19:01:01 -0600
+
 canvas-lms (2012.03.03.10) stable; urgency=low
 
   * Package ref: 1e5365a37a447a432d689fcce01b4360363c645e
