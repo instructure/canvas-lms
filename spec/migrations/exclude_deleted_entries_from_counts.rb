@@ -29,6 +29,10 @@ describe "fix unread counts" do
     @entry2 = @topic.discussion_entries.create!(:message => "it's me again", :user => @teacher)
     @entry3 = @topic.discussion_entries.create!(:message => "one more", :user => @teacher)
 
+    @topic2 = @course.discussion_topics.create!(:title => "hi again", :message => "blah", :user => @teacher)
+    @entry2_1 = @topic2.discussion_entries.create!(:message => "yo", :user => @teacher)
+    @entry2_1.change_read_state("read", @student1)
+
     @entry1.change_read_state("read", @student1)
     @entry2.destroy
 
@@ -36,7 +40,7 @@ describe "fix unread counts" do
     DiscussionTopicParticipant.update_all({ :unread_entry_count => 2 }, { :discussion_topic_id => @topic.id, :user_id => @student1.id })
     DiscussionEntryParticipant.create!(:discussion_entry => @entry2, :user => @teacher, :workflow_state => "read")
 
-    DataFixup::ExcludeDeletedEntriesFromUnreadCount.send_later_if_production(:run)
+    DataFixup::ExcludeDeletedEntriesFromUnreadCount.run
 
     @topic.unread_count(@teacher).should == 0
     @topic.unread_count(@student1).should == 1
