@@ -87,6 +87,34 @@ describe "speedgrader" do
     driver.execute_script('return jsonData.studentsWithSubmissions[0].submission.submission_history.length').should == 1
   end
 
+  context "as a course limited ta" do
+    before(:each) do
+      @taenrollment = course_with_ta(:course => @course, :active_all => true)
+      @taenrollment.limit_privileges_to_course_section = true
+      @taenrollment.save!
+      user_logged_in(:user => @ta, :username => "imata@example.com")
+
+      @section = @course.course_sections.create!
+      student_in_course(:active_all => true); @student1 = @student
+      student_in_course(:active_all => true); @student2 = @student
+      @enrollment.course_section = @section; @enrollment.save
+
+      @assignment.submission_types = "online_upload"
+      @assignment.save
+
+      @submission1 = @assignment.submit_homework(@student1, :submission_type => "online_text_entry", :body => "hi")
+      @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
+    end
+
+    it "should list the correct number of students" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajax_requests
+
+      f("#x_of_x_students").should include_text("1 of 1")
+      ff("#students_selectmenu-menu li").count.should == 1
+    end
+  end
+
   it "should display submission late notice message" do
     @assignment.due_at = Time.now - 2.days
     @assignment.save!
@@ -210,7 +238,7 @@ describe "speedgrader" do
     rubric.find_element(:css, '.criterion_comments img').click
     driver.find_element(:css, 'textarea.criterion_comments').send_keys('special rubric comment')
     driver.find_element(:css, '#rubric_criterion_comments_dialog .save_button').click
-    second_criterion = rubric.find_element(:id, 'criterion_2')
+    second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     rubric.find_element(:css, '.rubric_total').should include_text('8')
     driver.find_element(:css, '#rubric_full .save_rubric_button').click
@@ -335,9 +363,9 @@ describe "speedgrader" do
     wait_for_animations
     rubric = driver.find_element(:id, 'rubric_full')
     rubric.should be_displayed
-    first_criterion = rubric.find_element(:id, 'criterion_1')
+    first_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[0][:id]}")
     first_criterion.find_element(:css, '.ratings .edge_rating').click
-    second_criterion = rubric.find_element(:id, 'criterion_2')
+    second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     rubric.find_element(:css, '.rubric_total').should include_text('8')
     driver.find_element(:css, '#rubric_full .save_rubric_button').click
@@ -345,22 +373,22 @@ describe "speedgrader" do
     driver.find_element(:css, '.toggle_full_rubric').click
     wait_for_animations
 
-    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
-    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == "3"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == "5"
 
     driver.find_element(:css, '#gradebook_header .next').click
     wait_for_ajaximations
 
     driver.find_element(:id, 'rubric_full').should be_displayed
-    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == ""
-    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == ""
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == ""
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == ""
 
     driver.find_element(:css, '#gradebook_header .prev').click
     wait_for_ajaximations
 
     driver.find_element(:id, 'rubric_full').should be_displayed
-    driver.execute_script("return $('#criterion_1 input.criterion_points').val();").should == "3"
-    driver.execute_script("return $('#criterion_2 input.criterion_points').val();").should == "5"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == "3"
+    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == "5"
   end
 
   it "should handle versions correctly" do
@@ -447,6 +475,7 @@ describe "speedgrader" do
     @rubric.save!
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
     driver.find_element(:css, 'button.toggle_full_rubric').click
     driver.find_element(:css, "table.rubric.assessing tr:nth-child(1) table.ratings td:nth-child(1)").click
     driver.find_element(:css, "table.rubric.assessing tr:nth-child(3) table.ratings td:nth-child(1)").click
@@ -463,6 +492,7 @@ describe "speedgrader" do
 
     # check again that initial page load has the same data.
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
     driver.find_element(:css, "#grade_container input[type=text]").attribute(:value).should == '3'
     driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .editing").should be_displayed
     driver.find_element(:css, "#rubric_summary_container tr:nth-child(1) .ignoring").should_not be_displayed

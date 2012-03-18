@@ -1,8 +1,6 @@
 .defaultSkin table.mceLayout {
   border: 0;
   background-color: transparent; }
-  .defaultSkin table.mceLayout tr.mceLast td.mceIframeContainer {
-    border: 2px solid #ccc; }
   .defaultSkin table.mceLayout tr.mceFirst td.mceToolbar {
     border-top: 0;
     background: #ccc url(../images/tinybg.png) repeat-x top left;
@@ -31,5 +29,3 @@
           border-color: transparent; }
         .defaultSkin table.mceLayout tr.mceFirst td.mceToolbar table.mceToolbar tr td td {
           padding: 0; }
-          .defaultSkin table.mceLayout tr.mceFirst td.mceToolbar table.mceToolbar tr td td a.mceAction, .defaultSkin table.mceLayout tr.mceFirst td.mceToolbar table.mceToolbar tr td td a.mceOpen {
-            border-color: #ccc; }

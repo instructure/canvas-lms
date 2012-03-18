@@ -1,6 +1,7 @@
 define [
   'jquery'
   'i18n!calendar'
+  'vendor/underscore'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/EditCalendarEventDetails'
   'compiled/calendar/EditAssignmentDetails'
@@ -9,7 +10,7 @@ define [
   'jst/calendar/editEvent'
   'jquery.instructure_jquery_patches'
   'jqueryui/tabs'
-], ($, I18n, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDetails, EditAppointmentGroupDetails, editEventTemplate) ->
+], ($, I18n, _, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDetails, EditAppointmentGroupDetails, editEventTemplate) ->
 
   dialog = $('<div id="edit_event"><div /></div>').appendTo('body').dialog
     autoOpen: false
@@ -28,6 +29,7 @@ define [
       return null
 
     setupTabs: =>
+
       # Set up the tabbed view of the dialog
       tabs = dialog.find("#edit_event_tabs")
 
@@ -48,6 +50,12 @@ define [
         tabs.tabs('remove', 0)
         @assignmentDetailsForm.activate()
       else
+        # don't even show the assignments tab if the user doesn't have
+        # permission to create them
+        can_create_assignments = _.any(@event.allPossibleContexts, (c) -> c.can_create_assignments)
+        unless can_create_assignments
+          tabs.tabs('remove', 1)
+
         @calendarEventForm.activate()
 
     contextChange: (newContext) =>

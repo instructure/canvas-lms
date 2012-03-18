@@ -270,4 +270,25 @@ describe Rubric do
       @rubric2.data.first[:ratings].first[:points].should eql(0.5)
     end
   end
+
+  it "should be cool about duplicate titles" do
+    course_with_teacher
+
+    r1 = Rubric.new :title => "rubric", :context => @course
+    r1.save!
+    r1.title.should eql "rubric"
+
+    r2 = Rubric.new :title => "rubric", :context => @course
+    r2.save!
+    r2.title.should eql "rubric (1)"
+
+    r1.destroy
+
+    r3 = Rubric.create! :title => "rubric", :context => @course
+    r3.title.should eql "rubric"
+
+    r3.title = "rubric"
+    r3.save!
+    r3.title.should eql "rubric"
+  end
 end

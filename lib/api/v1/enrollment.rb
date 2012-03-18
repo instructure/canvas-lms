@@ -8,6 +8,12 @@ module Api::V1::Enrollment
   def enrollment_json(enrollment, user, session, includes = [])
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
+      if enrollment.student?
+        json[:grades] = {
+          :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),
+        }
+      end
+      json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
       json[:user] = user_json(enrollment.user, user, session) if includes.include?(:user)
     end
   end

@@ -21,39 +21,57 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'cutycapt'
 
 describe CutyCapt do
+  before(:each) do 
+    CutyCapt.config = nil
+  end
+
+  context "configuration" do
+    it "should correctly look up parameters specified by string keys in the config" do
+      Setting.set_config("cutycapt", { "path" => 'not used', 'timeout' => 1000 })
+      CutyCapt.config[:path].should == "not used"
+      CutyCapt.config[:timeout].should == 1000
+    end
+  end
+
   context "url validation" do
-    after(:each) do 
-      CutyCapt.config = nil
-    end
-    it "should check with_indifferent_access" do
-      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({"path" => 'not used'}))
-      CutyCapt.config[:path].should_not be_nil
-    end
     it "should check for an http scheme" do
-      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({:path => 'not used'}))
+      Setting.set_config("cutycapt", { :path => 'not used' })
       CutyCapt.verify_url("ftp://example.com/").should be_false
       CutyCapt.verify_url("http://example.com/").should be_true
       CutyCapt.verify_url("https://example.com/").should be_true
     end
-    
+
     it "should check for blacklisted domains" do
-      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({:path => 'not used', :domain_blacklist => ['example.com']}))
-      
+      Setting.set_config("cutycapt", { :path => 'not used', :domain_blacklist => ['example.com'] })
+
       CutyCapt.verify_url("http://example.com/blah").should be_false
       CutyCapt.verify_url("http://foo.example.com/blah").should be_false
       CutyCapt.verify_url("http://bar.foo.example.com/blah").should be_false
       CutyCapt.verify_url("http://google.com/blah").should be_true
     end
-    
+
     it "should check for blacklisted ip blocks" do
-      Setting.set_config("cutycapt", CutyCapt::CUTYCAPT_DEFAULTS.dup.merge({:path => 'not used'}))
+      Setting.set_config("cutycapt", { :path => 'not used' })
       
       CutyCapt.verify_url("http://10.0.1.1/blah").should be_false
       CutyCapt.verify_url("http://169.254.169.254/blah").should be_false
       CutyCapt.verify_url("http://4.4.4.4/blah").should be_true
-      
+
       Resolv.stubs(:getaddresses).returns([ "8.8.8.8", "10.0.1.1" ])
       CutyCapt.verify_url("http://workingexample.com/blah").should be_false
+    end
+  end
+
+  context "execution" do
+    it "should time out cuty processes" do
+      Setting.set_config("cutycapt", { :path => '/bin/sleep', :timeout => '1000' })
+
+      CutyCapt.stubs(:cuty_arguments).returns([ "/bin/sleep", "60" ])
+      begin
+        Timeout::timeout(10) { CutyCapt.snapshot_url("http://google.com/") }
+      rescue Timeout::Error
+        raise "Cuty did not time out after 2 seconds!"
+      end
     end
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -105,24 +105,25 @@ describe Submission do
   end
 
   context "Discussion Topic" do
-    it "should use its created_at date for its submitted_at value" do
-      submission_spec_model(:submission_type => "discussion_topic")
-      @assignment.submit_homework(@user, :submission_type => "discussion_topic")
+    it "should use correct date for its submitted_at value" do
+      course_with_student_logged_in(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "some topic")
+      @assignment = @course.assignments.create(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
+      @topic.assignment_id = @assignment.id
+      @topic.save!
+      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
       new_time = Time.now + 30.minutes
       Time.stubs(:now).returns(new_time)
-      @assignment.submit_homework(@user, :submission_type => "discussion_topic")
+      @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
       @submission.reload
       @submission.submitted_at.to_s(:db).should eql @submission.created_at.to_s(:db)
     end
   end
 
   context "broadcast policy" do
-    it "should have a broadcast policy" do
-      submission_spec_model
-      @submission.should be_respond_to(:dispatch)
-      @submission.should be_respond_to(:to)
-    end
-
     context "Assignment Submitted Late" do
       it "should create a message when the assignment is turned in late" do
         Notification.create(:name => 'Assignment Submitted Late')
@@ -285,77 +286,92 @@ describe Submission do
       @assignment.turnitin_settings = @assignment.turnitin_settings
       @assignment.save!
       submission_spec_model
-      @submission.turnitin_data = {
-        "submission_#{@submission.id}" => {
-          :web_overlap => 92,
-          :error => true,
-          :publication_overlap => 0,
-          :state => "failure",
-          :object_id => "123456789",
-          :student_overlap => 90,
-          :similarity_score => 92
+    end
+
+    context "submission" do
+      it "should submit to turnitin after a delay" do
+        @submission.submission_type = 'online_upload'
+        @submission.save!
+        job = Delayed::Job.find_by_tag('Submission#submit_to_turnitin')
+        job.should_not be_nil
+        job.run_at.should > Time.now.utc
+      end
+    end
+
+    context "report" do
+      before do
+        @submission.turnitin_data = {
+          "submission_#{@submission.id}" => {
+            :web_overlap => 92,
+            :error => true,
+            :publication_overlap => 0,
+            :state => "failure",
+            :object_id => "123456789",
+            :student_overlap => 90,
+            :similarity_score => 92
+          }
         }
-      }
-      @submission.save!
-
-      api = Turnitin::Client.new('test_account', 'sekret')
-      Turnitin::Client.expects(:new).at_least(1).returns(api)
-      api.expects(:sendRequest).with(:generate_report, 1, has_entries(:oid => "123456789")).at_least(1).returns('http://foo.bar')
-    end
-
-    it "should let teachers view the turnitin report" do
-      @teacher = User.create
-      @context.enroll_teacher(@teacher)
-      @submission.should be_grants_right(@teacher, nil, :view_turnitin_report)
-      @submission.turnitin_report_url("submission_#{@submission.id}", @teacher).should_not be_nil
-    end
-
-    it "should let students view the turnitin report after grading" do
-      @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
-      @assignment.save!
-      @submission.reload
-
-      @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
-      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
-
-      @submission.score = 1
-      @submission.grade_it!
-
-      @submission.should be_grants_right(@user, nil, :view_turnitin_report)
-      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
-    end
-
-    it "should let students view the turnitin report immediately if the visibility setting allows it" do
-      @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
-      @assignment.save
-      @submission.reload
-
-      @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
-      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
-
-      @assignment.turnitin_settings[:originality_report_visibility] = 'immediate'
-      @assignment.save
-      @submission.reload
-
-      @submission.should be_grants_right(@user, nil, :view_turnitin_report)
-      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
-    end
-
-    it "should let students view the turnitin report after the due date if the visibility setting allows it" do
-      @assignment.turnitin_settings[:originality_report_visibility] = 'after_due_date'
-      @assignment.due_at = Time.now + 1.day
-      @assignment.save
-      @submission.reload
-
-      @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
-      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
-
-      @assignment.due_at = Time.now - 1.day
-      @assignment.save
-      @submission.reload
-
-      @submission.should be_grants_right(@user, nil, :view_turnitin_report)
-      @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+        @submission.save!
+  
+        api = Turnitin::Client.new('test_account', 'sekret')
+        Turnitin::Client.expects(:new).at_least(1).returns(api)
+        api.expects(:sendRequest).with(:generate_report, 1, has_entries(:oid => "123456789")).at_least(1).returns('http://foo.bar')
+      end
+  
+      it "should let teachers view the turnitin report" do
+        @teacher = User.create
+        @context.enroll_teacher(@teacher)
+        @submission.should be_grants_right(@teacher, nil, :view_turnitin_report)
+        @submission.turnitin_report_url("submission_#{@submission.id}", @teacher).should_not be_nil
+      end
+  
+      it "should let students view the turnitin report after grading" do
+        @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
+        @assignment.save!
+        @submission.reload
+  
+        @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
+        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+  
+        @submission.score = 1
+        @submission.grade_it!
+  
+        @submission.should be_grants_right(@user, nil, :view_turnitin_report)
+        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+      end
+  
+      it "should let students view the turnitin report immediately if the visibility setting allows it" do
+        @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
+        @assignment.save
+        @submission.reload
+  
+        @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
+        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+  
+        @assignment.turnitin_settings[:originality_report_visibility] = 'immediate'
+        @assignment.save
+        @submission.reload
+  
+        @submission.should be_grants_right(@user, nil, :view_turnitin_report)
+        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+      end
+  
+      it "should let students view the turnitin report after the due date if the visibility setting allows it" do
+        @assignment.turnitin_settings[:originality_report_visibility] = 'after_due_date'
+        @assignment.due_at = Time.now + 1.day
+        @assignment.save
+        @submission.reload
+  
+        @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
+        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
+  
+        @assignment.due_at = Time.now - 1.day
+        @assignment.save
+        @submission.reload
+  
+        @submission.should be_grants_right(@user, nil, :view_turnitin_report)
+        @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
+      end
     end
   end
 

@@ -9,16 +9,16 @@
       <%= spanned_group_name %>
     <% end %>
     <% if in_group
-         if !group || group.free_association?(@current_user)
+         if !group || group.allow_self_signup?(@current_user) || group.student_organized?
            management_url = context_url @context, :context_group_url, (group ? group.id : '{{ id }}'), :leave => 1
-           management_text = t 'actions.leave_group', 'leave this group' 
+           management_text = t 'actions.leave_group', 'leave this group'
          end
        else
          # a group should always be present if in_group is false, and for the
          # group to be being displayed with in_group false, it must be free
          # associative
          management_url = context_url @context, :context_group_url, group.id, :join => 1
-         management_text = 
+         management_text =
            if group.auto_accept?(@current_user)
              t 'actions.join_group', 'join this group'
            elsif group.allow_self_signup?(@current_user)
@@ -44,7 +44,11 @@
           it, but will be the only user in it %>
       <% members_text = t :member, 'member', :count => group ? group.participating_users.length : 1 %>
       <% members_tooltip = t :member_tooltip_show, 'View group roster' %>
-      <% items << link_to(h(members_text), group_members_url(group ? group.id : "{{ id }}"), :class => 'toggle_members_link', :title => h(members_tooltip)) %>
+      <% if !group || group.grants_right?(@current_user, session, :read_roster) %>
+        <% items << link_to(h(members_text), group_members_url(group ? group.id : "{{ id }}"), :class => 'toggle_members_link members_count', :title => h(members_tooltip)) %>
+      <% else %>
+        <% items << "<span class='members_count'>#{h(members_text)}</span>" %>
+      <% end %>
     <% end %>
     <% items << h(group.group_category.name) if group && !group.student_organized? %>
     <%= items.join(", ").html_safe %>

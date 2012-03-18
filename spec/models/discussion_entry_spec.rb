@@ -90,25 +90,81 @@ describe DiscussionEntry do
     topic.message.should eql("<a href=\"#\">only this should stay</a>")
   end
 
-  it "should send new entry notifications" do
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+  context "entry notifications" do
+    before do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
 
-    notification_name = "New Discussion Entry"
-    n = Notification.create(:name => notification_name, :category => "TestImmediately")
-    NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      @notification_name = "New Discussion Entry"
+      n = Notification.create(:name => @notification_name, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+    end
 
-    topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
-    entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
+    it "should send them for course discussion topics" do
+      topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+      entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
 
-    to_users = entry.messages_sent[notification_name].map(&:user)
-    to_users.should include(@teacher)
-    to_users.should_not include(@student)
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include(@teacher)
+      to_users.should_not include(@student)
 
-    entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
-    to_users = entry.messages_sent[notification_name].map(&:user)
-    to_users.should_not include(@teacher)
-    to_users.should include(@student)
+      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should_not include(@teacher)
+      to_users.should include(@student)
+    end
+
+    it "should send them for group discussion topics" do
+      group(:group_context => @course)
+
+      s1 = @student
+      student_in_course(@course)
+      s2 = @student
+
+      @group.participating_users << s1
+      @group.participating_users << s2
+      @group.save!
+
+      topic = @group.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+      entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include(@teacher)
+      to_users.should_not include(s1)
+      to_users.should_not include(s2)
+
+      entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include(@teacher)
+      to_users.should include(s1)
+      to_users.should_not include(s2)
+    end
+
+    it "should not send them to irrelevant users" do
+      teacher  = @teacher
+      student1 = @student
+      course   = @course
+
+      student_in_course
+      quitter  = @student
+
+      course_with_teacher
+      student_in_course
+      outsider = @student
+
+      topic = course.discussion_topics.create!(:user => teacher, :message => "Hi there")
+
+      entry = topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
+      quitter.enrollments.each { |e| e.destroy }
+
+      weird_entry = topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
+      entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")
+
+      to_users = entry.messages_sent[@notification_name].map(&:user)
+      to_users.should include teacher
+      to_users.should_not include outsider
+      to_users.should_not include student1
+      to_users.should_not include quitter
+    end
   end
 
   context "send_to_inbox" do
@@ -199,6 +255,126 @@ describe DiscussionEntry do
       @entry.update_topic
       @topic.reload
       @topic.last_reply_at.should == @original_last_reply_at
+    end
+  end
+
+  it "should touch all parent discussion_topics through root_topic_id, on update" do
+    course_with_student(:active_all => true)
+    @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
+    @subtopic = @course.discussion_topics.create!(:title => "subtopic")
+    @subtopic.root_topic = @topic
+    @subtopic.save!
+
+    DiscussionTopic.update_all({ :updated_at => 1.hour.ago }, { :id => [@topic.id, @subtopic.id] })
+    @topic_updated_at = @topic.reload.updated_at
+    @subtopic_updated_at = @subtopic.reload.updated_at
+
+    @subtopic_entry = @subtopic.discussion_entries.create!(:message => "hello", :user => @user)
+
+    @subtopic_updated_at.to_i.should_not == @subtopic.reload.updated_at.to_i
+    @topic_updated_at.to_i.should_not == @topic.reload.updated_at.to_i
+  end
+
+  context "read/unread state" do
+    before(:each) do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
+      @entry = @topic.discussion_entries.create!(:message => "entry", :user => @teacher)
+    end
+
+    it "should mark a entry you created as read" do
+      @entry.read?(@teacher).should be_true
+      @topic.unread_count(@teacher).should == 0
+    end
+
+    it "should be unread by default" do
+      @entry.read?(@student).should be_false
+      @topic.unread_count(@student).should == 1
+    end
+
+    it "should allow being marked unread" do
+      @entry.change_read_state("unread", @teacher)
+      @entry.read?(@teacher).should be_false
+      @topic.unread_count(@teacher).should == 1
+    end
+
+    it "should allow being marked read" do
+      @entry.change_read_state("read", @student)
+      @entry.read?(@student).should be_true
+      @topic.unread_count(@student).should == 0
+    end
+
+    it "should update counts for an entry without a user" do
+      @other_entry = @topic.discussion_entries.create!(:message => "no user entry")
+      @topic.unread_count(@teacher).should == 1
+      @topic.unread_count(@student).should == 2
+    end
+
+    it "should decrement unread counts on destroy" do
+      @topic.unread_count(@student).should == 1
+      @entry.change_read_state("read", @student)
+      @topic.unread_count(@student).should == 0
+      @entry2 = @topic.discussion_entries.create!(:message => "entry 2", :user => @teacher)
+      @topic.unread_count(@student).should == 1
+      @entry2.destroy
+      @topic.unread_count(@student).should == 0
+      @topic.unread_count(@teacher).should == 0
+    end
+
+    it "should allow a complex series of read/unread updates" do
+      @s1 = @student
+      student_in_course(:active_all => true); @s2 = @student
+      student_in_course(:active_all => true); @s3 = @student
+
+      @topic.change_read_state("read", @s1)
+      @entry.change_read_state("read", @s1)
+      @s1entry = @topic.discussion_entries.create!(:message => "s1 entry", :user => @s1)
+      @topic.unread_count(@s1).should == 0
+
+      @entry.change_read_state("read", @s2)
+      @topic.discussion_topic_participants.find_by_user_id(@s2.id).should_not be_nil
+      @topic.change_read_state("read", @s2)
+      @s2entry = @topic.discussion_entries.create!(:message => "s2 entry", :user => @s2)
+      @s1entry.change_read_state("read", @s2)
+      @s1entry.change_read_state("unread", @s2)
+      @topic.unread_count(@s2).should == 1
+
+      @topic.unread_count(@s3).should == 3
+      @entry.change_read_state("read", @s3)
+      @s3reply = @entry.discussion_subentries.create!(:discussion_topic => @topic, :message => "s3 reply", :user => @s3)
+      @topic.unread_count(@s3).should == 2
+
+      @topic.unread_count(@s1).should == 2
+      @topic.unread_count(@s2).should == 2
+      @topic.unread_count(@teacher).should == 3
+
+      @topic.change_all_read_state("read", @s1)
+      @topic.unread_count(@s1).should == 0
+      @topic.read?(@s1).should be_true
+      @entry.read?(@s1).should be_true
+
+      @topic.change_all_read_state("unread", @s2)
+      @topic.unread_count(@s2).should == 4
+      @topic.read?(@s2).should be_false
+      @entry.read?(@s2).should be_false
+      @s1entry.destroy
+      @topic.unread_count(@s2).should == 3
+
+      student_in_course(:active_all => true); @s4 = @student
+      @topic.unread_count(@s4).should == 3
+      @topic.change_all_read_state("unread", @s4)
+      @topic.read?(@s4).should be_false
+      @entry.read?(@s4).should be_false
+
+      student_in_course(:active_all => true); @s5 = @student
+      @topic.change_all_read_state("read", @s5)
+      @topic.unread_count(@s5).should == 0
+    end
+
+    it "should use unique_constaint_retry when updating read state" do
+      DiscussionEntry.expects(:unique_constraint_retry).once
+      @entry.change_read_state("read", @student)
     end
   end
 end

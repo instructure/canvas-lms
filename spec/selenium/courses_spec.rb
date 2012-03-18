@@ -92,6 +92,7 @@ describe "courses" do
 
       get "/courses/#{@course.id}/details"
 
+      wait_for_ajaximations
       driver.find_element(:link, I18n.t('links.import', 'Import Content into this Course')).click
       driver.find_element(:css, '#content a.button').click
 

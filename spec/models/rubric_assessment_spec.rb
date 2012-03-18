@@ -20,6 +20,31 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe RubricAssessment do
+  it "should htmlify the rating comments" do
+    assignment_model
+    rubric_model
+    @student = user(:active_all => true)
+    @course.enroll_student(@student).accept
+    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    comment = "Hi, please see www.example.com.\n\nThanks."
+    @assessment = @association.assess({
+      :user => @student,
+      :assessor => @teacher,
+      :artifact => @assignment.find_or_create_submission(@student),
+      :assessment => {
+        :assessment_type => 'grading',
+        :criterion_crit1 => {
+          :points => 5,
+          :comments => comment,
+        }
+      }
+    })
+    @assessment.data.first[:comments].should == comment
+    t = Class.new
+    t.extend TextHelper
+    @assessment.data.first[:comments_html].should == t.format_message(comment).first
+  end
+
   context "grading" do
     it "should update scores if used for grading" do
       assignment_model
@@ -48,6 +73,7 @@ describe RubricAssessment do
       @assessment.artifact.user.should eql(@student)
       @assessment.artifact.grader.should eql(@teacher)
       @assessment.artifact.score.should eql(5.0)
+      @assessment.data.first[:comments_html].should be_nil
     end
     
     it "should not update scores if not used for grading" do

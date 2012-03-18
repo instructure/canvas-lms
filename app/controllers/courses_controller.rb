@@ -813,7 +813,7 @@ class CoursesController < ApplicationController
       params[:user_list] ||= ""
       
       respond_to do |format|
-        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account, params[:only_search_existing_users] ? false : @context.open_registration_for?(@current_user, session)), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_privileges_to_course_section => params[:limit_privileges_to_course_section] == '1'))
+        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account, @context.user_list_search_mode_for(@current_user)), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_privileges_to_course_section => params[:limit_privileges_to_course_section] == '1'))
           format.json do
             Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
             json = @enrollments.map { |e|
@@ -930,7 +930,7 @@ class CoursesController < ApplicationController
       end
       standard_id = params[:course].delete :grading_standard_id
       if standard_id && @course.grants_right?(@current_user, session, :manage_grades)
-        @course.grading_standard = GradingStandard.standards_for(@course, @current_user).detect{|s| s.id == standard_id.to_i }
+        @course.grading_standard = GradingStandard.standards_for(@course).detect{|s| s.id == standard_id.to_i }
       end
       if @course.root_account.grants_right?(@current_user, session, :manage_courses)
         if params[:course][:account_id]

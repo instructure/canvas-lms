@@ -32,17 +32,17 @@
 //   will be the body of the link if no text is currently selected.
 
 define([
-  'INST' /* INST */,
   'i18nObj',
-  'jquery' /* jQuery, $ */,
-  'compiled/tinymce',
+  'jquery',
+  //'compiled/tinymce', // required, but the bundles that ACTUALLY use
+                        // tiny can require it themselves
   'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
   'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
   'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/scribd.view' /* scribd */
-], function(INST, I18nObj, $, tinyMCE) {
+], function(I18nObj, $) {
 
   var enableBookmarking = $("body").hasClass('ie');
   $(document).ready(function() {
@@ -443,6 +443,7 @@ define([
     if(editor && editor.execCommand) {
       editor.execCommand.apply(editor, arguments);
     }
+    return this;
   };
   
   $.fn._justGetCode = function() {

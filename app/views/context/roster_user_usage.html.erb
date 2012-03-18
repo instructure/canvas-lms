@@ -75,7 +75,7 @@
         </td>
         <td class="view_score"><%= access.view_score %></td>
         <td class="participate_score"><%= access.participate_score %></td>
-        <td class="last_viewed time_ago_date"><%= datetime_string(access.updated_at) %></td>
+        <td class="last_viewed time_ago_date"><%= datetime_string(access.last_access) %></td>
       </tr>
     <% end %>
     <tr class="access blank" style="display: none;">
@@ -120,7 +120,7 @@
               var access = data[idx].asset_user_access;
               $access.addClass(access.asset_class_name);
               access.readable_name = access.readable_name || access.display_name || access.asset_code;
-              access.last_viewed = $.parseFromISO(access.updated_at).datetime_formatted;
+              access.last_viewed = $.parseFromISO(access.last_access).datetime_formatted;
               $access.fillTemplateData({data: access});
               $("#usage_report table tbody").append($access.show());
             }

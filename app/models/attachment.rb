@@ -43,7 +43,7 @@ class Attachment < ActiveRecord::Base
   before_destroy :delete_scribd_doc
   acts_as_list :scope => :folder
   after_save :touch_context_if_appropriate
-  after_create :build_media_object
+  after_save :build_media_object
   
   attr_accessor :podcast_associated_asset
 
@@ -111,9 +111,28 @@ class Attachment < ActiveRecord::Base
       send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 })
     end
 
+    send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/
     if respond_to?(:process_attachment_with_processing) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
       temp_file = temp_path || create_temp_file
       self.class.attachment_options[:thumbnails].each { |suffix, size| send_later_if_production(:create_thumbnail_size, suffix) }
+    end
+  end
+
+  def infer_encoding
+    return unless self.encoding.nil?
+    begin
+      Iconv.open('UTF-8', 'UTF-8') do |iconv|
+        self.open do |chunk|
+          iconv.iconv(chunk)
+        end
+        iconv.iconv(nil)
+      end
+      self.encoding = 'UTF-8'
+      Attachment.update_all({:encoding => 'UTF-8'}, {:id => self.id})
+    rescue Iconv::Failure
+      self.encoding = ''
+      Attachment.update_all({:encoding => ''}, {:id => self.id})
+      return
     end
   end
   
@@ -147,7 +166,10 @@ class Attachment < ActiveRecord::Base
   
   def build_media_object
     return true if self.class.skip_media_object_creation?
-    if self.content_type && self.content_type.match(/\A(video|audio)/)
+    in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/
+    transitioned_to_this_state = self.id_was == nil || self.file_state_changed? && self.workflow_state_was =~ /^unattached/
+    if in_the_right_state && transitioned_to_this_state &&
+        self.content_type && self.content_type.match(/\A(video|audio)/)
       delay = Setting.get_cached('attachment_build_media_object_delay_seconds', 10.to_s).to_i
       MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now }, self, false)
     end
@@ -200,7 +222,7 @@ class Attachment < ActiveRecord::Base
       item.locked = true if hash[:locked]
       item.file_state = 'hidden' if hash[:hidden]
       item.display_name = hash[:display_name] if hash[:display_name]
-      item.save_without_broadcasting!
+      item.save!
       context.imported_migration_items << item if context.imported_migration_items
     end
     item
@@ -619,6 +641,10 @@ class Attachment < ActiveRecord::Base
     )
   end
 
+  def content_type_with_encoding
+    encoding.blank? ? content_type : "#{content_type}; charset=#{encoding}"
+  end
+
   # Returns an IO-like object containing the contents of the attachment file.
   # Any resources are guaranteed to be cleaned up when the object is garbage
   # collected (for instance, using the Tempfile class). Calling close on the
@@ -639,9 +665,21 @@ class Attachment < ActiveRecord::Base
   # If opts[:temp_folder] is given, and a local temporary file is created, this
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
-  def open(opts = {})
+  def open(opts = {}, &block)
     if Attachment.local_storage?
-      File.open(self.full_filename, 'rb')
+      if block
+        File.open(self.full_filename, 'rb') { |file|
+          chunk = file.read(4096)
+          while chunk
+            yield chunk
+            chunk = file.read(4096)
+          end
+        }
+      else
+        File.open(self.full_filename, 'rb')
+      end
+    elsif block
+      AWS::S3::S3Object.stream(self.full_filename, self.bucket_name, &block)
     else
       # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
       # natively support streaming the response, except when a block is given.
@@ -690,18 +728,7 @@ class Attachment < ActiveRecord::Base
     end
     filename
   end
-  has_a_broadcast_policy
 
-  set_broadcast_policy do |p|
-    p.dispatch :new_file_added
-    p.to { context.participants - [user] }
-    p.whenever { |record| 
-      !@skip_broadcast_messages and 
-      record.context.state == :available and record.just_created and
-      record.folder.visible?
-    }
-  end
-  
   def infer_display_name
     self.display_name ||= unencoded_filename
   end

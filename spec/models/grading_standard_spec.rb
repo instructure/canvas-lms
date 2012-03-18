@@ -74,4 +74,24 @@ describe GradingStandard do
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
   end
+
+  context "standards_for" do
+    it "should return standards that match the context" do
+      course_with_teacher
+      grading_standard_for @course
+      
+      standards = GradingStandard.standards_for(@course)
+      standards.length.should == 1
+      standards[0].id.should == @standard.id
+    end
+
+    it "should include standards made in the parent account" do
+      course_with_teacher
+      grading_standard_for @course.root_account
+      
+      standards = GradingStandard.standards_for(@course)
+      standards.length.should == 1
+      standards[0].id.should == @standard.id
+    end
+  end
 end

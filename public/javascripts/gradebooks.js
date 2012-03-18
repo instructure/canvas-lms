@@ -84,8 +84,9 @@ define([
       }
     });
     
-    $courseSections.add('.gradebook_table .course_section').each(function() {
-      if ($(this).data('course_section_id') != sectionToShow){
+    $('.outer_student_name .course_sections, .gradebook_table .course_sections').each(function() {
+      var section_ids = $(this).data('course_section_ids').toString().split(",");
+      if (section_ids.indexOf(sectionToShow) == -1) {
         $(this).closest('tr').remove();
       } else {
         var studentId = $(this).closest('.student_header').attr('id');
@@ -1679,7 +1680,7 @@ define([
       .find(".submission_comments").empty().end()
       .find(".comment_attachments").empty().end()
       .find(".save_buttons,.add_comment").showIf(!readOnlyGradebook).end()
-      .find(".group_comment").showIf(assignment && assignment.group_category).find(":checkbox").attr('checked', true).end().end();
+      .find(".group_comment").showIf(assignment && assignment.group_category).find(":checkbox").attr('checked', false).end().end();
 
     if(readOnlyGradebook) {
       $submission_information.find(".grade_entry").text(grade || "-");

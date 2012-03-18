@@ -2851,46 +2851,63 @@ describe Course, "user_is_teacher?" do
   end
 end
 
-describe Course, "#gradebook_json" do
-  it "should generate gradebook json" do
-    course_with_student(:active_all => true)
-    # user with no submissions
-    s0 = @user
-    # 2 users with some submissions
-    s1 = student_in_course(:course => @course, :active_all => true).user
-    s2 = student_in_course(:course => @course, :active_all => true).user
-    # shouldn't include concluded enrollments
-    student_in_course(:course => @course, :active_all => true).complete!
-    # 2 active assignments
-    a1 = assignment_model(:course => @course)
-    a2 = assignment_model(:course => @course)
-    # shouldn't include soft-deleted assignments
-    assignment_model(:course => @course).destroy
+describe Course, "user_has_been_teacher?" do
+  it "should be true for teachers, past or present" do
+    e = course_with_teacher(:active_all => true)
+    @course.user_has_been_teacher?(@teacher).should be_true
 
-    # make some submissions
-    a1.grade_student(s2, { :score => 3 })
-    a2.grade_student(s1, { :score => 5 })
-    a2.grade_student(s2, { :score => 1 })
+    e.conclude
+    e.reload.workflow_state.should == "completed"
+    @course.user_has_been_teacher?(@teacher).should be_true
 
-    hash = JSON.parse(@course.gradebook_json)
+    @course.complete
+    @course.user_has_been_teacher?(@teacher).should be_true
+  end
+end
 
-    hash['active_assignments'].size.should == 2
-    hash['students'].size.should == 3
+describe Course, "user_has_been_student?" do
+  it "should be true for students, past or present" do
+    e = course_with_student(:active_all => true)
+    @course.user_has_been_student?(@student).should be_true
 
-    hash.delete('active_assignments').sort_by { |a| a['id'] }.should == JSON.parse(@course.active_assignments.sort_by { |a| a.id }.map { |a| a.as_json(:include_root => false) }.to_json)
+    e.conclude
+    e.reload.workflow_state.should == "completed"
+    @course.user_has_been_student?(@student).should be_true
 
-    # verify inclusion of users and submission counts
-    sorted_students = hash.delete('students').sort_by { |u| u['id'] }
-    sorted_students.map { |u| u['id'] }.should == [s0.id, s1.id, s2.id]
-    # count # of submissions for each student
-    sorted_students.map { |u| u['submissions'].size }.should == [0, 1, 2]
+    @course.complete
+    @course.user_has_been_student?(@student).should be_true
+  end
+end
 
-    sorted_students.each do |user_hash|
-      user = User.find(user_hash['id'])
-      user_hash.delete('submissions').sort_by { |s| s['id'] }.should == JSON.parse(@course.submissions.select { |s| s.user_id == user.id }.sort_by { |s| s.assignment_id }.map { |s| s.as_json(:include_root => false) }.to_json)
-      user_hash.should == JSON.parse(user.to_json(:include_root => false))
+describe Course do
+  describe "user_list_search_mode_for" do
+    it "should be open for anyone if open registration is turned on" do
+      account = Account.default
+      account.settings = { :open_registration => true }
+      account.save!
+      course
+      @course.user_list_search_mode_for(nil).should == :open
+      @course.user_list_search_mode_for(user).should == :open
     end
 
-    hash.should == JSON.parse(@course.to_json(:include_root => false))
+    it "should be preferred for account admins" do
+      account = Account.default
+      course
+      @course.user_list_search_mode_for(nil).should == :closed
+      @course.user_list_search_mode_for(user).should == :closed
+      user
+      account.add_user(@user)
+      @course.user_list_search_mode_for(@user).should == :preferred
+    end
+
+    it "should be preferred if delegated authentication is configured" do
+      account = Account.default
+      account.settings = { :open_registration => true }
+      account.account_authorization_configs.create!(:auth_type => 'cas')
+      account.save!
+      course
+      @course.user_list_search_mode_for(nil).should == :preferred
+      @course.user_list_search_mode_for(user).should == :preferred
+    end
   end
 end

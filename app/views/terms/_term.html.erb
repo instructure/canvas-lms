@@ -5,7 +5,7 @@
       <span class="name"><%= term.name rescue nbsp %></span>
     </div>
     <div class="show_term" style="font-size: 0.8em;">
-      <% if term && (term.sis_source_id || can_do(term.root_account, @current_user, :manage_sis)) %>
+      <% if term && (term.sis_source_id && can_do(term.root_account, @current_user, :read_sis) || can_do(term.root_account, @current_user, :manage_sis)) %>
         <div style="font-size: 0.8em;">
           <%= before_label :sis_id, "SIS ID" %> <span class="sis_source_id"><%= term.sis_source_id %></span>
         </div>

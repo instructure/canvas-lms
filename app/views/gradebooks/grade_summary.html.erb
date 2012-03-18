@@ -123,7 +123,7 @@
      # so this wouldn't hit the query cache)
      submission.assignment = assignment if submission
      visible_rubric_assessments = []
-     visible_rubric_assessments = submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] } if submission
+     visible_rubric_assessments = submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] } if submission && !assignment.muted?
   %>
   <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %> <%= assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable" %>" data-muted="<%= assignment.muted? %>" id="<%= "submission_" + assignment.id.to_s %>">
     <td class="title">
@@ -165,13 +165,28 @@
             <% end %>
           </span>
           <% if assignment.grading_type == 'letter_grade' %>
-            <span class="score_value" style="font-size: 0.8em; color: #aaa; <%= hidden unless submission && submission.published_score %>"><%= submission.published_score rescue nbsp %></span>
+            <span class="score_value" style="font-size: 0.8em; color: #aaa;">
+              <% unless assignment.muted? || submission.nil? %>
+                <%= submission.published_score %>
+                (<%= submission.published_grade %>)
+              <% end %>
+            </span>
           <% end %>
           <%= "%" if assignment.special_class %>
         </span>
         <div style="display: none;">
-          <span class="original_score"><%= if assignment.muted? then "" else submission.published_score end rescue "" %></span>
-          <span class="score"><%= if assignment.muted? then "" else submission.published_score end rescue "" %></span>
+          <span class="original_score">
+            <% unless assignment.muted? || submission.nil? %>
+              <%= submission.published_score %>
+              <%= assignment.grading_type == 'letter_grade' ? "(#{submission.published_grade})" : '' %>
+            <% end %>
+          </span>
+          <span class="score">
+            <% unless assignment.muted? || submission.nil? %>
+              <%= submission.published_score %>
+              <%= assignment.grading_type == 'letter_grade' ? "(#{submission.published_grade})" : '' %>
+            <% end %>
+          </span>
           <span class="assignment_group_id"><%= assignment.assignment_group_id rescue "" %></span>
           <span class="assignment_id"><%= assignment.id.to_s %></span>
           <span class="group_weight"><%= assignment.group_weight rescue "" %></span>

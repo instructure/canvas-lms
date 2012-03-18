@@ -28,7 +28,7 @@ module Api::V1::Course
     base_attributes = %w(id name course_code account_id)
     allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes
     hash = api_json(course, user, session, :only => allowed_attributes)
-    hash['sis_course_id'] = course.sis_source_id
+    hash['sis_course_id'] = course.sis_source_id if course.root_account.grants_rights?(user, :read_sis, :manage_sis).values.any?
     if enrollments
       hash['enrollments'] = enrollments.map do |e|
         h = { :type => e.readable_type.downcase }

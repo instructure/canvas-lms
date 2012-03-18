@@ -276,6 +276,31 @@ class AccountAuthorizationConfigsController < ApplicationController
     end
     redirect_to :account_account_authorization_configs
   end
+  
+  def saml_testing
+    if @account.saml_authentication?
+      @account_config = @account.account_authorization_config
+      @account_config.start_debugging if params[:start_debugging]
+
+      respond_to do |format|
+        format.html { render :partial => 'saml_testing', :layout => false }
+        format.json { render :json => {:debugging => @account_config.debugging?, :debug_data => render_to_string(:partial => 'saml_testing.html', :layout => false) }.to_json }
+      end
+    else
+      respond_to do |format|
+        format.html { render :partial => 'saml_testing', :layout => false }
+        format.json { render :json => {:errors => {:account => t(:saml_required, "A SAML configuration is required to test SAML")}.to_json} }
+      end
+    end
+  end
+  
+  def saml_testing_stop
+      if @account_config = @account.account_authorization_config
+        @account_config.finish_debugging 
+      end
+      
+      render :json => {:status => "ok"}.to_json
+  end
 
   protected
   def recognized_params(auth_type)

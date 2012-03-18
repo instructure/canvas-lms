@@ -205,6 +205,52 @@ describe "editing external tools" do
     @tag.url.should == "http://www.example.com"
   end
 
+  it "should allow adding an existing external tool to a course module, and should pick the correct tool" do
+    @module = @course.context_modules.create!(:name => "module")
+    @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @tool2 = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    
+    get "/courses/#{@course.id}/modules"
+
+    keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
+
+    driver.find_element(:css, "#context_module_#{@module.id} .add_module_item_link").click
+    driver.find_element(:css, "#add_module_item_select option[value='context_external_tool']").click
+    keep_trying_until { driver.find_elements(:css, "#context_external_tools_select .tools .tool").length > 0 }
+    driver.find_elements(:css, "#context_external_tools_select .tools .tool")[1].click
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == @tool2.url
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == @tool2.name
+    driver.find_elements(:css, "#context_external_tools_select .tools .tool")[0].click
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == @tool1.url
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == @tool1.name
+    driver.find_element(:css, "#select_context_content_dialog .add_item_button").click
+
+    keep_trying_until { !driver.find_element(:css, "#select_context_content_dialog").displayed? }
+    keep_trying_until { driver.find_elements(:css, "#context_module_item_new").length == 0 }
+
+    @tag = ContentTag.last
+    @tag.should_not be_nil
+    @tag.title.should == @tool1.name
+    @tag.url.should == @tool1.url
+    @tag.content.should == @tool1
+
+    driver.find_element(:css, "#context_module_#{@module.id} .add_module_item_link").click
+    driver.find_element(:css, "#add_module_item_select option[value='context_external_tool']").click
+    driver.find_elements(:css, "#context_external_tools_select .tools .tool")[1].click
+    driver.find_element(:css, "#external_tool_create_url").attribute('value').should == @tool2.url
+    driver.find_element(:css, "#external_tool_create_title").attribute('value').should == @tool2.name
+    driver.find_element(:css, "#select_context_content_dialog .add_item_button").click
+
+    keep_trying_until { !driver.find_element(:css, "#select_context_content_dialog").displayed? }
+    keep_trying_until { driver.find_elements(:css, "#context_module_item_new").length == 0 }
+
+    @tag = ContentTag.last
+    @tag.should_not be_nil
+    @tag.title.should == @tool2.name
+    @tag.url.should == @tool2.url
+    @tag.content.should == @tool2
+  end
+
   it "should allow adding an external tool with resource selection enabled to a course module" do
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")

@@ -409,24 +409,6 @@ define([
 
   };
 
-  $.fn.fixDialogButtons = function() {
-    return this.each(function() {
-      var $dialog = $(this);
-      $dialog.find('.button-container:last .button, button[type=submit]').ifExists(function($buttons){
-        $dialog.find('.button-container:last, button[type=submit]').hide();
-        var buttons = $buttons.map(function() {
-          var $button = $(this);
-          return {
-            text: $button.text(),
-            'data-text-while-loading': $button.data('textWhileLoading'),
-            click: function() { $button.click() }
-          };
-        }).get();
-        if (buttons.length) $dialog.dialog('option', 'buttons', buttons);
-      });
-    });
-  }
-
   return $;
 });
 

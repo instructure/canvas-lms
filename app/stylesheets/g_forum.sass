@@ -1,5 +1,7 @@
 @import environment.sass
 .discussion_topic,.announcement
+  &.read .header .title
+    font-weight: normal
   div
     &.header
       .announcement_icon
@@ -10,7 +12,7 @@
           :display inline
           :visibility visible
           :opacity 1.0
-      
+
       .editable_locked_icon
         :display inline
         :cursor pointer
@@ -21,8 +23,8 @@
         &.locked
           :visibility visible
           :opacity 1.0
-      
-      
+
+
       .editable_locked_icon_hover
         :visibility visible
         :opacity 0.5
@@ -36,24 +38,24 @@
       :display inline
     .discussion_topic_icon
       :display none
-    
+
 .discussion_entry
   div
     &.header
       .right_bar
         :float right
-  
+
       .left_bar
         :float left
         :padding-top 2px
-      
+
       .teaser_message
         :float left
         :width 70%
         :overflow hidden
         :white-space nowrap
         :display none
-    
+
       .user_name
         :padding-left 0px
         :color #888
@@ -61,6 +63,11 @@
       .post_date
         :padding-top 0
         :color #666
+  &.unread, &.just_read
+    background: url('/images/discussion_entry_unread.png') 8px 35px no-repeat
+
+  &.just_read
+    background-image: url('/images/discussion_entry_just_read.png')
 
   &.clump
     div.header
@@ -79,7 +86,7 @@
           :padding-left 10px
     div.content
       :display none
-        
+
 .discussion_subtopic
   :padding-left 15px
   .discussion_entry
@@ -97,8 +104,8 @@
     +border-top-radius(3px)
 .discussion_end
   +border-bottom-radius(5px)
-  
-#topic_list .discussion_topic .user_content .media_comment_thumbnail, 
+
+#topic_list .discussion_topic .user_content .media_comment_thumbnail,
 #entry_list .discussion_entry .user_content .media_comment_thumbnail
   margin: 3px 0
 #entry_list.agglomerated .discussion_entry .header .link_box

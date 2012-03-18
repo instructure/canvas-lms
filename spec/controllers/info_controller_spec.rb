@@ -31,28 +31,6 @@ describe InfoController do
 
   end
 
-  describe "GET 'avatar_image_url'" do
-    it "should redirect to no_pic if no avatar is set" do
-      course_with_student_logged_in(:active_all => true)
-      get 'avatar_image_url', :user_id  => @user.id
-      response.should redirect_to '/images/no_pic.gif'
-    end
-    it "should handle passing a fallback" do
-      course_with_student_logged_in(:active_all => true)
-      get 'avatar_image_url', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
-      response.should redirect_to '/my/custom/fallback/url.png'
-    end
-    it "should handle passing a fallback when avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.save!
-      @account.service_enabled?(:avatars).should be_true
-      get 'avatar_image_url', :user_id  => @user.id, :fallback => "https://test.domain/my/custom/fallback/url.png"
-      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=https%3A%2F%2Ftest.domain%2Fmy%2Fcustom%2Ffallback%2Furl.png"
-    end
-  end
-
   def assert_recorded_error(msg = "Thanks for your help!  We'll get right on this")
     flash[:notice].should eql(msg)
     response.should be_redirect

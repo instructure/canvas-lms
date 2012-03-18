@@ -89,10 +89,10 @@ describe "grades" do
       #test changing existing scores
       first_row_grade = driver.find_element(:css, "#submission_#{@submission.assignment_id} .assignment_score .grade")
       first_row_grade.click
-      first_row_grade.find_element(:css, 'input').clear
-      first_row_grade.find_element(:css, 'input').send_keys("4")
-      first_row_grade.find_element(:css, 'input').send_keys Selenium::WebDriver::Keys[:return]
-      final_row.find_element(:css, '.assignment_score .grade').text.should == '40'
+      set_value(first_row_grade.find_element(:css, 'input'), '4')
+      first_row_grade.find_element(:css, 'input').send_keys(:return)
+      wait_for_ajax_requests
+      keep_trying_until { final_row.find_element(:css, '.assignment_score .grade').text.should == '40' }
 
       wait_for_ajax_requests
     end
@@ -107,6 +107,31 @@ describe "grades" do
 
       #check rubric comment
       driver.find_element(:css, '.assessment-comments div').text.should == 'cool, yo'
+    end
+
+    it "should not display rubric on muted assignment" do
+      @first_assignment.muted = true
+      @first_assignment.save!
+      get "/courses/#{@course.id}/grades"
+
+      f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").should_not be_displayed
+    end
+
+    it "should not display letter grade score on muted assignment" do
+      @another_assignment = assignment_model({
+                                               :course => @course,
+                                               :name => 'another assignment',
+                                               :points_possible => 100,
+                                               :submission_types => 'online_text_entry',
+                                               :assignment_group => @group,
+                                               :grading_type => 'letter_grade',
+                                               :muted => 'true'
+                                             })
+      @another_submission = @another_assignment.submit_homework(@student_1, :body => 'student second submission')
+      @another_assignment.grade_student(@student_1, :grade => 81)
+      @another_submission.save!
+      get "/courses/#{@course.id}/grades"
+      f('.score_value').text.should == ''
     end
 
     it "should display teacher comment and assignment statistics" do

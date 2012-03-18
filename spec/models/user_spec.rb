@@ -533,62 +533,85 @@ describe User do
       @user1.associated_accounts.map(&:id).sort.should == []
       @user2.associated_accounts.map(&:id).sort.should == [@account1, @account2, @subaccount1, @subaccount2, @subsubaccount1, @subsubaccount2].map(&:id).sort
     end
+
+    it "should move conversations to the new user" do
+      @user1 = user_model
+      @user2 = user_model
+      c1 = @user1.initiate_conversation([user.id, user.id]) # group conversation
+      c1.add_message("hello")
+      c1.update_attribute(:workflow_state, 'unread')
+      c2 = @user1.initiate_conversation([user.id]) # private conversation
+      c2.add_message("hello")
+      c2.update_attribute(:workflow_state, 'unread')
+      old_private_hash = c2.conversation.private_hash
+
+      @user1.move_to_user @user2
+
+      c1.reload.user_id.should eql @user2.id
+      c1.conversation.participant_ids.should_not include(@user1.id)
+      @user1.reload.unread_conversations_count.should eql 0
+
+      c2.reload.user_id.should eql @user2.id
+      c2.conversation.participant_ids.should_not include(@user1.id)
+      c2.conversation.private_hash.should_not eql old_private_hash
+      @user2.reload.unread_conversations_count.should eql 2
+    end
+
+    it "should point other user's observers to the new user" do
+      @user1 = user_model
+      @user2 = user_model
+      @observer = user_model
+      course
+      @course.enroll_student(@user1)
+      @oe = @course.enroll_user(@observer, 'ObserverEnrollment')
+      @oe.update_attribute(:associated_user_id, @user1.id)
+      @user1.move_to_user(@user2)
+      @oe.reload.associated_user_id.should == @user2.id
+    end
   end
 
-  context "permissions" do
-    it "should grant become_user to self" do
+  describe "can_masquerade?" do
+    it "should allow self" do
       @user = user_with_pseudonym(:username => 'nobody1@example.com')
-      @user.grants_right?(@user, nil, :become_user).should be_true
+      @user.can_masquerade?(@user, Account.default).should be_true
     end
 
-    it "should not grant become_user to other users" do
+    it "should not allow other users" do
       @user1 = user_with_pseudonym(:username => 'nobody1@example.com')
       @user2 = user_with_pseudonym(:username => 'nobody2@example.com')
-      @user1.grants_right?(@user2, nil, :become_user).should be_false
-      @user2.grants_right?(@user1, nil, :become_user).should be_false
+
+      @user1.can_masquerade?(@user2, Account.default).should be_false
+      @user2.can_masquerade?(@user1, Account.default).should be_false
     end
 
-    it "should grant become_user to site and account admins" do
+    it "should allow site and account admins" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
-      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
+      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
       Account.site_admin.add_user(@site_admin)
       Account.default.add_user(@admin)
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
-      @admin.grants_right?(@site_admin, nil, :become_user).should be_true
-      user.grants_right?(@admin, nil, :become_user).should be_true
-      @admin.grants_right?(@admin, nil, :become_user).should be_true
-      @admin.grants_right?(user, nil, :become_user).should be_false
-      @site_admin.grants_right?(@site_admin, nil, :become_user).should be_true
-      @site_admin.grants_right?(user, nil, :become_user).should be_false
-      @site_admin.grants_right?(@admin, nil, :become_user).should be_false
+      user.can_masquerade?(@site_admin, Account.default).should be_true
+      @admin.can_masquerade?(@site_admin, Account.default).should be_true
+      user.can_masquerade?(@admin, Account.default).should be_true
+      @admin.can_masquerade?(@admin, Account.default).should be_true
+      @admin.can_masquerade?(user, Account.default).should be_false
+      @site_admin.can_masquerade?(@site_admin, Account.default).should be_true
+      @site_admin.can_masquerade?(user, Account.default).should be_false
+      @site_admin.can_masquerade?(@admin, Account.default).should be_false
     end
 
-    it "should not grant become_user to other site admins" do
-      @site_admin1 = user_with_pseudonym(:username => 'nobody1@example.com')
-      @site_admin2 = user_with_pseudonym(:username => 'nobody2@example.com')
-      Account.site_admin.add_user(@site_admin1)
-      Account.site_admin.add_user(@site_admin2)
-      @site_admin1.grants_right?(@site_admin2, nil, :become_user).should be_false
-      @site_admin2.grants_right?(@site_admin1, nil, :become_user).should be_false
+    it "should not allow restricted admins to become full admins" do
+      user = user_with_pseudonym(:username => 'nobody1@example.com')
+      @restricted_admin = user_with_pseudonym(:username => 'nobody3@example.com')
+      account_admin_user_with_role_changes(:user => @restricted_admin, :membership_type => 'Restricted', :role_changes => { :become_user => true })
+      @admin = user_with_pseudonym(:username => 'nobody2@example.com')
+      Account.default.add_user(@admin)
+      user.can_masquerade?(@restricted_admin, Account.default).should be_true
+      @admin.can_masquerade?(@restricted_admin, Account.default).should be_false
+      @restricted_admin.can_masquerade?(@admin, Account.default).should be_true
     end
 
-    it "should not grant become_user to other account admins" do
-      @admin1 = user_with_pseudonym(:username => 'nobody1@example.com')
-      @admin2 = user_with_pseudonym(:username => 'nobody2@example.com')
-      Account.default.add_user(@admin1)
-      Account.default.add_user(@admin2)
-      @admin1.grants_right?(@admin2, nil, :become_user).should be_false
-      @admin2.grants_right?(@admin1, nil, :become_user).should be_false
-    end
-
-    it "should not allow account admin to modify admin privileges of other account admins" do
-      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
-    end
-
-    it "should grant become_user for users in multiple accounts to site admins but not account admins" do
+    it "should allow to admin even if user is in multiple accounts" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @account2 = Account.create!
       user.pseudonyms.create!(:unique_id => 'nobodyelse@example.com', :account => @account2)
@@ -596,26 +619,19 @@ describe User do
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
       Account.default.add_user(@admin)
       Account.site_admin.add_user(@site_admin)
-      user.grants_right?(@admin, nil, :become_user).should be_false
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
+      user.can_masquerade?(@admin, Account.default).should be_true
+      user.can_masquerade?(@admin, @account2).should be_false
+      user.can_masquerade?(@site_admin, Account.default).should be_true
+      user.can_masquerade?(@site_admin, @account2).should be_true
       @account2.add_user(@admin)
-      user.grants_right?(@admin, nil, :become_user).should be_false
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
     end
+  end
 
-    it "should not grant become_user for dis-associated users" do
-      @user1 = user_model
-      @user2 = user_model
-      @user1.grants_right?(@user2, nil, :become_user).should be_false
-      @user2.grants_right?(@user1, nil, :become_user).should be_false
-    end
-
-    it "should grant become_user for dis-associated users to site admins" do
-      user = user_model
-      @site_admin = user_model
-      Account.site_admin.add_user(@site_admin)
-      user.grants_right?(@site_admin, nil, :become_user).should be_true
-      @site_admin.grants_right?(user, nil, :become_user).should be_false
+  context "permissions" do
+    it "should not allow account admin to modify admin privileges of other account admins" do
+      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
     end
   end
 
@@ -633,7 +649,7 @@ describe User do
       @course.offer!
 
       @this_section_user = user_model
-      @course.enroll_user(@this_section_user, 'StudentEnrollment', :enrollment_state => 'active')
+      @this_section_user_enrollment = @course.enroll_user(@this_section_user, 'StudentEnrollment', :enrollment_state => 'active')
 
       @other_section_user = user_model
       @other_section = @course.course_sections.create
@@ -645,6 +661,10 @@ describe User do
       @group.users = [@this_section_user]
 
       @unrelated_user = user_model
+
+      @deleted_user = user_model(:name => 'deleted')
+      @course.enroll_user(@deleted_user, 'StudentEnrollment', :enrollment_state => 'active')
+      @deleted_user.destroy
     end
 
     it "should only return users from the specified context and type" do
@@ -653,12 +673,14 @@ describe User do
 
       @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
         should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
+      @student.enrollment_visibility[:user_counts][@course.id].should eql 5
 
       @student.messageable_users(:context => "course_#{@course.id}_students").map(&:id).sort.
         should eql [@student, @this_section_user, @other_section_user].map(&:id).sort
 
       @student.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.
         should eql [@this_section_user].map(&:id).sort
+      @student.group_membership_visibility[:user_counts][@group.id].should eql 1
 
       @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id).sort.
         should eql [@other_section_user, @other_section_teacher].map(&:id).sort
@@ -680,6 +702,20 @@ describe User do
 
       messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
       messageable_users.should be_empty
+    end
+
+    it "should not include deleted users" do
+      set_up_course_with_users
+      @student.messageable_users.map(&:id).should_not include(@deleted_user.id)
+      @student.messageable_users(:search => @deleted_user.name).map(&:id).should be_empty
+      @student.messageable_users(:ids => [@deleted_user.id]).map(&:id).should be_empty
+      @student.messageable_users(:skip_visibility_checks => true).map(&:id).should_not include(@deleted_user.id)
+      @student.messageable_users(:skip_visibility_checks => true, :search => @deleted_user.name).map(&:id).should be_empty
+    end
+
+    it "should include deleted iff skip_visibility_checks=true && ids are given" do
+      set_up_course_with_users
+      @student.messageable_users(:skip_visibility_checks => true, :ids => [@deleted_user.id]).map(&:id).should == [@deleted_user.id]
     end
 
     it "should only include users from the specified section" do
@@ -711,11 +747,34 @@ describe User do
       @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
     end
 
+    it "should return concluded enrollments in the group if they are still members" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      @this_section_user_enrollment.conclude
+
+      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+    end
+
     it "should respect section visibility when returning users for a specified group" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
+
+      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
+      @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
+      # student can only see people in his section
+      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @student.group_membership_visibility[:user_counts][@group.id].should eql 1
+    end
+
+    it "should return concluded enrollments in the group and section if they are still members" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+
+      @group.users << @other_section_user
+      @this_section_user_enrollment.conclude
 
       @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
       @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
@@ -1313,6 +1372,36 @@ describe User do
         events.size.should eql 1
         events.first.title.should eql 'test appointment'
       end
+    end
+  end
+  describe "avatar_key" do
+    it "should return a valid avatar key for a valid user id" do
+      User.avatar_key(1).should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
+      User.avatar_key("1").should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
+      User.avatar_key("2").should == "2-#{Canvas::Security.hmac_sha1('2')[0,10]}"
+      User.avatar_key("161612461246").should == "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0,10]}"
+    end
+    it" should return '0' for an invalid user id" do
+      User.avatar_key(nil).should == "0"
+      User.avatar_key("").should == "0"
+      User.avatar_key(0).should == "0"
+    end
+  end
+  describe "user_id_from_avatar_key" do
+    it "should return a valid user id for a valid avatar key" do
+      User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')[0,10]}").should == '1'
+      User.user_id_from_avatar_key("2-#{Canvas::Security.hmac_sha1('2')[0,10]}").should == '2'
+      User.user_id_from_avatar_key("1536394658-#{Canvas::Security.hmac_sha1('1536394658')[0,10]}").should == '1536394658'
+    end
+    it "should return nil for an invalid avatar key" do
+      User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')}").should == nil
+      User.user_id_from_avatar_key("1").should == nil
+      User.user_id_from_avatar_key("2-123456").should == nil
+      User.user_id_from_avatar_key("a").should == nil
+      User.user_id_from_avatar_key(nil).should == nil
+      User.user_id_from_avatar_key("").should == nil
+      User.user_id_from_avatar_key("-").should == nil
+      User.user_id_from_avatar_key("-159135").should == nil
     end
   end
 end

@@ -8,16 +8,18 @@
   entry_key = entry.new_record? ? entry.try_rescue(:discussion_topic).try_rescue(:cache_key) : entry.try_rescue(:cache_key) if entry
   entry_key ||= entry_context.try_rescue(:asset_string) || 'blank'
   skip_sub_entries ||= false
+  read_state = entry ? entry.read_state(@current_user) : "read"
  %>
 <% cache([
-    'entry_message_render', 
-    entry_key, 
-    out_of_context, 
+    'entry_message_render',
+    entry_key,
+    out_of_context,
     skip_sub_entries,
     @topic_agglomerated,
-    Time.zone.utc_offset
+    Time.zone.utc_offset,
+    read_state
   ].join('/')) do %>
-<div class="discussion_entry communication_message" style="<%= entry_exists ? "" : "display: none;" %>" id="entry_<%= entry_exists ? entry.id : "blank" %>">
+<div class="discussion_entry communication_message can_be_marked_as_read <%= read_state %>" <%= hidden(true) unless entry_exists %> id="entry_<%= entry_exists ? entry.id : "blank" %>" data-mark-read-url="<%= entry_exists && entry_id && context_url(entry_context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, discussion_topic_id, entry_id) %>">
   <div class="header">
     <% if entry && entry.new_record? && entry.new_record_header %>
       <%= entry.new_record_header %>

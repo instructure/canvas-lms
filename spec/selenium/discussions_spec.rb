@@ -47,6 +47,35 @@ describe "discussions" do
       driver.find_elements(:css, ".image_list .img_holder").length.should == 2
     end
 
+    it "should work with graded assignments and pageless" do
+
+      get "/courses/#{@course.id}/discussion_topics"
+      # create some topics. 11 is enough to trigger pageless with default value
+      # of 10 per page
+
+      driver.find_element(:css, '.add_topic_link').click
+      type_in_tiny('#topic_content_topic_new', 'asdf')
+      driver.find_element(:css, '.more_options_link').click
+      driver.find_element(:id, 'discussion_topic_assignment_set_assignment').click
+      driver.find_element(:css, '#add_topic_form_topic_new .submit_button').click
+
+      wait_for_ajax_requests
+
+      10.times do |i|
+        @course.discussion_topics.create!(:title => "Topic #{i}")
+      end
+
+      get "/courses/#{@course.id}/discussion_topics"
+
+      # scroll window to trigger pageless for #topic_list
+      driver.execute_script('window.scrollTo(0, 100000)')
+      wait_for_ajaximations
+      driver.execute_script "$('.discussion_topic:visible:last').mouseover()"
+      find_with_jquery('.edit_topic_link:visible:last').click
+      driver.find_element(:css, '.more_options_link').click
+      driver.find_element(:id, 'discussion_topic_assignment_set_assignment')['checked'].should_not be_nil
+    end
+
     it "should not record a javascript error when creating the first topic" do
       get "/courses/#{@course.id}/discussion_topics"
 
@@ -140,6 +169,33 @@ describe "discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
 
       driver.find_element(:id, "entry_#{entry.id}").should include_text('new entry from student')
+    end
+  end
+
+  context "marking as read" do
+    it "should mark things as read" do
+      reply_count = 3
+      course_with_teacher_logged_in
+      @topic = @course.discussion_topics.create!
+      reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet') }
+
+      # make sure everything looks unread
+      get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
+      driver.find_elements(:css, '.can_be_marked_as_read.unread').length.should eql(reply_count + 1)
+      driver.find_element(:css, '.topic_unread_entries_count').text.should eql(reply_count.to_s)
+
+      #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
+      sleep 2
+      driver.find_elements(:css, '.can_be_marked_as_read.unread').should be_empty
+      driver.find_elements(:css, '.can_be_marked_as_read.just_read').length.should eql(reply_count + 1)
+      driver.find_element(:css, '.topic_unread_entries_count').text.should eql('')
+
+      # refresh page and make sure nothing is unread/just_read and everthing is .read
+      get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
+      ['unread', 'just_read'].each do |state|
+        driver.find_elements(:css, ".can_be_marked_as_read.#{state}").should be_empty
+      end
+      driver.find_element(:css, '.topic_unread_entries_count').text.should eql('')
     end
   end
 end

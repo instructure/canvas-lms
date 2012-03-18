@@ -58,3 +58,7 @@ spec/javascripts/helpers/*
 public/optimized
 !node_modules
 chromedriver.log
+public/plugins/
+app/coffeescripts/plugins/
+app/views/jst/plugins/
+app/stylesheets/plugins/

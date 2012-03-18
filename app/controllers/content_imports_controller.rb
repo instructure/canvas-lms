@@ -18,12 +18,18 @@
 
 # @API Courses
 class ContentImportsController < ApplicationController
-  before_filter :require_context
-  add_crumb(proc { t 'crumbs.content_imports', "Content Imports" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
+  before_filter :require_context, :add_imports_crumb
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   
   include Api::V1::Course
+
+  def add_imports_crumb
+    if @context.is_a?(Course)
+      add_crumb(t('crumbs.content_imports', "Content Imports"), named_context_url(@context, :context_imports_url))
+    end
+    true
+  end
   
   def intro
     authorized_action(@context, @current_user, [:manage_content, :manage_files, :manage_quizzes])
@@ -171,10 +177,11 @@ class ContentImportsController < ApplicationController
           format.html { render :action => 'copy_course_content' }
         end
       else
-        @possible_courses = @current_user.manageable_courses.scoped(:include => :enrollment_term) - [@context]
         course_id = params[:copy] && params[:copy][:course_id].to_i
-        course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
-        @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id
+        course_id = params[:copy][:autocomplete_course_id].to_i if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
+        @copy_context = @current_user.manageable_courses.scoped(
+          :conditions => ["id = ? AND id <> ?", course_id, @context.id],
+          :include => :enrollment_term).first if course_id
         if !@copy_context
           @copy_context ||= Course.find_by_id(course_id) if course_id.present?
           @copy_context = nil if @copy_context && !@copy_context.grants_rights?(@current_user, session, :manage)

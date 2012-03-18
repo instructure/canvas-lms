@@ -1,0 +1,10 @@
+<% if @assignment.has_group_category? && can_do(@assignment.submissions.build(:user => @current_user), @current_user, :make_group_comment) %>
+<tr>
+  <td colspan="2">
+    <label>
+      <input type="checkbox" name="submission[group_comment]" />
+      <%= t('labels.group_comment', 'Send Comment to the Whole Group') %>
+    </label>
+  </td>
+</tr>
+<% end %>

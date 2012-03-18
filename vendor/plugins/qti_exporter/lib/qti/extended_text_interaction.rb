@@ -4,19 +4,16 @@ class ExtendedTextInteraction < AssessmentItemConverter
   
   def initialize(opts)
     super(opts)
-    @short_answer = opts[:interaction_type] =~ /short_answer_question/i ? true : false
   end
 
   def parse_question_data
     process_response_conditions
-    if !@short_answer
-      @short_answer = @question[:answers].present?
-    end
-    if @short_answer
+    if @question[:answers].present?
       @question[:question_type] ||= "short_answer_question"
       attach_feedback_values(@question[:answers])
     else
-      @question[:question_type] ||= "essay_question"
+      # a short answer question with no answers is an essay question
+      @question[:question_type] = "essay_question"
     end
     
     get_feedback

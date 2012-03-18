@@ -288,7 +288,7 @@ class ContextExternalTool < ActiveRecord::Base
   # as configured by an admin.  If there is still no match
   # then check for a match on the current context (configured by
   # the teacher).
-  def self.find_external_tool(url, context)
+  def self.find_external_tool(url, context, preferred_tool_id=nil)
     url = ContextExternalTool.standardize_url(url)
     account_contexts = []
     other_contexts = []
@@ -308,15 +308,15 @@ class ContextExternalTool < ActiveRecord::Base
     end
     return nil if account_contexts.empty? && other_contexts.empty?
     account_contexts.each do |context|
-      res = context.context_external_tools.active.sort_by(&:precedence).detect{|tool| tool.domain && tool.matches_url?(url) }
+      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.domain && tool.matches_url?(url) }
       return res if res
     end
     account_contexts.each do |context|
-      res = context.context_external_tools.active.sort_by(&:precedence).detect{|tool| tool.matches_url?(url) }
+      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.matches_url?(url) }
       return res if res
     end
     other_contexts.reverse.each do |context|
-      res = context.context_external_tools.active.sort_by(&:precedence).detect{|tool| tool.matches_url?(url) }
+      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.matches_url?(url) }
       return res if res
     end
     nil
