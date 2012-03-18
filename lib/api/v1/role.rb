@@ -26,7 +26,7 @@ module Api::V1::Role
       :role => role,
       :permissions => {}
     }
-    RoleOverride.manageable_permissions(account).each do |permission|
+    RoleOverride.manageable_permissions(account).keys.each do |permission|
       json[:permissions][permission] = permission_json(RoleOverride.permission_for(account, permission, role), current_user, session)
     end
     json

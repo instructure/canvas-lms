@@ -136,7 +136,6 @@ class GradebooksController < ApplicationController
   end
 
   # GET /gradebooks/1
-  # GET /gradebooks/1.xml
   # GET /gradebooks/1.json
   # GET /gradebooks/1.csv
   def show
@@ -144,44 +143,52 @@ class GradebooksController < ApplicationController
       return submissions_json if params[:updated] && request.format == :json
       return gradebook_init_json if params[:init] && request.format == :json
       @context.require_assignment_group
-      @groups = @context.assignment_groups.active
-      @groups_order = {}
-      @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
-      @just_assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title').select{|a| @groups_order[a.assignment_group_id] }
-      newest = Time.parse("Jan 1 2010")
-      @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
-      @assignments = @just_assignments.dup + groups_as_assignments(@groups)
-      @gradebook_upload = @context.build_gradebook_upload
-      @submissions = []
-      @submissions = @context.submissions
-      @new_submissions = @submissions
-      if params[:updated]
-        d = DateTime.parse(params[:updated])
-        @new_submissions = @submissions.select{|s| s.updated_at > d}
-      end
-      @enrollments_hash = {}
-      @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
-      @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name.downcase }.uniq
 
       log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")
       respond_to do |format|
-        if params[:view] == "simple"
-          @headers = false
-          format.html { render :action => "show_simple" }
-        else
-          format.html { render :action => "show" }
-        end
+        format.html {
+          @groups = @context.assignment_groups.active
+          @groups_order = {}
+          @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
+          @just_assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title').select{|a| @groups_order[a.assignment_group_id] }
+          newest = Time.parse("Jan 1 2010")
+          @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
+          @assignments = @just_assignments.dup + groups_as_assignments(@groups)
+          @gradebook_upload = @context.build_gradebook_upload
+          @submissions = @context.submissions
+          @new_submissions = @submissions
+          if params[:updated]
+            d = DateTime.parse(params[:updated])
+            @new_submissions = @submissions.select{|s| s.updated_at > d}
+          end
+          @enrollments_hash = {}
+          @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e|
+            @enrollments_hash[e.user_id] ||= []
+            @enrollments_hash[e.user_id] << e
+          }
+          @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name.downcase }.uniq
+          if params[:view] == "simple"
+            @headers = false
+            render :action => "show_simple"
+          else
+            render :action => "show"
+          end
+        }
         format.csv {
           cancel_cache_buster
           Enrollment.recompute_final_score_if_stale @context
           send_data(
-            @context.gradebook_to_csv(:include_sis_id => @context.grants_right?(@current_user, session, :manage_students)),
+            @context.gradebook_to_csv(:include_sis_id => @context.grants_rights?(@current_user, session, :read_sis, :manage_sis).values.any?),
             :type => "text/csv",
             :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
             :disposition => "attachment"
           )
         }
-        format.json  { render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments]) }
+        format.json  {
+          @submissions = @context.submissions
+          @new_submissions = @submissions
+          render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments])
+        }
       end
     end
   end
@@ -219,7 +226,7 @@ class GradebooksController < ApplicationController
       else
         @submissions = @context.submissions.scoped(scope_options)
       end
-      render :json => @submissions
+      render :json => @submissions.to_json(:include => [:attachments, :quiz_submission, :submission_comments])
     end
   end
   protected :gradebook_init_json
@@ -246,7 +253,11 @@ class GradebooksController < ApplicationController
       @submissions = []
       submissions.compact.each do |submission|
         @assignment = @context.assignments.active.find(submission[:assignment_id])
-        @user = @context.students_visible_to(@current_user).find(submission[:user_id].to_i)
+        begin
+          @user = @context.students_visible_to(@current_user).find(submission[:user_id].to_i)
+        rescue ActiveRecord::RecordNotFound
+          next
+        end
         submission[:grader] = @current_user
         submission.delete :comment_attachments
         if params[:attachments]

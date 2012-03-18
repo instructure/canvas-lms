@@ -175,6 +175,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should add image from flickr" do
+      pending("spec rewrite so we do not have to actually hit flickr")
       skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
@@ -197,6 +198,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
 
     it "should put flickr images into the right editor" do
+      pending("spec rewrite so we do not have to actually hit flickr")
       skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/quizzes"
       driver.find_element(:css, ".new-quiz-link").click

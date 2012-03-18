@@ -20,6 +20,8 @@
 # scoring using the rubric.  Assessments are grouped together in one
 # RubricAssociation, which may or may not have an association model.
 class RubricAssessment < ActiveRecord::Base
+  include TextHelper
+
   attr_accessible :rubric, :rubric_association, :user, :score, :data, :comments, :assessor, :artifact, :assessment_type
   belongs_to :rubric
   belongs_to :rubric_association
@@ -35,6 +37,7 @@ class RubricAssessment < ActiveRecord::Base
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   
   before_save :update_artifact_parameters
+  before_save :htmlify_rating_comments
   after_save :update_assessment_requests, :update_artifact
   after_save :track_outcomes
   
@@ -54,13 +57,24 @@ class RubricAssessment < ActiveRecord::Base
       end
     end
   end
-  
+
   def update_artifact_parameters
     if self.artifact_type == 'Submission' && self.artifact
       self.artifact_attempt = self.artifact.attempt
     end
   end
-  
+
+  def htmlify_rating_comments
+    if self.data_changed? && self.data.present?
+      self.data.each do |rating|
+        if rating.is_a?(Hash) && rating[:comments].present?
+          rating[:comments_html] = format_message(rating[:comments]).first
+        end
+      end
+    end
+    true
+  end
+
   def update_assessment_requests
     requests = self.assessment_requests
     requests += self.rubric_association.assessment_requests.find_all_by_assessor_id_and_asset_id_and_asset_type(self.assessor_id, self.artifact_id, self.artifact_type)

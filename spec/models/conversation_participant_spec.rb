@@ -152,4 +152,191 @@ describe ConversationParticipant do
       @me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id).should eql [@c8]
     end
   end
+
+  context "participants" do
+    before do
+      @me = course_with_student(:active_all => true).user
+      @u1 = student_in_course(:active_all => true).user
+      @u2 = student_in_course(:active_all => true).user
+      @u3 = student_in_course(:active_all => true).user
+      @convo = @me.initiate_conversation([@u1.id, @u2.id, @u3.id])
+      @convo.add_message "ohai"
+      @u3.destroy
+      @u4 = student_in_course(:active_all => true).user
+
+      other_convo = @u4.initiate_conversation([@me.id])
+      message = other_convo.add_message "just between you and me"
+      @convo.add_message("haha i forwarded it", :forwarded_message_ids => [message.id])
+    end
+
+    it "should include shared contexts by default" do
+      users = @convo.reload.participants
+      users.each do |user|
+        user.common_groups.should == {}
+        if [@me.id, @u3.id].include? user.id
+          user.common_courses.should == {}
+        else
+          user.common_courses.should == {@course.id => ["StudentEnrollment"]}
+        end
+      end
+    end
+
+    it "should not include forwarded participants by default" do
+      users = @convo.reload.participants
+      users.map(&:id).sort.should eql [@me.id, @u1.id, @u2.id, @u3.id]
+    end
+
+    it "should not include shared contexts if asked not to" do
+      users = @convo.reload.participants(:include_context_info => false)
+      users.each do |user|
+        user.common_groups.should be_nil
+        user.common_courses.should be_nil
+      end
+    end
+
+    it "should include include forwarded participants if requested" do
+      users = @convo.reload.participants(:include_indirect_participants => true)
+      users.map(&:id).sort.should eql [@me.id, @u1.id, @u2.id, @u3.id, @u4.id]
+    end
+  end
+
+  context "move_to_user" do
+    before do
+      @user1 = user_model
+      @user2 = user_model
+    end
+
+    it "should move a group conversation to the new user" do
+      c = @user1.initiate_conversation([user.id, user.id])
+      c.add_message("hello")
+      c.update_attribute(:workflow_state, 'unread')
+
+      c.move_to_user @user2
+
+      c.reload.user_id.should eql @user2.id
+      c.conversation.participant_ids.should_not include(@user1.id)
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+    end
+
+    it "should clean up group conversations having both users" do
+      c = @user1.initiate_conversation([@user2.id, user.id, user.id])
+      c.add_message("hello")
+      c.update_attribute(:workflow_state, 'unread')
+      rconvo = c.conversation
+      rconvo.participant_ids.size.should eql 4
+
+      c.move_to_user @user2
+
+      lambda{ c.reload }.should raise_error # deleted
+
+      rconvo.reload
+      rconvo.participants.size.should eql 3
+      rconvo.participant_ids.should_not include(@user1.id)
+      rconvo.participant_ids.should include(@user2.id)
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+    end
+
+    it "should move a private conversation to the new user" do
+      c = @user1.initiate_conversation([user.id])
+      c.add_message("hello")
+      c.update_attribute(:workflow_state, 'unread')
+      rconvo = c.conversation
+      old_hash = rconvo.private_hash
+
+      c.move_to_user @user2
+
+      c.reload.user_id.should eql @user2.id
+      rconvo.reload
+      rconvo.participants.size.should eql 2
+      rconvo.private_hash.should_not eql old_hash
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+    end
+
+    it "should merge a private conversation into the existing private conversation" do
+      other_guy = user
+      c = @user1.initiate_conversation([other_guy.id])
+      c.add_message("hello")
+      c.update_attribute(:workflow_state, 'unread')
+      c2 = @user2.initiate_conversation([other_guy.id])
+      c2.add_message("hola")
+
+      c.move_to_user @user2
+
+      lambda{ c.reload }.should raise_error # deleted
+      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+
+      c2.reload.messages.size.should eql 2
+      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
+      c2.message_count.should eql 2
+      c2.user_id.should eql @user2.id
+      c2.conversation.participants.size.should eql 2
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+      other_guy.reload.unread_conversations_count.should eql 1
+    end
+
+    it "should change a private conversation between the two users into a monologue" do
+      c = @user1.initiate_conversation([@user2.id])
+      c.add_message("hello self")
+      c.update_attribute(:workflow_state, 'unread')
+      @user2.mark_all_conversations_as_read!
+      rconvo = c.conversation
+      old_hash = rconvo.private_hash
+
+      c.move_to_user @user2
+
+      lambda{ c.reload }.should raise_error # deleted
+      rconvo.reload
+      rconvo.participants.size.should eql 1
+      rconvo.private_hash.should_not eql old_hash
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+    end
+
+    it "should merge a private conversations between the two users into the existing monologue" do
+      c = @user1.initiate_conversation([@user2.id])
+      c.add_message("hello self")
+      c.update_attribute(:workflow_state, 'unread')
+      c2 = @user2.initiate_conversation([@user2.id])
+      c2.add_message("monologue!")
+      @user2.mark_all_conversations_as_read!
+
+      c.move_to_user @user2
+
+      lambda{ c.reload }.should raise_error # deleted
+      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+
+      c2.reload.messages.size.should eql 2
+      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
+      c2.message_count.should eql 2
+      c2.user_id.should eql @user2.id
+      c2.conversation.participants.size.should eql 1
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+    end
+
+    it "should merge a monologue into the existing monologue" do
+      c = @user1.initiate_conversation([@user1.id])
+      c.add_message("monologue 1")
+      c.update_attribute(:workflow_state, 'unread')
+      c2 = @user2.initiate_conversation([@user2.id])
+      c2.add_message("monologue 2")
+
+      c.move_to_user @user2
+
+      lambda{ c.reload }.should raise_error # deleted
+      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+
+      c2.reload.messages.size.should eql 2
+      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
+      c2.message_count.should eql 2
+      c2.user_id.should eql @user2.id
+      c2.conversation.participants.size.should eql 1
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+    end
+  end
 end

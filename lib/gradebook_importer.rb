@@ -32,7 +32,7 @@ class GradebookImporter
     end
   end
   
-  attr_reader :context, :contents, :assignments, :students, :submissions
+  attr_reader :context, :contents, :assignments, :students, :submissions, :missing_assignments, :missing_students
   def initialize(context=nil, contents=nil)
     raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(context)
     raise ArgumentError, "Must provide CSV contents." unless contents
@@ -51,9 +51,8 @@ class GradebookImporter
     csv = FasterCSV.new(self.contents, :converters => :nil)
     header = csv.shift
     @assignments = process_header(header)
-    
+
     @students = []
-    @submissions = []
     csv.each do |row|
       if row[0] =~ /Points Possible/
         row.shift(@student_columns)
@@ -66,8 +65,60 @@ class GradebookImporter
       end
 
       @students << process_student(row)
-      @submissions << process_submissions(row, @students.last)
+      process_submissions(row, @students.last)
     end
+
+    @missing_assignments = []
+    @missing_assignments = @all_assignments.values - @assignments if @missing_assignment
+    @missing_students = []
+    @missing_students = @all_students.values - @students if @missing_student
+
+    # look up existing score for everything that was provided
+    @original_submissions = @context.submissions.find(:all,
+      :select => 'assignment_id, user_id, score',
+      :include => {:exclude => :quiz_submission},
+      :conditions => { :assignment_id => (@missing_assignment ? @all_assignments.values : @assignments).map(&:id),
+                       :user_id => (@missing_student ? @all_students.values : @students).map(&:id)}).map do |s|
+        {
+          :user_id => s.user_id,
+          :assignment_id => s.assignment_id,
+          :score => s.score.to_s
+        }
+      end
+
+    # cache the score on the existing object
+    original_submissions_by_student = @original_submissions.inject({}) do |r, s|
+      r[s[:user_id]] ||= {}
+      r[s[:user_id]][s[:assignment_id]] = s[:score]
+      r
+    end
+    @students.each do |student|
+      student.read_attribute(:submissions).each do |submission|
+        submission['original_grade'] = original_submissions_by_student[student.id].try(:[], submission['assignment_id'].to_i)
+      end
+    end
+
+    unless @missing_student
+      # weed out assignments with no changes
+      indexes_to_delete = []
+      @assignments.each_with_index do |assignment, idx|
+        next if assignment.changed?
+        indexes_to_delete << idx if @students.all? do |student|
+          submission = student.read_attribute(:submissions)[idx]
+          submission['original_grade'].to_s == submission['grade'] || (submission['original_grade'].blank? && submission['grade'].blank?)
+        end
+      end
+      indexes_to_delete.reverse.each do |idx|
+        @assignments.delete_at(idx)
+        @students.each do |student|
+          student.read_attribute(:submissions).delete_at(idx)
+        end
+      end
+      @unchanged_assignments = !indexes_to_delete.empty?
+      @students = [] if @assignments.empty?
+    end
+
+    @original_submissions = [] unless @missing_student || @missing_assignment
   end
   
   def process_header(row)
@@ -97,6 +148,7 @@ class GradebookImporter
       assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.original_id = assignment.id
       assignment.id ||= NegativeId.generate
+      @missing_assignment ||= assignment.new_record?
       assignment
     end
   end
@@ -119,6 +171,7 @@ class GradebookImporter
     student ||= User.new(:name => row[0])
     student.original_id = student.id
     student.id ||= NegativeId.generate
+    @missing_student ||= student.new_record?
     student
   end
   
@@ -130,15 +183,19 @@ class GradebookImporter
         'assignment_id' => assignment.new_record? ? assignment.id : assignment.original_id
       }
     end
-    l
+    student.write_attribute(:submissions, l)
   end
   
   def to_json
-    student_data = []
-    @students.each_with_index { |s, idx| student_data << student_to_hash(s, idx) }
     {
-      :students => student_data,
-      :assignments => @assignments.map { |a| assignment_to_hash(a) }
+      :students => @students.map { |s| student_to_hash(s) },
+      :assignments => @assignments.map { |a| assignment_to_hash(a) },
+      :missing_objects => {
+          :assignments => @missing_assignments.map { |a| assignment_to_hash(a) },
+          :students => @missing_students.map { |s| student_to_hash(s) }
+      },
+      :original_submissions => @original_submissions,
+      :unchanged_assignments => @unchanged_assignments
     }.to_json
   end
   
@@ -155,13 +212,13 @@ class GradebookImporter
       @pseudonyms_by_login_id ||= all_pseudonyms.inject({}) { |r, p| r[p.unique_id] = p; r }
     end
 
-    def student_to_hash(user, idx)
+    def student_to_hash(user)
       {
         :last_name_first => user.last_name_first,
         :name => user.name,
         :original_id => user.original_id,
         :id => user.id,
-        :submissions => @submissions[idx]
+        :submissions => user.read_attribute(:submissions)
       }
     end
     

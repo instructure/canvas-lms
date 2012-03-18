@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -194,6 +194,20 @@ describe DiscussionTopic do
   end
 
   context "refresh_subtopics" do
+    def topic_for_group_assignment
+      course_with_student(:active_all => true)
+      group_category = @course.group_categories.create(:name => "category")
+      @group1 = @course.groups.create(:name => "group 1", :group_category => group_category)
+      @group2 = @course.groups.create(:name => "group 2", :group_category => group_category)
+
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
+      @assignment.infer_due_at
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+    end
+
     it "should be a no-op unless there's an assignment and it has a group_category" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
@@ -208,24 +222,27 @@ describe DiscussionTopic do
     end
 
     it "should create a topic per active group in the category otherwise" do
-      course_with_student(:active_all => true)
-      group_category = @course.group_categories.create(:name => "category")
-      @group1 = @course.groups.create(:name => "group 1", :group_category => group_category)
-      @group2 = @course.groups.create(:name => "group 2", :group_category => group_category)
-
-      @topic = @course.discussion_topics.build(:title => "topic")
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
-      @assignment.infer_due_at
-      @assignment.saved_by = :discussion_topic
-      @topic.assignment = @assignment
-      @topic.save
-
+      topic_for_group_assignment
       subtopics = @topic.refresh_subtopics
       subtopics.should_not be_nil
       subtopics.size.should == 2
       subtopics.each{ |t| t.root_topic.should == @topic }
       @group1.reload.discussion_topics.should_not be_empty
       @group2.reload.discussion_topics.should_not be_empty
+    end
+
+    it "should only save the subtopic if it is new or has changed and not spawn new jobs" do
+      topic_for_group_assignment
+      @topic.refresh_subtopics
+
+      count_before = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).count
+      ids_before = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).map(&:id)
+      @topic.refresh_subtopics
+      count_after = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).count
+      ids_after = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).map(&:id)
+
+      count_before.should eql count_after
+      ids_before.sort.should eql ids_after.sort
     end
   end
 
@@ -399,21 +416,21 @@ describe DiscussionTopic do
     end
 
     it "should include users that have posted entries" do
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @topic.reply_from(:user => @student, :text => "entry")
       @topic.posters.should include(@student)
     end
 
     it "should include users that have replies to entries" do
       @entry = @topic.reply_from(:user => @teacher, :text => "entry")
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @entry.reply_from(:user => @student, :html => "reply")
       @topic.posters.should include(@student)
     end
 
     it "should dedupe users" do
       @entry = @topic.reply_from(:user => @teacher, :text => "entry")
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @entry.reply_from(:user => @student, :html => "reply 1")
       @entry.reply_from(:user => @student, :html => "reply 2")
       @topic.posters.should include(@teacher)
@@ -429,8 +446,21 @@ describe DiscussionTopic do
       discussion_topic_model(:user => @teacher)
     end
 
+    def build_submitted_assignment
+      student_in_course(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @topic.assignment_id = @assignment.id
+      @topic.save!
+      @entry1 = @topic.discussion_entries.create!(:message => "second message", :user => @user)
+      @entry1.created_at = 1.week.ago
+      @entry1.save!
+      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+    end
+
     it "should create submissions for existing entries when setting the assignment" do
-      @student = student_in_course.user
+      @student = student_in_course(:active_all => true).user
       @topic.reply_from(:user => @student, :text => "entry")
       @student.reload
       @student.submissions.should be_empty
@@ -443,13 +473,71 @@ describe DiscussionTopic do
       @student.submissions.first.submission_type.should == 'discussion_topic'
     end
 
+    it "should have the correct submission date if submission has comment" do
+      student_in_course(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @topic.assignment = @assignment
+      @topic.save
+      te = @course.enroll_teacher(user)
+      @submission = @assignment.find_or_create_submission(@student.id)
+      @submission_comment = @submission.add_comment(:author => te.user, :comment => "some comment")
+      @submission.created_at = 1.week.ago
+      @submission.save!
+      @submission.workflow_state.should == 'unsubmitted'
+      @submission.submitted_at.should be_nil
+      @entry = @topic.discussion_entries.create!(:message => "somne discussion message", :user => @student)
+      @submission.reload
+      @submission.workflow_state.should == 'submitted'
+      @submission.submitted_at.to_i.should >= @entry.created_at.to_i #this time may not be exact because it goes off of time.now in the submission
+    end
+
+    it "should fix submission date after deleting the oldest entry" do
+      build_submitted_assignment()
+      @entry2 = @topic.discussion_entries.create!(:message => "some message", :user => @user)
+      @entry2.created_at = 1.day.ago
+      @entry2.save!
+      @entry1.destroy
+      @topic.reload
+      @topic.discussion_entries.should_not be_empty
+      @topic.discussion_entries.active.should_not be_empty
+      @submission.reload
+      @submission.submitted_at.to_i.should == @entry2.created_at.to_i
+      @submission.workflow_state.should == 'submitted'
+    end
+
+    it "should mark submission as unsubmitted after deletion" do
+      build_submitted_assignment()
+      @entry1.destroy
+      @topic.reload
+      @topic.discussion_entries.should_not be_empty
+      @topic.discussion_entries.active.should be_empty
+      @submission.reload
+      @submission.workflow_state.should == 'unsubmitted'
+      @submission.submission_type.should == nil
+      @submission.submitted_at.should == nil
+    end
+
+    it "should have new submission date after deletion and re-submission" do
+      build_submitted_assignment()
+      @entry1.destroy
+      @topic.reload
+      @topic.discussion_entries.should_not be_empty
+      @topic.discussion_entries.active.should be_empty
+      @entry2 = @topic.discussion_entries.create!(:message => "some message", :user => @user)
+      @submission.reload
+      @submission.submitted_at.to_i.should >= @entry2.created_at.to_i #this time may not be exact because it goes off of time.now in the submission
+      @submission.workflow_state.should == 'submitted'
+    end
+
     it "should not duplicate submissions for existing entries that already have submissions" do
-      @student = student_in_course.user
-      @topic.reload # to get the student in topic.assignment.context.students
+      @student = student_in_course(:active_all => true).user
 
       @assignment = assignment_model(:course => @course)
       @topic.assignment = @assignment
       @topic.save
+      @topic.reload # to get the student in topic.assignment.context.students
 
       @topic.reply_from(:user => @student, :text => "entry")
       @student.reload
@@ -468,6 +556,71 @@ describe DiscussionTopic do
       @student.reload
       @student.submissions.size.should == 1
       @student.submissions.first.id.should == @existing_submission_id
+    end
+  end
+
+  context "read/unread state" do
+    before(:each) do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
+    end
+
+    it "should mark a topic you created as read" do
+      @topic.read?(@teacher).should be_true
+      @topic.unread_count(@teacher).should == 0
+    end
+
+    it "should be unread by default" do
+      @topic.read?(@student).should be_false
+      @topic.unread_count(@student).should == 0
+    end
+
+    it "should allow being marked unread" do
+      @topic.change_read_state("unread", @teacher)
+      @topic.read?(@teacher).should be_false
+      @topic.unread_count(@teacher).should == 0
+    end
+
+    it "should allow being marked read" do
+      @topic.change_read_state("read", @student)
+      @topic.read?(@student).should be_true
+      @topic.unread_count(@student).should == 0
+    end
+
+    it "should allow mark all as unread" do
+      @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
+      @topic.change_all_read_state("unread", @teacher)
+
+      @topic.read?(@student).should be_false
+      @entry.read?(@student).should be_false
+      @topic.unread_count(@student).should == 1
+    end
+
+    it "should allow mark all as read" do
+      @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
+      @topic.change_all_read_state("read", @student)
+
+      @topic.read?(@student).should be_true
+      @entry.read?(@student).should be_true
+      @topic.unread_count(@student).should == 0
+    end
+
+    it "should use unique_constaint_retry when updating read state" do
+      DiscussionTopic.expects(:unique_constraint_retry).once
+      @topic.change_read_state("read", @student)
+    end
+
+    it "should use unique_constaint_retry when updating all read state" do
+      DiscussionTopic.expects(:unique_constraint_retry).once
+      @topic.change_all_read_state("unread", @student)
+    end
+
+    it "should use active entries as deafult unread count" do
+      @entry1 = @topic.discussion_entries.create!(:message => "HI 1", :user => @teacher)
+      @entry2 = @topic.discussion_entries.create!(:message => "HI 2", :user => @teacher)
+      @entry2.destroy
+      @topic.unread_count(@student).should == 1
     end
   end
 end

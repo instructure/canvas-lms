@@ -59,14 +59,16 @@ describe DiscussionTopicsController, :type => :integration do
     # get rid of random characters in podcast url
     json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
     json.last.should ==
-                 {"podcast_url"=>"/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
+                 {"read_state"=>"read",
+                  "unread_count"=>0,
+                  "podcast_url"=>"/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
                   "require_initial_post"=>nil,
                   "title"=>"Topic 1",
                   "discussion_subentry_count"=>0,
                   "assignment_id"=>nil,
                   "delayed_post_at"=>nil,
                   "id"=>@topic.id,
-                  "user_name"=>"User Name",
+                  "user_name"=>@user.name,
                   "last_reply_at"=>@topic.last_reply_at.as_json,
                   "message"=>"<p>content here</p>",
                   "posted_at"=>@topic.posted_at.as_json,
@@ -122,14 +124,16 @@ describe DiscussionTopicsController, :type => :integration do
 
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s})
-    json.first.should == {"podcast_url"=>nil,
+    json.first.should == {"read_state"=>"read",
+                          "unread_count"=>0,
+                          "podcast_url"=>nil,
                           "require_initial_post"=>nil,
                           "title"=>"Group Topic 1",
                           "discussion_subentry_count"=>0,
                           "assignment_id"=>nil,
                           "delayed_post_at"=>nil,
                           "id"=>gtopic.id,
-                          "user_name"=>"User Name",
+                          "user_name"=>@user.name,
                           "last_reply_at"=>gtopic.last_reply_at.as_json,
                           "message"=>"<p>content here</p>",
                           "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
@@ -202,6 +206,7 @@ describe DiscussionTopicsController, :type => :integration do
         "id" => @entry.id,
         "user_id" => @user.id,
         "user_name" => @user.name,
+        "read_state" => "read",
         "message" => @message,
         "created_at" => @entry.created_at.utc.iso8601,
         "updated_at" => @entry.updated_at.as_json,
@@ -568,6 +573,150 @@ describe DiscussionTopicsController, :type => :integration do
       json.length.should == 1
     end
   end
+
+  context "read/unread state" do
+    before(:each) do
+      @topic = create_topic(@course, :title => "topic", :message => "topic")
+      @entry = create_entry(@topic, :message => "top-level entry")
+      @reply = create_reply(@entry, :message => "first reply")
+    end
+
+    it "should immediately mark messages you write as 'read'" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
+                        :course_id => @course.id.to_s })
+      json.first["read_state"].should == "read"
+      json.first["unread_count"].should == 0
+
+      json = api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      json.first["read_state"].should == "read"
+
+      json = api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
+        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+      json.first["read_state"].should == "read"
+    end
+
+    it "should be unread by default for a new user" do
+      student_in_course(:active_all => true)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
+                        :course_id => @course.id.to_s })
+      json.first["read_state"].should == "unread"
+      json.first["unread_count"].should == 2
+
+      json = api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      json.first["read_state"].should == "unread"
+
+      json = api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
+        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+      json.first["read_state"].should == "unread"
+    end
+
+    def call_mark_topic_read(course, topic)
+      raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/read.json",
+                      { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                        :course_id => course.id.to_s, :topic_id => topic.id.to_s })
+    end
+
+    def call_mark_topic_unread(course, topic)
+      raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/read.json",
+                      { :controller => 'discussion_topics_api', :action => 'mark_topic_unread', :format => 'json',
+                        :course_id => course.id.to_s, :topic_id => topic.id.to_s })
+    end
+
+    it "should set the read state for a topic" do
+      student_in_course(:active_all => true)
+      call_mark_topic_read(@course, @topic)
+      response.status.should == '204 No Content'
+      @topic.read?(@user).should be_true
+      @topic.unread_count(@user).should == 2
+
+      call_mark_topic_unread(@course, @topic)
+      response.status.should == '204 No Content'
+      @topic.read?(@user).should be_false
+      @topic.unread_count(@user).should == 2
+    end
+
+    it "should be idempotent for setting topic read state" do
+      student_in_course(:active_all => true)
+      call_mark_topic_read(@course, @topic)
+      response.status.should == '204 No Content'
+      @topic.read?(@user).should be_true
+      @topic.unread_count(@user).should == 2
+
+      call_mark_topic_read(@course, @topic)
+      response.status.should == '204 No Content'
+      @topic.read?(@user).should be_true
+      @topic.unread_count(@user).should == 2
+    end
+
+    def call_mark_entry_read(course, topic, entry)
+      raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/read.json",
+                      { :controller => 'discussion_topics_api', :action => 'mark_entry_read', :format => 'json',
+                        :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s })
+    end
+
+    def call_mark_entry_unread(course, topic, entry)
+      raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/read.json",
+                      { :controller => 'discussion_topics_api', :action => 'mark_entry_unread', :format => 'json',
+                        :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s })
+    end
+
+    it "should set the read state for a entry" do
+      student_in_course(:active_all => true)
+      call_mark_entry_read(@course, @topic, @entry)
+      response.status.should == '204 No Content'
+      @entry.read?(@user).should be_true
+      @topic.unread_count(@user).should == 1
+
+      call_mark_entry_unread(@course, @topic, @entry)
+      response.status.should == '204 No Content'
+      @entry.read?(@user).should be_false
+      @topic.unread_count(@user).should == 2
+    end
+
+    it "should be idempotent for setting entry read state" do
+      student_in_course(:active_all => true)
+      call_mark_entry_read(@course, @topic, @entry)
+      response.status.should == '204 No Content'
+      @entry.read?(@user).should be_true
+      @topic.unread_count(@user).should == 1
+
+      call_mark_entry_read(@course, @topic, @entry)
+      response.status.should == '204 No Content'
+      @entry.read?(@user).should be_true
+      @topic.unread_count(@user).should == 1
+    end
+
+    it "should allow mark all as read/unread" do
+      student_in_course(:active_all => true)
+      raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json",
+                      { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
+                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      response.status.should == '204 No Content'
+      @topic.read?(@user).should be_true
+      @entry.read?(@user).should be_true
+      @topic.unread_count(@user).should == 0
+
+      raw_api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json",
+                      { :controller => 'discussion_topics_api', :action => 'mark_all_unread', :format => 'json',
+                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      response.status.should == '204 No Content'
+      @topic.read?(@user).should be_false
+      @entry.read?(@user).should be_false
+      @topic.unread_count(@user).should == 2
+    end
+  end
 end
 
 def create_attachment(context, opts={})
@@ -582,6 +731,7 @@ end
 
 def create_topic(context, opts={})
   attachment = opts.delete(:attachment)
+  opts[:user] ||= @user
   topic = context.discussion_topics.build(opts)
   topic.attachment = attachment if attachment
   topic.save!
@@ -589,6 +739,7 @@ def create_topic(context, opts={})
 end
 
 def create_subtopic(topic, opts={})
+  opts[:user] ||= @user
   subtopic = topic.context.discussion_topics.build(opts)
   subtopic.root_topic_id = topic.id
   subtopic.save!

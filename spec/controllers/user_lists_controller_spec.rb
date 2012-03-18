@@ -27,14 +27,4 @@ describe UserListsController do
     post 'create', :course_id => @course.id, :user_list => ''
     response.should be_success
   end
-
-  it "should allow bypassing the effects of open registration" do
-    course
-    user
-    Account.default.add_user(@user)
-    user_session(@user)
-
-    UserList.any_instance.expects(:initialize).with('', Account.default, false)
-    post 'create', :course_id => @course.id, :user_list => '', :only_search_existing_users => true
-  end
 end

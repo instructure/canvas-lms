@@ -4,6 +4,24 @@ require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
 describe "conversations" do
   it_should_behave_like "conversations selenium tests"
 
+  it "should not allow double form submissions" do
+    student_name = 'student1'
+    new_message = 'new conversation message'
+    @s1 = User.create(:name => student_name)
+    @course.enroll_user(@s1)
+    get '/conversations'
+
+    expect {
+      name_input = f('#create_message_form .token_input input')
+      name_input.send_keys(student_name)
+      wait_for_ajaximations
+      wait_for_ajaximations
+      name_input.send_keys(:return)
+      f('#body').send_keys(new_message)
+      5.times { f('#create_message_form button[type=submit]').click }
+    }.to change(ConversationMessage, :count).by(1)
+  end
+
   context "conversation loading" do
     it "should load all conversations" do
       @me = @user
@@ -91,7 +109,7 @@ describe "conversations" do
       @course1.enroll_user(@s1)
       @course1.enroll_user(@s2)
 
-      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(*100.times.to_a.reverse.map{ |h| Time.now.utc - h.hours })
+      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(*100.times.to_a.reverse.map { |h| Time.now.utc - h.hours })
 
       @c1 = conversation(@user, @s1)
       @c1.add_message('yay i sent this')

@@ -140,186 +140,186 @@
         </td>
       <% end %>
     </tr>
-      <tr>
-        <td style="width: 10%;"><%= f.blabel :title, :en => "Title" %></td>
-        <td style="width: 40%;"><%= f.text_field :title, :style => "width: 140px;" %></td>
-        <td style="width: 25%;" class="more_assignment_values"><%= f.blabel :assignment_group_id, :en => "Assignment Group" %></td>
-        <td style="width: 25%;" class="more_assignment_values">
-          <%= f.select :assignment_group_id, (@assignment_groups.map {|g| [g.name, g.id]} << ["[ New Group ]", "new"]), :class => "#{(@context.weight_assignment_groups rescue false) ? 'weight' : ''}" %>
-        </td>
-      </tr><tr class="assignment_content">
-        <td style="width: 10%;"><%= f.blabel :points_possible, :en => "Points", :style => "width: 50px;" %></td>
-        <td style="width: 40%;">
-          <!-- javascript check on change, if score is 0 then show text, "No score.  Any points set in the gradebook will be extra credit for this assignment's type" -->
-          <%= f.text_field :points_possible, :style => "width: 140px;", :class => "points_possible" %>
-        </td>
-        <td style="width: 25%;" class="nobr more_assignment_values">
-          <%= f.blabel :grading_type, :en => "Grading By" %>
-          <!--span style="padding-left: 15px; font-size: 0.8em;">Graded As</span-->
-        </td><td style="width: 25%;" class="more_assignment_values">
-          <%= f.hidden_field :grading_standard_id, :class => "grading_standard_id" %>
-          <%= f.select :grading_type, {t('options.points', "Points") => "points", t('options.letter_grade', "Letter Grade") => "letter_grade", t('options.percentage', "Percentage") => "percent", t('options.pass_fail', "Complete/Incomplete") => "pass_fail" }, {:selected => (assignment.grading_type || "points")}, {:class => "grading_type"} %>
-        </td>
-      </tr><tr class="edit_letter_grades_link assignment_content" style="<%= "display: none;" if assignment.grading_type != "letter_grade" %>">
-        <td style="width: 10%;" class="more_assignment_values"></td>
-        <td style="width: 40%;" class="more_assignment_values"></td>
-        <td style="width: 50%;" class="more_assignment_values" colspan="2" style="text-align: left; padding-top: 0;">
-          <a href="#" style="padding-left: 10px; font-size: 0.8em;<%= "display: none;" if assignment.grading_type != "letter_grade" %>" class="edit_letter_grades_link"><%= t 'links.view_grading_levels', "View Grading Levels" %></a>
-        </td>
-      </tr><tr class="more_grading_options" style="<%= show_more_grading_options ? "" : "display: none;" %>">
-        <td style="width: 10%;" class="more_assignment_values"></td>
-        <td style="width: 40%;" class="more_assignment_values"></td>
-        <td style="width: 25%;" class="more_assignment_values"><%= before_label :score_range, "Score Range" %></td>
-        <td style="width: 25%;" class="more_assignment_values" title="<%= t 'titles.score_range', "Lowest and highest possible scores for this assignment" %>">
-          <%= t :score_range, "%{min_score} to %{max_score}",
-                :min_score => f.text_field(:min_score, :style => "width: 50px;", :class => "range_low"),
-                :max_score => f.text_field(:max_score, :style => "width: 50px;", :class => "range_high") %>
-        </td>
-      </tr><tr class="more_grading_options" style="<%= show_more_grading_options ? "" : "display: none;" %>">
-        <td style="width: 10%;" class="more_assignment_values"></td>
-        <td style="width: 40%;" class="more_assignment_values"></td>
-        <td style="width: 25%;" class="more_assignment_values"><%= before_label :master_level, "Mastery Level" %></td>
-        <td style="width: 25%;" class="more_assignment_values">
-          <%= t :mastery_level, "%{points} pts or higher",
-                :points => f.text_field(:mastery_score, :style => "width: 50px;", :class => "mastery_level") %>
-        </td>
-      </tr><tr class="more_grading_options" style="<%= show_more_grading_options ? "" : "display: none;" %>">
-        <td style="width: 10%;" class="more_assignment_values"></td>
-        <td style="width: 40%;" class="more_assignment_values"></td>
-        <td style="width: 50%;" class="more_assignment_values" colspan="2" style="text-align: right; display: none;">
-          <input type="checkbox" name="never_drop" id="assignment_never_drop" <%= (assignment.droppable? rescue true) ? "" : "checked" %>/>
-          <label for="assignment_never_drop"><%= t 'labels.never_drop', "Never drop this assignment" %></label>
-        </td>
-      </tr><tr style="display: none;">
-        <td class="more_assignment_values" colspan="4" style="text-align: right; padding: 0; display: none;">
-          <a href="#" style="padding-right: 10px; font-size: 0.8em;" class="more_grading_options_link"><%= t 'links.more_grading_options', "more grading options" %></a>
-        </td>
-      </tr><tr>
-      <!-- Accept multiple submissions?  Take the best, first, last, etc? Does that even make sense? -->
-        <td style="width: 10%; vertical-align: top;"><%= before_label :due, "Due" %></td>
-        <td style="width: 40%; vertical-align: top;">
-          <%= f.text_field :due_at, :value => datetime_string(assignment.due_at, :due_date), :style => "width: 120px;", :class => "date_field" %>
-        </td>
-        <td style="width: 50%;" class="more_assignment_values assignment_content" colspan="2">
-          <input type="checkbox" name="group_assignment" id="assignment_group_assignment" <%= 'checked' if @assignment && @assignment.has_group_category? %>/>
-          <label for="assignment_group_assignment"><%= t 'labels.group_assignment', "This is a Group Assignment" %></label>
-          <div id="assignment_group_category" style="<%= hidden unless @assignment && @assignment.has_group_category? %>; margin-left: 20px;">
-            <label for="assignment_group_category_select"><%= before_label :group_set, "Group Set" %></label>
-            <select id="assignment_group_category_select" name="assignment[group_category_id]">
-              <option value=""><%= t 'options.select_group_set', "[ Select Group Set ]" %></option>
-              <% @context.group_categories.select{ |c| !c.student_organized? }.each do |category| %>
-                <option value="<%= category.id %>" <%= 'selected' if @assignment && category == @assignment.group_category %>><%= category.name %></option>
-              <% end %>
-              <option value="new"><%= t 'options.new_group_set', "[ New Group Set ]" %></option>
-            </select><br/>
-            <%= f.check_box :grade_group_students_individually %>
-            <label for="grade_group_students_individually">
-              <%= t 'labels.assign_grades_individually', "Assign grades to each student individually" %><br />
-              <span style='font-size: 0.8em;'><%= t 'labels.assign_grades_individually_subtext', "(normally all students receive the same grade on group assignments)" %></span>
-            </label>
-          </div>
-        </td>
-      </tr><tr>
-        <td style="width: 10%; vertical-align: top;" class="more_assignment_values"><%= before_label :locked_until, "Locked Until" %></td>
-        <td style="width: 40%; vertical-align: top;" class="more_assignment_values">
-          <%= f.text_field :unlock_at, :value => datetime_string(assignment.unlock_at), :style => "width: 120px;", :class => "date_field" %>
-        </td>
-        <td style="width: 50%;" class="more_assignment_values assignment_content" colspan="2">
-          <%= f.check_box :peer_reviews, :id => 'assignment_peer_reviews' %>
-          <label for="assignment_peer_reviews"><%= t 'labels.require_peer_reviews', "Require Peer Reviews" %></label>
-          <table id="assignment_peer_reviews_options" style="margin-left: 10px; <%= hidden unless @assignment && @assignment.has_peer_reviews? %>">
-            <tr>
-              <td colspan="2">
-                <div>
-                  <input type="radio" name="assignment[automatic_peer_reviews]" value="0" id="manual_peer_reviews" <%= 'checked' if !@assignment || !@assignment.automatic_peer_reviews %> />
-                  <label for="manual_peer_reviews"><%= t 'labels.manually_assign_peer_reviews', "Manually Assign Peer Reviews" %></label>
-                </div>
-                <div>
-                  <input type="radio" name="assignment[automatic_peer_reviews]" value="1" id="auto_peer_reviews" <%= 'checked' if @assignment && @assignment.automatic_peer_reviews %> />
-                  <label for="auto_peer_reviews"><%= t 'labels.automatically_assign_peer_reviews', "Automatically Assign Peer Reviews" %></label>
-                </div>
-              </td>
-            </tr>
-            <tr class="auto_peer_reviews">
-              <td><%= f.blabel :peer_review_count, :en => "Reviews Per User" %></td>
-              <td><%= f.text_field :peer_review_count, :style => "width: 20px;" %></td>
-            </tr><tr class="auto_peer_reviews">
-              <td style="vertical-align: top;"><%= f.blabel :peer_reviews_assign_at, :en => "Assign Reviews", :style => "float: left;" %></td>
-              <td>
-                <div>
-                  <%= f.text_field :peer_reviews_assign_at, :value => datetime_string(assignment.peer_reviews_assign_at, :due_date), :style => "width: 120px;", :class => "date_field" %>
-                </div>
-                <div style="font-size: 0.8em;"><%= t 'descriptions.assign_reviews_after_due_date', "Must come after due date. If blank, uses due date." %></div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr><tr class="submission_content">
-        <td style="width: 10%; vertical-align: top;"><%= before_label :submission, "Submission" %></td>
-        <td style="vertical-align: top;" colspan="1">
-          <select name="submission_type" class="submission_type_option">
-            <option value="none" <%= "selected" if (!assignment.submission_types || assignment.submission_types == "none") %>><%= t 'options.no_submission', "No Submission" %></option>
-            <option value="online" <%= "selected" if (assignment.submission_types && assignment.submission_types.match(/media|online_text_entry|online_upload|online_url/)) %>><%= t 'options.online_submission', "Online Submission" %></option>
-            <option value="on_paper" <%= "selected" if (assignment.submission_types == "on_paper") %>><%= t 'options.on_paper', "On Paper" %></option>
-          </select>
-        </td>
-        <td style="width: 10%; vertical-align: top;" class="more_assignment_values"><%= before_label :lock_submits_after, "Lock Submits After" %></td>
-        <td style="width: 40%; vertical-align: top;" class="more_assignment_values">
-          <%= f.text_field :lock_at, :value => datetime_string(assignment.lock_at), :style => "width: 120px;", :class => "date_field" %>
-        </td>
-      </tr><tr class="submission_content">
-        <td colspan="2">
-          <div style="padding: 0px 30px;<%= "display: none;" if (!assignment.submission_types || !assignment.submission_types.match("online")) %>" class="online_submission_types">
-            <div><input type="checkbox" name="online_upload" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("online_upload")) %> id="assignment_online_upload"/><label for="assignment_online_upload"> <%= t 'labels.allow_file_uploads', "Allow File Uploads" %></label></div>
-            <div><input type="checkbox" name="online_text_entry" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("online_text_entry")) %> id="assignment_online_text_entry"/><label for="assignment_online_text_entry"> <%= t 'labels.allow_text_entry', "Allow Text Entry" %></label></div>
-            <div><input type="checkbox" name="online_url" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("online_url")) %> id="assignment_online_url"/><label for="assignment_online_url"> <%= t 'labels.allow_url', "Allow Website URL" %></label></div>
-            <% if feature_enabled?(:kaltura) %>
-              <div><input type="checkbox" name="media_recording" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("media_recording")) %> id="assignment_media_recording"/><label for="assignment_media_recording"> <%= t 'labels.allow_media_recordings', "Allow Media Recordings" %></label></div>
+    <tr>
+      <td style="width: 10%;"><%= f.blabel :title, :en => "Title" %></td>
+      <td style="width: 40%;"><%= f.text_field :title, :style => "width: 140px;" %></td>
+      <td style="width: 25%;" class="more_assignment_values"><%= f.blabel :assignment_group_id, :en => "Assignment Group" %></td>
+      <td style="width: 25%;" class="more_assignment_values">
+        <%= f.select :assignment_group_id, (@assignment_groups.map {|g| [g.name, g.id]} << ["[ New Group ]", "new"]), :class => "#{(@context.weight_assignment_groups rescue false) ? 'weight' : ''}" %>
+      </td>
+    </tr><tr class="assignment_content">
+      <td style="width: 10%;"><%= f.blabel :points_possible, :en => "Points", :style => "width: 50px;" %></td>
+      <td style="width: 40%;">
+        <!-- javascript check on change, if score is 0 then show text, "No score.  Any points set in the gradebook will be extra credit for this assignment's type" -->
+        <%= f.text_field :points_possible, :style => "width: 140px;", :class => "points_possible" %>
+      </td>
+      <td style="width: 25%;" class="nobr more_assignment_values">
+        <%= f.blabel :grading_type, :en => "Grading By" %>
+        <!--span style="padding-left: 15px; font-size: 0.8em;">Graded As</span-->
+      </td><td style="width: 25%;" class="more_assignment_values">
+        <%= f.hidden_field :grading_standard_id, :class => "grading_standard_id" %>
+        <%= f.select :grading_type, {t('options.points', "Points") => "points", t('options.letter_grade', "Letter Grade") => "letter_grade", t('options.percentage', "Percentage") => "percent", t('options.pass_fail', "Complete/Incomplete") => "pass_fail" }, {:selected => (assignment.grading_type || "points")}, {:class => "grading_type"} %>
+      </td>
+    </tr><tr class="edit_letter_grades_link assignment_content" style="<%= "display: none;" if assignment.grading_type != "letter_grade" %>">
+      <td style="width: 10%;" class="more_assignment_values"></td>
+      <td style="width: 40%;" class="more_assignment_values"></td>
+      <td style="width: 50%;" class="more_assignment_values" colspan="2" style="text-align: left; padding-top: 0;">
+        <a href="#" style="padding-left: 10px; font-size: 0.8em;<%= "display: none;" if assignment.grading_type != "letter_grade" %>" class="edit_letter_grades_link"><%= t 'links.view_grading_levels', "View Grading Levels" %></a>
+      </td>
+    </tr><tr class="more_grading_options" style="<%= show_more_grading_options ? "" : "display: none;" %>">
+      <td style="width: 10%;" class="more_assignment_values"></td>
+      <td style="width: 40%;" class="more_assignment_values"></td>
+      <td style="width: 25%;" class="more_assignment_values"><%= before_label :score_range, "Score Range" %></td>
+      <td style="width: 25%;" class="more_assignment_values" title="<%= t 'titles.score_range', "Lowest and highest possible scores for this assignment" %>">
+        <%= t :score_range, "%{min_score} to %{max_score}",
+              :min_score => f.text_field(:min_score, :style => "width: 50px;", :class => "range_low"),
+              :max_score => f.text_field(:max_score, :style => "width: 50px;", :class => "range_high") %>
+      </td>
+    </tr><tr class="more_grading_options" style="<%= show_more_grading_options ? "" : "display: none;" %>">
+      <td style="width: 10%;" class="more_assignment_values"></td>
+      <td style="width: 40%;" class="more_assignment_values"></td>
+      <td style="width: 25%;" class="more_assignment_values"><%= before_label :master_level, "Mastery Level" %></td>
+      <td style="width: 25%;" class="more_assignment_values">
+        <%= t :mastery_level, "%{points} pts or higher",
+              :points => f.text_field(:mastery_score, :style => "width: 50px;", :class => "mastery_level") %>
+      </td>
+    </tr><tr class="more_grading_options" style="<%= show_more_grading_options ? "" : "display: none;" %>">
+      <td style="width: 10%;" class="more_assignment_values"></td>
+      <td style="width: 40%;" class="more_assignment_values"></td>
+      <td style="width: 50%;" class="more_assignment_values" colspan="2" style="text-align: right; display: none;">
+        <input type="checkbox" name="never_drop" id="assignment_never_drop" <%= (assignment.droppable? rescue true) ? "" : "checked" %>/>
+        <label for="assignment_never_drop"><%= t 'labels.never_drop', "Never drop this assignment" %></label>
+      </td>
+    </tr><tr style="display: none;">
+      <td class="more_assignment_values" colspan="4" style="text-align: right; padding: 0; display: none;">
+        <a href="#" style="padding-right: 10px; font-size: 0.8em;" class="more_grading_options_link"><%= t 'links.more_grading_options', "more grading options" %></a>
+      </td>
+    </tr><tr>
+    <!-- Accept multiple submissions?  Take the best, first, last, etc? Does that even make sense? -->
+      <td style="width: 10%; vertical-align: top;"><%= before_label :due, "Due" %></td>
+      <td style="width: 40%; vertical-align: top;">
+        <%= f.text_field :due_at, :value => datetime_string(assignment.due_at, :due_date), :style => "width: 120px;", :class => "date_field" %>
+      </td>
+      <td style="width: 50%;" class="more_assignment_values assignment_content" colspan="2">
+        <input type="checkbox" name="group_assignment" id="assignment_group_assignment" <%= 'checked' if @assignment && @assignment.has_group_category? %>/>
+        <label for="assignment_group_assignment"><%= t 'labels.group_assignment', "This is a Group Assignment" %></label>
+        <div id="assignment_group_category" style="<%= hidden unless @assignment && @assignment.has_group_category? %>; margin-left: 20px;">
+          <label for="assignment_group_category_select"><%= before_label :group_set, "Group Set" %></label>
+          <select id="assignment_group_category_select" name="assignment[group_category_id]">
+            <option value=""><%= t 'options.select_group_set', "[ Select Group Set ]" %></option>
+            <% @context.group_categories.select{ |c| !c.student_organized? }.each do |category| %>
+              <option value="<%= category.id %>" <%= 'selected' if @assignment && category == @assignment.group_category %>><%= category.name %></option>
             <% end %>
-            <% if @context.turnitin_enabled? %>
-              <div style="margin-top: 10px;">
-                <%= f.check_box :turnitin_enabled %>
-                <%= f.label :turnitin_enabled, :en => "Enable Turnitin Submission Evaluations" %>
-                <div id="assignment_turnitin_settings" style="<%= hidden unless assignment && assignment.turnitin_enabled %>; margin-left: 20px;">
-                  <a href="#" class="show_turnitin_settings" style="font-size: 0.9em"><%= t 'links.advanced_turnitin_settings', 'Advanced Settings...' %></a>
-                </div>
+            <option value="new"><%= t 'options.new_group_set', "[ New Group Set ]" %></option>
+          </select><br/>
+          <%= f.check_box :grade_group_students_individually %>
+          <label for="grade_group_students_individually">
+            <%= t 'labels.assign_grades_individually', "Assign grades to each student individually" %><br />
+            <span style='font-size: 0.8em;'><%= t 'labels.assign_grades_individually_subtext', "(normally all students receive the same grade on group assignments)" %></span>
+          </label>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="width: 10%; vertical-align: top;" class="more_assignment_values"><%= before_label :locked_until, "Locked Until" %></td>
+      <td style="width: 40%; vertical-align: top;" class="more_assignment_values">
+        <%= f.text_field :unlock_at, :value => datetime_string(assignment.unlock_at), :style => "width: 120px;", :class => "date_field" %>
+      </td>
+      <td style="width: 50%;" class="more_assignment_values assignment_content" colspan="2">
+        <%= f.check_box :peer_reviews, :id => 'assignment_peer_reviews' %>
+        <label for="assignment_peer_reviews"><%= t 'labels.require_peer_reviews', "Require Peer Reviews" %></label>
+        <table id="assignment_peer_reviews_options" style="margin-left: 10px; <%= hidden unless @assignment && @assignment.has_peer_reviews? %>">
+          <tr>
+            <td colspan="2">
+              <div>
+                <input type="radio" name="assignment[automatic_peer_reviews]" value="0" id="manual_peer_reviews" <%= 'checked' if !@assignment || !@assignment.automatic_peer_reviews %> />
+                <label for="manual_peer_reviews"><%= t 'labels.manually_assign_peer_reviews', "Manually Assign Peer Reviews" %></label>
               </div>
-            <% end %>
-          </div>
-        </td>
-        <td style="width: 50%;" class="more_assignment_values assignment_content" colspan="2">
-          <div id='restrict_file_extensions_options'>
-            <input type="checkbox" name="restrict_file_extensions" id="assignment_restrict_file_extensions" <%= 'checked' if @assignment && @assignment.allowed_extensions.present? %>/>
-            <label for="assignment_restrict_file_extensions"><%= t 'labels.restrict_file_extensions', "Restrict the Permitted File Upload Extensions" %></label>
-            <div id='allowed_extensions_options' style="margin-left: 20px;">
-              <label for="assignment_allowed_extensions"><%= before_label :allowed_extensions, "Allowed File Extensions" %></label>
-                <br>
-                <%= f.text_field :allowed_extensions, :value => (assignment.allowed_extensions || []).join(",") %>
-                <br>
-                <span style='font-size: 0.8em;'><%= t 'descriptions.allowed_extensions', "enter a list of accepted extensions, for example: doc,xls,txt" %></span>
+              <div>
+                <input type="radio" name="assignment[automatic_peer_reviews]" value="1" id="auto_peer_reviews" <%= 'checked' if @assignment && @assignment.automatic_peer_reviews %> />
+                <label for="auto_peer_reviews"><%= t 'labels.automatically_assign_peer_reviews', "Automatically Assign Peer Reviews" %></label>
+              </div>
+            </td>
+          </tr>
+          <tr class="auto_peer_reviews">
+            <td><%= f.blabel :peer_review_count, :en => "Reviews Per User" %></td>
+            <td><%= f.text_field :peer_review_count, :style => "width: 20px;" %></td>
+          </tr><tr class="auto_peer_reviews">
+            <td style="vertical-align: top;"><%= f.blabel :peer_reviews_assign_at, :en => "Assign Reviews", :style => "float: left;" %></td>
+            <td>
+              <div>
+                <%= f.text_field :peer_reviews_assign_at, :value => datetime_string(assignment.peer_reviews_assign_at, :due_date), :style => "width: 120px;", :class => "date_field" %>
+              </div>
+              <div style="font-size: 0.8em;"><%= t 'descriptions.assign_reviews_after_due_date', "Must come after due date. If blank, uses due date." %></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr><tr class="submission_content">
+      <td style="width: 10%; vertical-align: top;"><%= before_label :submission, "Submission" %></td>
+      <td style="vertical-align: top;" colspan="1">
+        <select name="submission_type" class="submission_type_option">
+          <option value="none" <%= "selected" if (!assignment.submission_types || assignment.submission_types == "none") %>><%= t 'options.no_submission', "No Submission" %></option>
+          <option value="online" <%= "selected" if (assignment.submission_types && assignment.submission_types.match(/media|online_text_entry|online_upload|online_url/)) %>><%= t 'options.online_submission', "Online Submission" %></option>
+          <option value="on_paper" <%= "selected" if (assignment.submission_types == "on_paper") %>><%= t 'options.on_paper', "On Paper" %></option>
+        </select>
+      </td>
+      <td style="width: 10%; vertical-align: top;" class="more_assignment_values"><%= before_label :lock_submits_after, "Lock Submits After" %></td>
+      <td style="width: 40%; vertical-align: top;" class="more_assignment_values">
+        <%= f.text_field :lock_at, :value => datetime_string(assignment.lock_at), :style => "width: 120px;", :class => "date_field" %>
+      </td>
+    </tr><tr class="submission_content">
+      <td colspan="2">
+        <div style="padding: 0px 30px;<%= "display: none;" if (!assignment.submission_types || !assignment.submission_types.match("online")) %>" class="online_submission_types">
+          <div><input type="checkbox" name="online_upload" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("online_upload")) %> id="assignment_online_upload"/><label for="assignment_online_upload"> <%= t 'labels.allow_file_uploads', "Allow File Uploads" %></label></div>
+          <div><input type="checkbox" name="online_text_entry" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("online_text_entry")) %> id="assignment_online_text_entry"/><label for="assignment_online_text_entry"> <%= t 'labels.allow_text_entry', "Allow Text Entry" %></label></div>
+          <div><input type="checkbox" name="online_url" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("online_url")) %> id="assignment_online_url"/><label for="assignment_online_url"> <%= t 'labels.allow_url', "Allow Website URL" %></label></div>
+          <% if feature_enabled?(:kaltura) %>
+            <div><input type="checkbox" name="media_recording" <%= "checked" if (assignment.submission_types && assignment.submission_types.match("media_recording")) %> id="assignment_media_recording"/><label for="assignment_media_recording"> <%= t 'labels.allow_media_recordings', "Allow Media Recordings" %></label></div>
+          <% end %>
+          <% if @context.turnitin_enabled? %>
+            <div style="margin-top: 10px;">
+              <%= f.check_box :turnitin_enabled %>
+              <%= f.label :turnitin_enabled, :en => "Enable Turnitin Submission Evaluations" %>
+              <div id="assignment_turnitin_settings" style="<%= hidden unless assignment && assignment.turnitin_enabled %>; margin-left: 20px;">
+                <a href="#" class="show_turnitin_settings" style="font-size: 0.9em"><%= t 'links.advanced_turnitin_settings', 'Advanced Settings...' %></a>
+              </div>
             </div>
+          <% end %>
+        </div>
+      </td>
+      <td style="width: 50%;" class="more_assignment_values assignment_content" colspan="2">
+        <div id='restrict_file_extensions_options'>
+          <input type="checkbox" name="restrict_file_extensions" id="assignment_restrict_file_extensions" <%= 'checked' if @assignment && @assignment.allowed_extensions.present? %>/>
+          <label for="assignment_restrict_file_extensions"><%= t 'labels.restrict_file_extensions', "Restrict the Permitted File Upload Extensions" %></label>
+          <div id='allowed_extensions_options' style="margin-left: 20px;">
+            <label for="assignment_allowed_extensions"><%= before_label :allowed_extensions, "Allowed File Extensions" %></label>
+              <br>
+              <%= f.text_field :allowed_extensions, :value => (assignment.allowed_extensions || []).join(",") %>
+              <br>
+              <span style='font-size: 0.8em;'><%= t 'descriptions.allowed_extensions', "enter a list of accepted extensions, for example: doc,xls,txt" %></span>
           </div>
-        </td>
-      </tr>
-      <% end %>
-      <tr>
-        <td colspan="4">
-          <%= f.check_box :notify_of_update %>
-          <%= f.label :notify_of_update, :en => "Notify users that this content has changed" %>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="4">
-          <button type="submit" class="button"><%= t 'buttons.update', "Update Assignment" %></button>
-          <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-        </td>
-      </tr>
-    </table>
+        </div>
+      </td>
+    </tr>
     <% end %>
-    <% end %>
-  </div>
+    <tr>
+      <td colspan="4">
+        <%= f.check_box :notify_of_update %>
+        <%= f.label :notify_of_update, :en => "Notify users that this content has changed" %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <button type="submit" class="button"><%= t 'buttons.update', "Update Assignment" %></button>
+        <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+      </td>
+    </tr>
+  </table>
+  <% end %>
+  <% end %>
+</div>
 
-  <%= render :partial => "shared/add_assignment_group" %>
-  <%= render :partial => "groups/add_group_category" %>
-  <%= render :partial => "shared/turnitin_settings", :locals => {:assignment => assignment} %>
-  <%= render :partial => "shared/select_content_dialog", :locals => {:only => [:external_tools]} %>
+<%= render :partial => "shared/add_assignment_group" %>
+<%= render :partial => "groups/add_group_category" %>
+<%= render :partial => "shared/turnitin_settings", :locals => {:assignment => assignment} %>
+<%= render :partial => "shared/select_content_dialog", :locals => {:only => [:external_tools]} %>

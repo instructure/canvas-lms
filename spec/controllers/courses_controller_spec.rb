@@ -77,7 +77,21 @@ describe CoursesController do
       assigns[:pending_enrollment].should eql(@enrollment)
       assigns[:pending_enrollment].should be_rejected
     end
-    
+
+    it "should successfully reject temporary invitation" do
+      user_with_pseudonym(:active_all => 1)
+      user_session(@user, @pseudonym)
+      user = User.create! { |u| u.workflow_state = 'creation_pending' }
+      user.communication_channels.create!(:path => @cc.path)
+      course(:active_all => 1)
+      @enrollment = @course.enroll_student(user)
+      post 'enrollment_invitation', :course_id => @course.id, :reject => '1', :invitation => @enrollment.uuid
+      response.should be_redirect
+      response.should redirect_to(root_url)
+      assigns[:pending_enrollment].should eql(@enrollment)
+      assigns[:pending_enrollment].should be_rejected
+    end
+
     it "should not reject invitation for bad parameters" do
       course_with_student(:active_course => true, :active_user => true)
       post 'enrollment_invitation', :course_id => @course.id, :reject => '1', :invitation => @enrollment.uuid + 'a'

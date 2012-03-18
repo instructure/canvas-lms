@@ -1,7 +1,7 @@
 @import environment.sass
 
-fieldset.question, fieldset.display_question
-  padding: 0
+div.question
+  border-radius: 3px
 
 #sort_questions
   :max-height 250px
@@ -82,7 +82,15 @@ fieldset.question, fieldset.display_question
         :font-size 0.9em
       .move
         :display none
-      
+
+#questions.assessing
+  .answer
+    :padding 5px 5px
+    :margin 0 25px
+
+    &:last-child
+      :border-bottom 0
+
 #questions.brief 
   .question_holder .display_question
     :font-size 0.9em
@@ -264,8 +272,6 @@ fieldset.question, fieldset.display_question
     .answers
       .answer
         :padding 5px 30px
-        
-        // .answer_text
 
         .answer_list
           :margin 5px
@@ -307,6 +313,10 @@ fieldset.question, fieldset.display_question
           :padding-left 0.5em
         .answer_label > label > *:first-child, .answer_label > label + *
           :margin-top 0
+        .answer_label > label > p:last-child
+          :margin-bottom 0
+        .answer_html > p:last-child
+          :margin-bottom 0
 
         &.unspecified_answer
           .answer_comment_holder
@@ -399,7 +409,7 @@ fieldset.question, fieldset.display_question
       .flag_icon
         :display inline
         +opacity(1.0)
-  &.hover
+  .no-touch &.hover
     .move
       :background-color #fff
       .move_icon
@@ -411,6 +421,12 @@ fieldset.question, fieldset.display_question
       .flag_icon
         +opacity(0.5)
         :display inline
+
+.question.multiple_choice_question, .question.multiple_answers_question, .question.matching_question
+  .answer
+    :border-bottom 1px solid #ddd
+    &:last-child
+      :border-bottom 0
 
 .answer
   .answer_select
@@ -542,12 +558,10 @@ form.question_form
       :-moz-border-radius 5px
     .answer.hover
       :border 1px solid #ddd
-    .answer .delete_answer_link
-      :display block
-    .answer.hover .delete_answer_link
-      :background url(/images/delete_circle.png) no-repeat center center
-    .answer .delete_answer_link:focus
-      :background url(/images/delete_circle.png) no-repeat center center
+    .answer .question_actions
+      display: none
+    .answer.hover .question_actions
+      display: block
     .answer_comments
       :-moz-border-radius 5px
       :border 2px solid #faa
@@ -852,3 +866,25 @@ ul#quiz_versions
   +border-radius(5px)
   padding: 16px
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.75)
+
+.ui-selectmenu-menu a, .ui-selectmenu
+  color: #222 !important
+  font-weight: normal
+  text-decoration: none !important
+
+.ui-selectmenu
+  max-width: 100% !important
+
+.question select
+  max-width: 100%
+
+.edit-html-done
+  float: right
+
+.question_actions .atr-edit
+  display: none
+
+.multiple_choice_question .question_actions .atr-edit,
+.multiple_answers_question .question_actions .atr-edit
+  display: inline-block
+

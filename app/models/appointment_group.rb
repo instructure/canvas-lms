@@ -179,7 +179,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def instructors
     sub_context_type == 'CourseSection' ?
-      context.participating_instructors.for_course_section(sub_context_id).uniq :
+      context.participating_instructors.restrict_to_sections(sub_context_id).uniq :
       context.participating_instructors.uniq
   end
 

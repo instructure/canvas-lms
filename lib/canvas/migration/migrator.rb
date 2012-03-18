@@ -59,6 +59,9 @@ class Migrator
 
     if $?.exitstatus == 0
       return true
+    elsif $?.exitstatus == 1
+      add_warning(I18n.t('canvas.migration.warning.unzip_warning', 'The content package unzipped successfully, but with a warning'), zip_std_out)
+      return true
     elsif $?.exitstatus == 127
       raise "unzip isn't installed on this system, exit status #{$?.exitstatus}, message: #{zip_std_out}"
     else

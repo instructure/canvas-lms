@@ -8,6 +8,7 @@ define([
   'jquery.instructure_misc_helpers', // replaceTags
   'jquery.instructure_misc_plugins', // confirmDelete, showIf, /\.log/
   'jquery.loadingImg', // loadingImg, loadingImage
+  'compiled/tinymce',
   'tinymce.editor_box', // editorBox
   'vendor/date', // Date.parse
   'vendor/jquery.scrollTo', // /\.scrollTo/
@@ -54,7 +55,7 @@ define([
       var $link = $(this);
       $link.parents("li").confirmDelete({
         url: $link.attr('rel'),
-        message: I18n.t('confirms.delete_alert', "Are you sure you want to delete this alert?"),
+        message: I18n.t('confirms.delete_announcement', "Are you sure you want to delete this announcement?"),
         success: function() {
           $(this).slideUp(function() {
             $(this).remove();

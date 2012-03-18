@@ -72,7 +72,7 @@ define [
 
     $holder.delegate '.context_list_context', 'click', (event) ->
       # dont toggle if thy were clicking the .settings button
-      unless $(event.target).closest('.settings').length
+      unless $(event.target).closest('.settings, .actions').length
         visibleContexts.toggle $(this).data('context')
 
     $holder.delegate '.context_list_context'

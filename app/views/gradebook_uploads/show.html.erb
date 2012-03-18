@@ -90,7 +90,6 @@
 
 <% js_block do %>
   <script type="text/javascript">
-    window.originalGradebook = <%= raw @context.gradebook_json %>;
     window.uploadedGradebook = <%= raw @uploaded_gradebook.to_json %>
   </script>
 <% end %>

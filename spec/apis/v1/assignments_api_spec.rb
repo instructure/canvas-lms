@@ -90,6 +90,7 @@ describe AssignmentsApiController, :type => :integration do
             "online_url",
             "media_recording"
           ],
+          'html_url' => course_assignment_url(@course, @assignment),
           'rubric' => [
             {'id' => 'crit1', 'points' => 10, 'description' => 'Crit1',
               'ratings' => [
@@ -105,6 +106,7 @@ describe AssignmentsApiController, :type => :integration do
               ],
             },
           ],
+          "group_category_id" => nil
         },
       ]
     end
@@ -160,6 +162,8 @@ describe AssignmentsApiController, :type => :integration do
       'submission_types' => [
         'none',
       ],
+      'group_category_id' => nil,
+      'html_url' => course_assignment_url(@course, assignment),
     }
 
     Assignment.count.should == 1
@@ -201,6 +205,8 @@ describe AssignmentsApiController, :type => :integration do
       'submission_types' => [
         'none',
       ],
+      'group_category_id' => nil,
+      'html_url' => course_assignment_url(@course, @assignment),
     }
 
     Assignment.count.should == 1
@@ -232,6 +238,8 @@ describe AssignmentsApiController, :type => :integration do
       'topic_children' => [],
       'root_topic_id' => @topic.root_topic_id,
       'podcast_url' => nil,
+      'read_state' => 'unread',
+      'unread_count' => 0,
       'url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
       'attachments' => [],
     }

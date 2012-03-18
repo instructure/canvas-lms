@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -70,8 +70,8 @@ class AssignmentsController < ApplicationController
       @assignment_module = @assignment.context_module_tag
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
       if @assignment.grants_right?(@current_user, session, :grade)
-        student_ids = @context.students.map(&:id)
-        @current_student_submissions = @assignment.submissions.having_submission.select{|s| student_ids.include?(s.user_id) }
+        visible_student_ids = @context.enrollments_visible_to(@current_user).find(:all, :select => 'user_id').map(&:user_id)
+        @current_student_submissions = @assignment.submissions.scoped(:conditions => "submissions.submission_type IS NOT NULL").select{|s| visible_student_ids.include?(s.user_id) }
       end
       if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
         @current_user_submission = @assignment.submissions.find_by_user_id(@current_user.id) if @current_user

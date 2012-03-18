@@ -73,7 +73,7 @@ window.GradeCellEditor = function($container, columnDef, value, dataContext) {
     var scope = this;
 
     this.init = function() {
-      switch(columnDef._uploaded.grading_type){
+      switch(columnDef.grading_type){
       
       case "letter_grade":
         var letterGrades = [
@@ -111,11 +111,13 @@ window.GradeCellEditor = function($container, columnDef, value, dataContext) {
       $input.appendTo($container);
       $input.focus().select();
 
+      if (typeof(value.uploaded_grade) == "undefined") {
+        value.uploaded_grade = value.grade;
+      }
       var scores = {
-        originalScore: value._original && value._original.grade || "--",
-        uploadedScore: value._uploaded && value._uploaded.grade || "--"
+        originalScore: value.original_grade || "--",
+        uploadedScore: value.uploaded_grade || "--"
       };
-
 
       var helperTemplate = '' + 
       '<div class="grade-helper-wrapper">' + 

@@ -152,7 +152,7 @@ class StreamItem < ActiveRecord::Base
     when Submission
       res = object.attributes
       res.delete 'body' # this can be pretty large, and we don't display it
-      res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types')
+      res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types', 'group_category_id')
       res[:submission_comments] = object.submission_comments.map do |comment|
         hash = comment.attributes
         hash['formatted_body'] = comment.formatted_body(250)

@@ -59,6 +59,18 @@ describe SIS::CSV::GroupImporter do
     groups.map(&:workflow_state).should == %w(available deleted)
   end
 
+  it "should create groups with no account id column" do
+    account_model
+    process_csv_data_cleanly(
+      "group_id,name,status",
+      "G001,Group 1,available")
+    groups = Group.all(:order => :id)
+    groups.map(&:account_id).should == [@account.id]
+    groups.map(&:sis_source_id).should == %w(G001)
+    groups.map(&:name).should == ["Group 1"]
+    groups.map(&:workflow_state).should == %w(available)
+  end
+
   it "should update group attributes" do
     @sub = @account.sub_accounts.create!(:name => 'sub')
     @sub.update_attribute('sis_source_id', 'A002')

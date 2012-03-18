@@ -10412,7 +10412,7 @@ es:
         page_comments: "Comentarios de la Página"
       labels: 
         hide_from_students: "Esconder esta Página de los Estudiantes"
-        last_edited: "Editado por última ves por %{name} hace %{time_ago}"
+        last_edited: "Editado por última vez por %{name} hace %{time_ago}"
         notify_of_update: "Notificar usuarios de que este contenido ha cambiado"
       links: 
         page_history: "Historial de la Página"

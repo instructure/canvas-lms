@@ -315,6 +315,7 @@ describe CoursesController, :type => :integration do
     first_user = @user
     new_user = User.create!(:name => 'Zombo')
     @course2.enroll_student(new_user).accept!
+    RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
 
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
@@ -326,6 +327,7 @@ describe CoursesController, :type => :integration do
     first_user = @user
     new_user = User.create!(:name => 'Zombo')
     @course2.enroll_student(new_user).accept!
+    RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
 
     @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
@@ -389,7 +391,9 @@ describe CoursesController, :type => :integration do
     section2 = @course2.course_sections.create!(:name => 'Section B')
     section2.update_attribute :sis_source_id, 'sis-section'
     @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
+    RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
 
+    @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
             { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
     json.size.should == 2
@@ -413,12 +417,14 @@ describe CoursesController, :type => :integration do
     new_user = User.create!(:name => 'Zombo')
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
     @course2.enroll_student(new_user).accept!
+    ro = RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
 
     json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
             { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
     json.sort_by{|x| x["id"]}.should == api_json_response([first_user, new_user],
         :only => USER_API_FIELDS).sort_by{|x| x["id"]}
 
+    ro.destroy
     json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
             { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
     json['id'].should == @course2.id

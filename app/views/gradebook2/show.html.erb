@@ -3,21 +3,8 @@
   @body_classes << "gradebook2"
   @show_left_side = false
   add_crumb t(:go_back_to_the_old_gradebook, "Go back to the old gradebook"), context_url(@context, :change_gradebook_version_context_gradebook_url, :reset => true), :id => 'change_gradebook_version_link_holder'
-  js_bundle :gradebook2
   jammit_css :slickgrid, :gradebook2
-  options = {
-    :chunk_size => Setting.get_cached('gradebook2.submissions_chunk_size', '35').to_i,
-    :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments]),
-    :sections_and_students_url => api_v1_course_sections_url(@context, :include => [:students]),
-    :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
-    :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
-    :context_url => context_url(@context, :context_url),
-    :download_assignment_submissions_url => context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
-    :re_upload_submissions_url => context_url(@context, :context_gradebook_submissions_upload_url, "{{ assignment_id }}"),
-    :context_id => @context.id,
-    :context_code => @context.asset_string,
-    :group_weighting_scheme => @context.group_weighting_scheme
-  }
+  js_bundle :gradebook2
 %>
 <div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
   <div id="gradebook-toolbar">
@@ -46,22 +33,3 @@
     <%= render :partial => 'submissions/submission_download' %>
   </div>
 </div>
-
-<script>
-  GRADEBOOK_TRANSLATIONS = <%= {
-    :submission_tooltip_dropped => t('dropped_for_grading', 'Dropped for grading purposes'),
-    :submission_tooltip_late => t('submitted_late', 'Submitted late'),
-    :submission_tooltip_muted => t('assignment_muted', 'Assignment muted'),
-    :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
-    :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading'),
-    :submission_tooltip_online_url => t('titles.url', "URL Submission"),
-    :submission_tooltip_discussion_topic => t('titles.discussion', "Discussion Submission"),
-    :submission_tooltip_online_upload => t('titles.upload', "File Upload Submission"),
-    :submission_tooltip_online_text_entry => t('titles.text', "Text Entry Submission"),
-    :submission_tooltip_pending_review => t('titles.quiz_review', "This quiz needs review"),
-    :submission_tooltip_media_comment => t('titles.media', "Media Comment Submission"),
-    :submission_tooltip_quiz => t('title.quiz', "Quiz Submission")
-  }.to_json.html_safe %>;
-
-  GRADEBOOK_OPTIONS = (<%= options.to_json.html_safe %>);
-</script>

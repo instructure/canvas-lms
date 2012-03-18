@@ -176,12 +176,12 @@ describe Pseudonym do
 
     it "should not attempt to bind if last_timeout_failure is set recently" do
       # calling again should not attempt to bind
-      @aac.update_attribute(:last_timeout_failure, Time.now)
+      @aac.update_attribute(:last_timeout_failure, 5.seconds.ago)
       Net::LDAP.any_instance.expects(:bind_as).never
       @pseudonym.ldap_bind_result('test').should be_false
 
       # updating the config should reset :last_timeout_failure
-      @aac.update_attribute(:auth_port, 637)
+      @aac.reload.update_attributes(:auth_port => 637)
       @aac.last_timeout_failure.should be_nil
       Net::LDAP.any_instance.expects(:bind_as).returns(true)
       @pseudonym.ldap_bind_result('test').should be_true

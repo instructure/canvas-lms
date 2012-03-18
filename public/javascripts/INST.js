@@ -25,6 +25,9 @@ define(['jquery'], function($) {
   //this is just using jquery's browser sniffing result of if its firefox, it should probably use feature detection
   INST.browser.ff = $.browser.mozilla;
 
+  INST.browser.touch       = 'ontouchstart' in document;
+  INST.browser['no-touch'] = !INST.browser.touch;
+
   // now we have some degree of knowing which of the common browsers it is, on dom ready, give the body those classes
   // so for example, if you were on IE6 the body would have the classes "ie" AND "ie6"
   var classesToAdd = $.map(INST.browser, function(v,k){ if (v === true) return k }).join(' ');

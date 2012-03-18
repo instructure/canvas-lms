@@ -382,6 +382,32 @@ describe ContextModule do
       @progression = @module.evaluate_for(@user)
       @progression.should be_completed
     end
+    
+    it "should mark progression completed for min_score on discussion topic assignment" do
+      asmnt = assignment_model(:submission_types => "discussion_topic", :points_possible => 10)
+      topic = asmnt.discussion_topic
+      course_with_student(:active_all => true, :course => @course)
+      mod = @course.context_modules.create!(:name => "some module")
+      
+      tag = mod.add_item({:id => topic.id, :type => 'discussion_topic'})
+      mod.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 5}}
+      mod.save!
+      
+      p = mod.evaluate_for(@student)
+      p.requirements_met.should == []
+      p.workflow_state.should == 'unlocked'
+      
+      entry = topic.discussion_entries.create!(:message => "hi", :user => @student)
+      asmnt.reload
+      sub = asmnt.submissions.first
+      sub.score = 5
+      sub.workflow_state = 'graded'
+      sub.save!
+      
+      p = mod.evaluate_for(@student)
+      p.requirements_met.should == [{:type=>"min_score", :min_score=>5, :max_score=>nil, :id=>tag.id}]
+      p.workflow_state.should == 'completed'
+    end
   end
   describe "require_sequential_progress" do
     it "should update progression status on grading and view events" do

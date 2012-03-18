@@ -150,46 +150,36 @@ describe ConversationsController do
       assigns[:conversation].messages.first.forwarded_message_ids.should eql(@conversation.messages.first.id.to_s)
     end
 
-    it "should create one conversation shared by all recipients" do
-      old_count = Conversation.count
+    context "group conversations" do
+      before do
+        @old_count = Conversation.count
+  
+        course_with_teacher_logged_in(:active_all => true)
+  
+        @new_user1 = User.create
+        @course.enroll_student(@new_user1).accept!
+  
+        @new_user2 = User.create
+        @course.enroll_student(@new_user2).accept!
+      end
 
-      course_with_teacher_logged_in(:active_all => true)
+      ["1", "true", "yes", "on"].each do |truish|
+        it "should create a conversation shared by all recipients if group_conversation=#{truish.inspect}" do
+          post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => truish
+          response.should be_success
+    
+          Conversation.count.should eql(@old_count + 1)
+        end
+      end
 
-      new_user1 = User.create
-      enrollment1 = @course.enroll_student(new_user1)
-      enrollment1.workflow_state = 'active'
-      enrollment1.save
-
-      new_user2 = User.create
-      enrollment2 = @course.enroll_student(new_user2)
-      enrollment2.workflow_state = 'active'
-      enrollment2.save
-
-      post 'create', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "yo", :group_conversation => true
-      response.should be_success
-
-      Conversation.count.should eql(old_count + 1)
-    end
-
-    it "should create one conversation per recipient if not a group conversation" do
-      old_count = Conversation.count
-
-      course_with_teacher_logged_in(:active_all => true)
-
-      new_user1 = User.create
-      enrollment1 = @course.enroll_student(new_user1)
-      enrollment1.workflow_state = 'active'
-      enrollment1.save
-
-      new_user2 = User.create
-      enrollment2 = @course.enroll_student(new_user2)
-      enrollment2.workflow_state = 'active'
-      enrollment2.save
-
-      post 'create', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "yo"
-      response.should be_success
-
-      Conversation.count.should eql(old_count + 2)
+      [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
+        it "should create one conversation per recipient if group_conversation=#{falsish.inspect}" do
+          post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => falsish
+          response.should be_success
+    
+          Conversation.count.should eql(@old_count + 2)
+        end
+      end
     end
 
     it "should correctly infer context tags" do

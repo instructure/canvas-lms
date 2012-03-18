@@ -270,6 +270,30 @@ describe Group do
     end
   end
 
+  context "invite_user" do
+    it "should auto accept invitations" do
+      course_with_student(:active_all => true)
+
+      group_category = GroupCategory.student_organized_for(@course)
+
+      group = @course.groups.create!(:group_category => group_category)
+      gm = group.invite_user(@student)
+      gm.should be_accepted
+    end
+  end
+
+  context "request_user" do
+    it "should auto accept invitations" do
+      course_with_student(:active_all => true)
+
+      group_category = GroupCategory.student_organized_for(@course)
+
+      group = @course.groups.create!(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      gm = group.request_user(@student)
+      gm.should be_accepted
+    end
+  end
+
   it "should default group_category to student organized category on save" do
     course_with_teacher
     group = @course.groups.create

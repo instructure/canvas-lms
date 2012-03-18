@@ -192,6 +192,40 @@ describe Assignment do
     @submission.user_id.should eql(@user.id)
   end
 
+  it "should preserve letter grades with zero points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'letter_grade'
+    @assignment.points_possible = 0.0
+    @assignment.save!
+
+    s = @assignment.grade_student(@user, :grade => 'C')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('C')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should preserve letter grades with no points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'letter_grade'
+    @assignment.points_possible = nil
+    @assignment.save!
+
+    s = @assignment.grade_student(@user, :grade => 'C')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('C')
+    @submission.user_id.should eql(@user.id)
+  end
+
   it "should give a grade to extra credit assignments" do
     setup_assignment_without_submission
     @assignment.grading_type = 'points'
@@ -994,12 +1028,6 @@ describe Assignment do
   end
 
   context "broadcast policy" do
-    it "should have a broadcast policy" do
-      assignment_model
-      @a.should be_respond_to(:dispatch)
-      @a.should be_respond_to(:to)
-    end
-
     context "due date changed" do
       it "should create a message when an assignment due date has changed" do
         Notification.create(:name => 'Assignment Due Date Changed')
@@ -1240,6 +1268,15 @@ describe Assignment do
       res.map{|s| s.user}.should be_include(@u1)
       res.map{|s| s.user}.should be_include(@u2)
     end
+    it "should create an initial submission comment for only the submitter by default" do
+      setup_assignment_with_group
+      sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "hey teacher, i hate my group. i did this entire project by myself :(")
+      sub.user_id.should eql(@u1.id)
+      sub.submission_comments.size.should eql 1
+      @a.reload
+      other_sub = (@a.submissions - [sub])[0]
+      other_sub.submission_comments.size.should eql 0
+    end
     it "should add a submission comment for only the specified user by default" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :comment => "woot")
@@ -1257,6 +1294,15 @@ describe Assignment do
       res.should_not be_empty
       res.length.should eql(1)
       res[0].user.should eql(@u1)
+    end
+    it "should create an initial submission comment for all group members if specified" do
+      setup_assignment_with_group
+      sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "ohai teacher, we had so much fun working together", :group_comment => "1")
+      sub.user_id.should eql(@u1.id)
+      sub.submission_comments.size.should eql 1
+      @a.reload
+      other_sub = (@a.submissions - [sub])[0]
+      other_sub.submission_comments.size.should eql 1
     end
     it "should add a submission comment for all group members if specified" do
       setup_assignment_with_group
@@ -1480,9 +1526,10 @@ describe Assignment do
 
       submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [attachment]
 
+      ignore_file = "/tmp/._why_macos_why.txt"
       @assignment.instance_variable_set :@ignored_files, []
-      @assignment.send(:infer_comment_context_from_filename, "grocery_list.txt").should be_nil
-      @assignment.instance_variable_get(:@ignored_files).should == ["grocery_list.txt"]
+      @assignment.send(:infer_comment_context_from_filename, ignore_file).should be_nil
+      @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
 
       filename = [@user.last_name_first, @user.id, attachment.id, attachment.display_name].join("_")
 
@@ -1492,7 +1539,7 @@ describe Assignment do
         :filename => filename,
         :display_name => attachment.display_name
       })
-      @assignment.instance_variable_get(:@ignored_files).should == ["grocery_list.txt"]
+      @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
     end
   end
 end

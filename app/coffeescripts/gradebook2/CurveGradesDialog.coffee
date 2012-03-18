@@ -6,6 +6,7 @@ define [
   'jquery.instructure_forms'
   'jquery.instructure_jquery_patches'
   'jquery.instructure_misc_plugins'
+  'compiled/jquery/fixDialogButtons'
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, curveGradesDialogTemplate) ->
 
@@ -39,7 +40,7 @@ define [
             #need to get rid of root object becuase it is coming from old, pre-api xhr
             submissions = (datum.submission for datum in data)
             $.publish 'submissions_updated', [submissions]
-            alert I18n.t("alerts.scores_updated", { one: "1 Student score updated", other: "%{count} Student scores updated"}, count: data.length)            
+            alert I18n.t("alerts.scores_updated", { one: "1 Student score updated", other: "%{count} Student scores updated"}, count: data.length)
         .dialog
           width: 350
           modal: true
@@ -47,7 +48,7 @@ define [
           open: @curve
           close: => @$dialog.remove()
         .fixDialogButtons()
-      
+
       @$dialog.find("#middle_score").bind "blur change keyup focus", @curve
       @$dialog.find("#assign_blanks").change @curve
 

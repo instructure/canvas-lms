@@ -39,16 +39,17 @@ describe UnzipAttachment do
       @ua.course_files_folder.should eql(@folder)
     end
 
-    it "should be able to take a root_folder argument" do
+    it "should be able to take a root_directory argument" do
       folder_model(:name => "a special folder")
       @course.folders << @folder
       @course.save!
       @course.reload
       ua = UnzipAttachment.new(:course => @course, :filename => @filename, :root_directory => @folder)
       ua.course_files_folder.should eql(@folder)
-
+      
       ua = UnzipAttachment.new(:course => @course, :filename => @filename, :root_directory => @folder)
       ua.course_files_folder.should eql(@folder)
+      
     end
 
     it "should unzip the file, create folders, and stick the contents of the zipped file as attachments in the folders" do
@@ -76,6 +77,15 @@ describe UnzipAttachment do
       @course.attachments.find_all_by_display_name('second_entry.txt').size.should eql(2)
       @course.attachments.find_all_by_display_name('second_entry.txt').any?{|a| a.file_state == 'deleted' }.should eql(true)
       @course.attachments.find_all_by_display_name('second_entry.txt').any?{|a| a.file_state == 'available' }.should eql(true)
+    end
+
+    it "should update progress as it goes" do
+      progress = nil
+      @ua.progress_proc = Proc.new { |pct|
+        progress = pct
+      }
+      @ua.process
+      progress.should_not be_nil
     end
   end
 

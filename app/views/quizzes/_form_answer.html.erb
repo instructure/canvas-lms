@@ -62,11 +62,13 @@
           <span class="id">&nbsp;</span>
           <span class="match_id">&nbsp;</span>
         </div>
-      </td><td style="vertical-align: top; padding-top: 0.5em; text-align: right; width: 20px;">
-        <div style="width: 20px;">
-        <a href="#" class="delete_answer_link no-hover" title="<%= t('titles.delete_answer', "Delete this Answer") %>"><%= image_tag "blank.png", :alt => t(:delete, "Delete") %></a>
+      </td><td style="vertical-align: top; padding-top: 0.5em; text-align: right; width: 40px;">
+        <div class="question_actions">
+          <a href="#" class="edit_html atr-edit" title="<%= t('titles.edit_as_html', "Edit HTML") %>"><%= t('titles.edit_as_html', "Edit HTML") %></a>
+          <a href="#" class="delete_answer_link atr-delete" title="<%= t('titles.delete_answer', "Delete this Answer") %>"><%= t('titles.delete_answer', "Delete this Answer") %></a>
         </div>
       </td>
     </tr>
   </table>
 </div>
+

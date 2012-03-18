@@ -71,6 +71,96 @@ describe ContextModulesController do
     end
   end
   
+  describe "GET 'item_redirect'" do
+    it "should require authorization" do
+      course_with_student
+      
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+      
+      get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
+      assert_unauthorized
+    end
+    
+    it "should find a matching tool" do
+      course_with_student_logged_in(:active_all => true)
+      
+      @module = @course.context_modules.create!
+      @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool2 = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+
+      tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
+      tag1.content_id.should == @tool1.id
+      tag2 = @module.add_item :type => 'context_external_tool', :id => @tool2.id, :url => @tool2.url
+      tag2.content_id.should == @tool2.id
+      
+      get 'item_redirect', :course_id => @course.id, :id => tag1.id
+      response.should_not be_redirect
+      assigns[:tool].should == @tool1
+      
+      get 'item_redirect', :course_id => @course.id, :id => tag2.id
+      response.should_not be_redirect
+      assigns[:tool].should == @tool2
+    end
+    
+    it "should fail if there is no matching tool" do
+      course_with_student_logged_in(:active_all => true)
+      
+      @module = @course.context_modules.create!
+      @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+
+      tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
+      @tool1.update_attribute(:url, 'http://www.example.com')
+      
+      get 'item_redirect', :course_id => @course.id, :id => tag1.id
+      response.should be_redirect
+      assigns[:tool].should == nil
+    end
+    
+    it "should redirect to an assignment page" do
+      course_with_student_logged_in(:active_all => true)
+      
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+      
+      get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
+      response.should be_redirect
+      response.should redirect_to course_assignment_url(@course, assignment1)
+    end
+    
+    it "should redirect to a discussion page" do
+      course_with_student_logged_in(:active_all => true)
+      
+      @module = @course.context_modules.create!
+      topic = @course.discussion_topics.create!
+
+      topicTag = @module.add_item :type => 'discussion_topic', :id => topic.id
+      
+      get 'item_redirect', :course_id => @course.id, :id => topicTag.id
+      response.should be_redirect
+      response.should redirect_to course_discussion_topic_url(@course, topic)
+    end
+    
+    it "should redirect to a quiz page" do
+      course_with_student_logged_in(:active_all => true)
+      
+      @module = @course.context_modules.create!
+      quiz = @course.quizzes.create!
+
+      tag = @module.add_item :type => 'quiz', :id => quiz.id
+      
+      get 'item_redirect', :course_id => @course.id, :id => tag.id
+      response.should be_redirect
+      response.should redirect_to course_quiz_url(@course, quiz)
+    end
+  end
+  
   describe "POST 'reorder_items'" do
     it "should reorder items" do
       course_with_teacher_logged_in(:active_all => true)

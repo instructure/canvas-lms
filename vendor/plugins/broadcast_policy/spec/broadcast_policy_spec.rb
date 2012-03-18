@@ -20,9 +20,9 @@ require 'rubygems'
 require 'spec'
 require File.join(File.dirname(__FILE__), "/../lib/broadcast_policy")
 
-include ::Instructure::Broadcast
+include ::Instructure
 
-describe Policy, "set_broadcast_policy" do
+describe BroadcastPolicy, "set_broadcast_policy" do
   before(:each) do
     class AnotherModel
       class << self
@@ -33,7 +33,7 @@ describe Policy, "set_broadcast_policy" do
           true
         end
       end
-      extend Policy::ClassMethods
+      extend BroadcastPolicy::ClassMethods
     end
   end
 
