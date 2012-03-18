@@ -1942,7 +1942,7 @@ define([
         }
       }
 
-      var isNotSurvey = !$('#quiz_assignment_id').val().match(/survey/i);
+      var isNotSurvey = $('#quiz_assignment_id').length == 0 || !$('#quiz_assignment_id').val().match(/survey/i);
       if (isNotSurvey && error_text) {
         $form.find(".answers_header").errorBox(error_text, true);
         return;
