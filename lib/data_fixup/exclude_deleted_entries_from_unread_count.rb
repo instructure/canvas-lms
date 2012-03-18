@@ -7,7 +7,7 @@ module DataFixup::ExcludeDeletedEntriesFromUnreadCount
     # Recalculate counts based on active entries minus read entries
     DiscussionTopicParticipant.find_each(:include => :discussion_topic) do |participant|
       topic = participant.discussion_topic
-      read_count = DiscussionEntryParticipant.scoped(:conditions => { :user_id => participant.user_id, :workflow_state => "read" }).count
+      read_count = topic.discussion_entry_participants.scoped(:conditions => { :user_id => participant.user_id, :workflow_state => "read" }).count
       participant.unread_entry_count = topic.discussion_entries.active.count - read_count
       participant.save
     end
