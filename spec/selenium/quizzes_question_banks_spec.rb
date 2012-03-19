@@ -8,6 +8,16 @@ describe "quizzes question banks" do
     course_with_teacher_logged_in
   end
 
+  it "should be able to create quiz questions" do
+    bank = AssessmentQuestionBank.create!(:context => @course)
+    get "/courses/#{@course.id}/question_banks/#{bank.id}"
+
+    driver.find_element(:css, '.add_question_link').click
+    wait_for_animations
+
+    expect { create_multiple_choice_question }.to change(AssessmentQuestion, :count).by(1)
+  end
+
   it "should tally up question bank question points" do
     quiz = @course.quizzes.create!(:title => "My Quiz")
     bank = AssessmentQuestionBank.create!(:context => @course)

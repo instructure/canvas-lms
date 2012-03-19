@@ -43,6 +43,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :root_topic, :class_name => 'DiscussionTopic', :touch => true
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
+  has_many :discussion_entry_participants, :through => :discussion_entries
   belongs_to :user
   validates_presence_of :context_id
   validates_presence_of :context_type
