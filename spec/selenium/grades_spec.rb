@@ -83,8 +83,7 @@ describe "grades" do
       Assignment.expects(:find_or_create_submission).once.returns(@submission)
 
       #check initial total
-      final_row = driver.find_element(:css, '#submission_final-grade')
-      final_row.find_element(:css, '.assignment_score .grade').text.should == '33.3'
+      driver.find_element(:css, '#submission_final-grade .assignment_score .grade').text.should == '33.3'
 
       #test changing existing scores
       first_row_grade = driver.find_element(:css, "#submission_#{@submission.assignment_id} .assignment_score .grade")
@@ -92,7 +91,8 @@ describe "grades" do
       set_value(first_row_grade.find_element(:css, 'input'), '4')
       first_row_grade.find_element(:css, 'input').send_keys(:return)
       wait_for_ajax_requests
-      keep_trying_until { final_row.find_element(:css, '.assignment_score .grade').text.should == '40' }
+      #using find with jquery to avoid caching issues
+      keep_trying_until { find_with_jquery('#submission_final-grade .assignment_score .grade').text.should == '40' }
 
       wait_for_ajax_requests
     end
