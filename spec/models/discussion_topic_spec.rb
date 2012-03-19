@@ -437,6 +437,15 @@ describe DiscussionTopic do
       @topic.posters.should include(@student)
       @topic.posters.size.should == 2
     end
+
+    it "should not include topic author if she is no longer enrolled in the course" do
+      student_in_course(:active_all => true)
+      @topic2 = @course.discussion_topics.create!(:title => "student topic", :message => "I'm outta here", :user => @student)
+      @entry = @topic2.discussion_entries.create!(:message => "go away", :user => @teacher)
+      @topic2.posters.map(&:id).sort.should eql [@student.id, @teacher.id].sort
+      @student.enrollments.first.destroy
+      @topic2.posters.map(&:id).sort.should eql [@teacher.id].sort
+    end
   end
 
   context "submissions when graded" do

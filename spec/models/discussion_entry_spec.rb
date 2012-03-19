@@ -83,7 +83,7 @@ describe DiscussionEntry do
       group(:group_context => @course)
 
       s1 = @student
-      student_in_course(@course)
+      student_in_course(:active_user => true)
       s2 = @student
 
       @group.participating_users << s1
@@ -92,14 +92,11 @@ describe DiscussionEntry do
 
       topic = @group.discussion_topics.create!(:user => @teacher, :message => "Hi there")
       entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
-      to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include(@teacher)
-      to_users.should_not include(s1)
-      to_users.should_not include(s2)
+      entry.messages_sent[@notification_name].should be_blank
 
       entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
       to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include(@teacher)
+      to_users.should_not include(@teacher)
       to_users.should include(s1)
       to_users.should_not include(s2)
     end
