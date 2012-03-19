@@ -884,10 +884,7 @@ describe DiscussionTopicsController, :type => :integration do
                   { :controller => "discussion_topics_api", :action => "entry_list", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
                  { :ids => @sub1.id })
         json.size.should == 1
-        pending("read state should be read") do
-          json.first.delete('read_state').should == 'read'
-        end
-        json.first.should == { 'id' => @sub1.id, 'deleted' => true, 'parent_id' => @entry.id, 'updated_at' => @sub1.updated_at.as_json, 'created_at' => @sub1.created_at.as_json }
+        json.first.should == { 'id' => @sub1.id, 'deleted' => true, 'read_state' => 'read', 'parent_id' => @entry.id, 'updated_at' => @sub1.updated_at.as_json, 'created_at' => @sub1.created_at.as_json }
       end
     end
   end

@@ -221,7 +221,7 @@ class DiscussionTopic < ActiveRecord::Base
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 
-      entry_ids = self.discussion_entries.active.map(&:id)
+      entry_ids = self.discussion_entries.map(&:id)
       if entry_ids.present?
         existing_entry_participants = DiscussionEntryParticipant.find(:all, :conditions => ["user_id = ? AND discussion_entry_id IN (?)",
                                                                       current_user.id, entry_ids])
@@ -243,7 +243,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def default_unread_count
-    self.discussion_entries.active.count
+    self.discussion_entries.count
   end
 
   def unread_count(current_user = nil)

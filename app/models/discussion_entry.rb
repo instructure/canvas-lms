@@ -27,7 +27,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
-  has_many :discussion_entry_participants
+  has_many :discussion_entry_participants, :dependent => :destroy
   belongs_to :discussion_topic, :touch => true
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
@@ -159,7 +159,6 @@ class DiscussionEntry < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     flattened_discussion_subentries.destroy_all
-    destroy_participants
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     save!
@@ -193,6 +192,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   named_scope :active, :conditions => ['discussion_entries.workflow_state != ?', 'deleted']
+  named_scope :deleted, :conditions => ['discussion_entries.workflow_state = ?', 'deleted']
 
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
@@ -373,20 +373,6 @@ class DiscussionEntry < ActiveRecord::Base
                                                                                          :workflow_state => "unread")
         end
       end
-    end
-  end
-
-  def destroy_participants
-    transaction do
-      # this could count toward the unread count either if there is a "unread"
-      # entry participant or no entry participant, so find all that have
-      # explicitly been marked "read" and decrement for all the others
-      read_deps = DiscussionEntryParticipant.find(:all, :conditions => { :discussion_entry_id => self.id, :workflow_state => "read" })
-      read_user_ids = read_deps.map(&:user_id)
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ?", self.discussion_topic_id])
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ? AND user_id NOT IN (?)", self.discussion_topic_id, read_user_ids]) if read_user_ids.present?
-      DiscussionTopicParticipant.update_all("unread_entry_count = unread_entry_count - 1", dtp_conditions)
-      self.discussion_entry_participants.destroy_all
     end
   end
 
