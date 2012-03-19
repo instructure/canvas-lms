@@ -538,9 +538,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def posters
-    users = context.participating_users(discussion_entries.map(&:user_id).uniq)
-    users << self.user
-    users.uniq
+    user_ids = discussion_entries.map(&:user_id).push(self.user_id).uniq
+    context.participating_users(user_ids)
   end
 
   def user_name
