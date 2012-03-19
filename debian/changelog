@@ -1,3 +1,12 @@
+canvas-lms (2012.03.17.17) stable; urgency=low
+
+  * Package ref: 430240d6227ac2d86a9331ca0a2e1200d03f6529
+  *
+  * [+5c434c6] fix datafixup to correctly count number of read entries for each user
+  * [+430240d] fix saving questions in question banks; fixes #7754
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 19 Mar 2012 15:15:56 -0600
+
 canvas-lms (2012.03.17.16) stable; urgency=low
 
   * Package ref: 8f48fee5d3b68e36988cf8d9295281a4a0198980
