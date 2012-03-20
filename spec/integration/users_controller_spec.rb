@@ -125,11 +125,82 @@ describe UsersController do
   end
 
   describe "#avatar_image_url" do
-    it "should maintain protocol and domain name in gravatar redirect" do
-      Account.default.tap { |a| a.enable_service(:avatars) }.save
-      user
-      get "https://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://someschool.instructure.com/images/no_pic.gif")}"
+    before do
+      course_with_student_logged_in(:active_all => true)
+      @a = Account.default
+      enable_avatars!
+    end
+
+    def enable_avatars!
+      @a.enable_service(:avatars)
+      @a.save!
+    end
+
+    def disable_avatars!
+      @a.disable_service(:avatars)
+      @a.save!
+    end
+
+    it "should maintain protocol and domain name in fallback" do
+      disable_avatars!
+      enable_cache do
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "http://someschool.instructure.com/images/no_pic.gif"
+
+        get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "https://otherschool.instructure.com/images/no_pic.gif"
+      end
+    end
+
+    it "should maintain protocol and domain name in gravatar redirect fallback" do
+      enable_cache do
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/no_pic.gif")}"
+
+        get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/images/no_pic.gif")}"
+      end
+    end
+
+    it "should return different urls for different fallbacks" do
+      enable_cache do
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/no_pic.gif")}"
+
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI.escape("/my/custom/fallback/url.png")}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/my/custom/fallback/url.png")}"
+
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI.escape("https://test.domain/another/custom/fallback/url.png")}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://test.domain/another/custom/fallback/url.png")}"
+      end
+    end
+
+    it "should forget all cached urls when the avatar changes" do
+      enable_cache do
+        data = Rails.cache.instance_variable_get(:@data)
+        orig_size = data.size
+
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/no_pic.gif")}"
+
+        get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=/my/custom/fallback/url.png"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/my/custom/fallback/url.png")}"
+
+        diff = data.select{|k,v|k =~ /avatar_img/}.size - orig_size
+        diff.should > 0
+
+        expect {
+          @user.update_attribute(:avatar_image, {'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif'})
+        }.to change(data, :size).by(-diff)
+
+        expect {
+          get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+          response.should redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
+
+          get "http://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI::escape("https://test.domain/my/custom/fallback/url.png")}"
+          response.should redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
+        }.to change(data, :size).by(diff)
+      end
     end
   end
 end

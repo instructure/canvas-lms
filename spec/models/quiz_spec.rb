@@ -54,7 +54,7 @@ describe Quiz do
     params = { :quiz => { :title => 'Test Quiz', :due_at => Time.zone.today } }
     quiz = @course.quizzes.create!(params[:quiz])
     quiz.due_at.should be_an_instance_of ActiveSupport::TimeWithZone
-    quiz.due_at.zone.should eql 'AKST'
+    quiz.due_at.zone.should eql Time.zone.now.dst? ? 'AKDT' : 'AKST'
     quiz.due_at.hour.should eql 23
     quiz.due_at.min.should eql 59
   end

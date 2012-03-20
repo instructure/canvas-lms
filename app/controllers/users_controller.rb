@@ -224,7 +224,7 @@ class UsersController < ApplicationController
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
-    @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+    @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
   end
 
   include Api::V1::StreamItem
@@ -409,7 +409,7 @@ class UsersController < ApplicationController
   end
 
   def close_notification
-    @current_user.close_notification(params[:id])
+    @current_user.close_announcement(AccountNotification.find(params[:id]))
     render :json => @current_user.to_json
   end
 
@@ -916,14 +916,19 @@ class UsersController < ApplicationController
     if params[:user_id].present? && params[:user_id].match(/-/)
       user_id = User.user_id_from_avatar_key(params[:user_id])
     end
-    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id)) do
+    account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
+    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
       user = User.find_by_id(user_id) if user_id.present?
-      if user && service_enabled?(:avatars)
-        url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars], params[:fallback], request)
+      if user && account_avatar_setting != 'disabled'
+        user.avatar_url(nil, account_avatar_setting, "%{fallback}")
+      else
+        ''
       end
-      url ||= params[:fallback] || '/images/no_pic.gif'
     end
-    redirect_to url
+    fallback = User.avatar_fallback_url(params[:fallback], request)
+    redirect_to url.blank? ?
+      fallback :
+      url.sub(CGI.escape("%{fallback}"), CGI.escape(fallback))
   end
 
   protected

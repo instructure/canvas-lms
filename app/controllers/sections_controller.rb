@@ -110,7 +110,9 @@ class SectionsController < ApplicationController
     @section = @context.course_sections.find(params[:id])
     return unless authorized_action(@section, @current_user, :read)
     add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
-    @enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => %w{active completed} }).count
+    @enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => 'active' }).count
+    @completed_enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => 'completed' }).count
+    @pending_enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => %w{invited pending} }).count
     @student_enrollments = @section.enrollments.scoped(:conditions => { :type => 'StudentEnrollment' }).count
     js_env(
       :PERMISSIONS => {

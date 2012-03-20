@@ -775,7 +775,7 @@ define([
     $answer.fillFormData({answer_text: answer.answer_text});
     $answer.fillTemplateData({data: answer, htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']});
     if (!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == I18n.t('answer_comments', "Answer comments")) {
-    $answer.find(".answer_comment_holder").hide();
+      $answer.find(".answer_comment_holder").hide();
     }
     if (answer.answer_weight == 100) {
       $answer.addClass('correct_answer');
@@ -1942,7 +1942,7 @@ define([
         }
       }
 
-      var isNotSurvey = !$('#quiz_assignment_id').val().match(/survey/i);
+      var isNotSurvey = $('#quiz_assignment_id').length == 0 || !$('#quiz_assignment_id').val().match(/survey/i);
       if (isNotSurvey && error_text) {
         $form.find(".answers_header").errorBox(error_text, true);
         return;
@@ -2247,7 +2247,30 @@ define([
           ui.placeholder.height(ui.helper.height()).find(".question_placeholder").height(ui.helper.height() - 10);
         }
       },
-      update: function(event, ui) {
+      stop: function(event, ui) {
+        if (ui.item.hasClass('group_top')) {
+          var take_with = ui.item.data('take_with');
+          if (take_with) {
+            var $obj = ui.item;
+            for(var idx in take_with) {
+              var $item = take_with[idx];
+              $obj.after($item.show());
+              $obj = $item;
+            }
+          }
+        } else {
+          if (quiz.findContainerGroup(ui.item)) {
+            ui.item.addClass('group');
+            var $obj = ui.item.prev();
+            while($obj.length > 0 && !$obj.hasClass('group_top')) {
+              $obj = $obj.prev();
+            }
+            $obj.find(".expand_link").click();
+          } else {
+            ui.item.removeClass('group');
+          }
+        }
+
         var url = $("#quiz_urls .reorder_questions_url, #bank_urls .reorder_questions_url").attr('href');
         var data = {};
         var $container = $("#questions");
@@ -2287,30 +2310,6 @@ define([
         $.ajaxJSON(url, 'POST', data, function(data) {
           $container.loadingImage('remove');
         });
-      },
-      stop: function(event, ui) {
-        if (ui.item.hasClass('group_top')) {
-          var take_with = ui.item.data('take_with');
-          if (take_with) {
-            var $obj = ui.item;
-            for(var idx in take_with) {
-              var $item = take_with[idx];
-              $obj.after($item.show());
-              $obj = $item;
-            }
-          }
-        } else {
-          if (quiz.findContainerGroup(ui.item)) {
-            ui.item.addClass('group');
-            var $obj = ui.item.prev();
-            while($obj.length > 0 && !$obj.hasClass('group_top')) {
-              $obj = $obj.prev();
-            }
-            $obj.find(".expand_link").click();
-          } else {
-            ui.item.removeClass('group');
-          }
-        }
       }
     });
 

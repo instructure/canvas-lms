@@ -159,17 +159,15 @@
   <div style="display: none;" id="topic_urls">
     <a href="<%= context_url(@context, {:controller => :discussion_entries, :action => :create}) %>" class="add_entry_url">&nbsp;</a>
   </div>
-  <% cache(['topic_entries_render', @topic.cache_key, @topic_agglomerated, can_do(@topic, @current_user, :edit), Time.zone.utc_offset, @initial_post_required].join('/')) do %>
-    <%= render :partial => "shared/topics", :object => [@topic], :locals => { 
-      :topic_type => "discussion_topic", :single_topic => true } %>
-    <div id="entry_list" class="entry_list <%= 'agglomerated' if @topic_agglomerated %>">
-      <% if @initial_post_required %>
-        <h3 id="initial_post_required" style="margin: 20px 0;"><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></h3>
-      <% else %>
-          <%= render :partial => "entry", :collection => @entries, :locals => {:topic => @topic} %>
-      <% end %>
-    </div>
-  <% end %>
+  <%= render :partial => "shared/topics", :object => [@topic], :locals => { 
+    :topic_type => "discussion_topic", :single_topic => true } %>
+  <div id="entry_list" class="entry_list <%= 'agglomerated' if @topic_agglomerated %>">
+    <% if @initial_post_required %>
+      <h3 id="initial_post_required" style="margin: 20px 0;"><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></h3>
+    <% else %>
+        <%= render :partial => "entry", :collection => @entries, :locals => {:topic => @topic} %>
+    <% end %>
+  </div>
   <% if !@topic_uneditable && can_do(@topic, @current_user, :reply) && !params[:combined]%>
     <div style="text-align: center; margin: 10px;">
       <a href="#" id="add_entry_bottom" class="add_entry_link add button big-button"> <%= image_tag "add.png" %> <%= t :add_new_entry, "Add New Entry" %></a><br/>

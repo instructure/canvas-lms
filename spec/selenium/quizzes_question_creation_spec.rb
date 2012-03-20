@@ -307,6 +307,61 @@ describe "quizzes question creation" do
     questions[2].should have_class("short_answer_question")
   end
 
+  context "drag and drop reordering" do
+
+    before(:each) do
+      quiz_with_new_questions
+      create_question_group
+    end
+
+    it "should reorder quiz questions" do
+      old_data = get_question_data
+      drag_question_to_top @quest2.id
+      refresh_page
+      new_data = get_question_data
+      new_data[0][:id].should == old_data[1][:id]
+      new_data[1][:id].should == old_data[0][:id]
+      new_data[2][:id].should == old_data[2][:id]
+    end
+
+    it "should add and remove questions to/from a group" do
+      # drag it into the group
+      drag_question_into_group @quest1.id, @group.id
+      refresh_page
+      group_should_contain_question(@group, @quest1)
+
+      # drag it out
+      drag_question_to_top @quest1.id
+      refresh_page
+      data = get_question_data
+      data[0][:id].should == @quest1.id
+    end
+
+    it "should reorder questions within a group" do
+      drag_question_into_group @quest1.id, @group.id
+      drag_question_into_group @quest2.id, @group.id
+      data = get_question_data_for_group @group.id
+      data[0][:id].should == @quest2.id
+      data[1][:id].should == @quest1.id
+
+      drag_question_to_top_of_group @quest1.id, @group.id
+      refresh_page
+      data = get_question_data_for_group @group.id
+      data[0][:id].should == @quest1.id
+      data[1][:id].should == @quest2.id
+    end
+
+    it "should reorder groups and questions" do
+      old_data = get_question_data
+      drag_group_to_top @group.id
+      refresh_page
+      new_data = get_question_data
+      new_data[0][:id].should == old_data[2][:id]
+      new_data[1][:id].should == old_data[0][:id]
+      new_data[2][:id].should == old_data[1][:id]
+    end
+  end
+
   context "html answers" do
 
     def edit_first_html_answer(question_type=nil)

@@ -293,7 +293,7 @@ class Quiz < ActiveRecord::Base
           data[:assessment_question_bank_id] = e.assessment_question_bank_id
           data[:questions] = []
         else
-          data[:questions] = e.quiz_questions.map{|q| q.data}
+          data[:questions] = e.quiz_questions.sort_by{|q| q.position}.map{|q| q.data}
         end
         data[:actual_pick_count] = e.actual_pick_count
         res = data

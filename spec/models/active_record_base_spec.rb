@@ -219,4 +219,16 @@ describe ActiveRecord::Base do
       User.distinct(:locale, :include_nil => true).should eql [nil, "en", "es"]
     end
   end
+
+  context "find_ids_in_batches" do
+    it "should return ids from the table in batches of specified size" do
+      ids = []
+      5.times { ids << User.create!().id }
+      batches = []
+      User.find_ids_in_batches(:batch_size => 2) do |found_ids|
+        batches << found_ids
+      end
+      batches.should == [ ids[0,2], ids[2,2], ids[4,1] ]
+    end
+  end
 end

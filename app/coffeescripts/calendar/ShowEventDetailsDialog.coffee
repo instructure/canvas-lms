@@ -6,11 +6,12 @@ define [
   'compiled/calendar/EditEventDetailsDialog'
   'jst/calendar/eventDetails'
   'jst/calendar/deleteItem'
+  'jst/calendar/reservationOverLimitDialog'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
-], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate) ->
+], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog) ->
 
   class ShowEventDetailsDialog
     constructor: (event) ->
@@ -42,21 +43,34 @@ define [
         success: () =>
           $.publish "CommonEvent/eventDeleted", event
 
-    reserveEvent: () =>
-      url = @event.object.reserve_url
-
-      successCB = (data) =>
-        @popover.hide()
-        # On success, this will return the new event created for the user.
-        $.publish "CommonEvent/eventSaved", @event
-
-      errorCB = (data) =>
+    reserveErrorCB: (data) =>
+      for error in data when error.message is 'participant has met per-participant limit'
+        errorHandled = true
+        $dialog = $(reservationOverLimitDialog(error)).dialog
+          resizable: false
+          width: 450
+          buttons: [
+            text: I18n.t 'reschedule', 'Reschedule'
+            'class': 'ui-button-primary'
+            click: =>
+              $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
+                $dialog.dialog('close')
+          ,
+            text: I18n.t 'do_nothing', 'Do Nothing'
+            click: -> $dialog.dialog('close')
+          ]
+      unless errorHandled
         alert "Could not reserve event: #{data}"
         $.publish "CommonEvent/eventSaveFailed", @event
 
-      if confirm("Are you sure you want to sign up for this time slot?")
-        $.publish "CommonEvent/eventSaving", @event
-        $.ajaxJSON url, 'POST', {}, successCB, errorCB
+    reserveSuccessCB: (data) =>
+      @popover.hide()
+      # On success, this will return the new event created for the user.
+      $.publish "CommonEvent/eventSaved", @event
+
+    reserveEvent: (params={}) =>
+      $.publish "CommonEvent/eventSaving", @event
+      $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB, @reserveErrorCB
 
     unreserveEvent: () =>
       for e in @event.childEvents

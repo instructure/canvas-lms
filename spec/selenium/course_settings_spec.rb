@@ -7,16 +7,6 @@ describe "course settings tests" do
     course_with_teacher_logged_in
   end
 
-  def add_section(section_name)
-    @course_section = @course.course_sections.create!(:name => section_name)
-    @course.reload
-  end
-
-  def multiple_student_enrollment
-    @enrollment = @course.student_enrollments.build(:user => @user, :workflow_state => "active", :course_section => @course_section)
-    @enrollment.save!
-  end
-
   describe "course details" do
     def test_select_standard_for(context)
       grading_standard_for context
@@ -261,7 +251,7 @@ describe "course settings tests" do
       student_in_course(:name => @username)
       @enrollment.course_section = @course_section; @enrollment.save
       add_section("Section 2")
-      multiple_student_enrollment
+      multiple_student_enrollment(@user, @course_section)
     end
 
     it "should coalesce multiple enrollments under a single student" do

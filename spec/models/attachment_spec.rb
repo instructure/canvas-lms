@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Attachment do
   
@@ -719,6 +719,21 @@ describe Attachment do
       @attachment.encoding.should be_nil
       @attachment.infer_encoding
       @attachment.encoding.should == 'UTF-8'
+    end
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should infer scribd mime type regardless of shard" do
+      scribd_mime_type_model(:extension => 'pdf')
+      attachment_model(:content_type => 'pdf')
+      @attachment.should be_scribdable
+      Attachment.clear_cached_mime_ids
+      @shard1.activate do
+        attachment_model(:content_type => 'pdf')
+        @attachment.should be_scribdable
+      end
     end
   end
 end

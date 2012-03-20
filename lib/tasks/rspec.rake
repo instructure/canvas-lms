@@ -1,5 +1,5 @@
 # Don't load rspec if running "rake gems:*"
-unless ARGV.any? {|a| a =~ /\Agems/}
+unless ARGV.any? { |a| a =~ /\Agems/ }
 
 begin
   require 'spec/rake/spectask'
@@ -20,7 +20,7 @@ rescue MissingSourceFile
 *  #{__FILE__},
 *  but rspec can not be found in vendor/gems, vendor/plugins or system gems.
 #{"*" * 80}
-MSG
+            MSG
           end
         end
       end
@@ -40,7 +40,7 @@ Spec::Rake::SpecTask.new(:spec) do |t|
   if ENV['SINGLE_TEST']
     t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
   end
-  spec_files = FileList['vendor/plugins/*/spec_canvas'] + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
+  spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
   Gem.loaded_specs.values.each do |spec|
     path = spec.full_gem_path
     spec_canvas_path = File.expand_path(path+"/spec_canvas")
@@ -49,7 +49,7 @@ Spec::Rake::SpecTask.new(:spec) do |t|
   end
   if ENV['IN_MEMORY_DB']
     N_PROCESSES = [ENV['IN_MEMORY_DB'].to_i, 1].max
-    spec_files = spec_files.map{|x| Dir[x + "/[^selenium]**/*_spec.rb" ]}.flatten.sort.in_groups_of(N_PROCESSES)
+    spec_files = spec_files.map { |x| Dir[x + "/[^selenium]**/*_spec.rb"] }.flatten.sort.in_groups_of(N_PROCESSES)
     processes = []
     Signal.trap "SIGINT", (lambda { Process.kill "-KILL", Process.getpgid(0) })
     child = false
@@ -57,12 +57,12 @@ Spec::Rake::SpecTask.new(:spec) do |t|
       pid = Process.fork
       unless pid
         child = true
-        t.spec_files = spec_files.map{|x|x[j]}.compact
+        t.spec_files = spec_files.map { |x| x[j] }.compact
         break
       end
       processes << pid
     end
-    exit Process.waitall.map(&:last).map(&:exitstatus).count{|x|x != 0} unless child
+    exit Process.waitall.map(&:last).map(&:exitstatus).count { |x| x != 0 } unless child
   else
     t.spec_files = spec_files
   end
@@ -75,14 +75,14 @@ namespace :spec do
     Rake::Task["db:test:prepare"].execute
     Rake::Task["spec"].execute
   end
-  
+
   desc "Run all specs in spec directory with RCov (excluding plugin specs)"
   Spec::Rake::SpecTask.new(:rcov) do |t|
     t.spec_opts = ['--options', "\"#{RAILS_ROOT}/spec/spec.opts\""]
     t.spec_files = FileList['spec/**/*/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
     t.rcov = true
     t.rcov_opts = lambda do
-      IO.readlines("#{RAILS_ROOT}/spec/rcov.opts").map {|l| l.chomp.split " "}.flatten
+      IO.readlines("#{RAILS_ROOT}/spec/rcov.opts").map { |l| l.chomp.split " " }.flatten
     end
   end
 
@@ -144,9 +144,9 @@ namespace :spec do
         ActiveRecord::Base.establish_connection(Rails.env)
         base_dir = File.join(Rails.root, 'spec', 'fixtures')
         fixtures_dir = ENV['FIXTURES_DIR'] ? File.join(base_dir, ENV['FIXTURES_DIR']) : base_dir
-        
+
         require 'active_record/fixtures'
-        (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/).map {|f| File.join(fixtures_dir, f) } : Dir.glob(File.join(fixtures_dir, '*.{yml,csv}'))).each do |fixture_file|
+        (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/).map { |f| File.join(fixtures_dir, f) } : Dir.glob(File.join(fixtures_dir, '*.{yml,csv}'))).each do |fixture_file|
           Fixtures.create_fixtures(File.dirname(fixture_file), File.basename(fixture_file, '.*'))
         end
       end
@@ -155,7 +155,7 @@ namespace :spec do
 
   namespace :server do
     daemonized_server_pid = File.expand_path("#{RAILS_ROOT}/tmp/pids/spec_server.pid")
-    
+
     desc "start spec_server."
     task :start do
       if File.exist?(daemonized_server_pid)
@@ -173,18 +173,18 @@ namespace :spec do
         $stderr.puts "No server running."
       else
         $stderr.puts "Shutting down spec_server ..."
-        system("kill", "-s", "TERM", File.read(daemonized_server_pid).strip) && 
-        File.delete(daemonized_server_pid)
+        system("kill", "-s", "TERM", File.read(daemonized_server_pid).strip) &&
+            File.delete(daemonized_server_pid)
       end
     end
 
     desc "restart spec_server."
     task :restart => [:stop, :start]
-    
+
     desc "check if spec server is running"
     task :status do
       if File.exist?(daemonized_server_pid)
-        $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).gsub("\n","")})}
+        $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).gsub("\n", "")})}
       else
         $stderr.puts "No server running."
       end
@@ -193,22 +193,20 @@ namespace :spec do
 end
 
 namespace :parallel do
-  task :nonselenium, :count do |t,args|
+  task :nonselenium, :count do |t, args|
     require "parallel_tests"
     count = args[:count]
-    test_files = FileList['vendor/plugins/*/spec_canvas'] + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
-    test_files.map!{|f| "#{Rails.root}/#{f}" }
-    Rake::Task['parallel:spec'].invoke(count,'','',test_files.join(' '))
+    test_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
+    test_files.map! { |f| "#{Rails.root}/#{f}" }
+    Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
   end
 
-  task :selenium, :count do |t,args|
+  task :selenium, :count do |t, args|
     require "parallel_tests"
     count = args[:count]
-    test_files = FileList['spec/selenium/*_spec.rb']
-    test_files.map!{|f| "#{Rails.root}/#{f}" }
-    Rake::Task['parallel:spec'].invoke(count,'','',test_files.join(' '))
+    test_files = FileList['spec/selenium/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
+    test_files.map! { |f| "#{Rails.root}/#{f}" }
+    Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
   end
-
 end
-
 end

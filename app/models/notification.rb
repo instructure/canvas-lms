@@ -117,7 +117,9 @@ class Notification < ActiveRecord::Base
     # throttled, so it definitely needs to go to at least one communication
     # channel with 'daily' as the frequency.
     if !policies.any?{|p| p.frequency == 'daily'} && opts[:fallback_channel]
-      policies << NotificationPolicy.new(:communication_channel => opts[:fallback_channel], :frequency => 'daily')
+      fallback_policy = opts[:fallback_channel].notification_policies.by(:daily).find(:first, :conditions => { :notification_id => nil })
+      fallback_policy ||= NotificationPolicy.new(:communication_channel => opts[:fallback_channel], :frequency => 'daily')
+      policies << fallback_policy
     end
 
     return false if (!opts[:fallback_channel] && cc && !cc.active?) || policies.empty? || self.registration?

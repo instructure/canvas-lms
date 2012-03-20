@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Instructure, Inc.
+ * Copyright (C) 2012 Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -214,6 +214,9 @@ define([
           delete data['assignment[max_score]'];
           delete data['assignment[mastery_score]'];
           delete data['never_drop'];
+        }
+        if (!$("#assignment_group_assignment").prop('checked')) {
+          data['assignment[group_category_id]'] = "";
         }
         $.each(['unlock_at', 'lock_at', 'due_at'], function(i, dateType) {
           if ( (dateType == 'due_at') || data['assignment[' + dateType + ']'] ) {
