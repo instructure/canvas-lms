@@ -615,11 +615,17 @@ Spec::Runner.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection
-    ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
-    yield
+  def enable_forgery_protection(enable = nil)
+    if enable != false
+      ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
+    end
+
+    yield if block_given?
+
   ensure
-    ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
+    if enable != true
+      ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
+    end
   end
 
   def start_test_http_server(requests=1)
@@ -700,5 +706,14 @@ Spec::Runner.configure do |config|
 
   def run_job(job)
     Delayed::Worker.new.perform(job)
+  end
+
+  # send a multipart post request in an integration spec post_params is
+  # an array of [k,v] params so that the order of the params can be
+  # defined
+  def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
+    mp = Multipart::MultipartPost.new
+    query, headers = mp.prepare_query(post_params)
+    send(method, url, query, headers.merge(http_headers))
   end
 end

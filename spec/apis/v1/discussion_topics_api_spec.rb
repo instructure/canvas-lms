@@ -90,7 +90,10 @@ describe DiscussionTopicsController, :type => :integration do
                   "attachments"=>[{"content-type"=>"unknown/unknown",
                                    "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                                    "filename"=>"content.txt",
-                                   "display_name"=>"content.txt"}],
+                                   "display_name"=>"content.txt",
+                                   "id"=>attachment.id,
+                                   "size"=>attachment.size,
+                  }],
                   "topic_children"=>[sub.id],
                   "permissions" => { "attach" => true }}
   end
@@ -155,7 +158,10 @@ describe DiscussionTopicsController, :type => :integration do
                                   [{"content-type"=>"unknown/unknown",
                                     "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                                     "filename"=>"content.txt",
-                                    "display_name"=>"content.txt"}],
+                                    "display_name"=>"content.txt",
+                                    "id" => attachment.id,
+                                    "size" => attachment.size,
+                                  }],
                           "posted_at"=>gtopic.posted_at.as_json,
                           "root_topic_id"=>nil,
                           "topic_children"=>[],
@@ -922,6 +928,8 @@ describe DiscussionTopicsController, :type => :integration do
         "url"=>"http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
         "filename"=>"unknown.loser",
         "display_name"=>"unknown.loser",
+        "id" => @attachment.id,
+        "size" => 100,
       }
 
       json['view'].should == [

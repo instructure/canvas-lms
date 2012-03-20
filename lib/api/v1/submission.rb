@@ -19,6 +19,7 @@
 module Api::V1::Submission
   include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::Attachment
   include Api::V1::DiscussionTopics
 
   def submission_json(submission, assignment, user, session, context = nil, includes = [])

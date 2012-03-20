@@ -667,20 +667,16 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :submissions_api) do |submissions|
-      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions', :action => :index, :path_name => 'course_assignment_submissions'
-      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions', :action => :index, :path_name => 'section_assignment_submissions'
-
-      submissions.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
-      submissions.get 'sections/:section_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'section_student_submissions'
-
-      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "course_assignment_submission"
-      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "section_assignment_submission"
-
-      submissions.post 'courses/:course_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
-      submissions.post 'sections/:section_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
-
-      submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'course_assignment_submission'
-      submissions.put 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'section_assignment_submission'
+      def submissions_api(submissions, context)
+        submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :index, :path_name => "#{context}_assignment_submissions"
+        submissions.get "#{context.pluralize}/:#{context}_id/students/submissions", :controller => :submissions_api, :action => :for_students, :path_name => "#{context}_student_submissions"
+        submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:id", :action => :show, :path_name => "#{context}_assignment_submission"
+        submissions.post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :create, :controller => :submissions
+        submissions.post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/files", :action => :create_file
+        submissions.put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:id", :action => :update, :path_name => "#{context}_assignment_submission"
+      end
+      submissions_api(submissions, "course")
+      submissions_api(submissions, "section")
     end
 
     api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
@@ -805,7 +801,16 @@ ActionController::Routing::Routes.draw do |map|
       groups.get 'appointment_groups/:id/users', :action => :users, :path_name => 'appointment_group_users'
       groups.get 'appointment_groups/:id/groups', :action => :groups, :path_name => 'appointment_group_groups'
     end
+
+    api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
+    api.get 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
   end
+
+  # this is not a "normal" api endpoint in the sense that it is not documented
+  # or called directly, it's used as the redirect in the file upload process
+  # for local files. it also doesn't use the normal oauth authentication
+  # system, so we can't put it in the api uri namespace.
+  map.api_v1_files_create 'files_api', :controller => 'files', :action => 'api_create', :conditions => { :method => :post }
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }

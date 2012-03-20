@@ -18,6 +18,7 @@
 
 module Api::V1::DiscussionTopics
   include Api::V1::Json
+  include Api::V1::Attachment
 
   def discussion_topics_api_json(topics, context, user, session)
     topics.map do |topic|

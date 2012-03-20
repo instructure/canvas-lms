@@ -22,6 +22,7 @@
 class ConversationsController < ApplicationController
   include ConversationsHelper
   include Api::V1::Submission
+  include Api::V1::Attachment
 
   before_filter :require_user, :except => [:public_feed]
   before_filter :require_pseudonym, :except => [:public_feed]

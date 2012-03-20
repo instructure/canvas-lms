@@ -508,7 +508,10 @@ class Attachment < ActiveRecord::Base
     policy['conditions'] += extras
     # flash won't send the session cookie, so for local uploads we put the user id in the signed
     # policy so we can mock up the session for FilesController#create
-    policy['conditions'] << {'pseudonym_id' => pseudonym.id} if Attachment.local_storage?
+    if Attachment.local_storage?
+      policy['conditions'] << { 'pseudonym_id' => pseudonym.id }
+      policy['attachment_id'] = self.id
+    end
 
     policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
     signature = Base64.encode64(
@@ -519,15 +522,26 @@ class Attachment < ActiveRecord::Base
 
     res[:id] = id
     res[:upload_params].merge!({
-      'Filename' => '',
-      'folder' => '',
-      'key' => sanitized_filename,
-      'acl' => 'private',
-      'Policy' => policy_encoded,
-      'Signature' => signature,
+       'Filename' => '',
+       'folder' => '',
+       'key' => sanitized_filename,
+       'acl' => 'private',
+       'Policy' => policy_encoded,
+       'Signature' => signature,
     })
     extras.map(&:to_a).each{ |extra| res[:upload_params][extra.first.first] = extra.first.last }
     res
+  end
+
+  def self.decode_policy(policy_str, signature_str)
+    return nil if policy_str.blank? || signature_str.blank?
+    signature = Base64.decode64(signature_str)
+    return nil if OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new("sha1"), Attachment.shared_secret, policy_str) != signature
+    policy = JSON.parse(Base64.decode64(policy_str))
+    return nil unless Time.zone.parse(policy['expiration']) >= Time.now
+    attachment = Attachment.find(policy['attachment_id'])
+    return nil unless attachment.try(:state) == :unattached
+    return policy, attachment
   end
 
   def unencoded_filename

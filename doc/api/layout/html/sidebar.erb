@@ -1,8 +1,9 @@
 <nav>
   <h2 class='first'>Basics</h2>
-  <a href="<%= url_for("oauth.html") %>" class="<%= 'current' if options[:object] == 'oauth.html' %>">OAuth</a>
-  <a href="<%= url_for("object_ids.html") %>" class="<%= 'current' if options[:object] == 'object_ids.html' %>">SIS IDs</a>
-  <a href="<%= url_for("pagination.html") %>" class="<%= 'current' if options[:object] == 'pagination.html' %>">Pagination</a>
+  <a href="<%= url_for("file.oauth.html") %>" class="<%= 'current' if options[:object] == 'file.oauth.html' %>">OAuth</a>
+  <a href="<%= url_for("file.object_ids.html") %>" class="<%= 'current' if options[:object] == 'file.object_ids.html' %>">SIS IDs</a>
+  <a href="<%= url_for("file.pagination.html") %>" class="<%= 'current' if options[:object] == 'file.pagination.html' %>">Pagination</a>
+  <a href="<%= url_for("file.file_uploads.html") %>" class="<%= 'current' if options[:object] == 'file.file_uploads.html' %>">File Uploads</a>
   <h2>Resources</h2>
   <% options[:resources].each_with_index do |(resource, controllers), i| %>
     <% link = url_for("#{topicize resource}.html")
@@ -10,12 +11,13 @@
        klass << "current" if resource == options[:object] %>
     <a class="<%= klass.join(' ') %>" href="<%= link %>"><%= resource %></a>
   <% end %>
-  <h2><a href="<%= url_for("sis_csv.html") %>" class="<%= 'current' if options[:object] == 'sis_csv.html' %>">SIS CSV</a></h2>
+  <h2>SIS</h2>
+  <a href="<%= url_for("file.sis_csv.html") %>" class="<%= 'current' if options[:object] == 'file.sis_csv.html' %>">SIS CSV Format</a>
   <h2>External Tools</h2>
-  <a href="<%= url_for("tools_intro.html") %>" class="<%= 'current' if options[:object] == 'tools_intro.html' %>">Introduction</a>
-  <a href="<%= url_for("assignment_tools.html") %>" class="<%= 'current' if options[:object] == 'assignment_tools.html' %>">Grading</a>
-  <a href="<%= url_for("navigation_tools.html") %>" class="<%= 'current' if options[:object] == 'navigation_tools.html' %>">Navigation</a>
-  <a href="<%= url_for("editor_button_tools.html") %>" class="<%= 'current' if options[:object] == 'editor_button_tools.html' %>">Rich Editor</a>
-  <a href="<%= url_for("link_selection_tools.html") %>" class="<%= 'current' if options[:object] == 'link_selection_tools.html' %>">Link Selection</a>
-  <a href="<%= url_for("tools_xml.html") %>" class="<%= 'current' if options[:object] == 'tools_xml.html' %>">Configuring</a>
+  <a href="<%= url_for("file.tools_intro.html") %>" class="<%= 'current' if options[:object] == 'file.tools_intro.html' %>">Introduction</a>
+  <a href="<%= url_for("file.assignment_tools.html") %>" class="<%= 'current' if options[:object] == 'file.assignment_tools.html' %>">Grading</a>
+  <a href="<%= url_for("file.navigation_tools.html") %>" class="<%= 'current' if options[:object] == 'file.navigation_tools.html' %>">Navigation</a>
+  <a href="<%= url_for("file.editor_button_tools.html") %>" class="<%= 'current' if options[:object] == 'file.editor_button_tools.html' %>">Rich Editor</a>
+  <a href="<%= url_for("file.link_selection_tools.html") %>" class="<%= 'current' if options[:object] == 'file.link_selection_tools.html' %>">Link Selection</a>
+  <a href="<%= url_for("file.tools_xml.html") %>" class="<%= 'current' if options[:object] == 'file.tools_xml.html' %>">Configuring</a>
 </nav>

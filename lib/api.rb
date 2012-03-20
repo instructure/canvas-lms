@@ -170,16 +170,6 @@ module Api
     collection
   end
 
-  def attachment_json(attachment, url_options = {})
-    url = file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
-    {
-      'content-type' => attachment.content_type,
-      'display_name' => attachment.display_name,
-      'filename' => attachment.filename,
-      'url' => url,
-    }
-  end
-
   def media_comment_json(media_object_or_hash)
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
     {
