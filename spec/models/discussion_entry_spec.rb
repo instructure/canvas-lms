@@ -342,4 +342,30 @@ describe DiscussionEntry do
       @entry.change_read_state("read", @student)
     end
   end
+
+  context "threaded discussions" do
+    it "should force a root entry as parent if the discussion isn't threaded" do
+      course_with_teacher
+      discussion_topic_model
+      root = @topic.reply_from(:user => @teacher, :text => "root entry")
+      sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
+      sub1.parent_entry.should == root
+      sub1.root_entry.should == root
+      sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
+      sub2.parent_entry.should == root
+      sub2.root_entry.should == root
+    end
+
+    it "should allow a sub-entry as parent if the discussion is threaded" do
+      course_with_teacher
+      discussion_topic_model(:threaded => true)
+      root = @topic.reply_from(:user => @teacher, :text => "root entry")
+      sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
+      sub1.parent_entry.should == root
+      sub1.root_entry.should == root
+      sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
+      sub2.parent_entry.should == sub1
+      sub2.root_entry.should == root
+    end
+  end
 end
