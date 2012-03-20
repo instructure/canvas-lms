@@ -15,6 +15,7 @@
     </div>
     <% form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
       <div class="edit_term">
+        <%= f.label :name, :en => 'Term Name:' %>
         <%= f.text_field :name %>
       </div>
       <% if term && can_do(@root_account, @current_user, :manage_sis) %>

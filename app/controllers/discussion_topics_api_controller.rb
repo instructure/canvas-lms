@@ -141,7 +141,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   # @API
-  # Add a reply to a top-level entry in a discussion topic. Returns a json
+  # Add a reply to an entry in a discussion topic. Returns a json
   # representation of the created reply (see documentation for 'replies'
   # method) on success.
   #
@@ -157,7 +157,7 @@ class DiscussionTopicsApiController < ApplicationController
   #        -F 'message=<message>' \ 
   #        -H "Authorization: Bearer <token>"
   def add_reply
-    @parent = root_entries(@topic).find(params[:entry_id])
+    @parent = all_entries(@topic).find(params[:entry_id])
     @entry = build_entry(@parent.discussion_subentries)
     if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
       if save_entry
@@ -343,7 +343,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   def save_entry
     if !@entry.save
-      render :json => @entry.errors.to_json, :status => :bad_request
+      render :json => @entry.errors, :status => :bad_request
       return false
     end
     @entry.update_topic
@@ -352,7 +352,7 @@ class DiscussionTopicsApiController < ApplicationController
     return true
   end
 
-  def root_entries(topic)
+  def visible_topics(topic)
     # conflate entries from all child topics for groups the user can access
     topics = [topic]
     if topic.for_group_assignment? && !topic.child_topics.empty?
@@ -361,11 +361,19 @@ class DiscussionTopicsApiController < ApplicationController
       end
       topic.child_topics.each{ |t| topics << t if groups.include?(t.context) }
     end
-    DiscussionEntry.top_level_for_topics(topics).active
+    topics
+  end
+
+  def all_entries(topic)
+    DiscussionEntry.all_for_topics(visible_topics(topic)).active
+  end
+
+  def root_entries(topic)
+    DiscussionEntry.top_level_for_topics(visible_topics(topic)).active
   end
 
   def reply_entries(entry)
-    entry.unordered_discussion_subentries.active
+    entry.flattened_discussion_subentries.active
   end
 
   def change_topic_read_state(new_state)

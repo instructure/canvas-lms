@@ -28,6 +28,8 @@ describe "sections/show.html.erb" do
       assigns[:context] = @course
       assigns[:section] = @section
       assigns[:student_enrollments] = 1
+      assigns[:pending_enrollments] = 1
+      assigns[:completed_enrollments] = 1
       assigns[:enrollments] = 1
       assigns[:permission_classes] = 'manage-permissions'
     end

@@ -400,19 +400,28 @@ describe CalendarEventsApiController, :type => :integration do
           error['reservations'].size.should eql 0
         end
 
-        it "should notify the teacher when appointment is cancelled" do
+        it "should notify the teacher when appointment is canceled" do
           prepare(true)
           json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
-                            :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s})
+                            :controller => 'calendar_events_api',
+                            :action => 'reserve',
+                            :format => 'json',
+                            :id => @event1.id.to_s })
 
           reservation = CalendarEvent.find(json["id"])
 
           raw_api_call(:delete, "/api/v1/calendar_events/#{reservation.id}", {
-                       :controller => 'calendar_events_api', :action => 'destroy', :format => 'json', :id => reservation.id.to_s})
+                         :controller => 'calendar_events_api',
+                         :action => 'destroy',
+                         :format => 'json',
+                         :id => reservation.id.to_s
+                       },
+                       :cancel_reason => "Too busy")
 
           message = Message.last
           message.notification_name.should == 'Appointment Canceled By User'
           message.to.should == "test_channel_email_#{@teacher.id}"
+          message.body.should =~ /Too busy/
         end
       end
     end

@@ -21,37 +21,47 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe "Date#in_time_zone" do
   before do
     @zones = ['America/Juneau', 'America/Denver', 'UTC', 'Asia/Baghdad', 'Asia/Shanghai'].map { |tzname| ActiveSupport::TimeZone.new(tzname) }
-    @today = Time.zone.today
+    today = Time.zone.now
+    @dates = [
+      Date.parse("#{today.year}-01-01"),
+      Date.parse("#{today.year}-07-01")
+    ]
   end
 
   it "should give midnight regardless of time zone" do
-    @zones.each do |tz|
-      today_in_tz = @today.in_time_zone(tz.name)
-      today_in_tz.hour.should       == 0
-      today_in_tz.min.should        == 0
-      today_in_tz.sec.should        == 0
-      today_in_tz.utc_offset.should == tz.utc_offset
+    @dates.each do |date|
+      @zones.each do |tz|
+        time_in_tz = date.in_time_zone(tz.name)
+        time_in_tz.hour.should       == 0
+        time_in_tz.min.should        == 0
+        time_in_tz.sec.should        == 0
+        time_in_tz.utc_offset.should == tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
+      end
     end
   end
 
   it "should give the same date regardless of time zone" do
-    @zones.each do |tz|
-      today_in_tz = @today.in_time_zone(tz.name)
-      today_in_tz.year.should       == @today.year
-      today_in_tz.month.should      == @today.month
-      today_in_tz.day.should        == @today.day
-      today_in_tz.utc_offset.should == tz.utc_offset
+    @dates.each do |date|
+      @zones.each do |tz|
+        time_in_tz = date.in_time_zone(tz.name)
+        time_in_tz.year.should       == date.year
+        time_in_tz.month.should      == date.month
+        time_in_tz.day.should        == date.day
+        time_in_tz.utc_offset.should == tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
+      end
     end
   end
 
   it "should work with no explicit zone given" do
-    tz = @zones.first
-    Time.use_zone(tz) do
-      today_in_tz = @today.in_time_zone
-      today_in_tz.hour.should       == 0
-      today_in_tz.min.should        == 0
-      today_in_tz.sec.should        == 0
-      today_in_tz.utc_offset.should == tz.utc_offset
+    @dates.each do |date|
+      tz = @zones.first
+      Time.use_zone(tz) do
+        time_in_tz = date.in_time_zone
+        time_in_tz.hour.should       == 0
+        time_in_tz.min.should        == 0
+        time_in_tz.sec.should        == 0
+        time_in_tz.utc_offset.should == tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
+      end
     end
   end
 end

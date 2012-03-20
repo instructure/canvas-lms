@@ -141,6 +141,8 @@ define [
           for contextInfo in @contexts when contextInfo.asset_string == group.context_code
             group.context = contextInfo
 
+          group.published = group.workflow_state == "active"
+
           groups.push group
 
         html = appointmentGroupListTemplate

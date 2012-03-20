@@ -3,85 +3,89 @@ require File.expand_path(File.dirname(__FILE__) + "/common")
 describe "context_modules" do
   it_should_behave_like "in-process server selenium tests"
 
+  def io
+    require 'action_controller'
+    require 'action_controller/test_process.rb'
+    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/txt.txt'), 'text/plain', true)
+  end
+
+  def add_existing_module_item(item_select_selector, module_name, item_name)
+    add_module(module_name + 'Module')
+    driver.find_element(:css, '.add_module_item_link').click
+    select_module_item('#add_module_item_select', module_name)
+    select_module_item(item_select_selector + ' .module_item_select', item_name)
+    driver.find_element(:css, '.add_item_button').click
+    wait_for_ajaximations
+    tag = ContentTag.last
+    module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+    module_item.should include_text(item_name)
+    module_item
+  end
+
+  def select_module_item(select_element_css, item_text)
+    click_option(select_element_css, item_text)
+  end
+
+  def new_module_form
+    keep_trying_until do
+      driver.find_element(:css, '.add_module_link').click
+      driver.find_element(:css, '.ui-dialog').should be_displayed
+    end
+    add_form = driver.find_element(:id, 'add_context_module_form')
+    add_form
+  end
+
+  def add_module(module_name = 'Test Module')
+    add_form = new_module_form
+    replace_content(add_form.find_element(:id, 'context_module_name'), module_name)
+    add_form.submit
+    wait_for_ajaximations
+    add_form.should_not be_displayed
+    driver.find_element(:id, 'context_modules').should include_text(module_name)
+  end
+
+  def add_new_module_item(item_select_selector, module_name, new_item_text, item_title_text)
+    add_module(module_name + 'Module')
+    driver.find_element(:css, '.add_module_item_link').click
+    select_module_item('#add_module_item_select', module_name)
+    select_module_item(item_select_selector + ' .module_item_select', new_item_text)
+    item_title = keep_trying_until do
+      item_title = find_with_jquery('.item_title:visible')
+      item_title.should be_displayed
+      item_title
+    end
+    replace_content(item_title, item_title_text)
+    yield if block_given?
+    driver.find_element(:css, '.add_item_button').click
+    wait_for_ajaximations
+    tag = ContentTag.last
+    module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+    module_item.should include_text(item_title_text)
+  end
+
+  def add_new_external_item(module_name, url_text, page_name_text)
+    add_module(module_name + 'Module')
+    driver.find_element(:css, '.add_module_item_link').click
+    select_module_item('#add_module_item_select', module_name)
+    wait_for_ajaximations
+    url_input = find_with_jquery('input[name="url"]:visible')
+    title_input = find_with_jquery('input[name="title"]:visible')
+    replace_content(url_input, url_text)
+
+    replace_content(title_input, page_name_text)
+
+    driver.find_element(:css, '.add_item_button').click
+    wait_for_ajaximations
+    tag = ContentTag.last
+    module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+    module_item.should include_text(page_name_text)
+  end
+
+  def course_module
+    @module = @course.context_modules.create!(:name => "some module")
+  end
+
   context "context modules as a teacher" do
-
-    def select_module_item(select_element_css, item_text)
-      click_option(select_element_css, item_text)
-    end
-
-    def new_module_form
-      keep_trying_until do
-        driver.find_element(:css, '.add_module_link').click
-        driver.find_element(:css, '.ui-dialog').should be_displayed
-      end
-      add_form = driver.find_element(:id, 'add_context_module_form')
-      add_form
-    end
-
-    def add_module(module_name = 'Test Module')
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), module_name)
-      add_form.submit
-      wait_for_ajaximations
-      add_form.should_not be_displayed
-      driver.find_element(:id, 'context_modules').should include_text(module_name)
-    end
-
-    def add_existing_module_item(item_select_selector, module_name, item_name)
-      add_module(module_name + 'Module')
-      driver.find_element(:css, '.add_module_item_link').click
-      select_module_item('#add_module_item_select', module_name)
-      select_module_item(item_select_selector + ' .module_item_select', item_name)
-      driver.find_element(:css, '.add_item_button').click
-      wait_for_ajaximations
-      tag = ContentTag.last
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
-      module_item.should include_text(item_name)
-      module_item
-    end
-
-    def add_new_module_item(item_select_selector, module_name, new_item_text, item_title_text)
-      add_module(module_name + 'Module')
-      driver.find_element(:css, '.add_module_item_link').click
-      select_module_item('#add_module_item_select', module_name)
-      select_module_item(item_select_selector + ' .module_item_select', new_item_text)
-      item_title = keep_trying_until do
-        item_title = find_with_jquery('.item_title:visible')
-        item_title.should be_displayed
-        item_title
-      end
-      replace_content(item_title, item_title_text)
-      yield if block_given?
-      driver.find_element(:css, '.add_item_button').click
-      wait_for_ajaximations
-      tag = ContentTag.last
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
-      module_item.should include_text(item_title_text)
-    end
-
-    def add_new_external_item(module_name, url_text, page_name_text)
-      add_module(module_name + 'Module')
-      driver.find_element(:css, '.add_module_item_link').click
-      select_module_item('#add_module_item_select', module_name)
-      wait_for_ajaximations
-      url_input = find_with_jquery('input[name="url"]:visible')
-      title_input = find_with_jquery('input[name="title"]:visible')
-      replace_content(url_input, url_text)
-
-      replace_content(title_input, page_name_text)
-
-      driver.find_element(:css, '.add_item_button').click
-      wait_for_ajaximations
-      tag = ContentTag.last
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
-      module_item.should include_text(page_name_text)
-    end
-
-    def io
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
-      ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/doc.doc'), 'application/msword', true)
-    end
 
     before (:each) do
       course_with_teacher_logged_in
@@ -226,18 +230,6 @@ describe "context_modules" do
       @ag2.assignments.first.title.should == "New Quiz"
     end
 
-    it "should add a file item to a module" do
-      #adding file to course
-      @folder = @course.folders.create!(:name => "test folder", :workflow_state => "visible")
-      @file = @folder.active_file_attachments.build(:uploaded_data => io)
-      @file.context = @course
-      @file.save!
-
-      #have to refresh the page for the file to show up in the select
-      refresh_page
-      add_existing_module_item('#attachments_select', 'File', 'doc.doc')
-    end
-
     it "should add a content page item to a module" do
       add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
     end
@@ -362,6 +354,40 @@ describe "context_modules" do
     end
   end
 
+  describe "files" do
+    FILE_NAME = 'some test file'
+
+    before (:each) do
+      course_with_teacher_logged_in
+      #adding file to course
+      @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+      @file.context = @course
+      @file.save!
+    end
+
+    it "should add a file item to a module" do
+      get "/courses/#{@course.id}/modules"
+
+      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+    end
+
+    it "should not remove the file link in a module when file is overwritten" do
+      pending("bug 6233 - when replacing a file, module links are unexpectedly deleted") do
+        course_module
+        @module.add_item({:id => @file.id, :type => 'attachment'})
+        get "/courses/#{@course.id}/modules"
+
+        driver.find_element(:css, '.context_module_item').should include_text(FILE_NAME)
+        file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+        file.context = @course
+        file.save!
+        Attachment.last.handle_duplicates(:overwrite)
+        refresh_page
+        driver.find_element(:css, '.context_module_item').should include_text(FILE_NAME)
+      end
+    end
+  end
+
   context "context modules as a student" do
     LOCKED_TEXT = 'locked'
     COMPLETED_TEXT = 'completed'
@@ -451,28 +477,27 @@ describe "context_modules" do
       driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
       driver.find_element(:id, 'module_prerequisites_list').should be_displayed
     end
-  end
 
-  describe "sequence footer" do
-    it "should show module navigation for group assignment discussions" do
-      course_with_student_logged_in
-      group_assignment_discussion(:course => @course)
-      @group.users << @student
-      assignment_model(:course => @course)
-      @module = ContextModule.create!(:context => @course)
-      @page = wiki_page_model(:course => @course)
-      i1 = @module.content_tags.create!(:context => @course, :content => @assignment, :tag_type => 'context_module')
-      i2 = @module.content_tags.create!(:context => @course, :content => @root_topic, :tag_type => 'context_module')
-      i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
-      @module2 = ContextModule.create!(:context => @course, :name => 'second module')
-      get "/courses/#{@course.id}/modules/items/#{i2.id}"
-      wait_for_ajaximations
+    describe "sequence footer" do
+      it "should show module navigation for group assignment discussions" do
+        group_assignment_discussion(:course => @course)
+        @group.users << @student
+        assignment_model(:course => @course)
+        @module = ContextModule.create!(:context => @course)
+        @page = wiki_page_model(:course => @course)
+        i1 = @module.content_tags.create!(:context => @course, :content => @assignment, :tag_type => 'context_module')
+        i2 = @module.content_tags.create!(:context => @course, :content => @root_topic, :tag_type => 'context_module')
+        i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
+        @module2 = ContextModule.create!(:context => @course, :name => 'second module')
+        get "/courses/#{@course.id}/modules/items/#{i2.id}"
+        wait_for_ajaximations
 
-      prev = driver.find_element(:css, '#sequence_footer a.prev')
-      URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i1.id}"
+        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i1.id}"
 
-      nxt = driver.find_element(:css, '#sequence_footer a.next')
-      URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i3.id}"
+        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i3.id}"
+      end
     end
   end
 end

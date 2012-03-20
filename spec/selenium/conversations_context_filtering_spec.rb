@@ -54,6 +54,32 @@ describe "conversations context filtering" do
     end
   end
 
+  it "should let you browse for filters" do
+    new_conversation
+    @browser = f("#context_tags_filter .browser:visible")
+    @input = f("#context_tags_filter input:visible")
+    browse_menu
+
+    menu.should eql ["that course", "the course", "the group"]
+    browse "that course" do
+      menu.should eql ["that course", "Everyone", "Teachers", "Students"]
+      browse("Everyone") { menu.should eql ["nobody@example.com", "student1", "User"] }
+      browse("Teachers") { menu.should eql ["nobody@example.com", "User"] }
+      browse("Students") { menu.should eql ["student1"] }
+    end
+    browse "the course" do
+      menu.should eql ["the course", "Everyone", "Teachers", "Students", "Student Groups"]
+      browse("Everyone") { menu.should eql ["nobody@example.com", "student1", "student2"] }
+      browse("Teachers") { menu.should eql ["nobody@example.com"] }
+      browse("Students") { menu.should eql ["student1", "student2"] }
+      browse "Student Groups" do
+        menu.should eql ["the group"]
+        browse("the group") { menu.should eql ["the group", "nobody@example.com", "student1", "student2"] }
+      end
+    end
+    browse("the group") { menu.should eql ["the group", "nobody@example.com", "student1", "student2"] }
+  end
+
   it "should let you filter by a course" do
     new_conversation
     browse_menu
@@ -68,7 +94,7 @@ describe "conversations context filtering" do
     find_all_with_jquery('#conversations > ul > li:visible').size.should eql 2
 
     @input = find_with_jquery("#context_tags_filter input:visible")
-    search("the course", "context_tags") { click("the course") }
+    search("the course", "context_tags") { browse("the course") { click("the course") } }
 
     keep_trying_until { driver.find_element(:id, "create_message_form") }
     conversations = find_all_with_jquery('#conversations > ul > li:visible')
@@ -95,7 +121,7 @@ describe "conversations context filtering" do
     get "/conversations/sent"
     
     @input = find_with_jquery("#context_tags_filter input:visible")
-    search("the course", "context_tags") { click("the course") }
+    search("the course", "context_tags") { browse("the course") { click("the course") } }
 
     keep_trying_until { driver.find_element(:id, "create_message_form") }
     conversations = find_all_with_jquery('#conversations > ul > li:visible')
@@ -138,7 +164,7 @@ describe "conversations context filtering" do
     search("the group", "context_tags") {
       menu.should eql ["the group"]
       elements.first.first.text.should include "the course" # make sure the group context is shown
-      click("the group")
+      browse("the group") { click("the group") }
     }
 
     keep_trying_until { driver.find_element(:id, "create_message_form") }

@@ -37,7 +37,7 @@ class Announcement < DiscussionTopic
   
   set_broadcast_policy do 
     dispatch :new_announcement
-    to { participants - [user] }
+    to { active_participants(true) - [user] }
     whenever { |record| 
       record.context.available? and
       ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))

@@ -64,6 +64,14 @@ describe "quizzes" do
     driver.find_elements(:css, ".question_holder .question_form").length.should == 0
   end
 
+  it "should pop up calendar on top of #main" do
+    get "/courses/#{@course.id}/quizzes/new"
+    f('#quiz_lock_at + .ui-datepicker-trigger').click
+    cal = f('#ui-datepicker-div')
+    cal.should be_displayed
+    cal.style('z-index').should > f('#main').style('z-index')
+  end
+
   it "should edit a quiz" do
     skip_if_ie('Out of memory')
     @context = @course

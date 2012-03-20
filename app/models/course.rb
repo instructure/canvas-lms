@@ -85,6 +85,7 @@ class Course < ActiveRecord::Base
   has_many :designers, :through => :designer_enrollments, :source => :user
   has_many :designer_enrollments, :class_name => 'DesignerEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :observers, :through => :observer_enrollments, :source => :user
+  has_many :participating_observers, :through => :observer_enrollments, :source => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
   has_many :observer_enrollments, :class_name => 'ObserverEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :instructors, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
   has_many :instructor_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
@@ -391,15 +392,6 @@ class Course < ActiveRecord::Base
     self.non_unique_associated_accounts.uniq
   end
 
-  # objects returned from this query will give you an additional attribute "page_views_count" that you can use, so:
-  # Account.first.courses.most_active(10).first.page_views_count  #=> "466"
-  named_scope :most_active, lambda { |limit|
-    {
-      :select => "courses.*, (SELECT COUNT(*) FROM page_views WHERE context_id = courses.id AND context_type = 'Course') AS page_views_count",
-      :order => "page_views_count DESC",
-      :limit => limit
-    }
-  }
   named_scope :recently_started, lambda {
     {:conditions => ['start_at < ? and start_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
   }
@@ -1292,8 +1284,8 @@ class Course < ActiveRecord::Base
     GradingStandard.score_to_grade(scheme, score)
   end
 
-  def participants
-    (participating_admins + participating_students).uniq
+  def participants(include_observers=false)
+    (participating_admins + participating_students + (include_observers ? participating_observers : [])).uniq
   end
 
   def enroll_user(user, type='StudentEnrollment', opts={})
@@ -2540,5 +2532,14 @@ class Course < ActiveRecord::Base
     end
     return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
     :closed
+  end
+
+  def participating_users(user_ids)
+    enrollments = self.enrollments.scoped(
+      :include => :user,
+      :conditions => ["enrollments.workflow_state = 'active' AND users.id IN (?)",
+                      user_ids]
+    )
+    enrollments.select { |e| e.active? }.map(&:user).uniq
   end
 end

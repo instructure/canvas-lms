@@ -39,12 +39,13 @@ module LinkedIn
     access_token ||= linked_in_retrieve_access_token
     body = access_token.get('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)').body
     data = Nokogiri::XML(body)
-    res = {}
+    res = {}.with_indifferent_access
     res[:id] = data.css('id')[0].content
     res[:first_name] = data.css('first-name')[0].content
     res[:last_name] = data.css('last-name')[0].content
     res[:profile_url] = data.css('public-profile-url')[0].content
-    res[:picture_url] = data.css('picture-url')[0].content rescue nil
+    # see https://developer.linkedin.com/forum/ssl-profile-picture-url-https
+    res[:picture_url] = data.css('picture-url')[0].content.gsub('http://media.linkedin.com', 'https://m1.licdn.com') rescue nil
     res
   end
 

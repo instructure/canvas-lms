@@ -142,8 +142,13 @@ body
     min-width: 250px
   .token_input
     min-width: 260px
-    padding: 1px 6px 0
+    padding: 1px 6px 1px
     +border-radius(11px)
+    a.browser
+      top: 1px
+      right: 5px
+    &.browsable > div
+      padding-right: 25px
 
 #conversation_actions
   font-size: 0.9em
@@ -805,20 +810,22 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
   li.toggleable.on.active a.toggle:hover i
     background-position: 0 -64px
   li.expanded, li.active.expanded
-    padding-left: 11px
     cursor: default
     a.expand
       i
         background-position: 10px -55px
     a.toggle
       display: none
-    img.avatar
-      margin: 0 14px 0 0
   li.active.expanded
     a.expand:hover
       cursor: pointer
       background: #fff
       border-color: #e4ebef
+  &.with-toggles
+    li.expanded, li.active.expanded
+      padding-left: 11px
+      img.avatar
+        margin: 0 14px 0 0
 
 
 #create_message_form

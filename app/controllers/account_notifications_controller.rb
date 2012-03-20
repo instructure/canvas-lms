@@ -19,7 +19,7 @@ class AccountNotificationsController < ApplicationController
   end
   
   def destroy
-    @notification = @account.account_notifications.find(params[:id])
+    @notification = @account.announcements.find(params[:id])
     @notification.destroy
     respond_to do |format|
       flash[:message] = t(:announcement_deleted_notice, "Announcement successfully deleted")

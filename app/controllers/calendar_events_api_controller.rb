@@ -106,6 +106,7 @@ class CalendarEventsApiController < ApplicationController
     get_event
     if authorized_action(@event, @current_user, :delete)
       @event.updating_user = @current_user
+      @event.cancel_reason = params[:cancel_reason]
       if @event.destroy
         render :json => event_json(@event, @current_user, session)
       else

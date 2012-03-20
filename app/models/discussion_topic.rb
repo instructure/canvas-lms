@@ -30,7 +30,7 @@ class DiscussionTopic < ActiveRecord::Base
   attr_readonly :context_id, :context_type, :user_id
 
   has_many :discussion_entries, :order => :created_at, :dependent => :destroy
-  has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id = ? AND discussion_entries.workflow_state != ?', 0, 'deleted']
+  has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state != ?', 'deleted']
   has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
@@ -43,6 +43,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :root_topic, :class_name => 'DiscussionTopic', :touch => true
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
+  has_many :discussion_entry_participants, :through => :discussion_entries
   belongs_to :user
   validates_presence_of :context_id
   validates_presence_of :context_type
@@ -216,7 +217,7 @@ class DiscussionTopic < ActiveRecord::Base
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 
-      entry_ids = self.discussion_entries.map(&:id)
+      entry_ids = self.discussion_entries.active.map(&:id)
       if entry_ids.present?
         existing_entry_participants = DiscussionEntryParticipant.find(:all, :conditions => ["user_id = ? AND discussion_entry_id IN (?)",
                                                                       current_user.id, entry_ids])
@@ -238,14 +239,14 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def default_unread_count
-    self.discussion_entries.count
+    self.discussion_entries.active.count
   end
 
   def unread_count(current_user = nil)
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    topic_participant = discussion_topic_participants.find_by_user_id(uid)
+    topic_participant = discussion_topic_participants.find_by_user_id(uid, :lock => true)
     topic_participant.try(:unread_entry_count) || self.default_unread_count
   end
 
@@ -253,14 +254,19 @@ class DiscussionTopic < ActiveRecord::Base
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
 
-    topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
-    topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
-                                                                   :unread_entry_count => self.unread_count(current_user),
-                                                                   :workflow_state => "unread")
-    topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
-    topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
-    topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
-    topic_participant.save
+    topic_participant = nil
+    DiscussionTopic.uncached do
+      DiscussionTopic.unique_constraint_retry do
+        topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id], :lock => true)
+        topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
+                                                                       :unread_entry_count => self.unread_count(current_user),
+                                                                       :workflow_state => "unread")
+        topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
+        topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
+        topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+        topic_participant.save
+      end
+    end
     topic_participant
   end
 
@@ -519,20 +525,20 @@ class DiscussionTopic < ActiveRecord::Base
   def delay_posting=(val); end
   def set_assignment=(val); end
 
-  def participants
-    ([self.user] + context.participants).compact.uniq
+  def participants(include_observers=false)
+    ([self.user] + context.participants(include_observers)).compact.uniq
   end
 
-  def active_participants
+  def active_participants(include_observers=false)
     if !self.context.available? && self.context.respond_to?(:participating_admins)
       self.context.participating_admins
     else
-      self.participants
+      self.participants(include_observers)
     end
   end
 
   def posters
-    users = self.discussion_entries.find(:all, :include => [:user]).map(&:user)
+    users = context.participating_users(discussion_entries.map(&:user_id).uniq)
     users << self.user
     users.uniq
   end
@@ -602,7 +608,7 @@ class DiscussionTopic < ActiveRecord::Base
     if options[:include_entries]
       self.discussion_entries.sort_by{|e| e.created_at }.each do |entry|
         dup_entry = entry.clone_for(context, nil, :migrate => options[:migrate])
-        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}") || 0
+        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}")
         dup_entry.discussion_topic_id = dup.id
         dup_entry.save!
         context.map_merge(entry, dup_entry)

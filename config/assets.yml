@@ -199,8 +199,8 @@ stylesheets:
     - public/stylesheets/compiled/external_tools.css
   select_content_dialog:
     - public/stylesheets/compiled/select_content_dialog.css
-  messages:
-    - public/stylesheets/compiled/messages.css
+  conversations:
+    - public/stylesheets/compiled/conversations.css
     - public/stylesheets/compiled/slideshow.css
   alerts:
     - public/stylesheets/compiled/alerts.css

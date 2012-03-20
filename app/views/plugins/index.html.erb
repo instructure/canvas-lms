@@ -5,6 +5,12 @@
   jammit_css 'plugins'
 %>
 
+<h2><%= t :instructure_canvas, "Instructure Canvas" %></h2>
+
+<p>
+  Revision: <%= Canvas.revision || t(:canvas_revision_unknown, "Unknown") %>
+</p>
+
 <h2><%= t :page_title, "Canvas Plugins" %></h2>
 
 <% if @plugins.any? %>

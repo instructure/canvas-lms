@@ -219,6 +219,7 @@ describe Notification do
     
     it "should not send messages after the user's limit" do
       notification_set
+      NotificationPolicy.count.should == 1
       Rails.cache.delete(['recent_messages_for', @user.id].cache_key)
       User.stubs(:max_messages_per_day).returns(1)
       User.max_messages_per_day.times do 
@@ -229,6 +230,11 @@ describe Notification do
       messages = @notification.create_message(@assignment, @user)
       messages.select{|m| m.to != 'dashboard'}.should be_empty
       DelayedMessage.count.should eql(1)
+      NotificationPolicy.count.should == 2
+      # should not create more dummy policies
+      messages = @notification.create_message(@assignment, @user)
+      messages.select{|m| m.to != 'dashboard'}.should be_empty
+      NotificationPolicy.count.should == 2
     end
     
     it "should not use notification policies for unconfirmed communication channels" do

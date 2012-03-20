@@ -59,7 +59,7 @@
     <div class="discussion_topic_content reminder-content" style="<%= hidden unless is_discussion_topic %>">
       <div class="body">
         <% ot('linked_to_discussion', "This assignment is linked to the discussion, %{discussion_topic}. Grading will be based on posts in the topic.", :discussion_topic => capture { %>
-            <span class="discussion_topic_title"><%= is_discussion_topic && assignment.discussion_topic.title rescue nbsp %></span><% }) %>)<br/>
+            <span class="discussion_topic_title"><%= is_discussion_topic && assignment.discussion_topic.title rescue nbsp %></span><% }) %><br/>
         <a class="assignment_topic_link content-link" href="<%= context_url(@context, :context_discussion_topic_url, (is_discussion_topic ? assignment.discussion_topic.id : "{{ discussion_topic_id }}")) %>" style="font-weight: bold;"><%= t 'links.discussion', "Click here to go to the discussion" %></a>
         <a class="assignment_topic_url" href="<%= context_url(@context, :context_discussion_topic_url, "{{ discussion_topic_id }}") %>" style="display: none;">&nbsp;</a>
       </div>

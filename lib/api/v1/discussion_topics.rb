@@ -39,9 +39,9 @@ module Api::V1::DiscussionTopics
 
     children = topic.child_topics.scoped(:select => 'id').map(&:id)
 
-    api_json(topic, user, session,
+    api_json(topic, user, session, {
                   :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at require_initial_post root_topic_id),
-                  :methods => [:user_name, :discussion_subentry_count]
+                  :methods => [:user_name, :discussion_subentry_count], }, [:attach]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
                   :podcast_url => url,
@@ -59,12 +59,12 @@ module Api::V1::DiscussionTopics
   def discussion_entry_api_json(entries, context, user, session)
     entries.map do |entry|
       json = api_json(entry, user, session,
-                           :only => %w(id user_id created_at updated_at),
-                           :methods => [:user_name, :discussion_subentry_count])
+                           :only => %w(id user_id created_at updated_at parent_id),
+                           :methods => [:user_name])
       json[:message] = api_user_content(entry.message, context)
       json[:read_state] = entry.read_state(user)
-      if entry.parent_id.zero?
-        replies = entry.unordered_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
+      if entry.root_entry_id.nil?
+        replies = entry.flattened_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
         unless replies.empty?
           json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session)
           json[:has_more_replies] = replies.size > 10

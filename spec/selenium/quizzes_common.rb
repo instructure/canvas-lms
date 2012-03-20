@@ -147,5 +147,146 @@ shared_examples_for "quizzes selenium tests" do
     f('.delete_answer_link:visible').click
   end
 
+
+  ##
+  # creates a question group through the browser
+  def create_question_group
+    f('.add_question_group_link').click
+    f('#group_top_new form').submit
+    wait_for_ajax_requests
+    @group = QuizGroup.last
+  end
+
+  ##
+  # Returns the question/group data as an array of hashes
+  #
+  # a question hash looks like this:
+  #
+  #   {:id => 23, :el => <#SeleniumElement>, :type => 'question'}
+  #
+  # a group looks like
+  #
+  #   {:id => 2, :el => <#SeleniumElement>, :type => 'group', :questions => []}
+  #
+  # where :questions is an array of questions in the group
+  def get_question_data
+    els = ff '#questions > *'
+    last_group_id = nil
+    data = []
+    els.each do |el|
+      # its a question
+      if el['class'].match(/question_holder/)
+        id = el.find_element(:css, 'a')['name'].gsub(/question_/, '')
+        question = {
+          :id => id.to_i,
+          :el => el,
+          :type => 'question'
+        }
+
+        if last_group_id
+          # add question to last group
+          data.last[:questions] << question
+        else
+          # not in a group
+          data << question
+        end
+
+      # its a group
+      elsif el['class'].match(/group_top/)
+        last_group_id = el['id'].gsub(/group_top_/, '').to_i
+        data << {
+          :id => last_group_id,
+          :questions => [],
+          :type => 'group',
+          :el => el
+        }
+
+      # group ended
+      elsif el['class'].match(/group_bottom/)
+        last_group_id = nil
+      end
+    end
+
+    data
+  end
+
+  ##
+  # Gets the questions hashes out of a group
+  def get_question_data_for_group(id)
+    data = get_question_data
+    group_data = data.detect do |item|
+      item[:type] == 'group' && item[:id] == id
+    end
+    group_data[:questions]
+  end
+
+  ##
+  # moves the cursor to a question preparatory to dragging it
+  def move_to_question(id)
+    element = f "#question_#{id}"
+    driver.action.move_to(element).perform
+  end
+
+  ##
+  # moves the cursor to a group preparatory to dragging it
+  def move_to_group(id)
+    group = f "#group_top_#{id}"
+    driver.action.move_to(group).perform
+  end
+
+
+  ##
+  # Drags a question with ActiveRecord id `question_id` into group with
+  # ActiveRecord id `group_id`
+  def drag_question_into_group(question_id, group_id)
+    move_to_question question_id
+    source = "#question_#{question_id} .move_icon"
+    target = "#group_top_#{group_id}"
+    js_drag_and_drop source, target
+    wait_for_ajax_requests
+  end
+
+  ##
+  # Asserts that a group contains a question both in the database and
+  # in the interface
+  def group_should_contain_question(group, question)
+    # check active record
+    question.reload
+    question.quiz_group_id.should == group.id
+
+    # check the interface
+    questions = get_question_data_for_group group.id
+    questions.detect { |item| item[:id] == question.id }.should_not be_nil
+  end
+
+  ##
+  # Drags a question with ActiveRecord id of `id` to the top of the list
+  def drag_question_to_top(id)
+    move_to_question id
+    source = "#question_#{id} .move_icon"
+    target = '#questions > *'
+    js_drag_and_drop source, target
+    wait_for_ajax_requests
+  end
+
+  ##
+  # Drags a group with ActiveRecord id of `id` to the top of the question list
+  def drag_group_to_top(id)
+    move_to_group id
+    source = "#group_top_#{id} .move_icon"
+    target = '#questions > *'
+    js_drag_and_drop source, target
+    wait_for_ajax_requests
+  end
+
+  ##
+  # Drags a question to the top of the group
+  def drag_question_to_top_of_group(question_id, group_id)
+    move_to_question question_id
+    source = "#question_#{question_id} .move_icon"
+    target = "#group_top_#{group_id} + *"
+    js_drag_and_drop source, target
+  end
+
 end
 

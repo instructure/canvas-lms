@@ -25,21 +25,26 @@ class DiscussionEntry < ActiveRecord::Base
   attr_readonly :discussion_topic_id, :user_id, :parent_id
   has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
-  has_many :discussion_entry_participants, :dependent => :destroy
+  has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
+  has_many :discussion_entry_participants
   belongs_to :discussion_topic, :touch => true
+  # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
+  # also null if a root entry
+  belongs_to :root_entry, :class_name => 'DiscussionEntry', :foreign_key => :root_entry_id
   belongs_to :user
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
   has_one :external_feed_entry, :as => :asset
 
-  before_create :infer_parent_id
-  before_save :infer_defaults
-  after_save :touch_parent
+  before_create :infer_root_entry_id
+  after_save :touch_root
   after_save :context_module_action_later
   after_create :create_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
+  before_validation_on_create :set_depth
+  validate_on_create :validate_depth
 
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
 
@@ -49,11 +54,6 @@ class DiscussionEntry < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
-  end
-
-  def infer_defaults
-    @message_changed = self.message_changed?
-    true
   end
 
   on_create_send_to_inboxes do
@@ -84,7 +84,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    if self.parent_id == 0
+    if self.root_entry_id.nil?
       recent_entries = DiscussionEntry.active.find(:all, :select => 'user_id', :conditions => ['discussion_entries.discussion_topic_id=? AND discussion_entries.created_at > ?', self.discussion_topic_id, 2.weeks.ago])
       # If the topic has been going for more than two weeks and it suddenly
       # got "popular" again, move it back up in user streams
@@ -102,16 +102,23 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  on_update_send_to_streams do
-    if @message_changed
-      []
+  # The maximum discussion entry threading depth that is allowed
+  def self.max_depth
+    Setting.get_cached('discussion_entry_max_depth', '50').to_i
+  end
+
+  def set_depth
+    self.depth ||= (self.parent_entry.try(:depth) || 0) + 1
+  end
+
+  def validate_depth
+    if !self.depth || self.depth > self.class.max_depth
+      errors.add_to_base("Maximum entry depth reached")
     end
   end
 
-  def touch_parent
-    if self.parent_id && self.parent_id != 0
-      self.discussion_topic.discussion_entries.find_by_id(self.parent_id).touch rescue nil
-    end
+  def touch_root
+    self.root_entry.try(:touch)
   end
 
   def reply_from(opts)
@@ -125,8 +132,8 @@ class DiscussionEntry < ActiveRecord::Base
     else
       entry = DiscussionEntry.new(:message => message)
       entry.discussion_topic_id = self.discussion_topic_id
-      entry.parent_id = self.parent_id == 0 ? self.id : self.parent_id
-      entry.user_id = user.id
+      entry.parent_entry = self
+      entry.user = user
       entry.save!
       entry
     end
@@ -152,7 +159,8 @@ class DiscussionEntry < ActiveRecord::Base
 
   alias_method :destroy!, :destroy
   def destroy
-    discussion_subentries.each &:destroy
+    flattened_discussion_subentries.destroy_all
+    destroy_participants
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     save!
@@ -184,17 +192,10 @@ class DiscussionEntry < ActiveRecord::Base
     self.user.name rescue t :default_user_name, "User Name"
   end
 
-  def infer_parent_id
-    parent = self.discussion_topic.discussion_entries.active.find_by_id(self.parent_id) if self.parent_id
-    if parent && parent.parent_id == 0
-      self.parent_id = parent.id
-    elsif parent && parent.parent_id != 0
-      self.parent_id = parent.parent_id
-    else
-      self.parent_id = 0
-    end
+  def infer_root_entry_id
+    self.root_entry_id = parent_entry.try(:root_entry_id) || parent_entry.try(:id)
   end
-  protected :infer_parent_id
+  protected :infer_root_entry_id
 
   def update_topic
     if self.discussion_topic
@@ -253,7 +254,11 @@ class DiscussionEntry < ActiveRecord::Base
   }
   named_scope :top_level_for_topics, lambda {|topics|
     topic_ids = topics.map{ |t| t.is_a?(DiscussionTopic) ? t.id : t }
-    {:conditions => ['discussion_entries.parent_id = ? AND discussion_entries.discussion_topic_id IN (?)', 0, topic_ids]}
+    {:conditions => ['discussion_entries.root_entry_id IS NULL AND discussion_entries.discussion_topic_id IN (?)', topic_ids]}
+  }
+  named_scope :all_for_topics, lambda { |topics|
+    topic_ids = topics.map{ |t| t.is_a?(DiscussionTopic) ? t.id : t }
+    {:conditions => ['discussion_entries.discussion_topic_id IN (?)', topic_ids]}
   }
   named_scope :newest_first, :order => 'discussion_entries.created_at DESC'
 
@@ -261,7 +266,7 @@ class DiscussionEntry < ActiveRecord::Base
     Atom::Entry.new do |entry|
       subject = [self.discussion_topic.title]
       subject << self.discussion_topic.context.name if opts[:include_context]
-      if parent_id != 0
+      if parent_id
         entry.title = t "#subject_reply_to", "Re: %{subject}", :subject => subject.to_sentence
       else
         entry.title = subject.to_sentence
@@ -281,7 +286,7 @@ class DiscussionEntry < ActiveRecord::Base
     self.attributes.delete_if{|k,v| [:id, :discussion_topic_id, :attachment_id].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
-    dup.parent_id = context.merge_mapped_id("discussion_entry_#{self.parent_id}") || 0
+    dup.parent_id = context.merge_mapped_id("discussion_entry_#{self.parent_id}")
     dup.attachment_id = context.merge_mapped_id(self.attachment)
     if !dup.attachment_id && self.attachment
       attachment = self.attachment.clone_for(context)
@@ -361,6 +366,20 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def destroy_participants
+    transaction do
+      # this could count toward the unread count either if there is a "unread"
+      # entry participant or no entry participant, so find all that have
+      # explicitly been marked "read" and decrement for all the others
+      read_deps = DiscussionEntryParticipant.find(:all, :conditions => { :discussion_entry_id => self.id, :workflow_state => "read" })
+      read_user_ids = read_deps.map(&:user_id)
+      dtp_conditions = sanitize_sql(["discussion_topic_id = ?", self.discussion_topic_id])
+      dtp_conditions = sanitize_sql(["discussion_topic_id = ? AND user_id NOT IN (?)", self.discussion_topic_id, read_user_ids]) if read_user_ids.present?
+      DiscussionTopicParticipant.update_all("unread_entry_count = unread_entry_count - 1", dtp_conditions)
+      self.discussion_entry_participants.destroy_all
+    end
+  end
+
   attr_accessor :current_user
   def read_state(current_user = nil)
     current_user ||= self.current_user
@@ -396,10 +415,15 @@ class DiscussionEntry < ActiveRecord::Base
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
 
-    entry_participant = self.discussion_entry_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
-    entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
-    entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
-    entry_participant.save
+    entry_participant = nil
+    DiscussionEntry.uncached do
+      DiscussionEntry.unique_constraint_retry do
+        entry_participant = self.discussion_entry_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
+        entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
+        entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
+        entry_participant.save
+      end
+    end
     entry_participant
   end
 end

@@ -48,6 +48,7 @@ class DiscussionTopicsController < ApplicationController
   # @response_field topic_children An array of topic_ids for the group discussions the user is a part of
   # @response_field user_name The username of the creator
   # @response_field url The URL to the discussion topic in canvas
+  # @response_field permissions[attach] If true, the calling user can attach files to this discussion's entries.
   #
   # @example_response
   #     [
@@ -74,7 +75,8 @@ class DiscussionTopicsController < ApplicationController
   #            "filename":"content.txt",
   #            "display_name":"content.txt"
   #          }
-  #        ]
+  #        ],
+  #        "permissions": { "attach": true }
   #      }
   #     ]
   def index
@@ -121,7 +123,7 @@ class DiscussionTopicsController < ApplicationController
   protected :child_topic
 
   def show
-    parent_id = params[:parent_id] || 0
+    parent_id = params[:parent_id]
     @topic = @context.all_discussion_topics.find(params[:id])
     @assignment = @topic.assignment
     @context.assert_assignment_group rescue nil
@@ -143,7 +145,7 @@ class DiscussionTopicsController < ApplicationController
         if params[:combined]
           @topic_agglomerated = true
           @topics = @topic.child_topics.select{|t| @groups.include?(t.context) }
-          @entries = @topics.map{|t| t.discussion_entries.active.find(:all, :conditions => ['parent_id = ?', 0])}.
+          @entries = @topics.map{|t| t.root_discussion_entries}.
             flatten.
             sort_by{|e| e.created_at}.
             each{|e| e.current_user = @current_user}
