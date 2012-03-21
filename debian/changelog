@@ -1,3 +1,11 @@
+canvas-lms (2012.03.31.03) testing; urgency=low
+
+  * Package ref: c8a538dbd42d642bb1f77f4f90fb5f213ff5dbdd
+  *
+  * [+c8a538d] flag topics as threaded, fixes #7792
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 21 Mar 2012 13:36:52 -0600
+
 canvas-lms (2012.03.31.01) testing; urgency=low
 
   * Package ref: 24514f54e05dd8cc0e438bdff36632d59a284a02
