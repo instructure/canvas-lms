@@ -126,4 +126,12 @@ module Canvas
       p[0, base_path.length] == base_path
     }
   end
+
+  def self.revision
+    return @revision unless @revision.nil?
+    if File.file?(Rails.root+"VERSION")
+      @revision = File.readlines(Rails.root+"VERSION").first.try(:strip)
+    end
+    @revision ||= false
+  end
 end
