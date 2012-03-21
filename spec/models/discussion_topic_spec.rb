@@ -460,20 +460,23 @@ describe DiscussionTopic do
     end
 
     it "should not re-flag graded discussion as needs grading if student make another comment" do
-      pending('bug 6273 - do not re-flag graded discussion as needs grading if student make another comment') do
-        student_enrollment = student_in_course(:name => 'student in course')
-        student = student_enrollment.user
-        assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
-        topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
-        topic.discussion_entries.create!(:message => "student message for grading", :user => student)
-        student_submission = Submission.last
-        student_submission.assignment.grade_student(student, {:grade => 9})
-        student_submission.reload
-        student_submission.workflow_state.should == 'graded'
-        topic.discussion_entries.create!(:message => "student message 2 for grading", :user => student)
-        student_submission.reload
-        student_submission.workflow_state.should == 'graded'
-      end
+      student_in_course(:name => 'student in course')
+      assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
+      topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
+      topic.discussion_entries.create!(:message => "student message for grading", :user => @student)
+
+      submissions = Submission.find_all_by_user_id_and_assignment_id(@student.id, assignment.id)
+      submissions.count.should == 1
+      student_submission = submissions.first
+      assignment.grade_student(@student, {:grade => 9})
+      student_submission.reload
+      student_submission.workflow_state.should == 'graded'
+
+      topic.discussion_entries.create!(:message => "student message 2 for grading", :user => @student)
+      submissions = Submission.find_all_by_user_id_and_assignment_id(@student.id, assignment.id)
+      submissions.count.should == 1
+      student_submission = submissions.first
+      student_submission.workflow_state.should == 'graded'
     end
 
     it "should create submissions for existing entries when setting the assignment" do
@@ -573,6 +576,25 @@ describe DiscussionTopic do
       @student.reload
       @student.submissions.size.should == 1
       @student.submissions.first.id.should == @existing_submission_id
+    end
+
+    it "should not resubmit graded discussion submissions" do
+      @student = student_in_course(:active_all => true).user
+
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.save!
+      @topic.reload
+
+      @topic.reply_from(:user => @student, :text => "entry")
+      @student.reload
+
+      @assignment.grade_student(@student, :grade => 1)
+      @submission = Submission.find(:first, :conditions => {:user_id => @student.id, :assignment_id => @assignment.id})
+      @submission.workflow_state.should == 'graded'
+
+      @topic.ensure_submission(@student)
+      @submission.reload.workflow_state.should == 'graded'
     end
   end
 

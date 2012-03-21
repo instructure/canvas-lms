@@ -130,7 +130,7 @@ class DiscussionTopic < ActiveRecord::Base
     # ungraded to graded, or from one assignment to another; we ignore the
     # transition from graded to ungraded) we acknowledge that the users that
     # have posted have contributed to the topic
-    if self.assignment_id && self.assignment_id != @old_assignment_id
+    if self.assignment_id && self.assignment_id_changed?
       posters.each{ |user| self.context_module_action(user, :contributed) }
     end
   end
@@ -507,7 +507,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def ensure_submission(user)
     submission = Submission.find_by_assignment_id_and_user_id(self.assignment_id, user.id)
-    return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state == 'submitted'
+    return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted'
     self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
   end
 
