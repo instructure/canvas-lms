@@ -1,3 +1,11 @@
+canvas-lms (2012.03.17.18) stable; urgency=low
+
+  * Package ref: b3b65ce221ad8118d691d72cccd6d578a9dcf43f
+  *
+  * [+b3b65ce] Canvas.revision
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 21 Mar 2012 13:20:14 -0600
+
 canvas-lms (2012.03.17.17) stable; urgency=low
 
   * Package ref: 430240d6227ac2d86a9331ca0a2e1200d03f6529
