@@ -726,7 +726,7 @@ describe DiscussionTopicsController, :type => :integration do
   describe "threaded discussions" do
     before do
       student_in_course(:active_all => true)
-      @topic = create_topic(@course)
+      @topic = create_topic(@course, :threaded => true)
       @entry = create_entry(@topic)
       @sub1 = create_reply(@entry)
       @sub2 = create_reply(@sub1)
