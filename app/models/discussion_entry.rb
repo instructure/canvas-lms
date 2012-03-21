@@ -193,6 +193,10 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def infer_root_entry_id
+    # only allow non-root parents for threaded discussions
+    unless self.discussion_topic.try(:threaded?)
+      self.parent_entry = parent_entry.try(:root_entry) || parent_entry
+    end
     self.root_entry_id = parent_entry.try(:root_entry_id) || parent_entry.try(:id)
   end
   protected :infer_root_entry_id
