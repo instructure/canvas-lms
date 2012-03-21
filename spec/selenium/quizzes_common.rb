@@ -106,7 +106,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def hover_first_question
-    question = f '.display_question'
+    question = f('.display_question')
     driver.action.move_to(question).perform
   end
 
@@ -117,7 +117,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def save_question
-    f('.question_form:visible').submit
+    fj('.question_form:visible').submit
     wait_for_ajax_requests
   end
 
@@ -131,7 +131,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def edit_first_multiple_choice_answer(text)
-    element = f 'input[name=answer_text]:visible'
+    element = fj('input[name=answer_text]:visible')
     element.click
     element.send_keys text
   end
@@ -144,7 +144,7 @@ shared_examples_for "quizzes selenium tests" do
 
   def delete_first_multiple_choice_answer
     driver.execute_script "$('.answer').addClass('hover');"
-    f('.delete_answer_link:visible').click
+    fj('.delete_answer_link:visible').click
   end
 
 

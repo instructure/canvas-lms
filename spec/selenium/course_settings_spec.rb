@@ -18,8 +18,8 @@ describe "course settings tests" do
       f('.find_grading_standard_link').click
       wait_for_ajaximations
 
-      f('.grading_standard_select:visible a').click
-      f('button.select_grading_standard_link:visible').click
+      fj('.grading_standard_select:visible a').click
+      fj('button.select_grading_standard_link:visible').click
       f('.done_button').click
       f('#course_form').submit
       wait_for_ajaximations

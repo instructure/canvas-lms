@@ -56,8 +56,8 @@ describe "conversations context filtering" do
 
   it "should let you browse for filters" do
     new_conversation
-    @browser = f("#context_tags_filter .browser:visible")
-    @input = f("#context_tags_filter input:visible")
+    @browser = fj("#context_tags_filter .browser:visible")
+    @input = fj("#context_tags_filter input:visible")
     browse_menu
 
     menu.should eql ["that course", "the course", "the group"]

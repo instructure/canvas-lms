@@ -98,12 +98,20 @@ module SeleniumTestsHelperMethods
   end
 
   # f means "find" this is a shortcut to finding elements
-  # if driver.find_element fails, then it'll try to find it with jquery
   def f(selector, scope = nil)
     begin
       (scope || driver).find_element :css, selector
     rescue
+      nil
+    end
+  end
+
+  # short for find with jquery
+  def fj(selector, scope = nil)
+    begin
       find_with_jquery selector, scope
+    rescue
+      nil
     end
   end
 
@@ -112,7 +120,16 @@ module SeleniumTestsHelperMethods
     begin
       (scope || driver).find_elements :css, selector
     rescue
+      []
+    end
+  end
+
+  # same as find with jquery but tries to find several elements instead of one
+  def ffj(selector, scope = nil)
+    begin
       find_all_with_jquery selector, scope
+    rescue
+      []
     end
   end
 
@@ -739,7 +756,7 @@ shared_examples_for "all selenium tests" do
   ##
   # returns true if a form validation error message is visible, false otherwise
   def error_displayed?
-    f('.error_text:visible') != nil
+    fj('.error_text:visible') != nil
   end
 
   self.use_transactional_fixtures = false
