@@ -972,6 +972,7 @@ define([
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         var $item = modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items").sortable('refresh');
+        modules.updateAssignmentData();
         $(this).dialog('close');
       },
       error: function(data) {

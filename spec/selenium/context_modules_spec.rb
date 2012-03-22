@@ -326,11 +326,25 @@ describe "context_modules" do
       add_form.find_element(:css, 'tr.unlock_module_at_details').should_not be_displayed
     end
 
-    it "should properly change indent of an item" do
+    it "should properly change indent of an item with arrows" do
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       tag = ContentTag.last
 
       driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
+      wait_for_ajaximations
+      driver.find_element(:id, "context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+
+      tag.reload
+      tag.indent.should == 1
+    end
+
+    it "should properly change indent of an item from edit dialog" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      tag = ContentTag.last
+
+      driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
+      click_option("#content_tag_indent_select", "Indent 1 Level")
+      f("#edit_item_form").submit
       wait_for_ajaximations
       driver.find_element(:id, "context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
 
@@ -345,7 +359,18 @@ describe "context_modules" do
       module_item.find_element(:css, ".due_date_display").text.should_not be_blank
       module_item.find_element(:css, ".points_possible_display").should include_text "10"
 
+      # change indent with arrows
       driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
+      wait_for_ajaximations
+
+      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
+
+      # change indent from edit form
+      driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
+      click_option("#content_tag_indent_select", "Don't Indent")
+      f("#edit_item_form").submit
       wait_for_ajaximations
 
       module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
