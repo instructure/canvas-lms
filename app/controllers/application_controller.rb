@@ -320,7 +320,12 @@ class ApplicationController < ActionController::Base
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
         @context_membership = @context_enrollment
       elsif params[:user_id]
-        @context = User.find(params[:user_id])
+        case params[:user_id]
+        when 'self'
+          @context = @current_user
+        else
+          @context = User.find(params[:user_id])
+        end
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user

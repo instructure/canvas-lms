@@ -485,7 +485,7 @@ class UsersController < ApplicationController
   def show
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-    @user = params[:id] ? User.find(params[:id]) : @current_user
+    @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
     if current_user_is_site_admin? || authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? profile_path : user_path(@user) )
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50
