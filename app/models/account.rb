@@ -85,6 +85,7 @@ class Account < ActiveRecord::Base
   has_many :alerts, :as => :context, :include => :criteria
   has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
   has_many :user_account_associations
+  has_many :report_snapshots
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults

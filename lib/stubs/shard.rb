@@ -33,6 +33,10 @@ class Shard
     Array(yield array)
   end
 
+  def self.with_each_shard
+    yield
+  end
+
   def activate
     yield
   end

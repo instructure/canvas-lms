@@ -17,75 +17,65 @@
 #
 
 require 'date'
-require 'lib/external_statuses'
 
 module Reporting
 
 class CountsReport
-  attr_accessor :overview, :detailed
-
-  COUNTS_OVERVIEW = 'counts_overview'
-  COUNTS_DETAILED = 'counts_detailed'
-  COUNTS_PROGRESSIVE_OVERVIEW = 'counts_progressive_overview'
-  COUNTS_PROGRESSIVE_DETAILED = 'counts_progressive_detailed'
-
   MONTHS_TO_KEEP = 24
   WEEKS_TO_KEEP = 52
 
   def self.process
-    # use the slave, if we can
-    config = ActiveRecord::Base.configurations["#{Rails.env}_slave"]
-    if config
-      ActiveRecord::Base.establish_connection(config)
-    end
-
     self.new.process
-  ensure
-    # switch back to the old conn
-    ActiveRecord::Base.establish_connection
   end
 
   def initialize
     date = Date.yesterday
     @yesterday = Time.parse("#{date.to_s} 23:59:00 UTC")
     @week = date.cweek
-    # make it a javascript timestamp since we're saving in json
-    @timestamp = @yesterday.to_i * 1000
+    @timestamp = @yesterday
     @overview = {:generated_at=>@timestamp, :totals => new_counts_hash}.with_indifferent_access
     ExternalStatuses.possible_external_statuses.each do |status|
       @overview[status.to_sym] = new_counts_hash
     end
-    @detailed = {}.with_indifferent_access
   end
 
   def process
     start_time = Time.now
 
-    each_account do |a|
-      next if a.external_status == 'test'
-      activity = last_activity(a.id)
-      next unless activity
+    Shard.with_each_shard do
+      Account.root_accounts.each do |account|
+        next if account.external_status == 'test'
+        activity = CountsReport.last_activity(account.id)
+        next unless activity
 
-      account = {}
-      account[:id] = a.id
-      account[:name] = a.name
-      account[:external_status] = a.external_status
-      account[:last_activity] = activity
-      account[:page_views_in_last_week] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", a.id, @yesterday - 1.week, @yesterday])
-      account[:page_views_in_last_month] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", a.id, @yesterday - 1.month, @yesterday])
+        data = {}.with_indifferent_access
+        data[:generated_at] = @timestamp
+        data[:id] = account.id
+        data[:name] = account.name
+        data[:external_status] = account.external_status
+        data[:last_activity] = activity
+        data[:page_views_in_last_week] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", account.id, @yesterday - 1.week, @yesterday])
+        data[:page_views_in_last_month] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", account.id, @yesterday - 1.month, @yesterday])
 
-      course_ids = []
-      get_course_ids(a, course_ids)
+        course_ids = get_course_ids(account)
 
-      account[:courses] = course_ids.length
-      account[:teachers] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'TeacherEnrollment' })
-      account[:students] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'StudentEnrollment' })
-      account[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids })
-      # ActiveRecord::Base.calculate doesn't support multiple calculations in a single pass
-      account[:files], account[:files_size] = course_ids.length == 0 ? [0, 0] : Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [a.id]).first.map(&:to_i)
-      account[:media_files], account[:media_files_size] = course_ids.length == [0, 0] ? 0 : MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [a.id]).first.map(&:to_i)
-      account[:media_files_size] *= 1000
-      add_account_stats(account)
+        data[:courses] = course_ids.length
+        data[:teachers] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'TeacherEnrollment' })
+        data[:students] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'StudentEnrollment' })
+        data[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids })
+        # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
+        data[:files], data[:files_size] = course_ids.length == 0 ? [0, 0] : Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.id]).first.map(&:to_i)
+        data[:media_files], data[:media_files_size] = course_ids.length == [0, 0] ? 0 : MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
+        data[:media_files_size] *= 1000
+
+        detailed = account.report_snapshots.detailed.build
+        detailed.created_at = @yesterday
+        detailed.data = data
+        detailed.save!
+
+        save_detailed_progressive(account, data)
+        add_account_stats(data)
+      end
     end
     @overview[:seconds_to_process] = Time.now - start_time
 
@@ -96,55 +86,52 @@ class CountsReport
 
   private
 
-  # override to determine which accounts to report stats on
-  def each_account(&block)
-    Account.root_accounts.each(&block)
-  end
-
   def save_counts
-    overview = ReportSnapshot.new(:report_type => COUNTS_OVERVIEW)
-    overview.data = @overview.to_json
-    overview.save
-
-    @overview[:detailed] = @detailed
-    detailed = ReportSnapshot.new(:report_type => COUNTS_DETAILED)
-    detailed.data = @overview.to_json
-    detailed.save
+    overview = ReportSnapshot.overview.build
+    overview.created_at = @yesterday
+    overview.data = @overview
+    overview.save!
   end
 
   def save_progressive
-    if snapshot = ReportSnapshot.find_last_by_report_type(COUNTS_PROGRESSIVE_DETAILED)
-      detailed_progressive = JSON.parse(snapshot.data).with_indifferent_access
+    if snapshot = ReportSnapshot.progressive_overview.last
+      progressive = snapshot.data.with_indifferent_access
     else
-      detailed_progressive = start_progressive_hash.with_indifferent_access
+      progressive = start_progressive_hash.with_indifferent_access
     end
     
-    detailed_progressive[:generated_at] = @timestamp
-    create_progressive_hashes(detailed_progressive[:totals], @overview[:totals])
+    progressive[:generated_at] = @timestamp
+    create_progressive_hashes(progressive[:totals], @overview[:totals])
     ExternalStatuses.possible_external_statuses.each do |status|
-      detailed_progressive[status.to_sym] ||= new_progressive_hash
-      create_progressive_hashes(detailed_progressive[status.to_sym], @overview[status.to_sym])
-    end
-    @detailed.each do |k, v|
-      detailed_progressive[:detailed][k.to_s] ||= new_progressive_hash
-      create_progressive_hashes(detailed_progressive[:detailed][k.to_s], v)
+      progressive[status.to_sym] ||= new_progressive_hash
+      create_progressive_hashes(progressive[status.to_sym], @overview[status.to_sym])
     end
 
-    detailed_snap = ReportSnapshot.new(:report_type => COUNTS_PROGRESSIVE_DETAILED)
-    detailed_snap.data = detailed_progressive.to_json
-    detailed_snap.save
-
-    detailed_progressive.delete :detailed
-    overview_snap = ReportSnapshot.new(:report_type => COUNTS_PROGRESSIVE_OVERVIEW)
-    overview_snap.data = detailed_progressive.to_json
-    overview_snap.save
-
+    snapshot = ReportSnapshot.progressive_overview.build
+    snapshot.created_at = @yesterday
+    snapshot.data = progressive
+    snapshot.save!
   end
-  
+
+  def save_detailed_progressive(account, data)
+    if snapshot = account.report_snapshots.progressive.last
+      progressive = snapshot.data.with_indifferent_access
+    else
+      progressive = new_progressive_hash.with_indifferent_access
+    end
+    progressive[:generated_at] = @timestamp
+    create_progressive_hashes(progressive, data)
+
+    snapshot = account.report_snapshots.progressive.build
+    snapshot.created_at = @yesterday
+    snapshot.data = progressive
+    snapshot.save!
+  end
+
   def create_progressive_hashes(cumulative, totals)
     year = {:year=>@yesterday.year}
     copy_counts(year, totals)
-    cumulative[:yearly].pop if cumulative[:yearly].last and cumulative[:yearly].last[:year] == year[:year] 
+    cumulative[:yearly].pop if cumulative[:yearly].last and cumulative[:yearly].last[:year] == year[:year]
     cumulative[:yearly] << year
     
     month = {:year=>@yesterday.year, :month=>@yesterday.month}
@@ -185,8 +172,6 @@ class CountsReport
   end
 
   def add_account_stats(account)
-    @detailed[account[:id].to_s] = account
-
     unless @overview[account[:external_status]]
       @overview[account[:external_status]] = new_counts_hash
     end
@@ -216,27 +201,22 @@ class CountsReport
     @overview[:totals][:page_views_in_last_month] += account[:page_views_in_last_month]
   end
 
-  def last_activity(account_id)
+  def self.last_activity(account_id)
     PageView.maximum(:created_at, :conditions => { :account_id => account_id })
   end
 
-  def get_course_ids(account, course_ids)
-    account.courses.find_all_by_workflow_state('available').each do |c|
-      next if is_default_account(account) and not should_use_default_account_course(c)
-      course_ids << c.id
+  def get_course_ids(account)
+    is_default_account = account.external_status == ExternalStatuses.default_external_status.to_s
+    course_ids = []
+    account.all_courses.scoped(:conditions => { :workflow_state => 'available' }, :select => 'id, updated_at').find_in_batches do |batch|
+      course_ids.concat batch.select { |course| !is_default_account || should_use_default_account_course(course) }.map(&:id)
     end
-    account.sub_accounts.each do |sa|
-      get_course_ids(sa, course_ids)
-    end
+    course_ids
   end
 
   def should_use_default_account_course(course)
     @one_month_ago ||= @yesterday - 1.month
     course.updated_at > @one_month_ago
-  end
-
-  def is_default_account(account)
-    account.root_account.external_status == ExternalStatuses.default_external_status.to_s
   end
 
   def new_counts_hash
