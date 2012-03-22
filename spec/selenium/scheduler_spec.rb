@@ -261,6 +261,55 @@ describe "scheduler" do
       AppointmentGroup.find(ag_id).max_appointments_per_participant.should == 3
     end
 
+    it "should allow removing individual appointments" do
+      # user appointment group
+      create_appointment_group
+      ag = AppointmentGroup.first
+      2.times do
+        student_in_course(:course => @course, :active_all => true)
+        ag.appointments.first.reserve_for(@user, @user)
+      end
+
+      # group appointment group
+      gc = @course.group_categories.create!(:name => "Blah Groups")
+      title = create_appointment_group :sub_context_code => gc.asset_string,
+                                       :title => "group ag"
+      ag = AppointmentGroup.find_by_title(title)
+      2.times do |i|
+        student_in_course(:course => @course, :active_all => true)
+        group = Group.create! :group_category => gc,
+                              :context => @course,
+                              :name => "Group ##{i+1}"
+        group.users << @user
+        group.save!
+        ag.appointments.first.reserve_for(group, @user)
+      end
+
+      get "/calendar2"
+      click_scheduler_link
+
+      2.times do |i|
+        f(".appointment-group-item:nth-child(#{i+1}) .view_calendar_link").click
+
+        f('.fc-event').click
+        ff('#attendees li').size.should eql 2
+
+        # delete the first appointment
+        f('.cancel_appointment_link').click
+        fj('button:visible:contains(Delete)').click
+        wait_for_ajax_requests
+        ff('#attendees li').size.should eql 1
+
+        # make sure the appointment was really deleted
+        f('#refresh_calendar_link').click
+        wait_for_ajax_requests
+        f('.fc-event-time').click
+        ff('#attendees li').size.should eql 1
+
+        f('.single_item_done_button').click
+      end
+    end
+
   end
 
   context "as a student" do
@@ -322,6 +371,20 @@ describe "scheduler" do
       reserve_appointment_manual(2)
       fj('.ui-button:contains("OK")').click # "can't reserve" dialog
       f('.fc-event:nth-child(3)').should include_text "Available"
+    end
+
+    it "should not allow me to cancel reservations from the attendees list" do
+      create_appointment_group
+      ag = AppointmentGroup.first
+      ag.appointments.first.reserve_for(@user, @user)
+      get "/calendar2"
+      wait_for_ajaximations
+      click_scheduler_link
+      wait_for_ajaximations
+      click_appointment_link
+
+      fj('.fc-event:visible').click
+      ff('#reservations').size.should be_zero
     end
 
   end
