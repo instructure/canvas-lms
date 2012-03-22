@@ -136,6 +136,7 @@ define([
           buttons: [
             {
               text: I18n.t('#buttons.delete', 'Delete'),
+              'class': 'ui-button-primary',
               click: function() { result = true; $(this).dialog('close'); }
             }, {
               text: I18n.t('#buttons.cancel', 'Cancel'),
