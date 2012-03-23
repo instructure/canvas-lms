@@ -1025,8 +1025,6 @@ class Assignment < ActiveRecord::Base
     return primary_homework
   end
 
-
-
   def submissions_downloaded?
     self.submissions_downloads && self.submissions_downloads > 0
   end
