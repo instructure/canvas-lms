@@ -426,7 +426,7 @@ define([
           title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
           width: 560,
           height: 460,
-          modal: (opts.modal == false ? false : true)
+          modal: false
         });
         $dialog.dialog('option', 'close', function() {
           $("#audio_record").before("<div id='audio_record'/>").remove();
