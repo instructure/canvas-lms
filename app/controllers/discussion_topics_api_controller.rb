@@ -73,7 +73,7 @@ class DiscussionTopicsApiController < ApplicationController
     structure, participant_ids, entry_ids = @topic.materialized_view
     if structure
       participant_info = User.find(participant_ids).map do |user|
-        { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)) }
+        { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => polymorphic_url([@context, user]) }
       end
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
       # as an optimization, the view structure is pre-serialized as a json
