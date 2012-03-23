@@ -10,7 +10,7 @@ describe "scheduler" do
     Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
   end
 
-  def create_appointment_group_manual
+  def create_appointment_group_manual(should_publish = true)
     new_appointment_text = 'new appointment group'
     expect {
       driver.find_element(:css, '.create_link').click
@@ -24,7 +24,12 @@ describe "scheduler" do
       datepicker_next
       replace_content(edit_form.find_element(:css, '.start_time'), '1')
       replace_content(edit_form.find_element(:css, '.end_time'), '3')
-      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      save_buttons = ff(".ui-dialog-buttonset .ui-button")
+      if should_publish
+        save_buttons[0].click
+      else
+        save_buttons[1].click
+      end
       wait_for_ajaximations
       driver.find_element(:css, '.view_calendar_link').text.should == new_appointment_text
     }.to change(AppointmentGroup, :count).by(1)
@@ -67,11 +72,11 @@ describe "scheduler" do
   def create_appointment_group(params={})
     current_date = Date.today.to_s
     default_params = {
-      :title => "new appointment group",
-      :context => @course,
-      :new_appointments => [
-        [current_date + ' 12:00:00', current_date + ' 13:00:00'],
-      ]
+        :title => "new appointment group",
+        :context => @course,
+        :new_appointments => [
+            [current_date + ' 12:00:00', current_date + ' 13:00:00'],
+        ]
     }
     ag = @course.appointment_groups.create(default_params.merge(params))
     ag.publish!
@@ -80,13 +85,33 @@ describe "scheduler" do
 
   context "as a teacher" do
 
-    before (:each) { course_with_teacher_logged_in }
+    before (:each) do
+      course_with_teacher_logged_in
+    end
 
     it "should create a new appointment group" do
       get "/calendar2"
       click_scheduler_link
 
       create_appointment_group_manual
+    end
+
+    it "should create appointment group and go back and publish it" do
+      get "/calendar2"
+      click_scheduler_link
+
+      create_appointment_group_manual(false)
+      new_appointment_group = AppointmentGroup.last
+      new_appointment_group.workflow_state.should == 'pending'
+      f('.ag-x-of-x-signed-up').should include_text('unpublished')
+      driver.action.move_to(f('.appointment-group-item')).perform
+      click_al_option('.edit_link')
+      edit_form = driver.find_element(:id, 'edit_appointment_form')
+      keep_trying_until { edit_form.should be_displayed }
+      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      wait_for_ajaximations
+      new_appointment_group.reload
+      new_appointment_group.workflow_state.should == 'active'
     end
 
     it "should delete an appointment group" do
@@ -207,14 +232,14 @@ describe "scheduler" do
 
   context "as a student" do
 
-    before (:each) { course_with_student_logged_in }
+    before (:each) {course_with_student_logged_in}
 
     it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
       create_appointment_group(:max_appointments_per_participant => 1,
                                :new_appointments => [
-                                 [Date.today.to_s + ' 12:00:00', current_date = Date.today.to_s + ' 13:00:00'],
-                                 [Date.today.to_s + ' 14:00:00', current_date = Date.today.to_s + ' 15:00:00'],
-                              ])
+                                   [Date.today.to_s + ' 12:00:00', current_date = Date.today.to_s + ' 13:00:00'],
+                                   [Date.today.to_s + ' 14:00:00', current_date = Date.today.to_s + ' 15:00:00'],
+                               ])
       get "/calendar2"
       wait_for_ajaximations
       click_scheduler_link
