@@ -73,7 +73,7 @@ module Api::V1::DiscussionTopics
       else
         json = api_json(entry, user, session,
                         :only => %w(id user_id created_at updated_at parent_id),
-                        :methods => [:user_name])
+                        :methods => [:user_name, :summary])
         json[:editor_id] = entry.editor_id if entry.editor_id && entry.editor_id != entry.user_id
         if context.present? && user.present?
           json[:message] = api_user_content(entry.message, context, user)

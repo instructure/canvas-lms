@@ -224,6 +224,7 @@ describe DiscussionTopicsController, :type => :integration do
         "user_name" => @user.name,
         "read_state" => "read",
         "message" => @message,
+        "summary" => @entry.summary,
         "created_at" => @entry.created_at.utc.iso8601,
         "updated_at" => @entry.updated_at.as_json,
       }
