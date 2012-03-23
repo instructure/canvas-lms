@@ -913,8 +913,8 @@ describe DiscussionTopicsController, :type => :integration do
       json['unread_entries'].sort.should == (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       json['participants'].sort_by { |h| h['id'] }.should == [
-        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}" },
-        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@teacher.id)}" },
+        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
+        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@teacher.id)}", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
       ].sort_by { |h| h['id'] }
 
       json['view'].should == [
