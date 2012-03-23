@@ -63,7 +63,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :touch_context
   after_save :schedule_delayed_post
   after_create :create_participant
-  after_create :update_materialized_view
+  after_create :create_materialized_view
 
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
@@ -801,5 +801,10 @@ class DiscussionTopic < ActiveRecord::Base
   # update it completes. so this view is eventually consistent.
   def materialized_view
     DiscussionTopic::MaterializedView.materialized_view_for(self)
+  end
+
+  # synchronously create/update the materialized view
+  def create_materialized_view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view
   end
 end

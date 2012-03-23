@@ -37,9 +37,13 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     { :only_path => false, :host => HostUrl.context_host(discussion_topic.context) }
   end
 
+  def self.for(discussion_topic)
+    self.find_by_discussion_topic_id(discussion_topic.id) ||
+      self.create!(:discussion_topic => discussion_topic)
+  end
+
   def self.materialized_view_for(discussion_topic)
-    view = self.find_by_discussion_topic_id(discussion_topic.id) ||
-           self.create!(:discussion_topic => discussion_topic)
+    view = self.for(discussion_topic)
     view.materialized_view_json
   end
 

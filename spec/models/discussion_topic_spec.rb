@@ -671,8 +671,7 @@ describe DiscussionTopic do
     end
 
     it "should return nil if the view has not been built yet, and schedule a job" do
-      # test that it kicks off the view building right as the discussion is first created
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      DiscussionTopic::MaterializedView.for(@topic).destroy
       @topic.materialized_view.should be_nil
       @topic.materialized_view.should be_nil
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1

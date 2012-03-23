@@ -29,7 +29,12 @@ describe DiscussionTopic::MaterializedView do
   end
 
   describe ".materialized_view_for" do
+    it "should build the intial empty view synchronously" do
+      DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == ["[]", [], []]
+    end
+
     it "should return nil and schedule a job if no view" do
+      DiscussionTopic::MaterializedView.for(@topic).destroy
       DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == nil
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
     end
