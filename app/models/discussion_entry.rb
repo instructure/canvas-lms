@@ -148,7 +148,7 @@ class DiscussionEntry < ActiveRecord::Base
     plaintext_message(length)
   end
 
-  def summary(length=250)
+  def summary(length=150)
     strip_and_truncate(message, :max_length => length)
   end
 
@@ -221,31 +221,31 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user and self.discussion_subentries.empty? && !self.discussion_topic.locked? }
+    given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
     can :delete
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }#
+    given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }# students.find_by_id(user) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }
     can :reply and can :create and can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }
     can :read
 
-    given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked?  }# students.find_by_id(user) }
+    given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked?  }
     can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }#admins.find_by_id(user) }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }#admins.find_by_id(user) }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }#admins.find_by_id(user) }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }#admins.find_by_id(user) }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
   end
 

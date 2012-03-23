@@ -1,0 +1,17 @@
+<form class="discussion-section hide-if-collapsed discussion-reply-form">
+  <span class="notification" data-bind="notification"></span>
+  <label class="discussion-reply-label hide-if-replying" data-event="addReply" for="reply_message_for_{{id}}">
+    {{#t "write_a_reply"}}Write a reply...{{/t}}
+  </label>
+  <div class="show-if-replying">
+    <textarea class="reply-textarea" id="reply_message_for_{{id}}"></textarea>
+    <ul class="discussion-reply-attachments"></ul>
+    {{#if canAttach}}
+      <a href="#" class="discussion-reply-add-attachment" data-event="addReplyAttachment">{{#t "attach_file"}}Attach{{/t}}</a>
+    {{/if}}
+    <div>
+      <button class="button" type="submit">{{#t "post_response"}}Post Response{{/t}}</button>
+      <button class="cancel_button button button-secondary">{{#t "cancel"}}Cancel{{/t}}</button>
+    </div>
+  </div>
+</form>

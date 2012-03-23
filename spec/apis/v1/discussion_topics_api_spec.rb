@@ -254,7 +254,7 @@ describe DiscussionTopicsController, :type => :integration do
       @entry.attachment.should_not be_nil
     end
 
-    it "should silently ignore attachments on replies to top-level entries" do
+    it "should include attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, :message => 'top-level message')
       require 'action_controller'
       require 'action_controller/test_process.rb'
@@ -265,7 +265,7 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
         { :message => @message, :attachment => data })
       @entry = DiscussionEntry.find_by_id(json['id'])
-      @entry.attachment.should be_nil
+      @entry.attachment.should_not be_nil
     end
 
     it "should include attachment info in the json response" do

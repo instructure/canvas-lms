@@ -17,6 +17,7 @@
  */
 
 define([
+  'ENV',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
@@ -48,12 +49,18 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'vendor/scribd.view' /* scribd */
-], function(INST, I18n, $, htmlEscape, wikiSidebar) {
+], function(ENV, INST, I18n, $, htmlEscape, wikiSidebar) {
 
+  // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
+  var CSRFProtection =  function(xhr) {
+    if (ENV.AUTHENTICITY_TOKEN) xhr.setRequestHeader('X-CSRF-Token', ENV.AUTHENTICITY_TOKEN);
+  }
 
-  // sends timing info of XHRs to google analytics so we can track ajax speed.
-  // (ONLY for ajax requests that took longer than a second)
   $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+    if ( !options.crossDomain ) CSRFProtection(jqXHR);
+
+    // sends timing info of XHRs to google analytics so we can track ajax speed.
+    // (ONLY for ajax requests that took longer than a second)
     var urlWithoutPageViewParam = options.url;
     var start = new Date().getTime();
     jqXHR.done(function(data, textStatus, jqXHR){

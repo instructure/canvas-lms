@@ -9,6 +9,8 @@
   entry_key ||= entry_context.try_rescue(:asset_string) || 'blank'
   skip_sub_entries ||= false
   read_state = entry ? entry.read_state(@current_user) : "read"
+  link_to_headless ||= false
+  headless_param = {:headless => 1} if link_to_headless
  %>
 <% cache([
     'entry_message_render',
@@ -17,7 +19,8 @@
     skip_sub_entries,
     @topic_agglomerated,
     Time.zone.utc_offset,
-    read_state
+    read_state,
+    link_to_headless
   ].join('/')) do %>
 <div class="discussion_entry communication_message can_be_marked_as_read <%= read_state %>" <%= hidden(true) unless entry_exists %> id="entry_<%= entry_exists ? entry.id : "blank" %>" data-mark-read-url="<%= entry_exists && entry_id && context_url(entry_context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, discussion_topic_id, entry_id) %>">
   <div class="header">
@@ -27,7 +30,7 @@
       <div class="header_title">
         <% if out_of_context %>
           <span style="font-size: 0.8em; padding-left: 20px;">from
-            <a href="<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
+            <a href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
           </span>
         <% else %>
           <% if @topic_agglomerated && entry %>

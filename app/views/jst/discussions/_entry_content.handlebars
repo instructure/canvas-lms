@@ -1,0 +1,50 @@
+<header class="discussion-section admin-link-hover-area {{read_state}} clearfix" data-event="toggleCollapsed">
+  <div class="discussion-read-state tooltip">
+    <span class="tooltip_wrap unread">
+      <span class="tooltip_text">{{#t "unread"}}Unread{{/t}}</span>
+    </span>
+    <span class="tooltip_wrap just_read">
+      <span class="tooltip_text">{{#t "just_read"}}Just Read{{/t}}</span>
+    </span>
+  </div>
+  {{>avatar author}}
+  <div class="discussion-header-content right-of-avatar">
+    <div class="hide-if-collapsed admin-links">
+      <button class="al-trigger" data-event="openMenu"><span class="al-trigger-inner">{{#t "manage"}}Manage{{/t}}</span></button>
+      <ul class="al-options">
+        <li><a href="#{{#if parent_cid}}{{parent_cid}}{{else}}content{{/if}}"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
+        {{#if canModerate}}
+          <li><a data-event="edit" href="#"><span class="ui-icon ui-icon-pencil" />{{#t "edit"}}Edit{{/t}}</a></li>
+          <li><a data-event="remove" href="#"><span class="ui-icon ui-icon-trash" />{{#t "delete"}}Delete{{/t}}</a></li>
+        {{/if}}
+      </ul>
+    </div>
+    <div class="discussion-header-right">
+      <div class="discussion-pubdate">{{friendlyDatetime updated_at pubdate=true}}</div>
+    </div>
+    <h1 class="discussion-title">
+      <a class="show-if-collapsed summary ellipsis">{{summary}}</a>
+      <a class="hide-if-collapsed author" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author.url}} href="{{author.url}}" {{/if}} class="author">{{author.display_name}}</a>
+    </h1>
+    <h2 class="show-if-collapsed discussion-subtitle">
+      <a title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author.url}} href="{{author.url}}" {{/if}} class="author">{{author.display_name}}</a>
+    </h2>
+  </div>
+</header>
+<div class="discussion-section hide-if-collapsed message_wrapper">
+  <span class="message-notification" data-bind="messageNotification"></span>
+  <div data-bind="message" class="message user_content">{{{message}}}</div>
+  {{#if editor}}
+    <div class="discussion-fyi">This comment was edited by <a {{#if editor.url}} href="{{editor.url}}" {{/if}}>{{editor.display_name}}</a></div>
+  {{/if}}
+  {{#if attachments}}
+    <div class="comment_attachments">
+      {{#each attachments}}
+        <div><a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a></div>
+      {{/each}}
+    </div>
+  {{/if}}
+</div>
+{{#if canReply}}
+  {{>[discussions/reply_form]}}
+{{/if}}

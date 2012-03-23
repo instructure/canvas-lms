@@ -79,6 +79,7 @@ class DiscussionTopic < ActiveRecord::Base
         self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
       end
     end
+    self.threaded = true if self.threaded_was # can't un-set it once set
   end
   protected :default_values
 
@@ -788,6 +789,18 @@ class DiscussionTopic < ActiveRecord::Base
       end
       item
     end
+  end
+
+  def initial_post_required?(user, enrollment, session)
+    if require_initial_post?
+      # check if the user, or the user being observed can see the posts
+      if enrollment && enrollment.respond_to?(:associated_user) && enrollment.associated_user
+        return true if !user_can_see_posts?(enrollment.associated_user)
+      elsif !user_can_see_posts?(user, session)
+        return true
+      end
+    end
+    false
   end
 
   # returns the materialized view of the discussion as structure, participant_ids, and entry_ids

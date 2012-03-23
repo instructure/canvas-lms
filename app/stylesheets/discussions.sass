@@ -1,0 +1,189 @@
+@import environment.sass
+.discussion-entries
+  list-style: none
+  margin: -4px 0 0 8px
+  padding: 0
+  background: inline-image('discussions/line.png') left repeat-y
+  .entry
+    padding: 4px 0 0 10px
+    background: inline-image('discussions/child_bg.png') left top no-repeat
+    &:last-child
+      background-color: white
+
+//adding .highlighted-entry to an .entry will make the lines to it's children blue
+.highlighted-entry,
+.highlighted-entry > .replies > .discussion-entries
+  background-image: inline-image('discussions/line_highlighted.png')
+.highlighted-entry > .replies > .discussion-entries > .entry
+  background-image: inline-image('discussions/child_highlighed_bg.png')
+
+
+.show-if-collapsed
+  display: none
+.collapsed
+  .hide-if-collapsed
+    display: none
+  .show-if-collapsed
+    display: block
+
+.discussion_entry
+  margin: 5px 0
+  box-shadow: rgba(0,0,0, 0.2) 0px 1px 2px
+  .new-and-total-badge
+    float: right
+    margin-top: 10px
+  .al-trigger
+    opacity: 0.5
+    margin-left: 10px
+    margin-right: -10px
+    margin-top: -4px
+  .admin-link-hover-area
+    &:hover, &.active
+      cursor: pointer
+      background-color: #E4F3FE
+      .discussion-title a
+        color: #15A3FA
+        text-decoration: none
+  .ellipsis
+    padding-right: 70px
+
+.reply-textarea
+  width: 100%
+
+.discussion-section
+  padding: 10px 25px
+  background-color: #f3f4f5
+  border-top: 1px solid #fff
+  border-bottom: 1px solid #e1e1e1
+  position: relative
+
+.discussion-title
+  font-size: 15px
+  margin: 0
+.discussion-subtitle
+  font-size: 11px
+  margin: 0
+.discussion-header-content
+  position: relative
+  min-height: 50px
+  a
+    color: inherit
+.discussion-header-right
+  float: right
+.discussion-pubdate
+  font-size: 11px
+  color: #777
+.discussion-assignment-links
+  margin-top: 20px
+  a
+    margin-right: 20px
+
+.discussion-fyi
+  font-style: italic
+  font-size: 12px
+  color: #777
+
+.discussion-read-state
+  position: absolute
+  top: 0
+  left: 0
+  bottom: 0
+  width: 10px
+  background-color: #d7d7d7 //grey
+  .tooltip_wrap
+    left: -4px
+    top: -25px
+    bottom: auto
+    display: none
+  .unread &
+    background-color: #6dc0ff
+
+//.read      .discussion-read-state .read,
+.unread    .discussion-read-state .unread,
+.just_read .discussion-read-state .just_read
+  display: block
+
+.discussion-reply-form
+  .show-if-replying
+    display: none
+  &.replying
+    .hide-if-replying
+      display: none
+    .show-if-replying
+      display: block
+
+.discussion-reply-label
+  display: block
+  background-color: #fff
+  font-size: 11px
+  color: #636363
+  padding: 3px 10px
+  cursor: text
+  border: 1px inset
+//these can be global
+.avatar
+  float: left
+  margin: 0 10px 0 0
+  img
+    max-width: 50px
+    // TODO: get rid of this when we implement silhouette
+    min-height: 50px
+
+.discussion-reply-attachments
+  list-style: none
+  padding: 0
+  margin: 0
+  li
+    padding: 0 0 0 20px
+    margin: 0
+    background: transparent url(/images/messages/attach-gray.png) left center no-repeat
+  a
+    display: inline-block
+    text-indent: -1000em
+    width: 16px
+    height: 16px
+    background: transparent url(/images/delete_circle.png) left center no-repeat
+
+.discussion-reply-add-attachment
+  display: inline-block
+  padding-left: 20px
+  background: transparent url(/images/messages/attach-blue.png) left center no-repeat
+
+.message-notification, .notification
+  background: #ffffcc
+
+//stuff for right side
+.view_switcher
+  //make it look like a button
+  width: 258px
+  text-decoration: none !important
+  border: 1px solid
+  box-shadow: 1px, 1px, 1px rgba(0, 0, 0, 0.15)
+  background: url(/images/button_bg.png) 0px 0px repeat-x !important
+  color: #555 !important
+  border-color: #b6b6b6
+  font-size: 1.08em
+  font-weight: normal
+  +text-shadow(0px, 1px, 0px, rgba(255, 255, 255, 0.8))
+  &.ui-state-hover, &.ui-state-active, &.ui-selectmenu-menu-dropdown
+    box-shadow: rgba(0, 0, 0, 0.3) 0 0 6px
+  a
+    color: inherit
+  &.ui-selectmenu-menu-dropdown
+    background: #EBEBEB none !important
+    border-top: 0
+
+  //make icons align with right-side button icons
+  &li.ui-selectmenu-hasIcon a,
+  .ui-selectmenu-status
+    padding-left: 25px
+    margin-left: 12px
+.collapsed-view .ui-selectmenu-item-icon
+  background-image: inline-image('discussions/collapsed_view_icon.png')
+.unread-view .ui-selectmenu-item-icon
+  background-image: inline-image('discussions/smart_view_icon.png')
+.expanded-view .ui-selectmenu-item-icon
+  background-image: inline-image('discussions/expanded_view_icon.png')
+
+.deleted-discussion-entry
+  opacity: 0.5

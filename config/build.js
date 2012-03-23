@@ -170,6 +170,7 @@
     { name: "compiled/bundles/take_quiz", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/teacher_activity_report", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/tool_inline", exclude: ['common', 'compiled/tinymce'] },
+    { name: "compiled/bundles/discussion", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/topic", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/topics", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/user", exclude: ['common', 'compiled/tinymce'] },
@@ -179,7 +180,7 @@
     { name: "compiled/bundles/user_notes", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/user_sortable_name", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/wiki", exclude: ['common', 'compiled/tinymce'] },
-    { name: "compiled/bundles/calendar2", exclude: ['common', 'compiled/tinymce'] }
+    { name: "compiled/bundles/calendar2", exclude: ['common', 'compiled/tinymce'] },
   ]
 })
 

@@ -72,6 +72,9 @@ class DiscussionTopicsApiController < ApplicationController
     return unless authorized_action(@topic, @current_user, :read)
     structure, participant_ids, entry_ids = @topic.materialized_view
     if structure
+      if @topic.initial_post_required?(@current_user, @context_enrollment, session) || @topic.for_group_assignment?
+        structure, participant_ids, entry_ids = "[]", [], []
+      end
       participant_info = User.find(participant_ids).map do |user|
         { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => polymorphic_url([@context, user]) }
       end
@@ -104,18 +107,7 @@ class DiscussionTopicsApiController < ApplicationController
   def add_entry
     @entry = build_entry(@topic.discussion_entries)
     if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
-      has_attachment = params[:attachment] && params[:attachment].size > 0 &&
-        @entry.grants_right?(@current_user, session, :attach)
-      return if has_attachment && params[:attachment].size > 1.kilobytes &&
-        quota_exceeded(named_context_url(@context, :context_discussion_topic_url, @topic.id))
-      if save_entry
-        if has_attachment
-          @attachment = @context.attachments.create(:uploaded_data => params[:attachment])
-          @entry.attachment = @attachment
-          @entry.save
-        end
-        render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first, :status => :created
-      end
+      save_entry
     end
   end
 
@@ -212,18 +204,21 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @argument message The body of the entry.
   #
+  # @argument attachment [Optional] a multipart/form-data form-field-style
+  #   attachment. Attachments larger than 1 kilobyte are subject to quota
+  #   restrictions.
+  #
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \ 
   #        -F 'message=<message>' \ 
+  #        -F 'attachment=@<filename>' \ 
   #        -H "Authorization: Bearer <token>"
   def add_reply
     @parent = all_entries(@topic).find(params[:entry_id])
     @entry = build_entry(@parent.discussion_subentries)
     if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
-      if save_entry
-        render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first, :status => :created
-      end
+      save_entry
     end
   end
 
@@ -302,7 +297,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entry_list?ids[]=1&ids[]=2&ids[]=3' \ 
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries?id[]=1&id[]=2&id[]=3' \ 
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -432,12 +427,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def require_initial_post
-    return true unless @topic.require_initial_post?
-
-    users = []
-    users << @current_user if @current_user
-    users << @context_enrollment.associated_user if @context_enrollment && @context_enrollment.respond_to?(:associated_user_id) && @context_enrollment.associated_user_id
-    return true if users.any?{ |user| @topic.user_can_see_posts?(user, session) }
+    return true if !@topic.initial_post_required?(@current_user, @context_enrollment, session)
 
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status
@@ -450,14 +440,23 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def save_entry
-    if !@entry.save
+    has_attachment = params[:attachment].present? && params[:attachment].size > 0 && 
+      @entry.grants_right?(@current_user, session, :attach)
+    return if has_attachment && params[:attachment].size > 1.kilobytes &&
+      quota_exceeded(named_context_url(@context, :context_discussion_topic_url, @topic.id))
+    if @entry.save
+      @entry.update_topic
+      log_asset_access(@topic, 'topics', 'topics', 'participate')
+      @entry.context_module_action
+      if has_attachment
+        @attachment = @context.attachments.create(:uploaded_data => params[:attachment])
+        @entry.attachment = @attachment
+        @entry.save
+      end
+      render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first, :status => :created
+    else
       render :json => @entry.errors, :status => :bad_request
-      return false
     end
-    @entry.update_topic
-    log_asset_access(@topic, 'topics', 'topics', 'participate')
-    @entry.context_module_action
-    return true
   end
 
   def visible_topics(topic)
