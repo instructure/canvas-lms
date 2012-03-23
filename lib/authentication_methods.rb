@@ -100,7 +100,7 @@ module AuthenticationMethods
         # just using an app session
         # this basic auth support is deprecated and marked for removal in 2012
         @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
-        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || raise(AccessTokenError)
+        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || form_authenticity_token == request.headers['X-CSRF-Token'] || raise(AccessTokenError)
       end
     end
 

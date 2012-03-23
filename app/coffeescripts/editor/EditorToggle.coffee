@@ -10,13 +10,13 @@ define ['i18n!editor', 'jquery', 'tinymce.editor_box'], (I18n, $) ->
       doneText: I18n.t 'done_as_in_finished', 'Done'
 
     ##
-    # @param {jQueryEl} @el
+    # @param {jQueryEl} @el - the element containing html to edit
     # @param {Object} options
     constructor: (@el, options) ->
       @options = $.extend {}, @options, options
       @textArea = @createTextArea()
       @done = @createDone()
-      @content = $.trim @el.html()
+      @content = @getContent()
       @editing = false
 
     ##
@@ -32,7 +32,7 @@ define ['i18n!editor', 'jquery', 'tinymce.editor_box'], (I18n, $) ->
     # Converts the element to an editor
     # @api public
     edit: ->
-      @textArea.val @el.html()
+      @textArea.val @getContent()
       @textArea.insertBefore @el
       @el.detach()
       @done.insertAfter @textArea
@@ -53,6 +53,12 @@ define ['i18n!editor', 'jquery', 'tinymce.editor_box'], (I18n, $) ->
       # so tiny doesn't hang on to this instance
       @textArea.attr 'id', ''
       @editing = false
+
+    ##
+    # method to get the content for the editor
+    # @api private
+    getContent: ->
+      $.trim @el.html()
 
     ##
     # creates the textarea tinymce uses for the editor

@@ -82,6 +82,12 @@
     <%= label :discussion_topic, :is_announcement, :en => "Make this post an announcement" %>
   </div>
   <% end %>
+  <% if topic_type == "discussion_topic" %>
+  <div>
+    <%= f.check_box :threaded, :class => 'discussion_topic_threaded' %>
+    <%= f.label :threaded, :en => "This is a threaded discussion" %>
+  </div>
+  <% end %>
   <% if can_do(@context, @current_user, :manage_content) %>
     <div style="margin-left: 20px;">
       <a href="#" class="more_options_link"><%= t('#links.more_options', %{more options}) %></a>

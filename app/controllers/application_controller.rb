@@ -73,7 +73,8 @@ class ApplicationController < ActionController::Base
     @js_env ||= {
       :current_user_id => @current_user.try(:id),
       :current_user_roles => @current_user.try(:roles),
-      :context_asset_string => @context.try(:asset_string)
+      :context_asset_string => @context.try(:asset_string),
+      :AUTHENTICITY_TOKEN => form_authenticity_token
     }
 
     hash.each do |k,v|
