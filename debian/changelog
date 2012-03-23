@@ -1,3 +1,11 @@
+canvas-lms (2012.03.17.19) stable; urgency=low
+
+  * Package ref: b8d8fa07ca6c0548ea2626e56b357ab612f0c7ee
+  *
+  * [+b8d8fa0] don't resubmit discussion assignments marked as graded
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 23 Mar 2012 15:19:42 -0600
+
 canvas-lms (2012.03.17.18) stable; urgency=low
 
   * Package ref: b3b65ce221ad8118d691d72cccd6d578a9dcf43f
