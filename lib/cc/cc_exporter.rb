@@ -19,7 +19,7 @@ module CC
   class CCExporter
     ZIP_DIR = 'zip_dir'
     
-    attr_accessor :course, :user, :export_dir, :manifest, :zip_file
+    attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy
     delegate :add_error, :to => :@content_export, :allow_nil => true
 
     def initialize(content_export, opts={})
@@ -32,7 +32,8 @@ module CC
       @zip_name = nil
       @logger = Rails.logger
       @migration_config = Setting.from_config('external_migration')
-      @migration_config ||= {:keep_after_complete => false} 
+      @migration_config ||= {:keep_after_complete => false}
+      @for_course_copy = opts[:for_course_copy]
     end
 
     def self.export(content_export, opts={})
@@ -84,6 +85,10 @@ module CC
     
     def export_id
       @content_export ? @content_export.id : nil
+    end
+
+    def export_object?(obj)
+      @content_export ? @content_export.export_object?(obj) : true
     end
     
     private

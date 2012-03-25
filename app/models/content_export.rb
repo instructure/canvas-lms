@@ -48,11 +48,11 @@ class ContentExport < ActiveRecord::Base
     }
   end
   
-  def export_course
+  def export_course(opts={})
     self.workflow_state = 'exporting'
     self.save
     begin
-      if CC::CCExporter.export(self)
+      if CC::CCExporter.export(self, opts.merge({:for_course_copy => self.settings[:for_course_copy]}))
         self.workflow_state = 'exported'
       else
         self.workflow_state = 'failed'
@@ -72,6 +72,28 @@ class ContentExport < ActiveRecord::Base
   
   def error_messages
     self.settings[:errors] ||= []
+  end
+
+  def selected_content=(copy_settings)
+    self.settings[:selected_content] = copy_settings
+  end
+
+  def selected_content
+    self.settings[:selected_content]
+  end
+
+  def export_object?(obj)
+    return false unless obj
+    return true unless selected_content
+    return true if is_set?(selected_content[:everything])
+
+    asset_type = obj.class.table_name
+    return true if is_set?(selected_content["all_#{asset_type}"])
+
+    return false unless selected_content[asset_type]
+    return true if is_set?(selected_content[asset_type][CC::CCHelper.create_key(obj)])
+
+    false
   end
   
   def add_error(user_message, exception_or_info)
@@ -100,7 +122,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def settings
-    read_attribute(:settings) || write_attribute(:settings,{})
+    read_attribute(:settings) || write_attribute(:settings,{}.with_indifferent_access)
   end
   
   def fast_update_progress(val)
@@ -110,5 +132,11 @@ class ContentExport < ActiveRecord::Base
   
   named_scope :active, {:conditions => ['workflow_state != ?', 'deleted']}
   named_scope :running, {:conditions => ['workflow_state IN (?)', ['created', 'exporting']]}
+
+  private
+
+  def is_set?(option)
+    Canvas::Plugin::value_to_boolean option
+  end
   
 end

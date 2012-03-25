@@ -36,6 +36,7 @@ module CC
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |events_node|
         @course.calendar_events.each do |event|
+          next unless export_object?(event)
           migration_id = CCHelper.create_key(event)
           events_node.event(:identifier=>migration_id) do |event_node|
             event_node.title event.title unless event.title.blank?

@@ -21,7 +21,7 @@ module CC
       return nil unless @course.context_external_tools.active.count > 0
 
       @course.context_external_tools.active.each do |tool|
-
+        next unless export_object?(tool)
         migration_id = CCHelper::create_key(tool)
 
         lti_file_name = "#{migration_id}.xml"
