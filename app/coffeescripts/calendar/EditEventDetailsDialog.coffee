@@ -29,14 +29,8 @@ define [
       return null
 
     setupTabs: =>
-
       # Set up the tabbed view of the dialog
       tabs = dialog.find("#edit_event_tabs")
-
-      # don't need tabs at all for the appt group calendar events
-      if @event.isAppointmentGroupEvent()
-        tabs.find('.tab_list').hide()
-        return
 
       tabs.tabs().bind 'tabsselect', (event, ui) ->
         $(ui.panel).closest(".tab_holder").data('form-widget').activate()

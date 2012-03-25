@@ -311,6 +311,38 @@ describe "scheduler" do
       end
     end
 
+    def open_edit_appointment_slot_dialog
+      f('.fc-event').click
+      f('.edit_event_link').click
+    end
+
+    it "should allow me to override the participant limit on a slot-by-slot basis" do
+      create_appointment_group :participants_per_appointment => 2, :context => @course
+      get "/calendar2"
+      wait_for_ajaximations
+      click_scheduler_link
+      wait_for_ajaximations
+      click_appointment_link
+
+      open_edit_appointment_slot_dialog
+      replace_content f('[name=max_participants]'), "5"
+      fj('.ui-button:contains(Update)').click
+      wait_for_ajaximations
+
+      ag = AppointmentGroup.first
+      ag.appointments.first.participants_per_appointment.should eql 5
+      ag.participants_per_appointment.should eql 2
+
+      open_edit_appointment_slot_dialog
+      f('[name=max_participants_option]').click
+      debugger
+      fj('.ui-button:contains(Update)').click
+      wait_for_ajaximations
+
+      ag.reload
+      ag.appointments.first.participants_per_appointment.should be_nil
+    end
+
   end
 
   context "as a student" do
