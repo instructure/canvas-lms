@@ -5,11 +5,21 @@ define [
 
   class EditApptCalendarEventDialog
     constructor: (@event) ->
-      form = $('<div></div>')
+      @form = $('<div></div>')
                .html(editApptCalendarEventTemplate(@event))
                .appendTo('body')
 
-      @dialog = form.dialog
+      $maxParticipantsOption = @form.find('[name=max_participants_option]')
+      @$maxParticipants      = @form.find('[name=max_participants]')
+
+      $maxParticipantsOption.change =>
+        @$maxParticipants.prop('disabled', not $maxParticipantsOption.prop('checked'))
+
+      if @event.calendarEvent.participants_per_appointment
+        $maxParticipantsOption.click()
+        @$maxParticipants.val(@event.calendarEvent.participants_per_appointment)
+
+      @dialog = @form.dialog
         autoOpen: false
         width: 'auto'
         resizable: false
@@ -22,13 +32,30 @@ define [
           }
         ]
 
-    show: ->
-      @dialog.html editApptCalendarEventTemplate(@event)
-      @dialog.dialog('open')
+    show: -> @dialog.dialog('open')
 
     save: =>
-      debugger
-      description = @dialog.getFormData().description
-      @event.calendarEvent.description = description
-      @event.save 'calendar_event[description]': description
+      formData = @dialog.getFormData()
+
+      limit_participants = formData.max_participants_option == "on"
+      max_participants = formData.max_participants
+
+      if limit_participants and max_participants <= 0
+        @$maxParticipants.errorBox(I18n.t 'invalid_participants', 'You must allow at least one user to attend')
+        return false
+
+      @event.calendarEvent.description = formData.description
+      if limit_participants
+        @event.calendarEvent.total_slots = max_participants
+        @event.calendarEvent.remaining_slots = max_participants - @event.calendarEvent.child_events.length
+      else
+        @event.calendarEvent.total_slots = undefined
+        @event.calendarEvent.remaining_slots = undefined
+
+      participants_per_appointment = if limit_participants then max_participants else ""
+      @event.save
+        'calendar_event[description]': formData.description
+        'calendar_event[participants_per_appointment]': participants_per_appointment
+
       @dialog.dialog('destroy')
+      @form.remove()
