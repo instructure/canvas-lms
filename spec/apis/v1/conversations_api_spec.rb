@@ -65,6 +65,7 @@ describe ConversationsController, :type => :integration do
           "private" => false,
           "starred" => false,
           "properties" => ["last_author"],
+          "visible" => true,
           "audience" => [@billy.id, @bob.id],
           "audience_contexts" => {
             "groups" => {},
@@ -88,6 +89,7 @@ describe ConversationsController, :type => :integration do
           "private" => true,
           "starred" => false,
           "properties" => ["last_author"],
+          "visible" => true,
           "audience" => [@bob.id],
           "audience_contexts" => {
             "groups" => {},
@@ -138,6 +140,7 @@ describe ConversationsController, :type => :integration do
           "private" => false,
           "starred" => false,
           "properties" => ["last_author"],
+          "visible" => true,
           "audience" => [@billy.id, @bob.id],
           "audience_contexts" => {
             "groups" => {},
@@ -275,6 +278,7 @@ describe ConversationsController, :type => :integration do
             "private" => true,
             "starred" => false,
             "properties" => ["last_author"],
+            "visible" => true,
             "audience" => [@bob.id],
             "audience_contexts" => {
               "groups" => {},
@@ -315,6 +319,7 @@ describe ConversationsController, :type => :integration do
             "private" => false,
             "starred" => false,
             "properties" => ["last_author"],
+            "visible" => true,
             "audience" => [@billy.id, @bob.id],
             "audience_contexts" => {
               "groups" => {},
@@ -359,6 +364,7 @@ describe ConversationsController, :type => :integration do
             "private" => true,
             "starred" => false,
             "properties" => ["last_author"],
+            "visible" => true,
             "audience" => [@bob.id],
             "audience_contexts" => {
               "groups" => {},
@@ -420,6 +426,7 @@ describe ConversationsController, :type => :integration do
             "private" => true,
             "starred" => false,
             "properties" => ["last_author"],
+            "visible" => true,
             "audience" => [@billy.id],
             "audience_contexts" => {
               "groups" => {},
@@ -698,6 +705,7 @@ describe ConversationsController, :type => :integration do
         "private" => true,
         "starred" => false,
         "properties" => ["last_author", "attachments", "media_objects"],
+        "visible" => true,
         "audience" => [@bob.id],
         "audience_contexts" => {
           "groups" => {},
@@ -835,6 +843,7 @@ describe ConversationsController, :type => :integration do
         "private" => true,
         "starred" => false,
         "properties" => ["last_author"],
+        "visible" => true,
         "audience" => [@bob.id],
         "audience_contexts" => {
           "groups" => {},
@@ -873,6 +882,7 @@ describe ConversationsController, :type => :integration do
         "private" => false,
         "starred" => false,
         "properties" => ["last_author"],
+        "visible" => true,
         "audience" => [@billy.id, @bob.id, @jane.id, @joe.id, @tommy.id],
         "audience_contexts" => {
           "groups" => {},
@@ -899,7 +909,10 @@ describe ConversationsController, :type => :integration do
               { :controller => 'conversations', :action => 'update', :id => conversation.conversation_id.to_s, :format => 'json' },
               { :conversation => {:subscribed => false, :workflow_state => 'archived'} })
       conversation.reload
-
+      json.delete("avatar_url")
+      json["participants"].each{ |p|
+        p.delete("avatar_url")
+      }
       json.should eql({
         "id" => conversation.conversation_id,
         "workflow_state" => "archived",
@@ -911,7 +924,18 @@ describe ConversationsController, :type => :integration do
         "subscribed" => false,
         "private" => false,
         "starred" => false,
-        "properties" => ["last_author"]
+        "properties" => ["last_author"],
+        "visible" => false, # since we archived it, and the default view is assumed
+        "audience" => [@billy.id, @bob.id],
+        "audience_contexts" => {
+          "groups" => {},
+          "courses" => {@course.id.to_s => []}
+        },
+        "participants" => [
+          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        ]
       })
     end
 
@@ -966,6 +990,7 @@ describe ConversationsController, :type => :integration do
         "private" => true,
         "starred" => false,
         "properties" => ["last_author"],
+        "visible" => true,
         "audience" => [@bob.id],
         "audience_contexts" => {
           "groups" => {},
@@ -983,6 +1008,10 @@ describe ConversationsController, :type => :integration do
 
       json = api_call(:delete, "/api/v1/conversations/#{conversation.conversation_id}",
               { :controller => 'conversations', :action => 'destroy', :id => conversation.conversation_id.to_s, :format => 'json' })
+      json.delete("avatar_url")
+      json["participants"].each{ |p|
+        p.delete("avatar_url")
+      }
       json.should eql({
         "id" => conversation.conversation_id,
         "workflow_state" => "read",
@@ -994,7 +1023,17 @@ describe ConversationsController, :type => :integration do
         "subscribed" => true,
         "private" => true,
         "starred" => false,
-        "properties" => []
+        "properties" => [],
+        "visible" => false,
+        "audience" => [@bob.id],
+        "audience_contexts" => {
+          "groups" => {},
+          "courses" => {} # tags, and by extension audience_contexts, get cleared out when the conversation is deleted
+        },
+        "participants" => [
+          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        ]
       })
     end
   end

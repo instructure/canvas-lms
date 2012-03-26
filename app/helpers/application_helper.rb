@@ -205,7 +205,7 @@ module ApplicationHelper
   end
 
   def message_user_path(user)
-    conversations_path + "#/conversations?user_id=#{user.id}"
+    conversations_path(:user_id => user.id)
   end
 
   def hidden(include_style=false)

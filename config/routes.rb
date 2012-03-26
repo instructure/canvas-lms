@@ -8,10 +8,10 @@ ActionController::Routing::Routes.draw do |map|
   map.inbox_item 'inbox/:id', :controller => 'context', :action => 'inbox_item'
 
   map.discussion_replies 'conversations/discussion_replies', :controller => 'context', :action => 'discussion_replies'
-  map.conversations_unread 'conversations/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
-  map.conversations_starred 'conversations/starred', :controller => 'conversations', :action => 'index', :scope => 'starred'
-  map.conversations_sent 'conversations/sent', :controller => 'conversations', :action => 'index', :scope => 'sent'
-  map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
+  map.conversations_unread 'conversations/unread', :controller => 'conversations', :action => 'index', :redirect_scope => 'unread'
+  map.conversations_starred 'conversations/starred', :controller => 'conversations', :action => 'index', :redirect_scope => 'starred'
+  map.conversations_sent 'conversations/sent', :controller => 'conversations', :action => 'index', :redirect_scope => 'sent'
+  map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :redirect_scope => 'archived'
   map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
   map.conversations_watched_intro 'conversations/watched_intro', :controller => 'conversations', :action => 'watched_intro', :conditions => {:method => :post}

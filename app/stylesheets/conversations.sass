@@ -168,8 +168,11 @@ body
     top: -1px
     left: 0
 
-ul.messages, ul.conversations
+ul.messages, div.conversations
   overflow: auto
+div.conversations > ul > li
+  height: 50px
+ul.messages, ul.conversations, div.conversations > ul
   list-style: none
   margin: 0
   padding: 0
@@ -234,7 +237,7 @@ ul.messages, ul.conversations
 ul.private .audience em
   display: none
 
-ul.conversations
+div.conversations > ul
   border-right: 1px solid #ddd
   background-color: #fff
   > li
@@ -463,8 +466,9 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     width: 100%
     margin: 2em 1em
     text-align: center
-  ul.conversations
+  div.conversations
     position: relative
+  div.conversations > ul
     a.details_link
       display: none
     .actions
@@ -488,7 +492,6 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     .actions:focus
       right: 17px
     .count
-      display: none
       color: #fff
       font-size: 0.9em
       position: absolute

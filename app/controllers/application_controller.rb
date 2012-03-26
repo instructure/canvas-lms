@@ -990,6 +990,11 @@ class ApplicationController < ActionController::Base
     )
   end
   helper_method :calendar_url_for, :files_url_for
+
+  def conversations_path(params={})
+    hash = params.to_json.unpack('H*').first
+    "/conversations##{hash}"
+  end
   
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")

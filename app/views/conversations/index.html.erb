@@ -20,20 +20,20 @@
         <% end %>
       </ul>
       <ul class="menus">
-        <li><a href="#" id="menu_views" class="<%= @scope %>"><%= @view_name %></a>
+        <li><a href="#" id="menu_views"></a>
           <span></span>
           <div>
             <ul class="first">
               <li><b><%= t(:inbox_view, "VIEW") %></b></li>
             </ul>
             <ul>
-              <li class="<%= 'checked' if @scope == :inbox %>"><%= link_to t('inbox_views.inbox', "Inbox"), conversations_url(:filter => params[:filter]) %></li>
-              <li class="<%= 'checked' if @scope == :unread %>"><%= link_to t('inbox_views.unread_messages', "Unread"), conversations_unread_url(:filter => params[:filter]) %></li>
-              <li class="<%= 'checked' if @scope == :starred %>"><%= link_to t('inbox_views.starred_messages', "Starred"), conversations_starred_url(:filter => params[:filter]) %></li>
-              <li class="<%= 'checked' if @scope == :sent %>"><%= link_to t('inbox_views.sent_messages', "Sent"), conversations_sent_url(:filter => params[:filter]) %></li>
+              <li data-scope="inbox"><%= link_to t('inbox_views.inbox', "Inbox"), '#' %></li>
+              <li data-scope="unread"><%= link_to t('inbox_views.unread_messages', "Unread"), '#' %></li>
+              <li data-scope="starred"><%= link_to t('inbox_views.starred_messages', "Starred"), '#' %></li>
+              <li data-scope="sent"><%= link_to t('inbox_views.sent_messages', "Sent"), '#' %></li>
             </ul>
             <ul>
-              <li class="<%= 'checked' if @scope == :archived %>"><%= link_to t('inbox_views.archived_messages', "Archived"), conversations_archived_url(:filter => params[:filter]) %></li>
+              <li data-scope="archived"><%= link_to t('inbox_views.archived_messages', "Archived"), '#' %></li>
             </ul>
             <ul class="last">
               <li><%= link_to t('inbox_views.discussion_replies', "Discussion Replies"), discussion_replies_url %></li>
@@ -41,22 +41,16 @@
           </div>
         </li>
       </ul>
-      <div id="context_tags_filter" style="<%= hidden unless @filterable %>">
+      <div id="context_tags_filter">
         <label for="context_tags">
           <%= before_label :filter, "Filter" %>
         </label>
-        <%= text_field_tag :context_tags, nil, :finder_url => conversations_find_recipients_url %>
+        <%= text_field_tag :context_tags, nil, 'data-finder_url' => conversations_find_recipients_url %>
       </div>
       <div class="clear"></div>
     </div>
-    <ul class="conversations">
-      <li id="conversations_loader" style="<%= hidden %>">
-        <%= image_tag "ajax-loader.gif" %> <%= t :loading_conversations, "Loading..." %>
-      </li>
-    </ul>
-    <p id="no_messages" style="<%= hidden %>">
-      <%= @no_messages %>
-    </p>
+    <div class="conversations"><ul></ul></div>
+    <p id="no_messages" style="display:none"></p>
   </div>
   <div id="messages">
     <div id="message_actions">
@@ -74,7 +68,7 @@
         </li>
       </ul>
       <table>
-        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
+        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, 'data-finder_url' => conversations_find_recipients_url, :class => "recipients" %></td></tr>
         <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
         <tr id="group_conversation_info"><th></th><td><%= check_box_tag :group_conversation %> <%= label_tag :group_conversation, :en => "This is a group conversation. Participants will see everyone's replies" %></td></tr>
         <tr id="user_note_info"><th></th><td><%= check_box_tag :user_note, "1", false, :id => :add_to_faculty_journal %> <%= label_tag :add_to_faculty_journal, :en => "Add as a Faculty Journal entry" %></td></tr>
@@ -117,20 +111,6 @@
   <div class="spin_holder"></div>
 </div>
 <ul style="display:none">
-  <li id="conversation_blank">
-    <%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :title => t('inbox_actions.mark_as_unread', "Mark as Unread"), :class => :action_mark_as_unread %>
-    <%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :title => t('inbox_actions.mark_as_read', "Mark as Read"), :class => :action_mark_as_read %>
-    <%= link_to t('inbox_actions.star', "Star"), conversation_url('{{ id }}', :conversation => {:starred => true}), :title =>  t('inbox_actions.star', "Star"), :class => :action_star %>
-    <%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :title => t('inbox_actions.unstar', "Unstar"), :class => :action_unstar %>
-    <span class="date"></span>
-    <img class="attachments" src="/images/messages/attach-gray.png" title="<%= t('has_attachments', 'This conversation has one or more attachments') %>">
-    <img class="media_objects" src="/images/messages/media-gray.png" title="<%= t('has_media', 'This conversation has one or more media comments') %>">
-    <span class="audience"></span>
-    <span class="count"></span>
-    <p></p>
-    <span class="actions"><a href="#" title="<%= t(:inbox_actions_description, "Actions") %>"><%= t(:inbox_actions_description, "Actions") %></a></span>
-    <a href="<%= conversation_url('{{ id }}') %>" add_url="<%= conversation_add_message_url('{{ id }}') %>" class="details_link"><%= t :read_more, "more..." %></a>
-  </li>
   <li id="message_blank" class="message">
     <span class="date"></span>
     <b class="audience"></b>
@@ -186,18 +166,18 @@
   <span></span>
   <div>
     <ul>
-      <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :id => 'action_mark_as_unread', :class => :action_mark_as_unread %></li>
-      <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => 'action_mark_as_read', :class => :action_mark_as_read %></li>
-      <li><%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :id => 'action_unstar', :class => :action_unstar %></li>
-      <li><%= link_to t('inbox_actions.star', "Star"), conversation_url('{{ id }}', :conversation => {:starred => true}), :id => 'action_star', :class => :action_star %></li>
+      <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :id => 'action_mark_as_unread', :class => :standard_action %></li>
+      <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => 'action_mark_as_read', :class => :standard_action %></li>
+      <li><%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :id => 'action_unstar', :class => :standard_action %></li>
+      <li><%= link_to t('inbox_actions.star', "Star"), conversation_url('{{ id }}', :conversation => {:starred => true}), :id => 'action_star', :class => :standard_action %></li>
     </ul>
     <ul>
-      <li><%= link_to t('inbox_actions.unsubscribe', "Unsubscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 0}), :id => :action_unsubscribe %></li>
-      <li><%= link_to t('inbox_actions.subscribe', "Subscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 1}), :id => :action_subscribe %></li>
+      <li><%= link_to t('inbox_actions.unsubscribe', "Unsubscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 0}), :id => :action_unsubscribe, :class => :standard_action %></li>
+      <li><%= link_to t('inbox_actions.subscribe', "Subscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 1}), :id => :action_subscribe, :class => :standard_action %></li>
     </ul>
     <ul>
-      <li><%= link_to t('inbox_actions.archive', "Archive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "archived"}), :id => :action_archive %></li>
-      <li><%= link_to t('inbox_actions.unarchive', "Unarchive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => :action_unarchive %></li>
+      <li><%= link_to t('inbox_actions.archive', "Archive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "archived"}), :id => :action_archive, :class => :standard_action %></li>
+      <li><%= link_to t('inbox_actions.unarchive', "Unarchive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => :action_unarchive, :class => :standard_action %></li>
       <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_url('{{ id }}'), :id => :action_delete_all %></li>
     </ul>
   </div>
@@ -207,12 +187,12 @@
   <p>
     <%= t :add_recipients_instructions, "People you add to the conversation will see all previous messages." %>
   </p>
-  <%= text_field_tag :recipients, nil, :id => 'add_recipients', :finder_url => conversations_find_recipients_url, :class => "recipients", :style => "width: 370px" %>
+  <%= text_field_tag :recipients, nil, :id => 'add_recipients', 'data-finder_url' => conversations_find_recipients_url, :class => "recipients", :style => "width: 370px" %>
 </form>
 
 <% form_tag conversations_url, :id => 'forward_message_form' do %>
   <table>
-    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
+    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, 'data-finder_url' => conversations_find_recipients_url, :class => "recipients" %></td></tr>
     <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body, nil, :id => :forward_body %></td></tr>
   </table>
   <ul class="messages"></ul>

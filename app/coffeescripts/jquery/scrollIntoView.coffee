@@ -10,7 +10,7 @@ define ['jquery'], ($) ->
     if options.ignore?.border
       elemTop += parseInt($(this[0]).css('border-top-width').replace('px', ''))
       elemBottom -= parseInt($(this[0]).css('border-bottom-width').replace('px', ''))
-    if elemTop < containerTop
+    if elemTop < containerTop or options.toTop
       $container.scrollTop(elemTop)
     else if elemBottom > containerBottom
       $container.scrollTop(elemBottom - $container.height())

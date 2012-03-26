@@ -22,30 +22,29 @@ describe "conversations sent filter" do
 
     get "/conversations/sent"
 
-    conversations = find_all_with_jquery("#conversations > ul > li:visible")
-    conversations.first.attribute('id').should eql("conversation_#{@c1.conversation_id}")
+    conversations = get_conversations
+    conversations.first.attribute('data-id').should eql(@c1.conversation_id.to_s)
     conversations.first.text.should match(/yay i sent this/)
-    conversations.last.attribute('id').should eql("conversation_#{@c2.conversation_id}")
+    conversations.last.attribute('data-id').should eql(@c2.conversation_id.to_s)
     conversations.last.text.should match(/test/)
   end
 
   it "should reorder based on last authored message" do
-    driver.find_element(:id, "conversation_#{@c2.conversation_id}").click
-    wait_for_ajaximations
+    get_conversations.last.click
+    get_messages(false)
 
     submit_message_form(:message => "qwerty")
 
-    conversations = find_all_with_jquery("#conversations > ul > li:visible")
+    conversations = get_conversations
     conversations.size.should eql 2
     conversations.first.text.should match(/qwerty/)
     conversations.last.text.should match(/yay i sent this/)
   end
 
   it "should remove the conversation when the last message by the author is deleted" do
-    driver.find_element(:id, "conversation_#{@c2.conversation_id}").click
-    wait_for_ajaximations
+    get_conversations.last.click
 
-    msgs = driver.find_elements(:css, "div#messages ul.messages > li")
+    msgs = get_messages(false)
     msgs.size.should == 2
     msgs.last.click
 
@@ -63,7 +62,7 @@ describe "conversations sent filter" do
 
     submit_message_form(:message => "ohai guys", :add_recipient => false, :group_conversation => false)
 
-    conversations = find_all_with_jquery("#conversations > ul > li:visible")
+    conversations = get_conversations
     conversations.size.should eql 3
     conversations.each do |conversation|
       conversation.text.should match(/ohai guys/)

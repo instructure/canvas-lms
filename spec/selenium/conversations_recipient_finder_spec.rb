@@ -218,12 +218,12 @@ describe "conversations recipient finder" do
   it "should allow a user id in the url hash to add recipient" do
     skip_if_ie("Java crashes")
     # check without any user_name
-    get "/conversations#/conversations?user_id=#{@s1.id}"
+    get conversations_path(:user_id => @s1.id)
     wait_for_ajaximations
     tokens.should eql ["student 1"]
     # explanation of user_name param: we used to pass the user name in the
     # hash fragment, and it was spoofable. now we load that data via ajax.
-    get "/conversations#/conversations?user_id=#{@s1.id}&user_name=some_fake_name"
+    get conversations_path(:user_id => @s1.id, :user_name => "some_fake_name")
     wait_for_ajaximations
     tokens.should eql ["student 1"]
   end
@@ -231,7 +231,7 @@ describe "conversations recipient finder" do
   it "should reject a non-contactable user id in the url hash" do
     skip_if_ie("Java crashes")
     other = User.create(:name => "other guy")
-    get "/conversations#/conversations?user_id=#{other.id}"
+    get conversations_path(:user_id => other.id)
     wait_for_ajaximations
     tokens.should eql []
   end
@@ -241,7 +241,7 @@ describe "conversations recipient finder" do
     other = User.create(:name => "other guy")
     # if the users have a conversation in common already, then the recipient can be added
     c = Conversation.initiate([@user.id, other.id], true)
-    get "/conversations#/conversations?user_id=#{other.id}&from_conversation_id=#{c.id}"
+    get conversations_path(:user_id => other.id, :from_conversation_id => c.id)
     wait_for_ajaximations
     tokens.should eql ["other guy"]
   end

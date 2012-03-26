@@ -18,7 +18,7 @@ describe "conversations submissions" do
     get "/conversations"
     elements = nil
     keep_trying_until {
-      elements = find_all_with_jquery("#conversations > ul > li:visible")
+      elements = get_conversations
       elements.size == 1
     }
     elements.first.click
