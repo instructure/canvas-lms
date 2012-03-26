@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 class TestCourseApi
   include Api::V1::Course
@@ -499,6 +500,28 @@ describe CoursesController, :type => :integration do
             { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
     json['id'].should == @course1.id
   end
+
+  context "course files" do
+    it_should_behave_like "file uploads api with folders"
+
+    def preflight(preflight_params)
+      @user = @teacher
+      api_call(:post, "/api/v1/courses/#{@course.id}/files",
+        { :controller => "courses", :action => "create_file", :format => "json", :course_id => @course.to_param, },
+        preflight_params)
+    end
+
+    def context
+      @course
+    end
+
+    it "should require the correct permission to upload" do
+      @user = student_in_course(:course => @course).user
+      api_call(:post, "/api/v1/courses/#{@course.id}/files",
+        { :controller => "courses", :action => "create_file", :format => "json", :course_id => @course.to_param, },
+        { :name => 'failboat.txt' }, {}, :expected_status => 401)
+    end
+  end
 end
 
 def each_copy_option
@@ -676,5 +699,4 @@ describe ContentImportsController, :type => :integration do
       check_counts(1, option)
     end
   end
-  
 end

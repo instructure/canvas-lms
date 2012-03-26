@@ -474,7 +474,7 @@ class FilesController < ApplicationController
     @attachment.uploaded_data = params[:file]
     if @attachment.save
       # for consistency with the s3 upload client flow, we redirect to the success url here to finish up
-      redirect_to api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid)
+      redirect_to api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => params[:on_duplicate])
     else
       render(:nothing => true, :status => :bad_request)
     end
@@ -483,6 +483,8 @@ class FilesController < ApplicationController
   def api_create_success
     @attachment = Attachment.find_by_id_and_uuid(params[:id], params[:uuid])
     return render(:nothing => true, :status => :bad_request) unless @attachment.try(:file_state) == 'deleted'
+    duplicate_handling = check_duplicate_handling_option(request)
+    return unless duplicate_handling
     if Attachment.s3_storage?
       return render(:nothing => true, :status => :bad_request) unless @attachment.state == :unattached
       details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name)
@@ -491,6 +493,7 @@ class FilesController < ApplicationController
       @attachment.file_state = 'available'
       @attachment.save!
     end
+    @attachment.handle_duplicates(duplicate_handling)
     render :json => attachment_json(@attachment)
   end
 

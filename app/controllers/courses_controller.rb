@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,7 +24,7 @@ require 'set'
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :require_pseudonym, :only => [:index]
-  before_filter :require_context, :only => [:roster, :locks, :switch_role]
+  before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
 
   include Api::V1::Course
 
@@ -149,6 +149,23 @@ class CoursesController < ApplicationController
           format.json { render :json => @course.errors.to_json, :status => :bad_request }
         end
       end
+    end
+  end
+
+  # @API
+  #
+  # Upload a file to the course.
+  #
+  # This API endpoint is the first step in uploading a file to a course.
+  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # the file upload workflow.
+  #
+  # Only those with the "Manage Files" permission on a course can upload files
+  # to the course. By default, this is Teachers, TAs and Designers.
+  def create_file
+    @attachment = Attachment.new(:context => @context)
+    if authorized_action(@attachment, @current_user, :create)
+      api_attachment_preflight(@context, request)
     end
   end
 

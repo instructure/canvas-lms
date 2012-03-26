@@ -649,6 +649,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
+      courses.post 'courses/:course_id/files', :action => :create_file
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
@@ -735,6 +736,7 @@ ActionController::Routing::Routes.draw do |map|
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
 
       users.put 'users/:id', :action => :update
+      users.post 'users/:user_id/files', :action => :create_file
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
@@ -792,14 +794,18 @@ ActionController::Routing::Routes.draw do |map|
       events.post 'calendar_events/:id/reservations/:participant_id', :action => :reserve, :path_name => 'calendar_event_reserve'
     end
 
-    api.with_options(:controller => :appointment_groups) do |groups|
-      groups.get 'appointment_groups', :action => :index, :path_name => 'appointment_groups'
-      groups.post 'appointment_groups', :action => :create
-      groups.get 'appointment_groups/:id', :action => :show, :path_name => 'appointment_group'
-      groups.put 'appointment_groups/:id', :action => :update
-      groups.delete 'appointment_groups/:id', :action => :destroy
-      groups.get 'appointment_groups/:id/users', :action => :users, :path_name => 'appointment_group_users'
-      groups.get 'appointment_groups/:id/groups', :action => :groups, :path_name => 'appointment_group_groups'
+    api.with_options(:controller => :appointment_groups) do |appt_groups|
+      appt_groups.get 'appointment_groups', :action => :index, :path_name => 'appointment_groups'
+      appt_groups.post 'appointment_groups', :action => :create
+      appt_groups.get 'appointment_groups/:id', :action => :show, :path_name => 'appointment_group'
+      appt_groups.put 'appointment_groups/:id', :action => :update
+      appt_groups.delete 'appointment_groups/:id', :action => :destroy
+      appt_groups.get 'appointment_groups/:id/users', :action => :users, :path_name => 'appointment_group_users'
+      appt_groups.get 'appointment_groups/:id/groups', :action => :groups, :path_name => 'appointment_group_groups'
+    end
+
+    api.with_options(:controller => :groups) do |groups|
+      groups.post 'groups/:group_id/files', :action => :create_file
     end
 
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'

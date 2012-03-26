@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe 'Submissions API', :type => :integration do
 
@@ -1583,83 +1584,12 @@ describe 'Submissions API', :type => :integration do
         @user = @student1
       end
 
-      it "should allow uploading files to the student's own submission (local files)" do
-        local_storage!
+      it_should_behave_like "file uploads api"
 
-        # step 1, preflight
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}/files",
+      def preflight(preflight_params)
+        api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}/files",
           { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student1.to_param },
-          { :name => "my_essay.doc" })
-        json['upload_url'].should == "http://www.example.com/files_api"
-
-        # step 2, upload
-        tmpfile = Tempfile.new(["test", ".doc"])
-        tmpfile.write("this is a test doc")
-        tmpfile.rewind
-        post_params = json["upload_params"].merge({"file" => tmpfile})
-        send_multipart(json["upload_url"], post_params)
-
-        attachment = Attachment.last(:order => :id)
-        response.should redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?uuid=#{attachment.uuid}")
-
-        # step 3, confirmation
-        post response['Location'], {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
-        response.should be_success
-        attachment.reload
-        json = json_parse(response.body)
-        json.should == {
-          'id' => attachment.id,
-          'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
-          'content-type' => attachment.content_type,
-          'display_name' => attachment.display_name,
-          'filename' => attachment.filename,
-          'size' => tmpfile.size,
-        }
-
-        attachment.context.should == @student1
-        attachment.file_state.should == 'available'
-        attachment.content_type.should == "application/msword"
-        attachment.open.read.should == "this is a test doc"
-        attachment.display_name.should == "my_essay.doc"
-      end
-
-      it "should allow uploading files to the student's own submission (s3 files)" do
-        s3_storage!
-
-        # step 1, preflight
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}/files",
-          { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student1.to_param },
-          { :name => "my_essay.doc" })
-        json['upload_url'].should == "http://no-bucket.s3.amazonaws.com/"
-        attachment = Attachment.last(:order => :id)
-        redir = json['upload_params']['success_action_redirect']
-        redir.should == "http://www.example.com/api/v1/files/#{attachment.id}/create_success?uuid=#{attachment.uuid}"
-
-        # step 2, upload
-        # we skip the actual call and stub this out, since we can't hit s3 during specs
-        AWS::S3::S3Object.expects(:about).with(attachment.full_filename, attachment.bucket_name).returns({
-          'content-type' => 'application/msword',
-          'content-length' => 1234,
-        })
-
-        # step 3, confirmation
-        post redir, {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
-        response.should be_success
-        attachment.reload
-        json = json_parse(response.body)
-        json.should == {
-          'id' => attachment.id,
-          'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
-          'content-type' => attachment.content_type,
-          'display_name' => attachment.display_name,
-          'filename' => attachment.filename,
-          'size' => 1234,
-        }
-
-        attachment.context.should == @student1
-        attachment.file_state.should == 'available'
-        attachment.content_type.should == "application/msword"
-        attachment.display_name.should == "my_essay.doc"
+          preflight_params)
       end
 
       it "should reject uploading files to other students' submissions" do

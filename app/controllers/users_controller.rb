@@ -412,6 +412,25 @@ class UsersController < ApplicationController
     render :json => { :hidden => true }
   end
 
+  # @API
+  #
+  # Upload a file to the user's personal files section.
+  #
+  # This API endpoint is the first step in uploading a file to a user's files.
+  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # the file upload workflow.
+  #
+  # Note that typically users will only be able to upload files to their
+  # own files section. Passing a user_id of +self+ is an easy shortcut
+  # to specify the current user.
+  def create_file
+    @user = api_find(User, params[:user_id])
+    @attachment = Attachment.new(:context => @user)
+    if authorized_action(@attachment, @current_user, :create)
+      api_attachment_preflight(@current_user, request)
+    end
+  end
+
   def close_notification
     @current_user.close_announcement(AccountNotification.find(params[:id]))
     render :json => @current_user.to_json

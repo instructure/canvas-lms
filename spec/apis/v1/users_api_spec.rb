@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 class TestUserApi
   include Api::V1::User
@@ -471,6 +472,27 @@ describe "Users API", :type => :integration do
         })
         response.code.should eql '401'
       end
+    end
+  end
+
+  context "user files" do
+    it_should_behave_like "file uploads api with folders"
+
+    def preflight(preflight_params)
+      api_call(:post, "/api/v1/users/self/files",
+        { :controller => "users", :action => "create_file", :format => "json", :user_id => 'self', },
+        preflight_params)
+    end
+
+    def context
+      @user
+    end
+
+    it "should not allow uploading to other users" do
+      user2 = User.create!
+      api_call(:post, "/api/v1/users/#{user2.id}/files",
+        { :controller => "users", :action => "create_file", :format => "json", :user_id => user2.to_param, },
+        { :name => "my_essay.doc" }, {}, :expected_status => 401)
     end
   end
 end
