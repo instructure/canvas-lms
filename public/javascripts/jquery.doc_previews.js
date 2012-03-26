@@ -20,11 +20,12 @@ define([
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
   'vendor/scribd.view' /* scribd */,
+  'str/htmlEscape' /* htmlEscape, /\$\.h/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.google-analytics' /* trackEvent */,
   'jquery.instructure_misc_helpers' /* uniqueId, /\$\.uniq/, capitalize */,
   'jquery.loadingImg' /* loadingImage */
-], function(INST, I18n, $, scribd) {
+], function(INST, I18n, $, scribd, htmlEscape) {
 
   // first element in array is if scribd can handle it, second is if google can.
   var previewableMimeTypes = {
