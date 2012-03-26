@@ -71,9 +71,6 @@ class DiscussionTopicsApiController < ApplicationController
     return unless authorized_action(@topic, @current_user, :read)
     structure, participant_ids, entry_ids = @topic.materialized_view
     if structure
-      if @topic.initial_post_required?(@current_user, @context_enrollment, session) || @topic.for_group_assignment?
-        structure, participant_ids, entry_ids = "[]", [], []
-      end
       participant_info = User.find(participant_ids).map do |user|
         { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => polymorphic_url([@context, user]) }
       end
@@ -296,7 +293,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries?id[]=1&id[]=2&id[]=3' \ 
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entry_list?ids[]=1&ids[]=2&ids[]=3' \ 
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
