@@ -271,6 +271,7 @@ class CoursesController < ApplicationController
   #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null, 'sis_login_id': null },
   #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis' } ]
   def students
+    # DEPRECATED. #users should replace this in a new version of the API.
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       proxy = @context.students
@@ -281,6 +282,54 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API
+  # Returns the list of users in this course. And optionally the user's enrollments
+  #   in the course.
+  #
+  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   When set, only return users where the user is enrolled as this type.
+  #
+  # @argument include[] ["email"] Optional user email.
+  # @argument include[] ["enrollments"] Optionally include with each Course the
+  #   user's current and invited enrollments.
+  # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
+  #
+  # @response_field id The unique identifier for the user.
+  # @response_field name The full user name.
+  # @response_field sortable_name The sortable user name.
+  # @response_field short_name The short user name.
+  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
+  #
+  # @response_field enrollments The user's enrollments in this course.
+  #   See the API documentation for enrollment data returned; however, the user data is not included.
+  #
+  # @example_response
+  #   [ { 'id': 1, 'name': 'first user', 'sis_user_id': null, 'sis_login_id': null,
+  #       'enrollments': [ ... ] },
+  #     { 'id': 2, 'name': 'second user', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis',
+  #       'enrollments': [ ... ] }]
+  def users
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      enrollment_type = "#{params[:enrollment_type].capitalize}Enrollment" if params[:enrollment_type]
+      users = (enrollment_type ?
+               @context.users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) :
+               @context.users)
+      if user_json_is_admin?
+        users = users.scoped(:include => {:pseudonym => :communication_channel})
+      end
+      users = Api.paginate(users, self, api_v1_course_users_path)
+      includes = Array(params[:include])
+      if includes.include?('enrollments')
+        User.send(:preload_associations, users, :current_and_invited_enrollments,
+                  :conditions => ['enrollments.course_id = ?', @context.id])
+      end
+      render :json => users.uniq.map { |u|
+        enrollments = u.current_and_invited_enrollments if includes.include?('enrollments')
+        user_json(u, @current_user, session, includes, @context, enrollments)
+      }
+    end
+  end
 
   include Api::V1::StreamItem
   # @API

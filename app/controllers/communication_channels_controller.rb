@@ -215,6 +215,7 @@ class CommunicationChannelsController < ApplicationController
     end
   end
 
+  # params[:enrollment_id] is optional
   def re_send_confirmation
     @user = User.find(params[:user_id])
     @enrollment = params[:enrollment_id] && @user.enrollments.find(params[:enrollment_id])
