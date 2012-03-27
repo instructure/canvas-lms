@@ -49,8 +49,9 @@ define ['use!backbone', 'use!underscore'], (Backbone, _) ->
         if typeof methodName is 'string'
           set methodName
         else # config object
+          set methodName.name
           eventName = _.map(methodName.deps, (name) -> "change:#{name}").join ' '
-          @bind eventName, -> set methodName
+          @bind eventName, -> set methodName.name
 
   Backbone.Model
 
