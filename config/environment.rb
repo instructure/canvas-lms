@@ -77,8 +77,8 @@ Rails::Initializer.run do |config|
   config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
   config.to_prepare do
     require_dependency 'canvas/plugins/default_plugins'
+    ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
   end
-
 end
 
 # Extend any base classes, even gem classes
