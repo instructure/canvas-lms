@@ -37,6 +37,9 @@ define [
 
       # overwrite cid so Reply::getModelAttributes gets the right "go to parent" link
       @model.cid = 'main'
+
+      @model.set 'canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
+
       @render()
       @initEntries() unless ENV.DISCUSSION.INITIAL_POST_REQUIRED
 
