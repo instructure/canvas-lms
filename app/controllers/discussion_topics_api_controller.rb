@@ -27,14 +27,14 @@ class DiscussionTopicsApiController < ApplicationController
   before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread]
 
   # @API
-  # Return a summary structure of the discussion topic, containing all entries,
-  # their authors, and a summarized version of their message bodies.
+  # Return a cached structure of the discussion topic, containing all entries,
+  # their authors, and their message bodies.
   #
   # May require (depending on the topic) that the user has posted in the topic.
   # If it is required, and the user has not posted, will respond with a 403
   # Forbidden status and the body 'require_initial_post'.
   #
-  # In some rare situations, this summary structure may not be available yet. In
+  # In some rare situations, this cached structure may not be available yet. In
   # that case, the server will respond with a 503 error, and the caller should
   # try again soon.
   #
@@ -45,8 +45,7 @@ class DiscussionTopicsApiController < ApplicationController
   # * "unread_entries": a list of entry ids that are unread by the current
   #   user. this implies that any entry not in this list is read.
   # * "view": a threaded view of all the entries in the discussion, containing
-  #   the id, user_id, and summary of the message. to get the full message text,
-  #   use the other discussion api calls.
+  #   the id, user_id, and message.
   #
   # @example_request
   #
@@ -61,11 +60,11 @@ class DiscussionTopicsApiController < ApplicationController
   #       { "id": 11, "display_name": "user 2", "avatar_url": "https://..." }
   #     ],
   #     "view": [
-  #       { "id": 1, "user_id": 10, "parent_id": null, "summary": "...html text...", "replies": [
-  #         { "id": 3, "user_id": 11, "parent_id": 1, "summary": "...html....", "replies": [...] }
+  #       { "id": 1, "user_id": 10, "parent_id": null, "message": "...html text...", "replies": [
+  #         { "id": 3, "user_id": 11, "parent_id": 1, "message": "...html....", "replies": [...] }
   #       ]},
-  #       { "id": 2, "user_id": 11, "parent_id": null, "summary": "...html..." },
-  #       { "id": 4, "user_id": 10, "parent_id": null, "summary": "...html..." }
+  #       { "id": 2, "user_id": 11, "parent_id": null, "message": "...html..." },
+  #       { "id": 4, "user_id": 10, "parent_id": null, "message": "...html..." }
   #     ]
   #   }
   def view
@@ -189,7 +188,7 @@ class DiscussionTopicsApiController < ApplicationController
   def entries
     if authorized_action(@topic, @current_user, :read)
       @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_path(@topic))
-      render :json => discussion_entry_api_json(@entries, @context, @current_user, session, true)
+      render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
     end
   end
 
@@ -266,7 +265,7 @@ class DiscussionTopicsApiController < ApplicationController
     @parent = root_entries(@topic).find(params[:entry_id])
     if authorized_action(@topic, @current_user, :read)
       @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_path(@parent))
-      render :json => discussion_entry_api_json(@replies, @context, @current_user, session, true)
+      render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
     end
   end
 
@@ -311,7 +310,7 @@ class DiscussionTopicsApiController < ApplicationController
       ids = Array(params[:ids])
       entries = @topic.discussion_entries.find(ids, :order => :id)
       @entries = Api.paginate(entries, self, entry_pagination_path(@topic))
-      render :json => discussion_entry_api_json(@entries, @context, @current_user, session, false)
+      render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [])
     end
   end
 
@@ -453,7 +452,7 @@ class DiscussionTopicsApiController < ApplicationController
         @entry.attachment = @attachment
         @entry.save
       end
-      render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first, :status => :created
+      render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first, :status => :created
     else
       render :json => @entry.errors, :status => :bad_request
     end

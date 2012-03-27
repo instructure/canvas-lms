@@ -68,12 +68,16 @@ describe DiscussionTopic::MaterializedView do
     json.size.should == 2
     json.map { |e| e['id'] }.should == [@root1.id, @root2.id]
     json.map { |e| e['parent_id'] }.should == [nil, nil]
-    json.map { |e| e['summary'] }.should == ['root1', 'root2']
     deleted = json[0]['replies'][0]
     deleted['deleted'].should == true
     deleted['user_id'].should be_nil
-    deleted['summary'].should be_nil
+    deleted['message'].should be_nil
     json[0]['replies'][1]['replies'][0]['attachment']['url'].should == "http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+    # verify the api_user_content functionality in a non-request context
+    html_message = json[0]['replies'][1]['message']
+    html = Nokogiri::HTML::DocumentFragment.parse(html_message)
+    html.at_css('a')['href'].should == "http://localhost/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}"
+    html.at_css('video')['src'].should == "http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&redirect=1&type=mp4"
 
     # the deleted entry will be marked deleted and have no summary
     simple_json = map_to_ids_and_replies(json)
