@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'use!underscore'
   'compiled/backbone-ext/Backbone'
   'compiled/util/backbone.multipart.sync'
   'jquery.ajaxJSON'
-], (_, Backbone) ->
+], ($, _, Backbone) ->
 
   ##
   # Model representing an entry in discussion topic
@@ -16,7 +17,6 @@ define [
 
       id: null
       parent_id: null
-      summary: null
       message: null
       user_id: null
       read_state: 'read'
@@ -36,7 +36,8 @@ define [
       parent_cid: null
 
       # Change this to toggle between collapsed and expanded views
-      collapsedView: true
+      # false because we expand everything on load
+      collapsedView: false
 
       canAttach: ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
 
@@ -48,8 +49,8 @@ define [
       'author'
       'editor'
       'canModerate'
-      # TODO: put depth back into the response and get rid of this
       { name: 'canReply', deps: ['parent_id'] }
+      { name: 'summary', deps: ['message'] }
     ]
 
     ##
@@ -59,8 +60,8 @@ define [
      "#{ENV.DISCUSSION.ENTRY_ROOT_URL}?ids[]=#{@get 'id'}"
 
     create: ->
-      parentId = @get('parent_id')
-      if not parentId # i.e. top-level
+      parentId = @get 'parent_id'
+      if parentId is null # i.e. top-level
         ENV.DISCUSSION.ROOT_REPLY_URL
       else
         ENV.DISCUSSION.REPLY_URL.replace /:entry_id/, parentId
@@ -112,6 +113,12 @@ define [
       editor_id = @get 'editor_id'
       return unless editor_id
       DISCUSSION.participants.get(editor_id).toJSON()
+
+    ##
+    # Computed attribute
+    summary: ->
+      @escapeDiv ||= $('<div/>')
+      @escapeDiv.html(@get('message')).text()
 
     ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON
