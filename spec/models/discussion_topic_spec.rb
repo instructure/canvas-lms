@@ -437,6 +437,15 @@ describe DiscussionTopic do
       @topic.posters.should include(@student)
       @topic.posters.size.should == 2
     end
+
+    it "should not include topic author if she is no longer enrolled in the course" do
+      student_in_course(:active_all => true)
+      @topic2 = @course.discussion_topics.create!(:title => "student topic", :message => "I'm outta here", :user => @student)
+      @entry = @topic2.discussion_entries.create!(:message => "go away", :user => @teacher)
+      @topic2.posters.map(&:id).sort.should eql [@student.id, @teacher.id].sort
+      @student.enrollments.first.destroy
+      @topic2.posters.map(&:id).sort.should eql [@teacher.id].sort
+    end
   end
 
   context "submissions when graded" do
@@ -460,20 +469,23 @@ describe DiscussionTopic do
     end
 
     it "should not re-flag graded discussion as needs grading if student make another comment" do
-      pending('bug 6273 - do not re-flag graded discussion as needs grading if student make another comment') do
-        student_enrollment = student_in_course(:name => 'student in course')
-        student = student_enrollment.user
-        assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
-        topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
-        topic.discussion_entries.create!(:message => "student message for grading", :user => student)
-        student_submission = Submission.last
-        student_submission.assignment.grade_student(student, {:grade => 9})
-        student_submission.reload
-        student_submission.workflow_state.should == 'graded'
-        topic.discussion_entries.create!(:message => "student message 2 for grading", :user => student)
-        student_submission.reload
-        student_submission.workflow_state.should == 'graded'
-      end
+      student_in_course(:name => 'student in course')
+      assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
+      topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
+      topic.discussion_entries.create!(:message => "student message for grading", :user => @student)
+
+      submissions = Submission.find_all_by_user_id_and_assignment_id(@student.id, assignment.id)
+      submissions.count.should == 1
+      student_submission = submissions.first
+      assignment.grade_student(@student, {:grade => 9})
+      student_submission.reload
+      student_submission.workflow_state.should == 'graded'
+
+      topic.discussion_entries.create!(:message => "student message 2 for grading", :user => @student)
+      submissions = Submission.find_all_by_user_id_and_assignment_id(@student.id, assignment.id)
+      submissions.count.should == 1
+      student_submission = submissions.first
+      student_submission.workflow_state.should == 'graded'
     end
 
     it "should create submissions for existing entries when setting the assignment" do
@@ -574,6 +586,25 @@ describe DiscussionTopic do
       @student.submissions.size.should == 1
       @student.submissions.first.id.should == @existing_submission_id
     end
+
+    it "should not resubmit graded discussion submissions" do
+      @student = student_in_course(:active_all => true).user
+
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.save!
+      @topic.reload
+
+      @topic.reply_from(:user => @student, :text => "entry")
+      @student.reload
+
+      @assignment.grade_student(@student, :grade => 1)
+      @submission = Submission.find(:first, :conditions => {:user_id => @student.id, :assignment_id => @assignment.id})
+      @submission.workflow_state.should == 'graded'
+
+      @topic.ensure_submission(@student)
+      @submission.reload.workflow_state.should == 'graded'
+    end
   end
 
   context "read/unread state" do
@@ -632,12 +663,39 @@ describe DiscussionTopic do
       DiscussionTopic.expects(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
     end
+  end
 
-    it "should use active entries as deafult unread count" do
-      @entry1 = @topic.discussion_entries.create!(:message => "HI 1", :user => @teacher)
-      @entry2 = @topic.discussion_entries.create!(:message => "HI 2", :user => @teacher)
-      @entry2.destroy
-      @topic.unread_count(@student).should == 1
+  context "materialized view" do
+    before do
+      topic_with_nested_replies
+    end
+
+    it "should return nil if the view has not been built yet, and schedule a job" do
+      DiscussionTopic::MaterializedView.for(@topic).destroy
+      @topic.materialized_view.should be_nil
+      @topic.materialized_view.should be_nil
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+    end
+
+    it "should return the materialized view if it's up to date" do
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
+      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array]
+    end
+
+    it "should update the materialized view on new entry" do
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      @topic.reply_from(:user => @user, :text => "ohai")
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+    end
+
+    it "should update the materialized view on edited entry" do
+      reply = @topic.reply_from(:user => @user, :text => "ohai")
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      reply.update_attributes(:message => "i got that wrong before")
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
     end
   end
 end

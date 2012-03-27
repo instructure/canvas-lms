@@ -258,6 +258,7 @@
   INST = <%= raw(inst_env.to_json) %>;
   ENV = <%= raw js_env.to_json %>;
 
+  // TODO: move this out when we have a single require call
   require = {
     translate: <%= use_optimized_js? %>,
     baseUrl: '<%= js_base_url %>',
@@ -265,7 +266,19 @@
       common: 'compiled/bundles/common',
       jquery: 'vendor/jquery-1.6.4',
       jqueryui: 'vendor/jqueryui',
-      uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4'
+      underscore: 'vendor/underscore',
+      backbone: 'vendor/backbone',
+      uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
+      use: 'vendor/use'
+    },
+    use: {
+      backbone: {
+        deps: ['use!underscore', 'jquery'],
+        attach: 'Backbone'
+      },
+      underscore: {
+        attach: '_'
+      }
     }
   };
 </script>

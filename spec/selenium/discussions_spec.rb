@@ -3,8 +3,27 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "discussions" do
   it_should_behave_like "in-process server selenium tests"
 
-  context "discussions as a teacher" do
+  def create_and_go_to_topic
+    topic = @course.discussion_topics.create!
+    get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+    wait_for_ajax_requests
+  end
 
+  def add_reply(message = 'message!')
+    @last_entry ||= f('#discussion_topic')
+    @last_entry.find_element(:css, '.discussion-reply-label').click
+    type_in_tiny 'textarea', message
+    f('.discussion-reply-form').submit
+    wait_for_ajax_requests
+    id = DiscussionEntry.last.id
+    @last_entry = fj ".entry[data-id=#{id}]"
+  end
+
+  def get_all_replies
+    ff('#discussion_subentries .discussion_entry')
+  end
+
+  context "discussions as a teacher" do
     before (:each) do
       course_with_teacher_logged_in
     end
@@ -48,11 +67,10 @@ describe "discussions" do
     end
 
     it "should work with graded assignments and pageless" do
-
       get "/courses/#{@course.id}/discussion_topics"
+
       # create some topics. 11 is enough to trigger pageless with default value
       # of 10 per page
-
       driver.find_element(:css, '.add_topic_link').click
       type_in_tiny('#topic_content_topic_new', 'asdf')
       driver.find_element(:css, '.more_options_link').click
@@ -115,28 +133,15 @@ describe "discussions" do
 
       driver.find_element(:css, '.discussion_topic .podcast img').click
       wait_for_animations
-      driver.find_element(:css, '#podcast_link_holder .feed').should be_displayed
-
+      driver.find_element(:css, '.feed').should be_displayed
     end
 
-    it "should display the current username when making a side comment" do
-      topic = @course.discussion_topics.create!
-      entry = topic.discussion_entries.create!
-
-      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
-
-      form = keep_trying_until {
-        find_with_jquery('.communication_sub_message .add_entry_link:visible').click
-        find_with_jquery('.add_sub_message_form:visible')
-      }
-
-      type_in_tiny '.add_sub_message_form:visible textarea', "My side comment!"
-      form.submit
-      wait_for_ajaximations
-
-      entry.discussion_subentries.should_not be_empty
-
-      find_with_jquery(".communication_sub_message:visible .user_name").text.should == @user.name
+    it "should display the current username when adding a reply" do
+      create_and_go_to_topic
+      get_all_replies.count.should == 0
+      add_reply
+      get_all_replies.count.should == 1
+      @last_entry.find_element(:css, '.author').text.should == @user.name
     end
   end
 
@@ -153,27 +158,24 @@ describe "discussions" do
       new_student_entry_text = 'new student entry'
       user_session(@student)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-
-      driver.find_element(:id, 'topic_list').should include_text('new topic from teacher')
-      driver.find_element(:id, 'content').should_not include_text(new_student_entry_text)
-      driver.find_element(:id, 'add_entry_bottom').click
-      type_in_tiny('textarea.entry_content_new', new_student_entry_text)
-      driver.find_element(:id, 'add_entry_form_entry_new').submit
-      wait_for_ajaximations
-      driver.find_element(:id, 'content').should include_text(new_student_entry_text)
+      f('.message_wrapper').should include_text('new topic from teacher')
+      f('#content').should_not include_text(new_student_entry_text)
+      add_reply new_student_entry_text
+      f('#content').should include_text(new_student_entry_text)
     end
 
     it "should reply as a student and validate teacher can see reply" do
+      pending "figure out delayed jobs"
       user_session(@teacher)
       entry = @topic.discussion_entries.create!(:user => @student, :message => 'new entry from student')
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-
-      driver.find_element(:id, "entry_#{entry.id}").should include_text('new entry from student')
+      fj("[data-id=#{entry.id}]").should include_text('new entry from student')
     end
   end
 
   context "marking as read" do
     it "should mark things as read" do
+      pending "figure out delayed jobs"
       reply_count = 3
       course_with_teacher_logged_in
       @topic = @course.discussion_topics.create!

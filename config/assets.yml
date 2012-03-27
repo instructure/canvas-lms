@@ -3,6 +3,13 @@ gzip_assets: off
 css_compressor_options:
   line_break: 0
 
+# if you want use IE in dev mode and want to get around the max of 30 stylesheets
+# problem, uncomment the following lines and make sure you
+# rm -rf public/assets after you make any changes to css
+# package_assets: always
+# compress_assets: off
+
+
 <%=
   # pull in the bundles from the various plugins' config/assets.yml extension
   # files and combine them under a plugins.<plugin> dictionary. so e.g. the
@@ -145,6 +152,9 @@ stylesheets:
     - public/stylesheets/compiled/course_settings.css
     - public/stylesheets/compiled/external_tools.css
     - public/stylesheets/compiled/grading_standards.css
+  discussions:
+    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/discussions.css
   full_files:
     - public/stylesheets/compiled/full_files.css
   datagrid:

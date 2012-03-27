@@ -1,0 +1,164 @@
+define [
+  'use!underscore'
+  'jquery'
+  'compiled/backbone-ext/Backbone'
+  'compiled/discussions/EntryCollection'
+  'compiled/discussions/EntryCollectionView'
+  'compiled/discussions/EntryView'
+  'compiled/discussions/ParticipantCollection'
+  'compiled/discussions/MarkAsReadWatcher'
+  'jst/discussions/_reply_form'
+  'vendor/ui.selectmenu'
+], (_, $, Backbone, EntryCollection, EntryCollectionView, EntryView, ParticipantCollection, MarkAsReadWatcher, template, replyForm) ->
+
+  ##
+  # View for all of the entries in a topic. TODO: There is some overlap and
+  # role confusion between this and TopicView, potential refactor to make
+  # their roles clearer (for starters, the Topic model should probably be
+  # fetched by the TopicView).
+  #
+  # events: `onFetchSucess` - Called when the model is successfully fetched
+  #
+  class EntriesView extends Backbone.View
+
+    events:
+
+      ##
+      # Catch-all for delegating entry click events in this view instead
+      # of delegating events in every entry view. This way we have one
+      # event listener instead of several hundred.
+      #
+      # Instead of the usual backbone pattern of adding events to delegate
+      # in EntryView, add the `data-event` attribute to elements in the
+      # view and the method defined will be called on the appropriate
+      # EntryView instance.
+      #
+      # ex:
+      #
+      #    <div data-event="someMethod">
+      #      click to call someMethod on an EntryView instance
+      #   </div>
+      #
+      'click .entry [data-event]': 'handleEntryEvent'
+
+    ##
+    # Initializes a new EntryView
+    initialize: ->
+      @$el = $ '#discussion_subentries'
+
+      @participants = new ParticipantCollection
+      @model.bind 'change:participants', @initParticipants
+
+      @collection = new EntryCollection
+      @model.bind 'change:view', @initEntries
+
+      MarkAsReadWatcher.on 'markAsRead', @onMarkAsRead
+
+      # kicks it all off
+      @model.fetch success: @onFetchSuccess
+
+    ##
+    # Initializes all the entries
+    #
+    # @api private
+    initEntries: (thisView, entries) =>
+      @collectionView = new EntryCollectionView @$el, @collection
+      @collection.reset entries
+      MarkAsReadWatcher.init()
+      @setUnreadEntries()
+
+    ##
+    # We don't get the unread state with the initial models, but we do get
+    # a list of ids for the unread entries. This fills in the gap
+    #
+    # @api private
+    setUnreadEntries: ->
+      unread_entries = @model.get 'unread_entries'
+      _.each unread_entries, (id) ->
+        EntryView.instances[id].model.set 'read_state', 'unread'
+
+    ##
+    # Initializes the participants. This collection is used as a data lookup
+    # when since the user information is not stored on the Entry
+    #
+    # @api private
+    initParticipants: (thisView, participants) =>
+      @participants.reset participants
+
+    ##
+    # Event listener for MarkAsReadWatcher. Whenever an entry is marked as read
+    # we remove the entry id from the unread_entries attribute of @model.
+    #
+    # @api private
+    onMarkAsRead: (entry) =>
+      unread = @model.get 'unread_entries'
+      id = entry.get 'id'
+      @model.set 'unread_entries', _.without(unread, id)
+
+    ##
+    # Called when the Topic model is successfully returned from the server,
+    # triggers `fetchSuccess` so other objects can wait.
+    #
+    # @api private
+    onFetchSuccess: =>
+      @fetchUnread()
+      @model.trigger 'fetchSuccess', @model
+
+    ##
+    # We auto-expand the unread messages. After `onFetchSuccess` is called, we
+    # fire of another request to get the full messages for the unread entries
+    # (the initial data doesn't contain the full message body).
+    #
+    # TODO: Refactor this out and create a method like Entry.fetchAllByIDs(ids)
+    # that handles the pagination and is a clean way to get an arbitrary number
+    # of full Entry models from the server.
+    #
+    # @api private
+    fetchUnread: ->
+
+      # how many models to fetch
+      perPage = 50
+
+      # finds an EntryView instance by ID to reset the model's attrs
+      setAttributes = (attributes) ->
+        attributes.collapsedView = false unless attributes.deleted
+        view = EntryView.instances[attributes.id]
+        view.model.set attributes
+
+      # fetches one page of unread entries
+      fetchPage = (ids) ->
+        ids = _.map(ids, (id) -> "ids[]=#{id}").join '&'
+        url = "#{ENV.DISCUSSION.ENTRY_ROOT_URL}?per_page=#{perPage}&#{ids}"
+        $.getJSON url, (data) ->
+          _.each data, setAttributes
+          # manually fire when a new page shows up, otherwise it has to wait for
+          # window scroll or resize
+          MarkAsReadWatcher.checkForVisibleEntries()
+
+      # paginate the ids
+      ids = _.clone @model.get('unread_entries')
+      pages = (ids.splice(0, perPage) while ids.length > 0)
+
+      # go get 'em
+      fetchPage page for page in pages
+
+    ##
+    # Routes events to the appropriate EntryView instance. See comments in
+    # `events` block of this file.
+    #
+    # @api private
+    handleEntryEvent: (event) ->
+      # get the element and the method to call
+      el = $ event.currentTarget
+      method = el.data 'event'
+
+      # get the EntryView instance ID
+      modelEl = el.parents ".#{EntryView::className}:first"
+      id = modelEl.data 'id'
+
+      # call the method from the EntryView, sets the context to the view
+      # so you can access everything in the method like it was called
+      # from a normal backbone event
+      instance = EntryView.instances[id]
+      instance[method].call instance, event, el
+
