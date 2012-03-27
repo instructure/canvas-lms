@@ -20,9 +20,11 @@ define [
 
   class BackoffPoller
     constructor: (@url, @handler, opts={}) ->
-      @baseInterval = opts.baseInterval ? 1000
+      @baseInterval  = opts.baseInterval  ? 1000
       @backoffFactor = opts.backoffFactor ? 1.5
-      @maxAttempts = opts.maxAttempts ? 8
+      @maxAttempts   = opts.maxAttempts   ? 8
+      @handleErrors  = opts.handleErrors  ? false
+      @initialDelay  = opts.initialDelay  ? true
 
     start: ->
       if @running
@@ -45,28 +47,33 @@ define [
       callback() for callback in @callbacks if success and @callbacks
       delete @callbacks
 
-    poll: ->
+    poll: =>
       @running = true
       @attempts++
-      jQuery.ajaxJSON @url, 'GET', {}, (data) =>
-        switch @handler(data)
-          when 'continue'
-            @nextPoll()
-          when 'reset'
-            @nextPoll(true)
-          when 'stop'
-            @stop(true)
-          else
-            @stop()
-      , (data) =>
-        @stop()
+      jQuery.ajaxJSON @url, 'GET', {}, @handle, (data, xhr) =>
+        if @handleErrors
+          @handle(data, xhr)
+        else
+          @stop()
+
+    handle: (data, xhr) =>
+      switch @handler(data, xhr)
+        when 'continue'
+          @nextPoll()
+        when 'reset'
+          @nextPoll(true)
+        when 'stop'
+          @stop(true)
+        else
+          @stop()
 
     nextPoll: (reset=false) ->
       if reset
         @reset()
+        return @poll() if not @initialDelay
       else
         @nextInterval = parseInt(@nextInterval * @backoffFactor)
       return @stop() if @attempts > @maxAttempts
 
-      @running = setTimeout jQuery.proxy(@poll, this), @nextInterval
+      @running = setTimeout @poll, @nextInterval
 
