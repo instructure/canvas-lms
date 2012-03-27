@@ -169,10 +169,6 @@ define([
           I18n.t('add_new_topic', "Add New Topic");
         $form.attr('method', "POST");
         $form.attr('action', $("#topic_urls .add_topic_url").attr('href'));
-      } else {
-        if (data.threaded == '1') {
-          $form.find('input[name="discussion_topic[threaded]"]').prop('disabled', true);
-        }
       }
       $form.fillFormData(data, {object_name: "discussion_topic"});
       $form.find(".is_announcement").change();

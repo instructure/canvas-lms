@@ -79,7 +79,6 @@ class DiscussionTopic < ActiveRecord::Base
         self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
       end
     end
-    self.threaded = true if self.threaded_was # can't un-set it once set
   end
   protected :default_values
 
