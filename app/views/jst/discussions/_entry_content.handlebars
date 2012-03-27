@@ -22,13 +22,10 @@
     <div class="discussion-header-right">
       <div class="discussion-pubdate">{{friendlyDatetime updated_at pubdate=true}}</div>
     </div>
-    <h1 class="discussion-title">
-      <a class="show-if-collapsed summary ellipsis">{{summary}}</a>
-      <a class="hide-if-collapsed author" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author.url}} href="{{author.url}}" {{/if}} class="author">{{author.display_name}}</a>
-    </h1>
-    <h2 class="show-if-collapsed discussion-subtitle">
-      <a title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author.url}} href="{{author.url}}" {{/if}} class="author">{{author.display_name}}</a>
+    <h2 class="discussion-title">
+      <a class="author" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author.url}} href="{{author.url}}" {{/if}} class="author">{{author.display_name}}</a>
     </h2>
+    <h1 class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</h1>
   </div>
 </header>
 <div class="discussion-section hide-if-collapsed message_wrapper">
