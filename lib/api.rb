@@ -214,11 +214,15 @@ module Api
   def api_user_content(html, context = @context, user = @current_user)
     return html if html.blank?
 
+    # if we're a controller, use the host of the request, otherwise let HostUrl
+    # figure out what host is appropriate
+    host = HostUrl.context_host(context, @account_domain) unless self.is_a?(ApplicationController)
+
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
       obj = match.obj_class.find_by_id(match.obj_id)
       next unless obj && rewriter.user_can_view_content?(obj)
-      file_download_url(obj.id, :verifier => obj.uuid, :download => '1')
+      file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host)
     end
     html = rewriter.translate_content(html)
 
@@ -229,8 +233,8 @@ module Api
     doc.css('a.instructure_inline_media_comment').each do |anchor|
       media_id = anchor['id'].try(:gsub, /^media_comment_/, '')
       next if media_id.blank?
-      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1')
-      thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3)
+      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1', :host => host)
+      thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host)
       video_node = Nokogiri::XML::Node.new('video', doc)
       video_node['controls'] = 'controls'
       video_node['poster'] = thumbnail
