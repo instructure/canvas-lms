@@ -24,6 +24,7 @@ class FilesController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => :api_create
 
   include Api::V1::Attachment
+  include Api::V1::Avatar
 
   before_filter { |c| c.active_tab = "files" }
 
@@ -496,8 +497,6 @@ class FilesController < ApplicationController
     render :json => attachment_json(@attachment)
   end
 
-  # POST /files
-  # POST /files.xml
   def create
     if (folder_id = params[:attachment].delete(:folder_id)) && folder_id.present?
       @folder = @context.folders.active.find_by_id(folder_id)
@@ -555,12 +554,28 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
           format.json do
-            render :json => { :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false),
-                   :as_text => true
+            json = { :attachment => @attachment,
+              :deleted_attachment_ids => deleted_attachments.map(&:id) }
+            if @folder.name == 'profile pictures'
+              json[:avatar] = avatar_json(@current_user, @attachment, { :type => 'attachment' })
+            end
+
+            render :json => json.to_json(:allow => :uuid,
+              :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
+              :permissions => {:user => @current_user, :session => session}, :include_root => false,
+              :as_text => true)
           end
           format.text do
-            render :json => { :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false),
-                   :as_text => true
+            json = { :attachment => @attachment,
+              :deleted_attachment_ids => deleted_attachments.map(&:id) }
+            if @folder.name == 'profile pictures'
+              json[:avatar] = avatar_json(@current_user, @attachment, { :type => 'attachment' })
+            end
+
+            render :json => json.to_json(:allow => :uuid,
+              :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
+              :permissions => {:user => @current_user, :session => session}, :include_root => false,
+              :as_text => true)
           end
         else
           format.html { render :action => "new" }

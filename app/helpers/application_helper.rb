@@ -153,7 +153,7 @@ module ApplicationHelper
     if session["reported_#{user_id}"]
       image_tag "messages/avatar-50.png"
     else
-      image_tag(avatar_image_url(User.avatar_key(user_id || 0)), :style => "height: #{height}px; max-width: #{height}px;", :alt => '')
+      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "height: #{height}px; max-width: #{height}px;", :alt => '')
     end
   end
 

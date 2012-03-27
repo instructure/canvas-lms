@@ -881,7 +881,10 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages
+    can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar
+
+    given { |user| user == self && user.user_can_edit_name? }
+    can :rename
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
@@ -916,7 +919,7 @@ class User < ActiveRecord::Base
         self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
       )
     end
-    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :read
+    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read
 
     given do |user|
       user && (
@@ -1084,9 +1087,9 @@ class User < ActiveRecord::Base
           self.avatar_state = 'submitted'
         end
       end
-    elsif val['type'] == 'attachment' && val['url'] && val['url'].match(/\A\/images\/thumbnails\//)
-      self.avatar_image_url = val['url']
+    elsif val['type'] == 'attachment' && val['url']
       self.avatar_image_source = 'attachment'
+      self.avatar_image_url = val['url']
       self.avatar_image_updated_at = Time.now
       self.avatar_state = 'submitted'
     end
@@ -1116,7 +1119,7 @@ class User < ActiveRecord::Base
         self.avatar_image_source = 'no_pic'
         self.avatar_image_updated_at = Time.now
       end
-      write_attribute(:avatar_state, val)
+      write_attribute(:avatar_state, val.to_s)
     end
   end
 

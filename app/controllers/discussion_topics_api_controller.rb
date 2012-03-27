@@ -399,7 +399,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ \ 
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ 
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>"\ 
   #        -H "Content-Length: 0"

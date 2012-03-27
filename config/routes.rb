@@ -470,7 +470,7 @@ ActionController::Routing::Routes.draw do |map|
     add_question_banks(account)
     account.resources :user_lists, :only => :create
   end
-  map.avatar_image 'images/users/:user_id', :controller => 'users', :action => 'avatar_image_url', :conditions => {:method => :get}
+  map.avatar_image 'images/users/:user_id', :controller => 'users', :action => 'avatar_image', :conditions => {:method => :get}
   map.thumbnail_image 'images/thumbnails/:id/:uuid', :controller => 'files', :action => 'image_thumbnail'
   map.show_thumbnail_image 'images/thumbnails/show/:id/:uuid', :controller => 'files', :action => 'show_thumbnail'
   map.report_avatar_image 'images/users/:user_id/report', :controller => 'users', :action => 'report_avatar_image', :conditions => {:method => :post}
@@ -779,6 +779,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
     api.get 'users/:user_id/profile', :controller => :profile, :action => :show
+    api.get 'users/:user_id/avatars', :controller => :profile, :action => :profile_pics
 
     api.with_options(:controller => :conversations) do |conversations|
       conversations.get 'conversations', :action => :index

@@ -528,13 +528,14 @@ class UsersController < ApplicationController
   end
 
   include Api::V1::User
+  include Api::V1::Avatar
   # @API
   # Create and return a new user and pseudonym for an account.
   #
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
-  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed [here](http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone).
+  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
   # @argument pseudonym[unique_id] User's login ID.
   # @argument pseudonym[password] [Optional] User's password.
@@ -628,40 +629,97 @@ class UsersController < ApplicationController
 
   # @API
   # Modify an existing user. To modify a user's login, see the documentation for logins.
+  #
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
   # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
+  # @argument user[avatar][token] [Optional] A unique representation of the avatar record to assign as the user's current avatar. This token can be obtained from the user avatars endpoint. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/users/133.json' \ 
+  #        -X PUT \ 
+  #        -F 'user[name]=Sheldon Cooper' \ 
+  #        -F 'user[short_name]=Shelly' \ 
+  #        -F 'user[time_zone]=Pacific Time (US & Canada)' \ 
+  #        -F 'user[avatar][token]=<opaque_token>' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #
+  #   {
+  #     "id":133,
+  #     "login_id":"sheldor@example.com",
+  #     "name":"Sheldon Cooper",
+  #     "short_name":"Shelly",
+  #     "sortable_name":"Cooper, Sheldon",
+  #     "avatar_url":"http://<canvas>/images/users/133-..."
+  #   }
   def update
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? User.find(params[:id]) : @current_user
-    rename = params[:rename] || api_request?
-    if (!rename ? authorized_action(@user, @current_user, :manage) : authorized_action(@user, @current_user, :rename))
-      if rename
-        params[:default_pseudonym_id] = nil
-        managed_attributes = [:name, :short_name, :sortable_name]
-        if @user.grants_right?(@current_user, nil, :manage_user_details)
-          managed_attributes.concat([:time_zone, :locale])
+
+    if params[:default_pseudonym_id] && authorized_action(@user, @current_user, :manage)
+      @default_pseudonym = @user.pseudonyms.find(params[:default_pseudonym_id])
+      @default_pseudonym.move_to_top
+    end
+
+    managed_attributes = []
+    managed_attributes.concat [:name, :short_name, :sortable_name] if @user.grants_right?(@current_user, nil, :rename)
+    if @user.grants_right?(@current_user, nil, :manage_user_details)
+      managed_attributes.concat([:time_zone, :locale])
+    end
+
+    if @user.grants_right?(@current_user, nil, :update_avatar)
+      avatar = params[:user].delete(:avatar)
+
+      # delete any avatar_image passed, because we only allow updating avatars
+      # based on [:avatar][:token].
+      params[:user].delete(:avatar_image)
+
+      managed_attributes << :avatar_image
+      if token = avatar.try(:[], :token)
+        if av_json = avatar_for_token(@user, token)
+          params[:user][:avatar_image] = { :type => av_json['type'],
+            :url => av_json['url'] }
         end
-        params[:user] = params[:user].slice(*managed_attributes)
       end
-      if params[:default_pseudonym_id] && @user == @current_user
-        @default_pseudonym = @user.pseudonyms.find(params[:default_pseudonym_id])
-        @default_pseudonym.move_to_top
+    end
+
+    user_params = params[:user].slice(*managed_attributes)
+
+    if user_params == params[:user]
+      # admins can update avatar images even if they are locked
+      admin_avatar_update = user_params[:avatar_image] &&
+        @user.grants_right?(@current_user, nil, :update_avatar) &&
+        @user.grants_right?(@current_user, nil, :manage_user_details)
+
+      if admin_avatar_update
+        old_avatar_state = @user.avatar_state
+        @user.avatar_state = 'submitted'
       end
+
       respond_to do |format|
-        if @user.update_attributes(params[:user])
+        if @user.update_attributes(user_params)
+          if admin_avatar_update
+            @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved')
+            @user.save
+          end
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
           format.json {
-            render :json => user_json(@user, @current_user, session, %w{locale},
+            render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
               @current_user.pseudonym.account) }
         else
           format.html { render :action => "edit" }
+          format.json { render :json => @user.errors, :status => :bad_request }
         end
       end
+    else
+      render_unauthorized_action(@user)
     end
   end
 
@@ -943,7 +1001,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def avatar_image_url
+  def avatar_image
     cancel_cache_buster
     return redirect_to(params[:fallback] || '/images/no_pic.gif') unless service_enabled?(:avatars)
     # TODO: remove support for specifying user ids by id, require using

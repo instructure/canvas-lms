@@ -23,6 +23,7 @@ class ProfileController < ApplicationController
   before_filter { |c| c.active_tab = "profile" }
 
   include Api::V1::User
+  include Api::V1::Avatar
 
   # @API
   # Returns user profile data, including user id, name, and profile pic.
@@ -133,53 +134,53 @@ class ProfileController < ApplicationController
     @other_channels.reject! { |c| c.path_type == 'twitter' } unless has_twitter_installed
   end
   
+  # @API
+  # Retrieve the possible user avatar options that can be set with the user update endpoint. The response will be an array of avatar records. If the 'type' field is 'attachment', the record will include all the normal attachment json fields; otherwise it will include only the 'url' and 'display_name' fields. Additionally, all records will include a 'type' field and a 'token' field. The following explains each field in more detail
+  # type:: ["gravatar"|"twitter"|"linked_in"|"attachment"|"no_pic"] The type of avatar record, for categorization purposes.
+  # url:: The url of the avatar 
+  # token:: A unique representation of the avatar record which can be used to set the avatar with the user update endpoint. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
+  # display_name:: A textual description of the avatar record
+  # id:: ['attachment' type only] the internal id of the attachment
+  # content-type:: ['attachment' type only] the content-type of the attachment
+  # filename:: ['attachment' type only] the filename of the attachment
+  # size:: ['attachment' type only] the size of the attachment
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/users/1/avatars.json' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #
+  #   [
+  #     {
+  #       "type":"gravatar",
+  #       "url":"https://secure.gravatar.com/avatar/2284...",
+  #       "token":<opaque_token>,
+  #       "display_name":"gravatar pic"
+  #     },
+  #     {
+  #       "type":"attachment",
+  #       "url":"https://<canvas>/images/thumbnails/12/gpLWJ...",
+  #       "token":<opaque_token>,
+  #       "display_name":"profile.jpg",
+  #       "id":12,
+  #       "content-type":"image/jpeg",
+  #       "filename":"profile.jpg",
+  #       "size":32649
+  #     },
+  #     {
+  #       "type":"no_pic",
+  #       "url":"https://<canvas>/images/dotted_pic.png",
+  #       "token":<opaque_token>,
+  #       "display_name":"no pic"
+  #     }
+  #   ]
   def profile_pics
-    @pics = []
-    @user = @current_user
-    if feature_enabled?(:facebook) && facebook = @user.facebook
-      # TODO: add facebook picture if enabled
+    @user = if api_request? then api_find(User, params[:user_id]) else @current_user end
+    if authorized_action(@user, @current_user, :update_avatar)
+      render :json => avatars_json_for_user(@user)
     end
-    if feature_enabled?(:twitter) && twitter = @user.user_services.for_service('twitter').first
-      url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
-      data = JSON.parse(Net::HTTP.get(url)) rescue nil
-      if data
-        @pics << {
-          :url => data['profile_image_url_https'],
-          :type => 'twitter',
-          :alt => 'twitter pic'
-        }
-      end
-    end
-    if feature_enabled?(:linked_in) && linked_in = @user.user_services.for_service('linked_in').first
-      self.extend LinkedIn
-      profile = linked_in_profile
-      if profile && profile['picture_url']
-        @pics << {
-          :url => profile['picture_url'],
-          :type => 'linked_in',
-          :alt => 'linked_in pic'
-        }
-      end
-    end
-    @pics << {
-      :url => @current_user.gravatar_url(50, "/images/dotted_pic.png", request),
-      :type => 'gravatar',
-      :alt => 'gravatar pic'
-    }
-    @pics << {
-      :url => '/images/dotted_pic.png',
-      :type => 'none',
-      :alt => 'no pic'
-    }
-    @current_user.profile_pics_folder.active_file_attachments({:include => :thumbnail}).select{|a| a.content_type.match(/\Aimage\//) && a.thumbnail}.sort_by(&:id).reverse.each do |image|
-      @pics << {
-        :url => "/images/thumbnails/#{image.id}/#{image.uuid}",
-        :pending => image.thumbnail.nil?,
-        :type => 'attachment',
-        :alt => image.display_name
-      }
-    end
-    render :json => @pics.to_json
   end
   
   def update
