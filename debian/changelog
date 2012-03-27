@@ -1,3 +1,29 @@
+canvas-lms (2012.03.31.06) testing; urgency=low
+
+  * Package ref: 94766bb4f4aa256ba08f3654ff9b10a4cd29b2cf
+  *
+  * [+fb18618] don't resubmit discussion assignments marked as graded
+  * [+4d6653a] only send scheduler notifications to available courses; fixes #7267
+  * [+631599c] don't assume topic poster is in course/group; fixes #7483
+  * [+6d1c5e0] include previous complete submissions in quiz statistics csv
+  * [+f5e0834] added backbone.js
+  * [+2b0f485] discussion topics materialized view api, refs #7567
+  * [+5623b98] discussion entry_list api, refs #7567
+  * [+4109c64] update/delete discussion entry apis, refs #7567
+  * [+73bf0f3] materialized view of discussion topics, closes #7567
+  * [+0853a91] Revert "exclude deleted discussion entries from read counts; fixes #7741"
+  * [+3ff3ebc] return html_url for participants in the materialized discussion view
+  * [+9b79e83] always return entry summary in json response
+  * [+7a8a838] build the initial, empty materialized view synchronously
+  * [+dd753e9] new discussions UI
+  * [+fe21dd2] make non-threaded default, and allow switching to non-threaded
+  * [+5d04a1c] fix attachments in discussion materialized view
+  * [+52cd12f] retry when we get a 503 (exponential backoff, to a point)
+  * [+32bc23b] allow top-level attachments
+  * [+94766bb] made non-threaded discussions threadish again
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 27 Mar 2012 09:06:11 -0600
+
 canvas-lms (2012.03.31.03) testing; urgency=low
 
   * Package ref: c8a538dbd42d642bb1f77f4f90fb5f213ff5dbdd
