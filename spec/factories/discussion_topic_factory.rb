@@ -46,6 +46,7 @@ def topic_with_nested_replies(opts = {})
   @reply1 = @root1.reply_from(:user => @teacher, :html => "reply1")
   @reply2 = @root1.reply_from(:user => @teacher, :html => "reply2")
   @reply_reply1 = @reply2.reply_from(:user => @student, :html => "reply_reply1")
+  @reply_reply1.update_attribute(:attachment, attachment_model)
   @reply_reply2 = @reply1.reply_from(:user => @student, :html => "reply_reply2")
   @reply3 = @root2.reply_from(:user => @student, :html => "reply3")
   @reply1.destroy

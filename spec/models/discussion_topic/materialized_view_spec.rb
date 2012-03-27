@@ -73,9 +73,11 @@ describe DiscussionTopic::MaterializedView do
     deleted['deleted'].should == true
     deleted['user_id'].should be_nil
     deleted['summary'].should be_nil
+    json[0]['replies'][1]['replies'][0]['attachment']['url'].should == "http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+
     # the deleted entry will be marked deleted and have no summary
-    json = map_to_ids_and_replies(json)
-    json.should == [
+    simple_json = map_to_ids_and_replies(json)
+    simple_json.should == [
       {
       'id' => @root1.id,
       'replies' => [

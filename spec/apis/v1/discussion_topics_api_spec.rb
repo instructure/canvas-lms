@@ -345,7 +345,7 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       entry_json = json.first
       entry_json['attachment'].should_not be_nil
-      entry_json['attachment']['url'].should == "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+      entry_json['attachment']['url'].should == "http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     end
 
     it "should include replies on top level entries" do
@@ -918,6 +918,13 @@ describe DiscussionTopicsController, :type => :integration do
         { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@teacher.id)}", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
       ].sort_by { |h| h['id'] }
 
+      reply_reply1_attachment_json = {
+        "content-type"=>"application/loser",
+        "url"=>"http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
+        "filename"=>"unknown.loser",
+        "display_name"=>"unknown.loser",
+      }
+
       json['view'].should == [
         {
           'id' => @root1.id,
@@ -956,6 +963,8 @@ describe DiscussionTopicsController, :type => :integration do
                 'summary' => 'censored',
                 'created_at' => @reply_reply1.created_at.as_json,
                 'updated_at' => @reply_reply1.updated_at.as_json,
+                'attachment' => reply_reply1_attachment_json,
+                'attachments' => [reply_reply1_attachment_json]
               } ],
             },
           ],
