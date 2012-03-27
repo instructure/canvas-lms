@@ -362,21 +362,7 @@ class PseudonymSessionsController < ApplicationController
     respond_to do |format|
       flash[:notice] = t 'notices.login_success', "Login successful." unless flash[:error]
       if session[:oauth2]
-        # this is where we will verify client authorization and scopes, once implemented
-        # .....
-        # now generate the temporary code, and respond/redirect
-        code = ActiveSupport::SecureRandom.hex(64)
-        code_data = { 'user' => user.id, 'client_id' => session[:oauth2][:client_id] }
-        Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
-        redirect_uri = session[:oauth2][:redirect_uri]
-        if redirect_uri == OAUTH2_OOB_URI
-          # destroy this user session, it's only for generating the token
-          @pseudonym_session.try(:destroy)
-          reset_session
-          format.html { redirect_to oauth2_auth_url(:code => code) }
-        else
-          format.html { redirect_to "#{redirect_uri}?code=#{code}" }
-        end
+        return redirect_to(oauth2_auth_confirm_url)
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
@@ -396,26 +382,48 @@ class PseudonymSessionsController < ApplicationController
   OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
   def oauth2_auth
-    if params[:code]
+    if params[:code] || params[:error]
       # hopefully the user never sees this, since it's an oob response and the
       # browser should be closed automatically. but we'll at least display
       # something basic.
       return render()
     end
 
-    key = DeveloperKey.find_by_id(params[:client_id]) if params[:client_id].present?
-    unless key
+    @key = DeveloperKey.find_by_id(params[:client_id]) if params[:client_id].present?
+    unless @key
       return render(:status => 400, :json => { :message => "invalid client_id" })
     end
 
     redirect_uri = params[:redirect_uri].presence || ""
-    unless redirect_uri == OAUTH2_OOB_URI || key.redirect_domain_matches?(redirect_uri)
+    unless redirect_uri == OAUTH2_OOB_URI || @key.redirect_domain_matches?(redirect_uri)
       return render(:status => 400, :json => { :message => "invalid redirect_uri" })
     end
 
-    session[:oauth2] = { :client_id => key.id, :redirect_uri => redirect_uri }
-    # force the user to re-authenticate
-    redirect_to login_url(:re_login => true)
+    session[:oauth2] = { :client_id => @key.id, :redirect_uri => redirect_uri }
+    if @current_pseudonym
+      redirect_to oauth2_auth_confirm_url
+    else
+      redirect_to login_url
+    end
+  end
+
+  def oauth2_confirm
+    @key = DeveloperKey.find(session[:oauth2][:client_id])
+    @app_name = @key.name.presence || @key.user_name.presence || @key.email.presence || t(:default_app_name, "Third-Party Application")
+  end
+
+  def oauth2_accept
+    # now generate the temporary code, and respond/redirect
+    code = ActiveSupport::SecureRandom.hex(64)
+    code_data = { 'user' => @current_user.id, 'client_id' => session[:oauth2][:client_id] }
+    Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
+    final_oauth2_redirect(session[:oauth2][:redirect_uri], :code => code)
+    session.delete(:oauth2)
+  end
+
+  def oauth2_deny
+    final_oauth2_redirect(session[:oauth2][:redirect_uri], :error => "access_denied")
+    session.delete(:oauth2)
   end
 
   def oauth2_token
@@ -444,5 +452,14 @@ class PseudonymSessionsController < ApplicationController
       'access_token' => token.token,
       'user' => user.as_json(:only => [:id, :name], :include_root => false),
     }
+  end
+
+  def final_oauth2_redirect(redirect_uri, opts = {})
+    if redirect_uri == OAUTH2_OOB_URI
+      redirect_to oauth2_auth_url(opts)
+    else
+      has_params = redirect_uri =~ %r{\?}
+      redirect_to(redirect_uri + (has_params ? "&" : "?") + opts.to_query)
+    end
   end
 end

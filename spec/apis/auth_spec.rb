@@ -137,20 +137,21 @@ describe "API Authentication", :type => :integration do
 
           # step 1
           get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-          response.should redirect_to(login_url(:re_login => true))
+          response.should redirect_to(login_url)
 
           yield
 
-          # step 2
+          # step 3
           response.should be_redirect
-          response['Location'].should match(%r{/login/oauth2/auth?})
+          response['Location'].should match(%r{/login/oauth2/confirm$})
+          get response['Location']
+          response.should render_template("pseudonym_sessions/oauth2_confirm")
+          post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+
+          response.should be_redirect
+          response['Location'].should match(%r{/login/oauth2/auth\?})
           code = response['Location'].match(/code=([^\?&]+)/)[1]
           code.should be_present
-
-          # make sure the user is now logged out, or the app also has full access to their session
-          get '/'
-          response.should be_redirect
-          response['Location'].should == 'http://www.example.com/login'
 
           # we have the code, we can close the browser session
           if opts[:basic_auth]
@@ -241,9 +242,43 @@ describe "API Authentication", :type => :integration do
 
           get '/login', :ticket => 'ST-abcd'
           response.should be_redirect
-          response['Location'].should match(%r{/login/oauth2/auth\?code=})
-          session.should be_blank
         end
+      end
+
+      it "should not require logging in again, or log out afterwards" do
+        course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
+        get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/confirm$})
+        get response['Location']
+        response.should render_template("pseudonym_sessions/oauth2_confirm")
+        post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/auth\?})
+        code = response['Location'].match(/code=([^\?&]+)/)[1]
+        code.should be_present
+        get response['Location']
+        response.should be_success
+        # verify we're still logged in
+        get "/courses/#{@course.id}"
+        response.should be_success
+      end
+
+      it "should redirect with access_denied if the user doesn't accept" do
+        course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
+        get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/confirm$})
+        get response['Location']
+        response.should render_template("pseudonym_sessions/oauth2_confirm")
+        get "/login/oauth2/deny"
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/auth\?})
+        error = response['Location'].match(%r{error=([^\?&]+)})[1]
+        error.should == "access_denied"
+        response['Location'].should_not match(%r{code=})
+        get response['Location']
+        response.should be_success
       end
 
       it "should allow http basic auth for the app auth" do
@@ -257,7 +292,7 @@ describe "API Authentication", :type => :integration do
       it "should require the correct client secret" do
         # step 1
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-        response.should redirect_to(login_url(:re_login => true))
+        response.should redirect_to(login_url)
 
         get response['Location']
         response.should be_success
@@ -268,7 +303,9 @@ describe "API Authentication", :type => :integration do
 
         # step 2
         response.should be_redirect
-        response['Location'].should match(%r{/login/oauth2/auth?})
+        response['Location'].should match(%r{/login/oauth2/confirm$})
+        post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+
         code = response['Location'].match(/code=([^\?&]+)/)[1]
         code.should be_present
 
@@ -304,11 +341,16 @@ describe "API Authentication", :type => :integration do
             @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
 
             get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"
-            response.should redirect_to(login_url(:re_login => true))
+            response.should redirect_to(login_url)
 
             get response['Location']
             response.should be_success
             post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+
+            response.should be_redirect
+            response['Location'].should match(%r{/login/oauth2/confirm$})
+            get response['Location']
+            post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
 
             response.should be_redirect
             response['Location'].should match(%r{http://www.example.com/my_uri?})
