@@ -33,8 +33,7 @@
     <div class="notes" style="font-size: 0.8em; float: left;">
       <% if assignment %>
         <div class="for_assignment" style="font-style: italic;">
-          <%= t :topic_for_assignment, "This topic is for the assignment, %{assignment_name_link}.", :assignment_name_link => link_to(assignment.title, context_url(assignment.context, :context_assignment_url, assignment)) %>
-          <span class="for_grading_text"><%= t('posts_for_grading', %{Posts will be used for grading.}) %></span>
+          <%= t :topic_for_assignment, "This is a *graded discussion topic*. Grading will be based on posts in this discussion.", :wrapper => link_to('\\1', context_url(assignment.context, :context_assignment_url, assignment)) %>
           <%= link_to nbsp, context_url(assignment.context, :context_assignment_url, assignment), :style => "display:none", :class => "topic_assignment_url" %>
           <span class="assignment_id" style="display: none;"><%= assignment.id %></span>
         </div>
@@ -57,24 +56,17 @@
       <% if topic.require_initial_post && !topic.user_has_posted %>
         <p class="initial_post_required"><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></p>
       <% else %>
-        <% entry_count = topic.try_rescue(:total_root_discussion_entries) || entries.length %>
-        <% link_text = t('links.show_more_entries', { :one => "Show 1 More Entry", :other => "Show %{count} More Entries" }, :count => (entries.length - 2)) %>
-        <div class="communication_sub_message" style="<%= hidden unless entries.length > 3 %>">
-          <div class="content behavior_content">
-            <% if entry_count > 10 %>
-              <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="_show_sub_messages_link"><%= link_text %></a>
-            <% else %>
-              <a href="#" class="show_sub_messages_link"><%= link_text %></a>
-            <% end %>
-          </div>
-        </div>
-        <% entries.each_with_index do |entry, idx| %>
-          <%= render :partial => "context/dashboard_topic_entry", :object => entry, :locals => {:show_context => show_context, :context_code => context_code, :hide_entry => entries.length > 3 && idx < entries.length - 2} %>
-        <% end %>
+        <%
+          real_topic = DiscussionTopic.find_by_id(topic.id) if topic
+          total_messages = link_to(t(:total_messages, {:one => "1 message", :other => "%{count} messages"}, :count => (real_topic ? real_topic.discussion_entries.active.size : 0)), "#{context_prefix(context_code)}/discussion_topics/#{topic ? topic.id : '{{ id }}'}")
+          unread_count = real_topic ? real_topic.unread_count(@current_user) : 0
+          unread_messages = t(:unread_messages, "%{count} unread", :count => unread_count)
+        %>
+        <p><%= unread_count > 0 ? t(:message_summary, "%{total_messages} (%{unread_messages})", :unread_messages => unread_messages, :total_messages => total_messages) : total_messages %></p>
       <% end %>
       
       <% if !topic || can_do(topic, @current_user, :reply) %>
-        <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if entries.empty? %>">
+        <div class="communication_sub_message reply_message lonely_behavior_message">
           <div class="content behavior_content">
             <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="add_entry_link textarea"><%= t('links.add_comment', %{Add a Comment...}) %></a>
             <div class="less_important">

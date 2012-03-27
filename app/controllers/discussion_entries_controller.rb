@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
   before_filter :require_context, :except => :public_feed
 
@@ -69,14 +70,32 @@ class DiscussionEntriesController < ApplicationController
     end
   end
 
+  include Api::V1::DiscussionTopics
+
+  # @API
+  # Update an existing discussion entry.
+  #
+  # The entry must have been created by the current user, or the current user
+  # must have admin rights to the discussion. If the edit is not allowed, a 401 will be returned.
+  #
+  # @argument message The updated body of the entry.
+  #
+  # @example_request
+  #   curl -X PUT 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \ 
+  #        -F 'message=<message>' \ 
+  #        -H "Authorization: Bearer <token>"
   def update
-    @remove_attachment = (params[:discussion_entry] || {}).delete :remove_attachment
+    @topic = @context.all_discussion_topics.active.find(params[:topic_id]) if params[:topic_id].present?
+    params[:discussion_entry] ||= params
+    @remove_attachment = params[:discussion_entry].delete :remove_attachment
     # unused attributes during update
     params[:discussion_entry].delete(:discussion_topic_id)
     params[:discussion_entry].delete(:parent_id)
 
-    @entry = @context.discussion_entries.find(params[:id])
-    @topic = @entry.discussion_topic
+    @entry = (@topic || @context).discussion_entries.find(params[:id])
+    raise(ActiveRecord::RecordNotFound) if @entry.deleted?
+
+    @topic ||= @entry.discussion_topic
     @entry.current_user = @current_user
     @entry.attachment_id = nil if @remove_attachment == '1'
     if authorized_action(@entry, @current_user, :update)
@@ -86,16 +105,18 @@ class DiscussionEntriesController < ApplicationController
         quota_exceeded(named_context_url(@context, :context_discussion_topic_url, @topic.id))
       @entry.editor = @current_user
       respond_to do |format|
-        if @entry.update_attributes(params[:discussion_entry])
+        if @entry.update_attributes(params[:discussion_entry].slice(:message, :plaintext_message))
           if params[:attachment] && params[:attachment][:uploaded_data] && params[:attachment][:uploaded_data].size > 0 && @entry.grants_right?(@current_user, session, :attach)
             @attachment = @context.attachments.create(params[:attachment])
             @entry.attachment = @attachment
             @entry.save
           end
-          flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
-          format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id) }
-          format.json { render :json => @entry.to_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :ok }
-          format.text { render :json => @entry.to_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :ok }
+          format.html {
+            flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
+            redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
+          }
+          format.json { render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first }
+          format.text {  render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @entry.errors.to_json, :status => :bad_request }
@@ -105,14 +126,28 @@ class DiscussionEntriesController < ApplicationController
     end
   end
 
+  # @API
+  # Delete a discussion entry.
+  #
+  # The entry must have been created by the current user, or the current user
+  # must have admin rights to the discussion. If the delete is not allowed, a 401 will be returned.
+  #
+  # The discussion will be marked deleted, and the user_id and message will be cleared out.
+  #
+  # @example_request
+  #
+  #   curl -X DELETE 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \ 
+  #        -H "Authorization: Bearer <token>"
   def destroy
-    @entry = @context.discussion_entries.find(params[:id])
+    @topic = @context.all_discussion_topics.active.find(params[:topic_id]) if params[:topic_id].present?
+    @entry = (@topic || @context).discussion_entries.find(params[:id])
     if authorized_action(@entry, @current_user, :delete)
+      @entry.editor = @current_user
       @entry.destroy
 
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id) }
-        format.json { render :json => @entry.to_json, :status => :ok }
+        format.json { render :nothing => true, :status => :no_content }
       end
     end
   end

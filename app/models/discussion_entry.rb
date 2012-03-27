@@ -20,13 +20,14 @@ class DiscussionEntry < ActiveRecord::Base
   include Workflow
   include SendToInbox
   include SendToStream
+  include TextHelper
 
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
   has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
-  has_many :discussion_entry_participants
+  has_many :discussion_entry_participants, :dependent => :destroy
   belongs_to :discussion_topic, :touch => true
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
@@ -38,7 +39,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
 
   before_create :infer_root_entry_id
-  after_save :touch_root
+  after_save :update_discussion
   after_save :context_module_action_later
   after_create :create_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -117,10 +118,6 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  def touch_root
-    self.root_entry.try(:touch)
-  end
-
   def reply_from(opts)
     user = opts[:user]
     message = opts[:html].strip
@@ -144,7 +141,6 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def plaintext_message=(val)
-    self.extend TextHelper
     self.message = format_message(val).first
   end
 
@@ -152,19 +148,28 @@ class DiscussionEntry < ActiveRecord::Base
     plaintext_message(length)
   end
 
+  def summary(length=150)
+    strip_and_truncate(message, :max_length => length)
+  end
+
   def plaintext_message(length=250)
-    self.extend TextHelper
     truncate_html(self.message, :max_length => length)
   end
 
   alias_method :destroy!, :destroy
   def destroy
     flattened_discussion_subentries.destroy_all
-    destroy_participants
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     save!
     update_topic_submission
+  end
+
+  def update_discussion
+    if %w(workflow_state message attachment_id editor_id).any? { |a| self.changed.include?(a) }
+      self.discussion_topic.touch
+      self.discussion_topic.update_materialized_view
+    end
   end
 
   def update_topic_submission
@@ -187,6 +192,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   named_scope :active, :conditions => ['discussion_entries.workflow_state != ?', 'deleted']
+  named_scope :deleted, :conditions => ['discussion_entries.workflow_state = ?', 'deleted']
 
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
@@ -215,31 +221,31 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user and self.discussion_subentries.empty? && !self.discussion_topic.locked? }
+    given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
     can :delete
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }#
+    given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }# students.find_by_id(user) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }
     can :reply and can :create and can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }
     can :read
 
-    given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked?  }# students.find_by_id(user) }
+    given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked?  }
     can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }#admins.find_by_id(user) }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }#admins.find_by_id(user) }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }#admins.find_by_id(user) }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }#admins.find_by_id(user) }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
   end
 
@@ -340,7 +346,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def context_module_action_later
-    self.send_later(:context_module_action)
+    self.send_later_if_production(:context_module_action)
   end
   protected :context_module_action_later
 
@@ -367,20 +373,6 @@ class DiscussionEntry < ActiveRecord::Base
                                                                                          :workflow_state => "unread")
         end
       end
-    end
-  end
-
-  def destroy_participants
-    transaction do
-      # this could count toward the unread count either if there is a "unread"
-      # entry participant or no entry participant, so find all that have
-      # explicitly been marked "read" and decrement for all the others
-      read_deps = DiscussionEntryParticipant.find(:all, :conditions => { :discussion_entry_id => self.id, :workflow_state => "read" })
-      read_user_ids = read_deps.map(&:user_id)
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ?", self.discussion_topic_id])
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ? AND user_id NOT IN (?)", self.discussion_topic_id, read_user_ids]) if read_user_ids.present?
-      DiscussionTopicParticipant.update_all("unread_entry_count = unread_entry_count - 1", dtp_conditions)
-      self.discussion_entry_participants.destroy_all
     end
   end
 

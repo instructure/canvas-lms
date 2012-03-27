@@ -160,15 +160,15 @@ class AppointmentGroup < ActiveRecord::Base
   set_broadcast_policy do
     dispatch :appointment_group_published
     to       { possible_users }
-    whenever { active? && workflow_state_changed? }
+    whenever { context.available? && active? && workflow_state_changed? }
 
     dispatch :appointment_group_updated
     to       { possible_users }
-    whenever { active? && new_appointments && !workflow_state_changed? }
+    whenever { context.available? && active? && new_appointments && !workflow_state_changed? }
 
     dispatch :appointment_group_deleted
     to       { possible_users }
-    whenever { deleted? && workflow_state_changed? }
+    whenever { context.available? && deleted? && workflow_state_changed? }
   end
 
   def possible_users

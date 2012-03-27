@@ -744,10 +744,11 @@ class Quiz < ActiveRecord::Base
     columns << t('statistics.csv_columns.submitted', 'submitted')
     columns << t('statistics.csv_columns.attempt', 'attempt') if options[:include_all_versions]
     first_question_index = columns.length
-    submissions = self.quiz_submissions.scoped(:include => (options[:include_all_versions] ? [:versions] : [])).select{|s| s.completed? && s.submission_data.is_a?(Array) && self.context.students.map(&:id).include?(s.user_id) }
+    submissions = self.quiz_submissions.scoped(:include => (options[:include_all_versions] ? [:versions] : [])).select { |s| self.context.students.map(&:id).include?(s.user_id) }
     if options[:include_all_versions]
       submissions = submissions.map(&:submitted_versions).flatten
     end
+    submissions = submissions.select{|s| s.completed? && s.submission_data.is_a?(Array) }
     submissions = submissions.sort_by(&:updated_at).reverse
     found_question_ids = {}
     quiz_datas = [quiz_data] + submissions.map(&:quiz_data)

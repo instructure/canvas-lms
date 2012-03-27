@@ -6,7 +6,7 @@
 //     For all details and documentation:
 //     http://documentcloud.github.com/underscore
 
-define(function() {
+(function() {
 
   // Baseline setup
   // --------------
@@ -180,7 +180,7 @@ define(function() {
     each(obj, function(value, index, list) {
       if (!(result = result && iterator.call(context, value, index, list))) return breaker;
     });
-    return result;
+    return !!result;
   };
 
   // Determine if at least one element in the object matches a truth test.
@@ -224,7 +224,7 @@ define(function() {
 
   // Return the maximum element or (element-based computation).
   _.max = function(obj, iterator, context) {
-    if (!iterator && _.isArray(obj)) return Math.max.apply(Math, obj);
+    if (!iterator && _.isArray(obj) && obj[0] === +obj[0]) return Math.max.apply(Math, obj);
     if (!iterator && _.isEmpty(obj)) return -Infinity;
     var result = {computed : -Infinity};
     each(obj, function(value, index, list) {
@@ -236,7 +236,7 @@ define(function() {
 
   // Return the minimum element (or element-based computation).
   _.min = function(obj, iterator, context) {
-    if (!iterator && _.isArray(obj)) return Math.min.apply(Math, obj);
+    if (!iterator && _.isArray(obj) && obj[0] === +obj[0]) return Math.min.apply(Math, obj);
     if (!iterator && _.isEmpty(obj)) return Infinity;
     var result = {computed : Infinity};
     each(obj, function(value, index, list) {
@@ -372,15 +372,17 @@ define(function() {
   // Aliased as `unique`.
   _.uniq = _.unique = function(array, isSorted, iterator) {
     var initial = iterator ? _.map(array, iterator) : array;
-    var result = [];
-    _.reduce(initial, function(memo, el, i) {
-      if (0 == i || (isSorted === true ? _.last(memo) != el : !_.include(memo, el))) {
-        memo[memo.length] = el;
-        result[result.length] = array[i];
+    var results = [];
+    // The `isSorted` flag is irrelevant if the array only contains two elements.
+    if (array.length < 3) isSorted = true;
+    _.reduce(initial, function (memo, value, index) {
+      if (isSorted ? _.last(memo) !== value || !memo.length : !_.include(memo, value)) {
+        memo.push(value);
+        results.push(array[index]);
       }
       return memo;
     }, []);
-    return result;
+    return results;
   };
 
   // Produce an array that contains the union: each distinct element from all of
@@ -403,7 +405,7 @@ define(function() {
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
-    var rest = _.flatten(slice.call(arguments, 1));
+    var rest = _.flatten(slice.call(arguments, 1), true);
     return _.filter(array, function(value){ return !_.include(rest, value); });
   };
 
@@ -548,15 +550,17 @@ define(function() {
 
   // Returns a function, that, as long as it continues to be invoked, will not
   // be triggered. The function will be called after it stops being called for
-  // N milliseconds.
-  _.debounce = function(func, wait) {
+  // N milliseconds. If `immediate` is passed, trigger the function on the
+  // leading edge, instead of the trailing.
+  _.debounce = function(func, wait, immediate) {
     var timeout;
     return function() {
       var context = this, args = arguments;
       var later = function() {
         timeout = null;
-        func.apply(context, args);
+        if (!immediate) func.apply(context, args);
       };
+      if (immediate && !timeout) func.apply(context, args);
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
     };
@@ -761,6 +765,7 @@ define(function() {
   // Is a given array, string, or object empty?
   // An "empty" object has no enumerable own-properties.
   _.isEmpty = function(obj) {
+    if (obj == null) return true;
     if (_.isArray(obj) || _.isString(obj)) return obj.length === 0;
     for (var key in obj) if (_.has(obj, key)) return false;
     return true;
@@ -996,7 +1001,5 @@ define(function() {
     return this._wrapped;
   };
 
-  // return underscore object
-  return _;
-});
+}).call(this);
 

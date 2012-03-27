@@ -16,6 +16,7 @@ require [
   'ajax_errors'
   'page_views'
   'compiled/license_help'
+  'compiled/behaviors/ujsLinks'
 
   # other stuff several bundles use
   'media_comments'

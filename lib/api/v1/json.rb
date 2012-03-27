@@ -21,6 +21,9 @@ module Api::V1::Json
   # some tasks that all api json should do, like not including the root wrapper
   # object, and passing the user permissions info into the serialization engine.
   #
+  # if no user/session is given, permissions will not be considered during
+  # serialization! make sure that's ok.
+  #
   # this returns the ruby hash of the json data, not the raw json string. you can still pass that hash to render like
   # render :json => hash
   # and it'll be stringified properly.

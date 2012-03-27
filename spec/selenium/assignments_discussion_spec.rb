@@ -60,6 +60,6 @@ describe "discussion assignments" do
     edit_form.submit
     wait_for_ajaximations
     expect_new_page_load { driver.find_element(:link, assignment_title).click }
-    driver.find_element(:css, '.for_assignment').should include_text('Grading will be based on posts submitted to this topic')
+    f('.assignment_peer_reviews_link').should be_displayed
   end
 end

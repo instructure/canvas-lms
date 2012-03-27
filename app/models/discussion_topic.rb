@@ -22,6 +22,7 @@ class DiscussionTopic < ActiveRecord::Base
   include SendToStream
   include HasContentTags
   include CopyAuthorizedLinks
+  include TextHelper
 
   attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
@@ -62,6 +63,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :touch_context
   after_save :schedule_delayed_post
   after_create :create_participant
+  after_create :create_materialized_view
 
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
@@ -130,7 +132,7 @@ class DiscussionTopic < ActiveRecord::Base
     # ungraded to graded, or from one assignment to another; we ignore the
     # transition from graded to ungraded) we acknowledge that the users that
     # have posted have contributed to the topic
-    if self.assignment_id && self.assignment_id != @old_assignment_id
+    if self.assignment_id && self.assignment_id_changed?
       posters.each{ |user| self.context_module_action(user, :contributed) }
     end
   end
@@ -167,17 +169,19 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def plaintext_message=(val)
-    self.extend TextHelper
     self.message = format_message(strip_tags(val)).first
   end
 
   def plaintext_message
-    self.extend TextHelper
     truncate_html(self.message, :max_length => 250)
   end
 
   def create_participant
     self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+  end
+
+  def update_materialized_view
+    materialized_view # kick off building of the view
   end
 
   # If no join record exists, assume all discussion enrties are unread, and
@@ -217,7 +221,7 @@ class DiscussionTopic < ActiveRecord::Base
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 
-      entry_ids = self.discussion_entries.active.map(&:id)
+      entry_ids = self.discussion_entries.map(&:id)
       if entry_ids.present?
         existing_entry_participants = DiscussionEntryParticipant.find(:all, :conditions => ["user_id = ? AND discussion_entry_id IN (?)",
                                                                       current_user.id, entry_ids])
@@ -239,7 +243,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def default_unread_count
-    self.discussion_entries.active.count
+    self.discussion_entries.count
   end
 
   def unread_count(current_user = nil)
@@ -364,9 +368,12 @@ class DiscussionTopic < ActiveRecord::Base
 
   def reply_from(opts)
     user = opts[:user]
-    message = opts[:text].strip
-    self.extend TextHelper
-    message = format_message(message).first
+    if opts[:text]
+      message = opts[:text].strip
+      message = format_message(message).first
+    else
+      message = opts[:html].strip
+    end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
@@ -507,7 +514,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def ensure_submission(user)
     submission = Submission.find_by_assignment_id_and_user_id(self.assignment_id, user.id)
-    return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state == 'submitted'
+    return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted'
     self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
   end
 
@@ -538,9 +545,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def posters
-    users = context.participating_users(discussion_entries.map(&:user_id).uniq)
-    users << self.user
-    users.uniq
+    user_ids = discussion_entries.map(&:user_id).push(self.user_id).uniq
+    context.participating_users(user_ids)
   end
 
   def user_name
@@ -782,5 +788,35 @@ class DiscussionTopic < ActiveRecord::Base
       end
       item
     end
+  end
+
+  def initial_post_required?(user, enrollment, session)
+    if require_initial_post?
+      # check if the user, or the user being observed can see the posts
+      if enrollment && enrollment.respond_to?(:associated_user) && enrollment.associated_user
+        return true if !user_can_see_posts?(enrollment.associated_user)
+      elsif !user_can_see_posts?(user, session)
+        return true
+      end
+    end
+    false
+  end
+
+  # returns the materialized view of the discussion as structure, participant_ids, and entry_ids
+  # the view is already converted to a json string, the other two arrays of ids are ruby arrays
+  # see the description of the format in the discussion topics api documentation.
+  #
+  # returns nil if the view is not currently available, and kicks off a
+  # background job to build the view. this typically only takes a couple seconds.
+  #
+  # if a new message is posted, it won't appear in this view until the job to
+  # update it completes. so this view is eventually consistent.
+  def materialized_view
+    DiscussionTopic::MaterializedView.materialized_view_for(self)
+  end
+
+  # synchronously create/update the materialized view
+  def create_materialized_view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view
   end
 end
