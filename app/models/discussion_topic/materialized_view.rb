@@ -20,6 +20,7 @@
 # queried directly by other code.
 class DiscussionTopic::MaterializedView < ActiveRecord::Base
   include Api::V1::DiscussionTopics
+  include Api
   include ActionController::UrlWriter
 
   attr_accessible :discussion_topic
@@ -31,10 +32,6 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
 
   def self.primary_key
     :discussion_topic_id
-  end
-
-  def self.default_url_options(options = nil)
-    { :only_path => false, :host => HostUrl.context_host(discussion_topic.context) }
   end
 
   def self.for(discussion_topic)

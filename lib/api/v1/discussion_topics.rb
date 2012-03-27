@@ -78,9 +78,9 @@ module Api::V1::DiscussionTopics
         if context.present? && user.present?
           json[:message] = api_user_content(entry.message, context, user)
         end
-        json[:attachment] = attachment_json(entry.attachment) if entry.attachment
+        json[:attachment] = attachment_json(entry.attachment, :host => HostUrl.context_host(context)) if entry.attachment
         # this is for backwards compatibility, and can go away if we make an api v2
-        json[:attachments] = [attachment_json(entry.attachment)] if entry.attachment
+        json[:attachments] = [json[:attachment]] if entry.attachment
       end
       json[:read_state] = entry.read_state(user) if user
 
