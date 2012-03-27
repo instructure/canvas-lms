@@ -54,7 +54,6 @@ define [
 
       MarkAsReadWatcher.on 'markAsRead', @onMarkAsRead
 
-      # kicks it all off
       @model.fetch success: @onFetchSuccess
 
     ##
@@ -101,46 +100,7 @@ define [
     #
     # @api private
     onFetchSuccess: =>
-      @fetchUnread()
       @model.trigger 'fetchSuccess', @model
-
-    ##
-    # We auto-expand the unread messages. After `onFetchSuccess` is called, we
-    # fire of another request to get the full messages for the unread entries
-    # (the initial data doesn't contain the full message body).
-    #
-    # TODO: Refactor this out and create a method like Entry.fetchAllByIDs(ids)
-    # that handles the pagination and is a clean way to get an arbitrary number
-    # of full Entry models from the server.
-    #
-    # @api private
-    fetchUnread: ->
-
-      # how many models to fetch
-      perPage = 50
-
-      # finds an EntryView instance by ID to reset the model's attrs
-      setAttributes = (attributes) ->
-        attributes.collapsedView = false unless attributes.deleted
-        view = EntryView.instances[attributes.id]
-        view.model.set attributes
-
-      # fetches one page of unread entries
-      fetchPage = (ids) ->
-        ids = _.map(ids, (id) -> "ids[]=#{id}").join '&'
-        url = "#{ENV.DISCUSSION.ENTRY_ROOT_URL}?per_page=#{perPage}&#{ids}"
-        $.getJSON url, (data) ->
-          _.each data, setAttributes
-          # manually fire when a new page shows up, otherwise it has to wait for
-          # window scroll or resize
-          MarkAsReadWatcher.checkForVisibleEntries()
-
-      # paginate the ids
-      ids = _.clone @model.get('unread_entries')
-      pages = (ids.splice(0, perPage) while ids.length > 0)
-
-      # go get 'em
-      fetchPage page for page in pages
 
     ##
     # Routes events to the appropriate EntryView instance. See comments in
