@@ -19,8 +19,12 @@
 module Api::V1::Attachment
   include Api::V1::Json
 
-  def attachment_json(attachment, url_options = {})
-    url = file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
+  def attachment_json(attachment, url_options = {}, options = {})
+    url = if options[:thumbnail_url]
+      attachment.thumbnail_url
+    else
+      file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
+    end
     {
       'id' => attachment.id,
       'content-type' => attachment.content_type,
