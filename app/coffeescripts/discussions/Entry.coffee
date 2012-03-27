@@ -38,10 +38,6 @@ define [
       # Change this to toggle between collapsed and expanded views
       collapsedView: true
 
-      # Non-threaded topics get no replies, threaded discussions may require
-      # people to make an initial post before they can reply to others
-      canReply: ENV.DISCUSSION.PERMISSIONS.CAN_REPLY && ENV.DISCUSSION.THREADED
-
       canAttach: ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
 
       # not used, but we'll eventually want to style differently when
@@ -52,6 +48,8 @@ define [
       'author'
       'editor'
       'canModerate'
+      # TODO: put depth back into the response and get rid of this
+      { name: 'canReply', deps: ['parent_id'] }
     ]
 
     ##
@@ -101,6 +99,12 @@ define [
     canModerate: ->
       isAuthorsEntry = @get('user_id') is ENV.DISCUSSION.CURRENT_USER.id
       isAuthorsEntry or ENV.DISCUSSION.PERMISSIONS.MODERATE
+
+    # Non-threaded topics get replies to first-level replies
+    canReply: ->
+      return false unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+      return true if ENV.DISCUSSION.THREADED
+      return true if @get('parent_id') is null # null means its a root entry
 
     ##
     # Computed attribute to determine if the entry has an editor
