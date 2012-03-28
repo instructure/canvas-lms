@@ -26,8 +26,8 @@ define [
       # Only catch events for the top level "add reply" form,
       # EntriesView handles the clicks for the other replies
       'click #discussion_topic .discussion-reply-form [data-event]': 'handleEvent'
-
       'change .view_switcher': 'switchView'
+      'click .add_root_reply': 'addRootReply'
 
     initialize: ->
       @$el = $ '#main'
@@ -46,6 +46,8 @@ define [
       $.scrollSidebar() if $(document.body).is('.with-right-side')
       assignmentRubricDialog.initTriggers()
       @disableNextUnread()
+
+      @$el.toggleClass 'directed-discussion', !ENV.DISCUSSION.THREADED
 
     ##
     # Creates the Entries
@@ -165,4 +167,10 @@ define [
       for id, view of EntryView.instances
         collapsedView = view.model.get('read_state') is 'read'
         view.model.set 'collapsedView', collapsedView
+
+    addRootReply: (event) ->
+      $el = @$ event.currentTarget
+      target = $('#discussion_topic')
+      @addReply event
+      $('html, body').animate scrollTop: target.offset().top
 

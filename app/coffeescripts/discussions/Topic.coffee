@@ -37,3 +37,7 @@ define [
         backoffFactor: 1.6
       loader.start()
 
+    initialize: ->
+      super
+      @cid = 'discussion_topic'
+
