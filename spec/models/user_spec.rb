@@ -1044,6 +1044,13 @@ describe User do
       @user.avatar_image_url.should be_nil
     end
 
+    it "should allow external url's to be assigned" do
+      user_model
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
+      @user.save!
+      @user.reload.avatar_image_url.should == 'http://www.example.com/image.jpg'
+    end
+
     it "should return a useful avatar_fallback_url" do
       User.avatar_fallback_url.should ==
         "https://#{HostUrl.default_host}/images/no_pic.gif"
