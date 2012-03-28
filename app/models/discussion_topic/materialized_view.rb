@@ -81,9 +81,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     user_ids = Set.new
     discussion_entries = self.discussion_topic.discussion_entries
     discussion_entries.find_each do |entry|
-      json = discussion_entry_api_json([entry], @context, nil, nil, false).first
-      json.delete(:user_name) # this can get out of date in the cached view
-      json[:summary] = entry.summary unless entry.deleted?
+      json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
       entry_lookup[entry.id] = json
       user_ids << entry.user_id
       user_ids << entry.editor_id if entry.editor_id

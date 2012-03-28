@@ -63,31 +63,29 @@ module Api::V1::DiscussionTopics
   # there is no specific user attached to this view of the discussion, the same
   # json is returned to all users who can access the discussion, so it's a bit
   # different than our normal api_json helpers
-  #
-  # the message body will only be included if context and @current_user are present
-  def discussion_entry_api_json(entries, context, user, session, include_subentries)
+  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries])
     entries.map do |entry|
       if entry.deleted?
         json = api_json(entry, user, session, :only => %w(id created_at updated_at parent_id))
         json[:deleted] = true
       else
         json = api_json(entry, user, session,
-                        :only => %w(id user_id created_at updated_at parent_id),
-                        :methods => [:user_name, :summary])
+                        :only => %w(id user_id created_at updated_at parent_id))
+        json[:user_name] = entry.user_name if includes.include?(:user_name)
         json[:editor_id] = entry.editor_id if entry.editor_id && entry.editor_id != entry.user_id
-        if context.present? && user.present?
-          json[:message] = api_user_content(entry.message, context, user)
+        json[:message] = api_user_content(entry.message, context, user)
+        if entry.attachment
+          json[:attachment] = attachment_json(entry.attachment, :host => HostUrl.context_host(context))
+          # this is for backwards compatibility, and can go away if we make an api v2
+          json[:attachments] = [json[:attachment]]
         end
-        json[:attachment] = attachment_json(entry.attachment, :host => HostUrl.context_host(context)) if entry.attachment
-        # this is for backwards compatibility, and can go away if we make an api v2
-        json[:attachments] = [json[:attachment]] if entry.attachment
       end
       json[:read_state] = entry.read_state(user) if user
 
-      if include_subentries && entry.root_entry_id.nil?
+      if includes.include?(:subentries) && entry.root_entry_id.nil?
         replies = entry.flattened_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
         unless replies.empty?
-          json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session, false)
+          json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session, includes)
           json[:has_more_replies] = replies.size > 10
         end
       end

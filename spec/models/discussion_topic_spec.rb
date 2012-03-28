@@ -244,6 +244,15 @@ describe DiscussionTopic do
       count_before.should eql count_after
       ids_before.sort.should eql ids_after.sort
     end
+
+    it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
+      topic_for_group_assignment
+      subtopics = @topic.refresh_subtopics
+      subtopics.each {|st| st.threaded.should be_nil }
+      @topic.threaded = true
+      @topic.save
+      subtopics.each {|st| st.reload.threaded.should == true }
+    end
   end
 
   context "root_topic?" do

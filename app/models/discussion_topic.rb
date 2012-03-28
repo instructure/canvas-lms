@@ -93,7 +93,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def update_subtopics
     if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.has_group_category?
-      send_later :refresh_subtopics
+      send_later_if_production :refresh_subtopics
     end
   end
 
@@ -106,6 +106,7 @@ class DiscussionTopic < ActiveRecord::Base
       topic.title = "#{self.title} - #{group.name}"
       topic.assignment_id = self.assignment_id
       topic.user_id = self.user_id
+      topic.threaded = self.threaded
       topic.save if topic.changed?
       topic
     end

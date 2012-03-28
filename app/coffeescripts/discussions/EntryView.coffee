@@ -57,11 +57,13 @@ define [
       @createReplies()
 
     onCollapsedView: (model, collapsedView) =>
-      # figure out if we should fetch the full entry
-      message = @model.get 'message'
-      fetchIt = collapsedView is false and message is null
-      @fetchFullEntry() if fetchIt
       @toggleCollapsedClass()
+      if @model.get('allowsSideComments')
+        els = @$('.replies, .add-side-comment-wrap')
+        if collapsedView
+          els.hide()
+        else
+          els.show()
 
     onReadState: (model, read_state) =>
       if read_state is 'unread'
@@ -115,8 +117,6 @@ define [
 
     # events delegated from EntriesView
     remove: ->
-      # should have a "deleted" template, and use the html from that
-      # to .html the element
       @model.set 'collapsedView', true
       html = deletedEntriesTemplate @model.toJSON()
       @$('.entry_content:first').html html
@@ -153,7 +153,11 @@ define [
     EntryView::createReplies = ->
       el = @$el.find '.replies'
       @collection = new EntryCollection
-      @view = new EntryCollectionView el, @collection
+
+      @view = new EntryCollectionView
+        $el: el
+        collection: @collection
+
       replies = @model.get 'replies'
       _.each replies, (reply) =>
         reply.parent_cid = @model.cid
