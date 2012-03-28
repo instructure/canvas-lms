@@ -1046,22 +1046,36 @@ class User < ActiveRecord::Base
     "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
   end
 
+  # Public: Set a user's avatar image. This is a convenience method that sets
+  #   the avatar_image_source, avatar_image_url, avatar_updated_at, and
+  #   avatar_state on the user model.
+  #
+  # val - A hash of options used to configure the avatar.
+  #       :type - The type of avatar. Should be 'facebook,' 'gravatar,'
+  #         'twitter,' 'linked_in,' 'external,' or 'attachment.'
+  #       :url - The URL of the gravatar. Used for types 'external' and
+  #         'attachment.'
+  #
+  # Returns nothing if avatar is set; false if avatar is locked.
   def avatar_image=(val)
     return false if avatar_state == :locked
-    val ||= {}
 
-    # clear out the old avatar first, in case of failure to get new avatar
-    self.avatar_image_url = nil
+    # Clear out the old avatar first, in case of failure to get new avatar.
+    # The order of these attributes is standard throughout the method.
     self.avatar_image_source = 'no_pic'
-    self.avatar_image_updated_at = Time.now
+    self.avatar_image_url = nil
+    self.avatar_image_updated_at = Time.zone.now
     self.avatar_state = 'approved'
+
+    # Return here if we're passed a nil val or any non-hash val (both of which
+    # will just nil the user's avatar).
+    return unless val.is_a?(Hash)
 
     if val['type'] == 'facebook'
       # TODO: support this
     elsif val['type'] == 'gravatar'
       self.avatar_image_source = 'gravatar'
       self.avatar_image_url = nil
-      self.avatar_image_updated_at = Time.now
       self.avatar_state = 'submitted'
     elsif val['type'] == 'twitter'
       twitter = self.user_services.for_service('twitter').first rescue nil
@@ -1071,7 +1085,6 @@ class User < ActiveRecord::Base
         if data
           self.avatar_image_source = 'twitter'
           self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
-          self.avatar_image_updated_at = Time.now
           self.avatar_state = 'submitted'
         end
       end
@@ -1081,16 +1094,18 @@ class User < ActiveRecord::Base
         self.extend LinkedIn
         profile = linked_in_profile
         if profile
-          self.avatar_image_url = profile['picture_url']
           self.avatar_image_source = 'linked_in'
-          self.avatar_image_updated_at = Time.now
+          self.avatar_image_url = profile['picture_url']
           self.avatar_state = 'submitted'
         end
       end
+    elsif val['type'] == 'external'
+      self.avatar_image_source = 'external'
+      self.avatar_image_url = val['url']
+      self.avatar_state = 'submitted'
     elsif val['type'] == 'attachment' && val['url']
       self.avatar_image_source = 'attachment'
       self.avatar_image_url = val['url']
-      self.avatar_image_updated_at = Time.now
       self.avatar_state = 'submitted'
     end
   end

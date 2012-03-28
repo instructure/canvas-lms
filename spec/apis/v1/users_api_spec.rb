@@ -533,6 +533,20 @@ describe "Users API", :type => :integration do
         user.avatar_image_source.should eql to_set['type']
         user.avatar_state.should eql :locked
       end
+
+      it "should allow the user's avatar to be set to an external url" do
+        url_to_set = 'http://www.instructure.example.com/image.jpg'
+        json = api_call(:put, @path, @path_options, {
+          :user => {
+            :avatar => {
+              :url => url_to_set
+            }
+          }
+        })
+        user = User.find(json['id'])
+        user.avatar_image_source.should eql 'external'
+        user.avatar_image_url.should eql url_to_set
+      end
     end
 
     context "an unauthorized user" do
