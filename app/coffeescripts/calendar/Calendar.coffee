@@ -160,7 +160,7 @@ define [
                 # If there is not a reserve_url set, then it is an
                 # actual, scheduled event and not just a placeholder.
                 keep = true
-              else if event.calendarEvent.child_events?.length > 0 && !event.calendarEvent.reserved
+              else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved
                 # If this *is* a placeholder, and it has child events, and it's not reserved by me,
                 # that means people have signed up for it, so we want to display it.
                 keep = true

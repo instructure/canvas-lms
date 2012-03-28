@@ -1,14 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/calendar2_common')
 
 EDIT_NAME = 'edited appointment'
 EDIT_LOCATION = 'edited location'
 
 describe "scheduler" do
-  it_should_behave_like "in-process server selenium tests"
-
-  before (:each) do
-    Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
-  end
+  it_should_behave_like "calendar2 selenium tests"
 
   def fill_out_appointment_group_form(new_appointment_text)
     driver.find_element(:css, '.create_link').click
@@ -79,20 +76,6 @@ describe "scheduler" do
     wait_for_ajaximations
     driver.find_element(:css, '.view_calendar_link').text.should == appointment_name
     driver.find_element(:css, '.ag-location').should include_text(location_name)
-  end
-
-  def create_appointment_group(params={})
-    tomorrow = (Date.today + 1).to_s
-    default_params = {
-        :title => "new appointment group",
-        :context => @course,
-        :new_appointments => [
-            [tomorrow + ' 12:00:00', tomorrow + ' 13:00:00'],
-        ]
-    }
-    ag = @course.appointment_groups.create!(default_params.merge(params))
-    ag.publish!
-    ag.title
   end
 
   context "as a teacher" do
@@ -324,7 +307,7 @@ describe "scheduler" do
       wait_for_ajaximations
       click_appointment_link
 
-      open_edit_appointment_slot_dialog
+      open_edit_event_dialog
       replace_content f('[name=max_participants]'), "5"
       fj('.ui-button:contains(Update)').click
       wait_for_ajaximations
@@ -333,9 +316,8 @@ describe "scheduler" do
       ag.appointments.first.participants_per_appointment.should eql 5
       ag.participants_per_appointment.should eql 2
 
-      open_edit_appointment_slot_dialog
+      open_edit_event_dialog
       f('[name=max_participants_option]').click
-      debugger
       fj('.ui-button:contains(Update)').click
       wait_for_ajaximations
 

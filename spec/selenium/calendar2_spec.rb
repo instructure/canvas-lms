@@ -1,11 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/calendar2_common')
 
 describe "calendar2" do
-  it_should_behave_like "in-process server selenium tests"
-
-  before (:each) do
-    Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
-  end
+  it_should_behave_like "calendar2 selenium tests"
 
   def make_event(params = {})
     opts = {
@@ -291,6 +288,27 @@ describe "calendar2" do
         get_header_text.should_not == current_month
         driver.find_element(:css, '.fc-button-today').click
         get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
+      end
+
+      context "event editing" do
+        it "should allow editing appointment events" do
+          create_appointment_group
+          ag = AppointmentGroup.first
+          student_in_course(:course => @course, :active_all => true)
+          ag.appointments.first.reserve_for(@user, @user)
+
+          get "/calendar2"
+          wait_for_ajaximations
+
+          open_edit_event_dialog
+          description = 'description...'
+          replace_content f('[name=description]'), description
+          fj('.ui-button:contains(Update)').click
+          wait_for_ajaximations
+
+          ag.reload.appointments.first.description.should eql description
+          lambda { f('.fc-event') }.should_not raise_error
+        end
       end
     end
 
