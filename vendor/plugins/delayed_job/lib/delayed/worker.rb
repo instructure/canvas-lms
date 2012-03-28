@@ -133,7 +133,7 @@ class Worker
         job.destroy
       end
     end
-    say("Completed #{log_job(job)} %.0fms" % (runtime * 1000), :info)
+    say("Completed #{log_job(job)} #{"%.0fms" % (runtime * 1000)}", :info)
     count
   rescue Exception => e
     handle_failed_job(job, e)

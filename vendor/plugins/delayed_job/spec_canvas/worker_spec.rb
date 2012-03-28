@@ -33,6 +33,12 @@ describe Delayed::Worker do
         @job.attempts.should == 1
       end
     end
+
+    it "should not fail when running a job with a % in the name" do
+      User.send_later(:name_parts, "Some % Name")
+      @job = Delayed::Job.last
+      @worker.perform(@job)
+    end
   end
 
   describe "running a batch" do
