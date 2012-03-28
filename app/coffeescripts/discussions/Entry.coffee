@@ -126,9 +126,12 @@ define [
     ##
     # Shows the reply form at the bottom of all side comments
     allowsSideComments: ->
-      !ENV.DISCUSSION.THREADED and
+      deleted = @get 'deleted'
+
+      not ENV.DISCUSSION.THREADED and
       ENV.DISCUSSION.PERMISSIONS.CAN_REPLY and
-      @get('parent_id') is null # root entry
+      @get('parent_id') is null and # root entry
+      not deleted
 
     ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON
