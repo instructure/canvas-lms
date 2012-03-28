@@ -21,12 +21,22 @@ module Delayed
       object.send(method, *args)
     end
 
+    def deep_de_ar_ize(arg)
+      case arg
+      when Hash
+        "{#{arg.map { |k, v| "#{deep_de_ar_ize(k)} => #{deep_de_ar_ize(v)}" }.join(', ')}}"
+      when Array
+        "[#{arg.map { |a| deep_de_ar_ize(a) }.join(', ')}]"
+      when ActiveRecord::Base
+        "#{arg.class}.find(#{arg.id})"
+      else
+        arg.inspect
+      end
+    end
+
     def full_name
       obj_name = object.is_a?(ActiveRecord::Base) ? "#{object.class}.find(#{object.id}).#{method}" : display_name
-      arg_names = args.map do |a|
-        a.is_a?(ActiveRecord::Base) ? "#{a.class}.find(#{a.id})" : a.inspect
-      end
-      "#{obj_name}(#{arg_names.join(", ")})"
+      "#{obj_name}(#{args.map { |a| deep_de_ar_ize(a) }.join(', ')})"
     end
   end
 end
