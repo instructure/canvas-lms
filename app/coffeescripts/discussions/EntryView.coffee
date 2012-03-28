@@ -58,7 +58,7 @@ define [
 
     onCollapsedView: (model, collapsedView) =>
       @toggleCollapsedClass()
-      if @model.get('allowsSideComments')
+      if @model.get 'hideRepliesOnCollapse'
         els = @$('.replies, .add-side-comment-wrap')
         if collapsedView
           els.hide()
