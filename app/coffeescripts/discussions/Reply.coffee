@@ -1,11 +1,13 @@
 define [
+  'compiled/backbone-ext/Backbone'
+  'use!underscore'
   'i18n!discussions.reply'
   'jquery'
   'compiled/discussions/Entry'
   'str/htmlEscape'
   'jst/discussions/_reply_attachment'
   'tinymce.editor_box'
-], (I18n, $, Entry, htmlEscape, replyAttachmentTemplate) ->
+], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate) ->
 
   class Reply
 
@@ -46,6 +48,7 @@ define [
       setTimeout =>
         @textarea.editorBox 'focus'
       @editing = true
+      @trigger 'edit', this
 
     ##
     # Hides the TinyMCE editor
@@ -58,6 +61,7 @@ define [
       @textarea.val @content
       @el.show()
       @editing = false
+      @trigger 'hide', this
 
     ##
     # Submit handler for the reply form. Creates a new Entry and saves it
@@ -133,4 +137,8 @@ define [
     # Removes all attachments
     removeAttachments: ->
       @form.find('ul.discussion-reply-attachments').empty()
+
+  _.extend Reply.prototype, Backbone.Events
+
+  Reply
 

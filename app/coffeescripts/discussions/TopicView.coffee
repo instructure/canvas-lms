@@ -39,6 +39,7 @@ define [
       @model.set 'canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
 
       @render()
+      @cacheElements()
       @initEntries() unless ENV.DISCUSSION.INITIAL_POST_REQUIRED
 
       @initViewSwitcher()
@@ -48,6 +49,11 @@ define [
       @disableNextUnread()
 
       @$el.toggleClass 'directed-discussion', !ENV.DISCUSSION.THREADED
+
+    ##
+    # Cache all the elements reused in the class
+    cacheElements: ->
+      @$addRootReply = @$ '.add_root_reply'
 
     ##
     # Creates the Entries
@@ -119,7 +125,10 @@ define [
     # @api private
     addReply: (event) ->
       event.preventDefault()
-      @reply ?= new Reply this, topLevel: true, added: @initEntries
+      unless @reply?
+        @reply = new Reply this, topLevel: true, added: @initEntries
+        @reply.on 'edit', => @$addRootReply.hide()
+        @reply.on 'hide', => @$addRootReply.show()
       @model.set 'notification', ''
       @reply.edit()
 
