@@ -136,7 +136,7 @@ class Assignment < ActiveRecord::Base
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
           :run_at => due_at,
-          :singleton => "assignment:auto_peer_review:#{self.id}"
+          :singleton => Shard.default.activate { "assignment:auto_peer_review:#{self.id}" }
         })
       end
     end
