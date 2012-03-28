@@ -659,7 +659,7 @@ class Assignment < ActiveRecord::Base
       event.end.ical_params = {"VALUE"=>["DATE"]}
     end
     event.summary = self.title
-    event.description = self.description
+    event.description = strip_tags(self.description).strip
     event.location = self.location
     event.dtstamp = self.updated_at.utc_datetime if self.updated_at
     event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp

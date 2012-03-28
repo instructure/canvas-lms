@@ -106,6 +106,26 @@ describe CalendarEvent do
       res.match(/DTSTART;VALUE=DATE:20080903/).should_not be_nil
       res.match(/DTEND;VALUE=DATE:20080903/).should_not be_nil
     end
+
+    it ".to_ics should return a plain-text description" do
+      calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
+      <p>
+        This assignment is due December 16th. Plz discuss the reading.
+        <p> </p>
+        <p> </p>
+        <p> </p>
+        <p> </p>
+        <p>Test.</p>
+      </p>
+      HTML
+      ev = @event.to_ics(false)
+      ev.description.should == "This assignment is due December 16th. Plz discuss the reading.
+         
+         
+         
+         
+        Test."
+    end
   end
 
   context "clone_for" do

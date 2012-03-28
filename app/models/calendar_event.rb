@@ -20,6 +20,7 @@ require 'date'
 
 class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks
+  include TextHelper
   attr_accessible :title, :description, :start_at, :end_at, :location_name,
       :location_address, :time_zone_edited, :cancel_reason
   attr_accessor :cancel_reason
@@ -350,7 +351,7 @@ class CalendarEvent < ActiveRecord::Base
       event.end.ical_params = {"VALUE"=>["DATE"]}
     end
     event.summary = self.title
-    event.description = self.description
+    event.description = strip_tags(self.description).strip
     event.location = loc_string
     event.dtstamp = self.updated_at.utc_datetime if self.updated_at
     event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
