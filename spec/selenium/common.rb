@@ -566,6 +566,7 @@ shared_examples_for "all selenium tests" do
     saved_window_handle = driver.window_handle
     driver.switch_to.frame id
     yield
+  ensure
     driver.switch_to.window saved_window_handle
   end
 
@@ -662,10 +663,6 @@ shared_examples_for "all selenium tests" do
   def refresh_page
     driver.navigate.refresh
     wait_for_dom_ready
-  end
-
-  def type_in_tiny(selector, content)
-    driver.execute_script("$('#{selector}').editorBox('execute', 'mceInsertContent',false, '#{content}')")
   end
 
   def make_full_screen
@@ -773,7 +770,8 @@ shared_examples_for "all selenium tests" do
   ##
   # returns true if a form validation error message is visible, false otherwise
   def error_displayed?
-    fj('.error_text:visible') != nil
+    # after it fades out, it's still visible, just off the screen
+    driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
   self.use_transactional_fixtures = false
