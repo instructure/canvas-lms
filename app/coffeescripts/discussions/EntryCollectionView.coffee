@@ -1,20 +1,25 @@
 define [
   'compiled/backbone-ext/Backbone'
   'compiled/discussions/EntryView'
-], (Backbone, EntryView) ->
+  'jst/discussions/EntryCollectionView'
+], (Backbone, EntryView, entryCollectionViewTemplate) ->
 
   ##
   # View for a collection of entries
   class EntryCollectionView extends Backbone.View
 
-    initialize: (@$el, @entries, args...) ->
-      super args...
-      @entries.bind 'reset', @addAll
-      @entries.bind 'add', @add
+    initialize: (options) ->
+      #TODO: backbone supposedly does the next couple lines for us but didn't
+      @$el = options.$el
+      @collection = options.collection
+
+      @collection.bind 'reset', @addAll
+      @collection.bind 'add', @add
       @render()
 
     render: ->
-      @$el.html '<ul class=discussion-entries></ul>'
+      html = entryCollectionViewTemplate @options
+      @$el.html html
       @cacheElements()
 
     cacheElements: ->
@@ -25,6 +30,5 @@ define [
       @list.append view.el
 
     addAll: =>
-      @entries.each @add
-
+      @collection.each @add
 

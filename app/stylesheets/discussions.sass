@@ -3,10 +3,10 @@
   list-style: none
   margin: -4px 0 0 8px
   padding: 0
-  background: inline-image('discussions/line.png') left repeat-y
+  background: url('/images/discussions/line.png') left repeat-y
   .entry
     padding: 4px 0 0 10px
-    background: inline-image('discussions/child_bg.png') left top no-repeat
+    background: url('/images/discussions/child_bg.png') left -13px no-repeat
     &:last-child
       background-color: white
 
@@ -51,21 +51,29 @@
   width: 100%
 
 .discussion-section
-  padding: 10px 25px
+  padding: 3px 13px
   background-color: #f3f4f5
   border-top: 1px solid #fff
   border-bottom: 1px solid #e1e1e1
   position: relative
+  &:first-child
+    border-top: 0
+  &:last-child
+    border-bottom: 0
+.topic
+  .discussion-section
+    padding-left: 5px
+  h1.discussion-title
+    font-size: 19px
 
 .discussion-title
-  font-size: 15px
+  font-size: 13px
   margin: 0
 .discussion-subtitle
   font-size: 11px
   margin: 0
 .discussion-header-content
   position: relative
-  min-height: 50px
   a
     color: inherit
 .discussion-header-right
@@ -73,8 +81,22 @@
 .discussion-pubdate
   font-size: 11px
   color: #777
+.discussion-assignment-section
+  background-image: url('/images/discussions/assignment_bg.png')
+  background-position: 8px 8px
+  background-repeat: no-repeat
+  padding-left: 40px !important
+  min-height: 40px
+  .discussion-title
+    font-size: 14px
+  .discussion-header-content
+    margin-bottom: 15px
 .discussion-assignment-links
-  margin-top: 20px
+  margin: 10px -13px -3px -40px
+  padding: 3px 0
+  border-top: 1px solid #b6b7b7
+  background-color: #e9e9ea
+  text-align: center
   a
     margin-right: 20px
 
@@ -88,7 +110,7 @@
   top: 0
   left: 0
   bottom: 0
-  width: 10px
+  width: 8px
   background-color: #d7d7d7 //grey
   .tooltip_wrap
     left: -4px
@@ -125,10 +147,14 @@
   float: left
   margin: 0 10px 0 0
   img
-    max-width: 50px
+    max-width: 35px
     // TODO: get rid of this when we implement silhouette
-    min-height: 50px
-
+    // we should not be setting a min-height, dont want to expand
+    // smaller images
+    min-height: 35px
+.topic .avatar img
+  max-width: 50px
+  min-height: 0
 .discussion-reply-attachments
   list-style: none
   padding: 0
@@ -187,3 +213,56 @@
 
 .deleted-discussion-entry
   opacity: 0.5
+  .discussion-header-content
+    min-height: 0
+  .admin-link-hover-area
+    &:hover, &.active
+      cursor: normal
+  .discussion-title
+    font-size: 12px
+    font-style: italic
+
+.add_side_comment
+  margin-left: 42px !important
+  margin-top: 10px !important
+
+.directed-discussion .discussion-entries
+  margin-left: 0
+  background: none
+
+.directed-discussion .entry
+  padding-left: 0
+  background: none
+
+.directed-discussion .entry .discussion_entry
+  margin-bottom: 0
+  position: relative
+
+.directed-discussion .entry .entry .discussion_entry
+  margin-bottom: 5px
+  border-bottom: none
+
+.directed-discussion .entry .entry .discussion_entry:first-child
+  margin-top: 10px
+
+.directed-discussion .entry .entry
+  margin-left: 0
+  background: none
+  padding-left: 10px
+  padding-right: 10px
+
+.directed-discussion .entry .replies
+  background-color: #cccccc
+  margin-left: 20px
+  margin-bottom: -5px
+
+.entry .add-side-comment-wrap .discussion-reply-form
+  background: #cccccc
+  padding: 10px
+  margin-top: 5px
+  margin-left: 20px
+  box-shadow: none
+
+.add_root_reply
+  margin-top: 20px
+

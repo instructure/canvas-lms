@@ -40,8 +40,11 @@ define [
     edit: ->
       @form.addClass 'replying'
       @textarea.editorBox()
-      @textarea.editorBox 'focus'
       @el.hide()
+      # sometimes it doesn't focus, not sure why yet, but using a setTimeout
+      # makes it focus every time (chrome/safair anyway...)
+      setTimeout =>
+        @textarea.editorBox 'focus'
       @editing = true
 
     ##
@@ -98,7 +101,11 @@ define [
     # @api private
     onPostReplySuccess: (entry) =>
       @view.collection.add entry unless @options.added?()
-      @view.model.set 'notification', I18n.t('reply_saved', "Reply saved, *go to your reply*", wrapper: "<a href='##{entry.cid}' data-event='goToReply'>$1</a>")
+      if @view.model.get('allowsSideComments')
+        text = ''
+      else
+        text = I18n.t('reply_saved', "Reply saved, *go to your reply*", wrapper: "<a href='##{entry.cid}' data-event='goToReply'>$1</a>")
+      @view.model.set 'notification', text
       @el.show()
 
     ##

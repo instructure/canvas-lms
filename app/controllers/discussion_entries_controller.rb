@@ -115,8 +115,8 @@ class DiscussionEntriesController < ApplicationController
             flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
             redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
           }
-          format.json { render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first }
-          format.text {  render :json => discussion_entry_api_json([@entry], @context, @current_user, session, false).first }
+          format.json { render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
+          format.text {  render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @entry.errors.to_json, :status => :bad_request }

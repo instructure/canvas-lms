@@ -26,10 +26,8 @@ define [
       # Only catch events for the top level "add reply" form,
       # EntriesView handles the clicks for the other replies
       'click #discussion_topic .discussion-reply-form [data-event]': 'handleEvent'
-
-      ##
-      # TODO: add view switcher feature
-      #'change .view_switcher': 'switchView' # for v2, see comments at initViewSwitcher
+      'change .view_switcher': 'switchView'
+      'click .add_root_reply': 'addRootReply'
 
     initialize: ->
       @$el = $ '#main'
@@ -43,11 +41,13 @@ define [
       @render()
       @initEntries() unless ENV.DISCUSSION.INITIAL_POST_REQUIRED
 
-      # @initViewSwitcher()
+      @initViewSwitcher()
 
       $.scrollSidebar() if $(document.body).is('.with-right-side')
       assignmentRubricDialog.initTriggers()
       @disableNextUnread()
+
+      @$el.toggleClass 'directed-discussion', !ENV.DISCUSSION.THREADED
 
     ##
     # Creates the Entries
@@ -144,8 +144,6 @@ define [
         @$('.entry_content:first').append html
       super
 
-    # TODO: v2 implement this, commented out discussion_topics/show.html.erb
-    ###
     initViewSwitcher: ->
       @$('.view_switcher').show().selectmenu
         icons: [
@@ -160,12 +158,19 @@ define [
       @[view + 'View']()
 
     collapsedView: ->
-      view.model.set('collapsedView', true) for view in EntryView.instances
+      view.model.set('collapsedView', true) for id, view of EntryView.instances
 
     expandedView: ->
-      view.model.set('collapsedView', false) for view in EntryView.instances
+      view.model.set('collapsedView', false) for id, view of EntryView.instances
 
     unreadView: ->
-      console.log 'unread'
-    ###
+      for id, view of EntryView.instances
+        collapsedView = view.model.get('read_state') is 'read'
+        view.model.set 'collapsedView', collapsedView
+
+    addRootReply: (event) ->
+      $el = @$ event.currentTarget
+      target = $('#discussion_topic')
+      @addReply event
+      $('html, body').animate scrollTop: target.offset().top
 

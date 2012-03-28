@@ -240,7 +240,6 @@ describe 'Submissions API', :type => :integration do
       [{
         'id' => se1.id,
         'message' => 'sub 1',
-        'summary' => 'sub 1',
         'user_id' => @student.id,
         'read_state' => 'unread',
         'parent_id' => e1.id,
@@ -251,7 +250,6 @@ describe 'Submissions API', :type => :integration do
       {
         'id' => se2.id,
         'message' => 'student 1',
-        'summary' => 'student 1',
         'user_id' => @student.id,
         'read_state' => 'unread',
         'parent_id' => nil,
@@ -307,7 +305,6 @@ describe 'Submissions API', :type => :integration do
       [{
         'id' => se1.id,
         'message' => 'sub 1',
-        'summary' => 'sub 1',
         'user_id' => @student.id,
         'user_name' => 'User',
         'read_state' => 'unread',
@@ -318,7 +315,6 @@ describe 'Submissions API', :type => :integration do
       {
         'id' => se2.id,
         'message' => 'student 1',
-        'summary' => 'student 1',
         'user_id' => @student.id,
         'user_name' => 'User',
         'read_state' => 'unread',

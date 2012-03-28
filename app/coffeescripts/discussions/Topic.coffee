@@ -25,6 +25,8 @@ define [
         return 'continue' if xhr.status is 503
         return 'abort' if xhr.status isnt 200
         @set(@parse(data, 200, xhr))
+        options.success?(this, data)
+        # TODO: handle options.error, perhaps with Backbone.wrapError
         'stop'
       ,
         handleErrors: true
@@ -34,4 +36,8 @@ define [
         maxAttempts: 11
         backoffFactor: 1.6
       loader.start()
+
+    initialize: ->
+      super
+      @cid = 'discussion_topic'
 
