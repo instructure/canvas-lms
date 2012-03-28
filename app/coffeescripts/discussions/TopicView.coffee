@@ -39,7 +39,6 @@ define [
       @model.set 'canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
 
       @render()
-      @cacheElements()
       @initEntries() unless ENV.DISCUSSION.INITIAL_POST_REQUIRED
 
       @initViewSwitcher()
@@ -75,6 +74,7 @@ define [
       @discussion.model.bind 'fetchSuccess', =>
         unread_entries = @discussion.model.get 'unread_entries'
         @setNextUnread unread_entries
+        @cacheElements()
 
       # TODO get rid of this global, used
       window.DISCUSSION = @discussion

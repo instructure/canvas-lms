@@ -241,7 +241,6 @@
   position: relative
 
 .directed-discussion .entry .deleted-discussion-entry
-  margin-bottom: 10px
 
 .directed-discussion .entry .entry .discussion_entry
   margin-bottom: 5px
@@ -259,14 +258,23 @@
 .directed-discussion .entry .replies
   background-color: #cccccc
   margin-left: 20px
-  margin-bottom: -5px
 
-.entry .add-side-comment-wrap .discussion-reply-form
+.add-side-comment-wrap .discussion-reply-form
   background: #cccccc
   padding: 10px
-  margin-top: 5px
+  margin-top: 0px
   margin-left: 20px
   box-shadow: none
+
+.directed-discussion .discussion-entries:last-child
+  margin-bottom: 0
+
+.directed-discussion .entry:last-child
+  margin-bottom: 0px
+  padding-bottom: 4px
+
+.directed-discussion .discussion-entries
+  margin-top: 0px
 
 .add_root_reply
   display: inline-block
