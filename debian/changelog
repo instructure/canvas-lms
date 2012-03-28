@@ -1,3 +1,19 @@
+canvas-lms (2012.03.31.08) testing; urgency=low
+
+  * Package ref: 51f0409dfe525b27e1302b9f2a1a5e7b4dab758c
+  *
+  * [+ec15b8e] fix gradient in ie, closes #7895
+  * [+5757ba5] fix disableWhileLoading for file upload formSubmits, fixes #7755
+  * [+3e18b53] store full message in materialized view, not summary
+  * [+fff2eba] fix bad merge
+  * [+41b01f0] tweak discussions css as per kyle's recommendations
+  * [+46815c9] included deleted entries in total message count
+  * [+f2ed5ee] make sure subtopics (for groups) get the threaded attribute
+  * [+2c6ca44] default to all expanded, added view switcher
+  * [+51f0409] new threadish styles and behavior
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 28 Mar 2012 09:18:47 -0600
+
 canvas-lms (2012.03.31.06) testing; urgency=low
 
   * Package ref: 94766bb4f4aa256ba08f3654ff9b10a4cd29b2cf
