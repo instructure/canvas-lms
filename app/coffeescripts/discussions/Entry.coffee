@@ -49,6 +49,7 @@ define [
       'author'
       'editor'
       'canModerate'
+      'allowsSideComments'
       { name: 'canReply', deps: ['parent_id'] }
       { name: 'summary', deps: ['message'] }
     ]
@@ -101,11 +102,13 @@ define [
       isAuthorsEntry = @get('user_id') is ENV.DISCUSSION.CURRENT_USER.id
       isAuthorsEntry or ENV.DISCUSSION.PERMISSIONS.MODERATE
 
-    # Non-threaded topics get replies to first-level replies
+    ##
+    # Only threaded discussions get the ability to reply in an EntryView
+    # Directed discussions have the reply form in the EntryCollectionView
     canReply: ->
       return false unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
       return true if ENV.DISCUSSION.THREADED
-      return true if @get('parent_id') is null # null means its a root entry
+      false
 
     ##
     # Computed attribute to determine if the entry has an editor
@@ -119,6 +122,13 @@ define [
     summary: ->
       @escapeDiv ||= $('<div/>')
       @escapeDiv.html(@get('message')).text()
+
+    ##
+    # Shows the reply form at the bottom of all side comments
+    allowsSideComments: ->
+      !ENV.DISCUSSION.THREADED and
+      ENV.DISCUSSION.PERMISSIONS.CAN_REPLY and
+      @get('parent_id') is null # root entry
 
     ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON

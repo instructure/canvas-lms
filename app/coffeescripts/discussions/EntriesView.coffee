@@ -61,7 +61,10 @@ define [
     #
     # @api private
     initEntries: (thisView, entries) =>
-      @collectionView = new EntryCollectionView @$el, @collection
+      @collectionView = new EntryCollectionView
+        $el: @$el
+        collection: @collection
+        showReplyButton: true
       @collection.reset entries
       MarkAsReadWatcher.init()
       @setUnreadEntries()

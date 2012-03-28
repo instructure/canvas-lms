@@ -8,3 +8,10 @@
   </div>
 </article>
 <div class="replies"></div>
+{{#if allowsSideComments}}
+  <div class="add-side-comment-wrap">
+    {{>[discussions/reply_form]}}
+  </div>
+{{/if}}
+
+
