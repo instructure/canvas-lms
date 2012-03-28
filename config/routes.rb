@@ -192,7 +192,9 @@ ActionController::Routing::Routes.draw do |map|
     add_zip_file_imports(course)
     course.import_quizzes 'imports/quizzes', :controller => 'content_imports', :action => 'quizzes'
     course.import_content 'imports/content', :controller => 'content_imports', :action => 'content'
-    course.import_copy 'imports/copy', :controller => 'content_imports', :action => 'copy_course', :conditions => {:method => :get}
+    course.import_choose_course 'imports/choose_course', :controller => 'content_imports', :action => 'choose_course', :conditions => {:method => :get}
+    course.import_choose_content 'imports/choose_content', :controller => 'content_imports', :action => 'choose_content', :conditions => {:method => :get}
+    course.import_copy_course_finish 'imports/copy_course_finish', :controller => 'content_imports', :action => 'copy_course_finish', :conditions => {:method => :get}
     course.import_migrate 'imports/migrate', :controller => 'content_imports', :action => 'migrate_content'
     course.import_upload 'imports/upload', :controller => 'content_imports', :action => 'migrate_content_upload'
     course.import_s3_success 'imports/s3_success', :controller => 'content_imports', :action => 'migrate_content_s3_success'

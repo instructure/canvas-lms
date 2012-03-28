@@ -105,7 +105,7 @@ describe "courses" do
       click_option('#copy_from_course', 'second course')
       driver.find_element(:css, '#content form').submit
 
-      driver.find_element(:id, 'copy_everything').click
+      #driver.find_element(:id, 'copy_everything').click
 
       #modify course dates
       driver.find_element(:id, 'copy_shift_dates').click
@@ -123,7 +123,7 @@ describe "courses" do
       wait_for_ajaximations
 
       # since jobs aren't running
-      CourseImport.last.perform
+      ContentMigration.last.copy_course_without_send_later
 
       keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
       @course.reload
@@ -139,11 +139,10 @@ describe "courses" do
 
         get "/courses/#{@course.id}/copy"
         expect_new_page_load { driver.find_element(:css, "div#content form").submit }
-        driver.find_element(:id, 'copy_everything').click
         driver.find_element(:id, 'copy_context_form').submit
         wait_for_ajaximations
 
-        CourseImport.last.perform
+        ContentMigration.last.copy_course_without_send_later
 
         keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
 

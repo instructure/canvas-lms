@@ -938,7 +938,7 @@ class CoursesController < ApplicationController
       @course.workflow_state = 'claimed'
       @course.save
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
-      redirect_to course_import_copy_url(@course, 'copy[course_id]' => @context.id)
+      redirect_to course_import_choose_content_url(@course, 'source_course' => @context.id)
     end
   end
 

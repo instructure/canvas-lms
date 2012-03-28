@@ -155,6 +155,7 @@ class Course < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
+  has_many :content_migrations
   has_many :content_exports
   has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
@@ -1632,16 +1633,15 @@ class Course < ActiveRecord::Base
     ActiveRecord::Base.skip_touch_context
     @imported_migration_items = []
 
-    # These only need to be processed once
-    Attachment.skip_media_object_creation do
-      process_migration_files(data, migration); migration.fast_update_progress(18)
-      Attachment.process_migration(data, migration); migration.fast_update_progress(20)
-      mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
-      import_media_objects(mo_attachments, migration)
+    if !migration.for_course_copy?
+      # These only need to be processed once
+      Attachment.skip_media_object_creation do
+        process_migration_files(data, migration); migration.fast_update_progress(18)
+        Attachment.process_migration(data, migration); migration.fast_update_progress(20)
+        mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
+        import_media_objects(mo_attachments, migration)
+      end
     end
-
-    # needs to happen after the files are processed, so that they are available in the syllabus
-    import_settings_from_migration(data); migration.fast_update_progress(21)
 
     migration.fast_update_progress(30)
     question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
@@ -1669,6 +1669,10 @@ class Course < ActiveRecord::Base
     CalendarEvent.process_migration(data, migration);migration.fast_update_progress(90)
     WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
 
+    if !migration.copy_options || migration.copy_options[:everything] || migration.copy_options[:all_course_settings]
+      import_settings_from_migration(data); migration.fast_update_progress(96)
+    end
+
     begin
       #Adjust dates
       if bool_res(params[:copy][:shift_dates])
@@ -1693,8 +1697,15 @@ class Course < ActiveRecord::Base
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.save!
+          elsif event.is_a?(ContextModule)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.start_at = shift_date(event.start_at, shift_options)
+            event.end_at = shift_date(event.end_at, shift_options)
           end
         end
+
+        self.start_at ||= shift_options[:new_start_date]
+        self.conclude_at ||= shift_options[:new_end_date]
       end
     rescue
       add_migration_warning("Couldn't adjust the due dates.", $!)
@@ -1769,6 +1780,63 @@ class Course < ActiveRecord::Base
     old && new && columns.all?{|column|
       old.respond_to?(column) && new.respond_to?(column) && old.send(column) == new.send(column)
     }
+  end
+
+  def copy_attachments_from_course(course, options={})
+    self.attachment_path_id_lookup = {}
+    root_folder = Folder.root_folders(self).first.name + '/'
+    ce = options[:content_export]
+    cm = options[:content_migration]
+
+    attachments = course.attachments.all(:conditions => "file_state <> 'deleted'")
+    total = attachments.count + 1
+
+    attachments.each_with_index do |file, i|
+      cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
+      if !ce || ce.export_object?(file)
+        new_file = file.clone_for(self)
+        self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder}/, '')] = new_file.migration_id
+        new_folder_id = merge_mapped_id(file.folder)
+        # make sure the file has somewhere to go
+        if !new_folder_id
+          # gather mapping of needed folders from old course to new course
+          old_folders = []
+          old_folders << file.folder
+          new_folders = []
+          new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
+          while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
+            old_folders << old_folders.last.parent_folder
+            new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
+          end
+          old_folders.reverse!
+          new_folders.reverse!
+          # try to use folders that already match if possible
+          final_new_folders = []
+          parent_folder = Folder.root_folders(self).first
+          old_folders.each_with_index do |folder, idx|
+            if f = parent_folder.active_sub_folders.find_by_name(folder.name)
+              final_new_folders << f
+            else
+              final_new_folders << new_folders[idx]
+            end
+            parent_folder = final_new_folders.last
+          end
+          # add or update the folder structure needed for the file
+          final_new_folders.first.parent_folder_id ||=
+            merge_mapped_id(old_folders.first.parent_folder) ||
+            Folder.root_folders(self).first.id
+          old_folders.each_with_index do |folder, idx|
+            final_new_folders[idx].save!
+            map_merge(folder, final_new_folders[idx])
+            final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
+          end
+          new_folder_id = merge_mapped_id(file.folder)
+        end
+        new_file.folder_id = new_folder_id
+        new_file.save!
+        map_merge(file, new_file)
+      end
+    end
   end
 
   attr_accessor :merge_mappings

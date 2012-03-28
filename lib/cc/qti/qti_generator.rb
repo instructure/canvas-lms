@@ -54,7 +54,7 @@ module CC
         end
         
         @course.quizzes.active.each do |quiz|
-          next unless export_object?(quiz)
+          next unless export_object?(quiz) || export_object?(quiz.assignment)
           begin
             generate_quiz(quiz)
           rescue

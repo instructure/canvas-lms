@@ -58,6 +58,15 @@ module Api::V1::Course
 
   def copy_status_json(import, course, user, session)
     hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state))
+
+    # the type of object for course copy changed but we don't want the api to change
+    # so map the workflow states to the old ones
+    if hash['workflow_state'] == 'imported'
+      hash['workflow_state'] = 'completed'
+    elsif !['created', 'failed'].member?(hash['workflow_state'])
+      hash['workflow_state'] = 'started'
+    end
+
     hash[:status_url] = api_v1_course_copy_status_url(course, import)
     hash
   end

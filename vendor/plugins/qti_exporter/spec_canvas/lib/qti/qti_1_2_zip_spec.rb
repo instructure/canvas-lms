@@ -59,19 +59,23 @@ if Qti.migration_executable
 
     it "should use expected file links in questions" do
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")
-      att = aq.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
+      c_att = @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
+      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1007")
-      att = aq.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821")
+      c_att = @course.attachments.find_by_migration_id("prepend_test_f3e5ead7f6e1b25a46a4145100566821")
+      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1014")
-      att = aq.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22")
+      c_att = @course.attachments.find_by_migration_id("prepend_test_d2b5ca33bd970f64a6301fa75ae2eb22")
+      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1053")
-      att = aq.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1")
+      c_att = @course.attachments.find_by_migration_id("prepend_test_c16566de1661613ef9e5517ec69c25a1")
+      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
     end
     
@@ -94,12 +98,14 @@ if Qti.migration_executable
       
       # Check the first import
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")
-      att = aq.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
+      c_att = @course.attachments.find_by_migration_id("prepend_test_4d348a246af616c7d9a7d403367c1a30")
+      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
       
       # check the second import
       aq = @course.assessment_questions.find_by_migration_id("test2_QUE_1003")
-      att = aq.attachments.find_by_migration_id("test2_4d348a246af616c7d9a7d403367c1a30")
+      c_att = @course.attachments.find_by_migration_id("test2_4d348a246af616c7d9a7d403367c1a30")
+      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
       aq.question_data["question_text"].should =~ %r{files/#{att.id}/download}
     end
 

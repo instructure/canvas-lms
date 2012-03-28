@@ -77,6 +77,10 @@ module CC
         blti_node.blti(:extensions, :platform => CC::CCHelper::CANVAS_PLATFORM) do |ext_node|
           ext_node.lticm :property, tool.workflow_state, 'name' => 'privacy_level'
           ext_node.lticm(:property, tool.domain, 'name' => 'domain') unless tool.domain.blank?
+          if for_course_copy
+            ext_node.lticm :property, tool.consumer_key, 'name' => 'consumer_key'
+            ext_node.lticm :property, tool.shared_secret, 'name' => 'shared_secret'
+          end
           [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button].each do |type|
             if tool.settings[type]
               ext_node.lticm(:options, :name => type.to_s) do |type_node|

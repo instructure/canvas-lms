@@ -21,6 +21,7 @@ class ContentExport < ActiveRecord::Base
   belongs_to :course
   belongs_to :user
   belongs_to :attachment
+  belongs_to :content_migration
   has_many :attachments, :as => :context, :dependent => :destroy
   has_a_broadcast_policy
   serialize :settings
@@ -30,6 +31,7 @@ class ContentExport < ActiveRecord::Base
     state :created
     state :exporting
     state :exported
+    state :exported_for_course_copy
     state :failed
     state :deleted
   end
@@ -52,8 +54,13 @@ class ContentExport < ActiveRecord::Base
     self.workflow_state = 'exporting'
     self.save
     begin
-      if CC::CCExporter.export(self, opts.merge({:for_course_copy => self.settings[:for_course_copy]}))
-        self.workflow_state = 'exported'
+      if CC::CCExporter.export(self, opts.merge({:for_course_copy => for_course_copy?}))
+        self.progress = 100
+        if for_course_copy?
+          self.workflow_state = 'exported_for_course_copy'
+        else
+          self.workflow_state = 'exported'
+        end
       else
         self.workflow_state = 'failed'
       end
@@ -65,6 +72,14 @@ class ContentExport < ActiveRecord::Base
     end
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def for_course_copy?
+    self.settings[:for_course_copy]
+  end
+
+  def for_course_copy=(val)
+    self.settings[:for_course_copy] = val
+  end
   
   def error_message
     self.settings[:errors] ? self.settings[:errors].last : nil
@@ -131,6 +146,7 @@ class ContentExport < ActiveRecord::Base
   end
   
   named_scope :active, {:conditions => ['workflow_state != ?', 'deleted']}
+  named_scope :not_for_copy, {:conditions => ['workflow_state != ?', 'exported_for_course_copy']}
   named_scope :running, {:conditions => ['workflow_state IN (?)', ['created', 'exporting']]}
 
   private

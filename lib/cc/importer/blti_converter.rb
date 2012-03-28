@@ -77,7 +77,9 @@ module CC::Importer
         if ext[:platform] == CANVAS_PLATFORM
           tool[:privacy_level] = ext[:custom_fields].delete 'privacy_level'
           tool[:domain] = ext[:custom_fields].delete 'domain'
-          
+          tool[:consumer_key] = ext[:custom_fields].delete 'consumer_key'
+          tool[:shared_secret] = ext[:custom_fields].delete 'shared_secret'
+
           tool[:settings] = ext[:custom_fields]
         else
           tool[:extensions] << ext

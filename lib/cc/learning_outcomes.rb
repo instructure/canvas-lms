@@ -72,8 +72,7 @@ module CC
       node.learningOutcome(:identifier=>migration_id) do |out_node|
         out_node.title item.short_description unless item.short_description.blank?
         out_node.description @html_exporter.html_content(item.description) unless item.description.blank?
-        criterion = item.data[:rubric_criterion]
-        if criterion
+        if item.data && criterion = item.data[:rubric_criterion]
           out_node.points_possible criterion[:points_possible] if criterion[:points_possible]
           out_node.mastery_points criterion[:mastery_points] if criterion[:mastery_points]
           if criterion[:ratings] && criterion[:ratings].length > 0

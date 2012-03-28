@@ -52,7 +52,7 @@ module CC::Importer::Standard
       create_file_map
       @course[:discussion_topics] = convert_discussions
       @course[:external_tools] = convert_blti_links(resources_by_type("imsbasiclti"))
-      @course[:assessment_questions], @course[:assessments] = convert_quizzes
+      @course[:assessment_questions], @course[:assessments] = convert_quizzes if Qti.qti_enabled?
       @course[:modules] = convert_organizations(@manifest)
       @course[:all_files_zip] = package_course_files(@course[:file_map])
       

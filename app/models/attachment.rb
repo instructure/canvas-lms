@@ -158,6 +158,7 @@ class Attachment < ActiveRecord::Base
     dup.write_attribute(:filename, self.filename)
     dup.root_attachment_id = self.root_attachment_id || self.id
     dup.context = context
+    dup.migration_id = CC::CCHelper.create_key(self)
     context.log_merge_result("File \"#{dup.folder.full_name rescue ''}/#{dup.display_name}\" created") if context.respond_to?(:log_merge_result)
     dup.updated_at = Time.now
     dup.clone_updated = true
