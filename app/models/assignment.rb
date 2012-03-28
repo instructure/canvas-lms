@@ -448,11 +448,12 @@ class Assignment < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
-    self.quiz.destroy if self.quiz && !self.quiz.deleted?
     ContentTag.delete_for(self)
     @grades_affected = true
-    self.save
+    res = self.save
+    self.discussion_topic.destroy if self.discussion_topic && self.discussion_topic.reload && !self.discussion_topic.deleted?
+    self.quiz.destroy if self.quiz && self.quiz.reload && !self.quiz.deleted?
+    res
   end
 
   def time_zone_edited

@@ -949,6 +949,19 @@ describe Assignment do
       @quiz.state.should eql(:created)
     end
 
+    it "should delete the quiz when destroyed" do
+      assignment_model(:submission_types => "online_quiz")
+      @a.reload
+      @a.submission_types.should eql('online_quiz')
+      @quiz = @a.quiz
+      @quiz.should_not be_nil
+      @quiz.assignment_id.should eql(@a.id)
+      @a.quiz.reload
+      @a.destroy
+      @quiz.reload
+      @quiz.state.should eql(:deleted)
+    end
+
     it "should create a discussion_topic if none exists and specified" do
       assignment_model(:submission_types => "discussion_topic")
       @a.submission_types.should eql('discussion_topic')
@@ -1024,6 +1037,17 @@ describe Assignment do
       @a.state.should eql(:published)
       @topic.reload
       @topic.state.should eql(:active)
+    end
+
+    it "should delete the topic when destroyed" do
+      assignment_model(:submission_types => "discussion_topic")
+      @a.submission_types.should eql('discussion_topic')
+      @topic = @a.discussion_topic
+      @topic.should_not be_nil
+      @topic.assignment_id.should eql(@a.id)
+      @a.destroy
+      @topic.reload
+      @topic.state.should eql(:deleted)
     end
   end
 
