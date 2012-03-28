@@ -243,6 +243,7 @@ describe AssignmentsApiController, :type => :integration do
       'url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
       'attachments' => [],
       'permissions' => { 'attach' => true },
+      'discussion_type' => 'side_comment',
     }
   end
 

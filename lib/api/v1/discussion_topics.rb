@@ -45,6 +45,7 @@ module Api::V1::DiscussionTopics
                   :methods => [:user_name, :discussion_subentry_count], }, [:attach]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
+                  :discussion_type => topic.discussion_type,
                   :podcast_url => url,
                   :read_state => topic.read_state(user),
                   :unread_count => topic.unread_count(user),

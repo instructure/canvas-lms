@@ -95,6 +95,7 @@ describe DiscussionTopicsController, :type => :integration do
                                    "size"=>attachment.size,
                   }],
                   "topic_children"=>[sub.id],
+                  "discussion_type" => 'side_comment',
                   "permissions" => { "attach" => true }}
   end
 
@@ -165,6 +166,7 @@ describe DiscussionTopicsController, :type => :integration do
                           "posted_at"=>gtopic.posted_at.as_json,
                           "root_topic_id"=>nil,
                           "topic_children"=>[],
+                          "discussion_type" => 'side_comment',
                           "permissions" => { "attach" => true }}
   end
 
@@ -826,6 +828,12 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     context "in the original API" do
+      it "should respond with information on the threaded discussion" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
+        json[0]['discussion_type'].should == 'threaded'
+      end
+
       it "should return nested discussions in a flattened format" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries",
                  { :controller => "discussion_topics_api", :action => "entries", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
