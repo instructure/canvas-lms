@@ -41,6 +41,15 @@ define [
 
     mimeClass: (contentType) -> $.mimeClass(contentType)
 
+    # finds any <video/audio class="instructure_inline_media_comment"> and turns them into media comment thumbnails
+    convertNativeToMediaCommentThumnail: (html) ->
+      $dummy = $('<div />').html(html)
+      $dummy.find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment').replaceWith ->
+        $("<a id='media_comment_#{$(this).data('media_comment_id')}
+              data-media_comment_type='#{$(this).data('media_comment_type')}
+              class='instructure_inline_media_comment' />")
+      new Handlebars.SafeString $dummy.html()
+
     newlinesToBreak : (string) ->
       new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")
 

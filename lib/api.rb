@@ -233,15 +233,26 @@ module Api
     doc.css('a.instructure_inline_media_comment').each do |anchor|
       media_id = anchor['id'].try(:gsub, /^media_comment_/, '')
       next if media_id.blank?
+
+      if anchor['class'].try(:match, /\baudio_comment\b/)
+        node = Nokogiri::XML::Node.new('audio', doc)
+        node['data-media_comment_type'] = 'audio'
+      else
+        node = Nokogiri::XML::Node.new('video', doc)
+        thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host)
+        node['poster'] = thumbnail
+        node['data-media_comment_type'] = 'video'
+        node['width'] = '550'
+        node['height'] = '448'
+      end
+
+      node['preload'] = 'none'
+      node['class'] = 'instructure_inline_media_comment'
+      node['data-media_comment_id'] = media_id
       media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1', :host => host)
-      thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host)
-      video_node = Nokogiri::XML::Node.new('video', doc)
-      video_node['controls'] = 'controls'
-      video_node['poster'] = thumbnail
-      video_node['src'] = media_redirect
-      video_node['width'] = '550'
-      video_node['height'] = '448'
-      anchor.replace(video_node)
+      node['controls'] = 'controls'
+      node['src'] = media_redirect
+      anchor.replace(node)
     end
 
     return doc.to_s
