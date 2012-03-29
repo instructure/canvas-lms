@@ -17,6 +17,9 @@
           <li><a data-event="edit" href="#"><span class="ui-icon ui-icon-pencil" />{{#t "edit"}}Edit{{/t}}</a></li>
           <li><a data-event="remove" href="#"><span class="ui-icon ui-icon-trash" />{{#t "delete"}}Delete{{/t}}</a></li>
         {{/if}}
+        {{#if speedgraderUrl}}
+          <li><a href="{{speedgraderUrl}}"><span class="ui-icon ui-icon-check" />{{#t "open_in_speedgrader"}}Open in SpeedGrader{{/t}}</a></li>
+        {{/if}}
       </ul>
     </div>
     <div class="discussion-header-right">

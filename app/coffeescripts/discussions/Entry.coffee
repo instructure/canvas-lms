@@ -51,6 +51,7 @@ define [
       'canModerate'
       'allowsSideComments'
       'hideRepliesOnCollapse'
+      'speedgraderUrl'
       { name: 'canReply', deps: ['parent_id'] }
       { name: 'summary', deps: ['message'] }
     ]
@@ -117,6 +118,14 @@ define [
       editor_id = @get 'editor_id'
       return unless editor_id
       DISCUSSION.participants.get(editor_id).toJSON()
+
+    ##
+    # Computed attribute
+    speedgraderUrl: ->
+      # ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE will only exist if I have permission to grade
+      # and this thing is an assignment
+      if ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE
+        ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE.replace /put_student_id_here/, @get('user_id')
 
     ##
     # Computed attribute
