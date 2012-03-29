@@ -6,7 +6,7 @@ define [
   Backbone.syncWithoutMultipart = Backbone.sync
   Backbone.syncWithMultipart = (method, model, options) ->
     # Create a hidden iframe
-    iframeId = 'file_upload_iframe_' + Date.now()
+    iframeId = 'file_upload_iframe_' + (new Date()).getTime()
     $iframe = $("<iframe id='#{iframeId}' name='#{iframeId}' ></iframe>").hide()
 
     # Create a hidden form
@@ -20,7 +20,7 @@ define [
           attr
         else if not _.isEmpty(attr) and (_.isArray(attr) or typeof attr is 'object')
           toForm(attr, key)
-        else if not "#{key}".match(/^_/) and attr
+        else if not "#{key}".match(/^_/) and attr? and typeof attr isnt 'object' and typeof attr isnt 'function'
           $("<input type='hidden' name='#{key}' value='#{attr}' />")[0]
       _.flatten(inputs)
     $form = $("""

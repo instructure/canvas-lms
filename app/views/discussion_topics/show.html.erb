@@ -35,9 +35,9 @@
       <% end %>
       <a id="jump_to_next_unread" class="button button-sidebar-wide disabled"><%= image_tag('discussions/next_unread_icon.png') %> Jump to Next Unread</a>
       <select class="view_switcher" style="display:none;">
-        <option value="collapsed" class="collapsed-view">All Collapsed</option>
-        <option value="unread" class="unread-view">Unread Only</option>
-        <option value="expanded" class="expanded-view" selected>All Expanded</option>
+        <option value="collapsed" class="collapsed-view"><%= t :collapse_all, 'Collapse All' %></option>
+        <option value="unread" class="unread-view"><%= t :expand_unread, 'Expand Unread' %></option>
+        <option value="expanded" class="expanded-view" selected><%= t :expand_all, 'Expand All' %></option>
       </select>
     </div>
 

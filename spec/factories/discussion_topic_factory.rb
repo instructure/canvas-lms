@@ -40,7 +40,7 @@ end
 def topic_with_nested_replies(opts = {})
   course_with_teacher(:active_all => true)
   student_in_course(:course => @course, :active_all => true)
-  @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :threaded => true)
+  @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
   @root1 = @topic.reply_from(:user => @student, :html => "root1")
   @root2 = @topic.reply_from(:user => @student, :html => "root2")
   @reply1 = @root1.reply_from(:user => @teacher, :html => "reply1")
