@@ -45,8 +45,8 @@ define [
     convertNativeToMediaCommentThumnail: (html) ->
       $dummy = $('<div />').html(html)
       $dummy.find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment').replaceWith ->
-        $("<a id='media_comment_#{$(this).data('media_comment_id')}
-              data-media_comment_type='#{$(this).data('media_comment_type')}
+        $("<a id='media_comment_#{$(this).data('media_comment_id')}'
+              data-media_comment_type='#{$(this).data('media_comment_type')}'
               class='instructure_inline_media_comment' />")
       new Handlebars.SafeString $dummy.html()
 
