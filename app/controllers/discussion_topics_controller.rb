@@ -158,8 +158,9 @@ class DiscussionTopicsController < ApplicationController
         elsif topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
           format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
         else
-          format.html {
-            js_env :DISCUSSION => {
+          format.html do
+
+            env_hash = {
               :TOPIC => {
                 :ID => @topic.id,
               },
@@ -179,7 +180,12 @@ class DiscussionTopicsController < ApplicationController
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
-          }
+            if @topic.for_assignment? && @topic.assignment.grants_right?(@current_user, session, :grade)
+              env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment.id, :anchor => {:student_id => "put_student_id_here"}.to_json)
+            end
+            js_env :DISCUSSION => env_hash
+
+          end
         end
       end
     end
