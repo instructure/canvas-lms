@@ -659,6 +659,47 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
     # columns are functionally dependent on
     Array(columns.first).join(", ")
   end
+
+  def after_transaction_commit(&block)
+    if open_transactions == 0
+      block.call
+    else
+      @after_transaction_commit ||= []
+      @after_transaction_commit << block
+    end
+  end
+
+  def after_transaction_commit_callbacks
+    @after_transaction_commit || []
+  end
+
+  # the alias_method_chain needs to happen in the subclass, since they all
+  # override commit_db_transaction
+  def commit_db_transaction_with_callbacks
+    commit_db_transaction_without_callbacks
+    return unless @after_transaction_commit
+    # the callback could trigger a new transaction on this connection,
+    # and leaving the callbacks in @after_transaction_commit could put us in an
+    # infinite loop.
+    # so we store off the callbacks to a local var here.
+    callbacks = @after_transaction_commit
+    @after_transaction_commit = []
+    callbacks.each { |cb| cb.call() }
+  ensure
+    @after_transaction_commit = [] if @after_transaction_commit
+  end
+
+  def rollback_db_transaction_with_callbacks
+    rollback_db_transaction_without_callbacks
+    @after_transaction_commit = [] if @after_transaction_commit
+  end
+end
+
+if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
+  ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
+    alias_method_chain :commit_db_transaction, :callbacks
+    alias_method_chain :rollback_db_transaction, :callbacks
+  end
 end
 
 if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
@@ -671,6 +712,9 @@ if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
           super
       end
     end
+
+    alias_method_chain :commit_db_transaction, :callbacks
+    alias_method_chain :rollback_db_transaction, :callbacks
   end
 end
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
@@ -691,6 +735,9 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       # specify all columns for postgres
       columns.flatten.join(', ')
     end
+
+    alias_method_chain :commit_db_transaction, :callbacks
+    alias_method_chain :rollback_db_transaction, :callbacks
   end
 end
 

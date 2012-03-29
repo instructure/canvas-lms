@@ -202,7 +202,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_materialized_view
-    materialized_view # kick off building of the view
+    # kick off building of the view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view
   end
 
   # If no join record exists, assume all discussion enrties are unread, and
@@ -838,6 +839,6 @@ class DiscussionTopic < ActiveRecord::Base
 
   # synchronously create/update the materialized view
   def create_materialized_view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later
   end
 end

@@ -916,6 +916,7 @@ describe DiscussionTopicsController, :type => :integration do
 
       @all_entries.each &:reload
 
+      run_transaction_commit_callbacks
       job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
       job.should be_present
       run_job(job)
@@ -1011,6 +1012,7 @@ describe DiscussionTopicsController, :type => :integration do
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
       @root1 = @topic.reply_from(:user => @student, :html => "root1")
 
+      run_transaction_commit_callbacks
       job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
       job.should be_present
       run_job(job)

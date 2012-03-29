@@ -58,8 +58,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   # that have been created or updated since the view was generated.
   def materialized_view_json(opts = {})
     if !up_to_date?
-      self.send_later_enqueue_args :update_materialized_view,
-        { :singleton => "materialized_discussion:#{discussion_topic_id}" }
+      update_materialized_view
     end
 
     if json_structure.present?
@@ -89,6 +88,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     self.entry_ids_array = entry_lookup
     self.save!
   end
+
+  handle_asynchronously :update_materialized_view,
+    :singleton => proc { |o| "materialized_discussion:#{o.discussion_topic_id}" }
 
   def build_materialized_view
     entry_lookup = {}
