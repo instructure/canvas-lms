@@ -46,11 +46,16 @@
         jquery: 'vendor/jquery-1.6.4',
         jqueryui: 'vendor/jqueryui',
         underscore: 'vendor/underscore',
+        backbone: 'vendor/backbone',
         use: 'vendor/use'
       },
 
       // non-amd shims
       use: {
+        backbone: {
+          deps: ['use!underscore', 'jquery'],
+          attach: 'Backbone'
+        },
         underscore: {
           attach: '_'
         }
