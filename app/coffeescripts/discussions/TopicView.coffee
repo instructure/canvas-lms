@@ -179,7 +179,7 @@ define [
 
     addRootReply: (event) ->
       $el = @$ event.currentTarget
-      target = $('#discussion_topic')
+      target = $('#discussion_topic .discussion-reply-form')
       @addReply event
-      $('html, body').animate scrollTop: target.offset().top
+      $('html, body').animate scrollTop: target.offset().top - 100
 

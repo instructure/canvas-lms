@@ -138,9 +138,7 @@ define [
     # on collapse
     hideRepliesOnCollapse: ->
       not ENV.DISCUSSION.THREADED and
-      # TODO: have @get('root_entry') instead of this check all over the place
-      @get('parent_id') is null and
-      @get('replies').length > 0
+        @get('parent_id') is null
 
     ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON
