@@ -1,3 +1,20 @@
+canvas-lms (2012.03.31.11) testing; urgency=low
+
+  * Package ref: a4d6770d8ee645928feb0cce042209372f5d472b
+  *
+  * [+ebd903a] fix materialzed view table definition for mysql
+  * [+c7be255] disable the css3 transitions  for kylemenus until they work
+  * [+39ae661] don't delete side comments when an entry is destroyed
+  * [+dacadc6] return discussion_type in topics api response
+  * [+cd656f1] better cancel button, deleted display, wording
+  * [+7099d26] fix attachments in new discussions, fixes #7917
+  * [+6536aef] side comments text, reply to topic, deleted replies
+  * [+c2d9e19] collapse deleted entries with children
+  * [+ac7fc77] convert <video> and <audio> from API to media_comment_thumbnails
+  * [+a4d6770] fix typo breaking media comments in discussions
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 29 Mar 2012 09:18:18 -0600
+
 canvas-lms (2012.03.31.08) testing; urgency=low
 
   * Package ref: 51f0409dfe525b27e1302b9f2a1a5e7b4dab758c
