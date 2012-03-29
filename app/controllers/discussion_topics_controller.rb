@@ -181,7 +181,7 @@ class DiscussionTopicsController < ApplicationController
               :THREADED => @topic.threaded?
             }
             if @topic.for_assignment? && @topic.assignment.grants_right?(@current_user, session, :grade)
-              env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment.id, :anchor => {:student_id => "put_student_id_here"}.to_json)
+              env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment.id, :anchor => {:student_id => ":student_id"}.to_json)
             end
             js_env :DISCUSSION => env_hash
 
