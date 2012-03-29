@@ -486,7 +486,16 @@ define([
         alert(I18n.t('alerts.file_previews_disabled', 'File previews have been disabled for this Canvas site'));
       });
     }
-    $(document).bind('user_content_change', $.throttle(50, enhanceUserContent));
+
+    // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
+    var enhanceUserContentTimeout;
+    $.subscribe('userContent/change', function(){
+      clearTimeout(enhanceUserContentTimeout);
+      enhanceUserContentTimeout = setTimeout(enhanceUserContent, 50);
+    });
+
+
+    $(document).bind('user_content_change', enhanceUserContent);
     setInterval(enhanceUserContent, 15000);
     setTimeout(enhanceUserContent, 1000);
 
