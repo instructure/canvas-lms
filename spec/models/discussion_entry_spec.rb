@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionEntry do
 
-  it "should be marked as deleted when parent is deleted" do
+  it "should not be marked as deleted when parent is deleted" do
     topic = course.discussion_topics.create!
     entry = topic.discussion_entries.create!
 
@@ -31,8 +31,8 @@ describe DiscussionEntry do
     topic.discussion_entries.active.length.should == 2
     entry.destroy
     sub_entry.reload
-    sub_entry.should be_deleted
-    topic.discussion_entries.active.length.should == 0
+    sub_entry.should_not be_deleted
+    topic.discussion_entries.active.length.should == 1
   end
 
   it "should preserve parent_id if valid" do

@@ -30,7 +30,7 @@
 </header>
 <div class="discussion-section hide-if-collapsed message_wrapper">
   <span class="message-notification" data-bind="messageNotification"></span>
-  <div data-bind="message" class="message user_content">{{{message}}}</div>
+  <div data-bind="message" class="message user_content">{{convertNativeToMediaCommentThumnail message}}</div>
   {{#if editor}}
     <div class="discussion-fyi">This comment was edited by <a {{#if editor.url}} href="{{editor.url}}" {{/if}}>{{editor.display_name}}</a></div>
   {{/if}}

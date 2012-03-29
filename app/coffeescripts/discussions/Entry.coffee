@@ -50,6 +50,7 @@ define [
       'editor'
       'canModerate'
       'allowsSideComments'
+      'hideRepliesOnCollapse'
       { name: 'canReply', deps: ['parent_id'] }
       { name: 'summary', deps: ['message'] }
     ]
@@ -126,9 +127,20 @@ define [
     ##
     # Shows the reply form at the bottom of all side comments
     allowsSideComments: ->
-      !ENV.DISCUSSION.THREADED and
+      deleted = @get 'deleted'
+      not ENV.DISCUSSION.THREADED and
       ENV.DISCUSSION.PERMISSIONS.CAN_REPLY and
-      @get('parent_id') is null # root entry
+      @get('parent_id') is null and # root entry
+      not deleted
+
+    ##
+    # Computed attribute. In side_comment discussions we hide the replies
+    # on collapse
+    hideRepliesOnCollapse: ->
+      not ENV.DISCUSSION.THREADED and
+      # TODO: have @get('root_entry') instead of this check all over the place
+      @get('parent_id') is null and
+      @get('replies').length > 0
 
     ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON

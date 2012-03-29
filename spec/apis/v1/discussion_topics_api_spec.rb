@@ -92,6 +92,7 @@ describe DiscussionTopicsController, :type => :integration do
                                    "filename"=>"content.txt",
                                    "display_name"=>"content.txt"}],
                   "topic_children"=>[sub.id],
+                  "discussion_type" => 'side_comment',
                   "permissions" => { "attach" => true }}
   end
 
@@ -159,6 +160,7 @@ describe DiscussionTopicsController, :type => :integration do
                           "posted_at"=>gtopic.posted_at.as_json,
                           "root_topic_id"=>nil,
                           "topic_children"=>[],
+                          "discussion_type" => 'side_comment',
                           "permissions" => { "attach" => true }}
   end
 
@@ -820,6 +822,12 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     context "in the original API" do
+      it "should respond with information on the threaded discussion" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
+        json[0]['discussion_type'].should == 'threaded'
+      end
+
       it "should return nested discussions in a flattened format" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries",
                  { :controller => "discussion_topics_api", :action => "entries", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -951,7 +959,7 @@ describe DiscussionTopicsController, :type => :integration do
             { 'id' => @reply2.id,
               'parent_id' => @root1.id,
               'user_id' => @teacher.id,
-              'message' => "<p><a href=\"http://localhost/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video controls=\"controls\" poster=\"http://localhost/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" src=\"http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\" width=\"550\" height=\"448\"></video>\n    </p>",
+              'message' => "<p><a href=\"http://localhost/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://localhost/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" width=\"550\" height=\"448\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\"></video>\n    </p>",
               'created_at' => @reply2.created_at.as_json,
               'updated_at' => @reply2.updated_at.as_json,
               'replies' => [ {

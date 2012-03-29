@@ -4,9 +4,9 @@ class AddMaterializedDiscussions < ActiveRecord::Migration
   def self.up
     create_table :discussion_topic_materialized_views, :id => false do |t|
       t.integer :discussion_topic_id, :limit => 8
-      t.text :json_structure
-      t.text :participants_array
-      t.text :entry_ids_array
+      t.text :json_structure, :limit => 10.megabytes
+      t.text :participants_array, :limit => 10.megabytes
+      t.text :entry_ids_array, :limit => 10.megabytes
 
       t.timestamps
     end
