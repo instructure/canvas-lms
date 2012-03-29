@@ -44,6 +44,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
   'vendor/jquery.store' /* /\$\.store/ */,
+  'vendor/jquery.ba-throttle-debounce' /* debounce */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
@@ -485,7 +486,7 @@ define([
         alert(I18n.t('alerts.file_previews_disabled', 'File previews have been disabled for this Canvas site'));
       });
     }
-    $(document).bind('user_content_change', enhanceUserContent);
+    $(document).bind('user_content_change', $.throttle(50, enhanceUserContent));
     setInterval(enhanceUserContent, 15000);
     setTimeout(enhanceUserContent, 1000);
 

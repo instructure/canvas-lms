@@ -86,6 +86,10 @@ define [
       @$el.attr 'id', @model.cid
       super
 
+      # enhance the media_comments in the message
+      $(document).trigger('user_content_change')
+
+
     openMenu: (event, $el) ->
       @createMenu($el) unless @$menu
       # open it up on first click
