@@ -74,8 +74,10 @@ module CC::Importer::Standard
       @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')]
     end
     
-    def get_canvas_att_replacement_url(path)
-      "$CANVAS_OBJECT_REFERENCE$/attachments/#{find_file_migration_id(path)}"
+    def get_canvas_att_replacement_url(path, resource_dir=nil)
+      mig_id = find_file_migration_id(resource_dir + '/' + path) if resource_dir
+      mig_id ||= find_file_migration_id(path)
+      mig_id ? "$CANVAS_OBJECT_REFERENCE$/attachments/#{mig_id}" : nil
     end
 
     def add_file(file)
@@ -124,6 +126,38 @@ module CC::Importer::Standard
           @lomimscc = key.gsub('xmlns:','')
         end
       end
+    end
+
+    FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
+    def replace_urls(html, resource_dir=nil)
+      return "" if html.blank?
+
+      doc = Nokogiri::HTML(html || "")
+      attrs = ['rel', 'href', 'src', 'data', 'value']
+      doc.search("*").each do |node|
+        attrs.each do |attr|
+          if node[attr]
+            val = URI.unescape(node[attr])
+            begin
+              if val =~ FILEBASE_REGEX
+                val.gsub!(FILEBASE_REGEX, '')
+                if new_url = URI::escape(get_canvas_att_replacement_url(val, resource_dir))
+                  node[attr] = new_url
+                end
+              else
+                if ImportedHtmlConverter.relative_url?(val)
+                  if new_url = URI::escape(get_canvas_att_replacement_url(val))
+                    node[attr] = new_url
+                  end
+                end
+              end
+            rescue URI::InvalidURIError
+              Rails.logger.warn "attempting to translate invalid url: #{val}"
+            end
+          end
+        end
+      end
+      doc.at_css('body').inner_html
     end
     
   end

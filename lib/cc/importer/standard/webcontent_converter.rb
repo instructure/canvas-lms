@@ -38,16 +38,17 @@ module CC::Importer::Standard
           end
           sub_file = {}
           sub_file[:path_name] = file_ref[:href]
-          sub_file[:migration_id] = Digest::MD5.hexdigest(main_file[:path_name])
+          sub_file[:migration_id] = Digest::MD5.hexdigest(sub_file[:path_name])
           sub_file[:file_name] = File.basename sub_file[:path_name]
           sub_file[:type] = 'FILE_TYPE'
           add_course_file(sub_file)
         end
-        
-        main_file[:file_name] = File.basename main_file[:path_name]
-        main_file[:type] = 'FILE_TYPE'
 
-        add_course_file(main_file, true)
+        if main_file[:path_name].present?
+          main_file[:file_name] = File.basename main_file[:path_name]
+          main_file[:type] = 'FILE_TYPE'
+          add_course_file(main_file, true)
+        end
       end
     end
 
