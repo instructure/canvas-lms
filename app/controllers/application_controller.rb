@@ -988,7 +988,7 @@ class ApplicationController < ActionController::Base
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
   def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
-    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
+    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host)}"
     ts, sig = @current_user && @current_user.access_verifier
 
     # add parameters so that the other domain can create a session that 

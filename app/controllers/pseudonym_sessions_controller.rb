@@ -105,6 +105,7 @@ class PseudonymSessionsController < ApplicationController
       }
       render :template => 'pseudonym_sessions/mobile_login', :layout => false, :status => status
     else
+      @request = request
       render :action => 'new', :status => status
     end
   end
