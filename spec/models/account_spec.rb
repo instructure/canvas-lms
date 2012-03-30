@@ -341,6 +341,8 @@ describe Account do
 
     limited_access = [ :read, :manage, :update, :delete ]
     full_access = RoleOverride.permissions.map { |k, v| k } + limited_access
+    index = full_access.index(:manage_courses)
+    full_access = full_access[0..index] + [:create_courses] + full_access[index+1..-1]
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
