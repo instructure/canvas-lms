@@ -158,6 +158,7 @@ describe "discussions" do
       new_student_entry_text = 'new student entry'
       user_session(@student)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
       f('.message_wrapper').should include_text('new topic from teacher')
       f('#content').should_not include_text(new_student_entry_text)
       add_reply new_student_entry_text
