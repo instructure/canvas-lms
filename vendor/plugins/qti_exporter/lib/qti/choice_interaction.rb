@@ -189,6 +189,8 @@ class ChoiceInteraction < AssessmentItemConverter
     if sum = cond.at_css('setOutcomeValue[identifier=SCORE] sum baseValue[baseType]')
       #it'll only be true if the score is a sum > 0
       weight = get_base_value(sum)
+    elsif sum = cond.at_css('setOutcomeValue[identifier=D2L_CORRECT] sum baseValue[baseType]')
+      weight = get_base_value(sum)
     elsif base = cond.at_css('setOutcomeValue[identifier=SCORE] > baseValue[baseType]')
       weight = get_base_value(base)
     elsif base = cond.at_css('setOutcomeValue[identifier^=SCORE] baseValue[baseType]')
