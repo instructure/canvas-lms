@@ -2661,6 +2661,10 @@ class Course < ActiveRecord::Base
         fake_student.preferences[:fake_student] = true
         fake_student.workflow_state = 'registered'
         fake_student.save
+        # hash the unique_id so that it's hard to accidently enroll the user in
+        # a course by entering something in a user list. :(
+        fake_student.pseudonyms.create!(:account => self.root_account,
+                                        :unique_id => Canvas::Security.hmac_sha1("Test Student_#{fake_student.id}"))
       end
       fake_student
     else
