@@ -66,9 +66,9 @@ define [
         collection: @collection
         showReplyButton: true
       @collection.reset entries
-      MarkAsReadWatcher.init()
       @updateFromNewEntries()
       @setUnreadEntries()
+      MarkAsReadWatcher.init()
 
     updateFromNewEntries: ->
       newEntries = @model.get 'new_entries'
