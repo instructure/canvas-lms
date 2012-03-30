@@ -108,6 +108,7 @@ Spec::Runner.configure do |config|
     HostUrl.reset_cache!
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
+    Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
   end
 
   # flush redis before the first spec, and before each spec that comes after
