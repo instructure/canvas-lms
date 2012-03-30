@@ -29,8 +29,6 @@ define [
         @ignore = collapsedView
         if collapsedView
           @clearTimer()
-        else
-          @createTimer()
 
     createTimer: ->
       @timer ||= setTimeout @markAsRead, MS_UNTIL_READ
