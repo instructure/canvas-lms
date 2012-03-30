@@ -20,7 +20,7 @@
 # API for accessing and configuring external tools on accounts and courses.
 # "External tools" are IMS LTI links: http://www.imsglobal.org/developers/LTI/index.cfm
 class ExternalToolsController < ApplicationController
-  before_filter :require_context, :require_user, :reject_student_view_student, :require_pseudonym
+  before_filter :require_context, :require_user
   include Api::V1::ExternalTools
 
   # @API
