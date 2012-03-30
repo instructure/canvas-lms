@@ -30,7 +30,7 @@ describe DiscussionTopic::MaterializedView do
 
   describe ".materialized_view_for" do
     it "should build the intial empty view synchronously" do
-      DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == ["[]", [], []]
+      DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == ["[]", [], [], "[]"]
     end
 
     it "should return nil and schedule a job if no view" do
@@ -61,7 +61,7 @@ describe DiscussionTopic::MaterializedView do
     view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
     view.update_materialized_view
     structure, participant_ids, entry_ids = @topic.materialized_view
-    view.materialized_view_json.should == [structure, participant_ids, entry_ids]
+    view.materialized_view_json.should == [structure, participant_ids, entry_ids, "[]"]
     participant_ids.sort.should == [@student.id, @teacher.id].sort
     entry_ids.sort.should == @topic.discussion_entries.map(&:id).sort
     json = JSON.parse(structure)

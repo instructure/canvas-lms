@@ -1004,8 +1004,59 @@ describe DiscussionTopicsController, :type => :integration do
         },
       ]
     end
-  end
 
+    it "should include new entries if the flag is given" do
+      course_with_teacher(:active_all => true)
+      student_in_course(:course => @course, :active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+      @root1 = @topic.reply_from(:user => @student, :html => "root1")
+
+      job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
+      job.should be_present
+      run_job(job)
+
+      # make everything slightly in the past to test updating
+      DiscussionEntry.update_all(:updated_at => 5.minutes.ago)
+      @reply1 = @root1.reply_from(:user => @teacher, :html => "reply1")
+      @reply2 = @root1.reply_from(:user => @teacher, :html => "reply2")
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                { :controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s }, { :include_new_entries => '1' })
+      json['unread_entries'].size.should == 2
+      json['unread_entries'].sort.should == [@reply1.id, @reply2.id]
+
+      json['participants'].map { |h| h['id'] }.sort.should == [@teacher.id, @student.id]
+
+      json['view'].should == [
+        'id' => @root1.id,
+        'parent_id' => nil,
+        'user_id' => @student.id,
+        'message' => 'root1',
+        'created_at' => @root1.created_at.as_json,
+        'updated_at' => @root1.updated_at.as_json,
+      ]
+
+      # it's important that these are returned in created_at order
+      json['new_entries'].should == [
+        {
+          'id' => @reply1.id,
+          'created_at' => @reply1.created_at.as_json,
+          'updated_at' => @reply1.updated_at.as_json,
+          'message' => 'reply1',
+          'parent_id' => @root1.id,
+          'user_id' => @teacher.id,
+        },
+        {
+          'id' => @reply2.id,
+          'created_at' => @reply2.created_at.as_json,
+          'updated_at' => @reply2.updated_at.as_json,
+          'message' => 'reply2',
+          'parent_id' => @root1.id,
+          'user_id' => @teacher.id,
+        },
+      ]
+    end
+  end
 end
 
 def create_attachment(context, opts={})

@@ -700,7 +700,7 @@ describe DiscussionTopic do
     it "should return the materialized view if it's up to date" do
       run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
       view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
-      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array]
+      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, "[]"]
     end
 
     it "should update the materialized view on new entry" do
