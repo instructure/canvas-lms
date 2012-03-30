@@ -832,8 +832,8 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # if a new message is posted, it won't appear in this view until the job to
   # update it completes. so this view is eventually consistent.
-  def materialized_view
-    DiscussionTopic::MaterializedView.materialized_view_for(self)
+  def materialized_view(opts = {})
+    DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
   end
 
   # synchronously create/update the materialized view
