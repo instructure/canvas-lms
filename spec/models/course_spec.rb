@@ -2610,6 +2610,52 @@ describe Course, "user_has_been_student?" do
   end
 end
 
+describe Course, "student_view_student" do
+  before(:each) do
+    course_with_teacher(:active_all => true)
+  end
+
+  it "should create and return the student view student for a course" do
+    expect { @course.student_view_student }.to change(User, :count).by(1)
+  end
+
+  it "should find and return the student view student on successive calls" do
+    @course.student_view_student
+    expect { @course.student_view_student }.to change(User, :count).by(0)
+  end
+
+  it "should create enrollments for each section" do
+    @section2 = @course.course_sections.create!
+    expect { @fake_student = @course.student_view_student }.to change(Enrollment, :count).by(2)
+    @fake_student.enrollments.all?{|e| e.fake_student?}.should be_true
+  end
+
+  it "should sync enrollments after being created" do
+    @course.student_view_student
+    @section2 = @course.course_sections.create!
+    expect { @course.student_view_student }.to change(Enrollment, :count).by(1)
+  end
+
+  it "should create a pseudonym for the fake student" do
+    expect { @fake_student = @course.student_view_student }.to change(Pseudonym, :count).by(1)
+    @fake_student.pseudonyms.should_not be_empty
+  end
+
+  it "should allow two different student view users for two different courses" do
+    @course1 = @course
+    @teacher1 = @teacher
+    course_with_teacher(:active_all => true)
+    @course2 = @course
+    @teacher2 = @teacher
+
+    @fake_student1 = @course1.student_view_student
+    @fake_student2 = @course2.student_view_student
+
+    @fake_student1.id.should_not eql @fake_student2.id
+    @fake_student1.pseudonym.id.should_not eql @fake_student2.pseudonym.id
+  end
+end
+
 describe Course do
   describe "user_list_search_mode_for" do
     it "should be open for anyone if open registration is turned on" do
