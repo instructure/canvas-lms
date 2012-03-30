@@ -21,7 +21,8 @@ class DelayedNotification < ActiveRecord::Base
   belongs_to :asset, :polymorphic => true
   belongs_to :notification
   belongs_to :asset_context, :polymorphic => true
-  attr_accessible :asset, :notification, :recipient_keys, :asset_context
+  attr_accessible :asset, :notification, :recipient_keys, :asset_context, :data
+  attr_accessor :data
   
   serialize :recipient_keys
   
@@ -33,15 +34,17 @@ class DelayedNotification < ActiveRecord::Base
     state :errored
   end
   
-  def self.process(asset, notification, recipient_keys, asset_context)
+  def self.process(asset, notification, recipient_keys, asset_context, data)
     dn = DelayedNotification.new(:asset => asset, :notification => notification, :recipient_keys => recipient_keys,
-      :asset_context => asset_context)
+      :asset_context => asset_context, :data => data)
     dn.process
   end
   
   def process
     tos = self.to_list
-    res = self.notification.create_message(self.asset, tos, :asset_context => self.asset_context) if self.asset && !tos.empty?
+    if self.asset && !tos.empty?
+      res = self.notification.create_message(self.asset, tos, :asset_context => self.asset_context, :data => self.data)
+    end
     self.do_process unless self.new_record?
     res
   rescue => e

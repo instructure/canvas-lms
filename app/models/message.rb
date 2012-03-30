@@ -30,7 +30,7 @@ class Message < ActiveRecord::Base
   belongs_to :user
   belongs_to :asset_context, :polymorphic => true
 
-  attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type, :from_name, :sent_at, :notification, :user, :communication_channel, :notification_name, :asset_context
+  attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type, :from_name, :sent_at, :notification, :user, :communication_channel, :notification_name, :asset_context, :data
 
   after_save :stage_message
   before_save :move_messages_for_deleted_users
@@ -259,7 +259,7 @@ class Message < ActiveRecord::Base
     @context = self.context
     @asset = @context
     @asset_context = self.asset_context
-    context, asset, user, delayed_messages, asset_context = [@context, @asset, @user, @delayed_messages, @asset_context]
+    context, asset, user, delayed_messages, asset_context, data = [@context, @asset, @user, @delayed_messages, @asset_context, @data]
     @time_zone = Time.zone
     time_zone = Time.zone
     path_type ||= self.communication_channel.path_type rescue path_type
@@ -384,6 +384,10 @@ class Message < ActiveRecord::Base
     super(key, default, options)
   end
   alias :t :translate
+
+  def data=(values_hash)
+    @data = OpenStruct.new(values_hash)
+  end
 
   protected
   

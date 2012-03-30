@@ -65,6 +65,38 @@ describe NotificationPolicy do
     m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "secondary@example.com"}
     m.should be_nil
   end
+
+  it "should pass 'data' to the message" do
+    Notification.create! :name => "Hello",
+                         :subject => "Hello",
+                         :body => "here's a free <%= data.favorite_soda %>",
+                         :category => "TestImmediately"
+    class DataTest < ActiveRecord::Base
+      set_table_name :courses
+      attr_accessible :id
+      has_a_broadcast_policy
+      set_broadcast_policy do
+        dispatch :hello
+        to {
+          u = student_in_course.user
+          u.communication_channels.build(
+            :path => 'blarg@example.com',
+            :path_type => 'email'
+          ) { |cc| cc.workflow_state = 'active' }
+          u.save!
+          u.register
+          u
+        }
+        whenever { true }
+        data { {:favorite_soda => 'mtn dew'} }
+      end
+    end
+    dt = DataTest.new
+    dt.save!
+    msg = dt.messages_sent["Hello"].find { |m| m.to == "blarg@example.com" }
+    msg.should_not be_nil
+    msg.body.should include "mtn dew"
+  end
   
   context "named scopes" do
     it "should have a named scope for users" do
