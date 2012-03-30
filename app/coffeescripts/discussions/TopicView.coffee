@@ -47,7 +47,7 @@ define [
       assignmentRubricDialog.initTriggers()
       @disableNextUnread()
 
-      @$el.toggleClass 'directed-discussion', !ENV.DISCUSSION.THREADED
+      @$el.toggleClass 'side_comment_discussion', !ENV.DISCUSSION.THREADED
 
     ##
     # Cache all the elements reused in the class
