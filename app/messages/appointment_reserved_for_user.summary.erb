@@ -10,4 +10,4 @@
             asset.appointment_group.contexts_for_user(user).map(&:name).join(", ")) %>
 <% end %>
 
-<%= t :message, '%{user} has signed you up for "%{appointment_name}" (%{date_and_time}).', :user => asset.updating_user.name, :appointment_name => asset.title, :date_and_time => datetime_string(asset.start_at, asset.end_at) %>
+<%= t :message, '%{user} has signed you up for "%{appointment_name}" (%{date_and_time}).', :user => data.updating_user.name, :appointment_name => asset.title, :date_and_time => datetime_string(asset.start_at, asset.end_at) %>

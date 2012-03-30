@@ -22,9 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_reserved_by_user.twitter' do
   it "should render" do
     user = user_model
-    appointment_participant_model(:updating_user => user, :participant => user)
+    appointment_participant_model(:participant => user)
 
-    generate_message(:appointment_reserved_by_user, :twitter, @event)
+    generate_message(:appointment_reserved_by_user, :twitter, @event,
+                     :data => {:updating_user => user})
 
     @message.body.should include('some title')
     @message.body.should include(user.name)

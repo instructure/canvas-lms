@@ -6,7 +6,7 @@
   <%= t('subject', 'You have been signed up for "%{appointment_name}"', :appointment_name => asset.title) %>
 <% end %>
 
-<%= t :message, '%{user} has signed you up for "%{appointment_name}".', :user => asset.updating_user.name, :appointment_name => asset.title %>
+<%= t :message, '%{user} has signed you up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %>
 
 <%= before_label :details, "Appointment details" %>
 <%= before_label :date_and_time, "Date/time" %> <%= datetime_string(asset.start_at, asset.end_at) %>

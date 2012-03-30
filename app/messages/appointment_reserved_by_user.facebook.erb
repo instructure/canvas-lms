@@ -2,7 +2,7 @@
   http://<%= HostUrl.context_host(asset.appointment_group.contexts.first) %>/appointment_groups/<%= asset.appointment_group.id %>
 <% end %>
 
-<%= t :message, '%{user} has signed up for "%{appointment_name}".', :user => asset.updating_user.name, :appointment_name => asset.title %><br>
+<%= t :message, '%{user} has signed up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %><br>
 <br>
 <b><%= before_label :details, "Appointment details" %></b><br>
 <%= before_label :date_and_time, "Date/time" %> <%= datetime_string(asset.start_at, asset.end_at) %><br>

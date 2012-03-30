@@ -357,6 +357,7 @@ describe AppointmentGroup do
 
     it "should notify all participants when deleting" do
       @ag.publish!
+      @ag.cancel_reason = "just because"
       @ag.destroy
       @ag.messages_sent.should be_include("Appointment Group Deleted")
       @ag.messages_sent["Appointment Group Deleted"].map(&:user_id).sort.uniq.should eql [@student.id]

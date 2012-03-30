@@ -2,7 +2,7 @@
   http://<%= HostUrl.context_host(asset.appointment_group.contexts.first) %>/appointment_groups/<%= asset.appointment_group.id %>
 <% end %>
 
-<%= t :message, '%{user} canceled his/her reservation for "%{appointment_name}".', :user => asset.updating_user.name, :appointment_name => asset.title %>
+<%= t :message, '%{user} canceled his/her reservation for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %>
 
 <b><%= before_label :details, "Appointment details" %></b><br>
 <%= before_label :date_and_time, "Date/time" %> <%= datetime_string(asset.start_at, asset.end_at) %><br>
@@ -20,6 +20,6 @@
 <% end -%>
 <br>
 <b><%= before_label :cancel_reason, "Reason for canceling" %></b><br>
-<%= asset.cancel_reason || t(:no_reason_given, "none given") %><br>
+<%= data.cancel_reason || t(:no_reason_given, "none given") %><br>
 <br>
 <a href="<%= content :link %>"><%= t :instructions, "View the appointment" %></a>

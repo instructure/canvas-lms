@@ -22,10 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_canceled_by_user.twitter' do
   it "should render" do
     user = user_model
-    appointment_participant_model(:updating_user => user, :participant => user)
-    @event.cancel_reason = 'just because'
+    appointment_participant_model(:participant => user)
 
-    generate_message(:appointment_canceled_by_user, :twitter, @event)
+    generate_message(:appointment_canceled_by_user, :twitter, @event,
+                     :data => {:updating_user => user,
+                                       :cancel_reason => "just because"})
 
     @message.body.should include('some title')
     @message.body.should include(user.name)
@@ -37,10 +38,11 @@ describe 'appointment_canceled_by_user.twitter' do
     cat = @course.group_categories.create
     @group = cat.groups.create(:context => @course)
     @group.users << user
-    appointment_participant_model(:updating_user => user, :participant => @group, :course => @course)
-    @event.cancel_reason = 'just because'
+    appointment_participant_model(:participant => @group, :course => @course)
 
-    generate_message(:appointment_canceled_by_user, :twitter, @event)
+    generate_message(:appointment_canceled_by_user, :twitter, @event,
+                     :data => {:updating_user => user,
+                                       :cancel_reason => "just because"})
 
     @message.body.should include('some title')
     @message.body.should include(user.name)

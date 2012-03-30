@@ -22,9 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_reserved_for_user.facebook' do
   it "should render" do
     user = user_model
-    appointment_participant_model(:updating_user => @teacher, :participant => user)
+    appointment_participant_model(:participant => user)
 
-    generate_message(:appointment_reserved_for_user, :facebook, @event)
+    generate_message(:appointment_reserved_for_user, :facebook, @event,
+                     :data => {:updating_user => @teacher})
 
     @message.body.should include('some title')
     @message.body.should include(@teacher.name)
@@ -39,9 +40,10 @@ describe 'appointment_reserved_for_user.facebook' do
     cat = @course.group_categories.create
     @group = cat.groups.create(:context => @course)
     @group.users << user
-    appointment_participant_model(:updating_user => @teacher, :participant => @group, :course => @course)
+    appointment_participant_model(:participant => @group, :course => @course)
 
-    generate_message(:appointment_reserved_for_user, :facebook, @event)
+    generate_message(:appointment_reserved_for_user, :facebook, @event,
+                     :data => {:updating_user => @teacher})
 
     @message.body.should include('some title')
     @message.body.should include(@teacher.name)
