@@ -173,20 +173,12 @@ module AuthenticationMethods
   private :load_user
 
   def require_user
-    unless @current_user
+    unless @current_user && @current_pseudonym
       redirect_to_login
       return false
     end
   end
   protected :require_user
-
-  def require_pseudonym
-    unless @current_pseudonym
-      session[:become_user_id] = nil
-      redirect_to_login
-      return false
-    end
-  end
 
   def store_location(uri=nil, overwrite=true)
     if overwrite || !session[:return_to]
