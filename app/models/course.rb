@@ -35,6 +35,7 @@ class Course < ActiveRecord::Base
                   :hashtag,
                   :show_public_context_messages,
                   :syllabus_body,
+                  :public_description,
                   :allow_student_forum_attachments,
                   :default_wiki_editing_roles,
                   :allow_student_organized_groups,

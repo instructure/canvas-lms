@@ -24,6 +24,7 @@ module Api::V1::Course
     include_syllabus = includes.include?('syllabus_body')
     include_total_scores = includes.include?('total_scores') && !course.settings[:hide_final_grade]
     include_url = includes.include?('html_url')
+    include_description = includes.include?('public_description')
 
     base_attributes = %w(id name course_code account_id)
     allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes
@@ -47,6 +48,9 @@ module Api::V1::Course
     end
     if include_syllabus
       hash['syllabus_body'] = course.syllabus_body
+    end
+    if include_description
+      hash['public_description'] = course.public_description
     end
     hash['html_url'] = course_url(course, :host => HostUrl.context_host(course)) if include_url
     hash
