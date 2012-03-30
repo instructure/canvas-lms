@@ -43,10 +43,16 @@ class PseudonymsController < ApplicationController
   #   ]
   def index
     return unless get_user && authorized_action(@user, @current_user, :read)
-    return unless context_is_root_account?
-    @pseudonyms = Api.paginate(
-      @user.pseudonyms.scoped(:conditions => { :account_id => @context.id }),
-      self, api_v1_pseudonyms_path)
+
+    if @context.is_a?(Account)
+      return unless context_is_root_account?
+      @pseudonyms = Api.paginate(
+        @user.pseudonyms.scoped(:conditions => { :account_id => @context.id }),
+        self, api_v1_account_pseudonyms_path)
+    else
+      @pseudonyms = Api.paginate(@user.pseudonyms, self, api_v1_user_pseudonyms_path)
+    end
+
     render :json => @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
   end
 
@@ -192,11 +198,15 @@ class PseudonymsController < ApplicationController
   end
   
   def get_user
-    if params[:user_id] || api_request?
-      @user = api_request? ? api_find(User, params[:user] && params[:user][:id]) : User.find(params[:user_id])
-    else
-      @user = @current_user
-    end
+    user_id = params[:user_id] || params[:user].try(:[], :id)
+    @user = case
+            when api_request? && user_id
+              api_find(User, user_id)
+            when user_id
+              User.find(user_id)
+            else
+              @current_user
+            end
     true
   end
   protected :get_user
