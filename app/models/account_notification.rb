@@ -2,46 +2,38 @@ class AccountNotification < ActiveRecord::Base
   attr_accessible :subject, :icon, :message,
     :account, :user, :start_at, :end_at
 
-  validates_presence_of :start_at
-  before_save :infer_defaults
-  after_save :touch_account
-  belongs_to :account
+  validates_presence_of :start_at, :end_at, :account_id
+  before_validation :infer_defaults
+  belongs_to :account, :touch => true
   belongs_to :user
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
   
   def infer_defaults
-    end_at ||= start_at + 2.weeks
-    end_at = [end_at, start_at].max
+    self.start_at ||= Time.now.utc
+    self.end_at ||= self.start_at + 2.weeks
+    self.end_at = [self.end_at, self.start_at].max
   end
-  
-  def touch_account
-    Account.update_all({:updated_at => Time.now.utc}, {:id => self.account_id}) if self.account_id
-  end
-  
-  named_scope :for_account, lambda{|account|
-    {:conditions => ['account_id = ? AND end_at > ?', account.id, Time.now], :order => 'start_at' }
-  }
-  
+
   def self.for_user_and_account(user, account)
-    closed_ids = (user && user.preferences[:closed_notifications]) || []
+    closed_ids = user.preferences[:closed_notifications] || []
     now = Time.now.utc
     # Refreshes every 10 minutes at the longest
     current = Rails.cache.fetch(['account_notifications2', account].cache_key, :expires_in => 10.minutes) do
-      AccountNotification.find(:all, :conditions => ['account_id IN (?,?) AND start_at < ? AND end_at > ?', Account.site_admin.id, account.id, now, now], :order => 'start_at DESC')
-    end
-    current ||= []
-    # If there are ids marked as 'closed' that are no longer
-    # applicable, they probably need to be cleared out.
-    if !(closed_ids - current.map(&:id)).empty?
-      Rails.cache.fetch(['old_closed_notifications', user.id].cache_key, :expires_in => 60.minutes) do
-        old_closed = AccountNotification.find(:all, :conditions => ["id IN (#{closed_ids.join(',')}) AND end_at < ?", now]) unless closed_ids.empty?
-        if !old_closed.empty?
-          user.preferences[:closed_notifications] -= old_closed.map(&:id)
-          user.save!
-        end
+      Shard.partition_by_shard([Account.site_admin, account]) do |accounts|
+        AccountNotification.find(:all, :conditions => ["account_id IN (?) AND start_at <? AND end_at>?", accounts, now, now], :order => 'start_at DESC')
       end
     end
-    for_user = current.reject{|n| closed_ids.include?(n.id) }
+
+    user.shard.activate do
+      # If there are ids marked as 'closed' that are no longer
+      # applicable, they probably need to be cleared out.
+      current_ids = current.map(&:id)
+      if !(closed_ids - current_ids).empty?
+        closed_ids = user.preferences[:closed_notifications] &= current_ids
+        user.save!
+      end
+      current.reject { |announcement| closed_ids.include?(announcement.id) }
+    end
   end
 end

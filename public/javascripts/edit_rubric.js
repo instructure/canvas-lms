@@ -29,6 +29,7 @@ define([
  'jquery.loadingImg' /* loadingImage */,
  'jquery.templateData' /* fillTemplateData, getTemplateData */,
  'vendor/jquery.ba-throttle-debounce' /* debounce */,
+ 'vendor/jquery.ba-tinypubsub',
  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(I18n, changePointsPossibleToMatchRubricDialog, $) {
 
@@ -383,7 +384,8 @@ define([
   }
 
 
-  $(document).ready(function() {
+
+  rubricEditing.init = function() {
     var limitToOneRubric = true;
     var $rubric_dialog = $("#rubric_dialog"),
         $rubric_long_description_dialog = $("#rubric_long_description_dialog");
@@ -893,6 +895,10 @@ define([
       rubricEditing.addCriterion($("#default_rubric"));
     }
     setInterval(rubricEditing.sizeRatings, 10000);
-  });
+    $.publish('edit_rubric/initted')
+  };
+
+  $(function() { rubricEditing.init() });
+
 });
 

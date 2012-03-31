@@ -21,6 +21,7 @@ end
 
 # delivery_method can be :smtp, :sendmail or :test
 ActionMailer::Base.delivery_method = config[:delivery_method]
+ActionMailer::Base.perform_deliveries = config[:perform_deliveries] if config.has_key?(:perform_deliveries)
 
 case config[:delivery_method]
 when :smtp

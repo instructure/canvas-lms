@@ -94,6 +94,44 @@ describe "assignments" do
       driver.find_element(:id, 'self_signup_help_dialog').should be_displayed
     end
 
+    it "should remove student group option" do
+      assignment_name = 'first test assignment'
+      due_date = Time.now.utc + 2.days
+      group = @course.assignment_groups.create!(:name => "default")
+      @course.assignments.create!(
+        :name => assignment_name,
+        :due_at => due_date,
+        :assignment_group => group,
+        :unlock_at => due_date - 1.day
+      )
+      @assignment = @course.assignments.last
+      get "/courses/#{@course.id}/assignments"
+
+      expect_new_page_load { driver.find_element(:link, assignment_name).click }
+      driver.find_element(:css, '.edit_full_assignment_link').click
+      driver.find_element(:css, '.more_options_link').click
+      driver.find_element(:id, 'assignment_group_assignment').click
+      click_option('#assignment_group_category_select', 'new', :value)
+      driver.find_element(:css, 'div.ui-dialog button[type=submit]').click
+      wait_for_ajaximations
+      driver.find_element(:id, 'edit_assignment_form').submit
+      wait_for_ajaximations
+      @assignment.reload
+      @assignment.group_category_id.should_not be_nil
+      @assignment.group_category.should_not be_nil
+
+      get "/courses/#{@course.id}/assignments"
+      expect_new_page_load { driver.find_element(:link, assignment_name).click }
+      driver.find_element(:css, '.edit_full_assignment_link').click
+      driver.find_element(:css, '.more_options_link').click
+      driver.find_element(:id, 'assignment_group_assignment').click
+      driver.find_element(:id, 'edit_assignment_form').submit
+      wait_for_ajaximations
+      @assignment.reload
+      @assignment.group_category_id.should be_nil
+      @assignment.group_category.should be_nil
+    end
+
     it "should allow creating a quiz assignment from 'more options'" do
       skip_if_ie("Out of memory")
       get "/courses/#{@course.id}/assignments"

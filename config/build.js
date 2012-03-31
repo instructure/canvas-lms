@@ -19,10 +19,24 @@
 
   // paths we have set up (matches require onfig in application.html.erb)
   paths: {
+    common: 'compiled/bundles/common',
     jquery: 'vendor/jquery-1.6.4',
     jqueryui: 'vendor/jqueryui',
+    underscore: 'vendor/underscore',
+    backbone: 'vendor/backbone',
     uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
-    common: 'compiled/bundles/common'
+    use: 'vendor/use'
+  },
+
+  // non-amd shims
+  use: {
+    backbone: {
+      deps: ['use!underscore', 'jquery'],
+      attach: 'Backbone'
+    },
+    underscore: {
+      attach: '_'
+    }
   },
 
   // which modules should have their dependencies concatenated into them
@@ -109,6 +123,7 @@
     { name: "compiled/bundles/content_exports", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/content_migration", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/context_modules", exclude: ['common', 'compiled/tinymce'] },
+    { name: "compiled/bundles/conversations", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/course", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/course_settings", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/dashboard", exclude: ['common', 'compiled/tinymce'] },
@@ -134,7 +149,6 @@
     { name: "compiled/bundles/link_enrollment", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/manage_avatars", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/manage_groups", exclude: ['common', 'compiled/tinymce'] },
-    { name: "compiled/bundles/messages", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/moderate_quiz", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/plugins", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/prerequisites_lookup", exclude: ['common', 'compiled/tinymce'] },
@@ -156,6 +170,7 @@
     { name: "compiled/bundles/take_quiz", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/teacher_activity_report", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/tool_inline", exclude: ['common', 'compiled/tinymce'] },
+    { name: "compiled/bundles/discussion", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/topic", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/topics", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/user", exclude: ['common', 'compiled/tinymce'] },
@@ -165,7 +180,7 @@
     { name: "compiled/bundles/user_notes", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/user_sortable_name", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/wiki", exclude: ['common', 'compiled/tinymce'] },
-    { name: "compiled/bundles/calendar2", exclude: ['common', 'compiled/tinymce'] }
+    { name: "compiled/bundles/calendar2", exclude: ['common', 'compiled/tinymce'] },
   ]
 })
 

@@ -291,6 +291,11 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
+  def teacher_in_course(opts={})
+    opts[:course] = @course if @course && !opts[:course]
+    course_with_teacher(opts)
+  end
+
   def course_with_teacher(opts={})
     course_with_user('TeacherEnrollment', opts)
     @teacher = @user
@@ -317,6 +322,16 @@ Spec::Runner.configure do |config|
   def course_with_observer_logged_in(opts={})
     course_with_observer(opts)
     user_session(@user)
+  end
+
+  def add_section(section_name)
+    @course_section = @course.course_sections.create!(:name => section_name)
+    @course.reload
+  end
+
+  def multiple_student_enrollment(user, section)
+    @enrollment = @course.student_enrollments.build(:user => user, :workflow_state => "active", :course_section => section)
+    @enrollment.save!
   end
 
   def group(opts={})

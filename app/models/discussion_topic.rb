@@ -22,15 +22,22 @@ class DiscussionTopic < ActiveRecord::Base
   include SendToStream
   include HasContentTags
   include CopyAuthorizedLinks
+  include TextHelper
 
   attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post
+    :require_initial_post, :threaded, :discussion_type
+
+  module DiscussionTypes
+    SIDE_COMMENT = 'side_comment'
+    THREADED     = 'threaded'
+    TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
+  end
 
   attr_readonly :context_id, :context_type, :user_id
 
   has_many :discussion_entries, :order => :created_at, :dependent => :destroy
-  has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id = ? AND discussion_entries.workflow_state != ?', 0, 'deleted']
+  has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state != ?', 'deleted']
   has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
@@ -47,6 +54,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :user
   validates_presence_of :context_id
   validates_presence_of :context_type
+  validates_presence_of :discussion_type, :in => DiscussionTypes::TYPES
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
 
@@ -62,10 +70,24 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :touch_context
   after_save :schedule_delayed_post
   after_create :create_participant
+  after_create :create_materialized_view
+
+  def threaded=(v)
+    self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
+  end
+
+  def threaded?
+    self.discussion_type == DiscussionTypes::THREADED
+  end
+
+  def discussion_type
+    read_attribute(:discussion_type) || DiscussionTypes::SIDE_COMMENT
+  end
 
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= t '#discussion_topic.default_title', "No Title"
+    self.discussion_type = DiscussionTypes::SIDE_COMMENT if !read_attribute(:discussion_type)
     @content_changed = self.message_changed? || self.title_changed?
     if self.assignment_id != self.assignment_id_was
       @old_assignment_id = self.assignment_id_was
@@ -91,7 +113,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def update_subtopics
     if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.has_group_category?
-      send_later :refresh_subtopics
+      send_later_if_production :refresh_subtopics
     end
   end
 
@@ -104,6 +126,7 @@ class DiscussionTopic < ActiveRecord::Base
       topic.title = "#{self.title} - #{group.name}"
       topic.assignment_id = self.assignment_id
       topic.user_id = self.user_id
+      topic.discussion_type = self.discussion_type
       topic.save if topic.changed?
       topic
     end
@@ -167,17 +190,19 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def plaintext_message=(val)
-    self.extend TextHelper
     self.message = format_message(strip_tags(val)).first
   end
 
   def plaintext_message
-    self.extend TextHelper
     truncate_html(self.message, :max_length => 250)
   end
 
   def create_participant
     self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+  end
+
+  def update_materialized_view
+    materialized_view # kick off building of the view
   end
 
   # If no join record exists, assume all discussion enrties are unread, and
@@ -217,7 +242,7 @@ class DiscussionTopic < ActiveRecord::Base
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 
-      entry_ids = self.discussion_entries.active.map(&:id)
+      entry_ids = self.discussion_entries.map(&:id)
       if entry_ids.present?
         existing_entry_participants = DiscussionEntryParticipant.find(:all, :conditions => ["user_id = ? AND discussion_entry_id IN (?)",
                                                                       current_user.id, entry_ids])
@@ -239,7 +264,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def default_unread_count
-    self.discussion_entries.active.count
+    self.discussion_entries.count
   end
 
   def unread_count(current_user = nil)
@@ -364,9 +389,12 @@ class DiscussionTopic < ActiveRecord::Base
 
   def reply_from(opts)
     user = opts[:user]
-    message = opts[:text].strip
-    self.extend TextHelper
-    message = format_message(message).first
+    if opts[:text]
+      message = opts[:text].strip
+      message = format_message(message).first
+    else
+      message = opts[:html].strip
+    end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
@@ -525,22 +553,21 @@ class DiscussionTopic < ActiveRecord::Base
   def delay_posting=(val); end
   def set_assignment=(val); end
 
-  def participants
-    ([self.user] + context.participants).compact.uniq
+  def participants(include_observers=false)
+    ([self.user] + context.participants(include_observers)).compact.uniq
   end
 
-  def active_participants
+  def active_participants(include_observers=false)
     if !self.context.available? && self.context.respond_to?(:participating_admins)
       self.context.participating_admins
     else
-      self.participants
+      self.participants(include_observers)
     end
   end
 
   def posters
-    users = context.participating_users(discussion_entries.map(&:user_id).uniq)
-    users << self.user
-    users.uniq
+    user_ids = discussion_entries.map(&:user_id).push(self.user_id).uniq
+    context.participating_users(user_ids)
   end
 
   def user_name
@@ -608,7 +635,7 @@ class DiscussionTopic < ActiveRecord::Base
     if options[:include_entries]
       self.discussion_entries.sort_by{|e| e.created_at }.each do |entry|
         dup_entry = entry.clone_for(context, nil, :migrate => options[:migrate])
-        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}") || 0
+        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}")
         dup_entry.discussion_topic_id = dup.id
         dup_entry.save!
         context.map_merge(entry, dup_entry)
@@ -782,5 +809,35 @@ class DiscussionTopic < ActiveRecord::Base
       end
       item
     end
+  end
+
+  def initial_post_required?(user, enrollment, session)
+    if require_initial_post?
+      # check if the user, or the user being observed can see the posts
+      if enrollment && enrollment.respond_to?(:associated_user) && enrollment.associated_user
+        return true if !user_can_see_posts?(enrollment.associated_user)
+      elsif !user_can_see_posts?(user, session)
+        return true
+      end
+    end
+    false
+  end
+
+  # returns the materialized view of the discussion as structure, participant_ids, and entry_ids
+  # the view is already converted to a json string, the other two arrays of ids are ruby arrays
+  # see the description of the format in the discussion topics api documentation.
+  #
+  # returns nil if the view is not currently available, and kicks off a
+  # background job to build the view. this typically only takes a couple seconds.
+  #
+  # if a new message is posted, it won't appear in this view until the job to
+  # update it completes. so this view is eventually consistent.
+  def materialized_view(opts = {})
+    DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
+  end
+
+  # synchronously create/update the materialized view
+  def create_materialized_view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view
   end
 end

@@ -133,7 +133,7 @@ class PseudonymSessionsController < ApplicationController
         # prefer a pseudonym from Site Admin if possible, otherwise just choose one
         valid_alternative = valid_alternatives.find {|p| p.account_id == Account.site_admin.id } || valid_alternatives.first
         if (!@domain_root_account.trusted_account_ids.include?(valid_alternative.account_id))
-          flash[:error] = t 'warnings.wrong_login_spot', "In the future, please login at %{domain}.", :domain => HostUrl.context_host(valid_alternative.account)
+          flash[:scary_warning] = t 'warnings.wrong_login_spot', "In the future, you will need to login at %{domain}.", :domain => HostUrl.context_host(valid_alternative.account)
         end
         @pseudonym_session = PseudonymSession.new(valid_alternative, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save

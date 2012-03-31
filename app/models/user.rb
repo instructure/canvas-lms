@@ -169,25 +169,6 @@ class User < ActiveRecord::Base
     }
   }
 
-  # scopes to the most active users across the system
-  named_scope :most_active, lambda { |*args|
-    {
-      :joins => [:page_views],
-      :order => "users.page_views_count DESC",
-      :limit => (args.first || 10)
-    }
-  }
-
-  # scopes to the most active users (by page view count) in a context:
-  # User.x_most_active_in_context(30, Course.find(112)) # will give you the 30 most active users in course 112
-  named_scope :x_most_active_in_context, lambda { |*args|
-    {
-      :select => "users.*, (SELECT COUNT(*) FROM page_views WHERE user_id = users.id AND context_id = #{args.last.id} AND context_type = '#{args.last.class.to_s}') AS page_views_count",
-      :order => "page_views_count DESC",
-      :limit => (args.first || 10),
-    }
-  }
-
   has_a_broadcast_policy
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
@@ -197,25 +178,6 @@ class User < ActiveRecord::Base
   before_save :update_avatar_image
   after_save :generate_reminders_if_changed
   after_save :update_account_associations_if_necessary
-
-  def page_views_by_day(options={})
-    conditions = {}
-    if options[:dates]
-      conditions.merge!({
-        :created_at => (options[:dates].first)..(options[:dates].last)
-      })
-    end
-    page_views_as_hash = {}
-    self.page_views.count(
-      :group => "date(created_at)",
-      :order => "date(created_at)",
-      :conditions => conditions
-    ).each do |day|
-      page_views_as_hash[day.first] = day.last
-    end
-    page_views_as_hash
-  end
-  memoize :page_views_by_day
 
   def self.skip_updating_account_associations(&block)
     @skip_updating_account_associations = true
@@ -370,27 +332,6 @@ class User < ActiveRecord::Base
       UserAccountAssociation.delete_all(:id => to_delete) unless incremental || to_delete.empty?
     end
   end
-
-  def page_view_data(options={})
-    # if they dont supply a date range then use the first day returned by page_views_by_day
-    # (which should be the first day that there is pageview statistics gathered)
-    dates = options[:dates] && options[:dates].first ?
-      [options[:dates].first, (options[:dates].last || Time.now)] :
-      [page_views_by_day.sort.first.first.to_datetime, Time.now]
-    enrollments_with_page_views = enrollments.reject{ |e| e.page_views_by_day(:dates => dates).empty? }
-    days = []
-    dates.first.to_datetime.upto(dates.last) do |d|
-      # this * 1000 part is because the Highcharts expects something like what Date.UTC(2006, 2, 28) would give you,
-      # which is MILLISECONDS from the unix epoch, ruby's to_f gives you SECONDS since then.
-      days << [ (d.at_beginning_of_day.to_f * 1000).to_i, page_views_by_day(:dates => dates)[d.to_date.to_s].to_i, nil, nil].concat(
-        # these 2 nil's at the end here are because the google annotatedtimeline expects a title and a text,
-        # we can put something meaninful here once we start tracking noteworth events
-        enrollments_with_page_views.map{ |enrollment| [ enrollment.page_views_by_day(:dates => dates)[d.to_date.to_s].to_i, nil, nil] }
-      ).flatten
-    end
-    { :days => days, :labels => ["All Page Views"] + enrollments_with_page_views.map{ |e| e.course.name  } }
-  end
-  memoize :page_view_data
 
   # These two methods can be overridden by a plugin if you want to have an approval process for new teachers
   def registration_approval_required?; false; end
@@ -1091,7 +1032,7 @@ class User < ActiveRecord::Base
   end
 
   def gravatar_url(size=50, fallback=nil, request=nil)
-    fallback ||= request ? "#{request.protocol}#{request.host_with_port}/images/no_pic.gif" : "http://#{HostUrl.default_host}/images/no_pic.gif"
+    fallback = self.class.avatar_fallback_url(fallback, request)
     "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
   end
 
@@ -1125,8 +1066,9 @@ class User < ActiveRecord::Base
         end
       end
     elsif val['type'] == 'linked_in'
-      linked_in = self.user_services.for_service('linked_in').first rescue nil
-      if linked_in
+      @linked_in_service = self.user_services.for_service('linked_in').first rescue nil
+      if @linked_in_service
+        self.extend LinkedIn
         profile = linked_in_profile
         if profile
           self.avatar_image_url = profile['picture_url']
@@ -1227,9 +1169,11 @@ class User < ActiveRecord::Base
     }.uniq
   end
 
-  def avatar_url(size=nil, avatar_setting=nil, fallback='/images/no_pic.gif', request = nil)
+  AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
+  def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil)
     size ||= 50
     avatar_setting ||= 'enabled'
+    fallback = self.class.avatar_fallback_url(fallback, request)
     if avatar_setting == 'enabled' || (avatar_setting == 'enabled_pending' && avatar_approved?) || (avatar_setting == 'sis_only')
       @avatar_url ||= self.avatar_image_url
     end
@@ -1240,6 +1184,22 @@ class User < ActiveRecord::Base
   
   def avatar_path
     "/images/users/#{User.avatar_key(self.id)}"
+  end
+  
+  def self.default_avatar_fallback
+    "/images/no_pic.gif"
+  end
+
+  def self.avatar_fallback_url(fallback=nil, request=nil)
+    return fallback if fallback == '%{fallback}'
+    if fallback and uri = URI.parse(fallback) rescue nil
+      uri.scheme ||= request ? request.scheme : "https"
+      uri.host ||= request ? request.host : HostUrl.default_host.split(/:/)[0]
+      uri.port ||= request.port if request && ![80, 443].include?(request.port)
+      uri.to_s
+    else
+      avatar_fallback_url(default_avatar_fallback, request)
+    end
   end
   
   named_scope :with_avatar_state, lambda{|state|
@@ -1291,11 +1251,13 @@ class User < ActiveRecord::Base
   end
 
 
-  def close_notification(id)
+  def close_announcement(announcement)
     preferences[:closed_notifications] ||= []
-    preferences[:closed_notifications] << id.to_i
+    # serialize ids relative to the user
+    self.shard.activate do
+      preferences[:closed_notifications] << announcement.id
+    end
     preferences[:closed_notifications].uniq!
-    self.updated_at = Time.now
     save
   end
 
@@ -1851,6 +1813,17 @@ class User < ActiveRecord::Base
     "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{messageable_user_clause})"
   end
 
+  def messageable_enrollment_clause(include_concluded_students=false)
+    <<-SQL
+    (
+      #{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
+      OR
+      #{self.class.reflections[:concluded_enrollments].options[:conditions]}
+      #{include_concluded_students ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
+    )
+    SQL
+  end
+
   def enrollment_visibility
     Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.hour) do
       full_course_ids = []
@@ -1874,7 +1847,7 @@ class User < ActiveRecord::Base
             end
             conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
-        base_conditions = "(" + self.class.reflections[:current_and_invited_enrollments].options[:conditions] + " OR " +  self.class.reflections[:concluded_enrollments].options[:conditions] + ")"
+        base_conditions = messageable_enrollment_clause
         base_conditions << " AND " << messageable_enrollment_user_clause
         user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).count("DISTINCT user_id")
 
@@ -1927,11 +1900,7 @@ class User < ActiveRecord::Base
           elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
             section_id_hash[group.id] = sections
             user_counts[group.id] = group.context.enrollments.scoped(:conditions => [
-              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND (" +
-                self.class.reflections[:current_and_invited_enrollments].options[:conditions] +
-                " OR " +
-                self.class.reflections[:concluded_enrollments].options[:conditions] +
-              ")",
+              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(true)}",
               group.group_memberships.map(&:user_id),
               sections
             ]).size
@@ -1962,10 +1931,12 @@ class User < ActiveRecord::Base
 
     limited_id = {}
     enrollment_type_sql = nil
+    include_concluded_students = true
 
     if options[:context]
       if options[:context].sub(/_all\z/, '') =~ MESSAGEABLE_USER_CONTEXT_REGEX
         type = $1
+        include_concluded_students = false unless type == 'group'
         limited_id[type] = $2.to_i
         enrollment_type = $4
         if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
@@ -2026,9 +1997,7 @@ class User < ActiveRecord::Base
       FROM users, enrollments, courses
       WHERE course_id IN (#{all_course_ids.join(', ')})
         AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
-        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
-          OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
-        )
+        AND #{messageable_enrollment_clause(include_concluded_students)}
         #{enrollment_type_sql}
         #{user_condition_sql}
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}

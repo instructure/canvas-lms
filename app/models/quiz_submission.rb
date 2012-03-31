@@ -357,28 +357,7 @@ class QuizSubmission < ActiveRecord::Base
     track_outcomes(self.attempt)
     true
   end
-  
-  def re_grade_submission(all_versions=false)
-    versions = [OpenObject.new(:model => self)]
-    versions += self.submitted_versions if all_versions
-    current_quiz_data = self.quiz.quiz_data
-    versions.each do |version|
-      submission = version.model
-      submission_data = submission.submission_data
-      submission_data.each do |question|
-        re_grade_question(question)
-      end
-      if version.is_a?(Version)
-        submission.update_submission_version(version)
-      else
-        self.submission_data = submission.submission_data
-        self.score = submission.score
-        self.save
-      end
-      track_outcomes(self.attempt) if self.attempt
-    end
-  end
-  
+
   # Updates a simply_versioned version instance in-place.  We want
   # a teacher to be able to come in and update points for an already-
   # taken quiz, even if it's a prior version of the submission. Thank you

@@ -11,17 +11,17 @@ define(['jquery'], function($){
 
   // Create a "dummy" jQuery object on which to bind, unbind and trigger event
   // handlers. Note that $({}) works in jQuery 1.4.3+.
-  var o = $({});
+  var o = $({}), subscribe, unsubscribe, publish;
 
   // Subscribe to a topic. Works just like bind, except the passed handler
   // is wrapped in a function so that the event object can be stripped out.
   // Even though the event object might be useful, it is unnecessary and
   // will only complicate things in the future should the user decide to move
   // to a non-$.event-based pub/sub implementation.
-  $.subscribe = function( topic, fn ) {
+  $.subscribe = subscribe = function( topic, fn ) {
     if ($.isPlainObject(topic)) {
       return $.each(topic, function(topic, fn) {
-        $.subscribe(topic, fn);
+        subscribe(topic, fn);
       });
     }
     // Call fn, stripping out the 1st argument (the event object).
@@ -38,13 +38,19 @@ define(['jquery'], function($){
   };
 
   // Unsubscribe from a topic. Works exactly like unbind.
-  $.unsubscribe = function() {
+  $.unsubscribe = unsubscribe = function() {
     o.unbind.apply( o, arguments );
   };
 
   // Publish a topic. Works exactly like trigger.
-  $.publish = function() {
+  $.publish = publish = function() {
     o.trigger.apply( o, arguments );
+  };
+
+  return {
+    subscribe: subscribe,
+    unsubscribe: unsubscribe,
+    publish: publish
   };
 
 });

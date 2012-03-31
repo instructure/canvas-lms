@@ -97,9 +97,6 @@ describe DiscussionTopicsController do
       response.should be_success
       assigns[:topic].should_not be_nil
       assigns[:topic].should eql(@topic)
-      assigns[:entries].should_not be_nil
-      assigns[:entries].should_not be_empty
-      assigns[:entries][0].should eql(@entry)
     end
 
     it "should allow concluded teachers to see discussions" do
@@ -160,8 +157,7 @@ describe DiscussionTopicsController do
         @topic.reply_from(:user => @student, :text => 'hai')
         user_session(@teacher)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_nil
-        assigns[:entries].length.should == 1
+        assigns[:initial_post_required].should be_false
       end
 
       it "shouldn't allow student who hasn't posted to see" do
@@ -169,7 +165,6 @@ describe DiscussionTopicsController do
         user_session(@student)
         get 'show', :course_id => @course.id, :id => @topic.id
         assigns[:initial_post_required].should be_true
-        assigns[:entries].should be_empty
       end
 
       it "shouldn't allow student's observer who hasn't posted to see" do
@@ -177,23 +172,20 @@ describe DiscussionTopicsController do
         user_session(@observer)
         get 'show', :course_id => @course.id, :id => @topic.id
         assigns[:initial_post_required].should be_true
-        assigns[:entries].should be_empty
       end
 
       it "should allow student who has posted to see" do
         @topic.reply_from(:user => @student, :text => 'hai')
         user_session(@student)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_nil
-        assigns[:entries].length.should == 1
+        assigns[:initial_post_required].should be_false
       end
 
       it "should allow student's observer who has posted to see" do
         @topic.reply_from(:user => @student, :text => 'hai')
         user_session(@observer)
         get 'show', :course_id => @course.id, :id => @topic.id
-        assigns[:initial_post_required].should be_nil
-        assigns[:entries].length.should == 1
+        assigns[:initial_post_required].should be_false
       end
 
     end

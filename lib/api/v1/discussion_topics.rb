@@ -39,11 +39,12 @@ module Api::V1::DiscussionTopics
 
     children = topic.child_topics.scoped(:select => 'id').map(&:id)
 
-    api_json(topic, user, session,
+    api_json(topic, user, session, {
                   :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at require_initial_post root_topic_id),
-                  :methods => [:user_name, :discussion_subentry_count]
+                  :methods => [:user_name, :discussion_subentry_count], }, [:attach]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
+                  :discussion_type => topic.discussion_type,
                   :podcast_url => url,
                   :read_state => topic.read_state(user),
                   :unread_count => topic.unread_count(user),
@@ -56,22 +57,38 @@ module Api::V1::DiscussionTopics
     end
   end
 
-  def discussion_entry_api_json(entries, context, user, session)
+  # this is called normally from controllers, but also in non-controller
+  # context by the code to build the optimized materialized view of the
+  # discussion
+  #
+  # there is no specific user attached to this view of the discussion, the same
+  # json is returned to all users who can access the discussion, so it's a bit
+  # different than our normal api_json helpers
+  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries])
     entries.map do |entry|
-      json = api_json(entry, user, session,
-                           :only => %w(id user_id created_at updated_at),
-                           :methods => [:user_name, :discussion_subentry_count])
-      json[:message] = api_user_content(entry.message, context)
-      json[:read_state] = entry.read_state(user)
-      if entry.parent_id.zero?
-        replies = entry.unordered_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
+      if entry.deleted?
+        json = api_json(entry, user, session, :only => %w(id created_at updated_at parent_id))
+        json[:deleted] = true
+      else
+        json = api_json(entry, user, session,
+                        :only => %w(id user_id created_at updated_at parent_id))
+        json[:user_name] = entry.user_name if includes.include?(:user_name)
+        json[:editor_id] = entry.editor_id if entry.editor_id && entry.editor_id != entry.user_id
+        json[:message] = api_user_content(entry.message, context, user)
+        if entry.attachment
+          json[:attachment] = attachment_json(entry.attachment, :host => HostUrl.context_host(context))
+          # this is for backwards compatibility, and can go away if we make an api v2
+          json[:attachments] = [json[:attachment]]
+        end
+      end
+      json[:read_state] = entry.read_state(user) if user
+
+      if includes.include?(:subentries) && entry.root_entry_id.nil?
+        replies = entry.flattened_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
         unless replies.empty?
-          json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session)
+          json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session, includes)
           json[:has_more_replies] = replies.size > 10
         end
-        json[:attachment] = attachment_json(entry.attachment) if entry.attachment
-        # this is for backwards compatibility, and can go away if we make an api v2
-        json[:attachments] = [attachment_json(entry.attachment)] if entry.attachment
       end
       json
     end

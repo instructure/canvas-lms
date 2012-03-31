@@ -4,7 +4,7 @@ describe "speedgrader" do
   it_should_behave_like "in-process server selenium tests"
 
   def student_submission(options = {})
-    submission_model({ :assignment => @assignment, :body => "first student submission text" }.merge(options))
+    submission_model({:assignment => @assignment, :body => "first student submission text"}.merge(options))
   end
 
   before (:each) do
@@ -27,7 +27,7 @@ describe "speedgrader" do
     @submission_2 = @assignment.submit_homework(@student_2, :body => 'second student submission text')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@submission.student.id}%7D"
-    keep_trying_until{ driver.find_element(:id, 'speedgrader_iframe') }
+    keep_trying_until { driver.find_element(:id, 'speedgrader_iframe') }
 
     #check for assignment title
     driver.find_element(:id, 'assignment_url').should include_text(@assignment.title)
@@ -57,7 +57,7 @@ describe "speedgrader" do
       driver.find_element(:css, '#gradebook_header .next').click
       wait_for_ajax_requests
       check_second_student
-   end
+    end
 
   end
 
@@ -81,7 +81,7 @@ describe "speedgrader" do
     #add comment
     driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')
     driver.find_element(:css, '#add_a_comment *[type="submit"]').click
-    keep_trying_until{ driver.find_element(:css, '#comments > .comment').displayed? }
+    keep_trying_until { driver.find_element(:css, '#comments > .comment').displayed? }
 
     # the ajax from that add comment form comes back without a submission_history, the js should mimic it.
     driver.execute_script('return jsonData.studentsWithSubmissions[0].submission.submission_history.length').should == 1
@@ -121,7 +121,7 @@ describe "speedgrader" do
     student_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    keep_trying_until{ driver.find_element(:id, 'speedgrader_iframe') }
+    keep_trying_until { driver.find_element(:id, 'speedgrader_iframe') }
 
     driver.find_element(:id, 'submission_late_notice').should be_displayed
   end
@@ -135,7 +135,7 @@ describe "speedgrader" do
 
     keep_trying_until {
       driver.find_element(:id, 'submissions_container').should
-        include_text(I18n.t('headers.no_submission', "This student does not have a submission for this assignment"))
+      include_text(I18n.t('headers.no_submission', "This student does not have a submission for this assignment"))
       find_with_jquery('#this_student_does_not_have_a_submission').should be_displayed
     }
   end
@@ -154,6 +154,33 @@ describe "speedgrader" do
     }
   end
 
+  it "should update quiz grade automatically when the update button is clicked" do
+    expected_points = "6"
+    student = student_in_course(:active_user => true).user
+    @assignment.points_possible = 10
+    @assignment.submission_types = 'online_quiz'
+    @assignment.title = 'Anonymous Graded Quiz'
+    @assignment.save!
+    q = Quiz.find_by_assignment_id(@assignment.id)
+    q.quiz_questions.create!(:quiz => q, :question_data => {:position => 1, :question_type => "true_false_question", :points_possible => 3, :question_name => "true false question"})
+    q.quiz_questions.create!(:quiz => q, :question_data => {:position => 2, :question_type => "essay_question", :points_possible => 7, :question_name => "essay question"})
+    q.generate_quiz_data
+    q.workflow_state = 'available'
+    q.save!
+    qs = q.generate_submission(student)
+    qs.submission_data = {"foo" => "bar1"}
+    qs.grade_submission
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+    in_frame('speedgrader_iframe') do
+      question_inputs = driver.find_elements(:css, '.question_input')
+      question_inputs.each_with_index { |qi, i| replace_content(qi, 3) }
+      driver.find_element(:css, 'button[type=submit]').click
+    end
+    keep_trying_until { driver.find_element(:css, '#grade_container input').attribute('value').should == expected_points }
+  end
+
   it "should display discussion entries for only one student" do
     #make assignment a discussion assignment
     @assignment.points_possible = 5
@@ -165,18 +192,18 @@ describe "speedgrader" do
 
     #create and entrol first student
     student = user_with_pseudonym(
-      :name => 'first student',
-      :active_user => true,
-      :username => 'student@example.com',
-      :password => 'qwerty'
+        :name => 'first student',
+        :active_user => true,
+        :username => 'student@example.com',
+        :password => 'qwerty'
     )
     @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
     #create and enroll second student
     student_2 = user_with_pseudonym(
-      :name => 'second student',
-      :active_user => true,
-      :username => 'student2@example.com',
-      :password => 'qwerty'
+        :name => 'second student',
+        :active_user => true,
+        :username => 'student2@example.com',
+        :password => 'qwerty'
     )
     @course.enroll_user(student_2, "StudentEnrollment", :enrollment_state => 'active')
 
@@ -185,31 +212,31 @@ describe "speedgrader" do
     second_message = 'second student message'
     discussion_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
     entry = discussion_topic.discussion_entries.
-      create!(:user => student, :message => first_message)
+        create!(:user => student, :message => first_message)
     entry.update_topic
     entry.context_module_action
     entry_2 = discussion_topic.discussion_entries.
-      create!(:user => student_2, :message => second_message)
+        create!(:user => student_2, :message => second_message)
     entry_2.update_topic
     entry_2.context_module_action
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     #check for correct submissions in speedgrader iframe
-    keep_trying_until{ driver.find_element(:id, 'speedgrader_iframe') }
+    keep_trying_until { driver.find_element(:id, 'speedgrader_iframe') }
     in_frame 'speedgrader_iframe' do
       driver.
-        find_element(:id, 'main').should include_text(first_message)
+          find_element(:id, 'main').should include_text(first_message)
       driver.
-        find_element(:id, 'main').should_not include_text(second_message)
+          find_element(:id, 'main').should_not include_text(second_message)
     end
     driver.find_element(:css, '#gradebook_header a.next').click
     wait_for_ajax_requests
     in_frame 'speedgrader_iframe' do
       driver.
-        find_element(:id, 'main').should_not include_text(first_message)
+          find_element(:id, 'main').should_not include_text(first_message)
       driver.
-        find_element(:id, 'main').should include_text(second_message)
+          find_element(:id, 'main').should include_text(second_message)
     end
   end
 
@@ -222,7 +249,7 @@ describe "speedgrader" do
     wait_for_animations
 
     #test opening and closing rubric
-    keep_trying_until{
+    keep_trying_until {
       driver.find_element(:css, '.toggle_full_rubric').click
       driver.find_element(:id, 'rubric_full').should be_displayed
     }
@@ -242,7 +269,7 @@ describe "speedgrader" do
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     rubric.find_element(:css, '.rubric_total').should include_text('8')
     driver.find_element(:css, '#rubric_full .save_rubric_button').click
-    keep_trying_until{ driver.find_element(:css, '#rubric_summary_container > table').displayed? }
+    keep_trying_until { driver.find_element(:css, '#rubric_summary_container > table').displayed? }
     driver.find_element(:css, '#rubric_summary_container').should include_text(@rubric.title)
     driver.find_element(:css, '#rubric_summary_container .rubric_total').should include_text('8')
     wait_for_ajaximations
@@ -255,7 +282,7 @@ describe "speedgrader" do
     wait_for_animations
 
     #check media comment
-    keep_trying_until{
+    keep_trying_until {
       driver.execute_script("$('#add_a_comment .media_comment_link').click();")
       driver.find_element(:id, "audio_record_option").should be_displayed
     }
@@ -272,7 +299,7 @@ describe "speedgrader" do
     #add comment
     driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')
     driver.find_element(:css, '#add_a_comment *[type="submit"]').click
-    keep_trying_until{ driver.find_element(:css, '#comments > .comment').displayed? }
+    keep_trying_until { driver.find_element(:css, '#comments > .comment').displayed? }
     driver.find_element(:css, '#comments > .comment').should include_text('grader comment')
 
     #make sure gradebook link works
@@ -451,26 +478,26 @@ describe "speedgrader" do
     @association.save!
     @ignored = @course.learning_outcomes.create!(:description => 'just for reference')
     @rubric.data = @rubric.data + [{
-      :points => 3,
-      :description => "just for reference",
-      :id => 3,
-      :ratings => [
-        {
-          :points => 3,
-          :description => "You Learned",
-          :criterion_id => 3,
-          :id => 6,
-        },
-        {
-          :points => 0,
-          :description => "No-learn-y",
-          :criterion_id => 3,
-          :id => 7,
-        },
-      ],
-      :learning_outcome_id => @ignored.id,
-      :ignore_for_scoring => '1',
-    }]
+                                       :points => 3,
+                                       :description => "just for reference",
+                                       :id => 3,
+                                       :ratings => [
+                                           {
+                                               :points => 3,
+                                               :description => "You Learned",
+                                               :criterion_id => 3,
+                                               :id => 6,
+                                           },
+                                           {
+                                               :points => 0,
+                                               :description => "No-learn-y",
+                                               :criterion_id => 3,
+                                               :id => 7,
+                                           },
+                                       ],
+                                       :learning_outcome_id => @ignored.id,
+                                       :ignore_for_scoring => '1',
+                                   }]
     @rubric.instance_variable_set('@outcomes_changed', true)
     @rubric.save!
 

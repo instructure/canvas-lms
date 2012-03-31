@@ -1,0 +1,17 @@
+<article class="discussion_entry can_be_marked_as_read {{read_state}}" data-mark-read-url="{{mark_read_url}}">
+  <div class="entry_content">
+    {{#if deleted}}
+      {{>[discussions/deleted_entry]}}
+    {{else}}
+      {{>[discussions/entry_content]}}
+    {{/if}}
+  </div>
+</article>
+<div class="replies"></div>
+{{#if allowsSideComments}}
+  <div class="add-side-comment-wrap">
+    {{>[discussions/reply_form]}}
+  </div>
+{{/if}}
+
+
