@@ -43,7 +43,7 @@ define [
 
     moreOptionsClick: (jsEvent) =>
       jsEvent.preventDefault()
-      pieces = $(event.target).attr('href').split("#")
+      pieces = $(jsEvent.target).attr('href').split("#")
       data = @form.getFormData( object_name: 'assignment' )
       params = {}
       if data.title then params['title'] = data.title
@@ -76,7 +76,11 @@ define [
 
       # Update the edit and more options links with the new context
       @form.attr('action', @currentContextInfo.create_assignment_url)
-      @form.find(".more_options_link").attr('href', @currentContextInfo.new_assignment_url)
+      moreOptionsUrl = if @event.assignment
+                           "#{@event.assignment.html_url}/edit"
+                         else
+                           @currentContextInfo.new_assignment_url
+      @form.find(".more_options_link").attr('href', moreOptionsUrl)
 
     setupTimeAndDatePickers: () =>
       @form.find(".datetime_field").datetime_field()
