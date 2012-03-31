@@ -20,23 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionEntry do
 
-  it "should set parent_id to 0 if invalid or nil" do
-    course
-    topic = @course.discussion_topics.create!
-    entry = topic.discussion_entries.create!
-    entry.should_not be_nil
-    entry.should_not be_new_record
-    entry.parent_id.should eql(0)
-
-    topic_2 = @course.discussion_topics.create!
-    entry_2 = topic_2.discussion_entries.create!
-    sub_entry = topic.discussion_entries.build
-    sub_entry.parent_id = entry_2.id
-    sub_entry.save!
-    sub_entry.parent_id.should eql(0)
-  end
-
-  it "should be marked as deleted when parent is deleted" do
+  it "should not be marked as deleted when parent is deleted" do
     topic = course.discussion_topics.create!
     entry = topic.discussion_entries.create!
 
@@ -47,27 +31,8 @@ describe DiscussionEntry do
     topic.discussion_entries.active.length.should == 2
     entry.destroy
     sub_entry.reload
-    sub_entry.should be_deleted
-    topic.discussion_entries.active.length.should == 0
-  end
-
-  it "should only allow one level of nesting" do
-    course
-    topic = @course.discussion_topics.create!
-    entry = topic.discussion_entries.create!
-    entry.should_not be_nil
-    entry.should_not be_new_record
-    entry.parent_id.should eql(0)
-
-    sub_entry = topic.discussion_entries.build
-    sub_entry.parent_id = entry.id
-    sub_entry.save!
-    sub_entry.parent_id.should eql(entry.id)
-
-    sub_sub_entry = topic.discussion_entries.build
-    sub_sub_entry.parent_id = sub_entry.id
-    sub_sub_entry.save!
-    sub_sub_entry.parent_id.should eql(entry.id)
+    sub_entry.should_not be_deleted
+    topic.discussion_entries.active.length.should == 1
   end
 
   it "should preserve parent_id if valid" do
@@ -118,7 +83,7 @@ describe DiscussionEntry do
       group(:group_context => @course)
 
       s1 = @student
-      student_in_course(@course)
+      student_in_course(:active_user => true)
       s2 = @student
 
       @group.participating_users << s1
@@ -127,14 +92,11 @@ describe DiscussionEntry do
 
       topic = @group.discussion_topics.create!(:user => @teacher, :message => "Hi there")
       entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
-      to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include(@teacher)
-      to_users.should_not include(s1)
-      to_users.should_not include(s2)
+      entry.messages_sent[@notification_name].should be_blank
 
       entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
       to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include(@teacher)
+      to_users.should_not include(@teacher)
       to_users.should include(s1)
       to_users.should_not include(s2)
     end
@@ -311,17 +273,6 @@ describe DiscussionEntry do
       @topic.unread_count(@student).should == 2
     end
 
-    it "should decrement unread counts on destroy" do
-      @topic.unread_count(@student).should == 1
-      @entry.change_read_state("read", @student)
-      @topic.unread_count(@student).should == 0
-      @entry2 = @topic.discussion_entries.create!(:message => "entry 2", :user => @teacher)
-      @topic.unread_count(@student).should == 1
-      @entry2.destroy
-      @topic.unread_count(@student).should == 0
-      @topic.unread_count(@teacher).should == 0
-    end
-
     it "should allow a complex series of read/unread updates" do
       @s1 = @student
       student_in_course(:active_all => true); @s2 = @student
@@ -358,11 +309,9 @@ describe DiscussionEntry do
       @topic.unread_count(@s2).should == 4
       @topic.read?(@s2).should be_false
       @entry.read?(@s2).should be_false
-      @s1entry.destroy
-      @topic.unread_count(@s2).should == 3
 
       student_in_course(:active_all => true); @s4 = @student
-      @topic.unread_count(@s4).should == 3
+      @topic.unread_count(@s4).should == 4
       @topic.change_all_read_state("unread", @s4)
       @topic.read?(@s4).should be_false
       @entry.read?(@s4).should be_false
@@ -375,6 +324,46 @@ describe DiscussionEntry do
     it "should use unique_constaint_retry when updating read state" do
       DiscussionEntry.expects(:unique_constraint_retry).once
       @entry.change_read_state("read", @student)
+    end
+  end
+
+  context "threaded discussions" do
+    it "should force a root entry as parent if the discussion isn't threaded" do
+      course_with_teacher
+      discussion_topic_model
+      root = @topic.reply_from(:user => @teacher, :text => "root entry")
+      sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
+      sub1.parent_entry.should == root
+      sub1.root_entry.should == root
+      sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
+      sub2.parent_entry.should == root
+      sub2.root_entry.should == root
+    end
+
+    it "should allow a sub-entry as parent if the discussion is threaded" do
+      course_with_teacher
+      discussion_topic_model(:threaded => true)
+      root = @topic.reply_from(:user => @teacher, :text => "root entry")
+      sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
+      sub1.parent_entry.should == root
+      sub1.root_entry.should == root
+      sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
+      sub2.parent_entry.should == sub1
+      sub2.root_entry.should == root
+    end
+  end
+
+  context "DiscussionEntryParticipant.read_entry_ids" do
+    it "should return the ids of the read entries" do
+      topic_with_nested_replies
+      @root2.change_read_state('read', @teacher)
+      @reply_reply1.change_read_state('read', @teacher)
+      @reply_reply2.change_read_state('read', @teacher)
+      @reply3.change_read_state('read', @teacher)
+      # change one back to unread, it shouldn't be returned
+      @reply_reply2.change_read_state('unread', @teacher)
+      read = DiscussionEntryParticipant.read_entry_ids(@topic.discussion_entries.map(&:id), @teacher).sort
+      read.should == [@root2, @reply1, @reply2, @reply_reply1, @reply3].map(&:id)
     end
   end
 end

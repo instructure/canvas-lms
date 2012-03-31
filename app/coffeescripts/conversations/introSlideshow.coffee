@@ -1,6 +1,6 @@
 define [
   'i18n!conversations_intro'
-  'compiled/slideshow'
+  'compiled/widget/slideshow'
   'jquery.ajaxJSON'
 ], (I18n, Slideshow) ->
 

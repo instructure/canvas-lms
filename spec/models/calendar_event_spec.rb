@@ -210,6 +210,14 @@ describe CalendarEvent do
         reservation.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student2.id]
       end
 
+      it "should notify participants if teacher deletes the appointment time slot" do
+        reservation = @appointment2.reserve_for(@group, @student1)
+        @appointment2.updating_user = @teacher
+        @appointment2.destroy
+        reservation.messages_sent.should be_include("Appointment Deleted For User")
+        reservation.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student1.id, @student2.id]
+      end
+
       it "should notify all participants when the the time slot is canceled" do
         reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher

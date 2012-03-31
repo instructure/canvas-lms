@@ -33,11 +33,7 @@
 
 <% content_for :stylesheets do %>
 <style>
-.roster .email {
-  margin-left: 10px;
-  font-size: 0.85em;
-}
-.roster .short_name {
+.roster .more_info {
   margin-left: 10px;
   font-size: 0.85em;
 }
@@ -58,11 +54,15 @@
           <td>
             <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a>
             <% if can_do(@context, @current_user, :manage_students) %>
-              <div class="short_name"><%= student.short_name %></div>
-              <div class="email"><%= student.email %></div>
-              <% if @enrollments_hash && (e = @enrollments_hash[student.id]) && e.course_section %>
-                <div class="short_name course_section"><%= e.course_section.display_name %></div>
-              <% end %>
+              <div class="more_info">
+                <div class="short_name"><%= student.short_name %></div>
+                <div class="email"><%= student.email %></div>
+                <% if @enrollments_hash %> 
+                  <% @enrollments_hash[student.id].each do |e| %>
+                    <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
+                  <% end %>
+                <% end %>
+              </div>
             <% end %>
           </td>
         </tr>
@@ -80,11 +80,15 @@
           <td>
             <a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a>
             <% if can_do(@context, @current_user, :manage_admin_users) %>
-              <div class="short_name"><%= teacher.short_name %></div>
-              <div class="email"><%= teacher.email %></div>
-              <% if @enrollments_hash && (e = @enrollments_hash[teacher.id]) && e.course_section %>
-                <div class="short_name course_section"><%= e.course_section.display_name %></div>
-              <% end %>
+              <div class="more_info">
+                <div class="short_name"><%= teacher.short_name %></div>
+                <div class="email"><%= teacher.email %></div>
+                <% if @enrollments_hash %> 
+                  <% @enrollments_hash[teacher.id].each do |e| %>
+                    <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
+                  <% end %>
+                <% end %>
+              </div>
             <% end %>
           </td>
         </tr>

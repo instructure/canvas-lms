@@ -147,8 +147,24 @@ h3 .tally {
 <% end %>
 <h2 id="section_name"><%= @section.name %></h2>
 <div style="margin-bottom: 20px;">
-  <div>
-    <%= t('enrollment', 'Enrollment', :count => @enrollments) %>
+  <div id="enrollments_div">
+    <table id="enrollment_table">
+    <% if @pending_enrollments > 0 %>
+          <tr>
+            <td class="pending_enrollments"><%= t('pending_enrollment', {:one => '1 Pending Enrollment', :other => '%{count} Pending Enrollments'}, :count => @pending_enrollments) %></td>
+          </tr>
+    <% end %>
+    <% if @enrollments > 0 %>
+      <tr>
+        <td class="active_enrollments"><%= t('active_enrollment', {:one => '1 Active Enrollment', :other => '%{count} Active Enrollments'}, :count => @enrollments) %></td>
+      </tr>
+    <% end %>
+    <% if @completed_enrollments > 0 %>
+          <tr>
+            <td class="completed_enrollments"><%= t('completed_enrollment', {:one => '1 Completed Enrollment', :other => '%{count} Completed Enrollments'}, :count => @completed_enrollments) %></td>
+          </tr>
+    <% end %>
+    </table>
   </div>
   <% if @section && ( @section.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis))%>
     <div><%= before_label('sis_id', "SIS ID") %> <span class="sis_source_id"><%= @section.sis_source_id %></span></div>
@@ -237,7 +253,7 @@ h3 .tally {
     <% if @student_enrollments > 0 %>
       <p>
         <%= t('decrosslist_long_description', %{
-        All grades for students in this course will no longer be visible.  
+        All grades for students in this course will no longer be visible.
         You can retrieve the grades later by re-cross-listing the course, 
         but in the mean time the grades for these students will come from the original course.
         }) %>

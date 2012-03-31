@@ -625,6 +625,18 @@ describe User do
       user.can_masquerade?(@site_admin, @account2).should be_true
       @account2.add_user(@admin)
     end
+
+    it "should allow site admin when they don't otherwise qualify for :create_courses" do
+      user = user_with_pseudonym(:username => 'nobody1@example.com')
+      @admin = user_with_pseudonym(:username => 'nobody2@example.com')
+      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
+      Account.default.add_user(@admin)
+      Account.site_admin.add_user(@site_admin)
+      course
+      @course.enroll_teacher(@admin)
+      Account.default.update_attribute(:settings, {:teachers_can_create_courses => true})
+      @admin.can_masquerade?(@site_admin, Account.default).should be_true
+    end
   end
 
   context "permissions" do
@@ -747,34 +759,11 @@ describe User do
       @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
     end
 
-    it "should return concluded enrollments in the group if they are still members" do
-      set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      @this_section_user_enrollment.conclude
-
-      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
-    end
-
     it "should respect section visibility when returning users for a specified group" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
-
-      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
-      @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
-      # student can only see people in his section
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
-      @student.group_membership_visibility[:user_counts][@group.id].should eql 1
-    end
-
-    it "should return concluded enrollments in the group and section if they are still members" do
-      set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-
-      @group.users << @other_section_user
-      @this_section_user_enrollment.conclude
 
       @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
       @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
@@ -882,6 +871,56 @@ describe User do
         should eql [@this_section_user.id] + # two contexts (course and group)
                    [@student.id, @this_section_teacher.id, @other_section_user.id, @other_section_teacher.id] # just the course
     end
+
+    context "concluded enrollments" do
+      it "should return concluded enrollments" do # i.e. you can do a bare search for people who used to be in your class
+        set_up_course_with_users
+        @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+        @this_section_user_enrollment.conclude
+  
+        @this_section_user.messageable_users.map(&:id).should include @this_section_user.id
+        @student.messageable_users.map(&:id).should include @this_section_user.id
+      end
+  
+      it "should not return concluded student enrollments in the course" do # when browsing a course you should not see concluded enrollments
+        set_up_course_with_users
+        @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+        @course.complete!
+  
+        @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
+        # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
+        @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
+        @this_section_user.enrollment_visibility[:user_counts][@course.id].should eql 2 # just the admins
+        @student.messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
+        @student.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
+        @student.enrollment_visibility[:user_counts][@course.id].should eql 2
+      end
+  
+      it "should return concluded enrollments in the group if they are still members" do
+        set_up_course_with_users
+        @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+        @this_section_user_enrollment.conclude
+  
+        @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 1
+        @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @student.group_membership_visibility[:user_counts][@group.id].should eql 1
+      end
+  
+      it "should return concluded enrollments in the group and section if they are still members" do
+        set_up_course_with_users
+        @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+  
+        @group.users << @other_section_user
+        @this_section_user_enrollment.conclude
+  
+        @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
+        @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
+        # student can only see people in his section
+        @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @student.group_membership_visibility[:user_counts][@group.id].should eql 1
+      end
+    end
   end
   
   context "lti_role_types" do
@@ -971,6 +1010,27 @@ describe User do
       @user.avatar_image_url = 'http://www.example.com'
       @user.avatar_image = { 'type' => 'twitter' }
       @user.avatar_image_url.should be_nil
+    end
+
+    it "should return a useful avatar_fallback_url" do
+      User.avatar_fallback_url.should ==
+        "https://#{HostUrl.default_host}/images/no_pic.gif"
+      User.avatar_fallback_url("/somepath").should ==
+        "https://#{HostUrl.default_host}/somepath"
+      User.avatar_fallback_url("//somedomain/path").should ==
+        "https://somedomain/path"
+      User.avatar_fallback_url("http://somedomain/path").should ==
+        "http://somedomain/path"
+      User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :scheme => "http")).should ==
+        "http://foo/images/no_pic.gif"
+      User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+        "https://bar/somepath"
+      User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+        "https://somedomain/path"
+      User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+        "http://somedomain/path"
+      User.avatar_fallback_url('%{fallback}').should ==
+        '%{fallback}'
     end
   end
 

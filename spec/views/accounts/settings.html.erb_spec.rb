@@ -31,7 +31,7 @@ describe "accounts/settings.html.erb" do
       assigns[:account_users] = []
       assigns[:root_account] = @account
       assigns[:associated_courses_count] = 0
-      assigns[:account_notifications] = []
+      assigns[:announcements] = []
     end
 
     it "should show to sis admin" do
@@ -59,7 +59,7 @@ describe "accounts/settings.html.erb" do
       assigns[:account_users] = []
       assigns[:root_account] = @account
       assigns[:associated_courses_count] = 0
-      assigns[:account_notifications] = []
+      assigns[:announcements] = []
       admin = account_admin_user
       view_context(@account, admin)
     end

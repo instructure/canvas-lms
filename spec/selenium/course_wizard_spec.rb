@@ -69,21 +69,29 @@ describe "course wizard" do
     driver.find_element(:css, '#section-tabs-header').text.should == expected_text
   end
 
-  it "should add an assignment to the course" do
-    start_course
-    get "/getting_started/assignments"
-    add_assignment(1)
+  # clicks the next step button and validates the expected element
+  # is on the next page
+  def click_next_step(expected_element_css)
+    expect_new_page_load { driver.find_element(:css, '.next_step_button').click }
+    driver.find_element(:css, expected_element_css).should be_displayed if expected_element_css != nil
   end
 
   def validate_assignment_addition
     driver.find_element(:css, '.no_assignments_message').should_not be_displayed
   end
 
+  it "should add an assignment to the course" do
+    start_course
+    click_next_step('.assignment_list')
+    add_assignment(1)
+    click_next_step('#user_list_textarea_container')
+  end
+
   it "should create an assignment group and add a new assignment to it" do
     #adding new assignment group
     group_name = 'Group Test'
     start_course
-    get "/getting_started/assignments"
+    click_next_step('.assignment_list')
 
     expect {
       driver.find_element(:css, '.add_group_link').click
@@ -96,17 +104,25 @@ describe "course wizard" do
 
     #adding assignment to new group
     add_assignment(1)
+    click_next_step('#user_list_textarea_container')
   end
 
   it "should not create two assignments when using more options in the wizard" do
     start_course
     expect {
-      expect_new_page_load { driver.find_element(:css, ".next_step_button").click }
+      click_next_step('.assignment_list')
       driver.find_element(:css, ".add_assignment_link").click
       expect_new_page_load { driver.find_element(:css, ".more_options_link").click }
       expect_new_page_load { driver.find_element(:css, "#edit_assignment_form button[type='submit']").click }
     }.to change(Assignment, :count).by(1)
     validate_assignment_addition
+    click_next_step('#user_list_textarea_container')
+  end
+
+  def click_and_validate_last_page
+    click_next_step(nil)
+    wizard_steps = driver.find_elements(:css, '#wizard-steps > li')
+    wizard_steps[3].should have_class('active')
   end
 
   it "should validate xss doesn't happen when adding students'" do
@@ -119,6 +135,7 @@ describe "course wizard" do
     fill_out_add_students_text(xss_text)
 
     driver.find_element(:css, '#user_list_no_valid_users').should be_displayed
+    click_and_validate_last_page
   end
 
   it "should not allow invalid email addresses when adding students" do
@@ -131,6 +148,7 @@ describe "course wizard" do
     fill_out_add_students_text(invalid_emails)
 
     driver.find_element(:css, '#user_list_no_valid_users').should be_displayed
+    click_and_validate_last_page
   end
 
   it "should verify that valid emails were added as students" do
@@ -139,6 +157,7 @@ describe "course wizard" do
 
     #normal add
     add_students
+    click_and_validate_last_page
   end
 
   it "should add students using valid user names" do
@@ -149,6 +168,7 @@ describe "course wizard" do
 
     #user name add
     add_students(usernames)
+    click_and_validate_last_page
   end
 
 
@@ -161,7 +181,7 @@ describe "course wizard" do
     driver.switch_to.default_content
     wait_for_ajaximations
     num_students_added -= 1
-    expect_new_page_load { driver.find_element(:css, '.next_step_button').click }
+    click_and_validate_last_page
     student_table_rows = driver.find_element(:css, '#student_list .summary').find_elements(:css, 'tr').length
 
     #have to do -1 because there is no better way to get the rows with css
@@ -177,6 +197,7 @@ describe "course wizard" do
       expect_new_page_load { driver.find_element(:css, '.previous_step_button').click }
       student_count = driver.find_element(:css, '.student_count').text
       student_count.to_i.should == num_students_added
+      click_and_validate_last_page
     end
   end
 
@@ -193,12 +214,28 @@ describe "course wizard" do
     wizard_link = driver.find_element(:css, '.wizard_popup_link')
     wizard_link.click if wizard_link.displayed?
     driver.find_element(:css, '.wizard_content').should_not include_text('Publish')
+    Course.last.workflow_state.should == 'available'
+  end
+
+  def validate_section_tabs_header(expected_text)
+    driver.find_element(:id, 'section-tabs-header').text.should == expected_text
   end
 
   it "should click the save and skip on the first page and verify course creation" do
     expected_text = start_course
     expect_new_page_load { driver.find_element(:css, '.save_button').click }
-    driver.find_element(:css, '#section-tabs-header').text.should == expected_text
+    validate_section_tabs_header(expected_text)
+  end
+
+  it "should validate a full course wizard click through" do
+    expected_text = start_course
+    click_next_step('.assignment_list')
+    add_assignment(1)
+    click_next_step('#user_list_textarea_container')
+    add_students
+    click_and_validate_last_page
+    expect_new_page_load { driver.find_element(:id, 'publish_course_url').find_element(:css, 'button[type=submit]').click }
+    validate_section_tabs_header(expected_text)
   end
 
   it "should validate false for teacher can create course account permission" do

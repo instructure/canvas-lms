@@ -13,7 +13,7 @@
     post_date = datetime_string(topic.last_reply_at) rescue t('last_post', "Last Post")
   end
   unread_count = topic ? topic.unread_count(@current_user) : 0
-  reply_count = topic.discussion_entries.active.length rescue 0
+  reply_count = topic.discussion_entries.length rescue 0
 %>
 <div class="clear"></div>
 <% if !topic || can_do(topic, @current_user, :read) %>
@@ -119,6 +119,7 @@
       <span class="podcast_enabled"><%= (topic && topic.podcast_enabled) ? "1" : "0" %></span>
       <span class="podcast_has_student_posts"><%= (topic && topic.podcast_has_student_posts) ? "1" : "0" %></span>
       <span class="require_initial_post"><%= (topic && topic.require_initial_post) ? "1" : "0" %></span>
+      <span class="threaded"><%= topic.try(:threaded?) ? "1" : "0" %></span>
     </div>
   </div>
 </div>

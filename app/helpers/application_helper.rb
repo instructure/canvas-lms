@@ -159,7 +159,7 @@ module ApplicationHelper
 
   def avatar(user_id, context_code, height=50)
     if service_enabled?(:avatars)
-      link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;')
+      link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
     end
   end
 
@@ -672,6 +672,16 @@ module ApplicationHelper
         })();
       ENDSCRIPT
       content_tag(:script, str, {}, false)
+    end
+  end
+
+
+  # this should be the same as friendlyDatetime in handlebars_helpers.coffee
+  def friendly_datetime(datetime, opts={})
+    attributes = { :title => datetime }
+    attributes[:pubdate] = true if opts[:pubdate]
+    content_tag(:time, attributes) do
+      datetime_string(datetime)
     end
   end
 

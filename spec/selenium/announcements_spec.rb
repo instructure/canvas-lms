@@ -117,6 +117,7 @@ describe "announcements" do
     end
 
     it "should have a teacher add a new entry to its own announcement" do
+      pending "delayed jobs"
       create_announcement
       get [@course, @announcement]
 

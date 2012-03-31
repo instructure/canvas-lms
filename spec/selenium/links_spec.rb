@@ -12,9 +12,9 @@ describe "links" do
       get "/courses/#{@course.id}"
     end
 
-    def find_link(link_text)
+    def find_link(link_css)
       link_section = driver.find_element(:id, 'section-tabs')
-      link_element = link_section.find_element(:link, link_text)
+      link_element = link_section.find_element(:css, link_css)
       link_element
     end
 
@@ -24,62 +24,62 @@ describe "links" do
     end
 
     it "should navigate user to announcements page after announcements link is clicked" do
-      link = find_link('Announcements')
+      link = find_link('.announcements')
       validate_link(link, 'Announcements')
     end
 
     it "should navigate user to assignments page after assignments link is clicked" do
-      link = find_link('Assignments')
+      link = find_link('.assignments')
       validate_link(link, 'Assignments')
     end
 
     it "should navigate user to discussions page after discussions link is clicked" do
-      link = find_link('Discussions')
+      link = find_link('.discussions')
       validate_link(link, 'Discussions')
     end
 
     it "should navigate user to gradebook page after grades link is clicked" do
-      link = find_link('Grades')
+      link = find_link('.grades')
       validate_link(link, 'Grades')
     end
 
     it "should navigate user to users page after people link is clicked" do
-      link = find_link('People')
+      link = find_link('.people')
       validate_link(link, 'People')
     end
 
     it "should navigate user to wiki page after pages link is clicked" do
-      link = find_link('Pages')
+      link = find_link('.pages')
       validate_link(link, 'Pages')
     end
 
     it "should navigate user to files page after files link is clicked" do
-      link = find_link('Files')
+      link = find_link('.files')
       validate_link(link, 'Files')
     end
 
     it "should navigate user to syllabus page after syllabus link is clicked" do
-      link = find_link('Syllabus')
+      link = find_link('.syllabus')
       validate_link(link, 'Syllabus')
     end
 
     it "should navigate user to outcomes page after outcomes link is clicked" do
-      link = find_link('Outcomes')
+      link = find_link('.outcomes')
       validate_link(link, 'Outcomes')
     end
 
     it "should navigate user to quizzes page after quizzes link is clicked" do
-      link = find_link('Quizzes')
+      link = find_link('.quizzes')
       validate_link(link, 'Quizzes')
     end
 
     it "should navigate user to modules page after modules link is clicked" do
-      link = find_link('Modules')
+      link = find_link('.modules')
       validate_link(link, 'Modules')
     end
 
     it "should navigate user to settings page after settings link is clicked" do
-      link = find_link('Settings')
+      link = find_link('.settings')
       validate_link(link, 'Settings')
     end
   end
@@ -117,18 +117,15 @@ describe "links" do
       end
 
       it "should navigate user to assignments page after assignments link is clicked" do
-        link = find_dashboard_link('#menu', 'Assignments')
-        validate_link(link, 'Assignments')
+        validate_link(driver.find_element(:css, '#assignments_menu_item a'), 'Assignments')
       end
 
       it "should navigate user to gradebook page after grades link is clicked" do
-        link = find_dashboard_link('#menu', 'Grades')
-        validate_link(link, 'Grades')
+        validate_link(driver.find_element(:css, '#grades_menu_item a'), 'Grades')
       end
 
       it "should navigate user to the calendar page after calender link is clicked" do
-        link = find_dashboard_link('#menu', 'Calendar')
-        validate_link(link, 'My Calendar')
+        validate_link(driver.find_element(:css, '#calendar_menu_item a'), 'My Calendar')
       end
     end
   end

@@ -125,14 +125,22 @@ class SisImportsApiController < ApplicationController
                                 request2.media_type)
         end
       end
-      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj)
 
+      batch_mode_term = nil
       if params[:batch_mode].to_i > 0
-        batch.batch_mode = true
         if params[:batch_mode_term_id].present?
-          batch.batch_mode_term = api_find(@account.enrollment_terms.active,
+          batch_mode_term = api_find(@account.enrollment_terms.active,
                                            params[:batch_mode_term_id])
         end
+        unless batch_mode_term
+          return render :json => { :message => "Batch mode specified, but the given batch_mode_term_id cannot be found." }, :status => :bad_request
+        end
+      end
+
+      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj)
+      if batch_mode_term
+        batch.batch_mode = true
+        batch.batch_mode_term = batch_mode_term
       end
 
       batch.options ||= {}

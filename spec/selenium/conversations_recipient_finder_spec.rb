@@ -61,6 +61,19 @@ describe "conversations recipient finder" do
     end
   end
 
+  it "should not show concluded enrollments as students in the course" do
+    pending('bug 7583 - concluded students in a live course still show up as students in the course when addressing messages in the inbox') do
+      student_1_enrollment = @s1.enrollments.last
+      student_1_enrollment.update_attributes(:workflow_state => 'completed')
+      student_1_enrollment.save!
+      student_1_enrollment.reload
+      browse_menu
+      browse("the course") do
+        browse("Students") { menu.should eql ["Select All", "student 2"] }
+      end
+    end
+  end
+
   it "should not return courses concluded a long time ago" do
     @course.complete!
     @course.update_attribute :conclude_at, 1.year.ago

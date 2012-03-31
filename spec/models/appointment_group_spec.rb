@@ -186,10 +186,7 @@ describe AppointmentGroup do
       Notification.create(:name => 'Appointment Group Updated', :category => "TestImmediately")
 
       course_with_teacher(:active_all => true)
-      @teacher = @user
-
       student_in_course(:course => @course, :active_all => true)
-      @student = @user
 
       [@teacher, @student].each do |user|
         channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
@@ -217,6 +214,20 @@ describe AppointmentGroup do
       @ag.destroy
       @ag.messages_sent.should be_include("Appointment Group Deleted")
       @ag.messages_sent["Appointment Group Deleted"].map(&:user_id).sort.uniq.should eql [@student.id]
+    end
+
+    it "should not notify participants in an unpublished course" do
+      @unpublished_course = course
+      @unpublished_course.enroll_user(@student, 'StudentEnrollment')
+      @unpublished_course.enroll_user(@teacher, 'TeacherEnrollment')
+
+      @ag = @unpublished_course.appointment_groups.create(:title => "test", 
+                                                          :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
+      @ag.publish!
+      @ag.messages_sent.should be_empty
+
+      @ag.destroy
+      @ag.messages_sent.should be_empty
     end
   end
 

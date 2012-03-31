@@ -31,7 +31,7 @@ describe "/discussion_topics/show" do
     assigns[:entries] = @topic.discussion_entries
     assigns[:all_entries] = @topic.discussion_entries
     render "discussion_topics/show"
-    response.should have_tag("div#entry_list")
+    response.should have_tag("div#discussion_subentries")
   end
 
   it "should render in a group context" do
@@ -50,6 +50,6 @@ describe "/discussion_topics/show" do
     @topic.for_assignment?.should be_true
     @topic.assignment.rubric_association.rubric.should_not be_nil
     render "discussion_topics/show"
-    response.should have_tag("div#entry_list")
+    response.should have_tag("div#discussion_subentries")
   end
 end

@@ -185,7 +185,7 @@ describe ConversationsController, :type => :integration do
         json[2]['last_authored_message'].should eql 'test'
       end
 
-      it "should only include non-archived conversations with at least one message by the author" do
+      it "should include conversations with at least one message by the author, regardless of workflow_state" do
         @c1 = conversation(@bob)
         @c2 = conversation(@bob, @billy)
         @c2.conversation.add_message(@bob, 'ohai')
@@ -194,8 +194,8 @@ describe ConversationsController, :type => :integration do
 
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
                 { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'sent' })
-        json.size.should eql 1
-        json[0]['id'].should eql @c1.conversation_id
+        json.size.should eql 2
+        json.map{ |c| c['id'] }.sort.should eql [@c1.conversation_id, @c3.conversation_id]
       end
     end
 

@@ -73,7 +73,8 @@ class ApplicationController < ActionController::Base
     @js_env ||= {
       :current_user_id => @current_user.try(:id),
       :current_user_roles => @current_user.try(:roles),
-      :context_asset_string => @context.try(:asset_string)
+      :context_asset_string => @context.try(:asset_string),
+      :AUTHENTICITY_TOKEN => form_authenticity_token
     }
 
     hash.each do |k,v|
@@ -1162,7 +1163,16 @@ class ApplicationController < ActionController::Base
   # refs #6632 -- once the speed grader ipad app is upgraded, we can remove these exceptions
   SKIP_JSON_CSRF_REGEX = %r{\A(?:/login|/logout|/dashboard/comment_session)}
   def prepend_json_csrf?
-    request.get? && @pseudonym_session && !@pseudonym_session.used_basic_auth? && !request.path.match(SKIP_JSON_CSRF_REGEX)
+    request.get? && in_app? && !request.path.match(SKIP_JSON_CSRF_REGEX)
+  end
+
+  def in_app?
+    @pseudonym_session && !@pseudonym_session.used_basic_auth?
+  end
+
+  def json_as_text?
+    (request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data}) &&
+    (params[:format].to_s != 'json' || in_app?)
   end
 
   def render(options = nil, extra_options = {}, &block)
@@ -1177,7 +1187,7 @@ class ApplicationController < ActionController::Base
 
       # fix for some browsers not properly handling json responses to multipart
       # file upload forms and s3 upload success redirects -- we'll respond with text instead.
-      if options[:as_text] || (request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data} && params[:format].to_s != 'json')
+      if options[:as_text] || json_as_text?
         options[:text] = json
       else
         options[:json] = json

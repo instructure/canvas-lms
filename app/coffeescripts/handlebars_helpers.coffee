@@ -3,10 +3,11 @@ define [
   'i18nObj'
   'jquery'
   'str/htmlEscape'
+  'compiled/util/semanticDateRange'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (Handlebars, I18n, $, htmlEscape) ->
+], (Handlebars, I18n, $, htmlEscape, semanticDateRange) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (key, defaultValue, options) ->
@@ -23,9 +24,12 @@ define [
 
     hiddenUnless : (condition) -> " display:none; " unless condition
 
-    friendlyDatetime : (datetime) ->
-      datetime = new Date(datetime)
-      new Handlebars.SafeString "<time title='#{datetime}' datetime='#{datetime.toISOString()}'>#{$.friendlyDatetime(datetime)}</time>"
+    semanticDateRange : ->
+      new Handlebars.SafeString semanticDateRange arguments...
+
+    friendlyDatetime : (datetime, {hash: {pubdate}}) ->
+      parsed = $.parseFromISO(datetime)
+      new Handlebars.SafeString "<time title='#{parsed.datetime_formatted}' datetime='#{parsed.datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(parsed.datetime)}</time>"
 
     datetimeFormatted : (isoString) ->
       isoString = $.parseFromISO(isoString) unless isoString.datetime
@@ -36,6 +40,15 @@ define [
       date.toString(format)
 
     mimeClass: (contentType) -> $.mimeClass(contentType)
+
+    # finds any <video/audio class="instructure_inline_media_comment"> and turns them into media comment thumbnails
+    convertNativeToMediaCommentThumnail: (html) ->
+      $dummy = $('<div />').html(html)
+      $dummy.find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment').replaceWith ->
+        $("<a id='media_comment_#{$(this).data('media_comment_id')}'
+              data-media_comment_type='#{$(this).data('media_comment_type')}'
+              class='instructure_inline_media_comment' />")
+      new Handlebars.SafeString $dummy.html()
 
     newlinesToBreak : (string) ->
       new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")

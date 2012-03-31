@@ -22,6 +22,7 @@ describe ApplicationController do
 
   before(:each) do
     @controller = ApplicationController.new
+    @controller.stubs(:form_authenticity_token).returns('asdf')
   end
 
   describe "js_env" do

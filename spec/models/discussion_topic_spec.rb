@@ -24,7 +24,18 @@ describe DiscussionTopic do
     @course.discussion_topics.create!(:message => "<a href='#' onclick='alert(12);'>only this should stay</a>")
     @course.discussion_topics.first.message.should eql("<a href=\"#\">only this should stay</a>")
   end
-  
+
+  it "should default to side_comment type" do
+    d = DiscussionTopic.new
+    d.discussion_type.should == 'side_comment'
+
+    d.threaded = '1'
+    d.discussion_type.should == 'threaded'
+
+    d.threaded = ''
+    d.discussion_type.should == 'side_comment'
+  end
+
   it "should update the assignment it is associated with" do
     course_model
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -38,7 +49,7 @@ describe DiscussionTopic do
     a.discussion_topic.should eql(t)
     a.submission_types.should eql("discussion_topic")
   end
-  
+
   it "should delete the assignment if the topic is no longer graded" do
     course_model
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -109,7 +120,7 @@ describe DiscussionTopic do
     @entry = @topic.discussion_entries.create!(:user => @teacher)
     (@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).should be_empty
   end
-  
+
   context "delayed posting" do
     def delayed_discussion_topic(opts = {})
       @topic = @course.discussion_topics.build(opts)
@@ -117,16 +128,16 @@ describe DiscussionTopic do
       @topic.save!
       @topic
     end
-    
+
     it "shouldn't send to streams on creation or update if it's delayed" do
       course_with_student(:active_all => true)
       @user.register
       topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
       StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
-      
+
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
-      
+
       topic.message = "content changed!"
       topic.save
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
@@ -138,7 +149,7 @@ describe DiscussionTopic do
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       topic.workflow_state.should == 'post_delayed'
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
-      
+
       topic.delayed_post_at = nil
       topic.title = "this isn't delayed any more"
       topic.workflow_state = 'active'
@@ -146,7 +157,7 @@ describe DiscussionTopic do
       StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
     end
   end
-  
+
   context "clone_for" do
     it "should clone to another context" do
       course_model
@@ -159,7 +170,7 @@ describe DiscussionTopic do
       new_topic.title.should eql(topic.title)
     end
   end
-  
+
   context "sub-topics" do
     it "should default subtopics_refreshed_at on save if a group assignment" do
       course_with_student(:active_all => true)
@@ -226,7 +237,7 @@ describe DiscussionTopic do
       subtopics = @topic.refresh_subtopics
       subtopics.should_not be_nil
       subtopics.size.should == 2
-      subtopics.each{ |t| t.root_topic.should == @topic }
+      subtopics.each { |t| t.root_topic.should == @topic }
       @group1.reload.discussion_topics.should_not be_empty
       @group2.reload.discussion_topics.should_not be_empty
     end
@@ -243,6 +254,15 @@ describe DiscussionTopic do
 
       count_before.should eql count_after
       ids_before.sort.should eql ids_after.sort
+    end
+
+    it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
+      topic_for_group_assignment
+      subtopics = @topic.refresh_subtopics
+      subtopics.each {|st| st.discussion_type.should == 'side_comment' }
+      @topic.discussion_type = 'threaded'
+      @topic.save
+      subtopics.each {|st| st.reload.discussion_type.should == 'threaded' }
     end
   end
 
@@ -359,14 +379,14 @@ describe DiscussionTopic do
       @parent_topic.should_send_to_stream.should be_true
       @subtopic.should_send_to_stream.should be_false
     end
-    
+
     it "should not send stream items to students if course isn't published'" do
       course
       course_with_teacher(:course => @course, :active_all => true)
       student_in_course(:course => @course, :active_all => true)
-      
+
       topic = @course.discussion_topics.create(:title => "secret topic", :user => @teacher)
-      
+
       StreamItem.for_user(@student).count.should == 0
       StreamItem.for_user(@teacher).count.should == 1
 
@@ -375,9 +395,9 @@ describe DiscussionTopic do
       StreamItem.for_user(@student).count.should == 0
       StreamItem.for_user(@teacher).count.should == 1
     end
-    
+
   end
-  
+
   context "posting first to view" do
     before(:each) do
       course_with_student(:active_all => true)
@@ -388,22 +408,22 @@ describe DiscussionTopic do
       @topic.require_initial_post = true
       @topic.save
     end
-    
+
     it "should allow admins to see posts without posting" do
       @topic.user_can_see_posts?(@teacher).should == true
     end
-    
+
     it "shouldn't allow student (and observer) who hasn't posted to see" do
       @topic.user_can_see_posts?(@student).should == false
     end
-    
-    it "should allow student (and observer) who has posted to see" do 
+
+    it "should allow student (and observer) who has posted to see" do
       @topic.reply_from(:user => @student, :text => 'hai')
       @topic.user_can_see_posts?(@student).should == true
     end
-    
+
   end
-  
+
   context "posters" do
     before :each do
       @teacher = course_with_teacher(:active_all => true).user
@@ -436,6 +456,15 @@ describe DiscussionTopic do
       @topic.posters.should include(@teacher)
       @topic.posters.should include(@student)
       @topic.posters.size.should == 2
+    end
+
+    it "should not include topic author if she is no longer enrolled in the course" do
+      student_in_course(:active_all => true)
+      @topic2 = @course.discussion_topics.create!(:title => "student topic", :message => "I'm outta here", :user => @student)
+      @entry = @topic2.discussion_entries.create!(:message => "go away", :user => @teacher)
+      @topic2.posters.map(&:id).sort.should eql [@student.id, @teacher.id].sort
+      @student.enrollments.first.destroy
+      @topic2.posters.map(&:id).sort.should eql [@teacher.id].sort
     end
   end
 
@@ -654,12 +683,39 @@ describe DiscussionTopic do
       DiscussionTopic.expects(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
     end
+  end
 
-    it "should use active entries as deafult unread count" do
-      @entry1 = @topic.discussion_entries.create!(:message => "HI 1", :user => @teacher)
-      @entry2 = @topic.discussion_entries.create!(:message => "HI 2", :user => @teacher)
-      @entry2.destroy
-      @topic.unread_count(@student).should == 1
+  context "materialized view" do
+    before do
+      topic_with_nested_replies
+    end
+
+    it "should return nil if the view has not been built yet, and schedule a job" do
+      DiscussionTopic::MaterializedView.for(@topic).destroy
+      @topic.materialized_view.should be_nil
+      @topic.materialized_view.should be_nil
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+    end
+
+    it "should return the materialized view if it's up to date" do
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
+      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, "[]"]
+    end
+
+    it "should update the materialized view on new entry" do
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      @topic.reply_from(:user => @user, :text => "ohai")
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+    end
+
+    it "should update the materialized view on edited entry" do
+      reply = @topic.reply_from(:user => @user, :text => "ohai")
+      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      reply.update_attributes(:message => "i got that wrong before")
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
     end
   end
 end

@@ -228,7 +228,7 @@ describe 'Submissions API', :type => :integration do
     @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
     se2 = @topic.discussion_entries.create!(:message => 'student 1', :user => @student)
     @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    e1 = @topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+    e2 = @topic.discussion_entries.create!(:message => 'another entry', :user => @user)
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
@@ -242,6 +242,7 @@ describe 'Submissions API', :type => :integration do
         'message' => 'sub 1',
         'user_id' => @student.id,
         'read_state' => 'unread',
+        'parent_id' => e1.id,
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
         'user_name' => 'User',
@@ -251,6 +252,7 @@ describe 'Submissions API', :type => :integration do
         'message' => 'student 1',
         'user_id' => @student.id,
         'read_state' => 'unread',
+        'parent_id' => nil,
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
         'user_name' => 'User',
@@ -291,7 +293,7 @@ describe 'Submissions API', :type => :integration do
     @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
     se2 = @child_topic.discussion_entries.create!(:message => 'student 1', :user => @student)
     @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    e1 = @child_topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+    e2 = @child_topic.discussion_entries.create!(:message => 'another entry', :user => @user)
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
@@ -306,6 +308,7 @@ describe 'Submissions API', :type => :integration do
         'user_id' => @student.id,
         'user_name' => 'User',
         'read_state' => 'unread',
+        'parent_id' => e1.id,
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
       },
@@ -315,6 +318,7 @@ describe 'Submissions API', :type => :integration do
         'user_id' => @student.id,
         'user_name' => 'User',
         'read_state' => 'unread',
+        'parent_id' => nil,
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
       }].sort_by { |h| h['user_id'] }

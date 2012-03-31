@@ -354,21 +354,44 @@ describe UsersController do
     it "should redirect to no-pic if avatars are disabled" do
       course_with_student_logged_in(:active_all => true)
       get 'avatar_image_url', :user_id  => @user.id
-      response.should redirect_to '/images/no_pic.gif'
+      response.should redirect_to 'http://test.host/images/no_pic.gif'
     end
-    it "should handle passing a fallback" do
+    it "should handle passing an absolute fallback" do
+      course_with_student_logged_in(:active_all => true)
+      get 'avatar_image_url', :user_id  => @user.id, :fallback => "http://foo.com/my/custom/fallback/url.png"
+      response.should redirect_to 'http://foo.com/my/custom/fallback/url.png'
+    end
+    it "should handle passing a host-relative fallback" do
       course_with_student_logged_in(:active_all => true)
       get 'avatar_image_url', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
-      response.should redirect_to '/my/custom/fallback/url.png'
+      response.should redirect_to 'http://test.host/my/custom/fallback/url.png'
     end
-    it "should handle passing a fallback when avatars are enabled" do
+    it "should pass along the default fallback to gravatar" do
+      course_with_student_logged_in(:active_all => true)
+      @account = Account.default
+      @account.enable_service(:avatars)
+      @account.save!
+      @account.service_enabled?(:avatars).should be_true
+      get 'avatar_image_url', :user_id  => @user.id
+      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/images/no_pic.gif")}"
+    end
+    it "should handle passing an absolute fallback when avatars are enabled" do
       course_with_student_logged_in(:active_all => true)
       @account = Account.default
       @account.enable_service(:avatars)
       @account.save!
       @account.service_enabled?(:avatars).should be_true
       get 'avatar_image_url', :user_id  => @user.id, :fallback => "https://test.domain/my/custom/fallback/url.png"
-      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=https%3A%2F%2Ftest.domain%2Fmy%2Fcustom%2Ffallback%2Furl.png"
+      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("https://test.domain/my/custom/fallback/url.png")}"
+    end
+    it "should handle passing a host-relative fallback when avatars are enabled" do
+      course_with_student_logged_in(:active_all => true)
+      @account = Account.default
+      @account.enable_service(:avatars)
+      @account.save!
+      @account.service_enabled?(:avatars).should be_true
+      get 'avatar_image_url', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
+      response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/my/custom/fallback/url.png")}"
     end
     it "should take an invalid id and return no_pic" do
       @account = Account.default
@@ -376,7 +399,7 @@ describe UsersController do
       @account.save!
       @account.service_enabled?(:avatars).should be_true
       get 'avatar_image_url', :user_id  => 'a'
-      response.should redirect_to '/images/no_pic.gif'
+      response.should redirect_to 'http://test.host/images/no_pic.gif'
     end
     it "should take an invalid id with a hyphen and return no_pic" do
       @account = Account.default
@@ -384,7 +407,7 @@ describe UsersController do
       @account.save!
       @account.service_enabled?(:avatars).should be_true
       get 'avatar_image_url', :user_id  => 'a-1'
-      response.should redirect_to '/images/no_pic.gif'
+      response.should redirect_to 'http://test.host/images/no_pic.gif'
     end
   end
 
