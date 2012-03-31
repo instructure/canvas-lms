@@ -1,3 +1,120 @@
+canvas-lms (2012.03.31.16) stable; urgency=low
+
+  * Package ref: 4619f2aba7917f283f978c6473b209813e6437a6
+  *
+  * [+25a4379] reorder questions in quizzes with drag and drop
+  * [+cd78e4c] fix workflow_state filter in enrollments api. fixes #7548
+  * [+a98e327] spec for excluding unmanageable permissions in api
+  * [+a44432e] fix string typo in full assignment view fixes #5644
+  * [+b90f827] spec: add selenium spec to gradebook2 file refs #7558
+  * [+4b64e68] spec: removed pendings on flickr specs
+  * [+32b3cd7] spec: add selenium spec to gradebook2 file refs #7553
+  * [+2c755b1] fixes changing group assignment to individual assignment
+  * [+d23687d] option to cancel existing reservations when reserving a slot (frontend)
+  * [+324ed89] fix date picker showing up behind #main, closes: #7025
+  * [+e9823a9] fix avatar fallbacks in conversations (and generally), fixes #7539
+  * [+9560a75] don't depend on jQuery in scripts loaded check
+  * [+7432f2a] fix linkedin profile pictures, and use ssl
+  * [+6f36e19] change short name to display name on welcome aboard page fixes #6286
+  * [+f6c2e82] correct student count in speedgrader with mult. enroll; fixes #7613
+  * [+3ef0d37] spec: add selenium spec to people file refs #7106
+  * [+9dbce90] clear up sis full batch import verbiage fixes #7472
+  * [+acf8fa7] spec: add model spec to discussion topic file refs #6273
+  * [+6ba570f] add label to term input fixes #7656
+  * [+3d9b721] spec: add selenium spec to context modules file refs #6233
+  * [+1fee342] include cancel-reason in appointment cancellation notification
+  * [+7db04fc] fix typo in development.rb
+  * [+e9edb2a] model and api work for threaded discussions, refs #7567
+  * [+627e5c5] test student notifications when teacher deletes time slot
+  * [+5f4774b] fix timezone/dst specs
+  * [+5e787e7] spec: make selenium course wizard specs more robust
+  * [+e5aaecc] fix account announcements across shards fixes #7396
+  * [+2ce5c0b] conversations frontend refactor, refs #7062
+  * [+c67b534] spec: add selenium spec to conversations finder file refs #7583
+  * [+bd406d7] spec: add selenium spec to gradebook2 file refs #7375
+  * [+d216522] show multiple sections on course users page; fixes #7510
+  * [+1984912] spec: add selenium spec to speed grader file refs #7646
+  * [+a2dc91d] modified parallel selenium rake task to include plugins specs
+  * [+3928851] clean up and stop creating duplication notification policies
+  * [+cda4221] spec: fix intermittently failing gradebook2 selenium spec
+  * [+6fbbfdc] spec: add selenium spec to dashboard file refs #7536
+  * [+8f58ea7] add heading to account permissions pages fixes #5343
+  * [+cfbe0c1] send announcement notifications to observers; fixes #7424
+  * [+e64b5d9] refactor top nav links to have id's
+  * [+0b570f8] remove dead code around page views
+  * [+6e9f162] remove dead code
+  * [+6a8856d] allow disabling mail from outgoing_mail.yml
+  * [+beb5e71] use flickr over ssl
+  * [+b50491b] add spec for scribd in multiple shards refs #7695
+  * [+9bd4028] error if the sis import is batch mode and no valid term is given
+  * [+1ea2f46] add api for enrollments by section; fixes #7647
+  * [+59b2f74] fix typo in course wizard fixes #7712
+  * [+4a3e231] indicate which appointment groups aren't published
+  * [+6b37cf1] return attach permission on discussion topics, closes #7376
+  * [+50d4ff4] show archived conversations under the sent filter, fixes #7627
+  * [+30cef92] browsable conversations filter, fixes #7566
+  * [+824bd1c] don't show concluded students under course in finder, fixes #7583
+  * [+76496a4] update course section enrollment display to be less confusing
+  * [+af95878] let students join inactive long-running conferences, fixes #7454
+  * [+c8a538d] flag topics as threaded, fixes #7792
+  * [+4d6653a] only send scheduler notifications to available courses; fixes #7267
+  * [+631599c] don't assume topic poster is in course/group; fixes #7483
+  * [+6d1c5e0] include previous complete submissions in quiz statistics csv
+  * [+f5e0834] added backbone.js
+  * [+2b0f485] discussion topics materialized view api, refs #7567
+  * [+5623b98] discussion entry_list api, refs #7567
+  * [+4109c64] update/delete discussion entry apis, refs #7567
+  * [+73bf0f3] materialized view of discussion topics, closes #7567
+  * [+0853a91] Revert "exclude deleted discussion entries from read counts; fixes #7741"
+  * [+3ff3ebc] return html_url for participants in the materialized discussion view
+  * [+9b79e83] always return entry summary in json response
+  * [+7a8a838] build the initial, empty materialized view synchronously
+  * [+dd753e9] new discussions UI
+  * [+fe21dd2] make non-threaded default, and allow switching to non-threaded
+  * [+5d04a1c] fix attachments in discussion materialized view
+  * [+52cd12f] retry when we get a 503 (exponential backoff, to a point)
+  * [+32bc23b] allow top-level attachments
+  * [+94766bb] made non-threaded discussions threadish again
+  * [+ec15b8e] fix gradient in ie, closes #7895
+  * [+5757ba5] fix disableWhileLoading for file upload formSubmits, fixes #7755
+  * [+3e18b53] store full message in materialized view, not summary
+  * [+fff2eba] fix bad merge
+  * [+41b01f0] tweak discussions css as per kyle's recommendations
+  * [+46815c9] included deleted entries in total message count
+  * [+f2ed5ee] make sure subtopics (for groups) get the threaded attribute
+  * [+2c6ca44] default to all expanded, added view switcher
+  * [+51f0409] new threadish styles and behavior
+  * [+ebd903a] fix materialzed view table definition for mysql
+  * [+c7be255] disable the css3 transitions  for kylemenus until they work
+  * [+39ae661] don't delete side comments when an entry is destroyed
+  * [+dacadc6] return discussion_type in topics api response
+  * [+cd656f1] better cancel button, deleted display, wording
+  * [+7099d26] fix attachments in new discussions, fixes #7917
+  * [+6536aef] side comments text, reply to topic, deleted replies
+  * [+c2d9e19] collapse deleted entries with children
+  * [+ac7fc77] convert <video> and <audio> from API to media_comment_thumbnails
+  * [+a4d6770] fix typo breaking media comments in discussions
+  * [+605462e] prevent page jump when canceling a reply
+  * [+ca232e0] collapse side comment form, add root scroll
+  * [+7059b7b] enhance user content (media_comments) with less delay
+  * [+04764f1] moved attach button to the right
+  * [+c8e886b] link directly to speedgrader from discussion reply
+  * [+2caf71a] trigger userContent change without killing ie8
+  * [+ffa4bed] fix the student_id replacement on the speedgrader link in discussions
+  * [+68c4e51] cancel button when editing an entry
+  * [+8f49d28] don't mark as read if an entry is collapsed
+  * [+85aa776] fix speedgrader buttons for discussion in a group
+  * [+fa9466d] expire dashboard todo list after 3 minutes; refs #7753
+  * [+e0b4091] auto-wrap long words (e.g. urls), fixes #7658
+  * [+cb196f1] optionally include entries not in the view yet in /view response
+  * [+55f2231] next step of scary warning for users logging in at wrong domain
+  * [+bd125e8] right padding in side_comment discussions
+  * [+4fe0fa1] fix site admins masquerading as teachers fixes #7954
+  * [+c4d7da3] add or edit new entries in discussions
+  * [+4619f2a] mark as read fixes
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 31 Mar 2012 07:28:44 -0600
+
 canvas-lms (2012.03.17.19) stable; urgency=low
 
   * Package ref: b8d8fa07ca6c0548ea2626e56b357ab612f0c7ee
