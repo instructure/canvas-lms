@@ -234,29 +234,6 @@ class Enrollment < ActiveRecord::Base
     self.save
   end
 
-  def page_views_by_day(options={})
-    conditions = {
-      :context_id => course.id,
-      :context_type => course.class.to_s,
-      :user_id => user.id
-    }
-    if options[:dates]
-      conditions.merge!({
-        :created_at => (options[:dates].first)..(options[:dates].last)
-      })
-    end
-    page_views_as_hash = {}
-    PageView.count(
-      :group => "date(created_at)",
-      :conditions => conditions
-    ).each do |day|
-      page_views_as_hash[day.first] = day.last
-    end
-    page_views_as_hash
-  end
-  memoize :page_views_by_day
-
-
   def defined_by_sis?
     !!self.sis_source_id
   end

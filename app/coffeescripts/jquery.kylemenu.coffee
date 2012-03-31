@@ -8,18 +8,26 @@ define [
   $.fn.kyleMenu = (options) ->
     this.each ->
       opts = $.extend(true, {}, $.fn.kyleMenu.defaults, options)
+      $trigger = $(this)
       unless opts.noButton
-        $button = $(this).button(opts.buttonOpts)
+        $trigger.button(opts.buttonOpts)
 
         # this is to undo the removal of the 'ui-state-active' class that jquery.ui.button
         # does by default on mouse out if the menu is still open
-        $button.bind 'mouseleave.button', ->
-          $button.addClass('ui-state-active') if $menu.is('.ui-state-open')
+        $trigger.bind 'mouseleave.button', ->
+          $trigger.addClass('ui-state-active') if $menu.is('.ui-state-open')
 
-      $menu = $(this).next()
+      $menu = $trigger.next()
                 .menu(opts.menuOpts)
                 .popup(opts.popupOpts)
                 .addClass("ui-kyle-menu use-css-transitions-for-show-hide")
+
+      # passing an appendMenuTo option when initializing a kylemenu helps get aroud popup being hidden
+      # by overflow:scroll on its parents
+      appendTo = opts.appendMenuTo
+      $menu.appendTo(appendTo) if appendTo
+
+      $trigger.data('kyleMenu', $menu)
       $menu.bind "menuselect", ->
         $(this).popup('close').removeClass "ui-state-open"
 
@@ -52,11 +60,17 @@ define [
   # this is a behaviour that will automatically set up a set of .admin-links
   # when the button is clicked, see _admin_links.scss for markup
   $('.al-trigger').live 'click', (event)->
-    $this = $(this)
-    unless $this.is('.ui-button')
+    $trigger = $(this)
+    unless $trigger.is('.ui-button')
       event.preventDefault()
-      $(this).kyleMenu({
+
+      defaults =
         buttonOpts:
-          icons: { primary: null, secondary: null }
-      }).next().popup('open')
+          icons:
+            primary: null
+            secondary: null
+      opts = $.extend defaults, $trigger.data('kyleMenuOptions')
+
+      $trigger.kyleMenu(opts)
+      $trigger.data('kyleMenu').popup('open')
 

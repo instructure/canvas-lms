@@ -41,7 +41,7 @@ describe "/users/user_dashboard" do
     assigns[:group_memberships] = []
     assigns[:topics] = []
     assigns[:upcoming_events] = []
-    assigns[:account_notifications] = [AccountNotification.new(:subject => "My Global Announcement")]
+    assigns[:announcements] = [AccountNotification.new(:subject => "My Global Announcement", :account => Account.default)]
     render "users/user_dashboard"
     response.body.should match /My Global Announcement/
   end

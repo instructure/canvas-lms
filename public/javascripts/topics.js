@@ -135,19 +135,19 @@ define([
       $form.addClass('add_topic_form_new').attr('id', 'add_topic_form_' + id)
         .find(".topic_content").addClass('topic_content_new').attr('id', 'topic_content_' + id);
       var data = $topic.getTemplateData({
-        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]', 'podcast_enabled', 'podcast_has_student_posts', 'require_initial_post'],
+        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]', 'podcast_enabled', 'podcast_has_student_posts', 'require_initial_post', 'threaded'],
         htmlValues: ['message']
       });
       data.message = $topic.find(".content .message_html").val();
-      if(data.title == I18n.t('no_title', "No Title")) {
+      if (data.title == I18n.t('no_title', "No Title"))
         data.title = I18n.t('default_topic_title', "Topic Title");
-      }
-      if(data.delayed_post_at) {
+      if (data.delayed_post_at)
         data.delay_posting = '1';
-      }
-      if(data['assignment[id]']) {
+      $.each(['podcast_enabled', 'podcast_has_student_posts', 'require_initial_post', 'threaded'], function(i, bool){
+        if (data[bool] === 'true') data[bool] = '1';
+      });
+      if (data['assignment[id]'])
         data['assignment[set_assignment]'] = '1';
-      }
       var addOrUpdate = $topic.hasClass('announcement') ?
         I18n.t('update_announcment', "Update Announcement") :
         I18n.t('update_topic', "Update Topic");
@@ -493,6 +493,17 @@ define([
       if(fragment == "#new") {
         $(".add_topic_link:visible:first").click();
       }
+
+      // this is because we punted on being able to edit topics with the new UI,
+      // we did not actually wire up editing from the show page.
+      // the 'edit' link on the show page will just take you to courses/x/discussion_topics#edit_topic_3
+      // where '3' is the id of the topic to edit
+      var matchData = (fragment || '').match(/#edit_topic_(\d+)/);
+      if (matchData){
+        var $topicToEdit = $('#topic_' + matchData[1]);
+        if ($topicToEdit.length) editTopic($topicToEdit);
+      }
+
     }).fragmentChange();
   });
 });

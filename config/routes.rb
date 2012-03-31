@@ -652,8 +652,10 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
       enrollments.get  'courses/:course_id/enrollments', :action => :index, :path_name => 'course_enrollments'
+      enrollments.get  'sections/:section_id/enrollments', :action => :index, :path_name => 'section_enrollments'
       enrollments.get  'users/:user_id/enrollments', :action => :index, :path_name => 'user_enrollments'
       enrollments.post 'courses/:course_id/enrollments', :action => :create
+      enrollments.post 'sections/:section_id/enrollments', :action => :create
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -688,27 +690,25 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :discussion_topics_api) do |topics|
-      topics.post 'courses/:course_id/discussion_topics/:topic_id/entries', :action => :add_entry, :path_name => 'course_discussion_add_entry'
-      topics.post 'groups/:group_id/discussion_topics/:topic_id/entries', :action => :add_entry, :path_name => 'group_discussion_add_entry'
-      topics.get 'courses/:course_id/discussion_topics/:topic_id/entries', :action => :entries, :path_name => 'course_discussion_entries'
-      topics.get 'groups/:group_id/discussion_topics/:topic_id/entries', :action => :entries, :path_name => 'group_discussion_entries'
-      topics.post 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :add_reply, :path_name => 'course_discussion_add_reply'
-      topics.post 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :add_reply, :path_name => 'group_discussion_add_reply'
-      topics.get 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'course_discussion_replies'
-      topics.get 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies', :action => :replies, :path_name => 'group_discussion_replies'
+      def topic_routes(topics, context)
+        topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/view", :action => :view, :path_name => "#{context}_discussion_topic_view"
+        topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", :action => :entry_list, :path_name => "#{context}_discussion_topic_entry_list"
+        topics.post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", :action => :add_entry, :path_name => "#{context}_discussion_add_entry"
+        topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", :action => :entries, :path_name => "#{context}_discussion_entries"
+        topics.post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/replies", :action => :add_reply, :path_name => "#{context}_discussion_add_reply"
+        topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/replies", :action => :replies, :path_name => "#{context}_discussion_replies"
+        topics.put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:id", :controller => :discussion_entries, :action => :update, :path_name => "#{context}_discussion_update_reply"
+        topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:id", :controller => :discussion_entries, :action => :destroy, :path_name => "#{context}_discussion_delete_reply"
 
-      topics.put 'courses/:course_id/discussion_topics/:topic_id/read', :action => :mark_topic_read, :path_name => 'course_discussion_topic_mark_read'
-      topics.put 'groups/:group_id/discussion_topics/:topic_id/read', :action => :mark_topic_read, :path_name => 'group_discussion_topic_mark_read'
-      topics.delete 'courses/:course_id/discussion_topics/:topic_id/read', :action => :mark_topic_unread, :path_name => 'course_discussion_topic_mark_unread'
-      topics.delete 'groups/:group_id/discussion_topics/:topic_id/read', :action => :mark_topic_unread, :path_name => 'group_discussion_topic_mark_unread'
-      topics.put 'courses/:course_id/discussion_topics/:topic_id/read_all', :action => :mark_all_read, :path_name => 'course_discussion_topic_mark_all_read'
-      topics.put 'groups/:group_id/discussion_topics/:topic_id/read_all', :action => :mark_all_read, :path_name => 'group_discussion_topic_mark_all_read'
-      topics.delete 'courses/:course_id/discussion_topics/:topic_id/read_all', :action => :mark_all_unread, :path_name => 'course_discussion_topic_mark_all_unread'
-      topics.delete 'groups/:group_id/discussion_topics/:topic_id/read_all', :action => :mark_all_unread, :path_name => 'group_discussion_topic_mark_all_unread'
-      topics.put 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_read, :path_name => 'course_discussion_topic_discussion_entry_mark_read'
-      topics.put 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_read, :path_name => 'group_discussion_topic_discussion_entry_mark_read'
-      topics.delete 'courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_unread, :path_name => 'course_discussion_topic_discussion_entry_mark_unread'
-      topics.delete 'groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read', :action => :mark_entry_unread, :path_name => 'group_discussion_topic_discussion_entry_mark_unread'
+        topics.put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read", :action => :mark_topic_read, :path_name => "#{context}_discussion_topic_mark_read"
+        topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read", :action => :mark_topic_unread, :path_name => "#{context}_discussion_topic_mark_unread"
+        topics.put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", :action => :mark_all_read, :path_name => "#{context}_discussion_topic_mark_all_read"
+        topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", :action => :mark_all_unread, :path_name => "#{context}_discussion_topic_mark_all_unread"
+        topics.put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", :action => :mark_entry_read, :path_name => "#{context}_discussion_topic_discussion_entry_mark_read"
+        topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", :action => :mark_entry_unread, :path_name => "#{context}_discussion_topic_discussion_entry_mark_unread"
+      end
+      topic_routes(topics, "course")
+      topic_routes(topics, "group")
     end
 
     api.with_options(:controller => :external_tools) do |tools|

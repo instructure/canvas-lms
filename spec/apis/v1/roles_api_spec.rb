@@ -33,10 +33,14 @@ describe "Roles API", :type => :integration do
     end
 
     def api_call_with_settings(settings={})
-      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
-        { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
-        { :role => @role,
-          :permissions => { @permission => settings } })
+      admin = settings.delete(:admin) || @admin
+      account = settings.delete(:account) || @admin.account
+      role = settings.delete(:role) || @role
+      permission = settings.delete(:permission) || @permission
+      api_call(:post, "/api/v1/accounts/#{account.id}/roles",
+        { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => account.id.to_s },
+        { :role => role,
+          :permissions => { permission => settings } })
     end
 
     it "should add the role to the account" do
@@ -163,6 +167,19 @@ describe "Roles API", :type => :integration do
           "enabled" => false,
           "locked" => false
         }
+      end
+
+      it "should only return manageable permissions" do
+        # set up a subaccount and admin in subaccount
+        subaccount = @account.sub_accounts.create!
+
+        # add a role in that subaccount
+        json = api_call_with_settings(:account => subaccount)
+        json["account"]["id"].should == subaccount.id
+
+        # become_user is a permission restricted to root account roles. it
+        # shouldn't be in the response for this subaccount role.
+        json["permissions"].keys.should_not include("become_user")
       end
 
       it "should set explicit and prior default if enabled was provided" do

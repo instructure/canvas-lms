@@ -281,8 +281,8 @@ class ContextController < ApplicationController
     if authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       if @context.is_a?(Course)
-        @enrollments_hash = {}
-        @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
+        @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
+        @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
         @students = @context.students_visible_to(@current_user).find(:all, :order => User.sortable_name_order_by_clause).uniq
         @teachers = @context.instructors.find(:all, :order => User.sortable_name_order_by_clause).uniq
         user_ids = @students.map(&:id) + @teachers.map(&:id)

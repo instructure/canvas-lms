@@ -48,6 +48,8 @@ class DiscussionTopicsController < ApplicationController
   # @response_field topic_children An array of topic_ids for the group discussions the user is a part of
   # @response_field user_name The username of the creator
   # @response_field url The URL to the discussion topic in canvas
+  # @response_field discussion_type The type of discussion. Values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
+  # @response_field permissions[attach] If true, the calling user can attach files to this discussion's entries.
   #
   # @example_response
   #     [
@@ -67,6 +69,7 @@ class DiscussionTopicsController < ApplicationController
   #        "topic_children":[],
   #        "root_topic_id":null,
   #        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
+  #        "discussion_type":"side_comment",
   #        "attachments":[
   #          {
   #            "content-type":"unknown/unknown",
@@ -74,7 +77,8 @@ class DiscussionTopicsController < ApplicationController
   #            "filename":"content.txt",
   #            "display_name":"content.txt"
   #          }
-  #        ]
+  #        ],
+  #        "permissions": { "attach": true }
   #      }
   #     ]
   def index
@@ -109,6 +113,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def child_topic
+    extra_params = {:headless => 1} if params[:headless]
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @context.discussion_topics.find_or_initialize_by_root_topic_id(params[:root_discussion_topic_id])
     @topic.message = @root_topic.message
@@ -116,14 +121,13 @@ class DiscussionTopicsController < ApplicationController
     @topic.assignment_id = @root_topic.assignment_id
     @topic.user_id = @root_topic.user_id
     @topic.save
-    redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id)
+    redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id, extra_params)
   end
   protected :child_topic
 
   def show
-    parent_id = params[:parent_id] || 0
+    parent_id = params[:parent_id]
     @topic = @context.all_discussion_topics.find(params[:id])
-    @assignment = @topic.assignment
     @context.assert_assignment_group rescue nil
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
     if @topic.deleted?
@@ -133,51 +137,55 @@ class DiscussionTopicsController < ApplicationController
     end
     if authorized_action(@topic, @current_user, :read)
       @headers = !params[:headless]
-      @all_entries = @topic.discussion_entries.active
-      @grouped_entries = @all_entries.group_by(&:parent_id)
-      @entries = @all_entries.select{|e| e.parent_id == parent_id}.each{|e| e.current_user = @current_user}
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @topic.context_module_action(@current_user, :read) if !@locked
       if @topic.for_group_assignment?
-        @groups = @topic.assignment.group_category.groups.active.select{|g| g.grants_right?(@current_user, session, :read) }
-        if params[:combined]
-          @topic_agglomerated = true
-          @topics = @topic.child_topics.select{|t| @groups.include?(t.context) }
-          @entries = @topics.map{|t| t.discussion_entries.active.find(:all, :conditions => ['parent_id = ?', 0])}.
-            flatten.
-            sort_by{|e| e.created_at}.
-            each{|e| e.current_user = @current_user}
-        else
-          @topics = @topic.child_topics.to_a
-          @topics = @topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
-          @group_entry = @topic.discussion_entries.build(:message => render_to_string(:partial => 'group_assignment_discussion_entry'))
-          @group_entry.new_record_header = t '#titles.group_discussion', "Group Discussion"
-          @group_entry.current_user = @current_user
-          @topic_uneditable = true
-          @entries = [@group_entry]
+        @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
+        topics = @topic.child_topics.to_a
+        topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
+        @group_topics = @groups.map do |group|
+          {:group => group, :topic => topics.find{|t| t.context == group} }
         end
       end
 
-      if @topic.require_initial_post?
-        # check if the user, or the user being observed can see the posts
-        if @context_enrollment && @context_enrollment.respond_to?(:associated_user) && @context_enrollment.associated_user
-          @initial_post_required = true if !@topic.user_can_see_posts?(@context_enrollment.associated_user)
-        elsif !@topic.user_can_see_posts?(@current_user, session)
-          @initial_post_required = true
-        end
-        @entries = [] if @initial_post_required
-      end
+      @initial_post_required = @topic.initial_post_required?(@current_user, @context_enrollment, session)
 
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
         if @topic.deleted?
           flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
           format.html { redirect_to named_context_url(@context, :discussion_topics_url) }
-        elsif @topics && @topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
-          format.html { redirect_to named_context_url(@topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
+        elsif topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
+          format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
         else
-          format.html { render :action => "show" }
-          format.json  { render :json => @entries.to_json(:methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}) }
+          format.html do
+
+            env_hash = {
+              :TOPIC => {
+                :ID => @topic.id,
+              },
+              :PERMISSIONS => {
+                :CAN_REPLY => !(@topic.for_group_assignment? || @topic.locked?),
+                :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
+                :MODERATE => @context.grants_right?(@current_user, session, :moderate_forum)
+              },
+              :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
+              :ENTRY_ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_entry_list_url, @topic),
+              :REPLY_URL => named_context_url(@context, :api_v1_context_discussion_add_reply_url, @topic, ':entry_id'),
+              :ROOT_REPLY_URL => named_context_url(@context, :api_v1_context_discussion_add_entry_url, @topic),
+              :DELETE_URL => named_context_url(@context, :api_v1_context_discussion_delete_reply_url, @topic, ':id'),
+              :UPDATE_URL => named_context_url(@context, :api_v1_context_discussion_update_reply_url, @topic, ':id'),
+              :MARK_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, @topic, ':id'),
+              :CURRENT_USER => { :id => @current_user.id, :display_name => @current_user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(@current_user.id)) },
+              :INITIAL_POST_REQUIRED => @initial_post_required,
+              :THREADED => @topic.threaded?
+            }
+            if @topic.for_assignment? && @topic.assignment.grants_right?(@current_user, session, :grade)
+              env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment.id, :anchor => {:student_id => ":student_id"}.to_json)
+            end
+            js_env :DISCUSSION => env_hash
+
+          end
         end
       end
     end
@@ -328,7 +336,10 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@topic, @current_user, :delete)
       @topic.destroy
       respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
+        format.html {
+          flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
+          redirect_to named_context_url(@context, :context_discussion_topics_url)
+        }
         format.json  { render :json => @topic.to_json(:include => {:user => {:only => :name} } ), :status => :ok }
       end
     end

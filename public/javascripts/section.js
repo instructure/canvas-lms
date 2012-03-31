@@ -17,18 +17,19 @@ define([
 ], function(I18n, $, _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, PaginatedList, enrollmentTemplate, sectionEnrollmentPresenter) {
 
   $(document).ready(function() {
-    var $edit_section_form = $("#edit_section_form"),
+    var section_id = window.location.pathname.split('/')[4]
+        $edit_section_form = $("#edit_section_form"),
         $edit_section_link = $(".edit_section_link"),
         currentEnrollmentList   = new PaginatedList($('#current-enrollment-list'), {
           presenter: sectionEnrollmentPresenter,
           template: enrollmentTemplate,
-          url: '/api/v1/courses/' + window.location.pathname.split('/')[2] + '/enrollments'
+          url: '/api/v1/sections/' + section_id + '/enrollments'
         }),
         completedEnrollmentList = new PaginatedList($('#completed-enrollment-list'), {
           presenter: sectionEnrollmentPresenter,
           requestParams: { state: 'completed' },
           template: enrollmentTemplate,
-          url: '/api/v1/courses/' + window.location.pathname.split('/')[2] + '/enrollments'
+          url: '/api/v1/sections/' + section_id + '/enrollments'
         });
 
     $edit_section_form.formSubmit({

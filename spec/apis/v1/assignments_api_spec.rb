@@ -242,6 +242,8 @@ describe AssignmentsApiController, :type => :integration do
       'unread_count' => 0,
       'url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
       'attachments' => [],
+      'permissions' => { 'attach' => true },
+      'discussion_type' => 'side_comment',
     }
   end
 

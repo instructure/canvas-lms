@@ -699,19 +699,45 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  ##
+  # load the simulate plugin to simulate a drag events (among other things)
+  # will only load it once even if its called multiple times
   def load_simulate_js
-    # load the simulate plugin to simulate a drag event
-    js = File.read('spec/selenium/jquery.simulate.js')
-    driver.execute_script js
+    @load_simulate_js ||= begin
+      js = File.read('spec/selenium/jquery.simulate.js')
+      driver.execute_script js
+    end
   end
 
   # when selenium fails you, reach for .simulate
   # takes a CSS selector for jQuery to find the element you want to drag
   # and then the change in x and y you want to drag
   def drag_with_js(selector, x, y)
+    load_simulate_js
     driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
   end
 
+  ##
+  # drags an element matching css selector `source_selector` onto an element
+  # matching css selector `target_selector`
+  #
+  # sometimes seleniums drag and drop just doesn't seem to work right this
+  # seems to be more reliable
+  def js_drag_and_drop(source_selector, target_selector)
+    source = f source_selector
+    source_location = source.location
+
+    target = f target_selector
+    target_location = target.location
+
+    dx = target_location.x - source_location.x
+    dy = target_location.y - source_location.y
+
+    drag_with_js source_selector, dx, dy
+  end
+
+  ##
+  # returns true if a form validation error message is visible, false otherwise
   def error_displayed?
     f('.error_text:visible') != nil
   end
@@ -779,8 +805,10 @@ end
 
   def validate_link(link_element, breadcrumb_text)
     expect_new_page_load { link_element.click }
-    breadcrumb = driver.find_element(:id, 'breadcrumbs')
-    breadcrumb.should include_text(breadcrumb_text)
+    if breadcrumb_text != nil
+      breadcrumb = driver.find_element(:id, 'breadcrumbs')
+      breadcrumb.should include_text(breadcrumb_text)
+    end
     driver.execute_script("return INST.errorCount;").should == 0
   end
 

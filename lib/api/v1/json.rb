@@ -21,11 +21,19 @@ module Api::V1::Json
   # some tasks that all api json should do, like not including the root wrapper
   # object, and passing the user permissions info into the serialization engine.
   #
+  # if no user/session is given, permissions will not be considered during
+  # serialization! make sure that's ok.
+  #
   # this returns the ruby hash of the json data, not the raw json string. you can still pass that hash to render like
   # render :json => hash
   # and it'll be stringified properly.
-  def api_json(obj, user, session, opts = {})
+  def api_json(obj, user, session, opts = {}, permissions_to_return = [])
+    permissions = { :user => user, :session => session, :include_permissions => false }
+    if permissions_to_return.present?
+      permissions[:include_permissions] = true
+      permissions[:policies] = Array(permissions_to_return)
+    end
     obj.as_json({ :include_root => false,
-                  :permissions => { :user => user, :session => session, :include_permissions => false } }.merge(opts))
+                  :permissions => permissions }.merge(opts))
   end
 end

@@ -2,7 +2,7 @@ define([
   'jquery' /* $ */,
   'i18n!content_imports',
   'compiled/util/processItemSelections',
-  'vendor/underscore',
+  'use!underscore',
   'compiled/xhr/RemoteSelect',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* date_field */,

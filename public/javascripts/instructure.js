@@ -17,6 +17,7 @@
  */
 
 define([
+  'ENV',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
@@ -43,17 +44,24 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
   'vendor/jquery.store' /* /\$\.store/ */,
+  'vendor/jquery.ba-throttle-debounce' /* debounce */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'vendor/scribd.view' /* scribd */
-], function(INST, I18n, $, htmlEscape, wikiSidebar) {
+], function(ENV, INST, I18n, $, htmlEscape, wikiSidebar) {
 
+  // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
+  var CSRFProtection =  function(xhr) {
+    if (ENV.AUTHENTICITY_TOKEN) xhr.setRequestHeader('X-CSRF-Token', ENV.AUTHENTICITY_TOKEN);
+  }
 
-  // sends timing info of XHRs to google analytics so we can track ajax speed.
-  // (ONLY for ajax requests that took longer than a second)
   $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+    if ( !options.crossDomain ) CSRFProtection(jqXHR);
+
+    // sends timing info of XHRs to google analytics so we can track ajax speed.
+    // (ONLY for ajax requests that took longer than a second)
     var urlWithoutPageViewParam = options.url;
     var start = new Date().getTime();
     jqXHR.done(function(data, textStatus, jqXHR){
@@ -478,6 +486,15 @@ define([
         alert(I18n.t('alerts.file_previews_disabled', 'File previews have been disabled for this Canvas site'));
       });
     }
+
+    // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
+    var enhanceUserContentTimeout;
+    $.subscribe('userContent/change', function(){
+      clearTimeout(enhanceUserContentTimeout);
+      enhanceUserContentTimeout = setTimeout(enhanceUserContent, 50);
+    });
+
+
     $(document).bind('user_content_change', enhanceUserContent);
     setInterval(enhanceUserContent, 15000);
     setTimeout(enhanceUserContent, 1000);

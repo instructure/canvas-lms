@@ -8,8 +8,8 @@
 
 <% add_crumb "", '#', :id => 'help_crumb' %>
 
-<% js_bundle :messages %>
-<% jammit_css :messages %>
+<% js_bundle :conversations %>
+<% jammit_css :conversations %>
 
 <div id="inbox">
   <div id="conversations">
@@ -45,7 +45,7 @@
         <label for="context_tags">
           <%= before_label :filter, "Filter" %>
         </label>
-        <%= text_field_tag :context_tags, nil, :finder_url => conversations_find_recipients_url(:types => ['course', 'user', 'group'], :include_inactive => true) %>
+        <%= text_field_tag :context_tags, nil, :finder_url => conversations_find_recipients_url %>
       </div>
       <div class="clear"></div>
     </div>
@@ -217,30 +217,4 @@
   </table>
   <ul class="messages"></ul>
   <input type="hidden" name="group_conversation" value="1" />
-<% end %>
-
-<% js_block do %>
-  <script type="text/javascript">
-    // TODO: use js_env for all this stuff
-    require(['compiled/messages'], function (MessageInbox) {
-      MessageInbox.user_id = <%= @current_user.id %>;
-      MessageInbox.user_cache = <%= raw @user_cache.to_json %>;
-      MessageInbox.contexts = <%= raw @contexts.to_json %>;
-      MessageInbox.initial_conversations = <%= raw @conversations_json.to_json %>;
-      MessageInbox.conversation_page_size = <%= @page_max %>;
-      MessageInbox.initial_conversations_count = <%= @conversations_count %>;
-      MessageInbox.scope = <%= raw @scope.to_json %>;
-      <% # TODO: get note-enabled-ness per account, and cross reference with the recipient's associated account ids. this is already enforced in the model %>
-      MessageInbox.notes_enabled = <%= raw @current_user.associated_accounts.any?{|a| a.enable_user_notes } %>;
-      MessageInbox.can_add_notes_for_account = MessageInbox.notes_enabled && <%= raw @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) } %>;
-      MessageInbox.conversations_per_page = <%= @page_max.to_i %>;
-      MessageInbox.initial_filter = <%= raw @filter.to_json %>;
-      $(MessageInbox.init);
-    });
-    <% unless @current_user.watched_conversations_intro? %>
-    require(['compiled/conversations_intro'], function (conversationsIntro) {
-      conversationsIntro();
-    });
-    <% end %>
-  </script>
 <% end %>

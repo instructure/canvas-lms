@@ -436,25 +436,25 @@
       "\"close\" link to ignore the alert. **These announcements should be " +
       "used sparingly.**") %>
       <ul class="announcements_list unstyled_list">
-        <% @account_notifications.each do |notification| %>
+        <% @announcements.each do |announcement| %>
           <li>
             <div class="subject">
-              <%= image_tag("#{notification.icon}.png") %><%= notification.subject %>
+              <%= image_tag("#{announcement.icon}.png") %><%= announcement.subject %>
             </div>
             <% if can_do(@account, @current_user, :manage_alerts) %>
-              <a href="#" rel="<%= context_url(@account, :context_account_notification_url, notification) %>" class="delete_notification_link" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>"><%= image_tag "delete_circle.png" %></a>
+              <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="delete_notification_link" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>"><%= image_tag "delete_circle.png" %></a>
             <% end %>
             <div class="clear"></div>
             <div class="dates">
               <span style="padding-right: 10px;">
                 <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
-                      :start_at => datetime_string(notification.start_at),
-                      :end_at => datetime_string(notification.end_at)) %>
+                      :start_at => datetime_string(announcement.start_at),
+                      :end_at => datetime_string(announcement.end_at)) %>
               </span>
-              <%= link_to(context_user_name(@account, notification.user_id), user_path(notification.user_id)) %>
+              <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
             </div>
             <div class="message user_content">
-              <%= user_content(notification.message) %>
+              <%= user_content(announcement.message) %>
             </div>
           </li>
         <% end %>

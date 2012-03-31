@@ -19,6 +19,8 @@ module TextHelper
   def strip_and_truncate(text, options={})
     truncate_text(strip_tags(text), options)
   end
+  module_function :strip_and_truncate
+
   def strip_tags(text)
     text ||= ""
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| puts m; m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "")

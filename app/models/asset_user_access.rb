@@ -107,13 +107,6 @@ class AssetUserAccess < ActiveRecord::Base
     end
   end
   
-  def self.summarize_asset_accesses
-    @accesses = AssetUserAccess.to_be_summarized
-    if !@accesses.empty?
-      @accesses.each{|a| a.generate_summaries }
-    end
-  end
-  
   def display_name
     # repair existing AssetUserAccesses that have bad display_names
     if read_attribute(:display_name) == asset_code
@@ -172,70 +165,4 @@ class AssetUserAccess < ActiveRecord::Base
     asset = Context.find_asset_by_asset_string(asset_code)
     asset
   end
-  
-  def generate_summaries
-    contexts = []
-    obj = self
-    while (obj.respond_to?(:context) && obj.context) || (obj.respond_to?(:account) && obj.account)
-      if (obj.respond_to?(:context) && obj.context)
-        contexts << obj.context
-        obj = obj.context
-      else
-        contexts << obj.account
-        obj = obj.account
-      end
-    end
-    page_views = self.page_views
-    found_ranges = {}
-    page_views.each do |view|
-      view_week = view.created_at.to_date
-      # Week range is Monday to Sunday
-      view_week = (view_week - 1) - (view_week - 1).wday + 1
-      view_month = Date.new(y=view.created_at.year, m=view.created_at.month, d=1) #view.created_at.strftime("%m:%Y")
-      if !found_ranges[view_week]
-        contexts.each do |context|
-          week_range = self.asset_access_ranges.find_by_start_on_and_end_on_and_context_id_and_context_type(view_week, view_week + 6, context.id, context.class.to_s)
-          week_range ||= self.asset_access_ranges.build(:start_on => view_week, :end_on => view_week + 6, :context => context)
-          week_range.user_id = self.user_id
-          week_range.asset_code = self.asset_code
-          week_range.save
-        end
-      end
-      if !found_ranges[view_month]
-        contexts.each do |context|
-          month_range = self.asset_access_ranges.find_by_start_on_and_end_on_and_context_id_and_context_type(view_month, (view_month >> 1) - 1, context.id, context.class.to_s)
-          month_range ||= self.asset_access_ranges.build(:start_on => view_month, :end_on => (view_month >> 1) - 1, :context => context)
-          month_range.user_id = self.user_id
-          month_range.asset_code = self.asset_code
-          month_range.save
-        end
-      end
-      found_ranges[view_week] = true
-      found_ranges[view_month] = true
-    end
-    
-    self.asset_access_ranges.incomplete.each do |range|
-      views = page_views.select{|v| v.created_at >= range.start_on && v.created_at <= range.end_on.tomorrow}
-      range.view_score = 0
-      range.participate_score = 0
-      range.interaction_seconds = 0
-      range.action_level = 'view'
-      views.each do |view|
-        range.view_score += 1
-        range.asset_category ||= self.asset_category
-        range.display_name = self.display_name
-        range.membership_type ||= self.membership_type
-        range.participate_score += 1 if view.participated
-        range.interaction_seconds += view.interaction_seconds if view.interaction_seconds
-        range.action_level = 'participate' if view.participated
-      end
-      range.workflow_state = 'complete' if Time.now > range.end_on.tomorrow
-      range.save
-    end
-    self.summarized_at = Time.now
-    self.save
-  end
-  
-  named_scope :to_be_summarized, :order => 'updated_at', :conditions => ['summarized_at IS NULL'], :limit => 500
-  named_scope :to_be_resummarized, :order => 'summarized_at', :conditions => ['summarized_at < ?', 24.hours.ago], :limit => 5
 end

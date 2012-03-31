@@ -71,6 +71,18 @@ describe ConversationsController do
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
     end
 
+    it "should return all sent conversations" do
+      course_with_student_logged_in(:active_all => true)
+      @c1 = conversation
+      @c2 = conversation
+      @c3 = conversation
+      @c3.update_attribute :workflow_state, 'archived'
+
+      get 'index', :scope => 'sent'
+      response.should be_success
+      assigns[:conversations_json].size.should eql 3
+    end
+
     it "should return conversations matching the specified filter" do
       course_with_student_logged_in(:active_all => true)
       @c1 = conversation

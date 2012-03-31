@@ -1,0 +1,9 @@
+<div title="Cancel existing reservation and sign up for this one?">
+  {{#t "you_are_already_signed_up_for"}}You are already signed up for:{{/t}}<br>
+  {{#each reservations}}
+    <div>
+      {{semanticDateRange start_at end_at}}
+    </div>
+  {{/each}}
+  {{#t "would_you_like_to_cancel_that_and_sign_up_for_this"}}Would you like to cancel that and sign up for this?{{/t}}
+</div>
