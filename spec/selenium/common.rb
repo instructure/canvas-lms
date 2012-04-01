@@ -412,22 +412,35 @@ shared_examples_for "all selenium tests" do
   end
 
   def wait_for_ajax_requests(wait_start = 0)
-    driver.execute_async_script(<<-JS)
+    result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
-      if (typeof($) == 'undefined') {
+      if (window.wait_for_ajax_requests_hit_fallback) {
+        callback(0);
+      } else if (typeof($) == 'undefined') {
         callback(-1);
       } else {
+        var fallbackCallback = window.setTimeout(function() {
+          // technically, we should cancel the other timeouts that we've set up at this
+          // point, but we're going to be raising an exception anyway when this happens,
+          // so it's not a big deal.
+          window.wait_for_ajax_requests_hit_fallback = 1;
+          callback(-2);
+        }, 55000);
+        var doCallback = function(value) {
+          window.clearTimeout(fallbackCallback);
+          callback(value);
+        }
         var waitForAjaxStop = function(value) {
           $(document).bind('ajaxStop.canvasTestAjaxWait', function() {
             $(document).unbind('.canvasTestAjaxWait');
-            callback(value);
+            doCallback(value);
           });
         }
         if ($.active == 0) {
           // if there are no active requests, wait {wait_start}ms for one to start
           var timeout = window.setTimeout(function() {
             $(document).unbind('.canvasTestAjaxWait');
-            callback(0);
+            doCallback(0);
           }, #{wait_start});
           $(document).bind('ajaxStart.canvasTestAjaxWait', function() {
             window.clearTimeout(timeout);
@@ -438,6 +451,10 @@ shared_examples_for "all selenium tests" do
         }
       }
     JS
+    if result == -2
+      raise "Timed out waiting for ajax requests to finish. (This might mean there was a js error in an ajax callback.)"
+    end
+    result
   end
 
   def wait_for_animations(wait_start = 0)
