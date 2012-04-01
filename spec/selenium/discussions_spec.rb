@@ -180,6 +180,14 @@ describe "discussions" do
       f('#content').should include_text(new_student_entry_text)
     end
 
+    it "should still show entries without users" do
+      @topic.discussion_entries.create!(:user => nil, :message => 'new entry from nobody')
+      user_session(@student)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('#content').should include_text('new entry from nobody')
+    end
+
     it "should reply as a student and validate teacher can see reply" do
       pending "figure out delayed jobs"
       user_session(@teacher)

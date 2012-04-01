@@ -95,7 +95,7 @@ define [
       if userId is ENV.DISCUSSION.CURRENT_USER.id
         ENV.DISCUSSION.CURRENT_USER
       else
-        DISCUSSION.participants.get(userId).toJSON()
+        DISCUSSION.participants.get(userId)?.toJSON()
 
     ##
     # Computed attribute to determine if the entry can be moderated
@@ -117,7 +117,7 @@ define [
     editor: ->
       editor_id = @get 'editor_id'
       return unless editor_id
-      DISCUSSION.participants.get(editor_id).toJSON()
+      DISCUSSION.participants.get(editor_id)?.toJSON()
 
     ##
     # Computed attribute
