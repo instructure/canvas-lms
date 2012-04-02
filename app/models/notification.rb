@@ -551,9 +551,9 @@ class Notification < ActiveRecord::Base
     when 'Appointment Availability'
       t(:appointment_availability_description, "For changes to appointment time slots")
     when 'Appointment Signups'
-      t(:appointment_signups_description, "For appointments you get signed up for")
+      t(:appointment_signups_description, "For your new appointments")
     when 'Appointment Cancelations'
-      t(:appointment_cancelations_description, "For your appointments that get canceled")
+      t(:appointment_cancelations_description, "For canceled appointments")
     when 'Conversation Message'
       t(:conversation_message_description, "For new conversation messages")
     when 'Added To Conversation'
