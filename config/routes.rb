@@ -662,8 +662,11 @@ ActionController::Routing::Routes.draw do |map|
       enrollments.get  'courses/:course_id/enrollments', :action => :index, :path_name => 'course_enrollments'
       enrollments.get  'sections/:section_id/enrollments', :action => :index, :path_name => 'section_enrollments'
       enrollments.get  'users/:user_id/enrollments', :action => :index, :path_name => 'user_enrollments'
+
       enrollments.post 'courses/:course_id/enrollments', :action => :create
       enrollments.post 'sections/:section_id/enrollments', :action => :create
+
+      enrollments.delete 'courses/:course_id/enrollments/:id', :action => :destroy
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|

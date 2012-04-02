@@ -472,6 +472,34 @@ class Enrollment < ActiveRecord::Base
     @permission_lookup[action]
   end
 
+  # Determine if a user has permissions to conclude this enrollment.
+  #
+  # user    - The user requesting permission to conclude/delete enrollment.
+  # context - The current context, e.g. course or section.
+  # session - The current user's session (pass nil if not available).
+  #
+  # return Boolean
+  def can_be_concluded_by(user, context, session)
+    can_remove = [StudentEnrollment].include?(self.class) &&
+      context.grants_right?(user, session, :manage_students)
+    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+  end
+
+  # Determine if a user has permissions to delete this enrollment.
+  #
+  # user    - The user requesting permission to conclude/delete enrollment.
+  # context - The current context, e.g. course or section.
+  # session - The current user's session (pass nil if not available).
+  #
+  # return Boolean
+  def can_be_deleted_by(user, context, session)
+    can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
+      context.grants_right?(user, session, :manage_students)
+    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+    can_remove &&= self.user_id != user.id ||
+      context.account.grants_right?(user, session, :manage_admin_users)
+  end
+
   def pending?
     self.invited? || self.creation_pending?
   end
