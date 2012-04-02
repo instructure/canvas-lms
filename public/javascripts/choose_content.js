@@ -1,7 +1,7 @@
 define([
   'jquery' /* $ */,
   'i18n!content_imports',
-  'compiled/util/processItemSelections',
+  'compiled/util/processMigrationItemSelections',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* date_field */,
   'jquery.instructure_forms' /* formSubmit */,
@@ -10,7 +10,7 @@ define([
   'jquery.rails_flash_notifications' /* flashError */,
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function($, I18n, processItemSelections){
+], function($, I18n, processMigrationItemSelections){
 
   $(function () {
     var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
@@ -42,7 +42,7 @@ define([
     };
 
     $("#copy_context_form").formSubmit({
-      //processData:processItemSelections,
+      processData:processMigrationItemSelections,
       beforeSubmit:function (data) {
         $("#copy_context_form .submit_button").text(I18n.t('messages.copying', "Copying... this will take a few minutes")).attr('disabled', true);
         $(".progress_bar_holder").show();
@@ -53,8 +53,9 @@ define([
         }, 5000);
       }
     });
+
     $("#copy_entries_dialog button").click(function () {
-      var $checkbox = $("#copy_all_topics");
+      var $checkbox = $("#copy_all_discussion_topics");
       var include_secondaries = $(this).hasClass('include');
       if (include_secondaries) {
         $checkbox.parent().next("ul").find(":checkbox:not(.secondary_checkbox)").prop('checked', $checkbox.prop('checked')).each(function () {
@@ -65,28 +66,40 @@ define([
       }
       $("#copy_entries_dialog").dialog('close');
     });
-    $("#copy_context_form :checkbox").bind('change', function (event, force_secondaries) {
+
+    var checkEverything = function (checked) {
+      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.skip_on_everything):not(.shift_dates_checkbox)")
+              .prop('checked', checked)
+              .filter(":not(.copy_all)")
+              .each(function () {
+        $(this).triggerHandler('change');
+      });
+    };
+
+    var itemSelectionsFetchDfd;
+    var $itemSelectionsDiv = $("#item_selections");
+
+    $("#copy_context_form").delegate(':checkbox', 'change', function (event, force_secondaries) {
       if (!$(this).attr('checked')) {
         force_secondaries = true;
       }
       if ($(this).hasClass('copy_all')) {
-        if ($(this).is('#copy_all_topics') && $(this).attr('checked')) {
-          $("#copy_entries_dialog").dialog('close').dialog({
-            autoOpen:false,
-            title:I18n.t('titles.copy_discussion_replies', "Copy Discussion Replies?"),
-            width:370
-          }).dialog('open');
-        } else {
-          $(this).parent().next("ul").find(":checkbox:not(.secondary_checkbox)").prop('checked', $(this).prop('checked')).each(function () {
-            $(this).triggerHandler('change');
-          });
-          $('#copy_everything').attr('checked', false);
-        }
-      } else if ($(this).hasClass('copy_everything')) {
-        $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.skip_on_everything):not(.shift_dates_checkbox)").prop('checked', $(this).prop('checked')).filter(":not(.copy_all)").each(function () {
+        $(this).parent().next("ul").find(":checkbox:not(.secondary_checkbox)").prop('checked', $(this).prop('checked')).each(function () {
           $(this).triggerHandler('change');
         });
-        $("#copy_all_topics").prop('checked', $(this).prop('checked')).triggerHandler('change');
+        $('#copy_everything').attr('checked', false);
+      } else if ($(this).hasClass('copy_everything')) {
+        if ($(this).prop('checked')) {
+          $itemSelectionsDiv.hide();
+        } else {
+          var url = ENV.CONTENT_SELECT_URL;
+          itemSelectionsFetchDfd = itemSelectionsFetchDfd || $.ajaxJSON(url, 'GET', {}, function (data) {
+            if (data) {
+              $itemSelectionsDiv.find('.content_list').html(data.selection_list);
+            }
+          });
+          $itemSelectionsDiv.show().disableWhileLoading(itemSelectionsFetchDfd);
+        }
       } else {
         $(this).parent().find(":checkbox.secondary_checkbox" + (force_secondaries ? '' : ':not(.skip)')).attr('checked', $(this).attr('checked'));
         if ($(this).hasClass('secondary_checkbox') && $(this).attr('checked')) {
@@ -101,6 +114,16 @@ define([
           }
         }
       }
+    });
+
+    $("#check_everything").click(function (event) {
+      event.preventDefault();
+      checkEverything(true);
+    });
+
+    $("#uncheck_everything").click(function (event) {
+      event.preventDefault();
+      checkEverything(false);
     });
 
     $(".shift_dates_checkbox").change(

@@ -142,25 +142,14 @@ class ContentImportsController < ApplicationController
       end
     end
   end
-  
+
   def migrate_content_execute
     if authorized_action(@context, @current_user, :manage_content)
       migration_id = params[:id] || params[:copy] && params[:copy][:content_migration_id]
       @content_migration = ContentMigration.find_by_context_id_and_context_type_and_id(@context.id, @context.class.to_s, migration_id) if migration_id.present?
       @content_migration ||= ContentMigration.find_by_context_id_and_context_type(@context.id, @context.class.to_s, :order => "id DESC")
       if request.method == :post
-        if params[:items_to_copy]
-          params[:copy] ||= {}
-          params[:items_to_copy].each_pair do |key, vals|
-            params[:copy][key] ||= {}
-            if vals && ! vals.empty?
-              vals.each do |val|
-                params[:copy][key][val] = true
-              end
-            end
-          end
-          params.delete :items_to_copy
-        end
+        process_migration_params
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save
         @content_migration.import_content
@@ -183,6 +172,17 @@ class ContentImportsController < ApplicationController
           flash[:notice] = t('notices.choose_a_course', "Choose a course to copy")
           format.html { redirect_to course_import_choose_course_url(@context) }
         end
+      end
+    end
+  end
+
+  def copy_course_checklist
+    if authorized_action(@context, @current_user, :manage_content)
+      find_source_course
+      if @source_course
+        render :json => {:selection_list => render_to_string(:partial => 'copy_course_item_selection', :layout => false)}
+      else
+        render.html ""
       end
     end
   end
@@ -277,6 +277,7 @@ class ContentImportsController < ApplicationController
           copy_params[:everything] = true
         end
       else
+        process_migration_params
         @source_course = Course.find(params[:source_course])
         copy_params = params[:copy]
       end
@@ -344,6 +345,21 @@ class ContentImportsController < ApplicationController
           render :text => "", :status => :bad_request
         end
       end
+    end
+  end
+
+  def process_migration_params
+    if params[:items_to_copy]
+      params[:copy] ||= {}
+      params[:items_to_copy].each_pair do |key, vals|
+        params[:copy][key] ||= {}
+        if vals && !vals.empty?
+          vals.each do |val|
+            params[:copy][key][val] = true
+          end
+        end
+      end
+      params.delete :items_to_copy
     end
   end
 

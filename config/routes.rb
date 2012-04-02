@@ -194,6 +194,7 @@ ActionController::Routing::Routes.draw do |map|
     course.import_content 'imports/content', :controller => 'content_imports', :action => 'content'
     course.import_choose_course 'imports/choose_course', :controller => 'content_imports', :action => 'choose_course', :conditions => {:method => :get}
     course.import_choose_content 'imports/choose_content', :controller => 'content_imports', :action => 'choose_content', :conditions => {:method => :get}
+    course.import_copy_course_checklist 'imports/copy_course_checklist', :controller => 'content_imports', :action => 'copy_course_checklist', :conditions => {:method => :get}
     course.import_copy_course_finish 'imports/copy_course_finish', :controller => 'content_imports', :action => 'copy_course_finish', :conditions => {:method => :get}
     course.import_migrate 'imports/migrate', :controller => 'content_imports', :action => 'migrate_content'
     course.import_upload 'imports/upload', :controller => 'content_imports', :action => 'migrate_content_upload'

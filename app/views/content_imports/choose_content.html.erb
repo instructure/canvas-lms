@@ -3,7 +3,10 @@
 <% add_crumb t('crumbs.choose_course', "Choose Course"),  context_url(@context, :context_import_choose_course_url) %>
 <% add_crumb t('crumbs.choose_content', "Choose Content") %>
 
-<% js_env :COPY_COURSE_FINISH_URL => context_url(@context, :context_import_copy_course_finish_url)%>
+<%
+   js_env :COPY_COURSE_FINISH_URL => context_url(@context, :context_import_copy_course_finish_url)
+   js_env :CONTENT_SELECT_URL => context_url(@context, :context_import_copy_course_checklist_url) + "?source_course=#{@source_course.id}"
+%>
 
 <% content_for :stylesheets do %>
 <style>

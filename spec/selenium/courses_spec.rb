@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "courses" do
   it_should_behave_like "in-process server selenium tests"
 
-  context "course as a teacher" do
+  context "as a teacher" do
 
     before (:each) do
       account = Account.default
@@ -69,87 +69,117 @@ describe "courses" do
       url.should match(%r{/files/\d+/download\?verifier=})
     end
 
-    it "should copy course content" do
-      course_with_teacher_logged_in
-      @second_course = Course.create!(:name => 'second course')
-      @second_course.offer!
-      5.times do |i|
-        @second_course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}")
-      end
-      #add teacher as a user
-      e = @second_course.enroll_teacher(@user)
-      e.workflow_state = 'active'
-      e.accept
-      e.save!
-      @second_course.reload
-
-      new_term = Account.default.enrollment_terms.create(:name => 'Test Term')
-      third_course = Course.create!(:name => 'third course', :enrollment_term => new_term)
-      e = third_course.enroll_teacher(@user)
-      e.workflow_state = 'active'
-      e.accept
-      e.save!
-
-      get "/courses/#{@course.id}/details"
-
-      wait_for_ajaximations
-      driver.find_element(:link, I18n.t('links.import', 'Import Content into this Course')).click
-      driver.find_element(:css, '#content a.button').click
-
-      select_box = driver.find_element(:id, 'copy_from_course')
-      select_box.find_elements(:css, 'optgroup').length.should == 2
-      second_group = select_box.find_elements(:css, 'optgroup').last
-      second_group.find_elements(:css, 'option').length.should == 1
-      second_group.attribute('label').should == 'Test Term'
-
-      click_option('#copy_from_course', 'second course')
-      driver.find_element(:css, '#content form').submit
-
-      #driver.find_element(:id, 'copy_everything').click
-
-      #modify course dates
-      driver.find_element(:id, 'copy_shift_dates').click
-      #adjust start dates
-      driver.find_element(:css, '#copy_old_start_date + img').click
-      datepicker_prev
-      #adjust end dates
-      driver.find_element(:css, '#copy_old_end_date + img').click
-      datepicker_next
-      #adjust day substitutions
-      driver.find_element(:css, '.shift_dates_settings .add_substitution_link').click
-      driver.find_element(:css, '.substitutions > .substitution').should be_displayed
-
-      driver.find_element(:id, 'copy_context_form').submit
-      wait_for_ajaximations
-
-      # since jobs aren't running
-      ContentMigration.last.copy_course_without_send_later
-
-      keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
-      @course.reload
-      @course.wiki.wiki_pages.count.should == 5
-    end
-
-    it "should copy the course" do
-      enable_cache do
+    context "course copy" do
+      def course_copy_helper
         course_with_teacher_logged_in
+        @second_course = Course.create!(:name => 'second course')
+        @second_course.offer!
         5.times do |i|
-          @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}")
+          @second_course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}")
         end
+        #add teacher as a user
+        e = @second_course.enroll_teacher(@user)
+        e.workflow_state = 'active'
+        e.accept
+        e.save!
+        @second_course.reload
 
-        get "/courses/#{@course.id}/copy"
-        expect_new_page_load { driver.find_element(:css, "div#content form").submit }
+        new_term = Account.default.enrollment_terms.create(:name => 'Test Term')
+        third_course = Course.create!(:name => 'third course', :enrollment_term => new_term)
+        e = third_course.enroll_teacher(@user)
+        e.workflow_state = 'active'
+        e.accept
+        e.save!
+
+        get "/courses/#{@course.id}/details"
+
+        wait_for_ajaximations
+        driver.find_element(:link, I18n.t('links.import', 'Import Content into this Course')).click
+        driver.find_element(:css, '#content a.button').click
+
+        select_box = driver.find_element(:id, 'copy_from_course')
+        select_box.find_elements(:css, 'optgroup').length.should == 2
+        second_group = select_box.find_elements(:css, 'optgroup').last
+        second_group.find_elements(:css, 'option').length.should == 1
+        second_group.attribute('label').should == 'Test Term'
+
+        click_option('#copy_from_course', 'second course')
+        driver.find_element(:css, '#content form').submit
+
+        yield driver if block_given?
+
+        #modify course dates
+        driver.find_element(:id, 'copy_shift_dates').click
+        #adjust start dates
+        driver.find_element(:css, '#copy_old_start_date + img').click
+        datepicker_prev
+        #adjust end dates
+        driver.find_element(:css, '#copy_old_end_date + img').click
+        datepicker_next
+        #adjust day substitutions
+        driver.find_element(:css, '.shift_dates_settings .add_substitution_link').click
+        driver.find_element(:css, '.substitutions > .substitution').should be_displayed
+
         driver.find_element(:id, 'copy_context_form').submit
         wait_for_ajaximations
 
+        # since jobs aren't running
         ContentMigration.last.copy_course_without_send_later
 
         keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+        @course.reload
+      end
 
-        @new_course = Course.last(:order => :id)
-        get "/courses/#{@new_course.id}"
-        driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")
-        @new_course.wiki.wiki_pages.count.should == 5
+      it "should copy course content" do
+        course_copy_helper
+        @course.wiki.wiki_pages.count.should == 5
+      end
+
+      it "should copy content if things are unselected in hidden boxes" do
+        course_copy_helper do |driver|
+          driver.find_element(:id, 'copy_everything').click
+          wait_for_ajaximations
+          driver.find_element(:id, 'uncheck_everything').click
+          driver.find_element(:id, 'copy_everything').click
+        end
+        @course.wiki.wiki_pages.count.should == 5
+      end
+
+      it "should selectively copy content" do
+        course_copy_helper do |driver|
+          driver.find_element(:id, 'copy_everything').click
+          wait_for_ajaximations
+          driver.find_element(:id, 'uncheck_everything').click
+          @second_course.wiki.wiki_pages[0..2].each do |page|
+            driver.find_element(:id, "copy_wiki_pages_#{CC::CCHelper.create_key(page)}").click
+          end
+        end
+        @course.wiki.wiki_pages.count.should == 3
+      end
+
+      it "should copy the course" do
+        enable_cache do
+          course_with_teacher_logged_in
+          5.times do |i|
+            @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}")
+          end
+
+          get "/courses/#{@course.id}/copy"
+          expect_new_page_load { driver.find_element(:css, "div#content form").submit }
+          driver.find_element(:id, 'copy_context_form').submit
+          wait_for_ajaximations
+          driver.find_element(:id, 'copy_everything').click
+          wait_for_ajaximations
+
+          keep_trying_until { ContentMigration.last.copy_course_without_send_later }
+
+          keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+
+          @new_course = Course.last(:order => :id)
+          get "/courses/#{@new_course.id}"
+          driver.find_element(:css, "#no_topics_message span.title").should include_text("No Recent Messages")
+          @new_course.wiki.wiki_pages.count.should == 5
+        end
       end
     end
 
