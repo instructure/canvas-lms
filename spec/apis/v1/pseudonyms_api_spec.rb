@@ -219,4 +219,47 @@ describe PseudonymsController, :type => :integration do
       end
     end
   end
+  describe "pseudonym deletion" do
+    before do
+      @student.pseudonyms.create!(:unique_id => 'student@example.com')
+      @path = "/api/v1/users/#{@student.id}/logins/#{@student.pseudonym.id}"
+      @path_options = { :controller => 'pseudonyms',
+        :action => 'destroy', :format => 'json',
+        :user_id => @student.id.to_param, :id => @student.pseudonym.id.to_param }
+    end
+    context "an authorized user" do
+      it "should be able to delete a pseudonym" do
+        pseudonym = @student.pseudonym
+        @student.pseudonyms.create!(:unique_id => 'student1@example.com')
+        json = api_call(:delete, @path, @path_options)
+        @student.pseudonyms.active.count.should eql 1
+        json.should == {
+          'unique_id' => 'student@example.com',
+          'sis_user_id' => nil,
+          'account_id' => Account.default.id,
+          'id' => pseudonym.id,
+          'user_id' => @student.id
+        }
+      end
+
+      it "should receive an error when trying to delete the user's last pseudonym" do
+        raw_api_call(:delete, @path, @path_options)
+        response.code.should eql '400'
+        JSON.parse(response.body).should == {
+          'errors' => {
+            'base' => [
+              { 'type' => 'Users must have at least one login', 'attribute' => 'base', 'message' => 'Users must have at least one login' }
+            ]
+          }
+        }
+      end
+    end
+    context "an unauthorized user" do
+      it "should return 401" do
+        user_with_pseudonym
+        raw_api_call(:delete, @path, @path_options)
+        response.code.should eql '401'
+      end
+    end
+  end
 end

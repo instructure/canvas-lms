@@ -750,6 +750,7 @@ ActionController::Routing::Routes.draw do |map|
       pseudonyms.get 'users/:user_id/logins', :action => :index, :path_name => 'user_pseudonyms'
       pseudonyms.post 'accounts/:account_id/logins', :action => :create
       pseudonyms.put 'accounts/:account_id/logins/:id', :action => :update
+      pseudonyms.delete 'users/:user_id/logins/:id', :action => :destroy
     end
 
     api.with_options(:controller => :accounts) do |accounts|
