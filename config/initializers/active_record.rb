@@ -232,15 +232,20 @@ class ActiveRecord::Base
     value = '%' + value unless options[:type] == :right
     value += '%' unless options[:type] == :left
 
-    cols = case connection.adapter_name
+    cols = args.map{ |col| like_condition(col) }
+    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+  end
+
+  def self.like_condition(value, pattern = '?', downcase = true)
+    case connection.adapter_name
       when 'SQLite'
         # sqlite is always case-insensitive, and you must specify the escape char
-        args.map{|col| "#{col} LIKE ? ESCAPE '\\'"}
+        "#{value} LIKE #{pattern} ESCAPE '\\'"
       else
         # postgres is always case-sensitive (mysql depends on the collation)
-        args.map{|col| "LOWER(#{col}) LIKE ?"}
+        value = "LOWER(#{value})" if downcase
+        "#{value} LIKE #{pattern}"
     end
-    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
   end
 
   def self.case_insensitive(col)

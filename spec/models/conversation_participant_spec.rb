@@ -153,6 +153,45 @@ describe ConversationParticipant do
     end
   end
 
+  context "for_masquerading_user scope" do
+    before do
+      @a1 = Account.create
+      @a2 = Account.create
+      @a3 = Account.create
+      @admin_user = user
+      @a1.add_user(@admin_user)
+      @a2.add_user(@admin_user)
+      @admin_user.associated_accounts << @a3 # in the account, but not an admin
+
+      @target_user = user
+      # visible to @user
+      @c1 = @target_user.initiate_conversation([user.id])
+      @c1.add_message("hey man", :root_account_id => @a1.id)
+      @c2 = @target_user.initiate_conversation([user.id])
+      @c2.add_message("foo", :root_account_id => @a1.id)
+      @c2.add_message("bar", :root_account_id => @a2.id)
+      # invisible to @user, unless @user is a site admin
+      @c3 = @target_user.initiate_conversation([user.id])
+      @c3.add_message("secret", :root_account_id => @a3.id)
+      @c4 = @target_user.initiate_conversation([user.id])
+      @c4.add_message("super", :root_account_id => @a1.id)
+      @c4.add_message("sekrit", :root_account_id => @a3.id)
+    end
+
+    it "should let site admins see everything" do
+      Account.site_admin.add_user(@admin_user)
+      convos = @target_user.conversations.for_masquerading_user(@admin_user)
+      convos.size.should eql 4
+      convos.should eql @target_user.conversations.to_a
+    end
+
+    it "should limit others to their associated root accounts" do
+      convos = @target_user.conversations.for_masquerading_user(@admin_user)
+      convos.size.should eql 2
+      convos.sort_by(&:id).should eql [@c1, @c2]
+    end
+  end
+
   context "participants" do
     before do
       @me = course_with_student(:active_all => true).user

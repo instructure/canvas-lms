@@ -194,8 +194,12 @@ class ConversationMessage < ActiveRecord::Base
     res
   end
 
+  def root_account_id
+    context_id if context_type == 'Account'
+  end
+
   def reply_from(opts)
-    conversation.reply_from(opts.merge(:context => self.context))
+    conversation.reply_from(opts.merge(:root_account_id => self.root_account_id))
   end
 
   def forwarded_messages

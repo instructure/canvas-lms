@@ -119,6 +119,7 @@ class ConversationsController < ApplicationController
         @no_messages = I18n.t('no_messages', 'You have no messages')
         @current_user.conversations.default
     end
+    conversations_scope = conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
     @scope ||= params[:scope].to_sym
     base_scope = conversations_scope
     if params[:filter]
@@ -433,7 +434,7 @@ class ConversationsController < ApplicationController
   #
   def add_recipients
     if @recipients.present?
-      @conversation.add_participants(@recipients.keys, :tags => @tags)
+      @conversation.add_participants(@recipients.keys, :tags => @tags, :root_account_id => @domain_root_account.id)
       render :json => jsonify_conversation(@conversation.reload, :messages => [@conversation.messages.first])
     else
       render :json => {}, :status => :bad_request
@@ -917,7 +918,7 @@ class ConversationsController < ApplicationController
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
-    message = conversation.add_message(params[:body], :attachment_ids => params[:attachment_ids], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :context => @domain_root_account, :tags => @tags) do |m|
+    message = conversation.add_message(params[:body], :attachment_ids => params[:attachment_ids], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :root_account_id => @domain_root_account.id, :tags => @tags) do |m|
       media_id = params[:media_comment_id]
       media_type = params[:media_comment_type]
       if media_id.present? && media_type.present?
