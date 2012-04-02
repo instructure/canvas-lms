@@ -369,8 +369,6 @@ class Pseudonym < ActiveRecord::Base
     {:conditions => {:account_id => account.id, :unique_id => unique_ids}, :order => :unique_id}
   }
   named_scope :active, :conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted']
-  # returns pseudonyms not from account, but that can be used by account
-  named_scope :trusted_by, lambda { |account| {:conditions => ['account_id<>?', account.id]} }
   named_scope :trusted_by_including_self, lambda { |account| {} }
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
