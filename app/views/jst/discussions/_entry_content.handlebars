@@ -7,9 +7,7 @@
       <span class="tooltip_text">{{#t "just_read"}}Just Read{{/t}}</span>
     </span>
   </div>
-  {{#if author}}
-    {{>avatar author}}
-  {{/if}}
+  {{>avatar author}}
   <div class="discussion-header-content right-of-avatar">
     <div class="hide-if-collapsed admin-links">
       <button class="al-trigger" data-event="openMenu"><span class="al-trigger-inner">{{#t "manage"}}Manage{{/t}}</span></button>
@@ -28,7 +26,7 @@
       <div class="discussion-pubdate">{{friendlyDatetime updated_at pubdate=true}}</div>
     </div>
     <h2 class="discussion-title">
-      <a class="author {{#unless author}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
+      <a class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
     </h2>
     <h1 class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</h1>
   </div>

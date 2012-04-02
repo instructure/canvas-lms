@@ -1,9 +1,11 @@
 define [
+  'compiled/discussions/app'
   'jquery'
   'underscore'
   'Backbone'
+  'compiled/discussions/findParticipant'
   'jquery.ajaxJSON'
-], ($, _, Backbone) ->
+], (app, $, _, Backbone, findParticipant) ->
 
   ##
   # Model representing an entry in discussion topic
@@ -90,12 +92,8 @@ define [
     # Computed attribute to get the author into the model data
     author: ->
       return {} if @get('deleted')
-      userId = @get 'user_id'
-      if userId is ENV.DISCUSSION.CURRENT_USER.id
-        ENV.DISCUSSION.CURRENT_USER
-      else
-        DISCUSSION.participants.get(userId)?.toJSON()
-
+      findParticipant @get('user_id')
+    #
     ##
     # Computed attribute to determine if the entry can be moderated
     # by the current user
@@ -114,9 +112,8 @@ define [
     ##
     # Computed attribute to determine if the entry has an editor
     editor: ->
-      editor_id = @get 'editor_id'
-      return unless editor_id
-      DISCUSSION.participants.get(editor_id)?.toJSON()
+      if id = @get 'editor_id'
+        findParticipant id
 
     ##
     # Computed attribute
