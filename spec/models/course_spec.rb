@@ -2359,7 +2359,7 @@ describe Course, "conclusions" do
     @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
   end
 
-  context "appointment cancellation" do
+  context "appointment cancelation" do
     before do
       course_with_student(:active_all => true)
       @ag = @course.appointment_groups.create(:title => "test", :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])

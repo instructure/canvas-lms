@@ -478,7 +478,7 @@ class CoursesController < ApplicationController
     if params[:reject]
       if @pending_enrollment.invited?
         @pending_enrollment.reject!
-        flash[:notice] = t('notices.invitation_cancelled', "Invitation cancelled.")
+        flash[:notice] = t('notices.invitation_cancelled', "Invitation canceled.")
       end
       session[:enrollment_uuid] = nil
       if @current_user

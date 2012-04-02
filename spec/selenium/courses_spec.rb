@@ -380,7 +380,7 @@ describe "courses" do
       get "/courses/#{@course.id}"
       driver.find_element(:css, ".reminder .reject_button").click
       driver.switch_to.alert.accept
-      assert_flash_notice_message /Invitation cancelled./
+      assert_flash_notice_message /Invitation canceled./
     end
 
     it "should validate that a user cannot see a course they are not enrolled in" do
