@@ -758,4 +758,21 @@ describe Conversation do
       end
     end
   end
+
+  context "root_account_ids" do
+    it "should always be ordered" do
+      conversation = Conversation.create
+      conversation.update_attribute :root_account_ids, [3, 2, 1]
+      conversation.root_account_ids.should eql [1, 2, 3]
+    end
+
+    it "should be saved on the conversation when adding a message" do
+      u1 = user
+      u2 = user
+      conversation = Conversation.initiate([u1.id, u2.id], true)
+      conversation.add_message(u1, 'ohai', :root_account_id => 1)
+      conversation.add_message(u2, 'ohai yourself', :root_account_id => 2)
+      conversation.root_account_ids.should eql [1, 2]
+    end
+  end
 end

@@ -38,6 +38,29 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :archived, :conditions => "workflow_state = 'archived'"
   named_scope :starred, :conditions => "label = 'starred'"
   named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
+  named_scope :for_masquerading_user, lambda { |user|
+    # site admins can see everything
+    return {} if Account.site_admin.grants_right?(user, :become_user)
+
+    # we need to ensure that the user can access *all* of each conversation's
+    # accounts (and that each conversation has at least one account). so given
+    # a user who can access accounts 1-5, we construct a sql string like so:
+    #  '[1][2][3][4][5]' like '%[' || REPLACE(root_account_ids, ',', ']%[') || ']%'
+    #
+    # which when applied to a given row would be something like:
+    #  '[1][2][3][4][5]' like '%[2]%[4]%'
+    #
+    # note that we are reliant on root_account_ids always being in order. if
+    # they aren't, this scope will be totally broken (it could be written
+    # another slower way)
+    #
+    # we're also counting on conversations being in the join
+
+    own_root_account_ids = user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
+    id_string = "[" + own_root_account_ids.sort.join("][") + "]"
+    root_account_id_matcher = "'%[' || REPLACE(root_account_ids, ',', ']%[') || ']%'"
+    {:conditions => ["conversations.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string]}
+  }
 
   tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
     user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }

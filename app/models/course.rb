@@ -2336,7 +2336,7 @@ class Course < ActiveRecord::Base
     else
       recipients = self.teachers.map(&:id) - [user.id]
       conversation = user.initiate_conversation(recipients)
-      conversation.add_message(message)
+      conversation.add_message(message, :root_account_id => root_account_id)
     end
   end
 

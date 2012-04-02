@@ -123,6 +123,23 @@ describe ConversationsController do
       get 'index'
       assert_unauthorized
     end
+
+    it "should filter conversations when masquerading" do
+      a = Account.default
+      @student = user_with_pseudonym(:active_all => true)
+      course_with_student(:active_all => true, :account => a, :user => @student)
+      @student.associated_accounts << a
+      @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
+      @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
+
+      course_with_teacher_logged_in(:active_all => true, :account => a)
+      a.add_user(@user)
+      session[:become_user_id] = @student.id
+
+      get 'index'
+      response.should be_success
+      assigns[:conversations_json].size.should eql 1
+    end
   end
 
   describe "GET 'show'" do

@@ -103,7 +103,7 @@ class Conversation < ActiveRecord::Base
     if message
       add_message_to_participants(message, options) # make sure it gets re-added
     else
-      message = add_message(asset.user, '', options.merge(:asset => asset, :update_participants => false))
+      message = add_message(asset.user, '', options.merge(:asset => asset, :update_participants => false, :root_account_id => asset.context.try(:root_account_id)))
     end
     if (data = asset.conversation_message_data).present?
       message.created_at = data[:created_at]
@@ -180,13 +180,18 @@ class Conversation < ActiveRecord::Base
       # all specified (or implicit) tags, regardless of visibility to individual participants
       new_tags = options[:tags] ? options[:tags] & current_context_strings(1) : []
       new_tags = current_context_strings if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
-      update_attribute :tags, tags | new_tags if new_tags.present?
+      self.tags |= new_tags if new_tags.present?
+      self.root_account_ids |= [options[:root_account_id]] if options[:root_account_id].present?
+      save! if new_tags.present? || root_account_ids_changed?
 
       message = conversation_messages.build
       message.author_id = current_user.id
       message.body = body
       message.generated = options[:generated]
-      message.context = options[:context]
+      if options[:root_account_id]
+        message.context_type = 'Account'
+        message.context_id = options[:root_account_id]
+      end
       message.asset = options[:asset]
       message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
       if options[:forwarded_message_ids].present?
@@ -419,6 +424,15 @@ class Conversation < ActiveRecord::Base
       end
       destroy
     end
+  end
+
+  def root_account_ids
+    (read_attribute(:root_account_ids) || '').split(',').map(&:to_i)
+  end
+
+  def root_account_ids=(ids)
+    # ids must be sorted for the scope to work
+    write_attribute(:root_account_ids, ids.sort.join(','))
   end
 
   # rails' has_many-:through preloading doesn't preserve :select or :order
