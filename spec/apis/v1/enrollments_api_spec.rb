@@ -495,6 +495,91 @@ describe EnrollmentsApiController, :type => :integration do
       end
     end
 
+    describe "enrollment deletion and conclusion" do
+      before do
+        course_with_student(:active_all => true, :user => user_with_pseudonym)
+        @enrollment = @student.enrollments.first
+
+        @teacher = User.create!(:name => 'Test Teacher')
+        @teacher.pseudonyms.create!(:unique_id => 'test+teacher@example.com')
+        @course.enroll_teacher(@teacher)
+        @user = @teacher
+
+        @path = "/api/v1/courses/#{@course.id}/enrollments/#{@enrollment.id}"
+        @params = { :controller => 'enrollments_api', :action => 'destroy', :course_id => @course.id.to_param,
+          :id => @enrollment.id.to_param, :format => 'json' }
+
+        time = Time.now
+        Time.stubs(:now).returns(time)
+      end
+
+      context "an authorized user" do
+        it "should be able to conclude an enrollment" do
+          json = api_call(:delete, "#{@path}?task=conclude", @params.merge(:task => 'conclude'))
+          @enrollment.reload
+          json.should == {
+            'root_account_id'                    => @enrollment.root_account_id,
+            'id'                                 => @enrollment.id,
+            'user_id'                            => @student.id,
+            'course_section_id'                  => @enrollment.course_section_id,
+            'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
+            'enrollment_state'                   => 'completed',
+            'course_id'                          => @course.id,
+            'type'                               => @enrollment.type,
+            'html_url'                           => course_user_url(@course, @student),
+            'grades'                             => { 'html_url' => course_student_grades_url(@course, @student) },
+            'associated_user_id'                 => @enrollment.associated_user_id,
+            'updated_at'                         => @enrollment.updated_at.xmlschema
+          }
+        end
+
+        it "should be able to delete an enrollment" do
+          json = api_call(:delete, "#{@path}?task=delete", @params.merge(:task => 'delete'))
+          @enrollment.reload
+          json.should == {
+            'root_account_id'                    => @enrollment.root_account_id,
+            'id'                                 => @enrollment.id,
+            'user_id'                            => @student.id,
+            'course_section_id'                  => @enrollment.course_section_id,
+            'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
+            'enrollment_state'                   => 'deleted',
+            'course_id'                          => @course.id,
+            'type'                               => @enrollment.type,
+            'html_url'                           => course_user_url(@course, @student),
+            'grades'                             => { 'html_url' => course_student_grades_url(@course, @student) },
+            'associated_user_id'                 => @enrollment.associated_user_id,
+            'updated_at'                         => @enrollment.updated_at.xmlschema
+          }
+        end
+
+        it "should not be able to unenroll itself if it can't re-enroll itself" do
+          enrollment = @teacher.enrollments.first
+
+          @path.sub!(@enrollment.id.to_s, enrollment.id.to_s)
+          @params.merge!(:id => enrollment.id.to_param, :task => 'delete')
+
+          raw_api_call(:delete, "#{@path}?task=delete", @params)
+
+          response.code.should eql '401'
+          JSON.parse(response.body).should == {
+            'message' => 'You are not authorized to perform that action.',
+            'status'  => 'unauthorized'
+          }
+        end
+      end
+
+      context "an unauthorized user" do
+        it "should return 401" do
+          @user = @student
+          raw_api_call(:delete, @path, @params)
+          response.code.should eql '401'
+
+          raw_api_call(:delete, "#{@path}?type=delete", @params.merge(:type => 'delete'))
+          response.code.should eql '401'
+        end
+      end
+    end
+
     describe "filters" do
       it "should properly filter by a single enrollment type" do
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment", @params.merge(:type => %w{StudentEnrollment}))
