@@ -179,6 +179,47 @@ class EnrollmentsApiController < ApplicationController
       render(:json => @enrollment.errors.to_json)
   end
 
+  # @API
+  # Delete or conclude an enrollment.
+  #
+  # @argument task [conclude|delete] [String] The action to take on the enrollment.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments/:enrollment_id \ 
+  #     -X DELETE \ 
+  #     -F 'task=conclude'
+  #
+  # @example_response
+  #   {
+  #     "root_account_id": 15,
+  #     "id": 75,
+  #     "user_id": 4,
+  #     "course_section_id": 12,
+  #     "limit_privileges_to_course_section": false,
+  #     "enrollment_state": "completed",
+  #     "course_id": 12,
+  #     "type": "StudentEnrollment",
+  #     "html_url": "http://www.example.com/courses/12/users/4",
+  #     "grades": { "html_url": "http://www.example.com/courses/12/grades/4" },
+  #     "associated_user_id": null,
+  #     "updated_at": "2012-04-18T23:08:51Z"
+  #   }
+  def destroy
+    @enrollment = Enrollment.find(params[:id])
+    task = %w{conclude delete}.include?(params[:task]) ? params[:task] : 'conclude'
+
+    unless @enrollment.send("can_be_#{task}d_by", @current_user, @context, session)
+      return render_unauthorized_action(@context)
+    end
+
+    task = 'destroy' if task == 'delete'
+    if @enrollment.send(task)
+      render :json => enrollment_json(@enrollment, @current_user, session)
+    else
+      render :json => @enrollment.errors.to_json, :status => :bad_request
+    end
+  end
+
   protected
   def course_index_enrollments(scope_arguments)
     if authorized_action(@context, @current_user, :read_roster)
