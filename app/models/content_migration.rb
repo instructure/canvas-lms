@@ -222,7 +222,23 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def to_import(val)
-    migration_settings[:migration_ids_to_import][:copy][val] rescue nil
+    migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && migration_settings[:migration_ids_to_import][:copy][val]
+  end
+
+  def import_object?(asset_type, mig_id)
+    return false unless mig_id
+    return true unless migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && migration_settings[:migration_ids_to_import][:copy].length > 0
+    return true if is_set?(to_import(:everything))
+
+    return true if is_set?(to_import("all_#{asset_type}"))
+
+    return false unless to_import(asset_type)
+
+    is_set?(to_import(asset_type)[mig_id])
+  end
+
+  def is_set?(option)
+    Canvas::Plugin::value_to_boolean option
   end
 
   def import_content
@@ -295,6 +311,8 @@ class ContentMigration < ActiveRecord::Base
       if ce.workflow_state == 'exported_for_course_copy'
         # use the exported attachment as the import archive
         self.attachment = ce.attachment
+        migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
+        migration_settings[:migration_ids_to_import][:copy][:everything] = true
         self.save
         worker = Canvas::Migration::Worker::CCWorker.new
         worker.migration_id = self.id

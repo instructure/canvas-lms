@@ -1085,10 +1085,9 @@ class Quiz < ActiveRecord::Base
 
   def self.process_migration(data, migration, question_data)
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
-    to_import = migration.to_import 'quizzes'
     assessments.each do |assessment|
       migration_id = assessment['migration_id'] || assessment['assessment_id']
-      if migration_id && (!to_import || to_import[migration_id])
+      if migration.import_object?("quizzes", migration_id)
         allow_update = false
         # allow update if we find an existing item based on this migration setting
         if item_id = migration.migration_settings[:quiz_id_to_update]

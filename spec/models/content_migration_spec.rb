@@ -334,4 +334,50 @@ describe ContentMigration do
 
   end
 
+  context "import_object?" do
+    before do
+      @cm = ContentMigration.new
+    end
+
+    it "should return true for everything if there are no copy options" do
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return true for everything if 'everything' is selected" do
+      @cm.migration_ids_to_import = {:copy => {:everything => "1"}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return true if there are no copy options" do
+      @cm.migration_ids_to_import = {:copy => {}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return false for nil objects" do
+      @cm.import_object?("content_migrations", nil).should == false
+    end
+
+    it "should return true for all object types if the all_ option is true" do
+      @cm.migration_ids_to_import = {:copy => {:all_content_migrations => "1"}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return false for objects not selected" do
+      @cm.save!
+      @cm.migration_ids_to_import = {:copy => {:all_content_migrations => "0"}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+      @cm.migration_ids_to_import = {:copy => {:content_migrations => {}}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+      @cm.migration_ids_to_import = {:copy => {:content_migrations => {CC::CCHelper.create_key(@cm) => "0"}}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+    end
+
+    it "should return true for selected objects" do
+      @cm.save!
+      @cm.migration_ids_to_import = {:copy => {:content_migrations => {CC::CCHelper.create_key(@cm) => "1"}}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+  end
+
 end

@@ -1487,7 +1487,7 @@ class Assignment < ActiveRecord::Base
     assignments = data['assignments'] ? data['assignments']: []
     to_import = migration.to_import 'assignments'
     assignments.each do |assign|
-      if assign['migration_id'] && (!to_import || to_import[assign['migration_id']])
+      if migration.import_object?("assignments", assign['migration_id'])
         begin
           import_from_migration(assign, migration.context)
         rescue

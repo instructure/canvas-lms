@@ -652,9 +652,8 @@ class DiscussionTopic < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     announcements = data['announcements'] ? data['announcements']: []
-    to_import = migration.to_import 'announcements'
     announcements.each do |event|
-      if event['migration_id'] && (!to_import || to_import[event['migration_id']])
+      if migration.import_object?("announcements", event['migration_id'])
         event[:type] = 'announcement'
         begin
           import_from_migration(event, migration.context)
@@ -665,13 +664,12 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     topics = data['discussion_topics'] ? data['discussion_topics']: []
-    topics_to_import = migration.to_import 'topics'
     topic_entries_to_import = migration.to_import 'topic_entries'
       topics.each do |topic|
         context = Group.find_by_context_id_and_context_type_and_migration_id(migration.context.id, migration.context.class.to_s, topic['group_id']) if topic['group_id']
         context ||= migration.context
         if context
-          if topic['migration_id'] && (!topics_to_import || topics_to_import[topic['migration_id']])
+          if migration.import_object?("topics", topic['migration_id'])
             begin
               import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
             rescue

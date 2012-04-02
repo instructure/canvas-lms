@@ -264,9 +264,8 @@ class Rubric < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     rubrics = data['rubrics'] ? data['rubrics']: []
-    to_import = migration.to_import 'rubrics'
     rubrics.each do |rubric|
-      if rubric['migration_id'] && (!to_import || to_import[rubric['migration_id']])
+      if migration.import_object?("rubrics", rubric['migration_id'])
         begin
           import_from_migration(rubric, migration.context)
         rescue

@@ -390,6 +390,7 @@ class WikiPage < ActiveRecord::Base
   def self.process_migration(data, migration)
     wikis = data['wikis'] ? data['wikis']: []
     wikis.each do |wiki|
+      next unless migration.import_object?("wikis", wiki['migration_id'])
       begin
         import_from_migration(wiki, migration.context) if wiki
       rescue
