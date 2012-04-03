@@ -52,8 +52,10 @@ shared_examples_for "conversations attachments selenium tests" do
     find_all_with_jquery("#{message} .message_attachments li").size.should == 1
     find_with_jquery("#{message} .message_attachments li a .title").text.should == filename
     download_link = driver.find_element(:css, "#{message} .message_attachments li a")
-    file = open(download_link.attribute('href'))
-    file.read.should match data
+    keep_trying_until do
+      file = open(download_link.attribute('href'))
+      file.read.should match data
+    end
   end
 
   it "should save just one attachment when sending a bulk private message" do
