@@ -372,7 +372,7 @@ class AccountsController < ApplicationController
     # This needs to be publicly available since external SAML
     # servers need to be able to access it without being authenticated.
     # It is used to disclose our SAML configuration settings.
-    settings = AccountAuthorizationConfig.saml_settings_for_account(@domain_root_account, request.env['canvas.account_domain'])
+    settings = AccountAuthorizationConfig.saml_settings_for_account(@domain_root_account, request.host_with_port)
     render :xml => Onelogin::Saml::MetaData.create(settings)
   end
   

@@ -36,7 +36,7 @@ class HostUrl
       @@domain_config
     end
 
-    def context_host(context=nil, preferred_account_domain=nil)
+    def context_host(context=nil, current_host=nil)
       default_host
     end
     

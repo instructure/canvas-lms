@@ -231,7 +231,7 @@ module AuthenticationMethods
     reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id)
   end
 
-  def initiate_delegated_login(preferred_account_domain=nil)
+  def initiate_delegated_login(current_host=nil)
     is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
     is_cas = @domain_root_account.cas_authentication? && is_delegated
     is_saml = @domain_root_account.saml_authentication? && is_delegated
@@ -239,7 +239,7 @@ module AuthenticationMethods
       initiate_cas_login
       return true
     elsif is_saml
-      initiate_saml_login(preferred_account_domain)
+      initiate_saml_login(current_host)
       return true
     end
     false
@@ -257,10 +257,10 @@ module AuthenticationMethods
     end
   end
 
-  def initiate_saml_login(preferred_account_domain=nil)
+  def initiate_saml_login(current_host=nil)
     reset_session_for_login
     aac = @domain_root_account.account_authorization_config
-    settings = aac.saml_settings(preferred_account_domain)
+    settings = aac.saml_settings(current_host)
     request = Onelogin::Saml::AuthRequest.new(settings)
     forward_url = request.generate_request
     if aac.debugging? && !aac.debug_get(:request_id)

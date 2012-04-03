@@ -87,7 +87,7 @@ class PseudonymSessionsController < ApplicationController
 
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
-      initiate_saml_login(request.env['canvas.account_domain'])
+      initiate_saml_login(request.host_with_port)
     else
       flash[:delegated_message] = session.delete :delegated_message if session[:delegated_message]
       maybe_render_mobile_login
@@ -177,7 +177,7 @@ class PseudonymSessionsController < ApplicationController
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
       aac = @domain_root_account.account_authorization_config
-      settings = aac.saml_settings(request.env['canvas.account_domain'])
+      settings = aac.saml_settings(request.host_with_port)
       request = Onelogin::Saml::LogOutRequest.new(settings, session)
       forward_url = request.generate_request
       
@@ -224,7 +224,7 @@ class PseudonymSessionsController < ApplicationController
   def saml_consume
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
       aac = @domain_root_account.account_authorization_config
-      settings = aac.saml_settings(request.env['canvas.account_domain'])
+      settings = aac.saml_settings(request.host_with_port)
       response = saml_response(params[:SAMLResponse], settings)
 
       logger.info "Attempting SAML login for #{response.name_id} in account #{@domain_root_account.id}"
@@ -323,7 +323,7 @@ class PseudonymSessionsController < ApplicationController
   def saml_logout
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
       aac = @domain_root_account.account_authorization_config
-      settings = aac.saml_settings(request.env['canvas.account_domain'])
+      settings = aac.saml_settings(request.host_with_port)
       response = Onelogin::Saml::LogoutResponse.new(params[:SAMLResponse], settings)
       response.logger = logger
 

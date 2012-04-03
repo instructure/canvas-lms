@@ -97,11 +97,11 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     AccountAuthorizationConfig.saml_default_entity_id_for_account(self.account)
   end
 
-  def saml_settings(preferred_account_domain=nil)
+  def saml_settings(current_host=nil)
     return nil unless self.auth_type == 'saml'
 
     unless @saml_settings
-      @saml_settings = AccountAuthorizationConfig.saml_settings_for_account(self.account, preferred_account_domain)
+      @saml_settings = AccountAuthorizationConfig.saml_settings_for_account(self.account, current_host)
 
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
@@ -113,9 +113,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     @saml_settings
   end
   
-  def self.saml_settings_for_account(account, preferred_account_domain=nil)
+  def self.saml_settings_for_account(account, current_host=nil)
     app_config = Setting.from_config('saml') || {}
-    domain = HostUrl.context_host(account, preferred_account_domain)
+    domain = HostUrl.context_host(account, current_host)
     
     settings = Onelogin::Saml::Settings.new
     if ENV['RAILS_ENV'] == 'development'
