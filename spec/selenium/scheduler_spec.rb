@@ -290,12 +290,13 @@ describe "scheduler" do
 
       2.times do |i|
         f(".appointment-group-item:nth-child(#{i+1}) .view_calendar_link").click
+        wait_for_ajax_requests
 
-        f('.fc-event').click
+        fj('.fc-event:visible').click
         ff('#attendees li').size.should eql 2
 
         # delete the first appointment
-        f('.cancel_appointment_link').click
+        fj('.cancel_appointment_link:visible').click
         fj('button:visible:contains(Delete)').click
         wait_for_ajax_requests
         ff('#attendees li').size.should eql 1
@@ -303,7 +304,7 @@ describe "scheduler" do
         # make sure the appointment was really deleted
         f('#refresh_calendar_link').click
         wait_for_ajax_requests
-        f('.fc-event-time').click
+        fj('.fc-event-time:visible').click
         ff('#attendees li').size.should eql 1
 
         f('.single_item_done_button').click
