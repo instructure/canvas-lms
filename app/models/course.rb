@@ -648,7 +648,8 @@ class Course < ActiveRecord::Base
   def recompute_student_scores
     Enrollment.recompute_final_score(self.students.map(&:id), self.id)
   end
-  handle_asynchronously_if_production :recompute_student_scores
+  handle_asynchronously_if_production :recompute_student_scores,
+    :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
 
   def home_page
     WikiNamespace.default_for_context(self).wiki.wiki_page
