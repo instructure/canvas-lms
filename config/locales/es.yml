@@ -2060,7 +2060,6 @@ es:
       read_more: más
       titles: 
         author_name: "Nombre del Autor"
-      topic_for_assignment: "Este tema es para la tarea, %{assignment_name_link}."
     dashboard_topic_entry: 
       links: 
         title: 
