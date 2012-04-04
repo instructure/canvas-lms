@@ -845,9 +845,9 @@ class UsersController < ApplicationController
     return unless get_feed_context(:only => [:user])
     feed = Atom::Feed.new do |f|
       f.title = "#{@context.name} Feed"
-      f.links << Atom::Link.new(:href => dashboard_url)
+      f.links << Atom::Link.new(:href => dashboard_url, :rel => 'self')
       f.updated = Time.now
-      f.id = named_context_url(@context, :context_url)
+      f.id = user_url(@context)
     end
     @entries = []
     @context.courses.each do |context|

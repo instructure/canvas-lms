@@ -633,7 +633,7 @@ class ConversationsController < ApplicationController
     load_all_contexts
     feed = Atom::Feed.new do |f|
       f.title = t('titles.rss_feed', "Conversations Feed")
-      f.links << Atom::Link.new(:href => conversations_url)
+      f.links << Atom::Link.new(:href => conversations_url, :rel => 'self')
       f.updated = Time.now
       f.id = conversations_url
     end

@@ -101,12 +101,15 @@ describe CalendarsController do
   end
 
   describe "GET 'public_feed'" do
-    it "should assign variables" do
+    before(:each) do
       course_with_student(:active_all => true)
       course_event
       @course.is_public = true
       @course.save!
       @course.assignments.create!(:title => "some assignment")
+    end
+
+    it "should assign variables" do
       get 'public_feed', :feed_code => "course_#{@course.uuid}"
       response.should be_success
       assigns[:events].should_not be_nil
@@ -115,18 +118,33 @@ describe CalendarsController do
     end
 
     it "should assign variables" do
-      course_with_student(:active_all => true)
-      course_event
-      @course.is_public = true
-      @course.save!
-      @course.assignments.create!(:title => "some assignment")
-
       e = @user.calendar_events.create(:title => "my event")
       get 'public_feed', :feed_code => "user_#{@user.uuid}"
       response.should be_success
       assigns[:events].should_not be_nil
       assigns[:events].should_not be_empty
       assigns[:events].should be_include(e)
+    end
+
+    it "should require authorization" do
+      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
+      assigns[:problem].should eql("The verification code is invalid.")
+    end
+
+    it "should include absolute path for rel='self' link" do
+      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.links.first.rel.should match(/self/)
+      feed.links.first.href.should match(/http:\/\//)
+    end
+
+    it "should include an author for each entry" do
+      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.should_not be_empty
+      feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
 

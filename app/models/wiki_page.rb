@@ -327,6 +327,7 @@ class WikiPage < ActiveRecord::Base
     prefix = namespace.context_prefix || ""
     Atom::Entry.new do |entry|
       entry.title     = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", :course_or_group_name => namespace.context.name, :page_title => self.title)
+      entry.authors  << Atom::Person.new(:name => t(:atom_author, "Wiki Page"))
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"

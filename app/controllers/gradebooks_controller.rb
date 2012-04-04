@@ -341,9 +341,9 @@ class GradebooksController < ApplicationController
     respond_to do |format|
       feed = Atom::Feed.new do |f|
         f.title = t('titles.feed_for_course', "%{course} Gradebook Feed", :course => @context.name)
-        f.links << Atom::Link.new(:href => named_context_url(@context, :context_gradebook_url))
+        f.links << Atom::Link.new(:href => course_gradebook_url(@context), :rel => 'self')
         f.updated = Time.now
-        f.id = named_context_url(@context, :context_gradebook_url)
+        f.id = course_gradebook_url(@context)
       end
       @context.submissions.each do |e|
         feed.entries << e.to_atom

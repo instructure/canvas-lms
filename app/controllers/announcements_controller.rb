@@ -45,9 +45,9 @@ class AnnouncementsController < ApplicationController
       format.atom { 
         feed = Atom::Feed.new do |f|
           f.title = t(:feed_name, "%{course} Announcements Feed", :course => @context.name)
-          f.links << Atom::Link.new(:href => named_context_url(@context, :context_announcements_url))
+          f.links << Atom::Link.new(:href => polymorphic_url([@context, :announcements]), :rel => 'self')
           f.updated = Time.now
-          f.id = named_context_url(@context, :context_announcements_url)
+          f.id = polymorphic_url([@context, :announcements])
         end
         announcements.each do |e|
           feed.entries << e.to_atom
@@ -65,7 +65,7 @@ class AnnouncementsController < ApplicationController
         elsif @context.is_a?(Group)
           channel.description = t(:podcast_feed_description_group, "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed.", :group => @context.name)
         end
-        channel.link = named_context_url(@context, :context_announcements_url)
+        channel.link = polymorphic_url([@context, :announcements])
         channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
         elements = Announcement.podcast_elements(announcements, @context)
         elements.each do |item|

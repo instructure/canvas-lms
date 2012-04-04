@@ -189,4 +189,28 @@ describe EportfoliosController do
       e3.position.should eql(2)
     end
   end
+
+  describe "GET 'public_feed.atom'" do
+    before(:each) do
+      eportfolio_model
+      @eportfolio.public = true
+      @eportfolio.save!
+    end
+
+    it "should include absolute path for rel='self' link" do
+      get 'public_feed', :eportfolio_id => @eportfolio.id, :format => 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.links.first.rel.should match(/self/)
+      feed.links.first.href.should match(/http:\/\//)
+    end
+
+    it "should include an author for each entry" do
+      get 'public_feed', :eportfolio_id => @eportfolio.id, :format => 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.should_not be_empty
+      feed.entries.all?{|e| e.authors.present?}.should be_true
+    end
+  end
 end

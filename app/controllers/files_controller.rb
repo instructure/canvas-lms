@@ -656,9 +656,9 @@ class FilesController < ApplicationController
     return unless get_feed_context
     feed = Atom::Feed.new do |f|
       f.title = t :feed_title, "%{course_or_group} Files Feed", :course_or_group => @context.name
-      f.links << Atom::Link.new(:href => named_context_url(@context, :context_files_url))
+      f.links << Atom::Link.new(:href => polymorphic_url([@context, :files]), :rel => 'self')
       f.updated = Time.now
-      f.id = named_context_url(@context, :context_files_url)
+      f.id = polymorphic_url([@context, :files])
     end
     @entries = []
     @entries.concat @context.attachments.active

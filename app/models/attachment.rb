@@ -854,13 +854,14 @@ class Attachment < ActiveRecord::Base
   
   def to_atom(opts={})
     Atom::Entry.new do |entry|
-      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", :course_or_group => self.context.name, :title => self.context.name) if opts[:include_context]
       entry.title     = t(:feed_title, "File: %{title}", :title => self.context.name) unless opts[:include_context]
+      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", :course_or_group => self.context.name, :title => self.context.name) if opts[:include_context]
+      entry.authors  << Atom::Person.new(:name => self.context.name)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/files/#{self.feed_code}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
-                                    :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/files/#{self.id}")
+                                       :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/files/#{self.id}")
       entry.content   = Atom::Content::Html.new("#{self.display_name}")
     end
   end

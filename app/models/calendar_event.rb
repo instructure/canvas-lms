@@ -340,6 +340,7 @@ class CalendarEvent < ActiveRecord::Base
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_item_title, "Calendar Event: %{event_title}", :event_title => self.title) unless opts[:include_context]
       entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", :course_or_account_name => self.context.name, :event_title => self.title) if opts[:include_context]
+      entry.authors  << Atom::Person.new(:name => self.context.name)
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
       entry.links    << Atom::Link.new(:rel => 'alternate',

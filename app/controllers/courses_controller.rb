@@ -1054,9 +1054,9 @@ class CoursesController < ApplicationController
     return unless get_feed_context(:only => [:course])
     feed = Atom::Feed.new do |f|
       f.title = t('titles.rss_feed', "%{course} Feed", :course => @context.name)
-      f.links << Atom::Link.new(:href => named_context_url(@context, :context_url))
+      f.links << Atom::Link.new(:href => course_url(@context), :rel => 'self')
       f.updated = Time.now
-      f.id = named_context_url(@context, :context_url)
+      f.id = course_url(@context)
     end
     @entries = []
     @entries.concat @context.assignments.active
