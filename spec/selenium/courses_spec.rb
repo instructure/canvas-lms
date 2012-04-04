@@ -99,9 +99,9 @@ describe "courses" do
 
         select_box = driver.find_element(:id, 'copy_from_course')
         select_box.find_elements(:css, 'optgroup').length.should == 2
-        second_group = select_box.find_elements(:css, 'optgroup').last
-        second_group.find_elements(:css, 'option').length.should == 1
-        second_group.attribute('label').should == 'Test Term'
+        optgroups = select_box.find_elements(:css, 'optgroup')
+        optgroups.map{ |og| og.attribute('label') }.sort.should eql ["Default Term", "Test Term"]
+        optgroups.map{ |og| og.find_elements(:css, 'option').length }.should eql [1,1]
 
         click_option('#copy_from_course', 'second course')
         driver.find_element(:css, '#content form').submit
