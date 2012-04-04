@@ -123,7 +123,6 @@ stylesheets:
     - public/stylesheets/compiled/g_util_ui_listview.css
     - public/stylesheets/compiled/g_assignments.css
     - public/stylesheets/compiled/g_content_imports.css
-    - public/stylesheets/compiled/g_gradebook_history.css
     - public/stylesheets/compiled/g_context_inbox.css
     - public/stylesheets/compiled/g_groups.css
     - public/stylesheets/compiled/g_media_comments.css
@@ -170,6 +169,8 @@ stylesheets:
     - public/stylesheets/compiled/full_files.css
   datagrid:
     - public/stylesheets/compiled/datagrid.css
+  gradebook_history:
+    - public/stylesheets/compiled/gradebook_history.css
   gradebooks:
     - public/stylesheets/compiled/gradebooks.css
     - public/stylesheets/compiled/message_students.css
