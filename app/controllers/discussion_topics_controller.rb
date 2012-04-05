@@ -48,6 +48,7 @@ class DiscussionTopicsController < ApplicationController
   # @response_field topic_children An array of topic_ids for the group discussions the user is a part of
   # @response_field user_name The username of the creator
   # @response_field url The URL to the discussion topic in canvas
+  # @response_field discussion_type The type of discussion. Values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
   # @response_field permissions[attach] If true, the calling user can attach files to this discussion's entries.
   #
   # @example_response
@@ -68,6 +69,7 @@ class DiscussionTopicsController < ApplicationController
   #        "topic_children":[],
   #        "root_topic_id":null,
   #        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
+  #        "discussion_type":"side_comment",
   #        "attachments":[
   #          {
   #            "content-type":"unknown/unknown",
@@ -156,8 +158,9 @@ class DiscussionTopicsController < ApplicationController
         elsif topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
           format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
         else
-          format.html {
-            js_env :DISCUSSION => {
+          format.html do
+
+            env_hash = {
               :TOPIC => {
                 :ID => @topic.id,
               },
@@ -177,7 +180,12 @@ class DiscussionTopicsController < ApplicationController
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
-          }
+            if @topic.for_assignment? && @topic.assignment.grants_right?(@current_user, session, :grade)
+              env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment.id, :anchor => {:student_id => ":student_id"}.to_json)
+            end
+            js_env :DISCUSSION => env_hash
+
+          end
         end
       end
     end

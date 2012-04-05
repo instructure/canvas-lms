@@ -26,7 +26,13 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded
+    :require_initial_post, :threaded, :discussion_type
+
+  module DiscussionTypes
+    SIDE_COMMENT = 'side_comment'
+    THREADED     = 'threaded'
+    TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
+  end
 
   attr_readonly :context_id, :context_type, :user_id
 
@@ -48,6 +54,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :user
   validates_presence_of :context_id
   validates_presence_of :context_type
+  validates_presence_of :discussion_type, :in => DiscussionTypes::TYPES
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
 
@@ -65,9 +72,22 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_participant
   after_create :create_materialized_view
 
+  def threaded=(v)
+    self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
+  end
+
+  def threaded?
+    self.discussion_type == DiscussionTypes::THREADED
+  end
+
+  def discussion_type
+    read_attribute(:discussion_type) || DiscussionTypes::SIDE_COMMENT
+  end
+
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= t '#discussion_topic.default_title', "No Title"
+    self.discussion_type = DiscussionTypes::SIDE_COMMENT if !read_attribute(:discussion_type)
     @content_changed = self.message_changed? || self.title_changed?
     if self.assignment_id != self.assignment_id_was
       @old_assignment_id = self.assignment_id_was
@@ -106,7 +126,7 @@ class DiscussionTopic < ActiveRecord::Base
       topic.title = "#{self.title} - #{group.name}"
       topic.assignment_id = self.assignment_id
       topic.user_id = self.user_id
-      topic.threaded = self.threaded
+      topic.discussion_type = self.discussion_type
       topic.save if topic.changed?
       topic
     end
@@ -812,8 +832,8 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # if a new message is posted, it won't appear in this view until the job to
   # update it completes. so this view is eventually consistent.
-  def materialized_view
-    DiscussionTopic::MaterializedView.materialized_view_for(self)
+  def materialized_view(opts = {})
+    DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
   end
 
   # synchronously create/update the materialized view

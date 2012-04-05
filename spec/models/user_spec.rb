@@ -625,6 +625,18 @@ describe User do
       user.can_masquerade?(@site_admin, @account2).should be_true
       @account2.add_user(@admin)
     end
+
+    it "should allow site admin when they don't otherwise qualify for :create_courses" do
+      user = user_with_pseudonym(:username => 'nobody1@example.com')
+      @admin = user_with_pseudonym(:username => 'nobody2@example.com')
+      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
+      Account.default.add_user(@admin)
+      Account.site_admin.add_user(@site_admin)
+      course
+      @course.enroll_teacher(@admin)
+      Account.default.update_attribute(:settings, {:teachers_can_create_courses => true})
+      @admin.can_masquerade?(@site_admin, Account.default).should be_true
+    end
   end
 
   context "permissions" do

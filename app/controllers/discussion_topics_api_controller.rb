@@ -39,13 +39,19 @@ class DiscussionTopicsApiController < ApplicationController
   # try again soon.
   #
   # The response is an object containing the following keys:
-  # * "participants": a list of summary information on users who have posted to
+  # * "participants": A list of summary information on users who have posted to
   #   the discussion. Each value is an object containing their id, display_name,
   #   and avatar_url.
-  # * "unread_entries": a list of entry ids that are unread by the current
+  # * "unread_entries": A list of entry ids that are unread by the current
   #   user. this implies that any entry not in this list is read.
-  # * "view": a threaded view of all the entries in the discussion, containing
+  # * "view": A threaded view of all the entries in the discussion, containing
   #   the id, user_id, and message.
+  # * "new_entries": Because this view is eventually consistent, it's possible
+  #   that newly created or updated entries won't yet be reflected in the view.
+  #   If the application wants to also get a flat list of all entries not yet
+  #   reflected in the view, pass include_new_entries=1 to the request and this
+  #   array of entries will be returned. These entries are returned in a flat
+  #   array, in ascending created_at order.
   #
   # @example_request
   #
@@ -69,7 +75,8 @@ class DiscussionTopicsApiController < ApplicationController
   #   }
   def view
     return unless authorized_action(@topic, @current_user, :read)
-    structure, participant_ids, entry_ids = @topic.materialized_view
+    structure, participant_ids, entry_ids, new_entries_structure = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
+
     if structure
       participant_info = User.find(participant_ids).map do |user|
         { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => polymorphic_url([@context, user]) }
@@ -78,7 +85,7 @@ class DiscussionTopicsApiController < ApplicationController
       # as an optimization, the view structure is pre-serialized as a json
       # string, so we have to do a bit of manual json building here to fit it
       # into the response.
-      render :json => %[{ "unread_entries": #{unread_entries.to_json}, "participants": #{participant_info.to_json}, "view": #{structure} }]
+      render :json => %[{ "unread_entries": #{unread_entries.to_json}, "participants": #{participant_info.to_json}, "view": #{structure}, "new_entries": #{new_entries_structure} }]
     else
       render :nothing => true, :status => 503
     end

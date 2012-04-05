@@ -492,6 +492,7 @@ class Account < ActiveRecord::Base
     RoleOverride.permissions.each do |permission, details|
       given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
       can permission
+      can :create_courses if permission == :manage_courses
 
       next unless details[:account_only]
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|

@@ -18,7 +18,9 @@ define [
       # these
       view: null
 
-    url: ENV.DISCUSSION.ROOT_URL
+      new_entries: []
+
+    url: ENV.DISCUSSION.ROOT_URL + '?include_new_entries=1'
 
     fetch: (options = {}) ->
       loader = new BackoffPoller @url, (data, xhr) =>

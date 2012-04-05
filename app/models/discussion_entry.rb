@@ -158,7 +158,6 @@ class DiscussionEntry < ActiveRecord::Base
 
   alias_method :destroy!, :destroy
   def destroy
-    flattened_discussion_subentries.destroy_all
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     save!

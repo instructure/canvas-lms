@@ -56,9 +56,38 @@ describe UserContent, :type => :integration do
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
     video = doc.at_css('video')
     video.should be_present
+    video['class'].should match(/\binstructure_inline_media_comment\b/)
+    video['data-media_comment_type'].should == 'video'
+    video['data-media_comment_id'].should == 'qwerty'
     video['poster'].should match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
     video['src'].should match(%r{http://www.example.com/courses/#{@course.id}/media_download})
     video['src'].should match(%r{entryId=qwerty})
+  end
+
+  it "should translate media comment audio tags" do
+    course_with_teacher(:active_all => true)
+    attachment_model
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
+    <p>
+      Hello, students.<br>
+      Listen up: <a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>
+    </p>
+    HTML
+
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+    { :controller => 'assignments_api', :action => 'show',
+      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    audio = doc.at_css('audio')
+    audio.should be_present
+    audio['class'].should match(/\binstructure_inline_media_comment\b/)
+    audio['data-media_comment_type'].should == 'audio'
+    audio['data-media_comment_id'].should == 'abcde'
+    audio['poster'].should be_blank
+    audio['src'].should match(%r{http://www.example.com/courses/#{@course.id}/media_download})
+    audio['src'].should match(%r{entryId=abcde})
   end
 
   it "should not translate links in content not viewable by user" do

@@ -134,6 +134,10 @@
     .show-if-replying
       display: block
 
+.entry
+  .cancel_button
+    font-size: 11px
+
 .discussion-reply-label
   display: block
   background-color: #fff
@@ -155,6 +159,11 @@
 .topic .avatar img
   max-width: 50px
   min-height: 0
+
+.discussion-header-content
+  .author.unknown
+    font-style: italic
+
 .discussion-reply-attachments
   list-style: none
   padding: 0
@@ -174,6 +183,12 @@
   display: inline-block
   padding-left: 20px
   background: transparent url(/images/messages/attach-blue.png) left center no-repeat
+
+.discussion-reply-attachments-container
+  float: right
+
+.discussion-reply-buttons
+  float: left
 
 .message-notification, .notification
   background: #ffffcc
@@ -226,43 +241,58 @@
   margin-left: 42px !important
   margin-top: 10px !important
 
-.directed-discussion .discussion-entries
+.side_comment_discussion .discussion-entries
   margin-left: 0
   background: none
 
-.directed-discussion .entry
+.side_comment_discussion .entry
   padding-left: 0
   background: none
 
-.directed-discussion .entry .discussion_entry
+.side_comment_discussion .entry .discussion_entry
   margin-bottom: 0
   position: relative
 
-.directed-discussion .entry .entry .discussion_entry
+.side_comment_discussion .entry .deleted-discussion-entry
+
+.side_comment_discussion .entry .entry .discussion_entry
   margin-bottom: 5px
   border-bottom: none
 
-.directed-discussion .entry .entry .discussion_entry:first-child
+.side_comment_discussion .entry .entry .discussion_entry:first-child
   margin-top: 10px
 
-.directed-discussion .entry .entry
+.side_comment_discussion .entry .entry
   margin-left: 0
   background: none
   padding-left: 10px
+  padding-right: 0px
+
+.side_comment_discussion #discussion_subentries > .discussion-entries > .entry > .replies
   padding-right: 10px
 
-.directed-discussion .entry .replies
+.side_comment_discussion .entry .replies
   background-color: #cccccc
   margin-left: 20px
-  margin-bottom: -5px
 
-.entry .add-side-comment-wrap .discussion-reply-form
+.add-side-comment-wrap .discussion-reply-form
   background: #cccccc
   padding: 10px
-  margin-top: 5px
+  margin-top: 0px
   margin-left: 20px
   box-shadow: none
 
+.side_comment_discussion .discussion-entries:last-child
+  margin-bottom: 0
+
+.side_comment_discussion .entry:last-child
+  margin-bottom: 0px
+  padding-bottom: 4px
+
+.side_comment_discussion .discussion-entries
+  margin-top: 0px
+
 .add_root_reply
+  display: inline-block
   margin-top: 20px
 

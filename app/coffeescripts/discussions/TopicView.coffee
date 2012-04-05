@@ -47,7 +47,12 @@ define [
       assignmentRubricDialog.initTriggers()
       @disableNextUnread()
 
-      @$el.toggleClass 'directed-discussion', !ENV.DISCUSSION.THREADED
+      @$el.toggleClass 'side_comment_discussion', !ENV.DISCUSSION.THREADED
+
+    ##
+    # Cache all the elements reused in the class
+    cacheElements: ->
+      @$addRootReply = @$ '.add_root_reply'
 
     ##
     # Creates the Entries
@@ -69,6 +74,7 @@ define [
       @discussion.model.bind 'fetchSuccess', =>
         unread_entries = @discussion.model.get 'unread_entries'
         @setNextUnread unread_entries
+        @cacheElements()
 
       # TODO get rid of this global, used
       window.DISCUSSION = @discussion
@@ -119,7 +125,10 @@ define [
     # @api private
     addReply: (event) ->
       event.preventDefault()
-      @reply ?= new Reply this, topLevel: true, added: @initEntries
+      unless @reply?
+        @reply = new Reply this, topLevel: true, added: @initEntries
+        @reply.on 'edit', => @$addRootReply?.hide()
+        @reply.on 'hide', => @$addRootReply?.show()
       @model.set 'notification', ''
       @reply.edit()
 
@@ -170,7 +179,7 @@ define [
 
     addRootReply: (event) ->
       $el = @$ event.currentTarget
-      target = $('#discussion_topic')
+      target = $('#discussion_topic .discussion-reply-form')
       @addReply event
-      $('html, body').animate scrollTop: target.offset().top
+      $('html, body').animate scrollTop: target.offset().top - 100
 

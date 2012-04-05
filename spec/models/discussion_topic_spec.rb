@@ -25,6 +25,17 @@ describe DiscussionTopic do
     @course.discussion_topics.first.message.should eql("<a href=\"#\">only this should stay</a>")
   end
 
+  it "should default to side_comment type" do
+    d = DiscussionTopic.new
+    d.discussion_type.should == 'side_comment'
+
+    d.threaded = '1'
+    d.discussion_type.should == 'threaded'
+
+    d.threaded = ''
+    d.discussion_type.should == 'side_comment'
+  end
+
   it "should update the assignment it is associated with" do
     course_model
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -248,10 +259,10 @@ describe DiscussionTopic do
     it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
       topic_for_group_assignment
       subtopics = @topic.refresh_subtopics
-      subtopics.each {|st| st.threaded.should be_nil }
-      @topic.threaded = true
+      subtopics.each {|st| st.discussion_type.should == 'side_comment' }
+      @topic.discussion_type = 'threaded'
       @topic.save
-      subtopics.each {|st| st.reload.threaded.should == true }
+      subtopics.each {|st| st.reload.discussion_type.should == 'threaded' }
     end
   end
 
@@ -689,7 +700,7 @@ describe DiscussionTopic do
     it "should return the materialized view if it's up to date" do
       run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
       view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
-      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array]
+      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, "[]"]
     end
 
     it "should update the materialized view on new entry" do

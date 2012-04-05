@@ -39,9 +39,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       self.create!(:discussion_topic => discussion_topic)
   end
 
-  def self.materialized_view_for(discussion_topic)
+  def self.materialized_view_for(discussion_topic, opts = {})
     view = self.for(discussion_topic)
-    view.materialized_view_json
+    view.materialized_view_json(opts)
   end
 
   def up_to_date?
@@ -53,20 +53,35 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   # the background job runs to generate the new view. this is preferred over
   # serving a 503 and making the user check back later in the split second
   # between the discussion changing, and the view getting updated.
-  def materialized_view_json
+  #
+  # if opts[:include_new_entries] is true, it will also return all the entries
+  # that have been created or updated since the view was generated.
+  def materialized_view_json(opts = {})
     if !up_to_date?
       self.send_later_enqueue_args :update_materialized_view,
         { :singleton => "materialized_discussion:#{discussion_topic_id}" }
     end
 
     if json_structure.present?
-      return self.json_structure, self.participants_array, self.entry_ids_array
+      participant_ids = self.participants_array
+      entry_ids = self.entry_ids_array
+
+      if opts[:include_new_entries]
+        new_entries = discussion_topic.discussion_entries.all(:conditions => ["updated_at >= ?", (self.generation_started_at || self.updated_at)])
+        participant_ids = (Set.new(participant_ids) + new_entries.map(&:user_id).compact + new_entries.map(&:editor_id).compact).to_a
+        entry_ids = (Set.new(entry_ids) + new_entries.map(&:id)).to_a
+        new_entries_json_structure = discussion_entry_api_json(new_entries, discussion_topic.context, nil, nil, []).to_json
+      else
+        new_entries_json_structure = [].to_json
+      end
+      return self.json_structure, participant_ids, entry_ids, new_entries_json_structure
     else
       return nil
     end
   end
 
   def update_materialized_view
+    self.generation_started_at = Time.zone.now
     view_json, user_ids, entry_lookup =
       self.build_materialized_view
     self.json_structure = view_json
