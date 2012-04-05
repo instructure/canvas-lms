@@ -115,17 +115,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   
   def self.saml_settings_for_account(account, current_host=nil)
     app_config = Setting.from_config('saml') || {}
-    domain = HostUrl.context_host(account, current_host)
+    domains = HostUrl.context_hosts(account, current_host)
     
     settings = Onelogin::Saml::Settings.new
-    if ENV['RAILS_ENV'] == 'development'
-      # if you set the domain to go to your local box in /etc/hosts you can test saml
-      settings.assertion_consumer_service_url = "http://#{domain}/saml_consume"
-      settings.sp_slo_url = "http://#{domain}/saml_logout"
-    else
-      settings.assertion_consumer_service_url = "https://#{domain}/saml_consume"
-      settings.sp_slo_url = "https://#{domain}/saml_logout"
-    end
+    protocol = Rails.env.development? ? 'http' : 'https'
+    settings.sp_slo_url = "#{protocol}://#{domains.first}/saml_logout"
+    settings.assertion_consumer_service_url = domains.map { |domain| "#{protocol}://#{domain}/saml_consume" }
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
     
