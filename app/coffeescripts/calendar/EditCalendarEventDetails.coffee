@@ -43,7 +43,7 @@ define [
 
     moreOptionsClick: (jsEvent) =>
       jsEvent.preventDefault()
-      pieces = $(event.target).attr('href').split("#")
+      pieces = $(jsEvent.target).attr('href').split("#")
       data = $("#edit_calendar_event_form").getFormData(object_name: 'calendar_event')
       params = {}
       if data.title then params['title'] = data.title
