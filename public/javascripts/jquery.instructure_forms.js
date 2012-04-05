@@ -325,6 +325,9 @@ define([
     });
   }
   $.ajaxFileUpload = function(options) {
+    if(!options.data.authenticity_token) {
+      options.data.authenticity_token = ENV.AUTHENTICITY_TOKEN
+    }
     $.toMultipartForm(options.data, function(params) {
       $.sendFormAsBinary({
         url: options.url,
