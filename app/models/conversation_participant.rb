@@ -266,14 +266,16 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def move_to_user(new_user)
-    conversation.conversation_messages.update_all(["author_id = ?", new_user.id], ["author_id = ?", user_id])
-    if existing = conversation.conversation_participants.find_by_user_id(new_user.id)
-      existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
-      destroy
-    else
-      update_attribute :user_id, new_user.id
+    self.class.send :with_exclusive_scope do
+      conversation.conversation_messages.update_all(["author_id = ?", new_user.id], ["author_id = ?", user_id])
+      if existing = conversation.conversation_participants.find_by_user_id(new_user.id)
+        existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+        destroy
+      else
+        update_attribute :user_id, new_user.id
+      end
+      conversation.regenerate_private_hash! if private?
     end
-    conversation.regenerate_private_hash! if private?
   end
 
   attr_writer :last_message
