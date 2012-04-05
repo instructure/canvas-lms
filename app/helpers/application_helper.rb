@@ -555,15 +555,8 @@ module ApplicationHelper
   end
 
   def map_courses_for_menu(courses)
-    # so we can display the term for duplicate course names
-    name_counts = {}
-    courses.each do |course|
-      name_counts[course.short_name] ||= 0
-      name_counts[course.short_name] += 1
-    end
-
     mapped = courses.map do |course|
-      term = course.enrollment_term.name if (name_counts[course.short_name] > 1 && !course.enrollment_term.default_term?)
+      term = course.enrollment_term.name if !course.enrollment_term.default_term?
       subtitle = (course.primary_enrollment_state == 'invited' ?
                   before_label('#shared.menu_enrollment.labels.invited_as', 'Invited as') :
                   before_label('#shared.menu_enrollment.labels.enrolled_as', "Enrolled as")

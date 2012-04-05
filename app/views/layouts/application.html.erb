@@ -168,17 +168,19 @@
         <%= left_side %>
       <% else %>
         <% if @context.try(:short_name) %>
-        <h1 id="section-tabs-header"><%= @context.short_name %></h1>
+          <h1 id="section-tabs-header"><%= @context.short_name %></h1>
           <% if @context && @context.respond_to?(:context)  %>
-        <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
+            <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
+          <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
+            <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
           <% end %>
         <% end %>
         <%= section_tabs %>
       <% end %>
       <% if left_side_custom %>
-      <div class="left-side-inner">
-       <%= left_side_custom %>
-      </div>
+        <div class="left-side-inner">
+          <%= left_side_custom %>
+        </div>
       <% end %>
     </div>
     <% end %>
