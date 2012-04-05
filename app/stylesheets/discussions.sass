@@ -238,62 +238,56 @@
     font-size: 12px
     font-style: italic
 
+.add_root_reply
+  display: inline-block
+  margin-top: 20px
+
+//stuff for side comments
 .add_side_comment
   margin-left: 42px !important
   margin-top: 10px !important
 
-.side_comment_discussion .discussion-entries
-  margin-left: 0
-  background: none
+.side_comment_discussion
 
-.side_comment_discussion .entry
-  padding-left: 0
-  background: none
+  .discussion-entries
+    margin-left: 0
+    margin-top: 0
+    background: none
+    &:last-child
+      margin-bottom: 0
 
-.side_comment_discussion .entry .discussion_entry
-  margin-bottom: 0
-  position: relative
+  .entry
+    padding-left: 0
+    background: none
+    &:last-child
+      margin-bottom: 0
+      padding-bottom: 4px
 
-.side_comment_discussion .entry .deleted-discussion-entry
+    .discussion_entry
+      margin-bottom: 0
+      position: relative
 
-.side_comment_discussion .entry .entry .discussion_entry
-  margin-bottom: 5px
-  border-bottom: none
+      .entry
+        margin-left: 0
+        background: none
+        padding-left: 10px
+        padding-right: 0
 
-.side_comment_discussion .entry .entry .discussion_entry:first-child
-  margin-top: 10px
+        .discussion_entry
+          margin-bottom: 5px
+          border-bottom: none
+          &:first-child
+            margin-top: 10px
 
-.side_comment_discussion .entry .entry
-  margin-left: 0
-  background: none
-  padding-left: 10px
-  padding-right: 0px
+    .replies
+      background-color: #cccccc
+      margin-left: 20px
 
-.side_comment_discussion #discussion_subentries > .discussion-entries > .entry > .replies
-  padding-right: 10px
-
-.side_comment_discussion .entry .replies
-  background-color: #cccccc
-  margin-left: 20px
-
+  #discussion_subentries > .discussion-entries > .entry > .replies
+    padding-right: 10px
 .add-side-comment-wrap .discussion-reply-form
   background: #cccccc
   padding: 10px
   margin-top: 0px
   margin-left: 20px
   box-shadow: none
-
-.side_comment_discussion .discussion-entries:last-child
-  margin-bottom: 0
-
-.side_comment_discussion .entry:last-child
-  margin-bottom: 0px
-  padding-bottom: 4px
-
-.side_comment_discussion .discussion-entries
-  margin-top: 0px
-
-.add_root_reply
-  display: inline-block
-  margin-top: 20px
-
