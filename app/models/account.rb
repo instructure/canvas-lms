@@ -639,6 +639,14 @@ class Account < ActiveRecord::Base
       special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
       account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id) if special_account_id
     end
+    # another process (i.e. selenium spec) may have changed the setting
+    unless account
+      special_account_id = Setting.get("#{special_account_type}_account_id", nil)
+      if special_account_id && special_account_id != @special_account_ids[special_account_type]
+        @special_account_ids[special_account_type] = special_account_id
+        account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
+      end
+    end
     unless account
       # TODO i18n
       t '#account.default_site_administrator_account_name', 'Site Admin'
