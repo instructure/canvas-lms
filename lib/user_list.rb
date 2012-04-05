@@ -214,7 +214,7 @@ class UserList
       elsif address[:type] == :email && @search_method == :open
         (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
       else
-        if @search_method == :preferred
+        if @search_method == :preferred && (address[:details] == :non_unique || address[:type] == :email)
           address.delete :user_id
           (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
         else
