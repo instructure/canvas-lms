@@ -41,23 +41,6 @@ shared_examples_for "conversations attachments selenium tests" do
     find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 1
   end
 
-  it "should save attachments on initial messages on new conversations" do
-    student_in_course
-    filename, fullpath, data = get_file("testfile1.txt")
-
-    new_conversation
-    message = submit_message_form(:attachments => [fullpath])
-    message = "#message_#{message.id}"
-
-    find_all_with_jquery("#{message} .message_attachments li").size.should == 1
-    find_with_jquery("#{message} .message_attachments li a .title").text.should == filename
-    download_link = driver.find_element(:css, "#{message} .message_attachments li a")
-    keep_trying_until do
-      file = open(download_link.attribute('href'))
-      file.read.should match data
-    end
-  end
-
   it "should save just one attachment when sending a bulk private message" do
     student_in_course
     @course.enroll_user(User.create(:name => "student1"))
@@ -110,6 +93,24 @@ describe "conversations attachments local tests" do
   prepend_before (:all) do
     Setting.set("file_storage_test_override", "local")
   end
+
+  it "should save attachments on initial messages on new conversations" do
+    student_in_course
+    filename, fullpath, data = get_file("testfile1.txt")
+
+    new_conversation
+    message = submit_message_form(:attachments => [fullpath])
+    message = "#message_#{message.id}"
+
+    find_all_with_jquery("#{message} .message_attachments li").size.should == 1
+    find_with_jquery("#{message} .message_attachments li a .title").text.should == filename
+    download_link = driver.find_element(:css, "#{message} .message_attachments li a")
+    keep_trying_until do
+      file = open(download_link.attribute('href'))
+      file.read.should match data
+    end
+  end
+
 end
 
 describe "conversations attachments S3 tests" do
