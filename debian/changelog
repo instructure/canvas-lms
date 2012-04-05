@@ -1,3 +1,14 @@
+canvas-lms (2012.03.31.21) stable; urgency=low
+
+  * Package ref: 13bfb823b393fee77b266ac7c2325fe3200cfab8
+  *
+  * [+b6b860a] fix posting to post-first discussions
+  * [+d917b23] fix showing discussion entries without users; fixes #7976
+  * [+a82356e] calendar2: fix 'more options' links
+  * [+13bfb82] fix conversation merge issue, fixes #7801
+
+ -- Zach Wily <zach@instructure.com>  Thu, 05 Apr 2012 14:55:56 -0600
+
 canvas-lms (2012.03.31.16) stable; urgency=low
 
   * Package ref: 4619f2aba7917f283f978c6473b209813e6437a6
