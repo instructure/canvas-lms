@@ -9,29 +9,31 @@ describe "jobs ui" do
   end
 
   describe "actions" do
-    it "should only action the individual job when it's been searched for" do
+    it "should only action the individual job when it has been searched for" do
       j = Delayed::Job.last(:order => :id)
       get "/jobs?id=#{j.id}"
-      driver.find_element(:id, "hold-jobs").click
+      f("#hold-jobs").click
       wait_for_ajax_requests
       j.reload.locked_by.should == 'on hold'
-      Delayed::Job.count(:conditions => { :locked_by => 'on hold' }).should == 1
+      Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should == 1
     end
 
     it "should not action if no rows are selected" do
       get "/jobs"
-      expect_fired_alert { driver.find_element(:id, "hold-jobs").click }
-      Delayed::Job.count(:conditions => { :locked_by => 'on hold' }).should == 0
+      f("#hold-jobs").click
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.accept
+      Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should == 0
     end
 
-    it "should confirm if all rows are selected" do
+    it "should confirm that all rows were selected" do
       get "/jobs"
-      driver.find_element(:id, "select-all-jobs").click
-      driver.execute_script(" window.confirm = function() { window.confirmed = true; return true; } ")
-      driver.find_element(:id, "hold-jobs").click
+      f("#select-all-jobs").click
+      f("#hold-jobs").click
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.accept
       wait_for_ajax_requests
-      driver.execute_script("return window.confirmed;").should == true
-      Delayed::Job.count(:conditions => { :locked_by => 'on hold' }).should == 2
+      Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should == 2
     end
   end
 
