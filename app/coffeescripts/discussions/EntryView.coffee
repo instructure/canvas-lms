@@ -12,15 +12,13 @@ define [
   'compiled/discussions/MarkAsReadWatcher'
   'str/htmlEscape'
   'vendor/jquery.ba-tinypubsub'
+  'compiled/fn/preventDefault'
   'compiled/jquery.kylemenu'
 
   # entry_with_replies partials
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], (require, I18n, Backbone, _, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape, {publish}) ->
-
-  # save memory
-  noop = ->
+], (require, I18n, Backbone, _, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape, {publish}, preventDefault) ->
 
   ##
   # View for a single entry
@@ -112,8 +110,7 @@ define [
       # EntriesView::handleEntryEvent won't capture clicks on this
       # since its appended to the body, so we have to replicate the
       # event handling here
-      @$menu.delegate '[data-event]', 'click', (event) =>
-        event.preventDefault()
+      @$menu.delegate '[data-event]', 'click', preventDefault (event) =>
         $el = $(event.currentTarget)
         action = $el.data('event')
         @[action](event, $el)
