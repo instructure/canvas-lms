@@ -338,5 +338,31 @@ describe ConversationParticipant do
       @user1.reload.unread_conversations_count.should eql 0
       @user2.reload.unread_conversations_count.should eql 1
     end
+
+    it "should not be adversely affected by an outer scope" do
+      other_guy = user
+      c = @user1.initiate_conversation([other_guy.id])
+      c.add_message("hello")
+      c.update_attribute(:workflow_state, 'unread')
+      c2 = @user2.initiate_conversation([other_guy.id])
+      c2.add_message("hola")
+
+      c.reload
+      ConversationParticipant.send :with_scope, :find => {:conditions => ["user_id = ?", @user1.id]} do
+        c.move_to_user @user2
+      end
+  
+      lambda{ c.reload }.should raise_error # deleted
+      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+
+      c2.reload.messages.size.should eql 2
+      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
+      c2.message_count.should eql 2
+      c2.user_id.should eql @user2.id
+      c2.conversation.participants.size.should eql 2
+      @user1.reload.unread_conversations_count.should eql 0
+      @user2.reload.unread_conversations_count.should eql 1
+      other_guy.reload.unread_conversations_count.should eql 1
+    end
   end
 end
