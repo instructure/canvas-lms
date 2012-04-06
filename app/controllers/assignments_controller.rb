@@ -217,22 +217,12 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    if !params[:model_key]
-      args = request.query_parameters
-      args[:model_key] = rand(999999).to_s
-      redirect_to(args)
-      return
-    end
     @assignment ||= Assignment.new(:context => @context)
-    if params[:model_key] && session["assignment_#{params[:model_key]}"].present?
-      @assignment = @context.assignments.find_by_id(session["assignment_#{params[:model_key]}"])
-    else
-      @assignment.title = params[:title]
-      @assignment.due_at = params[:due_at]
-      @assignment.points_possible = params[:points_possible]
-      @assignment.assignment_group_id = params[:assignment_group_id]
-      @assignment.submission_types = params[:submission_types]
-    end
+    @assignment.title = params[:title]
+    @assignment.due_at = params[:due_at]
+    @assignment.points_possible = params[:points_possible]
+    @assignment.assignment_group_id = params[:assignment_group_id]
+    @assignment.submission_types = params[:submission_types]
     if authorized_action(@assignment, @current_user, :create)
       @assignment.title = params[:title]
       @assignment.due_at = params[:due_at]
@@ -247,10 +237,6 @@ class AssignmentsController < ApplicationController
   def create
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
-    if params[:model_key] && session["assignment_#{params[:model_key]}"].present?
-      @assignment = @context.assignments.find_by_id(session["assignment_#{params[:model_key]}"])
-      @assignment.attributes = params[:assignment] if @assignment
-    end
     @assignment ||= @context.assignments.build(params[:assignment])
     @assignment.workflow_state = "available"
     @assignment.content_being_saved_by(@current_user)
@@ -260,9 +246,6 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :create)
       respond_to do |format|
         if @assignment.save
-          if params[:model_key]
-            session["assignment_#{params[:model_key]}"] = @assignment.id
-          end
           flash[:notice] = t 'notices.created', "Assignment was successfully created."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
