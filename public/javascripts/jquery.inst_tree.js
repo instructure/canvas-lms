@@ -17,7 +17,7 @@
  */
 define([
   'jquery' /* $ */,
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jqueryui/droppable' /* /\.droppable/ */
 ], function($) {
   $.fn.instTree = function(options) {

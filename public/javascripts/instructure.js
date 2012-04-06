@@ -24,7 +24,7 @@ define([
   'str/htmlEscape',
   'wikiSidebar',
   'instructure_helper',
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */,
   'jquery.dropdownList' /* dropdownList */,

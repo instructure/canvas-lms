@@ -25,7 +25,7 @@ define([
   'jqueryui/mouse',
   'jqueryui/position',
   'jqueryui/resizable',
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */
+  'jqueryui/draggable' /* /\.draggable/ */
 ], function( $, _core, _widget, _button, _draggable, _mouse, _position, _resizable, undefined ) {
 
 var uiDialogClasses =

@@ -21,7 +21,7 @@ define([
   'i18n!files',
   'jquery' /* jQuery, $ */,
   'str/htmlEscape',
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.doc_previews' /* loadDocPreview */,
   'jquery.inst_tree' /* instTree */,

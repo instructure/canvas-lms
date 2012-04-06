@@ -23,7 +23,7 @@ define([
   'str/htmlEscape',
   'rubric_assessment',
   'ajax_errors' /* INST.log_error */,
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* getJSON, ajaxJSONFiles, ajaxJSON */,
   'jquery.doc_previews' /* loadDocPreview */,
   'jquery.instructure_date_and_time' /* parseFromISO */,

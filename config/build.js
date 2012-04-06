@@ -82,7 +82,7 @@
         'i18n!media_comments',
         'vendor/jqueryui/button',
         'vendor/jqueryui/draggable',
-        'instructure-jquery.ui.draggable-patch',
+        'jqueryui/draggable',
         'vendor/jqueryui/resizable',
         'vendor/jqueryui/dialog',
         'jquery.instructure_jquery_patches',

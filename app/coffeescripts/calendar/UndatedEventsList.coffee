@@ -3,7 +3,7 @@ define [
   'jst/calendar/undatedEvents'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/ShowEventDetailsDialog'
-  'instructure-jquery.ui.draggable-patch'
+  'jqueryui/draggable'
   'jquery.disableWhileLoading'
   'vendor/jquery.ba-tinypubsub'
 ], ($, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
