@@ -833,7 +833,7 @@ ActionController::Routing::Routes.draw do |map|
     lti.post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
   end
 
-  map.resources :equation_images, :only => :show
+  map.equation_images 'equation_images/:id', :controller => :equation_images, :action => :show, :id => /.+/
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want

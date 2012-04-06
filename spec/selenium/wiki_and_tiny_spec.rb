@@ -143,7 +143,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   end
 
   it "should add an equation to the rce by using the equation editor" do
-    equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}'
+    equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
     get "/courses/#{@course.id}/wiki"
 
@@ -175,10 +175,22 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     textarea.send_keys "=1/2"
     f('.mathquill-editor .mathquill-toolbar a[title="\\\\sqrt"]').click
     textarea.send_keys "x"
+    textarea.send_keys :arrow_right
+    textarea.send_keys :arrow_right
+    textarea.send_keys "\\text that. is. so. cool."
     driver.find_element(:id, 'instructure_equation_prompt_form').submit
     wait_for_ajax_requests
     in_frame "wiki_page_body_ifr" do
-      keep_trying_until { driver.find_element(:css, '.equation_image').attribute('title').should == equation_text }
+      keep_trying_until { f('.equation_image').attribute('title').should == equation_text }
+
+      # currently there's an issue where the equation is double-escaped in the
+      # src, though it's correct after the redirect to codecogs. here we just
+      # want to confirm we redirect correctly. so when that bug is fixed, this
+      # spec should still pass.
+      src = f('.equation_image').attribute('src')
+      response = Net::HTTP.get_response(URI.parse(src))
+      response.code.should eql "302"
+      response.header['location'].should include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     end
   end
 
